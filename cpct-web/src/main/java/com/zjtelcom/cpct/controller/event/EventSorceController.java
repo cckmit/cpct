@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,10 +35,25 @@ public class EventSorceController extends BaseController {
         try {
             eventSorceList = eventSorceService.listEventSorces(evtSrcCode, evtSrcName);
         } catch (Exception e) {
-            logger.error("[op:EventController] fail to eventList for evtSrcCode = {},evtSrcName = {}! Exception: ", evtSrcCode, evtSrcName, e);
-            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+            logger.error("[op:EventSorceController] fail to eventList for evtSrcCode = {},evtSrcName = {}! Exception: ", evtSrcCode, evtSrcName, e);
+            return initFailRespInfo(ErrorCode.SEARCH_EVENTSORCE_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENTSORCE_LIST_FAILURE.getErrorCode());
         }
         return initSuccRespInfo(eventSorceList);
+    }
+
+    /**
+     * delete event sorce
+     */
+    @RequestMapping("/eventSorceDel")
+    @CrossOrigin
+    public String eventSorceDel(@Param("evtSrcId") Long evtSrcId) {
+        try {
+            eventSorceService.eventSorceDel(evtSrcId);
+        } catch (Exception e) {
+            logger.error("[op:EventSorceController] fail to eventSorceDel for evtSrcId = {}! Exception: ", evtSrcId, e);
+            return initFailRespInfo(ErrorCode.DELETE_EVENTSORCE_FAILURE.getErrorMsg(), ErrorCode.DELETE_EVENTSORCE_FAILURE.getErrorCode());
+        }
+        return initSuccRespInfo(null);
     }
 
 }

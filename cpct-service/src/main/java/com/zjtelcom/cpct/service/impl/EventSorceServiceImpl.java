@@ -38,4 +38,17 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
         return eventSorceList;
     }
 
+    /**
+     *  delete event sorce
+     */
+    @Override
+    public void eventSorceDel(Long evtSrcId) {
+        try {
+            eventSorceMapper.eventSorceDel(evtSrcId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("[op:EventSorceServiceImpl] fail to eventSorceDel ", e);
+        }
+    }
+
 }

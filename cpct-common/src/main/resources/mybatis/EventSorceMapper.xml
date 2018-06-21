@@ -2,49 +2,38 @@
 <!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.zjtelcom.cpct.dao.EventMapper">
-    <resultMap id="resultMapper" type="com.zjtelcom.cpct.domain.EventList">
-        <id column="EVENT_ID" property="eventId"/>
-        <result column="EVENT_NBR" property="eventNbr"/>
-        <result column="EVENT_NAME" property="eventName"/>
-        <result column="EVENT_TRIG_TYPE" property="eventTrigType"/>
-        <result column="EVT_TYPE_NAME" property="evtTypeName"/>
+<mapper namespace="com.zjtelcom.cpct.dao.EventSorceMapper">
+    <resultMap id="resultMapper" type="com.zjtelcom.cpct.domain.EventSorce">
+        <id column="EVT_SRC_ID" property="evtSrcId"/>
+        <result column="EVT_SRC_CODE" property="evtSrcCode"/>
         <result column="EVT_SRC_NAME" property="evtSrcName"/>
+        <result column="EVT_SRC_DESC" property="evtSrcDesc"/>
+        <result column="REGION_ID" property="regionId"/>
+        <result column="STATUS_CD" property="statusCd"/>
+        <result column="CREATE_STAFF" property="createStaff"/>
+        <result column="UPDATE_STAFF" property="updateStaff"/>
+        <result column="CREATE_DATE" property="createDate"/>
+        <result column="STATUS_DATE" property="statusDate"/>
+        <result column="UPDATE_DATE" property="updateDate"/>
+        <result column="REMARK" property="remark"/>
     </resultMap>
 
-    <!--查询列表方法-->
-    <select id="listEventSorces" resultType="com.zjtelcom.cpct.domain.EventSorce">
-        select
-        e.EVENT_ID eventId,
-        e.EVENT_NBR eventNbr,
-        e.EVENT_NAME eventName,
-        e.EVENT_TRIG_TYPE eventTrigType,
-        e.EVT_MAPPED_ADDR evtMappedAddr,
-        t.EVT_TYPE_NAME evtTypeName,
-        s.EVT_SRC_NAME evtSrcName
-        from event e
-        <include refid="eventJoin"/>
-        where 1=1
-        <if test="evtSrcId != null and evtSrcId != 0">
-            and s.EVT_SRC_ID = #{evtSrcId}
-        </if>
-        <if test="eventName != null and eventName != ''">
-            and e.EVENT_NAME LIKE CONCAT(CONCAT('%',#{eventName}),'%')
-        </if>
-    </select>
 
     <!--查询方法(只设置id与name两个查询条件)-->
-    <select id="query" resultMap="resultMapper">
-        select * from event
-
+    <select id="listEventSorces" resultMap="resultMapper">
+        select * from event_sorce
         where 1=1
-        <if test="id != null and id != 0">
-            and id = #{id}
+        <if test="evtSrcCode != null and evtSrcCode != ''">
+            and EVT_SRC_CODE like CONCAT(CONCAT('%',#{evtSrcCode}),'%')
         </if>
-        <if test="name != null and name != ''">
-            and name = #{name}
+        <if test="evtSrcName != null and evtSrcName != ''">
+            and EVT_SRC_NAME like CONCAT(CONCAT('%',#{evtSrcName}),'%')
         </if>
     </select>
+
+    <delete id="eventSorceDel">
+        delete from
+    </delete>
 
     <!--插入操作,useGeneratedKeys代表支持自动生成序列号,keyProperty代表自动生成序列号的属性为id-->
     <!--由于采用了自动生成序列号,因此id不需要在mapper文件中写出来-->

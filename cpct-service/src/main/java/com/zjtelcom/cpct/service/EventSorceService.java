@@ -14,4 +14,6 @@ public interface EventSorceService {
 
     List<EventSorce> listEventSorces(String evtSrcCode, String eventName);
 
+    void eventSorceDel(Long evtSrcId);
+
 }
