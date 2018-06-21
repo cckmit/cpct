@@ -7,6 +7,7 @@
     <context id="DB2Tables" targetRuntime="MyBatis3Simple">
         <!-- 生成的Java文件的编码 -->
         <property name="javaFileEncoding" value="UTF-8"/>
+
         <!-- 格式化XML代码 -->
         <property name="xmlFormatter" value="org.mybatis.generator.api.dom.DefaultXmlFormatter"/>
         <commentGenerator>
@@ -22,7 +23,7 @@
             <property name="forceBigDecimals" value="false"/>
         </javaTypeResolver>
         <!-- 生成模型的包名和位置-->
-        <javaModelGenerator targetPackage="com.zjtelcom.cpct.model" targetProject="src/test/java">
+        <javaModelGenerator targetPackage="com.zjtelcom.cpct.domain" targetProject="src/test/java">
             <!--  for MyBatis3/MyBatis3Simple 自动为每一个生成的类创建一个构造方法，构造方法包含了所有的field；而不是使用setter -->
             <property name="constructorBased" value="false"/>
             <property name="enableSubPackages" value="true"/>
@@ -30,11 +31,11 @@
             <property name="trimStrings" value="false"/>
         </javaModelGenerator>
         <!-- 生成映射文件的包名和位置-->
-        <sqlMapGenerator targetPackage="resources.mapping" targetProject="src/test">
+        <sqlMapGenerator targetPackage="resources.mybatis" targetProject="src/test">
             <property name="enableSubPackages" value="true"/>
         </sqlMapGenerator>
         <!-- 生成DAO的包名和位置-->
-        <javaClientGenerator type="XMLMAPPER" targetPackage="com.zjtelcom.cpct.mapper" targetProject="src/test/java">
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.zjtelcom.cpct.dao" targetProject="src/test/java">
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
         <!-- 要生成的表 tableName是数据库中的表名或视图名 domainObjectName是实体类名-->
