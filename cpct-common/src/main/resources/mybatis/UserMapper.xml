@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zjtelcom.cpct.dao.UserMapper">
+    <resultMap id="resultMapper" type="com.zjtelcom.cpct.domain.User">
+        <id column="id"                    property="id"/>
+        <result column="user_name"        property="loginName"/>
+        <result column="passWord"         property="passWord"/>
+        <result column="phone"            property="phone"/>
+        <result column="email"            property="email"/>
+        <result column="remark"           property="remark"/>
+        <result column="create_datetime" property="createDate"/>
+        <result column="update_datetime" property="updateDate"/>
+    </resultMap>
+
+    <select id="query" resultMap="resultMapper">
+        select * from sys_user where 1 = 1
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="loginName != null and loginName !=''">
+            and login_name = #{loginName}
+        </if>
+        <if test="passWord != null and passWord !=''">
+            and password = #{passWord}
+        </if>
+    </select>
+
+    <!-- 根据用户名查询用户信息 -->
+    <select id="queryUserByName" resultMap="resultMapper" parameterType="String">
+        select * from user where user_name = #{userName} 
+    </select>
+
+    <!-- 名查询用户列表 -->
+    <select id="userList" resultMap="resultMapper">
+        select * from user order by create_datetime desc 
+    </select>
+
+
+
+</mapper>

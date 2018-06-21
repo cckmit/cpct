@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zjtelcom.cpct.dao.TestMapper">
+    <resultMap id="resultMapper" type="com.zjtelcom.cpct.domain.Test">
+        <id column="id"                      property="id"/>
+        <result column="name"               property="name"/>
+    </resultMap>
+
+    <!--查询方法(只设置id与name两个查询条件)-->
+    <select id="getList" resultMap="resultMapper">
+        select * from test
+    </select>
+
+</mapper>

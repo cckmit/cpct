@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zjtelcom.cpct.dao.UserRoleMapper">
+    <resultMap id="resultMapper" type="com.zjtelcom.cpct.domain.UserRole">
+        <id column="id"                    property="id"/>
+        <result column="user_id"          property="userId"/>
+        <result column="role_id"          property="roleId"/>
+        <result column="remark"           property="remark"/>
+        <result column="create_datetime" property="createDate"/>
+        <result column="update_datetime" property="updateDate"/>
+    </resultMap>
+
+    <!--查询方法(只设置id与name两个查询条件)-->
+    <select id="query" resultMap="resultMapper">
+        select * from user_role where 1=1
+        <if test = "id != null and id != 0">
+            and id = #{id}
+        </if>
+        <if test = "userId != null and userId != 0">
+            and user_id = #{userId}
+        </if>
+        <if test = "roleId != null and roleId != 0">
+            and role_id = #{roleId}
+        </if>
+    </select>
+
+    <!--插入操作,useGeneratedKeys代表支持自动生成序列号,keyProperty代表自动生成序列号的属性为id-->
+    <!--由于采用了自动生成序列号,因此id不需要在mapper文件中写出来-->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into user_role(
+        user_id,
+        role_id
+        <if test="remark != null">
+            ,remark
+        </if>
+        <if test="createDate != null">
+            ,create_datetime
+        </if>
+        <if test="updateDate != null">
+            ,update_datetime
+        </if>
+        ) values (
+        #{userId},
+        #{roleId}
+        <if test = "remark != null">
+            ,#{remark}
+        </if>
+        <if test = "createDate != null">
+            ,#{createDate}
+        </if>
+        <if test = "updateDate != null">
+            ,#{updateDate}
+        </if>
+        )
+    </insert>
+
+    <!--更新操作-->
+    <update id="update">
+        update user_role
+        <set>
+            <if test="userId != null and userId != 0">user_id = #{userId}</if>
+            <if test="roleId != null and roleId != 0">role_id = #{roleId}</if>
+            <if test="remark != null">remark = #{remark}</if>
+            <if test="createDate != null">create_datetime = #{createDate}</if>
+            <if test="updateDate != null">update_datetime = #{updateDate}</if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>
