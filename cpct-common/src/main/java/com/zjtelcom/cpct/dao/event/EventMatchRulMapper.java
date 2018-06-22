@@ -20,8 +20,6 @@ public interface EventMatchRulMapper {
 
     int updateByPrimaryKey(EventMatchRulDO record);
 
-    List<EventMatchRulDO> list();
-
     List<EventMatchRulDO> listEventMatchRuls(@Param("evtRulName") String evtRulName);
 
 }

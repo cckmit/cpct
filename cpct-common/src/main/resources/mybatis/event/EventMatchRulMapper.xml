@@ -63,7 +63,10 @@
     </select>
 
     <select id="listEventMatchRuls" resultMap="BaseResultMap">
-        select * from event_match_rul
+        select EVT_MATCH_RUL_ID, EVENT_ID, EVT_RUL_NAME, EVT_RUL_DESC, EVT_RUL_HANDLE_CLASS,
+        EVT_RUL_EXPRESSION, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+        UPDATE_DATE, REMARK
+        from event_match_rul
         where 1 = 1
         <if test="evtRulName != null and evtRulName != ''">
             and EVT_RUL_NAME LIKE CONCAT('%',CONCAT(#{evtRulName},'%'))

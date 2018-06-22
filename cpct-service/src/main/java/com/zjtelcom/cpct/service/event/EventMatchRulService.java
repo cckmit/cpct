@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.event;
 
+import com.zjtelcom.cpct.domain.event.DTO.EventMatchRulDTO;
 import com.zjtelcom.cpct.domain.event.EventMatchRulDO;
 import java.util.List;
 
@@ -11,6 +12,6 @@ import java.util.List;
 
 public interface EventMatchRulService {
 
-    List<EventMatchRulDO> listEventMatchRuls(String evtRulName);
+    List<EventMatchRulDTO> listEventMatchRuls(String evtRulName);
 
 }
