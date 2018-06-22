@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.MktScriptMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.Script">
+    <id column="SCRIPT_ID" jdbcType="BIGINT" property="scriptId" />
+    <result column="SCRIPT_NAME" jdbcType="VARCHAR" property="scriptName" />
+    <result column="SCRIPT_DESC" jdbcType="VARCHAR" property="scriptDesc" />
+    <result column="SCRIPT_TYPE" jdbcType="VARCHAR" property="scriptType" />
+    <result column="SUIT_CHANNEL_TYPE" jdbcType="VARCHAR" property="suitChannelType" />
+    <result column="EXEC_CHANNEL" jdbcType="VARCHAR" property="execChannel" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from mkt_script
+    where SCRIPT_ID = #{scriptId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.Script">
+    insert into mkt_script (SCRIPT_ID, SCRIPT_NAME, SCRIPT_DESC, 
+      SCRIPT_TYPE, SUIT_CHANNEL_TYPE, EXEC_CHANNEL, 
+      STATUS_CD, STATUS_DATE, CREATE_STAFF, 
+      CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, 
+      REMARK)
+    values (#{scriptId,jdbcType=BIGINT}, #{scriptName,jdbcType=VARCHAR}, #{scriptDesc,jdbcType=VARCHAR}, 
+      #{scriptType,jdbcType=VARCHAR}, #{suitChannelType,jdbcType=VARCHAR}, #{execChannel,jdbcType=VARCHAR}, 
+      #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.Script">
+    update mkt_script
+    set SCRIPT_NAME = #{scriptName,jdbcType=VARCHAR},
+      SCRIPT_DESC = #{scriptDesc,jdbcType=VARCHAR},
+      SCRIPT_TYPE = #{scriptType,jdbcType=VARCHAR},
+      SUIT_CHANNEL_TYPE = #{suitChannelType,jdbcType=VARCHAR},
+      EXEC_CHANNEL = #{execChannel,jdbcType=VARCHAR},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where SCRIPT_ID = #{scriptId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select SCRIPT_ID, SCRIPT_NAME, SCRIPT_DESC, SCRIPT_TYPE, SUIT_CHANNEL_TYPE, EXEC_CHANNEL, 
+    STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
+    from mkt_script
+    where SCRIPT_ID = #{scriptId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select SCRIPT_ID, SCRIPT_NAME, SCRIPT_DESC, SCRIPT_TYPE, SUIT_CHANNEL_TYPE, EXEC_CHANNEL, 
+    STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
+    from mkt_script
+  </select>
+</mapper>

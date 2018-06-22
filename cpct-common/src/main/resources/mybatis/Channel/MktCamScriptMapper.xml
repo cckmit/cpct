@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.MktCamScriptMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.CamScript">
+    <id column="MKT_CAMPAIGN_SCPT_ID" jdbcType="BIGINT" property="mktCampaignScptId" />
+    <result column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId" />
+    <result column="EVT_CONTACT_CONF_ID" jdbcType="BIGINT" property="evtContactConfId" />
+    <result column="SCRIPT_DESC" jdbcType="VARCHAR" property="scriptDesc" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="LAN_ID" jdbcType="BIGINT" property="lanId" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from mkt_cam_script
+    where MKT_CAMPAIGN_SCPT_ID = #{mktCampaignScptId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.CamScript">
+    insert into mkt_cam_script (MKT_CAMPAIGN_SCPT_ID, MKT_CAMPAIGN_ID, EVT_CONTACT_CONF_ID, 
+      SCRIPT_DESC, STATUS_CD, STATUS_DATE, 
+      CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, 
+      UPDATE_DATE, REMARK, LAN_ID
+      )
+    values (#{mktCampaignScptId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{evtContactConfId,jdbcType=BIGINT}, 
+      #{scriptDesc,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, 
+      #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, #{lanId,jdbcType=BIGINT}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.CamScript">
+    update mkt_cam_script
+    set MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},
+      EVT_CONTACT_CONF_ID = #{evtContactConfId,jdbcType=BIGINT},
+      SCRIPT_DESC = #{scriptDesc,jdbcType=VARCHAR},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      LAN_ID = #{lanId,jdbcType=BIGINT}
+    where MKT_CAMPAIGN_SCPT_ID = #{mktCampaignScptId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_CAMPAIGN_SCPT_ID, MKT_CAMPAIGN_ID, EVT_CONTACT_CONF_ID, SCRIPT_DESC, STATUS_CD, 
+    STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
+    from mkt_cam_script
+    where MKT_CAMPAIGN_SCPT_ID = #{mktCampaignScptId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select MKT_CAMPAIGN_SCPT_ID, MKT_CAMPAIGN_ID, EVT_CONTACT_CONF_ID, SCRIPT_DESC, STATUS_CD, 
+    STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
+    from mkt_cam_script
+  </select>
+</mapper>

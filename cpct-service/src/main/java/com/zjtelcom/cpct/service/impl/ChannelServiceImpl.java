@@ -1,8 +1,8 @@
 package com.zjtelcom.cpct.service.impl;
 
 import com.zjtelcom.cpct.bean.RespInfo;
-import com.zjtelcom.cpct.dao.ContactChannelMapper;
-import com.zjtelcom.cpct.domain.Channel;
+import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
+import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.dto.ChannelAddVO;
 import com.zjtelcom.cpct.dto.ChannelEditVO;
 import com.zjtelcom.cpct.dto.ChannelVO;
@@ -57,8 +57,6 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         Channel channel = channelMapper.selectByPrimaryKey(channelId);
         if (channel==null){
             return RespInfo.build(CODE_FAIL,"渠道信息不存在");
-
-
         }
         channelMapper.deleteByPrimaryKey(channelId);
         return RespInfo.build(CODE_SUCCESS,"删除成功");
