@@ -1,4 +1,4 @@
-package com.zjtelcom.cpct.service.impl;
+package com.zjtelcom.cpct.service.impl.channel;
 
 import com.zjtelcom.cpct.bean.RespInfo;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
@@ -7,7 +7,7 @@ import com.zjtelcom.cpct.dto.ChannelAddVO;
 import com.zjtelcom.cpct.dto.ChannelEditVO;
 import com.zjtelcom.cpct.dto.ChannelVO;
 import com.zjtelcom.cpct.service.BaseService;
-import com.zjtelcom.cpct.service.ChannelService;
+import com.zjtelcom.cpct.service.channel.ChannelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,12 +67,9 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         List<ChannelVO> voList = new ArrayList<>();
         List<Channel> channelList = new ArrayList<>();
         try {
-            channelList = channelMapper.selectAll();
+            channelList = channelMapper.selectAll(channelName);
             for (Channel channel : channelList){
-                if (channelName!=null && !channelName.equals("") && !channel.getContactChlName().contains(channelName)){
-                    continue;
-                }
-                ChannelVO vo = ChannelUtil.map2VO(channel);
+                ChannelVO vo = ChannelUtil.map2ChannelVO(channel);
                 voList.add(vo);
             }
         }catch (Exception e){
@@ -87,7 +84,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         ChannelVO vo = new ChannelVO();
         try {
             Channel channel = channelMapper.selectByPrimaryKey(channelId);
-            vo = ChannelUtil.map2VO(channel);
+            vo = ChannelUtil.map2ChannelVO(channel);
         }catch (Exception e){
             e.printStackTrace();
             logger.error("[op:ChannelServiceImpl] fail to listChannel ", e);

@@ -1,4 +1,4 @@
-package com.zjtelcom.cpct.service;
+package com.zjtelcom.cpct.service.channel;
 
 import com.zjtelcom.cpct.bean.RespInfo;
 import com.zjtelcom.cpct.dto.ChannelAddVO;

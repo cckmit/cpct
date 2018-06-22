@@ -19,7 +19,18 @@ public enum ErrorCode {
     EDIT_CHANNEL_FAILURE("修改渠道失败","00010"),
     DELETE_CHANNEL_FAILURE("删除渠道失败","00011"),
     GET_CHANNEL_LIST("获取渠道列表失败","00012"),
-    GET_CHANNEL_DETAIL("获取渠道详情失败","00013");
+    GET_CHANNEL_DETAIL("获取渠道详情失败","00013"),
+
+    ADD_SCRIPT_FAILURE("添加接触脚本失败","00014"),
+    EDIT_SCRIPT_FAILURE("修改接触脚本失败","00015"),
+    DELETE_SCRIPT_FAILURE("删除接触脚本失败","00016"),
+    GET_SCRIPT_LIST("获取接触脚本列表失败","00017"),
+    GET_SCRIPT_DETAIL("获取接触脚本详情失败","00018"),
+    ADD_CAM_SCRIPT_FAILURE("添加活动脚本失败","00019"),
+    EDIT_CAM_SCRIPT_FAILURE("修改活动脚本失败","000120"),
+    DELETE_CAM_SCRIPT_FAILURE("删除活动脚本失败","00021"),
+    GET_CAM_SCRIPT_LIST("获取活动脚本列表失败","00022"),
+    GET_CAM_SCRIPT_DETAIL("获取活动脚本详情失败","00023");
 
 
 

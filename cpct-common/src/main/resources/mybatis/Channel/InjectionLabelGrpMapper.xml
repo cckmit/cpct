@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.InjectionLabelGrpMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.LabelGrp">
+    <id column="GRP_ID" jdbcType="BIGINT" property="grpId" />
+    <result column="GRP_NAME" jdbcType="VARCHAR" property="grpName" />
+    <result column="GRP_DESC" jdbcType="VARCHAR" property="grpDesc" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from injection_label_grp
+    where GRP_ID = #{grpId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.LabelGrp">
+    insert into injection_label_grp (GRP_ID, GRP_NAME, GRP_DESC, 
+      STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+      CREATE_DATE, STATUS_DATE, UPDATE_DATE, 
+      REMARK)
+    values (#{grpId,jdbcType=BIGINT}, #{grpName,jdbcType=VARCHAR}, #{grpDesc,jdbcType=VARCHAR}, 
+      #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.LabelGrp">
+    update injection_label_grp
+    set GRP_NAME = #{grpName,jdbcType=VARCHAR},
+      GRP_DESC = #{grpDesc,jdbcType=VARCHAR},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where GRP_ID = #{grpId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select GRP_ID, GRP_NAME, GRP_DESC, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
+    STATUS_DATE, UPDATE_DATE, REMARK
+    from injection_label_grp
+    where GRP_ID = #{grpId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select GRP_ID, GRP_NAME, GRP_DESC, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
+    STATUS_DATE, UPDATE_DATE, REMARK
+    from injection_label_grp
+  </select>
+</mapper>
