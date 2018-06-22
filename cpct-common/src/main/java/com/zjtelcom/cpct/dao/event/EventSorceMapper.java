@@ -21,8 +21,8 @@ public interface EventSorceMapper {
 
     EventSorce editEventSorce(@Param("evtSrcId") Long evtSrcId);
 
-    void saveEventSorce(EventSorce eventSorce);
+    int saveEventSorce(EventSorce eventSorce);
 
-    void updateEventSorce(EventSorce eventSorce);
+    int updateEventSorce(EventSorce eventSorce);
 
 }

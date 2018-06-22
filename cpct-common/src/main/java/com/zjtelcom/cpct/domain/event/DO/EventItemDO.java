@@ -3,7 +3,7 @@ package com.zjtelcom.cpct.domain.event.DO;
 import lombok.Data;
 
 @Data
-public class EventItem {
+public class EventItemDO {
 
     private Long evtItemId;//事件采集项主键
     private Long eventId;//事件标识

@@ -1,17 +1,13 @@
 package com.zjtelcom.cpct.service.impl.event;
 
-import com.zjtelcom.cpct.dao.event.EventMapper;
 import com.zjtelcom.cpct.dao.event.EventMatchRulMapper;
 import com.zjtelcom.cpct.domain.event.DTO.EventMatchRulDTO;
-import com.zjtelcom.cpct.domain.event.EventList;
 import com.zjtelcom.cpct.domain.event.EventMatchRulDO;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.EventMatchRulService;
-import com.zjtelcom.cpct.service.event.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
 

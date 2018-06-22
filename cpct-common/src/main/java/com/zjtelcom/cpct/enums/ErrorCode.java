@@ -14,7 +14,9 @@ public enum ErrorCode {
     ADD_EVENTSORCE_FAILURE("新增事件源失败！","00005"),
     UPDATE_EVENTSORCE_FAILURE("更新事件源失败！","00006"),
     SEARCH_INTERFACECFG_FAILURE("查询事件源接口列表失败！","00007"),
-    SEARCH_EVENTMATCHRUL_FAILURE("查询事件匹配规则列表失败！","00008");
+    SEARCH_EVENTMATCHRUL_FAILURE("查询事件匹配规则列表失败！","00008"),
+    SEARCH_EVENTTYPE_FAILURE("查询事件目录树失败！","00009"),
+    SAVE_EVENT_FAILURE("保存事件失败！","00010");
 
     private String errorMsg;
     private String errorCode;

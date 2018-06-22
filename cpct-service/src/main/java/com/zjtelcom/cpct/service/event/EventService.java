@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.event;
 
+import com.zjtelcom.cpct.domain.event.DTO.EventDTO;
 import com.zjtelcom.cpct.domain.event.EventList;
 
 import java.util.List;
@@ -13,5 +14,7 @@ import java.util.List;
 public interface EventService {
 
     List<EventList> listEvents( Long evtSrcId, String eventName);
+
+    void saveEvent(EventDTO eventDTO);
 
 }
