@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.dao.event;
 
+import com.zjtelcom.cpct.domain.event.DO.EventDO;
 import com.zjtelcom.cpct.domain.event.EventList;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -17,5 +18,7 @@ import java.util.List;
 public interface EventMapper {
 
     List<EventList> listEvents(@Param("evtSrcId") Long evtSrcId, @Param("eventName") String eventName);
+
+    int saveEvent(EventDO record);
 
 }

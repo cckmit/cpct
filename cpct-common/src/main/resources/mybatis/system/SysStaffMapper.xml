@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.system.SysStaffMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.system.SysStaff">
+        <id column="STAFF_ID" jdbcType="BIGINT" property="staffId"/>
+        <result column="STAFF_CODE" jdbcType="VARCHAR" property="staffCode"/>
+        <result column="STAFF_NAME" jdbcType="VARCHAR" property="staffName"/>
+        <result column="PASSWORD" jdbcType="VARCHAR" property="password"/>
+        <result column="STAFF_PHONE" jdbcType="VARCHAR" property="staffPhone"/>
+        <result column="STAFF_TELEPHONE" jdbcType="VARCHAR" property="staffTelephone"/>
+        <result column="STAFF_EMAIL" jdbcType="VARCHAR" property="staffEmail"/>
+        <result column="CHANNEL_ID" jdbcType="BIGINT" property="channelId"/>
+        <result column="CITY_ID" jdbcType="BIGINT" property="cityId"/>
+        <result column="STATUS" jdbcType="BIGINT" property="status"/>
+        <result column="LAST_LOGIN" jdbcType="TIMESTAMP" property="lastLogin"/>
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff"/>
+    </resultMap>
+
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+      delete from sys_staff
+      where STAFF_ID = #{staffId,jdbcType=BIGINT}
+    </delete>
+
+    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.system.SysStaff">
+      insert into sys_staff (STAFF_CODE, STAFF_NAME,
+        PASSWORD, STAFF_PHONE, STAFF_TELEPHONE,
+        STAFF_EMAIL, CHANNEL_ID, CITY_ID,
+        STATUS, LAST_LOGIN, CREATE_DATE,
+        CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
+        )
+      values (#{staffCode,jdbcType=VARCHAR}, #{staffName,jdbcType=VARCHAR},
+        #{password,jdbcType=VARCHAR}, #{staffPhone,jdbcType=VARCHAR}, #{staffTelephone,jdbcType=VARCHAR},
+        #{staffEmail,jdbcType=VARCHAR}, #{channelId,jdbcType=BIGINT}, #{cityId,jdbcType=BIGINT},
+        #{status,jdbcType=BIGINT}, #{lastLogin,jdbcType=TIMESTAMP}, #{createDate,jdbcType=TIMESTAMP},
+        #{createStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}
+        )
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.system.SysStaff">
+      update sys_staff
+      set STAFF_CODE = #{staffCode,jdbcType=VARCHAR},
+        STAFF_NAME = #{staffName,jdbcType=VARCHAR},
+        STAFF_PHONE = #{staffPhone,jdbcType=VARCHAR},
+        STAFF_TELEPHONE = #{staffTelephone,jdbcType=VARCHAR},
+        STAFF_EMAIL = #{staffEmail,jdbcType=VARCHAR},
+        CHANNEL_ID = #{channelId,jdbcType=BIGINT},
+        CITY_ID = #{cityId,jdbcType=BIGINT},
+        STATUS = #{status,jdbcType=BIGINT},
+        UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+        UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT}
+      where STAFF_ID = #{staffId,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+      select STAFF_ID, STAFF_CODE, STAFF_NAME, PASSWORD, STAFF_PHONE, STAFF_TELEPHONE,
+      STAFF_EMAIL, CHANNEL_ID, CITY_ID, STATUS, LAST_LOGIN, CREATE_DATE, CREATE_STAFF,
+      UPDATE_DATE, UPDATE_STAFF
+      from sys_staff
+      where STAFF_ID = #{staffId,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select STAFF_ID, STAFF_CODE, STAFF_NAME, PASSWORD, STAFF_PHONE, STAFF_TELEPHONE,
+        STAFF_EMAIL, CHANNEL_ID, CITY_ID, STATUS, LAST_LOGIN, CREATE_DATE, CREATE_STAFF,
+        UPDATE_DATE, UPDATE_STAFF
+        from sys_staff
+        where STAFF_CODE like CONCAT('%',#{staffCode,jdbcType=VARCHAR},'%')
+        and STAFF_NAME like CONCAT('%',#{staffName,jdbcType=VARCHAR},'%')
+        <if test="status != null and status != 0">
+            and STATUS = #{status,jdbcType=BIGINT}
+        </if>
+        order by CREATE_DATE desc
+    </select>
+
+    <update id="changeStatus" parameterType="com.zjtelcom.cpct.domain.system.SysStaff">
+      update sys_staff
+      set STATUS = #{status,jdbcType=BIGINT},
+        UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+        UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT}
+      where STAFF_ID = #{staffId,jdbcType=BIGINT}
+    </update>
+
+</mapper>

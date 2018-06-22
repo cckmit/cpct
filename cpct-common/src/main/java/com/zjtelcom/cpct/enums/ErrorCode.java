@@ -30,9 +30,11 @@ public enum ErrorCode {
     EDIT_CAM_SCRIPT_FAILURE("修改活动脚本失败","000120"),
     DELETE_CAM_SCRIPT_FAILURE("删除活动脚本失败","00021"),
     GET_CAM_SCRIPT_LIST("获取活动脚本列表失败","00022"),
-    GET_CAM_SCRIPT_DETAIL("获取活动脚本详情失败","00023");
+    GET_CAM_SCRIPT_DETAIL("获取活动脚本详情失败","00023"),
 
 
+    SEARCH_EVENTTYPE_FAILURE("查询事件目录树失败！","00024"),
+    SAVE_EVENT_FAILURE("保存事件失败！","00025");
 
     private String errorMsg;
     private String errorCode;

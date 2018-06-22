@@ -1,7 +1,8 @@
 package com.zjtelcom.cpct.controller.event;
 
+import com.alibaba.fastjson.JSONArray;
 import com.zjtelcom.cpct.controller.BaseController;
-import com.zjtelcom.cpct.domain.event.EventDTO;
+import com.zjtelcom.cpct.domain.event.DTO.EventDTO;
 import com.zjtelcom.cpct.domain.event.EventList;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.event.EventService;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,13 +53,18 @@ public class EventController extends BaseController {
     }
 
     /**
-     * event add
+     * 新增事件
      */
-    @RequestMapping("/addEvent")
+    @RequestMapping("/saveEvent")
     @CrossOrigin
-    public String addEvent(EventDTO eventDTO) {
-
-        return null;
+    public String saveEvent(EventDTO eventDTO) {
+        try {
+            eventService.saveEvent(eventDTO);
+        } catch (Exception e) {
+            logger.error("[op:EventController] fail to saveEvent for eventDTO = {}! Exception: ", JSONArray.toJSON(eventDTO), e);
+            return initFailRespInfo(ErrorCode.SAVE_EVENT_FAILURE.getErrorMsg(), ErrorCode.SAVE_EVENT_FAILURE.getErrorCode());
+        }
+        return initSuccRespInfo(null);
     }
 
 }

@@ -1,10 +1,10 @@
-package com.zjtelcom.cpct.domain.event;
+package com.zjtelcom.cpct.domain.event.DO;
 
 import com.zjtelcom.cpct.BaseEntity;
 import lombok.Data;
 
 @Data
-public class Event extends BaseEntity {
+public class EventDO extends BaseEntity {
 
     private Long eventId; //事件主键标识
     private Long interfaceCfgId;//接口配置标识，主键标识

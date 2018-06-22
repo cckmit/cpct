@@ -55,31 +55,46 @@
 
     <!--插入操作,useGeneratedKeys代表支持自动生成序列号,keyProperty代表自动生成序列号的属性为id-->
     <!--由于采用了自动生成序列号,因此id不需要在mapper文件中写出来-->
-    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        insert into menu(
-        name
-        <if test="remark != null">
-            ,remark
-        </if>
-        <if test="createDate != null">
-            ,create_datetime
-        </if>
-        <if test="updateDate != null">
-            ,update_datetime
-        </if>
-        ) values (
-        #{name}
-        <if test="remark != null">
-            ,#{remark}
-        </if>
-        <if test="createDate != null">
-            ,#{createDate}
-        </if>
-        <if test="updateDate != null">
-            ,#{updateDate}
-        </if>
-        )
-    </insert>
+    <insert id="saveEvent" parameterType="com.zjtelcom.cpct.domain.event.DO.EventDO">
+        insert into event (
+          INTERFACE_CFG_ID,
+          EVENT_NBR,
+          EVENT_NAME,
+          EVT_MAPPED_ADDR,
+          EVT_MAPPED_IP,
+          EVT_PROCOTOL_TYPE,
+          EVT_MAPPED_FUN_NAME,
+          EVENT_DESC,
+          EVT_TYPE_ID,
+          EVENT_TRIG_TYPE,
+          EXT_EVENT_ID,
+          STATUS_CD,
+          CREATE_STAFF,
+          UPDATE_STAFF,
+          CREATE_DATE,
+          STATUS_DATE,
+          UPDATE_DATE,
+          REMARK)
+        values (
+          #{interfaceCfgId,jdbcType=BIGINT},
+          #{eventNbr,jdbcType=VARCHAR},
+          #{eventName,jdbcType=VARCHAR},
+          #{evtMappedAddr,jdbcType=VARCHAR},
+          #{evtMappedIp,jdbcType=VARCHAR},
+          #{evtProcotolType,jdbcType=VARCHAR},
+          #{evtMappedFunName,jdbcType=VARCHAR},
+          #{eventDesc,jdbcType=VARCHAR},
+          #{evtTypeId,jdbcType=BIGINT},
+          #{eventTrigType,jdbcType=VARCHAR},
+          #{extEventId,jdbcType=BIGINT},
+          #{statusCd,jdbcType=VARCHAR},
+          #{createStaff,jdbcType=BIGINT},
+          #{updateStaff,jdbcType=BIGINT},
+          #{createDate,jdbcType=TIMESTAMP},
+          #{statusDate,jdbcType=TIMESTAMP},
+          #{updateDate,jdbcType=TIMESTAMP},
+          #{remark,jdbcType=VARCHAR})
+  </insert>
 
     <!--更新操作-->
     <update id="update">
