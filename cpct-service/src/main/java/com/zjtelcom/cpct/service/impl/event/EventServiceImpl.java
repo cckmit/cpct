@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.impl.event;
 
+import com.zjtelcom.cpct.dao.event.EventItemMapper;
 import com.zjtelcom.cpct.dao.event.EventMapper;
 import com.zjtelcom.cpct.domain.event.DO.EventDO;
 import com.zjtelcom.cpct.domain.event.DO.EventItemDO;
@@ -25,6 +26,8 @@ public class EventServiceImpl extends BaseService implements EventService {
 
     @Autowired
     private EventMapper eventMapper;
+    @Autowired
+    private EventItemMapper eventItemMapper;
 
     /**
      * listEvents
@@ -53,9 +56,11 @@ public class EventServiceImpl extends BaseService implements EventService {
             CopyPropertiesUtil.copyBean2Bean(eventDO,eventDTO);
             eventMapper.saveEvent(eventDO);
 
-            //关联到事件采集项 todo
+            //关联到事件采集项
             List<EventItemDO> itemDOList = eventDTO.getEventItemDOList();
-
+            for(EventItemDO eventItemDO : itemDOList){
+                eventItemMapper.saveEventItem(eventItemDO);
+            }
 
             //关联到活动 todo
 
