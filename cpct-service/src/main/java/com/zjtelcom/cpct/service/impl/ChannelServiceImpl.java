@@ -56,6 +56,8 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         Channel channel = channelMapper.selectByPrimaryKey(channelId);
         if (channel==null){
             return RespInfo.build(CODE_FAIL,"渠道信息不存在");
+
+            
         }
         channelMapper.deleteByPrimaryKey(channelId);
         return RespInfo.build(CODE_SUCCESS,"删除成功");
