@@ -3,9 +3,6 @@ package com.zjtelcom.cpct.domain.channel;
 import com.zjtelcom.cpct.BaseEntity;
 import lombok.Data;
 
-import javax.persistence.*;
-import java.sql.Timestamp;
-
 @Data
 public class Script extends BaseEntity {
     private Long scriptId;//'营销脚本标识，主键',
