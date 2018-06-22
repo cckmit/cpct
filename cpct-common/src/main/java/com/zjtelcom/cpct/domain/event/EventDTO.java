@@ -1,10 +1,15 @@
-package com.zjtelcom.cpct.domain;
+package com.zjtelcom.cpct.domain.event;
 
 import com.zjtelcom.cpct.BaseEntity;
 import lombok.Data;
 
+/**
+ * @Description EventDTO
+ * @Author pengy
+ * @Date 2018/6/22 9:31
+ */
 @Data
-public class Event extends BaseEntity {
+public class EventDTO extends BaseEntity{
 
     private Long eventId; //事件主键标识
     private Long interfaceCfgId;//接口配置标识，主键标识
@@ -18,5 +23,7 @@ public class Event extends BaseEntity {
     private Long evtTypeId;//记录事件的所属事件类型标识
     private String eventTrigType;//记录事件的触发类型,1000实时触发事件 2000定期触发事件 3000人工触发事件
     private Long extEventId;//记录集团下发的事件标识
+    private EventMatchRulDO eventMatchRulDO;//事件匹配规则实体类
+
 
 }

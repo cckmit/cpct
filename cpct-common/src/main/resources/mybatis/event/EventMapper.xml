@@ -2,8 +2,8 @@
 <!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.zjtelcom.cpct.dao.EventMapper">
-    <resultMap id="resultMapper" type="com.zjtelcom.cpct.domain.EventList">
+<mapper namespace="com.zjtelcom.cpct.dao.event.EventMapper">
+    <resultMap id="resultMapper" type="com.zjtelcom.cpct.domain.event.EventList">
         <id column="EVENT_ID" property="eventId"/>
         <result column="EVENT_NBR" property="eventNbr"/>
         <result column="EVENT_NAME" property="eventName"/>
@@ -20,7 +20,7 @@
 
 
     <!--查询列表方法-->
-    <select id="listEvents" resultType="com.zjtelcom.cpct.domain.EventList">
+    <select id="listEvents" resultType="com.zjtelcom.cpct.domain.event.EventList">
         select
         e.EVENT_ID eventId,
         e.EVENT_NBR eventNbr,

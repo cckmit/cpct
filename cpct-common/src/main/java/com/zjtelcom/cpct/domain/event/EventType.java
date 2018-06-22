@@ -1,4 +1,4 @@
-package com.zjtelcom.cpct.domain;
+package com.zjtelcom.cpct.domain.event;
 
 import lombok.Data;
 
