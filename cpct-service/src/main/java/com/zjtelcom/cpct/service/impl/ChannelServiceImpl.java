@@ -34,6 +34,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         channel.setUpdateDate(new Date());
         channel.setCreateStaff(userId);
         channel.setUpdateStaff(userId);
+        channel.setStatusCd("1000");
         channelMapper.insert(channel);
         return RespInfo.build(CODE_SUCCESS,"添加成功");
     }
@@ -57,7 +58,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         if (channel==null){
             return RespInfo.build(CODE_FAIL,"渠道信息不存在");
 
-            
+
         }
         channelMapper.deleteByPrimaryKey(channelId);
         return RespInfo.build(CODE_SUCCESS,"删除成功");
