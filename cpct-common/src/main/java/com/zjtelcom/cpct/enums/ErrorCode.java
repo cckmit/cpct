@@ -14,7 +14,14 @@ public enum ErrorCode {
     ADD_EVENTSORCE_FAILURE("新增事件源失败！","00005"),
     UPDATE_EVENTSORCE_FAILURE("更新事件源失败！","00006"),
     SEARCH_INTERFACECFG_FAILURE("查询事件源接口列表失败！","00007"),
-    SEARCH_EVENTMATCHRUL_FAILURE("查询事件匹配规则列表失败！","00008");
+    SEARCH_EVENTMATCHRUL_FAILURE("查询事件匹配规则列表失败！","00008"),
+    ADD_CHANNEL_FAILURE("添加渠道失败","00009"),
+    EDIT_CHANNEL_FAILURE("修改渠道失败","00010"),
+    DELETE_CHANNEL_FAILURE("删除渠道失败","00011"),
+    GET_CHANNEL_LIST("获取渠道列表失败","00012"),
+    GET_CHANNEL_DETAIL("获取渠道详情失败","00013");
+
+
 
     private String errorMsg;
     private String errorCode;

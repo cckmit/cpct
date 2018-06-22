@@ -21,7 +21,7 @@ public interface ChannelService {
 
     RespInfo deleteChannel(Long userId,Long channelId);
 
-    List<ChannelVO> getChannelList(Long userId,Integer page,Integer pageSize);
+    List<ChannelVO> getChannelList(Long userId,String channelName,Integer page,Integer pageSize);
 
     ChannelVO getChannelDetail(Long userId,Long channelId);
 

@@ -63,12 +63,15 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
     }
 
     @Override
-    public List<ChannelVO> getChannelList(Long userId, Integer page, Integer pageSize) {
+    public List<ChannelVO> getChannelList(Long userId,String channelName ,Integer page, Integer pageSize) {
         List<ChannelVO> voList = new ArrayList<>();
         List<Channel> channelList = new ArrayList<>();
         try {
             channelList = channelMapper.selectAll();
             for (Channel channel : channelList){
+                if (channelName!=null && !channelName.equals("") && !channel.getContactChlName().contains(channelName)){
+                    continue;
+                }
                 ChannelVO vo = ChannelUtil.map2VO(channel);
                 voList.add(vo);
             }
