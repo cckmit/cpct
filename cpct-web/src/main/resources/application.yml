@@ -14,7 +14,7 @@ eureka:
 
 #Mybatis配置
 mybatis:
-  mapper-locations: classpath:mybatis/*.xml
+  mapper-locations: classpath:mybatis/*/*.xml
   type-aliases-package: com.zjtelcom.cpct.domain
   configuration:
     log-impl: org.apache.ibatis.logging.log4j.Log4jImpl #使用日志

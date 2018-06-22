@@ -1,9 +1,9 @@
 package com.zjtelcom.cpct.controller.event;
 
 import com.zjtelcom.cpct.controller.BaseController;
-import com.zjtelcom.cpct.domain.EventList;
+import com.zjtelcom.cpct.domain.event.EventList;
 import com.zjtelcom.cpct.enums.ErrorCode;
-import com.zjtelcom.cpct.service.EventService;
+import com.zjtelcom.cpct.service.event.EventService;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -28,14 +28,14 @@ public class EventController extends BaseController {
     /**
      * query event list
      */
-    @RequestMapping("/eventList")
+    @RequestMapping("/listEvents")
     @CrossOrigin
-    public String eventList(@Param("evtSrcId") Long evtSrcId, @Param("eventName") String eventName) {
+    public String listEvents(@Param("evtSrcId") Long evtSrcId, @Param("eventName") String eventName) {
         List<EventList> eventLists = new ArrayList<>();
         try {
             eventLists = eventService.listEvents(evtSrcId, eventName);
         } catch (Exception e) {
-            logger.error("[op:EventController] fail to eventList for evtSrcId = {},eventName = {}! Exception: ", evtSrcId, eventName, e);
+            logger.error("[op:EventController] fail to listEvents for evtSrcId = {},eventName = {}! Exception: ", evtSrcId, eventName, e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
         }
         return initSuccRespInfo(eventLists);
@@ -44,9 +44,19 @@ public class EventController extends BaseController {
     /**
      * event delete
      */
-    @RequestMapping("/eventDel")
+    @RequestMapping("/delEvent")
     @CrossOrigin
-    public String eventDel(@Param("eventId") Long eventId) {
+    public String delEvent(@Param("eventId") Long eventId) {
+
+        return null;
+    }
+
+    /**
+     * event add
+     */
+    @RequestMapping("/addEvent")
+    @CrossOrigin
+    public String addEvent(@Param("eventId") Long eventId) {
 
         return null;
     }

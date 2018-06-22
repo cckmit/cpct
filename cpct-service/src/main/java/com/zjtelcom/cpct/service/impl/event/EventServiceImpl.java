@@ -1,9 +1,9 @@
-package com.zjtelcom.cpct.service.impl;
+package com.zjtelcom.cpct.service.impl.event;
 
-import com.zjtelcom.cpct.dao.EventMapper;
-import com.zjtelcom.cpct.domain.EventList;
+import com.zjtelcom.cpct.dao.event.EventMapper;
+import com.zjtelcom.cpct.domain.event.EventList;
 import com.zjtelcom.cpct.service.BaseService;
-import com.zjtelcom.cpct.service.EventService;
+import com.zjtelcom.cpct.service.event.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +33,7 @@ public class EventServiceImpl extends BaseService implements EventService {
             eventLists = eventMapper.listEvents(evtSrcId,eventName);
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("[op:UserServiceImpl] fail to listEvents ", e);
+            logger.error("[op:EventServiceImpl] fail to listEvents ", e);
         }
         return eventLists;
     }

@@ -1,10 +1,10 @@
-package com.zjtelcom.cpct.dao;
+package com.zjtelcom.cpct.dao.event;
 
-import com.zjtelcom.cpct.domain.EventSorce;
-import lombok.experimental.PackagePrivate;
+import com.zjtelcom.cpct.domain.event.EventSorce;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
 /**
@@ -18,6 +18,12 @@ public interface EventSorceMapper {
 
     List<EventSorce> listEventSorces(@Param("evtSrcCode") String evtSrcCode, @Param("evtSrcName") String evtSrcName);
 
-    void eventSorceDel(@Param("evtSrcId") Long evtSrcId);
+    void delEventSorce(@Param("evtSrcId") Long evtSrcId);
+
+    EventSorce editEventSorce(@Param("evtSrcId") Long evtSrcId);
+
+    void saveEventSorce(EventSorce eventSorce);
+
+    void updateEventSorce(EventSorce eventSorce);
 
 }
