@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.service.impl.event;
 
 import com.zjtelcom.cpct.dao.event.EventMapper;
 import com.zjtelcom.cpct.dao.event.EventMatchRulMapper;
+import com.zjtelcom.cpct.domain.event.DTO.EventMatchRulDTO;
 import com.zjtelcom.cpct.domain.event.EventList;
 import com.zjtelcom.cpct.domain.event.EventMatchRulDO;
 import com.zjtelcom.cpct.service.BaseService;
@@ -30,14 +31,21 @@ public class EventMatchRulServiceImpl extends BaseService implements EventMatchR
      * listEventMatchRul
      */
     @Override
-    public List<EventMatchRulDO> listEventMatchRuls(String evtRulName) {
+    public List<EventMatchRulDTO> listEventMatchRuls(String evtRulName) {
+        List<EventMatchRulDTO> eventMatchRulDTOS = new ArrayList<>();
         List<EventMatchRulDO> eventMatchRulDOS = new ArrayList<>();
+        EventMatchRulDTO eventMatchRulDTO = new EventMatchRulDTO();
         try {
             eventMatchRulDOS = eventMatchRulMapper.listEventMatchRuls(evtRulName);
+            for(EventMatchRulDO eventMatchRulDO :eventMatchRulDOS ){
+                eventMatchRulDTO.setEvtMatchRulId(eventMatchRulDO.getEvtMatchRulId());
+                eventMatchRulDTO.setEvtRulName(eventMatchRulDO.getEvtRulName());
+                eventMatchRulDTOS.add(eventMatchRulDTO);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("[op:EventMatchRulServiceImpl] fail to listEventMatchRuls ", e);
         }
-        return eventMatchRulDOS;
+        return eventMatchRulDTOS;
     }
 }

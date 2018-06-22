@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.controller.event;
 
 import com.zjtelcom.cpct.controller.BaseController;
+import com.zjtelcom.cpct.domain.event.EventDTO;
 import com.zjtelcom.cpct.domain.event.EventList;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.event.EventService;
@@ -56,7 +57,7 @@ public class EventController extends BaseController {
      */
     @RequestMapping("/addEvent")
     @CrossOrigin
-    public String addEvent(@Param("eventId") Long eventId) {
+    public String addEvent(EventDTO eventDTO) {
 
         return null;
     }

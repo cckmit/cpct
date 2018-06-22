@@ -4,19 +4,19 @@ import com.zjtelcom.cpct.BaseEntity;
 import lombok.Data;
 
 /**
- * @Description EventMatchRul
+ * @Description EventMatchRulDO
  * @Author pengy
  * @Date 2018/6/22 9:31
  */
 @Data
 public class EventMatchRulDO extends BaseEntity {
 
-    private Long evtMatchRulId;
-    private Long eventId;
-    private String evtRulName;
-    private String evtRulDesc;
-    private String evtRulHandleClass;
-    private String evtRulExpression;
+    private Long evtMatchRulId;//记录事件的规则标识主键
+    private Long eventId;//事件主键标识
+    private String evtRulName;//记录事件规则的名称
+    private String evtRulDesc;//记录事件规则的描述说明
+    private String evtRulHandleClass;//记录事件规则的代码实现类名
+    private String evtRulExpression;//记录事件规则表达式
 
 
 }

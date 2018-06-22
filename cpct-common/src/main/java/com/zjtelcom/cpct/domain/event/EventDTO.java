@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.domain.event;
 
 import com.zjtelcom.cpct.BaseEntity;
+import com.zjtelcom.cpct.domain.event.DO.EventItem;
 import lombok.Data;
 
 /**
@@ -24,6 +25,7 @@ public class EventDTO extends BaseEntity{
     private String eventTrigType;//记录事件的触发类型,1000实时触发事件 2000定期触发事件 3000人工触发事件
     private Long extEventId;//记录集团下发的事件标识
     private EventMatchRulDO eventMatchRulDO;//事件匹配规则实体类
+    private EventItem eventItem;//事件采集项
 
 
 }
