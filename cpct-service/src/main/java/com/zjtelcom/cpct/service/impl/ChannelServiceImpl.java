@@ -1,8 +1,8 @@
 package com.zjtelcom.cpct.service.impl;
 
 import com.zjtelcom.cpct.bean.RespInfo;
-import com.zjtelcom.cpct.dao.ContactChannelMapper;
-import com.zjtelcom.cpct.domain.Channel;
+import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
+import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.dto.ChannelAddVO;
 import com.zjtelcom.cpct.dto.ChannelEditVO;
 import com.zjtelcom.cpct.dto.ChannelVO;
@@ -34,6 +34,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         channel.setUpdateDate(new Date());
         channel.setCreateStaff(userId);
         channel.setUpdateStaff(userId);
+        channel.setStatusCd("1000");
         channelMapper.insert(channel);
         return RespInfo.build(CODE_SUCCESS,"添加成功");
     }
@@ -62,12 +63,15 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
     }
 
     @Override
-    public List<ChannelVO> getChannelList(Long userId, Integer page, Integer pageSize) {
+    public List<ChannelVO> getChannelList(Long userId,String channelName ,Integer page, Integer pageSize) {
         List<ChannelVO> voList = new ArrayList<>();
         List<Channel> channelList = new ArrayList<>();
         try {
             channelList = channelMapper.selectAll();
             for (Channel channel : channelList){
+                if (channelName!=null && !channelName.equals("") && !channel.getContactChlName().contains(channelName)){
+                    continue;
+                }
                 ChannelVO vo = ChannelUtil.map2VO(channel);
                 voList.add(vo);
             }
