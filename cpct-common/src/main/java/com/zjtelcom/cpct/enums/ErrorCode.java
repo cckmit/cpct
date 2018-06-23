@@ -34,7 +34,14 @@ public enum ErrorCode {
 
 
     SEARCH_EVENTTYPE_FAILURE("查询事件目录树失败！","00024"),
-    SAVE_EVENT_FAILURE("保存事件失败！","00025");
+    SAVE_EVENT_FAILURE("保存事件失败！","00025"),
+    SAVE_EVENTTYPE_FAILURE("保存事件类型失败！","00016"),
+    EDIT_EVENTTYPE_FAILURE("编辑事件类型失败！","00017"),
+    UPDATE_EVENTTYPE_FAILURE("编辑事件类型失败！","00018"),
+    DEL_EVENTTYPE_FAILURE("删除事件类型失败！","00019"),
+    DEL_EVENT_FAILURE("删除事件失败！","00020"),
+    CLOSE_EVENT_FAILURE("关闭事件失败！","00021"),
+    EDIT_EVENT_FAILURE("关闭事件失败！","00022");
 
     private String errorMsg;
     private String errorCode;

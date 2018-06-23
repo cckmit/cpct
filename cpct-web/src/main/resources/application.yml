@@ -34,5 +34,8 @@ mybatis:
 spring:
   profiles:
     active: dev
+#事务回滚
+  transaction:
+    rollback-on-commit-failure: true
 
 

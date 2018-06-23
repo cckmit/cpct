@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.event;
 
+import com.zjtelcom.cpct.domain.event.DO.EventTypeDO;
 import com.zjtelcom.cpct.domain.event.DTO.EventTypeDTO;
 
 import java.util.List;
@@ -14,4 +15,11 @@ public interface EventTypeService {
 
     List<EventTypeDTO> listEventTypes();
 
+    void saveEventType(EventTypeDO eventTypeDO);
+
+    EventTypeDTO getEventTypeDTOById(Long evtTypeId);
+
+    void updateEventType(EventTypeDO eventTypeDO);
+
+    void delEventType(Long evtTypeId);
 }

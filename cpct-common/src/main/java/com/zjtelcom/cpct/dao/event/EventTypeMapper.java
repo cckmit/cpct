@@ -21,4 +21,6 @@ public interface EventTypeMapper {
     int updateByPrimaryKey(EventTypeDO record);
 
     List<EventTypeDO> listEventTypes(@Param("evtTypeId") Long evtTypeId, @Param("parEvtTypeId") Long parEvtTypeId);
+
+    int saveEventType(EventTypeDO eventTypeDO);
 }

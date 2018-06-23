@@ -5,6 +5,7 @@ import com.zjtelcom.cpct.domain.event.DO.EventTypeDO;
 import com.zjtelcom.cpct.domain.event.DTO.EventTypeDTO;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.EventTypeService;
+import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +45,61 @@ public class EventTypeServiceImpl extends BaseService implements EventTypeServic
             logger.error("[op:EventTypeServiceImpl] fail to listEventTypes ", e);
         }
         return eventTypeDTOS;
+    }
+
+    /**
+     * 新增事件目录保存
+     */
+    @Override
+    public void saveEventType(EventTypeDO eventTypeDO) {
+        try {
+            eventTypeMapper.saveEventType(eventTypeDO);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("[op:EventTypeServiceImpl] fail to saveEventType ", e);
+        }
+    }
+
+    /**
+     * 编辑事件目录
+     */
+    @Override
+    public EventTypeDTO getEventTypeDTOById(Long evtTypeId) {
+        EventTypeDTO eventTypeDTO = new EventTypeDTO();
+        try {
+            EventTypeDO eventTypeDO =  eventTypeMapper.selectByPrimaryKey(evtTypeId);
+            CopyPropertiesUtil.copyBean2Bean(eventTypeDTO,eventTypeDO);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("[op:EventTypeServiceImpl] fail to getEventTypeDTOById ", e);
+        }
+        return eventTypeDTO;
+    }
+
+    /**
+     * 编辑事件目录保存
+     */
+    @Override
+    public void updateEventType(EventTypeDO eventTypeDO) {
+        try {
+            eventTypeMapper.updateByPrimaryKey(eventTypeDO);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("[op:EventTypeServiceImpl] fail to updateEventType ", e);
+        }
+    }
+
+    /**
+     * 删除事件目录
+     */
+    @Override
+    public void delEventType(Long evtTypeId) {
+        try {
+            eventTypeMapper.deleteByPrimaryKey(evtTypeId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("[op:EventTypeServiceImpl] fail to delEventType ", e);
+        }
     }
 
     /**

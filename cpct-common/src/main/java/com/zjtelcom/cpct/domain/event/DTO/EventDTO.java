@@ -1,7 +1,7 @@
 package com.zjtelcom.cpct.domain.event.DTO;
 
 import com.zjtelcom.cpct.BaseEntity;
-import com.zjtelcom.cpct.domain.campaign.DTO.MktCampaignDTO;
+import com.zjtelcom.cpct.domain.campaign.DO.MktCampaignDO;
 import com.zjtelcom.cpct.domain.event.DO.EventItemDO;
 import com.zjtelcom.cpct.domain.event.DO.EventTypeDO;
 import com.zjtelcom.cpct.domain.event.EventMatchRulDO;
@@ -29,9 +29,10 @@ public class EventDTO extends BaseEntity {
     private Long evtTypeId;//记录事件的所属事件类型标识
     private String eventTrigType;//记录事件的触发类型,1000实时触发事件 2000定期触发事件 3000人工触发事件
     private Long extEventId;//记录集团下发的事件标识
-    private List<MktCampaignDTO> mktCampaignDTOList;//活动实体类
+    private List<MktCampaignDO> mktCampaignDTOList;//活动实体类
     private List<EventMatchRulDO> eventMatchRulDOList;//事件匹配规则实体类
     private List<EventItemDO> eventItemDOList;//事件采集项
     private List<EventTypeDO> eventTypeDOList;//事件目录
+    private List<ScenceCampaignDTO> scenceCampaignDTOS;//场景与活动
 
 }
