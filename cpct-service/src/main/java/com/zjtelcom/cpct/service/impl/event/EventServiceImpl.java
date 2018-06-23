@@ -15,7 +15,6 @@ import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,12 +126,30 @@ public class EventServiceImpl extends BaseService implements EventService {
         EventDTO eventDTO = new EventDTO();
         try {
             EventDO eventDO = eventMapper.getEventById(eventId);
-            CopyPropertiesUtil.copyBean2Bean(eventDTO, eventDO);
+            if (eventDO != null) {
+                CopyPropertiesUtil.copyBean2Bean(eventDTO, eventDO);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("[op:EventServiceImpl] fail to editEvent ", e);
         }
         return eventDTO;
+    }
+
+    /**
+     * 更新事件
+     */
+    @Transactional(readOnly = false)
+    @Override
+    public void updateEvent(EventDTO eventDTO) {
+        EventDO eventDO = new EventDO();
+        try {
+            CopyPropertiesUtil.copyBean2Bean(eventDO, eventDTO);
+            eventMapper.updateEvent(eventDO);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("[op:EventServiceImpl] fail to updateEvent ", e);
+        }
     }
 
 }

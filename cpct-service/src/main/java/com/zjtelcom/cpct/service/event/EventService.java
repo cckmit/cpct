@@ -24,4 +24,6 @@ public interface EventService {
 
     EventDTO editEvent(Long eventId);
 
+    void updateEvent(EventDTO eventDTO);
+
 }

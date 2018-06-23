@@ -20,4 +20,8 @@ public interface EventSceneMapper {
 
     List<EventSceneDO> listEventSences(EventSceneDO sceneDO);
 
+    int saveEventScene(EventSceneDO sceneDO);
+
+    EventSceneDO getEventSceneDO(Long eventSceneId);
+
 }
