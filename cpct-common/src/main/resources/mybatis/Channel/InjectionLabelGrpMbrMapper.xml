@@ -46,6 +46,15 @@
     from injection_label_grp_mbr
     where GRP_MBR_ID = #{grpMbrId,jdbcType=BIGINT}
   </select>
+  <select id="selectByLabelIdAndGrpId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select GRP_MBR_ID, GRP_ID, INJECTION_LABEL_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from injection_label_grp_mbr
+    where GRP_ID = #{grpId} and INJECTION_LABEL_ID = #{labelId}
+  </select>
+
+
+
   <select id="selectAll" resultMap="BaseResultMap">
     select GRP_MBR_ID, GRP_ID, INJECTION_LABEL_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK

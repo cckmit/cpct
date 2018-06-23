@@ -6,8 +6,8 @@ import lombok.Data;
 
 @Data
 public class LabelGrpMbr extends BaseEntity {
-    private long grpMbrId;
-    private long grpId;
-    private long injectionLabelId;
+    private Long grpMbrId;
+    private Long grpId;
+    private Long injectionLabelId;
 
 }

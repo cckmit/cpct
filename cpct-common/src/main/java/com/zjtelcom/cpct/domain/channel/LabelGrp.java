@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class LabelGrp extends BaseEntity {
-    private long grpId;
+    private Long grpId;
     private String grpName;
     private String grpDesc;
 

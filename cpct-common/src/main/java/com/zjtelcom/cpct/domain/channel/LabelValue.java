@@ -6,8 +6,8 @@ import lombok.Data;
 
 @Data
 public class LabelValue extends BaseEntity {
-    private long labelValueId;
-    private long injectionLabelId;
+    private Long labelValueId;
+    private Long injectionLabelId;
     private String labelValue;
     private String valueName;
     private String valueDesc;
