@@ -21,7 +21,14 @@ public enum ErrorCode {
     EDIT_CHANNEL_FAILURE("修改渠道失败","00012"),
     DELETE_CHANNEL_FAILURE("删除渠道失败","00013"),
     GET_CHANNEL_LIST("获取渠道列表失败","00014"),
-    GET_CHANNEL_DETAIL("获取渠道详情失败","00015");
+    GET_CHANNEL_DETAIL("获取渠道详情失败","00015"),
+    SAVE_EVENTTYPE_FAILURE("保存事件类型失败！","00016"),
+    EDIT_EVENTTYPE_FAILURE("编辑事件类型失败！","00017"),
+    UPDATE_EVENTTYPE_FAILURE("编辑事件类型失败！","00018"),
+    DEL_EVENTTYPE_FAILURE("删除事件类型失败！","00019"),
+    DEL_EVENT_FAILURE("删除事件失败！","00020"),
+    CLOSE_EVENT_FAILURE("关闭事件失败！","00021"),
+    EDIT_EVENT_FAILURE("关闭事件失败！","00022");
 
     private String errorMsg;
     private String errorCode;

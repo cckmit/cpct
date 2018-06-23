@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,13 +44,18 @@ public class EventController extends BaseController {
     }
 
     /**
-     * event delete
+     * 事件删除
      */
     @RequestMapping("/delEvent")
     @CrossOrigin
     public String delEvent(@Param("eventId") Long eventId) {
-
-        return null;
+        try {
+            eventService.delEvent(eventId);
+        } catch (Exception e) {
+            logger.error("[op:EventController] fail to delEvent for eventId = {}! Exception: ", eventId, e);
+            return initFailRespInfo(ErrorCode.DEL_EVENT_FAILURE.getErrorMsg(), ErrorCode.DEL_EVENT_FAILURE.getErrorCode());
+        }
+        return initSuccRespInfo(null);
     }
 
     /**
@@ -65,6 +71,37 @@ public class EventController extends BaseController {
             return initFailRespInfo(ErrorCode.SAVE_EVENT_FAILURE.getErrorMsg(), ErrorCode.SAVE_EVENT_FAILURE.getErrorCode());
         }
         return initSuccRespInfo(null);
+    }
+
+    /**
+     * 事件删除
+     */
+    @RequestMapping("/closeEvent")
+    @CrossOrigin
+    public String closeEvent(@Param("eventId") Long eventId) {
+        try {
+            eventService.closeEvent(eventId);
+        } catch (Exception e) {
+            logger.error("[op:EventController] fail to closeEvent for eventId = {}! Exception: ", eventId, e);
+            return initFailRespInfo(ErrorCode.CLOSE_EVENT_FAILURE.getErrorMsg(), ErrorCode.CLOSE_EVENT_FAILURE.getErrorCode());
+        }
+        return initSuccRespInfo(null);
+    }
+
+    /**
+     * 事件编辑
+     */
+    @RequestMapping("/editEvent")
+    @CrossOrigin
+    public String editEvent(@Param("eventId") Long eventId) {
+        EventDTO eventDTO = new EventDTO();
+        try {
+            eventDTO = eventService.editEvent(eventId);
+        } catch (Exception e) {
+            logger.error("[op:EventController] fail to editEvent for eventId = {}! Exception: ", eventId, e);
+            return initFailRespInfo(ErrorCode.EDIT_EVENT_FAILURE.getErrorMsg(), ErrorCode.EDIT_EVENT_FAILURE.getErrorCode());
+        }
+        return initSuccRespInfo(eventDTO);
     }
 
 }

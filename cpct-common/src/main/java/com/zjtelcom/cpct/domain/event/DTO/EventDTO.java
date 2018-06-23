@@ -33,5 +33,6 @@ public class EventDTO extends BaseEntity {
     private List<EventMatchRulDO> eventMatchRulDOList;//事件匹配规则实体类
     private List<EventItemDO> eventItemDOList;//事件采集项
     private List<EventTypeDO> eventTypeDOList;//事件目录
+    private List<ScenceCampaignDTO> scenceCampaignDTOS;//场景与活动
 
 }

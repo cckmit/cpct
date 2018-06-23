@@ -24,7 +24,7 @@ public class EventMatchRulServiceImpl extends BaseService implements EventMatchR
     private EventMatchRulMapper eventMatchRulMapper;
 
     /**
-     * listEventMatchRul
+     * 事件匹配规则列表
      */
     @Override
     public List<EventMatchRulDTO> listEventMatchRuls(String evtRulName) {

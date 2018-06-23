@@ -21,4 +21,10 @@ public interface EventMapper {
 
     int saveEvent(EventDO record);
 
+    int delEvent(@Param("eventId") Long eventId);
+
+    int updateEventStatusCd(@Param("eventId") Long eventId,@Param("statusCd") String statusCd);
+
+    EventDO getEventById(@Param("eventId") Long eventId );
+
 }
