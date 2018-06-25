@@ -9,7 +9,6 @@ import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dto.LabelAddVO;
 import com.zjtelcom.cpct.dto.LabelVO;
 import com.zjtelcom.cpct.dto.LabelValueVO;
-import com.zjtelcom.cpct.dto.ScriptVO;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.LabelService;
 import com.zjtelcom.cpct.util.BeanUtil;

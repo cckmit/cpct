@@ -2,6 +2,10 @@ package com.zjtelcom.cpct.util;
 
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dto.*;
+import com.zjtelcom.cpct.dto.CamScriptVO;
+import com.zjtelcom.cpct.dto.ChannelVO;
+import com.zjtelcom.cpct.dto.LabelVO;
+import com.zjtelcom.cpct.dto.LabelValueVO;
 
 public class ChannelUtil  {
 
