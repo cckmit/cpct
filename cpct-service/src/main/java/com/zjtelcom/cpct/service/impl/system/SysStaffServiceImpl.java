@@ -1,9 +1,16 @@
 package com.zjtelcom.cpct.service.impl.system;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.dao.system.SysStaffMapper;
+import com.zjtelcom.cpct.dao.system.SysStaffRoleMapper;
 import com.zjtelcom.cpct.domain.system.SysStaff;
+import com.zjtelcom.cpct.domain.system.SysStaffRole;
+import com.zjtelcom.cpct.dto.system.SysStaffVO;
 import com.zjtelcom.cpct.service.BaseService;
+import com.zjtelcom.cpct.service.system.SysStaffRoleService;
 import com.zjtelcom.cpct.service.system.SysStaffService;
+import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,15 +25,23 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
     @Autowired
     private SysStaffMapper sysStaffMapper;
 
+    @Autowired
+    private SysStaffRoleMapper sysStaffRoleMapper;
+
     @Override
-    public List<SysStaff> listStaff(String staffCode,String staffName,Long status) {
-        return sysStaffMapper.selectAll(staffCode,staffName,status);
+    public List<SysStaff> listStaff(String staffCode, String staffName, Long status,Integer page,Integer pageSize) {
+        PageHelper.startPage(page,pageSize);
+        List<SysStaff> list = sysStaffMapper.selectAll(staffCode, staffName, status);
+        PageInfo pageInfo = new PageInfo(list);
+        return list;
     }
 
     @Override
-    public int saveStaff(SysStaff sysStaff) {
+    public int saveStaff(SysStaffVO sysStaffVO) throws Exception {
         //todo 判断字段是否为空
 
+        SysStaff sysStaff = new SysStaff();
+        CopyPropertiesUtil.copyBean2Bean(sysStaff, sysStaffVO);
         //todo 判断账号是否重复
 
         //todo 密码加密
@@ -35,13 +50,29 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         Long loginId = 1L;
         sysStaff.setCreateStaff(loginId);
         sysStaff.setCreateDate(new Date());
+        int flag = sysStaffMapper.insert(sysStaff);
+        if (flag < 1) {
+            //todo flag<1 判断失败抛出业务异常
+        }
 
-        return sysStaffMapper.insert(sysStaff);
+        //保存角色信息
+        SysStaffRole sysStaffRole = new SysStaffRole();
+        sysStaffRole.setStaffId(sysStaff.getStaffId());
+        sysStaffRole.setRoleId(sysStaffVO.getRoleId());
+        flag = sysStaffRoleMapper.insert(sysStaffRole);
+        if (flag < 1) {
+            //todo flag<1 判断失败抛出业务异常
+        }
+
+        return flag;
     }
 
     @Override
-    public int updateStaff(SysStaff sysStaff) {
+    public int updateStaff(SysStaffVO sysStaffVO) throws Exception {
         //todo 判断字段是否为空
+        SysStaff sysStaff = new SysStaff();
+        CopyPropertiesUtil.copyBean2Bean(sysStaff, sysStaffVO);
+
 
         //todo 判断账号是否重复
 
@@ -49,12 +80,31 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         Long loginId = 1L;
         sysStaff.setUpdateStaff(loginId);
         sysStaff.setUpdateDate(new Date());
-        return sysStaffMapper.updateByPrimaryKey(sysStaff);
+        int flag = sysStaffMapper.updateByPrimaryKey(sysStaff);
+        if (flag < 1) {
+            //todo flag<1 判断失败抛出业务异常
+        }
+        //删除角色信息
+        flag = sysStaffRoleMapper.deleteByStaffId(sysStaff.getStaffId());
+        if (flag < 1) {
+            //todo flag<1 判断失败抛出业务异常
+        }
+
+        //保存角色信息
+        SysStaffRole sysStaffRole = new SysStaffRole();
+        sysStaffRole.setStaffId(sysStaff.getStaffId());
+        sysStaffRole.setRoleId(sysStaffVO.getRoleId());
+        flag = sysStaffRoleMapper.insert(sysStaffRole);
+        if (flag < 1) {
+            //todo flag<1 判断失败抛出业务异常
+        }
+
+        return flag;
     }
 
     @Override
     public int changeStatus(Long id, Long status) {
-        if(id == null || status == null) {
+        if (id == null || status == null) {
             // todo 异常
         }
         SysStaff params = new SysStaff();
@@ -68,12 +118,40 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         return sysStaffMapper.changeStatus(params);
     }
 
+    /**
+     * 根据id获取员工账号信息
+     *
+     * @param id 员工id
+     * @return
+     */
     @Override
     public SysStaff getStaff(Long id) {
 
-        if(id == null) {
+        if (id == null) {
             //todo 为空异常
         }
         return sysStaffMapper.selectByPrimaryKey(id);
     }
+
+    /**
+     * 修改密码
+     *
+     * @param id       员工id
+     * @param password 密码
+     * @return
+     */
+    @Override
+    public int updatePassword(Long id, String password) {
+        if (id == null) {
+            //todo 为空异常
+        }
+        if (password == null) {
+
+        }
+        //密码加密
+
+        return sysStaffMapper.updatePassword(id, password);
+    }
+
+
 }

@@ -16,4 +16,6 @@ public interface SysRoleService {
 
     int delRole(Long id);
 
+    void saveAuthority(Long roleId,List<Long> list);
+
 }

@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.domain.system;
 
-public class SysRoleMenu {
+import com.zjtelcom.cpct.BaseEntity;
+
+public class SysRoleMenu extends BaseEntity {
     private Long authorityId;
 
     private Long roleId;

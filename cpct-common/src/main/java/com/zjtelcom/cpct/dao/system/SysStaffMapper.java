@@ -26,4 +26,7 @@ public interface SysStaffMapper {
 
     int changeStatus(SysStaff record);
 
+    int updatePassword(@Param("staffId") Long staffId,
+                       @Param("password") String password);
+
 }

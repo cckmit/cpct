@@ -61,6 +61,9 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
 
     @Override
     public int delParams(Long id) {
+
+        //todo 验证是否可以删除
+
         return sysParamsMapper.deleteByPrimaryKey(id);
     }
 }
