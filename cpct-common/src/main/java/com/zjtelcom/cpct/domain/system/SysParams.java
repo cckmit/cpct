@@ -1,11 +1,12 @@
 package com.zjtelcom.cpct.domain.system;
 
+import com.zjtelcom.cpct.BaseEntity;
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
-public class SysParams {
+public class SysParams extends BaseEntity {
 
     private Long paramId;
 

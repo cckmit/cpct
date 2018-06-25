@@ -1,6 +1,9 @@
 package com.zjtelcom.cpct.domain.system;
 
-public class SysUserRole {
+import com.zjtelcom.cpct.BaseEntity;
+
+public class SysStaffRole extends BaseEntity {
+
     private Long staffRoleId;
 
     private Long staffId;

@@ -31,6 +31,7 @@
         <commons-lang3.version>3.1</commons-lang3.version>
         <lombok.version>1.18.0</lombok.version>
         <commons-lang.version>2.6</commons-lang.version>
+        <pagehelper.version>1.2.5</pagehelper.version>
     </properties>
 
     <parent>
@@ -154,6 +155,13 @@
                 <groupId>commons-lang</groupId>
                 <artifactId>commons-lang</artifactId>
                 <version>${commons-lang.version}</version>
+            </dependency>
+
+            <!-- PageHelper 分页插件 -->
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper-spring-boot-starter</artifactId>
+                <version>${pagehelper.version}</version>
             </dependency>
 
         </dependencies>

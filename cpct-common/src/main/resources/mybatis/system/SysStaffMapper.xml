@@ -25,7 +25,7 @@
       where STAFF_ID = #{staffId,jdbcType=BIGINT}
     </delete>
 
-    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.system.SysStaff">
+    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.system.SysStaff" keyProperty="staffId" useGeneratedKeys="true">
       insert into sys_staff (STAFF_CODE, STAFF_NAME,
         PASSWORD, STAFF_PHONE, STAFF_TELEPHONE,
         STAFF_EMAIL, CHANNEL_ID, CITY_ID,
@@ -81,6 +81,12 @@
       set STATUS = #{status,jdbcType=BIGINT},
         UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
         UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT}
+      where STAFF_ID = #{staffId,jdbcType=BIGINT}
+    </update>
+
+    <update id="updatePassword" parameterType="com.zjtelcom.cpct.domain.system.SysStaff">
+      update sys_staff
+      set PASSWORD = #{password,jdbcType=BIGINT}
       where STAFF_ID = #{staffId,jdbcType=BIGINT}
     </update>
 

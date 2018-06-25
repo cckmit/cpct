@@ -77,6 +77,21 @@ public class SysRoleController extends BaseController {
         return initSuccRespInfo(null);
     }
 
+
+    @RequestMapping("/saveAuthority")
+    @CrossOrigin
+    public String saveAuthority(@RequestParam("roleId") Long roleId,@RequestParam("list") List<Long> list) {
+
+        try {
+            sysRoleService.saveAuthority(roleId,list);
+        } catch (Exception e) {
+            logger.error("[op:SysRoleController] fail to saveRole Exception: ", e);
+            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+        }
+
+        return initSuccRespInfo(null);
+    }
+
     /**
      * 修改员工
      * @param sysRole

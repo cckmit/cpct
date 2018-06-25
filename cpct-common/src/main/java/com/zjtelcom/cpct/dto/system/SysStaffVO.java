@@ -1,12 +1,11 @@
-package com.zjtelcom.cpct.domain.system;
+package com.zjtelcom.cpct.dto.system;
 
-import com.zjtelcom.cpct.BaseEntity;
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
-public class SysStaff extends BaseEntity {
+public class SysStaffVO {
 
     private Long staffId;
 
@@ -15,6 +14,8 @@ public class SysStaff extends BaseEntity {
     private String staffName;
 
     private String password;
+
+    private String confirmPassword;
 
     private String staffPhone;
 
@@ -30,12 +31,10 @@ public class SysStaff extends BaseEntity {
 
     private Date lastLogin;
 
-    private Date createDate;
+    /**
+     * 角色id
+     */
+    private Long roleId;
 
-    private Long createStaff;
-
-    private Date updateDate;
-
-    private Long updateStaff;
 
 }
