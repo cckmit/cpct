@@ -1,7 +1,7 @@
 package com.zjtelcom.cpct.shiro;
 
-import com.zjtelcom.cpct.service.UserService;
-import com.zjtelcom.cpct.domain.User;
+import com.zjtelcom.cpct.domain.system.SysStaff;
+import com.zjtelcom.cpct.service.system.SysStaffService;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -10,6 +10,7 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import javax.annotation.Resource;
 import java.util.Map;
 
@@ -21,41 +22,53 @@ import java.util.Map;
  */
 public class MyShiroRealm extends AuthorizingRealm {
 
-    private static  final Logger logger = LoggerFactory.getLogger(MyShiroRealm.class);
+    private static final Logger logger = LoggerFactory.getLogger(MyShiroRealm.class);
 
     @Resource
-    private UserService userService;
+    private SysStaffService userService;
 
     @Override
-    public String getName(){
+    public String getName() {
         return "myShiroRealm";
     }
 
+    /**
+     * 添加角色权限
+     * @param principals
+     * @return
+     */
     @Override
-    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals){
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
 
-        logger.info("打印PrincipalCollection的相关信息{}",principals.toString());
+        logger.info("打印PrincipalCollection的相关信息{}", principals.toString());
         String username = principals.toString();
         logger.info(username);
         //UserInfo userInfo = (UserInfo)principals.getPrimaryPrincipal();
 
-        logger.info("打印PrincipalCollection的相关信息{}",principals.toString());
+        logger.info("打印PrincipalCollection的相关信息{}", principals.toString());
         authorizationInfo.addRole("Admin");
         authorizationInfo.addRole("SuperAdmin");
         return authorizationInfo;
     }
 
+    /**
+     * 用户认证
+     * @param authenticationToken
+     * @return
+     * @throws AuthenticationException
+     */
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken)
             throws AuthenticationException {
 
-        UsernamePasswordToken token = (UsernamePasswordToken)authenticationToken;
-        logger.info("验证当前登录用户时获取到的token={}",ReflectionToStringBuilder.toString(token));
-        Map<String,Object> userMap = userService.queryUserByName(token.getUsername());
-        User user = (User) userMap.get("data");
-        if(user == null) return null;
-        SimpleAuthenticationInfo authenticationInfo  = new SimpleAuthenticationInfo(user.getLoginName(),user.getPassWord(),getName());
-        return authenticationInfo;
+        UsernamePasswordToken token = (UsernamePasswordToken) authenticationToken;
+        logger.info("验证当前登录用户时获取到的token={}", ReflectionToStringBuilder.toString(token));
+        Map<String, Object> userMap = userService.queryUserByName(token.getUsername());
+        SysStaff user = (SysStaff) userMap.get("data");
+        if (user == null) {
+            return null;
+        }
+        return new SimpleAuthenticationInfo(user.getStaffCode(), user.getPassword(), getName());
     }
 }

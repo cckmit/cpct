@@ -1,7 +1,7 @@
 package com.zjtelcom.cpct.service.impl.event;
 
 import com.zjtelcom.cpct.dao.event.EventSceneMapper;
-import com.zjtelcom.cpct.domain.event.DO.EventSceneDO;
+import com.zjtelcom.cpct.domain.event.EventSceneDO;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.EventSceneService;
 import org.springframework.beans.factory.annotation.Autowired;

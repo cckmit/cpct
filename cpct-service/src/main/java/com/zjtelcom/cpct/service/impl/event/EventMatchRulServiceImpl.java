@@ -1,7 +1,7 @@
 package com.zjtelcom.cpct.service.impl.event;
 
 import com.zjtelcom.cpct.dao.event.EventMatchRulMapper;
-import com.zjtelcom.cpct.domain.event.DTO.EventMatchRulDTO;
+import com.zjtelcom.cpct.dto.event.EventMatchRulDTO;
 import com.zjtelcom.cpct.domain.event.EventMatchRulDO;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.EventMatchRulService;

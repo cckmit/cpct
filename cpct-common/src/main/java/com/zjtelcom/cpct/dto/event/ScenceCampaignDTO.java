@@ -1,14 +1,13 @@
-package com.zjtelcom.cpct.domain.event.DTO;
+package com.zjtelcom.cpct.dto.event;
 
 import com.zjtelcom.cpct.domain.campaign.DO.MktCampaignDO;
-import com.zjtelcom.cpct.domain.event.DO.EventSceneDO;
 import com.zjtelcom.cpct.domain.event.EventMatchRulDO;
 import lombok.Data;
 
 import java.util.List;
 
 /**
- * @Description
+ * @Description ScenceCampaignDTO
  * @Author pengy
  * @Date 2018/6/23 11:49
  */

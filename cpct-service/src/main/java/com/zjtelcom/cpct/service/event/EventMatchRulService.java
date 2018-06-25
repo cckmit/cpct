@@ -1,7 +1,7 @@
 package com.zjtelcom.cpct.service.event;
 
-import com.zjtelcom.cpct.domain.event.DTO.EventMatchRulDTO;
-import com.zjtelcom.cpct.domain.event.EventMatchRulDO;
+import com.zjtelcom.cpct.dto.event.EventMatchRulDTO;
+
 import java.util.List;
 
 /**

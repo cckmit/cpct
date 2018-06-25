@@ -3,6 +3,8 @@ package com.zjtelcom.cpct.controller.channel;
 import com.zjtelcom.cpct.bean.RespInfo;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dto.*;
+import com.zjtelcom.cpct.dto.ScriptAddVO;
+import com.zjtelcom.cpct.dto.ScriptEditVO;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.channel.ScriptService;
 import com.zjtelcom.cpct.util.MapUtil;

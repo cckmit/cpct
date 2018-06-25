@@ -1,6 +1,6 @@
 package com.zjtelcom.cpct.service.event;
 
-import com.zjtelcom.cpct.domain.event.DO.EventSceneDO;
+import com.zjtelcom.cpct.domain.event.EventSceneDO;
 
 import java.util.List;
 
