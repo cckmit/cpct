@@ -23,8 +23,10 @@ public interface EventMapper {
 
     int delEvent(@Param("eventId") Long eventId);
 
-    int updateEventStatusCd(@Param("eventId") Long eventId,@Param("statusCd") String statusCd);
+    int updateEventStatusCd(@Param("eventId") Long eventId, @Param("statusCd") String statusCd);
 
-    EventDO getEventById(@Param("eventId") Long eventId );
+    EventDO getEventById(@Param("eventId") Long eventId);
+
+    int updateEvent(EventDO eventDO);
 
 }

@@ -28,7 +28,7 @@ public class EventController extends BaseController {
     private EventService eventService;
 
     /**
-     * query event list
+     * 查询事件列表
      */
     @RequestMapping("/listEvents")
     @CrossOrigin
@@ -44,7 +44,7 @@ public class EventController extends BaseController {
     }
 
     /**
-     * 事件删除
+     * 删除事件
      */
     @RequestMapping("/delEvent")
     @CrossOrigin
@@ -74,7 +74,7 @@ public class EventController extends BaseController {
     }
 
     /**
-     * 事件删除
+     * 删除事件
      */
     @RequestMapping("/closeEvent")
     @CrossOrigin
@@ -89,7 +89,7 @@ public class EventController extends BaseController {
     }
 
     /**
-     * 事件编辑
+     * 编辑事件
      */
     @RequestMapping("/editEvent")
     @CrossOrigin
@@ -100,6 +100,22 @@ public class EventController extends BaseController {
         } catch (Exception e) {
             logger.error("[op:EventController] fail to editEvent for eventId = {}! Exception: ", eventId, e);
             return initFailRespInfo(ErrorCode.EDIT_EVENT_FAILURE.getErrorMsg(), ErrorCode.EDIT_EVENT_FAILURE.getErrorCode());
+        }
+        return initSuccRespInfo(eventDTO);
+    }
+
+    /**
+     * 更新事件
+     */
+    @RequestMapping("/updateEvent")
+    @CrossOrigin
+    public String updateEvent(EventDTO event) {
+        EventDTO eventDTO = new EventDTO();
+        try {
+            eventService.updateEvent(event);
+        } catch (Exception e) {
+            logger.error("[op:EventController] fail to updateEvent for event = {}! Exception: ", JSONArray.toJSON(event), e);
+            return initFailRespInfo(ErrorCode.UPDATE_EVENT_FAILURE.getErrorMsg(), ErrorCode.UPDATE_EVENT_FAILURE.getErrorCode());
         }
         return initSuccRespInfo(eventDTO);
     }

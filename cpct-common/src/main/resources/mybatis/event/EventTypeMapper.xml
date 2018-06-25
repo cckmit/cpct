@@ -40,7 +40,7 @@
         <if test="evtTypeName != null and evtTypeName != ''">
             EVT_TYPE_NAME = #{evtTypeName,jdbcType=VARCHAR},
         </if>
-        <if test="parEvtTypeId != null and parEvtTypeId != ''">
+        <if test="parEvtTypeId != null and parEvtTypeId != 0 ">
             PAR_EVT_TYPE_ID = #{parEvtTypeId,jdbcType=BIGINT},
         </if>
         <if test="evtTypeDesc != null and evtTypeDesc != ''">
@@ -49,10 +49,10 @@
         <if test="statusCd != null and statusCd != ''">
             STATUS_CD = #{statusCd,jdbcType=VARCHAR},
         </if>
-        <if test="createStaff != null and createStaff != ''">
+        <if test="createStaff != null and createStaff != 0">
             CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
         </if>
-        <if test="updateStaff != null and updateStaff != ''">
+        <if test="updateStaff != null and updateStaff != 0">
             UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
         </if>
         <if test="createDate != null and createDate != ''">

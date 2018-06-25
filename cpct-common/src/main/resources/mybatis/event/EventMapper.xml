@@ -55,7 +55,8 @@
 
     <!--插入操作,useGeneratedKeys代表支持自动生成序列号,keyProperty代表自动生成序列号的属性为id-->
     <!--由于采用了自动生成序列号,因此id不需要在mapper文件中写出来-->
-    <insert id="saveEvent" keyProperty="eventId" useGeneratedKeys="true" parameterType="com.zjtelcom.cpct.domain.event.DO.EventDO">
+    <insert id="saveEvent" keyProperty="eventId" useGeneratedKeys="true"
+            parameterType="com.zjtelcom.cpct.domain.event.DO.EventDO">
         insert into event (
           INTERFACE_CFG_ID,
           EVENT_NBR,
@@ -117,17 +118,74 @@
     <update id="updateEventStatusCd">
         update event
         set STATUS_CD = #{statusCd}
-        where EVENT_ID = #{eventId}
+        where EVENT_ID = #{eventId,jdbcType=BIGINT}
     </update>
 
     <!--查询方法，通过id查询-->
-    <select id="getEventById" resultMap="resultMapper">
+    <select id="getEventById" resultType="com.zjtelcom.cpct.domain.event.DO.EventDO">
         select * from event
-        where 1=1
-        <if test="eventId != null and eventId != 0">
-            and EVENT_ID = #{eventId}
-        </if>
-
+        where EVENT_ID = #{eventId,jdbcType=BIGINT}
     </select>
+
+    <update id="updateEvent" parameterType="com.zjtelcom.cpct.domain.event.DO.EventDO">
+        update event
+        set
+        <if test="evtSrcId != null and evtSrcId != 0">
+            INTERFACE_CFG_ID = #{interfaceCfgId,jdbcType=BIGINT},
+        </if>
+        <if test="evtSrcId != null and evtSrcId != ''">
+            EVENT_NBR = #{eventNbr,jdbcType=VARCHAR},
+        </if>
+        <if test="evtSrcId != null and evtSrcId != ''">
+            EVENT_NAME = #{eventName,jdbcType=VARCHAR},
+        </if>
+        <if test="evtSrcId != null and evtSrcId != ''">
+            EVT_MAPPED_ADDR = #{evtMappedAddr,jdbcType=VARCHAR},
+        </if>
+        <if test="evtSrcId != null and evtSrcId != ''">
+            EVT_MAPPED_IP = #{evtMappedIp,jdbcType=VARCHAR},
+        </if>
+        <if test="evtSrcId != null and evtSrcId != ''">
+            EVT_PROCOTOL_TYPE = #{evtProcotolType,jdbcType=VARCHAR},
+        </if>
+        <if test="evtSrcId != null and evtSrcId != ''">
+            EVT_MAPPED_FUN_NAME = #{evtMappedFunName,jdbcType=VARCHAR},
+        </if>
+        <if test="evtSrcId != null and evtSrcId != ''">
+            EVENT_DESC = #{eventDesc,jdbcType=VARCHAR},
+        </if>
+        <if test="evtSrcId != null and evtSrcId != 0">
+            EVT_TYPE_ID = #{evtTypeId,jdbcType=BIGINT},
+        </if>
+        <if test="evtSrcId != null and evtSrcId != ''">
+            EVENT_TRIG_TYPE = #{eventTrigType,jdbcType=VARCHAR},
+        </if>
+        <if test="evtSrcId != null and evtSrcId != 0">
+            EXT_EVENT_ID = #{extEventId,jdbcType=BIGINT},
+        </if>
+        <if test="evtSrcId != null and evtSrcId != ''">
+            STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+        </if>
+        <if test="evtSrcId != null and evtSrcId != 0">
+            CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+        </if>
+        <if test="evtSrcId != null and evtSrcId != 0">
+            UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        </if>
+        <if test="evtSrcId != null and evtSrcId != ''">
+            CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="evtSrcId != null and evtSrcId != ''">
+            STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="evtSrcId != null and evtSrcId != ''">
+            UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="evtSrcId != null and evtSrcId != ''">
+            REMARK = #{remark,jdbcType=VARCHAR},
+        </if>
+        EVENT_ID = #{eventId,jdbcType=BIGINT}
+        where EVENT_ID = #{eventId,jdbcType=BIGINT}
+    </update>
 
 </mapper>

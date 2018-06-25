@@ -41,7 +41,12 @@ public enum ErrorCode {
     DEL_EVENTTYPE_FAILURE("删除事件类型失败！","00019"),
     DEL_EVENT_FAILURE("删除事件失败！","00020"),
     CLOSE_EVENT_FAILURE("关闭事件失败！","00021"),
-    EDIT_EVENT_FAILURE("关闭事件失败！","00022");
+    EDIT_EVENT_FAILURE("编辑事件失败！","00022"),
+    UPDATE_EVENT_FAILURE("更新事件失败！","00022"),
+    SEARCH_EVENT_SCENE_LIST_FAILURE("查询事件场景列表失败！", "00023"),
+    SAVE_EVENT_SCENE_LIST_FAILURE("新增事件场景列表失败！", "00024"),
+    EDIT_EVENT_SCENE_LIST_FAILURE("编辑事件场景列表失败！", "00025"),
+    UPDATE_EVENT_SCENE_LIST_FAILURE("更新事件场景列表失败！", "00026");
 
     private String errorMsg;
     private String errorCode;
