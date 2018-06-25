@@ -1,7 +1,7 @@
 package com.zjtelcom.cpct.controller.event;
 
 import com.zjtelcom.cpct.controller.BaseController;
-import com.zjtelcom.cpct.domain.event.DTO.EventMatchRulDTO;
+import com.zjtelcom.cpct.dto.event.EventMatchRulDTO;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.event.EventMatchRulService;
 import org.apache.ibatis.annotations.Param;

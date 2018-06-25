@@ -2,8 +2,8 @@ package com.zjtelcom.cpct.controller.event;
 
 import com.alibaba.fastjson.JSONArray;
 import com.zjtelcom.cpct.controller.BaseController;
-import com.zjtelcom.cpct.domain.event.DTO.EventDTO;
-import com.zjtelcom.cpct.domain.event.EventList;
+import com.zjtelcom.cpct.dto.event.EventDTO;
+import com.zjtelcom.cpct.dto.event.EventList;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.event.EventService;
 import org.apache.ibatis.annotations.Param;
@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.ArrayList;
 import java.util.List;
 

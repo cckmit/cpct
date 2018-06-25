@@ -2,8 +2,8 @@ package com.zjtelcom.cpct.controller.event;
 
 import com.alibaba.fastjson.JSONArray;
 import com.zjtelcom.cpct.controller.BaseController;
-import com.zjtelcom.cpct.domain.event.DO.EventTypeDO;
-import com.zjtelcom.cpct.domain.event.DTO.EventTypeDTO;
+import com.zjtelcom.cpct.domain.event.EventTypeDO;
+import com.zjtelcom.cpct.dto.event.EventTypeDTO;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.event.EventTypeService;
 import org.apache.ibatis.annotations.Param;

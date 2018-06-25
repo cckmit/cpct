@@ -1,8 +1,8 @@
 package com.zjtelcom.cpct.service.impl.event;
 
 import com.zjtelcom.cpct.dao.event.EventTypeMapper;
-import com.zjtelcom.cpct.domain.event.DO.EventTypeDO;
-import com.zjtelcom.cpct.domain.event.DTO.EventTypeDTO;
+import com.zjtelcom.cpct.domain.event.EventTypeDO;
+import com.zjtelcom.cpct.dto.event.EventTypeDTO;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.EventTypeService;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;

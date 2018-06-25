@@ -1,8 +1,7 @@
 package com.zjtelcom.cpct.service.event;
 
-import com.zjtelcom.cpct.domain.event.DO.EventDO;
-import com.zjtelcom.cpct.domain.event.DTO.EventDTO;
-import com.zjtelcom.cpct.domain.event.EventList;
+import com.zjtelcom.cpct.dto.event.EventDTO;
+import com.zjtelcom.cpct.dto.event.EventList;
 
 import java.util.List;
 

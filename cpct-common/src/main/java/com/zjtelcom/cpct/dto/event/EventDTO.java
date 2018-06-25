@@ -1,9 +1,9 @@
-package com.zjtelcom.cpct.domain.event.DTO;
+package com.zjtelcom.cpct.dto.event;
 
-import com.zjtelcom.cpct.BaseEntity;
 import com.zjtelcom.cpct.domain.campaign.DO.MktCampaignDO;
-import com.zjtelcom.cpct.domain.event.DO.EventItemDO;
-import com.zjtelcom.cpct.domain.event.DO.EventTypeDO;
+import com.zjtelcom.cpct.domain.event.EventDO;
+import com.zjtelcom.cpct.domain.event.EventItemDO;
+import com.zjtelcom.cpct.domain.event.EventTypeDO;
 import com.zjtelcom.cpct.domain.event.EventMatchRulDO;
 import lombok.Data;
 
@@ -15,7 +15,7 @@ import java.util.List;
  * @Date 2018/6/22 9:31
  */
 @Data
-public class EventDTO extends BaseEntity {
+public class EventDTO extends EventDO {
 
     private Long eventId; //事件主键标识
     private Long interfaceCfgId;//接口配置标识，主键标识

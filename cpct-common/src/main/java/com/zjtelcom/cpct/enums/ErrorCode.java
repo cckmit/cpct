@@ -46,7 +46,11 @@ public enum ErrorCode {
     SEARCH_EVENT_SCENE_LIST_FAILURE("查询事件场景列表失败！", "00023"),
     SAVE_EVENT_SCENE_LIST_FAILURE("新增事件场景列表失败！", "00024"),
     EDIT_EVENT_SCENE_LIST_FAILURE("编辑事件场景列表失败！", "00025"),
-    UPDATE_EVENT_SCENE_LIST_FAILURE("更新事件场景列表失败！", "00026");
+    UPDATE_EVENT_SCENE_LIST_FAILURE("更新事件场景列表失败！", "00026"),
+    SAVE_TAR_GRP_FAILURE("保存目标分群失败失败！", "00026"),
+    DEL_TAR_GRP_CONDITION_FAILURE("删除目标分群条件失败失败！", "00026"),
+    EDIT_TAR_GRP_CONDITION_FAILURE("编辑目标分群条件失败失败！", "00026"),
+    UPDATE_TAR_GRP_CONDITION_FAILURE("更新目标分群条件失败失败！", "00026");
 
     private String errorMsg;
     private String errorCode;

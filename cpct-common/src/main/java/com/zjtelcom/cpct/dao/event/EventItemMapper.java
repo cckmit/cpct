@@ -1,6 +1,6 @@
 package com.zjtelcom.cpct.dao.event;
 
-import com.zjtelcom.cpct.domain.event.DO.EventItemDO;
+import com.zjtelcom.cpct.domain.event.EventItemDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 import java.util.List;
