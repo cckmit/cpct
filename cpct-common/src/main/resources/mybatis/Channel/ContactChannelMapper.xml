@@ -59,6 +59,11 @@
     select CONTACT_CHL_ID, CONTACT_CHL_CODE, CONTACT_CHL_NAME, CONTACT_CHL_TYPE, CONTACT_CHL_DESC, 
     STATUS_CD, CREATE_STAFF, UPDATE_STAFF, REGION_ID, STATUS_DATE, UPDATE_DATE, CREATE_DATE, 
     REMARK
-    from contact_channel
+    from contact_channel channel
+    where 1=1
+      <if test="channelName != null and channelName != ''">
+          and channel.CONTACT_CHL_NAME LIKE CONCAT(CONCAT('%',#{channelName}),'%')
+      </if>
+
   </select>
 </mapper>

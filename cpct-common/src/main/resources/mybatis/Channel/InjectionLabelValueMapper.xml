@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.LabelValue">
+    <id column="LABEL_VALUE_ID" jdbcType="BIGINT" property="labelValueId" />
+    <result column="INJECTION_LABEL_ID" jdbcType="BIGINT" property="injectionLabelId" />
+    <result column="LABEL_VALUE" jdbcType="VARCHAR" property="labelValue" />
+    <result column="VALUE_NAME" jdbcType="VARCHAR" property="valueName" />
+    <result column="VALUE_DESC" jdbcType="VARCHAR" property="valueDesc" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from injection_label_value
+    where LABEL_VALUE_ID = #{labelValueId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.LabelValue">
+    insert into injection_label_value (LABEL_VALUE_ID, INJECTION_LABEL_ID, LABEL_VALUE, 
+      VALUE_NAME, VALUE_DESC, STATUS_CD, 
+      CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
+      STATUS_DATE, UPDATE_DATE, REMARK
+      )
+    values (#{labelValueId,jdbcType=BIGINT}, #{injectionLabelId,jdbcType=BIGINT}, #{labelValue,jdbcType=VARCHAR}, 
+      #{valueName,jdbcType=VARCHAR}, #{valueDesc,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR}, 
+      #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.LabelValue">
+    update injection_label_value
+    set INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT},
+      LABEL_VALUE = #{labelValue,jdbcType=VARCHAR},
+      VALUE_NAME = #{valueName,jdbcType=VARCHAR},
+      VALUE_DESC = #{valueDesc,jdbcType=VARCHAR},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where LABEL_VALUE_ID = #{labelValueId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select LABEL_VALUE_ID, INJECTION_LABEL_ID, LABEL_VALUE, VALUE_NAME, VALUE_DESC, STATUS_CD, 
+    CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from injection_label_value
+    where LABEL_VALUE_ID = #{labelValueId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select LABEL_VALUE_ID, INJECTION_LABEL_ID, LABEL_VALUE, VALUE_NAME, VALUE_DESC, STATUS_CD, 
+    CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from injection_label_value
+  </select>
+</mapper>

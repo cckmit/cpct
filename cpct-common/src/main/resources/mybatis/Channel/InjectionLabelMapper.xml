@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.InjectionLabelMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.Label">
+    <id column="INJECTION_LABEL_ID" jdbcType="BIGINT" property="injectionLabelId" />
+    <result column="INJECTION_LABEL_CODE" jdbcType="VARCHAR" property="injectionLabelCode" />
+    <result column="INJECTION_LABEL_NAME" jdbcType="VARCHAR" property="injectionLabelName" />
+    <result column="INJECTION_LABEL_DESC" jdbcType="VARCHAR" property="injectionLabelDesc" />
+    <result column="LABEL_TYPE" jdbcType="VARCHAR" property="labelType" />
+    <result column="LABEL_VALUE_TYPE" jdbcType="VARCHAR" property="labelValueType" />
+    <result column="LABEL_DATA_TYPE" jdbcType="VARCHAR" property="labelDataType" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from injection_label
+    where INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.Label">
+    insert into injection_label (INJECTION_LABEL_ID, INJECTION_LABEL_CODE, 
+      INJECTION_LABEL_NAME, INJECTION_LABEL_DESC, 
+      LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, 
+      STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+      CREATE_DATE, STATUS_DATE, UPDATE_DATE, 
+      REMARK)
+    values (#{injectionLabelId,jdbcType=BIGINT}, #{injectionLabelCode,jdbcType=VARCHAR}, 
+      #{injectionLabelName,jdbcType=VARCHAR}, #{injectionLabelDesc,jdbcType=VARCHAR}, 
+      #{labelType,jdbcType=VARCHAR}, #{labelValueType,jdbcType=VARCHAR}, #{labelDataType,jdbcType=VARCHAR}, 
+      #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.Label">
+    update injection_label
+    set INJECTION_LABEL_CODE = #{injectionLabelCode,jdbcType=VARCHAR},
+      INJECTION_LABEL_NAME = #{injectionLabelName,jdbcType=VARCHAR},
+      INJECTION_LABEL_DESC = #{injectionLabelDesc,jdbcType=VARCHAR},
+      LABEL_TYPE = #{labelType,jdbcType=VARCHAR},
+      LABEL_VALUE_TYPE = #{labelValueType,jdbcType=VARCHAR},
+      LABEL_DATA_TYPE = #{labelDataType,jdbcType=VARCHAR},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC, 
+    LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from injection_label
+    where INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC, 
+    LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from injection_label
+  </select>
+</mapper>
