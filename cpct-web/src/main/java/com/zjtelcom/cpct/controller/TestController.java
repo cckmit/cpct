@@ -1,12 +1,9 @@
 package com.zjtelcom.cpct.controller;
 
-<<<<<<< HEAD
 import com.zjtelcom.cpct.service.EngineTestService;
-=======
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
->>>>>>> d35a0700b05d6634d74ec3a965c9afe8d252ef98
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
