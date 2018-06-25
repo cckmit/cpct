@@ -11,6 +11,7 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.system.SysStaffRoleService;
 import com.zjtelcom.cpct.service.system.SysStaffService;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
+import org.apache.shiro.crypto.hash.SimpleHash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +30,9 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
     private SysStaffRoleMapper sysStaffRoleMapper;
 
     @Override
-    public List<SysStaff> listStaff(String staffCode, String staffName, Long status,Integer page,Integer pageSize) {
-        PageHelper.startPage(page,pageSize);
+    public List<SysStaff> listStaff(String staffCode, String staffName, Long status, Integer page, Integer pageSize) {
+        //分页
+        PageHelper.startPage(page, pageSize);
         List<SysStaff> list = sysStaffMapper.selectAll(staffCode, staffName, status);
         PageInfo pageInfo = new PageInfo(list);
         return list;
@@ -42,10 +44,13 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
 
         SysStaff sysStaff = new SysStaff();
         CopyPropertiesUtil.copyBean2Bean(sysStaff, sysStaffVO);
-        //todo 判断账号是否重复
-
-        //todo 密码加密
-
+        //判断账号是否重复
+        int count = sysStaffMapper.checkCodeRepeat(sysStaff.getStaffCode());
+        if (count > 0) {
+            //todo 异常 账号重复
+        }
+        //密码加密
+        sysStaff.setPassword(new SimpleHash("md5", sysStaff.getPassword()).toHex());
         //todo 获取当前登录用户id
         Long loginId = 1L;
         sysStaff.setCreateStaff(loginId);
@@ -149,9 +154,14 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
 
         }
         //密码加密
+        password = (new SimpleHash("md5", password).toHex());
 
         return sysStaffMapper.updatePassword(id, password);
     }
 
 
+    @Override
+    public int lastLogin(String staffCode) {
+        return sysStaffMapper.lastLogin(staffCode);
+    }
 }

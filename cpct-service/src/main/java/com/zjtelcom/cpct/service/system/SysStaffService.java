@@ -20,4 +20,6 @@ public interface SysStaffService {
 
     int updatePassword(Long id,String password);
 
+    int lastLogin(String staffCode);
+
 }

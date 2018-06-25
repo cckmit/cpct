@@ -30,13 +30,6 @@ mybatis:
     local-cache-scope: session                          #设置本地缓存范围 session:就会有数据的共享  statement:语句范围 (多个SqlSession或者分布式的环境下使用，避免脏读 ) defalut:session
     jdbc-type-for-null: null                            #设置但JDBC类型为空时,某些驱动程序 要指定值,default:OTHER，插入空值时不需要指定类型
 
-#pagehelper 分页插件配置
-#pagehelper:
-#    helperDialect: mysql
-#    reasonable: true
-#    supportMethodsArguments: true
-#    params: count=countSql
-
 spring:
   profiles:
     active: dev

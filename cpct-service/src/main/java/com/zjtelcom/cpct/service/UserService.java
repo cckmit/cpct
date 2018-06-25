@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.service;
 
 import com.zjtelcom.cpct.domain.User;
+
 import java.util.List;
 import java.util.Map;
 
@@ -11,9 +12,10 @@ import java.util.Map;
  * @Modified By:
  */
 public interface UserService {
-    /**用户查询接口**/
-    public List<User> query(User user);
 
-    /**根据用户名查询用户**/
-    public Map<String, Object> queryUserByName(String userName);
+    /**
+     * 根据用户名查询用户
+     **/
+    Map<String, Object> queryUserByName(String userName);
+
 }
