@@ -1,8 +1,7 @@
 package com.zjtelcom.cpct.shiro;
 
 import com.zjtelcom.cpct.domain.system.SysStaff;
-import com.zjtelcom.cpct.service.UserService;
-import com.zjtelcom.cpct.domain.User;
+import com.zjtelcom.cpct.service.system.SysStaffService;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -26,7 +25,7 @@ public class MyShiroRealm extends AuthorizingRealm {
     private static final Logger logger = LoggerFactory.getLogger(MyShiroRealm.class);
 
     @Resource
-    private UserService userService;
+    private SysStaffService userService;
 
     @Override
     public String getName() {

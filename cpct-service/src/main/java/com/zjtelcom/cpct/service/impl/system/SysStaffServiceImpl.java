@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.impl.system;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.dao.system.SysStaffMapper;
@@ -17,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -28,6 +31,24 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
 
     @Autowired
     private SysStaffRoleMapper sysStaffRoleMapper;
+
+    public Map<String, Object> queryUserByName(String userName) {
+        Map<String, Object> reslutMap = new HashMap<String, Object>();
+        SysStaff user = null;
+        try{
+            user = sysStaffMapper.queryUserByName(userName);
+        } catch(Exception e){
+            e.printStackTrace();
+            logger.error("根据用户名查询用户信息异常,参数={},异常={}",userName);
+            reslutMap.put("code", "1");
+            reslutMap.put("msg", "根据用户名查询用户信息失败!");
+            return reslutMap;
+        }
+        reslutMap.put("code", "0");
+        reslutMap.put("data", user);
+        logger.info("根据用户名查询用户信息,参数={},返回值={}",userName, JSON.toJSONString(user));
+        return reslutMap;
+    }
 
     @Override
     public List<SysStaff> listStaff(String staffCode, String staffName, Long status, Integer page, Integer pageSize) {

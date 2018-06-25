@@ -32,6 +32,7 @@
         <lombok.version>1.18.0</lombok.version>
         <commons-lang.version>2.6</commons-lang.version>
         <pagehelper.version>1.2.5</pagehelper.version>
+        <QLExpress.version>3.2.0</QLExpress.version>
     </properties>
 
     <parent>
@@ -162,6 +163,19 @@
                 <groupId>com.github.pagehelper</groupId>
                 <artifactId>pagehelper-spring-boot-starter</artifactId>
                 <version>${pagehelper.version}</version>
+            </dependency>
+
+            <!-- 规则引擎 -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>QLExpress</artifactId>
+                <version>${QLExpress.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>log4j</artifactId>
+                        <groupId>log4j</groupId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
         </dependencies>

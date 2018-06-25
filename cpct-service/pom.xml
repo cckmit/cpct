@@ -31,6 +31,12 @@
             <artifactId>shiro-spring</artifactId>
         </dependency>
 
+        <!-- 规则引擎 -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>QLExpress</artifactId>
+        </dependency>
+
     </dependencies>
 
 
