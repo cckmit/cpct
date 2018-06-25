@@ -31,18 +31,18 @@ public class ShiroConfiguration {
         logger.info("ShiroConfiguration.shirFilter()");
 
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
-
         shiroFilterFactoryBean.setSecurityManager(securityManager);
 
         /**涉及到顺序问题,不能颠倒,所以要用LinkedHashMap**/
         Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
 
-        filterChainDefinitionMap.put("/logout", "logout");
+//        filterChainDefinitionMap.put("/logout", "logout"); //之后在更换拦截的方式
+        filterChainDefinitionMap.put("/logout", "anon");
         filterChainDefinitionMap.put("/static/**", "anon");
         filterChainDefinitionMap.put("/ajaxLogin", "anon");
         filterChainDefinitionMap.put("/users/login", "anon");
-        filterChainDefinitionMap.put("/**", "anon");
-//        filterChainDefinitionMap.put("/**", "authc");
+        filterChainDefinitionMap.put("/**", "anon");  //所有url都不验证（开发）
+//        filterChainDefinitionMap.put("/**", "authc"); //都验证
 
         //配置shiro默认登录界面地址，前后端分离中登录界面跳转应由前端路由控制，后台仅返回json数据
         shiroFilterFactoryBean.setLoginUrl("/unauth");

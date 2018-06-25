@@ -12,6 +12,7 @@ import java.util.List;
 @Repository
 public interface SysStaffMapper {
 
+
     int deleteByPrimaryKey(Long staffId);
 
     int insert(SysStaff record);
@@ -25,5 +26,16 @@ public interface SysStaffMapper {
     int updateByPrimaryKey(SysStaff record);
 
     int changeStatus(SysStaff record);
+
+    int updatePassword(@Param("staffId") Long staffId,
+                       @Param("password") String password);
+
+    int checkCodeRepeat(@Param("staffCode") String staffCode);
+
+    SysStaff queryUserByName(@Param("staffCode") String staffCode);
+
+    int lastLogin(@Param("staffCode") String staffCode);
+
+
 
 }

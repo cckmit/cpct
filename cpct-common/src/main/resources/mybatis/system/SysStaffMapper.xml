@@ -19,13 +19,21 @@
         <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff"/>
     </resultMap>
 
+    <!-- 根据用户名查询用户信息 -->
+    <select id="queryUserByName" resultMap="BaseResultMap" parameterType="String">
+        select STAFF_ID, STAFF_CODE, STAFF_NAME, PASSWORD, STAFF_PHONE, STAFF_TELEPHONE,
+        STAFF_EMAIL, CHANNEL_ID, CITY_ID, STATUS, LAST_LOGIN
+        from sys_staff
+        where STAFF_CODE = #{staffCode,jdbcType=VARCHAR}
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
       delete from sys_staff
       where STAFF_ID = #{staffId,jdbcType=BIGINT}
     </delete>
 
-    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.system.SysStaff">
+    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.system.SysStaff" keyProperty="staffId"
+            useGeneratedKeys="true">
       insert into sys_staff (STAFF_CODE, STAFF_NAME,
         PASSWORD, STAFF_PHONE, STAFF_TELEPHONE,
         STAFF_EMAIL, CHANNEL_ID, CITY_ID,
@@ -56,7 +64,7 @@
     </update>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-      select STAFF_ID, STAFF_CODE, STAFF_NAME, PASSWORD, STAFF_PHONE, STAFF_TELEPHONE,
+      select STAFF_ID, STAFF_CODE, STAFF_NAME, STAFF_PHONE, STAFF_TELEPHONE,
       STAFF_EMAIL, CHANNEL_ID, CITY_ID, STATUS, LAST_LOGIN, CREATE_DATE, CREATE_STAFF,
       UPDATE_DATE, UPDATE_STAFF
       from sys_staff
@@ -64,7 +72,7 @@
     </select>
 
     <select id="selectAll" resultMap="BaseResultMap">
-        select STAFF_ID, STAFF_CODE, STAFF_NAME, PASSWORD, STAFF_PHONE, STAFF_TELEPHONE,
+        select STAFF_ID, STAFF_CODE, STAFF_NAME, STAFF_PHONE, STAFF_TELEPHONE,
         STAFF_EMAIL, CHANNEL_ID, CITY_ID, STATUS, LAST_LOGIN, CREATE_DATE, CREATE_STAFF,
         UPDATE_DATE, UPDATE_STAFF
         from sys_staff
@@ -84,4 +92,21 @@
       where STAFF_ID = #{staffId,jdbcType=BIGINT}
     </update>
 
+    <update id="updatePassword" parameterType="com.zjtelcom.cpct.domain.system.SysStaff">
+      update sys_staff
+      set PASSWORD = #{password,jdbcType=BIGINT}
+      where STAFF_ID = #{staffId,jdbcType=BIGINT}
+    </update>
+
+    <select id="checkCodeRepeat" parameterType="java.lang.String" resultType="java.lang.Integer">
+      select count(0)
+      from sys_staff
+      where STAFF_CODE = #{staffCode,jdbcType=VARCHAR}
+    </select>
+
+    <update id="lastLogin" parameterType="java.lang.String">
+      update sys_staff
+      set LAST_LOGIN = now()
+      where STAFF_CODE = #{staffCode,jdbcType=VARCHAR}
+    </update>
 </mapper>
