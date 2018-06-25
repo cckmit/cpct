@@ -55,7 +55,7 @@ public interface LabelService {
 
     List<LabelValue> getLabelValueList(Long userId, Map<String,Object> params, Integer page, Integer pageSize);
 
-    LabelValue getLabelValueDetail(Long userId,Long scriptId);
+    LabelValue getLabelValueDetail(Long userId,Long labelValueId);
 
 
 

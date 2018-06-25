@@ -8,6 +8,7 @@ import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dto.LabelAddVO;
 import com.zjtelcom.cpct.dto.LabelVO;
+import com.zjtelcom.cpct.dto.LabelValueVO;
 import com.zjtelcom.cpct.dto.ScriptVO;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.LabelService;
@@ -260,10 +261,12 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     }
 
     @Override
-    public LabelValue getLabelValueDetail(Long userId, Long scriptId) {
+    public LabelValue getLabelValueDetail(Long userId, Long labelValueId) {
         LabelValue labelValue = new LabelValue();
+        LabelValueVO vo = new LabelValueVO();
         try {
-            labelValue = labelValueMapper.selectByPrimaryKey(scriptId);
+            labelValue = labelValueMapper.selectByPrimaryKey(labelValueId);
+            vo = ChannelUtil.map2LabelValueVO(labelValue);
         }catch (Exception e){
             e.printStackTrace();
             logger.error("[op:LabelServiceImpl] fail to getLabelValueDetail ", e);
