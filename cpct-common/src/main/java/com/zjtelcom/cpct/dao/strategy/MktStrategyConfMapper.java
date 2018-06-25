@@ -1,0 +1,18 @@
+package com.zjtelcom.cpct.dao.strategy;
+
+
+import com.zjtelcom.cpct.domain.campaign.DTO.MktStrategyConf;
+
+import java.util.List;
+
+public interface MktStrategyConfMapper {
+    int deleteByPrimaryKey(Long mktStrategyConfId);
+
+    int insert(MktStrategyConf mktStrategyConf);
+
+    MktStrategyConf selectByPrimaryKey(Long mktStrategyConfId);
+
+    List<MktStrategyConf> selectAll();
+
+    int updateByPrimaryKey(MktStrategyConf mktStrategyConf);
+}

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.MktCampaignMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.MktCampaign">
+    <id column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId" />
+    <result column="TIGGER_TYPE" jdbcType="VARCHAR" property="tiggerType" />
+    <result column="MKT_CAMPAIGN_NAME" jdbcType="VARCHAR" property="mktCampaignName" />
+    <result column="PLAN_BEGIN_TIME" jdbcType="DATE" property="planBeginTime" />
+    <result column="PLAN_END_TIME" jdbcType="DATE" property="planEndTime" />
+    <result column="BEGIN_TIME" jdbcType="DATE" property="beginTime" />
+    <result column="END_TIME" jdbcType="DATE" property="endTime" />
+    <result column="MKT_CAMPAIGN_TYPE" jdbcType="VARCHAR" property="mktCampaignType" />
+    <result column="MKT_ACTIVITY_NBR" jdbcType="VARCHAR" property="mktActivityNbr" />
+    <result column="MKT_ACTIVITY_TARGET" jdbcType="VARCHAR" property="mktActivityTarget" />
+    <result column="MKT_CAMPAIGN_DESC" jdbcType="VARCHAR" property="mktCampaignDesc" />
+    <result column="EXEC_TYPE" jdbcType="VARCHAR" property="execType" />
+    <result column="EXEC_INVL" jdbcType="VARCHAR" property="execInvl" />
+    <result column="EXEC_NUM" jdbcType="INTEGER" property="execNum" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="LAN_ID" jdbcType="BIGINT" property="lanId" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from mkt_campaign
+    where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.MktCampaign">
+    insert into mkt_campaign (MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, 
+      PLAN_BEGIN_TIME, PLAN_END_TIME, BEGIN_TIME, 
+      END_TIME, MKT_CAMPAIGN_TYPE, MKT_ACTIVITY_NBR, 
+      MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, EXEC_TYPE, 
+      EXEC_INVL, EXEC_NUM, STATUS_CD, 
+      STATUS_DATE, CREATE_STAFF, CREATE_DATE, 
+      UPDATE_STAFF, UPDATE_DATE, REMARK, 
+      LAN_ID)
+    values (#{mktCampaignId,jdbcType=BIGINT}, #{tiggerType,jdbcType=VARCHAR}, #{mktCampaignName,jdbcType=VARCHAR}, 
+      #{planBeginTime,jdbcType=DATE}, #{planEndTime,jdbcType=DATE}, #{beginTime,jdbcType=DATE}, 
+      #{endTime,jdbcType=DATE}, #{mktCampaignType,jdbcType=VARCHAR}, #{mktActivityNbr,jdbcType=VARCHAR}, 
+      #{mktActivityTarget,jdbcType=VARCHAR}, #{mktCampaignDesc,jdbcType=VARCHAR}, #{execType,jdbcType=VARCHAR}, 
+      #{execInvl,jdbcType=VARCHAR}, #{execNum,jdbcType=INTEGER}, #{statusCd,jdbcType=VARCHAR}, 
+      #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, 
+      #{lanId,jdbcType=BIGINT})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.MktCampaign">
+    update mkt_campaign
+    set TIGGER_TYPE = #{tiggerType,jdbcType=VARCHAR},
+      MKT_CAMPAIGN_NAME = #{mktCampaignName,jdbcType=VARCHAR},
+      PLAN_BEGIN_TIME = #{planBeginTime,jdbcType=DATE},
+      PLAN_END_TIME = #{planEndTime,jdbcType=DATE},
+      BEGIN_TIME = #{beginTime,jdbcType=DATE},
+      END_TIME = #{endTime,jdbcType=DATE},
+      MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR},
+      MKT_ACTIVITY_NBR = #{mktActivityNbr,jdbcType=VARCHAR},
+      MKT_ACTIVITY_TARGET = #{mktActivityTarget,jdbcType=VARCHAR},
+      MKT_CAMPAIGN_DESC = #{mktCampaignDesc,jdbcType=VARCHAR},
+      EXEC_TYPE = #{execType,jdbcType=VARCHAR},
+      EXEC_INVL = #{execInvl,jdbcType=VARCHAR},
+      EXEC_NUM = #{execNum,jdbcType=INTEGER},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      LAN_ID = #{lanId,jdbcType=BIGINT}
+    where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME, 
+    BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MKT_ACTIVITY_NBR, MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, 
+    EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, 
+    UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
+    from mkt_campaign
+    where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME, 
+    BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MKT_ACTIVITY_NBR, MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, 
+    EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, 
+    UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
+    from mkt_campaign
+  </select>
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.MktCampaign">
+    <id column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId" />
+    <result column="TIGGER_TYPE" jdbcType="VARCHAR" property="tiggerType" />
+    <result column="MKT_CAMPAIGN_NAME" jdbcType="VARCHAR" property="mktCampaignName" />
+    <result column="PLAN_BEGIN_TIME" jdbcType="DATE" property="planBeginTime" />
+    <result column="PLAN_END_TIME" jdbcType="DATE" property="planEndTime" />
+    <result column="BEGIN_TIME" jdbcType="DATE" property="beginTime" />
+    <result column="END_TIME" jdbcType="DATE" property="endTime" />
+    <result column="MKT_CAMPAIGN_TYPE" jdbcType="VARCHAR" property="mktCampaignType" />
+    <result column="MKT_ACTIVITY_NBR" jdbcType="VARCHAR" property="mktActivityNbr" />
+    <result column="MKT_ACTIVITY_TARGET" jdbcType="VARCHAR" property="mktActivityTarget" />
+    <result column="MKT_CAMPAIGN_DESC" jdbcType="VARCHAR" property="mktCampaignDesc" />
+    <result column="EXEC_TYPE" jdbcType="VARCHAR" property="execType" />
+    <result column="EXEC_INVL" jdbcType="VARCHAR" property="execInvl" />
+    <result column="EXEC_NUM" jdbcType="INTEGER" property="execNum" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="LAN_ID" jdbcType="BIGINT" property="lanId" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from mkt_campaign
+    where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.MktCampaign">
+    insert into mkt_campaign (MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, 
+      PLAN_BEGIN_TIME, PLAN_END_TIME, BEGIN_TIME, 
+      END_TIME, MKT_CAMPAIGN_TYPE, MKT_ACTIVITY_NBR, 
+      MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, EXEC_TYPE, 
+      EXEC_INVL, EXEC_NUM, STATUS_CD, 
+      STATUS_DATE, CREATE_STAFF, CREATE_DATE, 
+      UPDATE_STAFF, UPDATE_DATE, REMARK, 
+      LAN_ID)
+    values (#{mktCampaignId,jdbcType=BIGINT}, #{tiggerType,jdbcType=VARCHAR}, #{mktCampaignName,jdbcType=VARCHAR}, 
+      #{planBeginTime,jdbcType=DATE}, #{planEndTime,jdbcType=DATE}, #{beginTime,jdbcType=DATE}, 
+      #{endTime,jdbcType=DATE}, #{mktCampaignType,jdbcType=VARCHAR}, #{mktActivityNbr,jdbcType=VARCHAR}, 
+      #{mktActivityTarget,jdbcType=VARCHAR}, #{mktCampaignDesc,jdbcType=VARCHAR}, #{execType,jdbcType=VARCHAR}, 
+      #{execInvl,jdbcType=VARCHAR}, #{execNum,jdbcType=INTEGER}, #{statusCd,jdbcType=VARCHAR}, 
+      #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, 
+      #{lanId,jdbcType=BIGINT})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.MktCampaign">
+    update mkt_campaign
+    set TIGGER_TYPE = #{tiggerType,jdbcType=VARCHAR},
+      MKT_CAMPAIGN_NAME = #{mktCampaignName,jdbcType=VARCHAR},
+      PLAN_BEGIN_TIME = #{planBeginTime,jdbcType=DATE},
+      PLAN_END_TIME = #{planEndTime,jdbcType=DATE},
+      BEGIN_TIME = #{beginTime,jdbcType=DATE},
+      END_TIME = #{endTime,jdbcType=DATE},
+      MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR},
+      MKT_ACTIVITY_NBR = #{mktActivityNbr,jdbcType=VARCHAR},
+      MKT_ACTIVITY_TARGET = #{mktActivityTarget,jdbcType=VARCHAR},
+      MKT_CAMPAIGN_DESC = #{mktCampaignDesc,jdbcType=VARCHAR},
+      EXEC_TYPE = #{execType,jdbcType=VARCHAR},
+      EXEC_INVL = #{execInvl,jdbcType=VARCHAR},
+      EXEC_NUM = #{execNum,jdbcType=INTEGER},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      LAN_ID = #{lanId,jdbcType=BIGINT}
+    where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME, 
+    BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MKT_ACTIVITY_NBR, MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, 
+    EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, 
+    UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
+    from mkt_campaign
+    where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME, 
+    BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MKT_ACTIVITY_NBR, MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, 
+    EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, 
+    UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
+    from mkt_campaign
+  </select>
+</mapper>
