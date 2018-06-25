@@ -1,10 +1,10 @@
-package com.zjtelcom.cpct.domain.event.DTO;
+package com.zjtelcom.cpct.domain.event;
 
 import com.zjtelcom.cpct.BaseEntity;
 import lombok.Data;
 
 @Data
-public class EventSceneDTO extends BaseEntity {
+public class EventSceneDO extends BaseEntity {
 
     private Long eventSceneId;  //事件场景标识
     private String eventSceneNbr;//事件场景编码

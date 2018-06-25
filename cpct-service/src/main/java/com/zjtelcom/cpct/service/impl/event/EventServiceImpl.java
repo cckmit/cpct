@@ -3,11 +3,11 @@ package com.zjtelcom.cpct.service.impl.event;
 import com.zjtelcom.cpct.dao.event.EventItemMapper;
 import com.zjtelcom.cpct.dao.event.EventMapper;
 import com.zjtelcom.cpct.dao.event.EventSceneMapper;
-import com.zjtelcom.cpct.domain.event.DO.EventDO;
-import com.zjtelcom.cpct.domain.event.DO.EventItemDO;
-import com.zjtelcom.cpct.domain.event.DO.EventSceneDO;
-import com.zjtelcom.cpct.domain.event.DTO.EventDTO;
-import com.zjtelcom.cpct.domain.event.EventList;
+import com.zjtelcom.cpct.domain.event.EventDO;
+import com.zjtelcom.cpct.domain.event.EventItemDO;
+import com.zjtelcom.cpct.domain.event.EventSceneDO;
+import com.zjtelcom.cpct.dto.event.EventDTO;
+import com.zjtelcom.cpct.dto.event.EventList;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.EventService;
@@ -15,6 +15,7 @@ import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class EventServiceImpl extends BaseService implements EventService {
     private EventSceneMapper eventSceneMapper;
 
     /**
-     * listEvents
+     * 查询事件列表
      *
      * @return
      */
@@ -125,10 +126,7 @@ public class EventServiceImpl extends BaseService implements EventService {
     public EventDTO editEvent(Long eventId) {
         EventDTO eventDTO = new EventDTO();
         try {
-            EventDO eventDO = eventMapper.getEventById(eventId);
-            if (eventDO != null) {
-                CopyPropertiesUtil.copyBean2Bean(eventDTO, eventDO);
-            }
+            eventDTO = (EventDTO) eventMapper.getEventById(eventId);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("[op:EventServiceImpl] fail to editEvent ", e);

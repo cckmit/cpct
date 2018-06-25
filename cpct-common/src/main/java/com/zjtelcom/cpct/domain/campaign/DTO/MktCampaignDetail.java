@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class MktCampaignDTO extends BaseEntity{
+public class MktCampaignDetail extends BaseEntity{
 
     private Long mktCampaignId;
     private String tiggerType;

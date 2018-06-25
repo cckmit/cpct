@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zjtelcom.cpct.dao.event.EventSceneMapper">
-    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.event.DO.EventSceneDO">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.event.EventSceneDO">
         <id column="EVENT_SCENE_ID" jdbcType="BIGINT" property="eventSceneId"/>
         <result column="EVENT_SCENE_NBR" jdbcType="VARCHAR" property="eventSceneNbr"/>
         <result column="EVENT_SCENE_NAME" jdbcType="VARCHAR" property="eventSceneName"/>
@@ -21,7 +21,7 @@
     delete from event_scene
     where EVENT_SCENE_ID = #{eventSceneId,jdbcType=BIGINT}
   </delete>
-    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.event.DO.EventSceneDO">
+    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.event.EventSceneDO">
     insert into event_scene (EVENT_SCENE_ID, EVENT_SCENE_NBR, EVENT_SCENE_NAME, 
       EVENT_SCENE_DESC, EVENT_ID, EXT_EVENT_SCENE_ID, 
       STATUS_CD, STATUS_DATE, CREATE_STAFF, 
@@ -33,7 +33,7 @@
       #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, #{createDate,jdbcType=TIMESTAMP}, 
       #{remark,jdbcType=VARCHAR}, #{contactEvtCode,jdbcType=VARCHAR})
   </insert>
-    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.event.DO.EventSceneDO">
+    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.event.EventSceneDO">
         update event_scene
         set
         <if test="eventSceneNbr != null and eventSceneNbr != '' ">
@@ -92,7 +92,7 @@
     from event_scene
   </select>
 
-    <select id="listEventSences" parameterType="com.zjtelcom.cpct.domain.event.DO.EventSceneDO"
+    <select id="listEventSences" parameterType="com.zjtelcom.cpct.domain.event.EventSceneDO"
             resultMap="BaseResultMap">
         select EVENT_SCENE_ID, EVENT_SCENE_NBR, EVENT_SCENE_NAME, EVENT_SCENE_DESC, EVENT_ID,
         EXT_EVENT_SCENE_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE,
@@ -104,7 +104,7 @@
         </if>
     </select>
 
-    <insert id="saveEventScene" parameterType="com.zjtelcom.cpct.domain.event.DO.EventSceneDO">
+    <insert id="saveEventScene" parameterType="com.zjtelcom.cpct.domain.event.EventSceneDO">
     insert into event_scene ( EVENT_SCENE_NBR, EVENT_SCENE_NAME,
     EVENT_SCENE_DESC, EVENT_ID, EXT_EVENT_SCENE_ID,
     STATUS_CD, STATUS_DATE, CREATE_STAFF,

@@ -1,12 +1,12 @@
-package com.zjtelcom.cpct.domain.event.DTO;
+package com.zjtelcom.cpct.dto.event;
 
-import com.zjtelcom.cpct.BaseEntity;
+import com.zjtelcom.cpct.domain.event.EventTypeDO;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class EventTypeDTO extends BaseEntity{
+public class EventTypeDTO extends EventTypeDO {
 
     private Long evtTypeId;//事件类型标识，主键标识
     private String evtTypeNbr;//记录事件类型的编码

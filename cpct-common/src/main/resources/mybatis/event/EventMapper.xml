@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.zjtelcom.cpct.dao.event.EventMapper">
-    <resultMap id="resultMapper" type="com.zjtelcom.cpct.domain.event.EventList">
+    <resultMap id="resultMapper" type="com.zjtelcom.cpct.dto.event.EventList">
         <id column="EVENT_ID" property="eventId"/>
         <result column="EVENT_NBR" property="eventNbr"/>
         <result column="EVENT_NAME" property="eventName"/>
@@ -20,7 +20,7 @@
 
 
     <!--查询列表方法-->
-    <select id="listEvents" resultType="com.zjtelcom.cpct.domain.event.EventList">
+    <select id="listEvents" resultType="com.zjtelcom.cpct.dto.event.EventList">
         select
         e.EVENT_ID eventId,
         e.EVENT_NBR eventNbr,
@@ -56,7 +56,7 @@
     <!--插入操作,useGeneratedKeys代表支持自动生成序列号,keyProperty代表自动生成序列号的属性为id-->
     <!--由于采用了自动生成序列号,因此id不需要在mapper文件中写出来-->
     <insert id="saveEvent" keyProperty="eventId" useGeneratedKeys="true"
-            parameterType="com.zjtelcom.cpct.domain.event.DO.EventDO">
+            parameterType="com.zjtelcom.cpct.domain.event.EventDO">
         insert into event (
           INTERFACE_CFG_ID,
           EVENT_NBR,
@@ -122,12 +122,12 @@
     </update>
 
     <!--查询方法，通过id查询-->
-    <select id="getEventById" resultType="com.zjtelcom.cpct.domain.event.DO.EventDO">
+    <select id="getEventById" resultType="com.zjtelcom.cpct.domain.event.EventDO">
         select * from event
         where EVENT_ID = #{eventId,jdbcType=BIGINT}
     </select>
 
-    <update id="updateEvent" parameterType="com.zjtelcom.cpct.domain.event.DO.EventDO">
+    <update id="updateEvent" parameterType="com.zjtelcom.cpct.domain.event.EventDO">
         update event
         set
         <if test="evtSrcId != null and evtSrcId != 0">
