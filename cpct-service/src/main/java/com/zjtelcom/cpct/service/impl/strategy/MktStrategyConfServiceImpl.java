@@ -7,7 +7,7 @@
 package com.zjtelcom.cpct.service.impl.strategy;
 
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
-import com.zjtelcom.cpct.domain.campaign.DTO.MktStrategyConf;
+import com.zjtelcom.cpct.dto.campaign.MktStrategyConf;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

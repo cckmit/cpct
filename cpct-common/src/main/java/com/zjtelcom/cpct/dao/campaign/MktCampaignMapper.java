@@ -1,7 +1,7 @@
 package com.zjtelcom.cpct.dao.campaign;
 
 
-import com.zjtelcom.cpct.domain.campaign.DTO.MktCampaign;
+import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -12,11 +12,11 @@ import java.util.List;
 public interface MktCampaignMapper {
     int deleteByPrimaryKey(Long mktCampaignId);
 
-    int insert(MktCampaign record);
+    int insert(MktCampaignDO record);
 
-    MktCampaign selectByPrimaryKey(Long mktCampaignId);
+    MktCampaignDO selectByPrimaryKey(Long mktCampaignId);
 
-    List<MktCampaign> selectAll();
+    List<MktCampaignDO> selectAll();
 
-    int updateByPrimaryKey(MktCampaign record);
+    int updateByPrimaryKey(MktCampaignDO record);
 }

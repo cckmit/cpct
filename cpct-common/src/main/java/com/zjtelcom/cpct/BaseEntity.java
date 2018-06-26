@@ -19,5 +19,6 @@ public abstract class BaseEntity {
     private Date statusDate;//状态时间
     private Date updateDate;//更新时间
     private String remark;//备注
+    private Long lanId;//本地网标识
 
 }

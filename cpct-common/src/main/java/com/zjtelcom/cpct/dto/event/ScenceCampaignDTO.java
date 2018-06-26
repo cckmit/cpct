@@ -1,6 +1,6 @@
 package com.zjtelcom.cpct.dto.event;
 
-import com.zjtelcom.cpct.domain.campaign.DO.MktCampaignDO;
+import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.event.EventMatchRulDO;
 import lombok.Data;
 

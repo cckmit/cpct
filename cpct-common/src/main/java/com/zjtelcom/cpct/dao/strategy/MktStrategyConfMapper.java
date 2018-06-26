@@ -1,7 +1,7 @@
 package com.zjtelcom.cpct.dao.strategy;
 
 
-import com.zjtelcom.cpct.domain.campaign.DTO.MktStrategyConf;
+import com.zjtelcom.cpct.dto.campaign.MktStrategyConf;
 
 import java.util.List;
 

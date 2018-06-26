@@ -1,4 +1,4 @@
-package com.zjtelcom.cpct.domain.campaign.DTO;
+package com.zjtelcom.cpct.dto.campaign;
 
 import java.util.Date;
 
