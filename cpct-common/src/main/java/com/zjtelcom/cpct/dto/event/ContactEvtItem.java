@@ -1,13 +1,19 @@
-package com.zjtelcom.cpct.domain.event;
+package com.zjtelcom.cpct.dto.event;
 
 import com.zjtelcom.cpct.BaseEntity;
 import lombok.Data;
 
+/**
+ * @Description 事件采集项实体类
+ * @Author pengy
+ * @Date 2018/6/26 13:54
+ */
 @Data
-public class EventItemDO extends BaseEntity {
+public class ContactEvtItem extends BaseEntity {
 
+    private String actType;//  KIP=保持/ADD=新增/MOD=修改/DEL=删除
     private Long evtItemId;//事件采集项主键
-    private Long eventId;//事件标识
+    private Long contactEvtId;//事件标识
     private Long evtTypeId;//事件类型标识
     private String evtItemName;//记录事件采集项的名称
     private String evtItemCode;//记录事件采集项的编码，主要用于格式化

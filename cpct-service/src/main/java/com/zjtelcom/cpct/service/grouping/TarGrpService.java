@@ -23,4 +23,6 @@ public interface TarGrpService {
 
     Map<String,Object> updateTarGrpConditionDO(TarGrpConditionDO tarGrpConditionDO);
 
+    Map<String, Object> saveBigDataModel(Long mktCamGrpRulId);
+
 }
