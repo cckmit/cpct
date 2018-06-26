@@ -1,8 +1,11 @@
-package com.zjtelcom.cpct.domain.campaign;
+package com.zjtelcom.cpct.dto.campaign;
+
+import com.zjtelcom.cpct.domain.campaign.City;
 
 import java.util.Date;
+import java.util.List;
 
-public class MktStrategyConfDO {
+public class MktStrategyConfDetail {
     private Long mktStrategyConfId;
 
     private String mktStrategyConfName;
@@ -10,6 +13,8 @@ public class MktStrategyConfDO {
     private Date beginTime;
 
     private Date endTime;
+
+    private List<City> cityList;
 
     private Long channelsId;
 
@@ -51,6 +56,14 @@ public class MktStrategyConfDO {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public List<City> getCityList() {
+        return cityList;
+    }
+
+    public void setCityList(List<City> cityList) {
+        this.cityList = cityList;
     }
 
     public Long getChannelsId() {

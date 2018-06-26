@@ -50,7 +50,17 @@ public enum ErrorCode {
     SAVE_TAR_GRP_FAILURE("保存目标分群失败失败！", "00026"),
     DEL_TAR_GRP_CONDITION_FAILURE("删除目标分群条件失败失败！", "00026"),
     EDIT_TAR_GRP_CONDITION_FAILURE("编辑目标分群条件失败失败！", "00026"),
-    UPDATE_TAR_GRP_CONDITION_FAILURE("更新目标分群条件失败失败！", "00026");
+    UPDATE_TAR_GRP_CONDITION_FAILURE("更新目标分群条件失败失败！", "00026"),
+
+    SAVE_MKT_CAMPAIGN_SUCCESS("添加策略配置成功！", "00001"),
+    SAVE_MKT_CAMPAIGN_FAILURE("添加策略配置失败！", "00001"),
+    UPDATE_MKT_CAMPAIGN_SUCCESS("修改策略配置成功！", "00001"),
+    UPDATE_MKT_CAMPAIGN_FAILURE("修改策略配置失败！", "00001"),
+    GET_MKT_CAMPAIGN_SUCCESS("修改策略配置失败！", "00001"),
+    GET_MKT_CAMPAIGN_FAILURE("修改策略配置失败！", "00001"),
+    DELETE_MKT_CAMPAIGN_SUCCESS("删除策略配置成功！", "00001"),
+    DELETE_MKT_CAMPAIGN_FAILURE("删除策略配置失败！", "00001");
+
 
     private String errorMsg;
     private String errorCode;

@@ -2,16 +2,18 @@ package com.zjtelcom.cpct.domain.campaign;
 
 import java.util.Date;
 
-public class MktStrategyConfDO {
+public class MktStrategyConfRegionRelDO {
+    private Long mktStrategyConfRegionRelId;
+
     private Long mktStrategyConfId;
 
-    private String mktStrategyConfName;
+    private Long applyCityId;
 
-    private Date beginTime;
+    private String applyCounty;
 
-    private Date endTime;
+    private String applyBranch;
 
-    private Long channelsId;
+    private String applyGridding;
 
     private Long createStaff;
 
@@ -21,6 +23,14 @@ public class MktStrategyConfDO {
 
     private Date updateDate;
 
+    public Long getMktStrategyConfRegionRelId() {
+        return mktStrategyConfRegionRelId;
+    }
+
+    public void setMktStrategyConfRegionRelId(Long mktStrategyConfRegionRelId) {
+        this.mktStrategyConfRegionRelId = mktStrategyConfRegionRelId;
+    }
+
     public Long getMktStrategyConfId() {
         return mktStrategyConfId;
     }
@@ -29,36 +39,36 @@ public class MktStrategyConfDO {
         this.mktStrategyConfId = mktStrategyConfId;
     }
 
-    public String getMktStrategyConfName() {
-        return mktStrategyConfName;
+    public Long getApplyCityId() {
+        return applyCityId;
     }
 
-    public void setMktStrategyConfName(String mktStrategyConfName) {
-        this.mktStrategyConfName = mktStrategyConfName;
+    public void setApplyCityId(Long applyCityId) {
+        this.applyCityId = applyCityId;
     }
 
-    public Date getBeginTime() {
-        return beginTime;
+    public String getApplyCounty() {
+        return applyCounty;
     }
 
-    public void setBeginTime(Date beginTime) {
-        this.beginTime = beginTime;
+    public void setApplyCounty(String applyCounty) {
+        this.applyCounty = applyCounty;
     }
 
-    public Date getEndTime() {
-        return endTime;
+    public String getApplyBranch() {
+        return applyBranch;
     }
 
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
+    public void setApplyBranch(String applyBranch) {
+        this.applyBranch = applyBranch;
     }
 
-    public Long getChannelsId() {
-        return channelsId;
+    public String getApplyGridding() {
+        return applyGridding;
     }
 
-    public void setChannelsId(Long channelsId) {
-        this.channelsId = channelsId;
+    public void setApplyGridding(String applyGridding) {
+        this.applyGridding = applyGridding;
     }
 
     public Long getCreateStaff() {
