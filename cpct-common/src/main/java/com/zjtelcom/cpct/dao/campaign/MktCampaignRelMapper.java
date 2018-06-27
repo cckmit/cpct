@@ -1,8 +1,9 @@
 package com.zjtelcom.cpct.dao.campaign;
 
 
-import com.zjtelcom.cpct.domain.campaign.DTO.MktCampaignRel;
 
+
+import com.zjtelcom.cpct.dto.campaign.MktCampaignRel;
 
 import java.util.List;
 

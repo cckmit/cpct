@@ -6,9 +6,19 @@
  */
 package com.zjtelcom.cpct.service.impl.strategy;
 
+import com.alibaba.fastjson.JSON;
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
-import com.zjtelcom.cpct.domain.campaign.DTO.MktStrategyConf;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRegionRelMapper;
+import com.zjtelcom.cpct.domain.campaign.City;
+import com.zjtelcom.cpct.domain.campaign.CityProperty;
+import com.zjtelcom.cpct.domain.campaign.MktStrategyConfDO;
+import com.zjtelcom.cpct.domain.campaign.MktStrategyConfRegionRelDO;
+import com.zjtelcom.cpct.dto.campaign.MktStrategyConfDetail;
+import com.zjtelcom.cpct.enums.ErrorCode;
+import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
+import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +43,11 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
 
     @Autowired
     private MktStrategyConfRegionRelMapper mktStrategyConfRegionRelMapper;
+
+    @Override
+    public Map<String, Object> deleteMktStrategyConf(Long mktStrategyConfId) {
+        return null;
+    }
 
     /**
      * 添加策略配置信息
