@@ -57,4 +57,22 @@
     CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
     from injection_label_value
   </select>
+
+  <delete id="deleteAll">
+  	delete from injection_label_value
+  </delete>
+
+  <!-- 批量插入 -->
+  <insert id="insertBatch" parameterType="java.util.List">
+    insert into injection_label_value ( LABEL_VALUE_ID, INJECTION_LABEL_ID, LABEL_VALUE, VALUE_NAME, VALUE_DESC, STATUS_CD,
+    CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK)
+    values
+    <foreach collection="record" item="item" index="i" separator=",">
+      (#{labelValueId,jdbcType=BIGINT}, #{injectionLabelId,jdbcType=BIGINT}, #{labelValue,jdbcType=VARCHAR},
+      #{valueName,jdbcType=VARCHAR}, #{valueDesc,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR},
+      #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP},
+      #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+      )
+    </foreach>
+  </insert>
 </mapper>

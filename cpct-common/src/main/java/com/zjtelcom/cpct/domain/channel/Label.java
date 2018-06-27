@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 public class Label extends BaseEntity {
     private Long injectionLabelId;
+    private Long tagRowId;
     private String injectionLabelCode;
     private String injectionLabelName;
     private String injectionLabelDesc;

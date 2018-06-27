@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.dao.channel;
 
 import com.zjtelcom.cpct.domain.channel.Label;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,4 +20,10 @@ public interface InjectionLabelMapper {
     List<Label> selectAll();
 
     int updateByPrimaryKey(Label record);
+
+    int deleteAll();
+
+    int insertBatch(@Param("record")List<Label> record);
+
+
 }

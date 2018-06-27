@@ -5,6 +5,8 @@ import com.zjtelcom.cpct.dto.channel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Random;
+
 @Component
 public class ChannelUtil  {
 
@@ -36,4 +38,45 @@ public class ChannelUtil  {
         VerbalVO vo = BeanUtil.create(verbal,new VerbalVO());
         return vo;
     }
+
+    public static String getRandomStr(int length) {
+        char[] chars = "23456789ABCDEFGHJKMNPQRSTUVWXYZ".toCharArray();
+        Random r = new Random(System.currentTimeMillis());
+        String string = "";
+
+        for(int i = 0; i < length; ++i) {
+            string = string + chars[r.nextInt(31)];
+        }
+
+        return string;
+    }
+
+    public static String getDataType(String dataType){
+        //1000	日期型;1100	日期时间型;1200	字符型;1300	浮点型;1400	整数型;1500	布尔型;1600	计算型
+        String data = "";
+        switch (dataType){
+            case "text":
+                data = "1200";
+                break;
+            case "number":
+                data = "1400";
+                break;
+            case "date":
+                data = "1100";
+                break;
+            case "integer":
+                data = "1400";
+                break;
+            case "character":
+                data = "1200";
+                break;
+            case "smallint":
+                data = "1600";
+                break;
+        }
+        return data;
+    }
+
+
+
 }

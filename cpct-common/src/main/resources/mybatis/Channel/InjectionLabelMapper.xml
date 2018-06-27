@@ -22,7 +22,7 @@
     where INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.Label">
-    insert into injection_label (INJECTION_LABEL_ID, INJECTION_LABEL_CODE, 
+    insert into injection_label (INJECTION_LABEL_ID,INJECTION_LABEL_CODE,
       INJECTION_LABEL_NAME, INJECTION_LABEL_DESC, 
       LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, 
       STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
@@ -65,4 +65,25 @@
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
     from injection_label
   </select>
+
+  <delete id="deleteAll">
+  	delete from injection_label
+  </delete>
+
+  <!-- 批量插入 -->
+  <insert id="insertBatch" parameterType="java.util.List">
+    insert into injection_label (INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC,
+    LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK)
+    values
+    <foreach collection="record" item="item" index="i" separator=",">
+      (#{injectionLabelId,jdbcType=BIGINT}, #{injectionLabelCode,jdbcType=VARCHAR},
+      #{injectionLabelName,jdbcType=VARCHAR}, #{injectionLabelDesc,jdbcType=VARCHAR},
+      #{labelType,jdbcType=VARCHAR}, #{labelValueType,jdbcType=VARCHAR}, #{labelDataType,jdbcType=VARCHAR},
+      #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT},
+      #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP},
+      #{remark,jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+
 </mapper>
