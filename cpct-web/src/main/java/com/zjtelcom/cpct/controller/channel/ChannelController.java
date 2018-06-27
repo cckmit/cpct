@@ -2,9 +2,9 @@ package com.zjtelcom.cpct.controller.channel;
 
 import com.zjtelcom.cpct.bean.RespInfo;
 import com.zjtelcom.cpct.controller.BaseController;
-import com.zjtelcom.cpct.dto.ChannelAddVO;
-import com.zjtelcom.cpct.dto.ChannelEditVO;
-import com.zjtelcom.cpct.dto.ChannelVO;
+import com.zjtelcom.cpct.dto.channel.ChannelAddVO;
+import com.zjtelcom.cpct.dto.channel.ChannelEditVO;
+import com.zjtelcom.cpct.dto.channel.ChannelVO;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.channel.ChannelService;
 import org.springframework.beans.factory.annotation.Autowired;

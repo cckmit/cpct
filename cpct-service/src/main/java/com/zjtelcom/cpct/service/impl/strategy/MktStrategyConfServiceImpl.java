@@ -8,7 +8,6 @@ package com.zjtelcom.cpct.service.impl.strategy;
 
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.domain.campaign.DTO.MktStrategyConf;
-import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,12 +18,11 @@ import org.springframework.stereotype.Service;
  * version: V1.0
  */
 @Service
-public class MktStrategyConfServiceImpl implements MktStrategyConfService {
+public class MktStrategyConfServiceImpl  {
 
     @Autowired
     private MktStrategyConfMapper mktStrategyConfMapper;
 
-    @Override
     public Long saveMktStrategyConf(MktStrategyConf mktStrategyConf) {
         mktStrategyConfMapper.insert(mktStrategyConf);
         return null;

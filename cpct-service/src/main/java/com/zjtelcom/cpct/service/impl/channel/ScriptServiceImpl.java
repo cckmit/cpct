@@ -1,11 +1,13 @@
 package com.zjtelcom.cpct.service.impl.channel;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.bean.RespInfo;
 import com.zjtelcom.cpct.dao.channel.MktScriptMapper;
 import com.zjtelcom.cpct.domain.channel.Script;
-import com.zjtelcom.cpct.dto.ScriptAddVO;
-import com.zjtelcom.cpct.dto.ScriptEditVO;
-import com.zjtelcom.cpct.dto.ScriptVO;
+import com.zjtelcom.cpct.dto.channel.ScriptAddVO;
+import com.zjtelcom.cpct.dto.channel.ScriptEditVO;
+import com.zjtelcom.cpct.dto.channel.ScriptVO;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ScriptService;
 import com.zjtelcom.cpct.util.BeanUtil;
@@ -80,7 +82,9 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
             if (params.get("updateTime")!=null){
                 updateTime = new Date(Long.valueOf(params.get("updateTime").toString()));
             }
+            PageHelper.startPage(page,pageSize);
             scriptList = scriptMapper.selectAll(scriptName,createTime,updateTime);
+            PageInfo info = new PageInfo(scriptList);
             for (Script script : scriptList){
                 ScriptVO vo = ChannelUtil.map2ScriptVO(script);
                 voList.add(vo);

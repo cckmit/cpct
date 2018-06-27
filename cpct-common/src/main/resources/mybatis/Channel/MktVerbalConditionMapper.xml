@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.MktVerbalCondition">
+    <id column="CONDITION_ID" jdbcType="BIGINT" property="conditionId" />
+    <result column="VERBAL_ID" jdbcType="BIGINT" property="verbalId" />
+    <result column="LEFT_PARAM" jdbcType="VARCHAR" property="leftParam" />
+    <result column="LEFT_PARAM_TYPE" jdbcType="VARCHAR" property="leftParamType" />
+    <result column="OPER_TYPE" jdbcType="VARCHAR" property="operType" />
+    <result column="RIGHT_PARAM" jdbcType="VARCHAR" property="rightParam" />
+    <result column="RIGHT_PARAM_TYPE" jdbcType="VARCHAR" property="rightParamType" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from mkt_verbal_condition
+    where CONDITION_ID = #{conditionId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.MktVerbalCondition">
+    insert into mkt_verbal_condition (CONDITION_ID, VERBAL_ID, LEFT_PARAM, 
+      LEFT_PARAM_TYPE, OPER_TYPE, RIGHT_PARAM, 
+      RIGHT_PARAM_TYPE, STATUS_CD, CREATE_STAFF, 
+      CREATE_DATE, STATUS_DATE, REMARK
+      )
+    values (#{conditionId,jdbcType=BIGINT}, #{verbalId,jdbcType=BIGINT}, #{leftParam,jdbcType=VARCHAR}, 
+      #{leftParamType,jdbcType=VARCHAR}, #{operType,jdbcType=VARCHAR}, #{rightParam,jdbcType=VARCHAR}, 
+      #{rightParamType,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.MktVerbalCondition">
+    update mkt_verbal_condition
+    set VERBAL_ID = #{verbalId,jdbcType=BIGINT},
+      LEFT_PARAM = #{leftParam,jdbcType=VARCHAR},
+      LEFT_PARAM_TYPE = #{leftParamType,jdbcType=VARCHAR},
+      OPER_TYPE = #{operType,jdbcType=VARCHAR},
+      RIGHT_PARAM = #{rightParam,jdbcType=VARCHAR},
+      RIGHT_PARAM_TYPE = #{rightParamType,jdbcType=VARCHAR},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where CONDITION_ID = #{conditionId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select CONDITION_ID, VERBAL_ID, LEFT_PARAM, LEFT_PARAM_TYPE, OPER_TYPE, RIGHT_PARAM, 
+    RIGHT_PARAM_TYPE, STATUS_CD, CREATE_STAFF, CREATE_DATE, STATUS_DATE, REMARK
+    from mkt_verbal_condition
+    where CONDITION_ID = #{conditionId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select CONDITION_ID, VERBAL_ID, LEFT_PARAM, LEFT_PARAM_TYPE, OPER_TYPE, RIGHT_PARAM, 
+    RIGHT_PARAM_TYPE, STATUS_CD, CREATE_STAFF, CREATE_DATE, STATUS_DATE, REMARK
+    from mkt_verbal_condition
+  </select>
+
+  <select id="findConditionListByVerbalId" resultMap="BaseResultMap">
+    select CONDITION_ID, VERBAL_ID, LEFT_PARAM, LEFT_PARAM_TYPE, OPER_TYPE, RIGHT_PARAM,
+    RIGHT_PARAM_TYPE, STATUS_CD, CREATE_STAFF, CREATE_DATE, STATUS_DATE, REMARK
+    from mkt_verbal_condition where VERBAL_ID = #{verbalId}
+  </select>
+
+</mapper>

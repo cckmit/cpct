@@ -1,4 +1,4 @@
-package com.zjtelcom.cpct.dto;
+package com.zjtelcom.cpct.dto.channel;
 
 import com.zjtelcom.cpct.domain.channel.LabelValue;
 

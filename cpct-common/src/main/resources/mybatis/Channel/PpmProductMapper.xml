@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.PpmProductMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.PpmProduct">
+    <id column="product_id" jdbcType="BIGINT" property="productId" />
+    <result column="product_code" jdbcType="VARCHAR" property="productCode" />
+    <result column="product_name" jdbcType="VARCHAR" property="productName" />
+    <result column="product_desc" jdbcType="VARCHAR" property="productDesc" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="product_type" jdbcType="INTEGER" property="productType" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="ppm_product_id" jdbcType="INTEGER" property="ppmProductId" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from ppm_product
+    where product_id = #{productId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.PpmProduct">
+    insert into ppm_product (product_id, product_code, product_name, 
+      product_desc, start_time, end_time, 
+      product_type, status, ppm_product_id
+      )
+    values (#{productId,jdbcType=BIGINT}, #{productCode,jdbcType=VARCHAR}, #{productName,jdbcType=VARCHAR}, 
+      #{productDesc,jdbcType=VARCHAR}, #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, 
+      #{productType,jdbcType=INTEGER}, #{status,jdbcType=VARCHAR}, #{ppmProductId,jdbcType=INTEGER}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.PpmProduct">
+    update ppm_product
+    set product_code = #{productCode,jdbcType=VARCHAR},
+      product_name = #{productName,jdbcType=VARCHAR},
+      product_desc = #{productDesc,jdbcType=VARCHAR},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      product_type = #{productType,jdbcType=INTEGER},
+      status = #{status,jdbcType=VARCHAR},
+      ppm_product_id = #{ppmProductId,jdbcType=INTEGER}
+    where product_id = #{productId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select product_id, product_code, product_name, product_desc, start_time, end_time, 
+    product_type, status, ppm_product_id
+    from ppm_product
+    where product_id = #{productId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select product_id, product_code, product_name, product_desc, start_time, end_time, 
+    product_type, status, ppm_product_id
+    from ppm_product
+  </select>
+</mapper>
