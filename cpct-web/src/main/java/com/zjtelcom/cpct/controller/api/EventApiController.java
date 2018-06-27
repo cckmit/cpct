@@ -5,8 +5,13 @@ import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.service.api.EventApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 
 @RestController
@@ -20,13 +25,11 @@ public class EventApiController extends BaseController {
     /**
      * 事件触发入口
      */
-    @RequestMapping("/eventInput")
+    @RequestMapping("/CalculateCPC")
     @CrossOrigin
-    public String eventInput() {
+    public String eventInput(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> map) {
 
-
-
-
+        eventApiService.deal(map);
 
         return initSuccRespInfo(null);
     }
