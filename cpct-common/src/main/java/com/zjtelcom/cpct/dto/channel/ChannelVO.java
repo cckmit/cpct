@@ -1,4 +1,4 @@
-package com.zjtelcom.cpct.dto;
+package com.zjtelcom.cpct.dto.channel;
 
 import java.io.Serializable;
 import java.util.Date;

@@ -1,30 +1,23 @@
-package com.zjtelcom.cpct.dto;
+package com.zjtelcom.cpct.dto.channel;
 
 import java.io.Serializable;
 
-public class LabelVO implements Serializable {
-    private Long injectionLabelId;
-    private String injectionLabelCode;
+public class LabelEditVO implements Serializable {
+    private Long labelId;
+    private String injectionLabelCode;//
     private String injectionLabelName;
     private String injectionLabelDesc;
-    private String labelType;
-    private String labelValueType;
+    private String labelType;//1000	客户注智标签;2000	产品注智标签;3000	销售品注智标签;4000	营销资源注智标签;5000	礼包注智标签
+    private String labelValueType;//1000输入型;2000	枚举型
     private String labelDataType;
 
-    public Long getInjectionLabelId() {
-        return injectionLabelId;
+
+    public Long getLabelId() {
+        return labelId;
     }
 
-    public void setInjectionLabelId(Long injectionLabelId) {
-        this.injectionLabelId = injectionLabelId;
-    }
-
-    public String getInjectionLabelCode() {
-        return injectionLabelCode;
-    }
-
-    public void setInjectionLabelCode(String injectionLabelCode) {
-        this.injectionLabelCode = injectionLabelCode;
+    public void setLabelId(Long labelId) {
+        this.labelId = labelId;
     }
 
     public String getInjectionLabelName() {
@@ -65,5 +58,13 @@ public class LabelVO implements Serializable {
 
     public void setLabelDataType(String labelDataType) {
         this.labelDataType = labelDataType;
+    }
+
+    public String getInjectionLabelCode() {
+        return injectionLabelCode;
+    }
+
+    public void setInjectionLabelCode(String injectionLabelCode) {
+        this.injectionLabelCode = injectionLabelCode;
     }
 }

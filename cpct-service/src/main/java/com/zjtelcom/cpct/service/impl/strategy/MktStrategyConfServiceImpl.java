@@ -44,6 +44,11 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
     @Autowired
     private MktStrategyConfRegionRelMapper mktStrategyConfRegionRelMapper;
 
+    @Override
+    public Map<String, Object> deleteMktStrategyConf(Long mktStrategyConfId) {
+        return null;
+    }
+
     /**
      * 添加策略配置信息
      *
@@ -236,25 +241,4 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
     public Map<String, Object> listAllMktStrategyConf() {
         return null;
     }
-
-    @Override
-    public Map<String, Object> deleteMktStrategyConf(Long mktStrategyConfId) {
-        Map<String, Object> mktStrategyConfMap = new HashMap<String, Object>();
-        try {
-            // 删除策略配置活动关联信息
-            mktStrategyConfRegionRelMapper.deleteByMktStrategyConfId(mktStrategyConfId);
-            // 删除策略配置信息
-            mktStrategyConfMapper.deleteByPrimaryKey(mktStrategyConfId);
-            mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
-            mktStrategyConfMap.put("resultMsg", ErrorCode.DELETE_MKT_CAMPAIGN_SUCCESS.getErrorMsg());
-            mktStrategyConfMap.put("resultObject", mktStrategyConfId);
-        } catch (Exception e) {
-            logger.error("[op:MktStrategyConfServiceImpl] fail to delete MktStrategyConfDetail by mktStrategyConfId = {}, Exception: ", mktStrategyConfId, e);
-            mktStrategyConfMap.put("resultCode", CommonConstant.CODE_FAIL);
-            mktStrategyConfMap.put("resultMsg", ErrorCode.DELETE_MKT_CAMPAIGN_FAILURE.getErrorMsg());
-        }
-        return mktStrategyConfMap;
-    }
-
-
 }

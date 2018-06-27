@@ -1,9 +1,9 @@
 package com.zjtelcom.cpct.service.channel;
 
 import com.zjtelcom.cpct.bean.RespInfo;
-import com.zjtelcom.cpct.dto.ScriptAddVO;
-import com.zjtelcom.cpct.dto.ScriptEditVO;
-import com.zjtelcom.cpct.dto.ScriptVO;
+import com.zjtelcom.cpct.dto.channel.ScriptAddVO;
+import com.zjtelcom.cpct.dto.channel.ScriptEditVO;
+import com.zjtelcom.cpct.dto.channel.ScriptVO;
 
 import java.util.List;
 import java.util.Map;

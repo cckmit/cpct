@@ -1,12 +1,11 @@
 package com.zjtelcom.cpct.util;
 
 import com.zjtelcom.cpct.domain.channel.*;
-import com.zjtelcom.cpct.dto.*;
-import com.zjtelcom.cpct.dto.CamScriptVO;
-import com.zjtelcom.cpct.dto.ChannelVO;
-import com.zjtelcom.cpct.dto.LabelVO;
-import com.zjtelcom.cpct.dto.LabelValueVO;
+import com.zjtelcom.cpct.dto.channel.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ChannelUtil  {
 
     public static ChannelVO map2ChannelVO(Channel channel){
@@ -30,6 +29,11 @@ public class ChannelUtil  {
 
     public static LabelValueVO map2LabelValueVO(LabelValue labelValue){
         LabelValueVO vo = BeanUtil.create(labelValue,new LabelValueVO());
+        return vo;
+    }
+
+    public static VerbalVO map2VerbalVO(MktVerbal verbal){
+        VerbalVO vo = BeanUtil.create(verbal,new VerbalVO());
         return vo;
     }
 }
