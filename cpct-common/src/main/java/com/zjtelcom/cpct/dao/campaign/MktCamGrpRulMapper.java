@@ -18,4 +18,5 @@ public interface MktCamGrpRulMapper {
     List<MktCamGrpRul> selectAll();
 
     int updateByPrimaryKey(MktCamGrpRul record);
+
 }

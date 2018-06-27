@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @Description EventSorceServiceImpl
+ * @Description 事件源实现类
  * @Author pengy
  * @Date 2018/6/21 9:46
  */

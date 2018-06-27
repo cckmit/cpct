@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @Description EventMatchRulServiceImpl
+ * @Description 事件匹配规则实现类
  * @Author pengy
  * @Date 2018/6/21 9:46
  */
