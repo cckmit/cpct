@@ -3,10 +3,14 @@ package com.zjtelcom.cpct.dao.channel;
 
 
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
+import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
 
+@Mapper
+@Repository
 public interface PpmProductMapper {
     int deleteByPrimaryKey(Long productId);
 

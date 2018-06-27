@@ -7,6 +7,7 @@ import com.zjtelcom.cpct.dao.channel.PpmProductMapper;
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
 import com.zjtelcom.cpct.dto.channel.OfferVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,7 +34,7 @@ public class ProductController extends BaseController {
 	private PpmProductMapper ppmProductMapper;
 
 
-	@RequestMapping("/getPPMProduct")
+	@GetMapping("/getPPMProduct")
 	public Map<String, String> getPPMProduct(@RequestBody JSONObject request) {
 		Map<String, String> param = new HashMap<String, String>();
 		String offerName = request.getString("offerName");
@@ -58,7 +59,7 @@ public class ProductController extends BaseController {
 		return result;
 	}
 
-	@RequestMapping("/updateAllPPMProduct")
+	@GetMapping("/updateAllPPMProduct")
 	public JSONObject updateAllPPMProduct() {
 		logger.info("updateAllPPMProduct controller start...");
 		JSONObject result = new JSONObject();
@@ -120,7 +121,7 @@ public class ProductController extends BaseController {
 		return result;
 	}
 
-	@RequestMapping("/updateProductInUse")
+	@GetMapping("/updateProductInUse")
 	public JSONObject updateProductInUse(@RequestBody JSONObject requestObj, HttpServletRequest request) {
 		JSONObject result = new JSONObject();
 		String requestIp = request.getRemoteAddr();
