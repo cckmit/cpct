@@ -29,4 +29,11 @@ public interface EventMapper {
 
     int updateEvent(EventDO eventDO);
 
+    /**
+     * 根据事件编码获取事件
+     * @param eventNbr 事件编码
+     * @return
+     */
+    EventDO getEventByEventNbr(@Param("eventNbr") String eventNbr);
+
 }

@@ -102,6 +102,9 @@
         <if test="eventSceneId != null and eventSceneId != 0 ">
             and EVENT_SCENE_ID = #{eventSceneId}
         </if>
+        <if test="eventId != null and eventId != 0 ">
+            and EVENT_ID = #{eventId}
+        </if>
     </select>
 
     <insert id="saveEventScene" parameterType="com.zjtelcom.cpct.domain.event.EventSceneDO">
