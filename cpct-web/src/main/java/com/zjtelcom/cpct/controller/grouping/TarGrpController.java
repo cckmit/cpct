@@ -80,6 +80,23 @@ public class TarGrpController extends BaseController {
     }
 
     /**
+     * 获取目标分群条件信息
+     */
+    @RequestMapping("/listTarGrpCondition")
+    @CrossOrigin
+    public String listTarGrpCondition(@Param("mktCamGrpRulId") Long mktCamGrpRulId) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = tarGrpService.listTarGrpCondition(mktCamGrpRulId);
+        } catch (Exception e) {
+            logger.error("[op:TarGrpController] fail to listTarGrpCondition for mktCamGrpRulId = {}!" +
+                    " Exception: ", mktCamGrpRulId, e);
+            return FastJsonUtils.objToJson(maps);
+        }
+        return FastJsonUtils.objToJson(maps);
+    }
+
+    /**
      * 更新目标分群条件
      */
     @RequestMapping("/updateTarGrpCondition")
@@ -113,15 +130,20 @@ public class TarGrpController extends BaseController {
         return FastJsonUtils.objToJson(maps);
     }
 
+
+
+
     /**
      * 获取大数据模型
      */
     @RequestMapping("/listBigDataModel")
     @CrossOrigin
     public String listBigDataModel(@Param("mktCamGrpRulId") Long mktCamGrpRulId) {
+        //模拟大数据返回一个map
         Map<String, Object> maps = new HashMap<>();
         try {
             //大数据返回信息 todo
+            
         } catch (Exception e) {
             logger.error("[op:TarGrpController] fail to listBigDataModel for mktCamGrpRulId = {}!" +
                     " Exception: ", mktCamGrpRulId, e);
@@ -129,5 +151,25 @@ public class TarGrpController extends BaseController {
         }
         return FastJsonUtils.objToJson(maps);
     }
+
+
+    /**
+     * 策略试运算
+     */
+    @RequestMapping("/strategyTrial")
+    @CrossOrigin
+    public String strategyTrial(@Param("mktCamGrpRulId") Long mktCamGrpRulId) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            //返回前端策略试运算结果 todo
+
+        } catch (Exception e) {
+            logger.error("[op:TarGrpController] fail to strategyTrial for mktCamGrpRulId = {}!" +
+                    " Exception: ", mktCamGrpRulId, e);
+            return FastJsonUtils.objToJson(maps);
+        }
+        return FastJsonUtils.objToJson(maps);
+    }
+
 
 }

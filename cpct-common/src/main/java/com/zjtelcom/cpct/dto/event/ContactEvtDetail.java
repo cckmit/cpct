@@ -10,7 +10,7 @@ import java.util.List;
  * @Date 2018/6/22 9:31
  */
 @Data
-public class ContactEvtDetail extends BaseEntity {
+public class ContactEvtDetail extends ContactEvt{
 
     private List<ContactEvtItem> contactEvtItems;
     private List<ContactEvtMatchRul> contactEvtMatchRuls;

@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -161,16 +162,30 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     }
 
     /**
-     * 新增客户分群
+     * 新增大数据模型
      */
     @Transactional(readOnly = false)
     @Override
     public Map<String, Object> saveBigDataModel(Long mktCamGrpRulId) {
         Map<String, Object> maps = new HashMap<>();
-
+        //从大数据获取信息返回前台
         return maps;
     }
 
-
+    /**
+     * 获取目标分群条件信息
+     */
+    @Override
+    public Map<String, Object> listTarGrpCondition(Long mktCamGrpRulId) {
+        Map<String, Object> maps = new HashMap<>();
+        //通过mktCamGrpRulId获取所有活动关联关系
+        MktCamGrpRul mktCamGrpRul = mktCamGrpRulMapper.selectByPrimaryKey(mktCamGrpRulId);
+        TarGrpDetail tarGrpDetail = tarGrpMapper.selectByPrimaryKey(mktCamGrpRul.getTarGrpId());
+        List<TarGrpConditionDO> list = tarGrpConditionMapper.listTarGrpCondition(tarGrpDetail.getTarGrpId());
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("resultObject", list);
+        return maps;
+    }
 
 }
