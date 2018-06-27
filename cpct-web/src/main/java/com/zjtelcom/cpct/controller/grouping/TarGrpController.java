@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.controller.grouping;
 
 import com.alibaba.fastjson.JSONArray;
+import com.zjhcsoft.eagle.main.dubbo.model.policy.CalcReqModel;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.grouping.TarGrpConditionDO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpConditionDTO;
@@ -9,8 +10,10 @@ import com.zjtelcom.cpct.util.FastJsonUtils;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -131,8 +134,6 @@ public class TarGrpController extends BaseController {
     }
 
 
-
-
     /**
      * 获取大数据模型
      */
@@ -142,8 +143,8 @@ public class TarGrpController extends BaseController {
         //模拟大数据返回一个map
         Map<String, Object> maps = new HashMap<>();
         try {
-            //大数据返回信息 todo
-            
+            //大数据返回信息给前台
+            maps = tarGrpService.listBigDataModel(mktCamGrpRulId);
         } catch (Exception e) {
             logger.error("[op:TarGrpController] fail to listBigDataModel for mktCamGrpRulId = {}!" +
                     " Exception: ", mktCamGrpRulId, e);
@@ -158,14 +159,14 @@ public class TarGrpController extends BaseController {
      */
     @RequestMapping("/strategyTrial")
     @CrossOrigin
-    public String strategyTrial(@Param("mktCamGrpRulId") Long mktCamGrpRulId) {
+    public String strategyTrial(@RequestBody CalcReqModel req, String serialNum) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            //返回前端策略试运算结果 todo
-
+            //返回前端策略试运算结果
+            maps = tarGrpService.strategyTrial(req,serialNum);
         } catch (Exception e) {
-            logger.error("[op:TarGrpController] fail to strategyTrial for mktCamGrpRulId = {}!" +
-                    " Exception: ", mktCamGrpRulId, e);
+            logger.error("[op:TarGrpController] fail to strategyTrial for req = {}!" +
+                    " Exception: ", JSONArray.toJSON(req), e);
             return FastJsonUtils.objToJson(maps);
         }
         return FastJsonUtils.objToJson(maps);

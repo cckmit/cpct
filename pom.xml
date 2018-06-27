@@ -33,6 +33,8 @@
         <commons-lang.version>2.6</commons-lang.version>
         <pagehelper.version>1.2.5</pagehelper.version>
         <QLExpress.version>3.2.0</QLExpress.version>
+        <dubbo-eagle-service.version>1.0.0</dubbo-eagle-service.version>
+        <ehcache.version>2.9.1</ehcache.version>
     </properties>
 
     <parent>
@@ -42,10 +44,29 @@
     </parent>
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>net.sf.ehcache</groupId>
+                <artifactId>ehcache</artifactId>
+                <version>${ehcache.version}</version>
+            </dependency>
+
             <!-- 子模块 -->
             <dependency>
                 <groupId>com.zjtelcom.cpct</groupId>
                 <artifactId>cpct-common</artifactId>
+                <version>${cpct.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.zjtelcom.cpct</groupId>
+                <artifactId>cpct-cache</artifactId>
+                <version>${cpct.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.zjtelcom.cpct</groupId>
+                <artifactId>cpct-dubbo-client</artifactId>
                 <version>${cpct.version}</version>
             </dependency>
 
@@ -156,6 +177,13 @@
                 <groupId>commons-lang</groupId>
                 <artifactId>commons-lang</artifactId>
                 <version>${commons-lang.version}</version>
+            </dependency>
+
+            <!-- 大数据标签 -->
+            <dependency>
+                <groupId>com.zjhcsoft.eagle</groupId>
+                <artifactId>dubbo-eagle-service</artifactId>
+                <version>${dubbo-eagle-service.version}</version>
             </dependency>
 
             <!-- PageHelper 分页插件 -->

@@ -1,5 +1,8 @@
 package com.zjtelcom.cpct.service.impl.grouping;
 
+import com.alibaba.fastjson.JSON;
+import com.zjhcsoft.eagle.main.dubbo.model.policy.CalcReqModel;
+import com.zjtelcom.cpct.common.CacheManager;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamGrpRulMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
@@ -9,15 +12,17 @@ import com.zjtelcom.cpct.domain.grouping.TarGrpConditionDO;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpConditionDTO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
+import com.zjtelcom.cpct.dto.system.SystemParam;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +42,9 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     private TarGrpConditionMapper tarGrpConditionMapper;
     @Autowired
     private MktCamGrpRulMapper mktCamGrpRulMapper;
+    @Autowired
+    private RestTemplate restTemplate;
+
 
     /**
      * 新增目标分群
@@ -186,6 +194,73 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("resultObject", list);
         return maps;
+    }
+
+    /**
+     * 获取大数据模型
+     */
+    @Override
+    public Map<String, Object> listBigDataModel(Long mktCamGrpRulId) {
+        //通过传入参数获取大数据模型返回前台 todo
+
+        return null;
+    }
+
+    /**
+     * 策略试运算
+     */
+    @Override
+    public Map<String, Object> strategyTrial(CalcReqModel req, String serialNum) {
+        //通过调用大数据返回试算结果返回前台 todo
+        Map result = new HashMap(2);
+        try {
+            Map<String, Object> validateResult = validate(req);
+            if (!validateResult.isEmpty()) {
+                return validateResult;
+            }
+            SystemParam param = (SystemParam) CacheManager.getInstance().getCache(
+                    CommonConstant.SYSTEMPARAM_CACHE_NAME).queryOne("cpc.dubbo.client.url");
+            String url = param.getParamValue() + "/policy/trycalc";
+            if (StringUtils.isNotEmpty(serialNum)) {
+                url = url + "?serialNum=" + serialNum;
+            }
+            result = restTemplate.postForObject(url, req, Map.class);
+        }
+        catch (Exception e) {
+            logger.error("calc error", e);
+            result.put("resultCode", ErrorCode.INTERNAL_ERROR.getErrorCode());
+            result.put("resultMsg", ErrorCode.INTERNAL_ERROR.getErrorMsg());
+        }
+        logger.debug("trycalc result: " + JSON.toJSONString(result));
+        return result;
+    }
+
+    /**
+     * 参数校验
+     */
+    private Map<String, Object> validate(CalcReqModel req) {
+        Map<String, Object> result = new HashMap<>(2);
+        if (StringUtils.isEmpty(req.getActivityId())) {
+            result.put("resultCode", ErrorCode.VALIDATE_ERROR.getErrorCode());
+            result.put("resultMsg", "activityId不能为空");
+            return result;
+        }
+
+        if (CollectionUtils.isEmpty(req.getPolicyList())) {
+            result.put("resultCode", ErrorCode.VALIDATE_ERROR.getErrorCode());
+            result.put("resultMsg", "policyList不能为空");
+            return result;
+        }
+
+        for (Map<String, Object> policy : req.getPolicyList()) {
+            Object policyId = policy.get("policyId");
+            if (null == policyId || StringUtils.isEmpty(policyId.toString())) {
+                result.put("resultCode", ErrorCode.VALIDATE_ERROR.getErrorCode());
+                result.put("resultMsg", "policyId不能为空");
+                return result;
+            }
+        }
+        return result;
     }
 
 }

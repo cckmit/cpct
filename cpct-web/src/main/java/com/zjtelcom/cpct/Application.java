@@ -9,8 +9,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.client.RestTemplate;
 
 
 @SpringBootApplication
@@ -19,6 +21,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @MapperScan("com.zjtelcom.cpct.dao")
 @EnableTransactionManagement
 public class Application {
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+
     public static Logger logger = LoggerFactory.getLogger(Application.class);
     // for local development, debug in IDE
     public static void main(String[] args) throws Exception {

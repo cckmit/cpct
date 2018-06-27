@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.grouping;
 
+import com.zjhcsoft.eagle.main.dubbo.model.policy.CalcReqModel;
 import com.zjtelcom.cpct.domain.grouping.TarGrpConditionDO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpConditionDTO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
@@ -26,5 +27,9 @@ public interface TarGrpService {
     Map<String, Object> saveBigDataModel(Long mktCamGrpRulId);
 
     Map<String,Object> listTarGrpCondition(Long mktCamGrpRulId);
+
+    Map<String,Object> listBigDataModel(Long mktCamGrpRulId);
+
+    Map<String,Object> strategyTrial(CalcReqModel req, String serialNum);
 
 }

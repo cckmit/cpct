@@ -13,4 +13,12 @@
     <name>cpct-dubbo-client</name>
 
 
+    <dependencies>
+        <dependency>
+            <groupId>com.zjhcsoft.eagle</groupId>
+            <artifactId>dubbo-eagle-service</artifactId>
+        </dependency>
+    </dependencies>
+
+
 </project>
