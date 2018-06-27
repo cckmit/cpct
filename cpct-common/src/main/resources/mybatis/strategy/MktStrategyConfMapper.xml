@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zjtelcom.cpct.dao.MktStrategyConfMapper">
-  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.campaign.DO.MktStrategyConfDO">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.campaign.MktStrategyConfDO">
     <id column="MKT_STRATEGY_CONF_ID" jdbcType="DECIMAL" property="mktStrategyConfId" />
-    <result column="DEPARTMENT_NAME" jdbcType="VARCHAR" property="departmentName" />
+    <result column="MKT_STRATEGY_CONF_NAME" jdbcType="VARCHAR" property="departmentName" />
     <result column="BEGIN_TIME" jdbcType="DATE" property="beginTime" />
     <result column="END_TIME" jdbcType="DATE" property="endTime" />
     <result column="CREATE_STAFF" jdbcType="DECIMAL" property="createStaff" />
@@ -15,8 +15,8 @@
     delete from mkt_strategy_conf
     where MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=DECIMAL}
   </delete>
-  <insert id="insert" useGeneratedKeys="true" keyProperty="mktStrategyConfId" parameterType="com.zjtelcom.cpct.domain.campaign.DO.MktStrategyConfDO">
-    insert into mkt_strategy_conf (MKT_STRATEGY_CONF_ID, DEPARTMENT_NAME, 
+  <insert id="insert" useGeneratedKeys="true" keyProperty="mktStrategyConfId" parameterType="com.zjtelcom.cpct.domain.campaign.MktStrategyConfDO">
+    insert into mkt_strategy_conf (MKT_STRATEGY_CONF_ID, MKT_STRATEGY_CONF_NAME,
       BEGIN_TIME, END_TIME, CREATE_STAFF, 
       CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
       )
@@ -25,9 +25,9 @@
       #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=DECIMAL}, #{updateDate,jdbcType=TIMESTAMP}
       )
   </insert>
-  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.DO.MktStrategyConfDO">
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktStrategyConfDO">
     update mkt_strategy_conf
-    set DEPARTMENT_NAME = #{departmentName,jdbcType=VARCHAR},
+    set MKT_STRATEGY_CONF_NAME = #{departmentName,jdbcType=VARCHAR},
       BEGIN_TIME = #{beginTime,jdbcType=DATE},
       END_TIME = #{endTime,jdbcType=DATE},
       CREATE_STAFF = #{createStaff,jdbcType=DECIMAL},
@@ -37,13 +37,13 @@
     where MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=DECIMAL}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select MKT_STRATEGY_CONF_ID, DEPARTMENT_NAME, BEGIN_TIME, END_TIME, CREATE_STAFF, 
+    select MKT_STRATEGY_CONF_ID, MKT_STRATEGY_CONF_NAME, BEGIN_TIME, END_TIME, CREATE_STAFF,
     CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
     from mkt_strategy_conf
     where MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=DECIMAL}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
-    select MKT_STRATEGY_CONF_ID, DEPARTMENT_NAME, BEGIN_TIME, END_TIME, CREATE_STAFF, 
+    select MKT_STRATEGY_CONF_ID, MKT_STRATEGY_CONF_NAME, BEGIN_TIME, END_TIME, CREATE_STAFF,
     CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
     from mkt_strategy_conf
   </select>

@@ -6,7 +6,9 @@
  */
 package com.zjtelcom.cpct.service.campaign;
 
-import com.zjtelcom.cpct.domain.campaign.DTO.MktCampaign;
+
+import com.zjtelcom.cpct.dto.campaign.MktCampaign;
+import com.zjtelcom.cpct.dto.campaign.MktCampaignDetail;
 
 /**
  * Description:
@@ -16,6 +18,8 @@ import com.zjtelcom.cpct.domain.campaign.DTO.MktCampaign;
  */
 public interface MktCampaignService {
 
-    public int saveMktCampaign(MktCampaign mktCampaign);
+    int createMktCampaign(MktCampaignDetail mktCampaignDetail) throws Exception;
+
+    int modMktCampaign(MktCampaignDetail mktCampaignDetail) throws Exception;
 
 }

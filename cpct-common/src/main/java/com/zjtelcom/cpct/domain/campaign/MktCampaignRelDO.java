@@ -1,8 +1,8 @@
-package com.zjtelcom.cpct.domain.campaign.DTO;
+package com.zjtelcom.cpct.domain.campaign;
 
 import java.util.Date;
 
-public class MktCampaignRel {
+public class MktCampaignRelDO {
     private Long mktCampaignRelId;
 
     private String relType;

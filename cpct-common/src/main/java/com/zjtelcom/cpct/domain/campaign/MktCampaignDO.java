@@ -1,11 +1,11 @@
-package com.zjtelcom.cpct.domain.campaign.DTO;
+package com.zjtelcom.cpct.domain.campaign;
 
 import com.zjtelcom.cpct.BaseEntity;
 import lombok.Data;
 import java.util.Date;
 
 @Data
-public class MktCampaignDetail extends BaseEntity{
+public class MktCampaignDO extends BaseEntity{
 
     private Long mktCampaignId;
     private String tiggerType;
