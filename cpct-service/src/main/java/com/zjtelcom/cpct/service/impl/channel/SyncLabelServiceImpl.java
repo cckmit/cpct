@@ -23,6 +23,7 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 @Service
 public class SyncLabelServiceImpl extends BaseService implements SyncLabelService {
     public static final String BQ = "BQ";
+    public static final Long TAG_ROW_ID = 1000000L;
 
     @Autowired
     private InjectionLabelMapper labelMapper;
@@ -35,6 +36,7 @@ public class SyncLabelServiceImpl extends BaseService implements SyncLabelServic
 
         for (TagInfoModel info : tagInfoModelList){
             Label label = new Label();
+            label.setInjectionLabelId(info.getTagRowId()+TAG_ROW_ID);
             label.setLabelDataType(info.getSourceTableColumnType());
             label.setInjectionLabelCode(BQ+ChannelUtil.getRandomStr(8));
             label.setInjectionLabelName(info.getSourceTableColumnName());
@@ -55,15 +57,16 @@ public class SyncLabelServiceImpl extends BaseService implements SyncLabelServic
 
     @Override
     public RespInfo syncLabelValue(List<TagValueInfoModel> tagValueInfoModelList) {
-//        List<LabelValue> valueList = new ArrayList<>();
-//
-//        for (TagValueInfoModel info : tagValueInfoModelList){
-//            LabelValue value = new LabelValue();
-//            value.setInjectionLabelId();
-//            valueList.add(value);
-//        }
-//        labelValueMapper.deleteAll();
-//        labelValueMapper.insertBatch(valueList);
+        List<LabelValue> valueList = new ArrayList<>();
+
+        for (TagValueInfoModel info : tagValueInfoModelList){
+            LabelValue value = new LabelValue();
+            value.setInjectionLabelId(info.getTagRowId()+TAG_ROW_ID);
+            value.setLabelValue("");
+            valueList.add(value);
+        }
+        labelValueMapper.deleteAll();
+        labelValueMapper.insertBatch(valueList);
         return RespInfo.build(CODE_SUCCESS,null);
     }
 }
