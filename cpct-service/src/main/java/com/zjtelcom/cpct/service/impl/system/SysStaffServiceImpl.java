@@ -53,9 +53,9 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
     @Override
     public List<SysStaff> listStaff(String staffCode, String staffName, Long status, Integer page, Integer pageSize) {
         //分页
-        PageHelper.startPage(page, pageSize);
+//        PageHelper.startPage(page, pageSize);
         List<SysStaff> list = sysStaffMapper.selectAll(staffCode, staffName, status);
-        PageInfo pageInfo = new PageInfo(list);
+//        PageInfo pageInfo = new PageInfo(list);
         return list;
     }
 

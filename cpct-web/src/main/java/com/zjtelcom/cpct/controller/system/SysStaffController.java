@@ -23,7 +23,7 @@ public class SysStaffController extends BaseController {
      *
      * @return
      */
-    @RequestMapping("/listStaff")
+    @RequestMapping(value = "listStaff", method = RequestMethod.POST)
     @CrossOrigin
     public String listStaff(@RequestParam("staffCode") String staffCode,
                             @RequestParam("staffName") String staffName,

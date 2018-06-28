@@ -2,13 +2,15 @@ package com.zjtelcom.cpct.service.impl;
 
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
+import com.ql.util.express.Operator;
+import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.EngineTestService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class EngineTestServiceImpl implements EngineTestService {
+public class EngineTestServiceImpl extends BaseService implements EngineTestService {
 
     @Override
     public void test() {
@@ -16,6 +18,7 @@ public class EngineTestServiceImpl implements EngineTestService {
         try {
             ExpressRunner runner = new ExpressRunner();
             DefaultContext<String, Object> context = new DefaultContext<String, Object>();
+
 //            context.put("a",1);
 //            context.put("b",2);
 //            context.put("c",3);
@@ -39,11 +42,8 @@ public class EngineTestServiceImpl implements EngineTestService {
             Object r = runner.execute(express, context, null, true, false);
             System.out.println(r);
 
-
-
         } catch (Exception e) {
             e.printStackTrace();
-
         }
 
     }
