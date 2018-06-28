@@ -10,4 +10,9 @@ public class CommonConstant {
     public static final String CODE_SUCCESS = "0"; //成功
     public static final String CODE_FAIL = "1"; //失败
 
+    /**
+     * 系统参数缓存
+     */
+    public static final String SYSTEMPARAM_CACHE_NAME = "SYSTEMPARAM_CACHE";
+
 }

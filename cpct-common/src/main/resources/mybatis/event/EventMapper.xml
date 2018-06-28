@@ -58,44 +58,44 @@
     <insert id="saveEvent" keyProperty="eventId" useGeneratedKeys="true"
             parameterType="com.zjtelcom.cpct.domain.event.EventDO">
         insert into event (
-          INTERFACE_CFG_ID,
-          EVENT_NBR,
-          EVENT_NAME,
-          EVT_MAPPED_ADDR,
-          EVT_MAPPED_IP,
-          EVT_PROCOTOL_TYPE,
-          EVT_MAPPED_FUN_NAME,
-          EVENT_DESC,
-          EVT_TYPE_ID,
-          EVENT_TRIG_TYPE,
-          EXT_EVENT_ID,
-          STATUS_CD,
-          CREATE_STAFF,
-          UPDATE_STAFF,
-          CREATE_DATE,
-          STATUS_DATE,
-          UPDATE_DATE,
-          REMARK)
+        INTERFACE_CFG_ID,
+        EVENT_NBR,
+        EVENT_NAME,
+        EVT_MAPPED_ADDR,
+        EVT_MAPPED_IP,
+        EVT_PROCOTOL_TYPE,
+        EVT_MAPPED_FUN_NAME,
+        EVENT_DESC,
+        EVT_TYPE_ID,
+        EVENT_TRIG_TYPE,
+        EXT_EVENT_ID,
+        STATUS_CD,
+        CREATE_STAFF,
+        UPDATE_STAFF,
+        CREATE_DATE,
+        STATUS_DATE,
+        UPDATE_DATE,
+        REMARK)
         values (
-          #{interfaceCfgId,jdbcType=BIGINT},
-          #{eventNbr,jdbcType=VARCHAR},
-          #{eventName,jdbcType=VARCHAR},
-          #{evtMappedAddr,jdbcType=VARCHAR},
-          #{evtMappedIp,jdbcType=VARCHAR},
-          #{evtProcotolType,jdbcType=VARCHAR},
-          #{evtMappedFunName,jdbcType=VARCHAR},
-          #{eventDesc,jdbcType=VARCHAR},
-          #{evtTypeId,jdbcType=BIGINT},
-          #{eventTrigType,jdbcType=VARCHAR},
-          #{extEventId,jdbcType=BIGINT},
-          #{statusCd,jdbcType=VARCHAR},
-          #{createStaff,jdbcType=BIGINT},
-          #{updateStaff,jdbcType=BIGINT},
-          #{createDate,jdbcType=TIMESTAMP},
-          #{statusDate,jdbcType=TIMESTAMP},
-          #{updateDate,jdbcType=TIMESTAMP},
-          #{remark,jdbcType=VARCHAR})
-  </insert>
+        #{interfaceCfgId,jdbcType=BIGINT},
+        #{eventNbr,jdbcType=VARCHAR},
+        #{eventName,jdbcType=VARCHAR},
+        #{evtMappedAddr,jdbcType=VARCHAR},
+        #{evtMappedIp,jdbcType=VARCHAR},
+        #{evtProcotolType,jdbcType=VARCHAR},
+        #{evtMappedFunName,jdbcType=VARCHAR},
+        #{eventDesc,jdbcType=VARCHAR},
+        #{evtTypeId,jdbcType=BIGINT},
+        #{eventTrigType,jdbcType=VARCHAR},
+        #{extEventId,jdbcType=BIGINT},
+        #{statusCd,jdbcType=VARCHAR},
+        #{createStaff,jdbcType=BIGINT},
+        #{updateStaff,jdbcType=BIGINT},
+        #{createDate,jdbcType=TIMESTAMP},
+        #{statusDate,jdbcType=TIMESTAMP},
+        #{updateDate,jdbcType=TIMESTAMP},
+        #{remark,jdbcType=VARCHAR})
+    </insert>
 
     <!--更新操作-->
     <update id="update">
@@ -130,69 +130,62 @@
     <update id="updateEvent" parameterType="com.zjtelcom.cpct.domain.event.EventDO">
         update event
         set
-        <if test="evtSrcId != null and evtSrcId != 0">
+        <if test="interfaceCfgId != null and interfaceCfgId != 0">
             INTERFACE_CFG_ID = #{interfaceCfgId,jdbcType=BIGINT},
         </if>
-        <if test="evtSrcId != null and evtSrcId != ''">
+        <if test="eventNbr != null and eventNbr != ''">
             EVENT_NBR = #{eventNbr,jdbcType=VARCHAR},
         </if>
-        <if test="evtSrcId != null and evtSrcId != ''">
+        <if test="eventName != null and eventName != ''">
             EVENT_NAME = #{eventName,jdbcType=VARCHAR},
         </if>
-        <if test="evtSrcId != null and evtSrcId != ''">
+        <if test="evtMappedAddr != null and evtMappedAddr != ''">
             EVT_MAPPED_ADDR = #{evtMappedAddr,jdbcType=VARCHAR},
         </if>
-        <if test="evtSrcId != null and evtSrcId != ''">
+        <if test="evtMappedIp != null and evtMappedIp != ''">
             EVT_MAPPED_IP = #{evtMappedIp,jdbcType=VARCHAR},
         </if>
-        <if test="evtSrcId != null and evtSrcId != ''">
+        <if test="evtProcotolType != null and evtProcotolType != ''">
             EVT_PROCOTOL_TYPE = #{evtProcotolType,jdbcType=VARCHAR},
         </if>
-        <if test="evtSrcId != null and evtSrcId != ''">
+        <if test="evtMappedFunName != null and evtMappedFunName != ''">
             EVT_MAPPED_FUN_NAME = #{evtMappedFunName,jdbcType=VARCHAR},
         </if>
-        <if test="evtSrcId != null and evtSrcId != ''">
+        <if test="eventDesc != null and eventDesc != ''">
             EVENT_DESC = #{eventDesc,jdbcType=VARCHAR},
         </if>
-        <if test="evtSrcId != null and evtSrcId != 0">
+        <if test="evtTypeId != null and evtTypeId != 0">
             EVT_TYPE_ID = #{evtTypeId,jdbcType=BIGINT},
         </if>
-        <if test="evtSrcId != null and evtSrcId != ''">
+        <if test="eventTrigType != null and eventTrigType != ''">
             EVENT_TRIG_TYPE = #{eventTrigType,jdbcType=VARCHAR},
         </if>
-        <if test="evtSrcId != null and evtSrcId != 0">
+        <if test="extEventId != null and extEventId != 0">
             EXT_EVENT_ID = #{extEventId,jdbcType=BIGINT},
         </if>
-        <if test="evtSrcId != null and evtSrcId != ''">
+        <if test="statusCd != null and statusCd != ''">
             STATUS_CD = #{statusCd,jdbcType=VARCHAR},
         </if>
-        <if test="evtSrcId != null and evtSrcId != 0">
+        <if test="createStaff != null and createStaff != 0">
             CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
         </if>
-        <if test="evtSrcId != null and evtSrcId != 0">
+        <if test="updateStaff != null and updateStaff != 0">
             UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
         </if>
-        <if test="evtSrcId != null and evtSrcId != ''">
+        <if test="createDate != null and createDate != ''">
             CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
         </if>
-        <if test="evtSrcId != null and evtSrcId != ''">
+        <if test="statusDate != null and statusDate != ''">
             STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
         </if>
-        <if test="evtSrcId != null and evtSrcId != ''">
+        <if test="updateDate != null and updateDate != ''">
             UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
         </if>
-        <if test="evtSrcId != null and evtSrcId != ''">
+        <if test="remark != null and remark != ''">
             REMARK = #{remark,jdbcType=VARCHAR},
         </if>
         EVENT_ID = #{eventId,jdbcType=BIGINT}
         where EVENT_ID = #{eventId,jdbcType=BIGINT}
     </update>
-
-    <!--查询方法，通过id查询-->
-    <select id="getEventByEventNbr" resultType="com.zjtelcom.cpct.domain.event.EventDO"
-            parameterType="java.lang.String">
-        select * from event
-        where EVENT_NBR = #{eventNbr,jdbcType=VARCHAR}
-    </select>
 
 </mapper>
