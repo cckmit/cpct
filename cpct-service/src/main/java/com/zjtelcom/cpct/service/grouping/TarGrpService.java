@@ -32,4 +32,6 @@ public interface TarGrpService {
 
     Map<String,Object> strategyTrial(CalcReqModel req, String serialNum);
 
+    Map<String,String> trycalc(CalcReqModel req, String serialNum);
+
 }

@@ -35,6 +35,11 @@
         <QLExpress.version>3.2.0</QLExpress.version>
         <dubbo-eagle-service.version>1.0.0</dubbo-eagle-service.version>
         <ehcache.version>2.9.1</ehcache.version>
+        <groovy.version>2.4.7</groovy.version>
+        <freemarker.version>2.3.23</freemarker.version>
+        <aspectj.version>1.8.6</aspectj.version>
+        <file.version>1.4.0</file.version>
+        <aspectj.version>1.8.6</aspectj.version>
     </properties>
 
     <parent>
@@ -186,11 +191,42 @@
                 <version>${dubbo-eagle-service.version}</version>
             </dependency>
 
+            <!-- groovy -->
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-all</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+
             <!-- PageHelper 分页插件 -->
             <dependency>
                 <groupId>com.github.pagehelper</groupId>
                 <artifactId>pagehelper-spring-boot-starter</artifactId>
                 <version>${pagehelper.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.freemarker</groupId>
+                <artifactId>freemarker</artifactId>
+                <version>${freemarker.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjrt</artifactId>
+                <version>${aspectj.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjweaver</artifactId>
+                <version>${aspectj.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>com.springsource.org.apache.commons.io</artifactId>
+                <version>${file.version}</version>
             </dependency>
 
             <!-- 规则引擎 -->

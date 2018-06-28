@@ -15,4 +15,6 @@ public class CommonConstant {
      */
     public static final String SYSTEMPARAM_CACHE_NAME = "SYSTEMPARAM_CACHE";
 
+    public static final String DATABASE_COPNFIG_CACHE_NAME = "DATABASE_COPNFIG_CACHE";
+
 }

@@ -2,6 +2,8 @@ package com.zjtelcom.cpct.service.impl.grouping;
 
 import com.alibaba.fastjson.JSON;
 import com.zjhcsoft.eagle.main.dubbo.model.policy.CalcReqModel;
+import com.zjhcsoft.eagle.main.dubbo.model.policy.ResponseHeaderModel;
+import com.zjhcsoft.eagle.main.dubbo.service.PolicyCalculateService;
 import com.zjtelcom.cpct.common.CacheManager;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamGrpRulMapper;
@@ -14,15 +16,22 @@ import com.zjtelcom.cpct.dto.grouping.TarGrpConditionDTO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.dto.system.SystemParam;
 import com.zjtelcom.cpct.enums.ErrorCode;
+import com.zjtelcom.cpct.model.EagleDatabaseConfig;
+import com.zjtelcom.cpct.pojo.Company;
 import com.zjtelcom.cpct.service.BaseService;
+import com.zjtelcom.cpct.service.EagleDatabaseConfCache;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
+import com.zjtelcom.cpct.util.SqlUtil;
+import com.zjtelcom.cpct.validator.ValidateResult;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +53,10 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     private MktCamGrpRulMapper mktCamGrpRulMapper;
     @Autowired
     private RestTemplate restTemplate;
+    //    @Autowired
+//    private TryCalcService tryCalcService;
+    @Autowired(required = false)
+    private PolicyCalculateService policyCalculateService;
 
 
     /**
@@ -225,14 +238,87 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 url = url + "?serialNum=" + serialNum;
             }
             result = restTemplate.postForObject(url, req, Map.class);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("calc error", e);
             result.put("resultCode", ErrorCode.INTERNAL_ERROR.getErrorCode());
             result.put("resultMsg", ErrorCode.INTERNAL_ERROR.getErrorMsg());
         }
         logger.debug("trycalc result: " + JSON.toJSONString(result));
         return result;
+    }
+
+    /**
+     * 策略试运算（老系统）
+     */
+    @Override
+    public Map<String, String> trycalc(CalcReqModel calcReqModel, String serialNum) {
+        ResponseHeaderModel resp = null;
+        Map<String, String> result = new HashMap<String, String>(2);
+        try {
+            List<Map<String, Object>> policyList = calcReqModel.getPolicyList();
+//            ValidateResult validateResult = tryCalcService.validate(serialNum, calcReqModel);
+            ValidateResult validateResult = null;
+
+            //校验通过后进行试运算，否则返回消息给web
+            if (validateResult.getResult()) {
+
+                for (Map<String, Object> policy : policyList) {
+
+                    //页面选择的资产域
+                    String recommendType = policy.get("recommendType").toString();
+                    List<Map<String, String>> tagInfos = new ArrayList<>();
+                    //防止tagInfos添加重复的数据
+                    Map<String, String> tagInfoKeys = new HashMap<>();
+
+                    //规则
+                    List<Map<String, Object>> ruleList = (List<Map<String, Object>>) policy.get("rules");
+                    for (Map<String, Object> rule : ruleList) {
+
+                        List<Map<String, String>> triggers = (List<Map<String, String>>) rule.get("triggers");
+                        List<Company> company = (List<Company>) rule.get("company");
+                        String sql = null;
+                        //tagInfos 获取标签信息
+                        sql = SqlUtil.integrationSql(recommendType, triggers, tagInfos, company,
+                                tagInfoKeys);
+
+                        // 清除不必要的参数
+                        rule.remove("triggers");
+                        rule.remove("company");
+                        rule.remove("xietong");
+
+                        rule.put("sql", sql);
+                    }
+                    //清除不必要的参数
+                    policy.remove("recommendName");
+                    policy.remove("recommendType");
+                    policy.remove("place");
+
+                    policy.put("tagInfos", tagInfos);
+                }
+
+                //目前只支持一个数据源DB2
+                EagleDatabaseConfig config = (EagleDatabaseConfig) CacheManager.getInstance().getCache(
+                        CommonConstant.DATABASE_COPNFIG_CACHE_NAME).queryOne(
+                        EagleDatabaseConfCache.CACHE_DB2_KEY);
+                calcReqModel.setDbConfRowId(config.getDbConfRowId().toString());
+
+                logger.debug("calcReqModel: " + JSON.toJSONString(calcReqModel));
+                resp = policyCalculateService.tryCalculate(calcReqModel);
+                result.put("resultCode", resp.getResultCode());
+                result.put("resultMessage", resp.getResultMessage());
+                return result;
+            }
+
+            result.put("resultCode", validateResult.getCode());
+            result.put("resultMessage", validateResult.getMessage());
+        } catch (Exception e) {
+            result.put("resultCode", ErrorCode.INTERNAL_ERROR.getErrorCode());
+            result.put("resultMessage", ErrorCode.INTERNAL_ERROR.getErrorMsg());
+            logger.error("policyCalculateService.tryCalculate", e);
+        }
+
+        return result;
+
     }
 
     /**
