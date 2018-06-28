@@ -20,6 +20,7 @@ import com.zjtelcom.cpct.model.EagleDatabaseConfig;
 import com.zjtelcom.cpct.pojo.Company;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.EagleDatabaseConfCache;
+import com.zjtelcom.cpct.service.TryCalcService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.SqlUtil;
@@ -53,8 +54,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     private MktCamGrpRulMapper mktCamGrpRulMapper;
     @Autowired
     private RestTemplate restTemplate;
-    //    @Autowired
-//    private TryCalcService tryCalcService;
+    @Autowired
+    private TryCalcService tryCalcService;
     @Autowired(required = false)
     private PolicyCalculateService policyCalculateService;
 
@@ -256,14 +257,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         Map<String, String> result = new HashMap<String, String>(2);
         try {
             List<Map<String, Object>> policyList = calcReqModel.getPolicyList();
-//            ValidateResult validateResult = tryCalcService.validate(serialNum, calcReqModel);
-            ValidateResult validateResult = null;
+            ValidateResult validateResult = tryCalcService.validate(serialNum, calcReqModel);
 
             //校验通过后进行试运算，否则返回消息给web
             if (validateResult.getResult()) {
-
                 for (Map<String, Object> policy : policyList) {
-
                     //页面选择的资产域
                     String recommendType = policy.get("recommendType").toString();
                     List<Map<String, String>> tagInfos = new ArrayList<>();

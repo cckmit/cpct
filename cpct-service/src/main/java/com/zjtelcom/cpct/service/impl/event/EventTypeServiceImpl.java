@@ -30,7 +30,7 @@ public class EventTypeServiceImpl extends BaseService implements EventTypeServic
     private EventTypeMapper eventTypeMapper;
 
     /**
-     * listEventTypes
+     * 查询事件目录
      */
     @Override
     public List<EventTypeDTO> listEventTypes() {

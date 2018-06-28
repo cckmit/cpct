@@ -9,10 +9,7 @@ import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.util.FastJsonUtils;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -157,32 +154,16 @@ public class TarGrpController extends BaseController {
     /**
      * 策略试运算
      */
-    @RequestMapping("/strategyTrial")
+    @RequestMapping("/trycalc")
     @CrossOrigin
-    public String strategyTrial(@RequestBody CalcReqModel req, String serialNum) {
-        Map<String, Object> maps = new HashMap<>();
-        try {
-            //返回前端策略试运算结果
-            maps = tarGrpService.strategyTrial(req, serialNum);
-        } catch (Exception e) {
-            logger.error("[op:TarGrpController] fail to strategyTrial for req = {}!" +
-                    " Exception: ", JSONArray.toJSON(req), e);
-            return FastJsonUtils.objToJson(maps);
-        }
-        return FastJsonUtils.objToJson(maps);
-    }
-
-    /**
-     * 策略试运算
-     */
-    public String trycalc(@RequestBody CalcReqModel req, String serialNum) {
+    public String trycalc(@RequestBody CalcReqModel calcReqModel, String serialNum) {
         Map<String, String> maps = new HashMap<>();
         try {
             //返回前端策略试运算结果
-            maps = tarGrpService.trycalc(req, serialNum);
+            maps = tarGrpService.trycalc(calcReqModel, serialNum);
         } catch (Exception e) {
             logger.error("[op:TarGrpController] fail to strategyTrial for req = {}!" +
-                    " Exception: ", JSONArray.toJSON(req), e);
+                    " Exception: ", JSONArray.toJSON(calcReqModel), e);
             return FastJsonUtils.objToJson(maps);
         }
         return FastJsonUtils.objToJson(maps);

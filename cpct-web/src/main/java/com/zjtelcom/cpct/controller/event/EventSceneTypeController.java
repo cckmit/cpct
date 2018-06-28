@@ -15,19 +15,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @Description 事件目录controller
+ * @Description 事件场景目录controller
  * @Author pengy
- * @Date 2018/6/20 17:55
+ * @Date 2018/6/28 12:35
  */
 @RestController
-@RequestMapping("${adminPath}/eventType")
-public class EventTypeController extends BaseController {
+@RequestMapping("${adminPath}/eventSceneType")
+public class EventSceneTypeController extends BaseController {
 
     @Autowired
     private EventTypeService eventTypeService;
 
     /**
-     * 查询事件目录列表
+     * 查询事件场景目录列表
      */
     @RequestMapping("/listEventTypes")
     @CrossOrigin
@@ -43,7 +43,7 @@ public class EventTypeController extends BaseController {
     }
 
     /**
-     * 新增事件目录保存
+     * 新增事件场景目录保存
      */
     @RequestMapping("/saveEventTypes")
     @CrossOrigin
@@ -58,7 +58,7 @@ public class EventTypeController extends BaseController {
     }
 
     /**
-     * 编辑事件目录
+     * 编辑事件场景目录
      */
     @RequestMapping("/editEventType")
     @CrossOrigin
@@ -74,7 +74,7 @@ public class EventTypeController extends BaseController {
     }
 
     /**
-     * 编辑事件目录保存
+     * 编辑事件场景目录保存
      */
     @RequestMapping("/updateEventType")
     @CrossOrigin
@@ -89,7 +89,7 @@ public class EventTypeController extends BaseController {
     }
 
     /**
-     * 删除事件目录
+     * 删除事件场景目录
      */
     @RequestMapping("/delEventType")
     @CrossOrigin

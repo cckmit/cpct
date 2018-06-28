@@ -421,7 +421,6 @@ public final class SqlUtil {
                 String ftl = FileUtils.readFileToString(resource.getFile(), "UTF-8");
                 // 创建模板对象
                 template = new Template(ftl, new StringReader(ftl), config);
-
             }
             catch (IOException e) {
                 LOG.error(e);
