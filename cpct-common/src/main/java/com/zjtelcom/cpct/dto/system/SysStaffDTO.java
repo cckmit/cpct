@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class SysStaffVO {
+public class SysStaffDTO {
 
     private Long staffId;
 

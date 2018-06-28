@@ -2,7 +2,7 @@ package com.zjtelcom.cpct.controller.system;
 
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.system.SysStaff;
-import com.zjtelcom.cpct.dto.system.SysStaffVO;
+import com.zjtelcom.cpct.dto.system.SysStaffDTO;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.system.SysStaffService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ public class SysStaffController extends BaseController {
      * @param staffId
      * @return
      */
-    @RequestMapping("/getStaff")
+    @RequestMapping(value = "getStaff", method = RequestMethod.POST)
     @CrossOrigin
     public String getStaff(@RequestParam("staffId") Long staffId) {
         SysStaff sysStaff = new SysStaff();
@@ -62,15 +62,15 @@ public class SysStaffController extends BaseController {
     /**
      * 新增员工
      *
-     * @param sysStaffVO
+     * @param sysStaffDTO
      * @return
      */
-    @RequestMapping("/saveStaff")
+    @RequestMapping(value = "saveStaff", method = RequestMethod.POST)
     @CrossOrigin
-    public String saveStaff(SysStaffVO sysStaffVO) {
+    public String saveStaff(SysStaffDTO sysStaffDTO) {
 
         try {
-            sysStaffService.saveStaff(sysStaffVO);
+            sysStaffService.saveStaff(sysStaffDTO);
         } catch (Exception e) {
             logger.error("[op:SysStaffController] fail to saveStaff Exception: ", e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
@@ -85,9 +85,9 @@ public class SysStaffController extends BaseController {
      * @param sysStaff
      * @return
      */
-    @RequestMapping("/updateStaff")
+    @RequestMapping(value = "updateStaff", method = RequestMethod.POST)
     @CrossOrigin
-    public String updateStaff(SysStaffVO sysStaff) {
+    public String updateStaff(SysStaffDTO sysStaff) {
 
         try {
             sysStaffService.updateStaff(sysStaff);
@@ -106,7 +106,7 @@ public class SysStaffController extends BaseController {
      * @param status
      * @return
      */
-    @RequestMapping("/changeStatus")
+    @RequestMapping(value = "changeStatus", method = RequestMethod.POST)
     @CrossOrigin
     public String changeStatus(@RequestParam("staffId") Long staffId, @RequestParam("status") Long status) {
 
@@ -127,7 +127,7 @@ public class SysStaffController extends BaseController {
      * @param password 新密码
      * @return
      */
-    @RequestMapping("/updatePassword")
+    @RequestMapping(value = "updatePassword", method = RequestMethod.POST)
     @CrossOrigin
     public String updatePassword(@RequestParam("staffId") Long staffId, @RequestParam("password") String password) {
 

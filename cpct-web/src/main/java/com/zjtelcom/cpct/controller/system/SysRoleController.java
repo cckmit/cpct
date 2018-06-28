@@ -7,10 +7,7 @@ import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.system.SysRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +23,7 @@ public class SysRoleController extends BaseController {
      * 查询角色列表（分页）
      * @return
      */
-    @RequestMapping("/listRole")
+    @RequestMapping(value = "listRole", method = RequestMethod.POST)
     @CrossOrigin
     public String listRole(@RequestParam("roleId") Long roleId,
                            @RequestParam("roleName") String roleName) {
@@ -45,7 +42,7 @@ public class SysRoleController extends BaseController {
      * @param roleId
      * @return
      */
-    @RequestMapping("/getRole")
+    @RequestMapping(value = "getRole", method = RequestMethod.POST)
     @CrossOrigin
     public String getRole(@RequestParam("roleId") Long roleId) {
         SysRole sysRole = new SysRole();
@@ -63,7 +60,7 @@ public class SysRoleController extends BaseController {
      * @param sysRole
      * @return
      */
-    @RequestMapping("/saveRole")
+    @RequestMapping(value = "saveRole", method = RequestMethod.POST)
     @CrossOrigin
     public String saveStaff(SysRole sysRole) {
 
@@ -77,8 +74,13 @@ public class SysRoleController extends BaseController {
         return initSuccRespInfo(null);
     }
 
-
-    @RequestMapping("/saveAuthority")
+    /**
+     * 保存权限
+     * @param roleId
+     * @param list
+     * @return
+     */
+    @RequestMapping(value = "saveAuthority", method = RequestMethod.POST)
     @CrossOrigin
     public String saveAuthority(@RequestParam("roleId") Long roleId,@RequestParam("list") List<Long> list) {
 
@@ -97,7 +99,7 @@ public class SysRoleController extends BaseController {
      * @param sysRole
      * @return
      */
-    @RequestMapping("/updateRole")
+    @RequestMapping(value = "updateRole", method = RequestMethod.POST)
     @CrossOrigin
     public String updateRole(SysRole sysRole) {
 
@@ -111,7 +113,12 @@ public class SysRoleController extends BaseController {
         return initSuccRespInfo(null);
     }
 
-    @RequestMapping("/delRole")
+    /**
+     * 删除角色
+     * @param roleId
+     * @return
+     */
+    @RequestMapping(value = "delRole", method = RequestMethod.POST)
     @CrossOrigin
     public String delRole(Long roleId) {
 

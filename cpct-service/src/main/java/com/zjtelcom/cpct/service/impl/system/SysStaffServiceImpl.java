@@ -1,15 +1,12 @@
 package com.zjtelcom.cpct.service.impl.system;
 
 import com.alibaba.fastjson.JSON;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.dao.system.SysStaffMapper;
 import com.zjtelcom.cpct.dao.system.SysStaffRoleMapper;
 import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.domain.system.SysStaffRole;
-import com.zjtelcom.cpct.dto.system.SysStaffVO;
+import com.zjtelcom.cpct.dto.system.SysStaffDTO;
 import com.zjtelcom.cpct.service.BaseService;
-import com.zjtelcom.cpct.service.system.SysStaffRoleService;
 import com.zjtelcom.cpct.service.system.SysStaffService;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import org.apache.shiro.crypto.hash.SimpleHash;
@@ -60,18 +57,24 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
     }
 
     @Override
-    public int saveStaff(SysStaffVO sysStaffVO) throws Exception {
+    public int saveStaff(SysStaffDTO sysStaffDTO) throws Exception {
         //todo 判断字段是否为空
 
         SysStaff sysStaff = new SysStaff();
-        CopyPropertiesUtil.copyBean2Bean(sysStaff, sysStaffVO);
+        CopyPropertiesUtil.copyBean2Bean(sysStaff, sysStaffDTO);
         //判断账号是否重复
         int count = sysStaffMapper.checkCodeRepeat(sysStaff.getStaffCode());
         if (count > 0) {
             //todo 异常 账号重复
         }
-        //密码加密
-        sysStaff.setPassword(new SimpleHash("md5", sysStaff.getPassword()).toHex());
+
+        //密码加密 todo 默认密码
+        String password = "12345";
+        sysStaff.setPassword(new SimpleHash("md5", password).toHex());
+
+        //初始化状态值
+        sysStaff.setStatus(1L);
+
         //todo 获取当前登录用户id
         Long loginId = 1L;
         sysStaff.setCreateStaff(loginId);
@@ -84,7 +87,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         //保存角色信息
         SysStaffRole sysStaffRole = new SysStaffRole();
         sysStaffRole.setStaffId(sysStaff.getStaffId());
-        sysStaffRole.setRoleId(sysStaffVO.getRoleId());
+        sysStaffRole.setRoleId(sysStaffDTO.getRoleId());
         flag = sysStaffRoleMapper.insert(sysStaffRole);
         if (flag < 1) {
             //todo flag<1 判断失败抛出业务异常
@@ -94,10 +97,10 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
     }
 
     @Override
-    public int updateStaff(SysStaffVO sysStaffVO) throws Exception {
+    public int updateStaff(SysStaffDTO sysStaffDTO) throws Exception {
         //todo 判断字段是否为空
         SysStaff sysStaff = new SysStaff();
-        CopyPropertiesUtil.copyBean2Bean(sysStaff, sysStaffVO);
+        CopyPropertiesUtil.copyBean2Bean(sysStaff, sysStaffDTO);
 
 
         //todo 判断账号是否重复
@@ -119,7 +122,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         //保存角色信息
         SysStaffRole sysStaffRole = new SysStaffRole();
         sysStaffRole.setStaffId(sysStaff.getStaffId());
-        sysStaffRole.setRoleId(sysStaffVO.getRoleId());
+        sysStaffRole.setRoleId(sysStaffDTO.getRoleId());
         flag = sysStaffRoleMapper.insert(sysStaffRole);
         if (flag < 1) {
             //todo flag<1 判断失败抛出业务异常
