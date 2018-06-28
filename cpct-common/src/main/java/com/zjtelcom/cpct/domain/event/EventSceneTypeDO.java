@@ -1,14 +1,19 @@
-package com.zjtelcom.cpct.dto.event;
+package com.zjtelcom.cpct.domain.event;
+
 
 import com.zjtelcom.cpct.BaseEntity;
 
-public class EventSceneType extends BaseEntity{
+import java.io.Serializable;
 
-    private Long evtSceneTypeId;
-    private String evtSceneTypeNbr;
-    private String evtSceneTypeName;
-    private Long parEvtSceneTypeId;
-    private String evtSceneTypeDesc;
+public class EventSceneTypeDO extends BaseEntity implements Serializable{
+
+    private static final long serialVersionUID = -1161582235420131662L;
+
+    private Long evtSceneTypeId;//事件场景目录标识
+    private String evtSceneTypeNbr;//事件场景目录编码
+    private String evtSceneTypeName;//事件场景目录名称
+    private Long parEvtSceneTypeId;//父级事件场景目录标识
+    private String evtSceneTypeDesc;//事件场景目录描述
 
     public Long getEvtSceneTypeId() {
         return evtSceneTypeId;

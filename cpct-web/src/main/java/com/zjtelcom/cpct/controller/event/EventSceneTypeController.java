@@ -2,10 +2,10 @@ package com.zjtelcom.cpct.controller.event;
 
 import com.alibaba.fastjson.JSONArray;
 import com.zjtelcom.cpct.controller.BaseController;
-import com.zjtelcom.cpct.domain.event.EventTypeDO;
-import com.zjtelcom.cpct.dto.event.EventTypeDTO;
+import com.zjtelcom.cpct.domain.event.EventSceneTypeDO;
+import com.zjtelcom.cpct.dto.event.EventSceneTypeDTO;
 import com.zjtelcom.cpct.enums.ErrorCode;
-import com.zjtelcom.cpct.service.event.EventTypeService;
+import com.zjtelcom.cpct.service.event.EventSceneTypeService;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -24,19 +24,19 @@ import java.util.List;
 public class EventSceneTypeController extends BaseController {
 
     @Autowired
-    private EventTypeService eventTypeService;
+    private EventSceneTypeService eventSceneTypeService;
 
     /**
      * 查询事件场景目录列表
      */
-    @RequestMapping("/listEventTypes")
+    @RequestMapping("/listEventSceneTypes")
     @CrossOrigin
-    public String listEventTypes() {
-        List<EventTypeDTO> eventTypeDTOS = new ArrayList<>();
+    public String listEventSceneTypes() {
+        List<EventSceneTypeDTO> eventTypeDTOS = new ArrayList<>();
         try {
-            eventTypeDTOS = eventTypeService.listEventTypes();
+            eventTypeDTOS = eventSceneTypeService.listEventSceneTypes();
         } catch (Exception e) {
-            logger.error("[op:EventTypeController] fail to listEventTypes ! Exception: ", e);
+            logger.error("[op:EventTypeController] fail to listEventSceneTypes ! Exception: ", e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENTTYPE_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENTTYPE_FAILURE.getErrorCode());
         }
         return initSuccRespInfo(eventTypeDTOS);
@@ -45,13 +45,13 @@ public class EventSceneTypeController extends BaseController {
     /**
      * 新增事件场景目录保存
      */
-    @RequestMapping("/saveEventTypes")
+    @RequestMapping("/saveEventSceneTypes")
     @CrossOrigin
-    public String saveEventTypes(EventTypeDO eventTypeDO) {
+    public String saveEventSceneTypes(EventSceneTypeDO eventSceneTypeDO) {
         try {
-            eventTypeService.saveEventType(eventTypeDO);
+            eventSceneTypeService.saveEventSceneType(eventSceneTypeDO);
         } catch (Exception e) {
-            logger.error("[op:EventTypeController] fail to saveEventTypes eventTypeDO = {}! Exception: ", JSONArray.toJSON(eventTypeDO), e);
+            logger.error("[op:EventTypeController] fail to saveEventTypes eventTypeDO = {}! Exception: ", JSONArray.toJSON(eventSceneTypeDO), e);
             return initFailRespInfo(ErrorCode.SAVE_EVENTTYPE_FAILURE.getErrorMsg(), ErrorCode.SAVE_EVENTTYPE_FAILURE.getErrorCode());
         }
         return initSuccRespInfo(null);
@@ -60,14 +60,14 @@ public class EventSceneTypeController extends BaseController {
     /**
      * 编辑事件场景目录
      */
-    @RequestMapping("/editEventType")
+    @RequestMapping("/editEventSceneType")
     @CrossOrigin
-    public String editEventType(@Param("evtTypeId") Long evtTypeId) {
-        EventTypeDTO eventTypeDTO = new EventTypeDTO();
+    public String editEventSceneType(@Param("evtSceneTypeId") Long evtSceneTypeId) {
+        EventSceneTypeDTO eventTypeDTO = new EventSceneTypeDTO();
         try {
-            eventTypeDTO = eventTypeService.getEventTypeDTOById(evtTypeId);
+            eventTypeDTO = eventSceneTypeService.getEventSceneTypeDTOById(evtSceneTypeId);
         } catch (Exception e) {
-            logger.error("[op:EventTypeController] fail to editEventTypes evtTypeId = {}! Exception: ", evtTypeId, e);
+            logger.error("[op:EventTypeController] fail to editEventSceneType evtTypeId = {}! Exception: ", evtSceneTypeId, e);
             return initFailRespInfo(ErrorCode.EDIT_EVENTTYPE_FAILURE.getErrorMsg(), ErrorCode.EDIT_EVENTTYPE_FAILURE.getErrorCode());
         }
         return initSuccRespInfo(eventTypeDTO);
@@ -76,13 +76,13 @@ public class EventSceneTypeController extends BaseController {
     /**
      * 编辑事件场景目录保存
      */
-    @RequestMapping("/updateEventType")
+    @RequestMapping("/updateEventSceneType")
     @CrossOrigin
-    public String updateEventType(EventTypeDO eventTypeDO) {
+    public String updateEventSceneType(EventSceneTypeDO eventTypeDO) {
         try {
-            eventTypeService.updateEventType(eventTypeDO);
+            eventSceneTypeService.updateEventSceneType(eventTypeDO);
         } catch (Exception e) {
-            logger.error("[op:EventTypeController] fail to updateEventType eventTypeDO = {}! Exception: ", JSONArray.toJSON(eventTypeDO), e);
+            logger.error("[op:EventTypeController] fail to updateEventSceneType eventTypeDO = {}! Exception: ", JSONArray.toJSON(eventTypeDO), e);
             return initFailRespInfo(ErrorCode.UPDATE_EVENTTYPE_FAILURE.getErrorMsg(), ErrorCode.UPDATE_EVENTTYPE_FAILURE.getErrorCode());
         }
         return initSuccRespInfo(null);
@@ -91,13 +91,13 @@ public class EventSceneTypeController extends BaseController {
     /**
      * 删除事件场景目录
      */
-    @RequestMapping("/delEventType")
+    @RequestMapping("/delEventSceneType")
     @CrossOrigin
-    public String delEventType(@Param("evtTypeId") Long evtTypeId) {
+    public String delEventSceneType(@Param("evtSceneTypeId") Long evtSceneTypeId) {
         try {
-            eventTypeService.delEventType(evtTypeId);
+            eventSceneTypeService.delEventSceneType(evtSceneTypeId);
         } catch (Exception e) {
-            logger.error("[op:EventTypeController] fail to delEventType evtTypeId = {}! Exception: ", evtTypeId, e);
+            logger.error("[op:EventTypeController] fail to delEventType evtTypeId = {}! Exception: ", evtSceneTypeId, e);
             return initFailRespInfo(ErrorCode.DEL_EVENTTYPE_FAILURE.getErrorMsg(), ErrorCode.DEL_EVENTTYPE_FAILURE.getErrorCode());
         }
         return initSuccRespInfo(null);

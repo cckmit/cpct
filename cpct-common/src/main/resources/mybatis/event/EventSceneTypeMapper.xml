@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.event.EventSceneTypeMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.event.EventSceneTypeDO">
+    <id column="EVT_SCENE_TYPE_ID" jdbcType="BIGINT" property="evtSceneTypeId" />
+    <result column="EVT_SCENE_TYPE_NBR" jdbcType="VARCHAR" property="evtSceneTypeNbr" />
+    <result column="EVT_SCENE_TYPE_NAME" jdbcType="VARCHAR" property="evtSceneTypeName" />
+    <result column="PAR_EVT_SCENE_TYPE_ID" jdbcType="BIGINT" property="parEvtSceneTypeId" />
+    <result column="EVT_SCENE_TYPE_DESC" jdbcType="VARCHAR" property="evtSceneTypeDesc" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from event_scene_type
+    where EVT_SCENE_TYPE_ID = #{evtSceneTypeId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.event.EventSceneTypeDO">
+    insert into event_scene_type (EVT_SCENE_TYPE_ID, EVT_SCENE_TYPE_NBR, EVT_SCENE_TYPE_NAME, 
+      PAR_EVT_SCENE_TYPE_ID, EVT_SCENE_TYPE_DESC, STATUS_CD, 
+      CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
+      STATUS_DATE, UPDATE_DATE, REMARK
+      )
+    values (#{evtSceneTypeId,jdbcType=BIGINT}, #{evtSceneTypeNbr,jdbcType=VARCHAR}, #{evtSceneTypeName,jdbcType=VARCHAR}, 
+      #{parEvtSceneTypeId,jdbcType=BIGINT}, #{evtSceneTypeDesc,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR}, 
+      #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.event.EventSceneTypeDO">
+    update event_scene_type
+    set EVT_SCENE_TYPE_NBR = #{evtSceneTypeNbr,jdbcType=VARCHAR},
+      EVT_SCENE_TYPE_NAME = #{evtSceneTypeName,jdbcType=VARCHAR},
+      PAR_EVT_SCENE_TYPE_ID = #{parEvtSceneTypeId,jdbcType=BIGINT},
+      EVT_SCENE_TYPE_DESC = #{evtSceneTypeDesc,jdbcType=VARCHAR},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where EVT_SCENE_TYPE_ID = #{evtSceneTypeId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select EVT_SCENE_TYPE_ID, EVT_SCENE_TYPE_NBR, EVT_SCENE_TYPE_NAME, PAR_EVT_SCENE_TYPE_ID, 
+    EVT_SCENE_TYPE_DESC, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
+    UPDATE_DATE, REMARK
+    from event_scene_type
+    where EVT_SCENE_TYPE_ID = #{evtSceneTypeId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select EVT_SCENE_TYPE_ID, EVT_SCENE_TYPE_NBR, EVT_SCENE_TYPE_NAME, PAR_EVT_SCENE_TYPE_ID, 
+    EVT_SCENE_TYPE_DESC, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
+    UPDATE_DATE, REMARK
+    from event_scene_type
+  </select>
+
+  <select id="listEventSceneTypes" resultMap="BaseResultMap">
+    EVT_SCENE_TYPE_ID, EVT_SCENE_TYPE_NBR, EVT_SCENE_TYPE_NAME, PAR_EVT_SCENE_TYPE_ID,
+    EVT_SCENE_TYPE_DESC, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+    UPDATE_DATE, REMARK
+    from event_scene_type
+    where 1 = 1
+    <if test="evtSceneTypeId != null and evtSceneTypeId != ''">
+      and EVT_SCENE_TYPE_ID = #{evtSceneTypeId}
+    </if>
+    <if test="parEvtSceneTypeId != null and parEvtSceneTypeId != ''">
+      and PAR_EVT_SCENE_TYPE_ID = #{parEvtSceneTypeId}
+    </if>
+  </select>
+
+  <insert id="saveEventSceneType" parameterType="com.zjtelcom.cpct.domain.event.EventSceneTypeDO">
+    insert into event_scene_type (  EVT_SCENE_TYPE_NBR, EVT_SCENE_TYPE_NAME, PAR_EVT_SCENE_TYPE_ID,
+    EVT_SCENE_TYPE_DESC, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+    UPDATE_DATE, REMARK
+    )
+    values ( #{evtSceneTypeNbr,jdbcType=VARCHAR}, #{evtSceneTypeName,jdbcType=VARCHAR},
+      #{parEvtSceneTypeId,jdbcType=BIGINT}, #{evtSceneTypeDesc,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR},
+      #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP},
+      #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+
+</mapper>
