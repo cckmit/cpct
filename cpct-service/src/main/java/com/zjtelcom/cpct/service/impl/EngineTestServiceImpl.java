@@ -3,44 +3,57 @@ package com.zjtelcom.cpct.service.impl;
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.Operator;
+import com.ql.util.express.rule.RuleResult;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.EngineTestService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
 
 @Service
 @Transactional
 public class EngineTestServiceImpl extends BaseService implements EngineTestService {
 
     @Override
-    public void test() {
+    public void test(Map<String, String> map) {
 
         try {
             ExpressRunner runner = new ExpressRunner();
             DefaultContext<String, Object> context = new DefaultContext<String, Object>();
+//            DefaultContext<String, Object> context = new DefaultContext<String, Object>();
 
-//            context.put("a",1);
-//            context.put("b",2);
-//            context.put("c",3);
-//            String express = "a+b*c";
+            String label_1 = map.get("key_1");
+            String label_2 = map.get("key_2");
+            String label_3 = map.get("key_3");
+            String label_4 = map.get("key_4");
+            String label_5 = map.get("key_5");
+
+
+            context.put("label_1", label_1);
+            context.put("label_2", label_2);
+            context.put("label_3", label_3);
+            context.put("label_4", label_4);
+            context.put("label_5", label_5);
+
+//            String express = "1>=6 && 1==1 && 1==1";
 //            Object r = runner.execute(express, context, null, true, false);
-//            System.out.println(r);
 
-            //年溢出
-            String label1 = "label1";
-            //连续两个月
-            String label2 = "label2";
-            //订购
-            String label3 = "label3";
 
-            context.put(label1,6);
-            context.put(label2,1);
-            context.put(label3,1);
+//            String express= "if(label_1 >= 3 and label_2 == 1 and label_3 == 1){return true;}else if(label_4 <= 10){true} else {false}";
+            String express = "label_1 >= 3 and label_2 == 1 and label_3 == 1";
 
-            String express = "label1>=6&&label2==1&&label3==1";
+            //此算法仅支持if或者when等逻辑判断（待确认）
+            RuleResult ruleResult = runner.executeRule(express, context, true, true);
 
-            Object r = runner.execute(express, context, null, true, false);
-            System.out.println(r);
+            logger.info("======================================");
+            logger.info("事件流水 = {}", "ISI");
+            logger.info("活动ID = {}", "activityId");
+            logger.info("express = {}", express);
+            logger.info("result = {}", ruleResult.getResult());
+            logger.info("tree = {}", ruleResult.getRule().toTree());
+            logger.info("trace = {}", ruleResult.getTraceMap());
+            logger.info("======================================");
 
         } catch (Exception e) {
             e.printStackTrace();

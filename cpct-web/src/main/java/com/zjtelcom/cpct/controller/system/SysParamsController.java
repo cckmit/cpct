@@ -8,10 +8,7 @@ import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.system.SysParamsService;
 import com.zjtelcom.cpct.service.system.SysRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +24,7 @@ public class SysParamsController extends BaseController {
      * 查询参数列表（分页）
      * @return
      */
-    @RequestMapping("/listParams")
+    @RequestMapping(value = "listParams", method = RequestMethod.POST)
     @CrossOrigin
     public String listParams(@RequestParam("paramName") String paramName,
                            @RequestParam("configType") Long configType) {
@@ -46,7 +43,7 @@ public class SysParamsController extends BaseController {
      * @param paramId
      * @return
      */
-    @RequestMapping("/getParams")
+    @RequestMapping(value = "getParams", method = RequestMethod.POST)
     @CrossOrigin
     public String getParams(@RequestParam("paramId") Long paramId) {
         SysParams sysParams = new SysParams();
@@ -64,7 +61,7 @@ public class SysParamsController extends BaseController {
      * @param sysParams
      * @return
      */
-    @RequestMapping("/saveParams")
+    @RequestMapping(value = "saveParams", method = RequestMethod.POST)
     @CrossOrigin
     public String saveParams(SysParams sysParams) {
 
@@ -83,7 +80,7 @@ public class SysParamsController extends BaseController {
      * @param sysParams
      * @return
      */
-    @RequestMapping("/updateParams")
+    @RequestMapping(value = "updateParams", method = RequestMethod.POST)
     @CrossOrigin
     public String updateParams(SysParams sysParams) {
 
@@ -102,7 +99,7 @@ public class SysParamsController extends BaseController {
      * @param paramId
      * @return
      */
-    @RequestMapping("/delParams")
+    @RequestMapping(value = "delParams", method = RequestMethod.POST)
     @CrossOrigin
     public String delParams(Long paramId) {
 

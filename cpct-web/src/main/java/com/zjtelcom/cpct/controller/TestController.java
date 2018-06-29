@@ -6,6 +6,7 @@ import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -46,9 +47,9 @@ public class TestController extends BaseController {
 
     @RequestMapping("/engine")
     @CrossOrigin
-    public String engine() {
+    public String engine(@RequestBody Map<String,String> map) {
 
-        engineTestService.test();
+        engineTestService.test(map);
 
         return initSuccRespInfo(null);
     }
