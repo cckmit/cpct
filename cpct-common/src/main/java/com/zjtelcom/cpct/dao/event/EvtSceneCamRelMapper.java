@@ -16,6 +16,9 @@ public interface EvtSceneCamRelMapper {
     List<EvtSceneCamRelDO> selectAll();
     int updateByPrimaryKey(EvtSceneCamRelDO record);
 
+    //通过事件场景id查询所有规则
+    List<EvtSceneCamRelDO> selectCamsByEvtSceneId(Long eventSceneId);
+
     List<EvtSceneCamRelDO> selectByEventSceneId(@Param("eventSceneId") Long eventSceneId);
 
 }

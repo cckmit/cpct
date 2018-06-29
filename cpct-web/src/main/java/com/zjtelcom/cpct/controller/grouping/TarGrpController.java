@@ -152,7 +152,7 @@ public class TarGrpController extends BaseController {
 
 
     /**
-     * 策略试运算
+     * 策略试运算（老系统方法）
      */
     @RequestMapping("/trycalc")
     @CrossOrigin

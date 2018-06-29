@@ -78,7 +78,7 @@ public class EventServiceImpl extends BaseService implements EventService {
             //场景关联到活动
             if (sceneDOList != null) {
                 for (EventSceneDO evtSceneDO : sceneDOList) {
-
+                    
                 }
             }
             //关联到事件匹配规则 todo 暂时未找到场景，待确认

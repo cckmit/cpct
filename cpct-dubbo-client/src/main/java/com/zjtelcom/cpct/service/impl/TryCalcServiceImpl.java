@@ -19,6 +19,7 @@ import com.zjtelcom.cpct.constants.UseTypeConstants;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.model.EagleSourceTableDef;
 import com.zjtelcom.cpct.model.EagleTag;
+import com.zjtelcom.cpct.model.Trigger;
 import com.zjtelcom.cpct.model.TriggerValue;
 import com.zjtelcom.cpct.pojo.Company;
 import com.zjtelcom.cpct.service.TryCalcService;
@@ -27,8 +28,6 @@ import com.zjtelcom.cpct.validator.ValidateResult;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.Trigger;
 import org.springframework.stereotype.Service;
 import java.util.*;
 
@@ -203,14 +202,14 @@ public class TryCalcServiceImpl implements TryCalcService {
 
                 for (Map tigger : triggers) {
                     String conditionId = tigger.get("conditionId").toString();
-//                    String eagleName = triggerCache.queryOne(conditionId).getEagleName();
-//                    EagleTag tag = tagCache.queryOne(eagleName + "_" + recommendType);
-//                    if (null != tag
-//                        && !tag.getCtasTableDefinitionRowId().equals(
-//                            masterTable.getCtasTableDefinitionRowId())) {
-//                        tagIdList.add(tag.getTagRowId());
-//                        eagleMapping.put(eagleName, tigger.get("conditionName").toString());
-//                    }
+                    String eagleName = triggerCache.queryOne(conditionId).getEagleName();
+                    EagleTag tag = tagCache.queryOne(eagleName + "_" + recommendType);
+                    if (null != tag
+                        && !tag.getCtasTableDefinitionRowId().equals(
+                            masterTable.getCtasTableDefinitionRowId())) {
+                        tagIdList.add(tag.getTagRowId());
+                        eagleMapping.put(eagleName, tigger.get("conditionName").toString());
+                    }
                 }
 
                 //校验标签是否配置了主从关系

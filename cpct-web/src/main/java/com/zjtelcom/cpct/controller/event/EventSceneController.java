@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @Description eventController
+ * @Description 事件场景controller
  * @Author pengy
  * @Date 2018/6/20 17:55
  */
