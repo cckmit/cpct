@@ -13,9 +13,7 @@ import com.zjtelcom.cpct.util.ChannelUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -29,7 +27,8 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
 
 
     @Override
-    public RespInfo addCamScript(Long userId, CamScriptAddVO addVO) {
+    public Map<String,Object> addCamScript(Long userId, CamScriptAddVO addVO) {
+        Map<String,Object> result = new HashMap<>();
         CamScript script = BeanUtil.create(addVO,new CamScript());
         script.setCreateDate(new Date());
         script.setUpdateDate(new Date());
@@ -37,36 +36,49 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
         script.setUpdateStaff(userId);
         script.setStatusCd("1000");
         camScriptMapper.insert(script);
-        return RespInfo.build(CODE_SUCCESS,"添加成功");
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData","添加成功");
+        return result;
     }
 
     @Override
-    public RespInfo editCamScript(Long userId, CamScriptEditVO editVO) {
+    public Map<String,Object> editCamScript(Long userId, CamScriptEditVO editVO) {
+        Map<String,Object> result = new HashMap<>();
         CamScript script = camScriptMapper.selectByPrimaryKey(editVO.getCamScriptId());
         if (script==null){
-            return RespInfo.build(CODE_FAIL,"活动关联脚本信息不存在");
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","活动关联脚本信息不存在");
+            return result;
         }
         BeanUtil.copy(editVO,script);
         script.setUpdateDate(new Date());
         script.setUpdateStaff(userId);
         camScriptMapper.updateByPrimaryKey(script);
-        return RespInfo.build(CODE_SUCCESS,"修改成功");
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData","修改成功");
+        return result;
     }
 
     @Override
-    public RespInfo deleteCamScript(Long userId, List<Long> camScriptIdList) {
+    public Map<String,Object> deleteCamScript(Long userId, List<Long> camScriptIdList) {
+        Map<String,Object> result = new HashMap<>();
         for (Long id : camScriptIdList){
             CamScript script = camScriptMapper.selectByPrimaryKey(id);
             if (script==null){
-                return RespInfo.build(CODE_FAIL,"活动关联脚本信息不存在");
+                result.put("resultCode",CODE_FAIL);
+                result.put("resultMsg","活动关联脚本信息不存在");
+                return result;
             }
             camScriptMapper.deleteByPrimaryKey(id);
         }
-        return null;
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData","删除成功");
+        return result;
     }
 
     @Override
-    public List<CamScriptVO> getCamScriptList(Long userId, Long campaignId, Long evtContactConfId) {
+    public Map<String,Object> getCamScriptList(Long userId, Long campaignId, Long evtContactConfId) {
+        Map<String,Object> result = new HashMap<>();
         //todo  活动标识确定活动 推送渠道id确定渠道
         List<CamScriptVO> voList = new ArrayList<>();
         List<CamScript> scriptList = new ArrayList<>();
@@ -80,11 +92,13 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
             e.printStackTrace();
             logger.error("[op:ChannelServiceImpl] fail to listChannel ", e);
         }
-        return voList;
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData",voList);
+        return result;
     }
 
     @Override
-    public CamScriptVO getCamScriptVODetail(Long userId, Long camScriptId) {
+    public Map<String,Object> getCamScriptVODetail(Long userId, Long camScriptId) {
         return null;
     }
 }

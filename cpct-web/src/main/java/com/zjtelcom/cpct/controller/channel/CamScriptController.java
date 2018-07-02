@@ -7,11 +7,14 @@ import com.zjtelcom.cpct.dto.channel.CamScriptEditVO;
 import com.zjtelcom.cpct.dto.channel.CamScriptVO;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.channel.CamScriptService;
+import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -28,15 +31,18 @@ public class CamScriptController extends BaseController {
      */
     @PostMapping("addCamScript")
     @CrossOrigin
-    public RespInfo addCamScript(Long userId, CamScriptAddVO addVO) {
-        RespInfo respInfo = new RespInfo();
+    public Map<String,Object> addCamScript(CamScriptAddVO addVO) {
+        Long userId = UserUtil.LoginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            respInfo = camScriptService.addCamScript(userId,addVO);
+            result = camScriptService.addCamScript(userId,addVO);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to addCamScript",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.ADD_CAM_SCRIPT_FAILURE.getErrorMsg(),ErrorCode.ADD_CAM_SCRIPT_FAILURE.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return respInfo;
+        return result;
     }
 
     /**
@@ -44,15 +50,18 @@ public class CamScriptController extends BaseController {
      */
     @PostMapping("editCamScript")
     @CrossOrigin
-    public RespInfo editCamScript(Long userId, CamScriptEditVO editVO) {
-        RespInfo respInfo = new RespInfo();
+    public  Map<String,Object> editCamScript(CamScriptEditVO editVO) {
+        Long userId = UserUtil.LoginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            respInfo = camScriptService.editCamScript(userId,editVO);
+            result = camScriptService.editCamScript(userId,editVO);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to editCamScript",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.EDIT_CAM_SCRIPT_FAILURE.getErrorMsg(),ErrorCode.EDIT_CAM_SCRIPT_FAILURE.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return respInfo;
+        return result;
     }
 
     /**
@@ -60,16 +69,18 @@ public class CamScriptController extends BaseController {
      */
     @PostMapping("deleteCamScript")
     @CrossOrigin
-    public RespInfo deleteCamScript(@RequestBody List<Long> camScriptIdList) {
-        Long userId = 1L;
-        RespInfo respInfo = new RespInfo();
+    public  Map<String,Object> deleteCamScript(@RequestBody List<Long> camScriptIdList) {
+        Map<String,Object> result = new HashMap<>();
+        Long userId = UserUtil.LoginId();
         try {
-            respInfo = camScriptService.deleteCamScript(userId,camScriptIdList);
+            result = camScriptService.deleteCamScript(userId,camScriptIdList);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to deleteCamScript",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.DELETE_CAM_SCRIPT_FAILURE.getErrorMsg(),ErrorCode.DELETE_CAM_SCRIPT_FAILURE.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return respInfo;
+        return result;
     }
 
     /**
@@ -77,18 +88,23 @@ public class CamScriptController extends BaseController {
      */
     @GetMapping("getCamScriptList")
     @CrossOrigin
-    public RespInfo getCamScriptList(Long userId, Long campaignId, Long evtContactConfId) {
+    public  Map<String,Object> getCamScriptList(Long campaignId, Long evtContactConfId) {
+        Map<String,Object> result = new HashMap<>();
+        Long userId = UserUtil.LoginId();
         if (campaignId==null || evtContactConfId==null){
-            return RespInfo.build(CODE_FAIL,"未知的活动或渠道信息",null);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," 未知的活动或渠道信息");
+            return result;
         }
-        List<CamScriptVO> voList = new ArrayList<>();
         try {
-            voList = camScriptService.getCamScriptList(userId,campaignId,evtContactConfId);
+            result = camScriptService.getCamScriptList(userId,campaignId,evtContactConfId);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to getCamScriptList",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.GET_CAM_SCRIPT_LIST.getErrorMsg(),ErrorCode.GET_CAM_SCRIPT_LIST.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return RespInfo.build(CODE_SUCCESS,voList);
+        return result;
     }
 
     /**
@@ -96,15 +112,19 @@ public class CamScriptController extends BaseController {
      */
     @GetMapping("getCamScriptVODetail")
     @CrossOrigin
-    public RespInfo getCamScriptVODetail(Long userId, Long camScriptId) {
+    public  Map<String,Object> getCamScriptVODetail(Long camScriptId) {
+        Map<String,Object> result = new HashMap<>();
+        Long userId = UserUtil.LoginId();
         CamScriptVO vo = new CamScriptVO();
         try {
-            vo = camScriptService.getCamScriptVODetail(userId,camScriptId);
+            result = camScriptService.getCamScriptVODetail(userId,camScriptId);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to getCamScriptVODetail",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.GET_CAM_SCRIPT_DETAIL.getErrorMsg(),ErrorCode.GET_CAM_SCRIPT_DETAIL.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return RespInfo.build(CODE_SUCCESS,vo);
+        return result;
     }
 
 }
