@@ -32,7 +32,7 @@ public class CamScriptController extends BaseController {
     @PostMapping("addCamScript")
     @CrossOrigin
     public Map<String,Object> addCamScript(CamScriptAddVO addVO) {
-        Long userId = UserUtil.LoginId();
+        Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
             result = camScriptService.addCamScript(userId,addVO);
@@ -51,7 +51,7 @@ public class CamScriptController extends BaseController {
     @PostMapping("editCamScript")
     @CrossOrigin
     public  Map<String,Object> editCamScript(CamScriptEditVO editVO) {
-        Long userId = UserUtil.LoginId();
+        Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
             result = camScriptService.editCamScript(userId,editVO);
@@ -71,7 +71,7 @@ public class CamScriptController extends BaseController {
     @CrossOrigin
     public  Map<String,Object> deleteCamScript(@RequestBody List<Long> camScriptIdList) {
         Map<String,Object> result = new HashMap<>();
-        Long userId = UserUtil.LoginId();
+        Long userId = UserUtil.loginId();
         try {
             result = camScriptService.deleteCamScript(userId,camScriptIdList);
         } catch (Exception e) {
@@ -90,7 +90,7 @@ public class CamScriptController extends BaseController {
     @CrossOrigin
     public  Map<String,Object> getCamScriptList(Long campaignId, Long evtContactConfId) {
         Map<String,Object> result = new HashMap<>();
-        Long userId = UserUtil.LoginId();
+        Long userId = UserUtil.loginId();
         if (campaignId==null || evtContactConfId==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg"," 未知的活动或渠道信息");
@@ -114,7 +114,7 @@ public class CamScriptController extends BaseController {
     @CrossOrigin
     public  Map<String,Object> getCamScriptVODetail(Long camScriptId) {
         Map<String,Object> result = new HashMap<>();
-        Long userId = UserUtil.LoginId();
+        Long userId = UserUtil.loginId();
         CamScriptVO vo = new CamScriptVO();
         try {
             result = camScriptService.getCamScriptVODetail(userId,camScriptId);

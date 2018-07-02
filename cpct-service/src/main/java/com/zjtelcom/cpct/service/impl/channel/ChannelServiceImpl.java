@@ -1,6 +1,9 @@
 package com.zjtelcom.cpct.service.impl.channel;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.bean.RespInfo;
+import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.dto.channel.ChannelAddVO;
@@ -13,9 +16,7 @@ import com.zjtelcom.cpct.util.ChannelUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -28,7 +29,8 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
 
 
     @Override
-    public RespInfo addChannel(Long userId, ChannelAddVO addVO) {
+    public Map<String,Object> addChannel(Long userId, ChannelAddVO addVO) {
+        Map<String,Object> result = new HashMap<>();
         Channel channel = BeanUtil.create(addVO,new Channel());
         channel.setCreateDate(new Date());
         channel.setUpdateDate(new Date());
@@ -36,51 +38,66 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         channel.setUpdateStaff(userId);
         channel.setStatusCd("1000");
         channelMapper.insert(channel);
-        return RespInfo.build(CODE_SUCCESS,"添加成功");
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData","添加成功");
+        return result;
     }
 
     @Override
-    public RespInfo editChannel(Long userId, ChannelEditVO editVO) {
+    public  Map<String,Object> editChannel(Long userId, ChannelEditVO editVO) {
+        Map<String,Object> result = new HashMap<>();
         Channel channel = channelMapper.selectByPrimaryKey(editVO.getChannelId());
         if (channel==null){
-            return RespInfo.build(CODE_FAIL,"渠道信息不存在");
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","渠道不存在");
+            return result;
         }
         BeanUtil.copy(editVO,channel);
         channel.setUpdateDate(new Date());
         channel.setUpdateStaff(userId);
         channelMapper.updateByPrimaryKey(channel);
-        return RespInfo.build(CODE_SUCCESS,"修改成功");
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData","添加成功");
+        return result;
     }
 
     @Override
-    public RespInfo deleteChannel(Long userId, Long channelId) {
+    public  Map<String,Object> deleteChannel(Long userId, Long channelId) {
+        Map<String,Object> result = new HashMap<>();
         Channel channel = channelMapper.selectByPrimaryKey(channelId);
         if (channel==null){
-            return RespInfo.build(CODE_FAIL,"渠道信息不存在");
+            result.put("resultCode",CODE_FAIL);
+
+            result.put("resultMsg","渠道不存在");
+            return result;
         }
         channelMapper.deleteByPrimaryKey(channelId);
-        return RespInfo.build(CODE_SUCCESS,"删除成功");
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData","添加成功");
+        return result;
     }
 
     @Override
-    public List<ChannelVO> getChannelList(Long userId,String channelName ,Integer page, Integer pageSize) {
+    public  Map<String,Object> getChannelList(Long userId,String channelName ,Integer page, Integer pageSize) {
+        Map<String,Object> result = new HashMap<>();
         List<ChannelVO> voList = new ArrayList<>();
         List<Channel> channelList = new ArrayList<>();
-        try {
-            channelList = channelMapper.selectAll(channelName);
-            for (Channel channel : channelList){
-                ChannelVO vo = ChannelUtil.map2ChannelVO(channel);
-                voList.add(vo);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-            logger.error("[op:ChannelServiceImpl] fail to listChannel ", e);
+        PageHelper.startPage(page,pageSize);
+        channelList = channelMapper.selectAll(channelName);
+        Page pageInfo = new Page(new PageInfo(channelList));
+        for (Channel channel : channelList){
+            ChannelVO vo = ChannelUtil.map2ChannelVO(channel);
+            voList.add(vo);
         }
-        return voList;
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData",voList);
+        result.put("pageInfo",pageInfo);
+        return result;
     }
 
     @Override
-    public ChannelVO getChannelDetail(Long userId, Long channelId) {
+    public  Map<String,Object> getChannelDetail(Long userId, Long channelId) {
+        Map<String,Object> result = new HashMap<>();
         ChannelVO vo = new ChannelVO();
         try {
             Channel channel = channelMapper.selectByPrimaryKey(channelId);
@@ -89,6 +106,8 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
             e.printStackTrace();
             logger.error("[op:ChannelServiceImpl] fail to listChannel ", e);
         }
-        return vo;
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData",vo);
+        return result;
     }
 }

@@ -10,6 +10,7 @@ import com.zjtelcom.cpct.dto.channel.LabelAddVO;
 import com.zjtelcom.cpct.dto.channel.LabelVO;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.channel.LabelService;
+import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,15 +33,18 @@ public class LabelController extends BaseController {
      */
     @PostMapping("addLabel")
     @CrossOrigin
-    public RespInfo addLabel(Long userId, LabelAddVO addVO) {
-        RespInfo respInfo = new RespInfo();
+    public Map<String,Object> addLabel( LabelAddVO addVO) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            respInfo = labelService.addLabel(userId,addVO);
+            result = labelService.addLabel(userId,addVO);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to addScript",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.ADD_SCRIPT_FAILURE.getErrorMsg(),ErrorCode.ADD_SCRIPT_FAILURE.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return respInfo;
+        return result;
     }
 
     /**
@@ -48,15 +52,18 @@ public class LabelController extends BaseController {
      */
     @PostMapping("editLabel")
     @CrossOrigin
-    public RespInfo editLabel(Long userId, Label editVO) {
-        RespInfo respInfo = new RespInfo();
+    public Map<String,Object> editLabel( Label editVO) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            respInfo = labelService.editLabel(userId,editVO);
+            result = labelService.editLabel(userId,editVO);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to addScript",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.ADD_SCRIPT_FAILURE.getErrorMsg(),ErrorCode.ADD_SCRIPT_FAILURE.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return respInfo;
+        return result;
     }
 
     /**
@@ -64,15 +71,18 @@ public class LabelController extends BaseController {
      */
     @PostMapping("deleteLabel")
     @CrossOrigin
-    public RespInfo deleteLabel(Long userId, Long labelId) {
-        RespInfo respInfo = new RespInfo();
+    public Map<String,Object> deleteLabel(Long labelId) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            respInfo = labelService.deleteLabel(userId,labelId);
+            result = labelService.deleteLabel(userId,labelId);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to addScript",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.ADD_SCRIPT_FAILURE.getErrorMsg(),ErrorCode.ADD_SCRIPT_FAILURE.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return respInfo;
+        return result;
     }
 
     /**
@@ -80,15 +90,18 @@ public class LabelController extends BaseController {
      */
     @PostMapping("getLabelList")
     @CrossOrigin
-    public RespInfo getLabelList(@RequestBody HashMap<String, Object> params, Integer page, Integer pageSize) {
-        List<LabelVO> voList = new ArrayList<>();
+    public Map<String,Object> getLabelList(@RequestBody HashMap<String, Object> params, Integer page, Integer pageSize) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            voList = labelService.getLabelList(1L,params,page,pageSize);
+            result = labelService.getLabelList(1L,params,page,pageSize);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to getScriptList",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.GET_SCRIPT_LIST.getErrorMsg(),ErrorCode.GET_SCRIPT_LIST.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return RespInfo.build(CODE_SUCCESS,voList);
+        return result;
     }
 
 
@@ -97,15 +110,18 @@ public class LabelController extends BaseController {
      */
     @PostMapping("getLabelDetail")
     @CrossOrigin
-    public RespInfo getLabelDetail(Long userId, Long labelId) {
-        LabelVO vo = new LabelVO();
+    public Map<String,Object> getLabelDetail(Long labelId) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            vo = labelService.getLabelDetail(1L,labelId);
+            result = labelService.getLabelDetail(1L,labelId);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to getScriptList",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.GET_SCRIPT_LIST.getErrorMsg(),ErrorCode.GET_SCRIPT_LIST.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return RespInfo.build(CODE_SUCCESS,vo);
+        return result;
     }
 
 
@@ -115,15 +131,18 @@ public class LabelController extends BaseController {
      */
     @PostMapping("addLabelGrp")
     @CrossOrigin
-    public RespInfo addLabelGrp(Long userId, LabelGrp addVO) {
-        RespInfo respInfo = new RespInfo();
+    public Map<String,Object> addLabelGrp( LabelGrp addVO) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            respInfo = labelService.addLabelGrp(userId,addVO);
+            result = labelService.addLabelGrp(userId,addVO);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to addLabelGrp",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.ADD_SCRIPT_FAILURE.getErrorMsg(),ErrorCode.ADD_SCRIPT_FAILURE.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return respInfo;
+        return result;
     }
 
     /**
@@ -131,15 +150,18 @@ public class LabelController extends BaseController {
      */
     @PostMapping("editLabelGrp")
     @CrossOrigin
-    public RespInfo editLabelGrp(Long userId, LabelGrp editVO) {
-        RespInfo respInfo = new RespInfo();
+    public Map<String,Object> editLabelGrp(LabelGrp editVO) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            respInfo = labelService.editLabelGrp(userId,editVO);
+            result = labelService.editLabelGrp(userId,editVO);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to editLabelGrp",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.ADD_SCRIPT_FAILURE.getErrorMsg(),ErrorCode.ADD_SCRIPT_FAILURE.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return respInfo;
+        return result;
     }
 
     /**
@@ -147,15 +169,18 @@ public class LabelController extends BaseController {
      */
     @PostMapping("deleteLabelGrp")
     @CrossOrigin
-    public RespInfo deleteLabelGrp(Long userId, Long labelGrpId) {
-        RespInfo respInfo = new RespInfo();
+    public Map<String,Object> deleteLabelGrp(Long labelGrpId) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            respInfo = labelService.deleteLabelGrp(userId,labelGrpId);
+            result = labelService.deleteLabelGrp(userId,labelGrpId);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to deleteLabelGrp",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.ADD_SCRIPT_FAILURE.getErrorMsg(),ErrorCode.ADD_SCRIPT_FAILURE.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return respInfo;
+        return result;
     }
 
     /**
@@ -163,15 +188,18 @@ public class LabelController extends BaseController {
      */
     @PostMapping("getLabelGrpList")
     @CrossOrigin
-    public RespInfo getLabelGrpList(Long userId, Map<String, Object> params, Integer page, Integer pageSize) {
-        List<LabelGrp> voList = new ArrayList<>();
+    public Map<String,Object> getLabelGrpList( Map<String, Object> params, Integer page, Integer pageSize) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            voList = labelService.getLabelGrpList(1L,params,page,pageSize);
+            result = labelService.getLabelGrpList(1L,params,page,pageSize);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to getScriptList",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.GET_SCRIPT_LIST.getErrorMsg(),ErrorCode.GET_SCRIPT_LIST.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return RespInfo.build(CODE_SUCCESS,voList);
+        return result;
     }
 
     /**
@@ -179,15 +207,18 @@ public class LabelController extends BaseController {
      */
     @PostMapping("getLabelGrpDetail")
     @CrossOrigin
-    public RespInfo getLabelGrpDetail(Long userId, Long labelGrpId) {
-        LabelGrp vo = new LabelGrp();
+    public Map<String,Object> getLabelGrpDetail( Long labelGrpId) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            vo = labelService.getLabelGrpDetail(1L,labelGrpId);
+            result = labelService.getLabelGrpDetail(1L,labelGrpId);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to getLabelGrpDetail",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.GET_SCRIPT_LIST.getErrorMsg(),ErrorCode.GET_SCRIPT_LIST.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return RespInfo.build(CODE_SUCCESS,vo);
+        return result;
     }
 
 
@@ -196,15 +227,18 @@ public class LabelController extends BaseController {
      */
     @PostMapping("addLabelGrpMbr")
     @CrossOrigin
-    public RespInfo addLabelGrpMbr(Long userId, LabelGrpMbr addVO) {
-        RespInfo respInfo = new RespInfo();
+    public Map<String,Object> addLabelGrpMbr( LabelGrpMbr addVO) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            respInfo = labelService.addLabelGrpMbr(userId,addVO);
+            result = labelService.addLabelGrpMbr(userId,addVO);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to addLabelGrpMbr",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.ADD_SCRIPT_FAILURE.getErrorMsg(),ErrorCode.ADD_SCRIPT_FAILURE.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return respInfo;
+        return result;
     }
 
     /**
@@ -212,15 +246,18 @@ public class LabelController extends BaseController {
      */
     @PostMapping("editLabelGrpMbr")
     @CrossOrigin
-    public RespInfo editLabelGrpMbr(Long userId, Long grpMbrId,Long grpId) {
-        RespInfo respInfo = new RespInfo();
+    public Map<String,Object> editLabelGrpMbr( Long grpMbrId,Long grpId) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            respInfo = labelService.editLabelGrpMbr(userId,grpMbrId,grpId);
+            result = labelService.editLabelGrpMbr(userId,grpMbrId,grpId);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to editLabelGrpMbr",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.ADD_SCRIPT_FAILURE.getErrorMsg(),ErrorCode.ADD_SCRIPT_FAILURE.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return respInfo;
+        return result;
     }
 
     /**
@@ -228,15 +265,18 @@ public class LabelController extends BaseController {
      */
     @PostMapping("deleteLabelGrpMbr")
     @CrossOrigin
-    public RespInfo deleteLabelGrpMbr(Long userId, Long labelGrpMbrId) {
-        RespInfo respInfo = new RespInfo();
+    public Map<String,Object> deleteLabelGrpMbr( Long labelGrpMbrId) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            respInfo = labelService.deleteLabelGrpMbr(userId,labelGrpMbrId);
+            result = labelService.deleteLabelGrpMbr(userId,labelGrpMbrId);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to deleteLabelGrpMbr",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.ADD_SCRIPT_FAILURE.getErrorMsg(),ErrorCode.ADD_SCRIPT_FAILURE.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return respInfo;
+        return result;
     }
 
     /**
@@ -244,15 +284,18 @@ public class LabelController extends BaseController {
      */
     @PostMapping("getLabelGrpMbrDetail")
     @CrossOrigin
-    public RespInfo getLabelGrpMbrDetail(Long userId, Long labelGrpMbrId) {
-        LabelGrpMbr vo = new LabelGrpMbr();
+    public Map<String,Object> getLabelGrpMbrDetail( Long labelGrpMbrId) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            vo = labelService.getLabelGrpMbrDetail(1L,labelGrpMbrId);
+            result = labelService.getLabelGrpMbrDetail(1L,labelGrpMbrId);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to getLabelGrpMbrDetail",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.GET_SCRIPT_LIST.getErrorMsg(),ErrorCode.GET_SCRIPT_LIST.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return RespInfo.build(CODE_SUCCESS,vo);
+        return result;
     }
 
     /**
@@ -260,15 +303,18 @@ public class LabelController extends BaseController {
      */
     @PostMapping("addLabelValue")
     @CrossOrigin
-    public RespInfo addLabelValue(Long userId, LabelValue addVO) {
-        RespInfo respInfo = new RespInfo();
+    public Map<String,Object> addLabelValue(LabelValue addVO) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            respInfo = labelService.addLabelValue(userId,addVO);
+            result = labelService.addLabelValue(userId,addVO);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to addLabelValue",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.ADD_SCRIPT_FAILURE.getErrorMsg(),ErrorCode.ADD_SCRIPT_FAILURE.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return respInfo;
+        return result;
     }
 
     /**
@@ -276,15 +322,18 @@ public class LabelController extends BaseController {
      */
     @PostMapping("editLabelValue")
     @CrossOrigin
-    public RespInfo editLabelValue(Long userId, LabelValue editVO) {
-        RespInfo respInfo = new RespInfo();
+    public Map<String,Object> editLabelValue(LabelValue editVO) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            respInfo = labelService.editLabelValue(userId,editVO);
+            result = labelService.editLabelValue(userId,editVO);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to editLabelValue",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.ADD_SCRIPT_FAILURE.getErrorMsg(),ErrorCode.ADD_SCRIPT_FAILURE.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return respInfo;
+        return result;
     }
 
     /**
@@ -292,15 +341,18 @@ public class LabelController extends BaseController {
      */
     @PostMapping("deleteLabelValue")
     @CrossOrigin
-    public RespInfo deleteLabelValue(Long userId, Long labelValueId) {
-        RespInfo respInfo = new RespInfo();
+    public Map<String,Object> deleteLabelValue(Long labelValueId) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            respInfo = labelService.deleteLabelValue(userId,labelValueId);
+            result = labelService.deleteLabelValue(userId,labelValueId);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to deleteLabelValue",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.ADD_SCRIPT_FAILURE.getErrorMsg(),ErrorCode.ADD_SCRIPT_FAILURE.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return respInfo;
+        return result;
     }
 
     /**
@@ -308,15 +360,18 @@ public class LabelController extends BaseController {
      */
     @PostMapping("getLabelValueDetail")
     @CrossOrigin
-    public RespInfo getLabelValueDetail(Long userId, Long labelValueId) {
-        LabelValue vo = new LabelValue();
+    public Map<String,Object> getLabelValueDetail( Long labelValueId) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            vo = labelService.getLabelValueDetail(1L,labelValueId);
+            result = labelService.getLabelValueDetail(1L,labelValueId);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to getLabelValueDetail",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.GET_SCRIPT_LIST.getErrorMsg(),ErrorCode.GET_SCRIPT_LIST.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return RespInfo.build(CODE_SUCCESS,vo);
+        return result;
     }
 
 

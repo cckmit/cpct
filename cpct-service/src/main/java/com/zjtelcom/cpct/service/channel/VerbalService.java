@@ -6,16 +6,17 @@ import com.zjtelcom.cpct.dto.channel.VerbalEditVO;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
 
 import java.util.List;
+import java.util.Map;
 
 public interface VerbalService {
 
-    RespInfo addVerbal(Long userId, VerbalAddVO addVO);
+    Map<String,Object> addVerbal(Long userId, VerbalAddVO addVO);
 
-    RespInfo editVerbal(Long userId, VerbalEditVO editVO);
+    Map<String,Object> editVerbal(Long userId, VerbalEditVO editVO);
 
-    RespInfo getVerbalDetail(Long userId,Long verbalId);
+    Map<String,Object> getVerbalDetail(Long userId,Long verbalId);
 
-    RespInfo getVerbalListByConfId(Long userId,Long confId);
+    Map<String,Object> getVerbalListByConfId(Long userId,Long confId);
 
 
 

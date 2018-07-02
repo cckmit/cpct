@@ -6,6 +6,7 @@ import com.zjtelcom.cpct.dto.channel.ChannelEditVO;
 import com.zjtelcom.cpct.dto.channel.ChannelVO;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -15,15 +16,15 @@ import java.util.List;
  */
 public interface ChannelService {
 
-    RespInfo  addChannel(Long userId, ChannelAddVO addVO);
+    Map<String,Object> addChannel(Long userId, ChannelAddVO addVO);
 
-    RespInfo editChannel(Long userId, ChannelEditVO editVO);
+    Map<String,Object> editChannel(Long userId, ChannelEditVO editVO);
 
-    RespInfo deleteChannel(Long userId,Long channelId);
+    Map<String,Object> deleteChannel(Long userId,Long channelId);
 
-    List<ChannelVO> getChannelList(Long userId,String channelName,Integer page,Integer pageSize);
+    Map<String,Object> getChannelList(Long userId,String channelName,Integer page,Integer pageSize);
 
-    ChannelVO getChannelDetail(Long userId,Long channelId);
+    Map<String,Object> getChannelDetail(Long userId,Long channelId);
 
 
 

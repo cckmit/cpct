@@ -16,10 +16,7 @@ import com.zjtelcom.cpct.util.ChannelUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -38,7 +35,8 @@ public class LabelServiceImpl extends BaseService implements LabelService {
 
 
     @Override
-    public RespInfo addLabel(Long userId, LabelAddVO addVO) {
+    public Map<String,Object> addLabel(Long userId, LabelAddVO addVO) {
+        Map<String,Object> result = new HashMap<>();
         Label label = BeanUtil.create(addVO,new Label());
         label.setCreateDate(new Date());
         label.setUpdateDate(new Date());
@@ -46,34 +44,47 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         label.setUpdateStaff(userId);
         label.setStatusCd("1000");
         labelMapper.insert(label);
-        return RespInfo.build(CODE_SUCCESS,"添加成功");
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData","添加成功");
+        return result;
     }
 
     @Override
-    public RespInfo editLabel(Long userId, Label editVO) {
+    public Map<String,Object> editLabel(Long userId, Label editVO) {
+        Map<String,Object> result = new HashMap<>();
         Label label = labelMapper.selectByPrimaryKey(editVO.getInjectionLabelId());
         if (label==null){
-            return RespInfo.build(CODE_FAIL,"标签信息不存在");
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","标签信息不存在");
+            return result;
         }
         BeanUtil.copy(editVO,label);
         label.setUpdateDate(new Date());
         label.setUpdateStaff(userId);
         labelMapper.updateByPrimaryKey(label);
-        return RespInfo.build(CODE_SUCCESS,"修改成功");
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData","添加成功");
+        return result;
     }
 
     @Override
-    public RespInfo deleteLabel(Long userId, Long labelId) {
+    public Map<String,Object> deleteLabel(Long userId, Long labelId) {
+        Map<String,Object> result = new HashMap<>();
         Label label = labelMapper.selectByPrimaryKey(labelId);
         if (label==null){
-            return RespInfo.build(CODE_FAIL,"标签信息不存在");
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","标签信息不存在");
+            return result;
         }
         labelMapper.deleteByPrimaryKey(labelId);
-        return RespInfo.build(CODE_SUCCESS,"删除成功");
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData","添加成功");
+        return result;
     }
 
     @Override
-    public List<LabelVO> getLabelList(Long userId, Map<String, Object> params, Integer page, Integer pageSize) {
+    public Map<String,Object> getLabelList(Long userId, Map<String, Object> params, Integer page, Integer pageSize) {
+        Map<String,Object> result = new HashMap<>();
         List<LabelVO> voList = new ArrayList<>();
         List<Label> labelList = new ArrayList<>();
         try {
@@ -94,11 +105,14 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             e.printStackTrace();
             logger.error("[op:LabelServiceImpl] fail to getLabelList ", e);
         }
-        return voList;
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData",voList);
+        return result;
     }
 
     @Override
-    public LabelVO getLabelDetail(Long userId, Long labelId) {
+    public Map<String,Object> getLabelDetail(Long userId, Long labelId) {
+        Map<String,Object> result = new HashMap<>();
         LabelVO vo = new LabelVO();
         try {
             Label label = labelMapper.selectByPrimaryKey(labelId);
@@ -107,12 +121,15 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             e.printStackTrace();
             logger.error("[op:LabelServiceImpl] fail to getLabelDetail ", e);
         }
-        return vo;
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData",vo);
+        return result;
     }
 
     //标签组
     @Override
-    public RespInfo addLabelGrp(Long userId, LabelGrp addVO) {
+    public Map<String,Object> addLabelGrp(Long userId, LabelGrp addVO) {
+        Map<String,Object> result = new HashMap<>();
         LabelGrp labelGrp = BeanUtil.create(addVO,new LabelGrp());
         labelGrp.setCreateDate(new Date());
         labelGrp.setUpdateDate(new Date());
@@ -120,35 +137,48 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         labelGrp.setUpdateStaff(userId);
         labelGrp.setStatusCd("1000");
         labelGrpMapper.insert(labelGrp);
-        return RespInfo.build(CODE_SUCCESS,"添加成功");
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData","添加成功");
+        return result;
     }
 
     @Override
-    public RespInfo editLabelGrp(Long userId, LabelGrp editVO) {
+    public Map<String,Object> editLabelGrp(Long userId, LabelGrp editVO) {
+        Map<String,Object> result = new HashMap<>();
         LabelGrp labelGrp = labelGrpMapper.selectByPrimaryKey(editVO.getGrpId());
         if (labelGrp==null){
-            return RespInfo.build(CODE_FAIL,"标签组信息不存在");
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","标签组信息不存在");
+            return result;
         }
         BeanUtil.copy(editVO,labelGrp);
         labelGrp.setUpdateDate(new Date());
         labelGrp.setUpdateStaff(userId);
         labelGrpMapper.updateByPrimaryKey(labelGrp);
-        return RespInfo.build(CODE_SUCCESS,"修改成功");
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData","添加成功");
+        return result;
     }
 
     @Override
-    public RespInfo deleteLabelGrp(Long userId, Long labelGrpId) {
+    public Map<String,Object> deleteLabelGrp(Long userId, Long labelGrpId) {
+        Map<String,Object> result = new HashMap<>();
         LabelGrp labelGrp = labelGrpMapper.selectByPrimaryKey(labelGrpId);
         if (labelGrp==null){
-            return RespInfo.build(CODE_FAIL,"标签组信息不存在");
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","标签组信息不存在");
+            return result;
         }
         //todo 存在关联关系的标签组 不能删除
         labelGrpMapper.deleteByPrimaryKey(labelGrpId);
-        return RespInfo.build(CODE_SUCCESS,"删除成功");
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData","添加成功");
+        return result;
     }
 
     @Override
-    public List<LabelGrp> getLabelGrpList(Long userId, Map<String, Object> params, Integer page, Integer pageSize) {
+    public Map<String,Object> getLabelGrpList(Long userId, Map<String, Object> params, Integer page, Integer pageSize) {
+        Map<String,Object> result = new HashMap<>();
         List<LabelGrp> grpList = new ArrayList<>();
         try {
             grpList = labelGrpMapper.selectAll();
@@ -156,11 +186,14 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             e.printStackTrace();
             logger.error("[op:LabelServiceImpl] fail to getLabelGrpList ", e);
         }
-        return grpList;
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData",grpList);
+        return result;
     }
 
     @Override
-    public LabelGrp getLabelGrpDetail(Long userId, Long labelGrpId) {
+    public Map<String,Object> getLabelGrpDetail(Long userId, Long labelGrpId) {
+        Map<String,Object> result = new HashMap<>();
         LabelGrp labelGrp = new LabelGrp();
         try {
             labelGrp = labelGrpMapper.selectByPrimaryKey(labelGrpId);
@@ -168,54 +201,76 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             e.printStackTrace();
             logger.error("[op:LabelServiceImpl] fail to getLabelGrpDetail ", e);
         }
-        return labelGrp;
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData",labelGrp);
+        return result;
     }
 
     //标签组成员关系表
     @Override
-    public RespInfo addLabelGrpMbr(Long userId, LabelGrpMbr addVO) {
+    public Map<String,Object> addLabelGrpMbr(Long userId, LabelGrpMbr addVO) {
+        Map<String,Object> result = new HashMap<>();
         Label label = labelMapper.selectByPrimaryKey(addVO.getInjectionLabelId());
         if (label==null){
-            return RespInfo.build(CODE_FAIL,"标签信息不存在");
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","标签信息不存在");
+            return result;
         }
         LabelGrp labelGrp = labelGrpMapper.selectByPrimaryKey(addVO.getGrpId());
         if (labelGrp==null){
-            return RespInfo.build(CODE_FAIL,"标签组信息不存在");
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","标签组信息不存在");
+            return result;
         }
         LabelGrpMbr grpMbr = BeanUtil.create(addVO,new LabelGrpMbr());
         labelGrpMbrMapper.insert(grpMbr);
-        return RespInfo.build(CODE_SUCCESS,"添加成功");
-    }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData","添加成功");
+        return result;
+}
 
     @Override
-    public RespInfo editLabelGrpMbr(Long userId, Long grpMbrId,Long grpId) {
+    public Map<String,Object> editLabelGrpMbr(Long userId, Long grpMbrId,Long grpId) {
+        Map<String,Object> result = new HashMap<>();
         LabelGrpMbr labelGrpMbr = labelGrpMbrMapper.selectByPrimaryKey(grpMbrId);
         if (labelGrpMbr == null){
-            return RespInfo.build(CODE_FAIL,"关联信息不存在");
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","关联信息不存在");
+            return result;
         }
         LabelGrp labelGrp = labelGrpMapper.selectByPrimaryKey(grpId);
         if (labelGrp==null){
-            return RespInfo.build(CODE_FAIL,"标签组信息不存在");
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","标签组信息不存在");
+            return result;
         }
         labelGrpMbr.setGrpId(grpId);
         labelGrpMbr.setUpdateDate(new Date());
         labelGrpMbr.setUpdateStaff(userId);
         labelGrpMbrMapper.updateByPrimaryKey(labelGrpMbr);
-        return  RespInfo.build(CODE_SUCCESS,"修改成功");
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData","添加成功");
+        return result;
     }
 
     @Override
-    public RespInfo deleteLabelGrpMbr(Long userId, Long labelGrpMbrId) {
+    public Map<String,Object> deleteLabelGrpMbr(Long userId, Long labelGrpMbrId) {
+        Map<String,Object> result = new HashMap<>();
         LabelGrpMbr labelGrpMbr = labelGrpMbrMapper.selectByPrimaryKey(labelGrpMbrId);
         if (labelGrpMbr == null){
-            return RespInfo.build(CODE_FAIL,"关联信息不存在");
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","关联信息不存在");
+            return result;
         }
         labelGrpMbrMapper.deleteByPrimaryKey(labelGrpMbrId);
-        return  RespInfo.build(CODE_SUCCESS,"删除成功");
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData","添加成功");
+        return result;
     }
 
     @Override
-    public LabelGrpMbr getLabelGrpMbrDetail(Long userId, Long labelGrpMbrId) {
+    public Map<String,Object> getLabelGrpMbrDetail(Long userId, Long labelGrpMbrId) {
+        Map<String,Object> result = new HashMap<>();
         LabelGrpMbr grpMbr = new LabelGrpMbr();
         try {
             grpMbr = labelGrpMbrMapper.selectByPrimaryKey(labelGrpMbrId);
@@ -223,12 +278,15 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             e.printStackTrace();
             logger.error("[op:LabelServiceImpl] fail to getLabelGrpDetail ", e);
         }
-        return grpMbr;
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData",grpMbr);
+        return result;
     }
 
     //标签值规格配置
     @Override
-    public RespInfo addLabelValue(Long userId, LabelValue addVO) {
+    public Map<String,Object> addLabelValue(Long userId, LabelValue addVO) {
+        Map<String,Object> result = new HashMap<>();
         LabelValue labelValue = BeanUtil.create(addVO,new LabelValue());
         labelValue.setCreateDate(new Date());
         labelValue.setUpdateDate(new Date());
@@ -236,39 +294,52 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         labelValue.setUpdateStaff(userId);
         labelValue.setStatusCd("1000");
         labelValueMapper.insert(labelValue);
-        return RespInfo.build(CODE_SUCCESS,"添加成功");
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData","添加成功");
+        return result;
     }
 
     @Override
-    public RespInfo editLabelValue(Long userId, LabelValue editVO) {
+    public Map<String,Object> editLabelValue(Long userId, LabelValue editVO) {
+        Map<String,Object> result = new HashMap<>();
         LabelValue labelValue = labelValueMapper.selectByPrimaryKey(editVO.getLabelValueId());
         if (labelValue==null){
-            return RespInfo.build(CODE_FAIL,"标签值规格不存在");
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","标签值规格不存在");
+            return result;
         }
         BeanUtil.copy(editVO,labelValue);
         labelValue.setUpdateDate(new Date());
         labelValue.setUpdateStaff(userId);
         labelValueMapper.updateByPrimaryKey(labelValue);
-        return RespInfo.build(CODE_SUCCESS,"修改成功");
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData","添加成功");
+        return result;
     }
 
     @Override
-    public RespInfo deleteLabelValue(Long userId, Long labelValueId) {
+    public Map<String,Object> deleteLabelValue(Long userId, Long labelValueId) {
+        Map<String,Object> result = new HashMap<>();
         LabelValue labelValue = labelValueMapper.selectByPrimaryKey(labelValueId);
         if (labelValue==null){
-            return RespInfo.build(CODE_FAIL,"标签值规格不存在");
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","标签值规格不存在");
+            return result;
         }
         labelValueMapper.deleteByPrimaryKey(labelValueId);
-        return RespInfo.build(CODE_SUCCESS,"删除成功");
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData","添加成功");
+        return result;
     }
 
     @Override
-    public List<LabelValue> getLabelValueList(Long userId, Map<String, Object> params, Integer page, Integer pageSize) {
+    public Map<String,Object> getLabelValueList(Long userId, Map<String, Object> params, Integer page, Integer pageSize) {
         return null;
     }
 
     @Override
-    public LabelValue getLabelValueDetail(Long userId, Long labelValueId) {
+    public Map<String,Object> getLabelValueDetail(Long userId, Long labelValueId) {
+        Map<String,Object> result = new HashMap<>();
         LabelValue labelValue = new LabelValue();
         LabelValueVO vo = new LabelValueVO();
         try {
@@ -278,6 +349,8 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             e.printStackTrace();
             logger.error("[op:LabelServiceImpl] fail to getLabelValueDetail ", e);
         }
-        return labelValue;
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData",labelValue);
+        return result;
     }
 }
