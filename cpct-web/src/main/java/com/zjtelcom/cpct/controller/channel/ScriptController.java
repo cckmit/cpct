@@ -8,12 +8,14 @@ import com.zjtelcom.cpct.dto.channel.ScriptVO;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.channel.ScriptService;
 import com.zjtelcom.cpct.util.MapUtil;
+import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
@@ -32,15 +34,18 @@ public class ScriptController extends BaseController  {
      */
     @PostMapping("addScript")
     @CrossOrigin
-    public RespInfo addScript(Long userId, ScriptAddVO addVO) {
-        RespInfo respInfo = new RespInfo();
+    public Map<String,Object> addScript(ScriptAddVO addVO) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            respInfo = scriptService.addScript(userId,addVO);
+            result = scriptService.addScript(userId,addVO);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to addScript",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.ADD_SCRIPT_FAILURE.getErrorMsg(),ErrorCode.ADD_SCRIPT_FAILURE.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return respInfo;
+        return result;
     }
 
     /**
@@ -48,15 +53,18 @@ public class ScriptController extends BaseController  {
      */
     @PostMapping("editScript")
     @CrossOrigin
-    public RespInfo editScript(Long userId, ScriptEditVO editVO) {
-        RespInfo respInfo = new RespInfo();
+    public Map<String,Object> editScript(ScriptEditVO editVO) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            respInfo = scriptService.editScript(userId,editVO);
+            result = scriptService.editScript(userId,editVO);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to editScript",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.EDIT_SCRIPT_FAILURE.getErrorMsg(),ErrorCode.EDIT_SCRIPT_FAILURE.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return respInfo;
+        return result;
     }
 
     /**
@@ -64,15 +72,18 @@ public class ScriptController extends BaseController  {
      */
     @PostMapping("deleteScript")
     @CrossOrigin
-    public RespInfo deleteScript(Long userId, Long scriptId) {
-        RespInfo respInfo = new RespInfo();
+    public Map<String,Object> deleteScript(Long scriptId) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            respInfo = scriptService.deleteScript(userId,scriptId);
+            result = scriptService.deleteScript(userId,scriptId);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to deleteScript",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.DELETE_SCRIPT_FAILURE.getErrorMsg(),ErrorCode.DELETE_SCRIPT_FAILURE.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return respInfo;
+        return result;
     }
 
     /**
@@ -80,19 +91,22 @@ public class ScriptController extends BaseController  {
      */
     @PostMapping("getScriptList")
     @CrossOrigin
-    public RespInfo getScriptList(@RequestBody HashMap<String, Object> params) {
+    public Map<String,Object> getScriptList(@RequestBody HashMap<String, Object> params) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         Integer page = MapUtil.getIntNum(params.get("page"));
         Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
         params.remove("page");
         params.remove("pageSize");
-        List<ScriptVO> voList = new ArrayList<>();
         try {
-            voList = scriptService.getScriptList(1L,params,page,pageSize);
+            result = scriptService.getScriptList(1L,params,page,pageSize);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to getScriptList",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.GET_SCRIPT_LIST.getErrorMsg(),ErrorCode.GET_SCRIPT_LIST.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return RespInfo.build(CODE_SUCCESS,voList);
+        return result;
     }
 
     /**
@@ -100,15 +114,18 @@ public class ScriptController extends BaseController  {
      */
     @GetMapping("getScriptVODetail")
     @CrossOrigin
-    public RespInfo getScriptVODetail(Long userId, Long scriptId) {
-        ScriptVO vo = new ScriptVO();
+    public Map<String,Object> getScriptVODetail( Long scriptId) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            vo = scriptService.getScriptVODetail(userId,scriptId);
+            result = scriptService.getScriptVODetail(userId,scriptId);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to getScriptVODetail",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.GET_SCRIPT_DETAIL.getErrorMsg(),ErrorCode.GET_SCRIPT_DETAIL.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return RespInfo.build(CODE_SUCCESS,vo);
+        return result;
     }
 
 

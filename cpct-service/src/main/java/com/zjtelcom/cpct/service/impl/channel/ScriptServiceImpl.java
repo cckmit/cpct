@@ -15,10 +15,7 @@ import com.zjtelcom.cpct.util.ChannelUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -31,7 +28,8 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
 
 
     @Override
-    public RespInfo addScript(Long userId, ScriptAddVO addVO) {
+    public Map<String,Object> addScript(Long userId, ScriptAddVO addVO) {
+        Map<String,Object> result = new HashMap<>();
         Script script = BeanUtil.create(addVO,new Script());
         script.setCreateDate(new Date());
         script.setUpdateDate(new Date());
@@ -39,34 +37,47 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
         script.setUpdateStaff(userId);
         script.setStatusCd("1000");
         scriptMapper.insert(script);
-        return RespInfo.build(CODE_SUCCESS,"添加成功");
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData","添加成功");
+        return result;
     }
 
     @Override
-    public RespInfo editScript(Long userId, ScriptEditVO editVO) {
+    public Map<String,Object> editScript(Long userId, ScriptEditVO editVO) {
+        Map<String,Object> result = new HashMap<>();
         Script script = scriptMapper.selectByPrimaryKey(editVO.getScriptId());
         if (script==null){
-            return RespInfo.build(CODE_FAIL,"脚本信息不存在");
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","脚本信息不存在");
+            return result;
         }
         BeanUtil.copy(editVO,script);
         script.setUpdateDate(new Date());
         script.setUpdateStaff(userId);
         scriptMapper.updateByPrimaryKey(script);
-        return RespInfo.build(CODE_SUCCESS,"修改成功");
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData","添加成功");
+        return result;
     }
 
     @Override
-    public RespInfo deleteScript(Long userId, Long scriptId) {
+    public Map<String,Object> deleteScript(Long userId, Long scriptId) {
+        Map<String,Object> result = new HashMap<>();
         Script script = scriptMapper.selectByPrimaryKey(scriptId);
         if (script==null){
-            return RespInfo.build(CODE_FAIL,"脚本信息不存在");
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","脚本信息不存在");
+            return result;
         }
         scriptMapper.deleteByPrimaryKey(scriptId);
-        return RespInfo.build(CODE_SUCCESS,"删除成功");
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData","添加成功");
+        return result;
     }
 
     @Override
-    public List<ScriptVO> getScriptList(Long userId, Map<String, Object> params, Integer page, Integer pageSize) {
+    public Map<String,Object> getScriptList(Long userId, Map<String, Object> params, Integer page, Integer pageSize) {
+        Map<String,Object> result = new HashMap<>();
         List<ScriptVO> voList = new ArrayList<>();
         List<Script> scriptList = new ArrayList<>();
         try {
@@ -93,11 +104,14 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
             e.printStackTrace();
             logger.error("[op:ChannelServiceImpl] fail to listChannel ", e);
         }
-        return voList;
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData",voList);
+        return result;
     }
 
     @Override
-    public ScriptVO getScriptVODetail(Long userId, Long scriptId) {
+    public Map<String,Object> getScriptVODetail(Long userId, Long scriptId) {
+        Map<String,Object> result = new HashMap<>();
         ScriptVO vo = new ScriptVO();
         try {
             Script script = scriptMapper.selectByPrimaryKey(scriptId);
@@ -106,6 +120,8 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
             e.printStackTrace();
             logger.error("[op:ChannelServiceImpl] fail to listChannel ", e);
         }
-        return vo;
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData",vo);
+        return result;
     }
 }

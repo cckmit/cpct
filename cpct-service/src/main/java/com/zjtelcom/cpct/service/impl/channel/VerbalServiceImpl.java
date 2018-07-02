@@ -15,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.locks.Condition;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
@@ -37,7 +35,8 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
      */
     @Override
     @Transactional
-    public RespInfo addVerbal(Long userId, VerbalAddVO addVO) {
+    public Map<String,Object> addVerbal(Long userId, VerbalAddVO addVO) {
+        Map<String,Object> result = new HashMap<>();
         MktVerbal verbal = BeanUtil.create(addVO,new MktVerbal());
         verbal.setCreateDate(new Date());
         verbal.setCreateStaff(userId);
@@ -51,29 +50,37 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
         for (VerbalConditionAddVO  vcAddVO : addVO.getAddVOList()){
             addCondition(userId,verbal.getVerbalId(),vcAddVO);
         }
-        return RespInfo.build(CODE_SUCCESS,"添加成功");
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData","添加成功");
+        return result;
     }
 
     //弃用
     @Override
-    public RespInfo editVerbal(Long userId, VerbalEditVO editVO) {
+    public Map<String,Object> editVerbal(Long userId, VerbalEditVO editVO) {
         return null;
     }
 
     @Override
-    public RespInfo getVerbalDetail(Long userId, Long verbalId) {
+    public Map<String,Object> getVerbalDetail(Long userId, Long verbalId) {
+        Map<String,Object> result = new HashMap<>();
         MktVerbal verbal = verbalMapper.selectByPrimaryKey(verbalId);
         if (verbal==null){
-            return RespInfo.build(CODE_FAIL,"痛痒点话术不存在");
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","痛痒点话术不存在");
+            return result;
         }
         VerbalVO verbalVO = supplementVo(ChannelUtil.map2VerbalVO(verbal),verbal);
-        return RespInfo.build(CODE_SUCCESS,verbalVO);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData",verbalVO);
+        return result;
     }
 
     /**
      * 痛痒点话术返回结果包装
      */
     private VerbalVO supplementVo(VerbalVO verbalVO,MktVerbal verbal){
+        Map<String,Object> result = new HashMap<>();
         List<VerbalConditionVO> conditionVOList = new ArrayList<>();
         List<MktVerbalCondition> conditions = verbalConditionMapper.findConditionListByVerbalId(verbal.getVerbalId());
         for (MktVerbalCondition condition : conditions){
@@ -85,19 +92,24 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
     }
 
     @Override
-    public RespInfo getVerbalListByConfId(Long userId, Long confId) {
+    public Map<String,Object> getVerbalListByConfId(Long userId, Long confId) {
+        Map<String,Object> result = new HashMap<>();
         //todo 推送渠道对象
         List<Long>  verbalIdList = new ArrayList<>();
         List<VerbalVO> verbalVOS = new ArrayList<>();
         for (Long verbalId : verbalIdList){
             MktVerbal verbal = verbalMapper.selectByPrimaryKey(verbalId);
             if (verbal==null){
-                return RespInfo.build(CODE_FAIL,"痛痒点话术不存在");
+                result.put("resultCode",CODE_FAIL);
+                result.put("resultMsg","痛痒点话术不存在");
+                return result;
             }
             VerbalVO verbalVO = supplementVo(ChannelUtil.map2VerbalVO(verbal),verbal);
             verbalVOS.add(verbalVO);
         }
-        return RespInfo.build(CODE_SUCCESS,verbalVOS);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData",verbalVOS);
+        return result;
     }
 
 

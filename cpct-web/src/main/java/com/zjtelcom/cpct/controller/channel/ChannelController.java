@@ -7,11 +7,14 @@ import com.zjtelcom.cpct.dto.channel.ChannelEditVO;
 import com.zjtelcom.cpct.dto.channel.ChannelVO;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.channel.ChannelService;
+import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -28,30 +31,36 @@ public class ChannelController extends BaseController {
      */
     @PostMapping("addChannel")
     @CrossOrigin
-    public RespInfo addChannel(Long userId, ChannelAddVO addVO) {
-        RespInfo respInfo = new RespInfo();
+    public Map<String,Object> addChannel(ChannelAddVO addVO) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            respInfo = channelService.addChannel(userId,addVO);
+            result = channelService.addChannel(userId,addVO);
         } catch (Exception e) {
             logger.error("[op:ChannelController] fail to addChannel",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.ADD_CHANNEL_FAILURE.getErrorMsg(),ErrorCode.ADD_CHANNEL_FAILURE.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return respInfo;
+        return result;
     }
     /**
      * 编辑渠道
      */
     @PostMapping("editChannel")
     @CrossOrigin
-    public RespInfo editChannel(Long userId, ChannelEditVO editVO) {
-        RespInfo respInfo = new RespInfo();
+    public Map<String,Object> editChannel( ChannelEditVO editVO) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            respInfo = channelService.editChannel(userId,editVO);
+            result = channelService.editChannel(userId,editVO);
         } catch (Exception e) {
             logger.error("[op:ChannelController] fail to editChannel",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.EDIT_CHANNEL_FAILURE.getErrorMsg(),ErrorCode.EDIT_CHANNEL_FAILURE.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return respInfo;
+        return result;
     }
 
     /**
@@ -59,15 +68,18 @@ public class ChannelController extends BaseController {
      */
     @PostMapping("deleteChannel")
     @CrossOrigin
-    public RespInfo deleteChannel(Long userId, Long channelId) {
-        RespInfo respInfo = new RespInfo();
+    public Map<String,Object> deleteChannel(Long channelId) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            respInfo = channelService.deleteChannel(userId,channelId);
+            result = channelService.deleteChannel(userId,channelId);
         } catch (Exception e) {
             logger.error("[op:ChannelController] fail to deleteChannel",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.DELETE_CHANNEL_FAILURE.getErrorMsg(),ErrorCode.DELETE_CHANNEL_FAILURE.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return respInfo;
+        return result;
     }
 
 
@@ -76,15 +88,18 @@ public class ChannelController extends BaseController {
      */
     @GetMapping("getChannelList")
     @CrossOrigin
-    public RespInfo getChannelList(Long userId,String channelName,Integer page, Integer pageSize) {
-        List<ChannelVO> voList = new ArrayList<>();
+    public Map<String,Object> getChannelList(String channelName,Integer page, Integer pageSize) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            voList = channelService.getChannelList(userId,channelName,page,pageSize);
+            result = channelService.getChannelList(userId,channelName,page,pageSize);
         } catch (Exception e) {
             logger.error("[op:ChannelController] fail to deleteChannel",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.GET_CHANNEL_LIST.getErrorMsg(),ErrorCode.GET_CHANNEL_LIST.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return RespInfo.build(CODE_SUCCESS,voList);
+        return result;
     }
 
     /**
@@ -92,15 +107,18 @@ public class ChannelController extends BaseController {
      */
     @GetMapping("getChannelDetail")
     @CrossOrigin
-    public RespInfo getChannelDetail(Long userId, Long channelId) {
-        ChannelVO vo = new ChannelVO();
+    public Map<String,Object> getChannelDetail(Long channelId) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
         try {
-            vo = channelService.getChannelDetail(userId,channelId);
+            result = channelService.getChannelDetail(userId,channelId);
         } catch (Exception e) {
             logger.error("[op:ChannelController] fail to deleteChannel",e);
-            return RespInfo.build(CODE_FAIL,ErrorCode.GET_CHANNEL_DETAIL.getErrorMsg(),ErrorCode.GET_CHANNEL_DETAIL.getErrorCode());
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return RespInfo.build(CODE_SUCCESS,vo);
+        return result;
     }
 
 }

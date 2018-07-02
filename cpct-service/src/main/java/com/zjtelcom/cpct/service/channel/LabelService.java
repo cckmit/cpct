@@ -14,49 +14,49 @@ import java.util.Map;
 public interface LabelService {
 
     //标签
-    RespInfo addLabel(Long userId, LabelAddVO addVO);
+    Map<String,Object> addLabel(Long userId, LabelAddVO addVO);
 
-    RespInfo editLabel(Long userId, Label editVO);
+    Map<String,Object> editLabel(Long userId, Label editVO);
 
-    RespInfo deleteLabel(Long userId,Long labelId);
+    Map<String,Object> deleteLabel(Long userId,Long labelId);
 
-    List<LabelVO> getLabelList(Long userId, Map<String,Object> params, Integer page, Integer pageSize);
+    Map<String,Object> getLabelList(Long userId, Map<String,Object> params, Integer page, Integer pageSize);
 
-    LabelVO getLabelDetail(Long userId,Long scriptId);
+    Map<String,Object> getLabelDetail(Long userId,Long scriptId);
 
 
     //标签组
-    RespInfo addLabelGrp(Long userId, LabelGrp addVO);
+    Map<String,Object> addLabelGrp(Long userId, LabelGrp addVO);
 
-    RespInfo editLabelGrp(Long userId, LabelGrp editVO);
+    Map<String,Object> editLabelGrp(Long userId, LabelGrp editVO);
 
-    RespInfo deleteLabelGrp(Long userId,Long labelGrpId);
+    Map<String,Object> deleteLabelGrp(Long userId,Long labelGrpId);
 
-    List<LabelGrp> getLabelGrpList(Long userId, Map<String,Object> params, Integer page, Integer pageSize);
+    Map<String,Object> getLabelGrpList(Long userId, Map<String,Object> params, Integer page, Integer pageSize);
 
-    LabelGrp getLabelGrpDetail(Long userId,Long labelGrpId);
+    Map<String,Object> getLabelGrpDetail(Long userId,Long labelGrpId);
 
 
     //标签组成员关系
-    RespInfo addLabelGrpMbr(Long userId, LabelGrpMbr addVO);
+    Map<String,Object> addLabelGrpMbr(Long userId, LabelGrpMbr addVO);
 
-    RespInfo editLabelGrpMbr(Long userId, Long grpMbrId,Long grpId);
+    Map<String,Object> editLabelGrpMbr(Long userId, Long grpMbrId,Long grpId);
 
-    RespInfo deleteLabelGrpMbr(Long userId,Long labelGrpMbrId);
+    Map<String,Object> deleteLabelGrpMbr(Long userId,Long labelGrpMbrId);
 
-    LabelGrpMbr getLabelGrpMbrDetail(Long userId,Long labelGrpMbrId);
+    Map<String,Object> getLabelGrpMbrDetail(Long userId,Long labelGrpMbrId);
 
 
     //标签值规格（枚举类标签值规格）
-    RespInfo addLabelValue(Long userId, LabelValue addVO);
+    Map<String,Object> addLabelValue(Long userId, LabelValue addVO);
 
-    RespInfo editLabelValue(Long userId, LabelValue editVO);
+    Map<String,Object> editLabelValue(Long userId, LabelValue editVO);
 
-    RespInfo deleteLabelValue(Long userId,Long labelValueId);
+    Map<String,Object> deleteLabelValue(Long userId,Long labelValueId);
 
-    List<LabelValue> getLabelValueList(Long userId, Map<String,Object> params, Integer page, Integer pageSize);
+    Map<String,Object> getLabelValueList(Long userId, Map<String,Object> params, Integer page, Integer pageSize);
 
-    LabelValue getLabelValueDetail(Long userId,Long labelValueId);
+    Map<String,Object> getLabelValueDetail(Long userId,Long labelValueId);
 
 
 

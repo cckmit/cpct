@@ -9,15 +9,15 @@ import java.util.List;
 import java.util.Map;
 
 public interface ScriptService {
-    RespInfo addScript(Long userId, ScriptAddVO addVO);
+    Map<String,Object> addScript(Long userId, ScriptAddVO addVO);
 
-    RespInfo editScript(Long userId, ScriptEditVO editVO);
+    Map<String,Object> editScript(Long userId, ScriptEditVO editVO);
 
-    RespInfo deleteScript(Long userId,Long scriptId);
+    Map<String,Object> deleteScript(Long userId,Long scriptId);
 
-    List<ScriptVO> getScriptList(Long userId,Map<String,Object> params,Integer page,Integer pageSize);
+    Map<String,Object> getScriptList(Long userId,Map<String,Object> params,Integer page,Integer pageSize);
 
-    ScriptVO getScriptVODetail(Long userId,Long scriptId);
+    Map<String,Object> getScriptVODetail(Long userId,Long scriptId);
 
 
 
