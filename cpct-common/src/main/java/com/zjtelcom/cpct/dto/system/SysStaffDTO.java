@@ -11,6 +11,8 @@ public class SysStaffDTO {
 
     private String staffCode;
 
+    private String staffAccount;
+
     private String staffName;
 
     private String password;

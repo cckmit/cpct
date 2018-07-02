@@ -4,6 +4,7 @@
     <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.system.SysStaff">
         <id column="STAFF_ID" jdbcType="BIGINT" property="staffId"/>
         <result column="STAFF_CODE" jdbcType="VARCHAR" property="staffCode"/>
+        <result column="STAFF_ACCOUNT" jdbcType="VARCHAR" property="staffAccount"/>
         <result column="STAFF_NAME" jdbcType="VARCHAR" property="staffName"/>
         <result column="PASSWORD" jdbcType="VARCHAR" property="password"/>
         <result column="STAFF_PHONE" jdbcType="VARCHAR" property="staffPhone"/>
@@ -21,10 +22,10 @@
 
     <!-- 根据用户名查询用户信息 -->
     <select id="queryUserByName" resultMap="BaseResultMap" parameterType="String">
-        select STAFF_ID, STAFF_CODE, STAFF_NAME, PASSWORD, STAFF_PHONE, STAFF_TELEPHONE,
+        select STAFF_ID, STAFF_CODE, STAFF_ACCOUNT,STAFF_NAME, PASSWORD, STAFF_PHONE, STAFF_TELEPHONE,
         STAFF_EMAIL, CHANNEL_ID, CITY_ID, STATUS, LAST_LOGIN
         from sys_staff
-        where STAFF_CODE = #{staffCode,jdbcType=VARCHAR}
+        where STAFF_ACCOUNT = #{staffAccount,jdbcType=VARCHAR}
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
@@ -34,13 +35,13 @@
 
     <insert id="insert" parameterType="com.zjtelcom.cpct.domain.system.SysStaff" keyProperty="staffId"
             useGeneratedKeys="true">
-      insert into sys_staff (STAFF_CODE, STAFF_NAME,
+      insert into sys_staff (STAFF_CODE,STAFF_ACCOUNT, STAFF_NAME,
         PASSWORD, STAFF_PHONE, STAFF_TELEPHONE,
         STAFF_EMAIL, CHANNEL_ID, CITY_ID,
         STATUS, LAST_LOGIN, CREATE_DATE,
         CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
         )
-      values (#{staffCode,jdbcType=VARCHAR}, #{staffName,jdbcType=VARCHAR},
+      values (#{staffCode,jdbcType=VARCHAR}, #{staffAccount,jdbcType=VARCHAR},#{staffName,jdbcType=VARCHAR},
         #{password,jdbcType=VARCHAR}, #{staffPhone,jdbcType=VARCHAR}, #{staffTelephone,jdbcType=VARCHAR},
         #{staffEmail,jdbcType=VARCHAR}, #{channelId,jdbcType=BIGINT}, #{cityId,jdbcType=BIGINT},
         #{status,jdbcType=BIGINT}, #{lastLogin,jdbcType=TIMESTAMP}, #{createDate,jdbcType=TIMESTAMP},
@@ -51,6 +52,7 @@
     <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.system.SysStaff">
       update sys_staff
       set STAFF_CODE = #{staffCode,jdbcType=VARCHAR},
+        STAFF_ACCOUNT = #{staffAccount,jdbcType=VARCHAR},
         STAFF_NAME = #{staffName,jdbcType=VARCHAR},
         STAFF_PHONE = #{staffPhone,jdbcType=VARCHAR},
         STAFF_TELEPHONE = #{staffTelephone,jdbcType=VARCHAR},
@@ -64,7 +66,7 @@
     </update>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-      select STAFF_ID, STAFF_CODE, STAFF_NAME, STAFF_PHONE, STAFF_TELEPHONE,
+      select STAFF_ID, STAFF_CODE, STAFF_ACCOUNT,STAFF_NAME, STAFF_PHONE, STAFF_TELEPHONE,
       STAFF_EMAIL, CHANNEL_ID, CITY_ID, STATUS, LAST_LOGIN, CREATE_DATE, CREATE_STAFF,
       UPDATE_DATE, UPDATE_STAFF
       from sys_staff
@@ -72,12 +74,17 @@
     </select>
 
     <select id="selectAll" resultMap="BaseResultMap">
-        select STAFF_ID, STAFF_CODE, STAFF_NAME, STAFF_PHONE, STAFF_TELEPHONE,
+        select STAFF_ID, STAFF_CODE,STAFF_ACCOUNT, STAFF_NAME, STAFF_PHONE, STAFF_TELEPHONE,
         STAFF_EMAIL, CHANNEL_ID, CITY_ID, STATUS, LAST_LOGIN, CREATE_DATE, CREATE_STAFF,
         UPDATE_DATE, UPDATE_STAFF
         from sys_staff
-        where STAFF_CODE like CONCAT('%',#{staffCode,jdbcType=VARCHAR},'%')
-        and STAFF_NAME like CONCAT('%',#{staffName,jdbcType=VARCHAR},'%')
+        where 1=1
+        <if test="status != null and status != ''">
+            and STAFF_ACCOUNT like CONCAT('%',#{staffAccount,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="status != null and status != ''">
+            and STAFF_NAME like CONCAT('%',#{staffName,jdbcType=VARCHAR},'%')
+        </if>
         <if test="status != null and status != 0">
             and STATUS = #{status,jdbcType=BIGINT}
         </if>
@@ -101,12 +108,12 @@
     <select id="checkCodeRepeat" parameterType="java.lang.String" resultType="java.lang.Integer">
       select count(0)
       from sys_staff
-      where STAFF_CODE = #{staffCode,jdbcType=VARCHAR}
+      where STAFF_ACCOUNT = #{staffAccount,jdbcType=VARCHAR}
     </select>
 
     <update id="lastLogin" parameterType="java.lang.String">
       update sys_staff
       set LAST_LOGIN = now()
-      where STAFF_CODE = #{staffCode,jdbcType=VARCHAR}
+      where STAFF_ACCOUNT = #{staffAccount,jdbcType=VARCHAR}
     </update>
 </mapper>

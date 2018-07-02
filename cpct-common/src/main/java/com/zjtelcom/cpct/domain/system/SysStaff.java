@@ -14,6 +14,11 @@ public class SysStaff extends BaseEntity implements Serializable {
 
     private String staffCode;
 
+    /**
+     * 员工账号
+     */
+    private String staffAccount;
+
     private String staffName;
 
     private String password;
@@ -166,5 +171,13 @@ public class SysStaff extends BaseEntity implements Serializable {
     @Override
     public void setUpdateStaff(Long updateStaff) {
         this.updateStaff = updateStaff;
+    }
+
+    public String getStaffAccount() {
+        return staffAccount;
+    }
+
+    public void setStaffAccount(String staffAccount) {
+        this.staffAccount = staffAccount;
     }
 }
