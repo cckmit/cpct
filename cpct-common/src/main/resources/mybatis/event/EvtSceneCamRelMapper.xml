@@ -58,9 +58,9 @@
         select SCENE_CAM_REL_ID, EVENT_SCENE_ID, CAMPAIGN_SEQ, MKT_CAMPAIGN_ID, STATUS_CD,
         STATUS_DATE, CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE, CREATE_DATE, REMARK
         from evt_scene_cam_rel
-        where 1 == 1
+        where 1 = 1
         <if test="eventSceneId != null and eventSceneId != 0 ">
-            EVENT_SCENE_ID = #{eventSceneId}
+            and EVENT_SCENE_ID = #{eventSceneId}
         </if>
     </select>
 

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -28,9 +29,13 @@ public class EventApiController extends BaseController {
     @RequestMapping("/CalculateCPC")
     @CrossOrigin
     public String eventInput(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> map) {
-
-        eventApiService.deal(map);
-
-        return initSuccRespInfo(null);
+        Map result = new HashMap();
+        try {
+            result = eventApiService.deal(map);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return initFailRespInfo(e.getMessage(),"");
+        }
+        return initSuccRespInfo(result);
     }
 }
