@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.controller.system;
 
+import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.system.SysStaffDTO;
@@ -9,8 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+/**
+ * 用户模块控制器
+ */
 @RestController
 @RequestMapping("${adminPath}/staff")
 public class SysStaffController extends BaseController {
@@ -25,19 +31,20 @@ public class SysStaffController extends BaseController {
      */
     @RequestMapping(value = "listStaff", method = RequestMethod.POST)
     @CrossOrigin
-    public String listStaff(@RequestParam("staffCode") String staffCode,
+    public String listStaff(@RequestParam("staffAccount") String staffAccount,
                             @RequestParam("staffName") String staffName,
                             @RequestParam("status") Long status,
                             @RequestParam("page") Integer page,
                             @RequestParam("pageSize") Integer pageSize) {
         List<SysStaff> list = new ArrayList<>();
+        Map result = new HashMap();
         try {
-            list = sysStaffService.listStaff(staffCode, staffName, status, page, pageSize);
+            result = sysStaffService.listStaff(staffAccount, staffName, status, page, pageSize);
         } catch (Exception e) {
             logger.error("[op:SysStaffController] fail to eventList Exception: ", e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
         }
-        return initSuccRespInfo(list);
+        return JSON.toJSON(result).toString();
     }
 
     /**

@@ -9,8 +9,7 @@ public class UserUtil {
      * 获取当前登录用户id
      * @return
      */
-    public static Long LoginId() {
-
+    public static Long loginId() {
 
         return 1L;
     }

@@ -172,6 +172,7 @@
                 <version>${commons-lang3.version}</version>
             </dependency>
 
+            <!-- lombok插件 -->
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>

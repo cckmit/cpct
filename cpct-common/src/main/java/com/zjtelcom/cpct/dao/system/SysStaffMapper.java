@@ -19,7 +19,7 @@ public interface SysStaffMapper {
 
     SysStaff selectByPrimaryKey(Long staffId);
 
-    List<SysStaff> selectAll(@Param("staffCode") String staffCode,
+    List<SysStaff> selectAll(@Param("staffAccount") String staffAccount,
                              @Param("staffName") String staffName,
                              @Param("status") Long status);
 
@@ -30,11 +30,11 @@ public interface SysStaffMapper {
     int updatePassword(@Param("staffId") Long staffId,
                        @Param("password") String password);
 
-    int checkCodeRepeat(@Param("staffCode") String staffCode);
+    int checkCodeRepeat(@Param("staffAccount") String staffAccount);
 
-    SysStaff queryUserByName(@Param("staffCode") String staffCode);
+    SysStaff queryUserByName(@Param("staffAccount") String staffAccount);
 
-    int lastLogin(@Param("staffCode") String staffCode);
+    int lastLogin(@Param("staffAccount") String staffAccount);
 
 
 

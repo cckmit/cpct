@@ -1,6 +1,9 @@
 package com.zjtelcom.cpct.service.impl.system;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.system.SysStaffMapper;
 import com.zjtelcom.cpct.dao.system.SysStaffRoleMapper;
 import com.zjtelcom.cpct.domain.system.SysStaff;
@@ -9,6 +12,7 @@ import com.zjtelcom.cpct.dto.system.SysStaffDTO;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.system.SysStaffService;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
+import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,12 +52,19 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
     }
 
     @Override
-    public List<SysStaff> listStaff(String staffCode, String staffName, Long status, Integer page, Integer pageSize) {
+    public Map<String,Object> listStaff(String staffAccount, String staffName, Long status, Integer page, Integer pageSize) {
+        Map<String,Object> result = new HashMap<>();
+
         //分页
-//        PageHelper.startPage(page, pageSize);
-        List<SysStaff> list = sysStaffMapper.selectAll(staffCode, staffName, status);
-//        PageInfo pageInfo = new PageInfo(list);
-        return list;
+        PageHelper.startPage(page, pageSize);
+        List<SysStaff> list = sysStaffMapper.selectAll(staffAccount, staffName, status);
+        Page pageInfo = new Page(new PageInfo(list));
+        result.put("list",list);
+        result.put("pageInfo",pageInfo);
+        result.put("resultCode","0");
+
+
+        return result;
     }
 
     @Override
@@ -63,7 +74,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         SysStaff sysStaff = new SysStaff();
         CopyPropertiesUtil.copyBean2Bean(sysStaff, sysStaffDTO);
         //判断账号是否重复
-        int count = sysStaffMapper.checkCodeRepeat(sysStaff.getStaffCode());
+        int count = sysStaffMapper.checkCodeRepeat(sysStaff.getStaffAccount());
         if (count > 0) {
             //todo 异常 账号重复
 
@@ -72,11 +83,10 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         //密码加密
         sysStaff.setPassword(new SimpleHash("md5", sysStaff.getPassword()).toHex());
 
-        //初始化状态值
+        //初始化状态值 todo 静态
         sysStaff.setStatus(1L);
 
-        //todo 获取当前登录用户id
-        Long loginId = 1L;
+        Long loginId = UserUtil.loginId();
         sysStaff.setCreateStaff(loginId);
         sysStaff.setCreateDate(new Date());
         int flag = sysStaffMapper.insert(sysStaff);
@@ -106,8 +116,8 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
 
         //todo 判断账号是否重复
 
-        //todo 获取当前登录用户id
-        Long loginId = 1L;
+
+        Long loginId = UserUtil.loginId();
         sysStaff.setUpdateStaff(loginId);
         sysStaff.setUpdateDate(new Date());
         int flag = sysStaffMapper.updateByPrimaryKey(sysStaff);
@@ -141,8 +151,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         params.setStaffId(id);
         params.setStatus(status);
 
-        //todo 获取当前登录用户id
-        Long loginId = 1L;
+        Long loginId = UserUtil.loginId();
         params.setUpdateStaff(loginId);
         params.setUpdateDate(new Date());
         return sysStaffMapper.changeStatus(params);
