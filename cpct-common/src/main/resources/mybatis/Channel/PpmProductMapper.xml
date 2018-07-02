@@ -49,4 +49,14 @@
     product_type, status, ppm_product_id
     from ppm_product
   </select>
+  <select id="findByProductName" resultMap="BaseResultMap">
+    select product_id, product_code, product_name, product_desc, start_time, end_time,
+    product_type, status, ppm_product_id
+    from ppm_product
+    where 1=1
+    <if test="productName != null and productName != ''">
+      and product_name LIKE CONCAT(CONCAT('%',#{productName}),'%')
+    </if>
+  </select>
+
 </mapper>

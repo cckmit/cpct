@@ -5,19 +5,13 @@ import java.util.Date;
 import java.util.List;
 
 public class VerbalAddVO implements Serializable {
-    private Long campaignId;
+    private Long campaignId;//活动id
 
-    private Long contactConfId;
+    private Long contactConfId;//渠道推送配置id
 
-    private String scriptDesc;
+    private String scriptDesc;//脚本内容
 
-    private Long channelId;
-
-    private String statusCd;
-
-    private Long createStaff;
-
-    private Date createDate;
+    private Long channelId;//渠道id
 
     private String remark;
 
@@ -65,29 +59,6 @@ public class VerbalAddVO implements Serializable {
         this.channelId = channelId;
     }
 
-    public String getStatusCd() {
-        return statusCd;
-    }
-
-    public void setStatusCd(String statusCd) {
-        this.statusCd = statusCd;
-    }
-
-    public Long getCreateStaff() {
-        return createStaff;
-    }
-
-    public void setCreateStaff(Long createStaff) {
-        this.createStaff = createStaff;
-    }
-
-    public Date getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
 
     public String getRemark() {
         return remark;

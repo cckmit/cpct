@@ -19,6 +19,8 @@ public interface InjectionLabelMapper {
 
     List<Label> selectAll();
 
+    List<Label> findByParam(@Param("labelName")String labelName,@Param("fitDomain")String fitDomain);
+
     int updateByPrimaryKey(Label record);
 
     int deleteAll();

@@ -11,12 +11,10 @@ import com.zjtelcom.cpct.dto.channel.LabelVO;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.channel.LabelService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +27,9 @@ public class LabelController extends BaseController {
     @Autowired
     private LabelService labelService;
 
+    /**
+     * 添加标签
+     */
     @PostMapping("addLabel")
     @CrossOrigin
     public RespInfo addLabel(Long userId, LabelAddVO addVO) {
@@ -42,6 +43,9 @@ public class LabelController extends BaseController {
         return respInfo;
     }
 
+    /**
+     * 编辑标签
+     */
     @PostMapping("editLabel")
     @CrossOrigin
     public RespInfo editLabel(Long userId, Label editVO) {
@@ -55,6 +59,9 @@ public class LabelController extends BaseController {
         return respInfo;
     }
 
+    /**
+     * 删除标签
+     */
     @PostMapping("deleteLabel")
     @CrossOrigin
     public RespInfo deleteLabel(Long userId, Long labelId) {
@@ -68,9 +75,12 @@ public class LabelController extends BaseController {
         return respInfo;
     }
 
+    /**
+     * 获取标签列表
+     */
     @PostMapping("getLabelList")
     @CrossOrigin
-    public RespInfo getLabelList(Long userId, Map<String, Object> params, Integer page, Integer pageSize) {
+    public RespInfo getLabelList(@RequestBody HashMap<String, Object> params, Integer page, Integer pageSize) {
         List<LabelVO> voList = new ArrayList<>();
         try {
             voList = labelService.getLabelList(1L,params,page,pageSize);
@@ -81,6 +91,10 @@ public class LabelController extends BaseController {
         return RespInfo.build(CODE_SUCCESS,voList);
     }
 
+
+    /**
+     * 获取标签详情
+     */
     @PostMapping("getLabelDetail")
     @CrossOrigin
     public RespInfo getLabelDetail(Long userId, Long labelId) {
@@ -96,7 +110,9 @@ public class LabelController extends BaseController {
 
 
     //标签组
-
+    /**
+     * 添加标签组
+     */
     @PostMapping("addLabelGrp")
     @CrossOrigin
     public RespInfo addLabelGrp(Long userId, LabelGrp addVO) {
@@ -110,6 +126,9 @@ public class LabelController extends BaseController {
         return respInfo;
     }
 
+    /**
+     * 编辑标签组
+     */
     @PostMapping("editLabelGrp")
     @CrossOrigin
     public RespInfo editLabelGrp(Long userId, LabelGrp editVO) {
@@ -123,6 +142,9 @@ public class LabelController extends BaseController {
         return respInfo;
     }
 
+    /**
+     * 删除标签组
+     */
     @PostMapping("deleteLabelGrp")
     @CrossOrigin
     public RespInfo deleteLabelGrp(Long userId, Long labelGrpId) {
@@ -136,6 +158,9 @@ public class LabelController extends BaseController {
         return respInfo;
     }
 
+    /**
+     * 获取标签组列表
+     */
     @PostMapping("getLabelGrpList")
     @CrossOrigin
     public RespInfo getLabelGrpList(Long userId, Map<String, Object> params, Integer page, Integer pageSize) {
@@ -149,6 +174,9 @@ public class LabelController extends BaseController {
         return RespInfo.build(CODE_SUCCESS,voList);
     }
 
+    /**
+     * 获取标签组详情
+     */
     @PostMapping("getLabelGrpDetail")
     @CrossOrigin
     public RespInfo getLabelGrpDetail(Long userId, Long labelGrpId) {
@@ -163,7 +191,9 @@ public class LabelController extends BaseController {
     }
 
 
-
+    /**
+     * 添加标签组成员
+     */
     @PostMapping("addLabelGrpMbr")
     @CrossOrigin
     public RespInfo addLabelGrpMbr(Long userId, LabelGrpMbr addVO) {
@@ -177,6 +207,9 @@ public class LabelController extends BaseController {
         return respInfo;
     }
 
+    /**
+     * 编辑标签组成员
+     */
     @PostMapping("editLabelGrpMbr")
     @CrossOrigin
     public RespInfo editLabelGrpMbr(Long userId, Long grpMbrId,Long grpId) {
@@ -190,6 +223,9 @@ public class LabelController extends BaseController {
         return respInfo;
     }
 
+    /**
+     * 删除标签组成员
+     */
     @PostMapping("deleteLabelGrpMbr")
     @CrossOrigin
     public RespInfo deleteLabelGrpMbr(Long userId, Long labelGrpMbrId) {
@@ -203,7 +239,9 @@ public class LabelController extends BaseController {
         return respInfo;
     }
 
-
+    /**
+     * 获取标签组成员列表
+     */
     @PostMapping("getLabelGrpMbrDetail")
     @CrossOrigin
     public RespInfo getLabelGrpMbrDetail(Long userId, Long labelGrpMbrId) {
@@ -217,7 +255,9 @@ public class LabelController extends BaseController {
         return RespInfo.build(CODE_SUCCESS,vo);
     }
 
-
+    /**
+     * 添加标签值信息
+     */
     @PostMapping("addLabelValue")
     @CrossOrigin
     public RespInfo addLabelValue(Long userId, LabelValue addVO) {
@@ -231,6 +271,9 @@ public class LabelController extends BaseController {
         return respInfo;
     }
 
+    /**
+     * 编辑标签值信息
+     */
     @PostMapping("editLabelValue")
     @CrossOrigin
     public RespInfo editLabelValue(Long userId, LabelValue editVO) {
@@ -244,6 +287,9 @@ public class LabelController extends BaseController {
         return respInfo;
     }
 
+    /**
+     * 删除标签值信息
+     */
     @PostMapping("deleteLabelValue")
     @CrossOrigin
     public RespInfo deleteLabelValue(Long userId, Long labelValueId) {
@@ -257,12 +303,15 @@ public class LabelController extends BaseController {
         return respInfo;
     }
 
+    /**
+     * 获取标签值列表
+     */
     @PostMapping("getLabelValueDetail")
     @CrossOrigin
-    public RespInfo getLabelValueDetail(Long userId, Long scriptId) {
+    public RespInfo getLabelValueDetail(Long userId, Long labelValueId) {
         LabelValue vo = new LabelValue();
         try {
-            vo = labelService.getLabelValueDetail(1L,scriptId);
+            vo = labelService.getLabelValueDetail(1L,labelValueId);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to getLabelValueDetail",e);
             return RespInfo.build(CODE_FAIL,ErrorCode.GET_SCRIPT_LIST.getErrorMsg(),ErrorCode.GET_SCRIPT_LIST.getErrorCode());

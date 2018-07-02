@@ -23,6 +23,9 @@ public class ChannelController extends BaseController {
     private ChannelService channelService;
 
 
+    /**
+     * 添加渠道
+     */
     @PostMapping("addChannel")
     @CrossOrigin
     public RespInfo addChannel(Long userId, ChannelAddVO addVO) {
@@ -35,7 +38,9 @@ public class ChannelController extends BaseController {
         }
         return respInfo;
     }
-
+    /**
+     * 编辑渠道
+     */
     @PostMapping("editChannel")
     @CrossOrigin
     public RespInfo editChannel(Long userId, ChannelEditVO editVO) {
@@ -49,6 +54,9 @@ public class ChannelController extends BaseController {
         return respInfo;
     }
 
+    /**
+     * 删除渠道
+     */
     @PostMapping("deleteChannel")
     @CrossOrigin
     public RespInfo deleteChannel(Long userId, Long channelId) {
@@ -62,6 +70,10 @@ public class ChannelController extends BaseController {
         return respInfo;
     }
 
+
+    /**
+     * 获取渠道列表（渠道名称查询）
+     */
     @GetMapping("getChannelList")
     @CrossOrigin
     public RespInfo getChannelList(Long userId,String channelName,Integer page, Integer pageSize) {
@@ -75,6 +87,9 @@ public class ChannelController extends BaseController {
         return RespInfo.build(CODE_SUCCESS,voList);
     }
 
+    /**
+     * 获取渠道详情
+     */
     @GetMapping("getChannelDetail")
     @CrossOrigin
     public RespInfo getChannelDetail(Long userId, Long channelId) {

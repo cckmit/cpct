@@ -1,8 +1,9 @@
 package com.zjtelcom.cpct.service.channel;
 
+import com.zjhcsoft.eagle.main.dubbo.model.policy.TagInfoModel;
+import com.zjhcsoft.eagle.main.dubbo.model.policy.TagValueInfoModel;
 import com.zjtelcom.cpct.bean.RespInfo;
-import com.zjtelcom.cpct.dto.channel.TagInfoModel;
-import com.zjtelcom.cpct.dto.channel.TagValueInfoModel;
+
 
 import java.util.List;
 

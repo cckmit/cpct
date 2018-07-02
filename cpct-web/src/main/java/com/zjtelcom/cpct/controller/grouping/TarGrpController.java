@@ -152,9 +152,9 @@ public class TarGrpController extends BaseController {
     /**
      * 策略试运算（老系统方法）
      */
-    @RequestMapping("/trycalc")
+    @PostMapping("/trycalc")
     @CrossOrigin
-    public String trycalc(@RequestBody CalcReqModel calcReqModel, String serialNum) {
+    public String trycalc(String serialNum,@RequestBody CalcReqModel calcReqModel) {
         Map<String, String> maps = new HashMap<>();
         try {
             //返回前端策略试运算结果

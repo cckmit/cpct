@@ -27,7 +27,9 @@ public class ScriptController extends BaseController  {
     private ScriptService scriptService;
 
 
-
+    /**
+     * 添加脚本
+     */
     @PostMapping("addScript")
     @CrossOrigin
     public RespInfo addScript(Long userId, ScriptAddVO addVO) {
@@ -41,6 +43,9 @@ public class ScriptController extends BaseController  {
         return respInfo;
     }
 
+    /**
+     * 编辑脚本
+     */
     @PostMapping("editScript")
     @CrossOrigin
     public RespInfo editScript(Long userId, ScriptEditVO editVO) {
@@ -54,6 +59,9 @@ public class ScriptController extends BaseController  {
         return respInfo;
     }
 
+    /**
+     * 删除脚本
+     */
     @PostMapping("deleteScript")
     @CrossOrigin
     public RespInfo deleteScript(Long userId, Long scriptId) {
@@ -67,6 +75,9 @@ public class ScriptController extends BaseController  {
         return respInfo;
     }
 
+    /**
+     * 获取脚本列表
+     */
     @PostMapping("getScriptList")
     @CrossOrigin
     public RespInfo getScriptList(@RequestBody HashMap<String, Object> params) {
@@ -84,6 +95,9 @@ public class ScriptController extends BaseController  {
         return RespInfo.build(CODE_SUCCESS,voList);
     }
 
+    /**
+     * 获取脚本详情
+     */
     @GetMapping("getScriptVODetail")
     @CrossOrigin
     public RespInfo getScriptVODetail(Long userId, Long scriptId) {
