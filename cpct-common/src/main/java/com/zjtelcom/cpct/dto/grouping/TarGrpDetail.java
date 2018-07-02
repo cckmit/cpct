@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.dto.grouping;
 
 import com.zjtelcom.cpct.domain.grouping.TarGrpDetailDO;
 import lombok.Data;
+import java.util.List;
 
 @Data
 public class TarGrpDetail extends TarGrpDetailDO {

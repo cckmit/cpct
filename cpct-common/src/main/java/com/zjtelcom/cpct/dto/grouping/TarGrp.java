@@ -11,6 +11,6 @@ import lombok.Data;
 @Data
 public class TarGrp extends TarGrpDetailDO {
 
-    private String actType;
+    private String actType;//  KIP=保持/ADD=新增/MOD=修改/DEL=删除
 
 }

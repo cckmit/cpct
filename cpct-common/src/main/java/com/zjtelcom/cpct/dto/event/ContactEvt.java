@@ -3,14 +3,16 @@ package com.zjtelcom.cpct.dto.event;
 import com.zjtelcom.cpct.BaseEntity;
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * @Description 事件实体类
  * @Author pengy
  * @Date 2018/6/26 15:32
  */
-@Data
-public class ContactEvt extends BaseEntity{
+public class ContactEvt extends BaseEntity implements Serializable{
 
+    private static final long serialVersionUID = -6351197926116704813L;
     private String actType;//  KIP=保持/ADD=新增/MOD=修改/DEL=删除
     private Long contactEvtId; //事件主键标识
     private Long interfaceCfgId;//接口配置标识，主键标识
@@ -27,4 +29,123 @@ public class ContactEvt extends BaseEntity{
     private String coopType;//记录推送渠道协同类型，
     private Long extEventId;//记录集团下发的事件标识
 
+    public String getActType() {
+        return actType;
+    }
+
+    public void setActType(String actType) {
+        this.actType = actType;
+    }
+
+    public Long getContactEvtId() {
+        return contactEvtId;
+    }
+
+    public void setContactEvtId(Long contactEvtId) {
+        this.contactEvtId = contactEvtId;
+    }
+
+    public Long getInterfaceCfgId() {
+        return interfaceCfgId;
+    }
+
+    public void setInterfaceCfgId(Long interfaceCfgId) {
+        this.interfaceCfgId = interfaceCfgId;
+    }
+
+    public String getContactEvtCode() {
+        return contactEvtCode;
+    }
+
+    public void setContactEvtCode(String contactEvtCode) {
+        this.contactEvtCode = contactEvtCode;
+    }
+
+    public String getContactEvtName() {
+        return contactEvtName;
+    }
+
+    public void setContactEvtName(String contactEvtName) {
+        this.contactEvtName = contactEvtName;
+    }
+
+    public String getEvtMappedAddr() {
+        return evtMappedAddr;
+    }
+
+    public void setEvtMappedAddr(String evtMappedAddr) {
+        this.evtMappedAddr = evtMappedAddr;
+    }
+
+    public String getEvtMappedIp() {
+        return evtMappedIp;
+    }
+
+    public void setEvtMappedIp(String evtMappedIp) {
+        this.evtMappedIp = evtMappedIp;
+    }
+
+    public String getEvtProcotolType() {
+        return evtProcotolType;
+    }
+
+    public void setEvtProcotolType(String evtProcotolType) {
+        this.evtProcotolType = evtProcotolType;
+    }
+
+    public String getEvtMappedFunName() {
+        return evtMappedFunName;
+    }
+
+    public void setEvtMappedFunName(String evtMappedFunName) {
+        this.evtMappedFunName = evtMappedFunName;
+    }
+
+    public String getContactEvtDesc() {
+        return contactEvtDesc;
+    }
+
+    public void setContactEvtDesc(String contactEvtDesc) {
+        this.contactEvtDesc = contactEvtDesc;
+    }
+
+    public Long getContactChlId() {
+        return contactChlId;
+    }
+
+    public void setContactChlId(Long contactChlId) {
+        this.contactChlId = contactChlId;
+    }
+
+    public Long getContactEvtTypeId() {
+        return contactEvtTypeId;
+    }
+
+    public void setContactEvtTypeId(Long contactEvtTypeId) {
+        this.contactEvtTypeId = contactEvtTypeId;
+    }
+
+    public String getEvtTrigType() {
+        return evtTrigType;
+    }
+
+    public void setEvtTrigType(String evtTrigType) {
+        this.evtTrigType = evtTrigType;
+    }
+
+    public String getCoopType() {
+        return coopType;
+    }
+
+    public void setCoopType(String coopType) {
+        this.coopType = coopType;
+    }
+
+    public Long getExtEventId() {
+        return extEventId;
+    }
+
+    public void setExtEventId(Long extEventId) {
+        this.extEventId = extEventId;
+    }
 }

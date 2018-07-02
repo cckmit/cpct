@@ -2,19 +2,17 @@ package com.zjtelcom.cpct.request.event;
 
 import com.zjtelcom.cpct.dto.apply.RequestTemplateInst;
 import com.zjtelcom.cpct.dto.event.ContactEvtDetail;
-import lombok.Data;
-
 import java.io.Serializable;
 import java.util.List;
 
 /**
- * @Description 创建事件请求实体类
+ * @Description 修改时间请求对象
  * @Author pengy
- * @Date 2018/6/26 13:45
+ * @Date 2018/7/1 14:01
  */
-public class CreateContactEvtJtReq implements Serializable{
+public class ModContactEvtJtReq implements Serializable{
 
-    private static final long serialVersionUID = -2584042603507583666L;
+    private static final long serialVersionUID = 9099062938745900386L;
     private List<ContactEvtDetail> ContactEvtDetails;
     private RequestTemplateInst requestTemplateInst;
 

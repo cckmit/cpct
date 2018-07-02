@@ -68,7 +68,7 @@ public class EventTypeServiceImpl extends BaseService implements EventTypeServic
         EventTypeDTO eventTypeDTO = new EventTypeDTO();
         try {
             EventTypeDO eventTypeDO =  eventTypeMapper.selectByPrimaryKey(evtTypeId);
-            CopyPropertiesUtil.copyBean2Bean(eventTypeDTO,eventTypeDO);
+            eventTypeDTO = (EventTypeDTO) eventTypeDO;
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("[op:EventTypeServiceImpl] fail to getEventTypeDTOById ", e);
@@ -112,7 +112,7 @@ public class EventTypeServiceImpl extends BaseService implements EventTypeServic
                 EventTypeDTO eventTypeDTO = new EventTypeDTO();
                 eventTypeDTO.setEvtTypeId(eventTypeDO.getEvtTypeId());
                 eventTypeDTO.setParEvtTypeId(eventTypeDO.getParEvtTypeId());
-                eventTypeDTO.setEvtTypeName(eventTypeDO.getEvtTypeName());
+                eventTypeDTO.setContactEvtName(eventTypeDO.getContactEvtName());
                 dtoList.add(eventTypeDTO);
             }
             // 为一级菜单设置子菜单，getChild是递归调用的
@@ -135,7 +135,7 @@ public class EventTypeServiceImpl extends BaseService implements EventTypeServic
                 if (eventTypeDO.getParEvtTypeId() == id) {
                     EventTypeDTO eventTypeDTO = new EventTypeDTO();
                     eventTypeDTO.setEvtTypeId(eventTypeDO.getEvtTypeId());
-                    eventTypeDTO.setEvtTypeName(eventTypeDO.getEvtTypeName());
+                    eventTypeDTO.setContactEvtName(eventTypeDO.getContactEvtName());
                     eventTypeDTO.setParEvtTypeId(eventTypeDO.getParEvtTypeId());
                     childList.add(eventTypeDTO);
                 }

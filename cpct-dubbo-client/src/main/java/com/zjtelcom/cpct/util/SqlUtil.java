@@ -80,9 +80,9 @@ public final class SqlUtil {
 
         IDacher<EagleTag> tagCache = CacheManager.getInstance().getCache(
             CacheConstants.TAG_CACHE_NAME);
-        IDacher<TriggerValue> triggerValueCache = CacheManager.getInstance().getCache(
+        IDacher<LabelValue> triggerValueCache = CacheManager.getInstance().getCache(
             CacheConstants.TRIGGER_VALUE_CACHE_NAME);
-        IDacher<Trigger> triggerCache = CacheManager.getInstance().getCache(
+        IDacher<Label> triggerCache = CacheManager.getInstance().getCache(
             CacheConstants.TRIGGER_CACHE_NAME);
         IDacher<EagleTagAdaption> tagAdaptionCache = CacheManager.getInstance().getCache(
             CacheConstants.TAG_ADAPTION_CACHE_NAME);
@@ -95,9 +95,9 @@ public final class SqlUtil {
         //查询标签对应的valueid
         //todo 调用侯云峰
 //        List<Trigger> triggerList = triggerMapper.queryTriggerByLeftOpers(triggers);
-        List<Trigger> triggerList = new ArrayList<>();
-        Map<String, Trigger> triggerMap = new HashMap<>(triggerList.size());
-        for (Trigger trigger : triggerList) {
+        List<Label> triggerList = new ArrayList<>();
+        Map<String, Label> triggerMap = new HashMap<>(triggerList.size());
+        for (Label trigger : triggerList) {
             triggerMap.put(trigger.getConditionId().toString(), trigger);
         }
 
@@ -199,7 +199,7 @@ public final class SqlUtil {
 
                             String triggerValueCacheKey = new StringBuilder(valueId.toString()).append(
                                 "@").append(domainType).append("@").append(showValues[i]).toString();
-                            TriggerValue triggerValue = triggerValueCache.queryOne(triggerValueCacheKey);
+                            LabelValue triggerValue = triggerValueCache.queryOne(triggerValueCacheKey);
                             if (null != triggerValue) {
                                 realValue.append(triggerValue.getRealValue());
                             }
@@ -393,10 +393,10 @@ public final class SqlUtil {
 
     private static void init() {
         if (!initFlag) {
-            sourceTableRefMapper = ContextLoader.getCurrentWebApplicationContext().getBean(
-                EagleSourceTableRefMapper.class);
-            sourceTableDefMapper = ContextLoader.getCurrentWebApplicationContext().getBean(
-                EagleSourceTableDefMapper.class);
+//            sourceTableRefMapper = ContextLoader.getCurrentWebApplicationContext().getBean(
+//                EagleSourceTableRefMapper.class);
+//            sourceTableDefMapper = ContextLoader.getCurrentWebApplicationContext().getBean(
+//                EagleSourceTableDefMapper.class);
 //            triggerMapper = ContextLoader.getCurrentWebApplicationContext().getBean(
 //                TriggerMapper.class);
 

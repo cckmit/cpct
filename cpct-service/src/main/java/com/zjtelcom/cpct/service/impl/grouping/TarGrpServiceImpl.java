@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.zjhcsoft.eagle.main.dubbo.model.policy.CalcReqModel;
 import com.zjhcsoft.eagle.main.dubbo.model.policy.ResponseHeaderModel;
 import com.zjhcsoft.eagle.main.dubbo.service.PolicyCalculateService;
+import com.zjtelcom.cpct.common.CacheConstants;
 import com.zjtelcom.cpct.common.CacheManager;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamGrpRulMapper;
@@ -12,6 +13,7 @@ import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
 import com.zjtelcom.cpct.domain.grouping.TarGrpConditionDO;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
+import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpConditionDTO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.dto.system.SystemParam;
@@ -89,16 +91,19 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
      */
     @Transactional(readOnly = false)
     @Override
-    public Map<String, Object> saveTagNumFetch(Long mktCamGrpRulId, List<TarGrpConditionDTO> tarGrpConditionDTOList) {
+    public Map<String, Object> saveTagNumFetch(Long mktCamGrpRulId, List<TarGrpCondition> tarGrpConditionDTOList) {
         Map<String, Object> maps = new HashMap<>();
         TarGrpDetail tarGrpDetail = new TarGrpDetail();
         try {
             //生成客户分群
             tarGrpDetail = new TarGrpDetail();
+            tarGrpDetail.setStatusCd("1000");
             tarGrpMapper.insert(tarGrpDetail);
             //添加客户分群条件
             for (int i = 0; i < tarGrpConditionDTOList.size(); i++) {
-                tarGrpConditionMapper.insert(tarGrpConditionDTOList.get(i));
+                TarGrpConditionDO tarGrpConditionDO = tarGrpConditionDTOList.get(i);
+                tarGrpConditionDO.setTarGrpId(tarGrpDetail.getTarGrpId());
+                tarGrpConditionMapper.insert(tarGrpConditionDO);
             }
             //更新营销活动分群规则表
             MktCamGrpRul mktCamGrpRul = new MktCamGrpRul();
@@ -272,15 +277,15 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                     List<Map<String, Object>> ruleList = (List<Map<String, Object>>) policy.get("rules");
                     for (Map<String, Object> rule : ruleList) {
 
-                        List<Map<String, String>> triggers = (List<Map<String, String>>) rule.get("triggers");
+                        List<Map<String, String>> labels = (List<Map<String, String>>) rule.get("labels");
                         List<Company> company = (List<Company>) rule.get("company");
                         String sql = null;
                         //tagInfos 获取标签信息
-                        sql = SqlUtil.integrationSql(recommendType, triggers, tagInfos, company,
+                        sql = SqlUtil.integrationSql(recommendType, labels, tagInfos, company,
                                 tagInfoKeys);
 
                         // 清除不必要的参数
-                        rule.remove("triggers");
+                        rule.remove("labels");
                         rule.remove("company");
                         rule.remove("xietong");
 
@@ -296,7 +301,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
 
                 //目前只支持一个数据源DB2
                 EagleDatabaseConfig config = (EagleDatabaseConfig) CacheManager.getInstance().getCache(
-                        CommonConstant.DATABASE_COPNFIG_CACHE_NAME).queryOne(
+                        CacheConstants.DATABASE_COPNFIG_CACHE_NAME).queryOne(
                         EagleDatabaseConfCache.CACHE_DB2_KEY);
                 calcReqModel.setDbConfRowId(config.getDbConfRowId().toString());
 
