@@ -52,6 +52,7 @@ public class ProductController extends BaseController {
 			result.put("resultCode",CODE_SUCCESS);
 			result.put("resultMessage",CODE_SUCCESS);
 		} catch (Exception e) {
+			e.printStackTrace();
 			logger.info("get PPM product error: ", e);
 			result.put("resultCode",CODE_FAIL);
 			result.put("resultMessage", CODE_FAIL);

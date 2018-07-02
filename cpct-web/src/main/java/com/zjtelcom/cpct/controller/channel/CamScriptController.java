@@ -23,8 +23,10 @@ public class CamScriptController extends BaseController {
     @Autowired
     private CamScriptService camScriptService;
 
-
-    @PostMapping("addSaddCamScriptcript")
+    /**
+     * 添加营销活动脚本
+     */
+    @PostMapping("addCamScript")
     @CrossOrigin
     public RespInfo addCamScript(Long userId, CamScriptAddVO addVO) {
         RespInfo respInfo = new RespInfo();
@@ -37,6 +39,9 @@ public class CamScriptController extends BaseController {
         return respInfo;
     }
 
+    /**
+     * 编辑营销活动脚本
+     */
     @PostMapping("editCamScript")
     @CrossOrigin
     public RespInfo editCamScript(Long userId, CamScriptEditVO editVO) {
@@ -50,6 +55,9 @@ public class CamScriptController extends BaseController {
         return respInfo;
     }
 
+    /**
+     * 删除营销活动脚本
+     */
     @PostMapping("deleteCamScript")
     @CrossOrigin
     public RespInfo deleteCamScript(@RequestBody List<Long> camScriptIdList) {
@@ -64,6 +72,9 @@ public class CamScriptController extends BaseController {
         return respInfo;
     }
 
+    /**
+     * 获取营销活动脚本列表
+     */
     @GetMapping("getCamScriptList")
     @CrossOrigin
     public RespInfo getCamScriptList(Long userId, Long campaignId, Long evtContactConfId) {
@@ -80,6 +91,9 @@ public class CamScriptController extends BaseController {
         return RespInfo.build(CODE_SUCCESS,voList);
     }
 
+    /**
+     * 获取营销活动脚本详情
+     */
     @GetMapping("getCamScriptVODetail")
     @CrossOrigin
     public RespInfo getCamScriptVODetail(Long userId, Long camScriptId) {

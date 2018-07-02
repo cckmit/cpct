@@ -77,7 +77,15 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         List<LabelVO> voList = new ArrayList<>();
         List<Label> labelList = new ArrayList<>();
         try {
-            labelList = labelMapper.selectAll();
+            String labelName = null;
+            String fitDomain = null;
+            if (params.get("labelName")!=null){
+                labelName = params.get("labelName").toString();
+            }
+            if (params.get("fitDomain")!=null){
+                fitDomain = params.get("fitDomain").toString();
+            }
+            labelList = labelMapper.findByParam(labelName,fitDomain);
             for (Label label : labelList){
                 LabelVO vo = ChannelUtil.map2LabelVO(label);
                 voList.add(vo);

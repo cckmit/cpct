@@ -4,6 +4,7 @@ package com.zjtelcom.cpct.dao.channel;
 
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -37,4 +38,6 @@ public interface PpmProductMapper {
     List<PpmProduct> selectPpmProductByids(Map item);
 
     List<PpmProduct> getAllProductInUse();
+
+    List<PpmProduct> findByProductName(@Param("productName")String productName);
 }
