@@ -66,11 +66,11 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         int count = sysStaffMapper.checkCodeRepeat(sysStaff.getStaffCode());
         if (count > 0) {
             //todo 异常 账号重复
+
         }
 
-        //密码加密 todo 默认密码
-        String password = "12345";
-        sysStaff.setPassword(new SimpleHash("md5", password).toHex());
+        //密码加密
+        sysStaff.setPassword(new SimpleHash("md5", sysStaff.getPassword()).toHex());
 
         //初始化状态值
         sysStaff.setStatus(1L);
@@ -82,6 +82,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         int flag = sysStaffMapper.insert(sysStaff);
         if (flag < 1) {
             //todo flag<1 判断失败抛出业务异常
+
         }
 
         //保存角色信息

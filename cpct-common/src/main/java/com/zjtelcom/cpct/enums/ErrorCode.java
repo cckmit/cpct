@@ -23,6 +23,7 @@ public enum ErrorCode {
     INTERNAL_ERROR("未知错误，请联系接口人员！","00013"),
     VALIDATE_ERROR("参数校验出错，请联系接口人员！","00013"),
     POLICY_TRY_ERROR("无！","00013"),
+    NOT_CONFIG_MASTER_SUB("未配置主从关系！","00013"),
 
     ADD_SCRIPT_FAILURE("添加接触脚本失败","00014"),
     EDIT_SCRIPT_FAILURE("修改接触脚本失败","00015"),

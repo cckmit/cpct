@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.service.grouping;
 
 import com.zjhcsoft.eagle.main.dubbo.model.policy.CalcReqModel;
 import com.zjtelcom.cpct.domain.grouping.TarGrpConditionDO;
+import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpConditionDTO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import java.util.List;
@@ -16,7 +17,7 @@ public interface TarGrpService {
 
     Map<String, Object> createTarGrp(TarGrpDetail tarGrpDetail);
 
-    Map<String, Object> saveTagNumFetch(Long mktCamGrpRulId, List<TarGrpConditionDTO> tarGrpConditionDTOList);
+    Map<String, Object> saveTagNumFetch(Long mktCamGrpRulId, List<TarGrpCondition> tarGrpConditionDTOList);
 
     Map<String,Object> delTarGrpCondition(Long conditionId);
 
@@ -33,5 +34,7 @@ public interface TarGrpService {
     Map<String,Object> strategyTrial(CalcReqModel req, String serialNum);
 
     Map<String,String> trycalc(CalcReqModel req, String serialNum);
+
+    //
 
 }

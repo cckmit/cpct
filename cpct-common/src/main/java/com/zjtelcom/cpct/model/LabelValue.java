@@ -1,6 +1,6 @@
 package com.zjtelcom.cpct.model;
 
-public class TriggerValue {
+public class LabelValue {
     private Integer valueId;
 
     private String domain;

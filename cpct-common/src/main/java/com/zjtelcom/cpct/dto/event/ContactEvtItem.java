@@ -8,7 +8,6 @@ import lombok.Data;
  * @Author pengy
  * @Date 2018/6/26 13:54
  */
-@Data
 public class ContactEvtItem extends BaseEntity {
 
     private String actType;//  KIP=保持/ADD=新增/MOD=修改/DEL=删除
@@ -23,4 +22,91 @@ public class ContactEvtItem extends BaseEntity {
     private Integer evtItemLength;//记录事件采集项值的长度
     private Integer standardSort;//记录事件采集项的标准化的顺序
 
+    public String getActType() {
+        return actType;
+    }
+
+    public void setActType(String actType) {
+        this.actType = actType;
+    }
+
+    public Long getEvtItemId() {
+        return evtItemId;
+    }
+
+    public void setEvtItemId(Long evtItemId) {
+        this.evtItemId = evtItemId;
+    }
+
+    public Long getContactEvtId() {
+        return contactEvtId;
+    }
+
+    public void setContactEvtId(Long contactEvtId) {
+        this.contactEvtId = contactEvtId;
+    }
+
+    public Long getEvtTypeId() {
+        return evtTypeId;
+    }
+
+    public void setEvtTypeId(Long evtTypeId) {
+        this.evtTypeId = evtTypeId;
+    }
+
+    public String getEvtItemName() {
+        return evtItemName;
+    }
+
+    public void setEvtItemName(String evtItemName) {
+        this.evtItemName = evtItemName;
+    }
+
+    public String getEvtItemCode() {
+        return evtItemCode;
+    }
+
+    public void setEvtItemCode(String evtItemCode) {
+        this.evtItemCode = evtItemCode;
+    }
+
+    public String getValueDataType() {
+        return valueDataType;
+    }
+
+    public void setValueDataType(String valueDataType) {
+        this.valueDataType = valueDataType;
+    }
+
+    public String getEvtItemFormat() {
+        return evtItemFormat;
+    }
+
+    public void setEvtItemFormat(String evtItemFormat) {
+        this.evtItemFormat = evtItemFormat;
+    }
+
+    public String getIsNullable() {
+        return isNullable;
+    }
+
+    public void setIsNullable(String isNullable) {
+        this.isNullable = isNullable;
+    }
+
+    public Integer getEvtItemLength() {
+        return evtItemLength;
+    }
+
+    public void setEvtItemLength(Integer evtItemLength) {
+        this.evtItemLength = evtItemLength;
+    }
+
+    public Integer getStandardSort() {
+        return standardSort;
+    }
+
+    public void setStandardSort(Integer standardSort) {
+        this.standardSort = standardSort;
+    }
 }

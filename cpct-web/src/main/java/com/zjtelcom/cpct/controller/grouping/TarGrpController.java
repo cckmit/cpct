@@ -4,15 +4,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.zjhcsoft.eagle.main.dubbo.model.policy.CalcReqModel;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.grouping.TarGrpConditionDO;
-import com.zjtelcom.cpct.dto.grouping.TarGrpConditionDTO;
+import com.zjtelcom.cpct.dto.grouping.TarGrpDTO;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.util.FastJsonUtils;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -33,13 +31,13 @@ public class TarGrpController extends BaseController {
      */
     @RequestMapping("/saveTagNumFetch")
     @CrossOrigin
-    public String saveTagNumFetch(@Param("mktCamGrpRulId") Long mktCamGrpRulId, List<TarGrpConditionDTO> tarGrpConditionDTOList) {
+    public String saveTagNumFetch(@RequestBody TarGrpDTO tarGrpDTO) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            maps = tarGrpService.saveTagNumFetch(mktCamGrpRulId, tarGrpConditionDTOList);
+            maps = tarGrpService.saveTagNumFetch(tarGrpDTO.getMktCamGrpRulId(), tarGrpDTO.getTarGrpConditions());
         } catch (Exception e) {
-            logger.error("[op:TarGrpController] fail to saveTagNumFetch for mktCamGrpRulId = {},tarGrpConditionDTOList = {}!" +
-                    " Exception: ", mktCamGrpRulId, JSONArray.toJSON(tarGrpConditionDTOList), e);
+            logger.error("[op:TarGrpController] fail to saveTagNumFetch for tarGrpDTO = {}!" +
+                    " Exception: ", JSONArray.toJSON(tarGrpDTO), e);
             return FastJsonUtils.objToJson(maps);
         }
         return FastJsonUtils.objToJson(maps);
@@ -152,7 +150,7 @@ public class TarGrpController extends BaseController {
 
 
     /**
-     * 策略试运算
+     * 策略试运算（老系统方法）
      */
     @PostMapping("/trycalc")
     @CrossOrigin
@@ -162,12 +160,29 @@ public class TarGrpController extends BaseController {
             //返回前端策略试运算结果
             maps = tarGrpService.trycalc(calcReqModel, serialNum);
         } catch (Exception e) {
-            logger.error("[op:TarGrpController] fail to strategyTrial for req = {}!" +
+            logger.error("[op:TarGrpController] fail to trycalc for req = {}!" +
                     " Exception: ", JSONArray.toJSON(calcReqModel), e);
             return FastJsonUtils.objToJson(maps);
         }
         return FastJsonUtils.objToJson(maps);
     }
 
+    /**
+     * 策略试运算（新方法）todo
+     */
+    @RequestMapping("/trycalcNew")
+    @CrossOrigin
+    public String trycalcNew(@RequestBody CalcReqModel calcReqModel, String serialNum) {
+        Map<String, String> maps = new HashMap<>();
+        try {
+            //返回前端策略试运算结果
+
+        } catch (Exception e) {
+            logger.error("[op:TarGrpController] fail to trycalcNew for req = {}!" +
+                    " Exception: ", JSONArray.toJSON(calcReqModel), e);
+            return FastJsonUtils.objToJson(maps);
+        }
+        return FastJsonUtils.objToJson(maps);
+    }
 
 }

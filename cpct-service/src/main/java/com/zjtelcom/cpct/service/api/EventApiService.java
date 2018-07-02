@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface EventApiService {
 
-    EventApiResultDTO deal(Map<String, Object> map);
+    Map deal(Map<String, Object> map) throws Exception;
 
 
 }

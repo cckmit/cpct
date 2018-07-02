@@ -8,6 +8,7 @@ import java.util.List;
 @Mapper
 @Repository
 public interface EventItemMapper {
+
     int deleteByPrimaryKey(Long evtItemId);
 
     int insert(EventItemDO record);

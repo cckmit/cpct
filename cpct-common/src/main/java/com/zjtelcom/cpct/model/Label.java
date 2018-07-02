@@ -1,6 +1,6 @@
 package com.zjtelcom.cpct.model;
 
-public class Trigger {
+public class Label {
     private Integer conditionId;
 
     private String conditionName;

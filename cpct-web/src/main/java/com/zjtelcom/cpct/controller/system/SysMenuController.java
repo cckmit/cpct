@@ -6,10 +6,7 @@ import com.zjtelcom.cpct.domain.system.SysMenu;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.system.SysMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +18,11 @@ public class SysMenuController extends BaseController {
     @Autowired
     private SysMenuService sysMenuService;
 
-    @RequestMapping("/listMenu")
+    /**
+     * 获取所有菜单
+     * @return
+     */
+    @RequestMapping(value = "listMenu", method = RequestMethod.POST)
     @CrossOrigin
     public String listMenu() {
         List<SysMenu> list = new ArrayList<>();
@@ -34,8 +35,12 @@ public class SysMenuController extends BaseController {
         return initSuccRespInfo(list);
     }
 
-
-    @RequestMapping("/listMenuByRoleId")
+    /**
+     * 根据角色id获取权限菜单
+     * @param roleId
+     * @return
+     */
+    @RequestMapping(value = "listMenuByRoleId", method = RequestMethod.POST)
     @CrossOrigin
     public String listMenuByRoleId(@RequestParam("roleId") Long roleId) {
         List<SysMenu> list = new ArrayList<>();

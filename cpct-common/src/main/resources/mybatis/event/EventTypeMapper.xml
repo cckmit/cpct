@@ -3,8 +3,8 @@
 <mapper namespace="com.zjtelcom.cpct.dao.event.EventTypeMapper">
     <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.event.EventTypeDO">
         <id column="EVT_TYPE_ID" jdbcType="BIGINT" property="evtTypeId"/>
-        <result column="EVT_TYPE_NBR" jdbcType="VARCHAR" property="evtTypeNbr"/>
-        <result column="EVT_TYPE_NAME" jdbcType="VARCHAR" property="evtTypeName"/>
+        <result column="EVT_TYPE_NBR" jdbcType="VARCHAR" property="contactEvtTypeCode"/>
+        <result column="EVT_TYPE_NAME" jdbcType="VARCHAR" property="contactEvtName"/>
         <result column="PAR_EVT_TYPE_ID" jdbcType="BIGINT" property="parEvtTypeId"/>
         <result column="EVT_TYPE_DESC" jdbcType="VARCHAR" property="evtTypeDesc"/>
         <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd"/>
@@ -25,7 +25,7 @@
       CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
       STATUS_DATE, UPDATE_DATE, REMARK
       )
-    values (#{evtTypeId,jdbcType=BIGINT}, #{evtTypeNbr,jdbcType=VARCHAR}, #{evtTypeName,jdbcType=VARCHAR}, 
+    values (#{evtTypeId,jdbcType=BIGINT}, #{contactEvtTypeCode,jdbcType=VARCHAR}, #{contactEvtName,jdbcType=VARCHAR},
       #{parEvtTypeId,jdbcType=BIGINT}, #{evtTypeDesc,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR}, 
       #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, 
       #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
@@ -34,11 +34,11 @@
     <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.event.EventTypeDO">
         update event_type
         set
-        <if test="evtTypeNbr != null and evtTypeNbr != ''">
-            EVT_TYPE_NBR = #{evtTypeNbr,jdbcType=VARCHAR},
+        <if test="contactEvtTypeCode != null and contactEvtTypeCode != ''">
+            EVT_TYPE_NBR = #{contactEvtTypeCode,jdbcType=VARCHAR},
         </if>
-        <if test="evtTypeName != null and evtTypeName != ''">
-            EVT_TYPE_NAME = #{evtTypeName,jdbcType=VARCHAR},
+        <if test="contactEvtName != null and contactEvtName != ''">
+            EVT_TYPE_NAME = #{contactEvtName,jdbcType=VARCHAR},
         </if>
         <if test="parEvtTypeId != null and parEvtTypeId != 0 ">
             PAR_EVT_TYPE_ID = #{parEvtTypeId,jdbcType=BIGINT},
@@ -102,7 +102,7 @@
     CREATE_STAFF, UPDATE_STAFF, CREATE_DATE,
     STATUS_DATE, UPDATE_DATE, REMARK
     )
-    values (#{evtTypeNbr,jdbcType=VARCHAR}, #{evtTypeName,jdbcType=VARCHAR},
+    values (#{contactEvtTypeCode,jdbcType=VARCHAR}, #{contactEvtName,jdbcType=VARCHAR},
     #{parEvtTypeId,jdbcType=BIGINT}, #{evtTypeDesc,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR},
     #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP},
     #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}

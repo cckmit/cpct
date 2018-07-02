@@ -691,4 +691,10 @@ public class DateUtil {
         return date.getTime();
     }
 
+    public static String getNowDate(String pattern) {
+        SimpleDateFormat format = new SimpleDateFormat(pattern);
+        String v = format.format(new Date());
+        return v;
+    }
+
 }

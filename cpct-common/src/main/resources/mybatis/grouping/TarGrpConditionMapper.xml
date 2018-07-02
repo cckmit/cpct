@@ -121,4 +121,15 @@
         </if>
     </select>
 
+    <select id="selectByActivityId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select tgc.CONDITION_ID, tgc.TAR_GRP_ID, tgc.ROOT_FLAG, tgc.LEFT_PARAM, tgc.LEFT_PARAM_TYPE, tgc.OPER_TYPE,
+        tgc.RIGHT_PARAM, tgc.RIGHT_PARAM_TYPE, tgc.CONDITION_TEXT
+        from tar_grp_condition tgc
+        left join tar_grp tg
+        on tg.TAR_GRP_ID = tgc.TAR_GRP_ID
+        left join mkt_cam_grp_rul mcgr
+        on mcgr.TAR_GRP_ID = tg.TAR_GRP_ID
+        WHERE mcgr.MKT_CAMPAIGN_ID = #{activityId,jdbcType=BIGINT}
+    </select>
+
 </mapper>

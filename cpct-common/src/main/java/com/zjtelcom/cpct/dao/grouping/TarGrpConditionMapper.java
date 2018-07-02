@@ -23,4 +23,6 @@ public interface TarGrpConditionMapper {
     TarGrpConditionDO getTarGrpCondition(Long conditionId);
 
     List<TarGrpConditionDO> listTarGrpCondition(@Param("tarGrpId") Long tarGrpId);
+
+    List<TarGrpConditionDO> selectByActivityId(@Param("activityId") Long activityId);
 }
