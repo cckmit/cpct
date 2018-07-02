@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.service.impl.system;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.dao.system.SysStaffMapper;
 import com.zjtelcom.cpct.dao.system.SysStaffRoleMapper;
 import com.zjtelcom.cpct.domain.system.SysStaff;
@@ -9,6 +11,7 @@ import com.zjtelcom.cpct.dto.system.SysStaffDTO;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.system.SysStaffService;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
+import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,9 +53,10 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
     @Override
     public List<SysStaff> listStaff(String staffCode, String staffName, Long status, Integer page, Integer pageSize) {
         //分页
-//        PageHelper.startPage(page, pageSize);
+        PageHelper.startPage(page, pageSize);
         List<SysStaff> list = sysStaffMapper.selectAll(staffCode, staffName, status);
-//        PageInfo pageInfo = new PageInfo(list);
+        PageInfo pageInfo = new PageInfo(list);
+
         return list;
     }
 

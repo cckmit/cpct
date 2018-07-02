@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 用户模块控制器
+ */
 @RestController
 @RequestMapping("${adminPath}/staff")
 public class SysStaffController extends BaseController {
