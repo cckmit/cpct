@@ -33,7 +33,7 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
 
         result.put("resultCode","0");
         result.put("resultMsg","");
-        result.put("list",list);
+        result.put("data",list);
         result.put("pageInfo",pageInfo);
 
         return result;

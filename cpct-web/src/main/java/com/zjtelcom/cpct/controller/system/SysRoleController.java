@@ -138,5 +138,18 @@ public class SysRoleController extends BaseController {
     }
 
 
+    @RequestMapping(value = "listRoleDropDown", method = RequestMethod.POST)
+    @CrossOrigin
+    public String listRoleDropDown() {
+        Map result = new HashMap();
+        try {
+            result = sysRoleService.listRoleAll();
+        } catch (Exception e) {
+            logger.error("[op:SysRoleController] fail to listRole Exception: ", e);
+            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+        }
+        return JSON.toJSON(result).toString();
+    }
+
 
 }

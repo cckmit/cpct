@@ -61,8 +61,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         Page pageInfo = new Page(new PageInfo(list));
 
         result.put("resultCode","0");
-        result.put("resultMsg","");
-        result.put("list",list);
+        result.put("data",list);
         result.put("pageInfo",pageInfo);
 
         return result;

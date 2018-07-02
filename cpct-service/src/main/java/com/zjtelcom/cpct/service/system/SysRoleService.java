@@ -19,4 +19,6 @@ public interface SysRoleService {
 
     Map<String, Object> saveAuthority(Long roleId,List<Long> list);
 
+    Map<String, Object> listRoleAll();
+
 }

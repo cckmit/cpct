@@ -29,11 +29,11 @@ public class SysRoleServiceImpl extends BaseService implements SysRoleService {
     public Map<String, Object> listRole(Long roleId, String RoleName,int page,int pageSize) {
         Map<String,Object> result = new HashMap<>();
         PageHelper.startPage(page,pageSize);
-        List<SysRole> list = sysRoleMapper.selectAll(roleId, RoleName);
+        List<SysRole> list = sysRoleMapper.selectByParams(roleId, RoleName);
         Page pageInfo = new Page(new PageInfo(list));
 
         result.put("resultCode","0");
-        result.put("list",list);
+        result.put("data",list);
         result.put("pageInfo",pageInfo);
 
         return result;
@@ -115,4 +115,14 @@ public class SysRoleServiceImpl extends BaseService implements SysRoleService {
         return result;
     }
 
+    @Override
+    public Map<String, Object> listRoleAll() {
+        Map<String,Object> result = new HashMap<>();
+        List<Map<String,Object>> list = sysRoleMapper.selectAll();
+
+        result.put("resultCode","0");
+        result.put("data",list);
+
+        return result;
+    }
 }
