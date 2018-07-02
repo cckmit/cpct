@@ -60,11 +60,19 @@ public enum ErrorCode {
     SAVE_MKT_CAMPAIGN_FAILURE("添加策略配置失败！", "00001"),
     UPDATE_MKT_CAMPAIGN_SUCCESS("修改策略配置成功！", "00001"),
     UPDATE_MKT_CAMPAIGN_FAILURE("修改策略配置失败！", "00001"),
-    GET_MKT_CAMPAIGN_SUCCESS("修改策略配置失败！", "00001"),
-    GET_MKT_CAMPAIGN_FAILURE("修改策略配置失败！", "00001"),
+    GET_MKT_CAMPAIGN_SUCCESS("获取策略配置失败！", "00001"),
+    GET_MKT_CAMPAIGN_FAILURE("获取策略配置失败！", "00001"),
     DELETE_MKT_CAMPAIGN_SUCCESS("删除策略配置成功！", "00001"),
-    DELETE_MKT_CAMPAIGN_FAILURE("删除策略配置失败！", "00001");
+    DELETE_MKT_CAMPAIGN_FAILURE("删除策略配置失败！", "00001"),
 
+    SAVE_CAM_CHL_CONF_SUCCESS("添加协同渠道配置成功！", "00001"),
+    SAVE_CAM_CHL_CONF_FAILURE("添加协同渠道配置失败！", "00001"),
+    UPDATE_CAM_CHL_CONF_SUCCESS("修改协同渠道配置成功！", "00001"),
+    UPDATE_CAM_CHL_CONF_FAILURE("修改协同渠道配置失败！", "00001"),
+    GET_CAM_CHL_CONF_SUCCESS("获取协同渠道配置成功！", "00001"),
+    GET_CAM_CHL_CONF_FAILURE("获取协同渠道配置失败！", "00001"),
+    DELETE_CAM_CHL_CONF_SUCCESS("删除协同渠道配置成功！", "00001"),
+    DELETE_CAM_CHL_CONF_FAILURE("删除协同渠道配置失败！", "00001");
 
     private String errorMsg;
     private String errorCode;

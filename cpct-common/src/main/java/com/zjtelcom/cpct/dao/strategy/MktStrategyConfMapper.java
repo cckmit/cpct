@@ -11,13 +11,13 @@ import java.util.List;
 @Mapper
 @Repository
 public interface MktStrategyConfMapper {
-    Long deleteByPrimaryKey(Long mktStrategyConfId);
+    int deleteByPrimaryKey(Long mktStrategyConfId);
 
-    Long insert(MktStrategyConfDO mktStrategyConfDO);
+    int insert(MktStrategyConfDO mktStrategyConfDO);
 
     MktStrategyConfDO selectByPrimaryKey(Long mktStrategyConfId);
 
     List<MktStrategyConfDO> selectAll();
 
-    Long updateByPrimaryKey(MktStrategyConfDO mktStrategyConfDO);
+    int updateByPrimaryKey(MktStrategyConfDO mktStrategyConfDO);
 }
