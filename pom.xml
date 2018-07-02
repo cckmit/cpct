@@ -77,12 +77,6 @@
 
             <dependency>
                 <groupId>com.zjtelcom.cpct</groupId>
-                <artifactId>cpct-cache</artifactId>
-                <version>${cpct.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.zjtelcom.cpct</groupId>
                 <artifactId>cpct-service</artifactId>
                 <version>${cpct.version}</version>
             </dependency>

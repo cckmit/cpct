@@ -3,19 +3,20 @@ package com.zjtelcom.cpct.service.system;
 import com.zjtelcom.cpct.domain.system.SysRole;
 
 import java.util.List;
+import java.util.Map;
 
 public interface SysRoleService {
 
-    List<SysRole> listRole(Long roleId,String RoleName);
+    Map<String, Object> listRole(Long roleId, String RoleName,int page,int pageSize);
 
-    int saveRole(SysRole sysRole);
+    Map<String, Object> saveRole(SysRole sysRole);
 
-    int updateRole(SysRole sysRole);
+    Map<String, Object> updateRole(SysRole sysRole);
 
-    SysRole getRole(Long id);
+    Map<String, Object> getRole(Long id);
 
-    int delRole(Long id);
+    Map<String, Object> delRole(Long id);
 
-    void saveAuthority(Long roleId,List<Long> list);
+    Map<String, Object> saveAuthority(Long roleId,List<Long> list);
 
 }

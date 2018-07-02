@@ -36,7 +36,6 @@ public class SysStaffController extends BaseController {
                             @RequestParam("status") Long status,
                             @RequestParam("page") Integer page,
                             @RequestParam("pageSize") Integer pageSize) {
-        List<SysStaff> list = new ArrayList<>();
         Map result = new HashMap();
         try {
             result = sysStaffService.listStaff(staffAccount, staffName, status, page, pageSize);
@@ -56,14 +55,14 @@ public class SysStaffController extends BaseController {
     @RequestMapping(value = "getStaff", method = RequestMethod.POST)
     @CrossOrigin
     public String getStaff(@RequestParam("staffId") Long staffId) {
-        SysStaff sysStaff = new SysStaff();
+        Map result = new HashMap();
         try {
-            sysStaff = sysStaffService.getStaff(staffId);
+            result = sysStaffService.getStaff(staffId);
         } catch (Exception e) {
             logger.error("[op:SysStaffController] fail to eventList Exception: ", e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
         }
-        return initSuccRespInfo(sysStaff);
+        return JSON.toJSON(result).toString();
     }
 
     /**
@@ -75,15 +74,15 @@ public class SysStaffController extends BaseController {
     @RequestMapping(value = "saveStaff", method = RequestMethod.POST)
     @CrossOrigin
     public String saveStaff(SysStaffDTO sysStaffDTO) {
-
+        Map result = new HashMap();
         try {
-            sysStaffService.saveStaff(sysStaffDTO);
+            result = sysStaffService.saveStaff(sysStaffDTO);
         } catch (Exception e) {
             logger.error("[op:SysStaffController] fail to saveStaff Exception: ", e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
         }
 
-        return initSuccRespInfo(null);
+        return JSON.toJSON(result).toString();
     }
 
     /**
@@ -95,15 +94,15 @@ public class SysStaffController extends BaseController {
     @RequestMapping(value = "updateStaff", method = RequestMethod.POST)
     @CrossOrigin
     public String updateStaff(SysStaffDTO sysStaff) {
-
+        Map result = new HashMap();
         try {
-            sysStaffService.updateStaff(sysStaff);
+            result = sysStaffService.updateStaff(sysStaff);
         } catch (Exception e) {
             logger.error("[op:SysStaffController] fail to updateStaff Exception: ", e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
         }
 
-        return initSuccRespInfo(null);
+        return JSON.toJSON(result).toString();
     }
 
     /**
@@ -116,15 +115,15 @@ public class SysStaffController extends BaseController {
     @RequestMapping(value = "changeStatus", method = RequestMethod.POST)
     @CrossOrigin
     public String changeStatus(@RequestParam("staffId") Long staffId, @RequestParam("status") Long status) {
-
+        Map result = new HashMap();
         try {
-            sysStaffService.changeStatus(staffId, status);
+            result = sysStaffService.changeStatus(staffId, status);
         } catch (Exception e) {
             logger.error("[op:SysStaffController] fail to updateStaff Exception: ", e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
         }
 
-        return initSuccRespInfo(null);
+        return JSON.toJSON(result).toString();
     }
 
     /**
@@ -137,15 +136,15 @@ public class SysStaffController extends BaseController {
     @RequestMapping(value = "updatePassword", method = RequestMethod.POST)
     @CrossOrigin
     public String updatePassword(@RequestParam("staffId") Long staffId, @RequestParam("password") String password) {
-
+        Map result = new HashMap();
         try {
-            sysStaffService.updatePassword(staffId, password);
+            result = sysStaffService.updatePassword(staffId, password);
         } catch (Exception e) {
             logger.error("[op:SysStaffController] fail to updateStaff Exception: ", e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
         }
 
-        return initSuccRespInfo(null);
+        return JSON.toJSON(result).toString();
     }
 
 

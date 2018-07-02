@@ -11,17 +11,17 @@ public interface SysStaffService {
 
     Map<String,Object> listStaff(String staffAccount,String staffName,Long status,Integer page,Integer pageSize);
 
-    int saveStaff(SysStaffDTO sysStaffDTO) throws Exception;
+    Map<String,Object> saveStaff(SysStaffDTO sysStaffDTO) throws Exception;
 
-    int updateStaff(SysStaffDTO sysStaffDTO) throws Exception;
+    Map<String,Object> updateStaff(SysStaffDTO sysStaffDTO) throws Exception;
 
-    int changeStatus(Long id,Long status);
+    Map<String,Object> changeStatus(Long id,Long status);
 
-    SysStaff getStaff(Long id);
+    Map<String,Object> getStaff(Long id);
 
-    int updatePassword(Long id,String password);
+    Map<String,Object> updatePassword(Long id,String password);
 
-    int lastLogin(String staffCode);
+    Map<String,Object> lastLogin(String staffCode);
 
     Map<String, Object> queryUserByName(String userName);
 

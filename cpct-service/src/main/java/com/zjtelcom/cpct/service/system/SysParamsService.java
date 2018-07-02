@@ -4,17 +4,18 @@ import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.domain.system.SysRole;
 
 import java.util.List;
+import java.util.Map;
 
 public interface SysParamsService {
 
-    List<SysParams> listParams(String paramName, Long configType);
+    Map<String,Object> listParams(String paramName, Long configType,Integer page,Integer pageSize);
 
-    int saveParams(SysParams sysParams);
+    Map<String,Object> saveParams(SysParams sysParams);
 
-    int updateParams(SysParams sysParams);
+    Map<String,Object> updateParams(SysParams sysParams);
 
-    SysParams getParams(Long id);
+    Map<String,Object> getParams(Long id);
 
-    int delParams(Long id);
+    Map<String,Object> delParams(Long id);
 
 }
