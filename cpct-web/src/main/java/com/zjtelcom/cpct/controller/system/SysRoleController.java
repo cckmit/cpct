@@ -89,19 +89,8 @@ public class SysRoleController extends BaseController {
      */
     @RequestMapping(value = "saveAuthority", method = RequestMethod.POST)
     @CrossOrigin
-    public String saveAuthority(@RequestBody Map<String,String> params) {
+    public String saveAuthority(@RequestBody Map<String,Object> params) {
         Map result = new HashMap();
-
-        Long roleId = Long.parseLong(params.get("roleId"));
-        String list = params.get("key");
-
-
-        if (list != null) {
-
-        } else {
-            //todo 异常
-        }
-
 
         try {
             result = sysRoleService.saveAuthority(params);
