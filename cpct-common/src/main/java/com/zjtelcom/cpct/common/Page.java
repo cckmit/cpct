@@ -27,6 +27,21 @@ public class Page {
      */
     private Integer totalPage;
 
+    public Page() {
+    }
+
+    public Page(Integer page, Integer pageSize) {
+        this.page = page;
+        this.pageSize = pageSize;
+    }
+
+    public Page(Integer page, Integer pageSize, Long total, Integer totalPage) {
+        this.page = page;
+        this.pageSize = pageSize;
+        this.total = total;
+        this.totalPage = totalPage;
+    }
+
     public Page(PageInfo pageInfo) {
         this.page = pageInfo.getPageNum();
         this.pageSize = pageInfo.getPageSize();

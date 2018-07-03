@@ -19,4 +19,5 @@ public interface EventSceneTypeMapper {
     List<EventSceneTypeDO> listEventSceneTypes(@Param("evtSceneTypeId") Long evtSceneTypeId, @Param("parEvtSceneTypeId") Long parEvtSceneTypeId);
 
     int saveEventSceneType(EventSceneTypeDO eventTypeDO);
+
 }

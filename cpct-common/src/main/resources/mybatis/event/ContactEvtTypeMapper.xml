@@ -55,13 +55,13 @@
         <if test="updateStaff != null and updateStaff != 0">
             UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
         </if>
-        <if test="createDate != null and createDate != ''">
+        <if test="createDate != null">
             CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
         </if>
-        <if test="statusDate != null and statusDate != ''">
+        <if test="statusDate != null">
             STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
         </if>
-        <if test="updateDate != null and updateDate != ''">
+        <if test="updateDate != null">
             UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
         </if>
         <if test="remark != null and remark != ''">
@@ -135,13 +135,13 @@
         <if test="updateStaff != null and updateStaff != 0">
             UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
         </if>
-        <if test="createDate != null and createDate != ''">
+        <if test="createDate != null">
             CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
         </if>
-        <if test="statusDate != null and statusDate != ''">
+        <if test="statusDate != null">
             STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
         </if>
-        <if test="updateDate != null and updateDate != ''">
+        <if test="updateDate != null">
             UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
         </if>
         <if test="remark != null and remark != ''">
@@ -159,7 +159,7 @@
         <if test="evtTypeId != null and evtTypeId != 0">
             and EVT_TYPE_ID = #{evtTypeId}
         </if>
-        <if test="parEvtTypeId != null and parEvtTypeId != 0">
+        <if test="parEvtTypeId != null">
             and PAR_EVT_TYPE_ID = #{parEvtTypeId}
         </if>
         <if test="contactEvtTypeCode != null and contactEvtTypeCode != ''">

@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.event;
 
+import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.EventDTO;
 import com.zjtelcom.cpct.dto.event.EventList;
@@ -15,15 +16,15 @@ import java.util.Map;
 
 public interface ContactEvtService {
 
-    List<EventList> listEvents(String contactEvtName);
+    Map<String,Object> listEvents(ContactEvt contactEvt,Page pageInfo);
 
     Map<String,Object> createContactEvtJt(CreateContactEvtJtReq createContactEvtJtReq) throws Exception;
 
-    void delEvent(Long contactEvtId);
+    Map<String,Object> delEvent(Long contactEvtId);
 
-    void closeEvent(Long contactEvtId);
+    Map<String,Object> closeEvent(Long contactEvtId,String statusCd);
 
-    EventDTO editEvent(Long contactEvtId);
+    Map<String,Object> editEvent(Long contactEvtId);
 
     Map<String,Object> modContactEvtJt(CreateContactEvtJtReq createContactEvtJtReq);
 

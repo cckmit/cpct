@@ -117,7 +117,7 @@ public class EventTypeServiceImpl extends BaseService implements EventTypeServic
             }
             // 为一级菜单设置子菜单，getChild是递归调用的
             for (EventTypeDTO eventTypeDTO : dtoList) {
-                eventTypeDTO.setEventTypeDTOList(getChild(eventTypeDTO.getEvtTypeId(), eventLists));
+                eventTypeDTO.setChildren(getChild(eventTypeDTO.getEvtTypeId(), eventLists));
             }
         }
         return dtoList;
@@ -146,7 +146,7 @@ public class EventTypeServiceImpl extends BaseService implements EventTypeServic
             List<EventTypeDO> list = eventTypeMapper.listEventTypes(EVT_TYPE_ID_NULL, eventTypeDTO.getEvtTypeId());
             if (list.size() != LIST_SIZE_ZERO) {
                 // 递归
-                eventTypeDTO.setEventTypeDTOList(getChild(eventTypeDTO.getEvtTypeId(), rootMenu));
+                eventTypeDTO.setChildren(getChild(eventTypeDTO.getEvtTypeId(), rootMenu));
             }
         } // 递归退出条件
         if (childList.size() == LIST_SIZE_ZERO) {

@@ -14,7 +14,6 @@ import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
 import com.zjtelcom.cpct.domain.grouping.TarGrpConditionDO;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
-import com.zjtelcom.cpct.dto.grouping.TarGrpConditionDTO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.dto.system.SystemParam;
 import com.zjtelcom.cpct.enums.ErrorCode;
@@ -25,7 +24,9 @@ import com.zjtelcom.cpct.service.EagleDatabaseConfCache;
 import com.zjtelcom.cpct.service.TryCalcService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
+import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.SqlUtil;
+import com.zjtelcom.cpct.util.UserUtil;
 import com.zjtelcom.cpct.validator.ValidateResult;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -70,16 +71,27 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     public Map<String, Object> createTarGrp(TarGrpDetail tarGrpDetail) {
         TarGrp tarGrp = new TarGrp();
         Map<String, Object> maps = new HashMap<>();
-        try {
-            tarGrpMapper.insert(tarGrpDetail);
-            CopyPropertiesUtil.copyBean2Bean(tarGrp, tarGrpDetail);
-        } catch (Exception e) {
-            maps.put("resultCode", CommonConstant.CODE_FAIL);
-            maps.put("resultMsg", StringUtils.EMPTY);
-            maps.put("tarGrp", StringUtils.EMPTY);
-            logger.error("[op:TarGrpServiceImpl] fail to createTarGrp ", e);
-            return maps;
+        //插入客户分群记录
+        tarGrp = tarGrpDetail;
+        tarGrp.setCreateDate(DateUtil.getCurrentTime());
+        tarGrp.setUpdateDate(DateUtil.getCurrentTime());
+        tarGrp.setStatusDate(DateUtil.getCurrentTime());
+        tarGrp.setUpdateStaff(UserUtil.loginId());
+        tarGrp.setCreateStaff(UserUtil.loginId());
+        tarGrp.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+        tarGrpMapper.createTarGrp(tarGrp);
+        List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
+        for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
+            tarGrpCondition.setTarGrpId(tarGrp.getTarGrpId());
+            tarGrpCondition.setCreateDate(DateUtil.getCurrentTime());
+            tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
+            tarGrpCondition.setStatusDate(DateUtil.getCurrentTime());
+            tarGrpCondition.setUpdateStaff(UserUtil.loginId());
+            tarGrpCondition.setCreateStaff(UserUtil.loginId());
+            tarGrpCondition.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+            tarGrpConditionMapper.insert(tarGrpCondition);
         }
+        //插入客户分群条件
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("tarGrp", tarGrp);
@@ -87,7 +99,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     }
 
     /**
-     * 新增客户分群
+     * 新增目标分群
      */
     @Transactional(readOnly = false)
     @Override
@@ -101,9 +113,10 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             tarGrpMapper.insert(tarGrpDetail);
             //添加客户分群条件
             for (int i = 0; i < tarGrpConditionDTOList.size(); i++) {
-                TarGrpConditionDO tarGrpConditionDO = tarGrpConditionDTOList.get(i);
+//                TarGrpConditionDO tarGrpConditionDO = tarGrpConditionDTOList.get(i);
+                TarGrpConditionDO tarGrpConditionDO = null;
                 tarGrpConditionDO.setTarGrpId(tarGrpDetail.getTarGrpId());
-                tarGrpConditionMapper.insert(tarGrpConditionDO);
+//                tarGrpConditionMapper.insert(tarGrpCondition);
             }
             //更新营销活动分群规则表
             MktCamGrpRul mktCamGrpRul = new MktCamGrpRul();
@@ -167,8 +180,47 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         return maps;
     }
 
+
     /**
-     * 更新目标分群条件
+     * 修改目标分群
+     */
+    @Override
+    public Map<String, Object> modTarGrp(TarGrpDetail tarGrpDetail) {
+        Map<String,Object> maps = new HashMap<>();
+        TarGrp tarGrp = new TarGrp();
+        tarGrp = tarGrpDetail;
+        tarGrp.setUpdateDate(DateUtil.getCurrentTime());
+        tarGrp.setUpdateStaff(UserUtil.loginId());
+        tarGrpMapper.modTarGrp(tarGrp);
+        List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
+        for(TarGrpCondition tarGrpCondition : tarGrpConditions){
+            tarGrpConditionMapper.modTarGrpCondition(tarGrpCondition);
+        }
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        return maps;
+    }
+
+    /**
+     * 删除目标分群
+     */
+    @Override
+    public Map<String, Object> delTarGrp(TarGrpDetail tarGrpDetail) {
+        Map<String,Object> maps = new HashMap<>();
+        TarGrp tarGrp = tarGrpDetail;
+        tarGrpMapper.delTarGrp(tarGrp);
+        List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
+        for(TarGrpCondition tarGrpCondition : tarGrpConditions){
+            tarGrpConditionMapper.delTarGrpCondition(tarGrpCondition);
+        }
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        return maps;
+    }
+
+
+    /**
+     * 修改目标分群条件
      */
     @Override
     public Map<String, Object> updateTarGrpConditionDO(TarGrpConditionDO tarGrpConditionDO) {
@@ -238,7 +290,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 return validateResult;
             }
             SystemParam param = (SystemParam) CacheManager.getInstance().getCache(
-                    CommonConstant.SYSTEMPARAM_CACHE_NAME).queryOne("cpc.dubbo.client.url");
+                    CacheConstants.SYSTEMPARAM_CACHE_NAME).queryOne("cpc.dubbo.client.url");
             String url = param.getParamValue() + "/policy/trycalc";
             if (StringUtils.isNotEmpty(serialNum)) {
                 url = url + "?serialNum=" + serialNum;

@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.dao.event;
 
 import com.zjtelcom.cpct.domain.event.EventSceneDO;
+import com.zjtelcom.cpct.dto.event.EventScene;
+import com.zjtelcom.cpct.request.event.QryEventSceneListReq;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 import java.util.List;
@@ -16,12 +18,16 @@ public interface EventSceneMapper {
 
     List<EventSceneDO> selectAll();
 
-    int updateByPrimaryKey(EventSceneDO record);
+    int updateByPrimaryKey(EventScene record);
 
-    List<EventSceneDO> listEventSences(EventSceneDO sceneDO);
+    List<EventScene> qryEventSceneList(QryEventSceneListReq qryEventSceneListReq);
 
     int saveEventScene(EventSceneDO sceneDO);
 
     EventSceneDO getEventSceneDO(Long eventSceneId);
+
+    int createEventScene(EventScene eventScene);
+
+    int delEventScene(EventScene eventScene);
 
 }

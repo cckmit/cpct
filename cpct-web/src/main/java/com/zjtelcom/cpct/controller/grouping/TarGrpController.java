@@ -5,6 +5,7 @@ import com.zjhcsoft.eagle.main.dubbo.model.policy.CalcReqModel;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.grouping.TarGrpConditionDO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDTO;
+import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.util.FastJsonUtils;
 import org.apache.ibatis.annotations.Param;
@@ -27,7 +28,7 @@ public class TarGrpController extends BaseController {
     private TarGrpService tarGrpService;
 
     /**
-     * 新增客户分群
+     * 新增目标分群 （暂时废弃）
      */
     @RequestMapping("/saveTagNumFetch")
     @CrossOrigin
@@ -38,6 +39,23 @@ public class TarGrpController extends BaseController {
         } catch (Exception e) {
             logger.error("[op:TarGrpController] fail to saveTagNumFetch for tarGrpDTO = {}!" +
                     " Exception: ", JSONArray.toJSON(tarGrpDTO), e);
+            return FastJsonUtils.objToJson(maps);
+        }
+        return FastJsonUtils.objToJson(maps);
+    }
+
+    /**
+     * 新增目标分群
+     */
+    @RequestMapping("/createTarGrp")
+    @CrossOrigin
+    public String createTarGrp(@RequestBody TarGrpDetail tarGrpDetail) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = tarGrpService.createTarGrp(tarGrpDetail);
+        } catch (Exception e) {
+            logger.error("[op:TarGrpController] fail to createTarGrp for tarGrpDetail = {}!" +
+                    " Exception: ", JSONArray.toJSON(tarGrpDetail), e);
             return FastJsonUtils.objToJson(maps);
         }
         return FastJsonUtils.objToJson(maps);
@@ -59,6 +77,24 @@ public class TarGrpController extends BaseController {
         }
         return FastJsonUtils.objToJson(maps);
     }
+
+    /**
+     * 删除目标分群
+     */
+    @RequestMapping("/delTarGrp")
+    @CrossOrigin
+    public String delTarGrp(@RequestBody TarGrpDetail tarGrpDetail) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = tarGrpService.delTarGrp(tarGrpDetail);
+        } catch (Exception e) {
+            logger.error("[op:TarGrpController] fail to delTarGrpCondition for tarGrpDetail = {}!" +
+                    " Exception: ", JSONArray.toJSON(tarGrpDetail), e);
+            return FastJsonUtils.objToJson(maps);
+        }
+        return FastJsonUtils.objToJson(maps);
+    }
+
 
     /**
      * 编辑目标分群条件
@@ -95,7 +131,24 @@ public class TarGrpController extends BaseController {
     }
 
     /**
-     * 更新目标分群条件
+     * 修改目标分群
+     */
+    @RequestMapping("/modTarGrp")
+    @CrossOrigin
+    public String modTarGrp(@RequestBody TarGrpDetail tarGrpDetail) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = tarGrpService.modTarGrp(tarGrpDetail);
+        } catch (Exception e) {
+            logger.error("[op:TarGrpController] fail to modTarGrp for modTarGrp = {}!" +
+                    " Exception: ", JSONArray.toJSON(tarGrpDetail), e);
+            return FastJsonUtils.objToJson(maps);
+        }
+        return FastJsonUtils.objToJson(maps);
+    }
+
+    /**
+     * 修改目标分群条件
      */
     @RequestMapping("/updateTarGrpCondition")
     @CrossOrigin
@@ -154,7 +207,7 @@ public class TarGrpController extends BaseController {
      */
     @PostMapping("/trycalc")
     @CrossOrigin
-    public String trycalc(String serialNum,@RequestBody CalcReqModel calcReqModel) {
+    public String trycalc(String serialNum, @RequestBody CalcReqModel calcReqModel) {
         Map<String, String> maps = new HashMap<>();
         try {
             //返回前端策略试运算结果

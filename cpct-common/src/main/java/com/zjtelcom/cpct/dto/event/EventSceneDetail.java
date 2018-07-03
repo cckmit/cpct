@@ -7,7 +7,6 @@ import lombok.Data;
  * @Author pengy
  * @Date 2018/6/26 15:51
  */
-@Data
 public class EventSceneDetail extends EventScene{
 
 
