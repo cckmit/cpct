@@ -1,6 +1,9 @@
 package com.zjtelcom.cpct.service.impl.channel;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.bean.RespInfo;
+import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelGrpMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelGrpMbrMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
@@ -33,6 +36,34 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     @Autowired
     private InjectionLabelGrpMbrMapper labelGrpMbrMapper;
 
+
+    @Override
+    public Map<String, Object> getLabelListByParam(Long userId, Map<String, Object> params) {
+        Map<String,Object> result = new HashMap<>();
+        List<LabelVO> voList = new ArrayList<>();
+        List<Label> labelList = new ArrayList<>();
+        try {
+            String labelName = null;
+            String fitDomain = null;
+            if (params.get("labelName")!=null){
+                labelName = params.get("labelName").toString();
+            }
+            if (params.get("fitDomain")!=null){
+                fitDomain = params.get("fitDomain").toString();
+            }
+            labelList = labelMapper.findByParam(labelName,fitDomain);
+            for (Label label : labelList){
+                LabelVO vo = ChannelUtil.map2LabelVO(label);
+                voList.add(vo);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            logger.error("[op:LabelServiceImpl] fail to getLabelList ", e);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData",voList);
+        return result;
+    }
 
     @Override
     public Map<String,Object> addLabel(Long userId, LabelAddVO addVO) {
@@ -87,7 +118,6 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         Map<String,Object> result = new HashMap<>();
         List<LabelVO> voList = new ArrayList<>();
         List<Label> labelList = new ArrayList<>();
-        try {
             String labelName = null;
             String fitDomain = null;
             if (params.get("labelName")!=null){
@@ -96,17 +126,16 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             if (params.get("fitDomain")!=null){
                 fitDomain = params.get("fitDomain").toString();
             }
+            PageHelper.startPage(page,pageSize);
             labelList = labelMapper.findByParam(labelName,fitDomain);
+            Page pageInfo = new Page(new PageInfo(labelList));
             for (Label label : labelList){
                 LabelVO vo = ChannelUtil.map2LabelVO(label);
                 voList.add(vo);
             }
-        }catch (Exception e){
-            e.printStackTrace();
-            logger.error("[op:LabelServiceImpl] fail to getLabelList ", e);
-        }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultData",voList);
+        result.put("page",pageInfo);
         return result;
     }
 

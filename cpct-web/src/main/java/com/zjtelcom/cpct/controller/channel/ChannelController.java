@@ -1,23 +1,17 @@
 package com.zjtelcom.cpct.controller.channel;
 
-import com.zjtelcom.cpct.bean.RespInfo;
 import com.zjtelcom.cpct.controller.BaseController;
-import com.zjtelcom.cpct.dto.channel.ChannelAddVO;
+import com.zjtelcom.cpct.dto.channel.ContactChannelDetail;
 import com.zjtelcom.cpct.dto.channel.ChannelEditVO;
-import com.zjtelcom.cpct.dto.channel.ChannelVO;
-import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.channel.ChannelService;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
-import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 @RestController
 @RequestMapping("${adminPath}/channel")
@@ -31,11 +25,11 @@ public class ChannelController extends BaseController {
      */
     @PostMapping("addChannel")
     @CrossOrigin
-    public Map<String,Object> addChannel(ChannelAddVO addVO) {
+    public Map<String,Object> createContactChannel(ContactChannelDetail addVO) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
-            result = channelService.addChannel(userId,addVO);
+            result = channelService.createContactChannel(userId,addVO);
         } catch (Exception e) {
             logger.error("[op:ChannelController] fail to addChannel",e);
             result.put("resultCode",CODE_FAIL);
@@ -49,11 +43,11 @@ public class ChannelController extends BaseController {
      */
     @PostMapping("editChannel")
     @CrossOrigin
-    public Map<String,Object> editChannel( ChannelEditVO editVO) {
+    public Map<String,Object> modContactChannel( ContactChannelDetail editVO) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
-            result = channelService.editChannel(userId,editVO);
+            result = channelService.modContactChannel(userId,editVO);
         } catch (Exception e) {
             logger.error("[op:ChannelController] fail to editChannel",e);
             result.put("resultCode",CODE_FAIL);
@@ -68,11 +62,11 @@ public class ChannelController extends BaseController {
      */
     @PostMapping("deleteChannel")
     @CrossOrigin
-    public Map<String,Object> deleteChannel(Long channelId) {
+    public Map<String,Object> delContactChannel(ContactChannelDetail channelDetail) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
-            result = channelService.deleteChannel(userId,channelId);
+            result = channelService.delContactChannel(userId,channelDetail);
         } catch (Exception e) {
             logger.error("[op:ChannelController] fail to deleteChannel",e);
             result.put("resultCode",CODE_FAIL);
@@ -97,6 +91,30 @@ public class ChannelController extends BaseController {
             logger.error("[op:ChannelController] fail to deleteChannel",e);
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg"," fail to addCamScript");
+            return result;
+        }
+        return result;
+    }
+
+    /**
+     * 获取渠道列表（渠道类型查询）
+     */
+    @GetMapping("getChannelListByType")
+    @CrossOrigin
+    public Map<String, Object> getChannelListByType( String channelType) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
+        if (channelType==null || channelType.equals("")){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","请输入渠道类型");
+            return result;
+        }
+        try {
+            result = channelService.getChannelListByType(userId,channelType);
+        } catch (Exception e) {
+            logger.error("[op:ChannelController] fail to getChannelListByType",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to getChannelListByType");
             return result;
         }
         return result;

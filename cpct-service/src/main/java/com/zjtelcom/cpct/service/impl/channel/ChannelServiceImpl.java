@@ -2,11 +2,10 @@ package com.zjtelcom.cpct.service.impl.channel;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.zjtelcom.cpct.bean.RespInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.domain.channel.Channel;
-import com.zjtelcom.cpct.dto.channel.ChannelAddVO;
+import com.zjtelcom.cpct.dto.channel.ContactChannelDetail;
 import com.zjtelcom.cpct.dto.channel.ChannelEditVO;
 import com.zjtelcom.cpct.dto.channel.ChannelVO;
 import com.zjtelcom.cpct.service.BaseService;
@@ -29,7 +28,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
 
 
     @Override
-    public Map<String,Object> addChannel(Long userId, ChannelAddVO addVO) {
+    public Map<String,Object> createContactChannel(Long userId, ContactChannelDetail addVO) {
         Map<String,Object> result = new HashMap<>();
         Channel channel = BeanUtil.create(addVO,new Channel());
         channel.setCreateDate(new Date());
@@ -44,7 +43,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
     }
 
     @Override
-    public  Map<String,Object> editChannel(Long userId, ChannelEditVO editVO) {
+    public  Map<String,Object> modContactChannel(Long userId, ContactChannelDetail editVO) {
         Map<String,Object> result = new HashMap<>();
         Channel channel = channelMapper.selectByPrimaryKey(editVO.getChannelId());
         if (channel==null){
@@ -62,16 +61,16 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
     }
 
     @Override
-    public  Map<String,Object> deleteChannel(Long userId, Long channelId) {
+    public  Map<String,Object> delContactChannel(Long userId, ContactChannelDetail channelDetail) {
         Map<String,Object> result = new HashMap<>();
-        Channel channel = channelMapper.selectByPrimaryKey(channelId);
+        Channel channel = channelMapper.selectByPrimaryKey(channelDetail.getChannelId());
         if (channel==null){
             result.put("resultCode",CODE_FAIL);
 
             result.put("resultMsg","渠道不存在");
             return result;
         }
-        channelMapper.deleteByPrimaryKey(channelId);
+        channelMapper.deleteByPrimaryKey(channelDetail.getChannelId());
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultData","添加成功");
         return result;
@@ -81,9 +80,8 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
     public  Map<String,Object> getChannelList(Long userId,String channelName ,Integer page, Integer pageSize) {
         Map<String,Object> result = new HashMap<>();
         List<ChannelVO> voList = new ArrayList<>();
-        List<Channel> channelList = new ArrayList<>();
         PageHelper.startPage(page,pageSize);
-        channelList = channelMapper.selectAll(channelName);
+        List<Channel> channelList = channelMapper.selectAll(channelName);
         Page pageInfo = new Page(new PageInfo(channelList));
         for (Channel channel : channelList){
             ChannelVO vo = ChannelUtil.map2ChannelVO(channel);
@@ -92,6 +90,20 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultData",voList);
         result.put("pageInfo",pageInfo);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getChannelListByType(Long userId, String channelType) {
+        Map<String,Object> result = new HashMap<>();
+        List<ChannelVO> voList = new ArrayList<>();
+        List<Channel> channelList = channelMapper.selectByType(channelType);
+        for (Channel channel : channelList){
+            ChannelVO vo = ChannelUtil.map2ChannelVO(channel);
+            voList.add(vo);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultData",voList);
         return result;
     }
 

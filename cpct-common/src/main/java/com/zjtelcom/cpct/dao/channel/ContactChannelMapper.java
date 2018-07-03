@@ -19,5 +19,7 @@ public interface ContactChannelMapper {
 
     List<Channel> selectAll(@Param("channelName")String channelName);
 
+    List<Channel> selectByType(@Param("channelType")String channelType);
+
     int updateByPrimaryKey(Channel record);
 }

@@ -66,4 +66,12 @@
       </if>
 
   </select>
+
+  <select id="selectByType" resultMap="BaseResultMap">
+    select CONTACT_CHL_ID, CONTACT_CHL_CODE, CONTACT_CHL_NAME, CONTACT_CHL_TYPE, CONTACT_CHL_DESC,
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF, REGION_ID, STATUS_DATE, UPDATE_DATE, CREATE_DATE,
+    REMARK
+    from contact_channel channel
+    where 1=1 and channel.CONTACT_CHL_TYPE = #{channelType}
+  </select>
 </mapper>

@@ -8,6 +8,7 @@ import com.zjtelcom.cpct.domain.channel.LabelGrpMbr;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.dto.channel.LabelAddVO;
 import com.zjtelcom.cpct.dto.channel.LabelVO;
+import com.zjtelcom.cpct.dto.channel.QryMktScriptReq;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.channel.LabelService;
 import com.zjtelcom.cpct.util.UserUtil;
@@ -27,6 +28,25 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 public class LabelController extends BaseController {
     @Autowired
     private LabelService labelService;
+
+    /**
+     * 获取标签列表（标签名和域查询）
+     */
+    @PostMapping("getLabelListByParam")
+    @CrossOrigin
+    public Map<String, Object> getLabelListByParam(@RequestBody HashMap<String, Object> params) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = labelService.getLabelListByParam(1L,params);
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to getScriptList",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
+        }
+        return result;
+    }
 
     /**
      * 添加标签
@@ -90,11 +110,11 @@ public class LabelController extends BaseController {
      */
     @PostMapping("getLabelList")
     @CrossOrigin
-    public Map<String,Object> getLabelList(@RequestBody HashMap<String, Object> params, Integer page, Integer pageSize) {
+    public Map<String,Object> getLabelList(@RequestBody QryMktScriptReq req) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
-            result = labelService.getLabelList(1L,params,page,pageSize);
+            result = labelService.getLabelList(1L,req.getParams(),req.getPage(),req.getPageSize());
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to getScriptList",e);
             result.put("resultCode",CODE_FAIL);

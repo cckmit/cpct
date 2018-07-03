@@ -2,13 +2,23 @@ package com.zjtelcom.cpct.dto.channel;
 
 import java.io.Serializable;
 
-public class ChannelAddVO implements Serializable {
+public class ContactChannelDetail implements Serializable {
 
+    private Long channelId;
     private String contactChlCode;
     private String contactChlName;
     private String contactChlType;
     private String contactChlDesc;
     private Long regionId;
+
+
+    public Long getChannelId() {
+        return channelId;
+    }
+
+    public void setChannelId(Long channelId) {
+        this.channelId = channelId;
+    }
 
     public String getContactChlCode() {
         return contactChlCode;
