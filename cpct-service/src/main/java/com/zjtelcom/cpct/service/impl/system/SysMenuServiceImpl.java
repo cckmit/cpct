@@ -1,14 +1,20 @@
 package com.zjtelcom.cpct.service.impl.system;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zjtelcom.cpct.dao.system.SysMenuMapper;
 import com.zjtelcom.cpct.domain.system.SysMenu;
+import com.zjtelcom.cpct.dto.system.SysStaffDTO;
+import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.system.SysMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +25,7 @@ import java.util.Map;
 public class SysMenuServiceImpl extends BaseService implements SysMenuService {
 
     @Autowired
-    private SysMenuMapper sysMenuMapper;
+    private SysMenuMapper sysMenuMapper;  //菜单mapper
 
     @Override
     public Map<String, Object> listMenu() {
@@ -61,7 +67,11 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
         return result;
     }
 
-
+    /**
+     * 根据角色id获取权限菜单
+     * @param roleId
+     * @return
+     */
     @Override
     public Map<String, Object> listMenuByRoleId(Long roleId) {
         Map<String, Object> result = new HashMap<>();
@@ -71,4 +81,21 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
 
         return result;
     }
+
+
+//    @RequestMapping(value = "saveStaff", method = RequestMethod.POST)
+//    @CrossOrigin
+//    public String saveStaff(SysStaffDTO sysStaffDTO) {
+//        Map result = new HashMap();
+//        try {
+//            result = sysStaffService.saveStaff(sysStaffDTO);
+//        } catch (Exception e) {
+//            logger.error("[op:SysStaffController] fail to saveStaff Exception: ", e);
+//            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+//        }
+//
+//        return JSON.toJSON(result).toString();
+//    }
+
+
 }

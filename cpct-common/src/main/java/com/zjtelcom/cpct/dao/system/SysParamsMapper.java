@@ -16,4 +16,7 @@ public interface SysParamsMapper {
     List<SysParams> selectAll(@Param("paramName") String paramName, @Param("configType") Long configType);
 
     int updateByPrimaryKey(SysParams record);
+
+    List<SysParams> listParamsByKey(String key);
+
 }

@@ -18,4 +18,8 @@ public interface SysParamsService {
 
     Map<String,Object> delParams(Long id);
 
+    Map<String,Object> listParamsByKey(String key);
+
+
+
 }

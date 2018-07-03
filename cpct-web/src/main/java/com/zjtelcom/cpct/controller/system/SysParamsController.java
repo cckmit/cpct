@@ -124,4 +124,22 @@ public class SysParamsController extends BaseController {
         return JSON.toJSON(result).toString();
     }
 
+
+    @RequestMapping(value = "delParams", method = RequestMethod.POST)
+    @CrossOrigin
+    public String delParams(@RequestBody Map<String,String> params) {
+        Map result = new HashMap();
+
+        String key = params.get("key");
+
+        try {
+            result = sysParamsService.listParamsByKey(key);
+        } catch (Exception e) {
+            logger.error("[op:SysParamsController] fail to delParams Exception: ", e);
+            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+        }
+
+        return JSON.toJSON(result).toString();
+    }
+
 }
