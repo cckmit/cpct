@@ -16,24 +16,29 @@
     <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
     <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
     <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="FIT_DOMAIN" jdbcType="VARCHAR" property="fitDomain" />
+    <result column="RIGHT_OPERAND" jdbcType="VARCHAR" property="rightOperand" />
+    <result column="CONDITION_TYPE" jdbcType="VARCHAR" property="conditionType" />
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from injection_label
     where INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.Label">
-    insert into injection_label (INJECTION_LABEL_ID,INJECTION_LABEL_CODE,
+    insert into injection_label (INJECTION_LABEL_ID, INJECTION_LABEL_CODE, 
       INJECTION_LABEL_NAME, INJECTION_LABEL_DESC, 
       LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, 
       STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
       CREATE_DATE, STATUS_DATE, UPDATE_DATE, 
-      REMARK)
+      REMARK, FIT_DOMAIN, RIGHT_OPERAND, 
+      CONDITION_TYPE)
     values (#{injectionLabelId,jdbcType=BIGINT}, #{injectionLabelCode,jdbcType=VARCHAR}, 
       #{injectionLabelName,jdbcType=VARCHAR}, #{injectionLabelDesc,jdbcType=VARCHAR}, 
       #{labelType,jdbcType=VARCHAR}, #{labelValueType,jdbcType=VARCHAR}, #{labelDataType,jdbcType=VARCHAR}, 
       #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, 
       #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
-      #{remark,jdbcType=VARCHAR})
+      #{remark,jdbcType=VARCHAR}, #{fitDomain,jdbcType=VARCHAR}, #{rightOperand,jdbcType=VARCHAR}, 
+      #{conditionType,jdbcType=VARCHAR})
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.Label">
     update injection_label
@@ -49,20 +54,23 @@
       CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
       STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
       UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
-      REMARK = #{remark,jdbcType=VARCHAR}
+      REMARK = #{remark,jdbcType=VARCHAR},
+      FIT_DOMAIN = #{fitDomain,jdbcType=VARCHAR},
+      RIGHT_OPERAND = #{rightOperand,jdbcType=VARCHAR},
+      CONDITION_TYPE = #{conditionType,jdbcType=VARCHAR}
     where INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC, 
     LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
-    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK, FIT_DOMAIN, RIGHT_OPERAND, CONDITION_TYPE
     from injection_label
     where INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
     select INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC, 
     LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
-    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK, FIT_DOMAIN, RIGHT_OPERAND, CONDITION_TYPE
     from injection_label
   </select>
 
@@ -74,7 +82,7 @@
   <insert id="insertBatch" parameterType="java.util.List">
     insert into injection_label (INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC,
     LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
-    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK)
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK,FIT_DOMAIN, RIGHT_OPERAND, CONDITION_TYPE)
     values
     <foreach collection="record" item="item" index="i" separator=",">
       (#{injectionLabelId,jdbcType=BIGINT}, #{injectionLabelCode,jdbcType=VARCHAR},
@@ -82,16 +90,23 @@
       #{labelType,jdbcType=VARCHAR}, #{labelValueType,jdbcType=VARCHAR}, #{labelDataType,jdbcType=VARCHAR},
       #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT},
       #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP},
-      #{remark,jdbcType=VARCHAR})
+      #{remark,jdbcType=VARCHAR}, #{fitDomain,jdbcType=VARCHAR}, #{rightOperand,jdbcType=VARCHAR},
+      #{conditionType,jdbcType=VARCHAR})
     </foreach>
   </insert>
-<!--< 参数查询 >-->
-  <select id="selectByParams" parameterType="java.lang.Long" resultMap="BaseResultMap">
+  <!--< 参数查询 >-->
+  <select id="findByParam" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC,
     LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
-    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK,FIT_DOMAIN, RIGHT_OPERAND, CONDITION_TYPE
     from injection_label
-    where INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT}
-  </select>
+    where 1=1
+    <if test="labelName != null and labelName != ''">
+      and INJECTION_LABEL_NAME LIKE CONCAT(CONCAT('%',#{labelName}),'%')
+    </if>
+    <if test="fitDomain != null and fitDomain != ''">
+      and FIT_DOMAIN = #{fitDomain}
+    </if>
 
+  </select>
 </mapper>

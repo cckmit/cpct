@@ -24,6 +24,8 @@ public interface LabelService {
 
     Map<String,Object> getLabelDetail(Long userId,Long scriptId);
 
+    Map<String,Object> getLabelListByParam(Long userId, Map<String,Object> params);
+
 
     //标签组
     Map<String,Object> addLabelGrp(Long userId, LabelGrp addVO);

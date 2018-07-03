@@ -1,11 +1,8 @@
 package com.zjtelcom.cpct.service.channel;
 
-import com.zjtelcom.cpct.bean.RespInfo;
-import com.zjtelcom.cpct.dto.channel.ChannelAddVO;
+import com.zjtelcom.cpct.dto.channel.ContactChannelDetail;
 import com.zjtelcom.cpct.dto.channel.ChannelEditVO;
-import com.zjtelcom.cpct.dto.channel.ChannelVO;
 
-import java.util.List;
 import java.util.Map;
 
 
@@ -16,16 +13,17 @@ import java.util.Map;
  */
 public interface ChannelService {
 
-    Map<String,Object> addChannel(Long userId, ChannelAddVO addVO);
+    Map<String,Object> createContactChannel (Long userId, ContactChannelDetail addVO);
 
-    Map<String,Object> editChannel(Long userId, ChannelEditVO editVO);
+    Map<String,Object> modContactChannel (Long userId, ContactChannelDetail editVO);
 
-    Map<String,Object> deleteChannel(Long userId,Long channelId);
+    Map<String,Object> delContactChannel (Long userId,ContactChannelDetail channelDetail);
 
     Map<String,Object> getChannelList(Long userId,String channelName,Integer page,Integer pageSize);
 
     Map<String,Object> getChannelDetail(Long userId,Long channelId);
 
+    Map<String,Object> getChannelListByType(Long userId,String channelType);
 
 
 
