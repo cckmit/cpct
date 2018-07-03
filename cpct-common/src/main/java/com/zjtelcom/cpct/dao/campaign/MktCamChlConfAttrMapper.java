@@ -13,6 +13,8 @@ public interface MktCamChlConfAttrMapper {
 
     List<MktCamChlConfAttrDO> selectByEvtContactConfId(Long contactChlAttrRstrId);
 
+    int deleteByEvtContactConfId(Long evtContactConfId);
+
     List<MktCamChlConfAttrDO> selectAll();
 
     int updateByPrimaryKey(MktCamChlConfAttrDO mktCamChlConfAttrDO);

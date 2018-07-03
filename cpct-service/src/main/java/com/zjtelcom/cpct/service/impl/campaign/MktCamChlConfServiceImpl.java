@@ -49,7 +49,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
         MktCamChlConfDO mktCamChlConfDO = new MktCamChlConfDO();
         Map<String, Object> mktCamChlConfMap = new HashMap<>();
         try {
-            //更新协同渠道基本信息
+            //添加协同渠道基本信息
             CopyPropertiesUtil.copyBean2Bean(mktCamChlConfDO, mktCamChlConfDetail);
             mktCamChlConfDO.setStatusCd(StatusCode.STATUS_CODE_NOTACTIVE.getErrorCode());
             mktCamChlConfMapper.insert(mktCamChlConfDO);
@@ -127,7 +127,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
                 MktCamChlConfAttr mktCamChlConfAttr = new MktCamChlConfAttr();
                 CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttr, mktCamChlConfAttrDO);
-                if (mktCamChlConfAttr.getAttrId() == ConfAttrEnum.RULE.getArrId()){
+                if (mktCamChlConfAttr.getAttrId() == ConfAttrEnum.RULE.getArrId()) {
                     //TODO 通过EvtContactConfId获取规则放入属性中
                 }
                 mktCamChlConfDetail.getMktCamChlConfAttrList().add(mktCamChlConfAttr);
@@ -136,7 +136,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             mktCamChlConfMap.put("resultMsg", ErrorCode.GET_CAM_CHL_CONF_SUCCESS.getErrorMsg());
             mktCamChlConfMap.put("mktCamChlConfDetail", mktCamChlConfDetail);
         } catch (Exception e) {
-            logger.error("[op:MktCamChlConfServiceImpl] fail to getMktCamChlConf by evtContactConfId = {}" , evtContactConfId, e);
+            logger.error("[op:MktCamChlConfServiceImpl] fail to getMktCamChlConf by evtContactConfId = {}", evtContactConfId, e);
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCamChlConfMap.put("resultMsg", ErrorCode.GET_CAM_CHL_CONF_FAILURE.getErrorMsg());
             mktCamChlConfMap.put("mktCamChlConfDetail", mktCamChlConfDetail);
@@ -144,8 +144,52 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
         return mktCamChlConfMap;
     }
 
+
+    @Override
+    public Map<String, Object> listMktCamChlConf() {
+        Map<String, Object> mktCamChlConfMap = new HashMap<>();
+        List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
+        try {
+            //获取所有的协同渠道配置基本信息
+            List<MktCamChlConfDO> mktCamChlConfDOList = mktCamChlConfMapper.selectAll();
+            for (MktCamChlConfDO mktCamChlConfDO : mktCamChlConfDOList) {
+                // 遍历查询出对应的属性
+                List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(mktCamChlConfDO.getEvtContactConfId());
+                MktCamChlConfDetail mktCamChlConfDetail = new MktCamChlConfDetail();
+                CopyPropertiesUtil.copyBean2Bean(mktCamChlConfDetail, mktCamChlConfDO);
+                for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
+                    MktCamChlConfAttr mktCamChlConfAttr = new MktCamChlConfAttr();
+                    CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttr, mktCamChlConfAttrDO);
+                    if (mktCamChlConfAttr.getAttrId() == ConfAttrEnum.RULE.getArrId()) {
+                        //TODO 通过EvtContactConfId获取规则放入属性中
+                    }
+                    mktCamChlConfDetail.getMktCamChlConfAttrList().add(mktCamChlConfAttr);
+                }
+                mktCamChlConfDetailList.add(mktCamChlConfDetail);
+            }
+            mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            mktCamChlConfMap.put("resultMsg", ErrorCode.GET_CAM_CHL_CONF_SUCCESS.getErrorMsg());
+            mktCamChlConfMap.put("mktCamChlConfDetailList", mktCamChlConfDetailList);
+        } catch (Exception e) {
+            logger.error("[op:MktCamChlConfServiceImpl] fail to get mktCamChlConfDetailList evtContactConfId = {}", mktCamChlConfDetailList, e);
+            mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            mktCamChlConfMap.put("resultMsg", ErrorCode.GET_CAM_CHL_CONF_FAILURE.getErrorMsg());
+            mktCamChlConfMap.put("mktCamChlConfDetailList", mktCamChlConfDetailList);
+        }
+        return mktCamChlConfMap;
+    }
+
     @Override
     public Map<String, Object> deleteMktCamChlConf(Long evtContactConfId) {
-        return null;
+        mktCamChlConfMapper.deleteByPrimaryKey(evtContactConfId);
+        mktCamChlConfAttrMapper.deleteByEvtContactConfId(evtContactConfId);
+
+        //TODO 根据evtContactConfId删除相关的规则
+
+
+        Map<String, Object> mktCamChlConfMap = new HashMap<>();
+        mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+        mktCamChlConfMap.put("resultMsg", ErrorCode.DELETE_CAM_CHL_CONF_SUCCESS.getErrorMsg());
+        return mktCamChlConfMap;
     }
 }

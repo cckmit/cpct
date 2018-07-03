@@ -19,6 +19,10 @@
     delete from mkt_cam_chl_conf_attr
     where CONTACT_CHL_ATTR_RSTR_ID = #{contactChlAttrRstrId,jdbcType=DECIMAL}
   </delete>
+  <delete id="deleteByEvtContactConfId" parameterType="java.lang.Long">
+    delete from mkt_cam_chl_conf_attr
+    where EVT_CONTACT_CONF_ID = #{evtContactConfId,jdbcType=DECIMAL}
+  </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO">
     insert into mkt_cam_chl_conf_attr (CONTACT_CHL_ATTR_RSTR_ID, EVT_CONTACT_CONF_ID, 
       ATTR_ID, ATTR_VALUE_ID, ATTR_VALUE, 
