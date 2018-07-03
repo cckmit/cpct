@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.MktStrategyConfRuleMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO">
+    <id column="MKT_STRATEGY_CONF_RULE_ID" jdbcType="BIGINT" property="mktStrategyConfRuleId" />
+    <result column="TAR_GRP_ID" jdbcType="BIGINT" property="tarGrpId" />
+    <result column="PRODUCT_ID" jdbcType="BIGINT" property="productId" />
+    <result column="EVT_CONTACT_CONF_ID" jdbcType="BIGINT" property="evtContactConfId" />
+    <result column="RULE_CONF_ID" jdbcType="BIGINT" property="ruleConfId" />
+    <result column="CREATE_STAFF" jdbcType="VARCHAR" property="createStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_STAFF" jdbcType="VARCHAR" property="updateStaff" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from mkt_strategy_conf_rule
+    where MKT_STRATEGY_CONF_RULE_ID = #{mktStrategyConfRuleId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" useGeneratedKeys="true" keyProperty="mktStrategyConfRuleId" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO">
+    insert into mkt_strategy_conf_rule (MKT_STRATEGY_CONF_RULE_ID, TAR_GRP_ID, PRODUCT_ID, 
+      EVT_CONTACT_CONF_ID, RULE_CONF_ID, CREATE_STAFF, 
+      CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+      )
+    values (#{mktStrategyConfRuleId,jdbcType=BIGINT}, #{tarGrpId,jdbcType=BIGINT}, #{productId,jdbcType=BIGINT}, 
+      #{evtContactConfId,jdbcType=BIGINT}, #{ruleConfId,jdbcType=BIGINT}, #{createStaff,jdbcType=VARCHAR}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=VARCHAR}, #{updateDate,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO">
+    update mkt_strategy_conf_rule
+    set TAR_GRP_ID = #{tarGrpId,jdbcType=BIGINT},
+      PRODUCT_ID = #{productId,jdbcType=BIGINT},
+      EVT_CONTACT_CONF_ID = #{evtContactConfId,jdbcType=BIGINT},
+      RULE_CONF_ID = #{ruleConfId,jdbcType=BIGINT},
+      CREATE_STAFF = #{createStaff,jdbcType=VARCHAR},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_STAFF = #{updateStaff,jdbcType=VARCHAR},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
+    where MKT_STRATEGY_CONF_RULE_ID = #{mktStrategyConfRuleId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_STRATEGY_CONF_RULE_ID, TAR_GRP_ID, PRODUCT_ID, EVT_CONTACT_CONF_ID, RULE_CONF_ID, 
+    CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+    from mkt_strategy_conf_rule
+    where MKT_STRATEGY_CONF_RULE_ID = #{mktStrategyConfRuleId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select MKT_STRATEGY_CONF_RULE_ID, TAR_GRP_ID, PRODUCT_ID, EVT_CONTACT_CONF_ID, RULE_CONF_ID, 
+    CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+    from mkt_strategy_conf_rule
+  </select>
+</mapper>

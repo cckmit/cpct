@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace=" com.zjtelcom.cpct.dao.strategy.MktStrategyConfRegionRelMapper">
-  <!--<resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.campaign.MktStrategyConfRegionRelDO">-->
+  <!--<resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRegionRelDO">-->
     <!--<id column="MKT_STRATEGY_CONF_REGION_REL_ID" jdbcType="DECIMAL" property="mktStrategyConfRegionRelId" />-->
     <!--<result column="MKT_STRATEGY_CONF_ID" jdbcType="DECIMAL" property="mktStrategyConfId" />-->
     <!--<result column="APPLY_CITY_ID" jdbcType="DECIMAL" property="applyCityId" />-->
@@ -21,7 +21,7 @@
     <!--from mkt_strategy_conf_region_rel-->
     <!--where MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=DECIMAL}-->
   <!--</delete>-->
-  <!--<insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.MktStrategyConfRegionRelDO">-->
+  <!--<insert id="insert" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRegionRelDO">-->
     <!--insert into mkt_strategy_conf_region_rel (MKT_STRATEGY_CONF_REGION_REL_ID, MKT_STRATEGY_CONF_ID,-->
       <!--APPLY_CITY_ID, APPLY_COUNTY, APPLY_BRANCH,-->
       <!--APPLY_GRIDDING, CREATE_STAFF, CREATE_DATE,-->
@@ -31,7 +31,7 @@
       <!--#{applyGridding,jdbcType=VARCHAR}, #{createStaff,jdbcType=DECIMAL}, #{createDate,jdbcType=TIMESTAMP},-->
       <!--#{updateStaff,jdbcType=DECIMAL}, #{updateDate,jdbcType=TIMESTAMP})-->
   <!--</insert>-->
-  <!--<update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktStrategyConfRegionRelDO">-->
+  <!--<update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRegionRelDO">-->
     <!--update mkt_strategy_conf_region_rel-->
     <!--set MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=DECIMAL},-->
       <!--APPLY_CITY_ID = #{applyCityId,jdbcType=DECIMAL},-->

@@ -1,6 +1,6 @@
 package com.zjtelcom.cpct.dao.strategy;
 
-import com.zjtelcom.cpct.domain.campaign.MktStrategyConfRegionRelDO;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRegionRelDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 

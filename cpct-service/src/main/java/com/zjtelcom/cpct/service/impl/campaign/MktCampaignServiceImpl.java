@@ -11,7 +11,7 @@ import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.dto.campaign.MktCamItem;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignDetail;
-import com.zjtelcom.cpct.dto.campaign.MktStrategyDetail;
+import com.zjtelcom.cpct.dto.strategy.MktStrategyDetail;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import org.springframework.beans.factory.annotation.Autowired;

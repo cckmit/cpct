@@ -1,9 +1,9 @@
 package com.zjtelcom.cpct.dto.campaign;
 
-import com.zjtelcom.cpct.BaseEntity;
 import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
+import com.zjtelcom.cpct.dto.strategy.MktStrategyDetail;
 import lombok.Data;
-import java.util.Date;
+
 import java.util.List;
 
 /**
