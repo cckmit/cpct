@@ -11,6 +11,8 @@ public interface MktCamChlConfAttrMapper {
 
     MktCamChlConfAttrDO selectByPrimaryKey(Long contactChlAttrRstrId);
 
+    List<MktCamChlConfAttrDO> selectByEvtContactConfId(Long contactChlAttrRstrId);
+
     List<MktCamChlConfAttrDO> selectAll();
 
     int updateByPrimaryKey(MktCamChlConfAttrDO mktCamChlConfAttrDO);
