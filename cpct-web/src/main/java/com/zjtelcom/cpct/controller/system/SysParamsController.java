@@ -125,9 +125,9 @@ public class SysParamsController extends BaseController {
     }
 
 
-    @RequestMapping(value = "delParams", method = RequestMethod.POST)
+    @RequestMapping(value = "listParamsByKey", method = RequestMethod.POST)
     @CrossOrigin
-    public String delParams(@RequestBody Map<String,String> params) {
+    public String listParamsByKey(@RequestBody Map<String,String> params) {
         Map result = new HashMap();
 
         String key = params.get("key");
