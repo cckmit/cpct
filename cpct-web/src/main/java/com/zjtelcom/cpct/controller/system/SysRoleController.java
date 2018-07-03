@@ -137,7 +137,10 @@ public class SysRoleController extends BaseController {
         return JSON.toJSON(result).toString();
     }
 
-
+    /**
+     * 获取角色下拉框数据
+     * @return
+     */
     @RequestMapping(value = "listRoleDropDown", method = RequestMethod.POST)
     @CrossOrigin
     public String listRoleDropDown() {

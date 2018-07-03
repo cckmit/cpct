@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.controller.system;
 
 
+import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.system.SysMenu;
 import com.zjtelcom.cpct.enums.ErrorCode;
@@ -9,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("${adminPath}/menu")
@@ -25,14 +28,14 @@ public class SysMenuController extends BaseController {
     @RequestMapping(value = "listMenu", method = RequestMethod.POST)
     @CrossOrigin
     public String listMenu() {
-        List<SysMenu> list = new ArrayList<>();
+        Map result = new HashMap();
         try {
-            list = sysMenuService.listMenu();
+            result = sysMenuService.listMenu();
         } catch (Exception e) {
             logger.error("[op:SysMenuController] fail to listMenu Exception: ", e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
         }
-        return initSuccRespInfo(list);
+        return JSON.toJSON(result).toString();
     }
 
     /**
@@ -43,14 +46,14 @@ public class SysMenuController extends BaseController {
     @RequestMapping(value = "listMenuByRoleId", method = RequestMethod.POST)
     @CrossOrigin
     public String listMenuByRoleId(@RequestParam("roleId") Long roleId) {
-        List<SysMenu> list = new ArrayList<>();
+        Map result = new HashMap();
         try {
-            list = sysMenuService.listMenuByRoleId(roleId);
+            result = sysMenuService.listMenuByRoleId(roleId);
         } catch (Exception e) {
             logger.error("[op:SysStaffController] fail to eventList Exception: ", e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
         }
-        return initSuccRespInfo(list);
+        return JSON.toJSON(result).toString();
     }
 
 
