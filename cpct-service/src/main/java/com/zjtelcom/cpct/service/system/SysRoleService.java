@@ -17,7 +17,7 @@ public interface SysRoleService {
 
     Map<String, Object> delRole(Long id);
 
-    Map<String, Object> saveAuthority(Map<String, String> params);
+    Map<String, Object> saveAuthority(Map<String, Object> params);
 
     Map<String, Object> listRoleAll();
 

@@ -93,16 +93,16 @@ public class SysRoleServiceImpl extends BaseService implements SysRoleService {
     }
 
     @Override
-    public Map<String, Object> saveAuthority(Map<String, String> params) {
+    public Map<String, Object> saveAuthority(Map<String, Object> params) {
         Map<String, Object> result = new HashMap<>();
 
-        Long roleId = Long.parseLong(params.get("roleId"));
-        List<String> list = Arrays.asList(params.get("key"));
+        Long roleId = Long.parseLong(((Integer) params.get("roleId")).toString());
+        List<Integer> list = (List<Integer>) params.get("list");
 
         SysRoleMenu sysRoleMenu = new SysRoleMenu();
         sysRoleMenu.setRoleId(roleId);
-        for (String menuId : list) {
-            sysRoleMenu.setMenuId(Long.valueOf(menuId));
+        for (Integer menuId : list) {
+            sysRoleMenu.setMenuId(Long.parseLong(menuId.toString()));
             sysRoleMenuMapper.insert(sysRoleMenu);
         }
 
