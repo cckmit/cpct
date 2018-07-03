@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.controller.system;
 
 
+import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.system.SysRole;
 import com.zjtelcom.cpct.domain.system.SysStaff;
@@ -10,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("${adminPath}/role")
@@ -26,15 +29,17 @@ public class SysRoleController extends BaseController {
     @RequestMapping(value = "listRole", method = RequestMethod.POST)
     @CrossOrigin
     public String listRole(@RequestParam("roleId") Long roleId,
-                           @RequestParam("roleName") String roleName) {
-        List<SysRole> list = new ArrayList<>();
+                           @RequestParam("roleName") String roleName,
+                           @RequestParam("page") Integer page,
+                           @RequestParam("pageSize") Integer pageSize) {
+        Map result = new HashMap();
         try {
-            list = sysRoleService.listRole(roleId,roleName);
+            result = sysRoleService.listRole(roleId,roleName,page,pageSize);
         } catch (Exception e) {
             logger.error("[op:SysRoleController] fail to listRole Exception: ", e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
         }
-        return initSuccRespInfo(list);
+        return JSON.toJSON(result).toString();
     }
 
     /**
@@ -45,14 +50,14 @@ public class SysRoleController extends BaseController {
     @RequestMapping(value = "getRole", method = RequestMethod.POST)
     @CrossOrigin
     public String getRole(@RequestParam("roleId") Long roleId) {
-        SysRole sysRole = new SysRole();
+        Map result = new HashMap();
         try {
-            sysRole = sysRoleService.getRole(roleId);
+            result = sysRoleService.getRole(roleId);
         } catch (Exception e) {
             logger.error("[op:SysRoleController] fail to getRole Exception: ", e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
         }
-        return initSuccRespInfo(sysRole);
+        return JSON.toJSON(result).toString();
     }
 
     /**
@@ -63,15 +68,15 @@ public class SysRoleController extends BaseController {
     @RequestMapping(value = "saveRole", method = RequestMethod.POST)
     @CrossOrigin
     public String saveStaff(SysRole sysRole) {
-
+        Map result = new HashMap();
         try {
-            sysRoleService.saveRole(sysRole);
+            result = sysRoleService.saveRole(sysRole);
         } catch (Exception e) {
             logger.error("[op:SysRoleController] fail to saveRole Exception: ", e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
         }
 
-        return initSuccRespInfo(null);
+        return JSON.toJSON(result).toString();
     }
 
     /**
@@ -83,15 +88,15 @@ public class SysRoleController extends BaseController {
     @RequestMapping(value = "saveAuthority", method = RequestMethod.POST)
     @CrossOrigin
     public String saveAuthority(@RequestParam("roleId") Long roleId,@RequestParam("list") List<Long> list) {
-
+        Map result = new HashMap();
         try {
-            sysRoleService.saveAuthority(roleId,list);
+            result = sysRoleService.saveAuthority(roleId,list);
         } catch (Exception e) {
             logger.error("[op:SysRoleController] fail to saveRole Exception: ", e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
         }
 
-        return initSuccRespInfo(null);
+        return JSON.toJSON(result).toString();
     }
 
     /**
@@ -102,15 +107,15 @@ public class SysRoleController extends BaseController {
     @RequestMapping(value = "updateRole", method = RequestMethod.POST)
     @CrossOrigin
     public String updateRole(SysRole sysRole) {
-
+        Map result = new HashMap();
         try {
-            sysRoleService.updateRole(sysRole);
+            result = sysRoleService.updateRole(sysRole);
         } catch (Exception e) {
             logger.error("[op:SysRoleController] fail to updateRole Exception: ", e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
         }
 
-        return initSuccRespInfo(null);
+        return JSON.toJSON(result).toString();
     }
 
     /**
@@ -121,17 +126,30 @@ public class SysRoleController extends BaseController {
     @RequestMapping(value = "delRole", method = RequestMethod.POST)
     @CrossOrigin
     public String delRole(Long roleId) {
-
+        Map result = new HashMap();
         try {
-            sysRoleService.delRole(roleId);
+            result = sysRoleService.delRole(roleId);
         } catch (Exception e) {
             logger.error("[op:SysRoleController] fail to updateRole Exception: ", e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
         }
 
-        return initSuccRespInfo(null);
+        return JSON.toJSON(result).toString();
     }
 
+
+    @RequestMapping(value = "listRoleDropDown", method = RequestMethod.POST)
+    @CrossOrigin
+    public String listRoleDropDown() {
+        Map result = new HashMap();
+        try {
+            result = sysRoleService.listRoleAll();
+        } catch (Exception e) {
+            logger.error("[op:SysRoleController] fail to listRole Exception: ", e);
+            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+        }
+        return JSON.toJSON(result).toString();
+    }
 
 
 }

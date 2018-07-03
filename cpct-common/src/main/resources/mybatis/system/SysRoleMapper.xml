@@ -25,21 +25,21 @@
     </insert>
 
     <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.system.SysRole">
-    update sys_role
-    set ROLE_NAME = #{roleName,jdbcType=VARCHAR},
-      REMARK = #{remark,jdbcType=VARCHAR},
-      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
-      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT}
-    where ROLE_ID = #{roleId,jdbcType=BIGINT}
+      update sys_role
+      set ROLE_NAME = #{roleName,jdbcType=VARCHAR},
+        REMARK = #{remark,jdbcType=VARCHAR},
+        UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+        UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT}
+      where ROLE_ID = #{roleId,jdbcType=BIGINT}
     </update>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select ROLE_ID, ROLE_NAME, REMARK, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
-    from sys_role
-    where ROLE_ID = #{roleId,jdbcType=BIGINT}
+      select ROLE_ID, ROLE_NAME, REMARK, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
+      from sys_role
+      where ROLE_ID = #{roleId,jdbcType=BIGINT}
     </select>
 
-    <select id="selectAll" resultMap="BaseResultMap">
+    <select id="selectByParams" resultMap="BaseResultMap">
         select ROLE_ID, ROLE_NAME, REMARK, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
         from sys_role
         where 1=1
@@ -50,6 +50,12 @@
             and ROLE_NAME = #{roleName,jdbcType=VARCHAR}
         </if>
         order by CREATE_DATE desc
+    </select>
+
+    <select id="selectAll" resultType="Map">
+        select ROLE_ID as value, ROLE_NAME as name
+        from sys_role
+        order by ROLE_ID asc
     </select>
 
 </mapper>

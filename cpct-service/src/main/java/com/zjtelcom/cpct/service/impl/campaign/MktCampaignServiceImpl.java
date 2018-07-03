@@ -46,7 +46,7 @@ public class MktCampaignServiceImpl implements MktCampaignService {
         MktCampaignDO mktCampaign = new MktCampaignDO();
         CopyPropertiesUtil.copyBean2Bean(mktCampaign, mktCampaignDetail);//映射字段
         //保存主表信息
-        mktCampaignMapper.insert(mktCampaign);
+        int i = mktCampaignMapper.insert(mktCampaign);
         //获取主表id
         Long mainId = mktCampaign.getMktCampaignId();
 

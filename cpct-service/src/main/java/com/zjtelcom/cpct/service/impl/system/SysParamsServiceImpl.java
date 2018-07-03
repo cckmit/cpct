@@ -1,5 +1,8 @@
 package com.zjtelcom.cpct.service.impl.system;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.domain.system.SysRole;
@@ -10,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -20,12 +25,23 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
     private SysParamsMapper sysParamsMapper;
 
     @Override
-    public List<SysParams> listParams(String paramName, Long configType) {
-        return sysParamsMapper.selectAll(paramName, configType);
+    public Map<String,Object> listParams(String paramName, Long configType,Integer page,Integer pageSize) {
+        Map<String,Object> result = new HashMap<>();
+        PageHelper.startPage(page,pageSize);
+        List<SysParams> list = sysParamsMapper.selectAll(paramName, configType);
+        Page pageInfo = new Page(new PageInfo(list));
+
+        result.put("resultCode","0");
+        result.put("resultMsg","");
+        result.put("data",list);
+        result.put("pageInfo",pageInfo);
+
+        return result;
     }
 
     @Override
-    public int saveParams(SysParams sysParams) {
+    public Map<String,Object> saveParams(SysParams sysParams) {
+        Map<String,Object> result = new HashMap<>();
         //todo 判断字段是否为空
 
         //todo 判断参数名是否重复
@@ -35,11 +51,15 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
         sysParams.setCreateStaff(loginId);
         sysParams.setCreateDate(new Date());
 
-        return sysParamsMapper.insert(sysParams);
+        int flag = sysParamsMapper.insert(sysParams);
+        result.put("resultCode","0");
+
+        return result;
     }
 
     @Override
-    public int updateParams(SysParams sysParams) {
+    public Map<String,Object> updateParams(SysParams sysParams) {
+        Map<String,Object> result = new HashMap<>();
         //todo 判断字段是否为空
 
         //todo 判断参数名是否重复
@@ -48,22 +68,34 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
         Long loginId = 1L;
         sysParams.setUpdateStaff(loginId);
         sysParams.setUpdateDate(new Date());
-        return sysParamsMapper.updateByPrimaryKey(sysParams);
+        int flag = sysParamsMapper.updateByPrimaryKey(sysParams);
+        result.put("resultCode","0");
+
+        return result;
     }
 
     @Override
-    public SysParams getParams(Long id) {
+    public Map<String,Object> getParams(Long id) {
+        Map<String,Object> result = new HashMap<>();
         if(id == null) {
             //todo 为空异常
         }
-        return sysParamsMapper.selectByPrimaryKey(id);
+        SysParams sysParams = sysParamsMapper.selectByPrimaryKey(id);
+        result.put("resultCode","0");
+        result.put("data",sysParams);
+
+        return result;
     }
 
     @Override
-    public int delParams(Long id) {
+    public Map<String,Object> delParams(Long id) {
+        Map<String,Object> result = new HashMap<>();
 
         //todo 验证是否可以删除
 
-        return sysParamsMapper.deleteByPrimaryKey(id);
+        sysParamsMapper.deleteByPrimaryKey(id);
+        result.put("resultCode","0");
+
+        return result;
     }
 }

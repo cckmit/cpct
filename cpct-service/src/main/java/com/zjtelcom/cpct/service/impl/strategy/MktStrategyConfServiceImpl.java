@@ -63,16 +63,16 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             //添加属性配置信息
             MktStrategyConfDO mktStrategyConfDO = new MktStrategyConfDO();
             CopyPropertiesUtil.copyBean2Bean(mktStrategyConfDO, mktStrategyConfDetail);
-            Long mktStrategyConfId = mktStrategyConfMapper.insert(mktStrategyConfDO);
+            mktStrategyConfMapper.insert(mktStrategyConfDO);
             mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfMap.put("resultMsg", ErrorCode.SAVE_MKT_CAMPAIGN_SUCCESS.getErrorMsg());
-            mktStrategyConfMap.put("mktStrategyConfId", mktStrategyConfId);
+            mktStrategyConfMap.put("mktStrategyConfId", mktStrategyConfDO.getMktStrategyConfId());
 
             //添加属性配置信息 与 下发城市关联
             List<City> cityList = mktStrategyConfDetail.getCityList();
             for (City city : cityList) {
                 MktStrategyConfRegionRelDO mktStrategyConfRegionRelDO = new MktStrategyConfRegionRelDO();
-                mktStrategyConfRegionRelDO.setMktStrategyConfId(mktStrategyConfId);
+                mktStrategyConfRegionRelDO.setMktStrategyConfId(mktStrategyConfDO.getMktStrategyConfId());
                 mktStrategyConfRegionRelDO.setApplyCityId(city.getApplyCity().getCityPropertyId());
                 String applyCountyIds = "";
                 String applyBranchIds = "";
@@ -118,17 +118,16 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             //修改属性配置信息
             MktStrategyConfDO mktStrategyConfDO = new MktStrategyConfDO();
             CopyPropertiesUtil.copyBean2Bean(mktStrategyConfDO, mktStrategyConfDetail);
-            Long mktStrategyConfId = mktStrategyConfMapper.updateByPrimaryKey(mktStrategyConfDO);
-
+            mktStrategyConfMapper.updateByPrimaryKey(mktStrategyConfDO);
             mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfMap.put("resultMsg", ErrorCode.UPDATE_MKT_CAMPAIGN_SUCCESS.getErrorMsg());
-            mktStrategyConfMap.put("mktStrategyConfId", mktStrategyConfId);
+            mktStrategyConfMap.put("mktStrategyConfId", mktStrategyConfDO.getMktStrategyConfId());
 
             //修改属性配置信息 与 下发城市关联
             List<City> cityList = mktStrategyConfDetail.getCityList();
             for (City city : cityList) {
                 MktStrategyConfRegionRelDO mktStrategyConfRegionRelDO = new MktStrategyConfRegionRelDO();
-                mktStrategyConfRegionRelDO.setMktStrategyConfId(mktStrategyConfId);
+                mktStrategyConfRegionRelDO.setMktStrategyConfId(mktStrategyConfDO.getMktStrategyConfId());
                 mktStrategyConfRegionRelDO.setApplyCityId(city.getApplyCity().getCityPropertyId());
                 String applyCountyIds = "";
                 String applyBranchIds = "";
@@ -178,7 +177,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
         Map<String, Object> mktStrategyConfMap = new HashMap<String, Object>();
         MktStrategyConfDetail mktStrategyConfDetail = new MktStrategyConfDetail();
         try {
-            //TODO 查出获取所有的城市信息
+            //TODO 查出获取所有的城市信息, 设成全局Map
             Map<Long, String> cityMap = new HashMap<>();
 
 

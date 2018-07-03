@@ -31,7 +31,7 @@
       where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
     </delete>
 
-    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignDO" useGeneratedKeys="true" keyProperty="MKT_CAMPAIGN_ID">
+    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignDO" useGeneratedKeys="true" keyProperty="mktCampaignId">
       insert into mkt_campaign (TIGGER_TYPE, MKT_CAMPAIGN_NAME,
         PLAN_BEGIN_TIME, PLAN_END_TIME, BEGIN_TIME,
         END_TIME, MKT_CAMPAIGN_TYPE, MKT_ACTIVITY_NBR,
