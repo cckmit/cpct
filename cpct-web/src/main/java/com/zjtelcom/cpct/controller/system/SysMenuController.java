@@ -40,13 +40,16 @@ public class SysMenuController extends BaseController {
 
     /**
      * 根据角色id获取权限菜单
-     * @param roleId
+     * @param params
      * @return
      */
     @RequestMapping(value = "listMenuByRoleId", method = RequestMethod.POST)
     @CrossOrigin
-    public String listMenuByRoleId(@RequestParam("roleId") Long roleId) {
+    public String listMenuByRoleId(@RequestBody Map<String,String> params) {
         Map result = new HashMap();
+
+        Long roleId = Long.parseLong(params.get("roleId"));
+
         try {
             result = sysMenuService.listMenuByRoleId(roleId);
         } catch (Exception e) {

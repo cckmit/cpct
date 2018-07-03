@@ -10,10 +10,7 @@ import com.zjtelcom.cpct.service.system.SysRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("${adminPath}/role")
@@ -28,11 +25,14 @@ public class SysRoleController extends BaseController {
      */
     @RequestMapping(value = "listRole", method = RequestMethod.POST)
     @CrossOrigin
-    public String listRole(@RequestParam("roleId") Long roleId,
-                           @RequestParam("roleName") String roleName,
-                           @RequestParam("page") Integer page,
-                           @RequestParam("pageSize") Integer pageSize) {
+    public String listRole(@RequestBody Map<String,String> params) {
         Map result = new HashMap();
+
+        String roleName = params.get("roleName");
+        Long roleId = Long.parseLong(params.get("roleId"));
+        Integer page = Integer.parseInt(params.get("page"));
+        Integer pageSize = Integer.parseInt(params.get("pageSize"));
+
         try {
             result = sysRoleService.listRole(roleId,roleName,page,pageSize);
         } catch (Exception e) {
@@ -44,13 +44,16 @@ public class SysRoleController extends BaseController {
 
     /**
      * 根据员工id查询员工信息
-     * @param roleId
+     * @param params
      * @return
      */
     @RequestMapping(value = "getRole", method = RequestMethod.POST)
     @CrossOrigin
-    public String getRole(@RequestParam("roleId") Long roleId) {
+    public String getRole(@RequestBody Map<String,String> params) {
         Map result = new HashMap();
+
+        Long roleId = Long.parseLong(params.get("roleId"));
+
         try {
             result = sysRoleService.getRole(roleId);
         } catch (Exception e) {
@@ -67,7 +70,7 @@ public class SysRoleController extends BaseController {
      */
     @RequestMapping(value = "saveRole", method = RequestMethod.POST)
     @CrossOrigin
-    public String saveStaff(SysRole sysRole) {
+    public String saveStaff(@RequestBody SysRole sysRole) {
         Map result = new HashMap();
         try {
             result = sysRoleService.saveRole(sysRole);
@@ -81,16 +84,27 @@ public class SysRoleController extends BaseController {
 
     /**
      * 保存权限
-     * @param roleId
-     * @param list
+     * @param params
      * @return
      */
     @RequestMapping(value = "saveAuthority", method = RequestMethod.POST)
     @CrossOrigin
-    public String saveAuthority(@RequestParam("roleId") Long roleId,@RequestParam("list") List<Long> list) {
+    public String saveAuthority(@RequestBody Map<String,String> params) {
         Map result = new HashMap();
+
+        Long roleId = Long.parseLong(params.get("roleId"));
+        String list = params.get("key");
+
+
+        if (list != null) {
+
+        } else {
+            //todo 异常
+        }
+
+
         try {
-            result = sysRoleService.saveAuthority(roleId,list);
+            result = sysRoleService.saveAuthority(params);
         } catch (Exception e) {
             logger.error("[op:SysRoleController] fail to saveRole Exception: ", e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
@@ -106,7 +120,7 @@ public class SysRoleController extends BaseController {
      */
     @RequestMapping(value = "updateRole", method = RequestMethod.POST)
     @CrossOrigin
-    public String updateRole(SysRole sysRole) {
+    public String updateRole(@RequestBody SysRole sysRole) {
         Map result = new HashMap();
         try {
             result = sysRoleService.updateRole(sysRole);
@@ -120,13 +134,16 @@ public class SysRoleController extends BaseController {
 
     /**
      * 删除角色
-     * @param roleId
+     * @param params
      * @return
      */
     @RequestMapping(value = "delRole", method = RequestMethod.POST)
     @CrossOrigin
-    public String delRole(Long roleId) {
+    public String delRole(@RequestBody Map<String,String> params) {
         Map result = new HashMap();
+
+        Long roleId = Long.parseLong(params.get("roleId"));
+
         try {
             result = sysRoleService.delRole(roleId);
         } catch (Exception e) {
