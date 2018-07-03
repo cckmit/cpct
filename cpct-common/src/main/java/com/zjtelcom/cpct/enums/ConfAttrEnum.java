@@ -19,8 +19,7 @@ public enum ConfAttrEnum {
     START_TIME(1002L, "开始时间"),
     END_TIME(1003L, "结束时间"),
     QUESTION(1004L, "调查问卷"),
-    PUSH_TYPE(1005L, "推送方式"),
-    RULE(1006L, "协同规则");
+    RULE(1005L, "协同规则");
 
     private Long arrId;
     private String arrName;
