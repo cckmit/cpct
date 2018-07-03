@@ -24,5 +24,7 @@ public interface MktCamChlConfService {
 
     Map<String,Object> getMktCamChlConf(Long evtContactConfId);
 
+    Map<String,Object> listMktCamChlConf();
+
     Map<String,Object> deleteMktCamChlConf(Long evtContactConfId);
 }
