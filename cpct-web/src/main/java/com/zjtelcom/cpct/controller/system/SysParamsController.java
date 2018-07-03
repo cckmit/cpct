@@ -124,7 +124,11 @@ public class SysParamsController extends BaseController {
         return JSON.toJSON(result).toString();
     }
 
-
+    /**
+     * 根据关键字获取静态参数list
+     * @param params
+     * @return
+     */
     @RequestMapping(value = "listParamsByKey", method = RequestMethod.POST)
     @CrossOrigin
     public String listParamsByKey(@RequestBody Map<String,String> params) {
