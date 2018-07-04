@@ -7,9 +7,20 @@ public class LabelVO implements Serializable {
     private String injectionLabelCode;
     private String injectionLabelName;
     private String injectionLabelDesc;
-    private String labelType;
-    private String labelValueType;
-    private String labelDataType;
+    private String labelType;//1000
+    private String labelValueType;//1000输入型；2000枚举型
+    private String labelDataType;//1000	日期型;1100	日期时间型;1200	字符型;1300	浮点型;1400	整数型;1500	布尔型;1600	计算型
+    private String fitDomain;//适用域
+
+
+
+    public String getFitDomain() {
+        return fitDomain;
+    }
+
+    public void setFitDomain(String fitDomain) {
+        this.fitDomain = fitDomain;
+    }
 
     public Long getInjectionLabelId() {
         return injectionLabelId;

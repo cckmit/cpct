@@ -2,10 +2,12 @@ package com.zjtelcom.cpct.controller.channel;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.ctzj.ppm.dubbo.service.StrategySalesSearchService;
+import com.ctzj.ppm.dubbo.service.StrategySalesViewService;
+import com.ctzj.ppm.dubbo.vo.OfferVo;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.channel.PpmProductMapper;
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
-import com.zjtelcom.cpct.dto.channel.OfferVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,10 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -25,11 +24,11 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 @RequestMapping("/ppm/product")
 public class ProductController extends BaseController {
 
-//	@Autowired(required = false)
-//	private StrategySalesViewService	strategySalesViewService;
-//
-//	@Autowired(required = false)
-//	private StrategySalesSearchService	strategySalesSearchService;
+	@Autowired(required = false)
+	private StrategySalesViewService strategySalesViewService;
+
+	@Autowired(required = false)
+	private StrategySalesSearchService strategySalesSearchService;
 	@Autowired
 	private PpmProductMapper ppmProductMapper;
 
@@ -47,7 +46,7 @@ public class ProductController extends BaseController {
 		Map<String, String> result = new HashMap<>(2);
 
 		try {
-			List<OfferVO> rs = new ArrayList<>();//TODO strategySalesSearchService.salesSearch(param);
+			List<OfferVo> rs = strategySalesSearchService.salesSearch(param);
 			logger.info("get PPM product salesSearch <> page=" + page + ", result.size=" + rs.size());
 			result.put("resultCode",CODE_SUCCESS);
 			result.put("resultMessage",CODE_SUCCESS);
@@ -81,11 +80,11 @@ public class ProductController extends BaseController {
 			String lastProductCode = "";
 			do {
 				param.put("page", page + "");
-				List<OfferVO> rs = new ArrayList<>();//TODO strategySalesSearchService.salesSearch(param);
+				List<OfferVo> rs = strategySalesSearchService.salesSearch(param);
 				whileFlag = rs.size();
 				totalNum += whileFlag;
 				for (int i = 0; i < whileFlag; i++) {
-					OfferVO tempOfferVo = rs.get(i);
+					OfferVo tempOfferVo = rs.get(i);
 					String code = tempOfferVo.getOfferNbr();
 					//重复校验，如果刚刚更新过了这个销售品就直接忽略
 					if (code == null || lastProductCode.equals(code)) {
@@ -136,7 +135,7 @@ public class ProductController extends BaseController {
 			for (int i = 0; i < productInUse.size(); i++) {
 				param.add(productInUse.get(i).getProductCode());
 			}
-			List<OfferVO> searchRs = new ArrayList<>();//TODO strategySalesViewService.salesView(param);
+			List<OfferVo> searchRs = new ArrayList<>();//TODO strategySalesViewService.salesView(param);
 			logger.info("salesView result size = " + searchRs.size());
 			for (int j = 0; j < searchRs.size(); j++) {
 				logger.info("update ppm product. productCode=" + searchRs.get(j).getOfferNbr());
@@ -174,7 +173,7 @@ public class ProductController extends BaseController {
 		return true;
 	}
 
-	private PpmProduct parseOfferVo(OfferVO offerVo) {
+	private PpmProduct parseOfferVo(OfferVo offerVo) {
 		if (offerVo == null) {
 			return null;
 		}

@@ -5,13 +5,11 @@ import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dto.channel.CamScriptAddVO;
 import com.zjtelcom.cpct.dto.channel.CamScriptEditVO;
 import com.zjtelcom.cpct.dto.channel.CamScriptVO;
-import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.channel.CamScriptService;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

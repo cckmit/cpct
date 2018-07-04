@@ -1,27 +1,21 @@
 package com.zjtelcom.cpct.controller.channel;
 
-import com.zjtelcom.cpct.bean.RespInfo;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelGrp;
 import com.zjtelcom.cpct.domain.channel.LabelGrpMbr;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.dto.channel.LabelAddVO;
-import com.zjtelcom.cpct.dto.channel.LabelVO;
 import com.zjtelcom.cpct.dto.channel.QryMktScriptReq;
-import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.channel.LabelService;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
-import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 @RestController
 @RequestMapping("${adminPath}/label")
