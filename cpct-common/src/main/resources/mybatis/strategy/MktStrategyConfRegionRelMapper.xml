@@ -1,68 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace=" com.zjtelcom.cpct.dao.strategy.MktStrategyConfRegionRelMapper">
-  <!--<resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRegionRelDO">-->
-    <!--<id column="MKT_STRATEGY_CONF_REGION_REL_ID" jdbcType="DECIMAL" property="mktStrategyConfRegionRelId" />-->
-    <!--<result column="MKT_STRATEGY_CONF_ID" jdbcType="DECIMAL" property="mktStrategyConfId" />-->
-    <!--<result column="APPLY_CITY_ID" jdbcType="DECIMAL" property="applyCityId" />-->
-    <!--<result column="APPLY_COUNTY" jdbcType="VARCHAR" property="applyCounty" />-->
-    <!--<result column="APPLY_BRANCH" jdbcType="VARCHAR" property="applyBranch" />-->
-    <!--<result column="APPLY_GRIDDING" jdbcType="VARCHAR" property="applyGridding" />-->
-    <!--<result column="CREATE_STAFF" jdbcType="DECIMAL" property="createStaff" />-->
-    <!--<result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />-->
-    <!--<result column="UPDATE_STAFF" jdbcType="DECIMAL" property="updateStaff" />-->
-    <!--<result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />-->
-  <!--</resultMap>-->
-  <!--<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">-->
-    <!--delete from mkt_strategy_conf_region_rel-->
-    <!--where MKT_STRATEGY_CONF_REGION_REL_ID = #{mktStrategyConfRegionRelId,jdbcType=DECIMAL}-->
-  <!--</delete>-->
-  <!--<delete id="deleteByMktStrategyConfId" parameterType="java.lang.Long">-->
-    <!--from mkt_strategy_conf_region_rel-->
-    <!--where MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=DECIMAL}-->
-  <!--</delete>-->
-  <!--<insert id="insert" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRegionRelDO">-->
-    <!--insert into mkt_strategy_conf_region_rel (MKT_STRATEGY_CONF_REGION_REL_ID, MKT_STRATEGY_CONF_ID,-->
-      <!--APPLY_CITY_ID, APPLY_COUNTY, APPLY_BRANCH,-->
-      <!--APPLY_GRIDDING, CREATE_STAFF, CREATE_DATE,-->
-      <!--UPDATE_STAFF, UPDATE_DATE)-->
-    <!--values (#{mktStrategyConfRegionRelId,jdbcType=DECIMAL}, #{mktStrategyConfId,jdbcType=DECIMAL},-->
-      <!--#{applyCityId,jdbcType=DECIMAL}, #{applyCounty,jdbcType=VARCHAR}, #{applyBranch,jdbcType=VARCHAR},-->
-      <!--#{applyGridding,jdbcType=VARCHAR}, #{createStaff,jdbcType=DECIMAL}, #{createDate,jdbcType=TIMESTAMP},-->
-      <!--#{updateStaff,jdbcType=DECIMAL}, #{updateDate,jdbcType=TIMESTAMP})-->
-  <!--</insert>-->
-  <!--<update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRegionRelDO">-->
-    <!--update mkt_strategy_conf_region_rel-->
-    <!--set MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=DECIMAL},-->
-      <!--APPLY_CITY_ID = #{applyCityId,jdbcType=DECIMAL},-->
-      <!--APPLY_COUNTY = #{applyCounty,jdbcType=VARCHAR},-->
-      <!--APPLY_BRANCH = #{applyBranch,jdbcType=VARCHAR},-->
-      <!--APPLY_GRIDDING = #{applyGridding,jdbcType=VARCHAR},-->
-      <!--CREATE_STAFF = #{createStaff,jdbcType=DECIMAL},-->
-      <!--CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},-->
-      <!--UPDATE_STAFF = #{updateStaff,jdbcType=DECIMAL},-->
-      <!--UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}-->
-    <!--where MKT_STRATEGY_CONF_REGION_REL_ID = #{mktStrategyConfRegionRelId,jdbcType=DECIMAL}-->
-  <!--</update>-->
-  <!--<select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">-->
-    <!--select MKT_STRATEGY_CONF_REGION_REL_ID, MKT_STRATEGY_CONF_ID, APPLY_CITY_ID, APPLY_COUNTY,-->
-    <!--APPLY_BRANCH, APPLY_GRIDDING, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE-->
-    <!--from mkt_strategy_conf_region_rel-->
-    <!--where MKT_STRATEGY_CONF_REGION_REL_ID = #{mktStrategyConfRegionRelId,jdbcType=DECIMAL}-->
-  <!--</select>-->
-  <!--<select id="selectAll" resultMap="BaseResultMap">-->
-    <!--select MKT_STRATEGY_CONF_REGION_REL_ID, MKT_STRATEGY_CONF_ID, APPLY_CITY_ID, APPLY_COUNTY,-->
-    <!--APPLY_BRANCH, APPLY_GRIDDING, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE-->
-    <!--from mkt_strategy_conf_region_rel-->
-  <!--</select>-->
-  <!--<select id="selectByMktStrategyConfId" resultMap="BaseResultMap">-->
-    <!--select MKT_STRATEGY_CONF_REGION_REL_ID, MKT_STRATEGY_CONF_ID, APPLY_CITY_ID, APPLY_COUNTY,-->
-    <!--APPLY_BRANCH, APPLY_GRIDDING, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE-->
-    <!--from mkt_strategy_conf_region_rel-->
-    <!--where 1 = 1-->
-    <!--<if test = "mktStrategyConfId != null">-->
-      <!--AND MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=DECIMAL}-->
-    <!--</if>-->
-    <!--order by MKT_STRATEGY_CONF_REGION_REL_ID-->
-  <!--</select>-->
+<mapper namespace="com.zjtelcom.cpct.dao.strategy.MktStrategyConfRegionRelMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRegionRelDO">
+    <id column="MKT_STRATEGY_CONF_REGION_REL_ID" jdbcType="BIGINT" property="mktStrategyConfRegionRelId" />
+    <result column="MKT_STRATEGY_CONF_ID" jdbcType="BIGINT" property="mktStrategyConfId" />
+    <result column="APPLY_CITY_ID" jdbcType="BIGINT" property="applyCityId" />
+    <result column="APPLY_COUNTY" jdbcType="VARCHAR" property="applyCounty" />
+    <result column="APPLY_BRANCH" jdbcType="VARCHAR" property="applyBranch" />
+    <result column="APPLY_GRIDDING" jdbcType="VARCHAR" property="applyGridding" />
+    <result column="CREATE_STAFF" jdbcType="VARCHAR" property="createStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_STAFF" jdbcType="VARCHAR" property="updateStaff" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from mkt_strategy_conf_region_rel
+    where MKT_STRATEGY_CONF_REGION_REL_ID = #{mktStrategyConfRegionRelId,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByMktStrategyConfId" parameterType="java.lang.Long">
+    delete from mkt_strategy_conf_region_rel
+    where MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRegionRelDO">
+    insert into mkt_strategy_conf_region_rel (MKT_STRATEGY_CONF_REGION_REL_ID, MKT_STRATEGY_CONF_ID, 
+      APPLY_CITY_ID, APPLY_COUNTY, APPLY_BRANCH, 
+      APPLY_GRIDDING, CREATE_STAFF, CREATE_DATE, 
+      UPDATE_STAFF, UPDATE_DATE)
+    values (#{mktStrategyConfRegionRelId,jdbcType=BIGINT}, #{mktStrategyConfId,jdbcType=BIGINT}, 
+      #{applyCityId,jdbcType=BIGINT}, #{applyCounty,jdbcType=VARCHAR}, #{applyBranch,jdbcType=VARCHAR}, 
+      #{applyGridding,jdbcType=VARCHAR}, #{createStaff,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateStaff,jdbcType=VARCHAR}, #{updateDate,jdbcType=TIMESTAMP})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRegionRelDO">
+    update mkt_strategy_conf_region_rel
+    set MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=BIGINT},
+      APPLY_CITY_ID = #{applyCityId,jdbcType=BIGINT},
+      APPLY_COUNTY = #{applyCounty,jdbcType=VARCHAR},
+      APPLY_BRANCH = #{applyBranch,jdbcType=VARCHAR},
+      APPLY_GRIDDING = #{applyGridding,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=VARCHAR},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_STAFF = #{updateStaff,jdbcType=VARCHAR},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
+    where MKT_STRATEGY_CONF_REGION_REL_ID = #{mktStrategyConfRegionRelId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_STRATEGY_CONF_REGION_REL_ID, MKT_STRATEGY_CONF_ID, APPLY_CITY_ID, APPLY_COUNTY, 
+    APPLY_BRANCH, APPLY_GRIDDING, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+    from mkt_strategy_conf_region_rel
+    where MKT_STRATEGY_CONF_REGION_REL_ID = #{mktStrategyConfRegionRelId,jdbcType=BIGINT}
+  </select>
+  <select id="selectByMktStrategyConfId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_STRATEGY_CONF_REGION_REL_ID, MKT_STRATEGY_CONF_ID, APPLY_CITY_ID, APPLY_COUNTY,
+    APPLY_BRANCH, APPLY_GRIDDING, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+    from mkt_strategy_conf_region_rel
+    where MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select MKT_STRATEGY_CONF_REGION_REL_ID, MKT_STRATEGY_CONF_ID, APPLY_CITY_ID, APPLY_COUNTY, 
+    APPLY_BRANCH, APPLY_GRIDDING, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+    from mkt_strategy_conf_region_rel
+  </select>
 </mapper>
