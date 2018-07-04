@@ -16,4 +16,17 @@ spring:
     url: jdbc:mysql://47.94.168.117:3306/fpc_system?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
     username: root
     password: Yanlei2018
+  #redis相关配置
+  redis:
+    host: 47.94.168.117
+    port: 6379
+    password: 9bOCHtdJkNZ1hb2e35OmgIrLvGEaBXuT2udRBQNt5VQ
+    pool:
+      max-active: 8
+      max-wait: -1
+      max-idle: 8
+      min-idle: 0
+    timeout: 30000
+
+
 

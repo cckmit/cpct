@@ -5,17 +5,24 @@ import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
+import com.zjtelcom.cpct.dao.user.UserListMapper;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
+import com.zjtelcom.cpct.dto.user.UserList;
 import com.zjtelcom.cpct.request.filter.FilterRuleReq;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.filter.FilterRuleService;
 import com.zjtelcom.cpct.util.DateUtil;
+import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +38,14 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
 
     @Autowired
     private FilterRuleMapper filterRuleMapper;
+    @Autowired
+    private UserListMapper userListMapper;
+    @Autowired
+    private RedisUtils redisUtils;
 
+    /**
+     * 过滤规则列表（含分页）
+     */
     @Override
     public Map<String, Object> qryFilterRule(FilterRuleReq filterRuleReq) {
         Map<String, Object> maps = new HashMap<>();
@@ -42,6 +56,65 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("filterRules", filterRules);
         maps.put("pageInfo", new Page(new PageInfo(filterRules)));
+        return maps;
+    }
+
+    /**
+     * 过滤规则列表（不含分页）
+     */
+    @Override
+    public Map<String, Object> qryFilterRules(FilterRuleReq filterRuleReq) {
+        Map<String, Object> maps = new HashMap<>();
+        List<FilterRule> filterRules = filterRuleMapper.qryFilterRule(filterRuleReq.getFilterRule());
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("filterRules", filterRules);
+        return maps;
+    }
+
+    /**
+     * 导入用户名单
+     */
+    @Override
+    public Map<String, Object> importUserList(MultipartFile multipartFile) throws IOException {
+        Map<String, Object> maps = new HashMap<>();
+        UserList userList = new UserList();
+        InputStream inputStream = multipartFile.getInputStream();
+        XSSFWorkbook wb = new XSSFWorkbook(inputStream);
+        Sheet sheet = wb.getSheetAt(0);
+        Integer rowNums = sheet.getLastRowNum() + 1;
+        for (int i = 1; i < rowNums; i++) {
+            Row row = sheet.getRow(i);
+            for (int j = 0; j < row.getLastCellNum(); j++) {
+                Cell cell = row.getCell(j);
+                switch (j) {
+                    case 0:
+                        userList.setUserName(cell.getStringCellValue());
+                        break;
+                    case 1:
+                        cell.setCellType(CellType.STRING);
+                        userList.setUserPhone(cell.getStringCellValue());
+                        break;
+                    case 2:
+                        userList.setFilterType(cell.getStringCellValue());
+                        break;
+                }
+            }
+            UserList userListT = userListMapper.getUserList(userList);
+            if (userListT != null) {
+                continue;
+            }
+            userList.setCreateDate(DateUtil.getCurrentTime());
+            userList.setUpdateDate(DateUtil.getCurrentTime());
+            userList.setStatusDate(DateUtil.getCurrentTime());
+            userList.setUpdateStaff(UserUtil.loginId());
+            userList.setCreateStaff(UserUtil.loginId());
+            userList.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+            userListMapper.insert(userList);
+        }
+        redisUtils.set("1","1");
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
         return maps;
     }
 

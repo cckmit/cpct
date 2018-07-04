@@ -72,15 +72,15 @@ public class EventSceneController extends BaseController {
      */
     @RequestMapping("/editEventScene")
     @CrossOrigin
-    public String editEventScene(@Param("eventSceneId") Long eventSceneId) {
-        EventSceneDO eventSceneDO = new EventSceneDO();
+    public String editEventScene(@RequestBody EventScene eventScene) {
+        Map<String,Object> maps = new HashMap<>();
         try {
-            eventSceneDO = eventSceneService.editEventScene(eventSceneId);
+            maps = eventSceneService.editEventScene(eventScene.getEventSceneId());
         } catch (Exception e) {
-            logger.error("[op:EventSceneController] fail to editEventScene for eventSceneId = {}! Exception: ", eventSceneId, e);
+            logger.error("[op:EventSceneController] fail to editEventScene for eventScene = {}! Exception: ", JSONArray.toJSON(eventScene), e);
             return initFailRespInfo(ErrorCode.EDIT_EVENT_SCENE_LIST_FAILURE.getErrorMsg(), ErrorCode.EDIT_EVENT_SCENE_LIST_FAILURE.getErrorCode());
         }
-        return initSuccRespInfo(eventSceneDO);
+        return JSON.toJSONString(maps);
     }
 
     /**
