@@ -1,4 +1,4 @@
-package com.zjtelcom.cpct.domain.campaign;
+package com.zjtelcom.cpct.domain.strategy;
 
 import lombok.Data;
 

@@ -31,12 +31,15 @@ public class SysStaffController extends BaseController {
      */
     @RequestMapping(value = "listStaff", method = RequestMethod.POST)
     @CrossOrigin
-    public String listStaff(@RequestParam("staffAccount") String staffAccount,
-                            @RequestParam("staffName") String staffName,
-                            @RequestParam("status") Long status,
-                            @RequestParam("page") Integer page,
-                            @RequestParam("pageSize") Integer pageSize) {
+    public String listStaff(@RequestBody Map<String,String> params) {
         Map result = new HashMap();
+
+        String staffAccount = params.get("staffAccount");
+        String staffName = params.get("staffName");
+        Long status = Long.parseLong(params.get("status"));
+        Integer page = Integer.parseInt(params.get("page"));
+        Integer pageSize = Integer.parseInt(params.get("pageSize"));
+
         try {
             result = sysStaffService.listStaff(staffAccount, staffName, status, page, pageSize);
         } catch (Exception e) {
@@ -49,13 +52,16 @@ public class SysStaffController extends BaseController {
     /**
      * 根据员工id查询员工信息
      *
-     * @param staffId
+     * @param params
      * @return
      */
     @RequestMapping(value = "getStaff", method = RequestMethod.POST)
     @CrossOrigin
-    public String getStaff(@RequestParam("staffId") Long staffId) {
+    public String getStaff(@RequestBody Map<String,String> params) {
         Map result = new HashMap();
+
+        Long staffId = Long.parseLong(params.get("staffId"));
+
         try {
             result = sysStaffService.getStaff(staffId);
         } catch (Exception e) {
@@ -73,7 +79,7 @@ public class SysStaffController extends BaseController {
      */
     @RequestMapping(value = "saveStaff", method = RequestMethod.POST)
     @CrossOrigin
-    public String saveStaff(SysStaffDTO sysStaffDTO) {
+    public String saveStaff(@RequestBody SysStaffDTO sysStaffDTO) {
         Map result = new HashMap();
         try {
             result = sysStaffService.saveStaff(sysStaffDTO);
@@ -93,7 +99,7 @@ public class SysStaffController extends BaseController {
      */
     @RequestMapping(value = "updateStaff", method = RequestMethod.POST)
     @CrossOrigin
-    public String updateStaff(SysStaffDTO sysStaff) {
+    public String updateStaff(@RequestBody SysStaffDTO sysStaff) {
         Map result = new HashMap();
         try {
             result = sysStaffService.updateStaff(sysStaff);
@@ -108,14 +114,17 @@ public class SysStaffController extends BaseController {
     /**
      * 修改员工账号状态
      *
-     * @param staffId
-     * @param status
+     * @param params
      * @return
      */
     @RequestMapping(value = "changeStatus", method = RequestMethod.POST)
     @CrossOrigin
-    public String changeStatus(@RequestParam("staffId") Long staffId, @RequestParam("status") Long status) {
+    public String changeStatus(@RequestBody Map<String,String> params) {
         Map result = new HashMap();
+
+        Long staffId = Long.parseLong(params.get("staffId"));
+        Long status = Long.parseLong(params.get("status"));
+
         try {
             result = sysStaffService.changeStatus(staffId, status);
         } catch (Exception e) {
@@ -129,14 +138,17 @@ public class SysStaffController extends BaseController {
     /**
      * 修改密码
      *
-     * @param staffId  员工id
-     * @param password 新密码
+     * @param params
      * @return
      */
     @RequestMapping(value = "updatePassword", method = RequestMethod.POST)
     @CrossOrigin
-    public String updatePassword(@RequestParam("staffId") Long staffId, @RequestParam("password") String password) {
+    public String updatePassword(@RequestBody Map<String,String> params) {
         Map result = new HashMap();
+
+        Long staffId = Long.parseLong(params.get("staffId"));
+        String password = params.get("password");
+
         try {
             result = sysStaffService.updatePassword(staffId, password);
         } catch (Exception e) {

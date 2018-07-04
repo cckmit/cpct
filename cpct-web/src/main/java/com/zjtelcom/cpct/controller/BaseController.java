@@ -23,7 +23,7 @@ public class BaseController {
      * @param msg
      * @return
      */
-    public String initFailRespInfo(String msg, String errorCode) {
+    public static String initFailRespInfo(String msg, String errorCode) {
         return FastJsonUtils.objToJson(RespInfo.build(CommonConstant.CODE_FAIL,msg,errorCode));
     }
 

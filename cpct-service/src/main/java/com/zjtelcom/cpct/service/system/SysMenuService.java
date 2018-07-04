@@ -1,13 +1,12 @@
 package com.zjtelcom.cpct.service.system;
 
-import com.zjtelcom.cpct.domain.system.SysMenu;
 
-import java.util.List;
+import java.util.Map;
 
 public interface SysMenuService {
 
-    List<SysMenu> listMenu();
+    Map<String,Object> listMenu();
 
-    List<SysMenu> listMenuByRoleId(Long roleId);
+    Map<String,Object> listMenuByRoleId(Long roleId);
 
 }

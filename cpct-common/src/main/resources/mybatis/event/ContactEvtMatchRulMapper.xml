@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zjtelcom.cpct.dao.event.EventMatchRulMapper">
-    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.event.EventMatchRulDO">
+<mapper namespace="com.zjtelcom.cpct.dao.event.ContactEvtMatchRulMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.dto.event.ContactEvtMatchRul">
         <id column="EVT_MATCH_RUL_ID" jdbcType="BIGINT" property="evtMatchRulId"/>
-        <result column="EVENT_ID" jdbcType="BIGINT" property="eventId"/>
+        <result column="EVENT_ID" jdbcType="BIGINT" property="contactEvtId"/>
         <result column="EVT_RUL_NAME" jdbcType="VARCHAR" property="evtRulName"/>
         <result column="EVT_RUL_DESC" jdbcType="VARCHAR" property="evtRulDesc"/>
         <result column="EVT_RUL_HANDLE_CLASS" jdbcType="VARCHAR" property="evtRulHandleClass"/>
@@ -20,21 +20,21 @@
         delete from event_match_rul
         where EVT_MATCH_RUL_ID = #{evtMatchRulId,jdbcType=BIGINT}
     </delete>
-    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.event.EventMatchRulDO">
+    <insert id="insert" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtMatchRul">
         insert into event_match_rul (EVT_MATCH_RUL_ID, EVENT_ID, EVT_RUL_NAME,
         EVT_RUL_DESC, EVT_RUL_HANDLE_CLASS, EVT_RUL_EXPRESSION,
         STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
         CREATE_DATE, STATUS_DATE, UPDATE_DATE,
         REMARK)
-        values (#{evtMatchRulId,jdbcType=BIGINT}, #{eventId,jdbcType=BIGINT}, #{evtRulName,jdbcType=VARCHAR},
+        values (#{evtMatchRulId,jdbcType=BIGINT}, #{contactEvtId,jdbcType=BIGINT}, #{evtRulName,jdbcType=VARCHAR},
         #{evtRulDesc,jdbcType=VARCHAR}, #{evtRulHandleClass,jdbcType=VARCHAR}, #{evtRulExpression,jdbcType=VARCHAR},
         #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT},
         #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP},
         #{remark,jdbcType=VARCHAR})
     </insert>
-    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.event.EventMatchRulDO">
+    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtMatchRul">
         update event_match_rul
-        set EVENT_ID = #{eventId,jdbcType=BIGINT},
+        set EVENT_ID = #{contactEvtId,jdbcType=BIGINT},
         EVT_RUL_NAME = #{evtRulName,jdbcType=VARCHAR},
         EVT_RUL_DESC = #{evtRulDesc,jdbcType=VARCHAR},
         EVT_RUL_HANDLE_CLASS = #{evtRulHandleClass,jdbcType=VARCHAR},
@@ -72,5 +72,61 @@
             and EVT_RUL_NAME LIKE CONCAT('%',CONCAT(#{evtRulName},'%'))
         </if>
     </select>
+
+    <update id="modContactEvtMatchRul" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtMatchRul">
+        update event_match_rul
+        set
+        <if test="contactEvtId != null and contactEvtId != 0">
+            EVENT_ID = #{contactEvtId,jdbcType=BIGINT},
+        </if>
+        <if test="evtRulName != null and evtRulName != ''">
+            EVT_RUL_NAME = #{evtRulName,jdbcType=VARCHAR},
+        </if>
+        <if test="evtRulDesc != null and evtRulDesc != ''">
+            EVT_RUL_DESC = #{evtRulDesc,jdbcType=VARCHAR},
+        </if>
+        <if test="evtRulHandleClass != null and evtRulHandleClass != ''">
+            EVT_RUL_HANDLE_CLASS = #{evtRulHandleClass,jdbcType=VARCHAR},
+        </if>
+        <if test="evtRulExpression != null and evtRulExpression != ''">
+            EVT_RUL_EXPRESSION = #{evtRulExpression,jdbcType=VARCHAR},
+        </if>
+        <if test="statusCd != null and statusCd != ''">
+            STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+        </if>
+        <if test="createStaff != null and createStaff != 0">
+            CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+        </if>
+        <if test="updateStaff != null and updateStaff != 0">
+            UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        </if>
+        <if test="createDate != null">
+            CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="statusDate != null">
+            STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="updateDate != null">
+            UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="remark != null and remark != ''">
+            REMARK = #{remark,jdbcType=VARCHAR},
+        </if>
+        EVT_MATCH_RUL_ID = #{evtMatchRulId,jdbcType=BIGINT}
+        where EVT_MATCH_RUL_ID = #{evtMatchRulId,jdbcType=BIGINT}
+    </update>
+
+    <insert id="createContactEvtMatchRul" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtMatchRul">
+        insert into event_match_rul ( EVENT_ID, EVT_RUL_NAME,
+        EVT_RUL_DESC, EVT_RUL_HANDLE_CLASS, EVT_RUL_EXPRESSION,
+        STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+        CREATE_DATE, STATUS_DATE, UPDATE_DATE,
+        REMARK)
+        values (#{contactEvtId,jdbcType=BIGINT}, #{evtRulName,jdbcType=VARCHAR},
+        #{evtRulDesc,jdbcType=VARCHAR}, #{evtRulHandleClass,jdbcType=VARCHAR}, #{evtRulExpression,jdbcType=VARCHAR},
+        #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT},
+        #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP},
+        #{remark,jdbcType=VARCHAR})
+    </insert>
 
 </mapper>

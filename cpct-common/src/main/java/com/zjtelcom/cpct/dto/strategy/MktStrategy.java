@@ -1,4 +1,4 @@
-package com.zjtelcom.cpct.dto.campaign;
+package com.zjtelcom.cpct.dto.strategy;
 
 import com.zjtelcom.cpct.BaseEntity;
 

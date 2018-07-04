@@ -74,7 +74,7 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
         //根据事件id 查询所有关联的事件场景
         EventSceneDO param = new EventSceneDO();
         param.setEventId(eventId);
-        List<EventSceneDO> eventScenes = eventSceneMapper.listEventSences(param);
+        List<EventSceneDO> eventScenes = null;
 
         //循环事件场景列表 根据事件场景获取活动列表
         List<Long> activityIds = new ArrayList<>();

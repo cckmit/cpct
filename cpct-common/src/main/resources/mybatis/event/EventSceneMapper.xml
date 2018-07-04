@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zjtelcom.cpct.dao.event.EventSceneMapper">
-    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.event.EventSceneDO">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.dto.event.EventScene">
         <id column="EVENT_SCENE_ID" jdbcType="BIGINT" property="eventSceneId"/>
         <result column="EVENT_SCENE_NBR" jdbcType="VARCHAR" property="eventSceneNbr"/>
         <result column="EVENT_SCENE_NAME" jdbcType="VARCHAR" property="eventSceneName"/>
@@ -21,7 +21,7 @@
     delete from event_scene
     where EVENT_SCENE_ID = #{eventSceneId,jdbcType=BIGINT}
   </delete>
-    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.event.EventSceneDO">
+    <insert id="insert" parameterType="com.zjtelcom.cpct.dto.event.EventScene">
     insert into event_scene (EVENT_SCENE_ID, EVENT_SCENE_NBR, EVENT_SCENE_NAME, 
       EVENT_SCENE_DESC, EVENT_ID, EXT_EVENT_SCENE_ID, 
       STATUS_CD, STATUS_DATE, CREATE_STAFF, 
@@ -33,7 +33,7 @@
       #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, #{createDate,jdbcType=TIMESTAMP}, 
       #{remark,jdbcType=VARCHAR}, #{contactEvtCode,jdbcType=VARCHAR})
   </insert>
-    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.event.EventSceneDO">
+    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.dto.event.EventScene">
         update event_scene
         set
         <if test="eventSceneNbr != null and eventSceneNbr != '' ">
@@ -54,7 +54,7 @@
         <if test="statusCd != null and statusCd != '' ">
             STATUS_CD = #{statusCd,jdbcType=VARCHAR},
         </if>
-        <if test="statusDate != null and statusDate != '' ">
+        <if test="statusDate != null">
             STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
         </if>
         <if test="createStaff != null and createStaff != 0 ">
@@ -63,10 +63,10 @@
         <if test="updateStaff != null and updateStaff != 0 ">
             UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
         </if>
-        <if test="updateDate != null and updateDate != '' ">
+        <if test="updateDate != null">
             UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
         </if>
-        <if test="createDate != null and createDate != '' ">
+        <if test="createDate != null">
             CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
         </if>
         <if test="remark != null and remark != '' ">
@@ -92,7 +92,7 @@
     from event_scene
   </select>
 
-    <select id="listEventSences" parameterType="com.zjtelcom.cpct.domain.event.EventSceneDO"
+    <select id="qryEventSceneList" parameterType="com.zjtelcom.cpct.dto.event.EventScene"
             resultMap="BaseResultMap">
         select EVENT_SCENE_ID, EVENT_SCENE_NBR, EVENT_SCENE_NAME, EVENT_SCENE_DESC, EVENT_ID,
         EXT_EVENT_SCENE_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE,
@@ -102,12 +102,15 @@
         <if test="eventSceneId != null and eventSceneId != 0 ">
             and EVENT_SCENE_ID = #{eventSceneId}
         </if>
-        <if test="eventId != null and eventId != 0 ">
-            and EVENT_ID = #{eventId}
+        <if test="eventSceneNbr != null and eventSceneNbr != '' ">
+            and EVENT_SCENE_NBR like concat('%',concat(#{eventSceneNbr},'%'))
+        </if>
+        <if test="eventSceneName != null and eventSceneName != '' ">
+            and EVENT_SCENE_NAME like concat('%',concat(#{eventSceneName},'%'))
         </if>
     </select>
 
-    <insert id="saveEventScene" parameterType="com.zjtelcom.cpct.domain.event.EventSceneDO">
+    <insert id="saveEventScene" parameterType="com.zjtelcom.cpct.dto.event.EventScene">
     insert into event_scene ( EVENT_SCENE_NBR, EVENT_SCENE_NAME,
     EVENT_SCENE_DESC, EVENT_ID, EXT_EVENT_SCENE_ID,
     STATUS_CD, STATUS_DATE, CREATE_STAFF,
@@ -128,5 +131,22 @@
     where  EVENT_SCENE_ID = #{eventSceneId}
   </select>
 
+    <insert id="createEventScene" parameterType="com.zjtelcom.cpct.dto.event.EventScene">
+        insert into event_scene ( EVENT_SCENE_NBR, EVENT_SCENE_NAME,
+        EVENT_SCENE_DESC, EVENT_ID, EXT_EVENT_SCENE_ID,
+        STATUS_CD, STATUS_DATE, CREATE_STAFF,
+        UPDATE_STAFF, UPDATE_DATE, CREATE_DATE,
+        REMARK, CONTACT_EVT_CODE)
+        values ( #{eventSceneNbr,jdbcType=VARCHAR}, #{eventSceneName,jdbcType=VARCHAR},
+        #{eventSceneDesc,jdbcType=VARCHAR}, #{eventId,jdbcType=BIGINT}, #{extEventSceneId,jdbcType=BIGINT},
+        #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT},
+        #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, #{createDate,jdbcType=TIMESTAMP},
+        #{remark,jdbcType=VARCHAR}, #{contactEvtCode,jdbcType=VARCHAR})
+    </insert>
+
+    <delete id="delEventScene" parameterType="com.zjtelcom.cpct.dto.event.EventScene">
+        delete from event_scene
+        where EVENT_SCENE_ID = #{eventSceneId,jdbcType=BIGINT}
+    </delete>
 
 </mapper>

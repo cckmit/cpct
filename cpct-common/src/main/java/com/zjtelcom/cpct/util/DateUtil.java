@@ -202,14 +202,14 @@ public class DateUtil {
      *
      * @return Long 毫秒值
      */
-    public static Long getCurrentTime() {
+    public static Date getCurrentTime() {
 //        try {
 //            return DateUtil.getMilliSecondByStr("2018年7月1日");
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
 //        return null;
-        return new Date().getTime();
+        return new Date();
     }
 
     /**

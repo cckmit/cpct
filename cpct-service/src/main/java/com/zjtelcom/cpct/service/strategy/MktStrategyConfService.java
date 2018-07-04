@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.service.strategy;
 
-import com.zjtelcom.cpct.dto.campaign.MktStrategyConf;
-import com.zjtelcom.cpct.dto.campaign.MktStrategyConfDetail;
+import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 
 import java.util.Map;
 

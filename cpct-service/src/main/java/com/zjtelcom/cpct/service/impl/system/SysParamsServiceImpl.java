@@ -98,4 +98,16 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
 
         return result;
     }
+
+    @Override
+    public Map<String, Object> listParamsByKey(String key) {
+        Map<String,Object> result = new HashMap<>();
+
+        List<Map<String,String>> list = sysParamsMapper.listParamsByKey(key);
+
+        result.put("resultCode","0");
+        result.put("data",list);
+
+        return result;
+    }
 }

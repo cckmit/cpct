@@ -72,7 +72,25 @@ public enum ErrorCode {
     GET_CAM_CHL_CONF_SUCCESS("获取协同渠道配置成功！", "00001"),
     GET_CAM_CHL_CONF_FAILURE("获取协同渠道配置失败！", "00001"),
     DELETE_CAM_CHL_CONF_SUCCESS("删除协同渠道配置成功！", "00001"),
-    DELETE_CAM_CHL_CONF_FAILURE("删除协同渠道配置失败！", "00001");
+    DELETE_CAM_CHL_CONF_FAILURE("删除协同渠道配置失败！", "00001"),
+
+    SAVE_FILTER_RULE_CONF_SUCCESS("添加过滤规则配置成功！", "00001"),
+    SAVE_FILTER_RULE_CONF_FAILURE("添加过滤规则配置失败！", "00001"),
+    UPDATE_FILTER_RULE_CONF_SUCCESS("修改过滤规则配置成功！", "00001"),
+    UPDATE_FILTER_RULE_CONF_FAILURE("修改过滤规则配置失败！", "00001"),
+    GET_FILTER_RULE_CONF_SUCCESS("获取过滤规则配置成功！", "00001"),
+    GET_FILTER_RULE_CONF_FAILURE("获取过滤规则配置失败！", "00001"),
+    DELETE_FILTER_RULE_CONF_SUCCESS("删除过滤规则配置成功！", "00001"),
+    DELETE_FILTER_RULE_CONF_FAILURE("删除过滤规则配置失败！", "00001"),
+
+    SAVE_MKT_RULE_STR_CONF_RULE_SUCCESS("添加策略规则成功！", "00001"),
+    SAVE_MKT_RULE_STR_CONF_RULE_FAILURE("添加策略规则失败！", "00001"),
+    UPDATE_MKT_RULE_STR_CONF_RULE_SUCCESS("修改策略规则成功！", "00001"),
+    UPDATE_MKT_RULE_STR_CONF_RULE_FAILURE("修改策略规则失败！", "00001"),
+    GET_MKT_RULE_STR_CONF_RULE_SUCCESS("获取策略规则成功！", "00001"),
+    GET_MKT_RULE_STR_CONF_RULE_FAILURE("获取策略规则失败！", "00001"),
+    DELETE_MKT_RULE_STR_CONF_RULE_SUCCESS("删除策略规则成功！", "00001"),
+    DELETE_MKT_RULE_STR_CONF_RULE_FAILURE("删除策略规则失败！", "00001");
 
     private String errorMsg;
     private String errorCode;

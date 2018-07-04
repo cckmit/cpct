@@ -30,12 +30,14 @@ public class SysParamsController extends BaseController {
      */
     @RequestMapping(value = "listParams", method = RequestMethod.POST)
     @CrossOrigin
-    public String listParams(@RequestParam("paramName") String paramName,
-                             @RequestParam("configType") Long configType,
-                             @RequestParam("page") Integer page,
-                             @RequestParam("pageSize") Integer pageSize) {
+    public String listParams(@RequestBody Map<String,String> params) {
         Map result = new HashMap();
-        List<SysParams> list = new ArrayList<>();
+
+        String paramName = params.get("paramName");
+        Long configType = Long.parseLong(params.get("configType"));
+        Integer page = Integer.parseInt(params.get("page"));
+        Integer pageSize = Integer.parseInt(params.get("pageSize"));
+
         try {
             result = sysParamsService.listParams(paramName, configType, page, pageSize);
         } catch (Exception e) {
@@ -48,13 +50,16 @@ public class SysParamsController extends BaseController {
     /**
      * 根据参数id查询配置参数信息
      *
-     * @param paramId
+     * @param params
      * @return
      */
     @RequestMapping(value = "getParams", method = RequestMethod.POST)
     @CrossOrigin
-    public String getParams(@RequestParam("paramId") Long paramId) {
+    public String getParams(@RequestBody Map<String,String> params) {
         Map result = new HashMap();
+
+        Long paramId = Long.parseLong(params.get("paramId"));
+
         try {
             result = sysParamsService.getParams(paramId);
         } catch (Exception e) {
@@ -72,7 +77,7 @@ public class SysParamsController extends BaseController {
      */
     @RequestMapping(value = "saveParams", method = RequestMethod.POST)
     @CrossOrigin
-    public String saveParams(SysParams sysParams) {
+    public String saveParams(@RequestBody SysParams sysParams) {
         Map result = new HashMap();
         try {
             result = sysParamsService.saveParams(sysParams);
@@ -92,7 +97,7 @@ public class SysParamsController extends BaseController {
      */
     @RequestMapping(value = "updateParams", method = RequestMethod.POST)
     @CrossOrigin
-    public String updateParams(SysParams sysParams) {
+    public String updateParams(@RequestBody SysParams sysParams) {
         Map result = new HashMap();
         try {
             result = sysParamsService.updateParams(sysParams);
@@ -107,15 +112,40 @@ public class SysParamsController extends BaseController {
     /**
      * 删除配置参数
      *
-     * @param paramId
+     * @param params
      * @return
      */
     @RequestMapping(value = "delParams", method = RequestMethod.POST)
     @CrossOrigin
-    public String delParams(Long paramId) {
+    public String delParams(@RequestBody Map<String,String> params) {
         Map result = new HashMap();
+
+        Long paramId = Long.parseLong(params.get("paramId"));
+
         try {
             result = sysParamsService.delParams(paramId);
+        } catch (Exception e) {
+            logger.error("[op:SysParamsController] fail to delParams Exception: ", e);
+            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+        }
+
+        return JSON.toJSON(result).toString();
+    }
+
+    /**
+     * 根据关键字获取静态参数list
+     * @param params
+     * @return
+     */
+    @RequestMapping(value = "listParamsByKey", method = RequestMethod.POST)
+    @CrossOrigin
+    public String listParamsByKey(@RequestBody Map<String,String> params) {
+        Map result = new HashMap();
+
+        String key = params.get("key");
+
+        try {
+            result = sysParamsService.listParamsByKey(key);
         } catch (Exception e) {
             logger.error("[op:SysParamsController] fail to delParams Exception: ", e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());

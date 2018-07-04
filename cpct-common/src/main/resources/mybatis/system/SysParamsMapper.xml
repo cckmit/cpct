@@ -50,10 +50,10 @@
     </select>
 
     <select id="selectAll" resultMap="BaseResultMap">
-    select PARAM_ID, PARAM_NAME, PARAM_VALUE, CONFIG_TYPE, MODIFY_FLAG, DESCRIPTION, 
-    PARAM_KEY, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
-    from sys_params
-    where 1=1
+        select PARAM_ID, PARAM_NAME, PARAM_VALUE, CONFIG_TYPE, MODIFY_FLAG, DESCRIPTION,
+        PARAM_KEY, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
+        from sys_params
+        where 1=1
         <if test="paramName != null and paramName != ''">
             and PARAM_NAME like CONCAT('%',#{paramName,jdbcType=VARCHAR},'%')
         </if>
@@ -62,5 +62,12 @@
         </if>
         order by CREATE_DATE desc
     </select>
+
+    <select id="listParamsByKey" resultType="Map">
+        select PARAM_NAME as name, PARAM_VALUE value
+        from sys_params
+        where PARAM_KEY = #{paramKey,jdbcType=VARCHAR}
+    </select>
+
 
 </mapper>

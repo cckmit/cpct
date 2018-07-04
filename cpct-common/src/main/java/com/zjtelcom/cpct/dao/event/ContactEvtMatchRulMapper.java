@@ -1,14 +1,16 @@
 package com.zjtelcom.cpct.dao.event;
 
 import com.zjtelcom.cpct.domain.event.EventMatchRulDO;
+import com.zjtelcom.cpct.dto.event.ContactEvtMatchRul;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
 @Mapper
 @Repository
-public interface EventMatchRulMapper {
+public interface ContactEvtMatchRulMapper {
 
     int deleteByPrimaryKey(Long evtMatchRulId);
 
@@ -20,6 +22,10 @@ public interface EventMatchRulMapper {
 
     int updateByPrimaryKey(EventMatchRulDO record);
 
-    List<EventMatchRulDO> listEventMatchRuls(@Param("evtRulName") String evtRulName);
+    List<ContactEvtMatchRul> listEventMatchRuls(ContactEvtMatchRul contactEvtMatchRul);
+
+    int createContactEvtMatchRul(ContactEvtMatchRul contactEvtMatchRul);
+
+    int modContactEvtMatchRul(ContactEvtMatchRul contactEvtMatchRul);
 
 }

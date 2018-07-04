@@ -1,8 +1,7 @@
 package com.zjtelcom.cpct.dao.strategy;
 
 
-import com.zjtelcom.cpct.domain.campaign.MktStrategyConfDO;
-import com.zjtelcom.cpct.dto.campaign.MktStrategyConf;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 

@@ -25,6 +25,7 @@ public class ContactEvt extends BaseEntity implements Serializable{
     private String contactEvtDesc;//记录事件的描述说明
     private Long contactChlId;//记录触发事件的触点渠道标识
     private Long contactEvtTypeId;//记录事件的所属事件类型标识
+    private Long contactEvtTypeName;//记录事件的所属事件类型名称
     private String evtTrigType;//记录事件的触发类型,1000实时触发事件 2000定期触发事件 3000人工触发事件
     private String coopType;//记录推送渠道协同类型，
     private Long extEventId;//记录集团下发的事件标识

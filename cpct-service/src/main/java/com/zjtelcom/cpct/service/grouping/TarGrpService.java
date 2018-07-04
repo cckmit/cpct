@@ -35,6 +35,8 @@ public interface TarGrpService {
 
     Map<String,String> trycalc(CalcReqModel req, String serialNum);
 
-    //
+    Map<String,Object> modTarGrp(TarGrpDetail tarGrpDetail);
+
+    Map<String,Object> delTarGrp(TarGrpDetail tarGrpDetail);
 
 }

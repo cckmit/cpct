@@ -79,7 +79,7 @@ public class EventServiceImpl extends BaseService implements EventService {
             //事件关联到场景
             EventSceneDO eventSceneDO = new EventSceneDO();
             eventSceneDO.setEventId(eventDO.getEventId());
-            List<EventSceneDO> sceneDOList = eventSceneMapper.listEventSences(eventSceneDO);
+            List<EventSceneDO> sceneDOList = null;
             //场景关联到活动，创建规则关联表
             if (sceneDOList != null) {
                 for (EventSceneDO evtSceneDO : sceneDOList) {
