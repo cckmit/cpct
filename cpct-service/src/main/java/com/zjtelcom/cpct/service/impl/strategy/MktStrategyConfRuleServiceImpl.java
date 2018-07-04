@@ -54,7 +54,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
      */
     @Override
     public Map<String, Object> saveMktStrategyConfRule(MktStrategyConfRule mktStrategyConfRule) {
-        Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleMap = new HashMap<>();
+        Map<String, Object> mktStrategyConfRuleMap  = new HashMap<>();
         try {
             MktStrategyConfRuleDO ktStrategyConfRuleDO = new MktStrategyConfRuleDO();
             CopyPropertiesUtil.copyBean2Bean(ktStrategyConfRuleDO, mktStrategyConfRule);
@@ -79,7 +79,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
      */
     @Override
     public Map<String, Object> updateMktStrategyConfRule(MktStrategyConfRule mktStrategyConfRule) {
-        Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleMap = new HashMap<>();
+        Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();
         try {
             MktStrategyConfRuleDO ktStrategyConfRuleDO = new MktStrategyConfRuleDO();
             CopyPropertiesUtil.copyBean2Bean(ktStrategyConfRuleDO, mktStrategyConfRule);
@@ -128,10 +128,9 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
      */
     @Override
     public Map<String, Object> listAllMktStrategyConfRule() {
-        Map<String, Object> mktStrategyConfRuleMap = null;
+        Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();;
         List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList = new ArrayList<>();
         try {
-            mktStrategyConfRuleMap = new HashMap<>();
             mktStrategyConfRuleDOList = mktStrategyConfRuleMapper.selectAll();
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
@@ -153,9 +152,8 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
      */
     @Override
     public Map<String, Object> deleteMktStrategyConfRule(Long mktStrategyConfRuleId) {
-        Map<String, Object> mktStrategyConfRuleMap = null;
+        Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();
         try {
-            mktStrategyConfRuleMap = new HashMap<>();
             mktStrategyConfRuleMapper.deleteByPrimaryKey(mktStrategyConfRuleId);
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
