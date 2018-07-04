@@ -10,6 +10,53 @@ public class LabelAddVO implements Serializable {
     private String labelValueType;//1000输入型;2000	枚举型
     private String labelDataType;
 
+    private String fitDomain;//适用域
+    private String rightOperand;//右操作符（标签值）
+    private String conditionType;//单选多选框
+    private String operator;//运算符
+    private Integer scope;
+
+
+    public Integer getScope() {
+        return scope;
+    }
+
+    public void setScope(Integer scope) {
+        this.scope = scope;
+    }
+
+    public String getFitDomain() {
+        return fitDomain;
+    }
+
+    public void setFitDomain(String fitDomain) {
+        this.fitDomain = fitDomain;
+    }
+
+    public String getRightOperand() {
+        return rightOperand;
+    }
+
+    public void setRightOperand(String rightOperand) {
+        this.rightOperand = rightOperand;
+    }
+
+    public String getConditionType() {
+        return conditionType;
+    }
+
+    public void setConditionType(String conditionType) {
+        this.conditionType = conditionType;
+    }
+
+    public String getOperator() {
+        return operator;
+    }
+
+    public void setOperator(String operator) {
+        this.operator = operator;
+    }
+
     public String getInjectionLabelCode() {
         return injectionLabelCode;
     }

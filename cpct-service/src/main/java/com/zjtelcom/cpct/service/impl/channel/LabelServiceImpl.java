@@ -4,10 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.bean.RespInfo;
 import com.zjtelcom.cpct.common.Page;
-import com.zjtelcom.cpct.dao.channel.InjectionLabelGrpMapper;
-import com.zjtelcom.cpct.dao.channel.InjectionLabelGrpMbrMapper;
-import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
-import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
+import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dto.channel.LabelAddVO;
 import com.zjtelcom.cpct.dto.channel.LabelVO;
@@ -68,6 +65,24 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     @Override
     public Map<String,Object> addLabel(Long userId, LabelAddVO addVO) {
         Map<String,Object> result = new HashMap<>();
+//        List<FpcMTrigger> triggerList = triggerMapper.selectAll();
+//        for (FpcMTrigger trigger : triggerList){
+//
+//            LabelAddVO addVO1 = new LabelAddVO();
+//            addVO1.setInjectionLabelCode(trigger.getLeftOperand());
+//            addVO1.setInjectionLabelDesc(trigger.getDescription());
+//            addVO1.setInjectionLabelName(trigger.getConditionName());
+//            addVO1.setLabelType("1000");
+//            addVO1.setConditionType(trigger.getConditonType());
+//            addVO1.setScope(trigger.getScope());
+//            addVO1.setOperator(trigger.getOperator());
+//            addVO1.setRightOperand(trigger.getRightOperand());
+//            if (trigger.getValueId()!=null && !trigger.getValueId().equals("")){
+//                addVO1.setLabelValueType("2000");
+//            }else {
+//                addVO1.setLabelValueType("1000");
+//            }
+//        }
         Label label = BeanUtil.create(addVO,new Label());
         label.setCreateDate(new Date());
         label.setUpdateDate(new Date());
