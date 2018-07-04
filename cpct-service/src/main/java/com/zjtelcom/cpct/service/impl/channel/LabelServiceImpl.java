@@ -155,6 +155,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         return result;
     }
 
+
     //标签组
     @Override
     public Map<String,Object> addLabelGrp(Long userId, LabelGrp addVO) {

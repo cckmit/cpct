@@ -75,4 +75,15 @@
       )
     </foreach>
   </insert>
+
+  <!-- 根据标签id查询标签值 -->
+  <select id="selectByLabelId" resultMap="BaseResultMap">
+    select LABEL_VALUE_ID, INJECTION_LABEL_ID, LABEL_VALUE, VALUE_NAME, VALUE_DESC, STATUS_CD,
+    CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from injection_label_value
+    where INJECTION_LABEL_ID = #{labelId}
+  </select>
+
+
+
 </mapper>

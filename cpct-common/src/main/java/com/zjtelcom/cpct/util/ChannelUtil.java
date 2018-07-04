@@ -5,6 +5,8 @@ import com.zjtelcom.cpct.dto.channel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 @Component
@@ -26,6 +28,11 @@ public class ChannelUtil  {
     }
     public static LabelVO map2LabelVO(Label label){
         LabelVO vo = BeanUtil.create(label,new LabelVO());
+        List<String> valueList = new ArrayList<>();
+        if (label.getRightOperand()!=null && !label.getRightOperand().equals("")){
+            valueList = StringToList(label.getRightOperand());
+        }
+        vo.setValueList(valueList);
         return vo;
     }
 
@@ -49,6 +56,16 @@ public class ChannelUtil  {
         }
 
         return string;
+    }
+
+    public static List<String> StringToList(String var1) {
+        String[] array = var1.split(",");
+        List<String> list = new ArrayList<String>();
+        for (String str : array)
+        {
+            list.add(str);
+        }
+        return list;
     }
 
     public static String getDataType(String dataType){

@@ -17,7 +17,7 @@ public class Label extends BaseEntity {
 
     private String fitDomain;//适用域
     private String rightOperand;//右操作符（标签值）
-    private String conditionType;
+    private String conditionType;//单选多选框
     private String operator;//运算符
 
 }

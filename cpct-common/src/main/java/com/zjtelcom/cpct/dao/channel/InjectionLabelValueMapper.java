@@ -19,6 +19,8 @@ public interface InjectionLabelValueMapper {
 
     List<LabelValue> selectAll();
 
+    List<LabelValue> selectByLabelId(@Param("labelId")Long labelId);
+
     int updateByPrimaryKey(LabelValue record);
 
     int deleteAll();
