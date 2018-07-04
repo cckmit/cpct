@@ -7,9 +7,13 @@ import java.util.List;
 public interface MktStrategyConfRuleRelMapper {
     int deleteByPrimaryKey(Long mktStrategyConfRuleRelId);
 
+    int deleteByMktStrategyConfId(Long mktStrategyConfId);
+
     int insert(MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO);
 
     MktStrategyConfRuleRelDO selectByPrimaryKey(Long mktStrategyConfRuleRelId);
+
+    List<MktStrategyConfRuleRelDO> selectByMktStrategyConfId(Long mktStrategyConfId);
 
     List<MktStrategyConfRuleRelDO> selectAll();
 

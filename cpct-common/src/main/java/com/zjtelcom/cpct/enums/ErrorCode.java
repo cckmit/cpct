@@ -90,7 +90,16 @@ public enum ErrorCode {
     GET_MKT_RULE_STR_CONF_RULE_SUCCESS("获取策略规则成功！", "00001"),
     GET_MKT_RULE_STR_CONF_RULE_FAILURE("获取策略规则失败！", "00001"),
     DELETE_MKT_RULE_STR_CONF_RULE_SUCCESS("删除策略规则成功！", "00001"),
-    DELETE_MKT_RULE_STR_CONF_RULE_FAILURE("删除策略规则失败！", "00001");
+    DELETE_MKT_RULE_STR_CONF_RULE_FAILURE("删除策略规则失败！", "00001"),
+
+    SAVE_MKT_STR_CONF_RULE_REL_SUCCESS("添加策略配置与规则的关联关系成功！", "00001"),
+    SAVE_MKT_STR_CONF_RULE_REL_FAILURE("添加策略配置与规则的关联关系失败！", "00001"),
+    UPDATE_MKT_STR_CONF_RULE_REL_SUCCESS("修改策略配置与规则的关联关系成功！", "00001"),
+    UPDATE_MKT_STR_CONF_RULE_REL_FAILURE("修改策略配置与规则的关联关系失败！", "00001"),
+    GET_MKT_STR_CONF_RULE_REL_SUCCESS("获取策略配置与规则的关联关系成功！", "00001"),
+    GET_MKT_STR_CONF_RULE_REL_FAILURE("获取策略配置与规则的关联关系失败！", "00001"),
+    DELETE_MKT_STR_CONF_RULE_REL_SUCCESS("删除策略配置与规则的关联关系成功！", "00001"),
+    DELETE_MKT_STR_CONF_RULE_REL_FAILURE("删除策略配置与规则的关联关系失败！", "00001");
 
     private String errorMsg;
     private String errorCode;
