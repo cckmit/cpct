@@ -24,14 +24,15 @@ import org.aspectj.weaver.patterns.ThisOrTargetAnnotationPointcut;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.web.context.ContextLoader;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.*;
 
 /**
- *
  * 组装针对性营销需要的sql工具类
+ *
  * @author taowenwu
  * @version 1.0
  * @see SqlUtil
@@ -55,16 +56,16 @@ public final class SqlUtil {
 
     private static Template template;
 
-    private SqlUtil() {}
+    private SqlUtil() {
+    }
 
     /**
-     *
      * 组装sql
      *
-     * @param domainType 所属域
-     * @param triggers 因子集合
-     * @param tagInfos 出参，针对性标签集合
-     * @param company 组织单位
+     * @param domainType  所属域
+     * @param triggers    因子集合
+     * @param tagInfos    出参，针对性标签集合
+     * @param company     组织单位
      * @param tagInfoKeys 标签keyMap，防止重复标签
      * @return 根据因子组装后的sql
      * @see
@@ -79,13 +80,13 @@ public final class SqlUtil {
         Map<String, EagleSourceTableRef> keys = new HashMap<>(10);
 
         IDacher<EagleTag> tagCache = CacheManager.getInstance().getCache(
-            CacheConstants.TAG_CACHE_NAME);
+                CacheConstants.TAG_CACHE_NAME);
         IDacher<LabelValue> triggerValueCache = CacheManager.getInstance().getCache(
-            CacheConstants.TRIGGER_VALUE_CACHE_NAME);
+                CacheConstants.TRIGGER_VALUE_CACHE_NAME);
         IDacher<Label> triggerCache = CacheManager.getInstance().getCache(
-            CacheConstants.TRIGGER_CACHE_NAME);
+                CacheConstants.TRIGGER_CACHE_NAME);
         IDacher<EagleTagAdaption> tagAdaptionCache = CacheManager.getInstance().getCache(
-            CacheConstants.TAG_ADAPTION_CACHE_NAME);
+                CacheConstants.TAG_ADAPTION_CACHE_NAME);
 
         EagleTagAdaption eagleTagAdaption = tagAdaptionCache.queryOne("EAGLE_ALL_TAG_1_TRYCALC");
 
@@ -115,8 +116,8 @@ public final class SqlUtil {
             String conditionId = tigger.get("conditionId").toString();
 
             String leftOper = triggerCache.queryOne(conditionId).getEagleName();
-            leftOper = (String)GroovyUtil.invokeMethod(eagleTagAdaption.getScript(), "process",
-                new Object[] {tigger, domainType});
+            leftOper = (String) GroovyUtil.invokeMethod(eagleTagAdaption.getScript(), "process",
+                    new Object[]{tigger, domainType});
             String key = leftOper + "_" + domainType;
             EagleTag tag = tagCache.queryOne(key);
             //表别名
@@ -127,20 +128,20 @@ public final class SqlUtil {
                 // 数据类型
                 tigger.put("dataType", tag.getSourceTableColumnType());
 
-                EagleSourceTableDef tableDef = (EagleSourceTableDef)CacheManager.getInstance().getCache(
-                    CacheConstants.SOURCE_TABLE_DEF_CACHE_NAME).queryOne(
-                    tag.getCtasTableDefinitionRowId().toString());
+                EagleSourceTableDef tableDef = (EagleSourceTableDef) CacheManager.getInstance().getCache(
+                        CacheConstants.SOURCE_TABLE_DEF_CACHE_NAME).queryOne(
+                        tag.getCtasTableDefinitionRowId().toString());
 
                 // 查询出跟主表的关联表
                 EagleSourceTableRef joinTable = getJoinTable(masterTableDef, tableDef,
-                    tag.getFitDomain(), as);
+                        tag.getFitDomain(), as);
 
                 String joinTableKey = null;
                 if (null != tableDef) {
                     joinTableKey = new StringBuilder(
-                        tableDef.getCtasTableDefinitionRowId().toString()).append("-").append(
-                        masterTableDef.getCtasTableDefinitionRowId().toString()).append("-").append(
-                        domainType).toString();
+                            tableDef.getCtasTableDefinitionRowId().toString()).append("-").append(
+                            masterTableDef.getCtasTableDefinitionRowId().toString()).append("-").append(
+                            domainType).toString();
                 }
 
                 if (null != tableDef && null != joinTable) {
@@ -150,8 +151,7 @@ public final class SqlUtil {
                         tables.add(joinTable);
                         keys.put(joinTableKey, joinTable);
                     }
-                }
-                else {
+                } else {
                     LOG.error("tableDefId: " + tag.getCtasTableDefinitionRowId() + " cannot query");
                 }
 
@@ -160,17 +160,16 @@ public final class SqlUtil {
 
                 if (null == joinTable) {
                     as = "t0";
-                }
-                else {
+                } else {
                     as = keys.get(joinTableKey).getAlias();
                 }
 
                 Column col = new Column(leftOper, as);
                 if (null != tableDef
-                    && !keys.containsKey(tableDef.getCtasTableDefinitionRowId() + "-" + leftOper)) {
+                        && !keys.containsKey(tableDef.getCtasTableDefinitionRowId() + "-" + leftOper)) {
                     // 只有3和2才能在select中出现
                     if (UseTypeConstants.CONDITION_RESULT.equals(useType)
-                        || UseTypeConstants.RESULT.equals(useType)) {
+                            || UseTypeConstants.RESULT.equals(useType)) {
                         columns.add(col);
                     }
 
@@ -195,15 +194,14 @@ public final class SqlUtil {
                             rightOperand = formatRightOperand(rightOperand);
                         }
                         String[] showValues = rightOperand.split(",");
-                        for (int i = 0; i < showValues.length; i++ ) {
+                        for (int i = 0; i < showValues.length; i++) {
 
                             String triggerValueCacheKey = new StringBuilder(valueId.toString()).append(
-                                "@").append(domainType).append("@").append(showValues[i]).toString();
+                                    "@").append(domainType).append("@").append(showValues[i]).toString();
                             LabelValue triggerValue = triggerValueCache.queryOne(triggerValueCacheKey);
                             if (null != triggerValue) {
                                 realValue.append(triggerValue.getRealValue());
-                            }
-                            else {
+                            } else {
                                 realValue.append(showValues[i]);
                             }
                             realValue.append(",");
@@ -211,22 +209,21 @@ public final class SqlUtil {
 
                         if (realValue.length() != 0) {
                             realValue = realValue.delete(realValue.length() - 1,
-                                realValue.length());
+                                    realValue.length());
                             tigger.put("rightOperand", realValue.toString());
                         }
                     }
                 }
                 tagList.add(tigger);
-            }
-            else {
+            } else {
                 LOG.error("get cache tag null, key: " + key);
             }
-            k++ ;
+            k++;
         }
 
         // 必选字段要出现在sql中
-        SystemParam param = (SystemParam)CacheManager.getInstance().getCache(
-            CacheConstants.SYSTEMPARAM_CACHE_NAME).queryOne("eagle.necessary.tag");
+        SystemParam param = (SystemParam) CacheManager.getInstance().getCache(
+                CacheConstants.SYSTEMPARAM_CACHE_NAME).queryOne("eagle.necessary.tag");
         String[] requiredTags = param.getParamValue().split(",");
 
         //k = 1;
@@ -238,26 +235,26 @@ public final class SqlUtil {
             EagleTagAdaption tagAdaption = tagAdaptionCache.queryOne(tagAdaptionCacheKey);
             // ITV域的本地网需要特殊处理
             if (null != tagAdaption) {
-                key = (String)GroovyUtil.invokeMethod(tagAdaption.getScript(), "process",
-                    new Object[] {requiredTag, domainType});
+                key = (String) GroovyUtil.invokeMethod(tagAdaption.getScript(), "process",
+                        new Object[]{requiredTag, domainType});
             }
 
             EagleTag tag = tagCache.queryOne(key);
             requiredTag = tag.getSourceTableColumnName();
             if (null != tag) {
-                EagleSourceTableDef tableDef = (EagleSourceTableDef)CacheManager.getInstance().getCache(
-                    CacheConstants.SOURCE_TABLE_DEF_CACHE_NAME).queryOne(
-                    tag.getCtasTableDefinitionRowId().toString());
+                EagleSourceTableDef tableDef = (EagleSourceTableDef) CacheManager.getInstance().getCache(
+                        CacheConstants.SOURCE_TABLE_DEF_CACHE_NAME).queryOne(
+                        tag.getCtasTableDefinitionRowId().toString());
 
                 EagleSourceTableRef joinTable = getJoinTable(masterTableDef, tableDef,
-                    tag.getFitDomain(), as);
+                        tag.getFitDomain(), as);
 
                 String joinTableKey = null;
                 if (null != tableDef) {
                     joinTableKey = new StringBuilder(
-                        tableDef.getCtasTableDefinitionRowId().toString()).append("-").append(
-                        masterTableDef.getCtasTableDefinitionRowId().toString()).append("-").append(
-                        domainType).toString();
+                            tableDef.getCtasTableDefinitionRowId().toString()).append("-").append(
+                            masterTableDef.getCtasTableDefinitionRowId().toString()).append("-").append(
+                            domainType).toString();
                 }
 
                 if (null != tableDef && null != joinTable) {
@@ -265,35 +262,32 @@ public final class SqlUtil {
                         tables.add(joinTable);
                         keys.put(joinTableKey, joinTable);
                     }
-                }
-                else {
+                } else {
                     LOG.error("tableDefId: " + tag.getCtasTableDefinitionRowId() + " cannot query");
                 }
 
                 if (null == joinTable) {
                     as = "t0";
-                }
-                else {
+                } else {
                     as = keys.get(joinTableKey).getAlias();
                 }
 
                 Column col = new Column(requiredTag, as);
                 if (null != tableDef
-                    && !keys.containsKey(tableDef.getCtasTableDefinitionRowId() + "-"
-                                         + tag.getSourceTableColumnName())) {
+                        && !keys.containsKey(tableDef.getCtasTableDefinitionRowId() + "-"
+                        + tag.getSourceTableColumnName())) {
                     columns.add(col);
                     keys.put(
-                        tableDef.getCtasTableDefinitionRowId() + "-"
-                            + tag.getSourceTableColumnName(), null);
+                            tableDef.getCtasTableDefinitionRowId() + "-"
+                                    + tag.getSourceTableColumnName(), null);
                 }
                 if (null != tagInfos) {
                     addTagInfo(tagInfos, tag, tagInfoKeys);
                 }
-            }
-            else {
+            } else {
                 LOG.error("get necessary tag null, key: " + key);
             }
-            k++ ;
+            k++;
         }
 
         Map<String, Object> dataModel = new HashMap<>(4);
@@ -306,8 +300,7 @@ public final class SqlUtil {
         StringWriter out = new StringWriter();
         try {
             template.process(dataModel, out);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOG.error(e);
         }
         return out.toString();
@@ -319,7 +312,7 @@ public final class SqlUtil {
             if (null != rightOperands) {
                 List<String> source = new ArrayList<String>();
                 List<String> keys = new ArrayList<String>();
-                for (int i = 0; i < rightOperands.size(); i++ ) {
+                for (int i = 0; i < rightOperands.size(); i++) {
                     JSONObject object = rightOperands.getJSONObject(i);
                     List<String> listKeys = new ArrayList<String>(object.keySet());
                     if (org.apache.commons.collections.CollectionUtils.isNotEmpty(listKeys)) {
@@ -345,15 +338,15 @@ public final class SqlUtil {
         init();
         // 查询出这个域下主表
         SystemParam param = (SystemParam) CacheManager.getInstance().getCache(
-            CacheConstants.SYSTEMPARAM_CACHE_NAME).queryOne("eagle.master.table");
+                CacheConstants.SYSTEMPARAM_CACHE_NAME).queryOne("eagle.master.table");
         JSONObject obj = JSON.parseObject(param.getParamValue());
         String materTable = obj.getString(domainType);
-        EagleDatabaseConfig config = (EagleDatabaseConfig)CacheManager.getInstance().getCache(
-            CacheConstants.DATABASE_COPNFIG_CACHE_NAME).queryOne(
-            EagleDatabaseConfCache.CACHE_DB2_KEY);
+        EagleDatabaseConfig config = (EagleDatabaseConfig) CacheManager.getInstance().getCache(
+                CacheConstants.DATABASE_COPNFIG_CACHE_NAME).queryOne(
+                EagleDatabaseConfCache.CACHE_DB2_KEY);
 
         EagleSourceTableDef masterTableDef = sourceTableDefMapper.queryByTableNameAndDb(
-            materTable, config.getDbConfRowId().toString());
+                materTable, config.getDbConfRowId().toString());
         return masterTableDef;
     }
 
@@ -376,8 +369,8 @@ public final class SqlUtil {
         if (null != tableDef && !MAIN_FLAG.equals(tableDef.getTagTableMainFlag())) {
             // 查询
             List<EagleSourceTableRef> sourceTableRefList = sourceTableRefMapper.queryByMainFlagAndFitDomain(
-                tableDef.getCtasTableDefinitionRowId().toString(),
-                masterTableDef.getCtasTableDefinitionRowId().toString(), fitDomain);
+                    tableDef.getCtasTableDefinitionRowId().toString(),
+                    masterTableDef.getCtasTableDefinitionRowId().toString(), fitDomain);
             EagleSourceTableRef tableRef = null;
             if (org.apache.commons.collections.CollectionUtils.isNotEmpty(sourceTableRefList)) {
                 tableRef = sourceTableRefList.get(0);
@@ -408,21 +401,19 @@ public final class SqlUtil {
             methods.put("resolveCond", new TemplateTriggerFunction());
             try {
                 config.setAllSharedVariables(new SimpleHash(methods, config.getObjectWrapper()));
-            }
-            catch (TemplateModelException e1) {
+            } catch (TemplateModelException e1) {
                 LOG.error(e1);
             }
 
             PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(
-                ThisOrTargetAnnotationPointcut.class.getClassLoader());
+                    ThisOrTargetAnnotationPointcut.class.getClassLoader());
             // 获取ftl文件
             Resource resource = resolver.getResource("classpath:config/trycalc.ftl");
             try {
                 String ftl = FileUtils.readFileToString(resource.getFile(), "UTF-8");
                 // 创建模板对象
                 template = new Template(ftl, new StringReader(ftl), config);
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 LOG.error(e);
             }
         }

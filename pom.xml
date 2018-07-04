@@ -40,6 +40,9 @@
         <aspectj.version>1.8.6</aspectj.version>
         <file.version>1.4.0</file.version>
         <aspectj.version>1.8.6</aspectj.version>
+        <poi.version>3.17</poi.version>
+        <redis.version>1.4.7.RELEASE</redis.version>
+        <ppm-dubbo.version>1.0.0</ppm-dubbo.version>
     </properties>
 
     <parent>
@@ -235,6 +238,32 @@
                         <groupId>log4j</groupId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <!-- poi -->
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+
+            <!-- redis -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-redis</artifactId>
+                <version>${redis.version}</version>
+            </dependency>
+
+            <!--  -->
+            <dependency>
+                <groupId>com.ctzj.ppm</groupId>
+                <artifactId>ppm-dubbo</artifactId>
+                <version>${ppm-dubbo.version}</version>
             </dependency>
 
         </dependencies>

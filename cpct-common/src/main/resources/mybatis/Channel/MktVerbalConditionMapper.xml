@@ -19,7 +19,7 @@
     delete from mkt_verbal_condition
     where CONDITION_ID = #{conditionId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.MktVerbalCondition">
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.MktVerbalCondition" useGeneratedKeys="true" keyProperty="conditionId">
     insert into mkt_verbal_condition (CONDITION_ID, VERBAL_ID, LEFT_PARAM, 
       LEFT_PARAM_TYPE, OPER_TYPE, RIGHT_PARAM, 
       RIGHT_PARAM_TYPE, STATUS_CD, CREATE_STAFF, 

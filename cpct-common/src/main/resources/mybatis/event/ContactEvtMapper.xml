@@ -137,7 +137,7 @@
     </update>
 
     <!--查询方法，通过id查询-->
-    <select id="getEventById" resultType="com.zjtelcom.cpct.dto.event.ContactEvt">
+    <select id="getEventById" resultMap="resultMapper">
         select * from event
         where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
     </select>

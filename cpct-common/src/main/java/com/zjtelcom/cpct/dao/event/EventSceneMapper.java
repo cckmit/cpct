@@ -24,7 +24,7 @@ public interface EventSceneMapper {
 
     int saveEventScene(EventSceneDO sceneDO);
 
-    EventSceneDO getEventSceneDO(Long eventSceneId);
+    EventScene getEventScene(Long eventSceneId);
 
     int createEventScene(EventScene eventScene);
 

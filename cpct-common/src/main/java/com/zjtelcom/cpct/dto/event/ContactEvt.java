@@ -10,7 +10,7 @@ import java.io.Serializable;
  * @Author pengy
  * @Date 2018/6/26 15:32
  */
-public class ContactEvt extends BaseEntity implements Serializable{
+public class ContactEvt extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = -6351197926116704813L;
     private String actType;//  KIP=保持/ADD=新增/MOD=修改/DEL=删除
@@ -25,7 +25,7 @@ public class ContactEvt extends BaseEntity implements Serializable{
     private String contactEvtDesc;//记录事件的描述说明
     private Long contactChlId;//记录触发事件的触点渠道标识
     private Long contactEvtTypeId;//记录事件的所属事件类型标识
-    private Long contactEvtTypeName;//记录事件的所属事件类型名称
+    private String contactEvtTypeName;//记录事件的所属事件类型名称
     private String evtTrigType;//记录事件的触发类型,1000实时触发事件 2000定期触发事件 3000人工触发事件
     private String coopType;//记录推送渠道协同类型，
     private Long extEventId;//记录集团下发的事件标识
@@ -148,5 +148,13 @@ public class ContactEvt extends BaseEntity implements Serializable{
 
     public void setExtEventId(Long extEventId) {
         this.extEventId = extEventId;
+    }
+
+    public String getContactEvtTypeName() {
+        return contactEvtTypeName;
+    }
+
+    public void setContactEvtTypeName(String contactEvtTypeName) {
+        this.contactEvtTypeName = contactEvtTypeName;
     }
 }

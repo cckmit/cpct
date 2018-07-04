@@ -12,6 +12,8 @@ public class CommonConstant {
 
     public static final String STATUSCD_EFFECTIVE = "1000";
 
+    public static final String CONTENTTYPE = "application/vnd.ms-excel;charset=utf-8";
+
 
 
 }

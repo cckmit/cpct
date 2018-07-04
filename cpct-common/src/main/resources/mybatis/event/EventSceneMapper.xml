@@ -123,7 +123,7 @@
     #{remark,jdbcType=VARCHAR}, #{contactEvtCode,jdbcType=VARCHAR})
   </insert>
 
-    <select id="getEventSceneDO" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    <select id="getEventScene" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select EVENT_SCENE_ID, EVENT_SCENE_NBR, EVENT_SCENE_NAME, EVENT_SCENE_DESC, EVENT_ID,
     EXT_EVENT_SCENE_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE,
     CREATE_DATE, REMARK, CONTACT_EVT_CODE
