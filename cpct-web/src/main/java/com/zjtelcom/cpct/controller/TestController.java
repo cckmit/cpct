@@ -100,8 +100,8 @@ public class TestController extends BaseController {
                 idLeft = insert(idLeft, type, idRight);
             }
 
-            if (rule.getRuleChidren() != null) {
-                idLeft = insert(idLeft, type, saveDetail(rule.getRuleChidren()));
+            if (rule.getRuleChildren() != null) {
+                idLeft = insert(idLeft, type, saveDetail(rule.getRuleChildren()));
             }
 
 
@@ -195,7 +195,7 @@ public class TestController extends BaseController {
                     }
                 }
             } else {
-                rule.setRuleChidren(parseRules(labels, expressions, i));
+                rule.setRuleChildren(parseRules(labels, expressions, i));
                 break;
             }
         }

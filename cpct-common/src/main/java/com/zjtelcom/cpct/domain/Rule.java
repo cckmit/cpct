@@ -9,14 +9,15 @@ public class Rule {
 
     private List<RuleDetail> listData;
 
-    private Rule ruleChidren;
+    private Rule ruleChildren;
 
-    public Rule getRuleChidren() {
-        return ruleChidren;
+
+    public Rule getRuleChildren() {
+        return ruleChildren;
     }
 
-    public void setRuleChidren(Rule ruleChidren) {
-        this.ruleChidren = ruleChidren;
+    public void setRuleChildren(Rule ruleChildren) {
+        this.ruleChildren = ruleChildren;
     }
 
     public String getType() {
