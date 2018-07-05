@@ -82,14 +82,34 @@ public class LoginController extends BaseController {
             } catch (AuthenticationException ae) {
                 ae.printStackTrace();
                 logger.info("登录失败 = {}", ae.getMessage());
-                return initFailRespInfo("登录失败", "0001");
+                return initFailRespInfo("用户名或密码错误", "0001");
             } catch (Exception e) {
                 e.printStackTrace();
+                logger.info("登录失败 = {}", e.getMessage());
+                return initFailRespInfo("登录失败", "0001");
             }
         } else {
-            SysStaff sysStaff = (SysStaff) SecurityUtils.getSubject().getPrincipal();
-            result.put("user", sysStaff);
-            result.put("menu", sysStaff);
+            try {
+                SysStaff sysStaff = (SysStaff) SecurityUtils.getSubject().getPrincipal();
+                UserInfo userInfo = new UserInfo();
+                CopyPropertiesUtil.copyBean2Bean(userInfo, sysStaff);
+                //查询用户角色
+                List<SysRole> listRole = sysRoleMapper.selectByStaffId(userInfo.getStaffId());
+                userInfo.setRoleList(listRole);
+                //查询用户菜单
+                List<SysMenu> menuList = new ArrayList<>();
+                for(SysRole sysRole : listRole) {
+                    menuList = sysMenuMapper.selectByRoleId(sysRole.getRoleId());
+                }
+                userInfo.setMenuList(menuList);
+                result.put("user", userInfo);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.info("登录失败 = {}", e.getMessage());
+                return initFailRespInfo("查询用户信息失败", "0001");
+            }
+
         }
 
         return initSuccRespInfo(result);
