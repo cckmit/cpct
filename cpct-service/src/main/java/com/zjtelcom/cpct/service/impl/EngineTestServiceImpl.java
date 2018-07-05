@@ -23,34 +23,44 @@ public class EngineTestServiceImpl extends BaseService implements EngineTestServ
             DefaultContext<String, Object> context = new DefaultContext<String, Object>();
 //            DefaultContext<String, Object> context = new DefaultContext<String, Object>();
 
-            String label_1 = map.get("key_1");
-            String label_2 = map.get("key_2");
-            String label_3 = map.get("key_3");
-            String label_4 = map.get("key_4");
-            String label_5 = map.get("key_5");
+//            String label_1 = map.get("key_1");
+//            String label_2 = map.get("key_2");
+//            String label_3 = map.get("key_3");
+//            String label_4 = map.get("key_4");
+//            String label_5 = map.get("key_5");
+//
+//
+            context.put("1001", 1000);
+            context.put("1002", 1000);
+            context.put("1003", 1000);
+            context.put("1004", 1000);
+            context.put("1005", 1000);
+            context.put("1006", 1000);
+            context.put("1007", 1000);
+            context.put("1008", 1000);
+            context.put("1009", 1000);
 
-
-            context.put("label_1", label_1);
-            context.put("label_2", label_2);
-            context.put("label_3", label_3);
-            context.put("label_4", label_4);
-            context.put("label_5", label_5);
 
 //            String express = "1>=6 && 1==1 && 1==1";
 //            Object r = runner.execute(express, context, null, true, false);
 
 
 //            String express= "if(label_1 >= 3 and label_2 == 1 and label_3 == 1){return true;}else if(label_4 <= 10){true} else {false}";
-            String express = "label_1 >= 3 and label_2 == 1 and label_3 == 1";
+//            String express = "label_1 >= 3 and label_2 == 1 and label_3 == 1";
+//            String express = map.get("expression");
+            String express = "if(" + map.get("expression") + "){return true;}else {return false}";
+
+            Object r = runner.execute(express, context, null, true, true);
+            logger.info("结果 = {}", r);
 
             //此算法仅支持if或者when等逻辑判断（待确认）
             RuleResult ruleResult = runner.executeRule(express, context, true, true);
-
             logger.info("======================================");
             logger.info("事件流水 = {}", "ISI");
             logger.info("活动ID = {}", "activityId");
             logger.info("express = {}", express);
             logger.info("result = {}", ruleResult.getResult());
+            logger.info("script = {}", ruleResult.getScript());
             logger.info("tree = {}", ruleResult.getRule().toTree());
             logger.info("trace = {}", ruleResult.getTraceMap());
             logger.info("======================================");

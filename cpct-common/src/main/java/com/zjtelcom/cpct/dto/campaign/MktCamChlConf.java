@@ -44,6 +44,59 @@ public class MktCamChlConf extends BaseEntity {
      */
     private String ruleExpression;
 
+    public String getActType() {
+        return actType;
+    }
 
+    public void setActType(String actType) {
+        this.actType = actType;
+    }
 
+    public Long getEvtContactConfId() {
+        return evtContactConfId;
+    }
+
+    public void setEvtContactConfId(Long evtContactConfId) {
+        this.evtContactConfId = evtContactConfId;
+    }
+
+    public String getEvtContactConfName() {
+        return evtContactConfName;
+    }
+
+    public void setEvtContactConfName(String evtContactConfName) {
+        this.evtContactConfName = evtContactConfName;
+    }
+
+    public Long getMktCampaignId() {
+        return mktCampaignId;
+    }
+
+    public void setMktCampaignId(Long mktCampaignId) {
+        this.mktCampaignId = mktCampaignId;
+    }
+
+    public Long getContactChlId() {
+        return contactChlId;
+    }
+
+    public void setContactChlId(Long contactChlId) {
+        this.contactChlId = contactChlId;
+    }
+
+    public String getPushType() {
+        return pushType;
+    }
+
+    public void setPushType(String pushType) {
+        this.pushType = pushType;
+    }
+
+    public String getRuleExpression() {
+        return ruleExpression;
+    }
+
+    public void setRuleExpression(String ruleExpression) {
+        this.ruleExpression = ruleExpression;
+    }
 }

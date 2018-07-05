@@ -5,7 +5,7 @@ import java.util.Date;
 public class MktStrategyConf {
     private Long mktStrategyConfId;
 
-    private String departmentName;
+    private String mktStrategyConfName;
 
     private Date beginTime;
 
@@ -29,12 +29,12 @@ public class MktStrategyConf {
         this.mktStrategyConfId = mktStrategyConfId;
     }
 
-    public String getDepartmentName() {
-        return departmentName;
+    public String getMktStrategyConfName() {
+        return mktStrategyConfName;
     }
 
-    public void setDepartmentName(String departmentName) {
-        this.departmentName = departmentName;
+    public void setMktStrategyConfName(String mktStrategyConfName) {
+        this.mktStrategyConfName = mktStrategyConfName;
     }
 
     public Date getBeginTime() {

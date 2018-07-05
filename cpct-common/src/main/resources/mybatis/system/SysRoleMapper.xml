@@ -52,6 +52,15 @@
         order by CREATE_DATE desc
     </select>
 
+    <select id="selectByStaffId" resultMap="BaseResultMap" parameterType="Long">
+        select sr.ROLE_ID, sr.ROLE_NAME
+        from sys_role sr
+        left join sys_staff_role ssr
+        on sr.ROLE_ID = ssr.ROLE_ID
+        where ssr.STAFF_ID = #{staffId,jdbcType=VARCHAR}
+    </select>
+
+
     <select id="selectAll" resultType="Map">
         select ROLE_ID as value, ROLE_NAME as name
         from sys_role

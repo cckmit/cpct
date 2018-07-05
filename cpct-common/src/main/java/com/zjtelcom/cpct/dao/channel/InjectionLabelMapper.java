@@ -17,6 +17,8 @@ public interface InjectionLabelMapper {
 
     Label selectByPrimaryKey(Long injectionLabelId);
 
+    Label selectByLabelCode(@Param("labelCode") String  labelCode);
+
     List<Label> selectAll();
 
     List<Label> findByParam(@Param("labelName")String labelName,@Param("fitDomain")String fitDomain);

@@ -60,7 +60,7 @@ public enum ErrorCode {
     SAVE_MKT_CAMPAIGN_FAILURE("添加策略配置失败！", "00001"),
     UPDATE_MKT_CAMPAIGN_SUCCESS("修改策略配置成功！", "00001"),
     UPDATE_MKT_CAMPAIGN_FAILURE("修改策略配置失败！", "00001"),
-    GET_MKT_CAMPAIGN_SUCCESS("获取策略配置失败！", "00001"),
+    GET_MKT_CAMPAIGN_SUCCESS("获取策略配置成功！", "00001"),
     GET_MKT_CAMPAIGN_FAILURE("获取策略配置失败！", "00001"),
     DELETE_MKT_CAMPAIGN_SUCCESS("删除策略配置成功！", "00001"),
     DELETE_MKT_CAMPAIGN_FAILURE("删除策略配置失败！", "00001"),
