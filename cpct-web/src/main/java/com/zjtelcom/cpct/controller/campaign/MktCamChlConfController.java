@@ -12,9 +12,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,9 +32,9 @@ public class MktCamChlConfController extends BaseController {
     private MktCamChlConfService mktCamChlConfService;
 
 
-    @RequestMapping("/saveMktCamChlConf")
+    @RequestMapping(value = "/saveMktCamChlConf", method = RequestMethod.POST)
     @CrossOrigin
-    public String saveMktCamChlConf(MktCamChlConfDetail mktCamChlConfDetail){
+    public String saveMktCamChlConf(@RequestBody MktCamChlConfDetail mktCamChlConfDetail){
         Map<String, Object> map = new HashMap<>();
         try {
             map = mktCamChlConfService.saveMktCamChlConf(mktCamChlConfDetail);
@@ -46,9 +44,9 @@ public class MktCamChlConfController extends BaseController {
         return JSON.toJSONString(map);
     }
 
-    @RequestMapping("/updateMktCamChlConf")
+    @RequestMapping(value = "/updateMktCamChlConf", method = RequestMethod.POST)
     @CrossOrigin
-    public String updateMktCamChlConf(MktCamChlConfDetail mktCamChlConfDetail){
+    public String updateMktCamChlConf(@RequestBody MktCamChlConfDetail mktCamChlConfDetail){
         Map<String, Object> map = new HashMap<>();
         try {
             map = mktCamChlConfService.updateMktCamChlConf(mktCamChlConfDetail);
@@ -57,6 +55,34 @@ public class MktCamChlConfController extends BaseController {
         }
         return JSON.toJSONString(map);
     }
+
+    @RequestMapping(value = "/getMktCamChlConf", method = RequestMethod.POST)
+    @CrossOrigin
+    public String getMktCamChlConf(@RequestBody Map<String, String> params){
+        Map<String, Object> map = new HashMap<>();
+        Long evtContactConfId = Long.valueOf(params.get("evtContactConfId"));
+        try {
+            map = mktCamChlConfService.getMktCamChlConf(evtContactConfId);
+        } catch (Exception e) {
+            logger.error("[op:MktCamChlConfController] failed to get mktCamChlConfDetail = {} Exception: ", evtContactConfId, e);
+        }
+        return JSON.toJSONString(map);
+    }
+
+
+    @RequestMapping(value = "/deleteMktCamChlConf", method = RequestMethod.POST)
+    @CrossOrigin
+    public String deleteMktCamChlConf(@RequestBody Map<String, String> params){
+        Map<String, Object> map = new HashMap<>();
+        Long evtContactConfId = Long.valueOf(params.get("evtContactConfId"));
+        try {
+            map = mktCamChlConfService.deleteMktCamChlConf(evtContactConfId);
+        } catch (Exception e) {
+            logger.error("[op:MktCamChlConfController] failed to delete mktCamChlConfDetail = {} Exception: ", evtContactConfId, e);
+        }
+        return JSON.toJSONString(map);
+    }
+
 
 
 }

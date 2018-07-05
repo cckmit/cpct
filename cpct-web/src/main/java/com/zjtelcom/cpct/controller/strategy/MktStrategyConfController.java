@@ -24,7 +24,7 @@ import java.util.Map;
  */
 
 @RestController
-@RequestMapping("${adminPath}/MktStrategyConf")
+@RequestMapping("${adminPath}/mktStrategyConf")
 public class MktStrategyConfController extends BaseController {
 
     @Autowired
@@ -37,7 +37,7 @@ public class MktStrategyConfController extends BaseController {
      * @param mktStrategyConfDetail
      * @return
      */
-    @RequestMapping("/saveMktStrategyConf")
+    @RequestMapping(value = "/saveMktStrategyConf",  method = RequestMethod.POST)
     @CrossOrigin
     public String saveMktStrategyConf(@RequestBody MktStrategyConfDetail mktStrategyConfDetail) {
         Map<String, Object> map = new HashMap<>();
@@ -56,7 +56,7 @@ public class MktStrategyConfController extends BaseController {
      * @param mktStrategyConfDetail
      * @return
      */
-    @RequestMapping("/updateMktStrategyConf")
+    @RequestMapping(value = "/updateMktStrategyConf", method = RequestMethod.POST)
     @CrossOrigin
     public String updateMktStrategyConf(@RequestBody MktStrategyConfDetail mktStrategyConfDetail) {
         Map<String, Object> map = new HashMap<>();
