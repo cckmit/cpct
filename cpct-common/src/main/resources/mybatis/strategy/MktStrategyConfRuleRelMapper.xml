@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zjtelcom.cpct.dao.MktStrategyConfRuleRelMapper">
+<mapper namespace="com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper">
   <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO">
     <id column="MKT_STRATEGY_CONF_RULE_REL_ID" jdbcType="BIGINT" property="mktStrategyConfRuleRelId" />
     <result column="MKT_STRATEGY_CONF_ID" jdbcType="BIGINT" property="mktStrategyConfId" />
@@ -14,7 +14,11 @@
     delete from mkt_strategy_conf_rule_rel
     where MKT_STRATEGY_CONF_RULE_REL_ID = #{mktStrategyConfRuleRelId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO">
+  <delete id="deleteByMktStrategyConfId" parameterType="java.lang.Long">
+    delete from mkt_strategy_conf_rule_rel
+    where MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" useGeneratedKeys="true" keyProperty="mktStrategyConfRuleRelId" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO">
     insert into mkt_strategy_conf_rule_rel (MKT_STRATEGY_CONF_RULE_REL_ID, MKT_STRATEGY_CONF_ID, 
       MKT_STRATEGY_CONF_RULE_ID, CREATE_STAFF, CREATE_DATE, 
       UPDATE_STAFF, UPDATE_DATE)
@@ -33,10 +37,16 @@
     where MKT_STRATEGY_CONF_RULE_REL_ID = #{mktStrategyConfRuleRelId,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select MKT_STRATEGY_CONF_RULE_REL_ID, MKT_STRATEGY_CONF_ID, MKT_STRATEGY_CONF_RULE_ID, 
+    select MKT_STRATEGY_CONF_RULE_REL_ID, MKT_STRATEGY_CONF_ID, MKT_STRATEGY_CONF_RULE_ID,
     CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
     from mkt_strategy_conf_rule_rel
     where MKT_STRATEGY_CONF_RULE_REL_ID = #{mktStrategyConfRuleRelId,jdbcType=BIGINT}
+  </select>
+  <select id="selectByMktStrategyConfId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_STRATEGY_CONF_RULE_REL_ID, MKT_STRATEGY_CONF_ID, MKT_STRATEGY_CONF_RULE_ID,
+    CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+    from mkt_strategy_conf_rule_rel
+    where MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=BIGINT}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
     select MKT_STRATEGY_CONF_RULE_REL_ID, MKT_STRATEGY_CONF_ID, MKT_STRATEGY_CONF_RULE_ID, 

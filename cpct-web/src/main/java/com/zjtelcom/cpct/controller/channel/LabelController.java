@@ -122,7 +122,7 @@ public class LabelController extends BaseController {
     /**
      * 获取标签详情
      */
-    @PostMapping("getLabelDetail")
+    @GetMapping("getLabelDetail")
     @CrossOrigin
     public Map<String,Object> getLabelDetail(Long labelId) {
         Long userId = UserUtil.loginId();
@@ -219,7 +219,7 @@ public class LabelController extends BaseController {
     /**
      * 获取标签组详情
      */
-    @PostMapping("getLabelGrpDetail")
+    @GetMapping("getLabelGrpDetail")
     @CrossOrigin
     public Map<String,Object> getLabelGrpDetail( Long labelGrpId) {
         Long userId = UserUtil.loginId();
@@ -296,7 +296,7 @@ public class LabelController extends BaseController {
     /**
      * 获取标签组成员列表
      */
-    @PostMapping("getLabelGrpMbrDetail")
+    @GetMapping("getLabelGrpMbrDetail")
     @CrossOrigin
     public Map<String,Object> getLabelGrpMbrDetail( Long labelGrpMbrId) {
         Long userId = UserUtil.loginId();
@@ -372,7 +372,7 @@ public class LabelController extends BaseController {
     /**
      * 获取标签值列表
      */
-    @PostMapping("getLabelValueDetail")
+    @GetMapping("getLabelValueDetail")
     @CrossOrigin
     public Map<String,Object> getLabelValueDetail( Long labelValueId) {
         Long userId = UserUtil.loginId();

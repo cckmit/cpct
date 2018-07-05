@@ -1,9 +1,7 @@
 package com.zjtelcom.cpct.dto.strategy;
 
-import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 
-import java.util.Date;
-
-public class MktStrategyConfRuleRel extends MktStrategyConfRuleDO {
+public class MktStrategyConfRuleRel extends MktStrategyConfRuleRelDO {
 
 }

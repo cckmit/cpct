@@ -7,11 +7,11 @@ public class FilterRuleConfDO {
 
     private String filterRuleIds;
 
-    private String createStaff;
+    private Long createStaff;
 
     private Date createDate;
 
-    private String updateStaff;
+    private Long updateStaff;
 
     private Date updateDate;
 
@@ -31,12 +31,20 @@ public class FilterRuleConfDO {
         this.filterRuleIds = filterRuleIds;
     }
 
-    public String getCreateStaff() {
+    public Long getCreateStaff() {
         return createStaff;
     }
 
-    public void setCreateStaff(String createStaff) {
+    public void setCreateStaff(Long createStaff) {
         this.createStaff = createStaff;
+    }
+
+    public Long getUpdateStaff() {
+        return updateStaff;
+    }
+
+    public void setUpdateStaff(Long updateStaff) {
+        this.updateStaff = updateStaff;
     }
 
     public Date getCreateDate() {
@@ -45,14 +53,6 @@ public class FilterRuleConfDO {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
-    }
-
-    public String getUpdateStaff() {
-        return updateStaff;
-    }
-
-    public void setUpdateStaff(String updateStaff) {
-        this.updateStaff = updateStaff;
     }
 
     public Date getUpdateDate() {

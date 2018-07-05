@@ -16,6 +16,8 @@ import java.util.List;
  */
 public class City {
 
+    private Long mktStrategyConfRegionRelId;
+
     private CityProperty applyCity;
 
     private List<CityProperty> applyCountys;
@@ -23,6 +25,14 @@ public class City {
     private List<CityProperty> applyBranchs;
 
     private List<CityProperty> applyGriddings;
+
+    public Long getMktStrategyConfRegionRelId() {
+        return mktStrategyConfRegionRelId;
+    }
+
+    public void setMktStrategyConfRegionRelId(Long mktStrategyConfRegionRelId) {
+        this.mktStrategyConfRegionRelId = mktStrategyConfRegionRelId;
+    }
 
     public CityProperty getApplyCity() {
         return applyCity;

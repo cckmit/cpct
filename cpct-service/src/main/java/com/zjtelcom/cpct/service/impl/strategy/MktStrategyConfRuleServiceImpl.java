@@ -7,22 +7,14 @@
 package com.zjtelcom.cpct.service.impl.strategy;
 
 import com.alibaba.fastjson.JSON;
-import com.fasterxml.jackson.core.JsonGenerationException;
 import com.zjtelcom.cpct.constants.CommonConstant;
-import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
-import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRegionRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
-import com.zjtelcom.cpct.domain.campaign.City;
-import com.zjtelcom.cpct.domain.campaign.CityProperty;
-import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
-import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRegionRelDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
-import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
-import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
+
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,7 +46,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
      */
     @Override
     public Map<String, Object> saveMktStrategyConfRule(MktStrategyConfRule mktStrategyConfRule) {
-        Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleMap = new HashMap<>();
+        Map<String, Object> mktStrategyConfRuleMap  = new HashMap<>();
         try {
             MktStrategyConfRuleDO ktStrategyConfRuleDO = new MktStrategyConfRuleDO();
             CopyPropertiesUtil.copyBean2Bean(ktStrategyConfRuleDO, mktStrategyConfRule);
@@ -79,7 +71,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
      */
     @Override
     public Map<String, Object> updateMktStrategyConfRule(MktStrategyConfRule mktStrategyConfRule) {
-        Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleMap = new HashMap<>();
+        Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();
         try {
             MktStrategyConfRuleDO ktStrategyConfRuleDO = new MktStrategyConfRuleDO();
             CopyPropertiesUtil.copyBean2Bean(ktStrategyConfRuleDO, mktStrategyConfRule);
@@ -128,10 +120,9 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
      */
     @Override
     public Map<String, Object> listAllMktStrategyConfRule() {
-        Map<String, Object> mktStrategyConfRuleMap = null;
+        Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();;
         List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList = new ArrayList<>();
         try {
-            mktStrategyConfRuleMap = new HashMap<>();
             mktStrategyConfRuleDOList = mktStrategyConfRuleMapper.selectAll();
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
@@ -153,9 +144,8 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
      */
     @Override
     public Map<String, Object> deleteMktStrategyConfRule(Long mktStrategyConfRuleId) {
-        Map<String, Object> mktStrategyConfRuleMap = null;
+        Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();
         try {
-            mktStrategyConfRuleMap = new HashMap<>();
             mktStrategyConfRuleMapper.deleteByPrimaryKey(mktStrategyConfRuleId);
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
