@@ -1,5 +1,7 @@
 package com.zjtelcom.cpct.dto.campaign;
 
+import com.zjtelcom.cpct.dto.filter.FilterRule;
+
 import java.util.List;
 
 public class FilterRuleConf {
