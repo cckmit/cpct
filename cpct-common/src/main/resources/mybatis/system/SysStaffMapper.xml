@@ -26,6 +26,7 @@
         STAFF_EMAIL, CHANNEL_ID, CITY_ID, STATUS, LAST_LOGIN
         from sys_staff
         where STAFF_ACCOUNT = #{staffAccount,jdbcType=VARCHAR}
+        and STATUS != 2
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">

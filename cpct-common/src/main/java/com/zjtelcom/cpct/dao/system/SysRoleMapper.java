@@ -20,4 +20,7 @@ public interface SysRoleMapper {
     List<Map<String,Object>> selectAll();
 
     int updateByPrimaryKey(SysRole record);
+
+    List<SysRole> selectByStaffId(@Param("staffId") Long staffId);
+
 }

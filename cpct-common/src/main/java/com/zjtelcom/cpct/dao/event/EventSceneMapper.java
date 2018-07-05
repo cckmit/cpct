@@ -30,4 +30,6 @@ public interface EventSceneMapper {
 
     int delEventScene(EventScene eventScene);
 
+    List<EventScene> qryEventSceneByEvtId(Long contactEvtId);
+
 }

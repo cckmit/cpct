@@ -4,9 +4,9 @@
   <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.campaign.FilterRuleConfDO">
     <id column="FILTER_RULE_CONF_ID" jdbcType="BIGINT" property="filterRuleConfId" />
     <result column="FILTER_RULE_IDS" jdbcType="VARCHAR" property="filterRuleIds" />
-    <result column="CREATE_STAFF" jdbcType="VARCHAR" property="createStaff" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
     <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
-    <result column="UPDATE_STAFF" jdbcType="VARCHAR" property="updateStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
     <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
@@ -17,16 +17,16 @@
     insert into filter_rule_conf (FILTER_RULE_CONF_ID, FILTER_RULE_IDS, CREATE_STAFF, 
       CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
       )
-    values (#{filterRuleConfId,jdbcType=BIGINT}, #{filterRuleIds,jdbcType=VARCHAR}, #{createStaff,jdbcType=VARCHAR}, 
-      #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=VARCHAR}, #{updateDate,jdbcType=TIMESTAMP}
+    values (#{filterRuleConfId,jdbcType=BIGINT}, #{filterRuleIds,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT},
+      #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}
       )
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.FilterRuleConfDO">
     update filter_rule_conf
     set FILTER_RULE_IDS = #{filterRuleIds,jdbcType=VARCHAR},
-      CREATE_STAFF = #{createStaff,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
       CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
-      UPDATE_STAFF = #{updateStaff,jdbcType=VARCHAR},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
       UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
     where FILTER_RULE_CONF_ID = #{filterRuleConfId,jdbcType=BIGINT}
   </update>

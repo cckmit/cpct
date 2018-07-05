@@ -25,7 +25,7 @@ public class MyShiroRealm extends AuthorizingRealm {
     private static final Logger logger = LoggerFactory.getLogger(MyShiroRealm.class);
 
     @Resource
-    private SysStaffService userService;
+    private SysStaffService sysStaffService;
 
     @Override
     public String getName() {
@@ -64,11 +64,11 @@ public class MyShiroRealm extends AuthorizingRealm {
 
         UsernamePasswordToken token = (UsernamePasswordToken) authenticationToken;
         logger.info("验证当前登录用户时获取到的token={}", ReflectionToStringBuilder.toString(token));
-        Map<String, Object> userMap = userService.queryUserByName(token.getUsername());
+        Map<String, Object> userMap = sysStaffService.queryUserByName(token.getUsername());
         SysStaff user = (SysStaff) userMap.get("data");
         if (user == null) {
             return null;
         }
-        return new SimpleAuthenticationInfo(user.getStaffCode(), user.getPassword(), getName());
+        return new SimpleAuthenticationInfo(user, user.getPassword(), getName());
     }
 }

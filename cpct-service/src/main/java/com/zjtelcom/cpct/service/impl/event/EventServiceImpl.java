@@ -85,7 +85,7 @@ public class EventServiceImpl extends BaseService implements EventService {
                 for (EventSceneDO evtSceneDO : sceneDOList) {
                     EvtSceneCamRelDO evtSceneCamRelDO = new EvtSceneCamRelDO();
                     evtSceneCamRelDO.setEventSceneId(evtSceneDO.getEventSceneId());
-                    evtSceneCamRelMapper.insert(evtSceneCamRelDO);
+//                    evtSceneCamRelMapper.insert(evtSceneCamRel);
                 }
             }
             //关联到事件匹配规则 todo 暂时未找到场景，待确认

@@ -17,10 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * @Description test
@@ -63,6 +60,11 @@ public class TestController extends BaseController {
         return initSuccRespInfo(null);
     }
 
+    /**
+     * 规则插入
+     * @param param
+     * @return
+     */
     @RequestMapping("/ruleInsertTest")
     @CrossOrigin
     public String ruleInsertTest(@RequestBody String param) {
@@ -143,6 +145,10 @@ public class TestController extends BaseController {
         return l;
     }
 
+    /**
+     * 规则查询
+     * @return
+     */
     @RequestMapping("/ruleSelectTest")
     @CrossOrigin
     public String ruleSelectTest() {
@@ -207,6 +213,10 @@ public class TestController extends BaseController {
         return rule;
     }
 
+    /**
+     * 规则拼接测试
+     * @return
+     */
     @RequestMapping("/expressionTest")
     @CrossOrigin
     public String expressionTest() {
@@ -215,7 +225,12 @@ public class TestController extends BaseController {
         //查询出所有规则
         List<MktVerbalCondition> mktVerbalConditions = mktVerbalConditionMapper.findConditionListByVerbalId(evtContactConfId);
 
-        String expression = expressionMatching(mktVerbalConditions, mktVerbalConditions.get(0).getConditionId());
+        String expression = expressionMatching(mktVerbalConditions, mktVerbalConditions.get(mktVerbalConditions.size() - 1).getConditionId());
+
+        Map<String,String> map = new HashMap<>();
+        map.put("expression",expression);
+        engineTestService.test(map);
+
         return initSuccRespInfo(expression);
     }
 
@@ -229,25 +244,9 @@ public class TestController extends BaseController {
                 //右参
                 Long idRight = Long.parseLong(mktVerbalCondition.getRightParam());
 
-                for (MktVerbalCondition condition : expressions) {
-                    if (idLeft.equals(condition.getConditionId())) {
-                        if ("1000".equals(condition.getLeftParamType())) {
-                            sb.append(condition.getLeftParam());
-                            //这里待修改
-                            if ("1000".equals(condition.getOperType())) {
-                                sb.append(">");
-                            } else if ("2000".equals(condition.getOperType())) {
-                                sb.append("<");
-                            } else if ("3000".equals(condition.getOperType())) {
-                                sb.append("=");
-                            }
-                            sb.append(condition.getRightParam());
-                        } else {
-                            sb.append(expressionMatching(expressions, condition.getConditionId()));
-                        }
-                        break;
-                    }
-                }
+                sb.append("(");
+                //左参结果
+                forLabel(sb, idLeft, expressions);
 
                 if ("7000".equals(mktVerbalCondition.getOperType())) {
                     sb.append("&&");
@@ -255,29 +254,37 @@ public class TestController extends BaseController {
                     sb.append("||");
                 }
 
-                for (MktVerbalCondition condition : expressions) {
-                    if (idRight.equals(condition.getConditionId())) {
-                        if ("1000".equals(condition.getLeftParamType())) {
-                            sb.append(condition.getLeftParam());
-                            //这里待修改
-                            if ("1000".equals(condition.getOperType())) {
-                                sb.append(">");
-                            } else if ("2000".equals(condition.getOperType())) {
-                                sb.append("<");
-                            } else if ("3000".equals(condition.getOperType())) {
-                                sb.append("=");
-                            }
-                            sb.append(condition.getRightParam());
-                        } else {
-                            sb.append(expressionMatching(expressions, condition.getConditionId()));
-                        }
-                        break;
-                    }
-                }
+                //右参结果
+                forLabel(sb, idRight, expressions);
+                sb.append(")");
+
             }
         }
 
         return sb.toString();
+    }
+
+
+    public void forLabel(StringBuilder sb, Long id, List<MktVerbalCondition> expressions) {
+        for (MktVerbalCondition condition : expressions) {
+            if (id.equals(condition.getConditionId())) {
+                if ("1000".equals(condition.getLeftParamType())) {
+                    sb.append(condition.getLeftParam());
+                    //这里待修改
+                    if ("1000".equals(condition.getOperType())) {
+                        sb.append(">");
+                    } else if ("2000".equals(condition.getOperType())) {
+                        sb.append("<");
+                    } else if ("3000".equals(condition.getOperType())) {
+                        sb.append("==");
+                    }
+                    sb.append(condition.getRightParam());
+                } else {
+                    sb.append(expressionMatching(expressions, condition.getConditionId()));
+                }
+                break;
+            }
+        }
     }
 
 

@@ -1,6 +1,5 @@
 package com.zjtelcom.cpct.dto.user;
 
-
 import com.zjtelcom.cpct.BaseEntity;
 
 import java.io.Serializable;
@@ -12,6 +11,7 @@ public class UserList extends BaseEntity implements Serializable {
     private String userName;
     private String userPhone;
     private String filterType;
+    private Long ruleId;
 
     public Long getUserId() {
         return userId;
@@ -43,5 +43,13 @@ public class UserList extends BaseEntity implements Serializable {
 
     public void setFilterType(String filterType) {
         this.filterType = filterType;
+    }
+
+    public Long getRuleId() {
+        return ruleId;
+    }
+
+    public void setRuleId(Long ruleId) {
+        this.ruleId = ruleId;
     }
 }

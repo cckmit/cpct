@@ -3,7 +3,9 @@ package com.zjtelcom.cpct.controller.grouping;
 import com.alibaba.fastjson.JSONArray;
 import com.zjhcsoft.eagle.main.dubbo.model.policy.CalcReqModel;
 import com.zjtelcom.cpct.controller.BaseController;
+import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
 import com.zjtelcom.cpct.domain.grouping.TarGrpConditionDO;
+import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDTO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
@@ -11,6 +13,7 @@ import com.zjtelcom.cpct.util.FastJsonUtils;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,6 +49,7 @@ public class TarGrpController extends BaseController {
 
     /**
      * 新增目标分群
+     * 服务号：5013030003
      */
     @RequestMapping("/createTarGrp")
     @CrossOrigin
@@ -66,13 +70,13 @@ public class TarGrpController extends BaseController {
      */
     @RequestMapping("/delTarGrpCondition")
     @CrossOrigin
-    public String delTarGrpCondition(@Param("conditionId") Long conditionId) {
+    public String delTarGrpCondition(@RequestBody TarGrpCondition tarGrpCondition) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            maps = tarGrpService.delTarGrpCondition(conditionId);
+            maps = tarGrpService.delTarGrpCondition(tarGrpCondition.getConditionId());
         } catch (Exception e) {
-            logger.error("[op:TarGrpController] fail to delTarGrpCondition for conditionId = {}!" +
-                    " Exception: ", conditionId, e);
+            logger.error("[op:TarGrpController] fail to delTarGrpCondition for tarGrpCondition = {}!" +
+                    " Exception: ", JSONArray.toJSON(tarGrpCondition), e);
             return FastJsonUtils.objToJson(maps);
         }
         return FastJsonUtils.objToJson(maps);
@@ -80,6 +84,7 @@ public class TarGrpController extends BaseController {
 
     /**
      * 删除目标分群
+     * 服务号：5013030005
      */
     @RequestMapping("/delTarGrp")
     @CrossOrigin
@@ -97,17 +102,17 @@ public class TarGrpController extends BaseController {
 
 
     /**
-     * 编辑目标分群条件
+     * 查看目标分群条件
      */
     @RequestMapping("/editTarGrpCondition")
     @CrossOrigin
-    public String editTarGrpCondition(@Param("conditionId") Long conditionId) {
+    public String editTarGrpCondition(@RequestBody TarGrpCondition tarGrpCondition) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            maps = tarGrpService.editTarGrpConditionDO(conditionId);
+            maps = tarGrpService.editTarGrpConditionDO(tarGrpCondition.getConditionId());
         } catch (Exception e) {
-            logger.error("[op:TarGrpController] fail to editTarGrpCondition for conditionId = {}!" +
-                    " Exception: ", conditionId, e);
+            logger.error("[op:TarGrpController] fail to editTarGrpCondition for tarGrpCondition = {}!" +
+                    " Exception: ", JSONArray.toJSON(tarGrpCondition), e);
             return FastJsonUtils.objToJson(maps);
         }
         return FastJsonUtils.objToJson(maps);
@@ -118,13 +123,13 @@ public class TarGrpController extends BaseController {
      */
     @RequestMapping("/listTarGrpCondition")
     @CrossOrigin
-    public String listTarGrpCondition(@Param("mktCamGrpRulId") Long mktCamGrpRulId) {
+    public String listTarGrpCondition(@RequestBody MktCamGrpRul mktCamGrpRul) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            maps = tarGrpService.listTarGrpCondition(mktCamGrpRulId);
+            maps = tarGrpService.listTarGrpCondition(mktCamGrpRul.getMktCamGrpRulId());
         } catch (Exception e) {
-            logger.error("[op:TarGrpController] fail to listTarGrpCondition for mktCamGrpRulId = {}!" +
-                    " Exception: ", mktCamGrpRulId, e);
+            logger.error("[op:TarGrpController] fail to listTarGrpCondition for mktCamGrpRul = {}!" +
+                    " Exception: ", JSONArray.toJSON(mktCamGrpRul), e);
             return FastJsonUtils.objToJson(maps);
         }
         return FastJsonUtils.objToJson(maps);
@@ -152,13 +157,13 @@ public class TarGrpController extends BaseController {
      */
     @RequestMapping("/updateTarGrpCondition")
     @CrossOrigin
-    public String updateTarGrpCondition(TarGrpConditionDO tarGrpConditionDO) {
+    public String updateTarGrpCondition(@RequestBody TarGrpCondition tarGrpCondition) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            maps = tarGrpService.updateTarGrpConditionDO(tarGrpConditionDO);
+            maps = tarGrpService.updateTarGrpCondition(tarGrpCondition);
         } catch (Exception e) {
             logger.error("[op:TarGrpController] fail to updateTarGrpConditionDO for tarGrpConditionDO = {}!" +
-                    " Exception: ", JSONArray.toJSON(tarGrpConditionDO), e);
+                    " Exception: ", JSONArray.toJSON(tarGrpCondition), e);
             return FastJsonUtils.objToJson(maps);
         }
         return FastJsonUtils.objToJson(maps);
@@ -169,13 +174,13 @@ public class TarGrpController extends BaseController {
      */
     @RequestMapping("/saveBigDataModel")
     @CrossOrigin
-    public String saveBigDataModel(@Param("mktCamGrpRulId") Long mktCamGrpRulId) {
+    public String saveBigDataModel(@RequestBody MktCamGrpRul mktCamGrpRul) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            maps = tarGrpService.saveBigDataModel(mktCamGrpRulId);
+            maps = tarGrpService.saveBigDataModel(mktCamGrpRul.getMktCamGrpRulId());
         } catch (Exception e) {
-            logger.error("[op:TarGrpController] fail to saveBigDataModel for mktCamGrpRulId = {}!" +
-                    " Exception: ", mktCamGrpRulId, e);
+            logger.error("[op:TarGrpController] fail to saveBigDataModel for mktCamGrpRul = {}!" +
+                    " Exception: ", JSONArray.toJSON(mktCamGrpRul), e);
             return FastJsonUtils.objToJson(maps);
         }
         return FastJsonUtils.objToJson(maps);
@@ -187,15 +192,15 @@ public class TarGrpController extends BaseController {
      */
     @RequestMapping("/listBigDataModel")
     @CrossOrigin
-    public String listBigDataModel(@Param("mktCamGrpRulId") Long mktCamGrpRulId) {
+    public String listBigDataModel(@RequestBody MktCamGrpRul mktCamGrpRul) {
         //模拟大数据返回一个map
         Map<String, Object> maps = new HashMap<>();
         try {
             //大数据返回信息给前台
-            maps = tarGrpService.listBigDataModel(mktCamGrpRulId);
+            maps = tarGrpService.listBigDataModel(mktCamGrpRul.getMktCamGrpRulId());
         } catch (Exception e) {
-            logger.error("[op:TarGrpController] fail to listBigDataModel for mktCamGrpRulId = {}!" +
-                    " Exception: ", mktCamGrpRulId, e);
+            logger.error("[op:TarGrpController] fail to listBigDataModel for mktCamGrpRul = {}!" +
+                    " Exception: ", JSONArray.toJSON(mktCamGrpRul), e);
             return FastJsonUtils.objToJson(maps);
         }
         return FastJsonUtils.objToJson(maps);
