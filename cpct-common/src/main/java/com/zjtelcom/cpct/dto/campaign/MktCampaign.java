@@ -10,7 +10,6 @@ import java.util.Date;
  * @Descirption:营销活动服务对接基本dto父对象
  * @Date: 2018/6/26.
  */
-@Data
 public class MktCampaign extends BaseEntity {
 
     /**
@@ -68,4 +67,91 @@ public class MktCampaign extends BaseEntity {
      */
     private String mktCampaignDesc;
 
+    public Long getMktCampaignId() {
+        return mktCampaignId;
+    }
+
+    public void setMktCampaignId(Long mktCampaignId) {
+        this.mktCampaignId = mktCampaignId;
+    }
+
+    public Long getStrategyId() {
+        return strategyId;
+    }
+
+    public void setStrategyId(Long strategyId) {
+        this.strategyId = strategyId;
+    }
+
+    public String getMktCampaignName() {
+        return mktCampaignName;
+    }
+
+    public void setMktCampaignName(String mktCampaignName) {
+        this.mktCampaignName = mktCampaignName;
+    }
+
+    public Date getPlanBeginTime() {
+        return planBeginTime;
+    }
+
+    public void setPlanBeginTime(Date planBeginTime) {
+        this.planBeginTime = planBeginTime;
+    }
+
+    public Date getPlanEndTime() {
+        return planEndTime;
+    }
+
+    public void setPlanEndTime(Date planEndTime) {
+        this.planEndTime = planEndTime;
+    }
+
+    public Date getBeginTime() {
+        return beginTime;
+    }
+
+    public void setBeginTime(Date beginTime) {
+        this.beginTime = beginTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getMktCampaignType() {
+        return mktCampaignType;
+    }
+
+    public void setMktCampaignType(String mktCampaignType) {
+        this.mktCampaignType = mktCampaignType;
+    }
+
+    public String getMktActivityNbr() {
+        return mktActivityNbr;
+    }
+
+    public void setMktActivityNbr(String mktActivityNbr) {
+        this.mktActivityNbr = mktActivityNbr;
+    }
+
+    public String getMktActivityTarget() {
+        return mktActivityTarget;
+    }
+
+    public void setMktActivityTarget(String mktActivityTarget) {
+        this.mktActivityTarget = mktActivityTarget;
+    }
+
+    public String getMktCampaignDesc() {
+        return mktCampaignDesc;
+    }
+
+    public void setMktCampaignDesc(String mktCampaignDesc) {
+        this.mktCampaignDesc = mktCampaignDesc;
+    }
 }
