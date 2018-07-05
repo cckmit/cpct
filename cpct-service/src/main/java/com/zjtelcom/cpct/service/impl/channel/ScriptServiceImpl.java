@@ -37,7 +37,7 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
         script.setStatusCd("1000");
         scriptMapper.insert(script);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData","添加成功");
+        result.put("resultMsg","添加成功");
         return result;
     }
 
@@ -55,7 +55,7 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
         script.setUpdateStaff(userId);
         scriptMapper.updateByPrimaryKey(script);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData","添加成功");
+        result.put("resultMsg","添加成功");
         return result;
     }
 
@@ -70,7 +70,7 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
         }
         scriptMapper.deleteByPrimaryKey(mktScript.getScriptId());
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData","添加成功");
+        result.put("resultMsg","添加成功");
         return result;
     }
 
@@ -99,7 +99,7 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
                 voList.add(vo);
             }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData",voList);
+        result.put("resultMsg",voList);
         result.put("page",info);
         return result;
     }
@@ -116,7 +116,7 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
             logger.error("[op:ChannelServiceImpl] fail to listChannel ", e);
         }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData",vo);
+        result.put("resultMsg",vo);
         return result;
     }
 }

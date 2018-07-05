@@ -37,7 +37,7 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
         script.setStatusCd("1000");
         camScriptMapper.insert(script);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData","添加成功");
+        result.put("resultMsg","添加成功");
         return result;
     }
 
@@ -55,7 +55,7 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
         script.setUpdateStaff(userId);
         camScriptMapper.updateByPrimaryKey(script);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData","修改成功");
+        result.put("resultMsg","修改成功");
         return result;
     }
 
@@ -72,7 +72,7 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
             camScriptMapper.deleteByPrimaryKey(id);
         }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData","删除成功");
+        result.put("resultMsg","删除成功");
         return result;
     }
 
@@ -93,7 +93,7 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
             logger.error("[op:ChannelServiceImpl] fail to listChannel ", e);
         }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData",voList);
+        result.put("resultMsg",voList);
         return result;
     }
 

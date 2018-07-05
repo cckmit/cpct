@@ -51,7 +51,7 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
             addCondition(userId,verbal.getVerbalId(),vcAddVO);
         }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData","添加成功");
+        result.put("resultMsg","添加成功");
         return result;
     }
 
@@ -72,7 +72,7 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
         }
         VerbalVO verbalVO = supplementVo(ChannelUtil.map2VerbalVO(verbal),verbal);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData",verbalVO);
+        result.put("resultMsg",verbalVO);
         return result;
     }
 
@@ -108,7 +108,7 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
             verbalVOS.add(verbalVO);
         }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData",verbalVOS);
+        result.put("resultMsg",verbalVOS);
         return result;
     }
 
