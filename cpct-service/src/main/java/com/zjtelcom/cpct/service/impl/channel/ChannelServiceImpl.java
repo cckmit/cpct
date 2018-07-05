@@ -38,7 +38,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         channel.setStatusCd("1000");
         channelMapper.insert(channel);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData","添加成功");
+        result.put("resultMsg","添加成功");
         return result;
     }
 
@@ -56,7 +56,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         channel.setUpdateStaff(userId);
         channelMapper.updateByPrimaryKey(channel);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData","添加成功");
+        result.put("resultMsg","添加成功");
         return result;
     }
 
@@ -72,7 +72,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         }
         channelMapper.deleteByPrimaryKey(channelDetail.getChannelId());
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData","添加成功");
+        result.put("resultMsg","添加成功");
         return result;
     }
 
@@ -88,7 +88,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
             voList.add(vo);
         }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData",voList);
+        result.put("resultMsg",voList);
         result.put("pageInfo",pageInfo);
         return result;
     }
@@ -103,7 +103,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
             voList.add(vo);
         }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData",voList);
+        result.put("resultMsg",voList);
         return result;
     }
 
@@ -119,7 +119,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
             logger.error("[op:ChannelServiceImpl] fail to listChannel ", e);
         }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData",vo);
+        result.put("resultMsg",vo);
         return result;
     }
 }

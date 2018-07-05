@@ -58,7 +58,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             logger.error("[op:LabelServiceImpl] fail to getLabelList ", e);
         }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData",voList);
+        result.put("resultMsg",voList);
         return result;
     }
 
@@ -82,16 +82,37 @@ public class LabelServiceImpl extends BaseService implements LabelService {
 //            }else {
 //                addVO1.setLabelValueType("1000");
 //            }
+//            if (trigger.getField()!=null){
+//                switch(trigger.getField()){
+//                    case "YD":
+//                        addVO1.setFitDomain("1");
+//                        break;
+//                    case "KD":
+//                        addVO1.setFitDomain("2");
+//                        break;
+//                    case "GH":
+//                        addVO1.setFitDomain("3");
+//                        break;
+//                    case "ITV":
+//                        addVO1.setFitDomain("4");
+//                        break;
+//                }
+//            }
 //        }
-        Label label = BeanUtil.create(addVO,new Label());
-        label.setCreateDate(new Date());
-        label.setUpdateDate(new Date());
-        label.setCreateStaff(userId);
-        label.setUpdateStaff(userId);
-        label.setStatusCd("1000");
-        labelMapper.insert(label);
+        Label labelValodate = labelMapper.selectByLabelCode(addVO.getInjectionLabelCode());
+        if (labelValodate!=null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","标签已存在");
+            return result;
+        }   Label label = BeanUtil.create(addVO,new Label());
+            label.setCreateDate(new Date());
+            label.setUpdateDate(new Date());
+            label.setCreateStaff(userId);
+            label.setUpdateStaff(userId);
+            label.setStatusCd("1000");
+            labelMapper.insert(label);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData","添加成功");
+        result.put("resultMsg","添加成功");
         return result;
     }
 
@@ -109,7 +130,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         label.setUpdateStaff(userId);
         labelMapper.updateByPrimaryKey(label);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData","添加成功");
+        result.put("resultMsg","添加成功");
         return result;
     }
 
@@ -124,7 +145,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         }
         labelMapper.deleteByPrimaryKey(labelId);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData","添加成功");
+        result.put("resultMsg","添加成功");
         return result;
     }
 
@@ -149,7 +170,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
                 voList.add(vo);
             }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData",voList);
+        result.put("resultMsg",voList);
         result.put("page",pageInfo);
         return result;
     }
@@ -166,7 +187,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             logger.error("[op:LabelServiceImpl] fail to getLabelDetail ", e);
         }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData",vo);
+        result.put("resultMsg",vo);
         return result;
     }
 
@@ -183,7 +204,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         labelGrp.setStatusCd("1000");
         labelGrpMapper.insert(labelGrp);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData","添加成功");
+        result.put("resultMsg","添加成功");
         return result;
     }
 
@@ -201,7 +222,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         labelGrp.setUpdateStaff(userId);
         labelGrpMapper.updateByPrimaryKey(labelGrp);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData","添加成功");
+        result.put("resultMsg","添加成功");
         return result;
     }
 
@@ -217,7 +238,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         //todo 存在关联关系的标签组 不能删除
         labelGrpMapper.deleteByPrimaryKey(labelGrpId);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData","添加成功");
+        result.put("resultMsg","添加成功");
         return result;
     }
 
@@ -232,7 +253,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             logger.error("[op:LabelServiceImpl] fail to getLabelGrpList ", e);
         }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData",grpList);
+        result.put("resultMsg",grpList);
         return result;
     }
 
@@ -247,7 +268,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             logger.error("[op:LabelServiceImpl] fail to getLabelGrpDetail ", e);
         }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData",labelGrp);
+        result.put("resultMsg",labelGrp);
         return result;
     }
 
@@ -270,7 +291,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         LabelGrpMbr grpMbr = BeanUtil.create(addVO,new LabelGrpMbr());
         labelGrpMbrMapper.insert(grpMbr);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData","添加成功");
+        result.put("resultMsg","添加成功");
         return result;
 }
 
@@ -294,7 +315,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         labelGrpMbr.setUpdateStaff(userId);
         labelGrpMbrMapper.updateByPrimaryKey(labelGrpMbr);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData","添加成功");
+        result.put("resultMsg","添加成功");
         return result;
     }
 
@@ -309,7 +330,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         }
         labelGrpMbrMapper.deleteByPrimaryKey(labelGrpMbrId);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData","添加成功");
+        result.put("resultMsg","添加成功");
         return result;
     }
 
@@ -324,7 +345,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             logger.error("[op:LabelServiceImpl] fail to getLabelGrpDetail ", e);
         }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData",grpMbr);
+        result.put("resultMsg",grpMbr);
         return result;
     }
 
@@ -340,7 +361,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         labelValue.setStatusCd("1000");
         labelValueMapper.insert(labelValue);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData","添加成功");
+        result.put("resultMsg","添加成功");
         return result;
     }
 
@@ -358,7 +379,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         labelValue.setUpdateStaff(userId);
         labelValueMapper.updateByPrimaryKey(labelValue);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData","添加成功");
+        result.put("resultMsg","添加成功");
         return result;
     }
 
@@ -373,7 +394,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         }
         labelValueMapper.deleteByPrimaryKey(labelValueId);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData","添加成功");
+        result.put("resultMsg","添加成功");
         return result;
     }
 
@@ -395,7 +416,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             logger.error("[op:LabelServiceImpl] fail to getLabelValueDetail ", e);
         }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultData",labelValue);
+        result.put("resultMsg",labelValue);
         return result;
     }
 }
