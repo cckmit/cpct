@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zjtelcom.cpct.dao.event.EvtSceneCamRelMapper">
-    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.event.EvtSceneCamRelDO">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.dto.event.EvtSceneCamRel">
         <id column="SCENE_CAM_REL_ID" jdbcType="BIGINT" property="sceneCamRelId"/>
         <result column="EVENT_SCENE_ID" jdbcType="BIGINT" property="eventSceneId"/>
         <result column="CAMPAIGN_SEQ" jdbcType="INTEGER" property="campaignSeq"/>
@@ -18,7 +18,7 @@
     delete from evt_scene_cam_rel
     where SCENE_CAM_REL_ID = #{sceneCamRelId,jdbcType=BIGINT}
   </delete>
-    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.event.EvtSceneCamRelDO">
+    <insert id="insert" parameterType="com.zjtelcom.cpct.dto.event.EvtSceneCamRel">
     insert into evt_scene_cam_rel (SCENE_CAM_REL_ID, EVENT_SCENE_ID, CAMPAIGN_SEQ, 
       MKT_CAMPAIGN_ID, STATUS_CD, STATUS_DATE, 
       CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE, 
@@ -28,7 +28,7 @@
       #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, 
       #{createDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR})
   </insert>
-    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.event.EvtSceneCamRelDO">
+    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.dto.event.EvtSceneCamRel">
     update evt_scene_cam_rel
     set EVENT_SCENE_ID = #{eventSceneId,jdbcType=BIGINT},
       CAMPAIGN_SEQ = #{campaignSeq,jdbcType=INTEGER},

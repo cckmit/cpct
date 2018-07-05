@@ -99,7 +99,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     }
 
     /**
-     * 新增目标分群
+     * 新增目标分群(暂时废弃)
      */
     @Transactional(readOnly = false)
     @Override
@@ -164,19 +164,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     @Override
     public Map<String, Object> editTarGrpConditionDO(Long conditionId) {
         Map<String, Object> maps = new HashMap<>();
-        TarGrpConditionDO tarGrpConditionDO = new TarGrpConditionDO();
-        try {
-            tarGrpConditionDO = tarGrpConditionMapper.getTarGrpCondition(conditionId);
-        } catch (Exception e) {
-            maps.put("resultCode", CommonConstant.CODE_FAIL);
-            maps.put("resultMsg", ErrorCode.EDIT_TAR_GRP_CONDITION_FAILURE.getErrorMsg());
-            maps.put("resultObject", StringUtils.EMPTY);
-            logger.error("[op:TarGrpServiceImpl] fail to editTarGrpConditionDO ", e);
-            return maps;
-        }
+        TarGrpCondition tarGrpCondition = new TarGrpCondition();
+        tarGrpCondition = tarGrpConditionMapper.getTarGrpCondition(conditionId);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
-        maps.put("resultObject", tarGrpConditionDO);
+        maps.put("tarGrpCondition", tarGrpCondition);
         return maps;
     }
 
@@ -186,14 +178,16 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
      */
     @Override
     public Map<String, Object> modTarGrp(TarGrpDetail tarGrpDetail) {
-        Map<String,Object> maps = new HashMap<>();
+        Map<String, Object> maps = new HashMap<>();
         TarGrp tarGrp = new TarGrp();
         tarGrp = tarGrpDetail;
         tarGrp.setUpdateDate(DateUtil.getCurrentTime());
         tarGrp.setUpdateStaff(UserUtil.loginId());
         tarGrpMapper.modTarGrp(tarGrp);
         List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
-        for(TarGrpCondition tarGrpCondition : tarGrpConditions){
+        for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
+            tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
+            tarGrpCondition.setUpdateStaff(UserUtil.loginId());
             tarGrpConditionMapper.modTarGrpCondition(tarGrpCondition);
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -206,11 +200,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
      */
     @Override
     public Map<String, Object> delTarGrp(TarGrpDetail tarGrpDetail) {
-        Map<String,Object> maps = new HashMap<>();
+        Map<String, Object> maps = new HashMap<>();
         TarGrp tarGrp = tarGrpDetail;
         tarGrpMapper.delTarGrp(tarGrp);
         List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
-        for(TarGrpCondition tarGrpCondition : tarGrpConditions){
+        for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
             tarGrpConditionMapper.delTarGrpCondition(tarGrpCondition);
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -223,20 +217,13 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
      * 修改目标分群条件
      */
     @Override
-    public Map<String, Object> updateTarGrpConditionDO(TarGrpConditionDO tarGrpConditionDO) {
+    public Map<String, Object> updateTarGrpCondition(TarGrpCondition tarGrpCondition) {
         Map<String, Object> mapsT = new HashMap<>();
-        try {
-            tarGrpConditionMapper.updateByPrimaryKey(tarGrpConditionDO);
-        } catch (Exception e) {
-            mapsT.put("resultCode", CommonConstant.CODE_FAIL);
-            mapsT.put("resultMsg", ErrorCode.UPDATE_TAR_GRP_CONDITION_FAILURE.getErrorMsg());
-            mapsT.put("resultObject", StringUtils.EMPTY);
-            logger.error("[op:TarGrpServiceImpl] fail to updateTarGrpConditionDO ", e);
-            return mapsT;
-        }
+        tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
+        tarGrpCondition.setUpdateStaff(UserUtil.loginId());
+        tarGrpConditionMapper.modTarGrpCondition(tarGrpCondition);
         mapsT.put("resultCode", CommonConstant.CODE_SUCCESS);
         mapsT.put("resultMsg", StringUtils.EMPTY);
-        mapsT.put("resultObject", StringUtils.EMPTY);
         return mapsT;
     }
 
@@ -259,11 +246,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         Map<String, Object> maps = new HashMap<>();
         //通过mktCamGrpRulId获取所有活动关联关系
         MktCamGrpRul mktCamGrpRul = mktCamGrpRulMapper.selectByPrimaryKey(mktCamGrpRulId);
-        TarGrpDetail tarGrpDetail = tarGrpMapper.selectByPrimaryKey(mktCamGrpRul.getTarGrpId());
-        List<TarGrpConditionDO> list = tarGrpConditionMapper.listTarGrpCondition(tarGrpDetail.getTarGrpId());
+        TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(mktCamGrpRul.getTarGrpId());
+        List<TarGrpCondition> listTarGrpCondition = tarGrpConditionMapper.listTarGrpCondition(tarGrp.getTarGrpId());
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
-        maps.put("resultObject", list);
+        maps.put("listTarGrpCondition", listTarGrpCondition);
         return maps;
     }
 

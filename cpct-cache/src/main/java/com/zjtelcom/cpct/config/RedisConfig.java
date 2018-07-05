@@ -32,6 +32,8 @@ public class RedisConfig extends CachingConfigurerSupport {
     private int port;
     @Value("${spring.redis.timeout}")
     private int timeout;
+    @Value("${spring.redis.password}")
+    private String password;
 
     @Bean
     public KeyGenerator wiselyKeyGenerator() {
@@ -55,6 +57,7 @@ public class RedisConfig extends CachingConfigurerSupport {
         factory.setHostName(host);
         factory.setPort(port);
         factory.setTimeout(timeout); //设置连接超时时间
+        factory.setPassword(password);
         return factory;
     }
 

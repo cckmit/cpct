@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.service.event;
 
 import com.zjtelcom.cpct.dto.event.ContactEvtItem;
+import com.zjtelcom.cpct.request.event.ContactEvtReq;
 
 import java.util.Map;
 
@@ -11,7 +12,7 @@ import java.util.Map;
  */
 public interface ContactEvtItemService {
 
-    Map<String,Object> listEventItem(Long contactEvtId);
+    Map<String,Object> listEventItem(ContactEvtReq ContactEvtReq);
 
     Map<String,Object> delEventItem(ContactEvtItem contactEvtItem);
 

@@ -2,6 +2,8 @@ package com.zjtelcom.cpct.dao.campaign;
 
 
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.dto.campaign.MktCampaign;
+import com.zjtelcom.cpct.request.campaign.QryMktCampaignListReq;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -19,4 +21,6 @@ public interface MktCampaignMapper {
     List<MktCampaignDO> selectAll();
 
     int updateByPrimaryKey(MktCampaignDO record);
+
+    List<MktCampaign> qryMktCampaignList(QryMktCampaignListReq qryMktCampaignListReq);
 }

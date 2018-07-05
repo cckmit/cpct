@@ -8,6 +8,7 @@ import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.request.event.ContactEvtReq;
 import com.zjtelcom.cpct.request.event.CreateContactEvtJtReq;
+import com.zjtelcom.cpct.request.event.CreateContactEvtReq;
 import com.zjtelcom.cpct.service.event.ContactEvtService;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,16 +64,32 @@ public class ContactEvtController extends BaseController {
     }
 
     /**
-     * 新增事件
+     * 新增事件(集团)
      */
     @RequestMapping("/createContactEvtJt")
     @CrossOrigin
     public String createContactEvtJt(@RequestBody CreateContactEvtJtReq createContactEvtJtReq) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            contactEvtService.createContactEvtJt(createContactEvtJtReq);
+            maps = contactEvtService.createContactEvtJt(createContactEvtJtReq);
         } catch (Exception e) {
             logger.error("[op:EventController] fail to createContactEvtJt for createContactEvtJtReq = {}! Exception: ", JSONArray.toJSON(createContactEvtJtReq), e);
+            return initFailRespInfo(ErrorCode.SAVE_EVENT_FAILURE.getErrorMsg(), ErrorCode.SAVE_EVENT_FAILURE.getErrorCode());
+        }
+        return JSON.toJSONString(maps);
+    }
+
+    /**
+     * 新增事件
+     */
+    @RequestMapping("/createContactEvt")
+    @CrossOrigin
+    public String createContactEvt(@RequestBody CreateContactEvtReq createContactEvtReq) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = contactEvtService.createContactEvt(createContactEvtReq);
+        } catch (Exception e) {
+            logger.error("[op:EventController] fail to createContactEvtJt for createContactEvtJtReq = {}! Exception: ", JSONArray.toJSON(createContactEvtReq), e);
             return initFailRespInfo(ErrorCode.SAVE_EVENT_FAILURE.getErrorMsg(), ErrorCode.SAVE_EVENT_FAILURE.getErrorCode());
         }
         return JSON.toJSONString(maps);
@@ -99,12 +116,12 @@ public class ContactEvtController extends BaseController {
      */
     @RequestMapping("/editEvent")
     @CrossOrigin
-    public String editEvent(@RequestBody ContactEvtReq contactEvtReq) {
+    public String editEvent(@RequestBody ContactEvt contactEvt) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            maps = contactEvtService.editEvent(contactEvtReq.getContactEvt().getContactEvtId());
+            maps = contactEvtService.editEvent(contactEvt.getContactEvtId());
         } catch (Exception e) {
-            logger.error("[op:EventController] fail to editEvent for contactEvtReq = {}! Exception: ",  JSONArray.toJSON(contactEvtReq), e);
+            logger.error("[op:EventController] fail to editEvent for contactEvtReq = {}! Exception: ",  JSONArray.toJSON(contactEvt), e);
             return initFailRespInfo(ErrorCode.EDIT_EVENT_FAILURE.getErrorMsg(), ErrorCode.EDIT_EVENT_FAILURE.getErrorCode());
         }
         return JSON.toJSONString(maps);

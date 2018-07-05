@@ -71,6 +71,9 @@
         <if test="evtRulName != null and evtRulName != ''">
             and EVT_RUL_NAME LIKE CONCAT('%',CONCAT(#{evtRulName},'%'))
         </if>
+        <if test="contactEvtId != null and contactEvtId != 0">
+            and EVENT_ID = #{contactEvtId}
+        </if>
     </select>
 
     <update id="modContactEvtMatchRul" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtMatchRul">

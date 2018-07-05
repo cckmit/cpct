@@ -149,4 +149,12 @@
         where EVENT_SCENE_ID = #{eventSceneId,jdbcType=BIGINT}
     </delete>
 
+    <select id="qryEventSceneByEvtId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select EVENT_SCENE_ID, EVENT_SCENE_NBR, EVENT_SCENE_NAME, EVENT_SCENE_DESC, EVENT_ID,
+        EXT_EVENT_SCENE_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE,
+        CREATE_DATE, REMARK, CONTACT_EVT_CODE
+        from event_scene
+        where  EVENT_ID = #{contactEvtId}
+    </select>
+
 </mapper>

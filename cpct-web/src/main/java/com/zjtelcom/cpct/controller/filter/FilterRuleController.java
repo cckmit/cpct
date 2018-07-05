@@ -5,15 +5,18 @@ import com.alibaba.fastjson.JSONArray;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
+import com.zjtelcom.cpct.dto.user.UserList;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.request.filter.FilterRuleReq;
 import com.zjtelcom.cpct.service.filter.FilterRuleService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -175,12 +178,28 @@ public class FilterRuleController extends BaseController {
      */
     @RequestMapping("/importUserList")
     @CrossOrigin
-        public String importUserList(MultipartFile file) {
+    public String importUserList(MultipartFile file, @Param("ruleId") Long ruleId) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            maps = filterRuleService.importUserList(file);
+            maps = filterRuleService.importUserList(file, ruleId);
         } catch (Exception e) {
             logger.error("[op:FilterRuleController] fail to listEvents for multipartFile = {}! Exception: ", JSONArray.toJSON(file), e);
+            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+        }
+        return JSON.toJSONString(maps);
+    }
+
+    /**
+     * 缓存取出用户信息
+     */
+    @RequestMapping("/listUserList")
+    @CrossOrigin
+    public String listUserList(@RequestBody UserList userList) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = filterRuleService.listUserList(userList);
+        } catch (Exception e) {
+            logger.error("[op:FilterRuleController] fail to listEvents for userList = {}! Exception: ", JSONArray.toJSON(userList), e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
         }
         return JSON.toJSONString(maps);

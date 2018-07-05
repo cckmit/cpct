@@ -1,29 +1,29 @@
 package com.zjtelcom.cpct.request.event;
 
 import com.zjtelcom.cpct.dto.apply.RequestTemplateInst;
+import com.zjtelcom.cpct.dto.event.ContactEventDetail;
 import com.zjtelcom.cpct.dto.event.ContactEvtDetail;
-import lombok.Data;
 
 import java.io.Serializable;
 import java.util.List;
 
 /**
- * @Description 创建事件请求实体类（集团）
+ * @Description 创建事件请求实体类
  * @Author pengy
  * @Date 2018/6/26 13:45
  */
-public class CreateContactEvtJtReq implements Serializable{
+public class CreateContactEvtReq implements Serializable{
 
     private static final long serialVersionUID = -2584042603507583666L;
-    private List<ContactEvtDetail> ContactEvtDetails;
+    private List<ContactEventDetail> contactEvtDetails;
     private RequestTemplateInst requestTemplateInst;
 
-    public List<ContactEvtDetail> getContactEvtDetails() {
-        return ContactEvtDetails;
+    public List<ContactEventDetail> getContactEvtDetails() {
+        return contactEvtDetails;
     }
 
-    public void setContactEvtDetails(List<ContactEvtDetail> contactEvtDetails) {
-        ContactEvtDetails = contactEvtDetails;
+    public void setContactEvtDetails(List<ContactEventDetail> contactEvtDetails) {
+        this.contactEvtDetails = contactEvtDetails;
     }
 
     public RequestTemplateInst getRequestTemplateInst() {

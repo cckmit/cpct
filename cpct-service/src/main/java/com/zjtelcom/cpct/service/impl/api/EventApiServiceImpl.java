@@ -78,14 +78,14 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
 
         //循环事件场景列表 根据事件场景获取活动列表
         List<Long> activityIds = new ArrayList<>();
-        for (EventSceneDO eventSceneDO : eventScenes) {
-            List<EvtSceneCamRelDO> evtSceneCamRelDOS = evtSceneCamRelMapper.selectCamsByEvtSceneId(eventSceneDO.getEventSceneId());
-            if (evtSceneCamRelDOS != null && evtSceneCamRelDOS.size() > 0) {
-                for (EvtSceneCamRelDO evtSceneCamRelDO : evtSceneCamRelDOS) {
-                    activityIds.add(evtSceneCamRelDO.getMktCampaignId());
-                }
-            }
-        }
+//        for (EventSceneDO eventSceneDO : eventScenes) {
+//            List<EvtSceneCamRelDO> evtSceneCamRelDOS = evtSceneCamRelMapper.selectCamsByEvtSceneId(eventSceneDO.getEventSceneId());
+//            if (evtSceneCamRelDOS != null && evtSceneCamRelDOS.size() > 0) {
+//                for (EvtSceneCamRelDO evtSceneCamRelDO : evtSceneCamRelDOS) {
+//                    activityIds.add(evtSceneCamRelDO.getMktCampaignId());
+//                }
+//            }
+//        }
         //初始化参数
         List<MktCampaignDO> activities = new ArrayList<>(); //活动列表
 

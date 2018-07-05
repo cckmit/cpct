@@ -3,12 +3,15 @@ package com.zjtelcom.cpct.controller.event;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.zjtelcom.cpct.controller.BaseController;
+import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.ContactEvtItem;
 import com.zjtelcom.cpct.enums.ErrorCode;
+import com.zjtelcom.cpct.request.event.ContactEvtReq;
 import com.zjtelcom.cpct.service.event.ContactEvtItemService;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,12 +35,12 @@ public class ContactEvtItemController extends BaseController {
      */
     @RequestMapping("/listEventItem")
     @CrossOrigin
-    public String listEventItem(@Param("contactEvtId") Long contactEvtId) {
-        Map<String,Object> maps = new HashMap<>();
+    public String listEventItem(@RequestBody ContactEvtReq ContactEvtReq) {
+        Map<String, Object> maps = new HashMap<>();
         try {
-            maps = contactEvtItemService.listEventItem(contactEvtId);
+            maps = contactEvtItemService.listEventItem(ContactEvtReq);
         } catch (Exception e) {
-            logger.error("[op:ContactEvtItemController] fail to listEventItem for contactEvtId = {}! Exception: ",  contactEvtId, e);
+            logger.error("[op:ContactEvtItemController] fail to listEventItem for contactEvt = {}! Exception: ", JSONArray.toJSON(ContactEvtReq), e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
         }
         return JSON.toJSONString(maps);
@@ -48,8 +51,8 @@ public class ContactEvtItemController extends BaseController {
      */
     @RequestMapping("/delEventItem")
     @CrossOrigin
-    public String delEventItem(ContactEvtItem contactEvtItem) {
-        Map<String,Object> maps = new HashMap<>();
+    public String delEventItem(@RequestBody ContactEvtItem contactEvtItem) {
+        Map<String, Object> maps = new HashMap<>();
         try {
             maps = contactEvtItemService.delEventItem(contactEvtItem);
         } catch (Exception e) {
@@ -64,8 +67,8 @@ public class ContactEvtItemController extends BaseController {
      */
     @RequestMapping("/viewEventItem")
     @CrossOrigin
-    public String viewEventItem(ContactEvtItem contactEvtItem) {
-        Map<String,Object> maps = new HashMap<>();
+    public String viewEventItem(@RequestBody ContactEvtItem contactEvtItem) {
+        Map<String, Object> maps = new HashMap<>();
         try {
             maps = contactEvtItemService.viewEventItem(contactEvtItem);
         } catch (Exception e) {
@@ -80,8 +83,8 @@ public class ContactEvtItemController extends BaseController {
      */
     @RequestMapping("/createEventItem")
     @CrossOrigin
-    public String createEventItem(ContactEvtItem contactEvtItem) {
-        Map<String,Object> maps = new HashMap<>();
+    public String createEventItem(@RequestBody ContactEvtItem contactEvtItem) {
+        Map<String, Object> maps = new HashMap<>();
         try {
             maps = contactEvtItemService.createEventItem(contactEvtItem);
         } catch (Exception e) {
@@ -92,12 +95,12 @@ public class ContactEvtItemController extends BaseController {
     }
 
     /**
-     * 更新事件采集项
+     * 修改事件采集项
      */
     @RequestMapping("/modEventItem")
     @CrossOrigin
-    public String modEventItem(ContactEvtItem contactEvtItem) {
-        Map<String,Object> maps = new HashMap<>();
+    public String modEventItem(@RequestBody ContactEvtItem contactEvtItem) {
+        Map<String, Object> maps = new HashMap<>();
         try {
             maps = contactEvtItemService.modEventItem(contactEvtItem);
         } catch (Exception e) {
