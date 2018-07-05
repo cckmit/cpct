@@ -23,9 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Description 规律规则实现类
@@ -75,8 +73,9 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
     /**
      * 导入用户名单
      */
+    @Transactional(readOnly = false)
     @Override
-    public Map<String, Object> importUserList(MultipartFile multipartFile) throws IOException {
+    public Map<String, Object> importUserList(MultipartFile multipartFile, Long ruleId) throws IOException {
         Map<String, Object> maps = new HashMap<>();
         UserList userList = new UserList();
         InputStream inputStream = multipartFile.getInputStream();
@@ -104,6 +103,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
             if (userListT != null) {
                 continue;
             }
+            userList.setRuleId(ruleId);
             userList.setCreateDate(DateUtil.getCurrentTime());
             userList.setUpdateDate(DateUtil.getCurrentTime());
             userList.setStatusDate(DateUtil.getCurrentTime());
@@ -111,10 +111,36 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
             userList.setCreateStaff(UserUtil.loginId());
             userList.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
             userListMapper.insert(userList);
+
+            //新用户存入redis
+            redisUtils.hmSet(String.valueOf(userList.getUserId()), "userName", userList.getUserName());
+            redisUtils.hmSet(String.valueOf(userList.getUserId()), "userPhone", userList.getUserPhone());
+            redisUtils.hmSet(String.valueOf(userList.getUserId()), "filterType", userList.getFilterType());
+            redisUtils.hmSet(String.valueOf(userList.getUserId()), "ruleId", String.valueOf(ruleId));
         }
-        redisUtils.set("1","1");
+        System.out.println(redisUtils.hmGet(String.valueOf(userList.getUserId()), "userName"));
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
+        return maps;
+    }
+
+    /**
+     * 从缓存中获取用户列表
+     */
+    @Override
+    public Map<String, Object> listUserList(UserList userList) throws IOException {
+        Map<String, Object> maps = new HashMap<>();
+        List<UserList> userLists = new ArrayList<>();
+        Set<Object> keys = redisUtils.keys("*");
+        for (Object str : keys) {
+            UserList userListT = new UserList();
+            userListT.setUserName(String.valueOf(redisUtils.hmGet((String) str, "userName")));
+            userListT.setUserPhone(String.valueOf(redisUtils.hmGet((String) str, "userPhone")));
+            userLists.add(userListT);
+        }
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("userLists", userLists);
         return maps;
     }
 

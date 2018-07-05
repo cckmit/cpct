@@ -209,4 +209,13 @@ public class RedisUtils {
         ZSetOperations<String, Object> zset = redisTemplate.opsForZSet();
         return zset.rangeByScore(key, scoure, scoure1);
     }
+
+    /**
+     * 通过表达式匹配获取所有key
+     */
+    public Set<Object> keys(String pattern) {
+        Set<Object> set = redisTemplate.keys(pattern);
+        return set;
+    }
+
 }

@@ -6,19 +6,28 @@
  */
 package com.zjtelcom.cpct.service.impl.campaign;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.zjtelcom.cpct.common.Page;
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.dto.campaign.MktCamItem;
+import com.zjtelcom.cpct.dto.campaign.MktCampaign;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignDetail;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyDetail;
+import com.zjtelcom.cpct.request.campaign.QryMktCampaignListReq;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Description:
@@ -70,8 +79,6 @@ public class MktCampaignServiceImpl implements MktCampaignService {
         //todo 保存事件关联
 
 
-
-
         return 0;
     }
 
@@ -90,5 +97,21 @@ public class MktCampaignServiceImpl implements MktCampaignService {
 
 
         return 0;
+    }
+
+    /**
+     * 查询事件列表
+     */
+    @Override
+    public Map<String, Object> qryMktCampaignList(QryMktCampaignListReq qryMktCampaignListReq) {
+        Map<String, Object> maps = new HashMap<>();
+        Page pageInfo = qryMktCampaignListReq.getPageInfo();
+        PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
+        List<MktCampaign> mktCampaigns = mktCampaignMapper.qryMktCampaignList(qryMktCampaignListReq);
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("mktCampaigns", mktCampaigns);
+        maps.put("pageInfo", new Page(new PageInfo(mktCampaigns)));
+        return maps;
     }
 }

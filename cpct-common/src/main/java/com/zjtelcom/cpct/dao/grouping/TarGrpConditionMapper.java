@@ -21,9 +21,9 @@ public interface TarGrpConditionMapper {
 
     int updateByPrimaryKey(TarGrpConditionDO record);
 
-    TarGrpConditionDO getTarGrpCondition(Long conditionId);
+    TarGrpCondition getTarGrpCondition(Long conditionId);
 
-    List<TarGrpConditionDO> listTarGrpCondition(@Param("tarGrpId") Long tarGrpId);
+    List<TarGrpCondition> listTarGrpCondition(@Param("tarGrpId") Long tarGrpId);
 
     List<TarGrpConditionDO> selectByActivityId(@Param("activityId") Long activityId);
 

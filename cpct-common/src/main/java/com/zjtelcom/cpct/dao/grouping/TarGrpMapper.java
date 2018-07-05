@@ -13,7 +13,7 @@ public interface TarGrpMapper {
 
     int insert(TarGrpDetail record);
 
-    TarGrpDetail selectByPrimaryKey(Long tarGrpId);
+    TarGrp selectByPrimaryKey(Long tarGrpId);
 
     List<TarGrpDetail> selectAll();
 

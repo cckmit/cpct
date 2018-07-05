@@ -89,13 +89,13 @@
             UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
         </if>
         <if test="createDate != null">
-            CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+            CREATE_DATE = #{createDate},
         </if>
         <if test="statusDate != null ">
-            STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+            STATUS_DATE = #{statusDate},
         </if>
         <if test="updateDate != null ">
-            UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+            UPDATE_DATE = #{updateDate},
         </if>
         <if test="remark != null and remark != ''">
             REMARK = #{remark,jdbcType=VARCHAR},

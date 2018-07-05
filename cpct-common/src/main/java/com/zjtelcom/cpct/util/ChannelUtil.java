@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.util;
 
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dto.channel.*;
+import com.zjtelcom.cpct.enums.Operator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +29,15 @@ public class ChannelUtil  {
     }
     public static LabelVO map2LabelVO(Label label){
         LabelVO vo = BeanUtil.create(label,new LabelVO());
+        if (label.getOperator()!=null){
+            List<String> opratorList = StringToList(label.getOperator());
+            List<String> opStList  = new ArrayList<>();
+            for (String operator : opratorList){
+                Operator op = Operator.getOperator(Integer.valueOf(operator));
+                opStList.add(op.getDescription());
+            }
+            vo.setOperatorList(opStList);
+        }
         List<String> valueList = new ArrayList<>();
         if (label.getRightOperand()!=null && !label.getRightOperand().equals("")){
             valueList = StringToList(label.getRightOperand());
