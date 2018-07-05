@@ -23,4 +23,6 @@ public class FilterRuleConf {
     public void setFilterRuleList(List<FilterRule> filterRuleList) {
         this.filterRuleList = filterRuleList;
     }
+
+
 }

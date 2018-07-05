@@ -19,14 +19,12 @@ import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
+import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Description:
@@ -52,6 +50,10 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             //添加协同渠道基本信息
             CopyPropertiesUtil.copyBean2Bean(mktCamChlConfDO, mktCamChlConfDetail);
             mktCamChlConfDO.setStatusCd(StatusCode.STATUS_CODE_NOTACTIVE.getErrorCode());
+            mktCamChlConfDO.setCreateDate(new Date());
+            mktCamChlConfDO.setCreateStaff(UserUtil.loginId());
+            mktCamChlConfDO.setUpdateDate(new Date());
+            mktCamChlConfDO.setUpdateStaff(UserUtil.loginId());
             mktCamChlConfMapper.insert(mktCamChlConfDO);
             Long evtContactConfId = mktCamChlConfDO.getEvtContactConfId();
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -69,7 +71,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                 if (mktCamChlConfAttr.getAttrId() == ConfAttrEnum.RULE.getArrId()) {
                     mktCamChlConfAttrDO.setAttrValue(evtContactConfId.toString());
                 }
-                mktCamChlConfAttrMapper.updateByPrimaryKey(mktCamChlConfAttrDO);
+                mktCamChlConfAttrMapper.insert(mktCamChlConfAttrDO);
             }
         } catch (Exception e) {
             logger.error("[op:MktCamChlConfServiceImpl] fail to save MktCamChlConf = {}", mktCamChlConfDO, e);
@@ -88,7 +90,9 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             // 更新协同渠道基本信息
             CopyPropertiesUtil.copyBean2Bean(mktCamChlConfDO, mktCamChlConfDetail);
             mktCamChlConfDO.setStatusCd(StatusCode.STATUS_CODE_NOTACTIVE.getErrorCode());
-            mktCamChlConfMapper.insert(mktCamChlConfDO);
+            mktCamChlConfDO.setUpdateDate(new Date());
+            mktCamChlConfDO.setUpdateStaff(UserUtil.loginId());
+            mktCamChlConfMapper.updateByPrimaryKey(mktCamChlConfDO);
             Long evtContactConfId = mktCamChlConfDO.getEvtContactConfId();
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCamChlConfMap.put("resultMsg", ErrorCode.UPDATE_CAM_CHL_CONF_SUCCESS.getErrorMsg());
@@ -124,14 +128,16 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(evtContactConfId);
             List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(evtContactConfId);
             CopyPropertiesUtil.copyBean2Bean(mktCamChlConfDetail, mktCamChlConfDO);
+            List<MktCamChlConfAttr> mktCamChlConfAttrList = new ArrayList<>();
             for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
                 MktCamChlConfAttr mktCamChlConfAttr = new MktCamChlConfAttr();
                 CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttr, mktCamChlConfAttrDO);
                 if (mktCamChlConfAttr.getAttrId() == ConfAttrEnum.RULE.getArrId()) {
                     //TODO 通过EvtContactConfId获取规则放入属性中
                 }
-                mktCamChlConfDetail.getMktCamChlConfAttrList().add(mktCamChlConfAttr);
+                mktCamChlConfAttrList.add(mktCamChlConfAttr);
             }
+            mktCamChlConfDetail.setMktCamChlConfAttrList(mktCamChlConfAttrList);
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCamChlConfMap.put("resultMsg", ErrorCode.GET_CAM_CHL_CONF_SUCCESS.getErrorMsg());
             mktCamChlConfMap.put("mktCamChlConfDetail", mktCamChlConfDetail);
