@@ -8,6 +8,7 @@ import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.dto.channel.LabelAddVO;
 import com.zjtelcom.cpct.dto.channel.QryMktScriptReq;
 import com.zjtelcom.cpct.service.channel.LabelService;
+import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -169,6 +170,7 @@ public class LabelController extends BaseController {
         Map<String,Object> result = new HashMap<>();
         try {
             result = labelService.editLabelGrp(userId,editVO);
+
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to editLabelGrp",e);
             result.put("resultCode",CODE_FAIL);
@@ -202,10 +204,12 @@ public class LabelController extends BaseController {
      */
     @PostMapping("getLabelGrpList")
     @CrossOrigin
-    public Map<String,Object> getLabelGrpList( Map<String, Object> params, Integer page, Integer pageSize) {
+    public Map<String,Object> getLabelGrpList( @RequestBody HashMap<String, Object> params) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
+            Integer page = MapUtil.getIntNum(params.get("page"));
+            Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
             result = labelService.getLabelGrpList(1L,params,page,pageSize);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to getScriptList",e);

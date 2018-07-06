@@ -7,6 +7,7 @@ import com.zjtelcom.cpct.domain.channel.MktVerbal;
 import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
 import com.zjtelcom.cpct.domain.channel.Script;
 import com.zjtelcom.cpct.dto.channel.*;
+import com.zjtelcom.cpct.enums.ConditionType;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.VerbalService;
 import com.zjtelcom.cpct.util.BeanUtil;
@@ -37,18 +38,29 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
     @Transactional
     public Map<String,Object> addVerbal(Long userId, VerbalAddVO addVO) {
         Map<String,Object> result = new HashMap<>();
+
         MktVerbal verbal = BeanUtil.create(addVO,new MktVerbal());
         verbal.setCreateDate(new Date());
         verbal.setCreateStaff(userId);
         verbal.setStatusCd("1000");
         verbalMapper.insert(verbal);
         //删除旧的条件
-        List<MktVerbalCondition> historyList = verbalConditionMapper.findConditionListByVerbalId(verbal.getVerbalId());
-        for (MktVerbalCondition condition : historyList){
-            verbalConditionMapper.deleteByPrimaryKey(condition.getConditionId());
-        }
+//        List<MktVerbalCondition> historyList = verbalConditionMapper.findConditionListByVerbalId(verbal.getVerbalId());
+//        for (MktVerbalCondition condition : historyList){
+//            verbalConditionMapper.deleteByPrimaryKey(condition.getConditionId());
+//        }
         for (VerbalConditionAddVO  vcAddVO : addVO.getAddVOList()){
-            addCondition(userId,verbal.getVerbalId(),vcAddVO);
+            //类型为标签时
+                MktVerbalCondition mktVerbalCondition = BeanUtil.create(vcAddVO,new MktVerbalCondition());
+                mktVerbalCondition.setVerbalId(verbal.getVerbalId());
+                //标签类型
+                if (vcAddVO.getLeftParamType().equals("1000")){
+                    mktVerbalCondition.setRightParamType("3000"); //固定值
+                }else {
+                    mktVerbalCondition.setRightParamType("2000");
+                }
+                mktVerbalCondition.setConditionType(ConditionType.CHANNEL.getValue().toString());
+                verbalConditionMapper.insert(mktVerbalCondition);
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
@@ -58,6 +70,7 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
     //弃用
     @Override
     public Map<String,Object> editVerbal(Long userId, VerbalEditVO editVO) {
+        MktVerbal verbal = verbalMapper.selectByPrimaryKey(editVO.getVerbalId());
         return null;
     }
 
@@ -82,7 +95,7 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
     private VerbalVO supplementVo(VerbalVO verbalVO,MktVerbal verbal){
         Map<String,Object> result = new HashMap<>();
         List<VerbalConditionVO> conditionVOList = new ArrayList<>();
-        List<MktVerbalCondition> conditions = verbalConditionMapper.findConditionListByVerbalId(verbal.getVerbalId());
+        List<MktVerbalCondition> conditions = verbalConditionMapper.findChannelConditionListByVerbalId(verbal.getVerbalId());
         for (MktVerbalCondition condition : conditions){
             VerbalConditionVO vo = BeanUtil.create(condition,new VerbalConditionVO());
             conditionVOList.add(vo);
@@ -95,10 +108,9 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
     public Map<String,Object> getVerbalListByConfId(Long userId, Long confId) {
         Map<String,Object> result = new HashMap<>();
         //todo 推送渠道对象
-        List<Long>  verbalIdList = new ArrayList<>();
+        List<MktVerbal>  verbalList =  verbalMapper.findVerbalListByConfId(confId);
         List<VerbalVO> verbalVOS = new ArrayList<>();
-        for (Long verbalId : verbalIdList){
-            MktVerbal verbal = verbalMapper.selectByPrimaryKey(verbalId);
+        for (MktVerbal verbal : verbalList){
             if (verbal==null){
                 result.put("resultCode",CODE_FAIL);
                 result.put("resultMsg","痛痒点话术不存在");
@@ -112,17 +124,6 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
         return result;
     }
 
-
-    //添加
-    private MktVerbalCondition addCondition(Long userId,Long verbalId ,VerbalConditionAddVO addVO){
-        MktVerbalCondition verbalCondition = BeanUtil.create(addVO,new MktVerbalCondition());
-        verbalCondition.setStatusCd("1000");
-        verbalCondition.setCreateDate(new Date());
-        verbalCondition.setCreateStaff(userId);
-        verbalCondition.setVerbalId(verbalId);
-        verbalConditionMapper.insert(verbalCondition);
-        return verbalCondition;
-    }
 
 
 }

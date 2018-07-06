@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.domain.channel;
 
+import com.zjtelcom.cpct.enums.ConditionType;
 import lombok.Data;
 
 import java.util.Date;
@@ -16,9 +17,9 @@ public class MktVerbalCondition {
 
     private String operType;//运算类型,1000> 2000< 3000==  4000!=   5000>=  6000<=  7000in   8000&   9000||   7100	not in
 
-    private String rightParam;//右边参数，类型为注智标签时，对应为注智标签标识；类型为表达式时，为分群条件ID
+    private String rightParam;//
 
-    private String rightParamType;//参数类型1000	注智标签 2000	表达式 3000	固定值
+    private String rightParamType;//参数类型 1000注智标签 2000表达式 3000固定值
 
     private String statusCd;
 
@@ -29,6 +30,8 @@ public class MktVerbalCondition {
     private Date statusDate;
 
     private String remark;
+
+    private String conditionType;
 
 
 

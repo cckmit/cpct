@@ -50,4 +50,12 @@
     CREATE_STAFF, CREATE_DATE, REMARK
     from mkt_verbal
   </select>
+
+  <select id="findVerbalListByConfId" resultMap="BaseResultMap">
+    select VERBAL_ID, CAMPAIGN_ID, CONTACT_CONF_ID, SCRIPT_DESC, CHANNEL_ID, STATUS_CD,
+    CREATE_STAFF, CREATE_DATE, REMARK
+    from mkt_verbal where CONTACT_CONF_ID = #{confId}
+  </select>
+
+
 </mapper>

@@ -39,6 +39,7 @@ public interface LabelService {
     Map<String,Object> getLabelGrpDetail(Long userId,Long labelGrpId);
 
 
+
     //标签组成员关系
     Map<String,Object> addLabelGrpMbr(Long userId, LabelGrpMbr addVO);
 

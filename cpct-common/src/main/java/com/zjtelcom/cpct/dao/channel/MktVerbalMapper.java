@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.dao.channel;
 
 import com.zjtelcom.cpct.domain.channel.MktVerbal;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,6 +16,8 @@ public interface MktVerbalMapper {
     int insert(MktVerbal record);
 
     MktVerbal selectByPrimaryKey(Long verbalId);
+
+    List<MktVerbal> findVerbalListByConfId(@Param("verbalId") Long verbalId);
 
     List<MktVerbal> selectAll();
 

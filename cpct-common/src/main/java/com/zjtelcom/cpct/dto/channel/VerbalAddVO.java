@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 public class VerbalAddVO implements Serializable {
-    private Long campaignId;//活动id
 
     private Long contactConfId;//渠道推送配置id
 
@@ -25,14 +24,6 @@ public class VerbalAddVO implements Serializable {
 
     public void setAddVOList(List<VerbalConditionAddVO> addVOList) {
         this.addVOList = addVOList;
-    }
-
-    public Long getCampaignId() {
-        return campaignId;
-    }
-
-    public void setCampaignId(Long campaignId) {
-        this.campaignId = campaignId;
     }
 
     public Long getContactConfId() {

@@ -11,7 +11,6 @@ public class VerbalConditionAddVO implements Serializable {
 
     private String rightParam;
 
-    private String rightParamType;
 
     public String getLeftParam() {
         return leftParam;
@@ -45,11 +44,4 @@ public class VerbalConditionAddVO implements Serializable {
         this.rightParam = rightParam;
     }
 
-    public String getRightParamType() {
-        return rightParamType;
-    }
-
-    public void setRightParamType(String rightParamType) {
-        this.rightParamType = rightParamType;
-    }
 }

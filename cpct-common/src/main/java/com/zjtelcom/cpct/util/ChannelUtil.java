@@ -31,10 +31,15 @@ public class ChannelUtil  {
         LabelVO vo = BeanUtil.create(label,new LabelVO());
         if (label.getOperator()!=null){
             List<String> opratorList = StringToList(label.getOperator());
-            List<String> opStList  = new ArrayList<>();
+            List<OperatorDetail> opStList  = new ArrayList<>();
             for (String operator : opratorList){
                 Operator op = Operator.getOperator(Integer.valueOf(operator));
-                opStList.add(op.getDescription());
+                OperatorDetail detail = new OperatorDetail();
+                if (op!=null){
+                    detail.setOperName(op.getDescription());
+                    detail.setOperValue(op.getValue());
+                }
+                opStList.add(detail);
             }
             vo.setOperatorList(opStList);
         }

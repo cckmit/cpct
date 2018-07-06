@@ -13,7 +13,7 @@ public class LabelVO implements Serializable {
     private String labelDataType;//1000	日期型;1100	日期时间型;1200	字符型;1300	浮点型;1400	整数型;1500	布尔型;1600	计算型
     private String fitDomain;//适用域
     private String conditionType;//单选多选框
-    private List<String> operatorList;//运算符
+    private List<OperatorDetail> operatorList;//运算符
     private List<String> valueList;
 
     public List<String> getValueList() {
@@ -24,11 +24,11 @@ public class LabelVO implements Serializable {
         this.valueList = valueList;
     }
 
-    public List<String> getOperatorList() {
+    public List<OperatorDetail> getOperatorList() {
         return operatorList;
     }
 
-    public void setOperatorList(List<String> operatorList) {
+    public void setOperatorList(List<OperatorDetail> operatorList) {
         this.operatorList = operatorList;
     }
 
