@@ -206,10 +206,10 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
             logger.info("trace = {}", ruleResult.getTraceMap());
             logger.info("======================================");
             //判断匹配结果，如匹配则向下进行，如不匹配则continue结束本次循环
-            if (ruleResult.getResult() != null && ruleResult.getResult() == true) {
-                //根据活动id查询出活动信息以及渠道信息
-
-            }
+//            if (ruleResult.getResult() != null && ruleResult.getResult() == true) {
+//                //根据活动id查询出活动信息以及渠道信息
+//
+//            }
 
 
         }

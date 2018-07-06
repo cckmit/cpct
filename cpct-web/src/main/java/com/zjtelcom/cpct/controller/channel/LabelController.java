@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.controller.channel;
 
 import com.zjtelcom.cpct.controller.BaseController;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelGrp;
 import com.zjtelcom.cpct.domain.channel.LabelGrpMbr;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
@@ -23,6 +25,18 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 public class LabelController extends BaseController {
     @Autowired
     private LabelService labelService;
+    @Autowired
+    private InjectionLabelMapper labelMapper;
+
+    @PostMapping("queryTriggerByleftOperand")
+    @CrossOrigin
+    public Map<String, Object> queryTriggerByleftOperand(@RequestBody List<Map<String ,String>> leftOperans) {
+        List<Label> labelList = labelMapper.queryTriggerByLeftOpers(leftOperans);
+        Map ma = new HashMap();
+        ma.put("result",labelList);
+        return ma;
+    }
+
 
     /**
      * 获取标签列表（标签名和域查询）
