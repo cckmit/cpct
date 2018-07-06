@@ -11,7 +11,7 @@
     delete from mkt_product_rule
     where ID = #{id,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.MktProductRule">
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.MktProductRule" useGeneratedKeys="true" keyProperty="id">
     insert into mkt_product_rule (ID, PRODUCT_ID, PRODUCT_NAME, 
       REMARK)
     values (#{id,jdbcType=BIGINT}, #{productId,jdbcType=BIGINT}, #{productName,jdbcType=VARCHAR}, 

@@ -86,16 +86,16 @@ public class CamScriptController extends BaseController {
      */
     @GetMapping("getCamScriptList")
     @CrossOrigin
-    public  Map<String,Object> getCamScriptList(Long campaignId, Long evtContactConfId) {
+    public  Map<String,Object> getCamScriptList( Long evtContactConfId) {
         Map<String,Object> result = new HashMap<>();
         Long userId = UserUtil.loginId();
-        if (campaignId==null || evtContactConfId==null){
+        if ( evtContactConfId==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg"," 未知的活动或渠道信息");
             return result;
         }
         try {
-            result = camScriptService.getCamScriptList(userId,campaignId,evtContactConfId);
+            result = camScriptService.getCamScriptList(userId,evtContactConfId);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to getCamScriptList",e);
             result.put("resultCode",CODE_FAIL);

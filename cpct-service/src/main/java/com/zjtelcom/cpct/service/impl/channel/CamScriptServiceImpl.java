@@ -77,13 +77,13 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
     }
 
     @Override
-    public Map<String,Object> getCamScriptList(Long userId, Long campaignId, Long evtContactConfId) {
+    public Map<String,Object> getCamScriptList(Long userId, Long evtContactConfId) {
         Map<String,Object> result = new HashMap<>();
         //todo  活动标识确定活动 推送渠道id确定渠道
         List<CamScriptVO> voList = new ArrayList<>();
         List<CamScript> scriptList = new ArrayList<>();
         try {
-            scriptList = camScriptMapper.selectAll(campaignId,evtContactConfId);
+            scriptList = camScriptMapper.selectByConfId(evtContactConfId);
             for (CamScript script : scriptList){
                 CamScriptVO vo = ChannelUtil.map2CamScriptVO(script);
                 voList.add(vo);

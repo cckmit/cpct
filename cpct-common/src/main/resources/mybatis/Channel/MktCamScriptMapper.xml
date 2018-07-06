@@ -52,10 +52,10 @@
     from mkt_cam_script
     where MKT_CAMPAIGN_SCPT_ID = #{mktCampaignScptId,jdbcType=BIGINT}
   </select>
-  <select id="selectAll" resultMap="BaseResultMap">
+  <select id="selectByConfId" resultMap="BaseResultMap">
     select MKT_CAMPAIGN_SCPT_ID, MKT_CAMPAIGN_ID, EVT_CONTACT_CONF_ID, SCRIPT_DESC, STATUS_CD, 
     STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
     from mkt_cam_script
-    where MKT_CAMPAIGN_ID = #{campaignId} and EVT_CONTACT_CONF_ID = #{evtContactConfId}
+    where  EVT_CONTACT_CONF_ID = #{evtContactConfId}
   </select>
 </mapper>

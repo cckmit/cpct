@@ -20,7 +20,7 @@
     delete from contact_channel
     where CONTACT_CHL_ID = #{contactChlId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.Channel">
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.Channel" useGeneratedKeys="true" keyProperty="contactChlId">
     insert into contact_channel (CONTACT_CHL_ID, CONTACT_CHL_CODE, CONTACT_CHL_NAME, 
       CONTACT_CHL_TYPE, CONTACT_CHL_DESC, STATUS_CD, 
       CREATE_STAFF, UPDATE_STAFF, REGION_ID, 

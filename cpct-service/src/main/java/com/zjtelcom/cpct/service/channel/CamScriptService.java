@@ -15,7 +15,7 @@ public interface CamScriptService {
 
     Map<String,Object> deleteCamScript(Long userId,List<Long> camScriptIdList);
 
-    Map<String,Object> getCamScriptList(Long userId, Long campaignId, Long evtContactConfId );
+    Map<String,Object> getCamScriptList(Long userId, Long evtContactConfId );
 
     Map<String,Object> getCamScriptVODetail(Long userId,Long camScriptId);
 
