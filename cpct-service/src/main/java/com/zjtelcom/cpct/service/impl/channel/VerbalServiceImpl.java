@@ -40,6 +40,8 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
         Map<String,Object> result = new HashMap<>();
 
         MktVerbal verbal = BeanUtil.create(addVO,new MktVerbal());
+        //todo 活动id 通过配置获取 或直接删除
+        verbal.setCampaignId(1000L);
         verbal.setCreateDate(new Date());
         verbal.setCreateStaff(userId);
         verbal.setStatusCd("1000");

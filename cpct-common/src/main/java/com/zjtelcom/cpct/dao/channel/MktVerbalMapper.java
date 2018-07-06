@@ -17,7 +17,7 @@ public interface MktVerbalMapper {
 
     MktVerbal selectByPrimaryKey(Long verbalId);
 
-    List<MktVerbal> findVerbalListByConfId(@Param("verbalId") Long verbalId);
+    List<MktVerbal> findVerbalListByConfId(@Param("confId") Long confId);
 
     List<MktVerbal> selectAll();
 
