@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -27,15 +29,20 @@ public class PpmProductController extends BaseController  {
      * 获取销售品列表
      */
     @GetMapping("getProductList")
-    public RespInfo getProductList(Long userId, String productName){
+    public Map<String,Object> getProductList(Long userId, String productName){
+        Map<String ,Object> result = new HashMap<>();
         List<PpmProduct> productList = new ArrayList<>();
         try {
             productList = productService.getProductList(userId,productName);
         }catch (Exception e){
             logger.error("[op:PpmProductController] fail to getProductList",e);
-            return RespInfo.build(CODE_FAIL,"产品列表获取失败",null);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
         }
-        return RespInfo.build(CODE_SUCCESS,productList);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",productList);
+        return result;
     }
 
 }
