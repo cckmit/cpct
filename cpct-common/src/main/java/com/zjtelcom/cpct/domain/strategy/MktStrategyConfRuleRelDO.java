@@ -1,21 +1,24 @@
 package com.zjtelcom.cpct.domain.strategy;
 
+import com.zjtelcom.cpct.BaseEntity;
+
 import java.util.Date;
 
-public class MktStrategyConfRuleRelDO {
+public class MktStrategyConfRuleRelDO extends BaseEntity {
+    /**
+     * 策略配置规则关联Id
+     */
     private Long mktStrategyConfRuleRelId;
 
+    /**
+     * 策略配置Id
+     */
     private Long mktStrategyConfId;
 
+    /**
+     * 策略配置规则Id
+     */
     private Long mktStrategyConfRuleId;
-
-    private String createStaff;
-
-    private Date createDate;
-
-    private String updateStaff;
-
-    private Date updateDate;
 
     public Long getMktStrategyConfRuleRelId() {
         return mktStrategyConfRuleRelId;
@@ -39,37 +42,5 @@ public class MktStrategyConfRuleRelDO {
 
     public void setMktStrategyConfRuleId(Long mktStrategyConfRuleId) {
         this.mktStrategyConfRuleId = mktStrategyConfRuleId;
-    }
-
-    public String getCreateStaff() {
-        return createStaff;
-    }
-
-    public void setCreateStaff(String createStaff) {
-        this.createStaff = createStaff;
-    }
-
-    public Date getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
-
-    public String getUpdateStaff() {
-        return updateStaff;
-    }
-
-    public void setUpdateStaff(String updateStaff) {
-        this.updateStaff = updateStaff;
-    }
-
-    public Date getUpdateDate() {
-        return updateDate;
-    }
-
-    public void setUpdateDate(Date updateDate) {
-        this.updateDate = updateDate;
     }
 }

@@ -4,8 +4,8 @@
   <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO">
     <id column="MKT_STRATEGY_CONF_RULE_ID" jdbcType="BIGINT" property="mktStrategyConfRuleId" />
     <result column="TAR_GRP_ID" jdbcType="BIGINT" property="tarGrpId" />
-    <result column="PRODUCT_ID" jdbcType="BIGINT" property="productId" />
-    <result column="EVT_CONTACT_CONF_ID" jdbcType="BIGINT" property="evtContactConfId" />
+    <result column="PRODUCT_ID" jdbcType="VARCHAR" property="productId" />
+    <result column="EVT_CONTACT_CONF_ID" jdbcType="VARCHAR" property="evtContactConfId" />
     <result column="RULE_CONF_ID" jdbcType="BIGINT" property="ruleConfId" />
     <result column="CREATE_STAFF" jdbcType="VARCHAR" property="createStaff" />
     <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
@@ -21,16 +21,16 @@
       EVT_CONTACT_CONF_ID, RULE_CONF_ID, CREATE_STAFF, 
       CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
       )
-    values (#{mktStrategyConfRuleId,jdbcType=BIGINT}, #{tarGrpId,jdbcType=BIGINT}, #{productId,jdbcType=BIGINT}, 
-      #{evtContactConfId,jdbcType=BIGINT}, #{ruleConfId,jdbcType=BIGINT}, #{createStaff,jdbcType=VARCHAR}, 
+    values (#{mktStrategyConfRuleId,jdbcType=BIGINT}, #{tarGrpId,jdbcType=BIGINT}, #{productId,jdbcType=VARCHAR},
+      #{evtContactConfId,jdbcType=VARCHAR}, #{ruleConfId,jdbcType=BIGINT}, #{createStaff,jdbcType=VARCHAR},
       #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=VARCHAR}, #{updateDate,jdbcType=TIMESTAMP}
       )
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO">
     update mkt_strategy_conf_rule
     set TAR_GRP_ID = #{tarGrpId,jdbcType=BIGINT},
-      PRODUCT_ID = #{productId,jdbcType=BIGINT},
-      EVT_CONTACT_CONF_ID = #{evtContactConfId,jdbcType=BIGINT},
+      PRODUCT_ID = #{productId,jdbcType=VARCHAR},
+      EVT_CONTACT_CONF_ID = #{evtContactConfId,jdbcType=VARCHAR},
       RULE_CONF_ID = #{ruleConfId,jdbcType=BIGINT},
       CREATE_STAFF = #{createStaff,jdbcType=VARCHAR},
       CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
