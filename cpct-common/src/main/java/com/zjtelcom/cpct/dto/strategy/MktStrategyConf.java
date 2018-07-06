@@ -3,14 +3,29 @@ package com.zjtelcom.cpct.dto.strategy;
 import java.util.Date;
 
 public class MktStrategyConf {
+    /**
+     * 策略配置Id
+     */
     private Long mktStrategyConfId;
 
+    /**
+     * 策略配置名称
+     */
     private String mktStrategyConfName;
 
+    /**
+     * 生效时间
+     */
     private Date beginTime;
 
+    /**
+     * 失效时间
+     */
     private Date endTime;
 
+    /**
+     * 策略下发渠道
+     */
     private Long channelsId;
 
     private Long createStaff;

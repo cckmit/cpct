@@ -1,25 +1,34 @@
 package com.zjtelcom.cpct.domain.strategy;
 
+import com.zjtelcom.cpct.BaseEntity;
+
 import java.util.Date;
 
-public class MktStrategyConfRuleDO {
+public class MktStrategyConfRuleDO extends BaseEntity {
+    /**
+     * 策略配置规则Id
+     */
     private Long mktStrategyConfRuleId;
 
+    /**
+     * 客户分群配置Id
+     */
     private Long tarGrpId;
 
-    private Long productId;
+    /**
+     * 销售品配置Id集
+     */
+    private String productId;
 
-    private Long evtContactConfId;
+    /**
+     * 协同渠道配置Id
+     */
+    private String evtContactConfId;
 
+    /**
+     * 过滤规则配置Id
+     */
     private Long ruleConfId;
-
-    private String createStaff;
-
-    private Date createDate;
-
-    private String updateStaff;
-
-    private Date updateDate;
 
     public Long getMktStrategyConfRuleId() {
         return mktStrategyConfRuleId;
@@ -37,19 +46,19 @@ public class MktStrategyConfRuleDO {
         this.tarGrpId = tarGrpId;
     }
 
-    public Long getProductId() {
+    public String getProductId() {
         return productId;
     }
 
-    public void setProductId(Long productId) {
+    public void setProductId(String productId) {
         this.productId = productId;
     }
 
-    public Long getEvtContactConfId() {
+    public String getEvtContactConfId() {
         return evtContactConfId;
     }
 
-    public void setEvtContactConfId(Long evtContactConfId) {
+    public void setEvtContactConfId(String evtContactConfId) {
         this.evtContactConfId = evtContactConfId;
     }
 
@@ -59,37 +68,5 @@ public class MktStrategyConfRuleDO {
 
     public void setRuleConfId(Long ruleConfId) {
         this.ruleConfId = ruleConfId;
-    }
-
-    public String getCreateStaff() {
-        return createStaff;
-    }
-
-    public void setCreateStaff(String createStaff) {
-        this.createStaff = createStaff;
-    }
-
-    public Date getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
-
-    public String getUpdateStaff() {
-        return updateStaff;
-    }
-
-    public void setUpdateStaff(String updateStaff) {
-        this.updateStaff = updateStaff;
-    }
-
-    public Date getUpdateDate() {
-        return updateDate;
-    }
-
-    public void setUpdateDate(Date updateDate) {
-        this.updateDate = updateDate;
     }
 }

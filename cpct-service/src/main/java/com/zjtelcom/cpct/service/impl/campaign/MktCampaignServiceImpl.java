@@ -60,7 +60,7 @@ public class MktCampaignServiceImpl implements MktCampaignService {
         Long mainId = mktCampaign.getMktCampaignId();
 
         //分群信息
-        List<MktCamGrpRul> mktCamGrpRuls = mktCampaignDetail.getMktCamGrpRuls();
+/*        List<MktCamGrpRul> mktCamGrpRuls = mktCampaignDetail.getMktCamGrpRuls();
         //todo 保存分群信息
 
 
@@ -70,7 +70,7 @@ public class MktCampaignServiceImpl implements MktCampaignService {
 
         //营销活动条目
         List<MktCamItem> mktCamItems = mktCampaignDetail.getMktCamItems();
-        //todo 营销活动条目
+        //todo 营销活动条目*/
 
         //事件
 //        List<ContactEvt> mktCampaignEvts = mktCampaignDetail.getMktCampaignEvts();

@@ -40,6 +40,12 @@ public class FilterRuleConfServiceImpl extends BaseService implements FilterRule
     @Autowired
     private FilterRuleMapper filterRuleMapper;
 
+    /**
+     * 新增过滤规则配置
+     *
+     * @param filterRuleConf
+     * @return
+     */
     @Override
     public Map<String, Object> saveFilterRuleConf(FilterRuleConf filterRuleConf) {
         Map<String, Object> filterRuleConfMap = new HashMap<>();
@@ -72,6 +78,13 @@ public class FilterRuleConfServiceImpl extends BaseService implements FilterRule
         return filterRuleConfMap;
     }
 
+
+    /**
+     * 修改过滤规则配置
+     *
+     * @param filterRuleConf
+     * @return
+     */
     @Override
     public Map<String, Object> updateFilterRuleConf(FilterRuleConf filterRuleConf) {
         Map<String, Object> filterRuleConfMap = new HashMap<>();
@@ -102,6 +115,12 @@ public class FilterRuleConfServiceImpl extends BaseService implements FilterRule
         return filterRuleConfMap;
     }
 
+    /**
+     * 获取过滤规则配置
+     *
+     * @param filterRuleConfId
+     * @return
+     */
     @Override
     public Map<String, Object> getFilterRuleConf(Long filterRuleConfId) {
         Map<String, Object> filterRuleConfMap = new HashMap<>();
@@ -131,6 +150,12 @@ public class FilterRuleConfServiceImpl extends BaseService implements FilterRule
         return filterRuleConfMap;
     }
 
+    /**
+     * 删除过滤规则配置
+     *
+     * @param filterRuleConfId
+     * @return
+     */
     @Override
     public Map<String, Object> deleteFilterRuleConf(Long filterRuleConfId) {
         Map<String, Object> filterRuleConfMap = new HashMap<>();

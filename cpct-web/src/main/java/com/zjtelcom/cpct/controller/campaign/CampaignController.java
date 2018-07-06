@@ -41,11 +41,7 @@ public class CampaignController extends BaseController {
     @RequestMapping(value = "/createMktCampaign", method = RequestMethod.POST)
     @CrossOrigin
     public String createMktCampaign(@RequestBody  MktCampaignDetail mktCampaignDetail) throws Exception {
-
-
         mktCampaignService.createMktCampaign(mktCampaignDetail);
-
-
         return initSuccRespInfo(null);
     }
 
@@ -59,12 +55,23 @@ public class CampaignController extends BaseController {
     @RequestMapping(value = "/modMktCampaign", method = RequestMethod.POST)
     @CrossOrigin
     public String modMktCampaign(@RequestBody MktCampaignDetail mktCampaignDetail) throws Exception {
-
-
         mktCampaignService.modMktCampaign(mktCampaignDetail);
-
-
         return initSuccRespInfo(null);
+    }
+
+
+    /**
+     * 查询营销活动
+     *
+     * @param qryMktCampaignListReq
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/getMktCampaign", method = RequestMethod.POST)
+    @CrossOrigin
+    public String getMktCampaign(@RequestBody QryMktCampaignListReq qryMktCampaignListReq) throws Exception {
+        Map<String, Object> map = mktCampaignService.qryMktCampaignList(qryMktCampaignListReq);
+        return JSON.toJSONString(map);
     }
 
 
