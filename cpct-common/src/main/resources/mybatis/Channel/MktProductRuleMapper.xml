@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.MktProductRuleMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.MktProductRule">
+    <id column="ID" jdbcType="BIGINT" property="id" />
+    <result column="PRODUCT_ID" jdbcType="BIGINT" property="productId" />
+    <result column="PRODUCT_NAME" jdbcType="VARCHAR" property="productName" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from mkt_product_rule
+    where ID = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.MktProductRule">
+    insert into mkt_product_rule (ID, PRODUCT_ID, PRODUCT_NAME, 
+      REMARK)
+    values (#{id,jdbcType=BIGINT}, #{productId,jdbcType=BIGINT}, #{productName,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.MktProductRule">
+    update mkt_product_rule
+    set PRODUCT_ID = #{productId,jdbcType=BIGINT},
+      PRODUCT_NAME = #{productName,jdbcType=VARCHAR},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select ID, PRODUCT_ID, PRODUCT_NAME, REMARK
+    from mkt_product_rule
+    where ID = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select ID, PRODUCT_ID, PRODUCT_NAME, REMARK
+    from mkt_product_rule
+  </select>
+</mapper>
