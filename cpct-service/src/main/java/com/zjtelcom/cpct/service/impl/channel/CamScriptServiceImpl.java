@@ -79,21 +79,18 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
     @Override
     public Map<String,Object> getCamScriptList(Long userId, Long evtContactConfId) {
         Map<String,Object> result = new HashMap<>();
-        //todo  活动标识确定活动 推送渠道id确定渠道
-        List<CamScriptVO> voList = new ArrayList<>();
-        List<CamScript> scriptList = new ArrayList<>();
+        //todo  推送渠道id确定渠道
+        CamScriptVO vo = new CamScriptVO();
+        CamScript script = new CamScript();
         try {
-            scriptList = camScriptMapper.selectByConfId(evtContactConfId);
-            for (CamScript script : scriptList){
-                CamScriptVO vo = ChannelUtil.map2CamScriptVO(script);
-                voList.add(vo);
-            }
+            script = camScriptMapper.selectByConfId(evtContactConfId);
+            vo = ChannelUtil.map2CamScriptVO(script);
         }catch (Exception e){
             e.printStackTrace();
             logger.error("[op:ChannelServiceImpl] fail to listChannel ", e);
         }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",voList);
+        result.put("resultMsg",vo);
         return result;
     }
 

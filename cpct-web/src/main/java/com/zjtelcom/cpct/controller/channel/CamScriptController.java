@@ -82,7 +82,7 @@ public class CamScriptController extends BaseController {
     }
 
     /**
-     * 获取营销活动脚本列表
+     * 渠道获取营销活动脚本
      */
     @GetMapping("getCamScriptList")
     @CrossOrigin
