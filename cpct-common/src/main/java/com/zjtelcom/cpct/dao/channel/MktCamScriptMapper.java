@@ -16,7 +16,9 @@ public interface MktCamScriptMapper {
 
     CamScript selectByPrimaryKey(Long camScriptId);
 
-    List<CamScript> selectByConfId(@Param("evtContactConfId")Long evtContactConfId);
+    CamScript selectByConfId(@Param("evtContactConfId")Long evtContactConfId);
+
+    List<CamScript> selectAll();
 
     int updateByPrimaryKey(CamScript record);
 }

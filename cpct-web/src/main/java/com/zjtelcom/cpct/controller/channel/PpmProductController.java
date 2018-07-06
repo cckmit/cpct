@@ -1,6 +1,5 @@
 package com.zjtelcom.cpct.controller.channel;
 
-import com.zjtelcom.cpct.bean.RespInfo;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
 import com.zjtelcom.cpct.service.channel.ProductService;

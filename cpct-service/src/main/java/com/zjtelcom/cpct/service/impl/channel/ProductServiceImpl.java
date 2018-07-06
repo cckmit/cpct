@@ -103,7 +103,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         MktProductRule rule = ruleMapper.selectByPrimaryKey(ruleId);
         if (rule==null){
             result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg","不存在");
+            result.put("resultMsg","关联销售品记录不存在");
             return result;
         }
         ruleMapper.deleteByPrimaryKey(ruleId);
