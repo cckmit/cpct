@@ -49,4 +49,11 @@
     CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
     from mkt_strategy_conf_rule
   </select>
+  <select id="selectByMktStrategyConfId" resultMap="BaseResultMap" parameterType="Long">
+    select cr.MKT_STRATEGY_CONF_RULE_ID, cr.TAR_GRP_ID, cr.PRODUCT_ID, cr.EVT_CONTACT_CONF_ID, cr.RULE_CONF_ID
+    from mkt_strategy_conf_rule cr
+    left join mkt_strategy_conf_rule_rel crr
+    on cr.MKT_STRATEGY_CONF_RULE_ID = crr.MKT_STRATEGY_CONF_RULE_ID
+    where crr.MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=BIGINT}
+  </select>
 </mapper>

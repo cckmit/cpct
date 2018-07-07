@@ -25,13 +25,14 @@ public class PpmProductController extends BaseController  {
     /**
      * 获取销售品列表
      */
-    @GetMapping("getProductList")
+    @PostMapping("getProductList")
     @CrossOrigin
-    public Map<String,Object> getProductList(Long userId, String productName){
+    public Map<String,Object> getProductList(@RequestBody HashMap<String,String> params){
         Map<String ,Object> result = new HashMap<>();
+        Long userId = UserUtil.loginId();
         List<PpmProduct> productList = new ArrayList<>();
         try {
-            productList = productService.getProductList(userId,productName);
+            productList = productService.getProductList(userId,params.get("productName"));
         }catch (Exception e){
             logger.error("[op:PpmProductController] fail to getProductList",e);
             result.put("resultCode",CODE_FAIL);
@@ -67,16 +68,20 @@ public class PpmProductController extends BaseController  {
 
     /**
      * 添加备注
-     * @param ruleId
-     * @param remark
+     * @param params
      * @return
      */
     @PostMapping("editProductRule")
     @CrossOrigin
-    public Map<String, Object> editProductRule(Long ruleId, String remark) {
+    public Map<String, Object> editProductRule(@RequestBody HashMap<String,Object> params)  {
         Map<String ,Object> result = new HashMap<>();
         Long userId = UserUtil.loginId();
         try {
+            String remark = null;
+            Long ruleId = Long.valueOf(params.get("ruleId").toString());
+            if (params.get("remark")!=null){
+                remark = params.get("remark").toString();
+            }
             result = productService.editProductRule(userId,ruleId,remark);
         }catch (Exception e){
             logger.error("[op:PpmProductController] fail to getProductList",e);
@@ -110,15 +115,15 @@ public class PpmProductController extends BaseController  {
 
     /**
      * 删除规则的销售品
-     * @param ruleId
      * @return
      */
     @PostMapping("delProductRule")
     @CrossOrigin
-    public Map<String, Object> delProductRule( Long ruleId) {
+    public Map<String, Object> delProductRule(@RequestBody HashMap<String,Object> params) {
         Map<String, Object> result = new HashMap<>();
         Long userId = UserUtil.loginId();
         try {
+            Long ruleId = Long.valueOf(params.get("ruleId").toString());
             result = productService.delProductRule(userId, ruleId);
         } catch (Exception e) {
             logger.error("[op:PpmProductController] fail to delProductRule", e);
