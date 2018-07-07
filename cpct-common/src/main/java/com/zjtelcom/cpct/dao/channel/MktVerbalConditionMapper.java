@@ -23,5 +23,7 @@ public interface MktVerbalConditionMapper {
 
     List<MktVerbalCondition> findChannelConditionListByVerbalId (@Param("verbalId")Long verbalId);
 
+    int deleteByVerbalId(@Param("conditionType") String conditionType,@Param("verbalId")Long verbalId);
+
     int updateByPrimaryKey(MktVerbalCondition record);
 }

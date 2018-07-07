@@ -14,4 +14,8 @@ public interface MktStrategyConfRuleMapper {
     List<MktStrategyConfRuleDO> selectAll();
 
     int updateByPrimaryKey(MktStrategyConfRuleDO mktStrategyConfRuleDO);
+
+    List<MktStrategyConfRuleDO> selectByMktStrategyConfId(Long mktStrategyConfId);
+
+
 }
