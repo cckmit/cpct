@@ -49,6 +49,10 @@ public interface LabelService {
 
     Map<String,Object> getLabelGrpMbrDetail(Long userId,Long labelGrpMbrId);
 
+    Map<String,Object> getLabelListByLabelGrp(Long userId,Long labelGrpId);
+
+
+
 
     //标签值规格（枚举类标签值规格）
     Map<String,Object> addLabelValue(Long userId, LabelValue addVO);

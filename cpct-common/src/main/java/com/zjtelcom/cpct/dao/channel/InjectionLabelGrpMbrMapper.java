@@ -19,6 +19,8 @@ public interface InjectionLabelGrpMbrMapper {
 
     LabelGrpMbr selectByLabelIdAndGrpId(@Param("labelId")Long labelId,@Param("grpId")Long grpId);
 
+    List<LabelGrpMbr> findListByGrpId(@Param("grpId")Long grpId);
+
     List<LabelGrpMbr> selectAll();
 
     int updateByPrimaryKey(LabelGrpMbr record);

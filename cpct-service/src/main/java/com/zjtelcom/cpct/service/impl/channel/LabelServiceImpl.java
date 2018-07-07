@@ -349,6 +349,18 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         return result;
     }
 
+    @Override
+    public Map<String, Object> getLabelListByLabelGrp(Long userId, Long labelGrpId) {
+        Map<String,Object> result = new HashMap<>();
+        List<LabelGrpMbr> lgmList = labelGrpMbrMapper.findListByGrpId(labelGrpId);
+        List<LabelVO> labelVOList = new ArrayList<>();
+        for (LabelGrpMbr grpMbr : lgmList){
+        }
+        return null;
+
+
+    }
+
     //标签值规格配置
     @Override
     public Map<String,Object> addLabelValue(Long userId, LabelValue addVO) {
