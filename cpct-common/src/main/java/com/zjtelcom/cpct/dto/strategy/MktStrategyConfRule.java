@@ -2,6 +2,9 @@ package com.zjtelcom.cpct.dto.strategy;
 
 import java.util.List;
 
+/**
+ * 策略配置规则DTO
+ */
 public class MktStrategyConfRule {
     /**
      * 策略配置规则Id
