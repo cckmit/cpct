@@ -29,6 +29,51 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
 
 
     @Override
+    public Map<String, Object> getChannelListByParentId(Long userId, Long parentId) {
+        Map<String,Object> result = new HashMap<>();
+        List<ChannelVO> voList = new ArrayList<>();
+        List<Channel> childList = channelMapper.findChildListByParentId(parentId);
+        for (Channel channel : childList){
+            ChannelVO vo = ChannelUtil.map2ChannelVO(channel);
+            voList.add(vo);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",voList);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getParentList(Long userId) {
+        Map<String,Object> result = new HashMap<>();
+        List<ChannelVO> voList = new ArrayList<>();
+        List<Channel> parentList = channelMapper.findParentList();
+        for (Channel channel : parentList){
+            ChannelVO vo = ChannelUtil.map2ChannelVO(channel);
+            voList.add(vo);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",voList);
+        return result;
+    }
+
+    @Override
+    public  Map<String,Object> getChannelList(Long userId,String channelName ,Integer page, Integer pageSize) {
+        Map<String,Object> result = new HashMap<>();
+        List<ChannelVO> voList = new ArrayList<>();
+        PageHelper.startPage(page,pageSize);
+        List<Channel> channelList = channelMapper.selectAll(channelName);
+        Page pageInfo = new Page(new PageInfo(channelList));
+        for (Channel channel : channelList){
+            ChannelVO vo = ChannelUtil.map2ChannelVO(channel);
+            voList.add(vo);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",voList);
+        result.put("pageInfo",pageInfo);
+        return result;
+    }
+
+    @Override
     public Map<String, Object> getChannelTreeForActivity(Long userId) {
         Map<String,Object> result = new HashMap<>();
         Map<String,Object> resultMap = new HashMap<>();
@@ -50,12 +95,12 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
                     ChannelDetail detail = getDetail(child);
                     detail.setChildrenList(null);
                     initChildList.add(detail);
-                    initCount++;
+                    initCount += 1;
                 }else {
                     ChannelDetail detail = getDetail(child);
                     detail.setChildrenList(null);
                     passChildList.add(detail);
-                    passCount++;
+                    passCount += 1;
                 }
             }
             //所有主动渠道的渠道信息
@@ -95,7 +140,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
     public Map<String, Object> createParentChannel(Long userId, ContactChannelDetail parentAddVO) {
         Map<String,Object> result = new HashMap<>();
         Channel channel = BeanUtil.create(parentAddVO,new Channel());
-        channel.setParentId(null);
+        channel.setParentId(0L);
         channel.setChannelType(null);//主动被动
         channel.setCreateDate(new Date());
         channel.setUpdateDate(new Date());
@@ -122,7 +167,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
             result.put("resultMsg","请选择父级渠道添加");
             return result;
         }
-        Channel parent = channelMapper.selectByPrimaryKey(addVO.getChannelId());
+        Channel parent = channelMapper.selectByPrimaryKey(addVO.getParentId());
         if (parent==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","父级渠道不存在");
@@ -174,22 +219,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         return result;
     }
 
-    @Override
-    public  Map<String,Object> getChannelList(Long userId,String channelName ,Integer page, Integer pageSize) {
-        Map<String,Object> result = new HashMap<>();
-        List<ChannelVO> voList = new ArrayList<>();
-        PageHelper.startPage(page,pageSize);
-        List<Channel> channelList = channelMapper.selectAll(channelName);
-        Page pageInfo = new Page(new PageInfo(channelList));
-        for (Channel channel : channelList){
-            ChannelVO vo = ChannelUtil.map2ChannelVO(channel);
-            voList.add(vo);
-        }
-        result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",voList);
-        result.put("pageInfo",pageInfo);
-        return result;
-    }
+
 
     @Override
     public Map<String, Object> getChannelListByType(Long userId, String channelType) {

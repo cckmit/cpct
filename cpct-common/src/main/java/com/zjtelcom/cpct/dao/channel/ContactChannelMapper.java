@@ -23,7 +23,7 @@ public interface ContactChannelMapper {
 
     List<Channel> findParentList();
 
-    List<Channel> findChildListByParentId(@Param("channelId")Long channelId);
+    List<Channel> findChildListByParentId(@Param("parentId")Long parentId);
 
     int updateByPrimaryKey(Channel record);
 }

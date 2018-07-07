@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.controller.channel;
 
+import com.sun.corba.se.spi.ior.ObjectKey;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dto.channel.ContactChannelDetail;
 import com.zjtelcom.cpct.dto.channel.ChannelEditVO;
@@ -19,6 +20,45 @@ public class ChannelController extends BaseController {
     @Autowired
     private ChannelService channelService;
 
+    /**
+     * 获取子级列表
+     * @return
+     */
+    @GetMapping("getChannelListByParentId")
+    @CrossOrigin
+    public Map<String, Object> getChannelListByParentId(@RequestBody HashMap<String,Long> param) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = channelService.getChannelListByParentId(userId,param.get("parentId"));
+        } catch (Exception e) {
+            logger.error("[op:ChannelController] fail to getParentList",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to getParentList");
+            return result;
+        }
+        return result;
+    }
+    /**
+     * 获取父级列表
+     * @return
+     */
+    @GetMapping("getParentList")
+    @CrossOrigin
+    public Map<String, Object> getParentList() {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = channelService.getParentList(userId);
+        } catch (Exception e) {
+            logger.error("[op:ChannelController] fail to getParentList",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to getParentList");
+            return result;
+        }
+        return result;
+
+    }
 
     /**
      * 添加父级渠道
