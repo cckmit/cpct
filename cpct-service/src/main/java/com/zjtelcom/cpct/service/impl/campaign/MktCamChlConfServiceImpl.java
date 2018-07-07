@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 /**
- * Description:
+ * Description:  协同渠道基本信息配置 和属性配置
  * author: linchao
  * date: 2018/07/02 14:08
  * version: V1.0
