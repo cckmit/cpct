@@ -29,11 +29,11 @@ public class PpmProductController extends BaseController  {
      */
     @PostMapping("getProductNameById")
     @CrossOrigin
-    public Map<String, Object> getProductNameById(@RequestBody HashMap<String,Long> param) {
+    public Map<String, Object> getProductNameById(@RequestBody ProductParam param) {
         Map<String ,Object> result = new HashMap<>();
         Long userId = UserUtil.loginId();
         try {
-            result = productService.getProductNameById(userId,param.get("productId"));
+            result = productService.getProductNameById(userId,param.getIdList());
         }catch (Exception e){
             logger.error("[op:PpmProductController] fail to getProductNameById",e);
             result.put("resultCode",CODE_FAIL);
