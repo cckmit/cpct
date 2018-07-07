@@ -78,8 +78,7 @@ public class TestController extends BaseController {
         JSONObject jsonObject = JSONObject.parseObject(param);
         System.out.println(jsonObject.toString());
         //解析参数
-        Rule rule = JSON.parseObject(param, new TypeReference<Rule>() {
-        });
+        Rule rule = JSON.parseObject(param, new TypeReference<Rule>() {});
         System.out.println(jsonObject.toString());
 
         saveDetail(rule);
@@ -101,15 +100,13 @@ public class TestController extends BaseController {
                 idRight = insert(list.get(i).getId(), list.get(i).getOperType(), list.get(i).getContent());
                 idLeft = insert(idLeft, type, idRight);
             }
-
             if (rule.getRuleChildren() != null) {
                 idLeft = insert(idLeft, type, saveDetail(rule.getRuleChildren()));
             }
-
-
         } else {
             idLeft = 0L;
         }
+        System.out.println("----");
 
         return idLeft;
     }
@@ -173,11 +170,10 @@ public class TestController extends BaseController {
                 expressions.add(mktVerbalCondition);
             }
         }
-
+        System.out.println("-------");
         Rule rule = parseRules(labels, expressions, 0);
         return JSON.toJSONString(rule);
     }
-
 
     public Rule parseRules(List<MktVerbalCondition> labels, List<MktVerbalCondition> expressions, int index) {
         Rule rule = new Rule();
@@ -194,7 +190,6 @@ public class TestController extends BaseController {
                             || expressions.get(i).getRightParam().equals(condition.getConditionId().toString())) {
                         ruleDetail = new RuleDetail();
                         ruleDetail.setId(Integer.parseInt(condition.getLeftParam()));
-                        ruleDetail.setName("需要查询，或者直接保存");
                         ruleDetail.setContent(condition.getRightParam());
                         ruleDetail.setOperType(condition.getOperType());
                         ruleDetails.add(ruleDetail);
@@ -208,7 +203,7 @@ public class TestController extends BaseController {
         if (ruleDetails.size() == 0) {
             return null;
         }
-
+        System.out.println("-------");
         rule.setListData(ruleDetails);
         return rule;
     }

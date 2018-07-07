@@ -9,7 +9,7 @@ package com.zjtelcom.cpct.service.impl.campaign;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfAttrService;
 
 /**
- * Description:
+ * Description:  协同渠道信息配置
  * author: linchao
  * date: 2018/07/02 14:08
  * version: V1.0

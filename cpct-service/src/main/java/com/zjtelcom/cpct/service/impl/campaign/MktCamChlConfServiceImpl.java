@@ -6,11 +6,20 @@
  */
 package com.zjtelcom.cpct.service.impl.campaign;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfAttrMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
+import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
+import com.zjtelcom.cpct.domain.Rule;
+import com.zjtelcom.cpct.domain.RuleDetail;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
+import com.zjtelcom.cpct.domain.channel.Label;
+import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.enums.ConfAttrEnum;
@@ -27,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 /**
- * Description:
+ * Description:  协同渠道基本信息配置 和属性配置
  * author: linchao
  * date: 2018/07/02 14:08
  * version: V1.0
@@ -41,6 +50,12 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
 
     @Autowired
     private MktCamChlConfAttrMapper mktCamChlConfAttrMapper;
+
+    @Autowired
+    private MktVerbalConditionMapper mktVerbalConditionMapper;
+
+    @Autowired
+    private InjectionLabelMapper injectionLabelMapper; //标签因子
 
     @Override
     public Map<String, Object> saveMktCamChlConf(MktCamChlConfDetail mktCamChlConfDetail) {
@@ -60,16 +75,19 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             mktCamChlConfMap.put("resultMsg", ErrorCode.SAVE_CAM_CHL_CONF_SUCCESS.getErrorMsg());
             mktCamChlConfMap.put("evtContactConfId", evtContactConfId);
 
-            // TODO 将协同规则存储到库中
-
             // 更新属性
             List<MktCamChlConfAttr> mktCamChlConfAttrList = mktCamChlConfDetail.getMktCamChlConfAttrList();
             for (MktCamChlConfAttr mktCamChlConfAttr : mktCamChlConfAttrList) {
                 MktCamChlConfAttrDO mktCamChlConfAttrDO = new MktCamChlConfAttrDO();
                 CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttrDO, mktCamChlConfAttr);
                 mktCamChlConfAttrDO.setEvtContactConfId(mktCamChlConfDO.getEvtContactConfId());
-                if (mktCamChlConfAttr.getAttrId() == ConfAttrEnum.RULE.getArrId()) {
+                if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
                     mktCamChlConfAttrDO.setAttrValue(evtContactConfId.toString());
+
+                    //协同渠道自策略规则保存
+                    String params = mktCamChlConfAttr.getAttrValue();
+                    ruleInsert(evtContactConfId, params);
+
                 }
                 mktCamChlConfAttrMapper.insert(mktCamChlConfAttrDO);
             }
@@ -98,16 +116,20 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             mktCamChlConfMap.put("resultMsg", ErrorCode.UPDATE_CAM_CHL_CONF_SUCCESS.getErrorMsg());
             mktCamChlConfMap.put("evtContactConfId", evtContactConfId);
 
-            // TODO 将协同规则进行修改
-
             // 将属性插入库中
             List<MktCamChlConfAttr> mktCamChlConfAttrList = mktCamChlConfDetail.getMktCamChlConfAttrList();
             for (MktCamChlConfAttr mktCamChlConfAttr : mktCamChlConfAttrList) {
                 MktCamChlConfAttrDO mktCamChlConfAttrDO = new MktCamChlConfAttrDO();
                 CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttrDO, mktCamChlConfAttr);
                 mktCamChlConfAttrDO.setEvtContactConfId(mktCamChlConfDO.getEvtContactConfId());
-                if (mktCamChlConfAttr.getAttrId() == ConfAttrEnum.RULE.getArrId()) {
+                if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
                     mktCamChlConfAttrDO.setAttrValue(evtContactConfId.toString());
+
+                    //删除旧的关联规则 todo 静态
+                    mktVerbalConditionMapper.deleteByVerbalId("1",evtContactConfId);
+                    //保存新的规则
+                    String params = mktCamChlConfAttr.getAttrValue();
+                    ruleInsert(evtContactConfId, params);
                 }
                 mktCamChlConfAttrMapper.updateByPrimaryKey(mktCamChlConfAttrDO);
             }
@@ -132,8 +154,10 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
                 MktCamChlConfAttr mktCamChlConfAttr = new MktCamChlConfAttr();
                 CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttr, mktCamChlConfAttrDO);
-                if (mktCamChlConfAttr.getAttrId() == ConfAttrEnum.RULE.getArrId()) {
-                    //TODO 通过EvtContactConfId获取规则放入属性中
+                if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
+                    //通过EvtContactConfId获取规则放入属性中
+                    String rule = ruleSelect(mktCamChlConfAttr.getEvtContactConfId());
+                    mktCamChlConfAttr.setAttrValue(rule);
                 }
                 mktCamChlConfAttrList.add(mktCamChlConfAttr);
             }
@@ -166,8 +190,10 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                 for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
                     MktCamChlConfAttr mktCamChlConfAttr = new MktCamChlConfAttr();
                     CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttr, mktCamChlConfAttrDO);
-                    if (mktCamChlConfAttr.getAttrId() == ConfAttrEnum.RULE.getArrId()) {
-                        //TODO 通过EvtContactConfId获取规则放入属性中
+                    if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
+                        //通过EvtContactConfId获取规则放入属性中
+                        String rule = ruleSelect(mktCamChlConfAttr.getEvtContactConfId());
+                        mktCamChlConfAttr.setAttrValue(rule);
                     }
                     mktCamChlConfDetail.getMktCamChlConfAttrList().add(mktCamChlConfAttr);
                 }
@@ -190,12 +216,172 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
         mktCamChlConfMapper.deleteByPrimaryKey(evtContactConfId);
         mktCamChlConfAttrMapper.deleteByEvtContactConfId(evtContactConfId);
 
-        //TODO 根据evtContactConfId删除相关的规则
-
+        //删除旧的关联规则 todo 静态
+        mktVerbalConditionMapper.deleteByVerbalId("1",evtContactConfId);
 
         Map<String, Object> mktCamChlConfMap = new HashMap<>();
         mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
         mktCamChlConfMap.put("resultMsg", ErrorCode.DELETE_CAM_CHL_CONF_SUCCESS.getErrorMsg());
         return mktCamChlConfMap;
     }
+
+    /**
+     * 保存协同渠道子策略规则
+     *
+     * @param evtContactConfId
+     * @param param
+     */
+    public void ruleInsert(Long evtContactConfId, String param) {
+        //转换为json对象
+        JSONObject jsonObject = JSONObject.parseObject(param);
+        System.out.println(jsonObject.toString());
+        //解析参数
+        Rule rule = jsonObject.toJavaObject(Rule.class);
+        //保存
+        saveDetail(evtContactConfId, rule);
+    }
+
+    /**
+     * 递归规则并保存
+     * @param evtContactConfId
+     * @param rule
+     * @return
+     */
+    public Long saveDetail(Long evtContactConfId, Rule rule) {
+        //保存规则
+        List<RuleDetail> list = rule.getListData();
+        Long idLeft;
+        Long idRight;
+        String type = rule.getType();
+        if (list.size() > 0) {  //第一层
+            //先保存第一条标签因子
+            idLeft = insert(evtContactConfId, list.get(0).getId(), list.get(0).getOperType(), list.get(0).getContent());
+            for (int i = 1; i < list.size(); i++) {
+                idRight = insert(evtContactConfId, list.get(i).getId(), list.get(i).getOperType(), list.get(i).getContent());
+                idLeft = insert(evtContactConfId, idLeft, type, idRight);
+            }
+            if (rule.getRuleChildren() != null) {
+                idLeft = insert(evtContactConfId, idLeft, type, saveDetail(evtContactConfId, rule.getRuleChildren()));
+            }
+        } else {
+            idLeft = 0L;
+        }
+        return idLeft;
+    }
+
+    /**
+     * 子策略规则插入数据库（标签因子类型）
+     * @param evtContactConfId
+     * @param left
+     * @param operType
+     * @param right
+     * @return
+     */
+    public Long insert(Long evtContactConfId, Integer left, String operType, String right) {
+        MktVerbalCondition mktVerbalCondition = new MktVerbalCondition();
+        mktVerbalCondition.setVerbalId(evtContactConfId);
+        mktVerbalCondition.setLeftParam(left.toString());
+        mktVerbalCondition.setRightParam(right);
+        mktVerbalCondition.setOperType(operType);
+        mktVerbalCondition.setLeftParamType("1000"); //标签因子
+        mktVerbalCondition.setRightParamType("3000"); //固定值
+        mktVerbalCondition.setConditionType("1");
+        mktVerbalConditionMapper.insert(mktVerbalCondition);
+        return mktVerbalCondition.getConditionId();
+    }
+
+    /**
+     * 子策略规则插入数据库（表达式类型）
+     * @param evtContactConfId
+     * @param left
+     * @param operType
+     * @param right
+     * @return
+     */
+    public Long insert(Long evtContactConfId, Long left, String operType, Long right) {
+        MktVerbalCondition mktVerbalCondition = new MktVerbalCondition();
+        mktVerbalCondition.setVerbalId(evtContactConfId);
+        mktVerbalCondition.setLeftParam(left.toString());
+        mktVerbalCondition.setRightParam(right.toString());
+        mktVerbalCondition.setOperType(operType);
+        mktVerbalCondition.setLeftParamType("2000"); //表达式
+        mktVerbalCondition.setRightParamType("2000"); //表达式
+        mktVerbalCondition.setConditionType("1");
+        mktVerbalConditionMapper.insert(mktVerbalCondition);
+        return mktVerbalCondition.getConditionId();
+    }
+
+    /**
+     * 查询协同子策略规则并拼接格式
+     * @param evtContactConfId
+     * @return
+     */
+    public String ruleSelect(Long evtContactConfId) {
+        //唯一ID
+        //查询出所有规则
+        List<MktVerbalCondition> mktVerbalConditions = mktVerbalConditionMapper.findConditionListByVerbalId(evtContactConfId);
+
+        List<MktVerbalCondition> labels = new ArrayList<>(); //标签因子
+        List<MktVerbalCondition> expressions = new ArrayList<>(); //表达式
+
+        //分类
+        for (MktVerbalCondition mktVerbalCondition : mktVerbalConditions) {
+            if ("1000".equals(mktVerbalCondition.getLeftParamType())) {
+                labels.add(mktVerbalCondition);
+            } else if ("2000".equals(mktVerbalCondition.getLeftParamType())) {
+                expressions.add(mktVerbalCondition);
+            }
+        }
+        Rule rule = parseRules(labels, expressions, 0);
+        return JSON.toJSONString(rule);
+    }
+
+    /**
+     * 递归查询规则
+     * @param labels
+     * @param expressions
+     * @param index
+     * @return
+     */
+    public Rule parseRules(List<MktVerbalCondition> labels, List<MktVerbalCondition> expressions, int index) {
+        Rule rule = new Rule();
+        List<RuleDetail> ruleDetails = new ArrayList<>();
+        RuleDetail ruleDetail;
+
+        //遍历所有表达式
+        rule.setType(expressions.get(index).getOperType());
+        for (int i = index; i < expressions.size(); i++) {
+            //判断类型  如果不相同就进入下一级
+            if (rule.getType().equals(expressions.get(i).getOperType())) {
+                for (MktVerbalCondition condition : labels) {
+                    if (expressions.get(i).getLeftParam().equals(condition.getConditionId().toString())
+                            || expressions.get(i).getRightParam().equals(condition.getConditionId().toString())) {
+                        ruleDetail = new RuleDetail();
+                        ruleDetail.setId(Integer.parseInt(condition.getLeftParam()));
+                        //查询获取标签因子名称
+                        Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(condition.getLeftParam()));
+                        if(label != null) {
+                            ruleDetail.setName(label.getInjectionLabelName());
+                        } else {
+                            ruleDetail.setName("");
+                        }
+                        ruleDetail.setContent(condition.getRightParam());
+                        ruleDetail.setOperType(condition.getOperType());
+                        ruleDetails.add(ruleDetail);
+                    }
+                }
+            } else {
+                rule.setRuleChildren(parseRules(labels, expressions, i));
+                break;
+            }
+        }
+        if (ruleDetails.size() == 0) {
+            return null;
+        }
+
+        rule.setListData(ruleDetails);
+        return rule;
+    }
+
+
 }

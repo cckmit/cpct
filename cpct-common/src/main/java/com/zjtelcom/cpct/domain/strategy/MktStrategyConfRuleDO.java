@@ -4,6 +4,9 @@ import com.zjtelcom.cpct.BaseEntity;
 
 import java.util.Date;
 
+/**
+ * 策略配置规则DO
+ */
 public class MktStrategyConfRuleDO extends BaseEntity {
     /**
      * 策略配置规则Id

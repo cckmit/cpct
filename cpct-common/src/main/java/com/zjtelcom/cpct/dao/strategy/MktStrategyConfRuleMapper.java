@@ -4,6 +4,9 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 
 import java.util.List;
 
+/**
+ * 策略配置规则Mapper
+ */
 public interface MktStrategyConfRuleMapper {
     int deleteByPrimaryKey(Long mktStrategyConfRuleId);
 
@@ -14,4 +17,8 @@ public interface MktStrategyConfRuleMapper {
     List<MktStrategyConfRuleDO> selectAll();
 
     int updateByPrimaryKey(MktStrategyConfRuleDO mktStrategyConfRuleDO);
+
+    List<MktStrategyConfRuleDO> selectByMktStrategyConfId(Long mktStrategyConfId);
+
+
 }

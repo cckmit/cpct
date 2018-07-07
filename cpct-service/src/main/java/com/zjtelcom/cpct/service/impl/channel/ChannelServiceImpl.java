@@ -26,6 +26,26 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
     @Autowired
     private ContactChannelMapper channelMapper;
 
+    /**
+     * 添加
+     * @param userId
+     * @param parentAddVO
+     * @return
+     */
+    @Override
+    public Map<String, Object> createParentChannel(Long userId, ContactChannelDetail parentAddVO) {
+        Map<String,Object> result = new HashMap<>();
+        Channel channel = BeanUtil.create(parentAddVO,new Channel());
+        channel.setCreateDate(new Date());
+        channel.setUpdateDate(new Date());
+        channel.setCreateStaff(userId);
+        channel.setUpdateStaff(userId);
+        channel.setStatusCd("1000");
+        channelMapper.insert(channel);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","添加成功");
+        return result;
+    }
 
     @Override
     public Map<String,Object> createContactChannel(Long userId, ContactChannelDetail addVO) {

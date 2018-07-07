@@ -10,7 +10,25 @@ public class ContactChannelDetail implements Serializable {
     private String contactChlType;
     private String contactChlDesc;
     private Long regionId;
+    private String channelType;
+    private Long parentId;
 
+
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
+    }
+
+    public String getChannelType() {
+        return channelType;
+    }
+
+    public void setChannelType(String channelType) {
+        this.channelType = channelType;
+    }
 
     public Long getChannelId() {
         return channelId;
