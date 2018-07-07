@@ -28,14 +28,6 @@ public class MktStrategyConf {
      */
     private Long channelsId;
 
-    private Long createStaff;
-
-    private Date createDate;
-
-    private Long updateStaff;
-
-    private Date updateDate;
-
     public Long getMktStrategyConfId() {
         return mktStrategyConfId;
     }
@@ -74,37 +66,5 @@ public class MktStrategyConf {
 
     public void setChannelsId(Long channelsId) {
         this.channelsId = channelsId;
-    }
-
-    public Long getCreateStaff() {
-        return createStaff;
-    }
-
-    public void setCreateStaff(Long createStaff) {
-        this.createStaff = createStaff;
-    }
-
-    public Date getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
-
-    public Long getUpdateStaff() {
-        return updateStaff;
-    }
-
-    public void setUpdateStaff(Long updateStaff) {
-        this.updateStaff = updateStaff;
-    }
-
-    public Date getUpdateDate() {
-        return updateDate;
-    }
-
-    public void setUpdateDate(Date updateDate) {
-        this.updateDate = updateDate;
     }
 }

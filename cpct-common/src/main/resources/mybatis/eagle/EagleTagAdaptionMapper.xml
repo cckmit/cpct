@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zjtelcom.cpct.dao.eagle.EagleTagAdaptionMapper" >
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.model.EagleTagAdaption" >
+    <id column="ADAP_ID" property="adapId" jdbcType="INTEGER" />
+    <result column="SOURCE_TABLE_COLUMN_NAME" property="sourceTableColumnName" jdbcType="VARCHAR" />
+    <result column="FIT_DOMAIN" property="fitDomain" jdbcType="VARCHAR" />
+    <result column="SCRIPT" property="script" jdbcType="VARCHAR" />
+    <result column="ADAP_CLASSIFY" property="adapClassify" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ADAP_ID, SOURCE_TABLE_COLUMN_NAME, FIT_DOMAIN, SCRIPT, ADAP_CLASSIFY
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from fpc_eagle_tag_adaptation
+    where ADAP_ID = #{adapId,jdbcType=INTEGER}
+  </select>
+  <select id="queryAll" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from fpc_eagle_tag_adaptation
+  </select>
+  <select id="queryByNameAndDomain" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from fpc_eagle_tag_adaptation
+    where SOURCE_TABLE_COLUMN_NAME = #{tag} and FIT_DOMAIN = #{fitDomain} and ADAP_CLASSIFY = #{adapClassify}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from fpc_eagle_tag_adaptation
+    where ADAP_ID = #{adapId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.model.EagleTagAdaption" >
+    insert into fpc_eagle_tag_adaptation (ADAP_ID, SOURCE_TABLE_COLUMN_NAME, FIT_DOMAIN, 
+      SCRIPT)
+    values (#{adapId,jdbcType=INTEGER}, #{sourceTableColumnName,jdbcType=VARCHAR}, #{fitDomain,jdbcType=VARCHAR}, 
+      #{script,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zjtelcom.cpct.model.EagleTagAdaption" >
+    insert into fpc_eagle_tag_adaptation
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="adapId != null" >
+        ADAP_ID,
+      </if>
+      <if test="sourceTableColumnName != null" >
+        SOURCE_TABLE_COLUMN_NAME,
+      </if>
+      <if test="fitDomain != null" >
+        FIT_DOMAIN,
+      </if>
+      <if test="script != null" >
+        SCRIPT,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="adapId != null" >
+        #{adapId,jdbcType=INTEGER},
+      </if>
+      <if test="sourceTableColumnName != null" >
+        #{sourceTableColumnName,jdbcType=VARCHAR},
+      </if>
+      <if test="fitDomain != null" >
+        #{fitDomain,jdbcType=VARCHAR},
+      </if>
+      <if test="script != null" >
+        #{script,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zjtelcom.cpct.model.EagleTagAdaption" >
+    update fpc_eagle_tag_adaptation
+    <set >
+      <if test="sourceTableColumnName != null" >
+        SOURCE_TABLE_COLUMN_NAME = #{sourceTableColumnName,jdbcType=VARCHAR},
+      </if>
+      <if test="fitDomain != null" >
+        FIT_DOMAIN = #{fitDomain,jdbcType=VARCHAR},
+      </if>
+      <if test="script != null" >
+        SCRIPT = #{script,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ADAP_ID = #{adapId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.model.EagleTagAdaption" >
+    update fpc_eagle_tag_adaptation
+    set SOURCE_TABLE_COLUMN_NAME = #{sourceTableColumnName,jdbcType=VARCHAR},
+      FIT_DOMAIN = #{fitDomain,jdbcType=VARCHAR},
+      SCRIPT = #{script,jdbcType=VARCHAR}
+    where ADAP_ID = #{adapId,jdbcType=INTEGER}
+  </update>
+</mapper>

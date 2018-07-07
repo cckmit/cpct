@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.eagle.EagleTagMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.model.EagleTag">
+    <id column="TAG_ROW_ID" jdbcType="INTEGER" property="tagRowId" />
+    <result column="CTAS_TABLE_DEFINITION_ROW_ID" jdbcType="INTEGER" property="ctasTableDefinitionRowId" />
+    <result column="TAG_NAME" jdbcType="VARCHAR" property="tagName" />
+    <result column="SOURCE_TABLE_COLUMN_NAME" jdbcType="VARCHAR" property="sourceTableColumnName" />
+    <result column="SOURCE_TABLE_COLUMN_TYPE" jdbcType="VARCHAR" property="sourceTableColumnType" />
+    <result column="SENSITIVE_COLUMN_FLAG" jdbcType="VARCHAR" property="sensitiveColumnFlag" />
+    <result column="SENSITIVE_TYPE" jdbcType="VARCHAR" property="sensitiveType" />
+    <result column="FIT_DOMAIN" jdbcType="VARCHAR" property="fitDomain" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    TAG_ROW_ID, CTAS_TABLE_DEFINITION_ROW_ID, TAG_NAME, SOURCE_TABLE_COLUMN_NAME, SOURCE_TABLE_COLUMN_TYPE, 
+    SENSITIVE_COLUMN_FLAG, SENSITIVE_TYPE, FIT_DOMAIN
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from fpc_eagle_tag
+    where TAG_ROW_ID = #{tagRowId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="queryAll" resultMap="BaseResultMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from fpc_eagle_tag
+  </select>
+  
+  <select id="selectByNameAndDomain" parameterType="java.lang.String" resultMap="BaseResultMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from fpc_eagle_tag
+    where SOURCE_TABLE_COLUMN_NAME = #{name} and FIT_DOMAIN = #{fitDomain}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from fpc_eagle_tag
+    where TAG_ROW_ID = #{tagRowId,jdbcType=INTEGER}
+  </delete>
+  
+  <delete id="deleteAll">
+  	delete from fpc_eagle_tag
+  </delete>
+  
+  <insert id="insert" parameterType="com.zjtelcom.cpct.model.EagleTag">
+    insert into fpc_eagle_tag (TAG_ROW_ID, CTAS_TABLE_DEFINITION_ROW_ID, 
+      TAG_NAME, SOURCE_TABLE_COLUMN_NAME, SOURCE_TABLE_COLUMN_TYPE, 
+      SENSITIVE_COLUMN_FLAG, SENSITIVE_TYPE,FIT_DOMAIN)
+    values (#{tagRowId,jdbcType=INTEGER}, #{ctasTableDefinitionRowId,jdbcType=INTEGER}, 
+      #{tagName,jdbcType=VARCHAR}, #{sourceTableColumnName,jdbcType=VARCHAR}, #{sourceTableColumnType,jdbcType=VARCHAR}, 
+      #{sensitiveColumnFlag,jdbcType=VARCHAR}, #{sensitiveType,jdbcType=VARCHAR},#{fitDomain})
+  </insert>
+  
+  <!-- 批量插入 -->
+  <insert id="insertBatch" parameterType="java.util.List">
+    insert into fpc_eagle_tag (TAG_ROW_ID, CTAS_TABLE_DEFINITION_ROW_ID, 
+      TAG_NAME, SOURCE_TABLE_COLUMN_NAME, SOURCE_TABLE_COLUMN_TYPE, 
+      SENSITIVE_COLUMN_FLAG, SENSITIVE_TYPE,FIT_DOMAIN)
+    values 
+    <foreach collection="record" item="item" index="i" separator=",">
+    	(#{item.tagRowId,jdbcType=INTEGER}, #{item.ctasTableDefinitionRowId,jdbcType=INTEGER}, 
+      #{item.tagName,jdbcType=VARCHAR}, #{item.sourceTableColumnName,jdbcType=VARCHAR}, #{item.sourceTableColumnType,jdbcType=VARCHAR}, 
+      #{item.sensitiveColumnFlag,jdbcType=VARCHAR}, #{item.sensitiveType,jdbcType=VARCHAR},#{item.fitDomain})
+    </foreach>
+  </insert>
+  
+  <insert id="insertSelective" parameterType="com.zjtelcom.cpct.model.EagleTag">
+    insert into fpc_eagle_tag
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="tagRowId != null">
+        TAG_ROW_ID,
+      </if>
+      <if test="ctasTableDefinitionRowId != null">
+        CTAS_TABLE_DEFINITION_ROW_ID,
+      </if>
+      <if test="tagName != null">
+        TAG_NAME,
+      </if>
+      <if test="sourceTableColumnName != null">
+        SOURCE_TABLE_COLUMN_NAME,
+      </if>
+      <if test="sourceTableColumnType != null">
+        SOURCE_TABLE_COLUMN_TYPE,
+      </if>
+      <if test="sensitiveColumnFlag != null">
+        SENSITIVE_COLUMN_FLAG,
+      </if>
+      <if test="sensitiveType != null">
+        SENSITIVE_TYPE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="tagRowId != null">
+        #{tagRowId,jdbcType=INTEGER},
+      </if>
+      <if test="ctasTableDefinitionRowId != null">
+        #{ctasTableDefinitionRowId,jdbcType=INTEGER},
+      </if>
+      <if test="tagName != null">
+        #{tagName,jdbcType=VARCHAR},
+      </if>
+      <if test="sourceTableColumnName != null">
+        #{sourceTableColumnName,jdbcType=VARCHAR},
+      </if>
+      <if test="sourceTableColumnType != null">
+        #{sourceTableColumnType,jdbcType=VARCHAR},
+      </if>
+      <if test="sensitiveColumnFlag != null">
+        #{sensitiveColumnFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="sensitiveType != null">
+        #{sensitiveType,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zjtelcom.cpct.model.EagleTag">
+    update fpc_eagle_tag
+    <set>
+      <if test="ctasTableDefinitionRowId != null">
+        CTAS_TABLE_DEFINITION_ROW_ID = #{ctasTableDefinitionRowId,jdbcType=INTEGER},
+      </if>
+      <if test="tagName != null">
+        TAG_NAME = #{tagName,jdbcType=VARCHAR},
+      </if>
+      <if test="sourceTableColumnName != null">
+        SOURCE_TABLE_COLUMN_NAME = #{sourceTableColumnName,jdbcType=VARCHAR},
+      </if>
+      <if test="sourceTableColumnType != null">
+        SOURCE_TABLE_COLUMN_TYPE = #{sourceTableColumnType,jdbcType=VARCHAR},
+      </if>
+      <if test="sensitiveColumnFlag != null">
+        SENSITIVE_COLUMN_FLAG = #{sensitiveColumnFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="sensitiveType != null">
+        SENSITIVE_TYPE = #{sensitiveType,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where TAG_ROW_ID = #{tagRowId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.model.EagleTag">
+    update fpc_eagle_tag
+    set CTAS_TABLE_DEFINITION_ROW_ID = #{ctasTableDefinitionRowId,jdbcType=INTEGER},
+      TAG_NAME = #{tagName,jdbcType=VARCHAR},
+      SOURCE_TABLE_COLUMN_NAME = #{sourceTableColumnName,jdbcType=VARCHAR},
+      SOURCE_TABLE_COLUMN_TYPE = #{sourceTableColumnType,jdbcType=VARCHAR},
+      SENSITIVE_COLUMN_FLAG = #{sensitiveColumnFlag,jdbcType=VARCHAR},
+      SENSITIVE_TYPE = #{sensitiveType,jdbcType=VARCHAR}
+    where TAG_ROW_ID = #{tagRowId,jdbcType=INTEGER}
+  </update>
+  <select id="queryTagByPage" parameterType="com.zjtelcom.cpct.model.EagleTag" resultType="com.zjtelcom.cpct.model.EagleTag">
+  	SELECT
+		T1.TAG_ROW_ID AS id,
+		T1.TAG_NAME AS tagName,
+		T1.SOURCE_TABLE_COLUMN_NAME AS tagCode,
+		T1.SOURCE_TABLE_COLUMN_TYPE AS tagType,
+		T2.TAG_TABLE_NAME_EN AS tableName,
+		T2.TAG_TABLE_MAIN_FLAG AS mainFlag,
+		T3.DB_CONF_NAME AS dbName,
+		T3.DATA_BASE_TYPE AS dbType
+	FROM
+		fpc_eagle_tag T1
+	INNER JOIN fpc_eagle_source_table_def T2 ON T2.CTAS_TABLE_DEFINITION_ROW_ID = T1.CTAS_TABLE_DEFINITION_ROW_ID
+	INNER JOIN fpc_eagle_database_config T3 ON T2.DB_CONF_ROW_ID = T3.DB_CONF_ROW_ID
+	ORDER BY T1.TAG_ROW_ID
+  </select>
+  
+  <select id="queryByNotExistsTabRef" resultMap="BaseResultMap">
+  	select t1.TAG_ROW_ID,t1.SOURCE_TABLE_COLUMN_NAME,t1.SOURCE_TABLE_COLUMN_TYPE from fpc_eagle_tag t1
+	where t1.TAG_ROW_ID in 
+	<foreach collection="record" item="item" open="(" close=")" separator=",">
+		#{item}
+	</foreach>
+	and not EXISTS (
+		select 1 from fpc_eagle_source_table_ref t2
+		where t2.CTAS_MASTER_TABLE_ROW_ID = #{masterTableId} and t2.CTAS_SLAVE_TABLE_ROW_ID = t1.CTAS_TABLE_DEFINITION_ROW_ID and t2.FIT_DOMAIN = #{domain}
+	)
+  </select>
+</mapper>

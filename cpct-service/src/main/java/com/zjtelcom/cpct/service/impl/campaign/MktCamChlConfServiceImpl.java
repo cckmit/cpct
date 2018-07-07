@@ -155,7 +155,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                 MktCamChlConfAttr mktCamChlConfAttr = new MktCamChlConfAttr();
                 CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttr, mktCamChlConfAttrDO);
                 if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
-                    //TODO 通过EvtContactConfId获取规则放入属性中
+                    //通过EvtContactConfId获取规则放入属性中
                     String rule = ruleSelect(mktCamChlConfAttr.getEvtContactConfId());
                     mktCamChlConfAttr.setAttrValue(rule);
                 }
@@ -191,7 +191,9 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                     MktCamChlConfAttr mktCamChlConfAttr = new MktCamChlConfAttr();
                     CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttr, mktCamChlConfAttrDO);
                     if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
-                        //TODO 通过EvtContactConfId获取规则放入属性中
+                        //通过EvtContactConfId获取规则放入属性中
+                        String rule = ruleSelect(mktCamChlConfAttr.getEvtContactConfId());
+                        mktCamChlConfAttr.setAttrValue(rule);
                     }
                     mktCamChlConfDetail.getMktCamChlConfAttrList().add(mktCamChlConfAttr);
                 }
@@ -309,7 +311,11 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
         return mktVerbalCondition.getConditionId();
     }
 
-
+    /**
+     * 查询协同子策略规则并拼接格式
+     * @param evtContactConfId
+     * @return
+     */
     public String ruleSelect(Long evtContactConfId) {
         //唯一ID
         //查询出所有规则
@@ -330,6 +336,13 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
         return JSON.toJSONString(rule);
     }
 
+    /**
+     * 递归查询规则
+     * @param labels
+     * @param expressions
+     * @param index
+     * @return
+     */
     public Rule parseRules(List<MktVerbalCondition> labels, List<MktVerbalCondition> expressions, int index) {
         Rule rule = new Rule();
         List<RuleDetail> ruleDetails = new ArrayList<>();
