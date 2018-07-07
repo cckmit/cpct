@@ -25,7 +25,7 @@ public class PpmProductController extends BaseController  {
     /**
      * 获取销售品列表
      */
-    @GetMapping("getProductList")
+    @PostMapping("getProductList")
     @CrossOrigin
     public Map<String,Object> getProductList(Long userId, String productName){
         Map<String ,Object> result = new HashMap<>();

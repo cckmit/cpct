@@ -13,6 +13,8 @@ import java.util.Map;
  */
 public interface ChannelService {
 
+//    Map<String,Object> createParentChannel
+
     Map<String,Object> createContactChannel (Long userId, ContactChannelDetail addVO);
 
     Map<String,Object> modContactChannel (Long userId, ContactChannelDetail editVO);
