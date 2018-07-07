@@ -13,7 +13,9 @@ import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,39 +36,55 @@ public class MktStrategyConfController extends BaseController {
     /**
      * 添加策略配置信息
      *
-     * @param mktStrategyConfDetail
+     * @param params
      * @return
      */
-    @RequestMapping(value = "/saveMktStrategyConf",  method = RequestMethod.POST)
+    @RequestMapping(value = "/saveMktStrategyConf", method = RequestMethod.POST)
     @CrossOrigin
-    public String saveMktStrategyConf(@RequestBody MktStrategyConfDetail mktStrategyConfDetail) {
+    public String saveMktStrategyConf(@RequestBody Map<String, List<MktStrategyConfDetail>> params) {
         Map<String, Object> map = new HashMap<>();
+        Map<String, List<Long>> mktStrategyConfIdListMap = new HashMap<>();
+        List<Long> mktStrategyConfIdList = new ArrayList<>();
         try {
-            map = mktStrategyConfService.saveMktStrategyConf(mktStrategyConfDetail);
+            List<MktStrategyConfDetail> mktStrategyConfDetailList = params.get("mktStrategyConfDetailList");
+
+            for (MktStrategyConfDetail mktStrategyConfDetail : mktStrategyConfDetailList) {
+                map = mktStrategyConfService.saveMktStrategyConf(mktStrategyConfDetail);
+                mktStrategyConfIdList.add(Long.valueOf(map.get("mktStrategyConfId").toString()));
+            }
+            mktStrategyConfIdListMap.put("mktStrategyConfIdList", mktStrategyConfIdList);
         } catch (Exception e) {
-            logger.error("[op:MktStrategyConfController] failed to save MktStrategyConf = {}", mktStrategyConfDetail, e);
+            logger.error("[op:MktStrategyConfController] failed to save mktStrategyConfIdList = {}", JSON.toJSON(mktStrategyConfIdList), e);
         }
-        return JSON.toJSONString(map);
+        return JSON.toJSONString(mktStrategyConfIdListMap);
     }
 
 
     /**
      * 修改策略配置信息
      *
-     * @param mktStrategyConfDetail
+     * @param params
      * @return
      */
     @RequestMapping(value = "/updateMktStrategyConf", method = RequestMethod.POST)
     @CrossOrigin
-    public String updateMktStrategyConf(@RequestBody MktStrategyConfDetail mktStrategyConfDetail) {
-        Map<String, Object> map = new HashMap<>();
+    public String updateMktStrategyConf(@RequestBody Map<String, List<MktStrategyConfDetail>> params) {
+        Map<String, List<Long>> mktStrategyConfIdListMap = new HashMap<>();
+        List<Long> mktStrategyConfIdList = new ArrayList<>();
         try {
-            map = mktStrategyConfService.updateMktStrategyConf(mktStrategyConfDetail);
+            List<MktStrategyConfDetail> mktStrategyConfDetailList = params.get("mktStrategyConfDetailList");
+
+            for (MktStrategyConfDetail mktStrategyConfDetail : mktStrategyConfDetailList) {
+                mktStrategyConfService.updateMktStrategyConf(mktStrategyConfDetail);
+                mktStrategyConfIdList.add(mktStrategyConfDetail.getMktStrategyConfId());
+            }
+            mktStrategyConfIdListMap.put("mktStrategyConfIdList", mktStrategyConfIdList);
         } catch (Exception e) {
-            logger.error("[op:MktStrategyConfController] failed to update MktStrategyConf = {}", mktStrategyConfDetail, e);
+            logger.error("[op:MktStrategyConfController] failed to save mktStrategyConfIdList = {}", JSON.toJSON(mktStrategyConfIdList), e);
         }
-        return JSON.toJSONString(map);
+        return JSON.toJSONString(mktStrategyConfIdListMap);
     }
+
 
 
     /**

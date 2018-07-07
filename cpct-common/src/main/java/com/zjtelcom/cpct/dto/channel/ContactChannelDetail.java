@@ -10,7 +10,7 @@ public class ContactChannelDetail implements Serializable {
     private String contactChlType;
     private String contactChlDesc;
     private Long regionId;
-    private String channelType;
+    private String channelType;//主动被动
     private Long parentId;
 
 

@@ -9,6 +9,7 @@ package com.zjtelcom.cpct.service.campaign;
 
 import com.zjtelcom.cpct.dto.campaign.MktCampaign;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignDetail;
+import com.zjtelcom.cpct.dto.campaign.MktCampaignVO;
 import com.zjtelcom.cpct.request.campaign.QryMktCampaignListReq;
 
 import java.util.Map;
@@ -21,10 +22,16 @@ import java.util.Map;
  */
 public interface MktCampaignService {
 
-    int createMktCampaign(MktCampaignDetail mktCampaignDetail) throws Exception;
+/*    int createMktCampaign(MktCampaignDetail mktCampaignDetail) throws Exception;
 
-    int modMktCampaign(MktCampaignDetail mktCampaignDetail) throws Exception;
+    int modMktCampaign(MktCampaignDetail mktCampaignDetail) throws Exception;*/
 
     Map<String,Object> qryMktCampaignList (QryMktCampaignListReq qryMktCampaignListReq);
+
+    Map<String,Object> createMktCampaign(MktCampaignVO mktCampaignVO) throws Exception;
+
+    Map<String,Object> modMktCampaign(MktCampaignVO mktCampaignVO) throws Exception;
+
+//    Map<String,Object> qryMktCampaignList (MktCampaignVO mktCampaignVO);
 
 }

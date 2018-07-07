@@ -28,6 +28,24 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
 
     @Override
+    public Map<String, Object> getProductNameById(Long userId, List<Long> productIdList) {
+        Map<String,Object> result = new HashMap<>();
+        List<String> nameList = new ArrayList<>();
+        for (Long productId : productIdList){
+            PpmProduct product = productMapper.selectByPrimaryKey(productId);
+            if (product==null){
+                result.put("resultCode",CODE_FAIL);
+                result.put("resultMsg","产品不存在");
+                return result;
+            }
+            nameList.add(product.getProductName());
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",nameList);
+        return result;
+    }
+
+    @Override
     public List<PpmProduct> getProductList(Long userId,String productName){
         List<PpmProduct> productList = new ArrayList<>();
         try {

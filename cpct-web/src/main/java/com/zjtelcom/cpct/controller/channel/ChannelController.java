@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.controller.channel;
 
+import com.sun.corba.se.spi.ior.ObjectKey;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dto.channel.ContactChannelDetail;
 import com.zjtelcom.cpct.dto.channel.ChannelEditVO;
@@ -19,13 +20,95 @@ public class ChannelController extends BaseController {
     @Autowired
     private ChannelService channelService;
 
+    /**
+     * 获取子级列表
+     * @return
+     */
+    @GetMapping("getChannelListByParentId")
+    @CrossOrigin
+    public Map<String, Object> getChannelListByParentId(@RequestBody HashMap<String,Long> param) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = channelService.getChannelListByParentId(userId,param.get("parentId"));
+        } catch (Exception e) {
+            logger.error("[op:ChannelController] fail to getParentList",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to getParentList");
+            return result;
+        }
+        return result;
+    }
+    /**
+     * 获取父级列表
+     * @return
+     */
+    @GetMapping("getParentList")
+    @CrossOrigin
+    public Map<String, Object> getParentList() {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = channelService.getParentList(userId);
+        } catch (Exception e) {
+            logger.error("[op:ChannelController] fail to getParentList",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to getParentList");
+            return result;
+        }
+        return result;
+
+    }
+
+    /**
+     * 添加父级渠道
+     * @param parentAddVO
+     * @return
+     */
+    @PostMapping("createParentChannel")
+    @CrossOrigin
+    public Map<String, Object> createParentChannel(@RequestBody ContactChannelDetail parentAddVO) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = channelService.createParentChannel(userId,parentAddVO);
+        } catch (Exception e) {
+            logger.error("[op:ChannelController] fail to createParentChannel",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to createParentChannel");
+            return result;
+        }
+        return result;
+
+    }
+
+    /**
+     * 获取渠道树
+     * @return
+     */
+    @GetMapping("getChannelTreeForActivity")
+    @CrossOrigin
+    public Map<String, Object> getChannelTreeForActivity() {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = channelService.getChannelTreeForActivity(userId);
+        } catch (Exception e) {
+            logger.error("[op:ChannelController] fail to getChannelTreeForActivity",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to getChannelTreeForActivity");
+            return result;
+        }
+        return result;
+
+    }
 
     /**
      * 添加渠道
      */
     @PostMapping("addChannel")
     @CrossOrigin
-    public Map<String,Object> createContactChannel(ContactChannelDetail addVO) {
+    public Map<String,Object> createContactChannel(@RequestBody ContactChannelDetail addVO) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
@@ -43,7 +126,7 @@ public class ChannelController extends BaseController {
      */
     @PostMapping("editChannel")
     @CrossOrigin
-    public Map<String,Object> modContactChannel( ContactChannelDetail editVO) {
+    public Map<String,Object> modContactChannel(@RequestBody ContactChannelDetail editVO) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
@@ -62,7 +145,7 @@ public class ChannelController extends BaseController {
      */
     @PostMapping("deleteChannel")
     @CrossOrigin
-    public Map<String,Object> delContactChannel(ContactChannelDetail channelDetail) {
+    public Map<String,Object> delContactChannel(@RequestBody ContactChannelDetail channelDetail) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {

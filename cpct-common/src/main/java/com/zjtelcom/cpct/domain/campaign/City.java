@@ -16,14 +16,29 @@ import java.util.List;
  */
 public class City {
 
+    /**
+     * 城市Id
+     */
     private Long mktStrategyConfRegionRelId;
 
+    /**
+     * 地市
+     */
     private CityProperty applyCity;
 
+    /**
+     * 区县集合
+     */
     private List<CityProperty> applyCountys;
 
+    /**
+     * 支局集合
+     */
     private List<CityProperty> applyBranchs;
 
+    /**
+     * 网格集合
+     */
     private List<CityProperty> applyGriddings;
 
     public Long getMktStrategyConfRegionRelId() {

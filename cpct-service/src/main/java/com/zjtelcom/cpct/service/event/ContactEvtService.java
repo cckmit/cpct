@@ -28,7 +28,7 @@ public interface ContactEvtService {
 
     Map<String,Object> closeEvent(Long contactEvtId,String statusCd);
 
-    Map<String,Object> editEvent(Long contactEvtId);
+    Map<String,Object> editEvent(Long contactEvtId) throws Exception;
 
     Map<String,Object> modContactEvtJt(CreateContactEvtJtReq createContactEvtJtReq);
 

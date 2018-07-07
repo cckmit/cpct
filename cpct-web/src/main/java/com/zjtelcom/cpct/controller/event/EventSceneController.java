@@ -115,4 +115,21 @@ public class EventSceneController extends BaseController {
         return JSON.toJSONString(maps);
     }
 
+    /**
+     * 开始/关闭事件场景
+     */
+    @RequestMapping("/coEventScene")
+    @CrossOrigin
+    public String coEventScene(@RequestBody EventScene eventScene) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = eventSceneService.coEventScene(eventScene);
+        } catch (Exception e) {
+            logger.error("[op:EventSceneController] fail to editEventScene for modEventSceneReq = {}! Exception: ", JSONArray.toJSON(eventScene), e);
+            return initFailRespInfo(ErrorCode.UPDATE_EVENT_SCENE_LIST_FAILURE.getErrorMsg(), ErrorCode.UPDATE_EVENT_SCENE_LIST_FAILURE.getErrorCode());
+        }
+        return JSON.toJSONString(maps);
+    }
+
+
 }

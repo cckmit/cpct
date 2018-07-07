@@ -7,6 +7,8 @@ import java.util.Map;
 
 public interface ProductService {
 
+    Map<String,Object> getProductNameById(Long userId,List<Long> productIdList);
+
     List<PpmProduct>  getProductList(Long userId,String productName);
 
     Map<String,Object> addProductRule(Long userId,List<Long> productIdList);

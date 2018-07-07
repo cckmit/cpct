@@ -32,4 +32,6 @@ public interface EventSceneMapper {
 
     List<EventScene> qryEventSceneByEvtId(Long contactEvtId);
 
+    int coEventScene(EventScene eventScene);
+
 }

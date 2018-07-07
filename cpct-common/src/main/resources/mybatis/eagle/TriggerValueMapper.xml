@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zjtelcom.cpct.dao.eagle.TriggerValueMapper" >
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.model.TriggerValue" >
+    <result column="value_id" property="valueId" jdbcType="INTEGER" />
+    <result column="domain" property="domain" jdbcType="VARCHAR" />
+    <result column="show_value" property="showValue" jdbcType="VARCHAR" />
+    <result column="real_value" property="realValue" jdbcType="VARCHAR" />
+    <result column="value_desc" property="valueDesc" jdbcType="VARCHAR" />
+  </resultMap>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.model.TriggerValue" >
+    insert into fpc_m_trigger_value (value_id, domain, show_value, 
+      real_value, value_desc)
+    values (#{valueId,jdbcType=INTEGER}, #{domain,jdbcType=VARCHAR}, #{showValue,jdbcType=VARCHAR}, 
+      #{realValue,jdbcType=VARCHAR}, #{valueDesc,jdbcType=VARCHAR})
+  </insert>
+  
+  <insert id="insertBatch" parameterType="java.util.List" >
+	  insert into fpc_m_trigger_value (value_id, domain, show_value, 
+	      real_value, value_desc)
+	    values
+	  <foreach collection="record" item="item" separator=",">
+	  	(#{item.valueId,jdbcType=INTEGER}, #{item.domain,jdbcType=VARCHAR}, #{item.showValue,jdbcType=VARCHAR}, 
+      #{item.realValue,jdbcType=VARCHAR}, #{item.valueDesc,jdbcType=VARCHAR})
+	  </foreach>
+  </insert>
+  
+  <insert id="insertSelective" parameterType="com.zjtelcom.cpct.model.TriggerValue" >
+    insert into fpc_m_trigger_value
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="valueId != null" >
+        value_id,
+      </if>
+      <if test="domain != null" >
+        domain,
+      </if>
+      <if test="showValue != null" >
+        show_value,
+      </if>
+      <if test="realValue != null" >
+        real_value,
+      </if>
+      <if test="valueDesc != null" >
+        value_desc,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="valueId != null" >
+        #{valueId,jdbcType=INTEGER},
+      </if>
+      <if test="domain != null" >
+        #{domain,jdbcType=VARCHAR},
+      </if>
+      <if test="showValue != null" >
+        #{showValue,jdbcType=VARCHAR},
+      </if>
+      <if test="realValue != null" >
+        #{realValue,jdbcType=VARCHAR},
+      </if>
+      <if test="valueDesc != null" >
+        #{valueDesc,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <select id="queryAll" resultMap="BaseResultMap">
+  	select t2.value_id, t2.domain, t2.show_value, t2.real_value, t2.value_desc from fpc_m_trigger_value t2
+  </select>
+  
+  <select id="queryByLeftAndValue" parameterType="java.lang.String" resultMap="BaseResultMap">
+  	select t2.value_id, t2.domain, t2.show_value, t2.real_value, t2.value_desc from fpc_m_trigger_value t2
+  	where t2.value_id = #{valueId} and t2.show_value = #{showValue} and t2.domain = #{domain}
+  </select>
+  
+</mapper>

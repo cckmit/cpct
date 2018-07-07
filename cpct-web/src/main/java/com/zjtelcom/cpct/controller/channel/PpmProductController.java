@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.controller.channel;
 
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
+import com.zjtelcom.cpct.dto.channel.ProductParam;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,25 @@ public class PpmProductController extends BaseController  {
     @Autowired
     private ProductService productService;
 
+    /**
+     *获取产品名字
+     * @return
+     */
+    @PostMapping("getProductNameById")
+    @CrossOrigin
+    public Map<String, Object> getProductNameById(@RequestBody ProductParam param) {
+        Map<String ,Object> result = new HashMap<>();
+        Long userId = UserUtil.loginId();
+        try {
+            result = productService.getProductNameById(userId,param.getIdList());
+        }catch (Exception e){
+            logger.error("[op:PpmProductController] fail to getProductNameById",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to getProductNameById");
+            return result;
+        }
+        return result;
+    }
     /**
      * 获取销售品列表
      */
@@ -47,16 +67,16 @@ public class PpmProductController extends BaseController  {
 
     /**
      * 添加规则下的销售品
-     * @param productIdList
+     * @param
      * @return
      */
     @PostMapping("addProductRule")
     @CrossOrigin
-    public Map<String, Object> addProductRule(@RequestBody List<Long> productIdList) {
+    public Map<String, Object> addProductRule(@RequestBody ProductParam param) {
         Map<String ,Object> result = new HashMap<>();
         Long userId = UserUtil.loginId();
         try {
-            result = productService.addProductRule(userId,productIdList);
+            result = productService.addProductRule(userId,param.getIdList());
         }catch (Exception e){
             logger.error("[op:PpmProductController] fail to addProductRule",e);
             result.put("resultCode",CODE_FAIL);
@@ -94,16 +114,15 @@ public class PpmProductController extends BaseController  {
 
     /**
      * 获取规则下的销售品列表
-     * @param ruleIdList
      * @return
      */
     @PostMapping("getProductRuleList")
     @CrossOrigin
-    public Map<String, Object> getProductRuleList(@RequestBody List<Long> ruleIdList) {
+    public Map<String, Object> getProductRuleList(@RequestBody ProductParam ruleParam) {
         Map<String ,Object> result = new HashMap<>();
         Long userId = UserUtil.loginId();
         try {
-            result = productService.getProductRuleList(userId,ruleIdList);
+            result = productService.getProductRuleList(userId,ruleParam.getIdList());
         }catch (Exception e){
             logger.error("[op:PpmProductController] fail to getProductRuleList",e);
             result.put("resultCode",CODE_FAIL);

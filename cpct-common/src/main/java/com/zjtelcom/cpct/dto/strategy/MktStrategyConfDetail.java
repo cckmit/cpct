@@ -5,12 +5,20 @@ import com.zjtelcom.cpct.domain.campaign.City;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * 策略配置详情
+ */
 public class MktStrategyConfDetail extends MktStrategyConf {
 
     /**
      * 下发城市列表
      */
     private List<City> cityList;
+
+    /**
+     * 策略配置下规则列表
+     */
+    private List<MktStrategyConfRule> mktStrategyConfRuleList;
 
     public List<City> getCityList() {
         return cityList;
@@ -20,4 +28,11 @@ public class MktStrategyConfDetail extends MktStrategyConf {
         this.cityList = cityList;
     }
 
+    public List<MktStrategyConfRule> getMktStrategyConfRuleList() {
+        return mktStrategyConfRuleList;
+    }
+
+    public void setMktStrategyConfRuleList(List<MktStrategyConfRule> mktStrategyConfRuleList) {
+        this.mktStrategyConfRuleList = mktStrategyConfRuleList;
+    }
 }

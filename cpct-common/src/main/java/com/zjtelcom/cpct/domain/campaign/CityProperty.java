@@ -14,8 +14,14 @@ package com.zjtelcom.cpct.domain.campaign;
  */
 public class CityProperty {
 
+    /**
+     * 城市属性Id
+     */
     private Long cityPropertyId;
 
+    /**
+     * 城市属性名称
+     */
     private String cityPropertyName;
 
     public Long getCityPropertyId() {

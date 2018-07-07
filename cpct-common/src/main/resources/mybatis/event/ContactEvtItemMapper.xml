@@ -78,7 +78,7 @@
         UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
         from event_item
         where 1 = 1
-        <if test="contactEvtId != null  and contactEvtId !=0 ">
+        <if test="contactEvtId != null and contactEvtId != 0 ">
             AND EVENT_ID = #{contactEvtId}
         </if>
     </select>
@@ -128,7 +128,7 @@
         where EVT_ITEM_ID = #{evtItemId}
     </select>
 
-    <insert id="insertContactEvtItem" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtItem">
+    <insert id="insertContactEvtItem" keyProperty="evtItemId" useGeneratedKeys="true" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtItem">
         insert into event_item (
         EVENT_ID,
         EVT_TYPE_ID,

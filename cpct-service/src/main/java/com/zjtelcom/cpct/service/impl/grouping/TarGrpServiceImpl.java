@@ -8,15 +8,17 @@ import com.zjtelcom.cpct.common.CacheConstants;
 import com.zjtelcom.cpct.common.CacheManager;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamGrpRulMapper;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
+import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.grouping.TarGrpConditionDO;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.dto.system.SystemParam;
-import com.zjtelcom.cpct.enums.ErrorCode;
+import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.model.EagleDatabaseConfig;
 import com.zjtelcom.cpct.pojo.Company;
 import com.zjtelcom.cpct.service.BaseService;
@@ -28,6 +30,8 @@ import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.SqlUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import com.zjtelcom.cpct.validator.ValidateResult;
+import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
+import com.zjtelcom.cpct.vo.grouping.TarGrpVO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +65,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     private TryCalcService tryCalcService;
     @Autowired(required = false)
     private PolicyCalculateService policyCalculateService;
-
+    @Autowired
+    private InjectionLabelMapper injectionLabelMapper;
 
     /**
      * 新增目标分群
@@ -82,6 +87,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         tarGrpMapper.createTarGrp(tarGrp);
         List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
         for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
+            tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
+            tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
             tarGrpCondition.setTarGrpId(tarGrp.getTarGrpId());
             tarGrpCondition.setCreateDate(DateUtil.getCurrentTime());
             tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
@@ -242,15 +249,34 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
      * 获取目标分群条件信息
      */
     @Override
-    public Map<String, Object> listTarGrpCondition(Long mktCamGrpRulId) {
+    public Map<String, Object> listTarGrpCondition(Long mktCamGrpRulId) throws Exception {
         Map<String, Object> maps = new HashMap<>();
         //通过mktCamGrpRulId获取所有活动关联关系
         MktCamGrpRul mktCamGrpRul = mktCamGrpRulMapper.selectByPrimaryKey(mktCamGrpRulId);
         TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(mktCamGrpRul.getTarGrpId());
         List<TarGrpCondition> listTarGrpCondition = tarGrpConditionMapper.listTarGrpCondition(tarGrp.getTarGrpId());
+        List<TarGrpConditionVO> grpConditionList = new ArrayList<>();
+        List<TarGrpVO> tarGrpVOS = new ArrayList<>();//传回前端展示信息
+        for (TarGrpCondition tarGrpCondition : listTarGrpCondition) {
+            TarGrpConditionVO tarGrpConditionVO = new TarGrpConditionVO();
+            CopyPropertiesUtil.copyBean2Bean(tarGrpConditionVO, tarGrpCondition);
+            //塞入左参中文名
+            Label label = injectionLabelMapper.selectByPrimaryKey(Long.valueOf(tarGrpConditionVO.getLeftParam()));
+            tarGrpConditionVO.setOperTypeName(label.getInjectionLabelName());
+            //塞入领域
+            FitDomain fitDomain = null;
+            if (label.getFitDomain() != null) {
+                fitDomain = FitDomain.getFitDomain(Integer.parseInt(label.getFitDomain()));
+            }
+            tarGrpConditionVO.setFitDomainName(fitDomain.getDescription());
+            //将操作符转为中文
+            Operator op = Operator.getOperator(Integer.parseInt(tarGrpConditionVO.getOperType()));
+            tarGrpConditionVO.setLeftParamName(op.getDescription());
+            grpConditionList.add(tarGrpConditionVO);
+        }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
-        maps.put("listTarGrpCondition", listTarGrpCondition);
+        maps.put("listTarGrpCondition", grpConditionList);
         return maps;
     }
 
@@ -307,7 +333,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             if (validateResult.getResult()) {
                 for (Map<String, Object> policy : policyList) {
                     //页面选择的资产域
-                    String recommendType = policy.get("recommendType").toString();
+//                    String recommendType = policy.get("recommendType").toString();
+                    String fitDomain = policy.get("fitDomain").toString();//适用域  四种域 PHY-MAN-0022 移动  PHY-MAN-0001 固话  INT-MAN-0010 宽带 OTH-MAN-0034 ITV
                     List<Map<String, String>> tagInfos = new ArrayList<>();
                     //防止tagInfos添加重复的数据
                     Map<String, String> tagInfoKeys = new HashMap<>();
@@ -320,9 +347,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                         List<Company> company = (List<Company>) rule.get("company");
                         String sql = null;
                         //tagInfos 获取标签信息
-                        sql = SqlUtil.integrationSql(recommendType, labels, tagInfos, company,
+                        sql = SqlUtil.integrationSql(fitDomain, labels, tagInfos, company,
                                 tagInfoKeys);
-
                         // 清除不必要的参数
                         rule.remove("labels");
                         rule.remove("company");

@@ -1,6 +1,5 @@
 package com.zjtelcom.cpct.util;
 
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -9,8 +8,11 @@ import com.zjtelcom.cpct.common.CacheManager;
 import com.zjtelcom.cpct.common.IDacher;
 import com.zjtelcom.cpct.constants.ConditionTypeConstants;
 import com.zjtelcom.cpct.constants.UseTypeConstants;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.eagle.EagleSourceTableDefMapper;
 import com.zjtelcom.cpct.dao.eagle.EagleSourceTableRefMapper;
+import com.zjtelcom.cpct.domain.channel.Label;
+import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.dto.system.SystemParam;
 import com.zjtelcom.cpct.model.*;
 import com.zjtelcom.cpct.pojo.Company;
@@ -50,7 +52,7 @@ public final class SqlUtil {
 
     private static EagleSourceTableDefMapper sourceTableDefMapper;
 
-//    private static TriggerMapper triggerMapper;
+    private static InjectionLabelMapper triggerMapper;
 
     private static Configuration config;
 
@@ -73,10 +75,13 @@ public final class SqlUtil {
     @SuppressWarnings("unchecked")
     public static String integrationSql(String domainType, List<Map<String, String>> triggers,
                                         List<Map<String, String>> tagInfos, List<Company> company,
+
                                         Map<String, String> tagInfoKeys) {
+        //初始化
         init();
 
         //防止，组装sql中出现重复列，重复表关联，用Map区分是否有重复数据
+        //todo 缓存的数据，具体用途，另外 EagleSourceTableRef 这些Eagle开头对象什么作用
         Map<String, EagleSourceTableRef> keys = new HashMap<>(10);
 
         IDacher<EagleTag> tagCache = CacheManager.getInstance().getCache(
@@ -88,18 +93,17 @@ public final class SqlUtil {
         IDacher<EagleTagAdaption> tagAdaptionCache = CacheManager.getInstance().getCache(
                 CacheConstants.TAG_ADAPTION_CACHE_NAME);
 
+        // todo EAGLE_ALL_TAG_1_TRYCALC  代表什么含义
         EagleTagAdaption eagleTagAdaption = tagAdaptionCache.queryOne("EAGLE_ALL_TAG_1_TRYCALC");
 
         Set<EagleSourceTableRef> tables = new HashSet<>();
         List<Column> columns = new ArrayList<>();
 
         //查询标签对应的valueid
-        //todo 调用侯云峰
-//        List<Trigger> triggerList = triggerMapper.queryTriggerByLeftOpers(triggers);
-        List<Label> triggerList = new ArrayList<>();
+        List<Label> triggerList = triggerMapper.queryTriggerByLeftOpers(triggers);
         Map<String, Label> triggerMap = new HashMap<>(triggerList.size());
         for (Label trigger : triggerList) {
-            triggerMap.put(trigger.getConditionId().toString(), trigger);
+            triggerMap.put(trigger.getInjectionLabelId().toString(), trigger);
         }
 
         EagleSourceTableDef masterTableDef = getMasterTable(domainType);
@@ -113,9 +117,10 @@ public final class SqlUtil {
         int k = 1;
         for (Map tigger : triggers) {
 
-            String conditionId = tigger.get("conditionId").toString();
+//            String conditionId = tigger.get("conditionId").toString();
+            String injectionLabelId = tigger.get("injectionLabelId").toString();
 
-            String leftOper = triggerCache.queryOne(conditionId).getEagleName();
+            String leftOper = triggerCache.queryOne(injectionLabelId).getInjectionLabelCode();
             leftOper = (String) GroovyUtil.invokeMethod(eagleTagAdaption.getScript(), "process",
                     new Object[]{tigger, domainType});
             String key = leftOper + "_" + domainType;
@@ -180,8 +185,9 @@ public final class SqlUtil {
                 }
                 tigger.put("leftOperand", col.getTableAlias() + "." + col.getName());
 
-                if (triggerMap.containsKey(conditionId.toString())) {
-                    Integer valueId = triggerMap.get(conditionId.toString()).getValueId();
+                if (triggerMap.containsKey(injectionLabelId.toString())) {
+//                    Integer valueId = triggerMap.get(conditionId.toString()).getValueId();
+                    Integer valueId = 0;//todo 老系统一个trigger对象对应一个valueid 但是新的集团规范一个labelvalue对应一个labelid
                     String conditionType = tigger.get("conditionType").toString();
 
                     //类型是输入和范围的不用查询真实值
@@ -200,7 +206,7 @@ public final class SqlUtil {
                                     "@").append(domainType).append("@").append(showValues[i]).toString();
                             LabelValue triggerValue = triggerValueCache.queryOne(triggerValueCacheKey);
                             if (null != triggerValue) {
-                                realValue.append(triggerValue.getRealValue());
+                                realValue.append(triggerValue.getLabelValue());
                             } else {
                                 realValue.append(showValues[i]);
                             }
@@ -334,6 +340,9 @@ public final class SqlUtil {
         return "";
     }
 
+    /**
+     * 查询领域下的主表
+     */
     public static EagleSourceTableDef getMasterTable(String domainType) {
         init();
         // 查询出这个域下主表
@@ -362,6 +371,9 @@ public final class SqlUtil {
         }
     }
 
+    /**
+     * 查出跟主表的关联表
+     */
     private static EagleSourceTableRef getJoinTable(EagleSourceTableDef masterTableDef,
                                                     EagleSourceTableDef tableDef,
                                                     String fitDomain, String as) {
@@ -384,14 +396,17 @@ public final class SqlUtil {
         return null;
     }
 
+    /**
+     * 初始化方法
+     */
     private static void init() {
         if (!initFlag) {
-//            sourceTableRefMapper = ContextLoader.getCurrentWebApplicationContext().getBean(
-//                EagleSourceTableRefMapper.class);
-//            sourceTableDefMapper = ContextLoader.getCurrentWebApplicationContext().getBean(
-//                EagleSourceTableDefMapper.class);
-//            triggerMapper = ContextLoader.getCurrentWebApplicationContext().getBean(
-//                TriggerMapper.class);
+            sourceTableRefMapper = ContextLoader.getCurrentWebApplicationContext().getBean(
+                EagleSourceTableRefMapper.class);
+            sourceTableDefMapper = ContextLoader.getCurrentWebApplicationContext().getBean(
+                EagleSourceTableDefMapper.class);
+            triggerMapper = ContextLoader.getCurrentWebApplicationContext().getBean(
+                InjectionLabelMapper.class);
 
             config = new Configuration(new Version("2.3.23"));
             config.setDefaultEncoding("UTF-8");
