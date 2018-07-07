@@ -155,7 +155,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                 MktCamChlConfAttr mktCamChlConfAttr = new MktCamChlConfAttr();
                 CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttr, mktCamChlConfAttrDO);
                 if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
-                    //TODO 通过EvtContactConfId获取规则放入属性中
+                    //通过EvtContactConfId获取规则放入属性中
                     String rule = ruleSelect(mktCamChlConfAttr.getEvtContactConfId());
                     mktCamChlConfAttr.setAttrValue(rule);
                 }
@@ -191,7 +191,9 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                     MktCamChlConfAttr mktCamChlConfAttr = new MktCamChlConfAttr();
                     CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttr, mktCamChlConfAttrDO);
                     if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
-                        //TODO 通过EvtContactConfId获取规则放入属性中
+                        //通过EvtContactConfId获取规则放入属性中
+                        String rule = ruleSelect(mktCamChlConfAttr.getEvtContactConfId());
+                        mktCamChlConfAttr.setAttrValue(rule);
                     }
                     mktCamChlConfDetail.getMktCamChlConfAttrList().add(mktCamChlConfAttr);
                 }
