@@ -12,6 +12,8 @@ public interface MktStrategyConfRuleMapper {
 
     int insert(MktStrategyConfRuleDO mktStrategyConfRuleDO);
 
+    void insertByBatch(List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList);
+
     MktStrategyConfRuleDO selectByPrimaryKey(Long mktStrategyConfRuleId);
 
     List<MktStrategyConfRuleDO> selectAll();
