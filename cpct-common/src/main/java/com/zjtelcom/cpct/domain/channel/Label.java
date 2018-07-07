@@ -15,7 +15,7 @@ public class Label extends BaseEntity {
     private String labelValueType;//1000输入型;2000	枚举型
     private String labelDataType;//1000	日期型;1100	日期时间型;1200	字符型;1300	浮点型;1400	整数型;1500	布尔型;1600	计算型
 
-    private String fitDomain;//适用域
+    private String fitDomain;//适用域  四种域 PHY-MAN-0022 移动  PHY-MAN-0001 固话  INT-MAN-0010 宽带 OTH-MAN-0034 ITV
     private String rightOperand;//右操作符（标签值）
     private String conditionType;//单选多选框
     private String operator;//运算符

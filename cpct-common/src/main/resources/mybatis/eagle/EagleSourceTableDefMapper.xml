@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zjtelcom.cpct.dao.eagle.EagleSourceTableDefMapper" >
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.model.EagleSourceTableDef" >
+    <id column="CTAS_TABLE_DEFINITION_ROW_ID" property="ctasTableDefinitionRowId" jdbcType="INTEGER" />
+    <result column="TAG_TABLE_NAME_EN" property="tagTableNameEn" jdbcType="VARCHAR" />
+    <result column="DB_CONF_ROW_ID" property="dbConfRowId" jdbcType="INTEGER" />
+    <result column="TAG_TABLE_MAIN_FLAG" property="tagTableMainFlag" jdbcType="VARCHAR" />
+    <result column="TAG_TABLE_NAME_CN" property="tagTableNameCn" jdbcType="VARCHAR" />
+    <result column="SCHEMA_NAME" property="schemaName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    CTAS_TABLE_DEFINITION_ROW_ID, TAG_TABLE_NAME_EN, DB_CONF_ROW_ID, TAG_TABLE_MAIN_FLAG, 
+    TAG_TABLE_NAME_CN,SCHEMA_NAME
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from fpc_eagle_source_table_def
+    where CTAS_TABLE_DEFINITION_ROW_ID = #{ctasTableDefinitionRowId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="queryAll" resultMap="BaseResultMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from fpc_eagle_source_table_def
+  </select>
+  
+  <select id="queryByTableNameAndDb" parameterType="java.lang.String"  resultMap="BaseResultMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from fpc_eagle_source_table_def
+    where TAG_TABLE_NAME_EN = #{tableName} and DB_CONF_ROW_ID = #{dbConfId}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from fpc_eagle_source_table_def
+    where CTAS_TABLE_DEFINITION_ROW_ID = #{ctasTableDefinitionRowId,jdbcType=INTEGER}
+  </delete>
+  
+  <delete id="deleteAll">
+  	delete from fpc_eagle_source_table_def
+  </delete>
+  
+  <insert id="insert" parameterType="com.zjtelcom.cpct.model.EagleSourceTableDef" >
+    insert into fpc_eagle_source_table_def (CTAS_TABLE_DEFINITION_ROW_ID, TAG_TABLE_NAME_EN, 
+      DB_CONF_ROW_ID, TAG_TABLE_MAIN_FLAG, TAG_TABLE_NAME_CN,SCHEMA_NAME
+      )
+    values (#{ctasTableDefinitionRowId,jdbcType=INTEGER}, #{tagTableNameEn,jdbcType=VARCHAR}, 
+      #{dbConfRowId,jdbcType=INTEGER}, #{tagTableMainFlag,jdbcType=VARCHAR}, #{tagTableNameCn,jdbcType=VARCHAR},#{schemaName}
+      )
+  </insert>
+  
+  <insert id="insertBatch" parameterType="java.util.List" >
+    insert into fpc_eagle_source_table_def (CTAS_TABLE_DEFINITION_ROW_ID, TAG_TABLE_NAME_EN, 
+      DB_CONF_ROW_ID, TAG_TABLE_MAIN_FLAG, TAG_TABLE_NAME_CN,SCHEMA_NAME
+      )
+    values 
+    <foreach collection="record" item="item" separator=",">
+    (#{item.ctasTableDefinitionRowId,jdbcType=INTEGER}, #{item.tagTableNameEn,jdbcType=VARCHAR}, 
+      #{item.dbConfRowId,jdbcType=INTEGER}, #{item.tagTableMainFlag,jdbcType=VARCHAR}, #{item.tagTableNameCn,jdbcType=VARCHAR},#{item.schemaName,jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+  
+  <insert id="insertSelective" parameterType="com.zjtelcom.cpct.model.EagleSourceTableDef" >
+    insert into fpc_eagle_source_table_def
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="ctasTableDefinitionRowId != null" >
+        CTAS_TABLE_DEFINITION_ROW_ID,
+      </if>
+      <if test="tagTableNameEn != null" >
+        TAG_TABLE_NAME_EN,
+      </if>
+      <if test="dbConfRowId != null" >
+        DB_CONF_ROW_ID,
+      </if>
+      <if test="tagTableMainFlag != null" >
+        TAG_TABLE_MAIN_FLAG,
+      </if>
+      <if test="tagTableNameCn != null" >
+        TAG_TABLE_NAME_CN,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="ctasTableDefinitionRowId != null" >
+        #{ctasTableDefinitionRowId,jdbcType=INTEGER},
+      </if>
+      <if test="tagTableNameEn != null" >
+        #{tagTableNameEn,jdbcType=VARCHAR},
+      </if>
+      <if test="dbConfRowId != null" >
+        #{dbConfRowId,jdbcType=INTEGER},
+      </if>
+      <if test="tagTableMainFlag != null" >
+        #{tagTableMainFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="tagTableNameCn != null" >
+        #{tagTableNameCn,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zjtelcom.cpct.model.EagleSourceTableDef" >
+    update fpc_eagle_source_table_def
+    <set >
+      <if test="tagTableNameEn != null" >
+        TAG_TABLE_NAME_EN = #{tagTableNameEn,jdbcType=VARCHAR},
+      </if>
+      <if test="dbConfRowId != null" >
+        DB_CONF_ROW_ID = #{dbConfRowId,jdbcType=INTEGER},
+      </if>
+      <if test="tagTableMainFlag != null" >
+        TAG_TABLE_MAIN_FLAG = #{tagTableMainFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="tagTableNameCn != null" >
+        TAG_TABLE_NAME_CN = #{tagTableNameCn,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where CTAS_TABLE_DEFINITION_ROW_ID = #{ctasTableDefinitionRowId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.model.EagleSourceTableDef" >
+    update fpc_eagle_source_table_def
+    set TAG_TABLE_NAME_EN = #{tagTableNameEn,jdbcType=VARCHAR},
+      DB_CONF_ROW_ID = #{dbConfRowId,jdbcType=INTEGER},
+      TAG_TABLE_MAIN_FLAG = #{tagTableMainFlag,jdbcType=VARCHAR},
+      TAG_TABLE_NAME_CN = #{tagTableNameCn,jdbcType=VARCHAR}
+      SCHEMA_NAME = #{schemaName,jdbcType=VARCHAR}
+    where CTAS_TABLE_DEFINITION_ROW_ID = #{ctasTableDefinitionRowId,jdbcType=INTEGER}
+  </update>
+</mapper>

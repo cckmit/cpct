@@ -15,17 +15,18 @@ public enum FitDomain {
         this.description = description;
     }
 
-
-    public static FitDomain getDomain(Integer value){
+    public static FitDomain getFitDomain(Integer value){
         FitDomain[] allType = FitDomain.values();
-        FitDomain op = null;
+        FitDomain fitDomain = null;
         for (FitDomain operator : allType){
             if (operator.getValue().equals(value)){
-                op = operator;
+                fitDomain = operator;
             }
         }
-        return op;
+        return fitDomain;
     }
+
+
 
     public Integer getValue() {
         return value;

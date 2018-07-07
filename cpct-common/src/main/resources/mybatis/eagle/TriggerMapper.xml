@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.eagle.TriggerMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.model.Trigger">
+    <id column="condition_id" jdbcType="INTEGER" property="conditionId" />
+    <result column="condition_name" jdbcType="VARCHAR" property="conditionName" />
+    <result column="conditon_type" jdbcType="VARCHAR" property="conditionType" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="left_operand" jdbcType="VARCHAR" property="leftOperand" />
+    <result column="operator" jdbcType="VARCHAR" property="operator" />
+    <result column="right_operand" jdbcType="VARCHAR" property="rightOperand" />
+    <result column="value_id" jdbcType="INTEGER" property="valueId" />
+    <result column="eagle_name" jdbcType="VARCHAR" property="eagleName" />
+    <result column="is_shared" jdbcType="INTEGER" property="isShared" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    condition_id, condition_name, conditon_type, description, left_operand,
+    operator, right_operand, eagle_name, value_id, is_shared
+  </sql>
+<select id="queryTriggerListByPage" resultType="com.zjtelcom.cpct.model.Trigger" parameterType="com.zjtelcom.cpct.model.Trigger">
+    select
+    condition_id as conditionId,
+    condition_name as conditionName,
+    conditon_type as conditionType,
+    ifnull(description,'') as description,
+    left_operand as leftOperand,
+    operator as operator,
+    right_operand as rightOperand,
+    eagle_name as eagleName,
+    is_shared as isShared
+    from fpc_m_trigger
+    where 1=1
+    <if test="pd.conditionId != null and pd.conditionId != ''">
+      and condition_id = #{pd.conditionId,jdbcType=INTEGER}
+    </if>
+    <if test="pd.conditionName != null and pd.conditionName != ''">
+      and condition_name like concat('%',#{pd.conditionName,jdbcType=VARCHAR}, '%')
+    </if>
+    <if test="pd.conditionType != null and pd.conditionType != ''">
+      and conditon_type like concat('%',#{pd.conditionType,jdbcType=VARCHAR}, '%')
+    </if>
+    <if test="pd.description != null and pd.description != ''">
+      and description like concat('%',#{pd.description,jdbcType=VARCHAR}, '%')
+    </if>
+    <if test="pd.leftOperand != null and pd.leftOperand != ''">
+      and left_operand like concat('%', #{pd.leftOperand,jdbcType=VARCHAR}, '%') 
+    </if>
+    <if test="pd.operator != null and pd.operator != ''">
+      and operator = #{pd.operator,jdbcType=VARCHAR}
+    </if>
+    <if test="pd.rightOperand != null and pd.rightOperand != ''">
+      and right_operand = #{pd.rightOperand,jdbcType=VARCHAR}
+    </if>
+    order by condition_id desc
+  </select>
+
+  <!--<select id="getAllTriggerByPage" resultType="pd" parameterType="pd">-->
+  <!--select-->
+  <!--t.condition_id as conditionId,-->
+  <!--t.condition_name as conditionName,-->
+  <!--t.conditon_type as conditionType,-->
+  <!--ifnull(description,'') as description,-->
+  <!--t.left_operand as leftOperand,-->
+  <!--t.operator as operator,-->
+  <!--t.right_operand as rightOperand,-->
+  <!--t.is_shared as isShared,-->
+    <!--tg.condition_group_id as conditionGroupId,-->
+    <!--tg.condition_dimension as conditionDimension,-->
+    <!--tg.condition_group_name as conditionGroupName,-->
+    <!--tg.dimennsion_type as dimennsionType,-->
+    <!--tg.dimennsion_name as  dimennsionName-->
+  <!--from fpc_m_trigger t,fpc_m_trigger_group tg-->
+  <!--where-->
+    <!--find_in_set(t.condition_id,tg.condition_id)>0-->
+    <!--and t.is_shared = 1-->
+  <!--<if test="pd.conditionName != null and pd.conditionName != ''">-->
+    <!--and t.condition_name like concat('%',#{pd.conditionName,jdbcType=VARCHAR}, '%')-->
+  <!--</if>-->
+    <!--<if test="pd.conditionDimension != null and pd.conditionDimension != '' " >-->
+      <!--AND tg.condition_dimension in (${pd.conditionDimension})-->
+    <!--</if>-->
+    <!--<if test="pd.conditionGroupId != null and pd.conditionGroupId != ''">-->
+      <!--and tg.condition_group_id=#{pd.conditionGroupId}-->
+    <!--</if>-->
+    <!--<if test="pd.dimennsionType != null and pd.dimennsionType != ''">-->
+      <!--and tg.dimennsion_type=#{pd.dimennsionType}-->
+    <!--</if>-->
+    <!--group by t.condition_id,tg.condition_dimension-->
+    <!--order by tg.condition_group_id ASC , t.condition_id ASC-->
+<!--</select>-->
+
+  <select id="queryTriggerByConditionName" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from fpc_m_trigger
+    where condition_name = #{conditionName,jdbcType=VARCHAR}
+  </select>
+
+
+  <select id="queryTriggerIsUsering" resultType="com.zjtelcom.cpct.model.Trigger" parameterType="com.zjtelcom.cpct.model.Trigger">
+    select condition_id
+    from fpc_m_rule_condition
+    where condition_id = #{conditionId,jdbcType=INTEGER}
+  </select>
+
+  <insert id="insertTrigger" parameterType="com.zjtelcom.cpct.model.Trigger">
+    insert into
+    fpc_m_trigger (condition_id, condition_name, conditon_type,description, left_operand, operator, right_operand, eagle_name, is_shared)
+    values (
+    #{conditionId,jdbcType=INTEGER}, #{conditionName,jdbcType=VARCHAR},
+    #{conditionType,jdbcType=VARCHAR},
+    #{description,jdbcType=VARCHAR},#{leftOperand,jdbcType=VARCHAR}, 
+    #{operator,jdbcType=VARCHAR},#{rightOperand,jdbcType=VARCHAR},#{eagleName,jdbcType=VARCHAR},#{isShared,jdbcType=INTEGER})
+  </insert>
+
+
+  <update id="updateTriggerById" parameterType="com.zjtelcom.cpct.model.Trigger">
+    update fpc_m_trigger
+    <set>
+      <if test="conditionName != null">
+        condition_name = #{conditionName,jdbcType=VARCHAR},
+      </if>
+      <if test="conditionType != null">
+        conditon_type = #{conditionType,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="leftOperand != null">
+        left_operand = #{leftOperand,jdbcType=VARCHAR},
+      </if>
+      <if test="operator != null">
+        operator = #{operator,jdbcType=VARCHAR},
+      </if>
+      <if test="rightOperand != null">
+        right_operand = #{rightOperand,jdbcType=VARCHAR},
+      </if>
+      <if test="eagleName != null">
+        eagle_name = #{eagleName,jdbcType=VARCHAR},
+      </if>
+      <if test="isShared != null">
+        is_shared = #{isShared,jdbcType=INTEGER},
+      </if>
+    </set>
+    where condition_id = #{conditionId,jdbcType=INTEGER}
+  </update>
+
+  <delete id="deleteTriggerById" parameterType="java.lang.Integer" >
+    delete from fpc_m_trigger
+    where condition_id = #{conditionId,jdbcType=INTEGER}
+  </delete>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from fpc_m_trigger
+    where condition_id = #{conditionId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from fpc_m_trigger
+    where condition_id = #{conditionId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.model.Trigger">
+    insert into fpc_m_trigger (condition_id, condition_name,
+      conditon_type, description, left_operand, 
+      operator, right_operand, eagle_name, is_shared)
+    values (#{conditionId,jdbcType=INTEGER}, #{conditionName,jdbcType=VARCHAR},
+      #{conditionType,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{leftOperand,jdbcType=VARCHAR},
+      #{operator,jdbcType=VARCHAR}, #{rightOperand,jdbcType=VARCHAR},#{eagleName,jdbcType=VARCHAR},#{isShared,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zjtelcom.cpct.model.Trigger">
+    insert into fpc_m_trigger
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="conditionId != null">
+        condition_id,
+      </if>
+      <if test="conditionName != null">
+        condition_name,
+      </if>
+      <if test="conditionType != null">
+        conditon_type,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+      <if test="leftOperand != null">
+        left_operand,
+      </if>
+      <if test="operator != null">
+        operator,
+      </if>
+      <if test="rightOperand != null">
+        right_operand,
+      </if>
+      <if test="isShared != null">
+        isShared,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="conditionId != null">
+        #{conditionId,jdbcType=INTEGER},
+      </if>
+      <if test="conditionName != null">
+        #{conditionName,jdbcType=VARCHAR},
+      </if>
+      <if test="conditionType != null">
+        #{conditionType,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="leftOperand != null">
+        #{leftOperand,jdbcType=VARCHAR},
+      </if>
+      <if test="operator != null">
+        #{operator,jdbcType=VARCHAR},
+      </if>
+      <if test="rightOperand != null">
+        #{rightOperand,jdbcType=VARCHAR},
+      </if>
+      <if test="isShared != null">
+        #{isShared,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zjtelcom.cpct.model.Trigger">
+    update fpc_m_trigger
+    <set>
+      <if test="conditionName != null">
+        condition_name = #{conditionName,jdbcType=VARCHAR},
+      </if>
+      <if test="conditionType != null">
+        conditon_type = #{conditionType,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="leftOperand != null">
+        left_operand = #{leftOperand,jdbcType=VARCHAR},
+      </if>
+      <if test="operator != null">
+        operator = #{operator,jdbcType=VARCHAR},
+      </if>
+      <if test="rightOperand != null">
+        right_operand = #{rightOperand,jdbcType=VARCHAR},
+      </if>
+      <if test="isShared != null">
+        is_shared = #{isShared,jdbcType=INTEGER},
+      </if>
+    </set>
+    where condition_id = #{conditionId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.model.Trigger">
+    update fpc_m_trigger
+    set condition_name = #{conditionName,jdbcType=VARCHAR},
+      conditon_type = #{conditionType,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR},
+      left_operand = #{leftOperand,jdbcType=VARCHAR},
+      operator = #{operator,jdbcType=VARCHAR},
+      right_operand = #{rightOperand,jdbcType=VARCHAR},
+      is_shared = #{isShared,jdbcType=INTEGER}
+    where condition_id = #{conditionId,jdbcType=INTEGER}
+  </update>
+  
+  <update id="updateValueId" parameterType="java.util.List">
+    <foreach collection="record" separator=";" item="item">
+    	update fpc_m_trigger
+    	set 
+    		value_id = #{item.valueId}
+    	where condition_id = #{item.conditionId,jdbcType=INTEGER}
+    </foreach>
+  </update>
+  
+  <select id="selectByConditionId" parameterType="String" resultType="java.util.Map">
+    select
+    condition_id as conditionId,
+    condition_name as conditionName,
+    conditon_type as conditionType,
+    description,
+    left_operand as leftOperand,
+    operator,
+    right_operand as rightOperand,
+    is_shared as isShared
+    from fpc_m_trigger
+    where condition_id in (${value})
+  </select>
+  
+  <select id="queryTriggerByleftOperand" parameterType="java.util.List" resultMap="BaseResultMap">
+    select
+    condition_id,
+    condition_name,
+    conditon_type,
+    description,
+    left_operand,
+    operator,
+    right_operand,
+    value_id,
+    is_shared
+    from fpc_m_trigger
+    <where>
+    	<if test="null != leftOperands and leftOperands.size > 0">
+	    	left_operand in 
+	    	<foreach collection="leftOperands" item="oper" open="(" close=")" separator=",">
+    			#{oper}
+    		</foreach>
+	    </if>
+	</where>
+  </select>
+  
+  <select id="queryTriggerByLeftOpers" parameterType="java.util.List" resultMap="BaseResultMap">
+    select
+    condition_id,
+    condition_name,
+    conditon_type,
+    description,
+    left_operand,
+    operator,
+    right_operand,
+    value_id,
+    is_shared
+    from fpc_m_trigger
+    <where>
+    	<if test="null != record and record.size > 0">
+	    	condition_id in 
+	    	<foreach collection="record" item="item" open="(" close=")" separator=",">
+    			#{item.conditionId}
+    		</foreach>
+	    </if>
+	</where>
+  </select>
+  
+  <select id="queryAll" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from fpc_m_trigger
+  </select>
+  
+  <select id="queryTriggerByIds" parameterType="java.util.List" resultMap="BaseResultMap">
+    select
+    condition_id,
+    condition_name,
+    conditon_type,
+    description,
+    left_operand,
+    operator,
+    right_operand,
+    value_id,
+    is_shared
+    from fpc_m_trigger
+    <where>
+    	<if test="null != ids and ids.size > 0">
+	    	condition_id in 
+	    	<foreach collection="ids" item="oper" open="(" close=")" separator=",">
+    			#{oper}
+    		</foreach>
+	    </if>
+	</where>
+  </select>
+  
+  
+</mapper>
