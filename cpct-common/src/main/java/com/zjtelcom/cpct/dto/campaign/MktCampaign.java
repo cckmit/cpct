@@ -10,7 +10,7 @@ import java.util.Date;
  * @Descirption:营销活动服务对接基本dto父对象
  * @Date: 2018/6/26.
  */
-public class MktCampaign extends BaseEntity {
+public class MktCampaign {
 
     /**
      * 营销活动标识

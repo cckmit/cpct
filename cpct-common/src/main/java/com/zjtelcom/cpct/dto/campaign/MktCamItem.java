@@ -13,7 +13,7 @@ import com.zjtelcom.cpct.BaseEntity;
  * @descirption:定义营销活动的可推荐条目,支持通过推荐条目组定义不同的客户目标分群可推荐不同的条目.
  * @date: 2018/6/26.
  */
-public class MktCamItem extends BaseEntity {
+public class MktCamItem {
 
 
     /**

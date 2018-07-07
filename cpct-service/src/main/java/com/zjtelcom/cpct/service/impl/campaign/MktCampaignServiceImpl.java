@@ -11,11 +11,14 @@ import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCampaignRelMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.domain.campaign.MktCampaignRelDO;
 import com.zjtelcom.cpct.dto.campaign.MktCamItem;
 import com.zjtelcom.cpct.dto.campaign.MktCampaign;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignDetail;
+import com.zjtelcom.cpct.dto.campaign.MktCampaignVO;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyDetail;
 import com.zjtelcom.cpct.request.campaign.QryMktCampaignListReq;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
@@ -42,12 +45,45 @@ public class MktCampaignServiceImpl implements MktCampaignService {
     @Autowired
     private MktCampaignMapper mktCampaignMapper;
 
+    @Autowired
+    private MktCampaignRelMapper mktCampaignRelMapper;
+
+    @Override
+    public Map<String, Object> createMktCampaign(MktCampaignVO mktCampaignVO) throws Exception {
+        MktCampaignDO mktCampaignDO = new MktCampaignDO();
+        CopyPropertiesUtil.copyBean2Bean(mktCampaignDO, mktCampaignVO);
+        // 创建活动基本信息
+        mktCampaignMapper.insert(mktCampaignDO);
+        Long mktCampaignId = mktCampaignDO.getMktCampaignId();
+
+        // 创建活动与活动之间的关系
+        MktCampaignRelDO mktCampaignRelDO = new MktCampaignRelDO();
+        CopyPropertiesUtil.copyBean2Bean(mktCampaignRelDO, mktCampaignVO);
+        mktCampaignRelDO.setaMktCampaignId(mktCampaignId);
+        mktCampaignRelMapper.insert(mktCampaignRelDO);
+
+        Map<String, Object> maps = new HashMap<>();
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("mktCampaignId", mktCampaignId);
+        return maps;
+    }
+
+    @Override
+    public Map<String, Object> modMktCampaign(MktCampaignVO mktCampaignVO) throws Exception {
+        return null;
+    }
+
+
+
+
     /**
      * 新增营销活动（编码：5013010002 ）
      *
      * @param mktCampaignDetail
      * @return
      */
+/*
     @Override
     public int createMktCampaign(MktCampaignDetail mktCampaignDetail) throws Exception {
 
@@ -58,6 +94,7 @@ public class MktCampaignServiceImpl implements MktCampaignService {
         int i = mktCampaignMapper.insert(mktCampaign);
         //获取主表id
         Long mainId = mktCampaign.getMktCampaignId();
+*/
 
         //分群信息
 /*        List<MktCamGrpRul> mktCamGrpRuls = mktCampaignDetail.getMktCamGrpRuls();
@@ -78,9 +115,11 @@ public class MktCampaignServiceImpl implements MktCampaignService {
 //        List<EventScene> eventScenes = mktCampaignDetail.getEventScenes();
         //todo 保存事件关联
 
+/*
 
         return 0;
     }
+*/
 
     /**
      * 修改营销活动（编码：5013010003 ）
@@ -88,7 +127,7 @@ public class MktCampaignServiceImpl implements MktCampaignService {
      * @param mktCampaignDetail
      * @return
      */
-    @Override
+/*    @Override
     public int modMktCampaign(MktCampaignDetail mktCampaignDetail) throws Exception {
         //映射字段
         MktCampaignDO mktCampaign = new MktCampaignDO();
@@ -97,7 +136,7 @@ public class MktCampaignServiceImpl implements MktCampaignService {
 
 
         return 0;
-    }
+    }*/
 
     /**
      * 查询事件列表
