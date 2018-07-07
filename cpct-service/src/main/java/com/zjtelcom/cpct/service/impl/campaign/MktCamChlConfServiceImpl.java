@@ -309,7 +309,11 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
         return mktVerbalCondition.getConditionId();
     }
 
-
+    /**
+     * 查询协同子策略规则并拼接格式
+     * @param evtContactConfId
+     * @return
+     */
     public String ruleSelect(Long evtContactConfId) {
         //唯一ID
         //查询出所有规则
@@ -330,6 +334,13 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
         return JSON.toJSONString(rule);
     }
 
+    /**
+     * 递归查询规则
+     * @param labels
+     * @param expressions
+     * @param index
+     * @return
+     */
     public Rule parseRules(List<MktVerbalCondition> labels, List<MktVerbalCondition> expressions, int index) {
         Rule rule = new Rule();
         List<RuleDetail> ruleDetails = new ArrayList<>();
