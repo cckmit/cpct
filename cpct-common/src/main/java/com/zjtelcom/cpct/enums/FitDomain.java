@@ -15,6 +15,7 @@ public enum FitDomain {
         this.description = description;
     }
 
+
     public static FitDomain getDomain(Integer value){
         FitDomain[] allType = FitDomain.values();
         FitDomain op = null;
@@ -25,8 +26,6 @@ public enum FitDomain {
         }
         return op;
     }
-
-
 
     public Integer getValue() {
         return value;

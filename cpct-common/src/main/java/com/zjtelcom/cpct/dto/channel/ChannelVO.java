@@ -11,6 +11,7 @@ public class ChannelVO implements Serializable {
     private String contactChlType;
     private String contactChlDesc;
     private Long regionId;
+    private String channelType;
     private String statusCd;//记录状态。1000有效 1100无效  1200	未生效 1300已归档  1001将生效  1002待恢复  1101将失效  1102待失效 1301	待撤消
     private Long createStaff;//创建人
     private Long updateStaff;//更新人
@@ -19,6 +20,14 @@ public class ChannelVO implements Serializable {
     private Date updateDate;//更新时间
     private String remark;//备注
 
+
+    public String getChannelType() {
+        return channelType;
+    }
+
+    public void setChannelType(String channelType) {
+        this.channelType = channelType;
+    }
 
     public Long getContactChlId() {
         return contactChlId;
