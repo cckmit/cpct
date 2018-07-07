@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.channel;
 
+import com.sun.corba.se.spi.ior.ObjectKey;
 import com.zjtelcom.cpct.dto.channel.ContactChannelDetail;
 import com.zjtelcom.cpct.dto.channel.ChannelEditVO;
 
@@ -14,6 +15,8 @@ import java.util.Map;
 public interface ChannelService {
 
     Map<String,Object> createParentChannel(Long userId,ContactChannelDetail parentAddVO);
+
+    Map<String,Object> getChannelTreeForActivity(Long userId);
 
     Map<String,Object> createContactChannel (Long userId, ContactChannelDetail addVO);
 
