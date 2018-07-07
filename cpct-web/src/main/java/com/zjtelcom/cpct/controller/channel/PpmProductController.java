@@ -24,6 +24,25 @@ public class PpmProductController extends BaseController  {
     private ProductService productService;
 
     /**
+     *获取产品名字
+     * @return
+     */
+    @PostMapping("getProductNameById")
+    @CrossOrigin
+    public Map<String, Object> getProductNameById(@RequestBody HashMap<String,Long> param) {
+        Map<String ,Object> result = new HashMap<>();
+        Long userId = UserUtil.loginId();
+        try {
+            result = productService.getProductNameById(userId,param.get("productId"));
+        }catch (Exception e){
+            logger.error("[op:PpmProductController] fail to getProductNameById",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to getProductNameById");
+            return result;
+        }
+        return result;
+    }
+    /**
      * 获取销售品列表
      */
     @PostMapping("getProductList")
