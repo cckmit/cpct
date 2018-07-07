@@ -4,6 +4,7 @@ import com.zjtelcom.cpct.domain.event.EventItemDO;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.ContactEvtItem;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public interface ContactEvtItemMapper {
 
     int saveEventItem(EventItemDO record);
 
-    List<ContactEvtItem> listEventItem(Long contactEvtId);
+    List<ContactEvtItem> listEventItem(@Param("contactEvtId") Long contactEvtId);
 
     ContactEvtItem viewEventItem(Long evtItemId);
 

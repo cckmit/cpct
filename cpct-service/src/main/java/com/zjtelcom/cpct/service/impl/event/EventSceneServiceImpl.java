@@ -160,6 +160,18 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
     }
 
     /**
+     * 开启关闭事件场景
+     */
+    @Override
+    public Map<String, Object> coEventScene(EventScene eventScene) {
+        Map<String,Object> maps = new HashMap<>();
+        eventSceneMapper.coEventScene(eventScene);
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        return maps;
+    }
+
+    /**
      * 删除事件场景
      */
     @Transactional(readOnly = false)

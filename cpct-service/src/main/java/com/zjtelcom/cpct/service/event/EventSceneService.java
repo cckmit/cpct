@@ -28,4 +28,6 @@ public interface EventSceneService {
 
     Map<String,Object> modEventSceneJt(ModEventSceneJtReq modEventSceneJtReq);
 
+    Map<String,Object> coEventScene(EventScene eventScene);
+
 }

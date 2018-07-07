@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.eagle.EagleTrycalcRecordMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.model.EagleTrycalcRecord">
+    <id column="record_id" jdbcType="DECIMAL" property="recordId" />
+    <result column="activity_id" jdbcType="INTEGER" property="activityId" />
+    <result column="activity_name" jdbcType="VARCHAR" property="activityName" />
+    <result column="policy_id" jdbcType="INTEGER" property="policyId" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="serial_num" jdbcType="VARCHAR" property="serialNum" />
+    <result column="record_data" jdbcType="VARCHAR" property="recordData" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    record_id, activity_id, activity_name, policy_id, status, record_data, create_time,serial_num
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from fpc_eagle_trycalc_record
+    where record_id = #{recordId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from fpc_eagle_trycalc_record
+    where record_id = #{recordId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.model.EagleTrycalcRecord">
+    insert into fpc_eagle_trycalc_record (record_id, activity_id, activity_name, 
+      policy_id, status, record_data, 
+      create_time,serial_num)
+    values (#{recordId,jdbcType=DECIMAL}, #{activityId,jdbcType=INTEGER}, #{activityName,jdbcType=VARCHAR}, 
+      #{policyId,jdbcType=INTEGER}, #{status,jdbcType=VARCHAR}, #{recordData,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP},#{serialNum,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zjtelcom.cpct.model.EagleTrycalcRecord">
+    insert into fpc_eagle_trycalc_record
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="recordId != null">
+        record_id,
+      </if>
+      <if test="activityId != null">
+        activity_id,
+      </if>
+      <if test="activityName != null">
+        activity_name,
+      </if>
+      <if test="policyId != null">
+        policy_id,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="recordData != null">
+        record_data,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="recordId != null">
+        #{recordId,jdbcType=DECIMAL},
+      </if>
+      <if test="activityId != null">
+        #{activityId,jdbcType=INTEGER},
+      </if>
+      <if test="activityName != null">
+        #{activityName,jdbcType=VARCHAR},
+      </if>
+      <if test="policyId != null">
+        #{policyId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="recordData != null">
+        #{recordData,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zjtelcom.cpct.model.EagleTrycalcRecord">
+    update fpc_eagle_trycalc_record
+    <set>
+      <if test="activityId != null">
+        activity_id = #{activityId,jdbcType=INTEGER},
+      </if>
+      <if test="activityName != null">
+        activity_name = #{activityName,jdbcType=VARCHAR},
+      </if>
+      <if test="policyId != null">
+        policy_id = #{policyId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="recordData != null">
+        record_data = #{recordData,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where record_id = #{recordId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.model.EagleTrycalcRecord">
+    update fpc_eagle_trycalc_record
+    set activity_id = #{activityId,jdbcType=INTEGER},
+      activity_name = #{activityName,jdbcType=VARCHAR},
+      policy_id = #{policyId,jdbcType=INTEGER},
+      status = #{status,jdbcType=VARCHAR},
+      record_data = #{recordData,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where record_id = #{recordId,jdbcType=DECIMAL}
+  </update>
+  <select id="queryByActivityIdAndPolicyId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from fpc_eagle_trycalc_record
+    where activity_id = #{activityId} and policy_id = #{policyId} and status = #{status}
+    <!-- and DATE_FORMAT(create_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d') -->
+    group by create_time
+    having create_time = MAX(create_time)
+    order by create_time desc
+  </select>
+  <select id="queryByActivityIdAndPolicyIdAndSerial" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from fpc_eagle_trycalc_record
+    where activity_id = #{activityId} and policy_id = #{policyId} and status = #{status}
+    and serial_num = #{serialNum}
+    group by create_time
+    having create_time = MAX(create_time)
+    order by create_time desc
+  </select>
+  <select id="queryByActivityId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from fpc_eagle_trycalc_record
+    where activity_id = #{activityId} and  status = #{status} and DATE_FORMAT(create_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
+    order by create_time desc
+  </select>
+  
+  <select id="queryBySerialNum" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from fpc_eagle_trycalc_record
+    where activity_id = #{activityId} and status = #{status} and serial_num = #{serialNum}
+    order by create_time desc
+  </select>
+</mapper>

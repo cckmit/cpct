@@ -157,4 +157,13 @@
         where  EVENT_ID = #{contactEvtId}
     </select>
 
+    <update id="coEventScene" parameterType="com.zjtelcom.cpct.dto.event.EventScene">
+        update event_scene
+        set
+        <if test="statusCd != null and statusCd != '' ">
+            STATUS_CD = #{statusCd,jdbcType=VARCHAR}
+        </if>
+        where EVENT_SCENE_ID = #{eventSceneId,jdbcType=BIGINT}
+    </update>
+
 </mapper>

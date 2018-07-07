@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zjtelcom.cpct.dao.eagle.EagleSourceTableRefMapper" >
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.model.EagleSourceTableRef" >
+    <id column="CTAS_TWO_TABLE_REF_ROW_ID" property="ctasTwoTableRefRowId" jdbcType="INTEGER" />
+    <result column="CTAS_MASTER_TABLE_ROW_ID" property="ctasMasterTableRowId" jdbcType="INTEGER" />
+    <result column="CTAS_SLAVE_TABLE_ROW_ID" property="ctasSlaveTableRowId" jdbcType="INTEGER" />
+    <result column="MASTER_TABLE_COLUMN_NAME" property="masterTableColumnName" jdbcType="VARCHAR" />
+    <result column="SLAVE_TABLE_COLUMN_NAME" property="slaveTableColumnName" jdbcType="VARCHAR" />
+    <result column="JOIN_TYPE" property="joinType" jdbcType="VARCHAR" />
+    <result column="FIT_DOMAIN" property="fitDomain" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    CTAS_TWO_TABLE_REF_ROW_ID, CTAS_MASTER_TABLE_ROW_ID, CTAS_SLAVE_TABLE_ROW_ID, MASTER_TABLE_COLUMN_NAME, 
+    SLAVE_TABLE_COLUMN_NAME, JOIN_TYPE, FIT_DOMAIN
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from fpc_eagle_source_table_ref
+    where CTAS_TWO_TABLE_REF_ROW_ID = #{ctasTwoTableRefRowId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="queryAll" resultMap="BaseResultMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from fpc_eagle_source_table_ref
+  </select>
+  
+  <select id="queryByMainFlagAndFitDomain" resultMap="BaseResultMap" parameterType="java.lang.String">
+  	select 
+    <include refid="Base_Column_List" />
+    from fpc_eagle_source_table_ref
+    where FIT_DOMAIN = #{fitDomain}
+   		  and CTAS_SLAVE_TABLE_ROW_ID = #{slaveTableId}
+   		  and CTAS_MASTER_TABLE_ROW_ID = #{masterTableId}
+  </select>
+  
+  <select id="queryByMasterTable" resultMap="BaseResultMap" parameterType="java.lang.String">
+  	select 
+    <include refid="Base_Column_List" />
+    from fpc_eagle_source_table_ref
+    where TAG_TABLE_MAIN_FLAG = '1' and DB_CONF_ROW_ID = #{dbConfId} and TAG_TABLE_NAME_EN = #{tableName}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from fpc_eagle_source_table_ref
+    where CTAS_TWO_TABLE_REF_ROW_ID = #{ctasTwoTableRefRowId,jdbcType=INTEGER}
+  </delete>
+  
+  <delete id="deleteAll">
+  	delete from fpc_eagle_source_table_ref
+  </delete>
+  
+  <insert id="insert" parameterType="com.zjtelcom.cpct.model.EagleSourceTableRef" >
+    insert into fpc_eagle_source_table_ref (CTAS_TWO_TABLE_REF_ROW_ID, CTAS_MASTER_TABLE_ROW_ID, 
+      CTAS_SLAVE_TABLE_ROW_ID, MASTER_TABLE_COLUMN_NAME, 
+      SLAVE_TABLE_COLUMN_NAME, JOIN_TYPE, FIT_DOMAIN
+      )
+    values (#{ctasTwoTableRefRowId,jdbcType=INTEGER}, #{ctasMasterTableRowId,jdbcType=INTEGER}, 
+      #{ctasSlaveTableRowId,jdbcType=INTEGER}, #{masterTableColumnName,jdbcType=VARCHAR}, 
+      #{slaveTableColumnName,jdbcType=VARCHAR}, #{joinType,jdbcType=VARCHAR}, #{fitDomain,jdbcType=VARCHAR}
+      )
+  </insert>
+  
+  <insert id="insertBatch" parameterType="java.util.List" >
+    insert into fpc_eagle_source_table_ref (CTAS_TWO_TABLE_REF_ROW_ID, CTAS_MASTER_TABLE_ROW_ID, 
+      CTAS_SLAVE_TABLE_ROW_ID, MASTER_TABLE_COLUMN_NAME, 
+      SLAVE_TABLE_COLUMN_NAME, JOIN_TYPE, FIT_DOMAIN
+      )
+    values 
+    <foreach collection="record" item="item" separator=",">
+    (#{item.ctasTwoTableRefRowId,jdbcType=INTEGER}, #{item.ctasMasterTableRowId,jdbcType=INTEGER}, 
+      #{item.ctasSlaveTableRowId,jdbcType=INTEGER}, #{item.masterTableColumnName,jdbcType=VARCHAR}, 
+      #{item.slaveTableColumnName,jdbcType=VARCHAR}, #{item.joinType,jdbcType=VARCHAR}, #{item.fitDomain,jdbcType=VARCHAR}
+      )
+    </foreach>
+  </insert>
+  
+  <insert id="insertSelective" parameterType="com.zjtelcom.cpct.model.EagleSourceTableRef" >
+    insert into fpc_eagle_source_table_ref
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="ctasTwoTableRefRowId != null" >
+        CTAS_TWO_TABLE_REF_ROW_ID,
+      </if>
+      <if test="ctasMasterTableRowId != null" >
+        CTAS_MASTER_TABLE_ROW_ID,
+      </if>
+      <if test="ctasSlaveTableRowId != null" >
+        CTAS_SLAVE_TABLE_ROW_ID,
+      </if>
+      <if test="masterTableColumnName != null" >
+        MASTER_TABLE_COLUMN_NAME,
+      </if>
+      <if test="slaveTableColumnName != null" >
+        SLAVE_TABLE_COLUMN_NAME,
+      </if>
+      <if test="joinType != null" >
+        JOIN_TYPE,
+      </if>
+      <if test="fitDomain != null" >
+        FIT_DOMAIN,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="ctasTwoTableRefRowId != null" >
+        #{ctasTwoTableRefRowId,jdbcType=INTEGER},
+      </if>
+      <if test="ctasMasterTableRowId != null" >
+        #{ctasMasterTableRowId,jdbcType=INTEGER},
+      </if>
+      <if test="ctasSlaveTableRowId != null" >
+        #{ctasSlaveTableRowId,jdbcType=INTEGER},
+      </if>
+      <if test="masterTableColumnName != null" >
+        #{masterTableColumnName,jdbcType=VARCHAR},
+      </if>
+      <if test="slaveTableColumnName != null" >
+        #{slaveTableColumnName,jdbcType=VARCHAR},
+      </if>
+      <if test="joinType != null" >
+        #{joinType,jdbcType=VARCHAR},
+      </if>
+      <if test="fitDomain != null" >
+        #{fitDomain,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zjtelcom.cpct.model.EagleSourceTableRef" >
+    update fpc_eagle_source_table_ref
+    <set >
+      <if test="ctasMasterTableRowId != null" >
+        CTAS_MASTER_TABLE_ROW_ID = #{ctasMasterTableRowId,jdbcType=INTEGER},
+      </if>
+      <if test="ctasSlaveTableRowId != null" >
+        CTAS_SLAVE_TABLE_ROW_ID = #{ctasSlaveTableRowId,jdbcType=INTEGER},
+      </if>
+      <if test="masterTableColumnName != null" >
+        MASTER_TABLE_COLUMN_NAME = #{masterTableColumnName,jdbcType=VARCHAR},
+      </if>
+      <if test="slaveTableColumnName != null" >
+        SLAVE_TABLE_COLUMN_NAME = #{slaveTableColumnName,jdbcType=VARCHAR},
+      </if>
+      <if test="joinType != null" >
+        JOIN_TYPE = #{joinType,jdbcType=VARCHAR},
+      </if>
+      <if test="fitDomain != null" >
+        FIT_DOMAIN = #{fitDomain,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where CTAS_TWO_TABLE_REF_ROW_ID = #{ctasTwoTableRefRowId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.model.EagleSourceTableRef" >
+    update fpc_eagle_source_table_ref
+    set CTAS_MASTER_TABLE_ROW_ID = #{ctasMasterTableRowId,jdbcType=INTEGER},
+      CTAS_SLAVE_TABLE_ROW_ID = #{ctasSlaveTableRowId,jdbcType=INTEGER},
+      MASTER_TABLE_COLUMN_NAME = #{masterTableColumnName,jdbcType=VARCHAR},
+      SLAVE_TABLE_COLUMN_NAME = #{slaveTableColumnName,jdbcType=VARCHAR},
+      JOIN_TYPE = #{joinType,jdbcType=VARCHAR},
+      FIT_DOMAIN = #{fitDomain,jdbcType=VARCHAR}
+    where CTAS_TWO_TABLE_REF_ROW_ID = #{ctasTwoTableRefRowId,jdbcType=INTEGER}
+  </update>
+</mapper>
