@@ -177,6 +177,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             logger.error("[op:MktStrategyConfServiceImpl] fail to save MktStrategyConfDetail = {}, Exception: ", JSON.toJSON(mktStrategyConfDetail), e);
             mktStrategyConfMap.put("resultCode", CommonConstant.CODE_FAIL);
             mktStrategyConfMap.put("resultMsg", ErrorCode.SAVE_MKT_CAMPAIGN_FAILURE.getErrorMsg());
+
         }
         return mktStrategyConfMap;
     }
