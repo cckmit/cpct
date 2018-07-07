@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zjtelcom.cpct.dao.MktStrategyConfRuleMapper">
+<mapper namespace="com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper">
   <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO">
     <id column="MKT_STRATEGY_CONF_RULE_ID" jdbcType="BIGINT" property="mktStrategyConfRuleId" />
     <result column="TAR_GRP_ID" jdbcType="BIGINT" property="tarGrpId" />

@@ -50,8 +50,8 @@ public class EngineTestServiceImpl extends BaseService implements EngineTestServ
 //            String express = map.get("expression");
             String express = "if(" + map.get("expression") + "){return true;}else {return false}";
 
-            Object r = runner.execute(express, context, null, true, true);
-            logger.info("结果 = {}", r);
+//            Object r = runner.execute(express, context, null, true, true);
+//            logger.info("结果 = {}", r);
 
             //此算法仅支持if或者when等逻辑判断（待确认）
             RuleResult ruleResult = runner.executeRule(express, context, true, true);

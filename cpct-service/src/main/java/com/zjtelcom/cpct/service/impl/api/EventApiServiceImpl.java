@@ -14,10 +14,7 @@ import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.domain.campaign.*;
-import com.zjtelcom.cpct.domain.channel.CamScript;
-import com.zjtelcom.cpct.domain.channel.MktVerbal;
-import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
-import com.zjtelcom.cpct.domain.channel.PpmProduct;
+import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.event.EventDO;
 import com.zjtelcom.cpct.domain.event.EventSceneDO;
 import com.zjtelcom.cpct.domain.event.EvtSceneCamRelDO;
@@ -100,6 +97,9 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
     @Autowired
     private MktVerbalMapper mktVerbalMapper; //话术
 
+    @Autowired
+    private InjectionLabelMapper injectionLabelMapper; //标签因子
+
 
     /**
      * 事件触发接口实现
@@ -145,6 +145,7 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
         //遍历事件过滤规则匹配
         if (contactEvtMatchRuls != null && contactEvtMatchRuls.size() > 0) {
             //todo 匹配事件过滤规则
+            System.out.println("匹配事件过滤规则");
         }
 
         //根据事件id 查询所有关联的事件场景
@@ -162,16 +163,14 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
                 }
             }
         }
-        //初始化参数
-//        List<MktCampaignDO> activities = new ArrayList<>(); //活动列表
 
         //初始化返回结果中的工单信息
-        List<Map<String, String>> orderList = new ArrayList<>();
+        List<Map<String, Object>> orderList = new ArrayList<>();
 
         //遍历活动id  查询并匹配活动规则
         for (Long activityId : activityIds) {
 
-            Map<String, String> order = new HashMap<>();
+            Map<String, Object> order = new HashMap<>();
 
             //初始化规则引擎---------------------------
             ExpressRunner runner = new ExpressRunner();
@@ -188,24 +187,23 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
             order.put("skipCheck", "0");  //todo 不明 案例上有 文档上没有
             order.put("orderPriority", "100");  //todo 不明 案例上有 文档上没有
 
-            //初始化返回结果中的推荐信息列表
-            List<Map<String, Object>> recommendList = new ArrayList<>();
-
             //根据活动id获取策略列表
             List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOs = mktCamStrategyConfRelMapper.selectByMktCampaignId(activityId);
 
             if (mktCamStrategyConfRelDOs != null && mktCamStrategyConfRelDOs.size() > 0) {
+
+                //初始化返回结果中的推荐信息列表
+                List<Map<String, Object>> recommendList = new ArrayList<>();
+
                 //遍历策略列表
                 for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOs) {
 
                     //根据策略id获取策略下规则列表
                     List<MktStrategyConfRuleDO> mktStrategyConfRuleDOS = mktStrategyConfRuleMapper.selectByMktStrategyConfId(mktCamStrategyConfRelDO.getStrategyConfId());
+
                     //遍历规则列表
                     if (mktStrategyConfRuleDOS != null && mktStrategyConfRuleDOS.size() > 0) {
                         for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleDOS) {
-
-                            //初始化返回结果推荐信息
-                            Map<String, Object> recommend = new HashMap<>();
 
                             //获取分群id
                             Long tarGrpId = mktStrategyConfRuleDO.getTarGrpId();
@@ -245,7 +243,9 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
                             //遍历所有规则
                             for (int i = 0; i < tarGrpConditionDOs.size(); i++) {
                                 String type = tarGrpConditionDOs.get(i).getOperType();
-                                express.append(tarGrpConditionDOs.get(i).getLeftParam());
+                                Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i).getLeftParam()));
+                                express.append("(");
+                                express.append(label.getInjectionLabelCode());
                                 if ("1000".equals(type)) {
                                     express.append(">");
                                 } else if ("2000".equals(type)) {
@@ -253,21 +253,25 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
                                 } else if ("3000".equals(type)) {
                                     express.append("==");
                                 } else if ("4000".equals(type)) {
-                                    express.append(">=");
+                                    express.append("!=");
                                 } else if ("5000".equals(type)) {
+                                    express.append(">=");
+                                } else if ("6000".equals(type)) {
                                     express.append("<=");
                                 }
                                 express.append(tarGrpConditionDOs.get(i).getRightParam());
+                                express.append(")");
                                 if (i + 1 != tarGrpConditionDOs.size()) {
                                     express.append("&&");
                                 }
                             }
-                            express.append(") {return true;} else {return false;}");
+                            express.append(") {return true} else {return false}");
 
                             //将标签因子值存入规则引擎上下文（这里目前假定接口传入的标签满足规则运算，不需要额外查询）
                             for (Map<String, Object> objectMap : labelList) {
                                 Map<String, String> trigger = (Map<String, String>) objectMap.get("trigger");
                                 context.put(trigger.get("key"), trigger.get("value"));
+                                logger.info("key = {},value = {}", trigger.get("key"), trigger.get("value"));
                             }
 
                             //规则引擎计算
@@ -283,8 +287,10 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
                             logger.info("trace = {}", ruleResult.getTraceMap());
                             logger.info("======================================");
                             //判断匹配结果，如匹配则向下进行，如不匹配则continue结束本次循环
-//                            if (ruleResult.getResult() != null && ruleResult.getResult() == true) {
-                            if (ruleResult.getResult() != null) {
+                            if (ruleResult.getResult() != null && ((Boolean) ruleResult.getResult())) {
+                                //初始化返回结果推荐信息
+                                Map<String, Object> recommend = new HashMap<>();
+
                                 //查询销售品列表
                                 String[] productArray = productStr.split(",");
 
@@ -319,12 +325,16 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
 
                                     //查询脚本
                                     CamScript camScript = mktCamScriptMapper.selectByConfId(evtContactConfId);
-                                    recommend.put("reason", camScript.getScriptDesc());
+                                    if (camScript != null) {
+                                        recommend.put("reason", camScript.getScriptDesc());
+                                    }
 
                                     //查询话术
                                     List<MktVerbal> mktVerbals = mktVerbalMapper.findVerbalListByConfId(evtContactConfId);
-                                    //todo  多个如何返回
-                                    recommend.put("keyNote", mktVerbals.get(0).getScriptDesc());
+                                    if (mktVerbals != null && mktVerbals.size() > 0) {
+                                        //todo  多个如何返回
+                                        recommend.put("keyNote", mktVerbals.get(0).getScriptDesc());
+                                    }
 
                                     if (mktVerbals != null && mktVerbals.size() > 0) {
                                         for (MktVerbal mktVerbal : mktVerbals) {
@@ -334,25 +344,27 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
 
                                         }
                                     }
-
                                     recommend.put("verbal", ""); //todo 待定
-
                                 }
+                                recommendList.add(recommend);
                             }
                         }
+                        order.put("recommendList", recommendList);
                     } else {
                         //规则为空
+                        System.out.println("规则为空");
                     }
                 }
             } else {
                 //策略为空
+                System.out.println("策略为空");
             }
-
-
+            orderList.add(order);
         }
 
         //返回结果
         result.put("code", 1);
+        result.put("orderList", orderList);
 
         return result;
     }
