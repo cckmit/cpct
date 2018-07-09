@@ -24,8 +24,10 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.aspectj.weaver.patterns.ThisOrTargetAnnotationPointcut;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.ContextLoader;
 
 import java.io.IOException;
@@ -41,6 +43,7 @@ import java.util.*;
  * @see SqlUtil
  * @since JDK1.7
  */
+@Component
 public final class SqlUtil {
 
     private static final Logger LOG = Logger.getLogger(SqlUtil.class);
@@ -60,6 +63,12 @@ public final class SqlUtil {
     private static Configuration config;
 
     private static Template template;
+
+
+    @Autowired
+    public void setEagleSourceTableRefMapper(EagleSourceTableRefMapper sourceTableRefMapper) {
+        SqlUtil.sourceTableRefMapper = sourceTableRefMapper;
+    }
 
     private SqlUtil() {
     }
@@ -406,12 +415,6 @@ public final class SqlUtil {
      */
     private static void init() {
         if (!initFlag) {
-            sourceTableRefMapper = ContextLoader.getCurrentWebApplicationContext().getBean(
-                EagleSourceTableRefMapper.class);
-            sourceTableDefMapper = ContextLoader.getCurrentWebApplicationContext().getBean(
-                EagleSourceTableDefMapper.class);
-            triggerMapper = ContextLoader.getCurrentWebApplicationContext().getBean(
-                InjectionLabelMapper.class);
 
             config = new Configuration(new Version("2.3.23"));
             config.setDefaultEncoding("UTF-8");

@@ -29,6 +29,34 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
 
 
     @Override
+    public Map<String, Object> getChannelTreeList(Long userId) {
+        Map<String,Object> result = new HashMap<>();
+        List<ChannelDetail> parentDetailList = new ArrayList<>();
+        List<Channel> parentList = channelMapper.findParentList();
+        for (Channel parent : parentList){
+            ChannelDetail parentDetail = new ChannelDetail();
+            List<Channel> childList = channelMapper.findChildListByParentId(parent.getContactChlId());
+            List<ChannelDetail> childDetailList = new ArrayList<>();
+            for (Channel child : childList){
+                ChannelDetail childDetail = new ChannelDetail();
+                childDetail.setChannelId(child.getContactChlId());
+                childDetail.setChannelName(child.getContactChlName());
+                childDetailList.add(childDetail);
+            }
+            parentDetail.setChannelId(parent.getParentId());
+            parentDetail.setChannelName(parent.getContactChlName());
+            parentDetail.setChildrenList(childDetailList);
+            parentDetailList.add(parentDetail);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",parentDetailList);
+        return result;
+
+
+
+    }
+
+    @Override
     public Map<String, Object> getChannelListByParentId(Long userId, Long parentId) {
         Map<String,Object> result = new HashMap<>();
         List<ChannelVO> voList = new ArrayList<>();

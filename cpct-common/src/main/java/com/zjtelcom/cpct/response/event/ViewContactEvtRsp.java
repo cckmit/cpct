@@ -1,13 +1,10 @@
 package com.zjtelcom.cpct.response.event;
 
-import com.zjtelcom.cpct.dto.apply.RequestTemplateInst;
 import com.zjtelcom.cpct.dto.event.ContactEventDetail;
-
 import java.io.Serializable;
-import java.util.List;
 
 /**
- * @Description 创建事件请求实体类
+ * @Description 事件场景返回实体类
  * @Author pengy
  * @Date 2018/6/26 13:45
  */

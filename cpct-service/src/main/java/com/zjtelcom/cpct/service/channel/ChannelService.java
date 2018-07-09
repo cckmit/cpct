@@ -14,6 +14,8 @@ import java.util.Map;
  */
 public interface ChannelService {
 
+    Map<String,Object> getChannelTreeList(Long userId);
+
     Map<String,Object> getParentList(Long userId);
 
     Map<String,Object> getChannelListByParentId(Long userId,Long parentId);
