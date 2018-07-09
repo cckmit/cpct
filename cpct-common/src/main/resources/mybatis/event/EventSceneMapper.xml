@@ -131,7 +131,7 @@
     where  EVENT_SCENE_ID = #{eventSceneId}
   </select>
 
-    <insert id="createEventScene" parameterType="com.zjtelcom.cpct.dto.event.EventScene">
+    <insert id="createEventScene" parameterType="com.zjtelcom.cpct.dto.event.EventScene" keyProperty="eventSceneId" useGeneratedKeys="true">
         insert into event_scene ( EVENT_SCENE_NBR, EVENT_SCENE_NAME,
         EVENT_SCENE_DESC, EVENT_ID, EXT_EVENT_SCENE_ID,
         STATUS_CD, STATUS_DATE, CREATE_STAFF,

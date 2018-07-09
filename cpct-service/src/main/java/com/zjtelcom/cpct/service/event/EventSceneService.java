@@ -18,7 +18,7 @@ public interface EventSceneService {
 
     Map<String,Object> createEventScene(CreateEventSceneReq createEventSceneReq);
 
-    Map<String,Object> editEventScene(Long eventSceneId);
+    Map<String,Object> editEventScene(Long eventSceneId) throws Exception;
 
     Map<String,Object> modEventScene(ModEventSceneReq modEventSceneReq);
 

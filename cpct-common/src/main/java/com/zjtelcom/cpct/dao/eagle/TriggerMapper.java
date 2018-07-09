@@ -3,12 +3,16 @@ package com.zjtelcom.cpct.dao.eagle;
 
 
 import com.zjtelcom.cpct.model.Trigger;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+@Mapper
+@Repository
 public interface TriggerMapper {
 
 //    List<PageData> queryTriggerListByPage(Page page);

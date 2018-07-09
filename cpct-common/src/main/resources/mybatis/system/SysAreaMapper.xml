@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.system.SysAreaMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.SysArea">
+    <id column="area_id" jdbcType="INTEGER" property="areaId" />
+    <result column="parent_area" jdbcType="INTEGER" property="parentArea" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="area_level" jdbcType="INTEGER" property="areaLevel" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from sys_area
+    where area_id = #{areaId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.SysArea">
+    insert into sys_area (area_id, parent_area, name, 
+      area_level)
+    values (#{areaId,jdbcType=INTEGER}, #{parentArea,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, 
+      #{areaLevel,jdbcType=INTEGER})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.SysArea">
+    update sys_area
+    set parent_area = #{parentArea,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR},
+      area_level = #{areaLevel,jdbcType=INTEGER}
+    where area_id = #{areaId,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select area_id, parent_area, name, area_level
+    from sys_area
+    where area_id = #{areaId,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select area_id, parent_area, name, area_level
+    from sys_area
+  </select>
+</mapper>

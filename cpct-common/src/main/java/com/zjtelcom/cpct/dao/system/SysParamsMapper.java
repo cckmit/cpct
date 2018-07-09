@@ -18,6 +18,12 @@ public interface SysParamsMapper {
 
     int updateByPrimaryKey(SysParams record);
 
-    List<Map<String,String>> listParamsByKey(String key);
+    Map<String,String> listParamsByKey(String key);
+
+    Map<String,String> getParamsByKey(@Param("keyWord") String keyWord,@Param("key") String key);
+
+    Map<String,String> getParamsByValue(@Param("keyWord") String keyWord,@Param("value") String value);
+
+
 
 }

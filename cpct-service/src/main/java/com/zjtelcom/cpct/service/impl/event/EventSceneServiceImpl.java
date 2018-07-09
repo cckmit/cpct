@@ -2,21 +2,22 @@ package com.zjtelcom.cpct.service.impl.event;
 
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.event.EventSceneMapper;
-import com.zjtelcom.cpct.domain.event.EventSceneDO;
+import com.zjtelcom.cpct.dao.event.EvtSceneCamRelMapper;
 import com.zjtelcom.cpct.dto.event.EventScene;
 import com.zjtelcom.cpct.dto.event.EventSceneDetail;
+import com.zjtelcom.cpct.dto.event.EvtSceneCamRel;
 import com.zjtelcom.cpct.request.event.*;
 import com.zjtelcom.cpct.response.event.QryeventSceneRsp;
+import com.zjtelcom.cpct.response.event.ViewEventSceneRsp;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.EventSceneService;
+import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +34,8 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
 
     @Autowired
     private EventSceneMapper eventSceneMapper;
+    @Autowired
+    private EvtSceneCamRelMapper evtSceneCamRelMapper;
 
     /**
      * 查询事件场景列表
@@ -55,6 +58,7 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
         Map<String, Object> maps = new HashMap<>();
         List<EventSceneDetail> eventSceneDetails = new ArrayList<>();
         eventSceneDetails = createEventSceneReq.getEventSceneDetails();
+        List<EvtSceneCamRel> evtSceneCamRels = new ArrayList<>();
         if (eventSceneDetails != null) {
             for (EventSceneDetail eventSceneDetail : eventSceneDetails) {
                 EventScene eventScene = eventSceneDetail;
@@ -65,6 +69,18 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
                 eventScene.setUpdateDate(DateUtil.getCurrentTime());
                 eventScene.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
                 eventSceneMapper.createEventScene(eventScene);
+
+                evtSceneCamRels = eventSceneDetail.getEvtSceneCamRels();
+                for (EvtSceneCamRel evtSceneCamRel : evtSceneCamRels) {
+                    evtSceneCamRel.setEventSceneId(eventSceneDetail.getEventSceneId());
+                    evtSceneCamRel.setCreateDate(DateUtil.getCurrentTime());
+                    evtSceneCamRel.setStatusDate(DateUtil.getCurrentTime());
+                    evtSceneCamRel.setUpdateStaff(UserUtil.loginId());
+                    evtSceneCamRel.setCreateStaff(UserUtil.loginId());
+                    evtSceneCamRel.setUpdateDate(DateUtil.getCurrentTime());
+                    evtSceneCamRel.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                    evtSceneCamRelMapper.insert(evtSceneCamRel);
+                }
             }
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -104,13 +120,22 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
      */
     @Transactional(readOnly = true)
     @Override
-    public Map<String, Object> editEventScene(Long eventSceneId) {
+    public Map<String, Object> editEventScene(Long eventSceneId) throws Exception {
+        ViewEventSceneRsp viewEventSceneRsp = new ViewEventSceneRsp();
+        EventSceneDetail eventSceneDetail = new EventSceneDetail();
         Map<String, Object> maps = new HashMap<>();
         EventScene eventScene = new EventScene();
         eventScene = eventSceneMapper.getEventScene(eventSceneId);
+        CopyPropertiesUtil.copyBean2Bean(eventSceneDetail, eventScene);
+
+        //将活动相关信息插入返回实体类
+        List<EvtSceneCamRel> evtSceneCamRels = evtSceneCamRelMapper.selectCamsByEvtSceneId(eventScene.getEventSceneId());
+        eventSceneDetail.setEvtSceneCamRels(evtSceneCamRels);
+
+        viewEventSceneRsp.setEventSceneDetail(eventSceneDetail);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
-        maps.put("eventScene", eventScene);
+        maps.put("viewEventSceneRsp", viewEventSceneRsp);
         return maps;
 
     }
@@ -123,6 +148,7 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
     public Map<String, Object> modEventScene(ModEventSceneReq modEventSceneReq) {
         Map<String, Object> maps = new HashMap<>();
         List<EventSceneDetail> eventSceneDetails = new ArrayList<>();
+        List<EvtSceneCamRel> evtSceneCamRels = new ArrayList<>();
         if (modEventSceneReq.getEventSceneDetails() != null) {
             eventSceneDetails = modEventSceneReq.getEventSceneDetails();
             for (EventSceneDetail eventSceneDetailT : eventSceneDetails) {
@@ -130,6 +156,24 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
                 eventScene.setUpdateDate(DateUtil.getCurrentTime());
                 eventScene.setUpdateStaff(UserUtil.loginId());
                 eventSceneMapper.updateByPrimaryKey(eventScene);
+
+                evtSceneCamRels = eventSceneDetailT.getEvtSceneCamRels();
+                for (EvtSceneCamRel evtSceneCamRel : evtSceneCamRels) {
+                    EvtSceneCamRel evtSceneCamRelT = evtSceneCamRelMapper.selectByPrimaryKey(evtSceneCamRel.getSceneCamRelId());
+                    if (evtSceneCamRelT != null) {
+                        evtSceneCamRel.setUpdateDate(DateUtil.getCurrentTime());
+                        evtSceneCamRel.setUpdateStaff(UserUtil.loginId());
+                        evtSceneCamRelMapper.updateByPrimaryKey(evtSceneCamRel);
+                    } else {
+                        evtSceneCamRel.setUpdateDate(DateUtil.getCurrentTime());
+                        evtSceneCamRel.setStatusDate(DateUtil.getCurrentTime());
+                        evtSceneCamRel.setUpdateStaff(UserUtil.loginId());
+                        evtSceneCamRel.setCreateStaff(UserUtil.loginId());
+                        evtSceneCamRel.setCreateDate(DateUtil.getCurrentTime());
+                        evtSceneCamRel.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                        evtSceneCamRelMapper.insert(evtSceneCamRel);
+                    }
+                }
             }
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -164,7 +208,7 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
      */
     @Override
     public Map<String, Object> coEventScene(EventScene eventScene) {
-        Map<String,Object> maps = new HashMap<>();
+        Map<String, Object> maps = new HashMap<>();
         eventSceneMapper.coEventScene(eventScene);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
