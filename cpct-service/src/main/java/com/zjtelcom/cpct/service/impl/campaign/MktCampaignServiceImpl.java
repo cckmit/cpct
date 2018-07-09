@@ -59,8 +59,8 @@ public class MktCampaignServiceImpl implements MktCampaignService {
         // 创建活动与活动之间的关系
         MktCampaignRelDO mktCampaignRelDO = new MktCampaignRelDO();
         CopyPropertiesUtil.copyBean2Bean(mktCampaignRelDO, mktCampaignVO);
-        mktCampaignRelDO.setzMktCampaignId(mktCampaignVO.getMktCampaignId());
         mktCampaignRelDO.setaMktCampaignId(mktCampaignId);
+        mktCampaignRelDO.setzMktCampaignId(mktCampaignId);
         mktCampaignRelMapper.insert(mktCampaignRelDO);
 
         Map<String, Object> maps = new HashMap<>();
