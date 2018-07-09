@@ -7,6 +7,7 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dto.channel.LabelAddVO;
+import com.zjtelcom.cpct.dto.channel.LabelGrpVO;
 import com.zjtelcom.cpct.dto.channel.LabelVO;
 import com.zjtelcom.cpct.dto.channel.LabelValueVO;
 import com.zjtelcom.cpct.service.BaseService;
@@ -252,18 +253,25 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     public Map<String,Object> getLabelGrpList(Long userId, Map<String, Object> params) {
         Map<String,Object> result = new HashMap<>();
         List<LabelGrp> grpList = new ArrayList<>();
+        List<LabelGrpVO> voList = new ArrayList<>();
         try {
             String grpName = null;
             if (params.get("grpName")!=null){
                 grpName = params.get("grpName").toString();
             }
             grpList = labelGrpMapper.findByParams(grpName);
+            for (LabelGrp grp : grpList){
+                LabelGrpVO vo = BeanUtil.create(grp,new LabelGrpVO());
+                List<LabelVO> labelVOList = getLabelVOList(grp.getGrpId());
+                vo.setLabelList(labelVOList);
+                voList.add(vo);
+            }
         }catch (Exception e){
             e.printStackTrace();
             logger.error("[op:LabelServiceImpl] fail to getLabelGrpList ", e);
         }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",grpList);
+        result.put("resultMsg",voList);
         return result;
     }
 
@@ -373,6 +381,13 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             result.put("resultMsg","请选择标签组");
             return result;
         }
+        List<LabelVO> labelVOList = getLabelVOList(labelGrpId);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",labelVOList);
+        return result;
+    }
+
+    private List<LabelVO> getLabelVOList(Long labelGrpId) {
         List<LabelGrpMbr> lgmList = labelGrpMbrMapper.findListByGrpId(labelGrpId);
         List<LabelVO> labelVOList = new ArrayList<>();
         for (LabelGrpMbr grpMbr : lgmList){
@@ -382,9 +397,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
                 labelVOList.add(labelVO);
             }
         }
-        result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",labelVOList);
-        return result;
+        return labelVOList;
     }
 
     //标签值规格配置
