@@ -127,5 +127,19 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
     }
 
 
-
+    @Override
+    public Map<String, Object> delVerbal(Long userId, Long verbalId) {
+        Map<String, Object> result = new HashMap<>();
+        //todo 推送渠道对象
+        MktVerbal verbal = verbalMapper.selectByPrimaryKey(verbalId);
+        if (verbal==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","痛痒点话术不存在");
+            return result;
+        }
+        verbalMapper.deleteByPrimaryKey(verbalId);
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", "删除成功");
+        return result;
+    }
 }

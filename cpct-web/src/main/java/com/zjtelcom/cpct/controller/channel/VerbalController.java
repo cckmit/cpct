@@ -24,16 +24,43 @@ import java.util.Map;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 
 @RestController
-@RequestMapping("verbal")
+@RequestMapping("${adminPath}/verbal")
 public class VerbalController extends BaseController {
     @Autowired
     private VerbalService verbalService;
 
 
     /**
+     * 痛痒点脚本删除
+     * @param param
+     * @return
+     */
+    @PostMapping("delVerbal")
+    @CrossOrigin
+    public Map<String, Object> delVerbal(@RequestBody HashMap<String,Long> param) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
+        try {
+            if (param.get("verbalId")==null){
+                result.put("resultCode",CODE_FAIL);
+                result.put("resultMsg","请选择脚本");
+                return result;
+            }
+            result = verbalService.delVerbal(userId,param.get("verbalId"));
+        } catch (Exception e) {
+            logger.error("[op:VerbalController] fail to delVerbal",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to delVerbal");
+            return result;
+        }
+        return result;
+    }
+
+    /**
      * 添加痛痒点话术
      */
     @PostMapping("addVerbal")
+    @CrossOrigin
     public Map<String,Object> addVerbal(@RequestBody VerbalAddVO addVO) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
