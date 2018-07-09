@@ -48,7 +48,7 @@ public class LabelController extends BaseController {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
-            result = labelService.getLabelListByLabelGrp(userId,param.get("labelGrpId"));
+            result = labelService.getLabelListByLabelGrp(userId,param.get("grpId"));
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to getScriptList",e);
             result.put("resultCode",CODE_FAIL);
