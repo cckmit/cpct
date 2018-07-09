@@ -18,6 +18,8 @@ public interface VerbalService {
 
     Map<String,Object> getVerbalListByConfId(Long userId,Long confId);
 
+    Map<String,Object> delVerbal(Long userId,Long verbalId);
+
 
 
 }
