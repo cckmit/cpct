@@ -12,6 +12,7 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.VerbalService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
+import org.bouncycastle.asn1.cryptopro.GOST3410PublicKeyAlgParameters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -132,9 +133,10 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
         Map<String, Object> result = new HashMap<>();
         //todo 推送渠道对象
         MktVerbal verbal = verbalMapper.selectByPrimaryKey(verbalId);
-        if (verbal==null){
-            result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg","痛痒点话术不存在");
+        if (verbal==null) {
+
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "痛痒点话术不存在");
             return result;
         }
         verbalMapper.deleteByPrimaryKey(verbalId);

@@ -1,9 +1,7 @@
 package com.zjtelcom.cpct.controller.channel;
 
-import com.sun.corba.se.spi.ior.ObjectKey;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dto.channel.ContactChannelDetail;
-import com.zjtelcom.cpct.dto.channel.ChannelEditVO;
 import com.zjtelcom.cpct.service.channel.ChannelService;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +17,28 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 public class ChannelController extends BaseController {
     @Autowired
     private ChannelService channelService;
+
+
+    /**
+     *渠道管理渠道树
+     * @return
+     */
+    @GetMapping("getChannelTreeList")
+    @CrossOrigin
+    public Map<String, Object> getChannelTreeList() {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = channelService.getChannelTreeList(userId);
+        } catch (Exception e) {
+            logger.error("[op:ChannelController] fail to getParentList",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to getParentList");
+            return result;
+        }
+        return result;
+    }
+
 
     /**
      * 获取子级列表
