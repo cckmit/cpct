@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.dao.channel;
 
 import com.zjtelcom.cpct.domain.channel.LabelGrp;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,6 +17,10 @@ public interface InjectionLabelGrpMapper {
     LabelGrp selectByPrimaryKey(Long grpId);
 
     List<LabelGrp> selectAll();
+
+    List<LabelGrp> findByParams(@Param("grpName")String grpName);
+
+    LabelGrp findByGrpName(@Param("grpName")String grpName);
 
     int updateByPrimaryKey(LabelGrp record);
 }

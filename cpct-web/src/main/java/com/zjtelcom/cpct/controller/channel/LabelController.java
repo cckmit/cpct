@@ -37,6 +37,27 @@ public class LabelController extends BaseController {
         return ma;
     }
 
+    /**
+     * 通过标签组获取标签列表
+     * @param param
+     * @return
+     */
+    @PostMapping("getLabelListByLabelGrp")
+    @CrossOrigin
+    public Map<String, Object> getLabelListByLabelGrp(@RequestBody HashMap<String,Long> param) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = labelService.getLabelListByLabelGrp(userId,param.get("grpId"));
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to getScriptList",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
+        }
+        return result;
+
+    }
 
     /**
      * 获取标签列表（标签名和域查询）
@@ -160,7 +181,7 @@ public class LabelController extends BaseController {
      */
     @PostMapping("addLabelGrp")
     @CrossOrigin
-    public Map<String,Object> addLabelGrp( LabelGrp addVO) {
+    public Map<String,Object> addLabelGrp(@RequestBody LabelGrp addVO) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
@@ -222,9 +243,9 @@ public class LabelController extends BaseController {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
-            Integer page = MapUtil.getIntNum(params.get("page"));
-            Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
-            result = labelService.getLabelGrpList(1L,params,page,pageSize);
+//            Integer page = MapUtil.getIntNum(params.get("page"));
+//            Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
+            result = labelService.getLabelGrpList(userId,params);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to getScriptList",e);
             result.put("resultCode",CODE_FAIL);
@@ -259,7 +280,7 @@ public class LabelController extends BaseController {
      */
     @PostMapping("addLabelGrpMbr")
     @CrossOrigin
-    public Map<String,Object> addLabelGrpMbr( LabelGrpMbr addVO) {
+    public Map<String,Object> addLabelGrpMbr(@RequestBody LabelGrpMbr addVO) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {

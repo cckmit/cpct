@@ -6,6 +6,8 @@
  */
 package com.zjtelcom.cpct.dto.campaign;
 
+import java.util.List;
+
 /**
  * Description:
  * author: linchao
@@ -27,7 +29,27 @@ public class MktCampaignVO extends MktCampaign {
     /**
      * 下发地市Id
      */
-    private String applyRegionId;
+    private List<Long> applyRegionIds;
+
+    /**
+     * 营销活动目标
+     */
+    private String tiggerType;
+
+    /**
+     * 活动周期
+     */
+    private String execType;
+
+    /**
+     * 执行间隔
+     */
+    private String execInvl;
+
+    /**
+     * 执行次数
+     */
+    private Integer execNum;
 
     public Long getEventId() {
         return eventId;
@@ -45,11 +67,43 @@ public class MktCampaignVO extends MktCampaign {
         this.relType = relType;
     }
 
-    public String getApplyRegionId() {
-        return applyRegionId;
+    public List<Long> getApplyRegionIds() {
+        return applyRegionIds;
     }
 
-    public void setApplyRegionId(String applyRegionId) {
-        this.applyRegionId = applyRegionId;
+    public void setApplyRegionIds(List<Long> applyRegionIds) {
+        this.applyRegionIds = applyRegionIds;
+    }
+
+    public String getTiggerType() {
+        return tiggerType;
+    }
+
+    public void setTiggerType(String tiggerType) {
+        this.tiggerType = tiggerType;
+    }
+
+    public String getExecType() {
+        return execType;
+    }
+
+    public void setExecType(String execType) {
+        this.execType = execType;
+    }
+
+    public String getExecInvl() {
+        return execInvl;
+    }
+
+    public void setExecInvl(String execInvl) {
+        this.execInvl = execInvl;
+    }
+
+    public Integer getExecNum() {
+        return execNum;
+    }
+
+    public void setExecNum(Integer execNum) {
+        this.execNum = execNum;
     }
 }

@@ -38,7 +38,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -262,7 +261,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             CopyPropertiesUtil.copyBean2Bean(tarGrpConditionVO, tarGrpCondition);
             //塞入左参中文名
             Label label = injectionLabelMapper.selectByPrimaryKey(Long.valueOf(tarGrpConditionVO.getLeftParam()));
-            tarGrpConditionVO.setOperTypeName(label.getInjectionLabelName());
+            tarGrpConditionVO.setLeftParamName(label.getInjectionLabelName());
             //塞入领域
             FitDomain fitDomain = null;
             if (label.getFitDomain() != null) {
@@ -271,7 +270,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             tarGrpConditionVO.setFitDomainName(fitDomain.getDescription());
             //将操作符转为中文
             Operator op = Operator.getOperator(Integer.parseInt(tarGrpConditionVO.getOperType()));
-            tarGrpConditionVO.setLeftParamName(op.getDescription());
+            tarGrpConditionVO.setOperTypeName(op.getDescription());
             grpConditionList.add(tarGrpConditionVO);
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);

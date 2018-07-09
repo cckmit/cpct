@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.vo.grouping;
 
+
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 
 /**
@@ -7,7 +8,7 @@ import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
  * @Author pengy
  * @Date 2018/6/29 16:36
  */
-public class TarGrpConditionVO extends TarGrpCondition{
+public class TarGrpConditionVO extends TarGrpCondition {
 
     private String leftParamName;//左参名字
     private String operTypeName;//运算类型,1000> 2000< 3000==  4000!=   5000>=  6000<=  7000in   8000&   9000||   7100	not in

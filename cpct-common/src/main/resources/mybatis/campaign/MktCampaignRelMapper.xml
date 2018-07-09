@@ -17,13 +17,15 @@
         <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
         <result column="REMARK" jdbcType="VARCHAR" property="remark"/>
     </resultMap>
-
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
       delete from mkt_campaign_rel
       where MKT_CAMPAIGN_REL_ID = #{mktCampaignRelId,jdbcType=DECIMAL}
     </delete>
-
-    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignRelDO">
+    <delete id="deleteByAmktCampaignId" parameterType="java.lang.Long">
+        delete from mkt_campaign_rel
+        where A_MKT_CAMPAIGN_ID = #{aMktCampaignId,jdbcType=DECIMAL}
+    </delete>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="mktCampaignRelId" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignRelDO">
       insert into mkt_campaign_rel (MKT_CAMPAIGN_REL_ID, REL_TYPE, A_MKT_CAMPAIGN_ID,
         Z_MKT_CAMPAIGN_ID, EFF_DATE, EXP_DATE,
         APPLY_REGION_ID, STATUS_CD, CREATE_STAFF,
@@ -61,7 +63,13 @@
       from mkt_campaign_rel
       where MKT_CAMPAIGN_REL_ID = #{mktCampaignRelId,jdbcType=DECIMAL}
     </select>
-
+    <select id="selectByAmktCampaignId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select MKT_CAMPAIGN_REL_ID, REL_TYPE, A_MKT_CAMPAIGN_ID, Z_MKT_CAMPAIGN_ID, EFF_DATE,
+        EXP_DATE, APPLY_REGION_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+        UPDATE_DATE, REMARK
+        from mkt_campaign_rel
+        where A_MKT_CAMPAIGN_ID = #{aMktCampaignId,jdbcType=DECIMAL}
+    </select>
     <select id="selectAll" resultMap="BaseResultMap">
       select MKT_CAMPAIGN_REL_ID, REL_TYPE, A_MKT_CAMPAIGN_ID, Z_MKT_CAMPAIGN_ID, EFF_DATE,
       EXP_DATE, APPLY_REGION_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,

@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,13 @@ public class MktCampaignServiceImpl implements MktCampaignService {
     @Autowired
     private MktCampaignRelMapper mktCampaignRelMapper;
 
+    /**
+     * 添加活动基本信息 并建立关系
+     *
+     * @param mktCampaignVO
+     * @return
+     * @throws Exception
+     */
     @Override
     public Map<String, Object> createMktCampaign(MktCampaignVO mktCampaignVO) throws Exception {
         MktCampaignDO mktCampaignDO = new MktCampaignDO();
@@ -57,10 +65,46 @@ public class MktCampaignServiceImpl implements MktCampaignService {
         Long mktCampaignId = mktCampaignDO.getMktCampaignId();
 
         // 创建活动与活动之间的关系
-        MktCampaignRelDO mktCampaignRelDO = new MktCampaignRelDO();
-        CopyPropertiesUtil.copyBean2Bean(mktCampaignRelDO, mktCampaignVO);
-        mktCampaignRelDO.setaMktCampaignId(mktCampaignId);
-        mktCampaignRelMapper.insert(mktCampaignRelDO);
+        for (Long applyRegionIds : mktCampaignVO.getApplyRegionIds()) {
+            MktCampaignRelDO mktCampaignRelDO = new MktCampaignRelDO();
+            CopyPropertiesUtil.copyBean2Bean(mktCampaignRelDO, mktCampaignVO);
+            mktCampaignRelDO.setaMktCampaignId(mktCampaignId);
+            mktCampaignRelDO.setzMktCampaignId(mktCampaignId);
+            mktCampaignRelDO.setApplyRegionId(applyRegionIds);
+            mktCampaignRelMapper.insert(mktCampaignRelDO);
+        }
+        Map<String, Object> maps = new HashMap<>();
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("mktCampaignId", mktCampaignId);
+        return maps;
+    }
+
+    /**
+     * 修改活动基本信息 并重新建立关系
+     *
+     * @param mktCampaignVO
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public Map<String, Object> modMktCampaign(MktCampaignVO mktCampaignVO) throws Exception {
+        MktCampaignDO mktCampaignDO = new MktCampaignDO();
+        CopyPropertiesUtil.copyBean2Bean(mktCampaignDO, mktCampaignVO);
+        // 创建活动基本信息
+        mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
+        Long mktCampaignId = mktCampaignDO.getMktCampaignId();
+        // 删除与原有关系
+        mktCampaignRelMapper.deleteByAmktCampaignId(mktCampaignId);
+        // 重新创建活动与活动之间的关系
+        for (Long applyRegionIds : mktCampaignVO.getApplyRegionIds()) {
+            MktCampaignRelDO mktCampaignRelDO = new MktCampaignRelDO();
+            CopyPropertiesUtil.copyBean2Bean(mktCampaignRelDO, mktCampaignVO);
+            mktCampaignRelDO.setaMktCampaignId(mktCampaignId);
+            mktCampaignRelDO.setzMktCampaignId(mktCampaignId);
+            mktCampaignRelDO.setApplyRegionId(applyRegionIds);
+            mktCampaignRelMapper.insert(mktCampaignRelDO);
+        }
 
         Map<String, Object> maps = new HashMap<>();
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -69,12 +113,59 @@ public class MktCampaignServiceImpl implements MktCampaignService {
         return maps;
     }
 
+
+    /**
+     * 获取活动基本信息 并删除建立关系
+     *
+     * @param mktCampaignId
+     * @return
+     * @throws Exception
+     */
     @Override
-    public Map<String, Object> modMktCampaign(MktCampaignVO mktCampaignVO) throws Exception {
-        return null;
+    public Map<String, Object> getMktCampaign(Long mktCampaignId) throws Exception {
+        // 获取关系
+        List<MktCampaignRelDO> mktCampaignRelDOList = mktCampaignRelMapper.selectByAmktCampaignId(mktCampaignId);
+        List<Long> applyRegionIds = new ArrayList<>();
+        String relType = null;
+        for (MktCampaignRelDO mktCampaignRelDO : mktCampaignRelDOList) {
+            applyRegionIds.add(mktCampaignRelDO.getApplyRegionId());
+            relType = mktCampaignRelDO.getRelType();
+        }
+        // 获取活动基本信息
+        MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
+        MktCampaignVO mktCampaignVO = new MktCampaignVO();
+        CopyPropertiesUtil.copyBean2Bean(mktCampaignVO, mktCampaignDO);
+        mktCampaignVO.setApplyRegionIds(applyRegionIds);
+        mktCampaignVO.setRelType(relType);
+
+        //TODO 获取活动关联的事件
+
+        Map<String, Object> maps = new HashMap<>();
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("mktCampaignVO", mktCampaignVO);
+        return maps;
     }
 
-
+    /**
+     * 删除活动基本信息 并删除建立关系
+     *
+     * @param mktCampaignId
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public Map<String, Object> delMktCampaign(Long mktCampaignId) throws Exception {
+        // 删除关系
+        mktCampaignRelMapper.deleteByAmktCampaignId(mktCampaignId);
+        // 删除活动基本信息
+        mktCampaignMapper.deleteByPrimaryKey(mktCampaignId);
+        Map<String, Object> maps = new HashMap<>();
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("mktCampaignId", mktCampaignId);
+        return maps;
+    }
 
 
     /**
@@ -96,7 +187,7 @@ public class MktCampaignServiceImpl implements MktCampaignService {
         Long mainId = mktCampaign.getMktCampaignId();
 */
 
-        //分群信息
+    //分群信息
 /*        List<MktCamGrpRul> mktCamGrpRuls = mktCampaignDetail.getMktCamGrpRuls();
         //todo 保存分群信息
 
@@ -109,11 +200,11 @@ public class MktCampaignServiceImpl implements MktCampaignService {
         List<MktCamItem> mktCamItems = mktCampaignDetail.getMktCamItems();
         //todo 营销活动条目*/
 
-        //事件
+    //事件
 //        List<ContactEvt> mktCampaignEvts = mktCampaignDetail.getMktCampaignEvts();
-        //事件场景
+    //事件场景
 //        List<EventScene> eventScenes = mktCampaignDetail.getEventScenes();
-        //todo 保存事件关联
+    //todo 保存事件关联
 
 /*
 
@@ -142,11 +233,15 @@ public class MktCampaignServiceImpl implements MktCampaignService {
      * 查询事件列表
      */
     @Override
-    public Map<String, Object> qryMktCampaignList(QryMktCampaignListReq qryMktCampaignListReq) {
+    public Map<String, Object> qryMktCampaignListPage(String mktCampaignName, String statusCd, String tiggerType, String mktCampaignType, Integer page, Integer pageSize) {
         Map<String, Object> maps = new HashMap<>();
-        Page pageInfo = qryMktCampaignListReq.getPageInfo();
-        PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
-        List<MktCampaign> mktCampaigns = mktCampaignMapper.qryMktCampaignList(qryMktCampaignListReq);
+        PageHelper.startPage(page, pageSize);
+        MktCampaignDO mktCampaignDO = new MktCampaignDO();
+        mktCampaignDO.setMktCampaignName(mktCampaignName);
+        mktCampaignDO.setStatusCd(statusCd);
+        mktCampaignDO.setTiggerType(tiggerType);
+        mktCampaignDO.setMktCampaignType(mktCampaignType);
+        List<MktCampaign> mktCampaigns = mktCampaignMapper.qryMktCampaignListPage(mktCampaignDO);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("mktCampaigns", mktCampaigns);

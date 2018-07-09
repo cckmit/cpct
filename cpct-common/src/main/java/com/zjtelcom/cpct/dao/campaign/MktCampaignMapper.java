@@ -14,13 +14,13 @@ import java.util.List;
 public interface MktCampaignMapper {
     int deleteByPrimaryKey(Long mktCampaignId);
 
-    int insert(MktCampaignDO record);
+    int insert(MktCampaignDO mktCampaignDO);
 
     MktCampaignDO selectByPrimaryKey(Long mktCampaignId);
 
     List<MktCampaignDO> selectAll();
 
-    int updateByPrimaryKey(MktCampaignDO record);
+    int updateByPrimaryKey(MktCampaignDO mktCampaignDO);
 
-    List<MktCampaign> qryMktCampaignList(QryMktCampaignListReq qryMktCampaignListReq);
+    List<MktCampaign> qryMktCampaignListPage(MktCampaignDO mktCampaignDO);
 }

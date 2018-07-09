@@ -24,7 +24,7 @@ public class ChannelController extends BaseController {
      * 获取子级列表
      * @return
      */
-    @GetMapping("getChannelListByParentId")
+    @PostMapping("getChannelListByParentId")
     @CrossOrigin
     public Map<String, Object> getChannelListByParentId(@RequestBody HashMap<String,Long> param) {
         Long userId = UserUtil.loginId();
@@ -57,7 +57,6 @@ public class ChannelController extends BaseController {
             return result;
         }
         return result;
-
     }
 
     /**

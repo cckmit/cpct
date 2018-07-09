@@ -3,9 +3,7 @@ package com.zjtelcom.cpct.util;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.Operator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;

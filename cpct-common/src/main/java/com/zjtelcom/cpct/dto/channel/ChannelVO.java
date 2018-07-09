@@ -19,7 +19,25 @@ public class ChannelVO implements Serializable {
     private Date statusDate;//状态时间
     private Date updateDate;//更新时间
     private String remark;//备注
+    private Date startTime;
+    private Date endTime;
 
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
 
     public String getChannelType() {
         return channelType;
