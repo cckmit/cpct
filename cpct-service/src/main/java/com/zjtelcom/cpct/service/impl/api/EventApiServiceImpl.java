@@ -288,8 +288,7 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
                             logger.info("======================================");
                             //判断匹配结果，如匹配则向下进行，如不匹配则continue结束本次循环
                             if (ruleResult.getResult() != null && ((Boolean) ruleResult.getResult())) {
-                                //初始化返回结果推荐信息
-                                Map<String, Object> recommend = new HashMap<>();
+
 
                                 //查询销售品列表
                                 String[] productArray = productStr.split(",");
@@ -307,21 +306,30 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
                                     product.put("productType", ppmProduct.getProductType());
                                     productList.add(product);
                                 }
-                                recommend.put("productList", productList);
 
                                 //获取协同渠道所有id
                                 String[] evtContactConfIdArray = evtContactConfIdStr.split(",");
                                 //遍历协同渠道
                                 for (String str : evtContactConfIdArray) {
+
+                                    //初始化返回结果推荐信息
+                                    Map<String, Object> recommend = new HashMap<>();
+
+                                    recommend.put("productList", productList);
+
                                     Long evtContactConfId = Long.parseLong(str);
                                     //查询渠道信息基本信息
                                     MktCamChlConfDO mktCamChlConf = mktCamChlConfMapper.selectByPrimaryKey(evtContactConfId);
 
-                                    //查询渠道属性
-                                    List<MktCamChlConfAttrDO> mktCamChlConfAttrs = mktCamChlConfAttrMapper.selectByEvtContactConfId(evtContactConfId);
+                                    recommend.put("channelId", mktCamChlConf.getContactChlId());
+                                    recommend.put("pushType", mktCamChlConf.getPushType());
+                                    recommend.put("pushContent", ""); //todo 不明
 
-                                    //查询渠道子策略
-                                    List<MktVerbalCondition> mktVerbalConditions = mktVerbalConditionMapper.findConditionListByVerbalId(evtContactConfId);
+                                    //查询渠道属性
+//                                    List<MktCamChlConfAttrDO> mktCamChlConfAttrs = mktCamChlConfAttrMapper.selectByEvtContactConfId(evtContactConfId);
+
+                                    //查询渠道子策略 这里老系统暂时不返回
+//                                    List<MktVerbalCondition> mktVerbalConditions = mktVerbalConditionMapper.findConditionListByVerbalId(evtContactConfId);
 
                                     //查询脚本
                                     CamScript camScript = mktCamScriptMapper.selectByConfId(evtContactConfId);
@@ -345,8 +353,9 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
                                         }
                                     }
                                     recommend.put("verbal", ""); //todo 待定
+
+                                    recommendList.add(recommend);
                                 }
-                                recommendList.add(recommend);
                             }
                         }
                         order.put("recommendList", recommendList);
