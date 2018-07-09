@@ -36,7 +36,8 @@
         e.EVENT_NBR contactEvtCode,
         e.EVENT_NAME contactEvtName,
         e.EVENT_DESC contactEvtDesc,
-        t.EVT_TYPE_NAME contactEvtTypeName
+        t.EVT_TYPE_NAME contactEvtTypeName,
+        e.STATUS_CD statusCd
         from event e
         <include refid="eventJoin"/>
         where 1=1

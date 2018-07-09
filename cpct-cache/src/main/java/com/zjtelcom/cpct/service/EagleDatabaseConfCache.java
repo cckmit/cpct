@@ -1,11 +1,9 @@
 package com.zjtelcom.cpct.service;
 
-
 import com.zjtelcom.cpct.common.ABSGGCache;
 import com.zjtelcom.cpct.model.EagleDatabaseConfig;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import java.util.List;
 
 
 public class EagleDatabaseConfCache extends ABSGGCache<EagleDatabaseConfig> {
