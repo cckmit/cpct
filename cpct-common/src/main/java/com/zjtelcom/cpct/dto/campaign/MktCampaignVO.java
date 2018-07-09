@@ -6,6 +6,8 @@
  */
 package com.zjtelcom.cpct.dto.campaign;
 
+import java.util.List;
+
 /**
  * Description:
  * author: linchao
@@ -27,7 +29,7 @@ public class MktCampaignVO extends MktCampaign {
     /**
      * 下发地市Id
      */
-    private String applyRegionId;
+    private List<Long> applyRegionIds;
 
     /**
      * 营销活动目标
@@ -65,12 +67,12 @@ public class MktCampaignVO extends MktCampaign {
         this.relType = relType;
     }
 
-    public String getApplyRegionId() {
-        return applyRegionId;
+    public List<Long> getApplyRegionIds() {
+        return applyRegionIds;
     }
 
-    public void setApplyRegionId(String applyRegionId) {
-        this.applyRegionId = applyRegionId;
+    public void setApplyRegionIds(List<Long> applyRegionIds) {
+        this.applyRegionIds = applyRegionIds;
     }
 
     public String getTiggerType() {

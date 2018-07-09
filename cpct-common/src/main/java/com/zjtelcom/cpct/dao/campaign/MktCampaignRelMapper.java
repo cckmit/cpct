@@ -11,11 +11,15 @@ import java.util.List;
 public interface MktCampaignRelMapper {
     int deleteByPrimaryKey(Long mktCampaignRelId);
 
-    int insert(MktCampaignRelDO record);
+    int deleteByAmktCampaignId(Long mktCampaignRelId);
+
+    int insert(MktCampaignRelDO mktCampaignRelDO);
 
     MktCampaignRelDO selectByPrimaryKey(Long mktCampaignRelId);
 
+    List<MktCampaignRelDO> selectByAmktCampaignId(Long mktCampaignRelId);
+
     List<MktCampaignRelDO> selectAll();
 
-    int updateByPrimaryKey(MktCampaignRelDO record);
+    int updateByPrimaryKey(MktCampaignRelDO mktCampaignRelDO);
 }
