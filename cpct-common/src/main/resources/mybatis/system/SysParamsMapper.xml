@@ -69,5 +69,21 @@
         where PARAM_KEY = #{paramKey,jdbcType=VARCHAR}
     </select>
 
+    <select id="getParamsByKey" resultType="Map">
+        select PARAM_ID, PARAM_NAME, PARAM_VALUE, CONFIG_TYPE, MODIFY_FLAG, DESCRIPTION,
+        PARAM_KEY, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
+        from sys_params
+        where PARAM_NAME = #{key,jdbcType=VARCHAR}
+        and PARAM_KEY = #{keyWords,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getParamsByValue" resultType="Map">
+        select PARAM_ID, PARAM_NAME, PARAM_VALUE, CONFIG_TYPE, MODIFY_FLAG, DESCRIPTION,
+        PARAM_KEY, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
+        from sys_params
+        where PARAM_VALUE = #{value,jdbcType=VARCHAR}
+        and PARAM_KEY = #{keyWords,jdbcType=VARCHAR}
+    </select>
+
 
 </mapper>
