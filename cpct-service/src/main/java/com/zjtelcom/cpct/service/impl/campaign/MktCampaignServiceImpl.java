@@ -10,28 +10,22 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignRelMapper;
-import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
+import com.zjtelcom.cpct.domain.campaign.MktCamEvtRelDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignRelDO;
-import com.zjtelcom.cpct.dto.campaign.MktCamItem;
-import com.zjtelcom.cpct.dto.campaign.MktCampaign;
-import com.zjtelcom.cpct.dto.campaign.MktCampaignDetail;
-import com.zjtelcom.cpct.dto.campaign.MktCampaignVO;
-import com.zjtelcom.cpct.dto.strategy.MktStrategyDetail;
-import com.zjtelcom.cpct.request.campaign.QryMktCampaignListReq;
+import com.zjtelcom.cpct.dto.campaign.*;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
+import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Description:
@@ -48,6 +42,9 @@ public class MktCampaignServiceImpl implements MktCampaignService {
 
     @Autowired
     private MktCampaignRelMapper mktCampaignRelMapper;
+
+    @Autowired
+    private MktCamEvtRelMapper mktCamEvtRelMapper;
 
     /**
      * 添加活动基本信息 并建立关系
@@ -71,8 +68,23 @@ public class MktCampaignServiceImpl implements MktCampaignService {
             mktCampaignRelDO.setaMktCampaignId(mktCampaignId);
             mktCampaignRelDO.setzMktCampaignId(mktCampaignId);
             mktCampaignRelDO.setApplyRegionId(applyRegionIds);
+            mktCampaignRelDO.setCreateStaff(UserUtil.loginId());
+            mktCampaignRelDO.setCreateDate(new Date());
+            mktCampaignRelDO.setUpdateStaff(UserUtil.loginId());
+            mktCampaignRelDO.setUpdateDate(new Date());
             mktCampaignRelMapper.insert(mktCampaignRelDO);
         }
+
+        //创建活动与事件的关联
+        MktCamEvtRelDO mktCamEvtRelDO = new MktCamEvtRelDO();
+        mktCamEvtRelDO.setMktCampaignId(mktCampaignId);
+        mktCamEvtRelDO.setEventId(mktCampaignVO.getEventId());
+        mktCamEvtRelDO.setCreateStaff(UserUtil.loginId());
+        mktCamEvtRelDO.setCreateDate(new Date());
+        mktCamEvtRelDO.setUpdateStaff(UserUtil.loginId());
+        mktCamEvtRelDO.setUpdateDate(new Date());
+        mktCamEvtRelMapper.insert(mktCamEvtRelDO);
+
         Map<String, Object> maps = new HashMap<>();
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
@@ -103,6 +115,10 @@ public class MktCampaignServiceImpl implements MktCampaignService {
             mktCampaignRelDO.setaMktCampaignId(mktCampaignId);
             mktCampaignRelDO.setzMktCampaignId(mktCampaignId);
             mktCampaignRelDO.setApplyRegionId(applyRegionIds);
+            mktCampaignRelDO.setCreateStaff(UserUtil.loginId());
+            mktCampaignRelDO.setCreateDate(new Date());
+            mktCampaignRelDO.setUpdateStaff(UserUtil.loginId());
+            mktCampaignRelDO.setUpdateDate(new Date());
             mktCampaignRelMapper.insert(mktCampaignRelDO);
         }
 

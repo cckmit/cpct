@@ -2,8 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper">
   <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.campaign.MktCamEvtRelDO">
-      <id column="MKT_CAMP_EVT_REL_ID" jdbcType="BIGINT" property="mktCampEvtRelId" />
+    <id column="MKT_CAMP_EVT_REL_ID" jdbcType="BIGINT" property="mktCampEvtRelId" />
     <result column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId" />
+    <result column="CAMPAIGN_SEQ" jdbcType="INTEGER" property="campaignSeq" />
     <result column="EVENT_ID" jdbcType="BIGINT" property="eventId" />
     <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
     <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
@@ -17,36 +18,37 @@
     where MKT_CAMP_EVT_REL_ID = #{mktCampEvtRelId,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamEvtRelDO">
-    insert into mkt_cam_evt_rel (MKT_CAMP_EVT_REL_ID, MKT_CAMPAIGN_ID, EVENT_ID, 
-      STATUS_CD, STATUS_DATE, CREATE_STAFF, 
-      CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
-      )
-    values (#{mktCampEvtRelId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{eventId,jdbcType=BIGINT},
-      #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT},
-      #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}
-      )
+    insert into mkt_cam_evt_rel (MKT_CAMP_EVT_REL_ID, MKT_CAMPAIGN_ID, CAMPAIGN_SEQ,
+    EVENT_ID, STATUS_CD, STATUS_DATE,
+    CREATE_STAFF, CREATE_DATE, UPDATE_STAFF,
+    UPDATE_DATE)
+    values (#{mktCampEvtRelId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{campaignSeq,jdbcType=INTEGER},
+    #{eventId,jdbcType=BIGINT}, #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP},
+    #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT},
+    #{updateDate,jdbcType=TIMESTAMP})
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamEvtRelDO">
     update mkt_cam_evt_rel
     set MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},
-      EVENT_ID = #{eventId,jdbcType=BIGINT},
-      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
-      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
-      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
-      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
-      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
-      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
+    CAMPAIGN_SEQ = #{campaignSeq,jdbcType=INTEGER},
+    EVENT_ID = #{eventId,jdbcType=BIGINT},
+    STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+    STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+    CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+    CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+    UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+    UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
     where MKT_CAMP_EVT_REL_ID = #{mktCampEvtRelId,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select MKT_CAMP_EVT_REL_ID, MKT_CAMPAIGN_ID, EVENT_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, 
-    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+    select MKT_CAMP_EVT_REL_ID, MKT_CAMPAIGN_ID, CAMPAIGN_SEQ, EVENT_ID, STATUS_CD, STATUS_DATE,
+    CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
     from mkt_cam_evt_rel
     where MKT_CAMP_EVT_REL_ID = #{mktCampEvtRelId,jdbcType=BIGINT}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
-    select MKT_CAMP_EVT_REL_ID, MKT_CAMPAIGN_ID, EVENT_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, 
-    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+    select MKT_CAMP_EVT_REL_ID, MKT_CAMPAIGN_ID, CAMPAIGN_SEQ, EVENT_ID, STATUS_CD, STATUS_DATE,
+    CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
     from mkt_cam_evt_rel
   </select>
 </mapper>
