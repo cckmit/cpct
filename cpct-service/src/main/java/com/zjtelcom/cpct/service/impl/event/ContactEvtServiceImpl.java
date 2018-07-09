@@ -4,8 +4,11 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.event.*;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
+import com.zjtelcom.cpct.domain.campaign.MktCamEvtRelDO;
+import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.event.*;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.request.event.CreateContactEvtJtReq;
@@ -21,6 +24,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,6 +55,8 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     private ContactEvtMatchRulMapper contactEvtMatchRulMapper;
     @Autowired
     private FilterRuleMapper filterRuleMapper;
+    @Autowired
+    private MktCamEvtRelMapper mktCamEvtRelMapper;
 
 
     /**
@@ -129,7 +135,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
      */
     @Transactional(readOnly = false)
     @Override
-    public Map<String, Object> createContactEvt(CreateContactEvtReq createContactEvtReq) {
+    public Map<String, Object> createContactEvt(CreateContactEvtReq createContactEvtReq) throws Exception {
         Map<String, Object> maps = new HashMap<>();
         //获取到所有事件明细
         List<ContactEventDetail> evtDetailList = createContactEvtReq.getContactEvtDetails();
@@ -169,7 +175,20 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                 contactEvtMatchRulMapper.createContactEvtMatchRul(contactEvtMatchRul);
             }
 
-
+            //插入事件和活动关联
+            List<MktCamEvtRel> mktCamEvtRels = evtDetail.getMktCamEvtRels();
+            for (MktCamEvtRel mktCamEvtRel : mktCamEvtRels) {
+                MktCamEvtRelDO mktCamEvtRelDO = new MktCamEvtRelDO();
+                mktCamEvtRel.setEventId(contactEvt.getContactEvtId());
+                mktCamEvtRel.setCreateDate(DateUtil.getCurrentTime());
+                mktCamEvtRel.setUpdateDate(DateUtil.getCurrentTime());
+                mktCamEvtRel.setStatusDate(DateUtil.getCurrentTime());
+                mktCamEvtRel.setUpdateStaff(UserUtil.loginId());
+                mktCamEvtRel.setCreateStaff(UserUtil.loginId());
+                mktCamEvtRel.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                CopyPropertiesUtil.copyBean2Bean(mktCamEvtRelDO,mktCamEvtRel);
+                mktCamEvtRelMapper.insert(mktCamEvtRelDO);
+            }
 
 //            List<EvtSceneCamRel> evtSceneCamRels = evtDetail.getEvtSceneCamRels();
 //            for (EvtSceneCamRel evtSceneCamRel : evtSceneCamRels) {
@@ -241,7 +260,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         ViewContactEvtRsp viewContactEvtRsp = new ViewContactEvtRsp();
         ContactEventDetail contactEventDetail = new ContactEventDetail();
         ContactEvt contactEvt = contactEvtMapper.getEventById(contactEvtId);
-        CopyPropertiesUtil.copyBean2Bean(contactEventDetail,contactEvt);
+        CopyPropertiesUtil.copyBean2Bean(contactEventDetail, contactEvt);
         //查询出事件采集项
         List<ContactEvtItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId());
         contactEventDetail.setContactEvtItems(contactEvtItems);
@@ -251,14 +270,19 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         List<ContactEvtMatchRul> contactEvtMatchRuls = contactEvtMatchRulMapper.listEventMatchRuls(contactEvtMatchRul);
         List<FilterRule> filterRuleList = new ArrayList<>();
         FilterRule filterRule = new FilterRule();
-        for(ContactEvtMatchRul contactEvtMatchRul1 : contactEvtMatchRuls){
+        for (ContactEvtMatchRul contactEvtMatchRul1 : contactEvtMatchRuls) {
             filterRule.setRuleId(Long.valueOf(contactEvtMatchRul1.getEvtRulExpression()));
             List<FilterRule> filterRules = filterRuleMapper.qryFilterRule(filterRule);
-            if(filterRules != null){
+            if (filterRules != null) {
                 filterRuleList.add(filterRules.get(0));
             }
         }
         contactEventDetail.setFilterRules(filterRuleList);
+        //获取所有活动
+        List<MktCamEvtRel> mktCamEvtRels = new ArrayList<>();
+        mktCamEvtRels = mktCamEvtRelMapper.qryBycontactEvtId(contactEvt.getContactEvtId());
+        contactEventDetail.setMktCamEvtRels(mktCamEvtRels);
+
         viewContactEvtRsp.setContactEvtDetail(contactEventDetail);
         map.put("resultCode", CommonConstant.CODE_SUCCESS);
         map.put("resultMsg", StringUtils.EMPTY);
@@ -267,7 +291,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     }
 
     /**
-     * 修改事件
+     * 修改事件(集团)
      */
     @Transactional(readOnly = false)
     @Override
@@ -296,6 +320,65 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                 contactEvtMatchRul.setUpdateDate(DateUtil.getCurrentTime());
                 contactEvtMatchRul.setUpdateStaff(UserUtil.loginId());
                 contactEvtMatchRulMapper.modContactEvtMatchRul(contactEvtMatchRul);
+            }
+        }
+        map.put("resultCode", CommonConstant.CODE_SUCCESS);
+        map.put("resultMsg", StringUtils.EMPTY);
+        return map;
+    }
+
+    /**
+     * 修改事件
+     */
+    @Transactional(readOnly = false)
+    @Override
+    public Map<String, Object> modContactEvt(CreateContactEvtReq createContactEvtReq) throws Exception {
+        Map<String, Object> map = new HashMap<>();
+        //获取到所有事件明细
+        List<ContactEventDetail> evtDetailList = createContactEvtReq.getContactEvtDetails();
+        List<ContactEvtItem> contactEvtItems = new ArrayList<>();
+        List<ContactEvtMatchRul> contactEvtMatchRuls = new ArrayList<>();
+        List<MktCamEvtRel> mktCamEvtRels = new ArrayList<>();
+        for (ContactEventDetail evtDetail : evtDetailList) {
+            //更新事件主题信息
+            ContactEvt contactEvt = evtDetail;
+            contactEvt.setUpdateDate(DateUtil.getCurrentTime());
+            contactEvt.setUpdateStaff(UserUtil.loginId());
+            contactEvtMapper.modContactEvt(contactEvt);
+            //更新事件采集项
+            contactEvtItems = evtDetail.getContactEvtItems();
+            for (ContactEvtItem contactEvtItem : contactEvtItems) {
+                contactEvtItem.setUpdateDate(DateUtil.getCurrentTime());
+                contactEvtItem.setUpdateStaff(UserUtil.loginId());
+                contactEvtItemMapper.modEventItem(contactEvtItem);
+            }
+            //更新事件匹配规则
+            contactEvtMatchRuls = evtDetail.getContactEvtMatchRuls();
+            for (ContactEvtMatchRul contactEvtMatchRul : contactEvtMatchRuls) {
+                contactEvtMatchRul.setUpdateDate(DateUtil.getCurrentTime());
+                contactEvtMatchRul.setUpdateStaff(UserUtil.loginId());
+                contactEvtMatchRulMapper.modContactEvtMatchRul(contactEvtMatchRul);
+            }
+            //更新活动
+            mktCamEvtRels = evtDetail.getMktCamEvtRels();
+            for(MktCamEvtRel mktCamEvtRel : mktCamEvtRels){
+                MktCamEvtRelDO mktCamEvtRelDO = mktCamEvtRelMapper.selectByPrimaryKey(mktCamEvtRel.getMktCampEvtRelId());
+                if(mktCamEvtRelDO != null){
+                    mktCamEvtRelDO.setUpdateDate(DateUtil.getCurrentTime());
+                    mktCamEvtRelDO.setUpdateStaff(UserUtil.loginId());
+                    mktCamEvtRelMapper.updateByPrimaryKey(mktCamEvtRelDO);
+                }else {
+                    mktCamEvtRelDO = new MktCamEvtRelDO();
+                    mktCamEvtRel.setEventId(contactEvt.getContactEvtId());
+                    mktCamEvtRel.setCreateDate(DateUtil.getCurrentTime());
+                    mktCamEvtRel.setUpdateDate(DateUtil.getCurrentTime());
+                    mktCamEvtRel.setStatusDate(DateUtil.getCurrentTime());
+                    mktCamEvtRel.setUpdateStaff(UserUtil.loginId());
+                    mktCamEvtRel.setCreateStaff(UserUtil.loginId());
+                    mktCamEvtRel.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                    CopyPropertiesUtil.copyBean2Bean(mktCamEvtRelDO,mktCamEvtRel);
+                    mktCamEvtRelMapper.insert(mktCamEvtRelDO);
+                }
             }
         }
         map.put("resultCode", CommonConstant.CODE_SUCCESS);

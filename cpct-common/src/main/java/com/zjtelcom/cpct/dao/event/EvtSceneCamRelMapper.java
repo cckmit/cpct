@@ -13,9 +13,9 @@ public interface EvtSceneCamRelMapper {
 
     int deleteByPrimaryKey(Long sceneCamRelId);
     int insert(EvtSceneCamRel record);
-    EvtSceneCamRelDO selectByPrimaryKey(Long sceneCamRelId);
-    List<EvtSceneCamRelDO> selectAll();
-    int updateByPrimaryKey(EvtSceneCamRelDO record);
+    EvtSceneCamRel selectByPrimaryKey(Long sceneCamRelId);
+    List<EvtSceneCamRel> selectAll();
+    int updateByPrimaryKey(EvtSceneCamRel record);
 
     //通过事件场景id查询所有关联关系
     List<EvtSceneCamRel> selectCamsByEvtSceneId(@Param("eventSceneId") Long eventSceneId);

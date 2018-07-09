@@ -128,7 +128,7 @@ public class ContactEvtController extends BaseController {
     }
 
     /**
-     * 修改事件
+     * 修改事件（集团）
      */
     @RequestMapping("/modContactEvtJt")
     @CrossOrigin
@@ -138,6 +138,22 @@ public class ContactEvtController extends BaseController {
             maps = contactEvtService.modContactEvtJt(createContactEvtJtReq);
         } catch (Exception e) {
             logger.error("[op:EventController] fail to updateEvent for createContactEvtJtReq = {}! Exception: ", JSONArray.toJSON(createContactEvtJtReq), e);
+            return initFailRespInfo(ErrorCode.UPDATE_EVENT_FAILURE.getErrorMsg(), ErrorCode.UPDATE_EVENT_FAILURE.getErrorCode());
+        }
+        return JSON.toJSONString(maps);
+    }
+
+    /**
+     * 修改事件
+     */
+    @RequestMapping("/modContactEvt")
+    @CrossOrigin
+    public String modContactEvt(@RequestBody CreateContactEvtReq createContactEvtReq) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = contactEvtService.modContactEvt(createContactEvtReq);
+        } catch (Exception e) {
+            logger.error("[op:EventController] fail to updateEvent for createContactEvtJtReq = {}! Exception: ", JSONArray.toJSON(createContactEvtReq), e);
             return initFailRespInfo(ErrorCode.UPDATE_EVENT_FAILURE.getErrorMsg(), ErrorCode.UPDATE_EVENT_FAILURE.getErrorCode());
         }
         return JSON.toJSONString(maps);
