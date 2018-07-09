@@ -156,7 +156,6 @@ public class CacheManager {
             // 因子值缓存
             singleton.addCache(new TriggerValueCache(CacheConstants.TRIGGER_VALUE_CACHE_NAME, 5000));
             CacheManager.getInstance().getCache(CacheConstants.TRIGGER_VALUE_CACHE_NAME).synItWithLock();
-//
             // 因子缓存
             singleton.addCache(new TriggerCache(CacheConstants.TRIGGER_CACHE_NAME, 5000));
             CacheManager.getInstance().getCache(CacheConstants.TRIGGER_CACHE_NAME).synItWithLock();

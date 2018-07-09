@@ -60,6 +60,7 @@ public class MktCampaignServiceImpl implements MktCampaignService {
         MktCampaignRelDO mktCampaignRelDO = new MktCampaignRelDO();
         CopyPropertiesUtil.copyBean2Bean(mktCampaignRelDO, mktCampaignVO);
         mktCampaignRelDO.setaMktCampaignId(mktCampaignId);
+        mktCampaignRelDO.setzMktCampaignId(mktCampaignId);
         mktCampaignRelMapper.insert(mktCampaignRelDO);
 
         Map<String, Object> maps = new HashMap<>();

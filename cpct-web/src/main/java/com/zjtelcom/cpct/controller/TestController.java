@@ -121,6 +121,7 @@ public class TestController extends BaseController {
         mktVerbalCondition.setOperType(operType);
         mktVerbalCondition.setLeftParamType("1000"); //标签因子
         mktVerbalCondition.setRightParamType("3000"); //固定值
+        mktVerbalCondition.setConditionType("1"); //类型
         mktVerbalConditionMapper.insert(mktVerbalCondition);
         Long l = mktVerbalCondition.getConditionId();
         System.out.println("ID = " + l + ";左参 = " + left + ";右参 = " + right + ";类型 = " + operType);
@@ -136,6 +137,7 @@ public class TestController extends BaseController {
         mktVerbalCondition.setOperType(operType);
         mktVerbalCondition.setLeftParamType("2000"); //表达式
         mktVerbalCondition.setRightParamType("2000"); //表达式
+        mktVerbalCondition.setConditionType("1"); //类型
         mktVerbalConditionMapper.insert(mktVerbalCondition);
         Long l = mktVerbalCondition.getConditionId();
         System.out.println("ID = " + l + ";左参 = " + left + ";右参 = " + right + ";类型 = " + operType);
