@@ -29,6 +29,26 @@ public class MktCampaignVO extends MktCampaign {
      */
     private String applyRegionId;
 
+    /**
+     * 营销活动目标
+     */
+    private String tiggerType;
+
+    /**
+     * 活动周期
+     */
+    private String execType;
+
+    /**
+     * 执行间隔
+     */
+    private String execInvl;
+
+    /**
+     * 执行次数
+     */
+    private Integer execNum;
+
     public Long getEventId() {
         return eventId;
     }
@@ -51,5 +71,37 @@ public class MktCampaignVO extends MktCampaign {
 
     public void setApplyRegionId(String applyRegionId) {
         this.applyRegionId = applyRegionId;
+    }
+
+    public String getTiggerType() {
+        return tiggerType;
+    }
+
+    public void setTiggerType(String tiggerType) {
+        this.tiggerType = tiggerType;
+    }
+
+    public String getExecType() {
+        return execType;
+    }
+
+    public void setExecType(String execType) {
+        this.execType = execType;
+    }
+
+    public String getExecInvl() {
+        return execInvl;
+    }
+
+    public void setExecInvl(String execInvl) {
+        this.execInvl = execInvl;
+    }
+
+    public Integer getExecNum() {
+        return execNum;
+    }
+
+    public void setExecNum(Integer execNum) {
+        this.execNum = execNum;
     }
 }
