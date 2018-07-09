@@ -9,6 +9,7 @@ import com.zjtelcom.cpct.common.IDacher;
 import com.zjtelcom.cpct.constants.ConditionTypeConstants;
 import com.zjtelcom.cpct.constants.UseTypeConstants;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
 import com.zjtelcom.cpct.dao.eagle.EagleSourceTableDefMapper;
 import com.zjtelcom.cpct.dao.eagle.EagleSourceTableRefMapper;
 import com.zjtelcom.cpct.domain.channel.Label;
@@ -54,6 +55,8 @@ public final class SqlUtil {
 
     private static InjectionLabelMapper triggerMapper;
 
+    private  static InjectionLabelValueMapper injectionLabelValueMapper;
+
     private static Configuration config;
 
     private static Template template;
@@ -81,7 +84,6 @@ public final class SqlUtil {
         init();
 
         //防止，组装sql中出现重复列，重复表关联，用Map区分是否有重复数据
-        //todo 缓存的数据，具体用途，另外 EagleSourceTableRef 这些Eagle开头对象什么作用
         Map<String, EagleSourceTableRef> keys = new HashMap<>(10);
 
         IDacher<EagleTag> tagCache = CacheManager.getInstance().getCache(
@@ -186,8 +188,11 @@ public final class SqlUtil {
                 tigger.put("leftOperand", col.getTableAlias() + "." + col.getName());
 
                 if (triggerMap.containsKey(injectionLabelId.toString())) {
-//                    Integer valueId = triggerMap.get(conditionId.toString()).getValueId();
-                    Integer valueId = 0;//todo 老系统一个trigger对象对应一个valueid 但是新的集团规范一个labelvalue对应一个labelid
+                    List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(Long.valueOf(injectionLabelId));
+                    Integer valueId = 0;
+                    if(labelValues != null){
+                        valueId = Integer.valueOf(String.valueOf(triggerMap.get(labelValues.get(0).getLabelValue())));
+                    }
                     String conditionType = tigger.get("conditionType").toString();
 
                     //类型是输入和范围的不用查询真实值
