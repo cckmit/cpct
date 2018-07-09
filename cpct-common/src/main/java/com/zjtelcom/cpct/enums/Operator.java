@@ -9,7 +9,9 @@ public enum Operator {
     EQUAL(3000,"等于"),
     NOT_EQUAL(4000,"不等于"),
     IN(7000,"包含"),
-    NOT_IN(7100,"不包含");
+    NOT_IN(7100,"不包含"),
+    AND(8000,"并且"),
+    OR(9000,"或者");
 
     private Integer value;
     private String description;

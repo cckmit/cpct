@@ -34,7 +34,7 @@ public interface LabelService {
 
     Map<String,Object> deleteLabelGrp(Long userId,Long labelGrpId);
 
-    Map<String,Object> getLabelGrpList(Long userId, Map<String,Object> params, Integer page, Integer pageSize);
+    Map<String,Object> getLabelGrpList(Long userId, Map<String,Object> params);
 
     Map<String,Object> getLabelGrpDetail(Long userId,Long labelGrpId);
 

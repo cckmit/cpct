@@ -196,6 +196,12 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     @Override
     public Map<String,Object> addLabelGrp(Long userId, LabelGrp addVO) {
         Map<String,Object> result = new HashMap<>();
+        LabelGrp grp = labelGrpMapper.findByGrpName(addVO.getGrpName());
+        if (grp!=null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","已存在同名标签组");
+            return result;
+        }
         LabelGrp labelGrp = BeanUtil.create(addVO,new LabelGrp());
         labelGrp.setCreateDate(new Date());
         labelGrp.setUpdateDate(new Date());
@@ -243,11 +249,15 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     }
 
     @Override
-    public Map<String,Object> getLabelGrpList(Long userId, Map<String, Object> params, Integer page, Integer pageSize) {
+    public Map<String,Object> getLabelGrpList(Long userId, Map<String, Object> params) {
         Map<String,Object> result = new HashMap<>();
         List<LabelGrp> grpList = new ArrayList<>();
         try {
-            grpList = labelGrpMapper.selectAll();
+            String grpName = null;
+            if (params.get("grpName")!=null){
+                grpName = params.get("grpName").toString();
+            }
+            grpList = labelGrpMapper.findByParams(grpName);
         }catch (Exception e){
             e.printStackTrace();
             logger.error("[op:LabelServiceImpl] fail to getLabelGrpList ", e);
@@ -286,6 +296,12 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         if (labelGrp==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","标签组信息不存在");
+            return result;
+        }
+        LabelGrpMbr labelGrpMbr = labelGrpMbrMapper.selectByLabelIdAndGrpId(addVO.getInjectionLabelId(),addVO.getGrpId());
+        if (labelGrpMbr!=null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","标签已关联该标签组");
             return result;
         }
         LabelGrpMbr grpMbr = BeanUtil.create(addVO,new LabelGrpMbr());
@@ -352,13 +368,23 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     @Override
     public Map<String, Object> getLabelListByLabelGrp(Long userId, Long labelGrpId) {
         Map<String,Object> result = new HashMap<>();
+        if (labelGrpId==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","请选择标签组");
+            return result;
+        }
         List<LabelGrpMbr> lgmList = labelGrpMbrMapper.findListByGrpId(labelGrpId);
         List<LabelVO> labelVOList = new ArrayList<>();
         for (LabelGrpMbr grpMbr : lgmList){
+            Label label = labelMapper.selectByPrimaryKey(grpMbr.getInjectionLabelId());
+            if (label!=null){
+                LabelVO labelVO = ChannelUtil.map2LabelVO(label);
+                labelVOList.add(labelVO);
+            }
         }
-        return null;
-
-
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",labelVOList);
+        return result;
     }
 
     //标签值规格配置

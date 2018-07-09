@@ -1,6 +1,9 @@
 package com.zjtelcom.cpct.dto.channel;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.io.Serializable;
+import java.util.Date;
 
 public class ContactChannelDetail implements Serializable {
 
@@ -12,7 +15,26 @@ public class ContactChannelDetail implements Serializable {
     private Long regionId;
     private String channelType;//主动被动
     private Long parentId;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date startTime;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date endTime;
 
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
 
     public Long getParentId() {
         return parentId;

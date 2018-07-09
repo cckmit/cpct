@@ -3,6 +3,8 @@ package com.zjtelcom.cpct.domain.channel;
 import com.zjtelcom.cpct.BaseEntity;
 import lombok.Data;
 
+import java.util.Date;
+
 
 @Data
 public class Channel extends BaseEntity {
@@ -14,6 +16,10 @@ public class Channel extends BaseEntity {
     private Long regionId;//'记录适用区域标识，指定公共管理区域',
     private String channelType;//主动被动
     private Long parentId;
+    private Date startTime;
+    private Date endTime;
+
+
 
 
 }
