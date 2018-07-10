@@ -248,12 +248,12 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
      * 获取目标分群条件信息
      */
     @Override
-    public Map<String, Object> listTarGrpCondition(Long mktCamGrpRulId) throws Exception {
+    public Map<String, Object> listTarGrpCondition(Long tarGrpId) throws Exception {
         Map<String, Object> maps = new HashMap<>();
         //通过mktCamGrpRulId获取所有活动关联关系
-        MktCamGrpRul mktCamGrpRul = mktCamGrpRulMapper.selectByPrimaryKey(mktCamGrpRulId);
-        TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(mktCamGrpRul.getTarGrpId());
-        List<TarGrpCondition> listTarGrpCondition = tarGrpConditionMapper.listTarGrpCondition(tarGrp.getTarGrpId());
+//        MktCamGrpRul mktCamGrpRul = mktCamGrpRulMapper.selectByPrimaryKey(mktCamGrpRulId);
+//        TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(mktCamGrpRul.getTarGrpId());
+        List<TarGrpCondition> listTarGrpCondition = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
         List<TarGrpConditionVO> grpConditionList = new ArrayList<>();
         List<TarGrpVO> tarGrpVOS = new ArrayList<>();//传回前端展示信息
         for (TarGrpCondition tarGrpCondition : listTarGrpCondition) {

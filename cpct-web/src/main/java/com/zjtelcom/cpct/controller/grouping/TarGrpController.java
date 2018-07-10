@@ -123,7 +123,7 @@ public class TarGrpController extends BaseController {
     public String listTarGrpCondition(@RequestBody MktCamGrpRul mktCamGrpRul) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            maps = tarGrpService.listTarGrpCondition(mktCamGrpRul.getMktCamGrpRulId());
+            maps = tarGrpService.listTarGrpCondition(mktCamGrpRul.getTarGrpId());
         } catch (Exception e) {
             logger.error("[op:TarGrpController] fail to listTarGrpCondition for mktCamGrpRul = {}!" +
                     " Exception: ", JSONArray.toJSON(mktCamGrpRul), e);

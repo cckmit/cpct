@@ -23,9 +23,9 @@ spring:
       min-idle: 0
     timeout: 30000
   #ES
-  data:
-    elasticsearch:
-      cluster-name: es-cluster
+#  data:
+#    elasticsearch:
+#      cluster-name: es-cluster
 #      cluster-nodes: 192.168.0.211:9300
 
 

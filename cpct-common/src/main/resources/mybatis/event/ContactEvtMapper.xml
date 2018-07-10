@@ -11,6 +11,7 @@
         <result column="EVT_MAPPED_IP" jdbcType="VARCHAR" property="evtMappedIp" />
         <result column="EVT_PROCOTOL_TYPE" jdbcType="VARCHAR" property="evtProcotolType" />
         <result column="EVT_MAPPED_FUN_NAME" jdbcType="VARCHAR" property="evtMappedFunName" />
+        <result column="MKT_CAMPAIGN_TYPE" jdbcType="VARCHAR" property="mktCampaignType" />
         <result column="EVENT_DESC" jdbcType="VARCHAR" property="contactEvtDesc" />
         <result column="EVT_TYPE_ID" jdbcType="BIGINT" property="contactEvtTypeId" />
         <result column="EVENT_TRIG_TYPE" jdbcType="VARCHAR" property="evtTrigType" />
@@ -84,6 +85,7 @@
         CREATE_DATE,
         STATUS_DATE,
         UPDATE_DATE,
+        MKT_CAMPAIGN_TYPE,
         REMARK)
         values (
         #{interfaceCfgId,jdbcType=BIGINT},
@@ -103,6 +105,7 @@
         #{createDate,jdbcType=TIMESTAMP},
         #{statusDate,jdbcType=TIMESTAMP},
         #{updateDate,jdbcType=TIMESTAMP},
+        #{mktCampaignType,jdbcType=VARCHAR},
         #{remark,jdbcType=VARCHAR})
     </insert>
 
@@ -182,6 +185,9 @@
         <if test="statusCd != null and statusCd != ''">
             STATUS_CD = #{statusCd,jdbcType=VARCHAR},
         </if>
+        <if test="mktCampaignType != null and mktCampaignType != ''">
+            MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR},
+        </if>
         <if test="createStaff != null and createStaff != 0">
             CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
         </if>
@@ -228,6 +234,10 @@
         <if test="evtMappedFunName != null and evtMappedFunName != ''">
             EVT_MAPPED_FUN_NAME = #{evtMappedFunName,jdbcType=VARCHAR},
         </if>
+        <if test="mktCampaignType != null and mktCampaignType != ''">
+            MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR},
+        </if>
+
         <if test="contactEvtDesc != null and contactEvtDesc != ''">
             EVENT_DESC = #{contactEvtDesc,jdbcType=VARCHAR},
         </if>
@@ -300,6 +310,9 @@
         </if>
         <if test="extEventId != null and extEventId != 0">
             EXT_EVENT_ID = #{extEventId,jdbcType=BIGINT},
+        </if>
+        <if test="mktCampaignType != null and mktCampaignType != ''">
+            MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR},
         </if>
         <if test="statusCd != null and statusCd != ''">
             STATUS_CD = #{statusCd,jdbcType=VARCHAR},
