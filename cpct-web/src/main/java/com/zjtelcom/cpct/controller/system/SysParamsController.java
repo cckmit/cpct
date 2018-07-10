@@ -8,6 +8,7 @@ import com.zjtelcom.cpct.domain.system.SysRole;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.system.SysParamsService;
 import com.zjtelcom.cpct.service.system.SysRoleService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -146,6 +147,26 @@ public class SysParamsController extends BaseController {
 
         try {
             result = sysParamsService.listParamsByKey(key);
+        } catch (Exception e) {
+            logger.error("[op:SysParamsController] fail to delParams Exception: ", e);
+            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+        }
+
+        return JSON.toJSON(result).toString();
+    }
+
+    /**
+     * 获取活动总览页面的筛选条件列表
+     * created by linchao
+     *
+     * @return
+     */
+    @RequestMapping(value = "/listParamsByKeyForCampaign", method = RequestMethod.POST)
+    @CrossOrigin
+    public String listParamsByKeyForCampaign() {
+        Map result = new HashMap();
+        try {
+            result = sysParamsService.listParamsByKeyForCampaign();
         } catch (Exception e) {
             logger.error("[op:SysParamsController] fail to delParams Exception: ", e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());

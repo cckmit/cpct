@@ -1,17 +1,21 @@
-package com.zjtelcom.cpct.controller;
+package com.zjtelcom.cpct.controller.test;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.google.common.math.DoubleMath;
+import com.google.gson.Gson;
+import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
+import com.zjtelcom.cpct.dao.es.EmployeeRepository;
 import com.zjtelcom.cpct.domain.Rule;
 import com.zjtelcom.cpct.domain.RuleDetail;
 import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
+import com.zjtelcom.cpct.dto.es.Employee;
 import com.zjtelcom.cpct.service.EngineTestService;
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +40,61 @@ public class TestController extends BaseController {
 
     @Autowired
     private MktVerbalConditionMapper mktVerbalConditionMapper;
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
+    /**
+     * 添加
+     * @return
+     */
+    @RequestMapping("add")
+    public String add() {
+        Employee employee = new Employee();
+        employee.setId("2");
+        employee.setFirstName("xuxu");
+        employee.setLastName("zh");
+        employee.setAge(26);
+        employee.setAbout("i am in peking");
+        employeeRepository.save(employee);
+        System.err.println("add a obj");
+        return "success";
+    }
+
+    /**
+     * 删除
+     * @return
+     */
+    @RequestMapping("delete")
+    public String delete() {
+        Employee employee = employeeRepository.queryEmployeeById("1");
+        employeeRepository.delete(employee);
+        return "success";
+    }
+
+    /**
+     * 局部更新
+     * @return
+     */
+    @RequestMapping("update")
+    public String update() {
+        Employee employee = employeeRepository.queryEmployeeById("1");
+        employee.setFirstName("哈哈");
+        employeeRepository.save(employee);
+        System.err.println("update a obj");
+        return "success";
+    }
+    /**
+     * 查询
+     * @return
+     */
+    @RequestMapping("query")
+    public Employee query() {
+        Employee accountInfo = employeeRepository.queryEmployeeById("2");
+        System.err.println(new Gson().toJson(accountInfo));
+        return accountInfo;
+    }
+
 
     @RequestMapping("/test")
     @CrossOrigin
@@ -283,6 +342,7 @@ public class TestController extends BaseController {
             }
         }
     }
+
 
 
 }

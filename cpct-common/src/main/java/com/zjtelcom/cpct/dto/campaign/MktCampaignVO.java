@@ -22,6 +22,21 @@ public class MktCampaignVO extends MktCampaign {
     private Long eventId;
 
     /**
+     * 活动关联的事件Name
+     */
+    private String eventName;
+
+    /**
+     * 营销活动分类value
+     */
+    private String mktCampaignTypeValue;
+
+        /**
+         * 活动类别value（关系：强制活动，框架活动，自主活动）
+         */
+        private String relTypeValue;
+
+    /**
      * 活动类别（关系：强制活动，框架活动，自主活动）
      */
     private String relType;
@@ -32,12 +47,22 @@ public class MktCampaignVO extends MktCampaign {
     private List<Long> applyRegionIds;
 
     /**
-     * 营销活动目标
+     * 触发类型Value
+     */
+    private String tiggerTypeValue;
+
+    /**
+     * 触发类型
      */
     private String tiggerType;
 
     /**
-     * 活动周期
+     * 活动周期类型Id
+     */
+    private String execTypeValue;
+
+    /**
+     * 活动周期类型
      */
     private String execType;
 
@@ -52,6 +77,8 @@ public class MktCampaignVO extends MktCampaign {
     private Integer execNum;
 
     private String statusCd;
+
+    private String statusCdValue;
 
     public Long getEventId() {
         return eventId;
@@ -115,5 +142,53 @@ public class MktCampaignVO extends MktCampaign {
 
     public void setStatusCd(String statusCd) {
         this.statusCd = statusCd;
+    }
+
+    public String getMktCampaignTypeValue() {
+        return mktCampaignTypeValue;
+    }
+
+    public void setMktCampaignTypeValue(String mktCampaignTypeValue) {
+        this.mktCampaignTypeValue = mktCampaignTypeValue;
+    }
+
+    public String getRelTypeValue() {
+        return relTypeValue;
+    }
+
+    public void setRelTypeValue(String relTypeValue) {
+        this.relTypeValue = relTypeValue;
+    }
+
+    public String getTiggerTypeValue() {
+        return tiggerTypeValue;
+    }
+
+    public void setTiggerTypeValue(String tiggerTypeValue) {
+        this.tiggerTypeValue = tiggerTypeValue;
+    }
+
+    public String getExecTypeValue() {
+        return execTypeValue;
+    }
+
+    public void setExecTypeValue(String execTypeValue) {
+        this.execTypeValue = execTypeValue;
+    }
+
+    public String getEventName() {
+        return eventName;
+    }
+
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
+    }
+
+    public String getStatusCdValue() {
+        return statusCdValue;
+    }
+
+    public void setStatusCdValue(String statusCdValue) {
+        this.statusCdValue = statusCdValue;
     }
 }
