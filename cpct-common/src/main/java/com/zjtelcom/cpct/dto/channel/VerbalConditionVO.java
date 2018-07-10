@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.dto.channel;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 public class VerbalConditionVO implements Serializable {
 
@@ -14,6 +15,12 @@ public class VerbalConditionVO implements Serializable {
     private String leftParamType;
 
     private String operType;
+
+    private String operName;
+
+    private String conditionType;
+
+    private List<String> valueList;
 
     private String rightParam;
 
@@ -28,6 +35,31 @@ public class VerbalConditionVO implements Serializable {
     private Date statusDate;
 
     private String remark;
+
+
+    public String getConditionType() {
+        return conditionType;
+    }
+
+    public void setConditionType(String conditionType) {
+        this.conditionType = conditionType;
+    }
+
+    public List<String> getValueList() {
+        return valueList;
+    }
+
+    public void setValueList(List<String> valueList) {
+        this.valueList = valueList;
+    }
+
+    public String getOperName() {
+        return operName;
+    }
+
+    public void setOperName(String operName) {
+        this.operName = operName;
+    }
 
     public Long getConditionId() {
         return conditionId;

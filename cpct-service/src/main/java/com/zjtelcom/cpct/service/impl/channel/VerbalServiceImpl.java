@@ -1,24 +1,24 @@
 package com.zjtelcom.cpct.service.impl.channel;
 
-import com.zjtelcom.cpct.bean.RespInfo;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
 import com.zjtelcom.cpct.dao.channel.MktVerbalMapper;
+import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.MktVerbal;
 import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
-import com.zjtelcom.cpct.domain.channel.Script;
+
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.ConditionType;
+import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.VerbalService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
-import org.bouncycastle.asn1.cryptopro.GOST3410PublicKeyAlgParameters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.concurrent.locks.Condition;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -30,6 +30,9 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
     private MktVerbalMapper verbalMapper;
     @Autowired
     private MktVerbalConditionMapper verbalConditionMapper;
+    @Autowired
+    private InjectionLabelMapper labelMapper;
+
 
 
     /**
@@ -70,11 +73,37 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
         return result;
     }
 
-    //弃用
     @Override
     public Map<String,Object> editVerbal(Long userId, VerbalEditVO editVO) {
+        Map<String,Object> result = new HashMap<>();
         MktVerbal verbal = verbalMapper.selectByPrimaryKey(editVO.getVerbalId());
-        return null;
+        if (verbal==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","痛痒点话术不存在");
+            return result;
+        }
+        Long confId = verbal.getContactConfId();
+        List<MktVerbalCondition> conditions  = verbalConditionMapper.findChannelConditionListByVerbalId(verbal.getVerbalId());
+        for (MktVerbalCondition condition : conditions){
+            if (condition==null){
+                continue;
+            }
+            verbalConditionMapper.deleteByPrimaryKey(condition.getConditionId());
+        }
+        verbalMapper.deleteByPrimaryKey(verbal.getVerbalId());
+        VerbalAddVO addVO = BeanUtil.create(editVO,new VerbalAddVO());
+        addVO.setContactConfId(confId);
+        try {
+            addVerbal(userId,addVO);
+        }catch (Exception e){
+            logger.error("[op:VerbalServiceImpl] fail to editVerbal",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to editVerbal");
+            return result;
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","编辑成功");
+        return result;
     }
 
     @Override
@@ -101,6 +130,14 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
         List<MktVerbalCondition> conditions = verbalConditionMapper.findChannelConditionListByVerbalId(verbal.getVerbalId());
         for (MktVerbalCondition condition : conditions){
             VerbalConditionVO vo = BeanUtil.create(condition,new VerbalConditionVO());
+            vo.setOperName(Operator.getOperator(Integer.valueOf(condition.getOperType())).getDescription());
+            if (!condition.getLeftParamType().equals("2000")){
+                Label label = labelMapper.selectByPrimaryKey(Long.valueOf(condition.getLeftParam()));
+                vo.setConditionType(label.getConditionType());
+                if (label.getRightOperand()!=null){
+                    vo.setValueList(ChannelUtil.StringToList(label.getRightOperand()));
+                }
+            }
             conditionVOList.add(vo);
         }
         verbalVO.setConditionList(conditionVOList);

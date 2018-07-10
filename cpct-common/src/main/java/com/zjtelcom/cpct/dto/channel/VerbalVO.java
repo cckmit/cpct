@@ -20,6 +20,7 @@ public class VerbalVO implements Serializable {
 
     private List<VerbalConditionVO> conditionList;
 
+
     private String statusCd;
 
     private Long createStaff;

@@ -8,24 +8,17 @@ public class VerbalEditVO implements Serializable {
 
     private Long verbalId;
 
-    private Long campaignId;
+    private Long contactConfId;//渠道推送配置id
 
-    private Long contactConfId;
+    private String scriptDesc;//脚本内容
 
-    private String scriptDesc;
+    private Long channelId;//渠道id
 
-    private Long channelId;
+    private String remark;
 
-    private List<VerbalConditionEditVO> editVOList;
+    //todo 规则条件
+    private List<VerbalConditionAddVO> addVOList;
 
-
-    public List<VerbalConditionEditVO> getEditVOList() {
-        return editVOList;
-    }
-
-    public void setEditVOList(List<VerbalConditionEditVO> editVOList) {
-        this.editVOList = editVOList;
-    }
 
     public Long getVerbalId() {
         return verbalId;
@@ -33,14 +26,6 @@ public class VerbalEditVO implements Serializable {
 
     public void setVerbalId(Long verbalId) {
         this.verbalId = verbalId;
-    }
-
-    public Long getCampaignId() {
-        return campaignId;
-    }
-
-    public void setCampaignId(Long campaignId) {
-        this.campaignId = campaignId;
     }
 
     public Long getContactConfId() {
@@ -67,5 +52,19 @@ public class VerbalEditVO implements Serializable {
         this.channelId = channelId;
     }
 
+    public String getRemark() {
+        return remark;
+    }
 
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public List<VerbalConditionAddVO> getAddVOList() {
+        return addVOList;
+    }
+
+    public void setAddVOList(List<VerbalConditionAddVO> addVOList) {
+        this.addVOList = addVOList;
+    }
 }

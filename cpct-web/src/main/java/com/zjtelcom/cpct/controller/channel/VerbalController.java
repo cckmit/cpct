@@ -9,6 +9,7 @@ import com.zjtelcom.cpct.domain.Rule;
 import com.zjtelcom.cpct.domain.RuleDetail;
 import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
 import com.zjtelcom.cpct.dto.channel.VerbalAddVO;
+import com.zjtelcom.cpct.dto.channel.VerbalEditVO;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.channel.VerbalService;
 import com.zjtelcom.cpct.util.UserUtil;
@@ -29,6 +30,27 @@ public class VerbalController extends BaseController {
     @Autowired
     private VerbalService verbalService;
 
+
+    /**
+     * 编辑痛痒点脚本
+     * @param editVO
+     * @return
+     */
+    @PostMapping("editVerbal")
+    @CrossOrigin
+    public Map<String,Object> editVerbal(@RequestBody VerbalEditVO editVO) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = verbalService.editVerbal(userId,editVO);
+        } catch (Exception e) {
+            logger.error("[op:VerbalController] fail to editVerbal",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to editVerbal");
+            return result;
+        }
+        return result;
+    }
 
     /**
      * 痛痒点脚本删除
