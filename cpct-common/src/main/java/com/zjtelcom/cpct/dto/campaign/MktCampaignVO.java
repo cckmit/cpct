@@ -31,10 +31,10 @@ public class MktCampaignVO extends MktCampaign {
      */
     private String mktCampaignTypeValue;
 
-    /**
-     * 活动类别value（关系：强制活动，框架活动，自主活动）
-     */
-    private String relTypeValue;
+        /**
+         * 活动类别value（关系：强制活动，框架活动，自主活动）
+         */
+        private String relTypeValue;
 
     /**
      * 活动类别（关系：强制活动，框架活动，自主活动）

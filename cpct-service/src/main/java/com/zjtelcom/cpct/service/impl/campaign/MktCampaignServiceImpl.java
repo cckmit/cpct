@@ -177,7 +177,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         mktCampaignVO.setRelTypeValue(paramMap.
                 get(ParamKeyEnum.REL_TYPE.getParamKey() + relType));
         mktCampaignVO.setMktCampaignTypeValue(paramMap.
-                get(ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey() + mktCampaignDO.getMktCampaignId()));
+                get(ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey() + mktCampaignDO.getMktCampaignType()));
         mktCampaignVO.setStatusCdValue(paramMap.
                 get(ParamKeyEnum.STATUS_CD.getParamKey() + mktCampaignDO.getStatusCd()));
         mktCampaignVO.setExecTypeValue(paramMap.
@@ -322,7 +322,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignVO.setRelTypeValue(paramMap.
                     get(ParamKeyEnum.REL_TYPE.getParamKey() + relType));
             mktCampaignVO.setMktCampaignTypeValue(paramMap.
-                    get(ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey() + mktCampaignDO.getMktCampaignId()));
+                    get(ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey() + mktCampaignDO.getMktCampaignType()));
             mktCampaignVO.setStatusCdValue(paramMap.
                     get(ParamKeyEnum.STATUS_CD.getParamKey() + mktCampaignDO.getStatusCd()));
             mktCampaignVO.setExecTypeValue(paramMap.
