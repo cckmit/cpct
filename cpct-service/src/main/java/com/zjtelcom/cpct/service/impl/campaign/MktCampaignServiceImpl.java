@@ -295,10 +295,47 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         MktCampaignPar.setTiggerType(tiggerType);
         MktCampaignPar.setMktCampaignType(mktCampaignType);
         List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListPage(MktCampaignPar);
+
+        // 获取所有的sysParam
+        Map<String, String> paramMap = new HashMap<>();
+        List<SysParams> sysParamList = sysParamsMapper.selectAll("", 0L);
+        for (SysParams sysParams : sysParamList) {
+            paramMap.put(sysParams.getParamKey() + sysParams.getParamValue(), sysParams.getParamName());
+        }
+
+        List<MktCampaignVO> mktCampaignVOList = new ArrayList<>();
+        for (MktCampaignDO mktCampaignDO : mktCampaignDOList) {
+            // 从活动关系表中获取
+            List<MktCampaignRelDO> mktCampaignRelDOList = mktCampaignRelMapper.selectByAmktCampaignId(mktCampaignDO.getMktCampaignId());
+            String relType = null;
+            if (mktCampaignRelDOList.size() > 0) {
+                relType = mktCampaignRelDOList.get(0).getRelType();
+            }
+
+            MktCampaignVO mktCampaignVO = new MktCampaignVO();
+            try {
+                CopyPropertiesUtil.copyBean2Bean(mktCampaignVO, mktCampaignDO);
+            } catch (Exception e) {
+                logger.error("Excetion:",e);
+            }
+            mktCampaignVO.setTiggerTypeId(paramMap.
+                    get(ParamKeyEnum.TIGGER_TYPE.getParamKey() + mktCampaignDO.getTiggerType()));
+            mktCampaignVO.setRelTypeId(paramMap.
+                    get(ParamKeyEnum.REL_TYPE.getParamKey() + relType));
+            mktCampaignVO.setMktCampaignTypeId(paramMap.
+                    get(ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey() + mktCampaignDO.getMktCampaignId()));
+            mktCampaignVO.setMktCampaignTypeId(paramMap.
+                    get(ParamKeyEnum.STATUS_CD.getParamKey() + mktCampaignDO.getStatusCd()));
+            mktCampaignVO.setExecTypeId(paramMap.
+                    get(ParamKeyEnum.EXEC_TYPE.getParamKey() + mktCampaignDO.getExecType()));
+            mktCampaignVOList.add(mktCampaignVO);
+        }
+
+
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
-        maps.put("mktCampaigns", mktCampaignDOList);
-        maps.put("pageInfo", new Page(new PageInfo(mktCampaignDOList)));
+        maps.put("mktCampaigns", mktCampaignVOList);
+        maps.put("pageInfo", new Page(new PageInfo(mktCampaignVOList)));
         return maps;
     }
 }
