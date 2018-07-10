@@ -131,7 +131,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
     public Map<String, Object> listUserList(UserList userList) throws IOException {
         Map<String, Object> maps = new HashMap<>();
         List<UserList> userLists = new ArrayList<>();
-        Set<Object> keys = redisUtils.keys("*");
+        Set<Object> keys = redisUtils.keys("[1-9]*");
         for (Object str : keys) {
             UserList userListT = new UserList();
             userListT.setUserName(String.valueOf(redisUtils.hmGet((String) str, "userName")));

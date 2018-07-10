@@ -7,11 +7,6 @@ spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
 
-#    py mysql
-#    url: jdbc:mysql://116.62.129.215:3306/fpc_system?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true
-#    username: yannis
-#    password: 123456
-
 #   yanlei mysql
     url: jdbc:mysql://47.94.168.117:3306/fpc_system?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
     username: root
@@ -27,6 +22,11 @@ spring:
       max-idle: 8
       min-idle: 0
     timeout: 30000
+  #ES
+#  data:
+#    elasticsearch:
+#      cluster-name: es-cluster
+#      cluster-nodes: 192.168.0.211:9300
 
 
 

@@ -125,7 +125,6 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
      * 痛痒点话术返回结果包装
      */
     private VerbalVO supplementVo(VerbalVO verbalVO,MktVerbal verbal){
-        Map<String,Object> result = new HashMap<>();
         List<VerbalConditionVO> conditionVOList = new ArrayList<>();
         List<MktVerbalCondition> conditions = verbalConditionMapper.findChannelConditionListByVerbalId(verbal.getVerbalId());
         for (MktVerbalCondition condition : conditions){
@@ -134,6 +133,7 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
             if (!condition.getLeftParamType().equals("2000")){
                 Label label = labelMapper.selectByPrimaryKey(Long.valueOf(condition.getLeftParam()));
                 vo.setConditionType(label.getConditionType());
+                vo.setLeftParamName(label.getInjectionLabelName());
                 if (label.getRightOperand()!=null){
                     vo.setValueList(ChannelUtil.StringToList(label.getRightOperand()));
                 }
@@ -167,6 +167,7 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
         for (MktVerbal verbal : verbalList){
             if (verbal==null){
                 result.put("resultCode",CODE_FAIL);
+
                 result.put("resultMsg","痛痒点话术不存在");
                 return result;
             }

@@ -150,4 +150,12 @@
     where product_code = #{productCode,jdbcType=VARCHAR}
   </update>
 
+
+  <select id="selectPpmProductByCode" resultType="com.zjtelcom.cpct.domain.channel.PpmProduct" parameterType="java.lang.String">
+     select product_id, product_code, product_name, product_desc, start_time, end_time,
+    product_type, status, ppm_product_id
+    from ppm_product
+    where product_code = #{code}
+  </select>
+
 </mapper>

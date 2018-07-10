@@ -9,3 +9,15 @@ spring:
     username: yannis
     password: 123456
     driver-class-name: com.mysql.jdbc.Driver
+
+#redis相关配置
+  redis:
+    host: 47.94.168.117
+    port: 6379
+    password: 9bOCHtdJkNZ1hb2e35OmgIrLvGEaBXuT2udRBQNt5VQ
+    pool:
+      max-active: 8
+      max-wait: -1
+      max-idle: 8
+      min-idle: 0
+    timeout: 30000
