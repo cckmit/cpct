@@ -22,6 +22,8 @@ public class VerbalConditionVO implements Serializable {
 
     private List<String> valueList;
 
+    private List<OperatorDetail> operatorList;//运算符
+
     private String rightParam;
 
     private String rightParamType;
@@ -36,6 +38,14 @@ public class VerbalConditionVO implements Serializable {
 
     private String remark;
 
+
+    public List<OperatorDetail> getOperatorList() {
+        return operatorList;
+    }
+
+    public void setOperatorList(List<OperatorDetail> operatorList) {
+        this.operatorList = operatorList;
+    }
 
     public String getConditionType() {
         return conditionType;
