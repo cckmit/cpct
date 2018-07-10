@@ -125,9 +125,9 @@ public class ProductController extends BaseController {
 	public JSONObject updateProductInUse(@RequestBody JSONObject requestObj, HttpServletRequest request) {
 		JSONObject result = new JSONObject();
 		String requestIp = request.getRemoteAddr();
-		if (checkIpIllegal(requestIp)) {
-			return null;
-		}
+//		if (checkIpIllegal(requestIp)) {
+//			return null;
+//		}
 		try {
 			List<PpmProduct> productInUse = ppmProductMapper.getAllProductInUse();
 			logger.info("productInUse.size = " + productInUse.size());
@@ -135,7 +135,7 @@ public class ProductController extends BaseController {
 			for (int i = 0; i < productInUse.size(); i++) {
 				param.add(productInUse.get(i).getProductCode());
 			}
-			List<OfferVo> searchRs = new ArrayList<>();//TODO strategySalesViewService.salesView(param);
+			List<OfferVo> searchRs = strategySalesViewService.salesView(param);
 			logger.info("salesView result size = " + searchRs.size());
 			for (int j = 0; j < searchRs.size(); j++) {
 				logger.info("update ppm product. productCode=" + searchRs.get(j).getOfferNbr());

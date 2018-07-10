@@ -1,5 +1,8 @@
 package com.zjtelcom.cpct.service.impl.channel;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.MktProductRuleMapper;
 import com.zjtelcom.cpct.dao.channel.PpmProductMapper;
 import com.zjtelcom.cpct.domain.channel.MktProductRule;
@@ -49,7 +52,11 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     public List<PpmProduct> getProductList(Long userId,String productName){
         List<PpmProduct> productList = new ArrayList<>();
         try {
+            Integer page = 1;
+            Integer pageSize = 100;
+            PageHelper.startPage(page,pageSize);
             productList = productMapper.findByProductName(productName);
+            Page pageInfo = new Page(new PageInfo(productList));
         }catch (Exception e){
             e.printStackTrace();
             logger.error("[op:ProductServiceImpl] fail to getProductList ", e);

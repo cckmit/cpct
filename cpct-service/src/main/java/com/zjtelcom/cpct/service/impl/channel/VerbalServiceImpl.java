@@ -125,7 +125,6 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
      * 痛痒点话术返回结果包装
      */
     private VerbalVO supplementVo(VerbalVO verbalVO,MktVerbal verbal){
-        Map<String,Object> result = new HashMap<>();
         List<VerbalConditionVO> conditionVOList = new ArrayList<>();
         List<MktVerbalCondition> conditions = verbalConditionMapper.findChannelConditionListByVerbalId(verbal.getVerbalId());
         for (MktVerbalCondition condition : conditions){
@@ -167,6 +166,7 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
         for (MktVerbal verbal : verbalList){
             if (verbal==null){
                 result.put("resultCode",CODE_FAIL);
+
                 result.put("resultMsg","痛痒点话术不存在");
                 return result;
             }

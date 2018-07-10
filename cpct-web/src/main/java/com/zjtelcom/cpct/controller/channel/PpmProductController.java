@@ -4,6 +4,7 @@ import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
 import com.zjtelcom.cpct.dto.channel.ProductParam;
 import com.zjtelcom.cpct.service.channel.ProductService;
+import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -52,6 +53,8 @@ public class PpmProductController extends BaseController  {
         Long userId = UserUtil.loginId();
         List<PpmProduct> productList = new ArrayList<>();
         try {
+//            Integer page = MapUtil.getIntNum(params.get("page"));
+//            Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
             productList = productService.getProductList(userId,params.get("productName"));
         }catch (Exception e){
             logger.error("[op:PpmProductController] fail to getProductList",e);
