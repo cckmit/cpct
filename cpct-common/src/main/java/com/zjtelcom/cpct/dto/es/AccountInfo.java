@@ -1,9 +1,9 @@
 package com.zjtelcom.cpct.dto.es;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 
-import javax.persistence.Id;
 
 @Document(indexName = "houyunfeng",type = "accountinfo",shards = 1,replicas = 0,refreshInterval = "-1")
 public class AccountInfo {

@@ -33,7 +33,7 @@ public interface PpmProductMapper {
 
     List<PpmProduct> getAllProduct();
 
-    List<PpmProduct> selectPpmProductByCode(String code);
+    List<PpmProduct> selectPpmProductByCode(@Param("code") String code);
 
     List<PpmProduct> selectPpmProductByids(Map item);
 
