@@ -7,6 +7,8 @@ public class MktCamEvtRelDO {
 
     private Long mktCampaignId;
 
+    private Integer campaignSeq;
+
     private Long eventId;
 
     private String statusCd;
@@ -35,6 +37,14 @@ public class MktCamEvtRelDO {
 
     public void setMktCampaignId(Long mktCampaignId) {
         this.mktCampaignId = mktCampaignId;
+    }
+
+    public Integer getCampaignSeq() {
+        return campaignSeq;
+    }
+
+    public void setCampaignSeq(Integer campaignSeq) {
+        this.campaignSeq = campaignSeq;
     }
 
     public Long getEventId() {

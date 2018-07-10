@@ -51,6 +51,8 @@ public class MktCampaignVO extends MktCampaign {
      */
     private Integer execNum;
 
+    private String statusCd;
+
     public Long getEventId() {
         return eventId;
     }
@@ -105,5 +107,13 @@ public class MktCampaignVO extends MktCampaign {
 
     public void setExecNum(Integer execNum) {
         this.execNum = execNum;
+    }
+
+    public String getStatusCd() {
+        return statusCd;
+    }
+
+    public void setStatusCd(String statusCd) {
+        this.statusCd = statusCd;
     }
 }
