@@ -9,6 +9,7 @@ import com.zjtelcom.cpct.domain.channel.MktProductRule;
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ProductService;
+import com.zjtelcom.cpct.util.MapUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,19 +50,22 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     }
 
     @Override
-    public List<PpmProduct> getProductList(Long userId,String productName){
+    public Map<String,Object> getProductList(Long userId,Map<String,Object> params){
+        Map<String,Object> result = new HashMap<>();
         List<PpmProduct> productList = new ArrayList<>();
-        try {
-            Integer page = 1;
-            Integer pageSize = 100;
+            Integer page = MapUtil.getIntNum(params.get("page"));
+            Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
+            String productName = null;
+            if (params.get("productName")!=null){
+                productName = params.get("productName").toString();
+            }
             PageHelper.startPage(page,pageSize);
             productList = productMapper.findByProductName(productName);
             Page pageInfo = new Page(new PageInfo(productList));
-        }catch (Exception e){
-            e.printStackTrace();
-            logger.error("[op:ProductServiceImpl] fail to getProductList ", e);
-        }
-        return productList;
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",productList);
+        result.put("page",pageInfo);
+        return result;
     }
 
 

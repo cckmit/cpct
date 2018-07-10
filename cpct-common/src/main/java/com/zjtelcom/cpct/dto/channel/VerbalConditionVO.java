@@ -12,6 +12,8 @@ public class VerbalConditionVO implements Serializable {
 
     private String leftParam;
 
+    private String leftParamName;
+
     private String leftParamType;
 
     private String operType;
@@ -38,6 +40,13 @@ public class VerbalConditionVO implements Serializable {
 
     private String remark;
 
+    public String getLeftParamName() {
+        return leftParamName;
+    }
+
+    public void setLeftParamName(String leftParamName) {
+        this.leftParamName = leftParamName;
+    }
 
     public List<OperatorDetail> getOperatorList() {
         return operatorList;

@@ -9,7 +9,7 @@ public interface ProductService {
 
     Map<String,Object> getProductNameById(Long userId,List<Long> productIdList);
 
-    List<PpmProduct>  getProductList(Long userId,String productName);
+    Map<String,Object>  getProductList(Long userId,Map<String,Object> params);
 
     Map<String,Object> addProductRule(Long userId,List<Long> productIdList);
 

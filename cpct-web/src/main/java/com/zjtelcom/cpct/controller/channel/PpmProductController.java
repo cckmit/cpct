@@ -48,22 +48,17 @@ public class PpmProductController extends BaseController  {
      */
     @PostMapping("getProductList")
     @CrossOrigin
-    public Map<String,Object> getProductList(@RequestBody HashMap<String,String> params){
+    public Map<String,Object> getProductList(@RequestBody HashMap<String,Object> params){
         Map<String ,Object> result = new HashMap<>();
         Long userId = UserUtil.loginId();
-        List<PpmProduct> productList = new ArrayList<>();
         try {
-//            Integer page = MapUtil.getIntNum(params.get("page"));
-//            Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
-            productList = productService.getProductList(userId,params.get("productName"));
+            result = productService.getProductList(userId,params);
         }catch (Exception e){
             logger.error("[op:PpmProductController] fail to getProductList",e);
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg"," fail to addCamScript");
             return result;
         }
-        result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",productList);
         return result;
     }
 

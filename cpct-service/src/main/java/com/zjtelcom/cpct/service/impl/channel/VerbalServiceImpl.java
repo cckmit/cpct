@@ -133,6 +133,7 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
             if (!condition.getLeftParamType().equals("2000")){
                 Label label = labelMapper.selectByPrimaryKey(Long.valueOf(condition.getLeftParam()));
                 vo.setConditionType(label.getConditionType());
+                vo.setLeftParamName(label.getInjectionLabelName());
                 if (label.getRightOperand()!=null){
                     vo.setValueList(ChannelUtil.StringToList(label.getRightOperand()));
                 }
