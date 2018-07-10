@@ -172,15 +172,15 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         for (SysParams sysParams : sysParamList) {
             paramMap.put(sysParams.getParamKey() + sysParams.getParamValue(), sysParams.getParamName());
         }
-        mktCampaignVO.setTiggerTypeId(paramMap.
+        mktCampaignVO.setTiggerTypeValue(paramMap.
                 get(ParamKeyEnum.TIGGER_TYPE.getParamKey() + mktCampaignDO.getTiggerType()));
-        mktCampaignVO.setRelTypeId(paramMap.
+        mktCampaignVO.setRelTypeValue(paramMap.
                 get(ParamKeyEnum.REL_TYPE.getParamKey() + relType));
-        mktCampaignVO.setMktCampaignTypeId(paramMap.
+        mktCampaignVO.setMktCampaignTypeValue(paramMap.
                 get(ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey() + mktCampaignDO.getMktCampaignId()));
-        mktCampaignVO.setMktCampaignTypeId(paramMap.
+        mktCampaignVO.setStatusCdValue(paramMap.
                 get(ParamKeyEnum.STATUS_CD.getParamKey() + mktCampaignDO.getStatusCd()));
-        mktCampaignVO.setExecTypeId(paramMap.
+        mktCampaignVO.setExecTypeValue(paramMap.
                 get(ParamKeyEnum.EXEC_TYPE.getParamKey() + mktCampaignDO.getExecType()));
 
         //TODO 获取活动关联的事件
@@ -311,22 +311,21 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             if (mktCampaignRelDOList.size() > 0) {
                 relType = mktCampaignRelDOList.get(0).getRelType();
             }
-
             MktCampaignVO mktCampaignVO = new MktCampaignVO();
             try {
                 CopyPropertiesUtil.copyBean2Bean(mktCampaignVO, mktCampaignDO);
             } catch (Exception e) {
                 logger.error("Excetion:",e);
             }
-            mktCampaignVO.setTiggerTypeId(paramMap.
+            mktCampaignVO.setTiggerTypeValue(paramMap.
                     get(ParamKeyEnum.TIGGER_TYPE.getParamKey() + mktCampaignDO.getTiggerType()));
-            mktCampaignVO.setRelTypeId(paramMap.
+            mktCampaignVO.setRelTypeValue(paramMap.
                     get(ParamKeyEnum.REL_TYPE.getParamKey() + relType));
-            mktCampaignVO.setMktCampaignTypeId(paramMap.
+            mktCampaignVO.setMktCampaignTypeValue(paramMap.
                     get(ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey() + mktCampaignDO.getMktCampaignId()));
-            mktCampaignVO.setMktCampaignTypeId(paramMap.
+            mktCampaignVO.setStatusCdValue(paramMap.
                     get(ParamKeyEnum.STATUS_CD.getParamKey() + mktCampaignDO.getStatusCd()));
-            mktCampaignVO.setExecTypeId(paramMap.
+            mktCampaignVO.setExecTypeValue(paramMap.
                     get(ParamKeyEnum.EXEC_TYPE.getParamKey() + mktCampaignDO.getExecType()));
             mktCampaignVOList.add(mktCampaignVO);
         }
