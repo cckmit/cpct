@@ -10,6 +10,7 @@ import java.util.List;
  */
 public class MktStrategyConfDetail extends MktStrategyConf {
 
+    private Long mktCampaignId;
     /**
      * 下发城市列表
      */
@@ -34,5 +35,13 @@ public class MktStrategyConfDetail extends MktStrategyConf {
 
     public void setMktStrategyConfRuleList(List<MktStrategyConfRule> mktStrategyConfRuleList) {
         this.mktStrategyConfRuleList = mktStrategyConfRuleList;
+    }
+
+    public Long getMktCampaignId() {
+        return mktCampaignId;
+    }
+
+    public void setMktCampaignId(Long mktCampaignId) {
+        this.mktCampaignId = mktCampaignId;
     }
 }
