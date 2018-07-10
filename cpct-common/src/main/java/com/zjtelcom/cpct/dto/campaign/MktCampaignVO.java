@@ -22,6 +22,21 @@ public class MktCampaignVO extends MktCampaign {
     private Long eventId;
 
     /**
+     * 活动关联的事件Id
+     */
+    private String eventName;
+
+    /**
+     * 营销活动分类Id
+     */
+    private String mktCampaignTypeId;
+
+    /**
+     * 活动类别Id（关系：强制活动，框架活动，自主活动）
+     */
+    private String relTypeId;
+
+    /**
      * 活动类别（关系：强制活动，框架活动，自主活动）
      */
     private String relType;
@@ -32,12 +47,22 @@ public class MktCampaignVO extends MktCampaign {
     private List<Long> applyRegionIds;
 
     /**
-     * 营销活动目标
+     * 触发类型
+     */
+    private String tiggerTypeId;
+
+    /**
+     * 触发类型
      */
     private String tiggerType;
 
     /**
-     * 活动周期
+     * 活动周期类型Id
+     */
+    private String execTypeId;
+
+    /**
+     * 活动周期类型
      */
     private String execType;
 
@@ -115,5 +140,45 @@ public class MktCampaignVO extends MktCampaign {
 
     public void setStatusCd(String statusCd) {
         this.statusCd = statusCd;
+    }
+
+    public String getMktCampaignTypeId() {
+        return mktCampaignTypeId;
+    }
+
+    public void setMktCampaignTypeId(String mktCampaignTypeId) {
+        this.mktCampaignTypeId = mktCampaignTypeId;
+    }
+
+    public String getRelTypeId() {
+        return relTypeId;
+    }
+
+    public void setRelTypeId(String relTypeId) {
+        this.relTypeId = relTypeId;
+    }
+
+    public String getTiggerTypeId() {
+        return tiggerTypeId;
+    }
+
+    public void setTiggerTypeId(String tiggerTypeId) {
+        this.tiggerTypeId = tiggerTypeId;
+    }
+
+    public String getExecTypeId() {
+        return execTypeId;
+    }
+
+    public void setExecTypeId(String execTypeId) {
+        this.execTypeId = execTypeId;
+    }
+
+    public String getEventName() {
+        return eventName;
+    }
+
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
     }
 }

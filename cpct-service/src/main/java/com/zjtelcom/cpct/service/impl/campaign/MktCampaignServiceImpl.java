@@ -13,10 +13,16 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignRelMapper;
+import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
+import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamEvtRelDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignRelDO;
+import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.campaign.*;
+import com.zjtelcom.cpct.dto.event.ContactEvt;
+import com.zjtelcom.cpct.enums.ParamKeyEnum;
+import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.UserUtil;
@@ -35,7 +41,7 @@ import java.util.*;
  */
 @Service
 @Transactional
-public class MktCampaignServiceImpl implements MktCampaignService {
+public class MktCampaignServiceImpl extends BaseService implements MktCampaignService {
 
     @Autowired
     private MktCampaignMapper mktCampaignMapper;
@@ -45,6 +51,12 @@ public class MktCampaignServiceImpl implements MktCampaignService {
 
     @Autowired
     private MktCamEvtRelMapper mktCamEvtRelMapper;
+
+    @Autowired
+    private SysParamsMapper sysParamsMapper;
+
+    @Autowired
+    private ContactEvtMapper contactEvtMapper;
 
     /**
      * 添加活动基本信息 并建立关系
@@ -154,8 +166,33 @@ public class MktCampaignServiceImpl implements MktCampaignService {
         mktCampaignVO.setApplyRegionIds(applyRegionIds);
         mktCampaignVO.setRelType(relType);
 
-        //TODO 获取活动关联的事件
+        // 获取所有的sysParam
+        Map<String, String> paramMap = new HashMap<>();
+        List<SysParams> sysParamList = sysParamsMapper.selectAll("", 0L);
+        for (SysParams sysParams : sysParamList) {
+            paramMap.put(sysParams.getParamKey() + sysParams.getParamValue(), sysParams.getParamName());
+        }
+        mktCampaignVO.setTiggerTypeId(paramMap.
+                get(ParamKeyEnum.TIGGER_TYPE.getParamKey() + mktCampaignDO.getTiggerType()));
+        mktCampaignVO.setRelTypeId(paramMap.
+                get(ParamKeyEnum.REL_TYPE.getParamKey() + relType));
+        mktCampaignVO.setMktCampaignTypeId(paramMap.
+                get(ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey() + mktCampaignDO.getMktCampaignId()));
+        mktCampaignVO.setMktCampaignTypeId(paramMap.
+                get(ParamKeyEnum.STATUS_CD.getParamKey() + mktCampaignDO.getStatusCd()));
+        mktCampaignVO.setExecTypeId(paramMap.
+                get(ParamKeyEnum.EXEC_TYPE.getParamKey() + mktCampaignDO.getExecType()));
 
+        //TODO 获取活动关联的事件
+        MktCamEvtRelDO mktCamEvtRelDO = mktCamEvtRelMapper.qryByMktCampaignId(mktCampaignId);
+        if (mktCamEvtRelDO != null) {
+            Long eventId = mktCamEvtRelDO.getEventId();
+            ContactEvt contactEvt = contactEvtMapper.getEventById(eventId);
+            if (contactEvt != null) {
+                mktCampaignVO.setEventId(eventId);
+                mktCampaignVO.setEventName(contactEvt.getContactEvtName());
+            }
+        }
         Map<String, Object> maps = new HashMap<>();
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
@@ -252,16 +289,16 @@ public class MktCampaignServiceImpl implements MktCampaignService {
     public Map<String, Object> qryMktCampaignListPage(String mktCampaignName, String statusCd, String tiggerType, String mktCampaignType, Integer page, Integer pageSize) {
         Map<String, Object> maps = new HashMap<>();
         PageHelper.startPage(page, pageSize);
-        MktCampaignDO mktCampaignDO = new MktCampaignDO();
-        mktCampaignDO.setMktCampaignName(mktCampaignName);
-        mktCampaignDO.setStatusCd(statusCd);
-        mktCampaignDO.setTiggerType(tiggerType);
-        mktCampaignDO.setMktCampaignType(mktCampaignType);
-        List<MktCampaign> mktCampaigns = mktCampaignMapper.qryMktCampaignListPage(mktCampaignDO);
+        MktCampaignDO MktCampaignPar = new MktCampaignDO();
+        MktCampaignPar.setMktCampaignName(mktCampaignName);
+        MktCampaignPar.setStatusCd(statusCd);
+        MktCampaignPar.setTiggerType(tiggerType);
+        MktCampaignPar.setMktCampaignType(mktCampaignType);
+        List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListPage(MktCampaignPar);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
-        maps.put("mktCampaigns", mktCampaigns);
-        maps.put("pageInfo", new Page(new PageInfo(mktCampaigns)));
+        maps.put("mktCampaigns", mktCampaignDOList);
+        maps.put("pageInfo", new Page(new PageInfo(mktCampaignDOList)));
         return maps;
     }
 }

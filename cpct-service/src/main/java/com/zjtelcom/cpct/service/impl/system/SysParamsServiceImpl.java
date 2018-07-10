@@ -6,6 +6,7 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.domain.system.SysRole;
+import com.zjtelcom.cpct.enums.ParamKeyEnum;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.system.SysParamsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,4 +126,25 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
 
         return result;
     }
+
+    /**
+     * 获取活动总览页面的筛选条件列表
+     * created by linchao
+     * @return
+     */
+    @Override
+    public Map<String, Object> listParamsByKeyForCampaign() {
+        Map<String,Object> result = new HashMap<>();
+        List<SysParams> statusParams = sysParamsMapper.listParamsByKeyForCampaign(ParamKeyEnum.STATUS_CD.getParamKey());
+        result.put(statusParams.get(0).getParamKey(), statusParams);
+
+        List<SysParams> tiggerParams = sysParamsMapper.listParamsByKeyForCampaign(ParamKeyEnum.TIGGER_TYPE.getParamKey());
+        result.put(tiggerParams.get(0).getParamKey(), tiggerParams);
+
+        List<SysParams> campaignParams = sysParamsMapper.listParamsByKeyForCampaign(ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey());
+        result.put(campaignParams.get(0).getParamKey(), campaignParams);
+        return result;
+    }
+
+
 }

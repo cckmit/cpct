@@ -17,6 +17,8 @@ public interface MktCamEvtRelMapper {
 
     MktCamEvtRelDO selectByPrimaryKey(Long mktCampEvtRelId);
 
+    MktCamEvtRelDO qryByMktCampaignId(Long mktCampaignId);
+
     List<MktCamEvtRelDO> selectAll();
 
     int updateByPrimaryKey(MktCamEvtRelDO mktCamEvtRelDO);

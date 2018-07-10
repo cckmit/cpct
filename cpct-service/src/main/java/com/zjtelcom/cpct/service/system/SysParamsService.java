@@ -25,5 +25,7 @@ public interface SysParamsService {
 
     Map<String, String> getParamsByValue(String keyWord, String value);
 
+    Map<String, Object> listParamsByKeyForCampaign();
+
 
 }

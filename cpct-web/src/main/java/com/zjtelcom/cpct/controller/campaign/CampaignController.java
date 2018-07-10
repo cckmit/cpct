@@ -71,13 +71,14 @@ public class CampaignController extends BaseController {
     /**
      * 查询营销活动
      *
-     * @param mktCampaignId
+     * @param params
      * @return
      * @throws Exception
      */
     @RequestMapping(value = "/getMktCampaign", method = RequestMethod.POST)
     @CrossOrigin
-    public String getMktCampaign(Long mktCampaignId) throws Exception {
+    public String getMktCampaign(@RequestBody Map<String,String> params) throws Exception {
+        Long mktCampaignId = Long.valueOf(params.get("mktCampaignId"));
         Map<String, Object> map = mktCampaignService.getMktCampaign(mktCampaignId);
         return JSON.toJSONString(map);
     }
@@ -86,13 +87,14 @@ public class CampaignController extends BaseController {
     /**
      * 删除营销活动
      *
-     * @param mktCampaignId
+     * @param params
      * @return
      * @throws Exception
      */
     @RequestMapping(value = "/delMktCampaign", method = RequestMethod.POST)
     @CrossOrigin
-    public String delMktCampaign(Long mktCampaignId) throws Exception {
+    public String delMktCampaign(@RequestBody Map<String,String> params) throws Exception {
+        Long mktCampaignId = Long.valueOf(params.get("mktCampaignId"));
         Map<String, Object> map = mktCampaignService.delMktCampaign(mktCampaignId);
         return JSON.toJSONString(map);
     }
