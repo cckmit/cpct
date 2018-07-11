@@ -104,21 +104,16 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
     @Override
     public Map<String, Object> getChannelTreeForActivity(Long userId) {
         Map<String,Object> result = new HashMap<>();
-        Map<String,Object> resultMap = new HashMap<>();
-
         List<ChannelDetail> resultList = new ArrayList<>();
         List<ChannelDetail> initChannelList = new ArrayList<>();//主动
         List<ChannelDetail> passiveChannelList = new ArrayList<>();//被动
-
         List<Channel> parentList = channelMapper.findParentList();
         for (Channel parent : parentList){
             int initCount = 0;
             int passCount = 0;
             List<Channel> childList = channelMapper.findChildListByParentId(parent.getContactChlId());
-
             List<ChannelDetail> initChildList = new ArrayList<>();
             List<ChannelDetail> passChildList = new ArrayList<>();
-
             for (Channel child : childList){
                 if (child.getChannelType().equals(ChannelType.INITIATIVE.getValue().toString())){
                     ChannelDetail detail = getDetail(child);
