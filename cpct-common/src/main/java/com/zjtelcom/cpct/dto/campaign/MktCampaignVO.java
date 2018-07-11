@@ -6,6 +6,9 @@
  */
 package com.zjtelcom.cpct.dto.campaign;
 
+import com.zjtelcom.cpct.dto.event.EventDTO;
+import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
+
 import java.util.List;
 
 /**
@@ -17,24 +20,19 @@ import java.util.List;
 public class MktCampaignVO extends MktCampaign {
 
     /**
-     * 活动关联的事件Id
-     */
-    private Long eventId;
-
-    /**
-     * 活动关联的事件Name
-     */
-    private String eventName;
+     * 活动关联的事件
+      */
+    private List<EventDTO> eventDTOS;
 
     /**
      * 营销活动分类value
      */
     private String mktCampaignTypeValue;
 
-        /**
-         * 活动类别value（关系：强制活动，框架活动，自主活动）
-         */
-        private String relTypeValue;
+    /**
+     * 活动类别value（关系：强制活动，框架活动，自主活动）
+     */
+    private String relTypeValue;
 
     /**
      * 活动类别（关系：强制活动，框架活动，自主活动）
@@ -76,16 +74,28 @@ public class MktCampaignVO extends MktCampaign {
      */
     private Integer execNum;
 
+    /**
+     * 状态Id
+     */
     private String statusCd;
 
+    /**
+     * 状态value
+     */
     private String statusCdValue;
 
-    public Long getEventId() {
-        return eventId;
+    /**
+     * 活动关联策略集合
+     */
+    private List<MktStrategyConf> mktStrategyConfList;
+
+
+    public List<EventDTO> getEventDTOS() {
+        return eventDTOS;
     }
 
-    public void setEventId(Long eventId) {
-        this.eventId = eventId;
+    public void setEventDTOS(List<EventDTO> eventDTOS) {
+        this.eventDTOS = eventDTOS;
     }
 
     public String getRelType() {
@@ -176,13 +186,6 @@ public class MktCampaignVO extends MktCampaign {
         this.execTypeValue = execTypeValue;
     }
 
-    public String getEventName() {
-        return eventName;
-    }
-
-    public void setEventName(String eventName) {
-        this.eventName = eventName;
-    }
 
     public String getStatusCdValue() {
         return statusCdValue;
@@ -190,5 +193,13 @@ public class MktCampaignVO extends MktCampaign {
 
     public void setStatusCdValue(String statusCdValue) {
         this.statusCdValue = statusCdValue;
+    }
+
+    public List<MktStrategyConf> getMktStrategyConfList() {
+        return mktStrategyConfList;
+    }
+
+    public void setMktStrategyConfList(List<MktStrategyConf> mktStrategyConfList) {
+        this.mktStrategyConfList = mktStrategyConfList;
     }
 }

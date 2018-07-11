@@ -12,6 +12,11 @@ public class MktStrategyConfRule {
     private Long mktStrategyConfRuleId;
 
     /**
+     * 策略配置规则Name
+     */
+    private String mktStrategyConfRuleName;
+
+    /**
      * 客户分群配置Id
      */
     private Long tarGrpId;
@@ -70,5 +75,12 @@ public class MktStrategyConfRule {
     public void setRuleConfId(Long ruleConfId) {
         this.ruleConfId = ruleConfId;
     }
-    
+
+    public String getMktStrategyConfRuleName() {
+        return mktStrategyConfRuleName;
+    }
+
+    public void setMktStrategyConfRuleName(String mktStrategyConfRuleName) {
+        this.mktStrategyConfRuleName = mktStrategyConfRuleName;
+    }
 }

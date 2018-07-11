@@ -30,6 +30,10 @@
     delete from mkt_cam_evt_rel
     where MKT_CAMP_EVT_REL_ID = #{mktCampEvtRelId,jdbcType=BIGINT}
   </delete>
+    <delete id="deleteByMktCampaignId" parameterType="java.lang.Long">
+        delete from mkt_cam_evt_rel
+        where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+    </delete>
     <insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamEvtRelDO">
     insert into mkt_cam_evt_rel (MKT_CAMP_EVT_REL_ID, MKT_CAMPAIGN_ID, CAMPAIGN_SEQ,
     EVENT_ID, STATUS_CD, STATUS_DATE,

@@ -21,6 +21,8 @@ public class MktStrategyConfDetail extends MktStrategyConf {
      */
     private List<MktStrategyConfRule> mktStrategyConfRuleList;
 
+    private List<Long> delRuleIds;
+
     public List<City> getCityList() {
         return cityList;
     }
@@ -43,5 +45,13 @@ public class MktStrategyConfDetail extends MktStrategyConf {
 
     public void setMktCampaignId(Long mktCampaignId) {
         this.mktCampaignId = mktCampaignId;
+    }
+
+    public List<Long> getDelRuleIds() {
+        return delRuleIds;
+    }
+
+    public void setDelRuleIds(List<Long> delRuleIds) {
+        this.delRuleIds = delRuleIds;
     }
 }

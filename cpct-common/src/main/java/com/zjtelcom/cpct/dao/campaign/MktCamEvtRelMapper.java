@@ -13,11 +13,13 @@ import java.util.List;
 public interface MktCamEvtRelMapper {
     int deleteByPrimaryKey(Long mktCampEvtRelId);
 
+    int deleteByMktCampaignId(Long mktCampaignId);
+
     int insert(MktCamEvtRelDO mktCamEvtRelDO);
 
     MktCamEvtRelDO selectByPrimaryKey(Long mktCampEvtRelId);
 
-    MktCamEvtRelDO qryByMktCampaignId(Long mktCampaignId);
+    List<MktCamEvtRelDO> qryByMktCampaignId(Long mktCampaignId);
 
     List<MktCamEvtRelDO> selectAll();
 

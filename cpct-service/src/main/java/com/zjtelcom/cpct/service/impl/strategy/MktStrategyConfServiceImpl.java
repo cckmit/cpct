@@ -13,6 +13,8 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRegionRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
+import com.zjtelcom.cpct.dao.system.SysAreaMapper;
+import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.City;
 import com.zjtelcom.cpct.domain.campaign.CityProperty;
 import com.zjtelcom.cpct.domain.campaign.MktCamStrategyConfRelDO;
@@ -24,6 +26,7 @@ import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRuleRel;
 import com.zjtelcom.cpct.enums.ErrorCode;
+import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
@@ -74,6 +77,12 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
      */
     @Autowired
     private MktCamStrategyConfRelMapper mktCamStrategyConfRelMapper;
+
+    /**
+     * 下发城市
+     */
+    @Autowired
+    private SysAreaMapper sysAreaMapper;
 
 
     @Override
@@ -188,6 +197,10 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                 // 添加规则的信息 并返回id -- mktStrategyConfRuleId
                 mktStrategyConfRuleDO.setProductId(productIds);
                 mktStrategyConfRuleDO.setEvtContactConfId(evtContactConfIds);
+                mktStrategyConfRuleDO.setCreateDate(new Date());
+                mktStrategyConfRuleDO.setCreateStaff(UserUtil.loginId());
+                mktStrategyConfRuleDO.setUpdateDate(new Date());
+                mktStrategyConfRuleDO.setUpdateStaff(UserUtil.loginId());
                 mktStrategyConfRuleMapper.insert(mktStrategyConfRuleDO);
                 // 策略规则 Id
                 Long mktStrategyConfRuleId = mktStrategyConfRuleDO.getMktStrategyConfRuleId();
@@ -206,6 +219,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             MktCamStrategyConfRelDO mktCamStrategyConfRelDO = new MktCamStrategyConfRelDO();
             mktCamStrategyConfRelDO.setStrategyConfId(mktStrategyConfId);
             mktCamStrategyConfRelDO.setMktCampaignId(mktStrategyConfDetail.getMktCampaignId());
+            mktCamStrategyConfRelDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getErrorCode());
             mktCamStrategyConfRelDO.setStatusDate(new Date());
             mktCamStrategyConfRelDO.setCreateStaff(UserUtil.loginId());
             mktCamStrategyConfRelDO.setCreateDate(new Date());
@@ -231,7 +245,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             CopyPropertiesUtil.copyBean2Bean(mktStrategyConfDO, mktStrategyConfDetail);
             mktStrategyConfDO.setUpdateStaff(UserUtil.loginId());
             mktStrategyConfDO.setUpdateDate(new Date());
-            // 更新策略配置基本，并返回策略Id -- mktStrategyConfId
+            // 更新策略配置基本，并返回策略Id -- mktStrategyConfId0
             mktStrategyConfMapper.updateByPrimaryKey(mktStrategyConfDO);
             // 策略Id
             Long mktStrategyConfId = mktStrategyConfDO.getMktStrategyConfId();
@@ -316,7 +330,11 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
         MktStrategyConfDetail mktStrategyConfDetail = new MktStrategyConfDetail();
         try {
             //TODO 查出获取所有的城市信息, 设成全局Map
-            Map<Long, String> cityMap = new HashMap<>();
+            Map<Integer, String> cityMap = new HashMap<>();
+            List<SysArea> sysAreaList = sysAreaMapper.selectAll();
+            for (SysArea sysArea : sysAreaList) {
+                cityMap.put(sysArea.getAreaId(), sysArea.getName());
+            }
 
             //更具Id查询策略配置信息
             MktStrategyConfDO mktStrategyConfDO = mktStrategyConfMapper.selectByPrimaryKey(mktStrategyConfId);
@@ -339,7 +357,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                 for (int i = 0; i < applyCountys.length; i++) {
                     CityProperty countyProperty = new CityProperty();
                     countyProperty.setCityPropertyId(Long.valueOf(applyCountys[i]));
-                    countyProperty.setCityPropertyName(cityMap.get(Long.valueOf(applyCountys[i])));
+                    countyProperty.setCityPropertyName(cityMap.get(Integer.valueOf(applyCountys[i])));
                     applyCountyList.add(countyProperty);
                     city.setApplyCountys(applyCountyList);
                 }
@@ -350,7 +368,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                 for (int i = 0; i < applyBranchs.length; i++) {
                     CityProperty branchProperty = new CityProperty();
                     branchProperty.setCityPropertyId(Long.valueOf(applyBranchs[i]));
-                    branchProperty.setCityPropertyName(cityMap.get(Long.valueOf(applyBranchs[i])));
+                    branchProperty.setCityPropertyName(cityMap.get(Integer.valueOf(applyBranchs[i])));
                     applyBranchList.add(branchProperty);
                     city.setApplyBranchs(applyBranchList);
                 }
