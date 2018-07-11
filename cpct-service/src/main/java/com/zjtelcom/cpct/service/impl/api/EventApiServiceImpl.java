@@ -59,6 +59,9 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
     private EventSceneMapper eventSceneMapper; //事件场景
 
     @Autowired
+    private MktCamEvtRelMapper mktCamEvtRelMapper; //事件与活动关联表
+
+    @Autowired
     private EvtSceneCamRelMapper evtSceneCamRelMapper; //事件场景与活动关联表
 
     @Autowired
@@ -149,20 +152,23 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
         }
 
         //根据事件id 查询所有关联的事件场景
-        EventSceneDO param = new EventSceneDO();
-        param.setEventId(eventId);
-        List<EventScene> eventScenes = eventSceneMapper.qryEventSceneByEvtId(eventId);
+//        EventSceneDO param = new EventSceneDO();
+//        param.setEventId(eventId);
+//        List<EventScene> eventScenes = eventSceneMapper.qryEventSceneByEvtId(eventId);
 
-        //循环事件场景列表 根据事件场景获取活动列表  todo 目前是根据事件场景获取所有活动
-        List<Long> activityIds = new ArrayList<>(); //活动id list
-        for (EventScene eventScene : eventScenes) {
-            List<EvtSceneCamRel> evtSceneCamRels = evtSceneCamRelMapper.selectCamsByEvtSceneId(eventScene.getEventSceneId());
-            if (evtSceneCamRels != null && evtSceneCamRels.size() > 0) {
-                for (EvtSceneCamRel evtSceneCamRel : evtSceneCamRels) {
-                    activityIds.add(evtSceneCamRel.getMktCampaignId());
-                }
-            }
-        }
+        //循环事件场景列表 根据事件场景获取活动列表
+//        List<Long> activityIds = new ArrayList<>(); //活动id list
+//        for (EventScene eventScene : eventScenes) {
+//            List<EvtSceneCamRel> evtSceneCamRels = evtSceneCamRelMapper.selectCamsByEvtSceneId(eventScene.getEventSceneId());
+//            if (evtSceneCamRels != null && evtSceneCamRels.size() > 0) {
+//                for (EvtSceneCamRel evtSceneCamRel : evtSceneCamRels) {
+//                    activityIds.add(evtSceneCamRel.getMktCampaignId());
+//                }
+//            }
+//        }
+
+        //根据事件id 查询所有关联活动
+        List<Long> activityIds = mktCamEvtRelMapper.listActivityByEventId(eventId);
 
         //初始化返回结果中的工单信息
         List<Map<String, Object>> orderList = new ArrayList<>();
