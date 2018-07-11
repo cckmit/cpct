@@ -82,6 +82,7 @@
       select MKT_CAMPAIGN_ID
       from mkt_cam_evt_rel
       where EVENT_ID = #{eventId,jdbcType=BIGINT}
+      order by CAMPAIGN_SEQ asc
     </select>
 
 </mapper>

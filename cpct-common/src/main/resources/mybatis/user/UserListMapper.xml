@@ -66,4 +66,14 @@
     and USER_PHONE = #{userPhone,jdbcType=VARCHAR}
   </select>
 
+  <select id="checkRule" resultType="Integer">
+    select count(0)
+    from user_list
+    where USER_PHONE = #{userPhone,jdbcType=VARCHAR}
+    and RULE_ID = #{ruleId,jdbcType=BIGINT}
+    <if test="ruleType != null">
+      and FILTER_TYPE = #{ruleType,jdbcType=VARCHAR}
+    </if>
+  </select>
+
 </mapper>
