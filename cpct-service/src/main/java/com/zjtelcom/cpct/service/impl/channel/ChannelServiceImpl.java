@@ -106,6 +106,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         Map<String,Object> result = new HashMap<>();
         Map<String,Object> resultMap = new HashMap<>();
 
+        List<ChannelDetail> resultList = new ArrayList<>();
         List<ChannelDetail> initChannelList = new ArrayList<>();//主动
         List<ChannelDetail> passiveChannelList = new ArrayList<>();//被动
 
@@ -143,10 +144,18 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
                 passiveChannelList.add(detail);
             }
         }
-        resultMap.put("initChannelList",initChannelList);
-        resultMap.put("passiveChannelList",passiveChannelList);
+        ChannelDetail initDetail = new ChannelDetail();
+        initDetail.setChannelId(0L);
+        initDetail.setChannelName("主动渠道");
+        initDetail.setChildrenList(initChannelList);
+        resultList.add(initDetail);
+        ChannelDetail passDetail = new ChannelDetail();
+        passDetail.setChannelId(0L);
+        passDetail.setChannelName("被动渠道");
+        passDetail.setChildrenList(passiveChannelList);
+        resultList.add(passDetail);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",resultMap);
+        result.put("resultMsg",resultList);
         return result;
 
     }
