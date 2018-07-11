@@ -24,4 +24,7 @@ public interface MktCamEvtRelMapper {
     int updateByPrimaryKey(MktCamEvtRelDO mktCamEvtRelDO);
 
     List<MktCamEvtRel> qryBycontactEvtId(@Param("contactEvtId") Long contactEvtId);
+
+    List<Long> listActivityByEventId(@Param("eventId") Long eventId);
+
 }

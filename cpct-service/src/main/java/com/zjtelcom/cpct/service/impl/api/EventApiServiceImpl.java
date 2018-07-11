@@ -13,6 +13,7 @@ import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
+import com.zjtelcom.cpct.dao.user.UserListMapper;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.event.EventDO;
@@ -59,10 +60,16 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
     private EventSceneMapper eventSceneMapper; //事件场景
 
     @Autowired
+    private MktCamEvtRelMapper mktCamEvtRelMapper; //事件与活动关联表
+
+    @Autowired
     private EvtSceneCamRelMapper evtSceneCamRelMapper; //事件场景与活动关联表
 
     @Autowired
     private MktCampaignMapper mktCampaignMapper; //活动基本信息
+
+    @Autowired
+    private UserListMapper userListMapper; //过滤规则（红名单、黑名单数据）
 
     @Autowired
     private TarGrpConditionMapper tarGrpConditionMapper; //分群规则条件表
@@ -137,32 +144,43 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
 
         //获取事件id
         Long eventId = event.getEventId();
+        //todo 获取事件推荐活动数
 
         //获取事件过滤规则
-        ContactEvtMatchRul contactEvtMatchRul = new ContactEvtMatchRul();
-        contactEvtMatchRul.setContactEvtId(eventId);
-        List<ContactEvtMatchRul> contactEvtMatchRuls = contactEvtMatchRulMapper.listEventMatchRuls(contactEvtMatchRul);
+        ContactEvtMatchRul contactEvtMatchRulParam = new ContactEvtMatchRul();
+        contactEvtMatchRulParam.setContactEvtId(eventId);
+        List<ContactEvtMatchRul> contactEvtMatchRuls = contactEvtMatchRulMapper.listEventMatchRuls(contactEvtMatchRulParam);
         //遍历事件过滤规则匹配
         if (contactEvtMatchRuls != null && contactEvtMatchRuls.size() > 0) {
-            //todo 匹配事件过滤规则
-            System.out.println("匹配事件过滤规则");
-        }
-
-        //根据事件id 查询所有关联的事件场景
-        EventSceneDO param = new EventSceneDO();
-        param.setEventId(eventId);
-        List<EventScene> eventScenes = eventSceneMapper.qryEventSceneByEvtId(eventId);
-
-        //循环事件场景列表 根据事件场景获取活动列表  todo 目前是根据事件场景获取所有活动
-        List<Long> activityIds = new ArrayList<>(); //活动id list
-        for (EventScene eventScene : eventScenes) {
-            List<EvtSceneCamRel> evtSceneCamRels = evtSceneCamRelMapper.selectCamsByEvtSceneId(eventScene.getEventSceneId());
-            if (evtSceneCamRels != null && evtSceneCamRels.size() > 0) {
-                for (EvtSceneCamRel evtSceneCamRel : evtSceneCamRels) {
-                    activityIds.add(evtSceneCamRel.getMktCampaignId());
+            //匹配事件过滤规则
+            int flag = 0;
+            for (ContactEvtMatchRul contactEvtMatchRul : contactEvtMatchRuls) {
+                flag = userListMapper.checkRule("", contactEvtMatchRul.getEvtMatchRulId(), null);
+                if (flag > 0) {
+                    result.put("CPCResultCode", "0");
+                    return result;
                 }
             }
         }
+
+        //根据事件id 查询所有关联的事件场景
+//        EventSceneDO param = new EventSceneDO();
+//        param.setEventId(eventId);
+//        List<EventScene> eventScenes = eventSceneMapper.qryEventSceneByEvtId(eventId);
+
+        //循环事件场景列表 根据事件场景获取活动列表
+//        List<Long> activityIds = new ArrayList<>(); //活动id list
+//        for (EventScene eventScene : eventScenes) {
+//            List<EvtSceneCamRel> evtSceneCamRels = evtSceneCamRelMapper.selectCamsByEvtSceneId(eventScene.getEventSceneId());
+//            if (evtSceneCamRels != null && evtSceneCamRels.size() > 0) {
+//                for (EvtSceneCamRel evtSceneCamRel : evtSceneCamRels) {
+//                    activityIds.add(evtSceneCamRel.getMktCampaignId());
+//                }
+//            }
+//        }
+
+        //根据事件id 查询所有关联活动
+        List<Long> activityIds = mktCamEvtRelMapper.listActivityByEventId(eventId);
 
         //初始化返回结果中的工单信息
         List<Map<String, Object>> orderList = new ArrayList<>();
