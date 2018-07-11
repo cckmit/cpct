@@ -1,7 +1,7 @@
 #应用名称
 dubbo:
   application:
-    name: example-provider
+    name: 33.1059
 #注册中心类型
   registry:
     protocol: zookeeper
@@ -10,5 +10,5 @@ dubbo:
       #暴露服务端口
       port: 20880
 #注册中心地址
-    address:  127.0.0.1:2181
+    address:  134.96.159.11:8033
 

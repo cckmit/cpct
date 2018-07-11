@@ -7,17 +7,17 @@
     http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 
     <!-- 提供方应用信息，用于计算依赖关系 -->
-    <dubbo:application name="${dubbo.application.name}" />
+    <!--<dubbo:application name="33.1059" />-->
 
     <!-- 注册中心暴露服务地址 -->
     <!-- <dubbo:registry address="multicast://224.5.6.7:1234" /> -->
 
-    <!-- <dubbo:registry protocol="zookeeper" address="10.170.219.98:2181,10.173.55.173:2181" /> -->
-    <dubbo:registry protocol="${dubbo.registry.protocol}" address="${dubbo.registry.address}" />
+    <!-- <dubbo:registry protocol="zookeeper" address="10.170.219.98:2181,10.173.55.173x:2181" /> -->
+    <!--<dubbo:registry protocol="zookeeper" address="dubbo://134.96.159.11:8033" />-->
 
     <!-- 暴露服务 -->
-    <dubbo:protocol name="${dubbo.protocol.name}" port="${dubbo.protocol.port}" />
+    <!--<dubbo:protocol name="${dubbo.protocol.name}" port="${dubbo.protocol.port}" />-->
 
-    <dubbo:service interface="com.chengli.springboot.example.service.ExampleService"
-                   ref="exampleServiceImpl" retries="0" timeout="6000" />
+    <!--<dubbo:service interface="com.chengli.springboot.example.service.ExampleService"-->
+                   <!--ref="exampleServiceImpl" retries="0" timeout="6000" />-->
 </beans>

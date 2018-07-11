@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://code.alibabatech.com/schema/dubbo 
+	http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+
+    <dubbo:application name="33.1059"/>
+
+    <dubbo:registry protocol="zookeeper" address="dubbo://134.96.159.11:8033"/>
+
+    <dubbo:consumer timeout="5000"/>
+
+    <!--<dubbo:reference id="contactTaskReceiptService"-->
+    <!--interface="com.ctzj.coordination.service.dubbo.ContactTaskReceiptService"-->
+    <!--version="1.0" retries="0" check="false">-->
+    <!--<dubbo:method name="contactTaskReceipt" servicecode="33.1058.CPCResultFeedback"/>-->
+    <!--<dubbo:method name="queryRequestDetail" servicecode="33.1058.queryRequestDetail"/>-->
+    <!--</dubbo:reference >-->
+
+
+    <!--<dubbo:reference id="tagSyncService" interface="com.zjhcsoft.eagle.main.dubbo.service.TagSyncService" version="1.0">-->
+    <!--<dubbo:method name="syncDatabaseConfig" servicecode="33.1307.syncDatabaseConfig"/>-->
+    <!--<dubbo:method name="getSourceTableCount" servicecode="33.1307.getSourceTableCount"/>-->
+    <!--<dubbo:method name="syncSourceTable" servicecode="33.1307.syncSourceTable"/>-->
+    <!--<dubbo:method name="getSourceTableRefCount" servicecode="33.1307.getSourceTableRefCount"/>-->
+    <!--<dubbo:method name="syncSourceTableRef" servicecode="33.1307.syncSourceTableRef"/>-->
+    <!--<dubbo:method name="getTagCount" servicecode="33.1307.getTagCount"/>-->
+    <!--<dubbo:method name="syncTag" servicecode="33.1307.syncTag"/>-->
+    <!--<dubbo:method name="getTagValueCount" servicecode="33.1307.getTagValueCount"/>-->
+    <!--<dubbo:method name="syncTagValue" servicecode="33.1307.syncTagValue"/>-->
+    <!--</dubbo:reference>-->
+
+    <!--<dubbo:reference id="strategySalesViewService"-->
+    <!--interface="com.ctzj.ppm.dubbo.service.StrategySalesViewService"-->
+    <!--version="1.0" retries="0">-->
+    <!--<dubbo:method name="salesView" servicecode="33.1038.salesView"/>-->
+    <!--</dubbo:reference>-->
+
+    <dubbo:reference id="strategySalesSearchService"
+                     interface="com.ctzj.ppm.dubbo.service.StrategySalesSearchService"
+                     version="1.0" retries="0">
+        <dubbo:method name="salesSearch" servicecode="33.1038.salesSearch"/>
+    </dubbo:reference>
+
+
+</beans>

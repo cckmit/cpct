@@ -11,12 +11,14 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
 
 
 @SpringBootApplication
 @EnableAutoConfiguration
+@ImportResource({ "classpath:dubbo/*.xml" })
 @ComponentScan(value={"com.zjtelcom.cpct"})
 @MapperScan("com.zjtelcom.cpct.dao")
 @EnableTransactionManagement
