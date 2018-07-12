@@ -66,7 +66,7 @@ public class EventServiceImpl extends BaseService implements EventService {
         try {
             //事件信息插入
             CopyPropertiesUtil.copyBean2Bean(eventDO, eventDTO);
-            eventDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getErrorCode());
+            eventDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
             eventMapper.saveEvent(eventDO);
 
             //关联到事件采集项
@@ -118,7 +118,7 @@ public class EventServiceImpl extends BaseService implements EventService {
     @Override
     public void closeEvent(Long eventId) {
         try {
-            eventMapper.updateEventStatusCd(eventId, StatusCode.STATUS_CODE_FAILURE.getErrorCode());
+            eventMapper.updateEventStatusCd(eventId, StatusCode.STATUS_CODE_FAILURE.getStatusCode());
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("[op:EventServiceImpl] fail to closeEvent ", e);

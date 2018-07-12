@@ -49,7 +49,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
         try {
             //添加协同渠道基本信息
             CopyPropertiesUtil.copyBean2Bean(mktCamChlConfDO, mktCamChlConfDetail);
-            mktCamChlConfDO.setStatusCd(StatusCode.STATUS_CODE_NOTACTIVE.getErrorCode());
+            mktCamChlConfDO.setStatusCd(StatusCode.STATUS_CODE_NOTACTIVE.getStatusCode());
             mktCamChlConfDO.setCreateDate(new Date());
             mktCamChlConfDO.setCreateStaff(UserUtil.loginId());
             mktCamChlConfDO.setUpdateDate(new Date());
@@ -89,7 +89,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
         try {
             // 更新协同渠道基本信息
             CopyPropertiesUtil.copyBean2Bean(mktCamChlConfDO, mktCamChlConfDetail);
-            mktCamChlConfDO.setStatusCd(StatusCode.STATUS_CODE_NOTACTIVE.getErrorCode());
+            mktCamChlConfDO.setStatusCd(StatusCode.STATUS_CODE_NOTACTIVE.getStatusCode());
             mktCamChlConfDO.setUpdateDate(new Date());
             mktCamChlConfDO.setUpdateStaff(UserUtil.loginId());
             mktCamChlConfMapper.updateByPrimaryKey(mktCamChlConfDO);

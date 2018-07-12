@@ -14,6 +14,7 @@ public class MktCampaignDO extends BaseEntity{
     private Date beginTime;
     private Date endTime;
     private String mktCampaignType;
+    private String mktCampaignCategory;
     private String mktActivityNbr;
     private String mktActivityTarget;
     private String mktCampaignDesc;
@@ -131,5 +132,13 @@ public class MktCampaignDO extends BaseEntity{
 
     public void setExecNum(Integer execNum) {
         this.execNum = execNum;
+    }
+
+    public String getMktCampaignCategory() {
+        return mktCampaignCategory;
+    }
+
+    public void setMktCampaignCategory(String mktCampaignCategory) {
+        this.mktCampaignCategory = mktCampaignCategory;
     }
 }

@@ -15,7 +15,7 @@ package com.zjtelcom.cpct.enums;
 public enum ParamKeyEnum {
 
     STATUS_CD("statusCd", "状态"),
-    REL_TYPE("relType", "活动类别"),
+    MKT_CAMPAIGN_CATEGORY("mktCampaignCategory", "活动类别"),
     TIGGER_TYPE("tiggerType", "触发类型"),
     EXEC_TYPE("execType", "活动周期"),
     MKT_CAMPAIGN_TYPE("mktCampaignType", "活动分类"),;
