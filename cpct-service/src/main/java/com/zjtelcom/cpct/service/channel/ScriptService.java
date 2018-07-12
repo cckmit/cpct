@@ -14,8 +14,9 @@ public interface ScriptService {
 
     Map<String,Object> qryMktScriptList (Long userId,QryMktScriptReq params );
 
-
     Map<String,Object> getScriptVODetail(Long userId,Long scriptId);
+
+    Map<String,Object> getScriptList(Long userId,String scriptName);
 
 
 
