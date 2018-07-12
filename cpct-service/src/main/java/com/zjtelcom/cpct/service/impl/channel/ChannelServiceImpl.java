@@ -140,12 +140,12 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
             }
         }
         ChannelDetail initDetail = new ChannelDetail();
-        initDetail.setChannelId(0L);
+        initDetail.setChannelId(-1L);
         initDetail.setChannelName("主动渠道");
         initDetail.setChildrenList(initChannelList);
         resultList.add(initDetail);
         ChannelDetail passDetail = new ChannelDetail();
-        passDetail.setChannelId(0L);
+        passDetail.setChannelId(-2L);
         passDetail.setChannelName("被动渠道");
         passDetail.setChildrenList(passiveChannelList);
         resultList.add(passDetail);

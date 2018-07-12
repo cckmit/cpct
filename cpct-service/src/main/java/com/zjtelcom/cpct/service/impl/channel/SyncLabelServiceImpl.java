@@ -5,7 +5,6 @@ import com.zjhcsoft.eagle.main.dubbo.model.policy.TagValueInfoModel;
 import com.zjtelcom.cpct.bean.RespInfo;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
-import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.service.BaseService;

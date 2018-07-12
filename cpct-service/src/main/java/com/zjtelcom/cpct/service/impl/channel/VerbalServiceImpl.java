@@ -33,8 +33,6 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
     @Autowired
     private InjectionLabelMapper labelMapper;
 
-
-
     /**
      * 添加痛痒点话术
      */
