@@ -13,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Transactional
@@ -81,7 +78,7 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
         if(id == null) {
             //todo 为空异常
         }
-        SysParams sysParams = sysParamsMapper.selectByPrimaryKey(id);
+        List<SysParams> sysParams = sysParamsMapper.selectByPrimaryKey(id);
         result.put("resultCode","0");
         result.put("data",sysParams);
 
@@ -101,10 +98,15 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
     }
 
     @Override
-    public Map<String, String> listParamsByKey(String key) {
-        Map<String,String> result = new HashMap<>();
+    public Map<String, Object> listParamsByKey(String key) {
+        Map<String,Object> result = new HashMap<>();
 
-        result = sysParamsMapper.listParamsByKey(key);
+        List<Map<String,String>> list = new ArrayList<>();
+
+        list = sysParamsMapper.listParamsByKey(key);
+
+        result.put("data",list);
+        result.put("code","0");
 
         return result;
     }

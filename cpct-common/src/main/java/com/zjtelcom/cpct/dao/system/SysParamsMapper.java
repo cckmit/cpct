@@ -12,13 +12,13 @@ public interface SysParamsMapper {
 
     int insert(SysParams record);
 
-    SysParams selectByPrimaryKey(Long paramId);
+    List<SysParams> selectByPrimaryKey(Long paramId);
 
     List<SysParams> selectAll(@Param("paramName") String paramName, @Param("configType") Long configType);
 
     int updateByPrimaryKey(SysParams record);
 
-    Map<String,String> listParamsByKey(String key);
+    List<Map<String,String>> listParamsByKey(String key);
 
     Map<String,String> getParamsByKey(@Param("keyWord") String keyWord,@Param("key") String key);
 

@@ -19,7 +19,7 @@ public interface SysParamsService {
 
     Map<String, Object> delParams(Long id);
 
-    Map<String, String> listParamsByKey(String key);
+    Map<String, Object> listParamsByKey(String key);
 
     Map<String, String> getParamsByKey(String keyWord, String key);
 
