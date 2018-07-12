@@ -14,6 +14,7 @@ import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.grouping.TarGrpConditionDO;
+import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
@@ -25,10 +26,7 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.EagleDatabaseConfCache;
 import com.zjtelcom.cpct.service.TryCalcService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
-import com.zjtelcom.cpct.util.CopyPropertiesUtil;
-import com.zjtelcom.cpct.util.DateUtil;
-import com.zjtelcom.cpct.util.SqlUtil;
-import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct.validator.ValidateResult;
 import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
 import com.zjtelcom.cpct.vo.grouping.TarGrpVO;
@@ -262,6 +260,25 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             //塞入左参中文名
             Label label = injectionLabelMapper.selectByPrimaryKey(Long.valueOf(tarGrpConditionVO.getLeftParam()));
             tarGrpConditionVO.setLeftParamName(label.getInjectionLabelName());
+            //塞入标签基础信息
+            tarGrpConditionVO.setConditionType(label.getConditionType());
+            if (label.getRightOperand()!=null){
+                tarGrpConditionVO.setValueList(ChannelUtil.StringToList(label.getRightOperand()));
+            }
+            if (label.getOperator()!=null){
+                List<String> opratorList = ChannelUtil.StringToList(label.getOperator());
+                List<OperatorDetail> opStList  = new ArrayList<>();
+                for (String operator : opratorList){
+                    Operator op = Operator.getOperator(Integer.valueOf(operator));
+                    OperatorDetail detail = new OperatorDetail();
+                    if (op!=null){
+                        detail.setOperValue(op.getValue());
+                        detail.setOperName(op.getDescription());
+                    }
+                    opStList.add(detail);
+                }
+                tarGrpConditionVO.setOperatorList(opStList);
+            }
             //塞入领域
             FitDomain fitDomain = null;
             if (label.getFitDomain() != null) {
