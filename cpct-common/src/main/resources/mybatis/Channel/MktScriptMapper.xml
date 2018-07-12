@@ -69,4 +69,14 @@
           and UPDATE_DATE = #{createTime}
       </if>
   </select>
+
+  <select id="findByScriptName" resultMap="BaseResultMap">
+    select SCRIPT_ID, SCRIPT_NAME, SCRIPT_DESC, SCRIPT_TYPE, SUIT_CHANNEL_TYPE, EXEC_CHANNEL,
+    STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
+    from mkt_script
+    where 1=1
+    <if test="scriptName != null and scriptName != ''">
+      and SCRIPT_NAME LIKE CONCAT(CONCAT('%',#{scriptName}),'%')
+    </if>
+  </select>
 </mapper>

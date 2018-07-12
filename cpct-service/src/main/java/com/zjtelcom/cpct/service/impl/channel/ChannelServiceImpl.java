@@ -5,14 +5,13 @@ import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.domain.channel.Channel;
-import com.zjtelcom.cpct.dto.channel.ChannelDetail;
-import com.zjtelcom.cpct.dto.channel.ContactChannelDetail;
-import com.zjtelcom.cpct.dto.channel.ChannelVO;
+import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.ChannelType;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ChannelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
+import com.zjtelcom.cpct.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -104,9 +103,14 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
     @Override
     public Map<String, Object> getChannelTreeForActivity(Long userId) {
         Map<String,Object> result = new HashMap<>();
-        List<ChannelDetail> resultList = new ArrayList<>();
-        List<ChannelDetail> initChannelList = new ArrayList<>();//主动
-        List<ChannelDetail> passiveChannelList = new ArrayList<>();//被动
+        List<ChanDetailVO2> reList = new ArrayList<>();
+//        List<ChannelDetail> resultList = new ArrayList<>();
+//        List<ChannelDetail> initChannelList = new ArrayList<>();//主动
+//        List<ChannelDetail> passiveChannelList = new ArrayList<>();//被动
+
+        List<ChannelDetailVO> initVOList = new ArrayList<>();
+        List<ChannelDetailVO> passVOList = new ArrayList<>();
+
         List<Channel> parentList = channelMapper.findParentList();
         for (Channel parent : parentList){
             int initCount = 0;
@@ -127,30 +131,53 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
                     passCount += 1;
                 }
             }
+//            //所有主动渠道的渠道信息
+//            if (initCount >0 ){
+//                ChannelDetail detail = getDetail(parent);
+//                detail.setChildrenList(initChildList);
+//                initChannelList.add(detail);
+//            }
+//            if (passCount > 0){
+//                ChannelDetail detail = getDetail(parent);
+//                detail.setChildrenList(passChildList);
+//                passiveChannelList.add(detail);
+//            }
+
+
+            //----------------
             //所有主动渠道的渠道信息
-            if (initCount >0 ){
-                ChannelDetail detail = getDetail(parent);
-                detail.setChildrenList(initChildList);
-                initChannelList.add(detail);
+            if (initCount > 0){
+                ChannelDetailVO detailVO = getDetailvo(parent);
+                detailVO.setChildrenList(initChildList);
+                initVOList.add(detailVO);
             }
             if (passCount > 0){
-                ChannelDetail detail = getDetail(parent);
-                detail.setChildrenList(passChildList);
-                passiveChannelList.add(detail);
+                ChannelDetailVO detailVO = getDetailvo(parent);
+                detailVO.setChildrenList(passChildList);
+                passVOList.add(detailVO);
             }
         }
-        ChannelDetail initDetail = new ChannelDetail();
-        initDetail.setChannelId(-1L);
-        initDetail.setChannelName("主动渠道");
-        initDetail.setChildrenList(initChannelList);
-        resultList.add(initDetail);
-        ChannelDetail passDetail = new ChannelDetail();
-        passDetail.setChannelId(-2L);
-        passDetail.setChannelName("被动渠道");
-        passDetail.setChildrenList(passiveChannelList);
-        resultList.add(passDetail);
+//        ChannelDetail initDetail = new ChannelDetail();
+//        initDetail.setChannelId(-1L);
+//        initDetail.setChannelName("主动渠道");
+//        initDetail.setChildrenList(initChannelList);
+//        resultList.add(initDetail);
+//        ChannelDetail passDetail = new ChannelDetail();
+//        passDetail.setChannelId(-2L);
+//        passDetail.setChannelName("被动渠道");
+//        passDetail.setChildrenList(passiveChannelList);
+//        resultList.add(passDetail);
+//-------------------------------------
+        ChanDetailVO2 initvo = new ChanDetailVO2();
+        initvo.setChannelName("主动渠道");
+        initvo.setChildrenList(initVOList);
+        reList.add(initvo);
+        ChanDetailVO2 passvo = new ChanDetailVO2();
+        passvo.setChannelName("被动渠道");
+        passvo.setChildrenList(passVOList);
+        reList.add(passvo);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",resultList);
+        result.put("resultMsg",reList);
         return result;
 
     }
@@ -158,6 +185,12 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
     private ChannelDetail getDetail(Channel channel ){
         ChannelDetail detail = new ChannelDetail();
         detail.setChannelId(channel.getContactChlId());
+        detail.setChannelName(channel.getContactChlName());
+        return detail;
+    }
+
+    private ChannelDetailVO getDetailvo(Channel channel ){
+        ChannelDetailVO detail = new ChannelDetailVO();
         detail.setChannelName(channel.getContactChlName());
         return detail;
     }
