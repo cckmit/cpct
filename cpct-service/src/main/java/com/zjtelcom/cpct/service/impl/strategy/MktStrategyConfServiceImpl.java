@@ -85,6 +85,13 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
     private SysAreaMapper sysAreaMapper;
 
 
+    /**
+     * 删除活动配置
+     *
+     * @param mktStrategyConfId
+     * @return
+     * @throws Exception
+     */
     @Override
     public Map<String, Object> deleteMktStrategyConf(Long mktStrategyConfId) throws Exception {
         Map<String, Object> mktStrategyConfMap = new HashMap<>();
@@ -110,7 +117,6 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
      * @return
      */
     @Override
-    @Transactional
     public Map<String, Object> saveMktStrategyConf(MktStrategyConfDetail mktStrategyConfDetail) throws Exception {
 
         Map<String, Object> mktStrategyConfMap = new HashMap<>();
@@ -219,7 +225,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             MktCamStrategyConfRelDO mktCamStrategyConfRelDO = new MktCamStrategyConfRelDO();
             mktCamStrategyConfRelDO.setStrategyConfId(mktStrategyConfId);
             mktCamStrategyConfRelDO.setMktCampaignId(mktStrategyConfDetail.getMktCampaignId());
-            mktCamStrategyConfRelDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getErrorCode());
+            mktCamStrategyConfRelDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
             mktCamStrategyConfRelDO.setStatusDate(new Date());
             mktCamStrategyConfRelDO.setCreateStaff(UserUtil.loginId());
             mktCamStrategyConfRelDO.setCreateDate(new Date());
@@ -236,6 +242,13 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
         return mktStrategyConfMap;
     }
 
+
+    /**
+     * 更新策略配置信息
+     * @param mktStrategyConfDetail
+     * @return
+     * @throws Exception
+     */
     @Override
     public Map<String, Object> updateMktStrategyConf(MktStrategyConfDetail mktStrategyConfDetail) throws Exception {
         Map<String, Object> mktStrategyConfMap = new HashMap<String, Object>();
@@ -294,22 +307,41 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                 mktStrategyConfRegionRelMapper.updateByPrimaryKey(mktStrategyConfRegionRelDO);
             }
 
-            // 遍历
+            // 遍历策略下的所有规则
             for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfDetail.getMktStrategyConfRuleList()) {
                 MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
                 CopyPropertiesUtil.copyBean2Bean(mktStrategyConfRuleDO, mktStrategyConfRule);
-                // 修改规则的信息 并返回id -- mktStrategyConfRuleId
-                mktStrategyConfRuleMapper.updateByPrimaryKey(mktStrategyConfRuleDO);
-                // 策略规则 Id
-                Long mktStrategyConfRuleId = mktStrategyConfRuleDO.getMktStrategyConfRuleId();
-                // 建立策略配置和规则的关系
-                MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO = new MktStrategyConfRuleRelDO();
-                mktStrategyConfRuleRelDO.setMktStrategyConfId(mktStrategyConfId);
-                mktStrategyConfRuleRelDO.setMktStrategyConfRuleId(mktStrategyConfRuleId);
-                mktStrategyConfRuleRelDO.setUpdateStaff(UserUtil.loginId());
-                mktStrategyConfRuleRelDO.setUpdateDate(new Date());
-                mktStrategyConfRuleRelMapper.updateByPrimaryKey(mktStrategyConfRuleRelDO);
+                //判断规则是否是修改还是新增
+                if (mktStrategyConfRule.getMktStrategyConfRuleId() != null && mktStrategyConfRule.getMktStrategyConfRuleId() != 0) {
+                    // 修改规则的信息 并返回id -- mktStrategyConfRuleId
+                    mktStrategyConfRuleMapper.updateByPrimaryKey(mktStrategyConfRuleDO);
+                } else {
+                    // 添加新增的规则
+                    mktStrategyConfRuleMapper.insert(mktStrategyConfRuleDO);
+                    // 策略规则 Id
+                    Long mktStrategyConfRuleId = mktStrategyConfRuleDO.getMktStrategyConfRuleId();
+                    // 建立策略配置和规则的关系
+                    MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO = new MktStrategyConfRuleRelDO();
+                    mktStrategyConfRuleRelDO.setCreateDate(new Date());
+                    mktStrategyConfRuleRelDO.setCreateStaff(UserUtil.loginId());
+                    mktStrategyConfRuleRelDO.setMktStrategyConfId(mktStrategyConfId);
+                    mktStrategyConfRuleRelDO.setMktStrategyConfRuleId(mktStrategyConfRuleId);
+                    mktStrategyConfRuleRelDO.setUpdateStaff(UserUtil.loginId());
+                    mktStrategyConfRuleRelDO.setUpdateDate(new Date());
+                    mktStrategyConfRuleRelMapper.insert(mktStrategyConfRuleRelDO);
+                }
             }
+
+            // 删除被删掉的规则以及与策略的关联
+/*
+            for (Long mktStrategyConfRuleId : mktStrategyConfDetail.getDelRuleIds()) {
+                //删掉规则与策略的关联
+                mktStrategyConfRuleRelMapper.deleteByMktStrategyConfId(mktStrategyConfRuleId);
+                //删掉规则规则信息
+                mktStrategyConfRuleMapper.deleteByPrimaryKey(mktStrategyConfRuleId);
+            }
+*/
+
         } catch (Exception e) {
             logger.error("[op:MktStrategyConfServiceImpl] fail to update MktStrategyConfDetail = {}, Exception: ", JSON.toJSON(mktStrategyConfDetail), e);
             mktStrategyConfMap.put("resultCode", CommonConstant.CODE_FAIL);

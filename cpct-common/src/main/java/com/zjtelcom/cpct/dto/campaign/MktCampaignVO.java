@@ -6,8 +6,10 @@
  */
 package com.zjtelcom.cpct.dto.campaign;
 
+import com.zjtelcom.cpct.domain.campaign.CityProperty;
 import com.zjtelcom.cpct.dto.event.EventDTO;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
+import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 
 import java.util.List;
 
@@ -32,17 +34,17 @@ public class MktCampaignVO extends MktCampaign {
     /**
      * 活动类别value（关系：强制活动，框架活动，自主活动）
      */
-    private String relTypeValue;
+    private String mktCampaignCategoryValue;
 
     /**
      * 活动类别（关系：强制活动，框架活动，自主活动）
      */
-    private String relType;
+    private String mktCampaignCategory;
 
     /**
      * 下发地市Id
      */
-    private List<Long> applyRegionIds;
+    private List<CityProperty> applyRegionIdList;
 
     /**
      * 触发类型Value
@@ -90,6 +92,9 @@ public class MktCampaignVO extends MktCampaign {
     private List<MktStrategyConf> mktStrategyConfList;
 
 
+    private List<MktStrategyConfDetail> mktStrategyConfDetailList;
+
+
     public List<EventDTO> getEventDTOS() {
         return eventDTOS;
     }
@@ -98,20 +103,28 @@ public class MktCampaignVO extends MktCampaign {
         this.eventDTOS = eventDTOS;
     }
 
-    public String getRelType() {
-        return relType;
+    public String getMktCampaignCategoryValue() {
+        return mktCampaignCategoryValue;
     }
 
-    public void setRelType(String relType) {
-        this.relType = relType;
+    public void setMktCampaignCategoryValue(String mktCampaignCategoryValue) {
+        this.mktCampaignCategoryValue = mktCampaignCategoryValue;
     }
 
-    public List<Long> getApplyRegionIds() {
-        return applyRegionIds;
+    public String getMktCampaignCategory() {
+        return mktCampaignCategory;
     }
 
-    public void setApplyRegionIds(List<Long> applyRegionIds) {
-        this.applyRegionIds = applyRegionIds;
+    public void setMktCampaignCategory(String mktCampaignCategory) {
+        this.mktCampaignCategory = mktCampaignCategory;
+    }
+
+    public List<CityProperty> getApplyRegionIdList() {
+        return applyRegionIdList;
+    }
+
+    public void setApplyRegionIdList(List<CityProperty> applyRegionIdList) {
+        this.applyRegionIdList = applyRegionIdList;
     }
 
     public String getTiggerType() {
@@ -162,14 +175,6 @@ public class MktCampaignVO extends MktCampaign {
         this.mktCampaignTypeValue = mktCampaignTypeValue;
     }
 
-    public String getRelTypeValue() {
-        return relTypeValue;
-    }
-
-    public void setRelTypeValue(String relTypeValue) {
-        this.relTypeValue = relTypeValue;
-    }
-
     public String getTiggerTypeValue() {
         return tiggerTypeValue;
     }
@@ -201,5 +206,13 @@ public class MktCampaignVO extends MktCampaign {
 
     public void setMktStrategyConfList(List<MktStrategyConf> mktStrategyConfList) {
         this.mktStrategyConfList = mktStrategyConfList;
+    }
+
+    public List<MktStrategyConfDetail> getMktStrategyConfDetailList() {
+        return mktStrategyConfDetailList;
+    }
+
+    public void setMktStrategyConfDetailList(List<MktStrategyConfDetail> mktStrategyConfDetailList) {
+        this.mktStrategyConfDetailList = mktStrategyConfDetailList;
     }
 }
