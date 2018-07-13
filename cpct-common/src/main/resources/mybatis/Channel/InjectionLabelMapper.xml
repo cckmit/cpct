@@ -134,7 +134,7 @@
       <if test="null != record and record.size > 0">
         INJECTION_LABEL_ID in
         <foreach collection="record" item="item" open="(" close=")" separator=",">
-          #{item.INJECTION_LABEL_ID}
+          #{item.injectionLabelId}
         </foreach>
       </if>
     </where>

@@ -38,7 +38,7 @@ public class ContactEvtMatchRulController extends BaseController {
             maps = contactEvtMatchRulService.listEventMatchRuls(contactEvtMatchRul);
         } catch (Exception e) {
             logger.error("[op:EventMatchRulController] fail to listEventMatchRuls for contactEvtMatchRul = {}! Exception: ", contactEvtMatchRul, e);
-            return initFailRespInfo(ErrorCode.SEARCH_EVENTMATCHRUL_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENTMATCHRUL_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }

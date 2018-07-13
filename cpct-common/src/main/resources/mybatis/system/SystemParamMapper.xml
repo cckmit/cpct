@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zjtelcom.cpct.dao.system.SystemParamMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.dto.system.SystemParam">
+        <id column="param_id" property="paramId" jdbcType="INTEGER"/>
+        <result column="param_name" property="paramName" jdbcType="VARCHAR"/>
+        <result column="param_value" property="paramValue" jdbcType="VARCHAR"/>
+        <result column="config_type" property="configType" jdbcType="INTEGER"/>
+        <result column="modify_flag" property="modifyFlag" jdbcType="INTEGER"/>
+        <result column="descrip_tion" property="descripTion" jdbcType="VARCHAR"/>
+        <result column="param_key" property="paramKey" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+      param_id, param_name, param_value, config_type, modify_flag, descrip_tion, param_key
+    </sql>
+
+    <!--<select id="querySystemParamByPage" resultType="com.zjtelcom.cpct.dto.system.SystemParam" parameterType="com.zjtelcom.cpct.dto.system.SystemParam">-->
+        <!--select-->
+        <!--param_id as paramId,-->
+        <!--param_name as paramName,-->
+        <!--param_value as paramValue,-->
+        <!--config_type as configType,-->
+        <!--modify_flag as modifyFlag,-->
+        <!--descrip_tion as descripTion,-->
+        <!--param_key as paramKey-->
+        <!--from fpc_m_system_param-->
+        <!--where 1=1-->
+        <!--<if test="pd.paramId != null and pd.paramId != ''">-->
+            <!--and param_id = #{pd.paramId,jdbcType=INTEGER}-->
+        <!--</if>-->
+        <!--<if test="pd.paramName != null and pd.paramName != ''">-->
+            <!--and param_name like concat('%', #{pd.paramName,jdbcType=VARCHAR}, '%')-->
+        <!--</if>-->
+        <!--<if test="pd.paramValue != null and pd.paramValue != ''">-->
+            <!--and param_value  = #{pd.paramValue,jdbcType=VARCHAR}-->
+        <!--</if>-->
+        <!--<if test="pd.configType != null and pd.configType != ''">-->
+            <!--and config_type = #{pd.configType,jdbcType=INTEGER}-->
+        <!--</if>-->
+    <!--</select>-->
+
+
+    <insert id="insertSystemParamOne" parameterType="com.zjtelcom.cpct.dto.system.SystemParam">
+        insert into fpc_m_system_param
+        (param_id, param_name, param_value,config_type, modify_flag, descrip_tion, param_key)
+        values (#{paramId,jdbcType=INTEGER}, #{paramName,jdbcType=VARCHAR}, #{paramValue,jdbcType=VARCHAR},
+        #{configType,jdbcType=INTEGER}, #{modifyFlag,jdbcType=INTEGER}, #{descripTion,jdbcType=VARCHAR},
+        #{paramKey,jdbcType=VARCHAR})
+    </insert>
+
+
+    <update id="updateSystemParam" parameterType="com.zjtelcom.cpct.dto.system.SystemParam">
+        update fpc_m_system_param
+        set
+        param_name = #{paramName,jdbcType=VARCHAR},
+        param_value = #{paramValue,jdbcType=VARCHAR},
+        config_type = #{configType,jdbcType=INTEGER},
+        modify_flag = #{modifyFlag,jdbcType=INTEGER},
+        descrip_tion = #{descripTion,jdbcType=VARCHAR},
+        param_key = #{paramKey,jdbcType=VARCHAR}
+        where param_id = #{paramId,jdbcType=INTEGER}
+    </update>
+
+    <delete id="deleteSystemParam" parameterType="com.zjtelcom.cpct.dto.system.SystemParam">
+        delete from fpc_m_system_param
+        where param_id = #{paramId,jdbcType=INTEGER}
+    </delete>
+
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from fpc_m_system_param
+        where param_id = #{paramId,jdbcType=INTEGER}
+    </select>
+    
+     <select id="selectByParamKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from fpc_m_system_param
+        where param_key = #{paramKey}
+    </select>
+
+    <!-- add method queryAllSystemParam-->
+    <select id="queryAllSystemParam" resultType="com.zjtelcom.cpct.dto.system.SystemParam">
+        select
+        <include refid="Base_Column_List"/>
+        from fpc_m_system_param
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+      delete from fpc_m_system_param
+       where param_id = #{paramId,jdbcType=INTEGER}
+  </delete>
+
+
+    <insert id="insert" parameterType="com.zjtelcom.cpct.dto.system.SystemParam">
+    insert into fpc_m_system_param (param_id, param_name, param_value, 
+      config_type, modify_flag, descrip_tion, 
+      param_key)
+    values (#{paramId,jdbcType=INTEGER}, #{paramName,jdbcType=VARCHAR}, #{paramValue,jdbcType=VARCHAR}, 
+      #{configType,jdbcType=INTEGER}, #{modifyFlag,jdbcType=INTEGER}, #{descripTion,jdbcType=VARCHAR}, 
+      #{paramKey,jdbcType=VARCHAR})
+  </insert>
+
+    <insert id="insertSelective" parameterType="com.zjtelcom.cpct.dto.system.SystemParam">
+        insert into fpc_m_system_param
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="paramId != null">
+                param_id,
+            </if>
+            <if test="paramName != null">
+                param_name,
+            </if>
+            <if test="paramValue != null">
+                param_value,
+            </if>
+            <if test="configType != null">
+                config_type,
+            </if>
+            <if test="modifyFlag != null">
+                modify_flag,
+            </if>
+            <if test="descripTion != null">
+                descrip_tion,
+            </if>
+            <if test="paramKey != null">
+                param_key,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="paramId != null">
+                #{paramId,jdbcType=INTEGER},
+            </if>
+            <if test="paramName != null">
+                #{paramName,jdbcType=VARCHAR},
+            </if>
+            <if test="paramValue != null">
+                #{paramValue,jdbcType=VARCHAR},
+            </if>
+            <if test="configType != null">
+                #{configType,jdbcType=INTEGER},
+            </if>
+            <if test="modifyFlag != null">
+                #{modifyFlag,jdbcType=INTEGER},
+            </if>
+            <if test="descripTion != null">
+                #{descripTion,jdbcType=VARCHAR},
+            </if>
+            <if test="paramKey != null">
+                #{paramKey,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zjtelcom.cpct.dto.system.SystemParam">
+        update fpc_m_system_param
+        <set>
+            <if test="paramName != null">
+                param_name = #{paramName,jdbcType=VARCHAR},
+            </if>
+            <if test="paramValue != null">
+                param_value = #{paramValue,jdbcType=VARCHAR},
+            </if>
+            <if test="configType != null">
+                config_type = #{configType,jdbcType=INTEGER},
+            </if>
+            <if test="modifyFlag != null">
+                modify_flag = #{modifyFlag,jdbcType=INTEGER},
+            </if>
+            <if test="descripTion != null">
+                descrip_tion = #{descripTion,jdbcType=VARCHAR},
+            </if>
+            <if test="paramKey != null">
+                param_key = #{paramKey,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where param_id = #{paramId,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.dto.system.SystemParam">
+    update fpc_m_system_param
+    set param_name = #{paramName,jdbcType=VARCHAR},
+      param_value = #{paramValue,jdbcType=VARCHAR},
+      config_type = #{configType,jdbcType=INTEGER},
+      modify_flag = #{modifyFlag,jdbcType=INTEGER},
+      descrip_tion = #{descripTion,jdbcType=VARCHAR},
+      param_key = #{paramKey,jdbcType=VARCHAR}
+    where param_id = #{paramId,jdbcType=INTEGER}
+  </update>
+  
+    <select id="findParamKeyIn" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from fpc_m_system_param
+        where param_key like concat(#{paramKey}, "%");
+    </select>
+</mapper>

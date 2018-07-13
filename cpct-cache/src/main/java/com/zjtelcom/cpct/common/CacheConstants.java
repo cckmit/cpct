@@ -104,6 +104,8 @@ public class CacheConstants {
 
     public static final String TRIGGER_CACHE_NAME = "TRIGGER_CACHE";
 
+    public static final String LABEL_CACHE_NAME = "LABEL_CACHE";
+
     public static final String TAG_ADAPTION_CACHE_NAME = "TAG_ADAPTION_CACHE";
 
 }

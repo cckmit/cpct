@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.common;
 
+import com.zjtelcom.cpct.service.ApplicationContextRegister;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -206,7 +207,8 @@ public abstract class ABSGGCache<T> implements IDacher<T> {
     public <B> B getBean(Class<B> clazz){
         B springBean = null;
         if(null == this.bean){
-            springBean = ContextLoader.getCurrentWebApplicationContext().getBean(clazz);
+//            springBean = ContextLoader.getCurrentWebApplicationContext().getBean(clazz);
+            springBean = ApplicationContextRegister.getApplicationContext() .getBean(clazz);
             this.bean = springBean;
         }
         springBean = (B)this.bean;

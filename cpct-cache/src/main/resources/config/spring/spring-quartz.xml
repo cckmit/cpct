@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="
+            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd  
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+            http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.1.xsd">
+
+    <task:annotation-driven/> <!-- 定时器开关 -->
+
+    <!--
+    <task:scheduled-tasks scheduler="scheduler">
+        <task:scheduled ref="maxPushControlTask" method="changeIsMaxPushControlReload"
+            cron="0 15 02 ? * *" />
+    </task:scheduled-tasks>
+    -->
+
+    <task:executor id="executor" pool-size="20"/>
+    <task:scheduler id="scheduler" pool-size="20"/>
+
+    <!-- 定时刷新缓存机制
+    <bean id="maxPushControlTask" class="com.apps.toolbar.memparam.MaxPushControlCached" />
+     -->
+    <!-- 刷新缓存 -->
+    <task:scheduled-tasks scheduler="scheduler">
+        <task:scheduled ref="cacheCenter" method="synCache"
+                        cron="0/10 * * ? ?"/>
+    </task:scheduled-tasks>
+    <bean id="cacheCenter" class="com.zjtelcom.cpct.service.CacheCenter"/>
+
+</beans>

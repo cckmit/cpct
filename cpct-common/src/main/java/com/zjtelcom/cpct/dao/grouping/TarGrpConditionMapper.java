@@ -15,11 +15,11 @@ public interface TarGrpConditionMapper {
 
     int insert(TarGrpCondition record);
 
-    TarGrpConditionDO selectByPrimaryKey(Long conditionId);
+    TarGrpCondition selectByPrimaryKey(Long conditionId);
 
     List<TarGrpConditionDO> selectAll();
 
-    int updateByPrimaryKey(TarGrpConditionDO record);
+    int updateByPrimaryKey(TarGrpCondition record);
 
     TarGrpCondition getTarGrpCondition(Long conditionId);
 

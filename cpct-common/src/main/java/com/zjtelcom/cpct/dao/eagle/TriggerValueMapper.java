@@ -2,10 +2,14 @@ package com.zjtelcom.cpct.dao.eagle;
 
 
 import com.zjtelcom.cpct.model.TriggerValue;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
-
+@Mapper
+@Repository
 public interface TriggerValueMapper {
     int insert(TriggerValue record);
 

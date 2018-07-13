@@ -43,7 +43,7 @@ public class ContactEvtController extends BaseController {
             maps = contactEvtService.listEvents(contactEvtReq.getContactEvt(), contactEvtReq.getPage());
         } catch (Exception e) {
             logger.error("[op:EventController] fail to listEvents for contactEvtReq = {}! Exception: ", JSONArray.toJSON(contactEvtReq), e);
-            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -54,13 +54,14 @@ public class ContactEvtController extends BaseController {
     @RequestMapping("/delEvent")
     @CrossOrigin
     public String delEvent(@RequestBody ContactEvtReq contactEvtReq) {
+        Map<String,Object> maps = new HashMap<>();
         try {
-            contactEvtService.delEvent(contactEvtReq.getContactEvt().getContactEvtId());
+            maps = contactEvtService.delEvent(contactEvtReq.getContactEvt().getContactEvtId());
         } catch (Exception e) {
             logger.error("[op:EventController] fail to delEvent for contactEvtReq = {}! Exception: ", JSONArray.toJSON(contactEvtReq), e);
-            return initFailRespInfo(ErrorCode.DEL_EVENT_FAILURE.getErrorMsg(), ErrorCode.DEL_EVENT_FAILURE.getErrorCode());
+            return initSuccRespInfo(maps);
         }
-        return initSuccRespInfo(null);
+        return initSuccRespInfo(maps);
     }
 
     /**
@@ -74,7 +75,7 @@ public class ContactEvtController extends BaseController {
             maps = contactEvtService.createContactEvtJt(createContactEvtJtReq);
         } catch (Exception e) {
             logger.error("[op:EventController] fail to createContactEvtJt for createContactEvtJtReq = {}! Exception: ", JSONArray.toJSON(createContactEvtJtReq), e);
-            return initFailRespInfo(ErrorCode.SAVE_EVENT_FAILURE.getErrorMsg(), ErrorCode.SAVE_EVENT_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -90,7 +91,7 @@ public class ContactEvtController extends BaseController {
             maps = contactEvtService.createContactEvt(createContactEvtReq);
         } catch (Exception e) {
             logger.error("[op:EventController] fail to createContactEvtJt for createContactEvtJtReq = {}! Exception: ", JSONArray.toJSON(createContactEvtReq), e);
-            return initFailRespInfo(ErrorCode.SAVE_EVENT_FAILURE.getErrorMsg(), ErrorCode.SAVE_EVENT_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -106,7 +107,7 @@ public class ContactEvtController extends BaseController {
             maps = contactEvtService.closeEvent(contactEvtReq.getContactEvt().getContactEvtId(), contactEvtReq.getContactEvt().getStatusCd());
         } catch (Exception e) {
             logger.error("[op:EventController] fail to closeEvent for contactEvtReq = {}! Exception: ", JSONArray.toJSON(contactEvtReq), e);
-            return initFailRespInfo(ErrorCode.CLOSE_EVENT_FAILURE.getErrorMsg(), ErrorCode.CLOSE_EVENT_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -122,7 +123,7 @@ public class ContactEvtController extends BaseController {
             maps = contactEvtService.editEvent(contactEvt.getContactEvtId());
         } catch (Exception e) {
             logger.error("[op:EventController] fail to editEvent for contactEvtReq = {}! Exception: ",  JSONArray.toJSON(contactEvt), e);
-            return initFailRespInfo(ErrorCode.EDIT_EVENT_FAILURE.getErrorMsg(), ErrorCode.EDIT_EVENT_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -138,7 +139,7 @@ public class ContactEvtController extends BaseController {
             maps = contactEvtService.modContactEvtJt(createContactEvtJtReq);
         } catch (Exception e) {
             logger.error("[op:EventController] fail to updateEvent for createContactEvtJtReq = {}! Exception: ", JSONArray.toJSON(createContactEvtJtReq), e);
-            return initFailRespInfo(ErrorCode.UPDATE_EVENT_FAILURE.getErrorMsg(), ErrorCode.UPDATE_EVENT_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -154,7 +155,7 @@ public class ContactEvtController extends BaseController {
             maps = contactEvtService.modContactEvt(createContactEvtReq);
         } catch (Exception e) {
             logger.error("[op:EventController] fail to updateEvent for createContactEvtJtReq = {}! Exception: ", JSONArray.toJSON(createContactEvtReq), e);
-            return initFailRespInfo(ErrorCode.UPDATE_EVENT_FAILURE.getErrorMsg(), ErrorCode.UPDATE_EVENT_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }

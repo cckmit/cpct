@@ -2,11 +2,14 @@ package com.zjtelcom.cpct.dao.eagle;
 
 
 import com.zjtelcom.cpct.model.EagleTrycalcRecord;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-
+@Mapper
+@Repository
 public interface EagleTrycalcRecordMapper {
     int deleteByPrimaryKey(Integer recordId);
 

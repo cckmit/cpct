@@ -8,16 +8,16 @@
 		http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<!-- 提供方应用信息，用于计算依赖关系 -->
-	<!--<dubbo:application name="33.1059" />-->
+	<dubbo:application name="33.1059" />
 	
 
 	<!-- 使用zookeeper注册中心暴露服务地址 地址配置在fpc.properties -->
-	<!--<dubbo:registry protocol="zookeeper" address="${dubbo.registry.address}" />-->
+	<dubbo:registry protocol="zookeeper" address="dubbo://47.94.168.117:2888" />
 
 	<!--<dubbo:registry protocol="zookeeper" address="dubbo://134.96.161.20:8001" />-->
 
 	<!-- 用dubbo协议在2181端口暴露服务 -->
-	<!--<dubbo:protocol name="dubbo" port="2181" />-->
+	<dubbo:protocol name="dubbo" port="2181" />
 	<!--<dubbo:monitor protocol="registry" />-->
 
 
