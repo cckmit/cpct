@@ -24,6 +24,32 @@ public class ScriptController extends BaseController  {
 
 
     /**
+     * 获取渠道列表（不分页）
+     * @param param
+     * @return
+     */
+    @PostMapping("listScript")
+    @CrossOrigin
+    public Map<String, Object> getScriptList(@RequestBody HashMap<String,Object> param) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
+        try {
+            String scriptName = null;
+            if (param.get("scriptName")!=null){
+                scriptName = param.get("scriptName").toString();
+            }
+            result = scriptService.getScriptList(userId,scriptName);
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to getScriptList",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to getScriptList");
+            return result;
+        }
+        return result;
+
+    }
+
+    /**
      * 添加脚本
      */
     @PostMapping("addScript")

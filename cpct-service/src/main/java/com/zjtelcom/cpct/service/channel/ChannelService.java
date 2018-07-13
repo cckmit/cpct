@@ -1,8 +1,6 @@
 package com.zjtelcom.cpct.service.channel;
 
-import com.sun.corba.se.spi.ior.ObjectKey;
 import com.zjtelcom.cpct.dto.channel.ContactChannelDetail;
-import com.zjtelcom.cpct.dto.channel.ChannelEditVO;
 
 import java.util.Map;
 
@@ -13,6 +11,8 @@ import java.util.Map;
  * @Date 2018/06/21
  */
 public interface ChannelService {
+
+    Map<String,Object> getChannelTree4Activity(Long userId);
 
     Map<String,Object> getChannelTreeList(Long userId);
 

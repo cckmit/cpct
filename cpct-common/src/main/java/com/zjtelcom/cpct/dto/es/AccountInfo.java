@@ -11,10 +11,8 @@ public class AccountInfo {
     @Id
     private Long id;
 
-    @Field
     private String accountName;
 
-    @Field
     private String nickName;
 
     public Long getId() {

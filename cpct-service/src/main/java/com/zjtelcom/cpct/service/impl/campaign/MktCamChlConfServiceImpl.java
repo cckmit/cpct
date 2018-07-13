@@ -49,7 +49,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
         try {
             //添加协同渠道基本信息
             CopyPropertiesUtil.copyBean2Bean(mktCamChlConfDO, mktCamChlConfDetail);
-            mktCamChlConfDO.setStatusCd(StatusCode.STATUS_CODE_NOTACTIVE.getErrorCode());
+            mktCamChlConfDO.setStatusCd(StatusCode.STATUS_CODE_NOTACTIVE.getStatusCode());
             mktCamChlConfDO.setCreateDate(new Date());
             mktCamChlConfDO.setCreateStaff(UserUtil.loginId());
             mktCamChlConfDO.setUpdateDate(new Date());
@@ -68,7 +68,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                 MktCamChlConfAttrDO mktCamChlConfAttrDO = new MktCamChlConfAttrDO();
                 CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttrDO, mktCamChlConfAttr);
                 mktCamChlConfAttrDO.setEvtContactConfId(mktCamChlConfDO.getEvtContactConfId());
-                if (mktCamChlConfAttr.getAttrId() == ConfAttrEnum.RULE.getArrId()) {
+                if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
                     mktCamChlConfAttrDO.setAttrValue(evtContactConfId.toString());
                 }
                 mktCamChlConfAttrMapper.insert(mktCamChlConfAttrDO);
@@ -89,7 +89,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
         try {
             // 更新协同渠道基本信息
             CopyPropertiesUtil.copyBean2Bean(mktCamChlConfDO, mktCamChlConfDetail);
-            mktCamChlConfDO.setStatusCd(StatusCode.STATUS_CODE_NOTACTIVE.getErrorCode());
+            mktCamChlConfDO.setStatusCd(StatusCode.STATUS_CODE_NOTACTIVE.getStatusCode());
             mktCamChlConfDO.setUpdateDate(new Date());
             mktCamChlConfDO.setUpdateStaff(UserUtil.loginId());
             mktCamChlConfMapper.updateByPrimaryKey(mktCamChlConfDO);
@@ -106,7 +106,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                 MktCamChlConfAttrDO mktCamChlConfAttrDO = new MktCamChlConfAttrDO();
                 CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttrDO, mktCamChlConfAttr);
                 mktCamChlConfAttrDO.setEvtContactConfId(mktCamChlConfDO.getEvtContactConfId());
-                if (mktCamChlConfAttr.getAttrId() == ConfAttrEnum.RULE.getArrId()) {
+                if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
                     mktCamChlConfAttrDO.setAttrValue(evtContactConfId.toString());
                 }
                 mktCamChlConfAttrMapper.updateByPrimaryKey(mktCamChlConfAttrDO);
@@ -132,7 +132,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
                 MktCamChlConfAttr mktCamChlConfAttr = new MktCamChlConfAttr();
                 CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttr, mktCamChlConfAttrDO);
-                if (mktCamChlConfAttr.getAttrId() == ConfAttrEnum.RULE.getArrId()) {
+                if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
                     //TODO 通过EvtContactConfId获取规则放入属性中
                 }
                 mktCamChlConfAttrList.add(mktCamChlConfAttr);
@@ -166,7 +166,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                 for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
                     MktCamChlConfAttr mktCamChlConfAttr = new MktCamChlConfAttr();
                     CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttr, mktCamChlConfAttrDO);
-                    if (mktCamChlConfAttr.getAttrId() == ConfAttrEnum.RULE.getArrId()) {
+                    if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
                         //TODO 通过EvtContactConfId获取规则放入属性中
                     }
                     mktCamChlConfDetail.getMktCamChlConfAttrList().add(mktCamChlConfAttr);

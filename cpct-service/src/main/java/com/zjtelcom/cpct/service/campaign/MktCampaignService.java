@@ -36,6 +36,8 @@ public interface MktCampaignService {
 
     Map<String,Object> modMktCampaign(MktCampaignVO mktCampaignVO) throws Exception;
 
+    Map<String,Object> changeMktCampaignStatus(Long mktCampaignId, String statusCd) throws Exception;
+
 //    Map<String,Object> qryMktCampaignList (MktCampaignVO mktCampaignVO);
 
 }

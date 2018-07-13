@@ -16,13 +16,13 @@ public class Employee {
 
     @Id
     private String id;
-    @Field
+
     private String firstName;
-    @Field
+
     private String lastName;
-    @Field
+
     private Integer age = 0;
-    @Field
+
     private String about;
 
     public String getId() {

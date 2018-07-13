@@ -98,4 +98,19 @@ public class CampaignController extends BaseController {
         Map<String, Object> map = mktCampaignService.delMktCampaign(mktCampaignId);
         return JSON.toJSONString(map);
     }
+
+    /**
+     * 更改营销活动转态
+     * @param params
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/changeMktCampaignStatus", method = RequestMethod.POST)
+    public String changeMktCampaignStatus(@RequestBody Map<String, String> params) throws Exception {
+        Long mktCampaignId = Long.valueOf(params.get("mktCampaignId"));
+        String statusCd = params.get("statusCd");
+        Map<String, Object> map = mktCampaignService.changeMktCampaignStatus(mktCampaignId, statusCd);
+
+        return JSON.toJSONString(map);
+    }
 }

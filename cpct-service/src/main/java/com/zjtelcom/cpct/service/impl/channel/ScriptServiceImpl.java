@@ -27,6 +27,25 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
 
 
     @Override
+    public Map<String, Object> getScriptList(Long userId, String scriptName) {
+        Map<String,Object> result = new HashMap<>();
+        List<ScriptVO> voList = new ArrayList<>();
+        List<Script> scriptList = new ArrayList<>();
+        scriptList = scriptMapper.findByScriptName(scriptName);
+        for (Script script : scriptList){
+            ScriptVO vo = ChannelUtil.map2ScriptVO(script);
+            voList.add(vo);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",voList);
+        return result;
+
+
+
+
+    }
+
+    @Override
     public Map<String,Object> createMktScript(Long userId, MktScript addVO) {
         Map<String,Object> result = new HashMap<>();
         Script script = BeanUtil.create(addVO,new Script());
