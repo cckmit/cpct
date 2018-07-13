@@ -1,6 +1,5 @@
 package com.zjtelcom.cpct.controller.channel;
 
-import com.zjtelcom.cpct.bean.RespInfo;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dto.channel.CamScriptAddVO;
 import com.zjtelcom.cpct.dto.channel.CamScriptEditVO;
@@ -15,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
-import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 @RestController
 @RequestMapping("${adminPath}/channel")

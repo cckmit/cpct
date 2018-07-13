@@ -28,6 +28,13 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
 
 
     @Override
+    public Map<String, Object> getChannelTree4Activity(Long userId) {
+        return null;
+    }
+
+
+
+    @Override
     public Map<String, Object> getChannelTreeList(Long userId) {
         Map<String,Object> result = new HashMap<>();
         List<ChannelDetail> parentDetailList = new ArrayList<>();
