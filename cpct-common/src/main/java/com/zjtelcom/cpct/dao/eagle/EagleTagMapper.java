@@ -1,13 +1,15 @@
 package com.zjtelcom.cpct.dao.eagle;
 
 
-
 import com.zjtelcom.cpct.model.EagleTag;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-
+@Mapper
+@Repository
 public interface EagleTagMapper {
     int deleteByPrimaryKey(Integer tagRowId);
 

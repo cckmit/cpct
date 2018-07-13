@@ -11,6 +11,7 @@ import com.zjtelcom.cpct.dao.event.EventSceneMapper;
 import com.zjtelcom.cpct.dao.event.EvtSceneCamRelMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.user.UserListMapper;
@@ -20,6 +21,7 @@ import com.zjtelcom.cpct.domain.event.EventDO;
 import com.zjtelcom.cpct.domain.event.EventSceneDO;
 import com.zjtelcom.cpct.domain.event.EvtSceneCamRelDO;
 import com.zjtelcom.cpct.domain.grouping.TarGrpConditionDO;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 import com.zjtelcom.cpct.dto.api.EventApiResultDTO;
@@ -33,6 +35,7 @@ import com.zjtelcom.cpct.dto.event.EventScene;
 import com.zjtelcom.cpct.dto.event.EvtSceneCamRel;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
+import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRuleRel;
 import com.zjtelcom.cpct.request.event.QryEventSceneListReq;
 import com.zjtelcom.cpct.service.BaseService;
@@ -41,10 +44,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Transactional
@@ -75,7 +75,10 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
     private TarGrpConditionMapper tarGrpConditionMapper; //分群规则条件表
 
     @Autowired
-    private MktCamStrategyConfRelMapper mktCamStrategyConfRelMapper; //活动策略
+    private MktCamStrategyConfRelMapper mktCamStrategyConfRelMapper; //活动策略关联
+
+    @Autowired
+    private MktStrategyConfMapper mktStrategyConfMapper; //策略基本信息
 
     @Autowired
     private MktStrategyConfRuleMapper mktStrategyConfRuleMapper;//策略规则
@@ -116,6 +119,9 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
     public Map deal(Map<String, Object> map) throws Exception {
         //初始化返回结果
         Map<String, Object> result = new HashMap();
+
+        //获取当前时间
+        Date now = new Date();
 
         //获取事件code
         String eventNbr = (String) map.get("eventId");
@@ -158,6 +164,7 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
                 flag = userListMapper.checkRule("", contactEvtMatchRul.getEvtMatchRulId(), null);
                 if (flag > 0) {
                     result.put("CPCResultCode", "0");
+                    result.put("CPCResultMsg", "事件过滤拦截");
                     return result;
                 }
             }
@@ -185,7 +192,7 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
         //初始化返回结果中的工单信息
         List<Map<String, Object>> orderList = new ArrayList<>();
 
-        //遍历活动id  查询并匹配活动规则
+        //遍历活动id  查询并匹配活动规则  todo 需要根据事件推荐活动数 取前n个活动
         for (Long activityId : activityIds) {
 
             Map<String, Object> order = new HashMap<>();
@@ -216,6 +223,19 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
                 //遍历策略列表
                 for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOs) {
 
+                    //查询策略基本信息
+                    MktStrategyConfDO mktStrategyConf = mktStrategyConfMapper.selectByPrimaryKey(mktCamStrategyConfRelDO.getStrategyConfId());
+
+                    //验证策略生效时间
+                    if (!(now.after(mktStrategyConf.getBeginTime()) && now.before(mktStrategyConf.getEndTime()))) {
+                        //若当前时间在策略生效时间外
+                        continue;
+                    }
+
+                    //todo 下发地市
+
+                    //todo 判断下发渠道
+
                     //根据策略id获取策略下规则列表
                     List<MktStrategyConfRuleDO> mktStrategyConfRuleDOS = mktStrategyConfRuleMapper.selectByMktStrategyConfId(mktCamStrategyConfRelDO.getStrategyConfId());
 
@@ -232,7 +252,7 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
                             //协同渠道配置id
                             String evtContactConfIdStr = mktStrategyConfRuleDO.getEvtContactConfId();
 
-                            //  1.判断活动的过滤规则
+                            //  1.判断活动的过滤规则---------------------------
                             //获取过滤规则
                             FilterRuleConfDO filterRuleConfDO = filterRuleConfMapper.selectByPrimaryKey(ruleConfId);
                             String ruleConfIdStr = filterRuleConfDO.getFilterRuleIds();
@@ -242,11 +262,15 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
                                 for (String str : array) {
                                     //获取具体规则
                                     FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.parseLong(str));
-                                    //todo 计算过滤规则，入不符合直接pass
-                                    if (false) {
+
+                                    //匹配事件过滤规则
+                                    int flag = 0;
+                                    flag = userListMapper.checkRule("", filterRule.getRuleId(), null);
+                                    if (flag > 0) {
                                         ruleFilter = false;
                                     }
                                 }
+                                //若存在不符合的规则 结束当前规则循环
                                 if (!ruleFilter) {
                                     continue;
                                 }
@@ -307,7 +331,6 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
                             //判断匹配结果，如匹配则向下进行，如不匹配则continue结束本次循环
                             if (ruleResult.getResult() != null && ((Boolean) ruleResult.getResult())) {
 
-
                                 //查询销售品列表
                                 String[] productArray = productStr.split(",");
 
@@ -330,21 +353,57 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
                                 //遍历协同渠道
                                 for (String str : evtContactConfIdArray) {
 
+
+                                    //协同渠道规则表id（自建表）
+                                    Long evtContactConfId = Long.parseLong(str);
+
+                                    //查询渠道属性
+                                    List<MktCamChlConfAttrDO> mktCamChlConfAttrs = mktCamChlConfAttrMapper.selectByEvtContactConfId(evtContactConfId);
+
+                                    boolean checkTime = true;
+                                    for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrs) {
+                                        //判断渠道生失效时间
+                                        if (mktCamChlConfAttrDO.getAttrId() == 1000L) {
+                                            if (!now.after(new Date(mktCamChlConfAttrDO.getAttrValue()))) {
+                                                checkTime = false;
+                                            }
+                                        }
+                                        if (mktCamChlConfAttrDO.getAttrId() == 1001L) {
+                                            if (!now.after(new Date(mktCamChlConfAttrDO.getAttrValue()))) {
+                                                checkTime = false;
+                                            }
+                                        }
+                                        //判断接触时间段 todo
+//                                        if (mktCamChlConfAttrDO.getAttrId() == 1003L) {
+//                                            if (!now.after(new Date(mktCamChlConfAttrDO.getAttrValue()))) {
+//                                                checkTime = false;
+//                                            }
+//                                        }
+//                                        if (mktCamChlConfAttrDO.getAttrId() == 1004L) {
+//                                            if (!now.after(new Date(mktCamChlConfAttrDO.getAttrValue()))) {
+//                                                checkTime = false;
+//                                            }
+//                                        }
+                                    }
+
+                                    if (!checkTime) {
+                                        continue;
+                                    }
+
                                     //初始化返回结果推荐信息
                                     Map<String, Object> recommend = new HashMap<>();
 
-                                    recommend.put("productList", productList);
-
-                                    Long evtContactConfId = Long.parseLong(str);
                                     //查询渠道信息基本信息
                                     MktCamChlConfDO mktCamChlConf = mktCamChlConfMapper.selectByPrimaryKey(evtContactConfId);
 
+                                    //返回渠道基本信息
                                     recommend.put("channelId", mktCamChlConf.getContactChlId());
                                     recommend.put("pushType", mktCamChlConf.getPushType());
                                     recommend.put("pushContent", ""); //todo 不明
 
-                                    //查询渠道属性
-//                                    List<MktCamChlConfAttrDO> mktCamChlConfAttrs = mktCamChlConfAttrMapper.selectByEvtContactConfId(evtContactConfId);
+                                    //返回结果中添加销售品信息
+                                    recommend.put("productList", productList);
+
 
                                     //查询渠道子策略 这里老系统暂时不返回
 //                                    List<MktVerbalCondition> mktVerbalConditions = mktVerbalConditionMapper.findConditionListByVerbalId(evtContactConfId);
@@ -390,7 +449,6 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
         }
 
         //返回结果
-        result.put("code", 1);
         result.put("orderList", orderList);
 
         return result;

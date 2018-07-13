@@ -18,7 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 @EnableAutoConfiguration
-//@ImportResource({ "classpath:dubbo/*.xml" })
+@ImportResource({ "classpath:dubbo/*.xml","classpath:task/*.xml" })
 @ComponentScan(value={"com.zjtelcom.cpct"})
 @MapperScan("com.zjtelcom.cpct.dao")
 @EnableTransactionManagement
@@ -36,3 +36,4 @@ public class Application {
         logger.info("***********CPCT*********启动**********");
     }
 }
+

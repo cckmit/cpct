@@ -41,7 +41,7 @@ public class ContactEvtItemController extends BaseController {
             maps = contactEvtItemService.listEventItem(ContactEvtReq);
         } catch (Exception e) {
             logger.error("[op:ContactEvtItemController] fail to listEventItem for contactEvt = {}! Exception: ", JSONArray.toJSON(ContactEvtReq), e);
-            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -57,7 +57,7 @@ public class ContactEvtItemController extends BaseController {
             maps = contactEvtItemService.delEventItem(contactEvtItem);
         } catch (Exception e) {
             logger.error("[op:ContactEvtItemController] fail to delEventItem for contactEvtItem = {}! Exception: ", JSONArray.toJSON(contactEvtItem), e);
-            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -73,7 +73,7 @@ public class ContactEvtItemController extends BaseController {
             maps = contactEvtItemService.viewEventItem(contactEvtItem);
         } catch (Exception e) {
             logger.error("[op:ContactEvtItemController] fail to delEventItem for contactEvtItem = {}! Exception: ", JSONArray.toJSON(contactEvtItem), e);
-            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -89,7 +89,7 @@ public class ContactEvtItemController extends BaseController {
             maps = contactEvtItemService.createEventItem(contactEvtItem);
         } catch (Exception e) {
             logger.error("[op:ContactEvtItemController] fail to delEventItem for contactEvtItem = {}! Exception: ", JSONArray.toJSON(contactEvtItem), e);
-            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -105,7 +105,7 @@ public class ContactEvtItemController extends BaseController {
             maps = contactEvtItemService.modEventItem(contactEvtItem);
         } catch (Exception e) {
             logger.error("[op:ContactEvtItemController] fail to delEventItem for contactEvtItem = {}! Exception: ", JSONArray.toJSON(contactEvtItem), e);
-            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }

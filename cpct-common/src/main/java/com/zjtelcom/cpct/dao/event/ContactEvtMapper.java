@@ -33,6 +33,8 @@ public interface ContactEvtMapper {
 
     int createContactEvtJt(ContactEvt contactEvt);
 
+    int createContactEvt(ContactEvt contactEvt);
+
     int modContactEvtJt(ContactEvt contactEvt);
 
     int modContactEvtCode(@Param("contactEvtId") Long contactEvtId , @Param("contactEvtCode") String contactEvtCode);

@@ -40,7 +40,7 @@ public class ContactEvtTypeController extends BaseController {
             maps = contactEvtTypeService.qryContactEvtTypeList(qryContactEvtTypeReq);
         } catch (Exception e) {
             logger.error("[op:EventTypeController] fail to listEventTypes ! Exception: ", e);
-            return initFailRespInfo(ErrorCode.SEARCH_EVENTTYPE_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENTTYPE_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -56,7 +56,7 @@ public class ContactEvtTypeController extends BaseController {
             maps = contactEvtTypeService.qryContactEvtTypeLists(qryContactEvtTypeReq);
         } catch (Exception e) {
             logger.error("[op:ContactEvtTypeController] fail to qryContactEvtTypeList qryContactEvtTypeReq = {} ! Exception: ", JSONArray.toJSON(qryContactEvtTypeReq),e);
-            return initFailRespInfo(ErrorCode.SEARCH_EVENTTYPE_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENTTYPE_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -72,7 +72,7 @@ public class ContactEvtTypeController extends BaseController {
             maps = contactEvtTypeService.createContactEvtType(contactEvtType);
         } catch (Exception e) {
             logger.error("[op:ContactEvtTypeController] fail to createContactEvtType contactEvtType = {}! Exception: ", JSONArray.toJSON(contactEvtType), e);
-            return initFailRespInfo(ErrorCode.SAVE_EVENTTYPE_FAILURE.getErrorMsg(), ErrorCode.SAVE_EVENTTYPE_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -88,7 +88,7 @@ public class ContactEvtTypeController extends BaseController {
             maps = contactEvtTypeService.getEventTypeDTOById(evtTypeId);
         } catch (Exception e) {
             logger.error("[op:ContactEvtTypeController] fail to editEventTypes evtTypeId = {}! Exception: ", evtTypeId, e);
-            return initFailRespInfo(ErrorCode.EDIT_EVENTTYPE_FAILURE.getErrorMsg(), ErrorCode.EDIT_EVENTTYPE_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -104,7 +104,7 @@ public class ContactEvtTypeController extends BaseController {
             map = contactEvtTypeService.modContactEvtType(contactEvtType);
         } catch (Exception e) {
             logger.error("[op:ContactEvtTypeController] fail to modContactEvtType contactEvtType = {}! Exception: ", JSONArray.toJSON(contactEvtType), e);
-            return initFailRespInfo(ErrorCode.UPDATE_EVENTTYPE_FAILURE.getErrorMsg(), ErrorCode.UPDATE_EVENTTYPE_FAILURE.getErrorCode());
+            return JSON.toJSONString(map);
         }
         return JSON.toJSONString(map);
     }
@@ -120,7 +120,7 @@ public class ContactEvtTypeController extends BaseController {
             map = contactEvtTypeService.delContactEvtType(contactEvtType);
         } catch (Exception e) {
             logger.error("[op:ContactEvtTypeController] fail to delContactEvtType contactEvtType = {}! Exception: ", JSONArray.toJSON(contactEvtType), e);
-            return initFailRespInfo(ErrorCode.DEL_EVENTTYPE_FAILURE.getErrorMsg(), ErrorCode.DEL_EVENTTYPE_FAILURE.getErrorCode());
+            return JSON.toJSONString(map);
         }
         return JSON.toJSONString(map);
     }

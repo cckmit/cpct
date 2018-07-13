@@ -82,6 +82,11 @@
             <version>2.8.0</version>
         </dependency>
 
+        <!-- http -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
 
     </dependencies>
 

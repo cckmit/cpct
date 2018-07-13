@@ -1,9 +1,6 @@
 package com.zjtelcom.cpct.common;
 
-import com.zjtelcom.cpct.service.EagleTagAdaptionCache;
-import com.zjtelcom.cpct.service.EagleTagCache;
-import com.zjtelcom.cpct.service.TriggerCache;
-import com.zjtelcom.cpct.service.TriggerValueCache;
+import com.zjtelcom.cpct.service.*;
 import net.sf.ehcache.Cache;
 import org.apache.log4j.Logger;
 
@@ -85,8 +82,8 @@ public class CacheManager {
 //            CacheManager.getInstance().getCache(CacheConstants.CHANNEL_CACHE_NAME).synItWithLock();
 //
 //            // 系统参数缓存
-//            singleton.addCache(new SystemParamCache(CacheConstants.SYSTEMPARAM_CACHE_NAME, 5000));
-//            CacheManager.getInstance().getCache(CacheConstants.SYSTEMPARAM_CACHE_NAME).synItWithLock();
+            singleton.addCache(new SystemParamCache(CacheConstants.SYSTEMPARAM_CACHE_NAME, 5000));
+            CacheManager.getInstance().getCache(CacheConstants.SYSTEMPARAM_CACHE_NAME).synItWithLock();
 //            // 销售品信息缓存
 //            singleton.addCache(new RecommendProductCache(
 //                CacheConstants.RECOMMEND_PRODUCT_CACHE_NAME, 5000));
@@ -157,8 +154,8 @@ public class CacheManager {
             singleton.addCache(new TriggerValueCache(CacheConstants.TRIGGER_VALUE_CACHE_NAME, 5000));
             CacheManager.getInstance().getCache(CacheConstants.TRIGGER_VALUE_CACHE_NAME).synItWithLock();
             // 因子缓存
-            singleton.addCache(new TriggerCache(CacheConstants.TRIGGER_CACHE_NAME, 5000));
-            CacheManager.getInstance().getCache(CacheConstants.TRIGGER_CACHE_NAME).synItWithLock();
+            singleton.addCache(new TriggerCache(CacheConstants.LABEL_CACHE_NAME, 5000));
+            CacheManager.getInstance().getCache(CacheConstants.LABEL_CACHE_NAME).synItWithLock();
 
         } catch (Exception e) {
             log.error("初始化缓存失败.", e);

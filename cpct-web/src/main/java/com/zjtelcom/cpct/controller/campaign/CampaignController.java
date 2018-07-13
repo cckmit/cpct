@@ -100,7 +100,7 @@ public class CampaignController extends BaseController {
     }
 
     /**
-     * ge
+     * 更改营销活动转态
      * @param params
      * @return
      * @throws Exception

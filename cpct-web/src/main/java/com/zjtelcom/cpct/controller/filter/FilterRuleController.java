@@ -48,7 +48,7 @@ public class FilterRuleController extends BaseController {
             maps = filterRuleService.qryFilterRule(filterRuleReq);
         } catch (Exception e) {
             logger.error("[op:FilterRuleController] fail to listEvents for filterRule = {}! Exception: ", JSONArray.toJSON(filterRuleReq), e);
-            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -64,7 +64,7 @@ public class FilterRuleController extends BaseController {
             maps = filterRuleService.qryFilterRules(filterRuleReq);
         } catch (Exception e) {
             logger.error("[op:FilterRuleController] fail to listEvents for filterRule = {}! Exception: ", JSONArray.toJSON(filterRuleReq), e);
-            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -80,7 +80,7 @@ public class FilterRuleController extends BaseController {
             maps = filterRuleService.delFilterRule(filterRule);
         } catch (Exception e) {
             logger.error("[op:FilterRuleController] fail to listEvents for filterRule = {}! Exception: ", JSONArray.toJSON(filterRule), e);
-            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -96,7 +96,7 @@ public class FilterRuleController extends BaseController {
             maps = filterRuleService.getFilterRule(filterRule);
         } catch (Exception e) {
             logger.error("[op:FilterRuleController] fail to listEvents for filterRule = {}! Exception: ", JSONArray.toJSON(filterRule), e);
-            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -112,7 +112,7 @@ public class FilterRuleController extends BaseController {
             maps = filterRuleService.createFilterRule(filterRule);
         } catch (Exception e) {
             logger.error("[op:FilterRuleController] fail to listEvents for filterRule = {}! Exception: ", JSONArray.toJSON(filterRule), e);
-            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -128,7 +128,7 @@ public class FilterRuleController extends BaseController {
             maps = filterRuleService.modFilterRule(filterRule);
         } catch (Exception e) {
             logger.error("[op:FilterRuleController] fail to listEvents for filterRule = {}! Exception: ", JSONArray.toJSON(filterRule), e);
-            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -184,7 +184,7 @@ public class FilterRuleController extends BaseController {
             maps = filterRuleService.importUserList(file, ruleId);
         } catch (Exception e) {
             logger.error("[op:FilterRuleController] fail to listEvents for multipartFile = {}! Exception: ", JSONArray.toJSON(file), e);
-            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -200,7 +200,7 @@ public class FilterRuleController extends BaseController {
             maps = filterRuleService.listUserList(userList);
         } catch (Exception e) {
             logger.error("[op:FilterRuleController] fail to listEvents for userList = {}! Exception: ", JSONArray.toJSON(userList), e);
-            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
