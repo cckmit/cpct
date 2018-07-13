@@ -50,23 +50,20 @@ public class TestController extends BaseController {
 
 
     @GetMapping("addAccountInfo")
-    public List<PpmProduct> addAccountInfo() {
-//        AccountInfo accountInfo = new AccountInfo();
-//        accountInfo.setId(1L);
-//        accountInfo.setAccountName("zhangsanfeng");
-//        accountInfo.setNickName("张三丰");
-//        accountRepository.save(accountInfo);
-        List<PpmProduct> productList = productMapper.selectPpmProductByCode("5000002801100005");
-        return productList;
-    }
-
-    @GetMapping("findAccountInfo")
-    public AccountInfo findAccountInfo() {
-        AccountInfo accountInfo = accountRepository.findByAccountName("zhangsanfeng");
+    public AccountInfo addAccountInfo() {
+        AccountInfo accountInfo = new AccountInfo();
+        accountInfo.setAccountName("zhangsanfeng");
+        accountInfo.setNickName("张三丰");
+        accountRepository.save(accountInfo);
         return accountInfo;
     }
 
-
+    @GetMapping("findAccountInfo")
+    public Object findAccountInfo() {
+        AccountInfo accountInfo = accountRepository.findByAccountName("zhangsanfeng");
+        List<AccountInfo> list = accountRepository.findAllByAccountName("zhangsanfeng");
+        return list;
+    }
 
 
 

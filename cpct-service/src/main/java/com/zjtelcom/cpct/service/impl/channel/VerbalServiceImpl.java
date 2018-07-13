@@ -49,10 +49,6 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
         verbal.setStatusCd("1000");
         verbalMapper.insert(verbal);
         //删除旧的条件
-//        List<MktVerbalCondition> historyList = verbalConditionMapper.findConditionListByVerbalId(verbal.getVerbalId());
-//        for (MktVerbalCondition condition : historyList){
-//            verbalConditionMapper.deleteByPrimaryKey(condition.getConditionId());
-//        }
         for (VerbalConditionAddVO  vcAddVO : addVO.getAddVOList()){
             //类型为标签时
                 MktVerbalCondition mktVerbalCondition = BeanUtil.create(vcAddVO,new MktVerbalCondition());
@@ -70,6 +66,7 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
         result.put("resultMsg","添加成功");
         return result;
     }
+
 
     @Override
     public Map<String,Object> editVerbal(Long userId, VerbalEditVO editVO) {
