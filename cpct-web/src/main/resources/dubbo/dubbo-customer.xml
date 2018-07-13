@@ -38,10 +38,15 @@
     <!--<dubbo:method name="salesView" servicecode="33.1038.salesView"/>-->
     <!--</dubbo:reference>-->
 
-    <dubbo:reference id="strategySalesSearchService"
-                     interface="com.ctzj.ppm.dubbo.service.StrategySalesSearchService"
-                     version="1.0" retries="0">
-        <dubbo:method name="salesSearch" servicecode="33.1038.salesSearch"/>
+    <!--<dubbo:reference id="strategySalesSearchService"-->
+                     <!--interface="com.ctzj.ppm.dubbo.service.StrategySalesSearchService"-->
+                     <!--version="1.0" retries="0">-->
+        <!--<dubbo:method name="salesSearch" servicecode="33.1038.salesSearch"/>-->
+    <!--</dubbo:reference>-->
+
+    <!--  -->
+    <dubbo:reference id="policyCalculateService" interface="com.zjhcsoft.eagle.main.dubbo.service.PolicyCalculateService" version="1.0">
+        <dubbo:method name="tryCalculate" servicecode="33.1307.tryCalculate"/>
     </dubbo:reference>
 
 

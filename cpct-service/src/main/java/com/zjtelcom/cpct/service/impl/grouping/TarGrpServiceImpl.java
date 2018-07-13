@@ -7,6 +7,7 @@ import com.zjhcsoft.eagle.main.dubbo.service.PolicyCalculateService;
 import com.zjtelcom.cpct.common.CacheConstants;
 import com.zjtelcom.cpct.common.CacheManager;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.constants.ResponseCode;
 import com.zjtelcom.cpct.dao.campaign.MktCamGrpRulMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
@@ -14,7 +15,6 @@ import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.grouping.TarGrpConditionDO;
-import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
@@ -26,7 +26,10 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.EagleDatabaseConfCache;
 import com.zjtelcom.cpct.service.TryCalcService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
-import com.zjtelcom.cpct.util.*;
+import com.zjtelcom.cpct.util.CopyPropertiesUtil;
+import com.zjtelcom.cpct.util.DateUtil;
+import com.zjtelcom.cpct.util.SqlUtil;
+import com.zjtelcom.cpct.util.UserUtil;
 import com.zjtelcom.cpct.validator.ValidateResult;
 import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
 import com.zjtelcom.cpct.vo.grouping.TarGrpVO;
@@ -190,9 +193,23 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         tarGrpMapper.modTarGrp(tarGrp);
         List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
         for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
-            tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
-            tarGrpCondition.setUpdateStaff(UserUtil.loginId());
-            tarGrpConditionMapper.modTarGrpCondition(tarGrpCondition);
+            TarGrpCondition tarGrpCondition1 = tarGrpConditionMapper.selectByPrimaryKey(tarGrpCondition.getConditionId());
+            if(tarGrpCondition1 == null){
+                tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
+                tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
+                tarGrpCondition.setTarGrpId(tarGrp.getTarGrpId());
+                tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
+                tarGrpCondition.setCreateDate(DateUtil.getCurrentTime());
+                tarGrpCondition.setStatusDate(DateUtil.getCurrentTime());
+                tarGrpCondition.setUpdateStaff(UserUtil.loginId());
+                tarGrpCondition.setCreateStaff(UserUtil.loginId());
+                tarGrpCondition.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                tarGrpConditionMapper.insert(tarGrpCondition);
+            }else{
+                tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
+                tarGrpCondition.setUpdateStaff(UserUtil.loginId());
+                tarGrpConditionMapper.modTarGrpCondition(tarGrpCondition);
+            }
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
@@ -260,25 +277,6 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             //塞入左参中文名
             Label label = injectionLabelMapper.selectByPrimaryKey(Long.valueOf(tarGrpConditionVO.getLeftParam()));
             tarGrpConditionVO.setLeftParamName(label.getInjectionLabelName());
-            //塞入标签基础信息
-            tarGrpConditionVO.setConditionType(label.getConditionType());
-            if (label.getRightOperand()!=null){
-                tarGrpConditionVO.setValueList(ChannelUtil.StringToList(label.getRightOperand()));
-            }
-            if (label.getOperator()!=null){
-                List<String> opratorList = ChannelUtil.StringToList(label.getOperator());
-                List<OperatorDetail> opStList  = new ArrayList<>();
-                for (String operator : opratorList){
-                    Operator op = Operator.getOperator(Integer.valueOf(operator));
-                    OperatorDetail detail = new OperatorDetail();
-                    if (op!=null){
-                        detail.setOperValue(op.getValue());
-                        detail.setOperName(op.getDescription());
-                    }
-                    opStList.add(detail);
-                }
-                tarGrpConditionVO.setOperatorList(opStList);
-            }
             //塞入领域
             FitDomain fitDomain = null;
             if (label.getFitDomain() != null) {
@@ -341,32 +339,39 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     public Map<String, String> trycalc(CalcReqModel calcReqModel, String serialNum) {
         ResponseHeaderModel resp = null;
         Map<String, String> result = new HashMap<String, String>(2);
+
         try {
             List<Map<String, Object>> policyList = calcReqModel.getPolicyList();
-            ValidateResult validateResult = tryCalcService.validate(serialNum, calcReqModel);
+//            ValidateResult validateResult = tryCalcService.validate(serialNum, calcReqModel);
+            ValidateResult validateResult = new ValidateResult();
+            validateResult.setResult(true);
+            validateResult.setMessage("111");
+            validateResult.setCode("111");
 
             //校验通过后进行试运算，否则返回消息给web
             if (validateResult.getResult()) {
+
                 for (Map<String, Object> policy : policyList) {
+
                     //页面选择的资产域
-//                    String recommendType = policy.get("recommendType").toString();
-                    String fitDomain = policy.get("fitDomain").toString();//适用域  四种域 PHY-MAN-0022 移动  PHY-MAN-0001 固话  INT-MAN-0010 宽带 OTH-MAN-0034 ITV
+                    String recommendType = policy.get("recommendType").toString();
                     List<Map<String, String>> tagInfos = new ArrayList<>();
                     //防止tagInfos添加重复的数据
                     Map<String, String> tagInfoKeys = new HashMap<>();
 
                     //规则
-                    List<Map<String, Object>> ruleList = (List<Map<String, Object>>) policy.get("rules");
+                    List<Map<String, Object>> ruleList = (List<Map<String, Object>>)policy.get("rules");
                     for (Map<String, Object> rule : ruleList) {
 
-                        List<Map<String, String>> labels = (List<Map<String, String>>) rule.get("labels");
-                        List<Company> company = (List<Company>) rule.get("company");
+                        List<Map<String, String>> triggers = (List<Map<String, String>>)rule.get("triggers");
+                        List<Company> company = (List<Company>)rule.get("company");
                         String sql = null;
                         //tagInfos 获取标签信息
-                        sql = SqlUtil.integrationSql(fitDomain, labels, tagInfos, company,
+                        sql = SqlUtil.integrationSql(recommendType, triggers, tagInfos, company,
                                 tagInfoKeys);
+
                         // 清除不必要的参数
-                        rule.remove("labels");
+                        rule.remove("triggers");
                         rule.remove("company");
                         rule.remove("xietong");
 
@@ -381,9 +386,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 }
 
                 //目前只支持一个数据源DB2
-                EagleDatabaseConfig config = (EagleDatabaseConfig) CacheManager.getInstance().getCache(
-                        CacheConstants.DATABASE_COPNFIG_CACHE_NAME).queryOne(
-                        EagleDatabaseConfCache.CACHE_DB2_KEY);
+//                EagleDatabaseConfig config = (EagleDatabaseConfig)CacheManager.getInstance().getCache(
+//                        CacheConstants.DATABASE_COPNFIG_CACHE_NAME).queryOne(
+//                        EagleDatabaseConfCache.CACHE_DB2_KEY);
+                EagleDatabaseConfig config = new EagleDatabaseConfig();
+                config.setDbConfRowId(21L);
                 calcReqModel.setDbConfRowId(config.getDbConfRowId().toString());
 
                 logger.debug("calcReqModel: " + JSON.toJSONString(calcReqModel));
@@ -395,9 +402,10 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
 
             result.put("resultCode", validateResult.getCode());
             result.put("resultMessage", validateResult.getMessage());
-        } catch (Exception e) {
-            result.put("resultCode", ErrorCode.INTERNAL_ERROR.getErrorCode());
-            result.put("resultMessage", ErrorCode.INTERNAL_ERROR.getErrorMsg());
+        }
+        catch (Exception e) {
+            result.put("resultCode", ResponseCode.INTERNAL_ERROR);
+            result.put("resultMessage", ResponseCode.INTERNAL_ERROR_MSG);
             logger.error("policyCalculateService.tryCalculate", e);
         }
 

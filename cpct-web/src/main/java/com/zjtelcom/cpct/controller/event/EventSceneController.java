@@ -46,7 +46,7 @@ public class EventSceneController extends BaseController {
             qryeventSceneRsp = eventSceneService.qryEventSceneList(qryEventSceneListReq);
         } catch (Exception e) {
             logger.error("[op:EventSceneController] fail to listEventScenes for qryEventSceneListReq = {}! Exception: ", JSONArray.toJSON(qryEventSceneListReq), e);
-            return initFailRespInfo(ErrorCode.SEARCH_EVENT_SCENE_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_SCENE_LIST_FAILURE.getErrorCode());
+            return JSON.toJSONString(qryeventSceneRsp);
         }
         return JSON.toJSONString(qryeventSceneRsp);
     }
@@ -62,7 +62,7 @@ public class EventSceneController extends BaseController {
             maps = eventSceneService.createEventScene(createEventSceneReq);
         } catch (Exception e) {
             logger.error("[op:EventSceneController] fail to saveEventScenes for createEventSceneReq = {}! Exception: ", JSONArray.toJSON(createEventSceneReq), e);
-            return initFailRespInfo(ErrorCode.SAVE_EVENT_SCENE_LIST_FAILURE.getErrorMsg(), ErrorCode.SAVE_EVENT_SCENE_LIST_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -78,7 +78,7 @@ public class EventSceneController extends BaseController {
             maps = eventSceneService.editEventScene(eventScene.getEventSceneId());
         } catch (Exception e) {
             logger.error("[op:EventSceneController] fail to editEventScene for eventScene = {}! Exception: ", JSONArray.toJSON(eventScene), e);
-            return initFailRespInfo(ErrorCode.EDIT_EVENT_SCENE_LIST_FAILURE.getErrorMsg(), ErrorCode.EDIT_EVENT_SCENE_LIST_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -94,7 +94,7 @@ public class EventSceneController extends BaseController {
             maps = eventSceneService.modEventScene(modEventSceneReq);
         } catch (Exception e) {
             logger.error("[op:EventSceneController] fail to editEventScene for modEventSceneReq = {}! Exception: ", JSONArray.toJSON(modEventSceneReq), e);
-            return initFailRespInfo(ErrorCode.UPDATE_EVENT_SCENE_LIST_FAILURE.getErrorMsg(), ErrorCode.UPDATE_EVENT_SCENE_LIST_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -110,7 +110,7 @@ public class EventSceneController extends BaseController {
             maps = eventSceneService.delEventScene(eventScene);
         } catch (Exception e) {
             logger.error("[op:EventSceneController] fail to editEventScene for modEventSceneReq = {}! Exception: ", JSONArray.toJSON(eventScene), e);
-            return initFailRespInfo(ErrorCode.UPDATE_EVENT_SCENE_LIST_FAILURE.getErrorMsg(), ErrorCode.UPDATE_EVENT_SCENE_LIST_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }
@@ -126,7 +126,7 @@ public class EventSceneController extends BaseController {
             maps = eventSceneService.coEventScene(eventScene);
         } catch (Exception e) {
             logger.error("[op:EventSceneController] fail to editEventScene for modEventSceneReq = {}! Exception: ", JSONArray.toJSON(eventScene), e);
-            return initFailRespInfo(ErrorCode.UPDATE_EVENT_SCENE_LIST_FAILURE.getErrorMsg(), ErrorCode.UPDATE_EVENT_SCENE_LIST_FAILURE.getErrorCode());
+            return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
     }

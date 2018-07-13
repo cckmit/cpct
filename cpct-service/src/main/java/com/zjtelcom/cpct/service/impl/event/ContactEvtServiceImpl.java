@@ -150,7 +150,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             contactEvt.setUpdateStaff(UserUtil.loginId());
             contactEvt.setCreateStaff(UserUtil.loginId());
             contactEvt.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-            contactEvtMapper.createContactEvtJt(contactEvt);
+            contactEvtMapper.createContactEvt(contactEvt);
             //根据返回的id生成事件编码
             contactEvt.setContactEvtCode(generateEvtCode(contactEvt.getContactEvtId()));
             contactEvtMapper.modContactEvtCode(contactEvt.getContactEvtId(), contactEvt.getContactEvtCode());
