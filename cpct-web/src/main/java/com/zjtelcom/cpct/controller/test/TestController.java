@@ -49,33 +49,6 @@ public class TestController extends BaseController {
     private PpmProductMapper productMapper;
 
 
-    @GetMapping("addAccountInfo")
-    public AccountInfo addAccountInfo() {
-        AccountInfo accountInfo = new AccountInfo();
-        accountInfo.setAccountName("zhangsanfeng");
-        accountInfo.setNickName("张三丰");
-        accountRepository.save(accountInfo);
-        return accountInfo;
-    }
-
-    @GetMapping("findAccountInfo")
-    public Object findAccountInfo() {
-        AccountInfo accountInfo = accountRepository.findByAccountName("zhangsanfeng");
-        List<AccountInfo> list = accountRepository.findAllByAccountName("zhangsanfeng");
-        return list;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
     /**
      * 添加
      * @return
