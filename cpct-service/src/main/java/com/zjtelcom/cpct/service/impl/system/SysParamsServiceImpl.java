@@ -145,8 +145,14 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
 
         List<SysParams> campaignParams = sysParamsMapper.listParamsByKeyForCampaign(ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey());
         result.put(campaignParams.get(0).getParamKey(), campaignParams);
+
+        List<SysParams> execParams = sysParamsMapper.listParamsByKeyForCampaign(ParamKeyEnum.EXEC_TYPE.getParamKey());
+        result.put(execParams.get(0).getParamKey(), execParams);
+
+        List<SysParams> mktCampaignCategoryParams = sysParamsMapper.listParamsByKeyForCampaign(ParamKeyEnum.MKT_CAMPAIGN_CATEGORY.getParamKey());
+        result.put(mktCampaignCategoryParams.get(0).getParamKey(), mktCampaignCategoryParams);
+
         return result;
     }
-
 
 }

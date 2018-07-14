@@ -11,6 +11,7 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamStrategyConfRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCpcAlgorithmsRulMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamStrategyConfRelDO;
 import com.zjtelcom.cpct.domain.campaign.MktCpcAlgorithmsRulDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
@@ -41,6 +42,9 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
 
     @Autowired
     private MktStrategyConfRuleMapper mktStrategyConfRuleMapper;
+
+    @Autowired
+    private MktStrategyConfRuleRelMapper mktStrategyConfRuleRelMapper;
 
     @Autowired
     private MktCamStrategyConfRelMapper mktCamStrategyConfRelMapper; //cpc算法与活动关联表
@@ -144,7 +148,6 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
     @Override
     public Map<String, Object> listAllMktStrategyConfRule() {
         Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();
-        ;
         List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList = new ArrayList<>();
         try {
             mktStrategyConfRuleDOList = mktStrategyConfRuleMapper.selectAll();
@@ -170,6 +173,9 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
     public Map<String, Object> deleteMktStrategyConfRule(Long mktStrategyConfRuleId) {
         Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();
         try {
+            //删除规则跟策略的关联
+            mktStrategyConfRuleRelMapper.deleteByMktStrategyConfRulId(mktStrategyConfRuleId);
+            //删除规则
             mktStrategyConfRuleMapper.deleteByPrimaryKey(mktStrategyConfRuleId);
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());

@@ -9,6 +9,7 @@ package com.zjtelcom.cpct.service.impl.strategy;
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamStrategyConfRelMapper;
+import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRegionRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
@@ -18,6 +19,7 @@ import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.City;
 import com.zjtelcom.cpct.domain.campaign.CityProperty;
 import com.zjtelcom.cpct.domain.campaign.MktCamStrategyConfRelDO;
+import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRegionRelDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
@@ -84,6 +86,12 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
     @Autowired
     private SysAreaMapper sysAreaMapper;
 
+    /**
+     * 策略下发渠道
+     */
+    @Autowired
+    private ContactChannelMapper contactChannelMapper;
+
 
     /**
      * 删除活动配置
@@ -128,6 +136,16 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             mktStrategyConfDO.setCreateDate(new Date());
             mktStrategyConfDO.setUpdateStaff(UserUtil.loginId());
             mktStrategyConfDO.setUpdateDate(new Date());
+            // 策略下发渠道
+            String channelIds = "";
+            for (int i = 0; i < mktStrategyConfDetail.getChannelList().size(); i++) {
+                if (i == 0 ){
+                    channelIds += mktStrategyConfDetail.getChannelList().get(i).getContactChlId();
+                } else {
+                    channelIds += "/" +  mktStrategyConfDetail.getChannelList().get(i).getContactChlId();
+                }
+            }
+            mktStrategyConfDO.setChannelsId(channelIds);
             // 插入策略配置基本，并返回策略Id -- mktStrategyConfId
             mktStrategyConfMapper.insert(mktStrategyConfDO);
             // 策略Id
@@ -178,9 +196,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                 mktStrategyConfRegionRelDO.setUpdateDate(new Date());
                 mktStrategyConfRegionRelMapper.insert(mktStrategyConfRegionRelDO);
             }
-
-
-            // 遍历
+            // 遍历策略下对应的规则
             for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfDetail.getMktStrategyConfRuleList()) {
                 MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
                 String productIds = "";
@@ -258,6 +274,16 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             CopyPropertiesUtil.copyBean2Bean(mktStrategyConfDO, mktStrategyConfDetail);
             mktStrategyConfDO.setUpdateStaff(UserUtil.loginId());
             mktStrategyConfDO.setUpdateDate(new Date());
+            // 策略下发渠道
+            String channelIds = "";
+            for (int i = 0; i < mktStrategyConfDetail.getChannelList().size(); i++) {
+                if (i == 0 ){
+                    channelIds += mktStrategyConfDetail.getChannelList().get(i).getContactChlId();
+                } else {
+                    channelIds += "/" +  mktStrategyConfDetail.getChannelList().get(i).getContactChlId();
+                }
+            }
+            mktStrategyConfDO.setChannelsId(channelIds);
             // 更新策略配置基本，并返回策略Id -- mktStrategyConfId0
             mktStrategyConfMapper.updateByPrimaryKey(mktStrategyConfDO);
             // 策略Id
@@ -418,6 +444,15 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                 cityList.add(city);
             }
             mktStrategyConfDetail.setCityList(cityList);
+
+            // 策略下发渠道
+            String[] channelIds = mktStrategyConfDO.getChannelsId().split("/");
+            List<Channel> channelList = new ArrayList<>();
+            for (int i = 0; i < channelIds.length; i++) {
+                Channel channel = contactChannelMapper.selectByPrimaryKey(Long.valueOf(channelIds[i]));
+                channelList.add(channel);
+            }
+            mktStrategyConfDetail.setChannelList(channelList);
 
             //查询与策略匹配的所有规则
             List<MktStrategyConfRule> mktStrategyConfRuleList = new ArrayList<>();

@@ -108,8 +108,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         // 创建活动基本信息
         mktCampaignDO.setCreateDate(new Date());
         mktCampaignDO.setCreateStaff(UserUtil.loginId());
-        mktCampaignDO.setCreateDate(new Date());
+        mktCampaignDO.setUpdateDate(new Date());
         mktCampaignDO.setUpdateStaff(UserUtil.loginId());
+        mktCampaignDO.setStatusDate(new Date());
         mktCampaignMapper.insert(mktCampaignDO);
         Long mktCampaignId = mktCampaignDO.getMktCampaignId();
         //创建活动与城市之间的关系
@@ -240,7 +241,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         mktCampaignVO.setApplyRegionIdList(applyRegionIds);
 
 /*
-
         mktCampaignVO.setApplyRegionIds(applyRegionIds);
         mktCampaignVO.setRelType(relType);
 */

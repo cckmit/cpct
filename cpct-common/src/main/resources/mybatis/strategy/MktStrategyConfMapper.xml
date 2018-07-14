@@ -6,7 +6,7 @@
     <result column="MKT_STRATEGY_CONF_NAME" jdbcType="VARCHAR" property="mktStrategyConfName" />
     <result column="BEGIN_TIME" jdbcType="DATE" property="beginTime" />
     <result column="END_TIME" jdbcType="DATE" property="endTime" />
-    <result column="CHANNELS_ID" jdbcType="BIGINT" property="channelsId" />
+    <result column="CHANNELS_ID" jdbcType="VARCHAR" property="channelsId" />
     <result column="CREATE_STAFF" jdbcType="VARCHAR" property="createStaff" />
     <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
     <result column="UPDATE_STAFF" jdbcType="VARCHAR" property="updateStaff" />
@@ -22,7 +22,7 @@
       CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, 
       UPDATE_DATE)
     values (#{mktStrategyConfId,jdbcType=BIGINT}, #{mktStrategyConfName,jdbcType=VARCHAR}, 
-      #{beginTime,jdbcType=DATE}, #{endTime,jdbcType=DATE}, #{channelsId,jdbcType=BIGINT}, 
+      #{beginTime,jdbcType=DATE}, #{endTime,jdbcType=DATE}, #{channelsId,jdbcType=VARCHAR},
       #{createStaff,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=VARCHAR}, 
       #{updateDate,jdbcType=TIMESTAMP})
   </insert>
@@ -31,7 +31,7 @@
     set MKT_STRATEGY_CONF_NAME = #{mktStrategyConfName,jdbcType=VARCHAR},
       BEGIN_TIME = #{beginTime,jdbcType=DATE},
       END_TIME = #{endTime,jdbcType=DATE},
-      CHANNELS_ID = #{channelsId,jdbcType=BIGINT},
+      CHANNELS_ID = #{channelsId,jdbcType=VARCHAR},
       CREATE_STAFF = #{createStaff,jdbcType=VARCHAR},
       CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
       UPDATE_STAFF = #{updateStaff,jdbcType=VARCHAR},

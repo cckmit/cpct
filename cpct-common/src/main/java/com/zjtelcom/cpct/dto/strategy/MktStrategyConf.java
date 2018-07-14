@@ -1,6 +1,9 @@
 package com.zjtelcom.cpct.dto.strategy;
 
+import com.zjtelcom.cpct.domain.channel.Channel;
+
 import java.util.Date;
+import java.util.List;
 
 public class MktStrategyConf {
     /**
@@ -26,7 +29,7 @@ public class MktStrategyConf {
     /**
      * 策略下发渠道
      */
-    private Long channelsId;
+    private List<Channel> channelList;
 
     public Long getMktStrategyConfId() {
         return mktStrategyConfId;
@@ -60,11 +63,11 @@ public class MktStrategyConf {
         this.endTime = endTime;
     }
 
-    public Long getChannelsId() {
-        return channelsId;
+    public List<Channel> getChannelList() {
+        return channelList;
     }
 
-    public void setChannelsId(Long channelsId) {
-        this.channelsId = channelsId;
+    public void setChannelList(List<Channel> channelList) {
+        this.channelList = channelList;
     }
 }

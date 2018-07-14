@@ -26,7 +26,7 @@ public class MktStrategyConfDO {
     /**
      * 策略下发渠道
      */
-    private Long channelsId;
+    private String channelsId;
 
     private Long createStaff;
 
@@ -68,11 +68,11 @@ public class MktStrategyConfDO {
         this.endTime = endTime;
     }
 
-    public Long getChannelsId() {
+    public String getChannelsId() {
         return channelsId;
     }
 
-    public void setChannelsId(Long channelsId) {
+    public void setChannelsId(String channelsId) {
         this.channelsId = channelsId;
     }
 
