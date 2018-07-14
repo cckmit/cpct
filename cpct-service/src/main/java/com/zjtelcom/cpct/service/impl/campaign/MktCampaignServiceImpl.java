@@ -285,8 +285,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {
             MktStrategyConfDO mktStrategyConfDO = mktStrategyConfMapper.selectByPrimaryKey(mktCamStrategyConfRelDO.getStrategyConfId());
             MktStrategyConf mktStrategyConf = new MktStrategyConf();
-            CopyPropertiesUtil.copyBean2Bean(mktStrategyConf, mktStrategyConfDO);
-            mktStrategyConfList.add(mktStrategyConf);
+            if (mktStrategyConf != null) {
+                CopyPropertiesUtil.copyBean2Bean(mktStrategyConf, mktStrategyConfDO);
+                mktStrategyConfList.add(mktStrategyConf);
+            }
         }
         mktCampaignVO.setMktStrategyConfList(mktStrategyConfList);
 
@@ -307,7 +309,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Override
     public Map<String, Object> delMktCampaign(Long mktCampaignId) throws Exception {
         // 删除关系
-        mktCampaignRelMapper.deleteByAmktCampaignId(mktCampaignId);
+        // mktCampaignRelMapper.deleteByAmktCampaignId(mktCampaignId);
 
         // 删出活动和事件的关联
         mktCamEvtRelMapper.deleteByMktCampaignId(mktCampaignId);

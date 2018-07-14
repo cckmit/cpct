@@ -16,6 +16,14 @@
     delete from mkt_cam_strategy_conf_rel
     where CAM_STR_CONF_REL_ID = #{camStrConfRelId,jdbcType=BIGINT}
   </delete>
+  <delete id="deleteByStrategyConfId" parameterType="java.lang.Long">
+    delete from mkt_cam_strategy_conf_rel
+    where STRATEGY_CONF_ID = #{strategyConfId,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByMktCampaignId" parameterType="java.lang.Long">
+    delete from mkt_cam_strategy_conf_rel
+    where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+  </delete>
   <insert id="insert" useGeneratedKeys="true" keyProperty="camStrConfRelId" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamStrategyConfRelDO">
     insert into mkt_cam_strategy_conf_rel (CAM_STR_CONF_REL_ID, MKT_CAMPAIGN_ID, STRATEGY_CONF_ID, 
       STATUS_CD, STATUS_DATE, CREATE_STAFF, 

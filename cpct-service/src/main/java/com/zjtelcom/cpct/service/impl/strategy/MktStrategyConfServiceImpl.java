@@ -111,6 +111,8 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             mktStrategyConfRuleMapper.deleteByPrimaryKey(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId());
             mktStrategyConfRuleRelMapper.deleteByPrimaryKey(mktStrategyConfRuleRelDO.getMktStrategyConfRuleRelId());
         }
+        //删除策略与活动的关联
+        mktCamStrategyConfRelMapper.deleteByPrimaryKey(mktStrategyConfId);
         //删除策略
         mktStrategyConfMapper.deleteByPrimaryKey(mktStrategyConfId);
         mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -387,7 +389,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
         Map<String, Object> mktStrategyConfMap = new HashMap<String, Object>();
         MktStrategyConfDetail mktStrategyConfDetail = new MktStrategyConfDetail();
         try {
-            //TODO 查出获取所有的城市信息, 设成全局Map
+            //查出获取所有的城市信息, 设成全局Map
             Map<Integer, String> cityMap = new HashMap<>();
             List<SysArea> sysAreaList = sysAreaMapper.selectAll();
             for (SysArea sysArea : sysAreaList) {

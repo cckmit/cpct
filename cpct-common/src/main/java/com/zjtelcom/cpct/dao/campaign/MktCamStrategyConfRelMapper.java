@@ -7,6 +7,10 @@ import java.util.List;
 public interface MktCamStrategyConfRelMapper {
     int deleteByPrimaryKey(Long camStrConfRelId);
 
+    int deleteByStrategyConfId(Long strategyConfId);
+
+    int deleteByMktCampaignId(Long mktCampaignId);
+
     int insert(MktCamStrategyConfRelDO mktCamStrategyConfRelDO);
 
     MktCamStrategyConfRelDO selectByPrimaryKey(Long camStrConfRelId);
