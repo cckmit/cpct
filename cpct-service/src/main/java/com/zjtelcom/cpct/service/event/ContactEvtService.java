@@ -2,12 +2,8 @@ package com.zjtelcom.cpct.service.event;
 
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
-import com.zjtelcom.cpct.dto.event.EventDTO;
-import com.zjtelcom.cpct.dto.event.EventList;
 import com.zjtelcom.cpct.request.event.CreateContactEvtJtReq;
 import com.zjtelcom.cpct.request.event.CreateContactEvtReq;
-
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,6 +15,8 @@ import java.util.Map;
 public interface ContactEvtService {
 
     Map<String,Object> listEvents(ContactEvt contactEvt,Page pageInfo);
+
+    Map<String,Object> listEventNoPages(ContactEvt contactEvt);
 
     Map<String,Object> createContactEvtJt(CreateContactEvtJtReq createContactEvtJtReq) throws Exception;
 

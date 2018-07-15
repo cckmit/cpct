@@ -26,7 +26,7 @@
     <!-- 刷新缓存 -->
     <task:scheduled-tasks scheduler="scheduler">
         <task:scheduled ref="cacheCenter" method="synCache"
-                        cron="0/10 * * * * ?"/>
+                        cron="0 0 0/1 * * ?"/>
     </task:scheduled-tasks>
     <bean id="cacheCenter" class="com.zjtelcom.cpct.service.CacheCenter"/>
 

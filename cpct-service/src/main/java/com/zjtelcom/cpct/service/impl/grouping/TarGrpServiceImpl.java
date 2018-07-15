@@ -10,11 +10,14 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.constants.ResponseCode;
 import com.zjtelcom.cpct.dao.campaign.MktCamGrpRulMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
 import com.zjtelcom.cpct.domain.channel.Label;
+import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.domain.grouping.TarGrpConditionDO;
+import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
@@ -39,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -67,6 +71,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     private PolicyCalculateService policyCalculateService;
     @Autowired
     private InjectionLabelMapper injectionLabelMapper;
+    @Autowired
+    private InjectionLabelValueMapper injectionLabelValueMapper;
 
     /**
      * 新增目标分群
@@ -194,7 +200,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
         for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
             TarGrpCondition tarGrpCondition1 = tarGrpConditionMapper.selectByPrimaryKey(tarGrpCondition.getConditionId());
-            if(tarGrpCondition1 == null){
+            if (tarGrpCondition1 == null) {
                 tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
                 tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
                 tarGrpCondition.setTarGrpId(tarGrp.getTarGrpId());
@@ -205,7 +211,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 tarGrpCondition.setCreateStaff(UserUtil.loginId());
                 tarGrpCondition.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
                 tarGrpConditionMapper.insert(tarGrpCondition);
-            }else{
+            } else {
                 tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
                 tarGrpCondition.setUpdateStaff(UserUtil.loginId());
                 tarGrpConditionMapper.modTarGrpCondition(tarGrpCondition);
@@ -272,6 +278,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         List<TarGrpConditionVO> grpConditionList = new ArrayList<>();
         List<TarGrpVO> tarGrpVOS = new ArrayList<>();//传回前端展示信息
         for (TarGrpCondition tarGrpCondition : listTarGrpCondition) {
+            List<String> valueList = new ArrayList<>();
+            List<OperatorDetail> operatorList = new ArrayList<>();
             TarGrpConditionVO tarGrpConditionVO = new TarGrpConditionVO();
             CopyPropertiesUtil.copyBean2Bean(tarGrpConditionVO, tarGrpCondition);
             //塞入左参中文名
@@ -282,10 +290,44 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             if (label.getFitDomain() != null) {
                 fitDomain = FitDomain.getFitDomain(Integer.parseInt(label.getFitDomain()));
             }
-            tarGrpConditionVO.setFitDomainName(fitDomain.getDescription());
+            tarGrpConditionVO.setFitDomainId(Long.valueOf(fitDomain.getValue()));
             //将操作符转为中文
             Operator op = Operator.getOperator(Integer.parseInt(tarGrpConditionVO.getOperType()));
             tarGrpConditionVO.setOperTypeName(op.getDescription());
+            //todo 通过左参id
+            String operators = label.getOperator();
+            String[] operator = operators.split(",");
+            if (operator.length > 1) {
+                for (int i = 0; i < operator.length; i++) {
+                    Operator opTT = Operator.getOperator(Integer.parseInt(operator[i]));
+                    OperatorDetail operatorDetail = new OperatorDetail();
+                    operatorDetail.setOperName(opTT.getDescription());
+                    operatorDetail.setOperValue(opTT.getValue());
+                    operatorList.add(operatorDetail);
+                }
+            } else {
+                if (operator.length == 1) {
+                    OperatorDetail operatorDetail = new OperatorDetail();
+                    Operator opTT = Operator.getOperator(Integer.parseInt(operator[0]));
+                    operatorDetail.setOperName(opTT.getDescription());
+                    operatorDetail.setOperValue(opTT.getValue());
+                    operatorList.add(operatorDetail);
+                }
+            }
+            String rightOperand = label.getRightOperand();
+            String[] rightOperands = rightOperand.split(",");
+            if (rightOperands.length > 1) {
+                for (int i = 0; i < rightOperands.length; i++) {
+                    valueList.add(rightOperands[i]);
+                }
+            } else {
+                if (rightOperands.length == 1) {
+                    valueList.add(rightOperands[0]);
+                }
+            }
+            tarGrpConditionVO.setConditionType(label.getConditionType());
+            tarGrpConditionVO.setValueList(valueList);
+            tarGrpConditionVO.setOperatorList(operatorList);
             grpConditionList.add(tarGrpConditionVO);
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -360,11 +402,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                     Map<String, String> tagInfoKeys = new HashMap<>();
 
                     //规则
-                    List<Map<String, Object>> ruleList = (List<Map<String, Object>>)policy.get("rules");
+                    List<Map<String, Object>> ruleList = (List<Map<String, Object>>) policy.get("rules");
                     for (Map<String, Object> rule : ruleList) {
 
-                        List<Map<String, String>> triggers = (List<Map<String, String>>)rule.get("triggers");
-                        List<Company> company = (List<Company>)rule.get("company");
+                        List<Map<String, String>> triggers = (List<Map<String, String>>) rule.get("triggers");
+                        List<Company> company = (List<Company>) rule.get("company");
                         String sql = null;
                         //tagInfos 获取标签信息
                         sql = SqlUtil.integrationSql(recommendType, triggers, tagInfos, company,
@@ -402,8 +444,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
 
             result.put("resultCode", validateResult.getCode());
             result.put("resultMessage", validateResult.getMessage());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             result.put("resultCode", ResponseCode.INTERNAL_ERROR);
             result.put("resultMessage", ResponseCode.INTERNAL_ERROR_MSG);
             logger.error("policyCalculateService.tryCalculate", e);
