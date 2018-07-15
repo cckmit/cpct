@@ -15,6 +15,7 @@ public class TarGrpConditionVO extends TarGrpCondition {
     private String leftParamName;//左参名字
     private String operTypeName;//运算类型,1000> 2000< 3000==  4000!=   5000>=  6000<=  7000in   8000&   9000||   7100	not in
     private Long fitDomainId;//领域对象id
+    private String fitDomainName;//领域对象名字
 
     private String conditionType;
 
@@ -69,5 +70,13 @@ public class TarGrpConditionVO extends TarGrpCondition {
 
     public void setFitDomainId(Long fitDomainId) {
         this.fitDomainId = fitDomainId;
+    }
+
+    public String getFitDomainName() {
+        return fitDomainName;
+    }
+
+    public void setFitDomainName(String fitDomainName) {
+        this.fitDomainName = fitDomainName;
     }
 }

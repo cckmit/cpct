@@ -291,6 +291,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 fitDomain = FitDomain.getFitDomain(Integer.parseInt(label.getFitDomain()));
             }
             tarGrpConditionVO.setFitDomainId(Long.valueOf(fitDomain.getValue()));
+            tarGrpConditionVO.setFitDomainName(fitDomain.getDescription());
             //将操作符转为中文
             Operator op = Operator.getOperator(Integer.parseInt(tarGrpConditionVO.getOperType()));
             tarGrpConditionVO.setOperTypeName(op.getDescription());
