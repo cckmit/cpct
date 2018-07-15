@@ -135,10 +135,10 @@ public class CacheManager {
             singleton.addCache(new EagleTagCache(CacheConstants.TAG_CACHE_NAME, 86400));
             CacheManager.getInstance().getCache(CacheConstants.TAG_CACHE_NAME).synItWithLock();
 //
-//            // 大数据标签源表定义缓存
-//            singleton.addCache(new EagleSourceTableDefCache(
-//                CacheConstants.SOURCE_TABLE_DEF_CACHE_NAME, 86400));
-//            CacheManager.getInstance().getCache(CacheConstants.SOURCE_TABLE_DEF_CACHE_NAME).synItWithLock();
+            // 大数据标签源表定义缓存
+            singleton.addCache(new EagleSourceTableDefCache(
+                CacheConstants.SOURCE_TABLE_DEF_CACHE_NAME, 86400));
+            CacheManager.getInstance().getCache(CacheConstants.SOURCE_TABLE_DEF_CACHE_NAME).synItWithLock();
 //
 //            // 大数据标签源表关系缓存
 //            singleton.addCache(new EagleSourceTableRefCache(
@@ -146,16 +146,16 @@ public class CacheManager {
 //            CacheManager.getInstance().getCache(CacheConstants.SOURCE_TABLE_REF_CACHE_NAME).synItWithLock();
 //
 //            // 大数据标签源表关系缓存
-//            singleton.addCache(new EagleDatabaseConfCache(
-//                CacheConstants.DATABASE_COPNFIG_CACHE_NAME, 86400));
-//            CacheManager.getInstance().getCache(CacheConstants.DATABASE_COPNFIG_CACHE_NAME).synItWithLock();
-//
+            singleton.addCache(new EagleDatabaseConfCache(
+                CacheConstants.DATABASE_COPNFIG_CACHE_NAME, 86400));
+            CacheManager.getInstance().getCache(CacheConstants.DATABASE_COPNFIG_CACHE_NAME).synItWithLock();
+
             // 因子值缓存
             singleton.addCache(new TriggerValueCache(CacheConstants.TRIGGER_VALUE_CACHE_NAME, 5000));
             CacheManager.getInstance().getCache(CacheConstants.TRIGGER_VALUE_CACHE_NAME).synItWithLock();
             // 因子缓存
-            singleton.addCache(new TriggerCache(CacheConstants.LABEL_CACHE_NAME, 5000));
-            CacheManager.getInstance().getCache(CacheConstants.LABEL_CACHE_NAME).synItWithLock();
+            singleton.addCache(new TriggerCache(CacheConstants.TRIGGER_CACHE_NAME, 5000));
+            CacheManager.getInstance().getCache(CacheConstants.TRIGGER_CACHE_NAME).synItWithLock();
 
         } catch (Exception e) {
             log.error("初始化缓存失败.", e);

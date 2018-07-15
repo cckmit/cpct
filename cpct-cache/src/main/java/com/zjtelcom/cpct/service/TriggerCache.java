@@ -35,7 +35,7 @@ public class TriggerCache extends ABSGGCache<Trigger> {
                 addOne(trigger.getConditionId().toString(), trigger);
             }
             LOG.info("TriggerMapper cache end, consume " + (System.currentTimeMillis() - startTime) + " ms.");
-            
+
         }
         catch (Exception e) {
             LOG.error("init TriggerMapper error", e);

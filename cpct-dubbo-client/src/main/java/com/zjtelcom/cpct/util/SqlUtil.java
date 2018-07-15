@@ -12,14 +12,17 @@ import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
 import com.zjtelcom.cpct.dao.eagle.EagleSourceTableDefMapper;
 import com.zjtelcom.cpct.dao.eagle.EagleSourceTableRefMapper;
+import com.zjtelcom.cpct.dao.eagle.TriggerMapper;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.dto.system.SystemParam;
 import com.zjtelcom.cpct.model.*;
 import com.zjtelcom.cpct.pojo.Company;
+import com.zjtelcom.cpct.service.ApplicationContextRegister;
 import com.zjtelcom.cpct.service.EagleDatabaseConfCache;
 import com.zjtelcom.cpct.strategyengine.Combination;
 import freemarker.template.*;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -28,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.ContextLoader;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -55,18 +59,11 @@ public final class SqlUtil {
 
     private static EagleSourceTableDefMapper sourceTableDefMapper;
 
-    private static InjectionLabelMapper injectionLabelMapper;
-
-    private static InjectionLabelValueMapper injectionLabelValueMapper;
+    private static TriggerMapper triggerMapper;
 
     private static Configuration config;
 
     private static Template template;
-
-    @Autowired
-    public void setEagleSourceTableDefMapper(EagleSourceTableDefMapper sourceTableDefMapper) {
-        SqlUtil.sourceTableDefMapper = sourceTableDefMapper;
-    }
 
     @Autowired
     public void setEagleSourceTableRefMapper(EagleSourceTableRefMapper sourceTableRefMapper) {
@@ -74,8 +71,13 @@ public final class SqlUtil {
     }
 
     @Autowired
-    public void setInjectionLabelMapper(InjectionLabelMapper injectionLabelMapper) {
-        SqlUtil.injectionLabelMapper = injectionLabelMapper;
+    public void setEagleSourceTableDefMapper(EagleSourceTableDefMapper sourceTableDefMapper) {
+        SqlUtil.sourceTableDefMapper = sourceTableDefMapper;
+    }
+
+    @Autowired
+    public void setTriggerMapper(TriggerMapper triggerMapper) {
+        SqlUtil.triggerMapper = triggerMapper;
     }
 
     private SqlUtil() {
@@ -95,9 +97,7 @@ public final class SqlUtil {
     @SuppressWarnings("unchecked")
     public static String integrationSql(String domainType, List<Map<String, String>> triggers,
                                         List<Map<String, String>> tagInfos, List<Company> company,
-
                                         Map<String, String> tagInfoKeys) {
-        //初始化
         init();
 
         //防止，组装sql中出现重复列，重复表关联，用Map区分是否有重复数据
@@ -105,24 +105,23 @@ public final class SqlUtil {
 
         IDacher<EagleTag> tagCache = CacheManager.getInstance().getCache(
                 CacheConstants.TAG_CACHE_NAME);
-        IDacher<LabelValue> triggerValueCache = CacheManager.getInstance().getCache(
+        IDacher<TriggerValue> triggerValueCache = CacheManager.getInstance().getCache(
                 CacheConstants.TRIGGER_VALUE_CACHE_NAME);
-        IDacher<Label> triggerCache = CacheManager.getInstance().getCache(
-                CacheConstants.LABEL_CACHE_NAME);
+        IDacher<Trigger> triggerCache = CacheManager.getInstance().getCache(
+                CacheConstants.TRIGGER_CACHE_NAME);
         IDacher<EagleTagAdaption> tagAdaptionCache = CacheManager.getInstance().getCache(
                 CacheConstants.TAG_ADAPTION_CACHE_NAME);
 
-        // todo EAGLE_ALL_TAG_1_TRYCALC  代表什么含义
         EagleTagAdaption eagleTagAdaption = tagAdaptionCache.queryOne("EAGLE_ALL_TAG_1_TRYCALC");
 
         Set<EagleSourceTableRef> tables = new HashSet<>();
         List<Column> columns = new ArrayList<>();
 
         //查询标签对应的valueid
-        List<Label> labelList = injectionLabelMapper.queryTriggerByLeftOpers(triggers);
-        Map<String, Label> triggerMap = new HashMap<>(labelList.size());
-        for (Label label : labelList) {
-            triggerMap.put(label.getInjectionLabelId().toString(), label);
+        List<Trigger> triggerList = triggerMapper.queryTriggerByLeftOpers(triggers);
+        Map<String, Trigger> triggerMap = new HashMap<>(triggerList.size());
+        for (Trigger trigger : triggerList) {
+            triggerMap.put(trigger.getConditionId().toString(), trigger);
         }
 
         EagleSourceTableDef masterTableDef = getMasterTable(domainType);
@@ -136,33 +135,13 @@ public final class SqlUtil {
         int k = 1;
         for (Map tigger : triggers) {
 
-//            String conditionId = tigger.get("conditionId").toString();
-            String injectionLabelId = tigger.get("injectionLabelId").toString();
+            String conditionId = tigger.get("conditionId").toString();
 
-            String leftOper = triggerCache.queryOne(injectionLabelId).getInjectionLabelCode();
-            //todo
-//            String leftOper = "";
-            eagleTagAdaption = new EagleTagAdaption();
-            eagleTagAdaption.setScript("def process(def obj){\n" +
-                    "    if(\"TYPE_4G_FLG\" == obj.sourceTableColumnName){\n" +
-                    "        if(\"4G功能标识\" == obj.tagName){\n" +
-                    "            return true;\n" +
-                    "        }\n" +
-                    "        return false;\n" +
-                    "    }\n" +
-                    "    return false;\n" +
-                    "}");
-            //todo
-//            leftOper = (String) GroovyUtil.invokeMethod(eagleTagAdaption.getScript(), "process",
-//                    new Object[]{tigger, domainType});
+            String leftOper = triggerCache.queryOne(conditionId).getEagleName();
+            leftOper = (String) GroovyUtil.invokeMethod(eagleTagAdaption.getScript(), "process",
+                    new Object[]{tigger, domainType});
             String key = leftOper + "_" + domainType;
-//            EagleTag tag = tagCache.queryOne(key);
-            EagleTag tag = new EagleTag();
-            tag.setSourceTableColumnType("varchar");
-            tag.setCtasTableDefinitionRowId(21L);
-            tag.setFitDomain("2");
-            tag.setCtasTableDefinitionRowId(2L);
-            tag.setTagRowId(1L);
+            EagleTag tag = tagCache.queryOne(key);
             //表别名
             String as = "t" + k;
 
@@ -171,12 +150,9 @@ public final class SqlUtil {
                 // 数据类型
                 tigger.put("dataType", tag.getSourceTableColumnType());
 
-//                EagleSourceTableDef tableDef = (EagleSourceTableDef) CacheManager.getInstance().getCache(
-//                        CacheConstants.SOURCE_TABLE_DEF_CACHE_NAME).queryOne(
-//                        tag.getCtasTableDefinitionRowId().toString());
-                //todo
-                EagleSourceTableDef tableDef = new EagleSourceTableDef();
-                tableDef.setCtasTableDefinitionRowId(1L);
+                EagleSourceTableDef tableDef = (EagleSourceTableDef) CacheManager.getInstance().getCache(
+                        CacheConstants.SOURCE_TABLE_DEF_CACHE_NAME).queryOne(
+                        tag.getCtasTableDefinitionRowId().toString());
 
                 // 查询出跟主表的关联表
                 EagleSourceTableRef joinTable = getJoinTable(masterTableDef, tableDef,
@@ -226,12 +202,8 @@ public final class SqlUtil {
                 }
                 tigger.put("leftOperand", col.getTableAlias() + "." + col.getName());
 
-                if (triggerMap.containsKey(injectionLabelId.toString())) {
-                    List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(Long.valueOf(injectionLabelId));
-                    Integer valueId = 0;
-                    if (labelValues != null) {
-                        valueId = Integer.valueOf(String.valueOf(triggerMap.get(labelValues.get(0).getLabelValue())));
-                    }
+                if (triggerMap.containsKey(conditionId.toString())) {
+                    Integer valueId = triggerMap.get(conditionId.toString()).getValueId();
                     String conditionType = tigger.get("conditionType").toString();
 
                     //类型是输入和范围的不用查询真实值
@@ -248,9 +220,9 @@ public final class SqlUtil {
 
                             String triggerValueCacheKey = new StringBuilder(valueId.toString()).append(
                                     "@").append(domainType).append("@").append(showValues[i]).toString();
-                            LabelValue triggerValue = triggerValueCache.queryOne(triggerValueCacheKey);
+                            TriggerValue triggerValue = triggerValueCache.queryOne(triggerValueCacheKey);
                             if (null != triggerValue) {
-                                realValue.append(triggerValue.getLabelValue());
+                                realValue.append(triggerValue.getRealValue());
                             } else {
                                 realValue.append(showValues[i]);
                             }
@@ -272,11 +244,8 @@ public final class SqlUtil {
         }
 
         // 必选字段要出现在sql中
-        //todo
-//        SystemParam param = (SystemParam) CacheManager.getInstance().getCache(
-//                CacheConstants.SYSTEMPARAM_CACHE_NAME).queryOne("eagle.necessary.tag");
-        SystemParam param = new SystemParam();
-        param.setParamValue("500000");
+        SystemParam param = (SystemParam) CacheManager.getInstance().getCache(
+                CacheConstants.SYSTEMPARAM_CACHE_NAME).queryOne("eagle.necessary.tag");
         String[] requiredTags = param.getParamValue().split(",");
 
         //k = 1;
@@ -291,20 +260,13 @@ public final class SqlUtil {
                 key = (String) GroovyUtil.invokeMethod(tagAdaption.getScript(), "process",
                         new Object[]{requiredTag, domainType});
             }
-            //todo
-//            EagleTag tag = tagCache.queryOne(key);
-            EagleTag tag = new EagleTag();
-            tag.setSourceTableColumnName("ADDR_OWNER_NAME");
-            tag.setCtasTableDefinitionRowId(746L);
-            tag.setFitDomain("3");
-            tag.setTagRowId(1L);
+
+            EagleTag tag = tagCache.queryOne(key);
             requiredTag = tag.getSourceTableColumnName();
             if (null != tag) {
-//                EagleSourceTableDef tableDef = (EagleSourceTableDef) CacheManager.getInstance().getCache(
-//                        CacheConstants.SOURCE_TABLE_DEF_CACHE_NAME).queryOne(
-//                        tag.getCtasTableDefinitionRowId().toString());
-                EagleSourceTableDef tableDef = new EagleSourceTableDef();
-                tableDef.setCtasTableDefinitionRowId(1L);
+                EagleSourceTableDef tableDef = (EagleSourceTableDef) CacheManager.getInstance().getCache(
+                        CacheConstants.SOURCE_TABLE_DEF_CACHE_NAME).queryOne(
+                        tag.getCtasTableDefinitionRowId().toString());
 
                 EagleSourceTableRef joinTable = getJoinTable(masterTableDef, tableDef,
                         tag.getFitDomain(), as);
@@ -368,12 +330,12 @@ public final class SqlUtil {
 
     private static String formatRightOperand(Object rightOperand) {
         if (null != rightOperand && !"".equals(rightOperand.toString())) {
-            JSONArray rightOperands = JSONArray.parseArray(rightOperand.toString());
+            net.sf.json.JSONArray rightOperands = net.sf.json.JSONArray.fromObject(rightOperand.toString());
             if (null != rightOperands) {
                 List<String> source = new ArrayList<String>();
                 List<String> keys = new ArrayList<String>();
                 for (int i = 0; i < rightOperands.size(); i++) {
-                    JSONObject object = rightOperands.getJSONObject(i);
+                    net.sf.json.JSONObject object = rightOperands.getJSONObject(i);
                     List<String> listKeys = new ArrayList<String>(object.keySet());
                     if (org.apache.commons.collections.CollectionUtils.isNotEmpty(listKeys)) {
                         String key = listKeys.get(0);
@@ -394,22 +356,17 @@ public final class SqlUtil {
         return "";
     }
 
-    /**
-     * 查询领域下的主表
-     */
     public static EagleSourceTableDef getMasterTable(String domainType) {
         init();
         // 查询出这个域下主表
-//        SystemParam param = (SystemParam) CacheManager.getInstance().getCache(
-//                CacheConstants.SYSTEMPARAM_CACHE_NAME).queryOne("eagle.master.table");
-//        JSONObject obj = JSON.parseObject(param.getParamValue());
-//        String materTable = obj.getString(domainType);
-        String materTable = "BRD_User_Portrait_Z";
-//        EagleDatabaseConfig config = (EagleDatabaseConfig) CacheManager.getInstance().getCache(
-//                CacheConstants.DATABASE_COPNFIG_CACHE_NAME).queryOne(
-//                EagleDatabaseConfCache.CACHE_DB2_KEY);
-        EagleDatabaseConfig config = new EagleDatabaseConfig();
-        config.setDbConfRowId(21L);
+        SystemParam param = (SystemParam) CacheManager.getInstance().getCache(
+                CacheConstants.SYSTEMPARAM_CACHE_NAME).queryOne("eagle.master.table");
+        JSONObject obj = JSON.parseObject(param.getParamValue());
+        String materTable = obj.getString(domainType);
+        EagleDatabaseConfig config = (EagleDatabaseConfig) CacheManager.getInstance().getCache(
+                CacheConstants.DATABASE_COPNFIG_CACHE_NAME).queryOne(
+                EagleDatabaseConfCache.CACHE_DB2_KEY);
+
         EagleSourceTableDef masterTableDef = sourceTableDefMapper.queryByTableNameAndDb(
                 materTable, config.getDbConfRowId().toString());
         return masterTableDef;
@@ -427,9 +384,6 @@ public final class SqlUtil {
         }
     }
 
-    /**
-     * 查出跟主表的关联表
-     */
     private static EagleSourceTableRef getJoinTable(EagleSourceTableDef masterTableDef,
                                                     EagleSourceTableDef tableDef,
                                                     String fitDomain, String as) {
@@ -440,7 +394,7 @@ public final class SqlUtil {
                     tableDef.getCtasTableDefinitionRowId().toString(),
                     masterTableDef.getCtasTableDefinitionRowId().toString(), fitDomain);
             EagleSourceTableRef tableRef = null;
-            if (org.apache.commons.collections.CollectionUtils.isNotEmpty(sourceTableRefList)) {
+            if (CollectionUtils.isNotEmpty(sourceTableRefList)) {
                 tableRef = sourceTableRefList.get(0);
                 tableRef.setTableName(tableDef.getTagTableNameEn());
                 tableRef.setAlias(as);
@@ -452,11 +406,13 @@ public final class SqlUtil {
         return null;
     }
 
-    /**
-     * 初始化方法
-     */
     private static void init() {
         if (!initFlag) {
+            //自动注入
+//            sourceTableDefMapper = ContextLoader.getCurrentWebApplicationContext().getBean(
+//                    EagleSourceTableDefMapper.class);
+//            triggerMapper = ContextLoader.getCurrentWebApplicationContext().getBean(
+//                    TriggerMapper.class);
 
             config = new Configuration(new Version("2.3.23"));
             config.setDefaultEncoding("UTF-8");
@@ -478,6 +434,7 @@ public final class SqlUtil {
                 String ftl = FileUtils.readFileToString(resource.getFile(), "UTF-8");
                 // 创建模板对象
                 template = new Template(ftl, new StringReader(ftl), config);
+
             } catch (IOException e) {
                 LOG.error(e);
             }

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zjtelcom.cpct.dao.eagle.EagleDatabaseConfigMapper" >
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.model.EagleDatabaseConfig" >
+    <id column="DB_CONF_ROW_ID" property="dbConfRowId" jdbcType="INTEGER" />
+    <result column="DB_CONF_NAME" property="dbConfName" jdbcType="VARCHAR" />
+    <result column="DATA_BASE_TYPE" property="dataBaseType" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    DB_CONF_ROW_ID, DB_CONF_NAME, DATA_BASE_TYPE
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from fpc_eagle_database_config
+    where DB_CONF_ROW_ID = #{dbConfRowId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="queryAll" resultMap="BaseResultMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from fpc_eagle_database_config
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from fpc_eagle_database_config
+    where DB_CONF_ROW_ID = #{dbConfRowId,jdbcType=INTEGER}
+  </delete>
+  
+  <delete id="deleteAll">
+  	delete from fpc_eagle_database_config
+  </delete>
+  
+  <insert id="insert" parameterType="com.zjtelcom.cpct.model.EagleDatabaseConfig" >
+    insert into fpc_eagle_database_config (DB_CONF_ROW_ID, DB_CONF_NAME, DATA_BASE_TYPE
+      )
+    values (#{dbConfRowId,jdbcType=INTEGER}, #{dbConfName,jdbcType=VARCHAR}, #{dataBaseType,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertBatch" parameterType="java.util.List" >
+    insert into fpc_eagle_database_config (DB_CONF_ROW_ID, DB_CONF_NAME, DATA_BASE_TYPE
+      )
+    values 
+    <foreach collection="record" item="item" separator=",">
+    (#{item.dbConfRowId,jdbcType=INTEGER}, #{item.dbConfName,jdbcType=VARCHAR}, #{item.dataBaseType,jdbcType=VARCHAR}
+      )
+    </foreach>
+  </insert>
+  <insert id="insertSelective" parameterType="com.zjtelcom.cpct.model.EagleDatabaseConfig" >
+    insert into fpc_eagle_database_config
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="dbConfRowId != null" >
+        DB_CONF_ROW_ID,
+      </if>
+      <if test="dbConfName != null" >
+        DB_CONF_NAME,
+      </if>
+      <if test="dataBaseType != null" >
+        DATA_BASE_TYPE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="dbConfRowId != null" >
+        #{dbConfRowId,jdbcType=INTEGER},
+      </if>
+      <if test="dbConfName != null" >
+        #{dbConfName,jdbcType=VARCHAR},
+      </if>
+      <if test="dataBaseType != null" >
+        #{dataBaseType,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zjtelcom.cpct.model.EagleDatabaseConfig" >
+    update fpc_eagle_database_config
+    <set >
+      <if test="dbConfName != null" >
+        DB_CONF_NAME = #{dbConfName,jdbcType=VARCHAR},
+      </if>
+      <if test="dataBaseType != null" >
+        DATA_BASE_TYPE = #{dataBaseType,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where DB_CONF_ROW_ID = #{dbConfRowId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.model.EagleDatabaseConfig" >
+    update fpc_eagle_database_config
+    set DB_CONF_NAME = #{dbConfName,jdbcType=VARCHAR},
+      DATA_BASE_TYPE = #{dataBaseType,jdbcType=VARCHAR}
+    where DB_CONF_ROW_ID = #{dbConfRowId,jdbcType=INTEGER}
+  </update>
+</mapper>
