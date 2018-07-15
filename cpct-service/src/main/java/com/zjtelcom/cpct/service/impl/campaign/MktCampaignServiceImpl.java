@@ -210,7 +210,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
 
     /**
-     * 获取活动基本信息 并删除建立关系
+     * 获取活动基本信息
      *
      * @param mktCampaignId
      * @return
@@ -330,7 +330,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     }
 
     /**
-     * 查询事件列表
+     * 查询活动列表
      */
     @Override
     public Map<String, Object> qryMktCampaignListPage(String mktCampaignName, String statusCd, String tiggerType, String mktCampaignType, Integer page, Integer pageSize) {

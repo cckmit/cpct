@@ -44,6 +44,12 @@ public class MktCamChlConfController extends BaseController {
         return JSON.toJSONString(map);
     }
 
+    /**
+     * 更新协同渠道配置
+     *
+     * @param mktCamChlConfDetail
+     * @return
+     */
     @RequestMapping(value = "/updateMktCamChlConf", method = RequestMethod.POST)
     @CrossOrigin
     public String updateMktCamChlConf(@RequestBody MktCamChlConfDetail mktCamChlConfDetail){
@@ -56,6 +62,12 @@ public class MktCamChlConfController extends BaseController {
         return JSON.toJSONString(map);
     }
 
+    /**
+     * 获取协同渠道配置
+     *
+     * @param params
+     * @return
+     */
     @RequestMapping(value = "/getMktCamChlConf", method = RequestMethod.POST)
     @CrossOrigin
     public String getMktCamChlConf(@RequestBody Map<String, String> params){
@@ -69,7 +81,12 @@ public class MktCamChlConfController extends BaseController {
         return JSON.toJSONString(map);
     }
 
-
+    /**
+     * 删除协同渠道配置
+     *
+     * @param params
+     * @return
+     */
     @RequestMapping(value = "/deleteMktCamChlConf", method = RequestMethod.POST)
     @CrossOrigin
     public String deleteMktCamChlConf(@RequestBody Map<String, String> params){

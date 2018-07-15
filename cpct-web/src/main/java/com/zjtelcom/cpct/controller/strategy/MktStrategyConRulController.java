@@ -9,6 +9,7 @@ package com.zjtelcom.cpct.controller.strategy;
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,8 +32,16 @@ public class MktStrategyConRulController {
 
 
     @RequestMapping(value = "/deleteMktStrategyConfRule", method = RequestMethod.POST)
+    @CrossOrigin
     public String deleteMktStrategyConfRule(Long mktStrategyConfRuleId){
         Map<String, Object> map = mktStrategyConfRuleService.deleteMktStrategyConfRule(mktStrategyConfRuleId);
+        return JSON.toJSONString(map);
+    }
+
+    @RequestMapping(value = "/getMktStrategyConfRule", method = RequestMethod.POST)
+    @CrossOrigin
+    public String getMktStrategyConfRule(Long mktStrategyConfRuleId){
+        Map<String, Object> map = mktStrategyConfRuleService.getMktStrategyConfRule(mktStrategyConfRuleId);
         return JSON.toJSONString(map);
     }
 }

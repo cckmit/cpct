@@ -140,11 +140,13 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             mktStrategyConfDO.setUpdateDate(new Date());
             // 策略下发渠道
             String channelIds = "";
-            for (int i = 0; i < mktStrategyConfDetail.getChannelList().size(); i++) {
-                if (i == 0 ){
-                    channelIds += mktStrategyConfDetail.getChannelList().get(i).getContactChlId();
-                } else {
-                    channelIds += "/" +  mktStrategyConfDetail.getChannelList().get(i).getContactChlId();
+            if (mktStrategyConfDetail.getChannelList() != null) {
+                for (int i = 0; i < mktStrategyConfDetail.getChannelList().size(); i++) {
+                    if (i == 0) {
+                        channelIds += mktStrategyConfDetail.getChannelList().get(i).getContactChlId();
+                    } else {
+                        channelIds += "/" + mktStrategyConfDetail.getChannelList().get(i).getContactChlId();
+                    }
                 }
             }
             mktStrategyConfDO.setChannelsId(channelIds);
@@ -158,63 +160,70 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
 
             //添加属性配置信息 与 下发城市关联
             List<City> cityList = mktStrategyConfDetail.getCityList();
-            for (City city : cityList) {
-                MktStrategyConfRegionRelDO mktStrategyConfRegionRelDO = new MktStrategyConfRegionRelDO();
-                mktStrategyConfRegionRelDO.setMktStrategyConfId(mktStrategyConfId);
-                mktStrategyConfRegionRelDO.setApplyCityId(city.getApplyCity().getCityPropertyId());
-                String applyCountyIds = "";
-                String applyBranchIds = "";
-                String applyGriddingIds = "";
-                // 区县
-                for (int i = 0; i < city.getApplyCountys().size(); i++) {
-                    if (i == 0) {
-                        applyCountyIds += city.getApplyCountys().get(i).getCityPropertyId();
-                    } else {
-                        applyCountyIds += "/" + city.getApplyCountys().get(i).getCityPropertyId();
+            if (cityList != null) {
+                for (City city : cityList) {
+                    MktStrategyConfRegionRelDO mktStrategyConfRegionRelDO = new MktStrategyConfRegionRelDO();
+                    mktStrategyConfRegionRelDO.setMktStrategyConfId(mktStrategyConfId);
+                    mktStrategyConfRegionRelDO.setApplyCityId(city.getApplyCity().getCityPropertyId());
+                    String applyCountyIds = "";
+                    String applyBranchIds = "";
+                    String applyGriddingIds = "";
+                    // 区县
+                    for (int i = 0; i < city.getApplyCountys().size(); i++) {
+                        if (i == 0) {
+                            applyCountyIds += city.getApplyCountys().get(i).getCityPropertyId();
+                        } else {
+                            applyCountyIds += "/" + city.getApplyCountys().get(i).getCityPropertyId();
+                        }
                     }
-                }
-                // 支局
-                for (int i = 0; i < city.getApplyBranchs().size(); i++) {
-                    if (i == 0) {
-                        applyBranchIds += city.getApplyBranchs().get(i).getCityPropertyId();
-                    } else {
-                        applyBranchIds += "/" + city.getApplyBranchs().get(i).getCityPropertyId();
+                    // 支局
+                    for (int i = 0; i < city.getApplyBranchs().size(); i++) {
+                        if (i == 0) {
+                            applyBranchIds += city.getApplyBranchs().get(i).getCityPropertyId();
+                        } else {
+                            applyBranchIds += "/" + city.getApplyBranchs().get(i).getCityPropertyId();
+                        }
                     }
-                }
-                // 网格
-                for (int i = 0; i < city.getApplyGriddings().size(); i++) {
-                    if (i == 0) {
-                        applyGriddingIds += city.getApplyGriddings().get(i).getCityPropertyId();
-                    } else {
-                        applyGriddingIds += "/" + city.getApplyGriddings().get(i).getCityPropertyId();
+                    // 网格
+                    for (int i = 0; i < city.getApplyGriddings().size(); i++) {
+                        if (i == 0) {
+                            applyGriddingIds += city.getApplyGriddings().get(i).getCityPropertyId();
+                        } else {
+                            applyGriddingIds += "/" + city.getApplyGriddings().get(i).getCityPropertyId();
+                        }
                     }
+                    mktStrategyConfRegionRelDO.setApplyCounty(applyCountyIds);
+                    mktStrategyConfRegionRelDO.setApplyBranch(applyBranchIds);
+                    mktStrategyConfRegionRelDO.setApplyGridding(applyGriddingIds);
+                    mktStrategyConfRegionRelDO.setCreateStaff(UserUtil.loginId());
+                    mktStrategyConfRegionRelDO.setCreateDate(new Date());
+                    mktStrategyConfRegionRelDO.setUpdateStaff(UserUtil.loginId());
+                    mktStrategyConfRegionRelDO.setUpdateDate(new Date());
+                    mktStrategyConfRegionRelMapper.insert(mktStrategyConfRegionRelDO);
                 }
-                mktStrategyConfRegionRelDO.setApplyCounty(applyCountyIds);
-                mktStrategyConfRegionRelDO.setApplyBranch(applyBranchIds);
-                mktStrategyConfRegionRelDO.setApplyGridding(applyGriddingIds);
-                mktStrategyConfRegionRelDO.setCreateStaff(UserUtil.loginId());
-                mktStrategyConfRegionRelDO.setCreateDate(new Date());
-                mktStrategyConfRegionRelDO.setUpdateStaff(UserUtil.loginId());
-                mktStrategyConfRegionRelDO.setUpdateDate(new Date());
-                mktStrategyConfRegionRelMapper.insert(mktStrategyConfRegionRelDO);
             }
+
             // 遍历策略下对应的规则
             for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfDetail.getMktStrategyConfRuleList()) {
                 MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
                 String productIds = "";
                 String evtContactConfIds = "";
-                for (int i = 0; i < mktStrategyConfRule.getProductIdlist().size(); i++) {
-                    if (i == 0) {
-                        productIds += mktStrategyConfRule.getProductIdlist().get(i);
-                    } else {
-                        productIds += "/" + mktStrategyConfRule.getProductIdlist().get(i);
+                if (mktStrategyConfRule.getProductIdlist() != null) {
+                    for (int i = 0; i < mktStrategyConfRule.getProductIdlist().size(); i++) {
+                        if (i == 0) {
+                            productIds += mktStrategyConfRule.getProductIdlist().get(i);
+                        } else {
+                            productIds += "/" + mktStrategyConfRule.getProductIdlist().get(i);
+                        }
                     }
                 }
-                for (int i = 0; i < mktStrategyConfRule.getEvtContactConfIdList().size(); i++) {
-                    if (i == 0) {
-                        evtContactConfIds += mktStrategyConfRule.getEvtContactConfIdList().get(i);
-                    } else {
-                        evtContactConfIds += "/" + mktStrategyConfRule.getEvtContactConfIdList().get(i);
+                if (mktStrategyConfRule.getEvtContactConfIdList() != null) {
+                    for (int i = 0; i < mktStrategyConfRule.getEvtContactConfIdList().size(); i++) {
+                        if (i == 0) {
+                            evtContactConfIds += mktStrategyConfRule.getEvtContactConfIdList().get(i);
+                        } else {
+                            evtContactConfIds += "/" + mktStrategyConfRule.getEvtContactConfIdList().get(i);
+                        }
                     }
                 }
                 CopyPropertiesUtil.copyBean2Bean(mktStrategyConfRuleDO, mktStrategyConfRule);
@@ -263,6 +272,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
 
     /**
      * 更新策略配置信息
+     *
      * @param mktStrategyConfDetail
      * @return
      * @throws Exception
@@ -278,13 +288,16 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             mktStrategyConfDO.setUpdateDate(new Date());
             // 策略下发渠道
             String channelIds = "";
-            for (int i = 0; i < mktStrategyConfDetail.getChannelList().size(); i++) {
-                if (i == 0 ){
-                    channelIds += mktStrategyConfDetail.getChannelList().get(i).getContactChlId();
-                } else {
-                    channelIds += "/" +  mktStrategyConfDetail.getChannelList().get(i).getContactChlId();
+            if (mktStrategyConfDetail.getChannelList() != null) {
+                for (int i = 0; i < mktStrategyConfDetail.getChannelList().size(); i++) {
+                    if (i == 0) {
+                        channelIds += mktStrategyConfDetail.getChannelList().get(i).getContactChlId();
+                    } else {
+                        channelIds += "/" + mktStrategyConfDetail.getChannelList().get(i).getContactChlId();
+                    }
                 }
             }
+
             mktStrategyConfDO.setChannelsId(channelIds);
             // 更新策略配置基本，并返回策略Id -- mktStrategyConfId0
             mktStrategyConfMapper.updateByPrimaryKey(mktStrategyConfDO);
@@ -296,70 +309,83 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
 
             // 修改属性配置信息 与 下发城市关联
             List<City> cityList = mktStrategyConfDetail.getCityList();
-            for (City city : cityList) {
-                MktStrategyConfRegionRelDO mktStrategyConfRegionRelDO = new MktStrategyConfRegionRelDO();
-                mktStrategyConfRegionRelDO.setMktStrategyConfId(mktStrategyConfId);
-                mktStrategyConfRegionRelDO.setApplyCityId(city.getApplyCity().getCityPropertyId());
-                String applyCountyIds = "";
-                String applyBranchIds = "";
-                String applyGriddingIds = "";
-                // 区县
-                for (int i = 0; i < city.getApplyCountys().size(); i++) {
-                    if (i == 0) {
-                        applyCountyIds += city.getApplyCountys().get(i).getCityPropertyId();
-                    } else {
-                        applyCountyIds += "/" + city.getApplyCountys().get(i).getCityPropertyId();
+            if (cityList != null) {
+                for (City city : cityList) {
+                    MktStrategyConfRegionRelDO mktStrategyConfRegionRelDO = new MktStrategyConfRegionRelDO();
+                    mktStrategyConfRegionRelDO.setMktStrategyConfId(mktStrategyConfId);
+                    mktStrategyConfRegionRelDO.setApplyCityId(city.getApplyCity().getCityPropertyId());
+                    String applyCountyIds = "";
+                    String applyBranchIds = "";
+                    String applyGriddingIds = "";
+                    // 区县
+                    if (city.getApplyCountys() != null) {
+                        for (int i = 0; i < city.getApplyCountys().size(); i++) {
+                            if (i == 0) {
+                                applyCountyIds += city.getApplyCountys().get(i).getCityPropertyId();
+                            } else {
+                                applyCountyIds += "/" + city.getApplyCountys().get(i).getCityPropertyId();
+                            }
+                        }
                     }
-                }
-                // 支局
-                for (int i = 0; i < city.getApplyBranchs().size(); i++) {
-                    if (i == 0) {
-                        applyBranchIds += city.getApplyBranchs().get(i).getCityPropertyId();
-                    } else {
-                        applyBranchIds += "/" + city.getApplyBranchs().get(i).getCityPropertyId();
+                    // 支局
+                    if (city.getApplyBranchs() != null) {
+                        for (int i = 0; i < city.getApplyBranchs().size(); i++) {
+                            if (i == 0) {
+                                applyBranchIds += city.getApplyBranchs().get(i).getCityPropertyId();
+                            } else {
+                                applyBranchIds += "/" + city.getApplyBranchs().get(i).getCityPropertyId();
+                            }
+                        }
                     }
-                }
-                // 网格
-                for (int i = 0; i < city.getApplyGriddings().size(); i++) {
-                    if (i == 0) {
-                        applyGriddingIds += city.getApplyGriddings().get(i).getCityPropertyId();
-                    } else {
-                        applyGriddingIds += "/" + city.getApplyGriddings().get(i).getCityPropertyId();
+
+                    // 网格
+                    if (city.getApplyGriddings() != null) {
+                        for (int i = 0; i < city.getApplyGriddings().size(); i++) {
+                            if (i == 0) {
+                                applyGriddingIds += city.getApplyGriddings().get(i).getCityPropertyId();
+                            } else {
+                                applyGriddingIds += "/" + city.getApplyGriddings().get(i).getCityPropertyId();
+                            }
+                        }
                     }
+
+                    mktStrategyConfRegionRelDO.setApplyCounty(applyCountyIds);
+                    mktStrategyConfRegionRelDO.setApplyBranch(applyBranchIds);
+                    mktStrategyConfRegionRelDO.setApplyGridding(applyGriddingIds);
+                    mktStrategyConfRegionRelDO.setUpdateStaff(UserUtil.loginId());
+                    mktStrategyConfRegionRelDO.setUpdateDate(new Date());
+                    mktStrategyConfRegionRelMapper.updateByPrimaryKey(mktStrategyConfRegionRelDO);
                 }
-                mktStrategyConfRegionRelDO.setApplyCounty(applyCountyIds);
-                mktStrategyConfRegionRelDO.setApplyBranch(applyBranchIds);
-                mktStrategyConfRegionRelDO.setApplyGridding(applyGriddingIds);
-                mktStrategyConfRegionRelDO.setUpdateStaff(UserUtil.loginId());
-                mktStrategyConfRegionRelDO.setUpdateDate(new Date());
-                mktStrategyConfRegionRelMapper.updateByPrimaryKey(mktStrategyConfRegionRelDO);
             }
+
 
             // 遍历策略下的所有规则
-            for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfDetail.getMktStrategyConfRuleList()) {
-                MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
-                CopyPropertiesUtil.copyBean2Bean(mktStrategyConfRuleDO, mktStrategyConfRule);
-                //判断规则是否是修改还是新增
-                if (mktStrategyConfRule.getMktStrategyConfRuleId() != null && mktStrategyConfRule.getMktStrategyConfRuleId() != 0) {
-                    // 修改规则的信息 并返回id -- mktStrategyConfRuleId
-                    mktStrategyConfRuleMapper.updateByPrimaryKey(mktStrategyConfRuleDO);
-                } else {
-                    // 添加新增的规则
-                    mktStrategyConfRuleMapper.insert(mktStrategyConfRuleDO);
-                    // 策略规则 Id
-                    Long mktStrategyConfRuleId = mktStrategyConfRuleDO.getMktStrategyConfRuleId();
-                    // 建立策略配置和规则的关系
-                    MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO = new MktStrategyConfRuleRelDO();
-                    mktStrategyConfRuleRelDO.setCreateDate(new Date());
-                    mktStrategyConfRuleRelDO.setCreateStaff(UserUtil.loginId());
-                    mktStrategyConfRuleRelDO.setMktStrategyConfId(mktStrategyConfId);
-                    mktStrategyConfRuleRelDO.setMktStrategyConfRuleId(mktStrategyConfRuleId);
-                    mktStrategyConfRuleRelDO.setUpdateStaff(UserUtil.loginId());
-                    mktStrategyConfRuleRelDO.setUpdateDate(new Date());
-                    mktStrategyConfRuleRelMapper.insert(mktStrategyConfRuleRelDO);
+            if (mktStrategyConfDetail.getMktStrategyConfRuleList() != null) {
+                for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfDetail.getMktStrategyConfRuleList()) {
+                    MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
+                    CopyPropertiesUtil.copyBean2Bean(mktStrategyConfRuleDO, mktStrategyConfRule);
+                    //判断规则是否是修改还是新增
+                    if (mktStrategyConfRule.getMktStrategyConfRuleId() != null && mktStrategyConfRule.getMktStrategyConfRuleId() != 0) {
+                        // 修改规则的信息 并返回id -- mktStrategyConfRuleId
+                        mktStrategyConfRuleMapper.updateByPrimaryKey(mktStrategyConfRuleDO);
+                    } else {
+                        // 添加新增的规则
+                        mktStrategyConfRuleMapper.insert(mktStrategyConfRuleDO);
+                        // 策略规则 Id
+                        Long mktStrategyConfRuleId = mktStrategyConfRuleDO.getMktStrategyConfRuleId();
+                        // 建立策略配置和规则的关系
+                        MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO = new MktStrategyConfRuleRelDO();
+                        mktStrategyConfRuleRelDO.setCreateDate(new Date());
+                        mktStrategyConfRuleRelDO.setCreateStaff(UserUtil.loginId());
+                        mktStrategyConfRuleRelDO.setMktStrategyConfId(mktStrategyConfId);
+                        mktStrategyConfRuleRelDO.setMktStrategyConfRuleId(mktStrategyConfRuleId);
+                        mktStrategyConfRuleRelDO.setUpdateStaff(UserUtil.loginId());
+                        mktStrategyConfRuleRelDO.setUpdateDate(new Date());
+                        mktStrategyConfRuleRelMapper.insert(mktStrategyConfRuleRelDO);
+                    }
                 }
-            }
 
+            }
             // 删除被删掉的规则以及与策略的关联
 /*
             for (Long mktStrategyConfRuleId : mktStrategyConfDetail.getDelRuleIds()) {
