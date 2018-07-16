@@ -7,9 +7,17 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 @Component
 public class ChannelUtil  {
+
+    public static String getUUID(){
+        UUID uuid=UUID.randomUUID();
+        String str = uuid.toString();
+        String uuidStr=str.replace("-", "");
+        return uuidStr;
+    }
 
     public static ChannelVO map2ChannelVO(Channel channel){
         ChannelVO vo = BeanUtil.create(channel,new ChannelVO());

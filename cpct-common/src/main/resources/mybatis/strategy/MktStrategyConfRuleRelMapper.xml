@@ -18,6 +18,10 @@
     delete from mkt_strategy_conf_rule_rel
     where MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=BIGINT}
   </delete>
+  <delete id="deleteByMktStrategyConfRulId" parameterType="java.lang.Long">
+    delete from mkt_strategy_conf_rule_rel
+    where MKT_STRATEGY_CONF_RULE_ID = #{mktStrategyConfRuleId,jdbcType=BIGINT}
+  </delete>
   <insert id="insert" useGeneratedKeys="true" keyProperty="mktStrategyConfRuleRelId" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO">
     insert into mkt_strategy_conf_rule_rel (MKT_STRATEGY_CONF_RULE_REL_ID, MKT_STRATEGY_CONF_ID, 
       MKT_STRATEGY_CONF_RULE_ID, CREATE_STAFF, CREATE_DATE, 

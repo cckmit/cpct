@@ -4,10 +4,12 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 
 import java.util.List;
 
-public interface MktStrategyConfRuleRelMapper {
+public interface  MktStrategyConfRuleRelMapper {
     int deleteByPrimaryKey(Long mktStrategyConfRuleRelId);
 
     int deleteByMktStrategyConfId(Long mktStrategyConfId);
+
+    int deleteByMktStrategyConfRulId(Long mktStrategyConfRulId);
 
     int insert(MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO);
 

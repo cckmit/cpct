@@ -33,7 +33,7 @@ public class ContactEvtController extends BaseController {
     private ContactEvtService contactEvtService;
 
     /**
-     * 查询事件列表
+     * 查询事件列表（含分页）
      */
     @RequestMapping("/listEvents")
     @CrossOrigin
@@ -43,6 +43,22 @@ public class ContactEvtController extends BaseController {
             maps = contactEvtService.listEvents(contactEvtReq.getContactEvt(), contactEvtReq.getPage());
         } catch (Exception e) {
             logger.error("[op:EventController] fail to listEvents for contactEvtReq = {}! Exception: ", JSONArray.toJSON(contactEvtReq), e);
+            return JSON.toJSONString(maps);
+        }
+        return JSON.toJSONString(maps);
+    }
+
+    /**
+     * 查询事件列表（不含分页）
+     */
+    @RequestMapping("/listEventNoPages")
+    @CrossOrigin
+    public String listEventNoPages(@RequestBody ContactEvt contactEvt) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = contactEvtService.listEventNoPages(contactEvt);
+        } catch (Exception e) {
+            logger.error("[op:EventController] fail to listEvents for contactEvtReq = {}! Exception: ", JSONArray.toJSON(contactEvt), e);
             return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);

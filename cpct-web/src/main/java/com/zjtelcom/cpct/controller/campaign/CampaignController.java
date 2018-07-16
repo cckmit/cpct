@@ -3,8 +3,10 @@ package com.zjtelcom.cpct.controller.campaign;
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignVO;
+import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 import com.zjtelcom.cpct.request.campaign.QryMktCampaignListReq;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
+import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +20,8 @@ public class CampaignController extends BaseController {
     @Autowired
     private MktCampaignService mktCampaignService;
 
+    @Autowired
+    private MktStrategyConfService mktStrategyConfService;
     /**
      * 查询活动列表(分页)
      *
@@ -25,7 +29,7 @@ public class CampaignController extends BaseController {
      */
     @RequestMapping(value = "/listCampaignPage", method = RequestMethod.POST)
     @CrossOrigin
-    public String qryMktCampaignList(@RequestBody Map<String,String> params) throws Exception {
+    public String qryMktCampaignList(@RequestBody Map<String, String> params) throws Exception {
         String mktCampaignName = params.get("mktCampaignName");  // 活动名称
         String statusCd = params.get("statusCd");               // 活动状态
         String tiggerType = params.get("tiggerType");           // 活动触发类型
@@ -49,7 +53,12 @@ public class CampaignController extends BaseController {
         // 存活动
         Map<String, Object> mktCampaignMap = mktCampaignService.createMktCampaign(mktCampaignVO);
         Long mktCampaignId = Long.valueOf(mktCampaignMap.get("mktCampaignId").toString());
-
+        if (mktCampaignVO.getMktStrategyConfDetailList().size() > 0) {
+            for (MktStrategyConfDetail mktStrategyConfDetail : mktCampaignVO.getMktStrategyConfDetailList()) {
+                mktStrategyConfDetail.setMktCampaignId(mktCampaignId);
+                mktStrategyConfService.saveMktStrategyConf(mktStrategyConfDetail);
+            }
+        }
         return JSON.toJSONString(mktCampaignMap);
     }
 
@@ -77,7 +86,7 @@ public class CampaignController extends BaseController {
      */
     @RequestMapping(value = "/getMktCampaign", method = RequestMethod.POST)
     @CrossOrigin
-    public String getMktCampaign(@RequestBody Map<String,String> params) throws Exception {
+    public String getMktCampaign(@RequestBody Map<String, String> params) throws Exception {
         Long mktCampaignId = Long.valueOf(params.get("mktCampaignId"));
         Map<String, Object> map = mktCampaignService.getMktCampaign(mktCampaignId);
         return JSON.toJSONString(map);
@@ -93,7 +102,7 @@ public class CampaignController extends BaseController {
      */
     @RequestMapping(value = "/delMktCampaign", method = RequestMethod.POST)
     @CrossOrigin
-    public String delMktCampaign(@RequestBody Map<String,String> params) throws Exception {
+    public String delMktCampaign(@RequestBody Map<String, String> params) throws Exception {
         Long mktCampaignId = Long.valueOf(params.get("mktCampaignId"));
         Map<String, Object> map = mktCampaignService.delMktCampaign(mktCampaignId);
         return JSON.toJSONString(map);
@@ -101,6 +110,7 @@ public class CampaignController extends BaseController {
 
     /**
      * 更改营销活动转态
+     *
      * @param params
      * @return
      * @throws Exception

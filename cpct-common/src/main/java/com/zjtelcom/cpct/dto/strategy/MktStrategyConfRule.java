@@ -1,5 +1,7 @@
 package com.zjtelcom.cpct.dto.strategy;
 
+import com.zjtelcom.cpct.dto.channel.VerbalVO;
+
 import java.util.List;
 
 /**
@@ -35,6 +37,8 @@ public class MktStrategyConfRule {
      * 过滤规则配置Id
      */
     private Long ruleConfId;
+
+    private   List<VerbalVO> verbalVOList;
 
     public Long getMktStrategyConfRuleId() {
         return mktStrategyConfRuleId;
@@ -82,5 +86,13 @@ public class MktStrategyConfRule {
 
     public void setMktStrategyConfRuleName(String mktStrategyConfRuleName) {
         this.mktStrategyConfRuleName = mktStrategyConfRuleName;
+    }
+
+    public List<VerbalVO> getVerbalVOList() {
+        return verbalVOList;
+    }
+
+    public void setVerbalVOList(List<VerbalVO> verbalVOList) {
+        this.verbalVOList = verbalVOList;
     }
 }
