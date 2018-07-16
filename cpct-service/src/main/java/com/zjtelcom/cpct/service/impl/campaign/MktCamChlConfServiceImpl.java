@@ -193,6 +193,11 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
     }
 
 
+    /**
+     * 查询协同渠道列表
+     *
+     * @return
+     */
     @Override
     public Map<String, Object> listMktCamChlConf() {
         Map<String, Object> mktCamChlConfMap = new HashMap<>();
@@ -229,6 +234,12 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
         return mktCamChlConfMap;
     }
 
+    /**
+     * 删除策略配置
+     *
+     * @param evtContactConfId
+     * @return
+     */
     @Override
     public Map<String, Object> deleteMktCamChlConf(Long evtContactConfId) {
         mktCamChlConfMapper.deleteByPrimaryKey(evtContactConfId);

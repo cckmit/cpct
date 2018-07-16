@@ -64,6 +64,11 @@
     CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
     from mkt_strategy_conf_rule
   </select>
+  <select id="selectMktStrategyConfRuleName" parameterType="java.lang.Long"  resultType="java.lang.String">
+    select MKT_STRATEGY_CONF_RULE_NAME
+    from mkt_strategy_conf_rule
+    where MKT_STRATEGY_CONF_RULE_ID = #{mktStrategyConfRuleId,jdbcType=BIGINT}
+  </select>
   <select id="selectByMktStrategyConfId" resultMap="BaseResultMap" parameterType="Long">
     select cr.MKT_STRATEGY_CONF_RULE_ID, cr.MKT_STRATEGY_CONF_RULE_NAME, cr.TAR_GRP_ID, cr.PRODUCT_ID, cr.EVT_CONTACT_CONF_ID, cr.RULE_CONF_ID
     from mkt_strategy_conf_rule cr
