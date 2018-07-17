@@ -24,6 +24,7 @@ public class PpmProductController extends BaseController  {
     @Autowired
     private ProductService productService;
 
+
     /**
      *获取产品名字
      * @return
