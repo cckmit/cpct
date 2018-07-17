@@ -40,9 +40,6 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
         result.put("resultMsg",voList);
         return result;
 
-
-
-
     }
 
     @Override

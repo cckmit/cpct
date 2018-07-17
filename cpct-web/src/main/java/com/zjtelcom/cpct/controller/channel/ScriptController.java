@@ -54,7 +54,7 @@ public class ScriptController extends BaseController  {
      */
     @PostMapping("addScript")
     @CrossOrigin
-    public Map<String,Object> createMktScript(MktScript addVO) {
+    public Map<String,Object> createMktScript(@RequestBody MktScript addVO) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
@@ -73,7 +73,7 @@ public class ScriptController extends BaseController  {
      */
     @PostMapping("editScript")
     @CrossOrigin
-    public Map<String,Object> modMktScript(MktScript editVO) {
+    public Map<String,Object> modMktScript(@RequestBody MktScript editVO) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
@@ -92,7 +92,7 @@ public class ScriptController extends BaseController  {
      */
     @PostMapping("deleteScript")
     @CrossOrigin
-    public Map<String,Object> delMktScript(MktScript scriptId) {
+    public Map<String,Object> delMktScript(@RequestBody MktScript scriptId) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
@@ -130,7 +130,7 @@ public class ScriptController extends BaseController  {
      */
     @GetMapping("getScriptVODetail")
     @CrossOrigin
-    public Map<String,Object> getScriptVODetail( Long scriptId) {
+    public Map<String,Object> getScriptVODetail(Long scriptId) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
