@@ -7,7 +7,8 @@ import java.util.Map;
 
 public interface EventApiService {
 
-    Map deal(Map<String, Object> map) throws Exception;
+    Map<String, Object> CalculateCPC(Map<String, Object> map) throws Exception;
 
+    void cpc();
 
 }

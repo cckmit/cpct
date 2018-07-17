@@ -20,7 +20,7 @@ import java.util.Map;
 public class EventApiController extends BaseController {
 
 
-    @Autowired
+    @Autowired(required = false)
     private EventApiService eventApiService;
 
     /**
@@ -30,8 +30,11 @@ public class EventApiController extends BaseController {
     @CrossOrigin
     public String eventInput(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> map) {
         Map result = new HashMap();
+
+        Map<String, Object> params = new HashMap<>();
         try {
-            result = eventApiService.deal(map);
+//            result = eventApiService.CalculateCPC(params);
+            eventApiService.cpc();
         } catch (Exception e) {
             e.printStackTrace();
             return initFailRespInfo(e.getMessage(),"");

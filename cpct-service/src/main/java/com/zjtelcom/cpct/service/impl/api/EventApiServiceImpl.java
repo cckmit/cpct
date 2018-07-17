@@ -5,10 +5,7 @@ import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.rule.RuleResult;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.*;
-import com.zjtelcom.cpct.dao.event.ContactEvtMatchRulMapper;
-import com.zjtelcom.cpct.dao.event.EventMapper;
-import com.zjtelcom.cpct.dao.event.EventSceneMapper;
-import com.zjtelcom.cpct.dao.event.EvtSceneCamRelMapper;
+import com.zjtelcom.cpct.dao.event.*;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
@@ -18,26 +15,12 @@ import com.zjtelcom.cpct.dao.user.UserListMapper;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.event.EventDO;
-import com.zjtelcom.cpct.domain.event.EventSceneDO;
-import com.zjtelcom.cpct.domain.event.EvtSceneCamRelDO;
-import com.zjtelcom.cpct.domain.grouping.TarGrpConditionDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
-import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
-import com.zjtelcom.cpct.dto.api.EventApiResultDTO;
-import com.zjtelcom.cpct.dto.api.EventReportDTO;
-import com.zjtelcom.cpct.dto.campaign.FilterRuleConf;
-import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
-import com.zjtelcom.cpct.dto.campaign.MktCampaign;
-import com.zjtelcom.cpct.dto.channel.MktScript;
+import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.ContactEvtMatchRul;
-import com.zjtelcom.cpct.dto.event.EventScene;
-import com.zjtelcom.cpct.dto.event.EvtSceneCamRel;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
-import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
-import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRuleRel;
-import com.zjtelcom.cpct.request.event.QryEventSceneListReq;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.api.EventApiService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,8 +33,9 @@ import java.util.*;
 @Transactional
 public class EventApiServiceImpl extends BaseService implements EventApiService {
 
+
     @Autowired
-    private EventMapper eventMapper;  //事件总表
+    private ContactEvtMapper contactEvtMapper; //事件总表
 
     @Autowired
     private ContactEvtMatchRulMapper contactEvtMatchRulMapper; //事件过滤规则
@@ -116,7 +100,7 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Map deal(Map<String, Object> map) throws Exception {
+    public Map CalculateCPC(Map<String, Object> map) throws Exception {
         //初始化返回结果
         Map<String, Object> result = new HashMap();
 
@@ -146,11 +130,18 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
         List<Map<String, Object>> labelList = (List<Map<String, Object>>) map.get("triggers");
 
         //根据事件code查询事件信息
-        EventDO event = eventMapper.getEventByEventNbr(eventNbr);
+        ContactEvt event = contactEvtMapper.getEventByEventNbr(eventNbr);
 
         //获取事件id
-        Long eventId = event.getEventId();
-        //todo 获取事件推荐活动数
+        Long eventId = event.getContactEvtId();
+        //获取事件推荐活动数
+        int recCampaignAmount;
+        String recCampaignAmountStr = event.getRecCampaignAmount();
+        if (recCampaignAmountStr == null || "".equals(recCampaignAmountStr)) {
+            recCampaignAmount = 0;
+        } else {
+            recCampaignAmount = Integer.parseInt(recCampaignAmountStr);
+        }
 
         //获取事件过滤规则
         ContactEvtMatchRul contactEvtMatchRulParam = new ContactEvtMatchRul();
@@ -186,15 +177,23 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
 //            }
 //        }
 
-        //根据事件id 查询所有关联活动
+        //根据事件id 查询所有关联活动（根据优先级排序 正序）
         List<Long> activityIds = mktCamEvtRelMapper.listActivityByEventId(eventId);
 
         //初始化返回结果中的工单信息
         List<Map<String, Object>> orderList = new ArrayList<>();
 
-        //遍历活动id  查询并匹配活动规则  todo 需要根据事件推荐活动数 取前n个活动
-        for (Long activityId : activityIds) {
+        //遍历活动id  查询并匹配活动规则 需要根据事件推荐活动数 取前n个活动
+        int max = activityIds.size();
+        if (recCampaignAmount != 0) {
+            //事件推荐活动数
+            max = recCampaignAmount;
+        }
+        for (int j = 0; j < max; j++) {
+            //活动id
+            Long activityId = activityIds.get(j);
 
+            //返回参数
             Map<String, Object> order = new HashMap<>();
 
             //初始化规则引擎---------------------------
@@ -452,5 +451,11 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
         result.put("orderList", orderList);
 
         return result;
+    }
+
+
+    @Override
+    public void cpc() {
+
     }
 }
