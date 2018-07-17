@@ -70,14 +70,30 @@ public class ContactEvtController extends BaseController {
     @RequestMapping("/delEvent")
     @CrossOrigin
     public String delEvent(@RequestBody ContactEvtReq contactEvtReq) {
-        Map<String,Object> maps = new HashMap<>();
+        Map<String, Object> maps = new HashMap<>();
         try {
             maps = contactEvtService.delEvent(contactEvtReq.getContactEvt().getContactEvtId());
         } catch (Exception e) {
             logger.error("[op:EventController] fail to delEvent for contactEvtReq = {}! Exception: ", JSONArray.toJSON(contactEvtReq), e);
-            return initSuccRespInfo(maps);
+            return JSON.toJSONString(maps);
         }
-        return initSuccRespInfo(maps);
+        return JSON.toJSONString(maps);
+    }
+
+    /**
+     * 事件详情
+     */
+    @RequestMapping("/evtDetails")
+    @CrossOrigin
+    public String evtDetails(@RequestBody ContactEvt contactEvt) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = contactEvtService.evtDetails(contactEvt);
+        } catch (Exception e) {
+            logger.error("[op:EventController] fail to evtDetails for contactEvt = {}! Exception: ", JSONArray.toJSON(contactEvt), e);
+            return JSON.toJSONString(maps);
+        }
+        return JSON.toJSONString(maps);
     }
 
     /**
@@ -138,7 +154,7 @@ public class ContactEvtController extends BaseController {
         try {
             maps = contactEvtService.editEvent(contactEvt.getContactEvtId());
         } catch (Exception e) {
-            logger.error("[op:EventController] fail to editEvent for contactEvtReq = {}! Exception: ",  JSONArray.toJSON(contactEvt), e);
+            logger.error("[op:EventController] fail to editEvent for contactEvtReq = {}! Exception: ", JSONArray.toJSON(contactEvt), e);
             return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);

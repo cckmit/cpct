@@ -43,6 +43,7 @@ cmake-build-debug/
 # File-based project format
 *.iws
 
+
 # mpeltonen/sbt-idea plugin
 .idea_modules/
 
@@ -59,3 +60,5 @@ fabric.properties
 hs_err_pid*
 
 yanxuan-attence-admin/src/main/resources/static/*
+
+*.MF
