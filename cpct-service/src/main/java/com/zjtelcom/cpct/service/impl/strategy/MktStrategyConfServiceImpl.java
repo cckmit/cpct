@@ -8,6 +8,7 @@ package com.zjtelcom.cpct.service.impl.strategy;
 
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamStrategyConfRelMapper;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
@@ -24,6 +25,7 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRegionRelDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRuleRel;
@@ -91,6 +93,9 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
      */
     @Autowired
     private ContactChannelMapper contactChannelMapper;
+
+    @Autowired
+    private MktCamChlConfMapper mktCamChlConfMapper;
 
 
     /**
@@ -217,12 +222,12 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                         }
                     }
                 }
-                if (mktStrategyConfRule.getEvtContactConfIdList() != null) {
-                    for (int i = 0; i < mktStrategyConfRule.getEvtContactConfIdList().size(); i++) {
+                if (mktStrategyConfRule.getMktCamChlConfList()!= null) {
+                    for (int i = 0; i < mktStrategyConfRule.getMktCamChlConfList().size(); i++) {
                         if (i == 0) {
-                            evtContactConfIds += mktStrategyConfRule.getEvtContactConfIdList().get(i);
+                            evtContactConfIds += mktStrategyConfRule.getMktStrategyConfRuleId();
                         } else {
-                            evtContactConfIds += "/" + mktStrategyConfRule.getEvtContactConfIdList().get(i);
+                            evtContactConfIds += "/" + mktStrategyConfRule.getMktStrategyConfRuleId();
                         }
                     }
                 }
@@ -492,15 +497,22 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                 String[] productIds = mktStrategyConfRuleDO.getProductId().split("/");
                 List<Long> productIdList = new ArrayList<>();
                 for (int i = 0; i < productIds.length; i++) {
-                    productIdList.add(Long.valueOf(productIds[i]));
+                    if (productIds[i] != "" && !"".equals(productIds[i])) {
+                        productIdList.add(Long.valueOf(productIds[i]));
+                    }
                 }
                 String[] evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
-                List<Long> evtContactConfIdList = new ArrayList<>();
+                List<MktCamChlConf> mktCamChlConfList = new ArrayList<>();
                 for (int i = 0; i < evtContactConfIds.length; i++) {
-                    evtContactConfIdList.add(Long.valueOf(evtContactConfIds[i]));
+                    if (evtContactConfIds[i] != "" && !"".equals(evtContactConfIds[i])) {
+                        MktCamChlConf mktCamChlConf = new MktCamChlConf();
+                        mktCamChlConf.setEvtContactConfId(Long.valueOf(evtContactConfIds[i]));
+                        String evtContactConfName = mktCamChlConfMapper.selectforName(Long.valueOf(evtContactConfIds[i]));
+                        mktCamChlConf.setEvtContactConfName(evtContactConfName);
+                        mktCamChlConfList.add(mktCamChlConf);
+                    }
                 }
-                mktStrategyConfRule.setProductIdlist(productIdList);
-                mktStrategyConfRule.setEvtContactConfIdList(evtContactConfIdList);
+                mktStrategyConfRule.setMktCamChlConfList(mktCamChlConfList);
                 mktStrategyConfRuleList.add(mktStrategyConfRule);
             }
             mktStrategyConfDetail.setMktStrategyConfRuleList(mktStrategyConfRuleList);

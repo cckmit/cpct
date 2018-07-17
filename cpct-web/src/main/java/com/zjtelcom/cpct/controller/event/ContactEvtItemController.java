@@ -35,12 +35,12 @@ public class ContactEvtItemController extends BaseController {
      */
     @RequestMapping("/listEventItem")
     @CrossOrigin
-    public String listEventItem(@RequestBody ContactEvtReq ContactEvtReq) {
+    public String listEventItem(@RequestBody ContactEvtReq contactEvtReq) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            maps = contactEvtItemService.listEventItem(ContactEvtReq);
+            maps = contactEvtItemService.listEventItem(contactEvtReq);
         } catch (Exception e) {
-            logger.error("[op:ContactEvtItemController] fail to listEventItem for contactEvt = {}! Exception: ", JSONArray.toJSON(ContactEvtReq), e);
+            logger.error("[op:ContactEvtItemController] fail to listEventItem for contactEvtReq = {}! Exception: ", JSONArray.toJSON(contactEvtReq), e);
             return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
@@ -72,7 +72,7 @@ public class ContactEvtItemController extends BaseController {
         try {
             maps = contactEvtItemService.viewEventItem(contactEvtItem);
         } catch (Exception e) {
-            logger.error("[op:ContactEvtItemController] fail to delEventItem for contactEvtItem = {}! Exception: ", JSONArray.toJSON(contactEvtItem), e);
+            logger.error("[op:ContactEvtItemController] fail to viewEventItem for contactEvtItem = {}! Exception: ", JSONArray.toJSON(contactEvtItem), e);
             return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
@@ -88,7 +88,7 @@ public class ContactEvtItemController extends BaseController {
         try {
             maps = contactEvtItemService.createEventItem(contactEvtItem);
         } catch (Exception e) {
-            logger.error("[op:ContactEvtItemController] fail to delEventItem for contactEvtItem = {}! Exception: ", JSONArray.toJSON(contactEvtItem), e);
+            logger.error("[op:ContactEvtItemController] fail to createEventItem for contactEvtItem = {}! Exception: ", JSONArray.toJSON(contactEvtItem), e);
             return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
@@ -104,7 +104,7 @@ public class ContactEvtItemController extends BaseController {
         try {
             maps = contactEvtItemService.modEventItem(contactEvtItem);
         } catch (Exception e) {
-            logger.error("[op:ContactEvtItemController] fail to delEventItem for contactEvtItem = {}! Exception: ", JSONArray.toJSON(contactEvtItem), e);
+            logger.error("[op:ContactEvtItemController] fail to modEventItem for contactEvtItem = {}! Exception: ", JSONArray.toJSON(contactEvtItem), e);
             return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);

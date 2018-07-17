@@ -329,30 +329,28 @@ public final class SqlUtil {
     }
 
     private static String formatRightOperand(Object rightOperand) {
-        if (null != rightOperand && !"".equals(rightOperand.toString())) {
-//            net.sf.json.JSONArray rightOperands = net.sf.json.JSONArray.fromObject(rightOperand.toString());
-//            if (null != rightOperands) {
-//                List<String> source = new ArrayList<String>();
-//                List<String> keys = new ArrayList<String>();
-//                for (int i = 0; i < rightOperands.size(); i++) {
-//                    net.sf.json.JSONObject object = rightOperands.getJSONObject(i);
-//                    List<String> listKeys = new ArrayList<String>(object.keySet());
-//                    if (org.apache.commons.collections.CollectionUtils.isNotEmpty(listKeys)) {
-//                        String key = listKeys.get(0);
-//                        if (!"".equals(key)) {
-//                            Integer value = MapUtils.getInteger(object, key, 0);
-//                            if (1 == value.intValue()) {
-//                                keys.add(key);
-//                            }
-//                            source.add(key);
-//                        }
-//                    }
-//                }
-//                List<String> rightOperandList = Combination.combiantion(source, keys);
-//                String rightOperandStr = com.zjtelcom.cpct.util.CollectionUtils.list2String(rightOperandList);
-//                return rightOperandStr;
+        JSONArray rightOperands = JSONArray.parseArray(rightOperand.toString());
+        if (null != rightOperands) {
+            List<String> source = new ArrayList<String>();
+            List<String> keys = new ArrayList<String>();
+            for (int i = 0; i < rightOperands.size(); i++) {
+                JSONObject object = rightOperands.getJSONObject(i);
+                List<String> listKeys = new ArrayList<String>(object.keySet());
+                if (org.apache.commons.collections.CollectionUtils.isNotEmpty(listKeys)) {
+                    String key = listKeys.get(0);
+                    if (!"".equals(key)) {
+                        Integer value = MapUtils.getInteger(object, key, 0);
+                        if (1 == value.intValue()) {
+                            keys.add(key);
+                        }
+                        source.add(key);
+                    }
+                }
             }
-//        }
+            List<String> rightOperandList = Combination.combiantion(source, keys);
+            String rightOperandStr = com.zjtelcom.cpct.util.CollectionUtils.list2String(rightOperandList);
+            return rightOperandStr;
+        }
         return "";
     }
 

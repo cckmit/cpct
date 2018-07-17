@@ -14,5 +14,7 @@ public interface MktCamChlConfMapper {
 
     List<MktCamChlConfDO> selectAll();
 
+    String selectforName(Long evtContactConfId);
+
     int updateByPrimaryKey(MktCamChlConfDO mktCamChlConfDO);
 }

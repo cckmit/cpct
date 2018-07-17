@@ -14,7 +14,7 @@ import com.zjhcsoft.eagle.main.dubbo.model.policy.CalcReqModel;
 import com.zjtelcom.cpct.common.CacheConstants;
 import com.zjtelcom.cpct.common.CacheManager;
 import com.zjtelcom.cpct.common.IDacher;
-import com.zjtelcom.cpct.constants.UseTypeConstants;
+/*import com.zjtelcom.cpct.constants.UseTypeConstants;*/
 import com.zjtelcom.cpct.dao.eagle.EagleTagMapper;
 import com.zjtelcom.cpct.dao.eagle.EagleTrycalcRecordMapper;
 import com.zjtelcom.cpct.enums.ErrorCode;
@@ -121,7 +121,7 @@ public class TryCalcServiceImpl implements TryCalcService {
                         for (Map xietongTag : xietongList) {
                             String conditionId = xietongTag.get("conditionId").toString();
                             //协同规则上选择的标签都以查询字段出现
-                            xietongTag.put("useType", UseTypeConstants.RESULT);
+                           /* xietongTag.put("useType", UseTypeConstants.RESULT);*/
                             keys.put(conditionId, xietongTag);
                         }
                     }
@@ -146,7 +146,7 @@ public class TryCalcServiceImpl implements TryCalcService {
                             }
                         }
 
-                        //如果筛选出的个数跟规则个数相同说明这个标签在所有规则中都存在
+/*                        //如果筛选出的个数跟规则个数相同说明这个标签在所有规则中都存在
                         if (inAllRules.size() == ruleList.size()) {
                             rule1Trigger.put("useType", UseTypeConstants.CONDITION_RESULT);
                         } else {
@@ -155,7 +155,7 @@ public class TryCalcServiceImpl implements TryCalcService {
                                     "rule tag not InAllRules, ruleId: %s, trigger: %s", rule1Id,
                                     JSON.toJSONString(rule1Trigger)));
                             rule1Trigger.put("useType", UseTypeConstants.CONDITION);
-                        }
+                        }*/
                     }
                 }
 

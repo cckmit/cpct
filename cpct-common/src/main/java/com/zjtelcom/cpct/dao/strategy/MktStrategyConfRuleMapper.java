@@ -18,6 +18,8 @@ public interface MktStrategyConfRuleMapper {
 
     List<MktStrategyConfRuleDO> selectAll();
 
+    String selectMktStrategyConfRuleName(Long mktStrategyConfRuleId);
+
     int updateByPrimaryKey(MktStrategyConfRuleDO mktStrategyConfRuleDO);
 
     List<MktStrategyConfRuleDO> selectByMktStrategyConfId(Long mktStrategyConfId);
