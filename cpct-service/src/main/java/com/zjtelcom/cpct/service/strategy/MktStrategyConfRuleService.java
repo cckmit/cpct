@@ -15,6 +15,8 @@ public interface MktStrategyConfRuleService {
 
     public Map<String, Object> listAllMktStrategyConfRule();
 
+    public Map<String, Object> listAllMktStrategyConfRuleForName(Long mktStrategyConfId);
+
     public Map<String, Object> deleteMktStrategyConfRule(Long mktStrategyConfRuleId);
 
 }

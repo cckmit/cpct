@@ -8,6 +8,7 @@ package com.zjtelcom.cpct.service.impl.strategy;
 
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamStrategyConfRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCpcAlgorithmsRulMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
@@ -15,6 +16,8 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamStrategyConfRelDO;
 import com.zjtelcom.cpct.domain.campaign.MktCpcAlgorithmsRulDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.BaseService;
@@ -51,6 +54,9 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
 
     @Autowired
     private MktCpcAlgorithmsRulMapper mktCpcAlgorithmsRulMapper; //cpc算法规则表
+
+    @Autowired
+    private MktCamChlConfMapper mktCamChlConfMapper;
 
     /**
      * 添加策略规则
@@ -125,17 +131,39 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
     public Map<String, Object> getMktStrategyConfRule(Long mktStrategyConfRuleId) {
         Map<String, Object> mktStrategyConfRuleMap = null;
         MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
+        MktStrategyConfRule mktStrategyConfRule = new MktStrategyConfRule();
         try {
             mktStrategyConfRuleMap = new HashMap<>();
             mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(mktStrategyConfRuleId);
+            CopyPropertiesUtil.copyBean2Bean(mktStrategyConfRule, mktStrategyConfRuleDO);
+            String[] productIds = mktStrategyConfRuleDO.getProductId().split("/");
+            List<Long> productIdList = new ArrayList<>();
+            for (int i = 0; i < productIds.length; i++) {
+                if (productIds[i] != "" && !"".equals(productIds[i])) {
+                    productIdList.add(Long.valueOf(productIds[i]));
+                }
+            }
+            String[] evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
+            List<MktCamChlConf> mktCamChlConfList = new ArrayList<>();
+            for (int i = 0; i < evtContactConfIds.length; i++) {
+                if (evtContactConfIds[i] != "" && !"".equals(evtContactConfIds[i])) {
+                    MktCamChlConf mktCamChlConf = new MktCamChlConf();
+                    mktCamChlConf.setEvtContactConfId(Long.valueOf(evtContactConfIds[i]));
+                    String evtContactConfName = mktCamChlConfMapper.selectforName(Long.valueOf(evtContactConfIds[i]));
+                    mktCamChlConf.setEvtContactConfName(evtContactConfName);
+                    mktCamChlConfList.add(mktCamChlConf);
+                }
+            }
+            mktStrategyConfRule.setMktCamChlConfList(mktCamChlConfList);
+            mktStrategyConfRule.setProductIdlist(productIdList);
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
-            mktStrategyConfRuleMap.put("mktStrategyConfId", mktStrategyConfRuleId);
+            mktStrategyConfRuleMap.put("mktStrategyConfRule", mktStrategyConfRule);
         } catch (Exception e) {
-            logger.error("[op:MktStrategyConfRuleServiceImpl] failed to save MktStrategyConfRule = {}", JSON.toJSON(mktStrategyConfRuleDO));
+            logger.error("[op:MktStrategyConfRuleServiceImpl] failed to get MktStrategyConfRule = {}", JSON.toJSON(mktStrategyConfRuleDO), e);
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_FAIL);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_FAILURE.getErrorMsg());
-            mktStrategyConfRuleMap.put("mktStrategyConfRule", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
+            mktStrategyConfRuleMap.put("mktStrategyConfRule", mktStrategyConfRule);
         }
         return mktStrategyConfRuleMap;
     }
@@ -159,6 +187,37 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_FAIL);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_FAILURE.getErrorMsg());
             mktStrategyConfRuleMap.put("mktStrategyConfRuleDOList", mktStrategyConfRuleDOList);
+        }
+        return mktStrategyConfRuleMap;
+    }
+
+    /**
+     * 通过策略Id 查询对应的规则列表（id+名称）
+     *
+     * @return
+     */
+    @Override
+    public Map<String, Object> listAllMktStrategyConfRuleForName(Long mktStrategyConfId) {
+        Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();
+        List<MktStrategyConfRule> mktStrategyConfRuleList = new ArrayList<>();
+        try {
+            // 通过关系表查询策略下对应的规则Id
+            List<MktStrategyConfRuleRelDO> mktStrategyConfRuleRelDOList = mktStrategyConfRuleRelMapper.selectByMktStrategyConfId(mktStrategyConfId);
+            for (MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO : mktStrategyConfRuleRelDOList) {
+                MktStrategyConfRule mktStrategyConfRule = new MktStrategyConfRule();
+                String mktStrategyConfRuleName = mktStrategyConfRuleMapper.selectMktStrategyConfRuleName(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId());
+                mktStrategyConfRule.setMktStrategyConfRuleId(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId());
+                mktStrategyConfRule.setMktStrategyConfRuleName(mktStrategyConfRuleName);
+                mktStrategyConfRuleList.add(mktStrategyConfRule);
+            }
+            mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            mktStrategyConfRuleMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
+            mktStrategyConfRuleMap.put("mktStrategyConfRuleList", mktStrategyConfRuleList);
+        } catch (Exception e) {
+            logger.error("[op:MktStrategyConfRuleServiceImpl] failed to get the List of mktStrategyConfRuleList = {}", JSON.toJSON(mktStrategyConfRuleList));
+            mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_FAIL);
+            mktStrategyConfRuleMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_FAILURE.getErrorMsg());
+            mktStrategyConfRuleMap.put("mktStrategyConfRuleList", mktStrategyConfRuleList);
         }
         return mktStrategyConfRuleMap;
     }

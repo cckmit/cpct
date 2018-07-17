@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.dto.strategy;
 
+import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
 
 import java.util.List;
@@ -29,9 +30,9 @@ public class MktStrategyConfRule {
     private List<Long> productIdlist;
 
     /**
-     * 协同渠道配置Id集合
+     * 协同渠道配置集合
      */
-    private List<Long> evtContactConfIdList;
+    private List<MktCamChlConf> mktCamChlConfList;
 
     /**
      * 过滤规则配置Id
@@ -64,12 +65,12 @@ public class MktStrategyConfRule {
         this.productIdlist = productIdlist;
     }
 
-    public List<Long> getEvtContactConfIdList() {
-        return evtContactConfIdList;
+    public List<MktCamChlConf> getMktCamChlConfList() {
+        return mktCamChlConfList;
     }
 
-    public void setEvtContactConfIdList(List<Long> evtContactConfIdList) {
-        this.evtContactConfIdList = evtContactConfIdList;
+    public void setMktCamChlConfList(List<MktCamChlConf> mktCamChlConfList) {
+        this.mktCamChlConfList = mktCamChlConfList;
     }
 
     public Long getRuleConfId() {
