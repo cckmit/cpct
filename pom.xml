@@ -45,6 +45,8 @@
         <ppm-dubbo.version>1.0.0</ppm-dubbo.version>
         <httpclient.version>4.5.6</httpclient.version>
         <json-lib.version>2.4</json-lib.version>
+        <jna.version>3.0.9</jna.version>
+
     </properties>
 
     <parent>
@@ -304,8 +306,12 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/com.101tec/zkclient -->
 
+            <dependency>
+                <groupId>com.sun.jna</groupId>
+                <artifactId>jna</artifactId>
+                <version>${jna.version}</version>
+            </dependency>
 
 
         </dependencies>

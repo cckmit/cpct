@@ -110,6 +110,11 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>com.sun.jna</groupId>
+            <artifactId>jna</artifactId>
+        </dependency>
+
     </dependencies>
 
 

@@ -58,7 +58,7 @@ public class ContactEvtController extends BaseController {
         try {
             maps = contactEvtService.listEventNoPages(contactEvt);
         } catch (Exception e) {
-            logger.error("[op:EventController] fail to listEvents for contactEvtReq = {}! Exception: ", JSONArray.toJSON(contactEvt), e);
+            logger.error("[op:EventController] fail to listEventNoPages for contactEvt = {}! Exception: ", JSONArray.toJSON(contactEvt), e);
             return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
@@ -122,7 +122,7 @@ public class ContactEvtController extends BaseController {
         try {
             maps = contactEvtService.createContactEvt(createContactEvtReq);
         } catch (Exception e) {
-            logger.error("[op:EventController] fail to createContactEvtJt for createContactEvtJtReq = {}! Exception: ", JSONArray.toJSON(createContactEvtReq), e);
+            logger.error("[op:EventController] fail to createContactEvt for CreateContactEvtReq = {}! Exception: ", JSONArray.toJSON(createContactEvtReq), e);
             return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
@@ -170,7 +170,7 @@ public class ContactEvtController extends BaseController {
         try {
             maps = contactEvtService.modContactEvtJt(createContactEvtJtReq);
         } catch (Exception e) {
-            logger.error("[op:EventController] fail to updateEvent for createContactEvtJtReq = {}! Exception: ", JSONArray.toJSON(createContactEvtJtReq), e);
+            logger.error("[op:EventController] fail to modContactEvtJt for CreateContactEvtJtReq = {}! Exception: ", JSONArray.toJSON(createContactEvtJtReq), e);
             return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
@@ -186,7 +186,7 @@ public class ContactEvtController extends BaseController {
         try {
             maps = contactEvtService.modContactEvt(createContactEvtReq);
         } catch (Exception e) {
-            logger.error("[op:EventController] fail to updateEvent for createContactEvtJtReq = {}! Exception: ", JSONArray.toJSON(createContactEvtReq), e);
+            logger.error("[op:EventController] fail to modContactEvt for CreateContactEvtReq = {}! Exception: ", JSONArray.toJSON(createContactEvtReq), e);
             return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);

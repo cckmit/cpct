@@ -35,11 +35,11 @@ public class ContactEvtTypeController extends BaseController {
     @RequestMapping("/listEventTypes")
     @CrossOrigin
     public String listEventTypes(@RequestBody QryContactEvtTypeReq qryContactEvtTypeReq) {
-        Map<String,Object> maps = new HashMap<>();
+        Map<String, Object> maps = new HashMap<>();
         try {
             maps = contactEvtTypeService.qryContactEvtTypeList(qryContactEvtTypeReq);
         } catch (Exception e) {
-            logger.error("[op:EventTypeController] fail to listEventTypes ! Exception: ", e);
+            logger.error("[op:EventTypeController] fail to listEventTypes for contactEvtType = {}! Exception: ", JSONArray.toJSON(qryContactEvtTypeReq), e);
             return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
@@ -51,11 +51,11 @@ public class ContactEvtTypeController extends BaseController {
     @RequestMapping("/qryContactEvtTypeLists")
     @CrossOrigin
     public String qryContactEvtTypeLists(@RequestBody QryContactEvtTypeReq qryContactEvtTypeReq) {
-        Map<String,Object> maps = new HashMap<>();
+        Map<String, Object> maps = new HashMap<>();
         try {
             maps = contactEvtTypeService.qryContactEvtTypeLists(qryContactEvtTypeReq);
         } catch (Exception e) {
-            logger.error("[op:ContactEvtTypeController] fail to qryContactEvtTypeList qryContactEvtTypeReq = {} ! Exception: ", JSONArray.toJSON(qryContactEvtTypeReq),e);
+            logger.error("[op:ContactEvtTypeController] fail to qryContactEvtTypeList qryContactEvtTypeReq = {} ! Exception: ", JSONArray.toJSON(qryContactEvtTypeReq), e);
             return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
@@ -67,7 +67,7 @@ public class ContactEvtTypeController extends BaseController {
     @RequestMapping("/createContactEvtType")
     @CrossOrigin
     public String createContactEvtType(@RequestBody ContactEvtType contactEvtType) {
-        Map<String,Object> maps = new HashMap<>();
+        Map<String, Object> maps = new HashMap<>();
         try {
             maps = contactEvtTypeService.createContactEvtType(contactEvtType);
         } catch (Exception e) {
@@ -82,12 +82,12 @@ public class ContactEvtTypeController extends BaseController {
      */
     @RequestMapping("/viewContactEvtType")
     @CrossOrigin
-    public String viewContactEvtType(@Param("evtTypeId") Long evtTypeId) {
-        Map<String,Object> maps = new HashMap<>();
+    public String viewContactEvtType(@RequestBody ContactEvtType contactEvtType) {
+        Map<String, Object> maps = new HashMap<>();
         try {
-            maps = contactEvtTypeService.getEventTypeDTOById(evtTypeId);
+            maps = contactEvtTypeService.getEventTypeDTOById(contactEvtType.getEvtTypeId());
         } catch (Exception e) {
-            logger.error("[op:ContactEvtTypeController] fail to editEventTypes evtTypeId = {}! Exception: ", evtTypeId, e);
+            logger.error("[op:ContactEvtTypeController] fail to editEventTypes contactEvtType = {}! Exception: ", JSONArray.toJSON(contactEvtType), e);
             return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
@@ -99,7 +99,7 @@ public class ContactEvtTypeController extends BaseController {
     @RequestMapping("/modContactEvtType")
     @CrossOrigin
     public String modContactEvtType(@RequestBody ContactEvtType contactEvtType) {
-        Map<String,Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         try {
             map = contactEvtTypeService.modContactEvtType(contactEvtType);
         } catch (Exception e) {
@@ -115,7 +115,7 @@ public class ContactEvtTypeController extends BaseController {
     @RequestMapping("/delContactEvtType")
     @CrossOrigin
     public String delContactEvtType(@RequestBody ContactEvtType contactEvtType) {
-        Map<String,Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         try {
             map = contactEvtTypeService.delContactEvtType(contactEvtType);
         } catch (Exception e) {
