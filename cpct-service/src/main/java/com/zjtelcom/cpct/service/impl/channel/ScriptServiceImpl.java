@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.service.impl.channel;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.MktScriptMapper;
 import com.zjtelcom.cpct.domain.channel.Script;
 import com.zjtelcom.cpct.dto.channel.MktScript;
@@ -109,7 +110,7 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
             }
             PageHelper.startPage(req.getPage(),req.getPageSize());
             scriptList = scriptMapper.selectAll(scriptName,createTime,updateTime);
-            PageInfo info = new PageInfo(scriptList);
+            Page info = new Page(new PageInfo(scriptList));
             for (Script script : scriptList){
                 ScriptVO vo = ChannelUtil.map2ScriptVO(script);
                 voList.add(vo);
