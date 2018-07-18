@@ -112,7 +112,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
             userList.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
             userListMapper.insert(userList);
 
-            //新用户存入redis
+            //新用户存入redis;.
             redisUtils.hmSet(String.valueOf(userList.getUserId()), "userName", userList.getUserName());
             redisUtils.hmSet(String.valueOf(userList.getUserId()), "userPhone", userList.getUserPhone());
             redisUtils.hmSet(String.valueOf(userList.getUserId()), "filterType", userList.getFilterType());

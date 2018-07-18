@@ -44,8 +44,6 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     @Autowired
     private ContactEvtMapper contactEvtMapper;
     @Autowired
-    private EventItemMapper eventItemMapper;
-    @Autowired
     private EventSceneMapper eventSceneMapper;
     @Autowired
     private EvtSceneCamRelMapper evtSceneCamRelMapper;
