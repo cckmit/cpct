@@ -2,7 +2,10 @@ package com.zjtelcom.cpct.service.impl.channel;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zjtelcom.cpct.common.Page;
+import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.channel.MktScriptMapper;
+import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.channel.Script;
 import com.zjtelcom.cpct.dto.channel.MktScript;
 import com.zjtelcom.cpct.dto.channel.QryMktScriptReq;
@@ -24,6 +27,8 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
 
     @Autowired
     private MktScriptMapper scriptMapper;
+    @Autowired
+    private ContactChannelMapper channelMapper;
 
 
     @Override
@@ -39,9 +44,6 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",voList);
         return result;
-
-
-
 
     }
 
@@ -112,9 +114,15 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
             }
             PageHelper.startPage(req.getPage(),req.getPageSize());
             scriptList = scriptMapper.selectAll(scriptName,createTime,updateTime);
-            PageInfo info = new PageInfo(scriptList);
+            Page info = new Page(new PageInfo(scriptList));
             for (Script script : scriptList){
                 ScriptVO vo = ChannelUtil.map2ScriptVO(script);
+                if (script.getExecChannel()!=null){
+                    Channel channel = channelMapper.selectByPrimaryKey(Long.valueOf(script.getExecChannel()));
+                    if (channel!=null){
+                        vo.setChannelName(channel.getContactChlName());
+                    }
+                }
                 voList.add(vo);
             }
         result.put("resultCode",CODE_SUCCESS);

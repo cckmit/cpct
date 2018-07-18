@@ -81,7 +81,7 @@ public class SyncLabelController extends BaseController {
                 tagList.addAll(tagInfo);
             }
 
-            syncLabelService.syncLabel(tagList);
+//            syncLabelService.syncLabel(tagList);
             //同步完成之后再同步值
             executeLabelValue();
         }
@@ -144,7 +144,7 @@ public class SyncLabelController extends BaseController {
                 List<TagValueInfoModel> tagValueList = getTagValueInfo(tagSyncService, i, endNum);
                 dataList.addAll(tagValueList);
             }
-            syncLabelService.syncLabelValue(dataList);
+//            syncLabelService.syncLabelValue(dataList);
         }
         catch (Exception e) {
             logger.error("syncTagValue error", e);
