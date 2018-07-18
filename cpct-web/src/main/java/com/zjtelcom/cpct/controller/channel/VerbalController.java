@@ -111,7 +111,8 @@ public class VerbalController extends BaseController {
                 result.put("resultMsg","请选择推送渠道");
                 return result;
             }
-            result = verbalService.getVerbalListByConfId(userId,param.get("confId"));
+            Long confId = param.get("confId");
+            result = verbalService.getVerbalListByConfId(userId,confId);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("[op:VerbalController] fail to getVerbalListByConfId",e);
