@@ -24,4 +24,7 @@ public interface MktCampaignMapper {
     List<MktCampaignDO> qryMktCampaignListPage(MktCampaignDO mktCampaignDO);
 
     void changeMktCampaignStatus(@Param("mktCampaignId")Long mktCampaignId, @Param("statusCd")String statusCd);
+
+    List<MktCampaignDO> qryMktCampaignListByCondition(MktCampaignDO mktCampaignDO);
+
 }

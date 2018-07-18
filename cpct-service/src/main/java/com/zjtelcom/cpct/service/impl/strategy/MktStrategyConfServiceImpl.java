@@ -11,6 +11,8 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamStrategyConfRelMapper;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
+import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRegionRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
@@ -21,11 +23,13 @@ import com.zjtelcom.cpct.domain.campaign.City;
 import com.zjtelcom.cpct.domain.campaign.CityProperty;
 import com.zjtelcom.cpct.domain.campaign.MktCamStrategyConfRelDO;
 import com.zjtelcom.cpct.domain.channel.Channel;
+import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRegionRelDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
+import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRuleRel;
@@ -33,7 +37,9 @@ import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
+import com.zjtelcom.cpct.service.thread.TarGrpRule;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
+import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.io.CopyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +47,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Description:
@@ -94,8 +102,27 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
     @Autowired
     private ContactChannelMapper contactChannelMapper;
 
+    /*
+     * 协同渠道
+     */
     @Autowired
     private MktCamChlConfMapper mktCamChlConfMapper;
+
+    /**
+     * 客户分群
+     */
+    @Autowired
+    private TarGrpConditionMapper tarGrpConditionMapper;
+
+    /**
+     * 注智标签
+     */
+    @Autowired
+    private InjectionLabelMapper injectionLabelMapper;
+
+    // RedisUtils工具类
+    @Autowired
+    private RedisUtils redisUtils;
 
 
     /**
@@ -165,7 +192,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
 
             //添加属性配置信息 与 下发城市关联
             List<City> cityList = mktStrategyConfDetail.getCityList();
-            if (cityList != null) {
+            if (cityList != null && cityList.size() > 0) {
                 for (City city : cityList) {
                     MktStrategyConfRegionRelDO mktStrategyConfRegionRelDO = new MktStrategyConfRegionRelDO();
                     mktStrategyConfRegionRelDO.setMktStrategyConfId(mktStrategyConfId);
@@ -208,6 +235,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                 }
             }
 
+            ExecutorService executorService = Executors.newCachedThreadPool();
             // 遍历策略下对应的规则
             for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfDetail.getMktStrategyConfRuleList()) {
                 MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
@@ -222,7 +250,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                         }
                     }
                 }
-                if (mktStrategyConfRule.getMktCamChlConfList()!= null) {
+                if (mktStrategyConfRule.getMktCamChlConfList() != null) {
                     for (int i = 0; i < mktStrategyConfRule.getMktCamChlConfList().size(); i++) {
                         if (i == 0) {
                             evtContactConfIds += mktStrategyConfRule.getMktStrategyConfRuleId();
@@ -251,7 +279,15 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                 mktStrategyConfRuleRelDO.setUpdateStaff(UserUtil.loginId());
                 mktStrategyConfRuleRelDO.setUpdateDate(new Date());
                 mktStrategyConfRuleRelMapper.insert(mktStrategyConfRuleRelDO);
+
+                // 线程池执行规则存入redis
+                executorService.submit(new TarGrpRule(mktStrategyConfDetail.getMktCampaignId(), mktStrategyConfId, mktStrategyConfRuleDO, redisUtils, tarGrpConditionMapper, injectionLabelMapper));
             }
+            // 关闭线程池
+            if (!executorService.isShutdown()) {
+                executorService.shutdown();
+            }
+
 
             // 建立策略与活动的关联
             MktCamStrategyConfRelDO mktCamStrategyConfRelDO = new MktCamStrategyConfRelDO();
@@ -366,6 +402,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
 
             // 遍历策略下的所有规则
             if (mktStrategyConfDetail.getMktStrategyConfRuleList() != null) {
+                ExecutorService executorService = Executors.newCachedThreadPool();
                 for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfDetail.getMktStrategyConfRuleList()) {
                     MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
                     CopyPropertiesUtil.copyBean2Bean(mktStrategyConfRuleDO, mktStrategyConfRule);
@@ -388,6 +425,12 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                         mktStrategyConfRuleRelDO.setUpdateDate(new Date());
                         mktStrategyConfRuleRelMapper.insert(mktStrategyConfRuleRelDO);
                     }
+                    // 线程池执行规则存入redis
+                    executorService.submit(new TarGrpRule(mktStrategyConfDetail.getMktCampaignId(), mktStrategyConfId, mktStrategyConfRuleDO, redisUtils, tarGrpConditionMapper, injectionLabelMapper));
+                }
+                // 关闭线程池
+                if (!executorService.isShutdown()) {
+                    executorService.shutdown();
                 }
 
             }
@@ -533,4 +576,5 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
     public Map<String, Object> listAllMktStrategyConf() {
         return null;
     }
+
 }

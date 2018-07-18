@@ -1,71 +1,100 @@
-package com.zjtelcom.cpct.dto.campaign;
+/**
+ * @(#)QryMktCampaignListReq.java, 2018/7/17.
+ * <p/>
+ * Copyright 2018 Netease, Inc. All rights reserved.
+ * NETEASE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
+ */
+package com.zjtelcom.cpct.dubbo.model;
 
-import com.zjtelcom.cpct.BaseEntity;
-import lombok.Data;
+import com.zjtelcom.cpct.common.Page;
 
 import java.util.Date;
 
 /**
- * @Author:sunpeng
- * @Descirption:营销活动服务对接基本dto父对象
- * @Date: 2018/6/26.
+ * Description:
+ * author: linchao
+ * date: 2018/07/17 11:31
+ * version: V1.0
  */
-public class MktCampaign extends BaseEntity {
+public class QryMktCampaignListReq extends BaseModel {
 
     /**
      * 营销活动标识
      */
     private Long mktCampaignId;
-
     /**
      * 营销策略标识
      */
     private Long strategyId;
-
     /**
-     * 营销活动名称
+     *营销活动名称
      */
     private String mktCampaignName;
-
     /**
      * 计划开始时间
      */
     private Date planBeginTime;
-
     /**
      * 计划结束时间
      */
     private Date planEndTime;
-
     /**
      * 实际开始时间
      */
     private Date beginTime;
-
     /**
      * 实际结束时间
      */
     private Date endTime;
-
     /**
      * 营销活动分类
      */
     private String mktCampaignType;
-
     /**
      * 营销活动编号
      */
     private String mktActivityNbr;
-
     /**
      * 营销活动目标
      */
     private String mktActivityTarget;
-
     /**
-     * 营销活动描述
+     * 营销活动目标
      */
     private String mktCampaignDesc;
+    /**
+     * 营销活动状态
+     */
+    private String statusCd;
+
+    /**
+     * 状态时间
+     */
+    private Date statusDate;
+    /**
+     * 创建员工
+     */
+    private Long createStaff;
+    /**
+     * 创建时间
+     */
+    private Date createDate;
+    /**
+     * 更新员工
+     */
+    private Long updateStaff;
+    /**
+     * 备注
+     */
+    private String remark;
+    /**
+     * 本地网标识
+     */
+    private Long lanId;
+    /**
+     * 分页信息
+     */
+    private Page pageInfo;
 
     public Long getMktCampaignId() {
         return mktCampaignId;
@@ -153,5 +182,69 @@ public class MktCampaign extends BaseEntity {
 
     public void setMktCampaignDesc(String mktCampaignDesc) {
         this.mktCampaignDesc = mktCampaignDesc;
+    }
+
+    public String getStatusCd() {
+        return statusCd;
+    }
+
+    public void setStatusCd(String statusCd) {
+        this.statusCd = statusCd;
+    }
+
+    public Date getStatusDate() {
+        return statusDate;
+    }
+
+    public void setStatusDate(Date statusDate) {
+        this.statusDate = statusDate;
+    }
+
+    public Long getCreateStaff() {
+        return createStaff;
+    }
+
+    public void setCreateStaff(Long createStaff) {
+        this.createStaff = createStaff;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public Long getUpdateStaff() {
+        return updateStaff;
+    }
+
+    public void setUpdateStaff(Long updateStaff) {
+        this.updateStaff = updateStaff;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public Long getLanId() {
+        return lanId;
+    }
+
+    public void setLanId(Long lanId) {
+        this.lanId = lanId;
+    }
+
+    public Page getPageInfo() {
+        return pageInfo;
+    }
+
+    public void setPageInfo(Page pageInfo) {
+        this.pageInfo = pageInfo;
     }
 }

@@ -311,13 +311,15 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         // 删除关系
         // mktCampaignRelMapper.deleteByAmktCampaignId(mktCampaignId);
 
-        // 删出活动和事件的关联
+/*
+// 删出活动和事件的关联
         mktCamEvtRelMapper.deleteByMktCampaignId(mktCampaignId);
         //删除活动下的策略以及规则
         List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByMktCampaignId(mktCampaignId);
         for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {
             mktStrategyConfService.deleteMktStrategyConf(mktCamStrategyConfRelDO.getStrategyConfId());
         }
+ */
         // 删除活动基本信息
         mktCampaignMapper.deleteByPrimaryKey(mktCampaignId);
 
