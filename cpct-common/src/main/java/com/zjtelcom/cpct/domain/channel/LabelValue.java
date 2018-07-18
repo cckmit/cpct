@@ -11,5 +11,7 @@ public class LabelValue extends BaseEntity {
     private String labelValue;
     private String valueName;
     private String valueDesc;
+    private Long tagRowId;
+
 
 }

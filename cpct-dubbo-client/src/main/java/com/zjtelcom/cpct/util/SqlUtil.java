@@ -407,10 +407,6 @@ public final class SqlUtil {
     private static void init() {
         if (!initFlag) {
             //自动注入
-//            sourceTableDefMapper = ContextLoader.getCurrentWebApplicationContext().getBean(
-//                    EagleSourceTableDefMapper.class);
-//            triggerMapper = ContextLoader.getCurrentWebApplicationContext().getBean(
-//                    TriggerMapper.class);
 
             config = new Configuration(new Version("2.3.23"));
             config.setDefaultEncoding("UTF-8");

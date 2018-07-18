@@ -8,7 +8,7 @@
 
     <dubbo:application name="33.1059"/>
 
-    <dubbo:registry protocol="zookeeper" address="dubbo://134.96.159.11:8033"/>
+    <dubbo:registry protocol="dubbo" address="134.96.159.11:8033"/>
 
     <dubbo:consumer timeout="5000"/>
 
@@ -38,16 +38,21 @@
     <!--<dubbo:method name="salesView" servicecode="33.1038.salesView"/>-->
     <!--</dubbo:reference>-->
 
-    <!--<dubbo:reference id="strategySalesSearchService"-->
-                     <!--interface="com.ctzj.ppm.dubbo.service.StrategySalesSearchService"-->
-                     <!--version="1.0" retries="0">-->
-        <!--<dubbo:method name="salesSearch" servicecode="33.1038.salesSearch"/>-->
-    <!--</dubbo:reference>-->
-
-    <!--  -->
-    <dubbo:reference id="policyCalculateService" interface="com.zjhcsoft.eagle.main.dubbo.service.PolicyCalculateService" version="1.0">
-        <dubbo:method name="tryCalculate" servicecode="33.1307.tryCalculate"/>
+    <dubbo:reference id="strategySalesSearchService"
+                     interface="com.ctzj.ppm.dubbo.service.StrategySalesSearchService"
+                     version="1.0" retries="0">
+        <dubbo:method name="salesSearch" servicecode="33.1038.salesSearch"/>
     </dubbo:reference>
 
+    <!--  -->
+    <!--<dubbo:reference id="policyCalculateService" interface="com.zjhcsoft.eagle.main.dubbo.service.PolicyCalculateService" version="1.0">-->
+    <!--<dubbo:method name="tryCalculate" servicecode="33.1307.tryCalculate"/>-->
+    <!--</dubbo:reference>-->
+
+    <dubbo:reference id="eventApiService"
+                     interface="com.zjtelcom.cpct.service.api.EventApiService" version="1.0" retries="0">
+        <!--<dubbo:method name="CalculateCPC" servicecode="33.1059.CalculateCPCTest"/>-->
+        <dubbo:method name="cpc" servicecode="33.1059.CalculateCPCTest"/>
+    </dubbo:reference>
 
 </beans>

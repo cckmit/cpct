@@ -29,7 +29,7 @@ public interface ContactEvtMapper {
 
     int updateEvent(EventDO eventDO);
 
-    EventDO getEventByEventNbr(@Param("eventNbr") String eventNbr);
+    ContactEvt getEventByEventNbr(@Param("eventNbr") String eventNbr);
 
     int createContactEvtJt(ContactEvt contactEvt);
 

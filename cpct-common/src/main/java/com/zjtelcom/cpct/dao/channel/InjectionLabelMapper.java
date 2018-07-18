@@ -18,6 +18,9 @@ public interface InjectionLabelMapper {
 
     Label selectByPrimaryKey(Long injectionLabelId);
 
+    Label selectByTagRowId(@Param("tagRowId") Long tagRowId);
+
+
     Label selectByLabelCode(@Param("labelCode") String  labelCode);
 
     List<Label> selectAll();

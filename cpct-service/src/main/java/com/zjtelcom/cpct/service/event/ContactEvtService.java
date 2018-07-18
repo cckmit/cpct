@@ -32,4 +32,6 @@ public interface ContactEvtService {
 
     Map<String,Object> modContactEvt(CreateContactEvtReq createContactEvtReq) throws Exception;
 
+    Map<String,Object> evtDetails(ContactEvt contactEvt);
+
 }

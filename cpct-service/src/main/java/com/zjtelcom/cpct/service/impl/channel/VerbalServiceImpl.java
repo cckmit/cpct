@@ -132,7 +132,7 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
                 if (label.getRightOperand() != null) {
                     vo.setValueList(ChannelUtil.StringToList(label.getRightOperand()));
                 }
-                if (label.getOperator() != null) {
+                if (label.getOperator() != null && !label.getOperator().equals("")) {
                     List<String> opratorList = ChannelUtil.StringToList(label.getOperator());
                     List<OperatorDetail> opStList = new ArrayList<>();
                     for (String operator : opratorList) {

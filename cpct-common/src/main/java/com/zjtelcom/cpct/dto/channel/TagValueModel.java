@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 
-public class TagValueInfoModel implements Serializable {
+public class TagValueModel implements Serializable {
     private Long tagValueRowId;
     private Long tagRowId;
     private String tagValueName;

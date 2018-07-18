@@ -391,4 +391,10 @@
         where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
     </update>
 
+    <!--查询方法，通过id查询-->
+    <select id="getEventByEventNbr" resultMap="resultMapper" parameterType="java.lang.String">
+        select * from event
+        where EVENT_NBR = #{eventNbr,jdbcType=VARCHAR}
+    </select>
+
 </mapper>

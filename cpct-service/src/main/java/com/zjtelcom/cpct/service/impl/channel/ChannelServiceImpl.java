@@ -28,17 +28,22 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
 
 
     @Override
-    public Map<String, Object> getChannelTree4Activity(Long userId) {
-        return null;
-    }
-
-
-
-    @Override
-    public Map<String, Object> getChannelTreeList(Long userId) {
+    public Map<String, Object> listChannelTree(Long userId) {
         Map<String,Object> result = new HashMap<>();
+        Channel channel = channelMapper.selectChannel4AllChannel(-1L);
+        ChannelDetail allChannel = new ChannelDetail();
         List<ChannelDetail> parentDetailList = new ArrayList<>();
         List<Channel> parentList = channelMapper.findParentList();
+        listParent(parentDetailList, parentList);
+        allChannel.setChannelName(channel.getContactChlName());
+        allChannel.setChannelId(channel.getContactChlId());
+        allChannel.setChildrenList(parentDetailList);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",allChannel);
+        return result;
+    }
+
+    private void listParent(List<ChannelDetail> parentDetailList, List<Channel> parentList) {
         for (Channel parent : parentList){
             ChannelDetail parentDetail = new ChannelDetail();
             List<Channel> childList = channelMapper.findChildListByParentId(parent.getContactChlId());
@@ -54,6 +59,14 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
             parentDetail.setChildrenList(childDetailList);
             parentDetailList.add(parentDetail);
         }
+    }
+
+    @Override
+    public Map<String, Object> getChannelTreeList(Long userId) {
+        Map<String,Object> result = new HashMap<>();
+        List<ChannelDetail> parentDetailList = new ArrayList<>();
+        List<Channel> parentList = channelMapper.findParentList();
+        listParent(parentDetailList, parentList);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",parentDetailList);
         return result;
@@ -111,9 +124,6 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
     public Map<String, Object> getChannelTreeForActivity(Long userId) {
         Map<String,Object> result = new HashMap<>();
         List<ChanDetailVO2> reList = new ArrayList<>();
-//        List<ChannelDetail> resultList = new ArrayList<>();
-//        List<ChannelDetail> initChannelList = new ArrayList<>();//主动
-//        List<ChannelDetail> passiveChannelList = new ArrayList<>();//被动
 
         List<ChannelDetailVO> initVOList = new ArrayList<>();
         List<ChannelDetailVO> passVOList = new ArrayList<>();
@@ -138,20 +148,6 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
                     passCount += 1;
                 }
             }
-//            //所有主动渠道的渠道信息
-//            if (initCount >0 ){
-//                ChannelDetail detail = getDetail(parent);
-//                detail.setChildrenList(initChildList);
-//                initChannelList.add(detail);
-//            }
-//            if (passCount > 0){
-//                ChannelDetail detail = getDetail(parent);
-//                detail.setChildrenList(passChildList);
-//                passiveChannelList.add(detail);
-//            }
-
-
-            //----------------
             //所有主动渠道的渠道信息
             if (initCount > 0){
                 ChannelDetailVO detailVO = getDetailvo(parent);
@@ -164,17 +160,6 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
                 passVOList.add(detailVO);
             }
         }
-//        ChannelDetail initDetail = new ChannelDetail();
-//        initDetail.setChannelId(-1L);
-//        initDetail.setChannelName("主动渠道");
-//        initDetail.setChildrenList(initChannelList);
-//        resultList.add(initDetail);
-//        ChannelDetail passDetail = new ChannelDetail();
-//        passDetail.setChannelId(-2L);
-//        passDetail.setChannelName("被动渠道");
-//        passDetail.setChildrenList(passiveChannelList);
-//        resultList.add(passDetail);
-//-------------------------------------
         ChanDetailVO2 initvo = new ChanDetailVO2();
         initvo.setChannelName("主动渠道");
         initvo.setChildrenList(initVOList);

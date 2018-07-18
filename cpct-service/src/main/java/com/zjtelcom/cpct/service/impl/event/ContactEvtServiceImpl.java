@@ -44,8 +44,6 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     @Autowired
     private ContactEvtMapper contactEvtMapper;
     @Autowired
-    private EventItemMapper eventItemMapper;
-    @Autowired
     private EventSceneMapper eventSceneMapper;
     @Autowired
     private EvtSceneCamRelMapper evtSceneCamRelMapper;
@@ -401,5 +399,17 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         return map;
     }
 
+    /**
+     * 事件详情
+     */
+    @Override
+    public Map<String, Object> evtDetails(ContactEvt contactEvt) {
+        Map<String,Object> maps = new HashMap<>();
+        contactEvt = contactEvtMapper.getEventById(contactEvt.getContactEvtId());
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("ContactEvt", contactEvt);
+        return maps;
+    }
 
 }

@@ -12,7 +12,8 @@ import java.util.Map;
  */
 public interface ChannelService {
 
-    Map<String,Object> getChannelTree4Activity(Long userId);
+
+    Map<String,Object> listChannelTree(Long userId);
 
     Map<String,Object> getChannelTreeList(Long userId);
 

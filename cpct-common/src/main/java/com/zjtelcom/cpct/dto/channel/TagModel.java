@@ -1,6 +1,6 @@
 package com.zjtelcom.cpct.dto.channel;
 
-public class TagInfoModel {
+public class TagModel {
     private Long tagRowId;//标签表主键
     private Long ctasTableDefinitionRowId;//源表定义主键
     private String tagName;//标签名称
