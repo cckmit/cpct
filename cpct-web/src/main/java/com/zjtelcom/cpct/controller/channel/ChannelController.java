@@ -20,7 +20,27 @@ public class ChannelController extends BaseController {
 
 
     /**
-     *渠道管理渠道树
+     * 渠道管理渠道树
+     * @return
+     */
+    @GetMapping("listChannelTree")
+    @CrossOrigin
+    public Map<String, Object> listChannelTree() {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = channelService.listChannelTree(userId);
+        } catch (Exception e) {
+            logger.error("[op:ChannelController] fail to listChannelTree",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to listChannelTree");
+            return result;
+        }
+        return result;
+    }
+
+    /**
+     *渠道-渠道树
      * @return
      */
     @GetMapping("getChannelTreeList")

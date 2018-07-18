@@ -28,17 +28,20 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
 
 
     @Override
-    public Map<String, Object> getChannelTree4Activity(Long userId) {
-        return null;
-    }
-
-
-
-    @Override
-    public Map<String, Object> getChannelTreeList(Long userId) {
+    public Map<String, Object> listChannelTree(Long userId) {
         Map<String,Object> result = new HashMap<>();
+        ChannelDetailVO allChannel = new ChannelDetailVO();
         List<ChannelDetail> parentDetailList = new ArrayList<>();
         List<Channel> parentList = channelMapper.findParentList();
+        listParent(parentDetailList, parentList);
+        allChannel.setChannelName("所有渠道");
+        allChannel.setChildrenList(parentDetailList);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",allChannel);
+        return result;
+    }
+
+    private void listParent(List<ChannelDetail> parentDetailList, List<Channel> parentList) {
         for (Channel parent : parentList){
             ChannelDetail parentDetail = new ChannelDetail();
             List<Channel> childList = channelMapper.findChildListByParentId(parent.getContactChlId());
@@ -54,6 +57,14 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
             parentDetail.setChildrenList(childDetailList);
             parentDetailList.add(parentDetail);
         }
+    }
+
+    @Override
+    public Map<String, Object> getChannelTreeList(Long userId) {
+        Map<String,Object> result = new HashMap<>();
+        List<ChannelDetail> parentDetailList = new ArrayList<>();
+        List<Channel> parentList = channelMapper.findParentList();
+        listParent(parentDetailList, parentList);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",parentDetailList);
         return result;
