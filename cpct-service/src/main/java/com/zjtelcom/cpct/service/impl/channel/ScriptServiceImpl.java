@@ -138,6 +138,10 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
         try {
             Script script = scriptMapper.selectByPrimaryKey(scriptId);
             vo = ChannelUtil.map2ScriptVO(script);
+            Channel channel = channelMapper.selectByPrimaryKey(Long.valueOf(script.getExecChannel()));
+            if (channel!=null){
+                vo.setChannelName(channel.getContactChlName());
+            }
         }catch (Exception e){
             e.printStackTrace();
             logger.error("[op:ChannelServiceImpl] fail to listChannel ", e);
