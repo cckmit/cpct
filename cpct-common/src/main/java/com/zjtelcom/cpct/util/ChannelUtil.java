@@ -35,7 +35,7 @@ public class ChannelUtil  {
     }
     public static LabelVO map2LabelVO(Label label){
         LabelVO vo = BeanUtil.create(label,new LabelVO());
-        if (label.getOperator()!=null){
+        if (label.getOperator()!=null && !label.getOperator().equals("")){
             List<String> opratorList = StringToList(label.getOperator());
             List<OperatorDetail> opStList  = new ArrayList<>();
             for (String operator : opratorList){
