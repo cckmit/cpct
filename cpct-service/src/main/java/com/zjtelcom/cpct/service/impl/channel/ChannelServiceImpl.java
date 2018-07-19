@@ -211,7 +211,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
     }
 
     /**
-     * 添加子渠道
+     * 添加渠道
      * @param userId
      * @param addVO
      * @return
@@ -231,6 +231,10 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
             return result;
         }
         Channel channel = BeanUtil.create(addVO,new Channel());
+        Channel ch = channelMapper.selectChannel4AllChannel(-1L);
+        if (addVO.getParentId().equals(ch.getContactChlId())){
+            channel.setParentId(0L);
+        }
         channel.setCreateDate(new Date());
         channel.setUpdateDate(new Date());
         channel.setCreateStaff(userId);
@@ -251,7 +255,18 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
             result.put("resultMsg","渠道不存在");
             return result;
         }
-        BeanUtil.copy(editVO,channel);
+        if (!channel.getContactChlName().equals(editVO.getContactChlName())){
+            channel.setContactChlName(editVO.getContactChlName());
+        }
+        if (!channel.getContactChlCode().equals(editVO.getContactChlCode())){
+            channel.setContactChlCode(editVO.getContactChlCode());
+        }
+        if (!channel.getStartTime().equals(editVO.getStartTime())){
+            channel.setStartTime(editVO.getStartTime());
+        }
+        if (!channel.getEndTime().equals(editVO.getEndTime())){
+            channel.setEndTime(editVO.getEndTime());
+        }
         channel.setUpdateDate(new Date());
         channel.setUpdateStaff(userId);
         channelMapper.updateByPrimaryKey(channel);
@@ -266,8 +281,12 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         Channel channel = channelMapper.selectByPrimaryKey(channelDetail.getChannelId());
         if (channel==null){
             result.put("resultCode",CODE_FAIL);
-
             result.put("resultMsg","渠道不存在");
+            return result;
+        }
+        if (channel.getContactChlName().equals("所有渠道")){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","根渠道无法删除！");
             return result;
         }
         channelMapper.deleteByPrimaryKey(channelDetail.getChannelId());
