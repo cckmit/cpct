@@ -173,8 +173,24 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         MktCampaignDO mktCampaignDO = new MktCampaignDO();
         CopyPropertiesUtil.copyBean2Bean(mktCampaignDO, mktCampaignVO);
         // 更新活动基本信息
+        mktCampaignDO.setUpdateStaff(UserUtil.loginId());
+        mktCampaignDO.setUpdateDate(new Date());
         mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
         Long mktCampaignId = mktCampaignDO.getMktCampaignId();
+
+        //删除原来的活动与城市之间的关系
+        mktCamCityRelMapper.deleteByMktCampaignId(mktCampaignId);
+        //创建活动与城市之间的关系
+        for (CityProperty cityProperty : mktCampaignVO.getApplyRegionIdList()) {
+            MktCamCityRelDO mktCamCityRelDO = new MktCamCityRelDO();
+            mktCamCityRelDO.setCityId(cityProperty.getCityPropertyId());
+            mktCamCityRelDO.setMktCampaignId(mktCampaignId);
+            mktCamCityRelDO.setCreateDate(new Date());
+            mktCamCityRelDO.setCreateStaff(UserUtil.loginId());
+            mktCamCityRelDO.setUpdateDate(new Date());
+            mktCamCityRelDO.setUpdateStaff(UserUtil.loginId());
+            mktCamCityRelMapper.insert(mktCamCityRelDO);
+        }
 
         // 遍历所有策略集合
         for (MktStrategyConfDetail mktStrategyConfDetail : mktCampaignVO.getMktStrategyConfDetailList()) {

@@ -7,6 +7,8 @@ import java.util.List;
 public interface MktCamCityRelMapper {
     int deleteByPrimaryKey(Long mktCamCityRelId);
 
+    int deleteByMktCampaignId(Long mktCampaignId);
+
     int insert(MktCamCityRelDO mktCamCityRelDO);
 
     MktCamCityRelDO selectByPrimaryKey(Long mktCamCityRelId);
