@@ -79,6 +79,7 @@ public class ChannelUtil  {
         return string;
     }
 
+
     public static List<String> StringToList(String var1) {
         String[] array = var1.split(",");
         List<String> list = new ArrayList<String>();

@@ -54,7 +54,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
                 childDetail.setChannelName(child.getContactChlName());
                 childDetailList.add(childDetail);
             }
-            parentDetail.setChannelId(parent.getParentId());
+            parentDetail.setChannelId(parent.getContactChlId());
             parentDetail.setChannelName(parent.getContactChlName());
             parentDetail.setChildren(childDetailList);
             parentDetailList.add(parentDetail);
