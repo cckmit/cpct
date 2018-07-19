@@ -317,6 +317,11 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         ChannelVO vo = new ChannelVO();
         try {
             Channel channel = channelMapper.selectByPrimaryKey(channelId);
+            if (channel==null){
+                result.put("resultCode",CODE_FAIL);
+                result.put("resultMsg","渠道不存在");
+                return result;
+            }
             vo = ChannelUtil.map2ChannelVO(channel);
         }catch (Exception e){
             e.printStackTrace();
