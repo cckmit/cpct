@@ -245,12 +245,13 @@ public class ChannelController extends BaseController {
     /**
      * 获取渠道详情
      */
-    @GetMapping("getChannelDetail")
+    @PostMapping("getChannelDetail")
     @CrossOrigin
-    public Map<String,Object> getChannelDetail(Long channelId) {
+    public Map<String,Object> getChannelDetail(@RequestBody HashMap<String,Long> param) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
+            Long channelId = param.get("channelId");
             result = channelService.getChannelDetail(userId,channelId);
         } catch (Exception e) {
             logger.error("[op:ChannelController] fail to deleteChannel",e);
