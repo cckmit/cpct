@@ -33,4 +33,9 @@
     select area_id, parent_area, name, area_level
     from sys_area
   </select>
+  <select id="selectByAreaLevel"  parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select area_id, parent_area, name, area_level
+    from sys_area
+    where area_level = #{areaLevel,jdbcType=INTEGER}
+  </select>
 </mapper>

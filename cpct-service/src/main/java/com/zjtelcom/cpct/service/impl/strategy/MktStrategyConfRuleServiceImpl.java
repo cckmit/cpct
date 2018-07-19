@@ -136,22 +136,22 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktStrategyConfRuleMap = new HashMap<>();
             mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(mktStrategyConfRuleId);
             CopyPropertiesUtil.copyBean2Bean(mktStrategyConfRule, mktStrategyConfRuleDO);
-            if(mktStrategyConfRuleDO.getProductId()!=null){
+            if (mktStrategyConfRuleDO.getProductId() != null) {
                 String[] productIds = mktStrategyConfRuleDO.getProductId().split("/");
                 List<Long> productIdList = new ArrayList<>();
                 for (int i = 0; i < productIds.length; i++) {
-                    if (productIds[i] != "" && !"".equals(productIds[i])) {
+                    if (productIds[i] != "" && !"".equals(productIds[i]) && productIds[i].equals(null)) {
                         productIdList.add(Long.valueOf(productIds[i]));
                     }
                 }
                 mktStrategyConfRule.setProductIdlist(productIdList);
             }
 
-            if(mktStrategyConfRuleDO.getEvtContactConfId()!=null){
+            if (mktStrategyConfRuleDO.getEvtContactConfId() != null) {
                 String[] evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
                 List<MktCamChlConf> mktCamChlConfList = new ArrayList<>();
                 for (int i = 0; i < evtContactConfIds.length; i++) {
-                    if (evtContactConfIds[i] != "" && !"".equals(evtContactConfIds[i])) {
+                    if (evtContactConfIds[i] != "" && !"".equals(evtContactConfIds[i]) && evtContactConfIds[i].equals(null)) {
                         MktCamChlConf mktCamChlConf = new MktCamChlConf();
                         mktCamChlConf.setEvtContactConfId(Long.valueOf(evtContactConfIds[i]));
                         String evtContactConfName = mktCamChlConfMapper.selectforName(Long.valueOf(evtContactConfIds[i]));
