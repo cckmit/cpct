@@ -39,4 +39,15 @@ public class SysAreaServiceImpl implements SysAreaService {
         map.put("sysAreas", sysAreas);
         return map;
     }
+
+    @Override
+    public Map<String, Object> listSysCity() {
+        // 获取等级为2的地市级别的城市
+        List<SysArea> sysCitys = sysAreaMapper.selectByAreaLevel(2);
+        Map<String, Object> map = new HashMap<>();
+        map.put("resultCode", CommonConstant.CODE_SUCCESS);
+        map.put("resultMsg", StringUtils.EMPTY);
+        map.put("sysCitys", sysCitys);
+        return map;
+    }
 }

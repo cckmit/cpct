@@ -39,7 +39,6 @@ public class MktStrategyConfRule {
      */
     private Long ruleConfId;
 
-    private   List<VerbalVO> verbalVOList;
 
     public Long getMktStrategyConfRuleId() {
         return mktStrategyConfRuleId;
@@ -89,11 +88,4 @@ public class MktStrategyConfRule {
         this.mktStrategyConfRuleName = mktStrategyConfRuleName;
     }
 
-    public List<VerbalVO> getVerbalVOList() {
-        return verbalVOList;
-    }
-
-    public void setVerbalVOList(List<VerbalVO> verbalVOList) {
-        this.verbalVOList = verbalVOList;
-    }
 }

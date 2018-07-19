@@ -21,4 +21,6 @@ public interface SysAreaService {
 
     Map<String, Object> listSysArea();
 
+    Map<String, Object> listSysCity();
+
 }

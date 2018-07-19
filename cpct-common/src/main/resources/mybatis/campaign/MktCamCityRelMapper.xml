@@ -14,6 +14,10 @@
     delete from mkt_cam_city_rel
     where MKT_CAM_CITY_REL_ID = #{mktCamCityRelId,jdbcType=BIGINT}
   </delete>
+  <delete id="deleteByMktCampaignId" parameterType="java.lang.Long">
+    delete from mkt_cam_city_rel
+    where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+  </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamCityRelDO">
     insert into mkt_cam_city_rel (MKT_CAM_CITY_REL_ID, MKT_CAMPAIGN_ID, CITY_ID, 
       CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, 

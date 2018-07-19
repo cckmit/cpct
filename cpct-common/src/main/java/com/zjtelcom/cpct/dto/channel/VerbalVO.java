@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * 痛痒点
+ */
 public class VerbalVO implements Serializable {
 
     private Long verbalId;

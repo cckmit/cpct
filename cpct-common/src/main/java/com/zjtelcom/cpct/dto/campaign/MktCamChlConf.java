@@ -1,6 +1,9 @@
 package com.zjtelcom.cpct.dto.campaign;
 
 import com.zjtelcom.cpct.BaseEntity;
+import com.zjtelcom.cpct.dto.channel.VerbalVO;
+
+import java.util.List;
 
 /**
  * @author:sunpeng
@@ -99,4 +102,5 @@ public class MktCamChlConf extends BaseEntity {
     public void setRuleExpression(String ruleExpression) {
         this.ruleExpression = ruleExpression;
     }
+
 }
