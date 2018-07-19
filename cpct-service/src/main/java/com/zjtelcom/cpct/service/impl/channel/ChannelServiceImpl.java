@@ -37,7 +37,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         listParent(parentDetailList, parentList);
         allChannel.setChannelName(channel.getContactChlName());
         allChannel.setChannelId(channel.getContactChlId());
-        allChannel.setChildrenList(parentDetailList);
+        allChannel.setChildren(parentDetailList);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",allChannel);
         return result;
@@ -56,7 +56,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
             }
             parentDetail.setChannelId(parent.getParentId());
             parentDetail.setChannelName(parent.getContactChlName());
-            parentDetail.setChildrenList(childDetailList);
+            parentDetail.setChildren(childDetailList);
             parentDetailList.add(parentDetail);
         }
     }
@@ -138,12 +138,12 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
             for (Channel child : childList){
                 if (child.getChannelType().equals(ChannelType.INITIATIVE.getValue().toString())){
                     ChannelDetail detail = getDetail(child);
-                    detail.setChildrenList(null);
+                    detail.setChildren(null);
                     initChildList.add(detail);
                     initCount += 1;
                 }else {
                     ChannelDetail detail = getDetail(child);
-                    detail.setChildrenList(null);
+                    detail.setChildren(null);
                     passChildList.add(detail);
                     passCount += 1;
                 }

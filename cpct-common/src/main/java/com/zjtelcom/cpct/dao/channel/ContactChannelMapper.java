@@ -15,7 +15,7 @@ public interface ContactChannelMapper {
 
     int insert(Channel record);
 
-    Channel selectByPrimaryKey(@Param("parentId")Long parentId);
+    Channel selectByPrimaryKey(@Param("contactChlId")Long contactChlId);
 
     Channel selectChannel4AllChannel(Long contactChlId);
 

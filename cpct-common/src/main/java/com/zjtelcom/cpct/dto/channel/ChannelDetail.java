@@ -7,15 +7,15 @@ public class ChannelDetail implements Serializable {
 
     private Long channelId;
     private String channelName;
-    private List<ChannelDetail> childrenList;
+    private List<ChannelDetail> children;
 
 
-    public List<ChannelDetail> getChildrenList() {
-        return childrenList;
+    public List<ChannelDetail> getChildren() {
+        return children;
     }
 
-    public void setChildrenList(List<ChannelDetail> childrenList) {
-        this.childrenList = childrenList;
+    public void setChildren(List<ChannelDetail> children) {
+        this.children = children;
     }
 
     public Long getChannelId() {
