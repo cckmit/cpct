@@ -33,7 +33,7 @@ public class EventApiController extends BaseController {
 
         Map<String, Object> params = new HashMap<>();
         try {
-//            result = eventApiService.CalculateCPC(params);
+            result = eventApiService.CalculateCPC(params);
             eventApiService.cpc();
         } catch (Exception e) {
             e.printStackTrace();

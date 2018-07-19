@@ -384,9 +384,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         Map<String, String> result = new HashMap<String, String>(2);
 
         try {
+            //获取策略列表
             List<Map<String, Object>> policyList = calcReqModel.getPolicyList();
-//            ValidateResult validateResult = tryCalcService.validate(serialNum, calcReqModel);
-            ValidateResult validateResult = new ValidateResult();
+            //拼装sql前验证
+            ValidateResult validateResult = tryCalcService.validate(serialNum, calcReqModel);
+//            ValidateResult validateResult = new ValidateResult();
             validateResult.setResult(true);
             validateResult.setMessage("111");
             validateResult.setCode("111");
