@@ -11,5 +11,11 @@
 
     <artifactId>cpct-dubbo-server</artifactId>
     <name>cpct-dubbo-server</name>
+    <dependencies>
+        <dependency>
+            <groupId>com.zjtelcom.cpct</groupId>
+            <artifactId>cpct-common</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>
