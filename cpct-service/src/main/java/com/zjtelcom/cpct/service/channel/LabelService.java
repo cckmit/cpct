@@ -20,8 +20,6 @@ public interface LabelService {
 
     Map<String,Object> shared(Long userId, Long labelId);
 
-    Map<String,Object> unshared(Long userId, Long labelId);
-
 
     Map<String,Object> editLabel(Long userId, LabelEditVO editVO);
 

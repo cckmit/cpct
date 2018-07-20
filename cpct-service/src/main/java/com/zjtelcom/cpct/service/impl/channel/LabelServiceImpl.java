@@ -47,41 +47,23 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             result.put("resultMsg","标签信息不存在");
             return result;
         }
-        if (!label.getIsShared().equals(1)){
-            result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg","该标签非私有标签或已分享");
+        if (label.getIsShared().equals(1)){
+            label.setIsShared(0);
+            label.setUpdateDate(new Date());
+            label.setUpdateStaff(userId);
+            labelMapper.updateByPrimaryKey(label);
+            result.put("resultCode",CODE_SUCCESS);
+            result.put("resultMsg","分享成功");
+            return result;
+        }else {
+            label.setIsShared(1);
+            label.setUpdateDate(new Date());
+            label.setUpdateStaff(userId);
+            labelMapper.updateByPrimaryKey(label);
+            result.put("resultCode",CODE_SUCCESS);
+            result.put("resultMsg","取消分享成功");
             return result;
         }
-        label.setIsShared(0);
-        label.setUpdateDate(new Date());
-        label.setUpdateStaff(userId);
-        labelMapper.updateByPrimaryKey(label);
-        result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","分享成功");
-        return result;
-    }
-
-    @Override
-    public Map<String, Object> unshared(Long userId, Long labelId) {
-        Map<String,Object> result = new HashMap<>();
-        Label label = labelMapper.selectByPrimaryKey(labelId);
-        if (label==null){
-            result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg","标签信息不存在");
-            return result;
-        }
-        if (!label.getIsShared().equals(0)){
-            result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg","该标签非共享标签");
-            return result;
-        }
-        label.setIsShared(1);
-        label.setUpdateDate(new Date());
-        label.setUpdateStaff(userId);
-        labelMapper.updateByPrimaryKey(label);
-        result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","取消分享成功");
-        return result;
     }
 
     @Override

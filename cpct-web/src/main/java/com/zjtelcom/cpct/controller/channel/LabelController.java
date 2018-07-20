@@ -46,23 +46,6 @@ public class LabelController extends BaseController {
     }
 
 
-    @PostMapping("unshared")
-    @CrossOrigin
-    public Map<String, Object> unshared(@RequestBody HashMap<String,Long> param) {
-        Long userId = UserUtil.loginId();
-        Map<String,Object> result = new HashMap<>();
-        try {
-            result = labelService.unshared(userId,param.get("labelId"));
-        } catch (Exception e) {
-            logger.error("[op:ScriptController] fail to unshared",e);
-            result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg"," fail to unshared");
-            return result;
-        }
-        return result;
-    }
-
-
     @PostMapping("queryTriggerByleftOperand")
     @CrossOrigin
     public Map<String, Object> queryTriggerByleftOperand(@RequestBody List<Map<String ,String>> leftOperans) {
