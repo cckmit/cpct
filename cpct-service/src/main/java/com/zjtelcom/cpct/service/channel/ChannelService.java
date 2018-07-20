@@ -37,6 +37,8 @@ public interface ChannelService {
 
     Map<String,Object> getChannelListByType(Long userId,String channelType);
 
+    Object addAcount();
+
 
 
 

@@ -4,16 +4,19 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
+import com.zjtelcom.cpct.dao.es.ClTestRepository;
 import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.ChannelType;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ChannelService;
+import com.zjtelcom.cpct.service.impl.api.ClTest;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.*;
 
@@ -26,20 +29,25 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
     @Autowired
     private ContactChannelMapper channelMapper;
 
+    @Autowired
+    private ClTestRepository testRepository;
+
 
     @Override
     public Map<String, Object> listChannelTree(Long userId) {
         Map<String,Object> result = new HashMap<>();
         Channel channel = channelMapper.selectChannel4AllChannel(-1L);
-        ChannelDetail allChannel = new ChannelDetail();
+        List<ChannelDetail> chList = new ArrayList<>();
         List<ChannelDetail> parentDetailList = new ArrayList<>();
         List<Channel> parentList = channelMapper.findParentList();
         listParent(parentDetailList, parentList);
+        ChannelDetail allChannel = new ChannelDetail();
         allChannel.setChannelName(channel.getContactChlName());
         allChannel.setChannelId(channel.getContactChlId());
         allChannel.setChildren(parentDetailList);
+        chList.add(allChannel);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",allChannel);
+        result.put("resultMsg",chList);
         return result;
     }
 
@@ -331,4 +339,17 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         result.put("resultMsg",vo);
         return result;
     }
+
+    @Override
+    public Object addAcount() {
+            ClTest clTest = new ClTest();
+            clTest.setId(Long.valueOf(ChannelUtil.getRandomStr(5)));
+            testRepository.save(clTest);
+            logger.info("333333");
+
+        return "success";
+    }
+
+
+
 }

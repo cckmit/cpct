@@ -68,7 +68,7 @@ public class ChannelUtil  {
     }
 
     public static String getRandomStr(int length) {
-        char[] chars = "23456789ABCDEFGHJKMNPQRSTUVWXYZ".toCharArray();
+        char[] chars = "23456789".toCharArray();
         Random r = new Random(System.currentTimeMillis());
         String string = "";
 
