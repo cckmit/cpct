@@ -64,6 +64,11 @@ public class ChannelUtil  {
         if (label.getRightOperand()!=null && !label.getRightOperand().equals("")){
             valueList = StringToList(label.getRightOperand());
         }
+        if (label.getScope().equals(0)){
+            vo.setScope("自有标签");
+        }else {
+            vo.setScope("大数据标签");
+        }
         vo.setValueList(valueList);
         return vo;
     }

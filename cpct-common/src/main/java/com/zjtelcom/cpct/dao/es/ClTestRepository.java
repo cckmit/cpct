@@ -7,7 +7,7 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
-@Component("elasticClTestRepository")
+@Repository
 public interface ClTestRepository extends ElasticsearchRepository<ClTest,Long> {
 
 }
