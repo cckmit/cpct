@@ -17,5 +17,7 @@ public interface SysAreaMapper {
 
     List<SysArea> selectByAreaLevel(Integer areaLevel);
 
+    List<SysArea> selectByParnetArea(Integer parentArea);
+
     int updateByPrimaryKey(SysArea record);
 }

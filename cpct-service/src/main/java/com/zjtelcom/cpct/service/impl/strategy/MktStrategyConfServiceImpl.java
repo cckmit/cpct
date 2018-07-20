@@ -237,57 +237,62 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
 
             ExecutorService executorService = Executors.newCachedThreadPool();
             // 遍历策略下对应的规则
-            for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfDetail.getMktStrategyConfRuleList()) {
-                MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
-                String productIds = "";
-                String evtContactConfIds = "";
-                if (mktStrategyConfRule.getProductIdlist() != null) {
-                    for (int i = 0; i < mktStrategyConfRule.getProductIdlist().size(); i++) {
-                        if (i == 0) {
-                            productIds += mktStrategyConfRule.getProductIdlist().get(i);
-                        } else {
-                            productIds += "/" + mktStrategyConfRule.getProductIdlist().get(i);
+            try {
+                for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfDetail.getMktStrategyConfRuleList()) {
+                    MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
+                    String productIds = "";
+                    String evtContactConfIds = "";
+                    if (mktStrategyConfRule.getProductIdlist() != null) {
+                        for (int i = 0; i < mktStrategyConfRule.getProductIdlist().size(); i++) {
+                            if (i == 0) {
+                                productIds += mktStrategyConfRule.getProductIdlist().get(i);
+                            } else {
+                                productIds += "/" + mktStrategyConfRule.getProductIdlist().get(i);
+                            }
                         }
                     }
-                }
-                if (mktStrategyConfRule.getMktCamChlConfList() != null) {
-                    for (int i = 0; i < mktStrategyConfRule.getMktCamChlConfList().size(); i++) {
-                        if (i == 0) {
-                            evtContactConfIds += mktStrategyConfRule.getMktStrategyConfRuleId();
-                        } else {
-                            evtContactConfIds += "/" + mktStrategyConfRule.getMktStrategyConfRuleId();
+                    if (mktStrategyConfRule.getMktCamChlConfList() != null) {
+                        for (int i = 0; i < mktStrategyConfRule.getMktCamChlConfList().size(); i++) {
+                            if (i == 0) {
+                                evtContactConfIds += mktStrategyConfRule.getMktCamChlConfList().get(i).getEvtContactConfId();
+                            } else {
+                                evtContactConfIds += "/" + mktStrategyConfRule.getMktCamChlConfList().get(i).getEvtContactConfId();
+                            }
                         }
                     }
+                    CopyPropertiesUtil.copyBean2Bean(mktStrategyConfRuleDO, mktStrategyConfRule);
+                    // 添加规则的信息 并返回id -- mktStrategyConfRuleId
+                    mktStrategyConfRuleDO.setProductId(productIds);
+                    mktStrategyConfRuleDO.setEvtContactConfId(evtContactConfIds);
+                    mktStrategyConfRuleDO.setCreateDate(new Date());
+                    mktStrategyConfRuleDO.setCreateStaff(UserUtil.loginId());
+                    mktStrategyConfRuleDO.setUpdateDate(new Date());
+                    mktStrategyConfRuleDO.setUpdateStaff(UserUtil.loginId());
+                    mktStrategyConfRuleMapper.insert(mktStrategyConfRuleDO);
+                    // 策略规则 Id
+                    Long mktStrategyConfRuleId = mktStrategyConfRuleDO.getMktStrategyConfRuleId();
+                    // 建立策略配置和规则的关系
+                    MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO = new MktStrategyConfRuleRelDO();
+                    mktStrategyConfRuleRelDO.setMktStrategyConfId(mktStrategyConfId);
+                    mktStrategyConfRuleRelDO.setMktStrategyConfRuleId(mktStrategyConfRuleId);
+                    mktStrategyConfRuleRelDO.setCreateStaff(UserUtil.loginId());
+                    mktStrategyConfRuleRelDO.setCreateDate(new Date());
+                    mktStrategyConfRuleRelDO.setUpdateStaff(UserUtil.loginId());
+                    mktStrategyConfRuleRelDO.setUpdateDate(new Date());
+                    mktStrategyConfRuleRelMapper.insert(mktStrategyConfRuleRelDO);
+
+                    // 线程池执行规则存入redis
+                    executorService.submit(new TarGrpRule(mktStrategyConfDetail.getMktCampaignId(), mktStrategyConfId, mktStrategyConfRuleDO, redisUtils, tarGrpConditionMapper, injectionLabelMapper));
                 }
-                CopyPropertiesUtil.copyBean2Bean(mktStrategyConfRuleDO, mktStrategyConfRule);
-                // 添加规则的信息 并返回id -- mktStrategyConfRuleId
-                mktStrategyConfRuleDO.setProductId(productIds);
-                mktStrategyConfRuleDO.setEvtContactConfId(evtContactConfIds);
-                mktStrategyConfRuleDO.setCreateDate(new Date());
-                mktStrategyConfRuleDO.setCreateStaff(UserUtil.loginId());
-                mktStrategyConfRuleDO.setUpdateDate(new Date());
-                mktStrategyConfRuleDO.setUpdateStaff(UserUtil.loginId());
-                mktStrategyConfRuleMapper.insert(mktStrategyConfRuleDO);
-                // 策略规则 Id
-                Long mktStrategyConfRuleId = mktStrategyConfRuleDO.getMktStrategyConfRuleId();
-                // 建立策略配置和规则的关系
-                MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO = new MktStrategyConfRuleRelDO();
-                mktStrategyConfRuleRelDO.setMktStrategyConfId(mktStrategyConfId);
-                mktStrategyConfRuleRelDO.setMktStrategyConfRuleId(mktStrategyConfRuleId);
-                mktStrategyConfRuleRelDO.setCreateStaff(UserUtil.loginId());
-                mktStrategyConfRuleRelDO.setCreateDate(new Date());
-                mktStrategyConfRuleRelDO.setUpdateStaff(UserUtil.loginId());
-                mktStrategyConfRuleRelDO.setUpdateDate(new Date());
-                mktStrategyConfRuleRelMapper.insert(mktStrategyConfRuleRelDO);
-
-                // 线程池执行规则存入redis
-                executorService.submit(new TarGrpRule(mktStrategyConfDetail.getMktCampaignId(), mktStrategyConfId, mktStrategyConfRuleDO, redisUtils, tarGrpConditionMapper, injectionLabelMapper));
+                // 关闭线程池
+                if (!executorService.isShutdown()) {
+                    executorService.shutdown();
+                }
+            } catch (Exception e) {
+                if (!executorService.isShutdown()) {
+                    executorService.shutdown();
+                }
             }
-            // 关闭线程池
-            if (!executorService.isShutdown()) {
-                executorService.shutdown();
-            }
-
 
             // 建立策略与活动的关联
             MktCamStrategyConfRelDO mktCamStrategyConfRelDO = new MktCamStrategyConfRelDO();
@@ -403,34 +408,41 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             // 遍历策略下的所有规则
             if (mktStrategyConfDetail.getMktStrategyConfRuleList() != null) {
                 ExecutorService executorService = Executors.newCachedThreadPool();
-                for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfDetail.getMktStrategyConfRuleList()) {
-                    MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
-                    CopyPropertiesUtil.copyBean2Bean(mktStrategyConfRuleDO, mktStrategyConfRule);
-                    //判断规则是否是修改还是新增
-                    if (mktStrategyConfRule.getMktStrategyConfRuleId() != null && mktStrategyConfRule.getMktStrategyConfRuleId() != 0) {
-                        // 修改规则的信息 并返回id -- mktStrategyConfRuleId
-                        mktStrategyConfRuleMapper.updateByPrimaryKey(mktStrategyConfRuleDO);
-                    } else {
-                        // 添加新增的规则
-                        mktStrategyConfRuleMapper.insert(mktStrategyConfRuleDO);
-                        // 策略规则 Id
-                        Long mktStrategyConfRuleId = mktStrategyConfRuleDO.getMktStrategyConfRuleId();
-                        // 建立策略配置和规则的关系
-                        MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO = new MktStrategyConfRuleRelDO();
-                        mktStrategyConfRuleRelDO.setCreateDate(new Date());
-                        mktStrategyConfRuleRelDO.setCreateStaff(UserUtil.loginId());
-                        mktStrategyConfRuleRelDO.setMktStrategyConfId(mktStrategyConfId);
-                        mktStrategyConfRuleRelDO.setMktStrategyConfRuleId(mktStrategyConfRuleId);
-                        mktStrategyConfRuleRelDO.setUpdateStaff(UserUtil.loginId());
-                        mktStrategyConfRuleRelDO.setUpdateDate(new Date());
-                        mktStrategyConfRuleRelMapper.insert(mktStrategyConfRuleRelDO);
+                try {
+                    for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfDetail.getMktStrategyConfRuleList()) {
+                        MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
+                        CopyPropertiesUtil.copyBean2Bean(mktStrategyConfRuleDO, mktStrategyConfRule);
+                        //判断规则是否是修改还是新增
+                        if (mktStrategyConfRule.getMktStrategyConfRuleId() != null && mktStrategyConfRule.getMktStrategyConfRuleId() != 0) {
+                            // 修改规则的信息 并返回id -- mktStrategyConfRuleId
+                            mktStrategyConfRuleMapper.updateByPrimaryKey(mktStrategyConfRuleDO);
+                        } else {
+                            // 添加新增的规则
+                            mktStrategyConfRuleMapper.insert(mktStrategyConfRuleDO);
+                            // 策略规则 Id
+                            Long mktStrategyConfRuleId = mktStrategyConfRuleDO.getMktStrategyConfRuleId();
+                            // 建立策略配置和规则的关系
+                            MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO = new MktStrategyConfRuleRelDO();
+                            mktStrategyConfRuleRelDO.setCreateDate(new Date());
+                            mktStrategyConfRuleRelDO.setCreateStaff(UserUtil.loginId());
+                            mktStrategyConfRuleRelDO.setMktStrategyConfId(mktStrategyConfId);
+                            mktStrategyConfRuleRelDO.setMktStrategyConfRuleId(mktStrategyConfRuleId);
+                            mktStrategyConfRuleRelDO.setUpdateStaff(UserUtil.loginId());
+                            mktStrategyConfRuleRelDO.setUpdateDate(new Date());
+                            mktStrategyConfRuleRelMapper.insert(mktStrategyConfRuleRelDO);
+                        }
+                        // 线程池执行规则存入redis
+                        executorService.submit(new TarGrpRule(mktStrategyConfDetail.getMktCampaignId(), mktStrategyConfId, mktStrategyConfRuleDO, redisUtils, tarGrpConditionMapper, injectionLabelMapper));
                     }
-                    // 线程池执行规则存入redis
-                    executorService.submit(new TarGrpRule(mktStrategyConfDetail.getMktCampaignId(), mktStrategyConfId, mktStrategyConfRuleDO, redisUtils, tarGrpConditionMapper, injectionLabelMapper));
-                }
-                // 关闭线程池
-                if (!executorService.isShutdown()) {
-                    executorService.shutdown();
+                    // 关闭线程池
+                    if (!executorService.isShutdown()) {
+                        executorService.shutdown();
+                    }
+                } catch (Exception e) {
+                    // 关闭线程池
+                    if (!executorService.isShutdown()) {
+                        executorService.shutdown();
+                    }
                 }
 
             }
