@@ -37,10 +37,6 @@ public class ActivityTask implements Callable<Map<String, Object>> {
 
         Map<String, Object> order = new HashMap<>();
 
-        //初始化规则引擎---------------------------
-        ExpressRunner runner = new ExpressRunner();
-        DefaultContext<String, Object> context = new DefaultContext<String, Object>();
-
         //查询活动基本信息
         MktCampaignDO mktCampaign = mktCampaignMapper.selectByPrimaryKey(activityId);
 

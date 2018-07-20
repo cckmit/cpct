@@ -520,22 +520,6 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
             }
         }
 
-        //根据事件id 查询所有关联的事件场景
-//        EventSceneDO param = new EventSceneDO();
-//        param.setEventId(eventId);
-//        List<EventScene> eventScenes = eventSceneMapper.qryEventSceneByEvtId(eventId);
-
-        //循环事件场景列表 根据事件场景获取活动列表
-//        List<Long> activityIds = new ArrayList<>(); //活动id list
-//        for (EventScene eventScene : eventScenes) {
-//            List<EvtSceneCamRel> evtSceneCamRels = evtSceneCamRelMapper.selectCamsByEvtSceneId(eventScene.getEventSceneId());
-//            if (evtSceneCamRels != null && evtSceneCamRels.size() > 0) {
-//                for (EvtSceneCamRel evtSceneCamRel : evtSceneCamRels) {
-//                    activityIds.add(evtSceneCamRel.getMktCampaignId());
-//                }
-//            }
-//        }
-
         //根据事件id 查询所有关联活动（根据优先级排序 正序）
         List<Long> activityIds = mktCamEvtRelMapper.listActivityByEventId(eventId);
 
@@ -546,7 +530,9 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
         int max = activityIds.size();
         if (recCampaignAmount != 0) {
             //事件推荐活动数
-            max = recCampaignAmount;
+            if (activityIds.size() > recCampaignAmount) {
+                max = recCampaignAmount;
+            }
         }
 
 
@@ -566,6 +552,7 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
             threadList.add(f);
         }
 
+      
 
         //获取结果
         try {
