@@ -105,13 +105,20 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","标签已存在");
             return result;
-        }   Label label = BeanUtil.create(addVO,new Label());
-            label.setCreateDate(new Date());
-            label.setUpdateDate(new Date());
-            label.setCreateStaff(userId);
-            label.setUpdateStaff(userId);
-            label.setStatusCd("1000");
-            labelMapper.insert(label);
+        }
+        Label label = BeanUtil.create(addVO,new Label());
+        label.setScope(0);
+        label.setLabelType("1000");
+        //todo 系统添加待确认
+        label.setLabelDataType("1000");
+        label.setLabelValueType("1000");
+
+        label.setCreateDate(new Date());
+        label.setUpdateDate(new Date());
+        label.setCreateStaff(userId);
+        label.setUpdateStaff(userId);
+        label.setStatusCd("1000");
+        labelMapper.insert(label);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
         return result;

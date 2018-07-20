@@ -83,7 +83,7 @@ public class LabelController extends BaseController {
      */
     @PostMapping("addLabel")
     @CrossOrigin
-    public Map<String,Object> addLabel( LabelAddVO addVO) {
+    public Map<String,Object> addLabel( @RequestBody LabelAddVO addVO) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {

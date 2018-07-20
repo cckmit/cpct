@@ -6,16 +6,21 @@ public class LabelAddVO implements Serializable {
     private String injectionLabelCode;//
     private String injectionLabelName;
     private String injectionLabelDesc;
-    private String labelType;//1000	客户注智标签;2000	产品注智标签;3000	销售品注智标签;4000	营销资源注智标签;5000	礼包注智标签
-    private String labelValueType;//1000输入型;2000	枚举型
-    private String labelDataType;
-
     private String fitDomain;//适用域
     private String rightOperand;//右操作符（标签值）
     private String conditionType;//单选多选框
     private String operator;//运算符
     private Integer scope;
+    private Integer isShared;
 
+
+    public Integer getIsShared() {
+        return isShared;
+    }
+
+    public void setIsShared(Integer isShared) {
+        this.isShared = isShared;
+    }
 
     public Integer getScope() {
         return scope;
@@ -81,27 +86,4 @@ public class LabelAddVO implements Serializable {
         this.injectionLabelDesc = injectionLabelDesc;
     }
 
-    public String getLabelType() {
-        return labelType;
-    }
-
-    public void setLabelType(String labelType) {
-        this.labelType = labelType;
-    }
-
-    public String getLabelValueType() {
-        return labelValueType;
-    }
-
-    public void setLabelValueType(String labelValueType) {
-        this.labelValueType = labelValueType;
-    }
-
-    public String getLabelDataType() {
-        return labelDataType;
-    }
-
-    public void setLabelDataType(String labelDataType) {
-        this.labelDataType = labelDataType;
-    }
 }

@@ -85,6 +85,7 @@ public class SyncLabelServiceImpl extends BaseService implements SyncLabelServic
         label.setInjectionLabelCode(tagModel.getSourceTableColumnName());
         label.setInjectionLabelName(tagModel.getTagName());
         label.setInjectionLabelDesc(tagModel.getTagName());
+        label.setScope(1);
         //todo 暂无标签类型
         label.setLabelType("1000");
         //todo 暂无值类型

@@ -20,6 +20,8 @@ public class Label extends BaseEntity {
     private String conditionType;//单选多选框
     private String operator;//运算符
     private Integer scope;
+    private Integer isShared;
+    private String className;
 
 
 }
