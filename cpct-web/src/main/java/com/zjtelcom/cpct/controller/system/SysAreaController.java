@@ -42,4 +42,14 @@ public class SysAreaController {
         Map<String, Object> map = sysAreaService.listSysCity();
         return JSON.toJSONString(map);
     }
+
+
+    @RequestMapping(value = "/listSysAreaTree", method = RequestMethod.POST)
+    @CrossOrigin
+    public String listSysAreaTree(){
+        Map<String, Object> map = sysAreaService.listAllAreaTrea();
+        return JSON.toJSONString(map);
+    }
+
+
 }

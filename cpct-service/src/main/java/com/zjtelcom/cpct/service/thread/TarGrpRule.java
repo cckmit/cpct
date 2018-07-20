@@ -14,6 +14,7 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.util.RedisUtils;
+import org.springframework.context.annotation.Scope;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ import java.util.List;
  * date: 2018/07/18 13:59
  * version: V1.0
  */
+@Scope("prototype")
 public class TarGrpRule extends Thread {
 
 

@@ -140,7 +140,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 String[] productIds = mktStrategyConfRuleDO.getProductId().split("/");
                 List<Long> productIdList = new ArrayList<>();
                 for (int i = 0; i < productIds.length; i++) {
-                    if (productIds[i] != "" && !"".equals(productIds[i]) && productIds[i].equals(null)) {
+                    if (productIds[i] != "" && !"".equals(productIds[i]) && !productIds[i].equals(null)) {
                         productIdList.add(Long.valueOf(productIds[i]));
                     }
                 }
@@ -151,7 +151,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 String[] evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
                 List<MktCamChlConf> mktCamChlConfList = new ArrayList<>();
                 for (int i = 0; i < evtContactConfIds.length; i++) {
-                    if (evtContactConfIds[i] != "" && !"".equals(evtContactConfIds[i]) && evtContactConfIds[i].equals(null)) {
+                    if (evtContactConfIds[i] != "" && !"".equals(evtContactConfIds[i]) && !evtContactConfIds[i].equals(null)) {
                         MktCamChlConf mktCamChlConf = new MktCamChlConf();
                         mktCamChlConf.setEvtContactConfId(Long.valueOf(evtContactConfIds[i]));
                         String evtContactConfName = mktCamChlConfMapper.selectforName(Long.valueOf(evtContactConfIds[i]));

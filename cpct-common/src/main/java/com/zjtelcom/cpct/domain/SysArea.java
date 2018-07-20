@@ -1,5 +1,9 @@
 package com.zjtelcom.cpct.domain;
 
+import com.zjtelcom.cpct.domain.system.SysAreaTree;
+
+import java.util.List;
+
 public class SysArea {
     private Integer areaId;
 
@@ -8,6 +12,11 @@ public class SysArea {
     private String name;
 
     private Integer areaLevel;
+
+    /**
+     * 下级区域列表
+     */
+    private List<SysArea> childAreaList;
 
     public Integer getAreaId() {
         return areaId;
@@ -39,5 +48,13 @@ public class SysArea {
 
     public void setAreaLevel(Integer areaLevel) {
         this.areaLevel = areaLevel;
+    }
+
+    public List<SysArea> getChildrenAreaList() {
+        return childAreaList;
+    }
+
+    public void setChildrenAreaList(List<SysArea> childAreaList) {
+        this.childAreaList = childAreaList;
     }
 }
