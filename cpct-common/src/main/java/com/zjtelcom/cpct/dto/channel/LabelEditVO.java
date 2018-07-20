@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.dto.channel;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class LabelEditVO implements Serializable {
     private Long labelId;
@@ -10,9 +11,17 @@ public class LabelEditVO implements Serializable {
     private String fitDomain;//适用域
     private String rightOperand;//右操作符（标签值）
     private String conditionType;//单选多选框
-    private String operator;//运算符
+    private List<String> operatorList;//运算符
     private Integer isShared;
 
+
+    public List<String> getOperatorList() {
+        return operatorList;
+    }
+
+    public void setOperatorList(List<String> operatorList) {
+        this.operatorList = operatorList;
+    }
 
     public Long getLabelId() {
         return labelId;
@@ -69,15 +78,6 @@ public class LabelEditVO implements Serializable {
     public void setConditionType(String conditionType) {
         this.conditionType = conditionType;
     }
-
-    public String getOperator() {
-        return operator;
-    }
-
-    public void setOperator(String operator) {
-        this.operator = operator;
-    }
-
 
 
     public Integer getIsShared() {

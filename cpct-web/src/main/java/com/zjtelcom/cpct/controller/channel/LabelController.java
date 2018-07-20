@@ -2,15 +2,13 @@ package com.zjtelcom.cpct.controller.channel;
 
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
-import com.zjtelcom.cpct.domain.channel.Label;
-import com.zjtelcom.cpct.domain.channel.LabelGrp;
-import com.zjtelcom.cpct.domain.channel.LabelGrpMbr;
-import com.zjtelcom.cpct.domain.channel.LabelValue;
+import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dto.channel.LabelAddVO;
 import com.zjtelcom.cpct.dto.channel.LabelEditVO;
 import com.zjtelcom.cpct.dto.channel.QryMktScriptReq;
 import com.zjtelcom.cpct.service.channel.LabelService;
 import com.zjtelcom.cpct.util.BeanUtil;
+import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import javafx.scene.control.Labeled;
@@ -111,6 +109,9 @@ public class LabelController extends BaseController {
         try {
             LabelEditVO editVO = BeanUtil.create(label,new LabelEditVO());
             editVO.setLabelId(label.getInjectionLabelId());
+            if (label.getOperator()!=null && !label.getOperator().equals("")){
+                editVO.setOperatorList(ChannelUtil.StringToList(label.getOperator()));
+            }
             result = labelService.editLabel(userId,editVO);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to addScript",e);

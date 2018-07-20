@@ -135,14 +135,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             return result;
         }
         Label label = BeanUtil.create(addVO,new Label());
-        List<Integer> opValueList = new ArrayList<>();
-        for (String st : addVO.getOperatorList()){
-            Operator op = Operator.getOperator(st);
-            if (op!=null){
-                opValueList.add(op.getValue());
-            }
-        }
-        label.setOperator(ChannelUtil.List2String(opValueList));
+        operatorValodate(label, addVO.getOperatorList());
         label.setScope(0);
         label.setLabelType("1000");
         //todo 系统添加待确认
@@ -160,6 +153,19 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         return result;
     }
 
+    private void operatorValodate(Label label, List<String> operatorList) {
+        if (operatorList != null) {
+            List<Integer> opValueList = new ArrayList<>();
+            for (String st : operatorList) {
+                Operator op = Operator.getOperator(st);
+                if (op != null) {
+                    opValueList.add(op.getValue());
+                }
+            }
+            label.setOperator(ChannelUtil.List2String(opValueList));
+        }
+    }
+
     @Override
     public Map<String,Object> editLabel(Long userId, LabelEditVO editVO) {
         Map<String,Object> result = new HashMap<>();
@@ -170,6 +176,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             return result;
         }
         BeanUtil.copy(editVO,label);
+        operatorValodate(label, editVO.getOperatorList());
         label.setUpdateDate(new Date());
         label.setUpdateStaff(userId);
         labelMapper.updateByPrimaryKey(label);
