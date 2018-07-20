@@ -32,6 +32,20 @@ public enum Operator {
         return op;
     }
 
+    public static Operator getOperator(String description){
+        Operator[] allType = Operator.values();
+        Operator op = null;
+        if (description==null || description.equals("")){
+            return null;
+        }
+        for (Operator operator : allType){
+            if (operator.getDescription().equals(description)){
+                op = operator;
+            }
+        }
+        return op;
+    }
+
 
     public Integer getValue() {
         return value;

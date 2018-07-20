@@ -7,6 +7,7 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dto.channel.*;
+import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.LabelService;
 import com.zjtelcom.cpct.util.BeanUtil;
@@ -31,6 +32,36 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     @Autowired
     private InjectionLabelGrpMbrMapper labelGrpMbrMapper;
 
+    /**
+     *共享
+     * @param userId
+     * @param labelId
+     * @return
+     */
+    @Override
+    public Map<String, Object> shared(Long userId, Long labelId) {
+        Map<String,Object> result = new HashMap<>();
+        Label label = labelMapper.selectByPrimaryKey(labelId);
+        if (label==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","标签信息不存在");
+            return result;
+        }
+//        if (label.getIsShared().equals()){
+//
+//        }
+        label.setUpdateDate(new Date());
+        label.setUpdateStaff(userId);
+        labelMapper.updateByPrimaryKey(label);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","添加成功");
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> unshared(Long userId, Long labelId) {
+        return null;
+    }
 
     @Override
     public Map<String, Object> getLabelListByParam(Long userId, Map<String, Object> params) {
@@ -104,6 +135,14 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             return result;
         }
         Label label = BeanUtil.create(addVO,new Label());
+        List<Integer> opValueList = new ArrayList<>();
+        for (String st : addVO.getOperatorList()){
+            Operator op = Operator.getOperator(st);
+            if (op!=null){
+                opValueList.add(op.getValue());
+            }
+        }
+        label.setOperator(ChannelUtil.List2String(opValueList));
         label.setScope(0);
         label.setLabelType("1000");
         //todo 系统添加待确认

@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.util;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.Operator;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,16 @@ public class ChannelUtil  {
         String str = uuid.toString();
         String uuidStr=str.replace("-", "");
         return uuidStr;
+    }
+    public static String List2String(List<Integer> idList){
+        if (idList == null || idList.isEmpty()){
+            return "";
+        }
+        Integer[] ids = new Integer[idList.size()];
+        for (int i = 0;i<ids.length;i++){
+            ids[i] = idList.get(i);
+        }
+        return StringUtils.join(ids,",");
     }
 
     public static ChannelVO map2ChannelVO(Channel channel){
@@ -73,7 +84,7 @@ public class ChannelUtil  {
         String string = "";
 
         for(int i = 0; i < length; ++i) {
-            string = string + chars[r.nextInt(31)];
+            string = string + chars[r.nextInt(8)];
         }
 
         return string;

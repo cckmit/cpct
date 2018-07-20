@@ -18,6 +18,11 @@ public interface LabelService {
     //标签
     Map<String,Object> addLabel(Long userId, LabelAddVO addVO);
 
+    Map<String,Object> shared(Long userId, Long labelId);
+
+    Map<String,Object> unshared(Long userId, Long labelId);
+
+
     Map<String,Object> editLabel(Long userId, LabelEditVO editVO);
 
     Map<String,Object> deleteLabel(Long userId,Long labelId);

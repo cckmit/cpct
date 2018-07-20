@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.dto.channel;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class LabelAddVO implements Serializable {
     private String injectionLabelCode;//
@@ -9,7 +10,7 @@ public class LabelAddVO implements Serializable {
     private String fitDomain;//适用域
     private String rightOperand;//右操作符（标签值）
     private String conditionType;//单选多选框
-    private String operator;//运算符
+    private List<String> operatorList;//运算符
     private Integer scope;
     private Integer isShared;
 
@@ -54,12 +55,12 @@ public class LabelAddVO implements Serializable {
         this.conditionType = conditionType;
     }
 
-    public String getOperator() {
-        return operator;
+    public List<String> getOperatorList() {
+        return operatorList;
     }
 
-    public void setOperator(String operator) {
-        this.operator = operator;
+    public void setOperatorList(List<String> operatorList) {
+        this.operatorList = operatorList;
     }
 
     public String getInjectionLabelCode() {
