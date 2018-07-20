@@ -7,10 +7,13 @@ import com.zjtelcom.cpct.domain.channel.LabelGrp;
 import com.zjtelcom.cpct.domain.channel.LabelGrpMbr;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.dto.channel.LabelAddVO;
+import com.zjtelcom.cpct.dto.channel.LabelEditVO;
 import com.zjtelcom.cpct.dto.channel.QryMktScriptReq;
 import com.zjtelcom.cpct.service.channel.LabelService;
+import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.UserUtil;
+import javafx.scene.control.Labeled;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -102,10 +105,12 @@ public class LabelController extends BaseController {
      */
     @PostMapping("editLabel")
     @CrossOrigin
-    public Map<String,Object> editLabel( Label editVO) {
+    public Map<String,Object> editLabel(@RequestBody Label label) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
+            LabelEditVO editVO = BeanUtil.create(label,new LabelEditVO());
+            editVO.setLabelId(label.getInjectionLabelId());
             result = labelService.editLabel(userId,editVO);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to addScript",e);
@@ -121,10 +126,11 @@ public class LabelController extends BaseController {
      */
     @PostMapping("deleteLabel")
     @CrossOrigin
-    public Map<String,Object> deleteLabel(Long labelId) {
+    public Map<String,Object> deleteLabel(@RequestBody HashMap<String,Long> param) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
+            Long labelId = param.get("labelId");
             result = labelService.deleteLabel(userId,labelId);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to addScript",e);
@@ -144,7 +150,7 @@ public class LabelController extends BaseController {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
-            result = labelService.getLabelList(1L,req.getParams(),req.getPage(),req.getPageSize());
+            result = labelService.getLabelList(userId,req.getLabelName(),req.getLabelCode(),req.getScope(),req.getConditionType(),req.getFitDomain(),req.getPage(),req.getPageSize());
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to getScriptList",e);
             result.put("resultCode",CODE_FAIL);
@@ -158,13 +164,14 @@ public class LabelController extends BaseController {
     /**
      * 获取标签详情
      */
-    @GetMapping("getLabelDetail")
+    @PostMapping("getLabelDetail")
     @CrossOrigin
-    public Map<String,Object> getLabelDetail(Long labelId) {
+    public Map<String,Object> getLabelDetail(@RequestBody HashMap<String,Long> param) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
-            result = labelService.getLabelDetail(1L,labelId);
+            Long labelId = param.get("labelId");
+            result = labelService.getLabelDetail(userId,labelId);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to getScriptList",e);
             result.put("resultCode",CODE_FAIL);

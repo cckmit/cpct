@@ -6,7 +6,9 @@ import com.zjtelcom.cpct.domain.channel.LabelGrp;
 import com.zjtelcom.cpct.domain.channel.LabelGrpMbr;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.dto.channel.LabelAddVO;
+import com.zjtelcom.cpct.dto.channel.LabelEditVO;
 import com.zjtelcom.cpct.dto.channel.LabelVO;
+import com.zjtelcom.cpct.dto.channel.QryMktScriptReq;
 
 import java.util.List;
 import java.util.Map;
@@ -16,11 +18,11 @@ public interface LabelService {
     //标签
     Map<String,Object> addLabel(Long userId, LabelAddVO addVO);
 
-    Map<String,Object> editLabel(Long userId, Label editVO);
+    Map<String,Object> editLabel(Long userId, LabelEditVO editVO);
 
     Map<String,Object> deleteLabel(Long userId,Long labelId);
 
-    Map<String,Object> getLabelList(Long userId, Map<String,Object> params, Integer page, Integer pageSize);
+    Map<String,Object> getLabelList(Long userId,String labelName,String labelCode,Integer scope,String conditionType,String fitDomain,Integer page, Integer pageSize);
 
     Map<String,Object> getLabelDetail(Long userId,Long scriptId);
 

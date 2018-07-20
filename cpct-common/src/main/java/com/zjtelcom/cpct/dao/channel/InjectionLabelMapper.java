@@ -25,6 +25,8 @@ public interface InjectionLabelMapper {
 
     List<Label> selectAll();
 
+    List<Label> findLabelList(@Param("labelName")String labelName,@Param("fitDomain")String fitDomain,@Param("labelCode")String labelCode,@Param("scope")Integer scope,@Param("conditionType")String conditionType);
+
     List<Label> findByParam(@Param("labelName")String labelName,@Param("fitDomain")String fitDomain);
 
     int updateByPrimaryKey(Label record);

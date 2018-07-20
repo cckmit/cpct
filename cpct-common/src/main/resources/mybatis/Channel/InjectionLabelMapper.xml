@@ -165,4 +165,28 @@
   </select>
 
 
+  <select id="findLabelList" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC,
+    LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK,FIT_DOMAIN, RIGHT_OPERAND, CONDITION_TYPE,
+    OPERATOR,SCOPE,TAG_ROW_ID,IS_SHARED, CLASS_NAME
+    from injection_label
+    where 1=1
+    <if test="labelName != null and labelName != ''">
+      and INJECTION_LABEL_NAME LIKE CONCAT(CONCAT('%',#{labelName}),'%')
+    </if>
+    <if test="fitDomain != null and fitDomain != ''">
+      and FIT_DOMAIN = #{fitDomain}
+    </if>
+    <if test="labelCode != null and labelCode != ''">
+      and INJECTION_LABEL_CODE LIKE CONCAT(CONCAT('%',#{labelCode}),'%')
+    </if>
+    <if test="scope != null">
+      and SCOPE = #{scope}
+    </if>
+    <if test="conditionType != null and conditionType != ''">
+      and CONDITION_TYPE = #{conditionType}
+    </if>
+  </select>
+
 </mapper>
