@@ -1,8 +1,10 @@
 package com.zjtelcom.cpct.service.impl.channel;
 
+import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
 import com.zjtelcom.cpct.dao.channel.MktVerbalMapper;
+import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.MktVerbal;
 import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
@@ -32,6 +34,8 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
     private MktVerbalConditionMapper verbalConditionMapper;
     @Autowired
     private InjectionLabelMapper labelMapper;
+    @Autowired
+    private ContactChannelMapper channelMapper;
 
     /**
      * 添加痛痒点话术
@@ -134,25 +138,33 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
                 if (label.getRightOperand() != null) {
                     vo.setValueList(ChannelUtil.StringToList(label.getRightOperand()));
                 }
-                if (label.getOperator() != null && !label.getOperator().equals("")) {
-                    List<String> opratorList = ChannelUtil.StringToList(label.getOperator());
-                    List<OperatorDetail> opStList = new ArrayList<>();
-                    for (String operator : opratorList) {
-                        Operator op = Operator.getOperator(Integer.valueOf(operator));
-                        OperatorDetail detail = new OperatorDetail();
-                        if (op != null) {
-                            detail.setOperValue(op.getValue());
-                            detail.setOperName(op.getDescription());
-                        }
-                        opStList.add(detail);
-                    }
-                    vo.setOperatorList(opStList);
-                }
+                setOperator(vo, label);
             }
             conditionVOList.add(vo);
         }
         verbalVO.setConditionList(conditionVOList);
+        Channel channel = channelMapper.selectByPrimaryKey(verbalVO.getChannelId());
+        if (channel!=null){
+            verbalVO.setChannelName(channel.getContactChlName());
+        }
         return verbalVO;
+    }
+
+    private void setOperator(VerbalConditionVO vo, Label label) {
+        if (label.getOperator() != null && !label.getOperator().equals("")) {
+            List<String> opratorList = ChannelUtil.StringToList(label.getOperator());
+            List<OperatorDetail> opStList = new ArrayList<>();
+            for (String operator : opratorList) {
+                Operator op = Operator.getOperator(Integer.valueOf(operator));
+                OperatorDetail detail = new OperatorDetail();
+                if (op != null) {
+                    detail.setOperValue(op.getValue());
+                    detail.setOperName(op.getDescription());
+                }
+                opStList.add(detail);
+            }
+            vo.setOperatorList(opStList);
+        }
     }
 
     @Override
@@ -164,7 +176,6 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
         for (MktVerbal verbal : verbalList) {
             if (verbal == null) {
                 result.put("resultCode", CODE_FAIL);
-
                 result.put("resultMsg", "痛痒点话术不存在");
                 return result;
             }
