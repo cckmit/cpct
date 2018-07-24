@@ -194,7 +194,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
         // 遍历所有策略集合
         for (MktStrategyConfDetail mktStrategyConfDetail : mktCampaignVO.getMktStrategyConfDetailList()) {
-            if (mktStrategyConfDetail.getMktStrategyConfId() != 0 && mktStrategyConfDetail.getMktStrategyConfId() != null) {
+            mktStrategyConfDetail.setMktCampaignId(mktCampaignVO.getMktCampaignId());
+            if (mktStrategyConfDetail.getMktStrategyConfId() != null) {
                 mktStrategyConfService.updateMktStrategyConf(mktStrategyConfDetail);
             } else {
                 mktStrategyConfService.saveMktStrategyConf(mktStrategyConfDetail);
@@ -296,17 +297,17 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         }
 
         // 获取活动关联策略集合
-        List<MktStrategyConf> mktStrategyConfList = new ArrayList<>();
+        List<MktStrategyConfDetail> mktStrategyConfDetailList = new ArrayList<>();
         List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByMktCampaignId(mktCampaignId);
         for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {
             MktStrategyConfDO mktStrategyConfDO = mktStrategyConfMapper.selectByPrimaryKey(mktCamStrategyConfRelDO.getStrategyConfId());
             MktStrategyConf mktStrategyConf = new MktStrategyConf();
-            if (mktStrategyConf != null) {
-                CopyPropertiesUtil.copyBean2Bean(mktStrategyConf, mktStrategyConfDO);
-                mktStrategyConfList.add(mktStrategyConf);
-            }
+
+            Map<String, Object> mktStrategyConfMap = mktStrategyConfService.getMktStrategyConf(mktCamStrategyConfRelDO.getStrategyConfId());
+            MktStrategyConfDetail mktStrategyConfDetail = (MktStrategyConfDetail) mktStrategyConfMap.get("mktStrategyConfDetail");
+            mktStrategyConfDetailList.add(mktStrategyConfDetail);
         }
-        mktCampaignVO.setMktStrategyConfList(mktStrategyConfList);
+        mktCampaignVO.setMktStrategyConfDetailList(mktStrategyConfDetailList);
 
         Map<String, Object> maps = new HashMap<>();
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);

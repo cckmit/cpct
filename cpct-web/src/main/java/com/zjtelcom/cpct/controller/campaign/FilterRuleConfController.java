@@ -37,7 +37,7 @@ public class FilterRuleConfController extends BaseController {
      */
     @RequestMapping(value = "/saveFilterRuleConf", method = RequestMethod.POST)
     @CrossOrigin
-    public String saveFilterRuleConf(@RequestBody FilterRuleConf filterRuleConf){
+    public String saveFilterRuleConf(@RequestBody FilterRuleConf filterRuleConf) {
         Map<String, Object> map = new HashMap<>();
         try {
             map = filterRuleConfService.saveFilterRuleConf(filterRuleConf);
@@ -55,7 +55,7 @@ public class FilterRuleConfController extends BaseController {
      */
     @RequestMapping(value = "/updateFilterRuleConf", method = RequestMethod.POST)
     @CrossOrigin
-    public String updateFilterRuleConf(@RequestBody FilterRuleConf filterRuleConf){
+    public String updateFilterRuleConf(@RequestBody FilterRuleConf filterRuleConf) {
         Map<String, Object> map = new HashMap<>();
         try {
             map = filterRuleConfService.updateFilterRuleConf(filterRuleConf);
@@ -73,11 +73,14 @@ public class FilterRuleConfController extends BaseController {
      */
     @RequestMapping(value = "/getFilterRuleConf", method = RequestMethod.POST)
     @CrossOrigin
-    public String getFilterRuleConf(@RequestBody Map<String, String> params){
+    public String getFilterRuleConf(@RequestBody Map<String, String> params) {
         Map<String, Object> map = new HashMap<>();
-        Long filterRuleConfId = Long.valueOf(params.get("filterRuleConfId"));
+        Long filterRuleConfId = 0L;
         try {
-            map = filterRuleConfService.getFilterRuleConf(filterRuleConfId);
+            if (params.get("filterRuleConfId") != null) {
+                filterRuleConfId = Long.valueOf(params.get("filterRuleConfId"));
+                map = filterRuleConfService.getFilterRuleConf(filterRuleConfId);
+            }
         } catch (Exception e) {
             logger.error("[op:MktCamChlConfController] failed to get filterRuleConf by filterRuleConfId = {} Exception: ", filterRuleConfId, e);
         }
@@ -93,7 +96,7 @@ public class FilterRuleConfController extends BaseController {
      */
     @RequestMapping(value = "/deleteFilterRuleConf", method = RequestMethod.POST)
     @CrossOrigin
-    public String deleteFilterRuleConf(@RequestBody Map<String, String> params){
+    public String deleteFilterRuleConf(@RequestBody Map<String, String> params) {
         Map<String, Object> map = new HashMap<>();
         Long filterRuleConfId = Long.valueOf(params.get("filterRuleConfId"));
         try {

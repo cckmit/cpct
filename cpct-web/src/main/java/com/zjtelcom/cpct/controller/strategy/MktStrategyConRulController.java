@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.swing.*;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -36,8 +37,8 @@ public class MktStrategyConRulController {
      */
     @RequestMapping(value = "/deleteMktStrategyConfRule", method = RequestMethod.POST)
     @CrossOrigin
-    public String deleteMktStrategyConfRule(@RequestBody  Map<String, String> param){
-        Long mktStrategyConfRuleId =  Long.valueOf(param.get("mktStrategyConfRuleId"));
+    public String deleteMktStrategyConfRule(@RequestBody Map<String, String> param) {
+        Long mktStrategyConfRuleId = Long.valueOf(param.get("mktStrategyConfRuleId"));
         Map<String, Object> map = mktStrategyConfRuleService.deleteMktStrategyConfRule(mktStrategyConfRuleId);
         return JSON.toJSONString(map);
     }
@@ -50,9 +51,12 @@ public class MktStrategyConRulController {
      */
     @RequestMapping(value = "/getMktStrategyConfRule", method = RequestMethod.POST)
     @CrossOrigin
-    public String getMktStrategyConfRule(@RequestBody  Map<String, String> param){
-        Long mktStrategyConfRuleId =  Long.valueOf(param.get("mktStrategyConfRuleId"));
-        Map<String, Object> map = mktStrategyConfRuleService.getMktStrategyConfRule(mktStrategyConfRuleId);
+    public String getMktStrategyConfRule(@RequestBody Map<String, String> param) {
+        Map<String, Object> map = new HashMap<>();
+        if(param.get("mktStrategyConfRuleId")!=null && !"null".equals(param.get("mktStrategyConfRuleId"))){
+            Long mktStrategyConfRuleId = Long.valueOf(param.get("mktStrategyConfRuleId"));
+            map = mktStrategyConfRuleService.getMktStrategyConfRule(mktStrategyConfRuleId);
+        }
         return JSON.toJSONString(map);
     }
 
@@ -64,9 +68,12 @@ public class MktStrategyConRulController {
      */
     @RequestMapping(value = "/listAllMktStrategyConfRuleForName", method = RequestMethod.POST)
     @CrossOrigin
-    public String listAllMktStrategyConfRuleForName(@RequestBody  Map<String, String> param){
-        Long mktStrategyConfId = Long.valueOf(param.get("mktStrategyConfId"));
-        Map<String, Object> map = mktStrategyConfRuleService.listAllMktStrategyConfRuleForName(mktStrategyConfId);
+    public String listAllMktStrategyConfRuleForName(@RequestBody Map<String, String> param) {
+        Map<String, Object> map = new HashMap<>();
+        if (param.get("mktStrategyConfId") != null && !"null".equals(param.get("mktStrategyConfId"))) {
+            Long mktStrategyConfId = Long.valueOf(param.get("mktStrategyConfId"));
+            map = mktStrategyConfRuleService.listAllMktStrategyConfRuleForName(mktStrategyConfId);
+        }
         return JSON.toJSONString(map);
     }
 

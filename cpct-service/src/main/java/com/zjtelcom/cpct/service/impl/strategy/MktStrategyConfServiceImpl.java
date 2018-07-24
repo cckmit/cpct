@@ -144,7 +144,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             mktStrategyConfRuleRelMapper.deleteByPrimaryKey(mktStrategyConfRuleRelDO.getMktStrategyConfRuleRelId());
         }
         //删除策略与活动的关联
-        mktCamStrategyConfRelMapper.deleteByPrimaryKey(mktStrategyConfId);
+        mktCamStrategyConfRelMapper.deleteByStrategyConfId(mktStrategyConfId);
         //删除策略
         mktStrategyConfMapper.deleteByPrimaryKey(mktStrategyConfId);
         mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -411,8 +411,34 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                 try {
                     for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfDetail.getMktStrategyConfRuleList()) {
                         MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
+                        String productIds = "";
+                        String evtContactConfIds = "";
+                        if (mktStrategyConfRule.getProductIdlist() != null) {
+                            for (int i = 0; i < mktStrategyConfRule.getProductIdlist().size(); i++) {
+                                if (i == 0) {
+                                    productIds += mktStrategyConfRule.getProductIdlist().get(i);
+                                } else {
+                                    productIds += "/" + mktStrategyConfRule.getProductIdlist().get(i);
+                                }
+                            }
+                        }
+                        if (mktStrategyConfRule.getMktCamChlConfList() != null) {
+                            for (int i = 0; i < mktStrategyConfRule.getMktCamChlConfList().size(); i++) {
+                                if (i == 0) {
+                                    evtContactConfIds += mktStrategyConfRule.getMktCamChlConfList().get(i).getEvtContactConfId();
+                                } else {
+                                    evtContactConfIds += "/" + mktStrategyConfRule.getMktCamChlConfList().get(i).getEvtContactConfId();
+                                }
+                            }
+                        }
                         CopyPropertiesUtil.copyBean2Bean(mktStrategyConfRuleDO, mktStrategyConfRule);
-                        //判断规则是否是修改还是新增
+                        // 添加规则的信息 并返回id -- mktStrategyConfRuleId
+                        mktStrategyConfRuleDO.setProductId(productIds);
+                        mktStrategyConfRuleDO.setEvtContactConfId(evtContactConfIds);
+                        mktStrategyConfRuleDO.setCreateDate(new Date());
+                        mktStrategyConfRuleDO.setCreateStaff(UserUtil.loginId());
+                        mktStrategyConfRuleDO.setUpdateDate(new Date());
+                        mktStrategyConfRuleDO.setUpdateStaff(UserUtil.loginId());                        //判断规则是否是修改还是新增
                         if (mktStrategyConfRule.getMktStrategyConfRuleId() != null && mktStrategyConfRule.getMktStrategyConfRuleId() != 0) {
                             // 修改规则的信息 并返回id -- mktStrategyConfRuleId
                             mktStrategyConfRuleMapper.updateByPrimaryKey(mktStrategyConfRuleDO);
@@ -537,8 +563,10 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             String[] channelIds = mktStrategyConfDO.getChannelsId().split("/");
             List<Channel> channelList = new ArrayList<>();
             for (int i = 0; i < channelIds.length; i++) {
-                Channel channel = contactChannelMapper.selectByPrimaryKey(Long.valueOf(channelIds[i]));
-                channelList.add(channel);
+                if(channelIds[i]!=null && !"".equals(channelIds[i])){
+                    Channel channel = contactChannelMapper.selectByPrimaryKey(Long.valueOf(channelIds[i]));
+                    channelList.add(channel);
+                }
             }
             mktStrategyConfDetail.setChannelList(channelList);
 
@@ -549,25 +577,32 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleDOList) {
                 MktStrategyConfRule mktStrategyConfRule = new MktStrategyConfRule();
                 CopyPropertiesUtil.copyBean2Bean(mktStrategyConfRule, mktStrategyConfRuleDO);
-                String[] productIds = mktStrategyConfRuleDO.getProductId().split("/");
-                List<Long> productIdList = new ArrayList<>();
-                for (int i = 0; i < productIds.length; i++) {
-                    if (productIds[i] != "" && !"".equals(productIds[i])) {
-                        productIdList.add(Long.valueOf(productIds[i]));
+
+                if (mktStrategyConfRuleDO.getProductId() != null) {
+                    String[] productIds = mktStrategyConfRuleDO.getProductId().split("/");
+                    List<Long> productIdList = new ArrayList<>();
+                    for (int i = 0; i < productIds.length; i++) {
+                        if (productIds[i] != "" && !"".equals(productIds[i])) {
+                            productIdList.add(Long.valueOf(productIds[i]));
+                        }
                     }
+                    mktStrategyConfRule.setProductIdlist(productIdList);
                 }
-                String[] evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
-                List<MktCamChlConf> mktCamChlConfList = new ArrayList<>();
-                for (int i = 0; i < evtContactConfIds.length; i++) {
-                    if (evtContactConfIds[i] != "" && !"".equals(evtContactConfIds[i])) {
-                        MktCamChlConf mktCamChlConf = new MktCamChlConf();
-                        mktCamChlConf.setEvtContactConfId(Long.valueOf(evtContactConfIds[i]));
-                        String evtContactConfName = mktCamChlConfMapper.selectforName(Long.valueOf(evtContactConfIds[i]));
-                        mktCamChlConf.setEvtContactConfName(evtContactConfName);
-                        mktCamChlConfList.add(mktCamChlConf);
+                if (mktStrategyConfRuleDO.getEvtContactConfId() != null) {
+                    String[] evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
+                    List<MktCamChlConf> mktCamChlConfList = new ArrayList<>();
+                    for (int i = 0; i < evtContactConfIds.length; i++) {
+                        if (evtContactConfIds[i] != "" && !"".equals(evtContactConfIds[i])) {
+                            MktCamChlConf mktCamChlConf = new MktCamChlConf();
+                            mktCamChlConf.setEvtContactConfId(Long.valueOf(evtContactConfIds[i]));
+                            String evtContactConfName = mktCamChlConfMapper.selectforName(Long.valueOf(evtContactConfIds[i]));
+                            mktCamChlConf.setEvtContactConfName(evtContactConfName);
+                            mktCamChlConfList.add(mktCamChlConf);
+                        }
                     }
+                    mktStrategyConfRule.setMktCamChlConfList(mktCamChlConfList);
                 }
-                mktStrategyConfRule.setMktCamChlConfList(mktCamChlConfList);
+
                 mktStrategyConfRuleList.add(mktStrategyConfRule);
             }
             mktStrategyConfDetail.setMktStrategyConfRuleList(mktStrategyConfRuleList);

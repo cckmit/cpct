@@ -91,7 +91,9 @@ public class MktCampaignVO extends MktCampaign {
      */
     private List<MktStrategyConf> mktStrategyConfList;
 
-
+    /**
+     * 活动关联策略详情集合
+     */
     private List<MktStrategyConfDetail> mktStrategyConfDetailList;
 
 

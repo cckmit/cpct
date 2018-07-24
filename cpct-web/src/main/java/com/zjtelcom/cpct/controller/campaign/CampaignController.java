@@ -2,16 +2,21 @@ package com.zjtelcom.cpct.controller.campaign;
 
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.controller.BaseController;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
+import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignVO;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
-import com.zjtelcom.cpct.request.campaign.QryMktCampaignListReq;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
+import com.zjtelcom.cpct.service.thread.TarGrpRule;
+import com.zjtelcom.cpct.util.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @RestController
 @RequestMapping("${adminPath}/campaign")
@@ -22,6 +27,15 @@ public class CampaignController extends BaseController {
 
     @Autowired
     private MktStrategyConfService mktStrategyConfService;
+
+    @Autowired
+    private TarGrpConditionMapper tarGrpConditionMapper;
+
+    @Autowired
+    private InjectionLabelMapper injectionLabelMapper;
+
+    @Autowired
+    private RedisUtils redisUtils;
     /**
      * 查询活动列表(分页)
      *
@@ -122,5 +136,20 @@ public class CampaignController extends BaseController {
         Map<String, Object> map = mktCampaignService.changeMktCampaignStatus(mktCampaignId, statusCd);
 
         return JSON.toJSONString(map);
+    }
+
+    @RequestMapping(value = "/test", method = RequestMethod.POST)
+    public String test(@RequestBody Map<String, String> params) throws Exception {
+        Long tarGrpId = Long.valueOf(params.get("tarGrpId"));
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        for(int i=1; i<3; i++){
+            MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
+            mktStrategyConfRuleDO.setMktStrategyConfRuleId(Long.valueOf(i));
+            mktStrategyConfRuleDO.setTarGrpId(null);
+            // 线程池执行规则存入redis
+            executorService.submit(new TarGrpRule(Long.valueOf(i), Long.valueOf(i), mktStrategyConfRuleDO, redisUtils, tarGrpConditionMapper, injectionLabelMapper));
+        }
+
+        return null;
     }
 }
