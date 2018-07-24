@@ -26,6 +26,7 @@ public class ChannelController extends BaseController {
      * @return
      */
     @PostMapping("listChannelByIdList")
+
     @CrossOrigin
     public Map<String, Object> listChannelByIdList(@RequestBody HashMap<String,List<Long>> param ) {
         Long userId = UserUtil.loginId();

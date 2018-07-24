@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.controller.event;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.event.EventSceneTypeDO;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description 事件场景目录controller
@@ -80,13 +82,14 @@ public class EventSceneTypeController extends BaseController {
     @PostMapping("/updateEventSceneType")
     @CrossOrigin
     public String updateEventSceneType(@RequestBody EventSceneTypeDO eventTypeDO) {
+        Map<String, Object> maps = new HashMap<>();
         try {
-            eventSceneTypeService.updateEventSceneType(eventTypeDO);
+            maps = eventSceneTypeService.updateEventSceneType(eventTypeDO);
         } catch (Exception e) {
             logger.error("[op:EventTypeController] fail to updateEventSceneType eventTypeDO = {}! Exception: ", JSONArray.toJSON(eventTypeDO), e);
             return initFailRespInfo(ErrorCode.UPDATE_EVENTTYPE_FAILURE.getErrorMsg(), ErrorCode.UPDATE_EVENTTYPE_FAILURE.getErrorCode());
         }
-        return initSuccRespInfo(null);
+        return JSON.toJSONString(maps);
     }
 
     /**
@@ -95,14 +98,15 @@ public class EventSceneTypeController extends BaseController {
     @PostMapping("/delEventSceneType")
     @CrossOrigin
     public String delEventSceneType(@RequestBody HashMap<String,Long> param) {
+        Map<String, Object> maps = new HashMap<>();
         Long evtSceneTypeId = param.get("evtSceneTypeId");
         try {
-            eventSceneTypeService.delEventSceneType(evtSceneTypeId);
+            maps = eventSceneTypeService.delEventSceneType(evtSceneTypeId);
         } catch (Exception e) {
             logger.error("[op:EventTypeController] fail to delEventType evtTypeId = {}! Exception: ", evtSceneTypeId, e);
             return initFailRespInfo(ErrorCode.DEL_EVENTTYPE_FAILURE.getErrorMsg(), ErrorCode.DEL_EVENTTYPE_FAILURE.getErrorCode());
         }
-        return initSuccRespInfo(null);
+        return JSON.toJSONString(maps);
     }
 
 }

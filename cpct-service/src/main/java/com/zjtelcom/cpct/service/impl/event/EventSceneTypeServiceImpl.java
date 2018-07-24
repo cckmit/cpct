@@ -13,8 +13,11 @@ import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
+
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 /**
  * @Description EventTypeServiceImpl
@@ -90,26 +93,52 @@ public class EventSceneTypeServiceImpl extends BaseService implements EventScene
      * 编辑事件目录保存
      */
     @Override
-    public void updateEventSceneType(EventSceneTypeDO eventTypeDO) {
+    public Map<String, Object> updateEventSceneType(EventSceneTypeDO eventTypeDO) {
+        Map<String, Object> result = new HashMap<>();
         try {
-            eventSceneTypeMapper.updateByPrimaryKey(eventTypeDO);
+            EventSceneTypeDO evt = eventSceneTypeMapper.selectByPrimaryKey(eventTypeDO.getEvtSceneTypeId());
+            if (evt==null){
+                result.put("resultCode",CODE_FAIL);
+                result.put("resultMsg","事件目录不存在");
+                return result;
+            }
+            if (!eventTypeDO.getEvtSceneTypeName().equals(evt.getEvtSceneTypeName())){
+                evt.setEvtSceneTypeName(eventTypeDO.getEvtSceneTypeName());
+            }
+            evt.setUpdateDate(new Date());
+            evt.setUpdateStaff(UserUtil.loginId());
+            eventSceneTypeMapper.updateByPrimaryKey(evt);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("[op:EventTypeServiceImpl] fail to updateEventSceneType ", e);
         }
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", "编辑成功");
+        return result;
     }
 
     /**
      * 删除事件目录
      */
     @Override
-    public void delEventSceneType(Long evtTypeId) {
+    public Map<String, Object> delEventSceneType(Long evtTypeId) {
+        Map<String, Object> result = new HashMap<>();
         try {
+            EventSceneTypeDO evt = eventSceneTypeMapper.selectByPrimaryKey(evtTypeId);
+            if (evt==null){
+                result.put("resultCode",CODE_FAIL);
+                result.put("resultMsg","事件目录不存在");
+                return result;
+            }
             eventSceneTypeMapper.deleteByPrimaryKey(evtTypeId);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("[op:EventTypeServiceImpl] fail to delEventSceneType ", e);
         }
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", "删除成功");
+        return result;
+
     }
 
     /**
