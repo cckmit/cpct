@@ -30,6 +30,8 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
     public Map<String,Object> addCamScript(Long userId, CamScriptAddVO addVO) {
         Map<String,Object> result = new HashMap<>();
         CamScript script = BeanUtil.create(addVO,new CamScript());
+        //todo 添加活动id
+        script.setMktCampaignId(123L);
         script.setCreateDate(new Date());
         script.setUpdateDate(new Date());
         script.setCreateStaff(userId);
@@ -60,17 +62,15 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
     }
 
     @Override
-    public Map<String,Object> deleteCamScript(Long userId, List<Long> camScriptIdList) {
+    public Map<String,Object> deleteCamScript(Long userId, Long camScriptId) {
         Map<String,Object> result = new HashMap<>();
-        for (Long id : camScriptIdList){
-            CamScript script = camScriptMapper.selectByPrimaryKey(id);
+            CamScript script = camScriptMapper.selectByPrimaryKey(camScriptId);
             if (script==null){
                 result.put("resultCode",CODE_FAIL);
                 result.put("resultMsg","活动关联脚本信息不存在");
                 return result;
             }
-            camScriptMapper.deleteByPrimaryKey(id);
-        }
+            camScriptMapper.deleteByPrimaryKey(camScriptId);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
         return result;
