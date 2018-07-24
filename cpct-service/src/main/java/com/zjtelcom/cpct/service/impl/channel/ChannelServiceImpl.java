@@ -6,6 +6,7 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.es.ClTestRepository;
 import com.zjtelcom.cpct.domain.channel.Channel;
+import com.zjtelcom.cpct.domain.channel.MktProductRule;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.ChannelType;
 import com.zjtelcom.cpct.service.BaseService;
@@ -32,6 +33,28 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
     @Autowired
     private ClTestRepository testRepository;
 
+
+    @Override
+    public Map<String, Object> listChannelByIdList(List<Long> idList) {
+        Map<String,Object> result = new HashMap<>();
+        List<Channel> channelList = new ArrayList<>();
+        for (Long id : idList){
+            Channel channel = channelMapper.selectByPrimaryKey(id);
+            if (channel==null){
+                result.put("resultCode",CODE_FAIL);
+                result.put("resultMsg","渠道不存在");
+                return result;
+            }
+            channelList.add(channel);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",channelList);
+        return result;
+
+
+
+
+    }
 
     @Override
     public Map<String, Object> listChannelTree(Long userId) {

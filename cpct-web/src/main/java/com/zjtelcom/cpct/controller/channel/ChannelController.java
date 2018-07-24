@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
@@ -18,6 +19,28 @@ public class ChannelController extends BaseController {
     @Autowired
     private ChannelService channelService;
 
+
+    /**
+     *
+     * @param param
+     * @return
+     */
+    @PostMapping("listChannelByIdList")
+    @CrossOrigin
+    public Map<String, Object> listChannelByIdList(@RequestBody HashMap<String,List<Long>> param ) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
+        try {
+            List<Long> idList = param.get("idList");
+            result = channelService.listChannelByIdList(idList);
+        } catch (Exception e) {
+            logger.error("[op:ChannelController] fail to listChannelByIdList",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to listChannelByIdList");
+            return result;
+        }
+        return result;
+    }
 
     /**
      * 渠道管理渠道树
