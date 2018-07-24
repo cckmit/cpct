@@ -23,7 +23,6 @@ public class VerbalVO implements Serializable {
 
     private List<VerbalConditionVO> conditionList;
 
-
     private String statusCd;
 
     private Long createStaff;
@@ -31,6 +30,9 @@ public class VerbalVO implements Serializable {
     private Date createDate;
 
     private String remark;
+
+
+
 
 
     public String getChannelName() {

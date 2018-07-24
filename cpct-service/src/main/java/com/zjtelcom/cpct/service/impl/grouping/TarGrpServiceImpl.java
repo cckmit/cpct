@@ -48,6 +48,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
+
 /**
  * @Description 目标分群serviceImpl
  * @Author pengy
@@ -93,6 +95,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         tarGrpMapper.createTarGrp(tarGrp);
         List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
         for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
+            if (tarGrpCondition.getOperType()==null || tarGrpCondition.getOperType().equals("")){
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg", "请选择下拉框运算类型");
+                return maps;
+            }
             tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
             tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
             tarGrpCondition.setTarGrpId(tarGrp.getTarGrpId());
@@ -138,7 +145,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             mktCamGrpRulMapper.updateByPrimaryKey(mktCamGrpRul);
 
         } catch (Exception e) {
-            maps.put("resultCode", CommonConstant.CODE_FAIL);
+            maps.put("resultCode", CODE_FAIL);
             maps.put("resultMsg", ErrorCode.SAVE_TAR_GRP_FAILURE.getErrorMsg());
             maps.put("tarGrp", StringUtils.EMPTY);
             logger.error("[op:TarGrpServiceImpl] fail to saveTagNumFetch ", e);
@@ -159,7 +166,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         try {
             tarGrpConditionMapper.deleteByPrimaryKey(conditionId);
         } catch (Exception e) {
-            mapsT.put("resultCode", CommonConstant.CODE_FAIL);
+            mapsT.put("resultCode", CODE_FAIL);
             mapsT.put("resultMsg", ErrorCode.DEL_TAR_GRP_CONDITION_FAILURE.getErrorMsg());
             mapsT.put("resultObject", StringUtils.EMPTY);
             logger.error("[op:TarGrpServiceImpl] fail to delTarGrpCondition ", e);
@@ -201,6 +208,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
             TarGrpCondition tarGrpCondition1 = tarGrpConditionMapper.selectByPrimaryKey(tarGrpCondition.getConditionId());
             if (tarGrpCondition1 == null) {
+                if (tarGrpCondition.getOperType()==null || tarGrpCondition.getOperType().equals("")){
+                    maps.put("resultCode", CODE_FAIL);
+                    maps.put("resultMsg", "请选择下拉框运算类型");
+                    return maps;
+                }
                 tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
                 tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
                 tarGrpCondition.setTarGrpId(tarGrp.getTarGrpId());
@@ -293,8 +305,10 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             tarGrpConditionVO.setFitDomainId(Long.valueOf(fitDomain.getValue()));
             tarGrpConditionVO.setFitDomainName(fitDomain.getDescription());
             //将操作符转为中文
-            Operator op = Operator.getOperator(Integer.parseInt(tarGrpConditionVO.getOperType()));
-            tarGrpConditionVO.setOperTypeName(op.getDescription());
+            if (tarGrpConditionVO.getOperType()!=null && !tarGrpConditionVO.getOperType().equals("")){
+                Operator op = Operator.getOperator(Integer.parseInt(tarGrpConditionVO.getOperType()));
+                tarGrpConditionVO.setOperTypeName(op.getDescription());
+            }
             //todo 通过左参id
             String operators = label.getOperator();
             String[] operator = operators.split(",");

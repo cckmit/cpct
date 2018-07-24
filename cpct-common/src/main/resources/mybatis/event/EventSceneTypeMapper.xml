@@ -47,8 +47,8 @@
     where EVT_SCENE_TYPE_ID = #{evtSceneTypeId,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select EVT_SCENE_TYPE_ID, EVT_SCENE_TYPE_NBR, EVT_SCENE_TYPE_NAME, PAR_EVT_SCENE_TYPE_ID, 
-    EVT_SCENE_TYPE_DESC, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
+    select EVT_SCENE_TYPE_ID, EVT_SCENE_TYPE_NBR, EVT_SCENE_TYPE_NAME, PAR_EVT_SCENE_TYPE_ID,
+    EVT_SCENE_TYPE_DESC, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
     UPDATE_DATE, REMARK
     from event_scene_type
     where EVT_SCENE_TYPE_ID = #{evtSceneTypeId,jdbcType=BIGINT}
@@ -61,11 +61,11 @@
   </select>
 
   <select id="listEventSceneTypes" resultMap="BaseResultMap">
-    EVT_SCENE_TYPE_ID, EVT_SCENE_TYPE_NBR, EVT_SCENE_TYPE_NAME, PAR_EVT_SCENE_TYPE_ID,
+     select EVT_SCENE_TYPE_ID, EVT_SCENE_TYPE_NBR, EVT_SCENE_TYPE_NAME, PAR_EVT_SCENE_TYPE_ID,
     EVT_SCENE_TYPE_DESC, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
     UPDATE_DATE, REMARK
     from event_scene_type
-    where 1 = 1
+    where 1=1
     <if test="evtSceneTypeId != null and evtSceneTypeId != ''">
       and EVT_SCENE_TYPE_ID = #{evtSceneTypeId}
     </if>
@@ -73,6 +73,12 @@
       and PAR_EVT_SCENE_TYPE_ID = #{parEvtSceneTypeId}
     </if>
   </select>
+
+
+
+
+
+
 
   <insert id="saveEventSceneType" parameterType="com.zjtelcom.cpct.domain.event.EventSceneTypeDO">
     insert into event_scene_type (  EVT_SCENE_TYPE_NBR, EVT_SCENE_TYPE_NAME, PAR_EVT_SCENE_TYPE_ID,
