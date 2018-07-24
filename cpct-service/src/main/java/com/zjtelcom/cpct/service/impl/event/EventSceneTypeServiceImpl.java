@@ -1,11 +1,15 @@
 package com.zjtelcom.cpct.service.impl.event;
 
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.event.EventSceneTypeMapper;
 import com.zjtelcom.cpct.domain.event.EventSceneTypeDO;
+import com.zjtelcom.cpct.dto.event.EventScene;
 import com.zjtelcom.cpct.dto.event.EventSceneTypeDTO;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.EventSceneTypeService;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
+import com.zjtelcom.cpct.util.DateUtil;
+import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +42,7 @@ public class EventSceneTypeServiceImpl extends BaseService implements EventScene
         List<EventSceneTypeDTO> eventTypeDTOS = new ArrayList<>();
         try {
             //查询出父级菜单
-            eventLists = eventSceneTypeMapper.listEventSceneTypes(EVT_TYPE_ID_NULL, PAR_EVT_TYPE_ID_NULL);
+            eventLists = eventSceneTypeMapper.listEventSceneTypes(EVT_TYPE_ID_NULL, PAR_EVT_TYPE_ID_ZERO);
             eventTypeDTOS = generateTree(eventLists);
         } catch (Exception e) {
             e.printStackTrace();
@@ -53,6 +57,12 @@ public class EventSceneTypeServiceImpl extends BaseService implements EventScene
     @Override
     public void saveEventSceneType(EventSceneTypeDO eventTypeDO) {
         try {
+            eventTypeDO.setCreateDate(DateUtil.getCurrentTime());
+            eventTypeDO.setStatusDate(DateUtil.getCurrentTime());
+            eventTypeDO.setUpdateStaff(UserUtil.loginId());
+            eventTypeDO.setCreateStaff(UserUtil.loginId());
+            eventTypeDO.setUpdateDate(DateUtil.getCurrentTime());
+            eventTypeDO.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
             eventSceneTypeMapper.saveEventSceneType(eventTypeDO);
         } catch (Exception e) {
             e.printStackTrace();
