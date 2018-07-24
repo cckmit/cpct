@@ -14,11 +14,13 @@ public interface EventSceneMapper {
 
     int insert(EventSceneDO record);
 
-    EventSceneDO selectByPrimaryKey(Long eventSceneId);
+    EventScene selectByPrimaryKey(Long eventSceneId);
 
     List<EventSceneDO> selectAll();
 
     int updateByPrimaryKey(EventScene record);
+
+    int updateById(EventScene record);
 
     List<EventScene> qryEventSceneList(QryEventSceneListReq qryEventSceneListReq);
 

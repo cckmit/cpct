@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.service.impl.event;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.event.EventSceneMapper;
 import com.zjtelcom.cpct.dao.event.EvtSceneCamRelMapper;
+import com.zjtelcom.cpct.domain.event.EventSceneDO;
 import com.zjtelcom.cpct.dto.event.EventScene;
 import com.zjtelcom.cpct.dto.event.EventSceneDetail;
 import com.zjtelcom.cpct.dto.event.EvtSceneCamRel;
@@ -11,6 +12,7 @@ import com.zjtelcom.cpct.response.event.QryeventSceneRsp;
 import com.zjtelcom.cpct.response.event.ViewEventSceneRsp;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.EventSceneService;
+import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
@@ -22,6 +24,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 
 /**
  * @Description EventSceneServiceImpl
@@ -209,7 +213,18 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
     @Override
     public Map<String, Object> coEventScene(EventScene eventScene) {
         Map<String, Object> maps = new HashMap<>();
-        eventSceneMapper.coEventScene(eventScene);
+        EventScene es = eventSceneMapper.selectByPrimaryKey(eventScene.getEventSceneId());
+        if (es==null){
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg", "事件场景不存在");
+            return maps;
+        }
+        if (es.getStatusCd().equals("1000")){
+            es.setStatusCd("1100");
+        }else{
+            es.setStatusCd("1000");
+        }
+        eventSceneMapper.updateById(es);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         return maps;

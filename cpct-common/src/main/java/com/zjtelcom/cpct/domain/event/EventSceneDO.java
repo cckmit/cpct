@@ -14,5 +14,4 @@ public class EventSceneDO extends BaseEntity {
     private Long extEventSceneId;//外部事件场景标识
     private String contactEvtCode;//事件编码
 
-
 }
