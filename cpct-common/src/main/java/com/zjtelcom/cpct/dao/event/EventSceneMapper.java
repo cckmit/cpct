@@ -12,7 +12,7 @@ import java.util.List;
 public interface EventSceneMapper {
     int deleteByPrimaryKey(Long eventSceneId);
 
-    int insert(EventSceneDO record);
+    int insert(EventScene record);
 
     EventScene selectByPrimaryKey(Long eventSceneId);
 

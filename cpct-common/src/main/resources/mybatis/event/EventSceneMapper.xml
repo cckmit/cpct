@@ -22,17 +22,19 @@
     delete from event_scene
     where EVENT_SCENE_ID = #{eventSceneId,jdbcType=BIGINT}
   </delete>
-    <insert id="insert" parameterType="com.zjtelcom.cpct.dto.event.EventScene">
+    <insert id="insert" parameterType="com.zjtelcom.cpct.dto.event.EventScene" keyProperty="eventSceneId" useGeneratedKeys="true">
     insert into event_scene (EVENT_SCENE_ID, EVENT_SCENE_NBR, EVENT_SCENE_NAME, 
-      EVENT_SCENE_DESC, EVENT_ID, EXT_EVENT_SCENE_ID, EVENT_SCENE_TYPE_ID,
-      STATUS_CD, STATUS_DATE, CREATE_STAFF, 
-      UPDATE_STAFF, UPDATE_DATE, CREATE_DATE, 
-      REMARK, CONTACT_EVT_CODE)
-    values (#{eventSceneId,jdbcType=BIGINT}, #{eventSceneNbr,jdbcType=VARCHAR}, #{eventSceneName,jdbcType=VARCHAR},  #{eventSceneTypeId,jdbcType=BIGINT},
-      #{eventSceneDesc,jdbcType=VARCHAR}, #{eventId,jdbcType=BIGINT}, #{extEventSceneId,jdbcType=BIGINT}, 
-      #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT}, 
-      #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, #{createDate,jdbcType=TIMESTAMP}, 
-      #{remark,jdbcType=VARCHAR}, #{contactEvtCode,jdbcType=VARCHAR})
+      EVENT_SCENE_DESC, EVENT_ID, EXT_EVENT_SCENE_ID,
+      EVENT_SCENE_TYPE_ID, STATUS_CD, STATUS_DATE,
+      CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE,
+      CREATE_DATE, REMARK, CONTACT_EVT_CODE
+      )
+    values (#{eventSceneId,jdbcType=BIGINT}, #{eventSceneNbr,jdbcType=VARCHAR}, #{eventSceneName,jdbcType=VARCHAR},
+      #{eventSceneDesc,jdbcType=VARCHAR}, #{eventId,jdbcType=BIGINT}, #{extEventSceneId,jdbcType=BIGINT},
+      #{eventSceneTypeId,jdbcType=BIGINT}, #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP},
+      #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP},
+      #{createDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, #{contactEvtCode,jdbcType=VARCHAR}
+      )
   </insert>
 
     <update id="updateById" parameterType="com.zjtelcom.cpct.dto.event.EventScene">
@@ -136,16 +138,18 @@
     </select>
 
     <insert id="saveEventScene" parameterType="com.zjtelcom.cpct.dto.event.EventScene">
-    insert into event_scene ( EVENT_SCENE_NBR, EVENT_SCENE_NAME,
-    EVENT_SCENE_DESC, EVENT_ID, EXT_EVENT_SCENE_ID,EVENT_SCENE_TYPE_ID,
-    STATUS_CD, STATUS_DATE, CREATE_STAFF,
-    UPDATE_STAFF, UPDATE_DATE, CREATE_DATE,
-    REMARK, CONTACT_EVT_CODE)
-    values ( #{eventSceneNbr,jdbcType=VARCHAR}, #{eventSceneName,jdbcType=VARCHAR}, #{eventSceneTypeId,jdbcType=BIGINT},
-    #{eventSceneDesc,jdbcType=VARCHAR}, #{eventId,jdbcType=BIGINT}, #{extEventSceneId,jdbcType=BIGINT},
-    #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT},
-    #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, #{createDate,jdbcType=TIMESTAMP},
-    #{remark,jdbcType=VARCHAR}, #{contactEvtCode,jdbcType=VARCHAR})
+    insert into event_scene (EVENT_SCENE_ID, EVENT_SCENE_NBR, EVENT_SCENE_NAME,
+      EVENT_SCENE_DESC, EVENT_ID, EXT_EVENT_SCENE_ID,
+      EVENT_SCENE_TYPE_ID, STATUS_CD, STATUS_DATE,
+      CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE,
+      CREATE_DATE, REMARK, CONTACT_EVT_CODE
+      )
+    values (#{eventSceneId,jdbcType=BIGINT}, #{eventSceneNbr,jdbcType=VARCHAR}, #{eventSceneName,jdbcType=VARCHAR},
+      #{eventSceneDesc,jdbcType=VARCHAR}, #{eventId,jdbcType=BIGINT}, #{extEventSceneId,jdbcType=BIGINT},
+      #{eventSceneTypeId,jdbcType=BIGINT}, #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP},
+      #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP},
+      #{createDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, #{contactEvtCode,jdbcType=VARCHAR}
+      )
   </insert>
 
     <select id="getEventScene" parameterType="java.lang.Long" resultMap="BaseResultMap">

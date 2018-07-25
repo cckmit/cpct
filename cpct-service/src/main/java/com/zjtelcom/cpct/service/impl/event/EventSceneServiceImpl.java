@@ -65,14 +65,14 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
                 //todo 外部事件场景id
                 eventScene.setExtEventSceneId(1L);
                 eventScene.setEventId(1L);
-
+                eventScene.setEventSceneNbr("ET0990766987");
                 eventScene.setCreateDate(DateUtil.getCurrentTime());
                 eventScene.setStatusDate(DateUtil.getCurrentTime());
                 eventScene.setUpdateStaff(UserUtil.loginId());
                 eventScene.setCreateStaff(UserUtil.loginId());
                 eventScene.setUpdateDate(DateUtil.getCurrentTime());
                 eventScene.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-                eventSceneMapper.createEventScene(eventScene);
+                eventSceneMapper.insert(eventScene);
 
                 evtSceneCamRels = eventSceneDetail.getEvtSceneCamRels();
                 for (EvtSceneCamRel evtSceneCamRel : evtSceneCamRels) {
