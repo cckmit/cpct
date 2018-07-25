@@ -20,10 +20,8 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 
@@ -66,6 +64,10 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
         if (eventSceneDetails != null) {
             for (EventSceneDetail eventSceneDetail : eventSceneDetails) {
                 EventScene eventScene = eventSceneDetail;
+                //todo 外部事件场景id
+                eventScene.setExtEventSceneId(1L);
+                eventScene.setEventId(1L);
+
                 eventScene.setCreateDate(DateUtil.getCurrentTime());
                 eventScene.setStatusDate(DateUtil.getCurrentTime());
                 eventScene.setUpdateStaff(UserUtil.loginId());
@@ -76,7 +78,7 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
 
                 evtSceneCamRels = eventSceneDetail.getEvtSceneCamRels();
                 for (EvtSceneCamRel evtSceneCamRel : evtSceneCamRels) {
-                    evtSceneCamRel.setEventSceneId(eventSceneDetail.getEventSceneId());
+                    evtSceneCamRel.setEventSceneId(eventScene.getEventSceneId());
                     evtSceneCamRel.setCreateDate(DateUtil.getCurrentTime());
                     evtSceneCamRel.setStatusDate(DateUtil.getCurrentTime());
                     evtSceneCamRel.setUpdateStaff(UserUtil.loginId());
@@ -155,7 +157,9 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
         List<EvtSceneCamRel> evtSceneCamRels = new ArrayList<>();
         if (modEventSceneReq.getEventSceneDetails() != null) {
             eventSceneDetails = modEventSceneReq.getEventSceneDetails();
+
             for (EventSceneDetail eventSceneDetailT : eventSceneDetails) {
+
                 EventScene eventScene = eventSceneDetailT;
                 eventScene.setUpdateDate(DateUtil.getCurrentTime());
                 eventScene.setUpdateStaff(UserUtil.loginId());
@@ -163,12 +167,16 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
 
                 evtSceneCamRels = eventSceneDetailT.getEvtSceneCamRels();
                 for (EvtSceneCamRel evtSceneCamRel : evtSceneCamRels) {
-                    EvtSceneCamRel evtSceneCamRelT = evtSceneCamRelMapper.selectByPrimaryKey(evtSceneCamRel.getSceneCamRelId());
+
+//                    EvtSceneCamRel evtSceneCamRelT = evtSceneCamRelMapper.selectByPrimaryKey(evtSceneCamRel.getSceneCamRelId());
+                    //todo 编辑待确认
+                    EvtSceneCamRel evtSceneCamRelT = evtSceneCamRelMapper.findByCampaignIdAndEventSceneId(evtSceneCamRel.getMktCampaignId(),evtSceneCamRel.getEventSceneId());
                     if (evtSceneCamRelT != null) {
                         evtSceneCamRel.setUpdateDate(DateUtil.getCurrentTime());
                         evtSceneCamRel.setUpdateStaff(UserUtil.loginId());
                         evtSceneCamRelMapper.updateByPrimaryKey(evtSceneCamRel);
                     } else {
+
                         evtSceneCamRel.setUpdateDate(DateUtil.getCurrentTime());
                         evtSceneCamRel.setStatusDate(DateUtil.getCurrentTime());
                         evtSceneCamRel.setUpdateStaff(UserUtil.loginId());

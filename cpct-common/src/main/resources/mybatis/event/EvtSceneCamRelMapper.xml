@@ -64,4 +64,14 @@
         </if>
     </select>
 
+
+    <select id="findByCampaignIdAndEventSceneId" resultMap="BaseResultMap">
+        select SCENE_CAM_REL_ID, EVENT_SCENE_ID, CAMPAIGN_SEQ, MKT_CAMPAIGN_ID, STATUS_CD,
+        STATUS_DATE, CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE, CREATE_DATE, REMARK
+        from evt_scene_cam_rel
+        where EVENT_SCENE_ID = #{eventSceneId}
+        and MKT_CAMPAIGN_ID = #{campaignId}
+    </select>
+
+
 </mapper>
