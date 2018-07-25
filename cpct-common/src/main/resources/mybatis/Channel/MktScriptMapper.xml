@@ -68,6 +68,9 @@
       <if test="updateTime != null">
           and UPDATE_DATE = #{createTime}
       </if>
+    <if test="scriptType != null and scriptType != ''">
+      and SCRIPT_TYPE = #{scriptType}
+    </if>
   </select>
 
   <select id="findByScriptName" resultMap="BaseResultMap">
