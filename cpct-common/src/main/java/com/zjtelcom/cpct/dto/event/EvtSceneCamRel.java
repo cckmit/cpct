@@ -10,6 +10,28 @@ public class EvtSceneCamRel extends BaseEntity implements Serializable {
     private Long eventSceneId;
     private Integer campaignSeq;
     private Long mktCampaignId;
+    private Integer levelConfig;
+    private Integer whetherConfig;
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public Integer getLevelConfig() {
+        return levelConfig;
+    }
+
+    public void setLevelConfig(Integer levelConfig) {
+        this.levelConfig = levelConfig;
+    }
+
+    public Integer getWhetherConfig() {
+        return whetherConfig;
+    }
+
+    public void setWhetherConfig(Integer whetherConfig) {
+        this.whetherConfig = whetherConfig;
+    }
 
     public Long getSceneCamRelId() {
         return sceneCamRelId;

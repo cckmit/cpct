@@ -1,23 +1,13 @@
 package com.zjtelcom.cpct.dto.event;
 
-import com.zjtelcom.cpct.BaseEntity;
-import lombok.Data;
+import java.io.Serializable;
 
-/**
- * @Description 事件场景
- * @Author pengy
- * @Date 2018/6/26 15:49
- */
-public class EventScene extends BaseEntity{
+public class EventSceneEditVO implements Serializable {
 
     private String actType;//  KIP=保持/ADD=新增/MOD=修改/DEL=删除
     private Long eventSceneId;  //事件场景标识
-    private String eventSceneNbr;//事件场景编码
     private String eventSceneName;//事件场景名称
     private String eventSceneDesc;//事件场景描述
-    private Long eventId;//事件标识
-    private Long extEventSceneId;//外部事件场景标识
-    private String contactEvtCode;//事件编码
     private Long eventSceneTypeId;//事件场景目录id
 
 
@@ -45,14 +35,6 @@ public class EventScene extends BaseEntity{
         this.eventSceneId = eventSceneId;
     }
 
-    public String getEventSceneNbr() {
-        return eventSceneNbr;
-    }
-
-    public void setEventSceneNbr(String eventSceneNbr) {
-        this.eventSceneNbr = eventSceneNbr;
-    }
-
     public String getEventSceneName() {
         return eventSceneName;
     }
@@ -69,27 +51,4 @@ public class EventScene extends BaseEntity{
         this.eventSceneDesc = eventSceneDesc;
     }
 
-    public Long getEventId() {
-        return eventId;
-    }
-
-    public void setEventId(Long eventId) {
-        this.eventId = eventId;
-    }
-
-    public Long getExtEventSceneId() {
-        return extEventSceneId;
-    }
-
-    public void setExtEventSceneId(Long extEventSceneId) {
-        this.extEventSceneId = extEventSceneId;
-    }
-
-    public String getContactEvtCode() {
-        return contactEvtCode;
-    }
-
-    public void setContactEvtCode(String contactEvtCode) {
-        this.contactEvtCode = contactEvtCode;
-    }
 }

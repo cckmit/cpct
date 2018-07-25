@@ -8,6 +8,7 @@
         <result column="EVENT_SCENE_DESC" jdbcType="VARCHAR" property="eventSceneDesc"/>
         <result column="EVENT_ID" jdbcType="BIGINT" property="eventId"/>
         <result column="EXT_EVENT_SCENE_ID" jdbcType="BIGINT" property="extEventSceneId"/>
+        <result column="EVENT_SCENE_TYPE_ID" jdbcType="BIGINT" property="eventSceneTypeId" />
         <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd"/>
         <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate"/>
         <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
@@ -23,11 +24,11 @@
   </delete>
     <insert id="insert" parameterType="com.zjtelcom.cpct.dto.event.EventScene">
     insert into event_scene (EVENT_SCENE_ID, EVENT_SCENE_NBR, EVENT_SCENE_NAME, 
-      EVENT_SCENE_DESC, EVENT_ID, EXT_EVENT_SCENE_ID, 
+      EVENT_SCENE_DESC, EVENT_ID, EXT_EVENT_SCENE_ID, EVENT_SCENE_TYPE_ID,
       STATUS_CD, STATUS_DATE, CREATE_STAFF, 
       UPDATE_STAFF, UPDATE_DATE, CREATE_DATE, 
       REMARK, CONTACT_EVT_CODE)
-    values (#{eventSceneId,jdbcType=BIGINT}, #{eventSceneNbr,jdbcType=VARCHAR}, #{eventSceneName,jdbcType=VARCHAR}, 
+    values (#{eventSceneId,jdbcType=BIGINT}, #{eventSceneNbr,jdbcType=VARCHAR}, #{eventSceneName,jdbcType=VARCHAR},  #{eventSceneTypeId,jdbcType=BIGINT},
       #{eventSceneDesc,jdbcType=VARCHAR}, #{eventId,jdbcType=BIGINT}, #{extEventSceneId,jdbcType=BIGINT}, 
       #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT}, 
       #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, #{createDate,jdbcType=TIMESTAMP}, 
@@ -39,6 +40,7 @@
     set EVENT_SCENE_NBR = #{eventSceneNbr,jdbcType=VARCHAR},
       EVENT_SCENE_NAME = #{eventSceneName,jdbcType=VARCHAR},
       EVENT_SCENE_DESC = #{eventSceneDesc,jdbcType=VARCHAR},
+      EVENT_SCENE_TYPE_ID = #{eventSceneTypeId,jdbcType=BIGINT},
       EVENT_ID = #{eventId,jdbcType=BIGINT},
       EXT_EVENT_SCENE_ID = #{extEventSceneId,jdbcType=BIGINT},
       STATUS_CD = #{statusCd,jdbcType=VARCHAR},
@@ -71,6 +73,9 @@
         <if test="extEventSceneId != null and extEventSceneId != 0 ">
             EXT_EVENT_SCENE_ID = #{extEventSceneId,jdbcType=BIGINT},
         </if>
+        <if test="eventSceneTypeId != null and eventSceneTypeId != 0 ">
+            EVENT_SCENE_TYPE_ID = #{eventSceneTypeId,jdbcType=BIGINT},
+        </if>
         <if test="statusCd != null and statusCd != '' ">
             STATUS_CD = #{statusCd,jdbcType=VARCHAR},
         </if>
@@ -100,14 +105,14 @@
     </update>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select EVENT_SCENE_ID, EVENT_SCENE_NBR, EVENT_SCENE_NAME, EVENT_SCENE_DESC, EVENT_ID, 
-    EXT_EVENT_SCENE_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE, 
+    EXT_EVENT_SCENE_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE, EVENT_SCENE_TYPE_ID,
     CREATE_DATE, REMARK, CONTACT_EVT_CODE
     from event_scene
     where EVENT_SCENE_ID = #{eventSceneId,jdbcType=BIGINT}
   </select>
     <select id="selectAll" resultMap="BaseResultMap">
     select EVENT_SCENE_ID, EVENT_SCENE_NBR, EVENT_SCENE_NAME, EVENT_SCENE_DESC, EVENT_ID, 
-    EXT_EVENT_SCENE_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE, 
+    EXT_EVENT_SCENE_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE, EVENT_SCENE_TYPE_ID,
     CREATE_DATE, REMARK, CONTACT_EVT_CODE
     from event_scene
   </select>
@@ -115,7 +120,7 @@
     <select id="qryEventSceneList" parameterType="com.zjtelcom.cpct.dto.event.EventScene"
             resultMap="BaseResultMap">
         select EVENT_SCENE_ID, EVENT_SCENE_NBR, EVENT_SCENE_NAME, EVENT_SCENE_DESC, EVENT_ID,
-        EXT_EVENT_SCENE_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE,
+        EXT_EVENT_SCENE_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE,EVENT_SCENE_TYPE_ID,
         CREATE_DATE, REMARK, CONTACT_EVT_CODE
         from event_scene
         where 1 = 1
@@ -132,11 +137,11 @@
 
     <insert id="saveEventScene" parameterType="com.zjtelcom.cpct.dto.event.EventScene">
     insert into event_scene ( EVENT_SCENE_NBR, EVENT_SCENE_NAME,
-    EVENT_SCENE_DESC, EVENT_ID, EXT_EVENT_SCENE_ID,
+    EVENT_SCENE_DESC, EVENT_ID, EXT_EVENT_SCENE_ID,EVENT_SCENE_TYPE_ID,
     STATUS_CD, STATUS_DATE, CREATE_STAFF,
     UPDATE_STAFF, UPDATE_DATE, CREATE_DATE,
     REMARK, CONTACT_EVT_CODE)
-    values ( #{eventSceneNbr,jdbcType=VARCHAR}, #{eventSceneName,jdbcType=VARCHAR},
+    values ( #{eventSceneNbr,jdbcType=VARCHAR}, #{eventSceneName,jdbcType=VARCHAR}, #{eventSceneTypeId,jdbcType=BIGINT},
     #{eventSceneDesc,jdbcType=VARCHAR}, #{eventId,jdbcType=BIGINT}, #{extEventSceneId,jdbcType=BIGINT},
     #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT},
     #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, #{createDate,jdbcType=TIMESTAMP},
@@ -145,7 +150,7 @@
 
     <select id="getEventScene" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select EVENT_SCENE_ID, EVENT_SCENE_NBR, EVENT_SCENE_NAME, EVENT_SCENE_DESC, EVENT_ID,
-    EXT_EVENT_SCENE_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE,
+    EXT_EVENT_SCENE_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE,EVENT_SCENE_TYPE_ID,
     CREATE_DATE, REMARK, CONTACT_EVT_CODE
     from event_scene
     where  EVENT_SCENE_ID = #{eventSceneId}
@@ -153,11 +158,11 @@
 
     <insert id="createEventScene" parameterType="com.zjtelcom.cpct.dto.event.EventScene" keyProperty="eventSceneId" useGeneratedKeys="true">
         insert into event_scene ( EVENT_SCENE_NBR, EVENT_SCENE_NAME,
-        EVENT_SCENE_DESC, EVENT_ID, EXT_EVENT_SCENE_ID,
+        EVENT_SCENE_DESC, EVENT_ID, EXT_EVENT_SCENE_ID,EVENT_SCENE_TYPE_ID,
         STATUS_CD, STATUS_DATE, CREATE_STAFF,
         UPDATE_STAFF, UPDATE_DATE, CREATE_DATE,
         REMARK, CONTACT_EVT_CODE)
-        values ( #{eventSceneNbr,jdbcType=VARCHAR}, #{eventSceneName,jdbcType=VARCHAR},
+        values ( #{eventSceneNbr,jdbcType=VARCHAR}, #{eventSceneName,jdbcType=VARCHAR}, #{eventSceneTypeId,jdbcType=BIGINT},
         #{eventSceneDesc,jdbcType=VARCHAR}, #{eventId,jdbcType=BIGINT}, #{extEventSceneId,jdbcType=BIGINT},
         #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT},
         #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, #{createDate,jdbcType=TIMESTAMP},
@@ -171,7 +176,7 @@
 
     <select id="qryEventSceneByEvtId" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select EVENT_SCENE_ID, EVENT_SCENE_NBR, EVENT_SCENE_NAME, EVENT_SCENE_DESC, EVENT_ID,
-        EXT_EVENT_SCENE_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE,
+        EXT_EVENT_SCENE_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE,EVENT_SCENE_TYPE_ID,
         CREATE_DATE, REMARK, CONTACT_EVT_CODE
         from event_scene
         where  EVENT_ID = #{contactEvtId}

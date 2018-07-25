@@ -12,6 +12,7 @@ import java.util.List;
 public interface EvtSceneCamRelMapper {
 
     int deleteByPrimaryKey(Long sceneCamRelId);
+
     int insert(EvtSceneCamRel record);
 
     EvtSceneCamRel selectByPrimaryKey(Long sceneCamRelId);

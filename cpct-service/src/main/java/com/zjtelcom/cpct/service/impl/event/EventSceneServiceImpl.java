@@ -4,9 +4,7 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.event.EventSceneMapper;
 import com.zjtelcom.cpct.dao.event.EvtSceneCamRelMapper;
 import com.zjtelcom.cpct.domain.event.EventSceneDO;
-import com.zjtelcom.cpct.dto.event.EventScene;
-import com.zjtelcom.cpct.dto.event.EventSceneDetail;
-import com.zjtelcom.cpct.dto.event.EvtSceneCamRel;
+import com.zjtelcom.cpct.dto.event.*;
 import com.zjtelcom.cpct.request.event.*;
 import com.zjtelcom.cpct.response.event.QryeventSceneRsp;
 import com.zjtelcom.cpct.response.event.ViewEventSceneRsp;
@@ -159,31 +157,41 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
             eventSceneDetails = modEventSceneReq.getEventSceneDetails();
 
             for (EventSceneDetail eventSceneDetailT : eventSceneDetails) {
-
-                EventScene eventScene = eventSceneDetailT;
+                EventSceneEditVO evtEditVO = BeanUtil.create(eventSceneDetailT,new EventSceneEditVO());
+                EventScene eventScene = eventSceneMapper.selectByPrimaryKey(eventSceneDetailT.getEventSceneId());
+                if (eventScene==null){
+                    maps.put("resultCode", CODE_FAIL);
+                    maps.put("resultMsg","事件场景不存在");
+                    return maps;
+                }
+                BeanUtil.copy(evtEditVO,eventScene);
                 eventScene.setUpdateDate(DateUtil.getCurrentTime());
                 eventScene.setUpdateStaff(UserUtil.loginId());
-                eventSceneMapper.updateByPrimaryKey(eventScene);
+                eventSceneMapper.updateById(eventScene);
 
                 evtSceneCamRels = eventSceneDetailT.getEvtSceneCamRels();
                 for (EvtSceneCamRel evtSceneCamRel : evtSceneCamRels) {
+                    //转接editVO
+                    EventSceneCamRelEditVO editVO = BeanUtil.create(evtSceneCamRel,new EventSceneCamRelEditVO());
 
 //                    EvtSceneCamRel evtSceneCamRelT = evtSceneCamRelMapper.selectByPrimaryKey(evtSceneCamRel.getSceneCamRelId());
                     //todo 编辑待确认
                     EvtSceneCamRel evtSceneCamRelT = evtSceneCamRelMapper.findByCampaignIdAndEventSceneId(evtSceneCamRel.getMktCampaignId(),evtSceneCamRel.getEventSceneId());
-                    if (evtSceneCamRelT != null) {
-                        evtSceneCamRel.setUpdateDate(DateUtil.getCurrentTime());
-                        evtSceneCamRel.setUpdateStaff(UserUtil.loginId());
-                        evtSceneCamRelMapper.updateByPrimaryKey(evtSceneCamRel);
-                    } else {
 
-                        evtSceneCamRel.setUpdateDate(DateUtil.getCurrentTime());
-                        evtSceneCamRel.setStatusDate(DateUtil.getCurrentTime());
-                        evtSceneCamRel.setUpdateStaff(UserUtil.loginId());
-                        evtSceneCamRel.setCreateStaff(UserUtil.loginId());
-                        evtSceneCamRel.setCreateDate(DateUtil.getCurrentTime());
-                        evtSceneCamRel.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-                        evtSceneCamRelMapper.insert(evtSceneCamRel);
+                    if (evtSceneCamRelT != null) {
+                        BeanUtil.copy(editVO,evtSceneCamRelT);
+                        evtSceneCamRelT.setUpdateDate(DateUtil.getCurrentTime());
+                        evtSceneCamRelT.setUpdateStaff(UserUtil.loginId());
+                        evtSceneCamRelMapper.updateByPrimaryKey(evtSceneCamRelT);
+                    } else {
+                        EvtSceneCamRel evtScRel = BeanUtil.create(editVO,new EvtSceneCamRel());
+                        evtScRel.setUpdateDate(DateUtil.getCurrentTime());
+                        evtScRel.setStatusDate(DateUtil.getCurrentTime());
+                        evtScRel.setUpdateStaff(UserUtil.loginId());
+                        evtScRel.setCreateStaff(UserUtil.loginId());
+                        evtScRel.setCreateDate(DateUtil.getCurrentTime());
+                        evtScRel.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                        evtSceneCamRelMapper.insert(evtScRel);
                     }
                 }
             }

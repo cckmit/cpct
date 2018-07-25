@@ -6,6 +6,8 @@
         <result column="EVENT_SCENE_ID" jdbcType="BIGINT" property="eventSceneId"/>
         <result column="CAMPAIGN_SEQ" jdbcType="INTEGER" property="campaignSeq"/>
         <result column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId"/>
+        <result column="LEVEL_CONFIG" jdbcType="INTEGER" property="levelConfig" />
+        <result column="WHETHER_CONFIG" jdbcType="INTEGER" property="whetherConfig" />
         <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd"/>
         <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate"/>
         <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
@@ -19,20 +21,24 @@
     where SCENE_CAM_REL_ID = #{sceneCamRelId,jdbcType=BIGINT}
   </delete>
     <insert id="insert" parameterType="com.zjtelcom.cpct.dto.event.EvtSceneCamRel">
-    insert into evt_scene_cam_rel (SCENE_CAM_REL_ID, EVENT_SCENE_ID, CAMPAIGN_SEQ, 
-      MKT_CAMPAIGN_ID, STATUS_CD, STATUS_DATE, 
-      CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE, 
-      CREATE_DATE, REMARK)
-    values (#{sceneCamRelId,jdbcType=BIGINT}, #{eventSceneId,jdbcType=BIGINT}, #{campaignSeq,jdbcType=INTEGER}, 
-      #{mktCampaignId,jdbcType=BIGINT}, #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, 
-      #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, 
-      #{createDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR})
+     insert into evt_scene_cam_rel (SCENE_CAM_REL_ID, EVENT_SCENE_ID, CAMPAIGN_SEQ,
+      MKT_CAMPAIGN_ID, LEVEL_CONFIG, WHETHER_CONFIG,
+      STATUS_CD, STATUS_DATE, CREATE_STAFF,
+      UPDATE_STAFF, UPDATE_DATE, CREATE_DATE,
+      REMARK)
+    values (#{sceneCamRelId,jdbcType=BIGINT}, #{eventSceneId,jdbcType=BIGINT}, #{campaignSeq,jdbcType=INTEGER},
+      #{mktCampaignId,jdbcType=BIGINT}, #{levelConfig,jdbcType=INTEGER}, #{whetherConfig,jdbcType=INTEGER},
+      #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT},
+      #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, #{createDate,jdbcType=TIMESTAMP},
+      #{remark,jdbcType=VARCHAR})
   </insert>
     <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.dto.event.EvtSceneCamRel">
     update evt_scene_cam_rel
     set EVENT_SCENE_ID = #{eventSceneId,jdbcType=BIGINT},
       CAMPAIGN_SEQ = #{campaignSeq,jdbcType=INTEGER},
       MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},
+      LEVEL_CONFIG = #{levelConfig,jdbcType=INTEGER},
+      WHETHER_CONFIG = #{whetherConfig,jdbcType=INTEGER},
       STATUS_CD = #{statusCd,jdbcType=VARCHAR},
       STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
       CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
@@ -43,19 +49,21 @@
     where SCENE_CAM_REL_ID = #{sceneCamRelId,jdbcType=BIGINT}
   </update>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select SCENE_CAM_REL_ID, EVENT_SCENE_ID, CAMPAIGN_SEQ, MKT_CAMPAIGN_ID, STATUS_CD, 
-    STATUS_DATE, CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE, CREATE_DATE, REMARK
+    select SCENE_CAM_REL_ID, EVENT_SCENE_ID, CAMPAIGN_SEQ, MKT_CAMPAIGN_ID, STATUS_CD, LEVEL_CONFIG,
+    WHETHER_CONFIG,STATUS_DATE, CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE, CREATE_DATE, REMARK
     from evt_scene_cam_rel
     where SCENE_CAM_REL_ID = #{sceneCamRelId,jdbcType=BIGINT}
   </select>
     <select id="selectAll" resultMap="BaseResultMap">
-    select SCENE_CAM_REL_ID, EVENT_SCENE_ID, CAMPAIGN_SEQ, MKT_CAMPAIGN_ID, STATUS_CD, 
+    select SCENE_CAM_REL_ID, EVENT_SCENE_ID, CAMPAIGN_SEQ, MKT_CAMPAIGN_ID, STATUS_CD,LEVEL_CONFIG,
+    WHETHER_CONFIG,
     STATUS_DATE, CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE, CREATE_DATE, REMARK
     from evt_scene_cam_rel
   </select>
 
     <select id="selectCamsByEvtSceneId" resultMap="BaseResultMap">
-        select SCENE_CAM_REL_ID, EVENT_SCENE_ID, CAMPAIGN_SEQ, MKT_CAMPAIGN_ID, STATUS_CD,
+        select SCENE_CAM_REL_ID, EVENT_SCENE_ID, CAMPAIGN_SEQ, MKT_CAMPAIGN_ID, STATUS_CD,LEVEL_CONFIG,
+        WHETHER_CONFIG,
         STATUS_DATE, CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE, CREATE_DATE, REMARK
         from evt_scene_cam_rel
         where 1 = 1
@@ -66,7 +74,8 @@
 
 
     <select id="findByCampaignIdAndEventSceneId" resultMap="BaseResultMap">
-        select SCENE_CAM_REL_ID, EVENT_SCENE_ID, CAMPAIGN_SEQ, MKT_CAMPAIGN_ID, STATUS_CD,
+        select SCENE_CAM_REL_ID, EVENT_SCENE_ID, CAMPAIGN_SEQ, MKT_CAMPAIGN_ID, STATUS_CD,LEVEL_CONFIG,
+    WHETHER_CONFIG,
         STATUS_DATE, CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE, CREATE_DATE, REMARK
         from evt_scene_cam_rel
         where EVENT_SCENE_ID = #{eventSceneId}
