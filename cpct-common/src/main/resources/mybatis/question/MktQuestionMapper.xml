@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.question.MktQuestionMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.question.Question">
+    <id column="QUESTION_ID" jdbcType="DECIMAL" property="questionId" />
+    <result column="QUESTION_NAME" jdbcType="VARCHAR" property="questionName" />
+    <result column="QUESTION_TYPE" jdbcType="VARCHAR" property="questionType" />
+    <result column="QUESTION_DESC" jdbcType="VARCHAR" property="questionDesc" />
+    <result column="ANSWER_TYPE" jdbcType="VARCHAR" property="answerType" />
+    <result column="DEFAULT_ANSWER" jdbcType="VARCHAR" property="defaultAnswer" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="CREATE_STAFF" jdbcType="DECIMAL" property="createStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_STAFF" jdbcType="DECIMAL" property="updateStaff" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from mkt_question
+    where QUESTION_ID = #{questionId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.question.Question">
+    insert into mkt_question (QUESTION_ID, QUESTION_NAME, QUESTION_TYPE, 
+      QUESTION_DESC, ANSWER_TYPE, DEFAULT_ANSWER, 
+      STATUS_CD, STATUS_DATE, CREATE_STAFF, 
+      CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, 
+      REMARK)
+    values (#{questionId,jdbcType=DECIMAL}, #{questionName,jdbcType=VARCHAR}, #{questionType,jdbcType=VARCHAR}, 
+      #{questionDesc,jdbcType=VARCHAR}, #{answerType,jdbcType=VARCHAR}, #{defaultAnswer,jdbcType=VARCHAR}, 
+      #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=DECIMAL}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=DECIMAL}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.question.Question">
+    update mkt_question
+    set QUESTION_NAME = #{questionName,jdbcType=VARCHAR},
+      QUESTION_TYPE = #{questionType,jdbcType=VARCHAR},
+      QUESTION_DESC = #{questionDesc,jdbcType=VARCHAR},
+      ANSWER_TYPE = #{answerType,jdbcType=VARCHAR},
+      DEFAULT_ANSWER = #{defaultAnswer,jdbcType=VARCHAR},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      CREATE_STAFF = #{createStaff,jdbcType=DECIMAL},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_STAFF = #{updateStaff,jdbcType=DECIMAL},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where QUESTION_ID = #{questionId,jdbcType=DECIMAL}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select QUESTION_ID, QUESTION_NAME, QUESTION_TYPE, QUESTION_DESC, ANSWER_TYPE, DEFAULT_ANSWER, 
+    STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
+    from mkt_question
+    where QUESTION_ID = #{questionId,jdbcType=DECIMAL}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select QUESTION_ID, QUESTION_NAME, QUESTION_TYPE, QUESTION_DESC, ANSWER_TYPE, DEFAULT_ANSWER, 
+    STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
+    from mkt_question
+  </select>
+</mapper>
