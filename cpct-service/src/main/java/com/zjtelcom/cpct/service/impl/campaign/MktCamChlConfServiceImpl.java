@@ -12,11 +12,13 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfAttrMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
+import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
 import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
 import com.zjtelcom.cpct.domain.Rule;
 import com.zjtelcom.cpct.domain.RuleDetail;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
+import com.zjtelcom.cpct.domain.channel.CamScript;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
@@ -60,6 +62,9 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
 
     @Autowired
     private VerbalService verbalService;
+
+    @Autowired
+    private MktCamScriptMapper camScriptMapper;
 
     @Override
     public Map<String, Object> saveMktCamChlConf(MktCamChlConfDetail mktCamChlConfDetail) {
@@ -178,6 +183,9 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             Map<String, Object> verbalListMap = verbalService.getVerbalListByConfId(UserUtil.loginId(), evtContactConfId);
             List<VerbalVO> verbalVOList = (List<VerbalVO>) verbalListMap.get("resultMsg");
             mktCamChlConfDetail.setVerbalVOList(verbalVOList);
+
+            CamScript camScript = camScriptMapper.selectByConfId(evtContactConfId);
+            mktCamChlConfDetail.setCamScript(camScript);
 
             mktCamChlConfDetail.setMktCamChlConfAttrList(mktCamChlConfAttrList);
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
