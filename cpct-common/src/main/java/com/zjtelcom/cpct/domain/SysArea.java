@@ -50,11 +50,11 @@ public class SysArea {
         this.areaLevel = areaLevel;
     }
 
-    public List<SysArea> getChildrenAreaList() {
+    public List<SysArea> getChildAreaList() {
         return childAreaList;
     }
 
-    public void setChildrenAreaList(List<SysArea> childAreaList) {
+    public void setChildAreaList(List<SysArea> childAreaList) {
         this.childAreaList = childAreaList;
     }
 }

@@ -25,4 +25,8 @@ public interface SysAreaService {
 
     Map<String, Object> listAllAreaTrea();
 
+    Map<String, Object> getCityTable(List<Integer> areaIds);
+
+    Map<String, Object> saveCityTORedis();
+
 }
