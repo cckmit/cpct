@@ -29,15 +29,23 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
     @Override
     public Map<String,Object> addCamScript(Long userId, CamScriptAddVO addVO) {
         Map<String,Object> result = new HashMap<>();
-        CamScript script = BeanUtil.create(addVO,new CamScript());
-        //todo 添加活动id
-        script.setMktCampaignId(123L);
-        script.setCreateDate(new Date());
-        script.setUpdateDate(new Date());
-        script.setCreateStaff(userId);
-        script.setUpdateStaff(userId);
-        script.setStatusCd("1000");
-        camScriptMapper.insert(script);
+        CamScript script = camScriptMapper.selectByConfId(addVO.getEvtContactConfId());
+        if (script!=null){
+            BeanUtil.copy(addVO,script);
+            script.setUpdateDate(new Date());
+            script.setUpdateStaff(userId);
+            camScriptMapper.updateByPrimaryKey(script);
+        }else {
+             script = BeanUtil.create(addVO,new CamScript());
+            //todo 添加活动id
+            script.setMktCampaignId(123L);
+            script.setCreateDate(new Date());
+            script.setUpdateDate(new Date());
+            script.setCreateStaff(userId);
+            script.setUpdateStaff(userId);
+            script.setStatusCd("1000");
+            camScriptMapper.insert(script);
+        }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
         return result;
