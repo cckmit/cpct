@@ -14,20 +14,21 @@ public class MktStrategyConfDetail extends MktStrategyConf {
     /**
      * 下发城市列表
      */
-    private List<City> cityList;
+/*    private List<City> cityList;*/
 
     /**
      * 策略配置下规则列表
      */
     private List<MktStrategyConfRule> mktStrategyConfRuleList;
 
-    public List<City> getCityList() {
+/*    public List<City> getCityList() {
         return cityList;
     }
 
     public void setCityList(List<City> cityList) {
         this.cityList = cityList;
-    }
+    }*/
+
 
     public List<MktStrategyConfRule> getMktStrategyConfRuleList() {
         return mktStrategyConfRuleList;

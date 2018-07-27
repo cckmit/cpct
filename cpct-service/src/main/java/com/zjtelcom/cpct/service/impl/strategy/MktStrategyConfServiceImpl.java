@@ -175,13 +175,25 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             if (mktStrategyConfDetail.getChannelList() != null) {
                 for (int i = 0; i < mktStrategyConfDetail.getChannelList().size(); i++) {
                     if (i == 0) {
-                        channelIds += mktStrategyConfDetail.getChannelList().get(i).getContactChlId();
+                        channelIds += mktStrategyConfDetail.getChannelList().get(i);
                     } else {
-                        channelIds += "/" + mktStrategyConfDetail.getChannelList().get(i).getContactChlId();
+                        channelIds += "/" + mktStrategyConfDetail.getChannelList().get(i);
                     }
                 }
             }
             mktStrategyConfDO.setChannelsId(channelIds);
+            // 下发城市
+            String areaIds = "";
+            if (mktStrategyConfDetail.getAreaIdList() != null) {
+                for (int i = 0; i < mktStrategyConfDetail.getAreaIdList().size(); i++) {
+                    if (i == 0) {
+                        areaIds += mktStrategyConfDetail.getAreaIdList().get(i);
+                    } else {
+                        areaIds += "/" + mktStrategyConfDetail.getAreaIdList().get(i);
+                    }
+                }
+            }
+            mktStrategyConfDO.setAreaId(areaIds);
             // 插入策略配置基本，并返回策略Id -- mktStrategyConfId
             mktStrategyConfMapper.insert(mktStrategyConfDO);
             // 策略Id
@@ -189,7 +201,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfMap.put("resultMsg", ErrorCode.SAVE_MKT_CAMPAIGN_SUCCESS.getErrorMsg());
             mktStrategyConfMap.put("mktStrategyConfId", mktStrategyConfId);
-
+/*
             //添加属性配置信息 与 下发城市关联
             List<City> cityList = mktStrategyConfDetail.getCityList();
             if (cityList != null && cityList.size() > 0) {
@@ -234,6 +246,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                     mktStrategyConfRegionRelMapper.insert(mktStrategyConfRegionRelDO);
                 }
             }
+*/
 
             ExecutorService executorService = Executors.newCachedThreadPool();
             // 遍历策略下对应的规则
@@ -337,14 +350,26 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             if (mktStrategyConfDetail.getChannelList() != null) {
                 for (int i = 0; i < mktStrategyConfDetail.getChannelList().size(); i++) {
                     if (i == 0) {
-                        channelIds += mktStrategyConfDetail.getChannelList().get(i).getContactChlId();
+                        channelIds += mktStrategyConfDetail.getChannelList().get(i);
                     } else {
-                        channelIds += "/" + mktStrategyConfDetail.getChannelList().get(i).getContactChlId();
+                        channelIds += "/" + mktStrategyConfDetail.getChannelList().get(i);
                     }
                 }
             }
-
             mktStrategyConfDO.setChannelsId(channelIds);
+            // 下发城市
+            String areaIds = "";
+            if (mktStrategyConfDetail.getAreaIdList() != null) {
+                for (int i = 0; i < mktStrategyConfDetail.getAreaIdList().size(); i++) {
+                    if (i == 0) {
+                        areaIds += mktStrategyConfDetail.getAreaIdList().get(i);
+                    } else {
+                        areaIds += "/" + mktStrategyConfDetail.getAreaIdList().get(i);
+                    }
+                }
+            }
+            mktStrategyConfDO.setAreaId(areaIds);
+
             // 更新策略配置基本，并返回策略Id -- mktStrategyConfId0
             mktStrategyConfMapper.updateByPrimaryKey(mktStrategyConfDO);
             // 策略Id
@@ -352,6 +377,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfMap.put("resultMsg", ErrorCode.SAVE_MKT_CAMPAIGN_SUCCESS.getErrorMsg());
             mktStrategyConfMap.put("mktStrategyConfId", mktStrategyConfId);
+/*
 
             // 修改属性配置信息 与 下发城市关联
             List<City> cityList = mktStrategyConfDetail.getCityList();
@@ -403,6 +429,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                     mktStrategyConfRegionRelMapper.updateByPrimaryKey(mktStrategyConfRegionRelDO);
                 }
             }
+*/
 
 
             // 遍历策略下的所有规则
@@ -511,7 +538,14 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             //更具Id查询策略配置信息
             MktStrategyConfDO mktStrategyConfDO = mktStrategyConfMapper.selectByPrimaryKey(mktStrategyConfId);
             CopyPropertiesUtil.copyBean2Bean(mktStrategyConfDetail, mktStrategyConfDO);
+            List<Integer> areaIdList = new ArrayList<>();
+            String[] areaIds = mktStrategyConfDO.getAreaId().split("/");
+            for (String areaId : areaIds) {
+                areaIdList.add(Integer.valueOf(areaId));
+            }
+            mktStrategyConfDetail.setAreaIdList(areaIdList);
 
+/*
             List<MktStrategyConfRegionRelDO> mktStrategyConfRegionRelDOList = mktStrategyConfRegionRelMapper.selectByMktStrategyConfId(mktStrategyConfDO.getMktStrategyConfId());
             List<City> cityList = new ArrayList<>();
             for (MktStrategyConfRegionRelDO mktStrategyConfRegionRelDO : mktStrategyConfRegionRelDOList) {
@@ -558,15 +592,13 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                 cityList.add(city);
             }
             mktStrategyConfDetail.setCityList(cityList);
+*/
 
             // 策略下发渠道
             String[] channelIds = mktStrategyConfDO.getChannelsId().split("/");
-            List<Channel> channelList = new ArrayList<>();
-            for (int i = 0; i < channelIds.length; i++) {
-                if(channelIds[i]!=null && !"".equals(channelIds[i])){
-                    Channel channel = contactChannelMapper.selectByPrimaryKey(Long.valueOf(channelIds[i]));
-                    channelList.add(channel);
-                }
+            List<Long> channelList = new ArrayList<>();
+            for (String channelId : channelIds) {
+                channelList.add(Long.valueOf(channelId));
             }
             mktStrategyConfDetail.setChannelList(channelList);
 

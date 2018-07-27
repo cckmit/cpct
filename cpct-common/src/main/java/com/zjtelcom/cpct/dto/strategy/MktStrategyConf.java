@@ -29,7 +29,12 @@ public class MktStrategyConf {
     /**
      * 策略下发渠道
      */
-    private List<Channel> channelList;
+    private List<Long> channelList;
+
+    /**
+     * 下发城市
+     */
+    private List<Integer> areaIdList;
 
     public Long getMktStrategyConfId() {
         return mktStrategyConfId;
@@ -63,11 +68,19 @@ public class MktStrategyConf {
         this.endTime = endTime;
     }
 
-    public List<Channel> getChannelList() {
+    public List<Long> getChannelList() {
         return channelList;
     }
 
-    public void setChannelList(List<Channel> channelList) {
+    public void setChannelList(List<Long> channelList) {
         this.channelList = channelList;
+    }
+
+    public List<Integer> getAreaIdList() {
+        return areaIdList;
+    }
+
+    public void setAreaIdList(List<Integer> areaIdList) {
+        this.areaIdList = areaIdList;
     }
 }

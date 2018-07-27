@@ -28,6 +28,11 @@ public class MktStrategyConfDO {
      */
     private String channelsId;
 
+    /**
+     * 下发地市
+     */
+    private String areaId;
+
     private Long createStaff;
 
     private Date createDate;
@@ -106,5 +111,13 @@ public class MktStrategyConfDO {
 
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
+    }
+
+    public String getAreaId() {
+        return areaId;
+    }
+
+    public void setAreaId(String areaId) {
+        this.areaId = areaId;
     }
 }
