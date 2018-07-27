@@ -146,6 +146,11 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
         Channel channel = channelMapper.selectByPrimaryKey(verbalVO.getChannelId());
         if (channel!=null){
             verbalVO.setChannelName(channel.getContactChlName());
+            verbalVO.setChannelParentId(channel.getParentId());
+            Channel parent = channelMapper.selectByPrimaryKey(channel.getParentId());
+            if (parent!=null){
+                verbalVO.setChannelParentName(parent.getContactChlName());
+            }
         }
         return verbalVO;
     }
