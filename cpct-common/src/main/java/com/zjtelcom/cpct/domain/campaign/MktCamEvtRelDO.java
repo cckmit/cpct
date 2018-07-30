@@ -11,6 +11,10 @@ public class MktCamEvtRelDO {
 
     private Long eventId;
 
+    private Integer levelConfig;
+
+    private Integer whetherConfig;
+
     private String statusCd;
 
     private Date statusDate;
@@ -22,6 +26,22 @@ public class MktCamEvtRelDO {
     private Long updateStaff;
 
     private Date updateDate;
+
+    public Integer getLevelConfig() {
+        return levelConfig;
+    }
+
+    public void setLevelConfig(Integer levelConfig) {
+        this.levelConfig = levelConfig;
+    }
+
+    public Integer getWhetherConfig() {
+        return whetherConfig;
+    }
+
+    public void setWhetherConfig(Integer whetherConfig) {
+        this.whetherConfig = whetherConfig;
+    }
 
     public Long getMktCampEvtRelId() {
         return mktCampEvtRelId;
