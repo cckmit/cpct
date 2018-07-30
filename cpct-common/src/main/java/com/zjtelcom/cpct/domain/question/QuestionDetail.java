@@ -7,11 +7,11 @@ public class QuestionDetail {
 
     private Long questionId;
 
-    private Integer qstDetailOrder;
+    private Integer qstDetailOrder;//题库明细顺序
 
-    private String qstDetailValue;
+    private String qstDetailValue;//题库明细答案
 
-    private String qstDetailInputType;
+    private String qstDetailInputType;//题库明细输入类型
 
     private String statusCd;
 

@@ -15,9 +15,9 @@ public interface ContactEvtItemMapper {
 
     int deleteByPrimaryKey(Long evtItemId);
 
-    int insert(EventItemDO record);
+    int insert(ContactEvtItem record);
 
-    EventItemDO selectByPrimaryKey(Long evtItemId);
+    ContactEvtItem selectByPrimaryKey(Long evtItemId);
 
     List<EventItemDO> selectAll();
 

@@ -30,6 +30,7 @@ import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
+import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang.StringUtils;
@@ -38,6 +39,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 
 /**
  * Description:
@@ -345,6 +348,31 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("mktCampaignId", mktCampaignId);
+        return maps;
+    }
+
+
+    @Override
+    public Map<String, Object> getCampaignList(String mktCampaignName,String mktCampaignType) {
+        Map<String, Object> maps = new HashMap<>();
+        MktCampaignDO MktCampaignPar = new MktCampaignDO();
+        MktCampaignPar.setMktCampaignName(mktCampaignName);
+        if (mktCampaignType==null || mktCampaignType.equals("")){
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg", "请选择事件分类");
+            return maps;
+        }
+        MktCampaignPar.setMktCampaignType(mktCampaignType);
+        List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListPage(MktCampaignPar);
+        List<CampaignVO> voList = new ArrayList<>();
+        for (MktCampaignDO campaignDO : mktCampaignDOList){
+            CampaignVO vo = BeanUtil.create(campaignDO,new CampaignVO());
+            vo.setCampaignId(campaignDO.getMktCampaignId());
+            vo.setCampaignName(campaignDO.getMktCampaignName());
+            voList.add(vo);
+        }
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", voList);
         return maps;
     }
 
