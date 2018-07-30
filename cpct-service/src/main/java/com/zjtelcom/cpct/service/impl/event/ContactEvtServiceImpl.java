@@ -198,6 +198,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             contactEvtItems = evtDetail.getContactEvtItems();
             for (ContactEvtItem contactEvtItem : contactEvtItems) {
                 contactEvtItem.setContactEvtId(contactEvt.getContactEvtId());
+                contactEvtItem.setIsMainParam("1");
                 maps = evtItemService.createEventItem(contactEvtItem);
                 if (!maps.get("resultCode").equals(CODE_SUCCESS)){
                     return maps;

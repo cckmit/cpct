@@ -86,7 +86,6 @@ public class ContactEvtItemServiceImpl extends BaseService implements ContactEvt
         contactEvtItemMapper.insertContactEvtItem(contactEvtItem);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
-        maps.put("contactEvtItem",contactEvtItem);
         return maps;
     }
 

@@ -162,9 +162,10 @@
         #{evtItemFormat,jdbcType=VARCHAR},
         #{isNullable,jdbcType=VARCHAR},
         #{evtItemLength,jdbcType=INTEGER},
+         #{standardSort,jdbcType=INTEGER},
          #{isMainParam,jdbcType=VARCHAR},
           #{evtItemDesc,jdbcType=VARCHAR},
-        #{standardSort,jdbcType=INTEGER},
+
         #{statusCd,jdbcType=VARCHAR},
         #{createStaff,jdbcType=BIGINT},
         #{updateStaff,jdbcType=BIGINT},
