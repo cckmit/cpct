@@ -197,6 +197,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             //插入事件采集项
             contactEvtItems = evtDetail.getContactEvtItems();
             for (ContactEvtItem contactEvtItem : contactEvtItems) {
+                contactEvtItem.setContactEvtId(contactEvt.getContactEvtId());
                 maps = evtItemService.createEventItem(contactEvtItem);
                 if (!maps.get("resultCode").equals(CODE_SUCCESS)){
                     return maps;
@@ -414,6 +415,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             List<Long> contactIdList = new ArrayList<>();
             for (ContactEvtItem contactEvtItem : contactEvtItems) {
                 contactIdList.add(contactEvtItem.getEvtItemId());
+                //判断传值id 是否为0 为0新增 不为0更新
                 if (contactEvtItem.getEvtItemId().equals(0L)){
                     //todo 新增采集项
                     contactEvtItem.setContactEvtId(evtDetail.getContactEvtId());
