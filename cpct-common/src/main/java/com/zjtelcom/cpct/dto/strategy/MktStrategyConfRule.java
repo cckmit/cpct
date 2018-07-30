@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.dto.strategy;
 
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
 
 import java.util.List;
@@ -33,6 +34,11 @@ public class MktStrategyConfRule {
      * 协同渠道配置集合
      */
     private List<MktCamChlConf> mktCamChlConfList;
+
+    /**
+     * 二次协同渠道结果集合
+     */
+    private List<Long> mktCamChlResultIdList;
 
     /**
      * 过滤规则配置Id
@@ -88,4 +94,11 @@ public class MktStrategyConfRule {
         this.mktStrategyConfRuleName = mktStrategyConfRuleName;
     }
 
+    public List<Long> getMktCamChlResultIdList() {
+        return mktCamChlResultIdList;
+    }
+
+    public void setMktCamChlResultIdList(List<Long> mktCamChlResultIdList) {
+        this.mktCamChlResultIdList = mktCamChlResultIdList;
+    }
 }

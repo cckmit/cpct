@@ -162,6 +162,16 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 mktStrategyConfRule.setMktCamChlConfList(mktCamChlConfList);
             }
 
+            if (mktStrategyConfRuleDO.getMktCamChlResultId() != null) {
+                String[] mktCamChlResultIds = mktStrategyConfRuleDO.getMktCamChlResultId().split("/");
+                List<Long> mktCamChlResultIdList = new ArrayList<>();
+                for (String mktCamChlResultId : mktCamChlResultIds) {
+                    mktCamChlResultIdList.add(Long.valueOf(mktCamChlResultId));
+                }
+                mktStrategyConfRule.setMktCamChlResultIdList(mktCamChlResultIdList);
+            }
+
+
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
             mktStrategyConfRuleMap.put("mktStrategyConfRule", mktStrategyConfRule);
