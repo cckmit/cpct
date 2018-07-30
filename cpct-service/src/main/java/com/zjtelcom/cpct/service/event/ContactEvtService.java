@@ -14,6 +14,8 @@ import java.util.Map;
 
 public interface ContactEvtService {
 
+    Map<String,Object> listMktCampaignType(Long userId);
+
     Map<String,Object> listEvents(ContactEvt contactEvt,Page pageInfo);
 
     Map<String,Object> listEventNoPages(ContactEvt contactEvt);

@@ -28,9 +28,7 @@ public interface MktCampaignService {
 
     Map<String,Object> qryMktCampaignListPage (String mktCampaignName, String statusCd, String tiggerType, String mktCampaignType, Integer page, Integer pageSize);
 
-
-    Map<String,Object> getCampaignList (String mktCampaignName);
-
+    Map<String,Object> getCampaignList (String mktCampaignName,String mktCampaignType);
 
     Map<String,Object> createMktCampaign(MktCampaignVO mktCampaignVO) throws Exception;
 

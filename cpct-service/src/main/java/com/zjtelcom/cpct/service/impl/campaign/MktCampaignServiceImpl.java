@@ -40,6 +40,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
+
 /**
  * Description:
  * author: linchao
@@ -351,10 +353,16 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
 
     @Override
-    public Map<String, Object> getCampaignList(String mktCampaignName) {
+    public Map<String, Object> getCampaignList(String mktCampaignName,String mktCampaignType) {
         Map<String, Object> maps = new HashMap<>();
         MktCampaignDO MktCampaignPar = new MktCampaignDO();
         MktCampaignPar.setMktCampaignName(mktCampaignName);
+        if (mktCampaignType==null || mktCampaignType.equals("")){
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg", "请选择事件分类");
+            return maps;
+        }
+        MktCampaignPar.setMktCampaignType(mktCampaignType);
         List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListPage(MktCampaignPar);
         List<CampaignVO> voList = new ArrayList<>();
         for (MktCampaignDO campaignDO : mktCampaignDOList){

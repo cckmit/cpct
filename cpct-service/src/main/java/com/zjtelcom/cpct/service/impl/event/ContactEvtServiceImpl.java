@@ -7,10 +7,14 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.event.*;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
+import com.zjtelcom.cpct.dao.system.SysParamsMapper;
+import com.zjtelcom.cpct.dao.system.SystemParamMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamEvtRelDO;
+import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.event.*;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
+import com.zjtelcom.cpct.enums.ParamKeyEnum;
 import com.zjtelcom.cpct.request.event.CreateContactEvtJtReq;
 import com.zjtelcom.cpct.request.event.CreateContactEvtReq;
 import com.zjtelcom.cpct.response.event.ViewContactEvtRsp;
@@ -59,7 +63,22 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     private FilterRuleMapper filterRuleMapper;
     @Autowired
     private MktCamEvtRelMapper mktCamEvtRelMapper;
+    @Autowired
+    private SysParamsMapper sysParamsMapper;
 
+
+    /**
+     * 获取事件类型列表
+     * @param userId
+     * @return
+     */
+    @Override
+    public Map<String, Object> listMktCampaignType(Long userId) {
+        Map<String,Object> result = new HashMap<>();
+        List<SysParams> campaignParams = sysParamsMapper.listParamsByKeyForCampaign(ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey());
+        result.put(campaignParams.get(0).getParamKey(), campaignParams);
+        return result;
+    }
 
     /**
      * 查询事件列表

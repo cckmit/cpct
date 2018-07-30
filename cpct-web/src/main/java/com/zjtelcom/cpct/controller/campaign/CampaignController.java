@@ -58,7 +58,8 @@ public class CampaignController extends BaseController {
     @CrossOrigin
     public String getCampaignList(@RequestBody Map<String, String> params)throws Exception {
         String mktCampaignName = params.get("mktCampaignName");  // 活动名称
-        Map<String, Object> map = mktCampaignService.getCampaignList(mktCampaignName);
+        String mktCampaignType = params.get("mktCampaignType"); // 活动
+        Map<String, Object> map = mktCampaignService.getCampaignList(mktCampaignName,mktCampaignType);
         return JSON.toJSONString(map);
     }
 
