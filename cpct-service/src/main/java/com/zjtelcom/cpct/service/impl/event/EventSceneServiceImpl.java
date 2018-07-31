@@ -65,6 +65,7 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
                 //todo 外部事件场景id
                 eventScene.setExtEventSceneId(1L);
                 eventScene.setEventId(1L);
+                eventScene.setContactEvtCode("");
                 eventScene.setEventSceneNbr("ET0990766987");
                 eventScene.setCreateDate(DateUtil.getCurrentTime());
                 eventScene.setStatusDate(DateUtil.getCurrentTime());
