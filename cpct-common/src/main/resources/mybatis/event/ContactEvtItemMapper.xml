@@ -86,6 +86,9 @@
         <if test="contactEvtId != null and contactEvtId != 0 ">
             AND EVENT_ID = #{contactEvtId}
         </if>
+        <if test="isMainParam != null and isMainParam != ''">
+            AND IS_MAIN_PARAM = #{isMainParam}
+        </if>
     </select>
 
     <insert id="saveEventItem" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtItem">

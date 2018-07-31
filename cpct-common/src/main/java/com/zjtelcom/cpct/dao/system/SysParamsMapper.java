@@ -24,6 +24,8 @@ public interface SysParamsMapper {
 
     Map<String,String> getParamsByValue(@Param("keyWord") String keyWord,@Param("value") String value);
 
+    SysParams findParamsByValue(@Param("keyWord") String keyWord,@Param("value") String value);
+
     List<SysParams> listParamsByKeyForCampaign(String key);
 
 }
