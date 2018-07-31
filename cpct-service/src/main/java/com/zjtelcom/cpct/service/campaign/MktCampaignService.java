@@ -30,6 +30,8 @@ public interface MktCampaignService {
 
     Map<String,Object> getCampaignList (String mktCampaignName,String mktCampaignType);
 
+    Map<String,Object> getCampaignList4EventScene (String mktCampaignName);
+
     Map<String,Object> createMktCampaign(MktCampaignVO mktCampaignVO) throws Exception;
 
     Map<String,Object> delMktCampaign(Long mktCampaignId) throws Exception;
