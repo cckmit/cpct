@@ -63,6 +63,13 @@ public class CampaignController extends BaseController {
         return JSON.toJSONString(map);
     }
 
+    @RequestMapping(value = "/getCampaignList4EventScene", method = RequestMethod.POST)
+    @CrossOrigin
+    public String getCampaignList4EventScene(@RequestBody Map<String, String> params)throws Exception {
+        String mktCampaignName = params.get("mktCampaignName");  // 活动名称
+        Map<String, Object> map = mktCampaignService.getCampaignList4EventScene(mktCampaignName);
+        return JSON.toJSONString(map);
+    }
 
     /**
      * 新增营销活动

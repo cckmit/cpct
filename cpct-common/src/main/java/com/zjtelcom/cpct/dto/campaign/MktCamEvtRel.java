@@ -10,6 +10,8 @@ public class MktCamEvtRel extends BaseEntity implements Serializable{
 
     private Integer campaignSeq;
 
+    private String campaignName;
+
     private Long mktCampaignId;
 
     private Long eventId;
@@ -18,6 +20,14 @@ public class MktCamEvtRel extends BaseEntity implements Serializable{
 
     private Integer whetherConfig;
 
+
+    public String getCampaignName() {
+        return campaignName;
+    }
+
+    public void setCampaignName(String campaignName) {
+        this.campaignName = campaignName;
+    }
 
     public Integer getCampaignSeq() {
         return campaignSeq;

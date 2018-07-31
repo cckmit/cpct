@@ -23,6 +23,8 @@ public interface MktCamEvtRelMapper {
 
     List<MktCamEvtRelDO> qryByMktCampaignId(Long mktCampaignId);
 
+    List<MktCamEvtRelDO> findRelListByEvtId(@Param("contactEvtId") Long contactEvtId);
+
     List<MktCamEvtRelDO> selectAll();
 
     int updateByPrimaryKey(MktCamEvtRelDO mktCamEvtRelDO);

@@ -31,6 +31,7 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.util.BeanUtil;
+import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang.StringUtils;
@@ -351,6 +352,21 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         return maps;
     }
 
+    @Override
+    public Map<String, Object> getCampaignList4EventScene(String mktCampaignName) {
+        Map<String, Object> maps = new HashMap<>();
+        MktCampaignDO MktCampaignPar = new MktCampaignDO();
+        MktCampaignPar.setMktCampaignName(mktCampaignName);
+        List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListPage(MktCampaignPar);
+        List<CampaignVO> voList = new ArrayList<>();
+        for (MktCampaignDO campaignDO : mktCampaignDOList){
+            CampaignVO vo = ChannelUtil.map2CampaignVO(campaignDO);
+            voList.add(vo);
+        }
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", voList);
+        return maps;
+    }
 
     @Override
     public Map<String, Object> getCampaignList(String mktCampaignName,String mktCampaignType) {
@@ -366,9 +382,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListPage(MktCampaignPar);
         List<CampaignVO> voList = new ArrayList<>();
         for (MktCampaignDO campaignDO : mktCampaignDOList){
-            CampaignVO vo = BeanUtil.create(campaignDO,new CampaignVO());
-            vo.setCampaignId(campaignDO.getMktCampaignId());
-            vo.setCampaignName(campaignDO.getMktCampaignName());
+            CampaignVO vo = ChannelUtil.map2CampaignVO(campaignDO);
             voList.add(vo);
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);

@@ -5,13 +5,16 @@ import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.event.*;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.dao.system.SystemParamMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamEvtRelDO;
+import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
+import com.zjtelcom.cpct.dto.campaign.MktCampaign;
 import com.zjtelcom.cpct.dto.event.*;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.enums.ParamKeyEnum;
@@ -68,6 +71,8 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     private SysParamsMapper sysParamsMapper;
     @Autowired
     private ContactEvtItemService evtItemService;
+    @Autowired
+    private MktCampaignMapper campaignMapper;
 
 
     /**
@@ -340,8 +345,11 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         //获取所有活动
         List<MktCamEvtRel> mktCamEvtRels = new ArrayList<>();
         mktCamEvtRels = mktCamEvtRelMapper.qryBycontactEvtId(contactEvt.getContactEvtId());
+        for (MktCamEvtRel rel : mktCamEvtRels){
+            MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(rel.getMktCampaignId());
+            rel.setCampaignName(campaign.getMktCampaignName());
+        }
         contactEventDetail.setMktCamEvtRels(mktCamEvtRels);
-
         viewContactEvtRsp.setContactEvtDetail(contactEventDetail);
         map.put("resultCode", CommonConstant.CODE_SUCCESS);
         map.put("resultMsg", StringUtils.EMPTY);
