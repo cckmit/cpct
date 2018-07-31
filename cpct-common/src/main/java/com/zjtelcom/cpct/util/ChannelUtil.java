@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.util;
 
+import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
+import com.zjtelcom.cpct.dto.campaign.CampaignVO;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.Operator;
 import org.apache.commons.lang.StringUtils;
@@ -19,6 +21,14 @@ public class ChannelUtil  {
         String uuidStr=str.replace("-", "");
         return uuidStr;
     }
+    public static CampaignVO map2CampaignVO(MktCampaignDO campaignDO){
+        CampaignVO vo = BeanUtil.create(campaignDO,new CampaignVO());
+        vo.setCampaignId(campaignDO.getMktCampaignId());
+        vo.setCampaignName(campaignDO.getMktCampaignName());
+        return vo;
+    }
+
+
     public static String List2String(List<Integer> idList){
         if (idList == null || idList.isEmpty()){
             return "";
