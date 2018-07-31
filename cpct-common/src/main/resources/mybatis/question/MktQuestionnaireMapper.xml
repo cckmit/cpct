@@ -22,7 +22,7 @@
     delete from mkt_questionnaire
     where NAIRE_ID = #{naireId,jdbcType=DECIMAL}
   </delete>
-  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.question.Questionnaire">
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.question.Questionnaire" useGeneratedKeys="true" keyProperty="naireId">
     insert into mkt_questionnaire (NAIRE_ID, NAIRE_NAME, NAIRE_TYPE, 
       MARK_TYPE, NAIRE_POINTS, NAIRE_DESC, 
       START_TIP, END_TIP, STATUS_CD, 
