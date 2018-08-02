@@ -28,7 +28,7 @@ public interface MktCampaignService {
 
     Map<String,Object> qryMktCampaignListPage (String mktCampaignName, String statusCd, String tiggerType, String mktCampaignType, Integer page, Integer pageSize);
 
-    Map<String,Object> getCampaignList (String mktCampaignName,String mktCampaignType);
+    Map<String,Object> getCampaignList (String mktCampaignName,String mktCampaignType,Long eventId);
 
     Map<String,Object> getCampaignList4EventScene (String mktCampaignName);
 

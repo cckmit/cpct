@@ -6,11 +6,13 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.user.UserListMapper;
+import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.user.UserList;
 import com.zjtelcom.cpct.request.filter.FilterRuleReq;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.filter.FilterRuleService;
+import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UserUtil;
@@ -77,12 +79,13 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
     @Override
     public Map<String, Object> importUserList(MultipartFile multipartFile, Long ruleId) throws IOException {
         Map<String, Object> maps = new HashMap<>();
-        UserList userList = new UserList();
+
         InputStream inputStream = multipartFile.getInputStream();
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
         Sheet sheet = wb.getSheetAt(0);
         Integer rowNums = sheet.getLastRowNum() + 1;
-        for (int i = 1; i < rowNums; i++) {
+        for (int i = 0; i < rowNums; i++) {
+            UserList userList = new UserList();
             Row row = sheet.getRow(i);
             for (int j = 0; j < row.getLastCellNum(); j++) {
                 Cell cell = row.getCell(j);
@@ -104,9 +107,11 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
                 continue;
             }
             userList.setRuleId(ruleId);
-            userList.setCreateDate(DateUtil.getCurrentTime());
-            userList.setUpdateDate(DateUtil.getCurrentTime());
-            userList.setStatusDate(DateUtil.getCurrentTime());
+            userList.setCreateDate(new Date());
+            userList.setUpdateDate(new Date());
+            userList.setStatusDate(new Date());
+            userList.setRemark("123");
+            userList.setLanId(1L);
             userList.setUpdateStaff(UserUtil.loginId());
             userList.setCreateStaff(UserUtil.loginId());
             userList.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
@@ -117,8 +122,8 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
             redisUtils.hmSet(String.valueOf(userList.getUserId()), "userPhone", userList.getUserPhone());
             redisUtils.hmSet(String.valueOf(userList.getUserId()), "filterType", userList.getFilterType());
             redisUtils.hmSet(String.valueOf(userList.getUserId()), "ruleId", String.valueOf(ruleId));
+            System.out.println(redisUtils.hmGet(String.valueOf(userList.getUserId()), "userName"));
         }
-        System.out.println(redisUtils.hmGet(String.valueOf(userList.getUserId()), "userName"));
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         return maps;

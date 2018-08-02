@@ -56,10 +56,14 @@ public class CampaignController extends BaseController {
 
     @RequestMapping(value = "/getCampaignList", method = RequestMethod.POST)
     @CrossOrigin
-    public String getCampaignList(@RequestBody Map<String, String> params)throws Exception {
-        String mktCampaignName = params.get("mktCampaignName");  // 活动名称
-        String mktCampaignType = params.get("mktCampaignType"); // 活动
-        Map<String, Object> map = mktCampaignService.getCampaignList(mktCampaignName,mktCampaignType);
+    public String getCampaignList(@RequestBody Map<String, Object> params)throws Exception {
+        String mktCampaignName = params.get("mktCampaignName").toString();  // 活动名称
+        Long eventId = null;
+        if (params.get("eventId")!=null){
+            eventId = Long.valueOf(params.get("eventId").toString());
+        }
+//        String mktCampaignType = params.get("mktCampaignType"); // 活动
+        Map<String, Object> map = mktCampaignService.getCampaignList(mktCampaignName,null,eventId);
         return JSON.toJSONString(map);
     }
 
