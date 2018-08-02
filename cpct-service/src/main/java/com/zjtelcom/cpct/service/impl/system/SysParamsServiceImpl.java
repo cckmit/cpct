@@ -28,7 +28,6 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
         PageHelper.startPage(page,pageSize);
         List<SysParams> list = sysParamsMapper.selectAll(paramName, configType);
         Page pageInfo = new Page(new PageInfo(list));
-
         result.put("resultCode","0");
         result.put("resultMsg","");
         result.put("data",list);

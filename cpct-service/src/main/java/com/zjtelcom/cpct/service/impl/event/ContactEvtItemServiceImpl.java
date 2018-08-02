@@ -30,19 +30,19 @@ public class ContactEvtItemServiceImpl extends BaseService implements ContactEvt
     private ContactEvtItemMapper contactEvtItemMapper;
 
     /**
-     * 获取事件采集项列表
+     * 获取事件采集项列表(主参)
      */
     @Override
     public Map<String, Object> listEventItem(ContactEvtReq ContactEvtReq) {
         Map<String, Object> maps = new HashMap<>();
         List<ContactEvtItem> contactEvtItems = new ArrayList<>();
-        Page pageInfo = ContactEvtReq.getPage();
-        PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
-        contactEvtItems = contactEvtItemMapper.listEventItem(ContactEvtReq.getContactEvt().getContactEvtId());
+//        Page pageInfo = ContactEvtReq.getPage();
+//        PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
+        contactEvtItems = contactEvtItemMapper.listEventItem(ContactEvtReq.getContactEvt().getContactEvtId(),"0");
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("contactEvtItems", contactEvtItems);
-        maps.put("pageInfo", new Page(new PageInfo(contactEvtItems)));
+//        maps.put("pageInfo", new Page(new PageInfo(contactEvtItems)));
         return maps;
     }
 

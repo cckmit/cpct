@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.dao.question;
 
 
 import com.zjtelcom.cpct.domain.question.QuestRel;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -13,6 +14,8 @@ public interface MktQstQuestRelMapper {
     QuestRel selectByPrimaryKey(Long relId);
 
     List<QuestRel> selectAll();
+
+    List<QuestRel> findRelListByQuestionnaireId(@Param("questionnaireId")Long questionnaireId);
 
     int updateByPrimaryKey(QuestRel record);
 }

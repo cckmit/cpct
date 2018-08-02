@@ -271,6 +271,8 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         channel.setCreateStaff(userId);
         channel.setUpdateStaff(userId);
         channel.setStatusCd("1000");
+        channel.setChannelType("0");
+        channel.setContactChlType("10000");
         channelMapper.insert(channel);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");

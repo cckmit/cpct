@@ -65,6 +65,7 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
                 //todo 外部事件场景id
                 eventScene.setExtEventSceneId(1L);
                 eventScene.setEventId(1L);
+                eventScene.setContactEvtCode("");
                 eventScene.setEventSceneNbr("ET0990766987");
                 eventScene.setCreateDate(DateUtil.getCurrentTime());
                 eventScene.setStatusDate(DateUtil.getCurrentTime());
@@ -170,14 +171,18 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
                 eventSceneMapper.updateById(eventScene);
 
                 evtSceneCamRels = eventSceneDetailT.getEvtSceneCamRels();
+                List<Long> relIdList = new ArrayList<>();
+                List<EvtSceneCamRel> oldRelList = evtSceneCamRelMapper.selectCamsByEvtSceneId(eventSceneDetailT.getEventSceneId());
                 for (EvtSceneCamRel evtSceneCamRel : evtSceneCamRels) {
+                    if (evtSceneCamRel.getSceneCamRelId()!=null){
+                        relIdList.add(evtSceneCamRel.getSceneCamRelId());
+                    }
                     //转接editVO
                     EventSceneCamRelEditVO editVO = BeanUtil.create(evtSceneCamRel,new EventSceneCamRelEditVO());
 
 //                    EvtSceneCamRel evtSceneCamRelT = evtSceneCamRelMapper.selectByPrimaryKey(evtSceneCamRel.getSceneCamRelId());
                     //todo 编辑待确认
                     EvtSceneCamRel evtSceneCamRelT = evtSceneCamRelMapper.findByCampaignIdAndEventSceneId(evtSceneCamRel.getMktCampaignId(),evtSceneCamRel.getEventSceneId());
-
                     if (evtSceneCamRelT != null) {
                         BeanUtil.copy(editVO,evtSceneCamRelT);
                         evtSceneCamRelT.setUpdateDate(DateUtil.getCurrentTime());
@@ -191,7 +196,13 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
                         evtScRel.setCreateStaff(UserUtil.loginId());
                         evtScRel.setCreateDate(DateUtil.getCurrentTime());
                         evtScRel.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+
                         evtSceneCamRelMapper.insert(evtScRel);
+                    }
+                }
+                for (EvtSceneCamRel oldRel : oldRelList){
+                    if (!relIdList.contains(oldRel.getSceneCamRelId())){
+                        evtSceneCamRelMapper.deleteByPrimaryKey(oldRel.getSceneCamRelId());
                     }
                 }
             }

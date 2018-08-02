@@ -17,6 +17,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.campaign.MktCampaign;
 import com.zjtelcom.cpct.dto.event.*;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
+import com.zjtelcom.cpct.dto.system.SystemParam;
 import com.zjtelcom.cpct.enums.ParamKeyEnum;
 import com.zjtelcom.cpct.request.event.CreateContactEvtJtReq;
 import com.zjtelcom.cpct.request.event.CreateContactEvtReq;
@@ -189,6 +190,9 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         for (ContactEventDetail evtDetail : evtDetailList) {
             //插入事件主题信息
             ContactEvt contactEvt = evtDetail;
+            //todo 待确认必填字段
+            contactEvt.setInterfaceCfgId(1L);
+
             contactEvt.setUpdateDate(DateUtil.getCurrentTime());
             contactEvt.setCreateDate(DateUtil.getCurrentTime());
             contactEvt.setStatusDate(DateUtil.getCurrentTime());
@@ -326,8 +330,12 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         ContactEvt contactEvt = contactEvtMapper.getEventById(contactEvtId);
         CopyPropertiesUtil.copyBean2Bean(contactEventDetail, contactEvt);
         //查询出事件采集项
-        List<ContactEvtItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId());
-        contactEventDetail.setContactEvtItems(contactEvtItems);
+        List<ContactEvtItem> allItems = new ArrayList<>();
+        List<ContactEvtItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId(),"1");
+        List<ContactEvtItem> mainItems = contactEvtItemMapper.listEventItem(null,"0");
+        allItems.addAll(contactEvtItems);
+        allItems.addAll(mainItems);
+        contactEventDetail.setContactEvtItems(allItems);
         //查询出事件匹配规则
         ContactEvtMatchRul contactEvtMatchRul = new ContactEvtMatchRul();
         contactEvtMatchRul.setContactEvtId(contactEvtId);
@@ -342,6 +350,13 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             }
         }
         contactEventDetail.setFilterRules(filterRuleList);
+        if (contactEvt.getMktCampaignType()!=null){
+            String paramKey = ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey();
+           SysParams systemParam = sysParamsMapper.findParamsByValue(paramKey,contactEvt.getMktCampaignType());
+            if (systemParam!=null){
+                contactEventDetail.setMktCampaignTypeName(systemParam.getParamName());
+            }
+        }
         //获取所有活动
         List<MktCamEvtRel> mktCamEvtRels = new ArrayList<>();
         mktCamEvtRels = mktCamEvtRelMapper.qryBycontactEvtId(contactEvt.getContactEvtId());
@@ -419,7 +434,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             contactEvt.setUpdateStaff(UserUtil.loginId());
             contactEvtMapper.modContactEvt(contactEvt);
             //更新事件采集项
-            List<ContactEvtItem> oldItems = contactEvtItemMapper.listEventItem(evtDetail.getContactEvtId());
+            List<ContactEvtItem> oldItems = contactEvtItemMapper.listEventItem(evtDetail.getContactEvtId(),"1");
             contactEvtItems = evtDetail.getContactEvtItems();
             List<Long> contactIdList = new ArrayList<>();
             for (ContactEvtItem contactEvtItem : contactEvtItems) {

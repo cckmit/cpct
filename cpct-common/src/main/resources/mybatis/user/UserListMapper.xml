@@ -19,7 +19,7 @@
     delete from user_list
     where USER_ID = #{userId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" keyProperty="userId" useGeneratedKeys="true" parameterType="com.zjtelcom.cpct.dto.user.UserList">
+  <insert id="insert" parameterType="com.zjtelcom.cpct.dto.user.UserList" useGeneratedKeys="true" keyProperty="userId">
     insert into user_list (USER_ID, USER_NAME, USER_PHONE, 
       FILTER_TYPE, RULE_ID, STATUS_CD, 
       CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 

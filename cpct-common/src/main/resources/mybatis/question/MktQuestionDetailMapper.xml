@@ -19,7 +19,7 @@
     delete from mkt_question_detail
     where QST_DETAIL_ID = #{qstDetailId,jdbcType=DECIMAL}
   </delete>
-  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.question.QuestionDetail">
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.question.QuestionDetail" useGeneratedKeys="true" keyProperty="qstDetailId">
     insert into mkt_question_detail (QST_DETAIL_ID, QUESTION_ID, QST_DETAIL_ORDER, 
       QST_DETAIL_VALUE, QST_DETAIL_INPUT_TYPE, STATUS_CD, 
       STATUS_DATE, CREATE_STAFF, CREATE_DATE, 
@@ -57,4 +57,13 @@
     STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
     from mkt_question_detail
   </select>
+
+  <select id="findDetailListByQuestionId" resultMap="BaseResultMap">
+    select QST_DETAIL_ID, QUESTION_ID, QST_DETAIL_ORDER, QST_DETAIL_VALUE, QST_DETAIL_INPUT_TYPE,
+    STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
+    from mkt_question_detail
+    where QUESTION_ID = #{quesitonId}
+  </select>
+
+
 </mapper>

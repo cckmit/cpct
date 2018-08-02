@@ -21,6 +21,9 @@ public class ContactEventDetail extends ContactEvt{
     private InterfaceCfgDetail interfaceCfgDetail;
     private List<FilterRule> filterRules;
     private List<MktCamEvtRel> mktCamEvtRels;
+    private String mktCampaignTypeName;
+
+
 
     public List<ContactEvtItem> getContactEvtItems() {
         return contactEvtItems;
