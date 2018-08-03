@@ -61,4 +61,12 @@
     STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
     from mkt_qst_quest_rel
   </select>
+
+  <select id="findRelListByQuestionnaireId" resultMap="BaseResultMap">
+    select REL_ID, NAIRE_ID, QUESTION_ID, QUESTION_ORDER, QUESTION_WEIGHT, IS_MARK, IS_MUST,
+    STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
+    from mkt_qst_quest_rel
+    where NAIRE_ID = #{questionnaireId}
+  </select>
+
 </mapper>

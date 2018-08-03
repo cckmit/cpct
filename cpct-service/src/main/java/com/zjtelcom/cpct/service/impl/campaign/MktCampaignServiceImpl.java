@@ -67,6 +67,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
     @Autowired
     private ContactEvtMapper contactEvtMapper;
+    @Autowired
+    private MktCamEvtRelMapper camEvtRelMapper;
 
     /**
      * 策略配置和活动关联
@@ -369,19 +371,29 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     }
 
     @Override
-    public Map<String, Object> getCampaignList(String mktCampaignName,String mktCampaignType) {
+    public Map<String, Object> getCampaignList(String mktCampaignName,String mktCampaignType,Long eventId) {
         Map<String, Object> maps = new HashMap<>();
         MktCampaignDO MktCampaignPar = new MktCampaignDO();
         MktCampaignPar.setMktCampaignName(mktCampaignName);
-        if (mktCampaignType==null || mktCampaignType.equals("")){
-            maps.put("resultCode", CODE_FAIL);
-            maps.put("resultMsg", "请选择事件分类");
-            return maps;
-        }
+//        if (mktCampaignType==null || mktCampaignType.equals("")){
+//            maps.put("resultCode", CODE_FAIL);
+//            maps.put("resultMsg", "请选择事件分类");
+//            return maps;
+//        }
         MktCampaignPar.setMktCampaignType(mktCampaignType);
+        List<Long> relationCamList = new ArrayList<>();
+        if (eventId!=null){
+            List<MktCamEvtRel> camEvtRelList = camEvtRelMapper.qryBycontactEvtId(eventId);
+            for (MktCamEvtRel rel : camEvtRelList){
+                relationCamList.add(rel.getMktCampaignId());
+            }
+        }
         List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListPage(MktCampaignPar);
         List<CampaignVO> voList = new ArrayList<>();
         for (MktCampaignDO campaignDO : mktCampaignDOList){
+            if (relationCamList.contains(campaignDO.getMktCampaignId())){
+                continue;
+            }
             CampaignVO vo = ChannelUtil.map2CampaignVO(campaignDO);
             voList.add(vo);
         }

@@ -20,7 +20,7 @@
     delete from mkt_question
     where QUESTION_ID = #{questionId,jdbcType=DECIMAL}
   </delete>
-  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.question.Question">
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.question.Question" useGeneratedKeys="true" keyProperty="questionId">
     insert into mkt_question (QUESTION_ID, QUESTION_NAME, QUESTION_TYPE, 
       QUESTION_DESC, ANSWER_TYPE, DEFAULT_ANSWER, 
       STATUS_CD, STATUS_DATE, CREATE_STAFF, 

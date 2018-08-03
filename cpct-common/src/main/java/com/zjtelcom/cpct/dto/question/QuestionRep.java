@@ -5,9 +5,9 @@ import com.zjtelcom.cpct.domain.question.Questionnaire;
 import java.io.Serializable;
 import java.util.List;
 
-public class QuestionReq implements Serializable {
+public class QuestionRep implements Serializable {
     private Questionnaire questionnaire;
-    private List<QuestionAddVO> addVOList;
+    private List<QuestionVO> questionVOList;
 
     public Questionnaire getQuestionnaire() {
         return questionnaire;
@@ -17,11 +17,11 @@ public class QuestionReq implements Serializable {
         this.questionnaire = questionnaire;
     }
 
-    public List<QuestionAddVO> getAddVOList() {
-        return addVOList;
+    public List<QuestionVO> getQuestionVOList() {
+        return questionVOList;
     }
 
-    public void setAddVOList(List<QuestionAddVO> addVOList) {
-        this.addVOList = addVOList;
+    public void setQuestionVOList(List<QuestionVO> questionVOList) {
+        this.questionVOList = questionVOList;
     }
 }
