@@ -62,7 +62,7 @@ public class MktCamChlResultController extends BaseController {
     }
 
     /**
-     * 更新协同渠道配置
+     * 更新二次协同渠道配置
      *
      * @param mktCamChlResultList
      * @return

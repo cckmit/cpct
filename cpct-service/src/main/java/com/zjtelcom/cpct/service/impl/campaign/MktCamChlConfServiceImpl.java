@@ -179,11 +179,12 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                 }
                 mktCamChlConfAttrList.add(mktCamChlConfAttr);
             }
-
+            // 查询痛痒点话术列表
             Map<String, Object> verbalListMap = verbalService.getVerbalListByConfId(UserUtil.loginId(), evtContactConfId);
             List<VerbalVO> verbalVOList = (List<VerbalVO>) verbalListMap.get("resultMsg");
             mktCamChlConfDetail.setVerbalVOList(verbalVOList);
 
+            // 查询脚本
             CamScript camScript = camScriptMapper.selectByConfId(evtContactConfId);
             mktCamChlConfDetail.setCamScript(camScript);
 
