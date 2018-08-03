@@ -20,15 +20,13 @@ package com.zjtelcom.cpct.dto.pojo;
 
 public class CpcGroupRequest<T> {
 
-    private ContractReqRoot<T> contractRoot;
+    private ContractReqRoot<T> ContractRoot;
 
 	public ContractReqRoot<T> getContractRoot() {
-		return contractRoot;
+		return ContractRoot;
 	}
 
 	public void setContractRoot(ContractReqRoot<T> contractRoot) {
-		this.contractRoot = contractRoot;
+		ContractRoot = contractRoot;
 	}
-
-
 }

@@ -31,25 +31,26 @@ public class CpctEventServiceImpl implements CpctEventService {
 
         SvcReqCont<EventPo> svcCont = contractReqRoot.getSvcCont();
         EventPo eventPos = svcCont.getRequestObject();
-        List<EventDetail> evtDetails = eventPos.getContactEvtDetails();
+        EventDetail evtDetails = eventPos.getContactEvtDetails();
         if (evtDetails != null) {
-            for (EventDetail tempEvtDetail : evtDetails) {
-                ContactEvt contactEvt = tempEvtDetail;
+//            for (EventDetail tempEvtDetail : evtDetails) {
+                ContactEvt contactEvt = evtDetails;
                 groupEventMapper.createContactEvt(contactEvt);
                 // 事件采集项
-                List<ContactEvtItem> contactEvtItemList = tempEvtDetail.getContactEvtItems();
+                List<ContactEvtItem> contactEvtItemList = evtDetails.getContactEvtItems();
                 if (null != contactEvtItemList) {
                     for (ContactEvtItem tempContactEvtItem : contactEvtItemList) {
                         evtItemMapper.insertContactEvtItem(tempContactEvtItem);
                     }
                 }
                 // 事件匹配规则
-                List<ContactEvtMatchRul> contactEvtMatchRulList = tempEvtDetail.getContactEvtMatchRuls();
+                List<ContactEvtMatchRul> contactEvtMatchRulList = evtDetails.getContactEvtMatchRuls();
                 if (null != contactEvtMatchRulList) {
                     for (ContactEvtMatchRul tempContactEvtMatchRul : contactEvtMatchRulList) {
                         evtMatchRulMapper.createContactEvtMatchRul(tempContactEvtMatchRul);
                     }
                 }
+
 //                // 事件触发规则
 //                List<ContactEvtTrigRul> contactEvtTrigRulList = tempEvtDetail.getContactEvtTrigRuls();
 //                if (null != contactEvtTrigRulList) {
@@ -69,7 +70,7 @@ public class CpctEventServiceImpl implements CpctEventService {
 //                    }
 //                }
             }
-        }
+//        }
         cpcGroupResponse = CpcUtil.buildSuccessResponse(cpcGroupRequest);
         return cpcGroupResponse;
     }
@@ -80,12 +81,12 @@ public class CpctEventServiceImpl implements CpctEventService {
         ContractReqRoot<EventPo> contractReqRoot = cpcGroupRequest.getContractRoot();
         SvcReqCont<EventPo> svcCont = contractReqRoot.getSvcCont();
         EventPo eventPos = svcCont.getRequestObject();
-        List<EventDetail> evtDetails = eventPos.getContactEvtDetails();
+        EventDetail evtDetails = eventPos.getContactEvtDetails();
         if (evtDetails != null) {
-            for (EventDetail tempEvtDetail : evtDetails) {
+//            for (EventDetail tempEvtDetail : evtDetails) {
                 boolean deleteFlag = false;
-                ContactEvt contactEvt = tempEvtDetail;
-                String actType = tempEvtDetail.getActType();
+                ContactEvt contactEvt = evtDetails;
+                String actType = evtDetails.getActType();
                 if (null == actType) {
                     //continue;
                 } else if (ActType.ADD.equals(actType)) {
@@ -96,7 +97,7 @@ public class CpctEventServiceImpl implements CpctEventService {
                     groupEventMapper.modContactEvt(contactEvt);
                 }
                 // 事件采集项
-                List<ContactEvtItem> contactEvtItemList = tempEvtDetail.getContactEvtItems();
+                List<ContactEvtItem> contactEvtItemList = evtDetails.getContactEvtItems();
                 if (null != contactEvtItemList) {
                     for (ContactEvtItem tempContactEvtItem : contactEvtItemList) {
                         String itemActType = tempContactEvtItem.getActType();
@@ -112,7 +113,7 @@ public class CpctEventServiceImpl implements CpctEventService {
                     }
                 }
                 // 事件匹配规则
-                List<ContactEvtMatchRul> contactEvtMatchRulList = tempEvtDetail.getContactEvtMatchRuls();
+                List<ContactEvtMatchRul> contactEvtMatchRulList = evtDetails.getContactEvtMatchRuls();
                 if (null != contactEvtMatchRulList) {
                     for (ContactEvtMatchRul tempContactEvtMatchRul : contactEvtMatchRulList) {
                         String matchRulActType = tempContactEvtMatchRul.getActType();
@@ -182,7 +183,6 @@ public class CpctEventServiceImpl implements CpctEventService {
 //                    groupEventMapper.deleteByPrimaryKey(contactEvt.getContactEvtId());
 //                }
             }
-        }
         cpcGroupResponse = CpcUtil.buildSuccessResponse(cpcGroupRequest);
         return cpcGroupResponse;
     }

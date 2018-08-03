@@ -35,6 +35,16 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
 
 
     @Override
+    public Map<String, Object> listAllChildChannelList() {
+        Map<String,Object> result = new HashMap<>();
+        List<Channel> channelList = channelMapper.findChildList();
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",channelList);
+        return result;
+    }
+
+
+    @Override
     public Map<String, Object> listChannelByIdList(List<Long> idList) {
         Map<String,Object> result = new HashMap<>();
         List<Channel> channelList = new ArrayList<>();
@@ -50,9 +60,6 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",channelList);
         return result;
-
-
-
 
     }
 

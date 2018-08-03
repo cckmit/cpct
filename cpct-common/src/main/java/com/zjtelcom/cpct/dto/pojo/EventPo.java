@@ -4,7 +4,7 @@ import java.util.List;
 
 public class EventPo {
 	private RequestTemplateInst requestTemplateInst;
-	private List<EventDetail> contactEvtDetails;
+	private EventDetail contactEvtDetails;
 	
 	public RequestTemplateInst getRequestTemplateInst() {
 		return requestTemplateInst;
@@ -14,12 +14,11 @@ public class EventPo {
 		this.requestTemplateInst = requestTemplateInst;
 	}
 
-	public List<EventDetail> getContactEvtDetails() {
+	public EventDetail getContactEvtDetails() {
 		return contactEvtDetails;
 	}
 
-	public void setContactEvtDetails(List<EventDetail> contactEvtDetails) {
+	public void setContactEvtDetails(EventDetail contactEvtDetails) {
 		this.contactEvtDetails = contactEvtDetails;
 	}
-	
 }

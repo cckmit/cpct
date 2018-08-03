@@ -23,6 +23,8 @@ public class SvcReqCont<T> {
 
     private T requestObject;
 
+
+
     public AuthenticationInfo getAuthenticationInfo() {
         return authenticationInfo;
     }
