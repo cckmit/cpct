@@ -31,7 +31,9 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
         Map<String,Object> result = new HashMap<>();
         CamScript script = camScriptMapper.selectByConfId(addVO.getEvtContactConfId());
         if (script!=null){
+            //todo copy结果为null需要处理
             BeanUtil.copy(addVO,script);
+            script.setMktCampaignId(123L);
             script.setUpdateDate(new Date());
             script.setUpdateStaff(userId);
             camScriptMapper.updateByPrimaryKey(script);
