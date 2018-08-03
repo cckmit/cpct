@@ -1,5 +1,7 @@
 package com.zjtelcom.cpct.domain.question;
 
+import com.zjtelcom.cpct.BaseEntity;
+
 import java.util.Date;
 
 public class Questionnaire {
@@ -7,7 +9,7 @@ public class Questionnaire {
 
     private String naireName;
 
-    private String naireType;
+    private String naireType;//1000	营销问卷;2000	维挽问卷
 
     private String markType;
 

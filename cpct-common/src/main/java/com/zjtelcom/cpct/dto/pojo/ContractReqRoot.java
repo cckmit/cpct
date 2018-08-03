@@ -19,31 +19,25 @@ package com.zjtelcom.cpct.dto.pojo;
 
 public class ContractReqRoot<T> {
 	
-    private TcpReqCont tcpCont;
+    private TcpReqCont TcpCont;
 
     
-    private SvcReqCont<T> svcCont;
+    private SvcReqCont<T> SvcCont;
 
 
 	public TcpReqCont getTcpCont() {
-		return tcpCont;
+		return TcpCont;
 	}
-
 
 	public void setTcpCont(TcpReqCont tcpCont) {
-		this.tcpCont = tcpCont;
+		TcpCont = tcpCont;
 	}
-
 
 	public SvcReqCont<T> getSvcCont() {
-		return svcCont;
+		return SvcCont;
 	}
-
 
 	public void setSvcCont(SvcReqCont<T> svcCont) {
-		this.svcCont = svcCont;
+		SvcCont = svcCont;
 	}
-
-    
-
 }
