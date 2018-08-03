@@ -208,22 +208,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
         }
 
-
-/*        mktStrategyConfService.saveMktStrategyConf();
-        // 删除与原有关系
-        mktCampaignRelMapper.deleteByAmktCampaignId(mktCampaignId);
-        // 重新创建活动与活动之间的关系
-        for (CityProperty cityProperty : mktCampaignVO.getApplyRegionIdList()) {
-            MktCampaignRelDO mktCampaignRelDO = new MktCampaignRelDO();
-            CopyPropertiesUtil.copyBean2Bean(mktCampaignRelDO, mktCampaignVO);
-            mktCampaignRelDO.setaMktCampaignId(mktCampaignId);
-            mktCampaignRelDO.setzMktCampaignId(mktCampaignId);
-            mktCampaignRelDO.setApplyRegionId(cityProperty.getCityPropertyId());
-            mktCampaignRelDO.setUpdateStaff(UserUtil.loginId());
-            mktCampaignRelDO.setUpdateDate(new Date());
-            mktCampaignRelMapper.insert(mktCampaignRelDO);
-        }
-*/
         Map<String, Object> maps = new HashMap<>();
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
@@ -263,10 +247,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         }
         mktCampaignVO.setApplyRegionIdList(applyRegionIds);
 
-/*
-        mktCampaignVO.setApplyRegionIds(applyRegionIds);
-        mktCampaignVO.setRelType(relType);
-*/
 
         // 获取所有的sysParam
         Map<String, String> paramMap = new HashMap<>();

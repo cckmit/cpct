@@ -38,7 +38,7 @@ public class MktStrategyConfRule {
     /**
      * 二次协同渠道结果集合
      */
-    private List<Long> mktCamChlResultIdList;
+    private List<MktCamChlResult> mktCamChlResultList;
 
     /**
      * 过滤规则配置Id
@@ -94,11 +94,11 @@ public class MktStrategyConfRule {
         this.mktStrategyConfRuleName = mktStrategyConfRuleName;
     }
 
-    public List<Long> getMktCamChlResultIdList() {
-        return mktCamChlResultIdList;
+    public List<MktCamChlResult> getMktCamChlResultList() {
+        return mktCamChlResultList;
     }
 
-    public void setMktCamChlResultIdList(List<Long> mktCamChlResultIdList) {
-        this.mktCamChlResultIdList = mktCamChlResultIdList;
+    public void setMktCamChlResultList(List<MktCamChlResult> mktCamChlResultList) {
+        this.mktCamChlResultList = mktCamChlResultList;
     }
 }

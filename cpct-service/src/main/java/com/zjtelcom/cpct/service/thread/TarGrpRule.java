@@ -27,7 +27,6 @@ import java.util.List;
 @Scope("prototype")
 public class TarGrpRule extends Thread {
 
-
     private Long mktCampaignId;
 
     private Long mktStrategyConfId;

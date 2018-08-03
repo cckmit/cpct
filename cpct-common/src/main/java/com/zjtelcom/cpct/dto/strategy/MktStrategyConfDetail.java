@@ -11,23 +11,11 @@ import java.util.List;
 public class MktStrategyConfDetail extends MktStrategyConf {
 
     private Long mktCampaignId;
-    /**
-     * 下发城市列表
-     */
-/*    private List<City> cityList;*/
 
     /**
      * 策略配置下规则列表
      */
     private List<MktStrategyConfRule> mktStrategyConfRuleList;
-
-/*    public List<City> getCityList() {
-        return cityList;
-    }
-
-    public void setCityList(List<City> cityList) {
-        this.cityList = cityList;
-    }*/
 
 
     public List<MktStrategyConfRule> getMktStrategyConfRuleList() {

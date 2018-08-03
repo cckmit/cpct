@@ -76,7 +76,7 @@
     where MKT_STRATEGY_CONF_RULE_ID = #{mktStrategyConfRuleId,jdbcType=BIGINT}
   </select>
   <select id="selectByMktStrategyConfId" resultMap="BaseResultMap" parameterType="Long">
-    select cr.MKT_STRATEGY_CONF_RULE_ID, cr.MKT_STRATEGY_CONF_RULE_NAME,cr.MKT_CAM_CHL_RESULT_ID cr.TAR_GRP_ID, cr.PRODUCT_ID, cr.EVT_CONTACT_CONF_ID, cr.RULE_CONF_ID
+    select cr.MKT_STRATEGY_CONF_RULE_ID, cr.MKT_STRATEGY_CONF_RULE_NAME,cr.MKT_CAM_CHL_RESULT_ID, cr.TAR_GRP_ID, cr.PRODUCT_ID, cr.EVT_CONTACT_CONF_ID, cr.RULE_CONF_ID
     from mkt_strategy_conf_rule cr
     left join mkt_strategy_conf_rule_rel crr
     on cr.MKT_STRATEGY_CONF_RULE_ID = crr.MKT_STRATEGY_CONF_RULE_ID

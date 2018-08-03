@@ -53,7 +53,7 @@ public class MktStrategyConRulController {
     @CrossOrigin
     public String getMktStrategyConfRule(@RequestBody Map<String, String> param) {
         Map<String, Object> map = new HashMap<>();
-        if(param.get("mktStrategyConfRuleId")!=null && !"null".equals(param.get("mktStrategyConfRule    Id"))){
+        if(param.get("mktStrategyConfRuleId")!=null && !"null".equals(param.get("mktStrategyConfRuleId"))){
             Long mktStrategyConfRuleId = Long.valueOf(param.get("mktStrategyConfRuleId"));
             map = mktStrategyConfRuleService.getMktStrategyConfRule(mktStrategyConfRuleId);
         }
@@ -76,6 +76,4 @@ public class MktStrategyConRulController {
         }
         return JSON.toJSONString(map);
     }
-
-
 }
