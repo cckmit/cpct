@@ -20,13 +20,29 @@ public class ChannelController extends BaseController {
     private ChannelService channelService;
 
 
+    @PostMapping("listAllChildChannelList")
+    @CrossOrigin
+    public Map<String, Object> listAllChildChannelList() {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = channelService.listAllChildChannelList();
+        } catch (Exception e) {
+            logger.error("[op:ChannelController] fail to listChannelByIdList",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to listChannelByIdList");
+            return result;
+        }
+        return result;
+    }
+
+
     /**
-     *
+     *活动页--获取渠道
      * @param param
      * @return
      */
     @PostMapping("listChannelByIdList")
-
     @CrossOrigin
     public Map<String, Object> listChannelByIdList(@RequestBody HashMap<String,List<Long>> param ) {
         Long userId = UserUtil.loginId();

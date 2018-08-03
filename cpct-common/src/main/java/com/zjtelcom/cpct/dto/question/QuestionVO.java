@@ -10,6 +10,8 @@ public class QuestionVO implements Serializable {
     private Question question;
     private List<QuestionDetail> questionDetailList;
 
+
+
     public Question getQuestion() {
         return question;
     }

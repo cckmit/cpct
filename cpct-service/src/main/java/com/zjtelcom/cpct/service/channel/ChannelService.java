@@ -13,6 +13,7 @@ import java.util.Map;
  */
 public interface ChannelService {
 
+    Map<String,Object> listAllChildChannelList();
 
     Map<String,Object> listChannelByIdList(List<Long> idList);
 

@@ -19,6 +19,7 @@ import com.zjtelcom.cpct.dto.pojo.*;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.NestedRuntimeException;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -158,6 +159,31 @@ public final class CpcUtil {
             transactionID);
     }
 
+    public static CpcGroupResponse buildErrorResponse(CpcGroupRequest cpcGroupRequest, Exception e) {
+
+        ContractReqRoot contractRoot = cpcGroupRequest.getContractRoot();
+        String sign = contractRoot.getTcpCont().getSign();
+        String transactionID = contractRoot.getTcpCont().getTransactionId();
+        return buildErrorResponse(e, sign, transactionID);
+    }
+
+    public static CpcGroupResponse buildErrorResponse(Exception exception, String sign,
+                                                      String transactionID) {
+        if (exception instanceof SQLException) {
+            return buildResponse(ResponseCode.DATABASE_ERROR, ResponseCode.DATABASE_ERROR_MSG,
+                    null, sign, transactionID);
+        }
+        String msg = null;
+        if (exception instanceof RuntimeException) {
+
+            if (StringUtils.isEmpty(exception.getMessage())) {
+                msg = ResponseCode.VALIDATE_ERROR_MSG;
+            }
+            return buildResponse(ResponseCode.VALIDATE_ERROR, msg, null, sign, transactionID);
+        }
+        return buildResponse(ResponseCode.INTERNAL_ERROR, "处理失败，请联系接口人员！", null, sign,
+                transactionID);
+    }
 
     public static CpcGroupResponse buildSuccessResponse(CpcGroupRequest cpcGroupRequest) {
         ContractReqRoot contractRoot = cpcGroupRequest.getContractRoot();
