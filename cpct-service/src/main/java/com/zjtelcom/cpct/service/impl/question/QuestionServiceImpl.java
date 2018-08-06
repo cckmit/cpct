@@ -15,6 +15,7 @@ import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 @Service
+@Transactional
 public class QuestionServiceImpl implements QuestionService {
 
 
@@ -47,7 +49,7 @@ public class QuestionServiceImpl implements QuestionService {
         if (!map.get("resultCode").equals(CODE_SUCCESS)){
             return map;
         }
-        Long questionId = Long.valueOf(map.get("question").toString());
+        Long questionId = Long.valueOf(map.get("questionId").toString());
         for (QuestionDetailAddVO detailAddVO : addVO.getQuestionDetailAddVOList()){
             QuestionDetail detail = BeanUtil.create(detailAddVO,new QuestionDetail());
             detail.setQuestionId(questionId);
@@ -61,7 +63,7 @@ public class QuestionServiceImpl implements QuestionService {
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
-        result.put("questionId",question.getQuestionId());
+        result.put("questionId",questionId);
         return result;
     }
 

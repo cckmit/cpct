@@ -29,6 +29,7 @@ public class ChannelUtil  {
     }
 
 
+
     public static String List2String(List<Integer> idList){
         if (idList == null || idList.isEmpty()){
             return "";

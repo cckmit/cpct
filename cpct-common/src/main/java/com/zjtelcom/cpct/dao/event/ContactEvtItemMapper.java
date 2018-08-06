@@ -25,7 +25,9 @@ public interface ContactEvtItemMapper {
 
     int saveEventItem(EventItemDO record);
 
-    List<ContactEvtItem> listEventItem(@Param("contactEvtId") Long contactEvtId,@Param("isMainParam")String isMainParam);
+    List<ContactEvtItem> listEventItem(@Param("contactEvtId") Long contactEvtId);
+
+    List<ContactEvtItem> listMainItem();
 
     ContactEvtItem viewEventItem(Long evtItemId);
 

@@ -74,6 +74,8 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     private ContactEvtItemService evtItemService;
     @Autowired
     private MktCampaignMapper campaignMapper;
+    @Autowired
+    private ContactEvtTypeMapper evtTypeMapper;
 
 
     /**
@@ -207,7 +209,6 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             contactEvtItems = evtDetail.getContactEvtItems();
             for (ContactEvtItem contactEvtItem : contactEvtItems) {
                 contactEvtItem.setContactEvtId(contactEvt.getContactEvtId());
-                contactEvtItem.setIsMainParam("1");
                 maps = evtItemService.createEventItem(contactEvtItem);
                 if (!maps.get("resultCode").equals(CODE_SUCCESS)){
                     return maps;
@@ -328,14 +329,19 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         ViewContactEvtRsp viewContactEvtRsp = new ViewContactEvtRsp();
         ContactEventDetail contactEventDetail = new ContactEventDetail();
         ContactEvt contactEvt = contactEvtMapper.getEventById(contactEvtId);
+        if (contactEvt==null){
+            map.put("resultCode", CODE_FAIL);
+            map.put("resultMsg","事件不存在");
+            return map;
+        }
         CopyPropertiesUtil.copyBean2Bean(contactEventDetail, contactEvt);
+        ContactEvtType evtType = evtTypeMapper.selectByPrimaryKey(contactEvt.getContactEvtTypeId());
+        contactEventDetail.setEventTypeName(evtType.getContactEvtName());
+
         //查询出事件采集项
-        List<ContactEvtItem> allItems = new ArrayList<>();
-        List<ContactEvtItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId(),"1");
-        List<ContactEvtItem> mainItems = contactEvtItemMapper.listEventItem(null,"0");
-        allItems.addAll(contactEvtItems);
-        allItems.addAll(mainItems);
-        contactEventDetail.setContactEvtItems(allItems);
+        List<ContactEvtItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId());
+        contactEventDetail.setContactEvtItems(contactEvtItems);
+
         //查询出事件匹配规则
         ContactEvtMatchRul contactEvtMatchRul = new ContactEvtMatchRul();
         contactEvtMatchRul.setContactEvtId(contactEvtId);
@@ -434,7 +440,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             contactEvt.setUpdateStaff(UserUtil.loginId());
             contactEvtMapper.modContactEvt(contactEvt);
             //更新事件采集项
-            List<ContactEvtItem> oldItems = contactEvtItemMapper.listEventItem(evtDetail.getContactEvtId(),"1");
+            List<ContactEvtItem> oldItems = contactEvtItemMapper.listEventItem(evtDetail.getContactEvtId());
             contactEvtItems = evtDetail.getContactEvtItems();
             List<Long> contactIdList = new ArrayList<>();
             for (ContactEvtItem contactEvtItem : contactEvtItems) {
