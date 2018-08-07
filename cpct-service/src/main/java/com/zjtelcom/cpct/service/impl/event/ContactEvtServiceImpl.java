@@ -336,8 +336,9 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         }
         CopyPropertiesUtil.copyBean2Bean(contactEventDetail, contactEvt);
         ContactEvtType evtType = evtTypeMapper.selectByPrimaryKey(contactEvt.getContactEvtTypeId());
-        contactEventDetail.setEventTypeName(evtType.getContactEvtName());
-
+        if (evtType!=null){
+            contactEventDetail.setEventTypeName(evtType.getContactEvtName());
+        }
         //查询出事件采集项
         List<ContactEvtItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId());
         contactEventDetail.setContactEvtItems(contactEvtItems);
@@ -465,6 +466,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             //遍历旧的采集项 不在的删除
             for (ContactEvtItem oldItem : oldItems){
                 if (!contactIdList.contains(oldItem.getEvtItemId())){
+
                     contactEvtItemMapper.deleteByPrimaryKey(oldItem.getEvtItemId());
                 }
             }

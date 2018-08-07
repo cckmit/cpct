@@ -3,6 +3,8 @@ package com.zjtelcom.cpct.service.impl.cpct;
 import com.zjtelcom.cpct.dao.event.ContactEvtItemMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMatchRulMapper;
+import com.zjtelcom.cpct.dao.event.InterfaceCfgMapper;
+import com.zjtelcom.cpct.domain.event.InterfaceCfg;
 import com.zjtelcom.cpct.dto.event.*;
 import com.zjtelcom.cpct.dto.pojo.*;
 import com.zjtelcom.cpct.service.cpct.CpctEventService;
@@ -21,6 +23,9 @@ public class CpctEventServiceImpl implements CpctEventService {
     private ContactEvtItemMapper evtItemMapper;
     @Autowired
     private ContactEvtMatchRulMapper evtMatchRulMapper;
+    @Autowired
+    private InterfaceCfgMapper interfaceCfgMapper;
+
 
 
     @Override
@@ -50,27 +55,7 @@ public class CpctEventServiceImpl implements CpctEventService {
                         evtMatchRulMapper.createContactEvtMatchRul(tempContactEvtMatchRul);
                     }
                 }
-
-//                // 事件触发规则
-//                List<ContactEvtTrigRul> contactEvtTrigRulList = tempEvtDetail.getContactEvtTrigRuls();
-//                if (null != contactEvtTrigRulList) {
-//                    for (ContactEvtTrigRul tempContactEvtTrigRul : contactEvtTrigRulList) {
-//                        groupEventMapper.insertTrigRulSelective(tempContactEvtTrigRul);
-//                    }
-//                }
-//                // 事件源接口配置
-//                InterfaceCfgDetail interfaceCfgDetail = tempEvtDetail.getInterfaceCfgDetail();
-//                if (null != interfaceCfgDetail) {
-//                    groupEventMapper.insertInterfaceCfgSelective(interfaceCfgDetail);
-//                    List<InterfaceCfgParam> interfaceCfgParams = interfaceCfgDetail.getInterfaceCfgParams();
-//                    if (null != interfaceCfgParams) {
-//                        for (InterfaceCfgParam tempInterfaceCfgParam : interfaceCfgParams) {
-//                            groupEventMapper.insertInterfaceCfgParamSelective(tempInterfaceCfgParam);
-//                        }
-//                    }
-//                }
-            }
-//        }
+        }
         cpcGroupResponse = CpcUtil.buildSuccessResponse(cpcGroupRequest);
         return cpcGroupResponse;
     }

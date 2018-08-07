@@ -57,6 +57,12 @@ public class CpctEventTypeServiceImpl implements CpctEventTypeService {
                 if (ActType.MOD.equals(catalogActType)) {
                     //todo catalog 转 eventType
                     ContactEvtType evtType = new ContactEvtType();
+                    evtType.setContactEvtName(catalogDetail.getCatalogName());
+                    evtType.setContactEvtTypeCode(catalogDetail.getCatalogNbr());
+                    evtType.setEvtTypeDesc(catalogDetail.getCatalogDesc());
+                    //todo 父级id
+                    Long parEvtTypeId = catalogDetail.getCatalogItems().get(0).getParCatalogItemId();
+                    evtType.setParEvtTypeId(parEvtTypeId);
                     eventTypeMapper.modContactEvtType(evtType);
                 } else if (ActType.DEL.equals(catalogActType)) {
                     eventTypeMapper.deleteByPrimaryKey(catalog.getCatalogId());

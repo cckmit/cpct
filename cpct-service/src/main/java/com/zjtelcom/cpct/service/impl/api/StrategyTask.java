@@ -58,6 +58,8 @@ public class StrategyTask implements Callable<List<Map<String, Object>>> {
         List<Future<List<Map<String, Object>>>> threadList = new ArrayList<>();
         //初始化线程池
         ExecutorService executorService = Executors.newCachedThreadPool();
+
+
         //遍历规则列表
         if (mktStrategyConfRuleDOS != null && mktStrategyConfRuleDOS.size() > 0) {
             for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleDOS) {
