@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://code.alibabatech.com/schema/dubbo
+    http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <!-- 提供方应用信息，用于计算依赖关系 -->
+    <dubbo:application name="33.1059" />
+
+    <dubbo:registry protocol="zookeeper" address="dubbo://134.96.159.11:8033"/>
+    <!--<dubbo:registry protocol="zookeeper" address="dubbo://127.0.0.1:9090"/>-->
+    <!--<dubbo:registry protocol="dubbo" address="127.0.0.1:9090"/>-->
+
+    <!-- 暴露服务 -->
+    <dubbo:protocol name="dubbo" port="2181" />
+    <dubbo:monitor protocol="registry" />
+
+    <!-- 注册 -->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.EventApiService" ref="eventApiServiceImpl" version="1.0" >
+        <dubbo:method name="CalculateCPC" servicecode="33.1059.CalculateCPCTest" timeout="5000"/>
+    </dubbo:service>
+
+</beans>

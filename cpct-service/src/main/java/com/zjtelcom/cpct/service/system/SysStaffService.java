@@ -9,7 +9,7 @@ import java.util.Map;
 
 public interface SysStaffService {
 
-    Map<String,Object> listStaff(String staffAccount,String staffName,Long status,Integer page,Integer pageSize);
+    Map<String,Object> listStaff(Map<String,String> params);
 
     Map<String,Object> saveStaff(SysStaffDTO sysStaffDTO) throws Exception;
 

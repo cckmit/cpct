@@ -51,13 +51,48 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         return resultMap;
     }
 
+    /**
+     * 查询员工（用户）列表
+     * @param params
+     * @return
+     */
     @Override
-    public Map<String,Object> listStaff(String staffAccount, String staffName, Long status, Integer page, Integer pageSize) {
+    public Map<String,Object> listStaff(Map<String,String> params) {
         Map<String,Object> result = new HashMap<>();
+
+        //获取分页参数
+        Integer page = Integer.parseInt(params.get("page"));
+        Integer pageSize = Integer.parseInt(params.get("pageSize"));
+
+        SysStaff sysStaff = new SysStaff();
+        if(params.containsKey("staffAccount")) {
+            String staffAccount = params.get("staffAccount");
+            sysStaff.setStaffAccount(staffAccount);
+        }
+        if(params.containsKey("staffName")) {
+            String staffName = params.get("staffName");
+            sysStaff.setStaffName(staffName);
+        }
+        if(params.containsKey("status") && !"".equals(params.get("status"))) {
+            Long status = Long.parseLong(params.get("status"));
+            sysStaff.setStatus(status);
+        }
+        if(params.containsKey("cityId") && !"".equals(params.get("cityId"))) {
+            Long cityId = Long.parseLong(params.get("cityId"));
+            sysStaff.setCityId(cityId);
+        }
+        if(params.containsKey("channelId") && !"".equals(params.get("channelId"))) {
+            Long channelId = Long.parseLong(params.get("channelId"));
+            sysStaff.setChannelId(channelId);
+        }
+        if(params.containsKey("loginStatus") && !"".equals(params.get("loginStatus"))) {
+            Long loginStatus = Long.parseLong(params.get("loginStatus"));
+            sysStaff.setLoginStatus(loginStatus);
+        }
 
         //分页
         PageHelper.startPage(page, pageSize);
-        List<SysStaff> list = sysStaffMapper.selectAll(staffAccount, staffName, status);
+        List<SysStaff> list = sysStaffMapper.selectAll(sysStaff);
         Page pageInfo = new Page(new PageInfo(list));
 
         result.put("resultCode","0");
@@ -88,6 +123,8 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
 
         //初始化状态值 todo 静态
         sysStaff.setStatus(1L);
+        //初始化登录状态 离线
+        sysStaff.setLoginStatus(2L);
 
         Long loginId = UserUtil.loginId();
         sysStaff.setCreateStaff(loginId);
@@ -113,7 +150,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         }
 
         result.put("resultCode","0");
-
+        result.put("resultMsg","保存成功");
         return result;
     }
 
@@ -124,9 +161,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         SysStaff sysStaff = new SysStaff();
         CopyPropertiesUtil.copyBean2Bean(sysStaff, sysStaffDTO);
 
-
         //todo 判断账号是否重复
-
 
         Long loginId = UserUtil.loginId();
         sysStaff.setUpdateStaff(loginId);
@@ -151,6 +186,8 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         }
 
         result.put("resultCode","0");
+        result.put("resultMsg","保存成功");
+
         return result;
     }
 
@@ -170,6 +207,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         sysStaffMapper.changeStatus(params);
 
         result.put("resultCode","0");
+        result.put("resultMsg","保存成功");
         return result;
     }
 
@@ -214,6 +252,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
 
         sysStaffMapper.updatePassword(id, password);
         result.put("resultCode","0");
+        result.put("resultMsg","修改成功");
         return result;
     }
 

@@ -19,9 +19,7 @@ public interface SysStaffMapper {
 
     SysStaff selectByPrimaryKey(Long staffId);
 
-    List<SysStaff> selectAll(@Param("staffAccount") String staffAccount,
-                             @Param("staffName") String staffName,
-                             @Param("status") Long status);
+    List<SysStaff> selectAll(SysStaff record);
 
     int updateByPrimaryKey(SysStaff record);
 
