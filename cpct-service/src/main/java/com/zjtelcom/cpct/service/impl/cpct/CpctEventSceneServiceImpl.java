@@ -5,6 +5,7 @@ import com.zjtelcom.cpct.dto.event.EventScene;
 import com.zjtelcom.cpct.dto.event.EventSceneDetail;
 import com.zjtelcom.cpct.dto.pojo.*;
 import com.zjtelcom.cpct.service.cpct.CpctEventSceneService;
+import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.CpcUtil;
 import org.bouncycastle.asn1.dvcs.ServiceType;
 import org.omg.CORBA.ServiceDetail;
@@ -30,11 +31,10 @@ public class CpctEventSceneServiceImpl implements CpctEventSceneService {
         if (null != eventSceneDetails) {
             for (int i = 0; i < eventSceneDetails.size(); i++) {
                 EventSceneDetail eventSceneDetail = eventSceneDetails.get(i);
-                EventScene eventScene = eventSceneDetail;
+                EventScene eventScene = BeanUtil.create(eventSceneDetail,new EventScene());
                 //todo 事件场景编码自动生成
                 eventScene.setContactEvtCode("");
                 eventScene.setEventSceneNbr("ET0990766987");
-                eventScene.setEventSceneId(eventScene.getEventSceneId());
                 eventSceneMapper.insert(eventScene);
             }
         }
@@ -53,7 +53,7 @@ public class CpctEventSceneServiceImpl implements CpctEventSceneService {
         if (null != eventSceneDetails) {
             for (int i = 0; i < eventSceneDetails.size(); i++) {
                 EventSceneDetail eventSceneDetail = eventSceneDetails.get(i);
-                EventScene eventScene = eventSceneDetail;
+                EventScene eventScene = BeanUtil.create(eventSceneDetail,new EventScene());
                 String type = eventSceneDetail.getActType();
                 if(ActType.MOD.equals(type)){
                     eventSceneMapper.updateByPrimaryKey(eventScene);

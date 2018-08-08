@@ -6,7 +6,9 @@ import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dto.channel.LabelAddVO;
 import com.zjtelcom.cpct.dto.channel.LabelEditVO;
 import com.zjtelcom.cpct.dto.channel.QryMktScriptReq;
+import com.zjtelcom.cpct.dto.channel.RecordModel;
 import com.zjtelcom.cpct.service.channel.LabelService;
+import com.zjtelcom.cpct.service.channel.SyncLabelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.MapUtil;
@@ -28,6 +30,26 @@ public class LabelController extends BaseController {
     private LabelService labelService;
     @Autowired
     private InjectionLabelMapper labelMapper;
+    @Autowired
+    private SyncLabelService syncLabelService;
+
+    @PostMapping("syncLabelInfo")
+    @CrossOrigin
+    public  Map<String, Object> syncLabelInfo(@RequestBody  RecordModel record) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = syncLabelService.syncLabelInfo(record);
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to syncLabelInfo",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to syncLabelInfo");
+            return result;
+        }
+        return result;
+    }
+
+
 
     @PostMapping("shared")
     @CrossOrigin

@@ -2,25 +2,25 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zjtelcom.cpct.dao.question.MktQstQuestDetailRelMapper">
   <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.question.QuestDetailRel">
-    <id column="REL_CONF_ID" jdbcType="DECIMAL" property="relConfId" />
-    <result column="A_NAIRE_ID" jdbcType="DECIMAL" property="aNaireId" />
-    <result column="A_QUESTION_ID" jdbcType="DECIMAL" property="aQuestionId" />
-    <result column="A_QST_DETAIL_ID" jdbcType="DECIMAL" property="aQstDetailId" />
+    <id column="REL_CONF_ID" jdbcType="BIGINT" property="relConfId" />
+    <result column="A_NAIRE_ID" jdbcType="BIGINT" property="aNaireId" />
+    <result column="A_QUESTION_ID" jdbcType="BIGINT" property="aQuestionId" />
+    <result column="A_QST_DETAIL_ID" jdbcType="BIGINT" property="aQstDetailId" />
     <result column="RSTR_TYPE" jdbcType="VARCHAR" property="rstrType" />
-    <result column="Z_NAIRE_ID" jdbcType="DECIMAL" property="zNaireId" />
-    <result column="Z_QUESTION_ID" jdbcType="DECIMAL" property="zQuestionId" />
-    <result column="Z_QST_DETAIL_ID" jdbcType="DECIMAL" property="zQstDetailId" />
+    <result column="Z_NAIRE_ID" jdbcType="BIGINT" property="zNaireId" />
+    <result column="Z_QUESTION_ID" jdbcType="BIGINT" property="zQuestionId" />
+    <result column="Z_QST_DETAIL_ID" jdbcType="BIGINT" property="zQstDetailId" />
     <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
     <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
-    <result column="CREATE_STAFF" jdbcType="DECIMAL" property="createStaff" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
     <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
-    <result column="UPDATE_STAFF" jdbcType="DECIMAL" property="updateStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
     <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
     <result column="REMARK" jdbcType="VARCHAR" property="remark" />
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from mkt_qst_quest_detail_rel
-    where REL_CONF_ID = #{relConfId,jdbcType=DECIMAL}
+    where REL_CONF_ID = #{relConfId,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.question.QuestDetailRel">
     insert into mkt_qst_quest_detail_rel (REL_CONF_ID, A_NAIRE_ID, A_QUESTION_ID, 
@@ -29,37 +29,37 @@
       STATUS_DATE, CREATE_STAFF, CREATE_DATE, 
       UPDATE_STAFF, UPDATE_DATE, REMARK
       )
-    values (#{relConfId,jdbcType=DECIMAL}, #{aNaireId,jdbcType=DECIMAL}, #{aQuestionId,jdbcType=DECIMAL}, 
-      #{aQstDetailId,jdbcType=DECIMAL}, #{rstrType,jdbcType=VARCHAR}, #{zNaireId,jdbcType=DECIMAL}, 
-      #{zQuestionId,jdbcType=DECIMAL}, #{zQstDetailId,jdbcType=DECIMAL}, #{statusCd,jdbcType=VARCHAR}, 
-      #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=DECIMAL}, #{createDate,jdbcType=TIMESTAMP}, 
-      #{updateStaff,jdbcType=DECIMAL}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+    values (#{relConfId,jdbcType=BIGINT}, #{aNaireId,jdbcType=BIGINT}, #{aQuestionId,jdbcType=BIGINT}, 
+      #{aQstDetailId,jdbcType=BIGINT}, #{rstrType,jdbcType=VARCHAR}, #{zNaireId,jdbcType=BIGINT}, 
+      #{zQuestionId,jdbcType=BIGINT}, #{zQstDetailId,jdbcType=BIGINT}, #{statusCd,jdbcType=VARCHAR}, 
+      #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
       )
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.question.QuestDetailRel">
     update mkt_qst_quest_detail_rel
-    set A_NAIRE_ID = #{aNaireId,jdbcType=DECIMAL},
-      A_QUESTION_ID = #{aQuestionId,jdbcType=DECIMAL},
-      A_QST_DETAIL_ID = #{aQstDetailId,jdbcType=DECIMAL},
+    set A_NAIRE_ID = #{aNaireId,jdbcType=BIGINT},
+      A_QUESTION_ID = #{aQuestionId,jdbcType=BIGINT},
+      A_QST_DETAIL_ID = #{aQstDetailId,jdbcType=BIGINT},
       RSTR_TYPE = #{rstrType,jdbcType=VARCHAR},
-      Z_NAIRE_ID = #{zNaireId,jdbcType=DECIMAL},
-      Z_QUESTION_ID = #{zQuestionId,jdbcType=DECIMAL},
-      Z_QST_DETAIL_ID = #{zQstDetailId,jdbcType=DECIMAL},
+      Z_NAIRE_ID = #{zNaireId,jdbcType=BIGINT},
+      Z_QUESTION_ID = #{zQuestionId,jdbcType=BIGINT},
+      Z_QST_DETAIL_ID = #{zQstDetailId,jdbcType=BIGINT},
       STATUS_CD = #{statusCd,jdbcType=VARCHAR},
       STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
-      CREATE_STAFF = #{createStaff,jdbcType=DECIMAL},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
       CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
-      UPDATE_STAFF = #{updateStaff,jdbcType=DECIMAL},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
       UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
       REMARK = #{remark,jdbcType=VARCHAR}
-    where REL_CONF_ID = #{relConfId,jdbcType=DECIMAL}
+    where REL_CONF_ID = #{relConfId,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select REL_CONF_ID, A_NAIRE_ID, A_QUESTION_ID, A_QST_DETAIL_ID, RSTR_TYPE, Z_NAIRE_ID, 
     Z_QUESTION_ID, Z_QST_DETAIL_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, 
     UPDATE_STAFF, UPDATE_DATE, REMARK
     from mkt_qst_quest_detail_rel
-    where REL_CONF_ID = #{relConfId,jdbcType=DECIMAL}
+    where REL_CONF_ID = #{relConfId,jdbcType=BIGINT}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
     select REL_CONF_ID, A_NAIRE_ID, A_QUESTION_ID, A_QST_DETAIL_ID, RSTR_TYPE, Z_NAIRE_ID, 
