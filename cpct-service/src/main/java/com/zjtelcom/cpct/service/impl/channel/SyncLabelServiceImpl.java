@@ -51,7 +51,6 @@ public class SyncLabelServiceImpl extends BaseService implements SyncLabelServic
         try {
             switch (record.getOperateType()){
                 case OPERATE_TYPE_NEW:
-                    Label label = labelMapper.selectByTagRowId(record.getTag().getTagRowId());
                     result = addLabel(record);
                     break;
                 case OPERATE_TYPE_UPDATE:
@@ -79,6 +78,12 @@ public class SyncLabelServiceImpl extends BaseService implements SyncLabelServic
     private Map<String,Object> addLabel(RecordModel record){
         Map<String,Object> result = new HashMap<>();
         TagModel tagModel = record.getTag();
+        Label labelValodate = labelMapper.selectByTagRowId(record.getTag().getTagRowId());
+        if (labelValodate!=null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","标签已存在，请选择更新或删除后添加");
+            return result;
+        }
         List<TagValueModel> valueModelList = new ArrayList<>();
         if (record.getTagValueList()!=null && !record.getTagValueList().isEmpty()){
             valueModelList = record.getTagValueList();
@@ -182,7 +187,6 @@ public class SyncLabelServiceImpl extends BaseService implements SyncLabelServic
         List<String> stringList = new ArrayList<>();
         for (TagValueModel info : valueModelList){
             LabelValue value = BeanUtil.create(info,new LabelValue());
-            //todo 逗号分隔的value
             value.setLabelValue("");
             value.setInjectionLabelId(labelId);
             value.setValueDesc(info.getTagValueName());

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.campaign.MktCamItemMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.campaign.MktCamItem">
+    <id column="MKT_CAM_ITEM_ID" jdbcType="DECIMAL" property="mktCamItemId" />
+    <result column="MKT_CAMPAIGN_ID" jdbcType="DECIMAL" property="mktCampaignId" />
+    <result column="ITEM_TYPE" jdbcType="VARCHAR" property="itemType" />
+    <result column="ITEM_ID" jdbcType="DECIMAL" property="itemId" />
+    <result column="PRIORITY" jdbcType="DECIMAL" property="priority" />
+    <result column="ITEM_GROUP" jdbcType="DECIMAL" property="itemGroup" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="CREATE_STAFF" jdbcType="DECIMAL" property="createStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_STAFF" jdbcType="DECIMAL" property="updateStaff" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="LAN_ID" jdbcType="DECIMAL" property="lanId" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from mkt_cam_item
+    where MKT_CAM_ITEM_ID = #{mktCamItemId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamItem">
+    insert into mkt_cam_item (MKT_CAM_ITEM_ID, MKT_CAMPAIGN_ID, ITEM_TYPE, 
+      ITEM_ID, PRIORITY, ITEM_GROUP, 
+      STATUS_CD, STATUS_DATE, CREATE_STAFF, 
+      CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, 
+      REMARK, LAN_ID)
+    values (#{mktCamItemId,jdbcType=DECIMAL}, #{mktCampaignId,jdbcType=DECIMAL}, #{itemType,jdbcType=VARCHAR}, 
+      #{itemId,jdbcType=DECIMAL}, #{priority,jdbcType=DECIMAL}, #{itemGroup,jdbcType=DECIMAL}, 
+      #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=DECIMAL}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=DECIMAL}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR}, #{lanId,jdbcType=DECIMAL})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamItem">
+    update mkt_cam_item
+    set MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=DECIMAL},
+      ITEM_TYPE = #{itemType,jdbcType=VARCHAR},
+      ITEM_ID = #{itemId,jdbcType=DECIMAL},
+      PRIORITY = #{priority,jdbcType=DECIMAL},
+      ITEM_GROUP = #{itemGroup,jdbcType=DECIMAL},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      CREATE_STAFF = #{createStaff,jdbcType=DECIMAL},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_STAFF = #{updateStaff,jdbcType=DECIMAL},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      LAN_ID = #{lanId,jdbcType=DECIMAL}
+    where MKT_CAM_ITEM_ID = #{mktCamItemId,jdbcType=DECIMAL}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_CAM_ITEM_ID, MKT_CAMPAIGN_ID, ITEM_TYPE, ITEM_ID, PRIORITY, ITEM_GROUP, 
+    STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, 
+    LAN_ID
+    from mkt_cam_item
+    where MKT_CAM_ITEM_ID = #{mktCamItemId,jdbcType=DECIMAL}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select MKT_CAM_ITEM_ID, MKT_CAMPAIGN_ID, ITEM_TYPE, ITEM_ID, PRIORITY, ITEM_GROUP, 
+    STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, 
+    LAN_ID
+    from mkt_cam_item
+  </select>
+</mapper>
