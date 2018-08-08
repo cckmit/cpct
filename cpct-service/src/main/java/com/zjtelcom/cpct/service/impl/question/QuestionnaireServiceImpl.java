@@ -105,28 +105,47 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
         questionnaire.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
         questionnaireMapper.insert(questionnaire);
         Long naireId = questionnaire.getNaireId();
-        for (QuestionAddVO questionAddVO : questionReq.getAddVOList()){
+        for (InputQuestionAddVO inputQuestionAddVO : questionReq.getInputQuestionAddVOList()){
             //添加问题及答案
-            Map<String,Object> map = questionService.addQuestion(userId,questionAddVO);
-            if (!map.get("resultCode").equals(CODE_SUCCESS)){
-                return map;
-            }
-            Long questionId = Long.valueOf(map.get("questionId").toString());
-            //添加问卷问题关联关系表记录
-            QuestRel questRel = BeanUtil.create(questionAddVO,new QuestRel());
-            questRel.setQuestionId(questionId);
-            questRel.setNaireId(naireId);
-            questRel.setCreateDate(DateUtil.getCurrentTime());
-            questRel.setUpdateDate(DateUtil.getCurrentTime());
-            questRel.setStatusDate(DateUtil.getCurrentTime());
-            questRel.setUpdateStaff(UserUtil.loginId());
-            questRel.setCreateStaff(UserUtil.loginId());
-            questRel.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-            questRelMapper.insert(questRel);
+            QuestionAddVO questionAddVO = BeanUtil.create(inputQuestionAddVO,new QuestionAddVO());
+            Map<String, Object> map = addQuestion(userId, naireId, questionAddVO);
+            if (map != null) return map;
+        }
+        for (MultiQuestionAddVO multiQuestionAddVO : questionReq.getMultiQuestionAddVOList()){
+            //添加问题及答案
+            QuestionAddVO questionAddVO = BeanUtil.create(multiQuestionAddVO,new QuestionAddVO());
+            Map<String, Object> map = addQuestion(userId, naireId, questionAddVO);
+            if (map != null) return map;
+        }
+        for (SingleQuestionAddVO singleQuestionAddVO : questionReq.getSingleQuestionAddVOList()){
+            //添加问题及答案
+            QuestionAddVO questionAddVO = BeanUtil.create(singleQuestionAddVO,new QuestionAddVO());
+            Map<String, Object> map = addQuestion(userId, naireId, questionAddVO);
+            if (map != null) return map;
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
         return result;
+    }
+
+    private Map<String, Object> addQuestion(Long userId, Long naireId, QuestionAddVO questionAddVO) {
+        Map<String,Object> map = questionService.addQuestion(userId,questionAddVO);
+        if (!map.get("resultCode").equals(CODE_SUCCESS)){
+            return map;
+        }
+        Long questionId = Long.valueOf(map.get("questionId").toString());
+        //添加问卷问题关联关系表记录
+        QuestRel questRel = BeanUtil.create(questionAddVO,new QuestRel());
+        questRel.setQuestionId(questionId);
+        questRel.setNaireId(naireId);
+        questRel.setCreateDate(DateUtil.getCurrentTime());
+        questRel.setUpdateDate(DateUtil.getCurrentTime());
+        questRel.setStatusDate(DateUtil.getCurrentTime());
+        questRel.setUpdateStaff(UserUtil.loginId());
+        questRel.setCreateStaff(UserUtil.loginId());
+        questRel.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+        questRelMapper.insert(questRel);
+        return null;
     }
 
 
