@@ -8,10 +8,12 @@ import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.dto.channel.RecordModel;
 import com.zjtelcom.cpct.dto.channel.TagModel;
 import com.zjtelcom.cpct.dto.channel.TagValueModel;
+import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.SyncLabelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
+import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 
 @Service
 public class SyncLabelServiceImpl extends BaseService implements SyncLabelService {
@@ -75,6 +78,12 @@ public class SyncLabelServiceImpl extends BaseService implements SyncLabelServic
     private Map<String,Object> addLabel(RecordModel record){
         Map<String,Object> result = new HashMap<>();
         TagModel tagModel = record.getTag();
+        Label labelValodate = labelMapper.selectByTagRowId(record.getTag().getTagRowId());
+        if (labelValodate!=null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","标签已存在，请选择更新或删除后添加");
+            return result;
+        }
         List<TagValueModel> valueModelList = new ArrayList<>();
         if (record.getTagValueList()!=null && !record.getTagValueList().isEmpty()){
             valueModelList = record.getTagValueList();
@@ -85,7 +94,15 @@ public class SyncLabelServiceImpl extends BaseService implements SyncLabelServic
         label.setInjectionLabelCode(tagModel.getSourceTableColumnName());
         label.setInjectionLabelName(tagModel.getTagName());
         label.setInjectionLabelDesc(tagModel.getTagName());
+        label.setStatusCd(STATUSCD_EFFECTIVE);
+        label.setCreateStaff(UserUtil.loginId());
+        label.setCreateDate(new Date());
+        label.setFitDomain("1");
+        label.setConditionType(tagModel.getShowFlag());
+        //todo 标签操作符 对应显示类型
+        label.setOperator(String.valueOf(Operator.EQUAL.getValue()));
         label.setScope(1);
+        label.setIsShared(0);
         //todo 暂无标签类型
         label.setLabelType("1000");
         //todo 暂无值类型
@@ -98,7 +115,11 @@ public class SyncLabelServiceImpl extends BaseService implements SyncLabelServic
         label.setCreateDate(new Date());
         labelMapper.insert(label);
         if (!valueModelList.isEmpty()){
-            syncLabelValue(valueModelList,label.getInjectionLabelId());
+            Map<String,Object> map = syncLabelValue(valueModelList,label.getInjectionLabelId());
+            if (map.get("resultCode").equals(CODE_SUCCESS)){
+                label.setRightOperand(map.get("valueString").toString());
+                labelMapper.updateByPrimaryKey(label);
+            }
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","新增成功");
@@ -163,21 +184,24 @@ public class SyncLabelServiceImpl extends BaseService implements SyncLabelServic
     private Map<String,Object> syncLabelValue(List<TagValueModel> valueModelList,Long labelId) {
         Map<String,Object> result = new HashMap<>();
         List<LabelValue> valueList = new ArrayList<>();
+        List<String> stringList = new ArrayList<>();
         for (TagValueModel info : valueModelList){
             LabelValue value = BeanUtil.create(info,new LabelValue());
-            //todo 逗号分隔的value
             value.setLabelValue("");
             value.setInjectionLabelId(labelId);
             value.setValueDesc(info.getTagValueName());
             value.setValueName(info.getTagValueName());
+            value.setLabelValue(info.getTagDownValue());
             value.setCreateDate(new Date());
             value.setStatusCd("1000");
             value.setUpdateDate(new Date());
             valueList.add(value);
+            stringList.add(value.getLabelValue());
+            labelValueMapper.insert(value);
         }
-        labelValueMapper.insertBatch(valueList);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","标签值同步成功");
+        result.put("valueString",ChannelUtil.StringList2String(stringList));
         return result;
     }
 }

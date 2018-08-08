@@ -28,6 +28,17 @@ public class ChannelUtil  {
         return vo;
     }
 
+    public static String StringList2String(List<String> stringList){
+        if (stringList == null || stringList.isEmpty()){
+            return "";
+        }
+        String[] sts = new String[stringList.size()];
+        for (int i = 0;i<sts.length;i++){
+            sts[i] = stringList.get(i);
+        }
+        return StringUtils.join(sts,",");
+    }
+
 
     public static String List2String(List<Integer> idList){
         if (idList == null || idList.isEmpty()){

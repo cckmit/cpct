@@ -86,10 +86,16 @@
         <if test="contactEvtId != null and contactEvtId != 0 ">
             AND EVENT_ID = #{contactEvtId}
         </if>
-        <if test="isMainParam != null and isMainParam != ''">
-            AND IS_MAIN_PARAM = #{isMainParam}
-        </if>
     </select>
+
+    <select id="listMainItem"  resultMap="BaseResultMap">
+        select EVT_ITEM_ID, EVENT_ID, EVT_TYPE_ID, EVT_ITEM_NAME, EVT_ITEM_CODE, VALUE_DATA_TYPE,
+        EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, STANDARD_SORT, STATUS_CD, CREATE_STAFF,IS_MAIN_PARAM, EVT_ITEM_DESC,
+        UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+        from event_item
+        where EVENT_ID = 0 or EVENT_ID = -1
+    </select>
+
 
     <insert id="saveEventItem" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtItem">
         insert into event_item (

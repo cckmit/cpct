@@ -1,4 +1,4 @@
-package com.zjtelcom.cpct.dto.campaign;
+package com.zjtelcom.cpct.domain.campaign;
 
 
 /**
@@ -7,13 +7,15 @@ package com.zjtelcom.cpct.dto.campaign;
  */
 
 import com.zjtelcom.cpct.BaseEntity;
+import lombok.Data;
 
 /**
  * @author:sunpeng
  * @descirption:定义营销活动的可推荐条目,支持通过推荐条目组定义不同的客户目标分群可推荐不同的条目.
  * @date: 2018/6/26.
  */
-public class MktCamItem {
+@Data
+public class MktCamItem extends BaseEntity{
 
 
     /**

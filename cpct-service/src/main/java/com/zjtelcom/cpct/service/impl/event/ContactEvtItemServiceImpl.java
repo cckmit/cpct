@@ -38,7 +38,7 @@ public class ContactEvtItemServiceImpl extends BaseService implements ContactEvt
         List<ContactEvtItem> contactEvtItems = new ArrayList<>();
 //        Page pageInfo = ContactEvtReq.getPage();
 //        PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
-        contactEvtItems = contactEvtItemMapper.listEventItem(ContactEvtReq.getContactEvt().getContactEvtId(),"0");
+        contactEvtItems = contactEvtItemMapper.listMainItem();
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("contactEvtItems", contactEvtItems);
