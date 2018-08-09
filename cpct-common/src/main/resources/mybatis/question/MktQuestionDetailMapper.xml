@@ -62,7 +62,7 @@
     select QST_DETAIL_ID, QUESTION_ID, QST_DETAIL_ORDER, QST_DETAIL_VALUE, QST_DETAIL_INPUT_TYPE,
     STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
     from mkt_question_detail
-    where QUESTION_ID = #{quesitonId}
+    where QUESTION_ID = #{questionId}
   </select>
 
 

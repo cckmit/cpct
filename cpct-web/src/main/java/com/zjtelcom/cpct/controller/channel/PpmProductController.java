@@ -75,7 +75,7 @@ public class PpmProductController extends BaseController  {
         Map<String ,Object> result = new HashMap<>();
         Long userId = UserUtil.loginId();
         try {
-            result = productService.addProductRule(userId,param.getCampaignId(),param.getIdList());
+            result = productService.addProductRule(userId,param.getIdList());
         }catch (Exception e){
             logger.error("[op:PpmProductController] fail to addProductRule",e);
             result.put("resultCode",CODE_FAIL);

@@ -73,7 +73,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
     @Override
     @Transactional
-    public Map<String, Object> addProductRule(Long userId,Long campaignId, List<Long> productIdList) {
+    public Map<String, Object> addProductRule(Long userId, List<Long> productIdList) {
         Map<String,Object> result = new HashMap<>();
         List<Long> ruleIdList = new ArrayList<>();
         for (Long productId : productIdList){
@@ -85,7 +85,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             }
             MktCamItem item = new MktCamItem();
             item.setItemId(productId);
-            item.setMktCampaignId(campaignId);
             item.setItemType(product.getProductType());
             item.setCreateDate(new Date());
             item.setCreateDate(DateUtil.getCurrentTime());
@@ -95,7 +94,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             item.setCreateStaff(UserUtil.loginId());
             item.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
             camItemMapper.insert(item);
-            ruleIdList.add(item.getItemId());
+            ruleIdList.add(item.getMktCamItemId());
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",ruleIdList);
@@ -121,14 +120,22 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     @Override
     public Map<String, Object> getProductRuleList(Long userId, List<Long> ruleIdList) {
         Map<String,Object> result = new HashMap<>();
-        List<MktCamItem> ruleList = new ArrayList<>();
+        List<MktProductRule> ruleList = new ArrayList<>();
         for (Long ruleId : ruleIdList){
-            MktCamItem rule = camItemMapper.selectByPrimaryKey(ruleId);
-            if (rule==null){
+            MktCamItem item = camItemMapper.selectByPrimaryKey(ruleId);
+            if (item==null){
                 result.put("resultCode",CODE_FAIL);
                 result.put("resultMsg","推荐条目不存在");
                 return result;
             }
+            PpmProduct product = productMapper.selectByPrimaryKey(item.getItemId());
+            if (product==null){
+                continue;
+            }
+            MktProductRule rule = new MktProductRule();
+            rule.setId(item.getMktCamItemId());
+            rule.setProductId(item.getItemId());
+            rule.setProductName(product.getProductName());
             ruleList.add(rule);
         }
         result.put("resultCode",CODE_SUCCESS);
