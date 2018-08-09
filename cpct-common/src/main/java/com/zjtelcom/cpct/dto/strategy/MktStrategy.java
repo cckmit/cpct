@@ -5,7 +5,7 @@ import com.zjtelcom.cpct.BaseEntity;
 /**
  * 营销维挽策略
  */
-public class MktStrategy{
+public class MktStrategy extends BaseEntity{
 
     /**
      * 通用数据操作类型

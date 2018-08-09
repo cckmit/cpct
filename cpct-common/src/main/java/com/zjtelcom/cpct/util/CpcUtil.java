@@ -96,6 +96,10 @@ public final class CpcUtil {
         return buildResponse(ResponseCode.SUCCESS, "处理成功", null, sign, transactionID);
     }
 
+    public static CpcGroupResponse buildResponse(Result result, String sign, String transactionID) {
+        return buildResponse(result.getResultCode(), result.getResultMessage(),
+                result.getResultObject(), sign, transactionID);
+    }
 
     /**
      *
