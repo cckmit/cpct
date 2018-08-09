@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zjtelcom.cpct.dao.campaign.MktCamItemMapper">
-  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.campaign.MktCamItem">
-    <id column="MKT_CAM_ITEM_ID" jdbcType="BIGINT" property="mktCamItemId" />
+<mapper namespace="com.zjtelcom.cpct.dao.strategy.MktCamStrategyRelMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.pojo.MktCamStrategyRel">
+    <id column="CAMP_STR_REL_ID" jdbcType="BIGINT" property="campStrRelId" />
     <result column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId" />
-    <result column="ITEM_TYPE" jdbcType="VARCHAR" property="itemType" />
-    <result column="ITEM_ID" jdbcType="BIGINT" property="itemId" />
-    <result column="PRIORITY" jdbcType="BIGINT" property="priority" />
-    <result column="ITEM_GROUP" jdbcType="BIGINT" property="itemGroup" />
+    <result column="STRATEGY_ID" jdbcType="BIGINT" property="strategyId" />
     <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
     <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
     <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
@@ -18,28 +15,23 @@
     <result column="LAN_ID" jdbcType="BIGINT" property="lanId" />
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-    delete from mkt_cam_item
-    where MKT_CAM_ITEM_ID = #{mktCamItemId,jdbcType=BIGINT}
+    delete from mkt_cam_strategy_rel
+    where CAMP_STR_REL_ID = #{campStrRelId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamItem" useGeneratedKeys="true" keyProperty="mktCamItemId">
-    insert into mkt_cam_item (MKT_CAM_ITEM_ID, MKT_CAMPAIGN_ID, ITEM_TYPE, 
-      ITEM_ID, PRIORITY, ITEM_GROUP, 
+  <insert id="insert" parameterType="com.zjtelcom.cpct.pojo.MktCamStrategyRel">
+    insert into mkt_cam_strategy_rel (CAMP_STR_REL_ID, MKT_CAMPAIGN_ID, STRATEGY_ID, 
       STATUS_CD, STATUS_DATE, CREATE_STAFF, 
       CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, 
       REMARK, LAN_ID)
-    values (#{mktCamItemId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{itemType,jdbcType=VARCHAR}, 
-      #{itemId,jdbcType=BIGINT}, #{priority,jdbcType=BIGINT}, #{itemGroup,jdbcType=BIGINT}, 
+    values (#{campStrRelId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{strategyId,jdbcType=BIGINT}, 
       #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT}, 
       #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, 
       #{remark,jdbcType=VARCHAR}, #{lanId,jdbcType=BIGINT})
   </insert>
-  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamItem">
-    update mkt_cam_item
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.pojo.MktCamStrategyRel">
+    update mkt_cam_strategy_rel
     set MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},
-      ITEM_TYPE = #{itemType,jdbcType=VARCHAR},
-      ITEM_ID = #{itemId,jdbcType=BIGINT},
-      PRIORITY = #{priority,jdbcType=BIGINT},
-      ITEM_GROUP = #{itemGroup,jdbcType=BIGINT},
+      STRATEGY_ID = #{strategyId,jdbcType=BIGINT},
       STATUS_CD = #{statusCd,jdbcType=VARCHAR},
       STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
       CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
@@ -48,19 +40,17 @@
       UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
       REMARK = #{remark,jdbcType=VARCHAR},
       LAN_ID = #{lanId,jdbcType=BIGINT}
-    where MKT_CAM_ITEM_ID = #{mktCamItemId,jdbcType=BIGINT}
+    where CAMP_STR_REL_ID = #{campStrRelId,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select MKT_CAM_ITEM_ID, MKT_CAMPAIGN_ID, ITEM_TYPE, ITEM_ID, PRIORITY, ITEM_GROUP, 
-    STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, 
-    LAN_ID
-    from mkt_cam_item
-    where MKT_CAM_ITEM_ID = #{mktCamItemId,jdbcType=BIGINT}
+    select CAMP_STR_REL_ID, MKT_CAMPAIGN_ID, STRATEGY_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, 
+    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
+    from mkt_cam_strategy_rel
+    where CAMP_STR_REL_ID = #{campStrRelId,jdbcType=BIGINT}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
-    select MKT_CAM_ITEM_ID, MKT_CAMPAIGN_ID, ITEM_TYPE, ITEM_ID, PRIORITY, ITEM_GROUP, 
-    STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, 
-    LAN_ID
-    from mkt_cam_item
+    select CAMP_STR_REL_ID, MKT_CAMPAIGN_ID, STRATEGY_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, 
+    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
+    from mkt_cam_strategy_rel
   </select>
 </mapper>

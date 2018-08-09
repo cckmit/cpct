@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.dto.campaign;
 
-public class MktCamChlConfAttr {
+import com.zjtelcom.cpct.BaseEntity;
+
+public class MktCamChlConfAttr extends BaseEntity {
     private Long contactChlAttrRstrId;
 
     private Long evtContactConfId;

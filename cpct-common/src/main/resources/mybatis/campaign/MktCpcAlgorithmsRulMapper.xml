@@ -18,7 +18,7 @@
     delete from mkt_cpc_algorithms_rul
     where ALGORITHMS_RUL_ID = #{algorithmsRulId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.MktCpcAlgorithmsRulDO">
+  <insert id="insert" useGeneratedKeys="true" keyProperty="algorithmsRulId" parameterType="com.zjtelcom.cpct.domain.campaign.MktCpcAlgorithmsRulDO">
     insert into mkt_cpc_algorithms_rul (ALGORITHMS_RUL_ID, ALGORITHMS_RUL_NAME, 
       RULE_DESC, RULE_EXPRESSION, STATUS_CD, 
       CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 

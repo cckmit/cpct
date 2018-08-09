@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zjtelcom.cpct.dao.MktCamRecomCalcRelMapper">
+<mapper namespace="com.zjtelcom.cpct.dao.campaign.MktCamRecomCalcRelMapper">
   <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.campaign.MktCamRecomCalcRelDO">
     <id column="EVT_RECOM_CALC_REL_ID" jdbcType="BIGINT" property="evtRecomCalcRelId" />
     <result column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId" />
