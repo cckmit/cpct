@@ -21,7 +21,7 @@
     delete from mkt_cam_item
     where MKT_CAM_ITEM_ID = #{mktCamItemId,jdbcType=DECIMAL}
   </delete>
-  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamItem">
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamItem" useGeneratedKeys="true" keyProperty="mktCamItemId">
     insert into mkt_cam_item (MKT_CAM_ITEM_ID, MKT_CAMPAIGN_ID, ITEM_TYPE, 
       ITEM_ID, PRIORITY, ITEM_GROUP, 
       STATUS_CD, STATUS_DATE, CREATE_STAFF, 
