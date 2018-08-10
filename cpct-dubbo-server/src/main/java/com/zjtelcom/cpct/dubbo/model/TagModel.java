@@ -1,4 +1,4 @@
-package com.zjtelcom.cpct.dto.channel;
+package com.zjtelcom.cpct.dubbo.model;
 
 public class TagModel {
     private Long tagRowId;//标签表主键

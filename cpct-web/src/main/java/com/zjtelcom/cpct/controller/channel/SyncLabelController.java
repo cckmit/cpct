@@ -8,7 +8,6 @@ import com.zjtelcom.cpct.common.CacheManager;
 import com.zjtelcom.cpct.common.IDacher;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dto.system.SystemParam;
-import com.zjtelcom.cpct.service.channel.SyncLabelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,15 +16,12 @@ import org.springframework.web.context.ContextLoader;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 @RestController
 @RequestMapping("syncLabel")
 public class SyncLabelController extends BaseController {
 
-    @Autowired
-    private SyncLabelService syncLabelService;
 
 //    @Autowired(required = false)
 //    private SyncEagleDataService syncEagleDataService;

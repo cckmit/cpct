@@ -1,6 +1,4 @@
-package com.zjtelcom.cpct.dto.channel;
-
-import org.springframework.stereotype.Service;
+package com.zjtelcom.cpct.dubbo.model;
 
 import java.io.Serializable;
 
