@@ -1,31 +1,40 @@
-package com.zjtelcom.cpct.service.impl.channel;
+package com.zjtelcom.cpct.dubbo.service.impl;
 
-import com.zjtelcom.cpct.bean.RespInfo;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
-import com.zjtelcom.cpct.dto.channel.RecordModel;
-import com.zjtelcom.cpct.dto.channel.TagModel;
-import com.zjtelcom.cpct.dto.channel.TagValueModel;
+
+
+import com.zjtelcom.cpct.dubbo.model.RecordModel;
+import com.zjtelcom.cpct.dubbo.model.TagModel;
+import com.zjtelcom.cpct.dubbo.model.TagValueModel;
+import com.zjtelcom.cpct.dubbo.service.SyncLabelService;
 import com.zjtelcom.cpct.enums.Operator;
-import com.zjtelcom.cpct.service.BaseService;
-import com.zjtelcom.cpct.service.channel.SyncLabelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.UserUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
-import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
-import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
-import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
+import static com.zjtelcom.cpct.constants.CommonConstant.*;
 
+
+/**
+ * Description:
+ * author: hyf
+ * date: 2018/07/17 11:11
+ * version: V1.0
+ */
 @Service
-public class SyncLabelServiceImpl extends BaseService implements SyncLabelService {
+public class SyncLabelServiceImpl  implements SyncLabelService {
+    public static final Logger logger = LoggerFactory.getLogger(SyncLabelServiceImpl.class);
+
     public static final String BQ = "BQ";
     public static final Long TAG_ROW_ID = 1000000L;
 
