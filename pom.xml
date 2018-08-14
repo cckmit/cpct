@@ -12,6 +12,7 @@
         <module>cpct-web</module>
         <module>cpct-common</module>
         <module>cpct-service</module>
+        <module>cpct-es</module>
         <module>cpct-shiro</module>
         <module>cpct-dubbo-client</module>
         <module>cpct-dubbo-server</module>
