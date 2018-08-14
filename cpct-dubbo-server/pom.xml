@@ -50,10 +50,7 @@
             <artifactId>dubbo</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.zjtelcom.cpct</groupId>
-            <artifactId>cpct-es</artifactId>
-        </dependency>
+
 
     </dependencies>
 
