@@ -23,7 +23,7 @@ spring:
     timeout: 30000
 
 #ES
-  data:
-    elasticsearch:
-      cluster-name: es-cpct
-      cluster-nodes: 134.108.3.30:9200
+#  data:
+#    elasticsearch:
+#      cluster-name: es-cpct
+#      cluster-nodes: 134.108.3.30:9200
