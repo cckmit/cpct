@@ -101,7 +101,7 @@ public class EventApiServiceImpl implements EventApiService {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Map deal(Map<String, Object> map) throws Exception {
+    public Map deal(Map<String, Object> map) {
         //初始化返回结果
         Map<String, Object> result = new HashMap();
 
@@ -317,7 +317,12 @@ public class EventApiServiceImpl implements EventApiService {
                             }
 
                             //规则引擎计算
-                            RuleResult ruleResult = runner.executeRule(express.toString(), context, true, true);
+                            RuleResult ruleResult = new RuleResult();
+                            try {
+                                ruleResult = runner.executeRule(express.toString(), context, true, true);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                             //log输出
 //                            logger.info("======================================");
 //                            logger.info("事件流水 = {}", ISI);
@@ -454,130 +459,130 @@ public class EventApiServiceImpl implements EventApiService {
         return result;
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public Map CalculateCPC(Map<String, Object> map) throws Exception {
-        //初始化返回结果
-        Map<String, Object> result = new HashMap();
-
-        //获取当前时间
-        Date now = new Date();
-
-        //获取事件code
-        String eventNbr = (String) map.get("eventId");
-        //获取流水号
-        String ISI = (String) map.get("ISI");
-
-        //从map中取出参数
-//        EventReportDTO eventReportDTO = new EventReportDTO();
-//        eventReportDTO.setEventId((String) map.get("eventId")); //事件code
-//        eventReportDTO.setC4((String) map.get("C4")); //C4代码
-//        eventReportDTO.setChannelId((String) map.get("channelId")); //渠道
-//        eventReportDTO.setISI((String) map.get("ISI")); //流水号
-//        eventReportDTO.setLanId(Long.valueOf((String) map.get("lanId"))); //本地网标识
-
-        //构造返回参数
-        result.put("custId", "客户编码");
-        result.put("CPCResultCode", "1");
-        result.put("CPCResultMsg", "success");
-        result.put("ISI", ISI);
-
-        //获取标签因子集合
-        List<Map<String, Object>> labelList = (List<Map<String, Object>>) map.get("triggers");
-
-        //根据事件code查询事件信息
-        ContactEvt event = contactEvtMapper.getEventByEventNbr(eventNbr);
-
-        //获取事件id
-        Long eventId = event.getContactEvtId();
-        //获取事件推荐活动数
-        int recCampaignAmount;
-        String recCampaignAmountStr = event.getRecCampaignAmount();
-        if (recCampaignAmountStr == null || "".equals(recCampaignAmountStr)) {
-            recCampaignAmount = 0;
-        } else {
-            recCampaignAmount = Integer.parseInt(recCampaignAmountStr);
-        }
-
-        //获取事件过滤规则
-        ContactEvtMatchRul contactEvtMatchRulParam = new ContactEvtMatchRul();
-        contactEvtMatchRulParam.setContactEvtId(eventId);
-        List<ContactEvtMatchRul> contactEvtMatchRuls = contactEvtMatchRulMapper.listEventMatchRuls(contactEvtMatchRulParam);
-        //遍历事件过滤规则匹配
-        if (contactEvtMatchRuls != null && contactEvtMatchRuls.size() > 0) {
-            //匹配事件过滤规则
-            int flag = 0;
-            for (ContactEvtMatchRul contactEvtMatchRul : contactEvtMatchRuls) {
-                flag = userListMapper.checkRule("", contactEvtMatchRul.getEvtMatchRulId(), null);
-                if (flag > 0) {
-                    result.put("CPCResultCode", "0");
-                    result.put("CPCResultMsg", "事件过滤拦截");
-                    return result;
-                }
-            }
-        }
-
-        //根据事件id 查询所有关联活动（根据优先级排序 正序）
-        List<Long> activityIds = mktCamEvtRelMapper.listActivityByEventId(eventId);
-
-        //初始化返回结果中的工单信息
-        List<Map<String, Object>> orderList = new ArrayList<>();
-
-        //遍历活动id  查询并匹配活动规则 需要根据事件推荐活动数 取前n个活动
-        int max = activityIds.size();
-        if (recCampaignAmount != 0) {
-            //事件推荐活动数
-            if (activityIds.size() > recCampaignAmount) {
-                max = recCampaignAmount;
-            }
-        }
-
-
-        //初始化结果集
-        List<Future<Map<String, Object>>> threadList = new ArrayList<>();
-        //初始化线程池
-        ExecutorService executorService = Executors.newCachedThreadPool();
-
-        //遍历活动
-        for (int j = 0; j < max; j++) {
-
-            //活动id
-            Long activityId = activityIds.get(j);
-            //提交线程
-            Future<Map<String, Object>> f = executorService.submit(new ActivityTask(ISI, activityId));
-            //将线程处理结果添加到结果集
-            threadList.add(f);
-        }
-
-      
-
-        //获取结果
-        try {
-            for (Future<Map<String, Object>> future : threadList) {
-                orderList.add(future.get());
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            //发生异常关闭线程池
-            executorService.shutdown();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            //发生异常关闭线程池
-            executorService.shutdown();
-            return null;
-        }
-
-        //关闭线程池
-        executorService.shutdown();
-
-        //返回结果
-        result.put("orderList", orderList);
-
-        return result;
-    }
-
-    @Override
-    public void cpc() {
-
-    }
+//    @Override
+//    @SuppressWarnings("unchecked")
+//    public Map CalculateCPC(Map<String, Object> map) throws Exception {
+//        //初始化返回结果
+//        Map<String, Object> result = new HashMap();
+//
+//        //获取当前时间
+//        Date now = new Date();
+//
+//        //获取事件code
+//        String eventNbr = (String) map.get("eventId");
+//        //获取流水号
+//        String ISI = (String) map.get("ISI");
+//
+//        //从map中取出参数
+////        EventReportDTO eventReportDTO = new EventReportDTO();
+////        eventReportDTO.setEventId((String) map.get("eventId")); //事件code
+////        eventReportDTO.setC4((String) map.get("C4")); //C4代码
+////        eventReportDTO.setChannelId((String) map.get("channelId")); //渠道
+////        eventReportDTO.setISI((String) map.get("ISI")); //流水号
+////        eventReportDTO.setLanId(Long.valueOf((String) map.get("lanId"))); //本地网标识
+//
+//        //构造返回参数
+//        result.put("custId", "客户编码");
+//        result.put("CPCResultCode", "1");
+//        result.put("CPCResultMsg", "success");
+//        result.put("ISI", ISI);
+//
+//        //获取标签因子集合
+//        List<Map<String, Object>> labelList = (List<Map<String, Object>>) map.get("triggers");
+//
+//        //根据事件code查询事件信息
+//        ContactEvt event = contactEvtMapper.getEventByEventNbr(eventNbr);
+//
+//        //获取事件id
+//        Long eventId = event.getContactEvtId();
+//        //获取事件推荐活动数
+//        int recCampaignAmount;
+//        String recCampaignAmountStr = event.getRecCampaignAmount();
+//        if (recCampaignAmountStr == null || "".equals(recCampaignAmountStr)) {
+//            recCampaignAmount = 0;
+//        } else {
+//            recCampaignAmount = Integer.parseInt(recCampaignAmountStr);
+//        }
+//
+//        //获取事件过滤规则
+//        ContactEvtMatchRul contactEvtMatchRulParam = new ContactEvtMatchRul();
+//        contactEvtMatchRulParam.setContactEvtId(eventId);
+//        List<ContactEvtMatchRul> contactEvtMatchRuls = contactEvtMatchRulMapper.listEventMatchRuls(contactEvtMatchRulParam);
+//        //遍历事件过滤规则匹配
+//        if (contactEvtMatchRuls != null && contactEvtMatchRuls.size() > 0) {
+//            //匹配事件过滤规则
+//            int flag = 0;
+//            for (ContactEvtMatchRul contactEvtMatchRul : contactEvtMatchRuls) {
+//                flag = userListMapper.checkRule("", contactEvtMatchRul.getEvtMatchRulId(), null);
+//                if (flag > 0) {
+//                    result.put("CPCResultCode", "0");
+//                    result.put("CPCResultMsg", "事件过滤拦截");
+//                    return result;
+//                }
+//            }
+//        }
+//
+//        //根据事件id 查询所有关联活动（根据优先级排序 正序）
+//        List<Long> activityIds = mktCamEvtRelMapper.listActivityByEventId(eventId);
+//
+//        //初始化返回结果中的工单信息
+//        List<Map<String, Object>> orderList = new ArrayList<>();
+//
+//        //遍历活动id  查询并匹配活动规则 需要根据事件推荐活动数 取前n个活动
+//        int max = activityIds.size();
+//        if (recCampaignAmount != 0) {
+//            //事件推荐活动数
+//            if (activityIds.size() > recCampaignAmount) {
+//                max = recCampaignAmount;
+//            }
+//        }
+//
+//
+//        //初始化结果集
+//        List<Future<Map<String, Object>>> threadList = new ArrayList<>();
+//        //初始化线程池
+//        ExecutorService executorService = Executors.newCachedThreadPool();
+//
+//        //遍历活动
+//        for (int j = 0; j < max; j++) {
+//
+//            //活动id
+//            Long activityId = activityIds.get(j);
+//            //提交线程
+//            Future<Map<String, Object>> f = executorService.submit(new ActivityTask(ISI, activityId));
+//            //将线程处理结果添加到结果集
+//            threadList.add(f);
+//        }
+//
+//
+//
+//        //获取结果
+//        try {
+//            for (Future<Map<String, Object>> future : threadList) {
+//                orderList.add(future.get());
+//            }
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//            //发生异常关闭线程池
+//            executorService.shutdown();
+//        } catch (ExecutionException e) {
+//            e.printStackTrace();
+//            //发生异常关闭线程池
+//            executorService.shutdown();
+//            return null;
+//        }
+//
+//        //关闭线程池
+//        executorService.shutdown();
+//
+//        //返回结果
+//        result.put("orderList", orderList);
+//
+//        return result;
+//    }
+//
+//    @Override
+//    public void cpc() {
+//
+//    }
 }

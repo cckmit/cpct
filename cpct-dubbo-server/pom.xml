@@ -29,6 +29,11 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+        </dependency>
+
         <!-- 规则引擎 -->
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -40,7 +45,21 @@
             <artifactId>dubbo</artifactId>
         </dependency>
 
-
     </dependencies>
+
+    <build>
+        <finalName>cpct-dubbo-server</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>1.4.3.RELEASE</version>
+                <configuration>
+                    <mainClass>com.zjtelcom.cpct.DubboServerApplication</mainClass>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
 
 </project>

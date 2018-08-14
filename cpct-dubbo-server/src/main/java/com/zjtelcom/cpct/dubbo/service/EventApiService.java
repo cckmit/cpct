@@ -4,10 +4,10 @@ import java.util.Map;
 
 public interface EventApiService {
 
-    Map<String, Object> deal(Map<String, Object> map) throws Exception;
+    Map<String, Object> deal(Map<String, Object> map);
 
-    Map<String, Object> CalculateCPC(Map<String, Object> map) throws Exception;
+//    Map<String, Object> CalculateCPC(Map<String, Object> map) throws Exception;
 
-    void cpc();
+//    void cpc();
 
 }

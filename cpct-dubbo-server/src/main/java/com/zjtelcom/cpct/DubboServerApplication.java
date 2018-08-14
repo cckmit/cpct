@@ -1,4 +1,4 @@
-package com.zjtelcom.cpct.dubbo;
+package com.zjtelcom.cpct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
