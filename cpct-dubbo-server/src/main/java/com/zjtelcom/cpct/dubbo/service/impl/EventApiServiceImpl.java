@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.dubbo.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.rule.RuleResult;
@@ -24,6 +25,8 @@ import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.dubbo.task.ActivityTask;
+import com.zjtelcom.cpct.elastic.config.IndexList;
+import com.zjtelcom.cpct.elastic.service.EsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,6 +98,8 @@ public class EventApiServiceImpl implements EventApiService {
     @Autowired(required = false)
     private InjectionLabelMapper injectionLabelMapper; //标签因子
 
+    @Autowired(required = false)
+    private EsService esService;  //es存储
 
     /**
      * 事件触发接口实现
@@ -102,6 +107,9 @@ public class EventApiServiceImpl implements EventApiService {
     @Override
     @SuppressWarnings("unchecked")
     public Map deal(Map<String, Object> map) {
+
+        long begin = System.currentTimeMillis();
+
         //初始化返回结果
         Map<String, Object> result = new HashMap();
 
@@ -126,6 +134,14 @@ public class EventApiServiceImpl implements EventApiService {
         result.put("CPCResultCode", "1");
         result.put("CPCResultMsg", "success");
         result.put("ISI", ISI);
+
+        long cost = System.currentTimeMillis() - begin;
+        JSONObject jsonObject=new JSONObject();
+        jsonObject.put("timeCost",cost);
+        jsonObject.put("ISI",ISI);
+//        jsonObject.put("eventId",eventId);
+//        jsonObject.put("activityList",activityList);
+        esService.save(jsonObject,IndexList.EVENT_MODULE);
 
         //获取标签因子集合
         List<Map<String, Object>> labelList = (List<Map<String, Object>>) map.get("triggers");

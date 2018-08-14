@@ -21,3 +21,9 @@ spring:
       max-idle: 8
       min-idle: 0
     timeout: 30000
+
+#ES
+  data:
+    elasticsearch:
+      cluster-name: es-cpct
+      cluster-nodes: 134.108.3.30:9200

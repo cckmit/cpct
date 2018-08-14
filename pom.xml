@@ -79,6 +79,13 @@
 
             <dependency>
                 <groupId>com.zjtelcom.cpct</groupId>
+                <artifactId>cpct-es</artifactId>
+                <version>${cpct.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>com.zjtelcom.cpct</groupId>
                 <artifactId>cpct-dubbo-client</artifactId>
                 <version>${cpct.version}</version>
             </dependency>
