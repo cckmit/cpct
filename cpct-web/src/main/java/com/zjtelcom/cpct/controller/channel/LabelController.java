@@ -44,6 +44,31 @@ public class LabelController extends BaseController {
 //    }
 
 
+    @GetMapping("labelhits")
+    @CrossOrigin
+    public void labelhits() {
+        List<Label> labelList = labelMapper.selectAll();
+        for (Label label : labelList){
+            if (label.getFitDomain()==null){
+                continue;
+            }
+            switch(label.getFitDomain()){
+                    case "YD":
+                        label.setFitDomain("1");
+                        break;
+                    case "KD":
+                        label.setFitDomain("2");
+                        break;
+                    case "GH":
+                        label.setFitDomain("3");
+                        break;
+                    case "ITV":
+                        label.setFitDomain("4");
+                        break;
+                }
+                labelMapper.updateByPrimaryKey(label);
+        }
+    }
 
     @PostMapping("shared")
     @CrossOrigin

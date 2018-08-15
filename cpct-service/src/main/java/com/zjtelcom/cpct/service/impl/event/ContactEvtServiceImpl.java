@@ -101,6 +101,12 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         Map<String, Object> map = new HashMap<>();
         PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
         List<ContactEvt> contactEvtList = contactEvtMapper.listEvents(contactEvt);
+        for (ContactEvt evt : contactEvtList){
+            ContactEvtType evtType = evtTypeMapper.selectByPrimaryKey(evt.getContactEvtTypeId());
+            if (evtType!=null){
+                evt.setContactEvtTypeName(evtType.getContactEvtName());
+            }
+        }
         map.put("resultCode", CommonConstant.CODE_SUCCESS);
         map.put("resultMsg", StringUtils.EMPTY);
         map.put("contactEvtList", contactEvtList);
@@ -490,6 +496,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                     mktCamEvtRelMapper.updateByPrimaryKey(mktCamEvtRelDO);
                 } else {
                     mktCamEvtRelDO = BeanUtil.create(mktCamEvtRel,new MktCamEvtRelDO());
+
                     mktCamEvtRelDO.setEventId(contactEvt.getContactEvtId());
                     mktCamEvtRelDO.setCreateDate(DateUtil.getCurrentTime());
                     mktCamEvtRelDO.setUpdateDate(DateUtil.getCurrentTime());

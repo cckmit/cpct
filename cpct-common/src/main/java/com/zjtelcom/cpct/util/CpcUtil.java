@@ -60,7 +60,7 @@ public final class CpcUtil {
      * 创建服务应答对象
      *
      * @param resultCode 0 ：成功，其他值：失败
-     * @param resultMsg “处理成功”“签名验证不通过..”“……”
+     * @param resultMsg "处理成功""签名验证不通过..""……"
      * @param resultObject 响应附加内容
      * @param sign 签名
      * @param transactionID 唯一的交易流水号

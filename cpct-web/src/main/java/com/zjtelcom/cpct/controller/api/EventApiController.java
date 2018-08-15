@@ -30,7 +30,6 @@ public class EventApiController extends BaseController {
     @CrossOrigin
     public String eventInput(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> map) {
         Map result = new HashMap();
-
         Map<String, Object> params = new HashMap<>();
         try {
             result = eventApiService.CalculateCPC(params);

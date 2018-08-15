@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.DisplayColumnLabelMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.DisplayColumnLabel">
+    <id column="DISPLAY_COLUMN_LABEL_ID" jdbcType="BIGINT" property="displayColumnLabelId" />
+    <result column="INJECTION_LABEL_ID" jdbcType="BIGINT" property="injectionLabelId" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from display_column_label
+    where DISPLAY_COLUMN_LABEL_ID = #{displayColumnLabelId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.DisplayColumnLabel">
+    insert into display_column_label (DISPLAY_COLUMN_LABEL_ID, INJECTION_LABEL_ID, 
+      STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+      CREATE_DATE, STATUS_DATE, UPDATE_DATE, 
+      REMARK)
+    values (#{displayColumnLabelId,jdbcType=BIGINT}, #{injectionLabelId,jdbcType=BIGINT}, 
+      #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.DisplayColumnLabel">
+    update display_column_label
+    set INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where DISPLAY_COLUMN_LABEL_ID = #{displayColumnLabelId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select DISPLAY_COLUMN_LABEL_ID, INJECTION_LABEL_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from display_column_label
+    where DISPLAY_COLUMN_LABEL_ID = #{displayColumnLabelId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select DISPLAY_COLUMN_LABEL_ID, INJECTION_LABEL_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from display_column_label
+  </select>
+</mapper>
