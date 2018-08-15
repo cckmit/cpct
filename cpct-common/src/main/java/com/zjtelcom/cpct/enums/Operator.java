@@ -21,6 +21,7 @@ public enum Operator {
         this.description = description;
     }
 
+
     public static Operator getOperator(Integer value){
         Operator[] allType = Operator.values();
         Operator op = null;
