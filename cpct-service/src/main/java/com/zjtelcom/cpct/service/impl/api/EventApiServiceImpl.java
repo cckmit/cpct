@@ -341,7 +341,7 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
                                 List<Map<String, String>> productList = new ArrayList<>();
                                 for (String str : productArray) {
                                     Map<String, String> product = new HashMap<>();
-                                    PpmProduct ppmProduct = ppmProductMapper.selectByPrimaryKey(Long.parseLong(str));
+                                    PpmProduct ppmProduct = ppmProductMapper.selectByPrimaryKey(Long.valueOf(str));
 
                                     product.put("productCode", ppmProduct.getProductCode());
                                     product.put("productFlag", ""); //todo 不明 案例上有 文档上没有
