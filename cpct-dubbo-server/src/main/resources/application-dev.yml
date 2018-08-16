@@ -14,7 +14,7 @@ spring:
   redis:
     host: 134.96.252.170
     port: 30305
-    password: 9bOCHtdJkNZ1hb2e35OmgIrLvGEaBXuT2udRBQNt5VQ
+    password: xc.cpct
     pool:
       max-active: 8
       max-wait: -1

@@ -28,10 +28,8 @@ public class EventApiController extends BaseController {
      */
     @RequestMapping("/CalculateCPC")
     @CrossOrigin
-    public String eventInput(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> map) {
+    public String eventInput(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> params) {
         Map result = new HashMap();
-
-        Map<String, Object> params = new HashMap<>();
         try {
             result = eventApiService.deal(params);
 //            eventApiService.cpc();
