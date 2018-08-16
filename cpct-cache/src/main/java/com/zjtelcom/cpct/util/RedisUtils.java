@@ -19,9 +19,6 @@ public class RedisUtils {
     @Autowired
     private RedisTemplate redisTemplate;
 
-    @Autowired
-    private HashOperations hashOperations;
-
     /**
      * 写入缓存
      *
@@ -128,29 +125,6 @@ public class RedisUtils {
     public void hmSet(String key, Object hashKey, Object value) {
         HashOperations<String, Object, Object> hash = redisTemplate.opsForHash();
         hash.put(key, hashKey, value);
-    }
-
-    /**
-     * 添加单个
-     *
-     * @param key    key
-     * @param filed  filed
-     * @param domain 对象
-     */
-    public void hset(String key,String filed,Object domain){
-        hashOperations.put(key, filed, domain);
-    }
-
-
-    /**
-     * 查询key和field所确定的值
-     *
-     * @param key 查询的key
-     * @param field 查询的field
-     * @return HV
-     */
-    public Object hget(String key,String field) {
-        return hashOperations.get(key, field);
     }
 
 
