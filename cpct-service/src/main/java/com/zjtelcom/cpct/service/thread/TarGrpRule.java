@@ -16,6 +16,7 @@ import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.springframework.context.annotation.Scope;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -57,6 +58,7 @@ public class TarGrpRule extends Thread {
         //查询分群规则list
         Long tarGrpId = mktStrategyConfRuleDO.getTarGrpId();
         List<TarGrpCondition> tarGrpConditionDOs = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
+        List<Label> labelList = new ArrayList<>();
         if(tarGrpId != null && tarGrpId!=0){
             //将规则拼装为表达式
             StringBuilder express = new StringBuilder();
@@ -66,6 +68,7 @@ public class TarGrpRule extends Thread {
                 for (int i = 0; i < tarGrpConditionDOs.size(); i++) {
                     String type = tarGrpConditionDOs.get(i).getOperType();
                     Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i).getLeftParam()));
+                    labelList.add(label);
                     express.append("(");
                     express.append(label.getInjectionLabelCode());
                     if ("1000".equals(type)) {
@@ -93,6 +96,9 @@ public class TarGrpRule extends Thread {
             String key = "EVENT_RULE_" + mktCampaignId + "_" + mktStrategyConfId + "_" + mktStrategyConfRuleId;
             System.out.println("key>>>>>>>>>>" + key +">>>>>>>>express->>>>:" + JSON.toJSONString(express));
             redisUtils.set(key, express);
+
+            // 将所有的标签集合存入redis
+            redisUtils.hset(key, "label", labelList);
         }
     }
 
