@@ -28,6 +28,7 @@ import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.dubbo.task.ActivityTask;
 import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.elastic.service.EsService;
+import com.zjtelcom.cpct.util.HttpUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -103,7 +104,7 @@ public class EventApiServiceImpl implements EventApiService {
     @Autowired(required = false)
     private RedisUtils redisUtils;  // redis方法
 
-/**
+    /**
      * 事件触发接口实现
      */
 //
@@ -604,121 +605,119 @@ public class EventApiServiceImpl implements EventApiService {
 //    public void cpc() {
 //
 //    }
-
-
-
-@Override
-@SuppressWarnings("unchecked")
-public Map deal(Map<String, Object> map) {
-    long begin = System.currentTimeMillis();
-    //初始化返回结果
-    Map<String, Object> result = new HashMap();
-    //获取事件code
-    String eventNbr = (String) map.get("eventId");
-    //获取流水号
-    String ISI = (String) map.get("ISI");
-    //从map中取出参数
+    @Override
+    @SuppressWarnings("unchecked")
+    public Map deal(Map<String, Object> map) {
+        long begin = System.currentTimeMillis();
+        //初始化返回结果
+        Map<String, Object> result = new HashMap();
+        //获取事件code
+        String eventNbr = (String) map.get("eventId");
+        //获取流水号
+        String ISI = (String) map.get("ISI");
+        //从map中取出参数
 //        EventReportDTO eventReportDTO = new EventReportDTO();
 //        eventReportDTO.setEventId((String) map.get("eventId")); //事件code
 //        eventReportDTO.setC4((String) map.get("C4")); //C4代码
 //        eventReportDTO.setChannelId((String) map.get("channelId")); //渠道
 //        eventReportDTO.setISI((String) map.get("ISI")); //流水号
 //        eventReportDTO.setLanId(Long.valueOf((String) map.get("lanId"))); //本地网标识
-    //构造返回参数
-    result.put("custId", "客户编码");
-    result.put("CPCResultCode", "1");
-    result.put("CPCResultMsg", "success");
-    result.put("ISI", ISI);
+        //构造返回参数
+        result.put("custId", "客户编码");
+        result.put("CPCResultCode", "1");
+        result.put("CPCResultMsg", "success");
+        result.put("ISI", ISI);
 
-    //获取标签因子集合
-    List<Map<String, Object>> labelList = (List<Map<String, Object>>) map.get("triggers");
-    //根据事件code查询事件信息
-    ContactEvt event = contactEvtMapper.getEventByEventNbr(eventNbr);
-    //获取事件id
-    Long eventId = event.getContactEvtId();
-    //获取事件推荐活动数
-    int recCampaignAmount;
-    String recCampaignAmountStr = event.getRecCampaignAmount();
-    if (recCampaignAmountStr == null || "".equals(recCampaignAmountStr)) {
-        recCampaignAmount = 0;
-    } else {
-        recCampaignAmount = Integer.parseInt(recCampaignAmountStr);
-    }
-    //获取事件过滤规则
-    ContactEvtMatchRul contactEvtMatchRulParam = new ContactEvtMatchRul();
-    contactEvtMatchRulParam.setContactEvtId(eventId);
-    List<ContactEvtMatchRul> contactEvtMatchRuls = contactEvtMatchRulMapper.listEventMatchRuls(contactEvtMatchRulParam);
-    //遍历事件过滤规则匹配
-    if (contactEvtMatchRuls != null && contactEvtMatchRuls.size() > 0) {
-        //匹配事件过滤规则
-        int flag = 0;
-        for (ContactEvtMatchRul contactEvtMatchRul : contactEvtMatchRuls) {
-            flag = userListMapper.checkRule("", contactEvtMatchRul.getEvtMatchRulId(), null);
-            if (flag > 0) {
-                result.put("CPCResultCode", "0");
-                result.put("CPCResultMsg", "事件过滤拦截");
-                return result;
+        //获取标签因子集合
+        List<Map<String, Object>> labelList = (List<Map<String, Object>>) map.get("triggers");
+        //根据事件code查询事件信息
+        ContactEvt event = contactEvtMapper.getEventByEventNbr(eventNbr);
+        //获取事件id
+        Long eventId = event.getContactEvtId();
+        //获取事件推荐活动数
+        int recCampaignAmount;
+        String recCampaignAmountStr = event.getRecCampaignAmount();
+        if (recCampaignAmountStr == null || "".equals(recCampaignAmountStr)) {
+            recCampaignAmount = 0;
+        } else {
+            recCampaignAmount = Integer.parseInt(recCampaignAmountStr);
+        }
+        //获取事件过滤规则
+        ContactEvtMatchRul contactEvtMatchRulParam = new ContactEvtMatchRul();
+        contactEvtMatchRulParam.setContactEvtId(eventId);
+        List<ContactEvtMatchRul> contactEvtMatchRuls = contactEvtMatchRulMapper.listEventMatchRuls(contactEvtMatchRulParam);
+        //遍历事件过滤规则匹配
+        if (contactEvtMatchRuls != null && contactEvtMatchRuls.size() > 0) {
+            //匹配事件过滤规则
+            int flag = 0;
+            for (ContactEvtMatchRul contactEvtMatchRul : contactEvtMatchRuls) {
+                flag = userListMapper.checkRule("", contactEvtMatchRul.getEvtMatchRulId(), null);
+                if (flag > 0) {
+                    result.put("CPCResultCode", "0");
+                    result.put("CPCResultMsg", "事件过滤拦截");
+                    return result;
+                }
             }
         }
-    }
-    //根据事件id 查询所有关联活动（根据优先级排序 正序）
-    List<Long> activityIds = mktCamEvtRelMapper.listActivityByEventId(eventId);
-    //初始化返回结果中的工单信息
-    List<Map<String, Object>> activityList = new ArrayList<>();
+        //根据事件id 查询所有关联活动（根据优先级排序 正序）
+        List<Long> activityIds = mktCamEvtRelMapper.listActivityByEventId(eventId);
+        //初始化返回结果中的工单信息
+        List<Map<String, Object>> activityList = new ArrayList<>();
 
-    //遍历活动id  查询并匹配活动规则 需要根据事件推荐活动数 取前n个活动
-    int max = activityIds.size();
-    if (recCampaignAmount != 0) {
-        //事件推荐活动数
-        if (activityIds.size() > recCampaignAmount) {
-            max = recCampaignAmount;
-        }
-    }
-    //初始化结果集
-    List<Future<Map<String, Object>>> threadList = new ArrayList<>();
-    //初始化线程池
-    ExecutorService executorService = Executors.newCachedThreadPool();
-
-    //遍历活动
-    for (int j = 0; j < max; j++) {
-        //活动id
-        Long activityId = activityIds.get(j);
-        //提交线程
-        Future<Map<String, Object>> f = executorService.submit(
-                new ActivityTask(ISI, activityId,eventNbr));
-        //将线程处理结果添加到结果集
-        threadList.add(f);
-    }
-    //获取结果
-    try {
-        for (Future<Map<String, Object>> future : threadList) {
-            if (!future.get().isEmpty()){
-                activityList.add(future.get());
+        //遍历活动id  查询并匹配活动规则 需要根据事件推荐活动数 取前n个活动
+        int max = activityIds.size();
+        if (recCampaignAmount != 0) {
+            //事件推荐活动数
+            if (activityIds.size() > recCampaignAmount) {
+                max = recCampaignAmount;
             }
         }
-    } catch (InterruptedException e) {
-        e.printStackTrace();
-        //发生异常关闭线程池
+        //初始化结果集
+        List<Future<Map<String, Object>>> threadList = new ArrayList<>();
+        //初始化线程池
+        ExecutorService executorService = Executors.newCachedThreadPool();
+
+        //遍历活动
+        for (int j = 0; j < max; j++) {
+            //活动id
+            Long activityId = activityIds.get(j);
+            //提交线程
+            Future<Map<String, Object>> f = executorService.submit(
+                    new ActivityTask(ISI, activityId, eventNbr));
+            //将线程处理结果添加到结果集
+            threadList.add(f);
+        }
+        //获取结果
+        try {
+            for (Future<Map<String, Object>> future : threadList) {
+                if (!future.get().isEmpty()) {
+                    activityList.add(future.get());
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            //发生异常关闭线程池
+            executorService.shutdown();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            //发生异常关闭线程池
+            executorService.shutdown();
+            return Collections.EMPTY_MAP;
+        }
+        //关闭线程池
         executorService.shutdown();
-    } catch (ExecutionException e) {
-        e.printStackTrace();
-        //发生异常关闭线程池
-        executorService.shutdown();
-        return Collections.EMPTY_MAP;
+        long cost = System.currentTimeMillis() - begin;
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("timeCost", cost);
+        jsonObject.put("ISI", ISI);
+        jsonObject.put("eventId", eventId);
+        jsonObject.put("activityList", activityList);
+        esService.save(jsonObject, IndexList.EVENT_MODULE);
+        //返回结果
+        result.put("activityList", activityList); //协同回调结果
+        return result;
     }
-    //关闭线程池
-    executorService.shutdown();
-    long cost = System.currentTimeMillis() - begin;
-    JSONObject jsonObject=new JSONObject();
-    jsonObject.put("timeCost",cost);
-    jsonObject.put("ISI",ISI);
-    jsonObject.put("eventId",eventId);
-    jsonObject.put("activityList",activityList);
-    esService.save(jsonObject,IndexList.EVENT_MODULE);
-    //返回结果
-    result.put("activityList", activityList); //协同回调结果
-    return result;
-}
+
     /**
      * 获取策略列表
      */
@@ -726,11 +725,13 @@ public Map deal(Map<String, Object> map) {
         private String ISI;
         private Long activityId;
         private String eventId;
-        public ActivityTask(String ISI,Long activityId,String eventId) {
+
+        public ActivityTask(String ISI, Long activityId, String eventId) {
             this.ISI = ISI;
             this.activityId = activityId;
-            this.eventId=eventId;
+            this.eventId = eventId;
         }
+
         @Override
         public Map<String, Object> call() {
             Map<String, Object> activity = new HashMap<>();
@@ -756,26 +757,26 @@ public Map deal(Map<String, Object> map) {
                 //提交线程
                 Future<Map<String, Object>> f =
                         executorService.submit(new StrategyTask
-                                (mktCamStrategyConfRelDO.getStrategyConfId(),ISI,String.valueOf(activityId),eventId));
+                                (mktCamStrategyConfRelDO.getStrategyConfId(), ISI, String.valueOf(activityId), eventId));
                 //将线程处理结果添加到结果集
                 threadList.add(f);
             }
             //获取结果
-            try{
-                for(Future<Map<String, Object>> future : threadList) {
-                    if (!future.get().isEmpty()){
+            try {
+                for (Future<Map<String, Object>> future : threadList) {
+                    if (!future.get().isEmpty()) {
                         strageyList.add(future.get());
                     }
                 }
                 activity.put("strategyList", strageyList);
                 //todo 其他字段
-                JSONObject jsonObject=new JSONObject();
+                JSONObject jsonObject = new JSONObject();
                 jsonObject.put("orderISI", ISI);
                 jsonObject.put("activityId", mktCampaign.getMktCampaignId().toString());
                 jsonObject.put("activityName", mktCampaign.getMktCampaignName());
                 jsonObject.put("activityCode", mktCampaign.getMktActivityNbr());
-                jsonObject.put("strategyList",activity.get("strategyList"));
-                esService.save(jsonObject,IndexList.ACTIVITY_MODULE);
+                jsonObject.put("strategyList", activity.get("strategyList"));
+                esService.save(jsonObject, IndexList.ACTIVITY_MODULE);
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 //发生异常关闭线程池
@@ -791,6 +792,7 @@ public Map deal(Map<String, Object> map) {
             return activity;
         }
     }
+
     /**
      * 获取返回规则列表
      */
@@ -799,14 +801,16 @@ public Map deal(Map<String, Object> map) {
         private String ISI;
         private String activityId;
         private String eventId;
-        public StrategyTask(Long strategyConfId,String ISI,String activityId,String eventId) {
+
+        public StrategyTask(Long strategyConfId, String ISI, String activityId, String eventId) {
             this.strategyConfId = strategyConfId;
-            this.ISI=ISI;
-            this.activityId=activityId;
-            this.eventId=eventId;
+            this.ISI = ISI;
+            this.activityId = activityId;
+            this.eventId = eventId;
         }
+
         @Override
-        public Map<String, Object>call() {
+        public Map<String, Object> call() {
             //获取当前时间
             Date now = new Date();
             Map<String, Object> strategyMap = new HashMap<>();
@@ -814,7 +818,7 @@ public Map deal(Map<String, Object> map) {
             List<Map<String, Object>> ruleList = new ArrayList<>();
             //查询策略基本信息
             MktStrategyConfDO mktStrategyConf = mktStrategyConfMapper.selectByPrimaryKey(strategyConfId);
-            strategyMap.put("mktStrategyConfName",mktStrategyConf.getMktStrategyConfName());
+            strategyMap.put("mktStrategyConfName", mktStrategyConf.getMktStrategyConfName());
             //验证策略生效时间
             if (!(now.after(mktStrategyConf.getBeginTime()) && now.before(mktStrategyConf.getEndTime()))) {
                 //若当前时间在策略生效时间外
@@ -842,7 +846,7 @@ public Map deal(Map<String, Object> map) {
                     String evtContactConfIdStr = mktStrategyConfRuleDO.getEvtContactConfId();
                     //提交线程
                     Future<Map<String, Object>> f = executorService.submit(
-                            new RuleTask(strategyConfId,ISI, tarGrpId, productStr, ruleConfId, evtContactConfIdStr,eventId,activityId));
+                            new RuleTask(strategyConfId, ISI, tarGrpId, productStr, ruleConfId, evtContactConfIdStr, eventId, activityId));
                     //将线程处理结果添加到结果集
                     threadList.add(f);
                 }
@@ -850,11 +854,11 @@ public Map deal(Map<String, Object> map) {
             //获取结果
             try {
                 for (Future<Map<String, Object>> future : threadList) {
-                    if (!future.get().isEmpty()){
+                    if (!future.get().isEmpty()) {
                         ruleList.add(future.get());
                     }
                 }
-                strategyMap.put("ruleList",ruleList);
+                strategyMap.put("ruleList", ruleList);
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 //发生异常关闭线程池
@@ -867,16 +871,17 @@ public Map deal(Map<String, Object> map) {
             }
             //关闭线程池
             executorService.shutdown();
-            JSONObject jsonObject=new JSONObject();
+            JSONObject jsonObject = new JSONObject();
             jsonObject.put("activityId", activityId);
             jsonObject.put("strategyConfId", strategyConfId);
             jsonObject.put("eventId", eventId);
-            jsonObject.put("ISI",ISI);
-            jsonObject.put("ruleList",ruleList);
-            esService.save(jsonObject,IndexList.STRATEGY_MODULE);
+            jsonObject.put("ISI", ISI);
+            jsonObject.put("ruleList", ruleList);
+            esService.save(jsonObject, IndexList.STRATEGY_MODULE);
             return strategyMap;
         }
     }
+
     /**
      * 获取规则列表
      */
@@ -887,26 +892,27 @@ public Map deal(Map<String, Object> map) {
         private Long ruleConfId;
         private String evtContactConfIdStr;
         private String ISI;
-        private  String eventId;
+        private String eventId;
         private String activityId;
 
-        public RuleTask(Long strategyConfId,String ISI, Long tarGrpId
-                , String productStr, Long ruleConfId, String evtContactConfIdStr,String eventId,String activityId) {
+        public RuleTask(Long strategyConfId, String ISI, Long tarGrpId
+                , String productStr, Long ruleConfId, String evtContactConfIdStr, String eventId, String activityId) {
             this.strategyConfId = strategyConfId;
             this.tarGrpId = tarGrpId;
-            this.ISI= ISI;
+            this.ISI = ISI;
             this.productStr = productStr;
             this.ruleConfId = ruleConfId;
             this.evtContactConfIdStr = evtContactConfIdStr;
-            this.activityId=activityId;
-            this.eventId=eventId;
+            this.activityId = activityId;
+            this.eventId = eventId;
         }
+
         @Override
         public Map<String, Object> call() {
             Map<String, Object> ruleMap = new HashMap<>();
             //初始化返回结果中的推荐信息列表
             List<Map<String, Object>> channelList = new ArrayList<>();
-            //  1.判断活动的过滤规则---------------------------
+            //  1.判断过滤规则---------------------------
             //获取过滤规则
             FilterRuleConfDO filterRuleConfDO = filterRuleConfMapper.selectByPrimaryKey(ruleConfId);
             String ruleConfIdStr = filterRuleConfDO.getFilterRuleIds();
@@ -919,7 +925,7 @@ public Map deal(Map<String, Object> map) {
 
                     //匹配事件过滤规则
                     int flag = 0;
-                    if (filterRule!=null){
+                    if (filterRule != null) {
                         flag = userListMapper.checkRule("", filterRule.getRuleId(), null);
                         if (flag > 0) {
                             ruleFilter = false;
@@ -931,10 +937,58 @@ public Map deal(Map<String, Object> map) {
                     return Collections.EMPTY_MAP;
                 }
             }
-            //  2.判断活动的客户分群规则---------------------------
+            //  2.判断客户分群规则---------------------------
             //判断匹配结果，如匹配则向下进行，如不匹配则continue结束本次循环
             ExpressRunner runner = new ExpressRunner();
             DefaultContext<String, Object> context = new DefaultContext<String, Object>();
+
+            //查询标签实例数据
+            String httpResultStr = "";
+            String url = "http://134.96.216.156:8110/in"; //标签查询地址
+            //构造查询参数值
+            JSONObject param = new JSONObject();
+            //查询标识
+            param.put("reqId", "ISI_0605202636_887_44_732");
+            param.put("queryNum", "18058078809");
+            param.put("c3", "580");
+            param.put("queryId", "1-1D8CLB0P");
+            //查询标签列表
+            Map<String, String> queryFields = new HashMap<>();
+            queryFields.put("1", "FREE_CALL_TYPE");
+            queryFields.put("2", "PROM_AGREE_EXP_MONS");
+            queryFields.put("3", "IS_FREE_CALL");
+            param.put("queryFields", queryFields);
+
+            String paramStr = param.toString();
+            //验证post回调结果
+            httpResultStr = HttpUtil.post(url, paramStr);
+            if (httpResultStr == null || "".equals(httpResultStr)) {
+                System.out.println("查询标签出错");
+            }
+
+            //解析返回结果
+            JSONObject httpResult = JSONObject.parseObject(httpResultStr);
+            if (httpResult.getInteger("result_code") == 0) {
+                JSONObject body = httpResult.getJSONObject("msgbody");
+                //ES log 标签实例
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("ISI", ISI);
+                jsonObject.put("eventId", eventId);
+                jsonObject.put("activityId", activityId);
+                jsonObject.put("ruleConfId", ruleConfId);
+                jsonObject.put("strategyConfId", strategyConfId);
+                jsonObject.put("target", body);
+                esService.save(jsonObject, IndexList.Label_MODULE);
+                //拼接规则引擎上下文
+                for (Map.Entry<String, Object> entry : body.entrySet()) {
+                    //添加到时上下文
+                    context.put(entry.getKey(),entry.getValue());
+                }
+            } else {
+                System.out.println("查询标签失败:" + httpResult.getString("result_msg"));
+            }
+
+            //todo 获取表达式
 //        String key = "EVENT_RULE_" + mktCampaignId + "_" + mktStrategyConfId + "_" + mktStrategyConfRuleId;
             String key = "EVENT_RULE";
             //判断redis中是否存在
@@ -971,7 +1025,7 @@ public Map deal(Map<String, Object> map) {
                     expressSb.append(")");
                     executeSingleExpress(tarGrpConditionDOs,
                             context, runner, i, type,
-                            label,express);
+                            label, express);
                     if (i + 1 != tarGrpConditionDOs.size()) {
                         expressSb.append("&&");
                     }
@@ -999,18 +1053,18 @@ public Map deal(Map<String, Object> map) {
                         System.out.println("*********************product --->>>" + JSON.toJSON(product));
                         productList.add(product);
                     }
-                    JSONObject jsonObject=new JSONObject();
-                    jsonObject.put("express",express);
-                    jsonObject.put("ISI",ISI);
-                    jsonObject.put("eventId",eventId);
-                    jsonObject.put("activityId",activityId);
-                    jsonObject.put("ruleConfId",ruleConfId);
-                    jsonObject.put("strategyConfId",strategyConfId);
-                    jsonObject.put("productStr",productStr);
-                    jsonObject.put("evtContactConfIdStr",evtContactConfIdStr);
-                    jsonObject.put("tarGrpId",tarGrpId);
-                    jsonObject.put("result",ruleResult.getResult()); //看是否命中
-                    jsonObject.put("productList",productList);
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("express", express);
+                    jsonObject.put("ISI", ISI);
+                    jsonObject.put("eventId", eventId);
+                    jsonObject.put("activityId", activityId);
+                    jsonObject.put("ruleConfId", ruleConfId);
+                    jsonObject.put("strategyConfId", strategyConfId);
+                    jsonObject.put("productStr", productStr);
+                    jsonObject.put("evtContactConfIdStr", evtContactConfIdStr);
+                    jsonObject.put("tarGrpId", tarGrpId);
+                    jsonObject.put("result", ruleResult.getResult()); //看是否命中
+                    jsonObject.put("productList", productList);
                     esService.save(jsonObject, IndexList.RULE_MODULE);
                     //获取协同渠道所有id
                     String[] evtContactConfIdArray = evtContactConfIdStr.split("/");
@@ -1030,11 +1084,11 @@ public Map deal(Map<String, Object> map) {
                     //获取结果
                     try {
                         for (Future<Map<String, Object>> future : threadList) {
-                            if (!future.get().isEmpty()){
+                            if (!future.get().isEmpty()) {
                                 channelList.add(future.get());
                             }
                         }
-                        ruleMap.put("channelList",channelList);
+                        ruleMap.put("channelList", channelList);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                         //发生异常关闭线程池
@@ -1056,10 +1110,11 @@ public Map deal(Map<String, Object> map) {
             }
             return ruleMap;
         }
+
         private void executeSingleExpress(List<TarGrpCondition> tarGrpConditionDOs,
                                           DefaultContext context,
                                           ExpressRunner runner, int i,
-                                          String type, Label label,String express) {
+                                          String type, Label label, String express) {
             StringBuilder singleExpress = new StringBuilder();
             singleExpress.append("if(");
             singleExpress.append("(");
@@ -1082,19 +1137,19 @@ public Map deal(Map<String, Object> map) {
             singleExpress.append(") {return true} else {return false}");
             try {
                 RuleResult ruleResult = runner.executeRule(singleExpress.toString(), context, true, true);
-                JSONObject jsonObject=new JSONObject();
-                jsonObject.put("express",express);
-                jsonObject.put("ISI",ISI);
-                jsonObject.put("eventId",eventId);
-                jsonObject.put("activityId",activityId);
-                jsonObject.put("ruleConfId",ruleConfId);
-                jsonObject.put("strategyConfId",strategyConfId);
-                jsonObject.put("productStr",productStr);
-                jsonObject.put("evtContactConfIdStr",evtContactConfIdStr);
-                jsonObject.put("tarGrpId",tarGrpId);
-                jsonObject.put("result",ruleResult.getResult()); //看是否命中
-                jsonObject.put("labelCode",label.getInjectionLabelCode());
-                jsonObject.put("labelName",label.getInjectionLabelName());
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("express", express);
+                jsonObject.put("ISI", ISI);
+                jsonObject.put("eventId", eventId);
+                jsonObject.put("activityId", activityId);
+                jsonObject.put("ruleConfId", ruleConfId);
+                jsonObject.put("strategyConfId", strategyConfId);
+                jsonObject.put("productStr", productStr);
+                jsonObject.put("evtContactConfIdStr", evtContactConfIdStr);
+                jsonObject.put("tarGrpId", tarGrpId);
+                jsonObject.put("result", ruleResult.getResult()); //看是否命中
+                jsonObject.put("labelCode", label.getInjectionLabelCode());
+                jsonObject.put("labelName", label.getInjectionLabelName());
                 esService.save(jsonObject, IndexList.Label_MODULE);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1114,6 +1169,7 @@ public Map deal(Map<String, Object> map) {
             this.evtContactConfId = evtContactConfId;
             this.productList = productList;
         }
+
         @Override
         public Map<String, Object> call() {
             Date now = new Date();
