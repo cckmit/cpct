@@ -15,6 +15,7 @@
 //import com.zjtelcom.cpct.domain.campaign.*;
 //import com.zjtelcom.cpct.domain.channel.*;
 //import com.zjtelcom.cpct.domain.event.EventDO;
+///*import com.zjtelcom.cpct.domainain.strategy.MktStrategyConfDO;*/
 //import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 //import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 //import com.zjtelcom.cpct.dto.event.ContactEvt;
@@ -456,7 +457,7 @@
 //
 //        return result;
 //    }
-//
+///*
 //    @Override
 //    @SuppressWarnings("unchecked")
 //    public Map CalculateCPC(Map<String, Object> map) throws Exception {
@@ -579,8 +580,8 @@
 //        return result;
 //    }
 //
-//    @Override
+//   @Override
 //    public void cpc() {
 //
-//    }
+//    }*/
 //}

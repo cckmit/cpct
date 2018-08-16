@@ -4,14 +4,13 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
-import com.zjtelcom.cpct.dao.es.ClTestRepository;
 import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.channel.MktProductRule;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.ChannelType;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ChannelService;
-import com.zjtelcom.cpct.service.impl.api.ClTest;
+/*import com.zjtelcom.cpct.service.impl.api.ClTest;*/
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
@@ -29,9 +28,9 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
 
     @Autowired
     private ContactChannelMapper channelMapper;
-
+/*
     @Autowired
-    private ClTestRepository testRepository;
+    private ClTestRepository testRepository;*/
 
 
     @Override
@@ -365,10 +364,10 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
 
     @Override
     public Object addAcount() {
-            ClTest clTest = new ClTest();
+/*            ClTest clTest = new ClTest();
             clTest.setId(Long.valueOf(ChannelUtil.getRandomStr(5)));
             testRepository.save(clTest);
-            logger.info("333333");
+            logger.info("333333");*/
 
         return "success";
     }
