@@ -207,7 +207,11 @@
           #{item}
         </foreach>
       </if>
+      <if test="labelName != null and labelName != ''">
+        and INJECTION_LABEL_NAME LIKE CONCAT(CONCAT('%',#{labelName}),'%')
+      </if>
     </where>
+
   </select>
 
 </mapper>

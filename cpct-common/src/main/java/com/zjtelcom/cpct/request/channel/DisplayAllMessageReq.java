@@ -15,7 +15,17 @@ public class DisplayAllMessageReq {
 
     private List<Long> injectionLabelIds;
 
+    private String labelName;
+
     private Page page;
+
+    public String getLabelName() {
+        return labelName;
+    }
+
+    public void setLabelName(String labelName) {
+        this.labelName = labelName;
+    }
 
     public Long getDisplayColumnId() {
         return displayColumnId;
