@@ -643,22 +643,22 @@ public class EventApiServiceImpl implements EventApiService {
             recCampaignAmount = Integer.parseInt(recCampaignAmountStr);
         }
         //获取事件过滤规则
-        ContactEvtMatchRul contactEvtMatchRulParam = new ContactEvtMatchRul();
-        contactEvtMatchRulParam.setContactEvtId(eventId);
-        List<ContactEvtMatchRul> contactEvtMatchRuls = contactEvtMatchRulMapper.listEventMatchRuls(contactEvtMatchRulParam);
-        //遍历事件过滤规则匹配
-        if (contactEvtMatchRuls != null && contactEvtMatchRuls.size() > 0) {
-            //匹配事件过滤规则
-            int flag = 0;
-            for (ContactEvtMatchRul contactEvtMatchRul : contactEvtMatchRuls) {
-                flag = userListMapper.checkRule("", contactEvtMatchRul.getEvtMatchRulId(), null);
-                if (flag > 0) {
-                    result.put("CPCResultCode", "0");
-                    result.put("CPCResultMsg", "事件过滤拦截");
-                    return result;
-                }
-            }
-        }
+//        ContactEvtMatchRul contactEvtMatchRulParam = new ContactEvtMatchRul();
+//        contactEvtMatchRulParam.setContactEvtId(eventId);
+//        List<ContactEvtMatchRul> contactEvtMatchRuls = contactEvtMatchRulMapper.listEventMatchRuls(contactEvtMatchRulParam);
+//        //遍历事件过滤规则匹配
+//        if (contactEvtMatchRuls != null && contactEvtMatchRuls.size() > 0) {
+//            //匹配事件过滤规则
+//            int flag = 0;
+//            for (ContactEvtMatchRul contactEvtMatchRul : contactEvtMatchRuls) {
+//                flag = userListMapper.checkRule("", contactEvtMatchRul.getEvtMatchRulId(), null);
+//                if (flag > 0) {
+//                    result.put("CPCResultCode", "0");
+//                    result.put("CPCResultMsg", "事件过滤拦截");
+//                    return result;
+//                }
+//            }
+//        }
         //根据事件id 查询所有关联活动（根据优先级排序 正序）
         List<Long> activityIds = mktCamEvtRelMapper.listActivityByEventId(eventId);
         //初始化返回结果中的工单信息
@@ -939,11 +939,14 @@ public class EventApiServiceImpl implements EventApiService {
             }
             //  2.判断客户分群规则---------------------------
             //判断匹配结果，如匹配则向下进行，如不匹配则continue结束本次循环
+            //拼装redis key
+            String key = "EVENT_RULE_" + activityId + "_" + strategyConfId + "_" + ruleConfId;
+
             ExpressRunner runner = new ExpressRunner();
             DefaultContext<String, Object> context = new DefaultContext<String, Object>();
 
             //查询标签实例数据
-            String httpResultStr = "";
+            String httpResultStr;
             String url = "http://134.96.216.156:8110/in"; //标签查询地址
             //构造查询参数值
             JSONObject param = new JSONObject();
@@ -954,9 +957,24 @@ public class EventApiServiceImpl implements EventApiService {
             param.put("queryId", "1-1D8CLB0P");
             //查询标签列表
             Map<String, String> queryFields = new HashMap<>();
-            queryFields.put("1", "FREE_CALL_TYPE");
-            queryFields.put("2", "PROM_AGREE_EXP_MONS");
-            queryFields.put("3", "IS_FREE_CALL");
+            List<Label> labels = (List<Label>) redisUtils.hmGet(key, "label");
+            if(labels == null || labels.size() <= 0) {
+                //redis中没有，从数据库查询标签
+                List<TarGrpCondition> tarGrpConditionDOs = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
+                //遍历所有规则
+                for (int i = 1; i <= tarGrpConditionDOs.size(); i++) {
+                    Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i).getLeftParam()));
+                    queryFields.put(String.valueOf(i), label.getInjectionLabelCode());
+                }
+            } else {
+                //redis中获取标签
+                for (int i = 1; i <= labels.size(); i++) {
+                    queryFields.put(String.valueOf(i), labels.get(i).getInjectionLabelCode());
+                }
+            }
+//            queryFields.put("1", "FREE_CALL_TYPE");
+//            queryFields.put("2", "PROM_AGREE_EXP_MONS");
+//            queryFields.put("3", "IS_FREE_CALL");
             param.put("queryFields", queryFields);
 
             String paramStr = param.toString();
@@ -982,15 +1000,14 @@ public class EventApiServiceImpl implements EventApiService {
                 //拼接规则引擎上下文
                 for (Map.Entry<String, Object> entry : body.entrySet()) {
                     //添加到时上下文
-                    context.put(entry.getKey(),entry.getValue());
+                    context.put(entry.getKey(), entry.getValue());
                 }
+                System.out.println("查询标签成功:" + context.toString());
             } else {
                 System.out.println("查询标签失败:" + httpResult.getString("result_msg"));
             }
 
-            //todo 获取表达式
-//        String key = "EVENT_RULE_" + mktCampaignId + "_" + mktStrategyConfId + "_" + mktStrategyConfRuleId;
-            String key = "EVENT_RULE";
+
             //判断redis中是否存在
             String express = "";
             if (redisUtils.exists(key)) {
