@@ -60,16 +60,18 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         return result;
     }
 
+    /**
+     * 下发策略试运算结果
+     * @param request
+     * @return
+     */
     @Override
     public Map<String, Object> issueTrialResult(IssueTrialRequest request) {
         Map<String, Object> result = new HashMap<>();
-
-
-
-
+        //todo 入参： 批次号、销售品列表、渠道信息列表
         try {
             //todo 待验证
-            restTemplate.postForObject(FIND_BATCH_HITS_LIST_URL, request,null);
+            restTemplate.postForObject(STRATEGY_TRIAL_TO_REDIS_URL, request,null);
         } catch (Exception e) {
             e.printStackTrace();
         }

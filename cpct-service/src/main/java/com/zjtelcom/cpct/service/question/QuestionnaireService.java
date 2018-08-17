@@ -12,4 +12,10 @@ public interface QuestionnaireService {
     Map<String,Object> createQuestionnaire(Long userId,QuestionReq questionReq);
 
     Map<String,Object> listQuestionListByQuestionId(Long userId,Long questionnaireId);
+
+    Map<String,Object> modQuestionnaire(Long userId,QuestionReq req);
+
+    Map<String,Object> delQuestionnaire(Long userId,QuestionReq req);
+
+
 }

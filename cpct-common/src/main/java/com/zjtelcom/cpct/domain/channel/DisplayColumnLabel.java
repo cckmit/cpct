@@ -19,6 +19,21 @@ public class DisplayColumnLabel extends BaseEntity{
      */
     private Long injectionLabelId;
 
+    /**
+     * 展示列ID
+     */
+    private Long displayId;
+
+
+
+    public Long getDisplayId() {
+        return displayId;
+    }
+
+    public void setDisplayId(Long displayId) {
+        this.displayId = displayId;
+    }
+
     public Long getDisplayColumnLabelId() {
         return displayColumnLabelId;
     }
