@@ -2,7 +2,9 @@ package com.zjtelcom.cpct.controller.question;
 
 import com.alibaba.fastjson.JSONArray;
 import com.zjtelcom.cpct.controller.BaseController;
+import com.zjtelcom.cpct.dto.question.QuestionEditVO;
 import com.zjtelcom.cpct.dto.question.QuestionReq;
+import com.zjtelcom.cpct.service.question.QuestionService;
 import com.zjtelcom.cpct.service.question.QuestionnaireService;
 import com.zjtelcom.cpct.util.FastJsonUtils;
 import com.zjtelcom.cpct.util.UserUtil;
@@ -21,13 +23,25 @@ public class QuestionController extends BaseController {
     @Autowired
     private QuestionService questionService;
 
-
-    @PostMapping("modQuestion")
+    @PostMapping("delQuestionnaire")
     @CrossOrigin
-    public Map<String, Object> modQuestion(@RequestBody QuestionEditVO editVO) {
+    public Map<String, Object> delQuestionnaire(@RequestBody QuestionReq req) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            maps = questionService.modQuestion(1L,editVO);
+            maps = questionnaireService.delQuestionnaire(1L,req);
+        } catch (Exception e) {
+            logger.error("[op:TarGrpController] fail to delQuestionnaire ", e);
+        }
+        return maps;
+
+    }
+
+    @PostMapping("modQuestionnaire")
+    @CrossOrigin
+    public Map<String, Object> modQuestionnaire(@RequestBody QuestionReq req) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = questionnaireService.modQuestionnaire(1L,req);
         } catch (Exception e) {
             logger.error("[op:TarGrpController] fail to createQuestionnaire ", e);
         }
