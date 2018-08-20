@@ -844,9 +844,11 @@ public class EventApiServiceImpl implements EventApiService {
                     Long ruleConfId = mktStrategyConfRuleDO.getRuleConfId();
                     //协同渠道配置id
                     String evtContactConfIdStr = mktStrategyConfRuleDO.getEvtContactConfId();
+
+                    Long mktStrategyConfRuleId = mktStrategyConfRuleDO.getMktStrategyConfRuleId();
                     //提交线程
                     Future<Map<String, Object>> f = executorService.submit(
-                            new RuleTask(strategyConfId, ISI, tarGrpId, productStr, ruleConfId, evtContactConfIdStr, eventId, activityId));
+                            new RuleTask(strategyConfId, ISI, tarGrpId, productStr, ruleConfId, evtContactConfIdStr, eventId, activityId,mktStrategyConfRuleId));
                     //将线程处理结果添加到结果集
                     threadList.add(f);
                 }
@@ -894,9 +896,10 @@ public class EventApiServiceImpl implements EventApiService {
         private String ISI;
         private String eventId;
         private String activityId;
+        private Long mktStrategyConfRuleId;
 
         public RuleTask(Long strategyConfId, String ISI, Long tarGrpId
-                , String productStr, Long ruleConfId, String evtContactConfIdStr, String eventId, String activityId) {
+                , String productStr, Long ruleConfId, String evtContactConfIdStr, String eventId, String activityId,Long mktStrategyConfRuleId) {
             this.strategyConfId = strategyConfId;
             this.tarGrpId = tarGrpId;
             this.ISI = ISI;
@@ -905,6 +908,7 @@ public class EventApiServiceImpl implements EventApiService {
             this.evtContactConfIdStr = evtContactConfIdStr;
             this.activityId = activityId;
             this.eventId = eventId;
+            this.mktStrategyConfRuleId = mktStrategyConfRuleId;
         }
 
         @Override
@@ -914,33 +918,33 @@ public class EventApiServiceImpl implements EventApiService {
             List<Map<String, Object>> channelList = new ArrayList<>();
             //  1.判断过滤规则---------------------------
             //获取过滤规则
-            FilterRuleConfDO filterRuleConfDO = filterRuleConfMapper.selectByPrimaryKey(ruleConfId);
-            String ruleConfIdStr = filterRuleConfDO.getFilterRuleIds();
-            if (ruleConfIdStr != null) {
-                String[] array = ruleConfIdStr.split(",");
-                boolean ruleFilter = true;
-                for (String str : array) {
-                    //获取具体规则
-                    FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.parseLong(str));
-
-                    //匹配事件过滤规则
-                    int flag = 0;
-                    if (filterRule != null) {
-                        flag = userListMapper.checkRule("", filterRule.getRuleId(), null);
-                        if (flag > 0) {
-                            ruleFilter = false;
-                        }
-                    }
-                }
-                //若存在不符合的规则 结束当前规则循环
-                if (!ruleFilter) {
-                    return Collections.EMPTY_MAP;
-                }
-            }
+//            FilterRuleConfDO filterRuleConfDO = filterRuleConfMapper.selectByPrimaryKey(ruleConfId);
+//            String ruleConfIdStr = filterRuleConfDO.getFilterRuleIds();
+//            if (ruleConfIdStr != null) {
+//                String[] array = ruleConfIdStr.split(",");
+//                boolean ruleFilter = true;
+//                for (String str : array) {
+//                    //获取具体规则
+//                    FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.parseLong(str));
+//
+//                    //匹配事件过滤规则
+//                    int flag = 0;
+//                    if (filterRule != null) {
+//                        flag = userListMapper.checkRule("", filterRule.getRuleId(), null);
+//                        if (flag > 0) {
+//                            ruleFilter = false;
+//                        }
+//                    }
+//                }
+//                //若存在不符合的规则 结束当前规则循环
+//                if (!ruleFilter) {
+//                    return Collections.EMPTY_MAP;
+//                }
+//            }
             //  2.判断客户分群规则---------------------------
             //判断匹配结果，如匹配则向下进行，如不匹配则continue结束本次循环
             //拼装redis key
-            String key = "EVENT_RULE_" + activityId + "_" + strategyConfId + "_" + ruleConfId;
+            String key = "EVENT_RULE_" + activityId + "_" + strategyConfId + "_" + mktStrategyConfRuleId;
 
             ExpressRunner runner = new ExpressRunner();
             DefaultContext<String, Object> context = new DefaultContext<String, Object>();
@@ -957,7 +961,7 @@ public class EventApiServiceImpl implements EventApiService {
             param.put("queryId", "1-1D8CLB0P");
             //查询标签列表
             Map<String, String> queryFields = new HashMap<>();
-            List<Label> labels = (List<Label>) redisUtils.hmGet(key, "label");
+            List<Label> labels = (List<Label>) redisUtils.get(key + "label");
             if(labels == null || labels.size() <= 0) {
                 //redis中没有，从数据库查询标签
                 List<TarGrpCondition> tarGrpConditionDOs = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
