@@ -5,54 +5,18 @@
 	http://code.alibabatech.com/schema/dubbo 
 	http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 
+    <!-- 提供方应用信息，用于计算依赖关系 -->
+    <dubbo:application name="33.1083" />
 
-    <dubbo:application name="33.1059"/>
+    <dubbo:registry protocol="dubbo" address="134.96.253.86:8033"/>
 
-    <dubbo:registry protocol="dubbo" address="134.96.159.11:8033"/>
+    <!--&lt;!&ndash; 暴露服务 &ndash;&gt;-->
+    <!--<dubbo:protocol name="dubbo" port="30323" />-->
+    <!--<dubbo:monitor protocol="registry" />-->
 
-    <dubbo:consumer timeout="5000"/>
-
-    <!--<dubbo:reference id="contactTaskReceiptService"-->
-    <!--interface="com.ctzj.coordination.service.dubbo.ContactTaskReceiptService"-->
-    <!--version="1.0" retries="0" check="false">-->
-    <!--<dubbo:method name="contactTaskReceipt" servicecode="33.1058.CPCResultFeedback"/>-->
-    <!--<dubbo:method name="queryRequestDetail" servicecode="33.1058.queryRequestDetail"/>-->
-    <!--</dubbo:reference >-->
-
-
-    <!--<dubbo:reference id="tagSyncService" interface="com.zjhcsoft.eagle.main.dubbo.service.TagSyncService" version="1.0">-->
-    <!--<dubbo:method name="syncDatabaseConfig" servicecode="33.1307.syncDatabaseConfig"/>-->
-    <!--<dubbo:method name="getSourceTableCount" servicecode="33.1307.getSourceTableCount"/>-->
-    <!--<dubbo:method name="syncSourceTable" servicecode="33.1307.syncSourceTable"/>-->
-    <!--<dubbo:method name="getSourceTableRefCount" servicecode="33.1307.getSourceTableRefCount"/>-->
-    <!--<dubbo:method name="syncSourceTableRef" servicecode="33.1307.syncSourceTableRef"/>-->
-    <!--<dubbo:method name="getTagCount" servicecode="33.1307.getTagCount"/>-->
-    <!--<dubbo:method name="syncTag" servicecode="33.1307.syncTag"/>-->
-    <!--<dubbo:method name="getTagValueCount" servicecode="33.1307.getTagValueCount"/>-->
-    <!--<dubbo:method name="syncTagValue" servicecode="33.1307.syncTagValue"/>-->
-    <!--</dubbo:reference>-->
-
-    <!--<dubbo:reference id="strategySalesViewService"-->
-    <!--interface="com.ctzj.ppm.dubbo.service.StrategySalesViewService"-->
-    <!--version="1.0" retries="0">-->
-    <!--<dubbo:method name="salesView" servicecode="33.1038.salesView"/>-->
-    <!--</dubbo:reference>-->
-
-    <dubbo:reference id="strategySalesSearchService"
-                     interface="com.ctzj.ppm.dubbo.service.StrategySalesSearchService"
-                     version="1.0" retries="0">
-        <dubbo:method name="salesSearch" servicecode="33.1038.salesSearch"/>
-    </dubbo:reference>
-
-    <!--  -->
-    <!--<dubbo:reference id="policyCalculateService" interface="com.zjhcsoft.eagle.main.dubbo.service.PolicyCalculateService" version="1.0">-->
-    <!--<dubbo:method name="tryCalculate" servicecode="33.1307.tryCalculate"/>-->
-    <!--</dubbo:reference>-->
-
-    <dubbo:reference id="eventApiService"
-                     interface="com.zjtelcom.cpct.service.api.EventApiService" version="1.0" retries="0">
-        <!--<dubbo:method name="CalculateCPC" servicecode="33.1059.CalculateCPCTest"/>-->
-        <dubbo:method name="cpc" servicecode="33.1059.CalculateCPCTest"/>
+    <dubbo:reference interface="com.zjtelcom.cpct.service.api.EventApiService" id="eventApiService"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="deal" servicecode="33.1083.CalculateCPC" timeout="5000"/>
     </dubbo:reference>
 
 </beans>

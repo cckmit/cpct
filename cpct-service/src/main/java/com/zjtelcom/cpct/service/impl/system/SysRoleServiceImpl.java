@@ -53,6 +53,7 @@ public class SysRoleServiceImpl extends BaseService implements SysRoleService {
 
         sysRoleMapper.insert(sysRole);
         result.put("resultCode", "0");
+        result.put("resultMsg","保存成功");
         return result;
     }
 
@@ -69,6 +70,7 @@ public class SysRoleServiceImpl extends BaseService implements SysRoleService {
         sysRole.setUpdateDate(new Date());
         sysRoleMapper.updateByPrimaryKey(sysRole);
         result.put("resultCode", "0");
+        result.put("resultMsg","保存成功");
         return result;
     }
 
@@ -84,14 +86,25 @@ public class SysRoleServiceImpl extends BaseService implements SysRoleService {
         return result;
     }
 
+    /**
+     * 删除角色
+     * @param id
+     * @return
+     */
     @Override
     public Map<String, Object> delRole(Long id) {
         Map<String, Object> result = new HashMap<>();
         sysRoleMapper.deleteByPrimaryKey(id);
         result.put("resultCode", "0");
+        result.put("resultMsg", "删除成功");
         return result;
     }
 
+    /**
+     * 保存角色权限
+     * @param params
+     * @return
+     */
     @Override
     public Map<String, Object> saveAuthority(Map<String, Object> params) {
         Map<String, Object> result = new HashMap<>();
@@ -99,6 +112,9 @@ public class SysRoleServiceImpl extends BaseService implements SysRoleService {
         Long roleId = Long.parseLong(((Integer) params.get("roleId")).toString());
         List<Integer> list = (List<Integer>) params.get("list");
 
+        //先删除所有权限
+        sysRoleMenuMapper.deleteByPrimaryKey(roleId);
+        //保存新权限
         SysRoleMenu sysRoleMenu = new SysRoleMenu();
         sysRoleMenu.setRoleId(roleId);
         for (Integer menuId : list) {
@@ -107,6 +123,7 @@ public class SysRoleServiceImpl extends BaseService implements SysRoleService {
         }
 
         result.put("resultCode", "0");
+        result.put("resultMsg", "保存成功");
         return result;
     }
 
