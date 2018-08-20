@@ -16,5 +16,9 @@ public interface SysMenuMapper {
 
     List<SysMenu> selectByRoleId(Long roleId);
 
+    List<SysMenu> listMenuById(Long menuId);
+
+    List<SysMenu> listMenuByLevel(Long level);
+
     int updateByPrimaryKey(SysMenu record);
 }

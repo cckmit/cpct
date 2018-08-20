@@ -92,7 +92,7 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
 
         sysParamsMapper.deleteByPrimaryKey(id);
         result.put("resultCode","0");
-
+        result.put("resultMsg","保存成功");
         return result;
     }
 

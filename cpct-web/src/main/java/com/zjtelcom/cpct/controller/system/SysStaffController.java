@@ -34,14 +34,8 @@ public class SysStaffController extends BaseController {
     public String listStaff(@RequestBody Map<String,String> params) {
         Map result = new HashMap();
 
-        String staffAccount = params.get("staffAccount");
-        String staffName = params.get("staffName");
-        Long status = Long.parseLong(params.get("status"));
-        Integer page = Integer.parseInt(params.get("page"));
-        Integer pageSize = Integer.parseInt(params.get("pageSize"));
-
         try {
-            result = sysStaffService.listStaff(staffAccount, staffName, status, page, pageSize);
+            result = sysStaffService.listStaff(params);
         } catch (Exception e) {
             logger.error("[op:SysStaffController] fail to eventList Exception: ", e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());

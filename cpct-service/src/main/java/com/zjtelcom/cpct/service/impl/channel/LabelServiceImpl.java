@@ -213,13 +213,13 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         Map<String,Object> result = new HashMap<>();
         List<LabelVO> voList = new ArrayList<>();
         List<Label> labelList = new ArrayList<>();
-            PageHelper.startPage(page,pageSize);
-            labelList = labelMapper.findLabelList(labelName,fitDomain,labelCode,scope,conditionType);
-            Page pageInfo = new Page(new PageInfo(labelList));
-            for (Label label : labelList){
-                LabelVO vo = ChannelUtil.map2LabelVO(label);
-                voList.add(vo);
-            }
+        PageHelper.startPage(page,pageSize);
+        labelList = labelMapper.findLabelList(labelName,fitDomain,labelCode,scope,conditionType);
+        Page pageInfo = new Page(new PageInfo(labelList));
+        for (Label label : labelList){
+            LabelVO vo = ChannelUtil.map2LabelVO(label);
+            voList.add(vo);
+        }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",voList);
         result.put("page",pageInfo);

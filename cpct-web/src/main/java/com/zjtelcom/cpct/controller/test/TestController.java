@@ -1,3 +1,4 @@
+/*
 package com.zjtelcom.cpct.controller.test;
 
 import com.alibaba.fastjson.JSONObject;
@@ -23,11 +24,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+*/
 /**
  * @Description test
  * @Author pengy
  * @Date 2018/6/25 11:42
- */
+ *//*
+
 @RestController
 @RequestMapping("${adminPath}/test")
 public class TestController extends BaseController {
@@ -49,10 +52,12 @@ public class TestController extends BaseController {
     private PpmProductMapper productMapper;
 
 
-    /**
+    */
+/**
      * 添加
      * @return
-     */
+     *//*
+
     @RequestMapping("add")
     public String add() {
         Employee employee = new Employee();
@@ -66,10 +71,12 @@ public class TestController extends BaseController {
         return "success";
     }
 
-    /**
+    */
+/**
      * 删除
      * @return
-     */
+     *//*
+
     @RequestMapping("delete")
     public String delete() {
         Employee employee = employeeRepository.queryEmployeeById("1");
@@ -77,10 +84,12 @@ public class TestController extends BaseController {
         return "success";
     }
 
-    /**
+    */
+/**
      * 局部更新
      * @return
-     */
+     *//*
+
     @RequestMapping("update")
     public String update() {
         Employee employee = employeeRepository.queryEmployeeById("1");
@@ -89,10 +98,12 @@ public class TestController extends BaseController {
         System.err.println("update a obj");
         return "success";
     }
-    /**
+    */
+/**
      * 查询
      * @return
-     */
+     *//*
+
     @RequestMapping("query")
     public Employee query() {
         Employee accountInfo = employeeRepository.queryEmployeeById("2");
@@ -124,11 +135,13 @@ public class TestController extends BaseController {
         return initSuccRespInfo(null);
     }
 
-    /**
+    */
+/**
      * 规则插入
      * @param param
      * @return
-     */
+     *//*
+
     @RequestMapping("/ruleInsertTest")
     @CrossOrigin
     public String ruleInsertTest(@RequestBody String param) {
@@ -208,10 +221,12 @@ public class TestController extends BaseController {
         return l;
     }
 
-    /**
+    */
+/**
      * 规则查询
      * @return
-     */
+     *//*
+
     @RequestMapping("/ruleSelectTest")
     @CrossOrigin
     public String ruleSelectTest() {
@@ -274,10 +289,12 @@ public class TestController extends BaseController {
         return rule;
     }
 
-    /**
+    */
+/**
      * 规则拼接测试
      * @return
-     */
+     *//*
+
     @RequestMapping("/expressionTest")
     @CrossOrigin
     public String expressionTest() {
@@ -353,3 +370,4 @@ public class TestController extends BaseController {
 }
 
 
+*/

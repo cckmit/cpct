@@ -25,6 +25,11 @@
     <result column="IS_SHARED" jdbcType="INTEGER" property="isShared" />
     <result column="CLASS_NAME" jdbcType="VARCHAR" property="className" />
   </resultMap>
+
+  <resultMap id="BaseResultMapT" type="com.zjtelcom.cpct.domain.channel.Label">
+    <id column="INJECTION_LABEL_ID" jdbcType="BIGINT" property="injectionLabelId" />
+    <result column="INJECTION_LABEL_NAME" jdbcType="VARCHAR" property="injectionLabelName" />
+  </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from injection_label
     where INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT}
@@ -187,6 +192,26 @@
     <if test="conditionType != null and conditionType != ''">
       and CONDITION_TYPE = #{conditionType}
     </if>
+  </select>
+
+  <select id="queryLabelsExceptSelected" parameterType="java.util.List" resultMap="BaseResultMap">
+      select INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC,
+        LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+        CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK,FIT_DOMAIN, RIGHT_OPERAND, CONDITION_TYPE,
+        OPERATOR,SCOPE,TAG_ROW_ID,IS_SHARED, CLASS_NAME
+      from injection_label
+    <where>
+      <if test="null != injectionLabelIds and injectionLabelIds.size > 0">
+        INJECTION_LABEL_ID not in
+        <foreach collection="injectionLabelIds" item="item" open="(" close=")" separator=",">
+          #{item}
+        </foreach>
+      </if>
+      <if test="labelName != null and labelName != ''">
+        and INJECTION_LABEL_NAME LIKE CONCAT(CONCAT('%',#{labelName}),'%')
+      </if>
+    </where>
+
   </select>
 
 </mapper>

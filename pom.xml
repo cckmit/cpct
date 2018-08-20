@@ -12,6 +12,7 @@
         <module>cpct-web</module>
         <module>cpct-common</module>
         <module>cpct-service</module>
+        <module>cpct-es</module>
         <module>cpct-shiro</module>
         <module>cpct-dubbo-client</module>
         <module>cpct-dubbo-server</module>
@@ -46,6 +47,7 @@
         <httpclient.version>4.5.6</httpclient.version>
         <json-lib.version>2.4</json-lib.version>
         <jna.version>3.0.9</jna.version>
+        <elasticsearch.version>6.3.1</elasticsearch.version>
 
     </properties>
 
@@ -56,6 +58,12 @@
     </parent>
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>org.elasticsearch</groupId>
+                <artifactId>elasticsearch</artifactId>
+                <version>6.3.1</version>
+            </dependency>
 
             <dependency>
                 <groupId>net.sf.ehcache</groupId>
@@ -75,6 +83,13 @@
                 <artifactId>cpct-cache</artifactId>
                 <version>${cpct.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.zjtelcom.cpct</groupId>
+                <artifactId>cpct-es</artifactId>
+                <version>${cpct.version}</version>
+            </dependency>
+
 
             <dependency>
                 <groupId>com.zjtelcom.cpct</groupId>
@@ -313,6 +328,21 @@
                 <version>${jna.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.elasticsearch</groupId>
+                <artifactId>elasticsearch</artifactId>
+                <version>${elasticsearch.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>transport</artifactId>
+                <version>${elasticsearch.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.elasticsearch.plugin</groupId>
+                <artifactId>transport-netty4-client</artifactId>
+                <version>${elasticsearch.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>

@@ -35,6 +35,8 @@ public class SysStaff extends BaseEntity implements Serializable {
 
     private Long status;
 
+    private Long loginStatus;
+
     private Date lastLogin;
 
     private Date createDate;
@@ -180,4 +182,13 @@ public class SysStaff extends BaseEntity implements Serializable {
     public void setStaffAccount(String staffAccount) {
         this.staffAccount = staffAccount;
     }
+
+    public Long getLoginStatus() {
+        return loginStatus;
+    }
+
+    public void setLoginStatus(Long loginStatus) {
+        this.loginStatus = loginStatus;
+    }
+
 }
