@@ -5,20 +5,9 @@ import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dto.grouping.TrialOperationVO;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.util.UserUtil;
-import net.sf.json.JSONObject;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +24,6 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 public class TrialOperationController extends BaseController {
     @Autowired
     private TrialOperationService operationService;
-
 
 
     /**

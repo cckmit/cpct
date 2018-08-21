@@ -227,14 +227,12 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
      * 查询出所有展示列
      */
     @Override
-    public Map<String, Object> queryDisplays(String displayName) {
+    public Map<String, Object> queryDisplays(String displayName,String displayType) {
         Map<String, Object> maps = new HashMap<>();
         List<DisplayColumnVO> displayColumnVOList = new ArrayList<>();
-        List<DisplayColumn> displayColumnList = displayColumnMapper.selectAll();
+        List<DisplayColumn> displayColumnList = displayColumnMapper.findDisplayListByParam(displayName,displayType);
         for (DisplayColumn displayColumn : displayColumnList) {
-            DisplayColumnVO displayColumnVO = new DisplayColumnVO();
-            displayColumnVO.setDisplayColumnId(displayColumn.getDisplayColumnId());
-            displayColumnVO.setDisplayColumnName(displayColumn.getDisplayColumnName());
+            DisplayColumnVO displayColumnVO = BeanUtil.create(displayColumn,new DisplayColumnVO());
             displayColumnVOList.add(displayColumnVO);
         }
         maps.put("resultCode", CODE_SUCCESS);

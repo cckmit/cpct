@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.dao.channel;
 
 import com.zjtelcom.cpct.domain.channel.DisplayColumn;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,6 +22,8 @@ public interface DisplayColumnMapper {
     DisplayColumn selectByPrimaryKey(Long displayColumnId);
 
     List<DisplayColumn> selectAll();
+
+    List<DisplayColumn> findDisplayListByParam(@Param("displayName") String displayName,@Param("displayType") String displayType);
 
     int updateByPrimaryKey(DisplayColumn record);
 }
