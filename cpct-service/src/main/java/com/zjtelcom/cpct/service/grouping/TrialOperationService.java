@@ -7,7 +7,7 @@ import com.zjtelcom.cpct.dto.grouping.TrialOperationVO;
 import java.util.Map;
 
 public interface TrialOperationService  {
-    Map<String,Object> searchBatchInfo(TrialOperationVO operationVO);
+    Map<String,Object> createTrialOperation(TrialOperationVO operationVO);
 
     Map<String,Object> sampleFromES(TrialOperationVO operationVO);
 
