@@ -11,7 +11,7 @@ public interface InterfaceCfgService {
 
     Map<String,Object> delInterfaceCfg(InterfaceCfg interfaceCfg);
 
-    Map<String,Object> listInterfaceCfg(InterfaceCfg interfaceCfg);
+    Map<String,Object> listInterfaceCfg(Long evtSrcId,String interfaceName,String interfaceType,Integer page,Integer pageSize);
 
     Map<String,Object> getInterfaceCfgDetail(InterfaceCfg interfaceCfg);
 

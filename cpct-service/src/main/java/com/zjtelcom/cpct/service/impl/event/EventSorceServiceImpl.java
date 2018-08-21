@@ -8,6 +8,8 @@ package com.zjtelcom.cpct.service.impl.event;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.event.EventSceneMapper;
 import com.zjtelcom.cpct.dao.event.EventSorceMapper;
@@ -152,6 +154,7 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
             eventSorceDOReq.setEvtSrcName(evtSrcName);
             PageHelper.startPage(page, pageSize);
             List<EventSorceDO> eventSorceDOList = eventSorceMapper.selectForPage(eventSorceDOReq);
+            Page pageInfo = new Page(new PageInfo(eventSorceDOList));
             List<EventSorce> eventSorcesList = new ArrayList<>();
             for (EventSorceDO eventSorceDO : eventSorceDOList) {
                 EventSorce eventSorce = BeanUtil.create(eventSorceDO, new EventSorce());
@@ -160,6 +163,7 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
             eventSorceMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             eventSorceMap.put("resultMsg", "分页查询事件源列表成功！");
             eventSorceMap.put("eventSorcesList", eventSorcesList);
+            eventSorceMap.put("page",pageInfo);
         } catch (Exception e) {
             eventSorceMap.put("resultCode", CommonConstant.CODE_FAIL);
             eventSorceMap.put("resultMsg", "分页查询事件源列表失败！");
