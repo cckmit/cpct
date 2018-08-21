@@ -26,4 +26,5 @@ public class InterfaceCfg extends BaseEntity {
 
     private String protocolType;//1000	HTTP;2000	FTP 协议类型
 
+
 }

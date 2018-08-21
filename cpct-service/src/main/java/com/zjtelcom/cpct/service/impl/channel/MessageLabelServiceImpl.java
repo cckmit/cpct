@@ -5,8 +5,11 @@ import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.dao.system.SystemParamMapper;
 import com.zjtelcom.cpct.domain.channel.*;
+import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.channel.*;
+import com.zjtelcom.cpct.dto.system.SystemParam;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.request.channel.DisplayAllMessageReq;
 import com.zjtelcom.cpct.request.channel.MessageReq;
@@ -43,6 +46,8 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
     private DisplayColumnMapper displayColumnMapper;
     @Autowired
     private DisplayColumnLabelMapper displayColumnLabelMapper;
+    @Autowired
+    private SystemParamMapper systemParamMapper;
 
 
     /**
@@ -233,6 +238,10 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         List<DisplayColumn> displayColumnList = displayColumnMapper.findDisplayListByParam(displayName,displayType);
         for (DisplayColumn displayColumn : displayColumnList) {
             DisplayColumnVO displayColumnVO = BeanUtil.create(displayColumn,new DisplayColumnVO());
+            SystemParam sysParams = systemParamMapper.selectByParamKey("DISPLAY_CLOUMN_TYPE",displayColumn.getDisplayColumnType());
+            if (sysParams!=null){
+                displayColumnVO.setDisplayColumnTypeName(sysParams.getParamName());
+            }
             displayColumnVOList.add(displayColumnVO);
         }
         maps.put("resultCode", CODE_SUCCESS);

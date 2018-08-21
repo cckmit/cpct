@@ -21,6 +21,15 @@ public class DisplayColumnVO{
      */
     private String displayColumnType;
 
+    private String displayColumnTypeName;
+
+    public String getDisplayColumnTypeName() {
+        return displayColumnTypeName;
+    }
+
+    public void setDisplayColumnTypeName(String displayColumnTypeName) {
+        this.displayColumnTypeName = displayColumnTypeName;
+    }
 
     public String getDisplayColumnType() {
         return displayColumnType;
