@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.service.impl.event;
 
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.event.EventSorceMapper;
 import com.zjtelcom.cpct.dao.event.InterfaceCfgMapper;
 import com.zjtelcom.cpct.domain.channel.Channel;
@@ -13,6 +14,7 @@ import com.zjtelcom.cpct.service.event.InterfaceCfgService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
+import io.netty.channel.group.ChannelMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,8 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
     private InterfaceCfgMapper interfaceCfgMapper;
     @Autowired
     private EventSorceMapper eventSorceMapper;
+    @Autowired
+    private ContactChannelMapper channelMapper;
 
 
     @Override
@@ -96,12 +100,20 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
         List<InterfaceCfg> cfgList = interfaceCfgMapper.findInterfaceCfgListByParam(interfaceCfg.getEvtSrcId(),interfaceCfg.getInterfaceName(),interfaceCfg.getInterfaceType());
         List<InterfaceCfgVO> voList = new ArrayList<>();
         for (InterfaceCfg interfaceCfg1 : cfgList){
-            EventSorceDO eventSorce = eventSorceMapper.selectByPrimaryKey(interfaceCfg.getEvtSrcId());
+            EventSorceDO eventSorce = eventSorceMapper.selectByPrimaryKey(interfaceCfg1.getEvtSrcId());
             if (eventSorce==null){
                 continue;
             }
-            InterfaceCfgVO vo = BeanUtil.create(interfaceCfg,new InterfaceCfgVO());
+            InterfaceCfgVO vo = BeanUtil.create(interfaceCfg1,new InterfaceCfgVO());
             vo.setEvtSrcName(eventSorce.getEvtSrcName());
+            Channel caller = channelMapper.selectByPrimaryKey(Long.valueOf(interfaceCfg1.getCaller()));
+            if (caller!=null){
+                vo.setCallerName(caller.getContactChlName());
+            }
+            Channel provider = channelMapper.selectByPrimaryKey(Long.valueOf(interfaceCfg1.getProvider()));
+            if (provider!=null){
+                vo.setProviderName(provider.getContactChlName());
+            }
             voList.add(vo);
         }
         result.put("resultCode",CODE_SUCCESS);
@@ -118,10 +130,18 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
             result.put("resultMsg","事件源接口不存在");
             return result;
         }
-        InterfaceCfgVO vo = BeanUtil.create(interfaceCfg,new InterfaceCfgVO());
-        EventSorceDO eventSorce = eventSorceMapper.selectByPrimaryKey(interfaceCfg.getEvtSrcId());
+        InterfaceCfgVO vo = BeanUtil.create(ic,new InterfaceCfgVO());
+        EventSorceDO eventSorce = eventSorceMapper.selectByPrimaryKey(ic.getEvtSrcId());
         if (eventSorce!=null){
             vo.setEvtSrcName(eventSorce.getEvtSrcName());
+        }
+        Channel caller = channelMapper.selectByPrimaryKey(Long.valueOf(ic.getCaller()));
+        if (caller!=null){
+            vo.setCallerName(caller.getContactChlName());
+        }
+        Channel provider = channelMapper.selectByPrimaryKey(Long.valueOf(ic.getProvider()));
+        if (provider!=null){
+            vo.setProviderName(provider.getContactChlName());
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",vo);
