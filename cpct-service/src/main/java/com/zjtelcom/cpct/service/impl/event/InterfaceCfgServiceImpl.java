@@ -1,5 +1,8 @@
 package com.zjtelcom.cpct.service.impl.event;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.event.EventSorceMapper;
@@ -95,9 +98,11 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
     }
 
     @Override
-    public Map<String, Object> listInterfaceCfg(InterfaceCfg interfaceCfg) {
+    public Map<String, Object> listInterfaceCfg(Long evtSrcId,String interfaceName,String interfaceType,Integer page,Integer pageSize){
         Map<String,Object> result = new HashMap<>();
-        List<InterfaceCfg> cfgList = interfaceCfgMapper.findInterfaceCfgListByParam(interfaceCfg.getEvtSrcId(),interfaceCfg.getInterfaceName(),interfaceCfg.getInterfaceType());
+        PageHelper.startPage(page,pageSize);
+        List<InterfaceCfg> cfgList = interfaceCfgMapper.findInterfaceCfgListByParam(evtSrcId,interfaceName,interfaceType);
+        Page info = new Page(new PageInfo(cfgList));
         List<InterfaceCfgVO> voList = new ArrayList<>();
         for (InterfaceCfg interfaceCfg1 : cfgList){
             EventSorceDO eventSorce = eventSorceMapper.selectByPrimaryKey(interfaceCfg1.getEvtSrcId());
@@ -118,6 +123,7 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",voList);
+        result.put("page",info);
         return result;
     }
 

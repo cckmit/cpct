@@ -5,26 +5,27 @@ import com.google.gson.JsonObject;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 import com.zjtelcom.cpct.dto.grouping.*;
 import com.zjtelcom.cpct.dto.strategy.MktStrategy;
+import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRuleRel;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.HTTPSClientUtil;
+import com.zjtelcom.cpct.util.RedisUtils;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.*;
 
@@ -39,6 +40,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private MktStrategyMapper strategyMapper;
     @Autowired
     private RestTemplate restTemplate;
+    @Autowired
+    private MktStrategyConfRuleRelMapper ruleRelMapper;
+    @Autowired
+    private RedisUtils redisUtils;
 
 
     /**
@@ -141,7 +146,18 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
         TrialRequest request = new TrialRequest();
         request.setFieldList(fieldList);
-        request.setOperationVOList(operationVO.getParamList());
+        List<TrialOperationParam> paramList = new ArrayList<>();
+        List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(operationVO.getStrategyId());
+        for (MktStrategyConfRuleRelDO ruleRelDO : ruleRelList){
+            TrialOperationParam param = new TrialOperationParam();
+            param.setRuleId(ruleRelDO.getMktStrategyConfRuleId());
+            param.setBatchNum(trialOperation.getBatchNum());
+            //redis取规则
+            String rule = redisUtils.get("EVENT_RULE_"+operationVO.getCampaignId()+"_"+operationVO.getStrategyId()+"_"+ruleRelDO.getMktStrategyConfRuleId()).toString();
+            param.setRule(rule);
+            paramList.add(param);
+        }
+        request.setOperationVOList(paramList);
         HashMap<String,Object> response = new HashMap<>();
 
         try {
