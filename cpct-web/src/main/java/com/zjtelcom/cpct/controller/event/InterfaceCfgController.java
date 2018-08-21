@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.controller.event;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.event.InterfaceCfg;
 import com.zjtelcom.cpct.service.event.InterfaceCfgService;
+import com.zjtelcom.cpct.util.MapUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,10 +66,24 @@ public class InterfaceCfgController extends BaseController {
 
     @PostMapping("listInterfaceCfg")
     @CrossOrigin
-    public Map<String, Object> listInterfaceCfg(@RequestBody InterfaceCfg interfaceCfg) {
+    public Map<String, Object> listInterfaceCfg(@RequestBody HashMap<String,Object> param) {
         Map<String,Object> result = new HashMap<>();
         try {
-            result = interfaceCfgService.listInterfaceCfg(interfaceCfg);
+            Long evtSrcId = null;
+            String interFaceName = null;
+            String interFaceType = null;
+            Integer page = MapUtil.getIntNum(param.get("page"));
+            Integer pageSize = MapUtil.getIntNum(param.get("pageSize"));
+            if (param.get("evtSrcId")!=null){
+                evtSrcId = Long.valueOf(param.get("evtSrcId").toString());
+            }
+            if (param.get("interfaceName")!=null){
+                interFaceName = param.get("interfaceName").toString();
+            }
+            if (param.get("interfaceType")!=null){
+                interFaceType = param.get("interfaceType").toString();
+            }
+            result = interfaceCfgService.listInterfaceCfg(evtSrcId,interFaceName,interFaceType,page,pageSize);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to listInterfaceCfg",e);
             result.put("resultCode",CODE_FAIL);
