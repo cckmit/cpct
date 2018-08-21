@@ -126,10 +126,14 @@ public class MessageLabelController extends BaseController {
     public String queryDisplays(@RequestBody HashMap<String,String> param) {
         Map<String, Object> map = new HashMap<>();
         String displayName = null;
+        String displayType = null;
         if (param.get("displayName")!=null){
             displayName = param.get("displayName");
         }
-        map = messageLabelService.queryDisplays(displayName);
+        if (param.get("displayType")!=null){
+            displayType = param.get("displayType");
+        }
+        map = messageLabelService.queryDisplays(displayName,displayType);
         return JSON.toJSONString(map);
     }
 

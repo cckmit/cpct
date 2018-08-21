@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.elastic.controller;
 import com.alibaba.fastjson.JSONObject;
 
 import com.zjtelcom.cpct.elastic.config.ElasticSearchDemo;
+import com.zjtelcom.cpct.elastic.model.CampaignHitParam;
 import com.zjtelcom.cpct.elastic.service.EsService;
 import com.zjtelcom.cpct.elastic.util.DateUtil;
 import com.zjtelcom.cpct.elastic.util.ElasticsearchUtil;
@@ -14,6 +15,7 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,6 +49,18 @@ public class EsController {
 
     @Autowired
     private EsService esService;
+
+    /**
+     * 活动命中查询
+     * @param param
+     * @return
+     */
+    @RequestMapping("/searchCampaignHitsInfo")
+    @ResponseBody
+    public Map<String, Object> searchCampaignHitsInfo(@RequestBody CampaignHitParam param) {
+        return esService.searchCampaignHitsInfo(param);
+    }
+
 
     /**
      * http://127.0.0.1:8080/es/createIndex
