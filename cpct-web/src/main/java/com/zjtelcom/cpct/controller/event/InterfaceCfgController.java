@@ -74,7 +74,7 @@ public class InterfaceCfgController extends BaseController {
             String interFaceType = null;
             Integer page = MapUtil.getIntNum(param.get("page"));
             Integer pageSize = MapUtil.getIntNum(param.get("pageSize"));
-            if (param.get("evtSrcId")!=null){
+            if (param.get("evtSrcId")!=null && param.get("evtSrcId").equals("")){
                 evtSrcId = Long.valueOf(param.get("evtSrcId").toString());
             }
             if (param.get("interfaceName")!=null){
