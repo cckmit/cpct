@@ -86,7 +86,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
      * @return
      */
     @Override
-    public Map<String, Object> searchBatchInfo(TrialOperationVO operationVO) {
+    public Map<String, Object> createTrialOperation( TrialOperationVO operationVO) {
         Map<String, Object> result = new HashMap<>();
         //生成批次号
         String batchNumSt = DateUtil.date2String(new Date())+System.currentTimeMillis();
@@ -104,8 +104,16 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         trialOp.setCreateDate(new Date());
         trialOp.setStatusCd("1000");
         trialOperationMapper.insert(trialOp);
+        operationVO.setTrialId(trialOp.getId());
         List<TrialOperation> operationList = trialOperationMapper.findOperationListByStrategyId(operationVO.getStrategyId());
         //todo 调用es的抽样接口
+       final TrialOperationVO vo = operationVO;
+        new Thread(){
+            public void run(){
+                sampleFromES(vo);
+            }
+        }.start();
+
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",operationList);
         return result;

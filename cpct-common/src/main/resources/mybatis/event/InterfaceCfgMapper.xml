@@ -23,7 +23,7 @@
     delete from interface_cfg
     where INTERFACE_CFG_ID = #{interfaceCfgId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.event.InterfaceCfg">
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.event.InterfaceCfg" keyProperty="interfaceCfgId" useGeneratedKeys="true">
     insert into interface_cfg (INTERFACE_CFG_ID, EVT_SRC_ID, INTERFACE_NAME, 
       INTERFACE_DESC, INTERFACE_NBR, INTERFACE_TYPE, 
       PROVIDER, CALLER, PROTOCOL_TYPE, 
@@ -174,5 +174,24 @@
       </if>
     </trim>
   </insert>
+
+
+  <select id="findInterfaceCfgListByParam" resultMap="BaseResultMap" parameterType="com.zjtelcom.cpct.domain.event.InterfaceCfg">
+    select INTERFACE_CFG_ID, EVT_SRC_ID, INTERFACE_NAME, INTERFACE_DESC, INTERFACE_NBR,
+    INTERFACE_TYPE, PROVIDER, CALLER, PROTOCOL_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from interface_cfg
+    where 1=1
+    <if test="evtSrcId != null ">
+      and EVT_SRC_ID = #{evtSrcId,jdbcType=BIGINT}
+    </if>
+    <if test="interfaceName != null and interfaceName != ''">
+      and INTERFACE_NAME  LIKE CONCAT(CONCAT('%',#{interfaceName}),'%')
+    </if>
+    <if test="interfaceType != null and interfaceType != ''">
+      and INTERFACE_TYPE = #{interfaceType,jdbcType=VARCHAR}
+    </if>
+  </select>
+
 
 </mapper>
