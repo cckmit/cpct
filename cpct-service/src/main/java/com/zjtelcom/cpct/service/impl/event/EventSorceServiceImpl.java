@@ -13,7 +13,9 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.event.EventSceneMapper;
 import com.zjtelcom.cpct.dao.event.EventSorceMapper;
+import com.zjtelcom.cpct.dao.system.SysStaffMapper;
 import com.zjtelcom.cpct.domain.event.EventSorceDO;
+import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.event.EventSorce;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.EventSorceService;
@@ -38,6 +40,9 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
 
     @Autowired
     private EventSorceMapper eventSorceMapper;
+
+    @Autowired
+    private SysStaffMapper sysStaffMapper;
 
     /**
      * 新增事件源
@@ -77,7 +82,11 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
         Map<String, Object> eventSorceMap = new HashMap<>();
         try {
             EventSorceDO eventSorceDO = eventSorceMapper.selectByPrimaryKey(evtSrcId);
+            SysStaff createSysStaff = sysStaffMapper.selectByPrimaryKey(eventSorceDO.getCreateStaff());
+            SysStaff updateSysStaff = sysStaffMapper.selectByPrimaryKey(eventSorceDO.getCreateStaff());
             EventSorce eventSorce = BeanUtil.create(eventSorceDO, new EventSorce());
+            eventSorce.setCreateStaffName(createSysStaff.getStaffName());
+            eventSorce.setUpdateStaffName(updateSysStaff.getStaffName());
             eventSorceMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             eventSorceMap.put("resultMsg", "查询事件源成功！");
             eventSorceMap.put("eventSorce", eventSorce);
@@ -157,7 +166,11 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
             Page pageInfo = new Page(new PageInfo(eventSorceDOList));
             List<EventSorce> eventSorcesList = new ArrayList<>();
             for (EventSorceDO eventSorceDO : eventSorceDOList) {
+                SysStaff createSysStaff = sysStaffMapper.selectByPrimaryKey(eventSorceDO.getCreateStaff());
+                SysStaff updateSysStaff = sysStaffMapper.selectByPrimaryKey(eventSorceDO.getCreateStaff());
                 EventSorce eventSorce = BeanUtil.create(eventSorceDO, new EventSorce());
+                eventSorce.setCreateStaffName(createSysStaff.getStaffName());
+                eventSorce.setUpdateStaffName(updateSysStaff.getStaffName());
                 eventSorcesList.add(eventSorce);
             }
             eventSorceMap.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -184,7 +197,11 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
             List<EventSorceDO> eventSorceDOList = eventSorceMapper.selectAll();
             List<EventSorce> eventSorcesList = new ArrayList<>();
             for (EventSorceDO eventSorceDO : eventSorceDOList) {
+                SysStaff createSysStaff = sysStaffMapper.selectByPrimaryKey(eventSorceDO.getCreateStaff());
+                SysStaff updateSysStaff = sysStaffMapper.selectByPrimaryKey(eventSorceDO.getCreateStaff());
                 EventSorce eventSorce = BeanUtil.create(eventSorceDO, new EventSorce());
+                eventSorce.setCreateStaffName(createSysStaff.getStaffName());
+                eventSorce.setUpdateStaffName(updateSysStaff.getStaffName());
                 eventSorcesList.add(eventSorce);
             }
             eventSorceMap.put("resultCode", CommonConstant.CODE_SUCCESS);
