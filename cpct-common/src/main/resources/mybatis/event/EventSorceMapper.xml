@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.event.EventSorceMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.event.EventSorceDO">
+    <id column="EVT_SRC_ID" jdbcType="BIGINT" property="evtSrcId" />
+    <result column="EVT_SRC_CODE" jdbcType="VARCHAR" property="evtSrcCode" />
+    <result column="EVT_SRC_NAME" jdbcType="VARCHAR" property="evtSrcName" />
+    <result column="EVT_SRC_DESC" jdbcType="VARCHAR" property="evtSrcDesc" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REGION_ID" jdbcType="BIGINT" property="regionId" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from event_sorce
+    where EVT_SRC_ID = #{evtSrcId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" useGeneratedKeys="true" keyProperty="evtSrcId" parameterType="com.zjtelcom.cpct.domain.event.EventSorceDO">
+    insert into event_sorce (EVT_SRC_ID, EVT_SRC_CODE, EVT_SRC_NAME, 
+      EVT_SRC_DESC, STATUS_CD, STATUS_DATE, 
+      CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, 
+      UPDATE_DATE, REGION_ID, REMARK
+      )
+    values (#{evtSrcId,jdbcType=BIGINT}, #{evtSrcCode,jdbcType=VARCHAR}, #{evtSrcName,jdbcType=VARCHAR}, 
+      #{evtSrcDesc,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, 
+      #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{regionId,jdbcType=BIGINT}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.event.EventSorceDO">
+    update event_sorce
+    set
+    <if test="evtSrcCode != null and evtSrcCode != '' ">
+      EVT_SRC_CODE = #{evtSrcCode,jdbcType=VARCHAR},
+    </if>
+    <if test="evtSrcName != null and evtSrcName != '' ">
+      EVT_SRC_NAME = #{evtSrcName,jdbcType=VARCHAR},
+    </if>
+    <if test="evtSrcDesc != null and evtSrcDesc != '' ">
+      EVT_SRC_DESC = #{evtSrcDesc,jdbcType=VARCHAR},
+    </if>
+    <if test="statusCd != null and statusCd != '' ">
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+    </if>
+    <if test="statusDate != null ">
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+    </if>
+    <if test="createStaff != null and createStaff != '' ">
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+    </if>
+    <if test="createDate != null ">
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+    </if>
+    <if test="updateStaff != null and updateStaff != '' ">
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+    </if>
+    <if test="updateDate != null ">
+      REGION_ID = #{regionId,jdbcType=BIGINT},
+    </if>
+    <if test="remark != null and remark != ''  ">
+      REMARK = #{remark,jdbcType=VARCHAR},
+    </if>
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
+    where EVT_SRC_ID = #{evtSrcId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select EVT_SRC_ID, EVT_SRC_CODE, EVT_SRC_NAME, EVT_SRC_DESC, STATUS_CD, STATUS_DATE, 
+    CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REGION_ID, REMARK
+    from event_sorce
+    where EVT_SRC_ID = #{evtSrcId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" parameterType="com.zjtelcom.cpct.domain.event.EventSorceDO" resultMap="BaseResultMap">
+    select EVT_SRC_ID, EVT_SRC_CODE, EVT_SRC_NAME, EVT_SRC_DESC, STATUS_CD, STATUS_DATE, 
+    CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REGION_ID, REMARK
+    from event_sorce
+  </select>
+  <select id="selectForPage" parameterType="com.zjtelcom.cpct.domain.event.EventSorceDO" resultMap="BaseResultMap">
+    select EVT_SRC_ID, EVT_SRC_CODE, EVT_SRC_NAME, EVT_SRC_DESC, STATUS_CD, STATUS_DATE,
+    CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REGION_ID, REMARK
+    from event_sorce
+    WHERE 1 = 1
+    <if test="evtSrcCode != null and evtSrcCode != ''">
+      AND EVT_SRC_CODE = #{evtSrcCode,jdbcType=VARCHAR}
+    </if>
+    <if test="evtSrcName != null and evtSrcName != ''">
+      AND EVT_SRC_NAME like CONCAT('%',#{evtSrcName,jdbcType=VARCHAR},'%')
+    </if>
+  </select>
+</mapper>
