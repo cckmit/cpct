@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ImportResource;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 @ComponentScan(value={"com.zjtelcom.cpct"})
 @MapperScan("com.zjtelcom.cpct.dao")
 @EnableTransactionManagement
+@EnableScheduling
 public class Application {
 
     @Bean

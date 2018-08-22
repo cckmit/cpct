@@ -2,20 +2,25 @@ package com.zjtelcom.cpct.elastic.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.zjtelcom.cpct.elastic.util.EsSearchUtil;
+import com.zjtelcom.cpct.elastic.util.FtpUtil;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.client.transport.TransportClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @RestController
 @EnableAutoConfiguration
@@ -23,6 +28,17 @@ import java.util.Random;
 public class EsFileController {
 
     private static final Logger logger = LoggerFactory.getLogger(EsFileController.class);
+
+    @Value("${ftp.address}")
+    private String ftpAddress;
+    @Value("${ftp.port}")
+    private int ftpPort;
+    @Value("${ftp.name}")
+    private String ftpName;
+    @Value("${ftp.password}")
+    private String ftpPassword;
+    @Value("${ftp.basepath}")
+    private String ftpBathPath;
 
     @Autowired
     private TransportClient client;
@@ -134,6 +150,36 @@ public class EsFileController {
         logger.info("import end. cost:[{}ms]", cost);
         // 返回是否成功的标记
         return flag;
+    }
+
+    @RequestMapping("/uploadFileToFtp")
+    public Map<String,Object> uploadFileToFtp(@RequestParam(value = "file")MultipartFile file) {
+        Map<String,Object> res = new HashMap<>();
+        try {
+            String fileName = file.getOriginalFilename();
+            String dicName = fileName.substring(0,fileName.lastIndexOf("_"));
+            FtpUtil ftpUtil = new FtpUtil();
+            FTPClient ftpClient = ftpUtil.connect(ftpAddress,ftpPort,ftpName,ftpPassword);
+            //创建文件夹
+            boolean hasDir = FtpUtil.makeDirectory(ftpClient,dicName);
+            if (hasDir) {
+                logger.debug("创建文件夹成功");
+            }else {
+                logger.debug("文件夹已存在");
+            }
+            //上传文件
+            boolean result = ftpUtil.uploadFile(ftpAddress,ftpPort,ftpName,ftpPassword,dicName,fileName,file.getInputStream());
+            if (result) {
+                res.put("status","success");
+                res.put("message","上传文件成功");
+            }
+        }catch (Exception e) {
+            logger.error("fail",e);
+            res.put("status","fail");
+            res.put("message","上传文件失败");
+            return res;
+        }
+        return res;
     }
 
 }
