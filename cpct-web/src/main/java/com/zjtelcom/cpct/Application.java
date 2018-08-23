@@ -3,6 +3,7 @@ package com.zjtelcom.cpct;
 /**
  * Created by huanghua on 2017/5/23.
  */
+
 import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,8 +12,6 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.ImportResource;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
 
@@ -24,7 +23,6 @@ import org.springframework.web.client.RestTemplate;
 @ComponentScan(value={"com.zjtelcom.cpct"})
 @MapperScan("com.zjtelcom.cpct.dao")
 @EnableTransactionManagement
-@EnableScheduling
 public class Application {
 
     @Bean

@@ -32,16 +32,6 @@ mybatis:
     local-cache-scope: session                          #设置本地缓存范围 session:就会有数据的共享  statement:语句范围 (多个SqlSession或者分布式的环境下使用，避免脏读 ) defalut:session
     jdbc-type-for-null: null                            #设置但JDBC类型为空时,某些驱动程序 要指定值,default:OTHER，插入空值时不需要指定类型
 
-#ftp
-ftp:
-  address: 39.104.172.17
-  port: 21
-  name: es
-  password: 123456
-  basepath: /usr/share/ftp_file/es/
-  localpath1: /www/web/www.test.com/public_html/renovate_order/
-  localpath2: /www/web/www.test.com/public_html/renovated_order/
-
 spring:
   profiles:
     active: dev
