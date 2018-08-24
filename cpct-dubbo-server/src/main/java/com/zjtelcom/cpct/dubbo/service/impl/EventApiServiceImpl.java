@@ -1060,7 +1060,6 @@ public class EventApiServiceImpl implements EventApiService {
                     //添加到时上下文
                     context.put(entry.getKey(), entry.getValue());
                 }
-                context.put("PROM_TYPE", "乐享4G套餐");
                 System.out.println("查询标签成功:" + context.toString());
             } else {
                 System.out.println("查询标签失败:" + httpResult.getString("result_msg"));
