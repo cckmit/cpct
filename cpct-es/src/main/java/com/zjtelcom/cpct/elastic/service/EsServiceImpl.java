@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 public class EsServiceImpl implements EsService {
@@ -42,7 +43,7 @@ public class EsServiceImpl implements EsService {
 
     @Override
     public void save(JSONObject jsonObject,String indexName) {
-        String id = ElasticsearchUtil.addData(jsonObject, indexName, esType, jsonObject.getString("ISI"));
+        String id = ElasticsearchUtil.addData(jsonObject, indexName, esType, UUID.randomUUID().toString());
 
         logger.info("test..."+id);
     }

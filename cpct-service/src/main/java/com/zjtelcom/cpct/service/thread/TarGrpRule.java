@@ -10,6 +10,7 @@ import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.domain.channel.Label;
+import com.zjtelcom.cpct.domain.channel.LabelResult;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
@@ -57,7 +58,7 @@ public class TarGrpRule extends Thread {
         //查询分群规则list
         Long tarGrpId = mktStrategyConfRuleDO.getTarGrpId();
         List<TarGrpCondition> tarGrpConditionDOs = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
-        List<Label> labelList = new ArrayList<>();
+        List<LabelResult> labelResultList = new ArrayList<>();
         if (tarGrpId != null && tarGrpId != 0) {
             //将规则拼装为表达式
             StringBuilder express = new StringBuilder();
@@ -65,9 +66,15 @@ public class TarGrpRule extends Thread {
                 express.append("if(");
                 //遍历所有规则
                 for (int i = 0; i < tarGrpConditionDOs.size(); i++) {
+                    LabelResult labelResult = new LabelResult();
                     String type = tarGrpConditionDOs.get(i).getOperType();
                     Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i).getLeftParam()));
-                    labelList.add(label);
+
+                    labelResult.setLabelCode(label.getInjectionLabelCode());
+                    labelResult.setLabelName(label.getInjectionLabelName());
+                    labelResult.setRightOperand(label.getRightOperand());
+                    labelResult.setRightParam(tarGrpConditionDOs.get(i).getRightParam());
+                    labelResultList.add(labelResult);
                     if ("7100".equals(type)) {
                         express.append("!");
                     }
@@ -102,7 +109,7 @@ public class TarGrpRule extends Thread {
             redisUtils.set(key, express);
 
             // 将所有的标签集合存入redis
-            redisUtils.set(key + "label", labelList);
+            redisUtils.set(key + "_LABEL", labelResultList);
         }
     }
 
