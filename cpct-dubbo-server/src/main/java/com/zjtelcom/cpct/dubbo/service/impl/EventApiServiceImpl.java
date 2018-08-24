@@ -937,8 +937,8 @@ public class EventApiServiceImpl implements EventApiService {
         private String activityId;
         private String integrationId;
         private String accNbr;
-        private Long mktStrategyConfRuleId;
-        private String mktStrategyConfRuleName;
+        private Long ruleId;
+        private String ruleName;
 
         public RuleTask(Long strategyConfId, String ISI, String c3, Long tarGrpId, String productStr, Long ruleConfId, String evtContactConfIdStr, String eventId, String activityId, Long mktStrategyConfRuleId, String mktStrategyConfRuleName, String integrationId, String accNbr) {
             this.strategyConfId = strategyConfId;
@@ -950,8 +950,8 @@ public class EventApiServiceImpl implements EventApiService {
             this.evtContactConfIdStr = evtContactConfIdStr;
             this.activityId = activityId;
             this.eventId = eventId;
-            this.mktStrategyConfRuleId = mktStrategyConfRuleId;
-            this.mktStrategyConfRuleName = mktStrategyConfRuleName;
+            this.ruleId = mktStrategyConfRuleId;
+            this.ruleName = mktStrategyConfRuleName;
             this.integrationId = integrationId;
             this.accNbr = accNbr;
         }
@@ -989,7 +989,7 @@ public class EventApiServiceImpl implements EventApiService {
             //  2.判断客户分群规则---------------------------
             //判断匹配结果，如匹配则向下进行，如不匹配则continue结束本次循环
             //拼装redis key
-            String key = "EVENT_RULE_" + activityId + "_" + strategyConfId + "_" + mktStrategyConfRuleId;
+            String key = "EVENT_RULE_" + activityId + "_" + strategyConfId + "_" + ruleId;
 
             ExpressRunner runner = new ExpressRunner();
             DefaultContext<String, Object> context = new DefaultContext<String, Object>();
@@ -1047,7 +1047,7 @@ public class EventApiServiceImpl implements EventApiService {
                 if (ruleConfId != null) {
                     jsonobj.put("ruleConfId", ruleConfId);
                 }
-                jsonobj.put("ruleId", mktStrategyConfRuleId);
+                jsonobj.put("ruleId", ruleId);
                 jsonobj.put("integrationId", integrationId);
                 jsonobj.put("accNbr", accNbr);
                 jsonobj.put("strategyConfId", strategyConfId);
@@ -1182,23 +1182,27 @@ public class EventApiServiceImpl implements EventApiService {
                 System.out.println("result=" + ruleResult.getResult());
                 System.out.println("Tree=" + ruleResult.getRule().toTree());
                 System.out.println("TraceMap=" + ruleResult.getTraceMap());
-
-                if (ruleResult.getResult() != null && ((Boolean) ruleResult.getResult())) {
+                //初始化返回结果中的销售品条目
+                List<Map<String, String>> productList = new ArrayList<>();
+                if (ruleResult != null) {
                     //查询销售品列表
-                    String[] productArray = productStr.split(",");
+                    if (productStr!=null && !"".equals(productStr)){
+                        String[] productArray = productStr.split(",");
+                        for (String str : productArray) {
+                            Map<String, String> product = new HashMap<>();
+                            PpmProduct ppmProduct = ppmProductMapper.selectByPrimaryKey(Long.parseLong(str));
+                            product.put("productCode", ppmProduct.getProductCode());
+                            product.put("productFlag", ""); //todo 不明 案例上有 文档上没有
+                            product.put("productAlias", ""); //todo 不明 案例上有 文档上没有
+                            product.put("productName", ppmProduct.getProductName());
+                            product.put("productType", ppmProduct.getProductType());
+                            System.out.println("*********************product --->>>" + JSON.toJSON(product));
+                            productList.add(product);
+                        }
+                    }
 
-                    //初始化返回结果中的销售品条目
-                    List<Map<String, String>> productList = new ArrayList<>();
-                    for (String str : productArray) {
-                        Map<String, String> product = new HashMap<>();
-                        PpmProduct ppmProduct = ppmProductMapper.selectByPrimaryKey(Long.parseLong(str));
-                        product.put("productCode", ppmProduct.getProductCode());
-                        product.put("productFlag", ""); //todo 不明 案例上有 文档上没有
-                        product.put("productAlias", ""); //todo 不明 案例上有 文档上没有
-                        product.put("productName", ppmProduct.getProductName());
-                        product.put("productType", ppmProduct.getProductType());
-                        System.out.println("*********************product --->>>" + JSON.toJSON(product));
-                        productList.add(product);
+                    if (ruleResult.getResult() == null) {
+                        ruleResult.setResult(false);
                     }
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("express", express);
@@ -1207,8 +1211,8 @@ public class EventApiServiceImpl implements EventApiService {
                     jsonObject.put("activityId", activityId);
                     jsonObject.put("ruleConfId", ruleConfId);
                     jsonObject.put("strategyConfId", strategyConfId);
-                    jsonObject.put("mktStrategyConfRuleId", mktStrategyConfRuleId);
-                    jsonObject.put("mktStrategyConfRuleName", mktStrategyConfRuleName);
+                    jsonObject.put("ruleId", ruleId);
+                    jsonObject.put("ruleName", ruleName);
                     jsonObject.put("productStr", productStr);
                     jsonObject.put("evtContactConfIdStr", evtContactConfIdStr);
                     jsonObject.put("tarGrpId", tarGrpId);
