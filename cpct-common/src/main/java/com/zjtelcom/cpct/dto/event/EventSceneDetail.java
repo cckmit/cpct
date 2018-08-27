@@ -11,7 +11,16 @@ import java.util.List;
 public class EventSceneDetail extends EventScene implements Serializable{
 
     private static final long serialVersionUID = 3765073047877719384L;
+    private String eventSceneTypeName;
     private List<EvtSceneCamRel> evtSceneCamRels ;
+
+    public String getEventSceneTypeName() {
+        return eventSceneTypeName;
+    }
+
+    public void setEventSceneTypeName(String eventSceneTypeName) {
+        this.eventSceneTypeName = eventSceneTypeName;
+    }
 
     public List<EvtSceneCamRel> getEvtSceneCamRels() {
         return evtSceneCamRels;

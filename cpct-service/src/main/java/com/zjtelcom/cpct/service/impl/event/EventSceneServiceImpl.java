@@ -5,8 +5,10 @@ import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.event.EventSceneMapper;
+import com.zjtelcom.cpct.dao.event.EventSceneTypeMapper;
 import com.zjtelcom.cpct.dao.event.EvtSceneCamRelMapper;
 import com.zjtelcom.cpct.domain.event.EventSceneDO;
+import com.zjtelcom.cpct.domain.event.EventSceneTypeDO;
 import com.zjtelcom.cpct.dto.event.*;
 import com.zjtelcom.cpct.request.event.*;
 import com.zjtelcom.cpct.response.event.QryeventSceneRsp;
@@ -39,6 +41,8 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
     private EventSceneMapper eventSceneMapper;
     @Autowired
     private EvtSceneCamRelMapper evtSceneCamRelMapper;
+    @Autowired
+    private EventSceneTypeMapper eventSceneTypeMapper;
 
 
     /**
@@ -155,10 +159,16 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
         EventScene eventScene = new EventScene();
         eventScene = eventSceneMapper.getEventScene(eventSceneId);
         CopyPropertiesUtil.copyBean2Bean(eventSceneDetail, eventScene);
-
+        if (eventScene.getEventSceneTypeId()!=null){
+            EventSceneTypeDO eventSceneTypeDO = eventSceneTypeMapper.selectByPrimaryKey(eventScene.getEventSceneTypeId());
+            if (eventSceneTypeDO!=null){
+                eventSceneDetail.setEventSceneTypeName(eventSceneTypeDO.getEvtSceneTypeName());
+            }
+        }
         //将活动相关信息插入返回实体类
         List<EvtSceneCamRel> evtSceneCamRels = evtSceneCamRelMapper.selectCamsByEvtSceneId(eventScene.getEventSceneId());
         eventSceneDetail.setEvtSceneCamRels(evtSceneCamRels);
+
 
         viewEventSceneRsp.setEventSceneDetail(eventSceneDetail);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
