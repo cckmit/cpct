@@ -36,4 +36,6 @@ public interface ContactEvtService {
 
     Map<String,Object> evtDetails(ContactEvt contactEvt);
 
+    Map<String,Object> synchronizeEvent(Long eventId,String roleName);
+
 }
