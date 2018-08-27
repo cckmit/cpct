@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 public class CampaignHitResponse implements Serializable {
-    private List<Map<String,Object>> labelInfo;
+    private Map<String,Object> labelInfo;
     private Map<String,Object> eventInfo;
     private Map<String,Object> campaignInfo;
     private Long total;
@@ -18,11 +18,11 @@ public class CampaignHitResponse implements Serializable {
         this.total = total;
     }
 
-    public List<Map<String, Object>> getLabelInfo() {
+    public Map<String, Object> getLabelInfo() {
         return labelInfo;
     }
 
-    public void setLabelInfo(List<Map<String, Object>> labelInfo) {
+    public void setLabelInfo(Map<String, Object> labelInfo) {
         this.labelInfo = labelInfo;
     }
 
