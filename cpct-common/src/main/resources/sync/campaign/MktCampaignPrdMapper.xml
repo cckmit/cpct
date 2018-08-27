@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zjtelcom.cpct.dao.campaign.MktCampaignMapper">
+<mapper namespace="com.zjtelcom.cpct_prd.dao.MktCampaignPrdMapper">
     <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.campaign.MktCampaignDO">
         <id column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId"/>
         <result column="TIGGER_TYPE" jdbcType="VARCHAR" property="tiggerType"/>

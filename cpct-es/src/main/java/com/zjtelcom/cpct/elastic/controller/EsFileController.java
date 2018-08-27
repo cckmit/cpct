@@ -23,7 +23,6 @@ import java.util.Random;
 public class EsFileController {
 
     private static final Logger logger = LoggerFactory.getLogger(EsFileController.class);
-
     @Autowired
     private TransportClient client;
     /**
