@@ -5,6 +5,7 @@
     <id column="DISPLAY_COLUMN_LABEL_ID" jdbcType="BIGINT" property="displayColumnLabelId" />
     <result column="INJECTION_LABEL_ID" jdbcType="BIGINT" property="injectionLabelId" />
     <result column="DISPLAY_ID" jdbcType="BIGINT" property="displayId" />
+    <result column="MESSAGE_TYPE" jdbcType="BIGINT" property="messageType" />
     <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
     <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
     <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
@@ -13,16 +14,17 @@
     <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
     <result column="REMARK" jdbcType="VARCHAR" property="remark" />
   </resultMap>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from display_column_label
     where DISPLAY_COLUMN_LABEL_ID = #{displayColumnLabelId,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.DisplayColumnLabel">
-    insert into display_column_label (DISPLAY_COLUMN_LABEL_ID, INJECTION_LABEL_ID, DISPLAY_ID,
+    insert into display_column_label (DISPLAY_COLUMN_LABEL_ID, INJECTION_LABEL_ID, DISPLAY_ID,MESSAGE_TYPE,
       STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
       CREATE_DATE, STATUS_DATE, UPDATE_DATE, 
       REMARK)
-    values (#{displayColumnLabelId,jdbcType=BIGINT}, #{injectionLabelId,jdbcType=BIGINT}, #{displayId,jdbcType=BIGINT},
+    values (#{displayColumnLabelId,jdbcType=BIGINT}, #{injectionLabelId,jdbcType=BIGINT}, #{displayId,jdbcType=BIGINT}, #{messageType,jdbcType=BIGINT},
       #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, 
       #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
       #{remark,jdbcType=VARCHAR})
@@ -31,6 +33,7 @@
     update display_column_label
     set INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT},
       DISPLAY_ID = #{displayId,jdbcType=BIGINT},
+      MESSAGE_TYPE = #{messageType,jdbcType=BIGINT},
       STATUS_CD = #{statusCd,jdbcType=VARCHAR},
       CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
       UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
@@ -41,19 +44,19 @@
     where DISPLAY_COLUMN_LABEL_ID = #{displayColumnLabelId,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select DISPLAY_COLUMN_LABEL_ID, INJECTION_LABEL_ID,DISPLAY_ID,STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    select DISPLAY_COLUMN_LABEL_ID, INJECTION_LABEL_ID,DISPLAY_ID,MESSAGE_TYPE,STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
     from display_column_label
     where DISPLAY_COLUMN_LABEL_ID = #{displayColumnLabelId,jdbcType=BIGINT}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
-    select DISPLAY_COLUMN_LABEL_ID, INJECTION_LABEL_ID,DISPLAY_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    select DISPLAY_COLUMN_LABEL_ID, INJECTION_LABEL_ID,DISPLAY_ID,MESSAGE_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
     from display_column_label
   </select>
 
   <select id="findByDisplayIdAndLabelId" resultMap="BaseResultMap">
-    select DISPLAY_COLUMN_LABEL_ID, INJECTION_LABEL_ID,DISPLAY_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    select DISPLAY_COLUMN_LABEL_ID, INJECTION_LABEL_ID,DISPLAY_ID,MESSAGE_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
     from display_column_label
     where INJECTION_LABEL_ID = #{labelId}
@@ -61,7 +64,7 @@
   </select>
 
   <select id="findListByDisplayId" resultMap="BaseResultMap">
-    select DISPLAY_COLUMN_LABEL_ID, INJECTION_LABEL_ID,DISPLAY_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    select DISPLAY_COLUMN_LABEL_ID, INJECTION_LABEL_ID,DISPLAY_ID,MESSAGE_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
     from display_column_label
     where  DISPLAY_ID = #{displayId}

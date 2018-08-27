@@ -14,7 +14,9 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -22,10 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -36,7 +35,6 @@ import java.util.concurrent.Executors;
 @EnableAutoConfiguration
 @RequestMapping("/es")
 public class EsController {
-
     /**
      * 测试索引
      */
@@ -49,6 +47,22 @@ public class EsController {
 
     @Autowired
     private EsService esService;
+
+
+
+    @RequestMapping("/searchLabelInfoByRuleId")
+    @ResponseBody
+    public Map<String, Object> searchLabelInfoByRuleId(@RequestBody HashMap<String,Object> param) {
+        return esService.searchLabelInfoByRuleId(param.get("ruleId").toString(),param.get("isi").toString());
+    }
+
+
+    @RequestMapping("/searchCampaignHitsTotal")
+    @ResponseBody
+    public Map<String, Object> searchCampaignHitsTotal(@RequestBody CampaignHitParam param) {
+        return esService.searchCampaignHitsTotal(param);
+    }
+
 
     /**
      * 活动命中查询

@@ -34,7 +34,7 @@ public interface MessageLabelService {
     /**
      * 查询出所有信息
      */
-    Map<String,Object> queryMessages();
+    Map<String,Object> queryMessages(String displayColumnType);
 
     /**
      * 新增标签组
