@@ -24,6 +24,19 @@ public class MessageVO {
      */
     private List<LabelDTO> labelDTOList;
 
+    /**
+     * 是否选中
+     */
+    private String checked;
+
+    public String getChecked() {
+        return checked;
+    }
+
+    public void setChecked(String checked) {
+        this.checked = checked;
+    }
+
     public List<LabelDTO> getLabelDTOList() {
         return labelDTOList;
     }

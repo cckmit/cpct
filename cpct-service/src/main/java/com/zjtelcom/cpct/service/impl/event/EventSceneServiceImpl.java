@@ -1,5 +1,8 @@
 package com.zjtelcom.cpct.service.impl.event;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.event.EventSceneMapper;
 import com.zjtelcom.cpct.dao.event.EvtSceneCamRelMapper;
@@ -36,6 +39,26 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
     private EventSceneMapper eventSceneMapper;
     @Autowired
     private EvtSceneCamRelMapper evtSceneCamRelMapper;
+
+
+    /**
+     * 查询事件场景列表（分页）
+     * @param qryEventSceneListReq
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @Override
+    public Map<String, Object> getEventSceneList(QryEventSceneListReq qryEventSceneListReq, Integer page, Integer pageSize) {
+        Map<String, Object> maps = new HashMap<>();
+        PageHelper.startPage(page,pageSize);
+        List<EventScene> eventScenes = eventSceneMapper.qryEventSceneList(qryEventSceneListReq);
+        Page pageInfo = new Page(new PageInfo(eventScenes));
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg",eventScenes);
+        maps.put("page",pageInfo);
+        return maps;
+    }
 
     /**
      * 查询事件场景列表

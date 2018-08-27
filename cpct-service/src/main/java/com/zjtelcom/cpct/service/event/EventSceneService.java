@@ -14,6 +14,8 @@ import java.util.Map;
 
 public interface EventSceneService {
 
+    Map<String,Object> getEventSceneList(QryEventSceneListReq qryEventSceneListReq,Integer page,Integer pageSize);
+
     QryeventSceneRsp qryEventSceneList(QryEventSceneListReq qryEventSceneListReq);
 
     Map<String,Object> createEventScene(CreateEventSceneReq createEventSceneReq);
