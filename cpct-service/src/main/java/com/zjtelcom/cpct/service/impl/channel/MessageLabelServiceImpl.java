@@ -220,11 +220,18 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         List<MessageVO> messageVOList = new ArrayList<>();
         List<Message> messageList = messageMapper.selectAll();
         for (Message message : messageList) {
+            if (message.getMessageName().equals("固定信息") && displayColumnType!=null && displayColumnType.equals("2000")){
+                continue;
+            }
             MessageVO messageVO = BeanUtil.create(message,new MessageVO());
+            messageVO.setChecked("0");
             Map<String,Object> labelMaps = qureyMessageLabel(message);
             if (labelMaps.get("resultCode").equals(CODE_SUCCESS)){
                 MessageLabelDTO messageLabelDTO = (MessageLabelDTO)labelMaps.get("messageLabelDTO");
                 List<LabelDTO> list = messageLabelDTO.getMessageLabelId();
+                for (LabelDTO labelDTO : list){
+                    labelDTO.setMessageType(message.getMessageId());
+                }
                 messageVO.setLabelDTOList(list);
             }
             messageVOList.add(messageVO);
@@ -281,6 +288,12 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
     @Override
     public Map<String, Object> createDisplayAllMessage(DisplayAllMessageReq displayAllMessageReq) {
         Map<String, Object> maps = new HashMap<>();
+        DisplayColumn displayColumn = displayColumnMapper.selectByPrimaryKey(displayAllMessageReq.getDisplayColumnId());
+        if (displayColumn==null){
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg", "展示列不存在");
+            return maps;
+        }
         List<DisplayLabelInfo> injectionLabelIds = displayAllMessageReq.getInjectionLabelIds();
         List<DisplayLabelInfo> labelInfoList = new ArrayList<>();
         List<DisplayColumnLabel> oldRels = displayColumnLabelMapper.findListByDisplayId(displayAllMessageReq.getDisplayColumnId());
@@ -309,6 +322,8 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         }
         DisplayColumn dc = new DisplayColumn();
         dc.setDisplayColumnId(displayAllMessageReq.getDisplayColumnId());
+        displayColumn.setStatusCd("2000");
+        displayColumnMapper.updateByPrimaryKey(displayColumn);
         return  queryLabelListByDisplayId(dc);
     }
 

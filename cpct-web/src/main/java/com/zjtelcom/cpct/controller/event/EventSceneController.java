@@ -35,6 +35,23 @@ public class EventSceneController extends BaseController {
     @Autowired
     private EventSceneService eventSceneService;
 
+
+    /**
+     * 查询事件场景列表
+     */
+    @RequestMapping("/getEventSceneList")
+    @CrossOrigin
+    public String getEventSceneList(@RequestBody QryEventSceneListReq qryEventSceneListReq) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = eventSceneService.getEventSceneList(qryEventSceneListReq,qryEventSceneListReq.getPage(),qryEventSceneListReq.getPageSize());
+        } catch (Exception e) {
+            logger.error("[op:EventSceneController] fail to listEventScenes for qryEventSceneListReq = {}! Exception: ", JSONArray.toJSON(qryEventSceneListReq), e);
+            return JSON.toJSONString(maps);
+        }
+        return JSON.toJSONString(maps);
+    }
+
     /**
      * 查询事件场景列表
      */
