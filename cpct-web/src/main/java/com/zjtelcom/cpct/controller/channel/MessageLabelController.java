@@ -103,7 +103,11 @@ public class MessageLabelController extends BaseController {
     @CrossOrigin
     public String queryMessages() {
         Map<String, Object> map = new HashMap<>();
-        map = messageLabelService.queryMessages();
+        String columnType = null;
+//        if (param.get("displayColumnType")!=null){
+//            columnType =  param.get("displayColumnType");
+//        }
+        map = messageLabelService.queryMessages(columnType);
         return JSON.toJSONString(map);
     }
 

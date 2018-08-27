@@ -15,6 +15,7 @@ public class TrialOperation {
 
     private Long batchNum;
 
+
     private String statusCd;//1000 试算中；2000 试算异常；3000 试算成功
 
     private Long createStaff;

@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.request.channel;
 
 import com.zjtelcom.cpct.common.Page;
+import com.zjtelcom.cpct.dto.channel.DisplayLabelInfo;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ public class DisplayAllMessageReq {
 
     private Long displayColumnId;
 
-    private List<Long> injectionLabelIds;
+    private List<DisplayLabelInfo> injectionLabelIds;
 
     private String labelName;
 
@@ -35,11 +36,12 @@ public class DisplayAllMessageReq {
         this.displayColumnId = displayColumnId;
     }
 
-    public List<Long> getInjectionLabelIds() {
+
+    public List<DisplayLabelInfo> getInjectionLabelIds() {
         return injectionLabelIds;
     }
 
-    public void setInjectionLabelIds(List<Long> injectionLabelIds) {
+    public void setInjectionLabelIds(List<DisplayLabelInfo> injectionLabelIds) {
         this.injectionLabelIds = injectionLabelIds;
     }
 

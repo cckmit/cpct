@@ -8,8 +8,6 @@
     <result column="STRATEGY_ID" jdbcType="BIGINT" property="strategyId" />
     <result column="STRATEGY_NAME" jdbcType="VARCHAR" property="strategyName" />
     <result column="BATCH_NUM" jdbcType="BIGINT" property="batchNum" />
-    <result column="RULE_ID" jdbcType="BIGINT" property="ruleId" />
-    <result column="RULE_NAME" jdbcType="VARCHAR" property="ruleName" />
     <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
     <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
     <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
@@ -24,14 +22,13 @@
   </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.grouping.TrialOperation" useGeneratedKeys="true" keyProperty="id">
     insert into trial_operation (ID, CAMPAIGN_ID, CAMPAIGN_NAME, 
-      STRATEGY_ID, STRATEGY_NAME, BATCH_NUM, 
-      RULE_ID, RULE_NAME, STATUS_CD, 
+      STRATEGY_ID, STRATEGY_NAME, BATCH_NUM,  STATUS_CD,
       CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
       STATUS_DATE, UPDATE_DATE, REMARK
       )
     values (#{id,jdbcType=BIGINT}, #{campaignId,jdbcType=BIGINT}, #{campaignName,jdbcType=VARCHAR}, 
       #{strategyId,jdbcType=BIGINT}, #{strategyName,jdbcType=VARCHAR}, #{batchNum,jdbcType=BIGINT}, 
-      #{ruleId,jdbcType=BIGINT}, #{ruleName,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR}, 
+      #{statusCd,jdbcType=VARCHAR},
       #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, 
       #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
       )
@@ -43,8 +40,6 @@
       STRATEGY_ID = #{strategyId,jdbcType=BIGINT},
       STRATEGY_NAME = #{strategyName,jdbcType=VARCHAR},
       BATCH_NUM = #{batchNum,jdbcType=BIGINT},
-      RULE_ID = #{ruleId,jdbcType=BIGINT},
-      RULE_NAME = #{ruleName,jdbcType=VARCHAR},
       STATUS_CD = #{statusCd,jdbcType=VARCHAR},
       CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
       UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
@@ -55,30 +50,26 @@
     where ID = #{id,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM, RULE_ID, 
-    RULE_NAME, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, 
+    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
     REMARK
     from trial_operation
     where ID = #{id,jdbcType=BIGINT}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
-    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM, RULE_ID, 
-    RULE_NAME, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, 
+    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
     REMARK
     from trial_operation
   </select>
 
   <select id="findOperationListByRuleId" resultMap="BaseResultMap">
-    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM, RULE_ID,
-    RULE_NAME, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
+    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
     REMARK
     from trial_operation
     where RULE_ID = #{ruleId}
   </select>
 
   <select id="findOperationListByStrategyId" resultMap="BaseResultMap">
-    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM, RULE_ID,
-    RULE_NAME, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
+    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM,  STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
     REMARK
     from trial_operation
     where STRATEGY_ID = #{strategyId}

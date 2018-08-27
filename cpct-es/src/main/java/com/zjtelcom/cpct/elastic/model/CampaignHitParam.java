@@ -4,14 +4,32 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class CampaignHitParam implements Serializable {
-    private String ISI;//
+    private String isi;//
     private String eventCode;
     private Date startTime;
     private Date endTime;
     private String assetNumber;
     private String searchBy;
     private int from;
+    private String accNbr;
+    private String integrationId;
 
+
+    public String getAccNbr() {
+        return accNbr;
+    }
+
+    public void setAccNbr(String accNbr) {
+        this.accNbr = accNbr;
+    }
+
+    public String getIntegrationId() {
+        return integrationId;
+    }
+
+    public void setIntegrationId(String integrationId) {
+        this.integrationId = integrationId;
+    }
 
     public int getFrom() {
         return from;
@@ -21,12 +39,12 @@ public class CampaignHitParam implements Serializable {
         this.from = from;
     }
 
-    public String getISI() {
-        return ISI;
+    public String getIsi() {
+        return isi;
     }
 
-    public void setISI(String ISI) {
-        this.ISI = ISI;
+    public void setIsi(String isi) {
+        this.isi = isi;
     }
 
     public String getEventCode() {
