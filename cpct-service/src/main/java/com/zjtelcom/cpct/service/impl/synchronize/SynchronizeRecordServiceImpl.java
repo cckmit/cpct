@@ -26,4 +26,24 @@ public class SynchronizeRecordServiceImpl implements SynchronizeRecordService {
     public int insert(SynchronizeRecord record) {
         return synchronizeRecordMapper.insert(record);
     }
+
+    /**
+     * 新增同并记录
+     * @param roleName  角色
+     * @param name      同步表名称
+     * @param eventId   同步主键
+     * @param type      操作类型
+     * @return
+     */
+    @Override
+    public int addRecord(String roleName, String name,Long eventId, Integer type) {
+        SynchronizeRecord synchronizeRecord=new SynchronizeRecord();
+        synchronizeRecord.setRoleName(roleName);
+        synchronizeRecord.setSynchronizeName(name);
+        synchronizeRecord.setSynchronizeType(type);
+        synchronizeRecord.setSynchronizeId(eventId.toString());
+        return  synchronizeRecordMapper.insert(synchronizeRecord);
+    }
+
+
 }

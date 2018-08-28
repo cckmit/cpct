@@ -8,7 +8,6 @@ import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.event.*;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
-import com.zjtelcom.cpct.dao.synchronize.SynchronizeRecordMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.dao.system.SystemParamMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamEvtRelDO;
@@ -18,7 +17,6 @@ import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.campaign.MktCampaign;
 import com.zjtelcom.cpct.dto.event.*;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
-import com.zjtelcom.cpct.dto.synchronize.SynchronizeRecord;
 import com.zjtelcom.cpct.dto.system.SystemParam;
 import com.zjtelcom.cpct.enums.ParamKeyEnum;
 import com.zjtelcom.cpct.request.event.CreateContactEvtJtReq;
@@ -32,7 +30,6 @@ import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
-import com.zjtelcom.cpct_prd.dao.event.ContactEvtPrdMapper;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -79,10 +76,6 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     private MktCampaignMapper campaignMapper;
     @Autowired
     private ContactEvtTypeMapper evtTypeMapper;
-    @Autowired
-    private ContactEvtPrdMapper contactEvtPrdMapper;
-    @Autowired
-    private SynchronizeRecordMapper synchronizeRecordMapper;
 
 
     /**
@@ -372,7 +365,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         contactEventDetail.setFilterRules(filterRuleList);
         if (contactEvt.getMktCampaignType()!=null){
             String paramKey = ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey();
-           SysParams systemParam = sysParamsMapper.findParamsByValue(paramKey,contactEvt.getMktCampaignType());
+            SysParams systemParam = sysParamsMapper.findParamsByValue(paramKey,contactEvt.getMktCampaignType());
             if (systemParam!=null){
                 contactEventDetail.setMktCampaignTypeName(systemParam.getParamName());
             }
@@ -538,38 +531,5 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         maps.put("ContactEvt", contactEvt);
         return maps;
     }
-
-
-    /**
-     * 同步事件
-     * @param eventId    事件id
-     * @param roleName   操作人身份
-     * @return
-     */
-    @Override
-    public Map<String, Object> synchronizeEvent(Long eventId, String roleName) {
-        Map<String,Object> maps = new HashMap<>();
-        //查询源数据库
-        ContactEvt contactEvt=contactEvtMapper.getEventById(eventId);
-        //同步时查看是新增还是更新
-        ContactEvt eventById = contactEvtPrdMapper.getEventById(eventId);
-        if(eventById==null){
-            contactEvtPrdMapper.createContactEvtJt(contactEvt);
-        }else{
-            contactEvtPrdMapper.modContactEvtJt(contactEvt);
-        }
-        //同步完成  新增一条同步记录
-        SynchronizeRecord synchronizeRecord=new SynchronizeRecord();
-        synchronizeRecord.setRoleName(roleName);
-        synchronizeRecord.setSynchronizeName("同步事件");
-        synchronizeRecord.setSynchronizeId(eventId.toString());
-        synchronizeRecordMapper.insert(synchronizeRecord);
-
-
-        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
-        maps.put("resultMsg", StringUtils.EMPTY);
-        return maps;
-    }
-
 
 }

@@ -10,4 +10,7 @@ import com.zjtelcom.cpct.dto.synchronize.SynchronizeRecord;
 public interface SynchronizeRecordService {
 
     int insert(SynchronizeRecord record);
+
+
+    int addRecord(String roleName, String name,Long eventId, Integer type);
 }

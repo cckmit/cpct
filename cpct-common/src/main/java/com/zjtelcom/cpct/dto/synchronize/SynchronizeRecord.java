@@ -8,7 +8,7 @@ import java.util.Date;
 /**
  * @Auther: anson
  * @Date: 2018/8/27
- * @Description:
+ * @Description:同步记录
  */
 public class SynchronizeRecord extends BaseEntity implements Serializable {
 
@@ -16,8 +16,11 @@ public class SynchronizeRecord extends BaseEntity implements Serializable {
     /** 主键标识*/
     private Long id;
 
-    /** 同步类型名称*/
+    /** 同步表名称*/
     private String synchronizeName;
+
+    /** 同步操作类型   0新增   1修改   2删除*/
+    private Integer synchronizeType;
 
     /** 同步类型主键id*/
     private String synchronizeId;
@@ -66,5 +69,13 @@ public class SynchronizeRecord extends BaseEntity implements Serializable {
 
     public void setSynchronizeTime(Date synchronizeTime) {
         this.synchronizeTime = synchronizeTime;
+    }
+
+    public Integer getSynchronizeType() {
+        return synchronizeType;
+    }
+
+    public void setSynchronizeType(Integer synchronizeType) {
+        this.synchronizeType = synchronizeType;
     }
 }

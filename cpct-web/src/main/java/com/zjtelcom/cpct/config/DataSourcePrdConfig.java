@@ -44,4 +44,9 @@ public class DataSourcePrdConfig {
         return sessionFactoryBean.getObject();
     }
 
+    @Bean(name = "prodTransactionManager")
+    public DataSourceTransactionManager prodTransactionManager()
+            throws SQLException {
+        return new DataSourceTransactionManager(datasourcePrd());
+    }
 }

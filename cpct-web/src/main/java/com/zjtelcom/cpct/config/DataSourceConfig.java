@@ -12,8 +12,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 import javax.sql.DataSource;
+import java.sql.SQLException;
 
 /**
  * Package: com.zjtelcom.cpct.config
@@ -41,6 +43,13 @@ public class DataSourceConfig {
         sessionFactoryBean.setMapperLocations(new PathMatchingResourcePatternResolver()
                 .getResources("classpath:mybatis/*/*.xml"));
         return sessionFactoryBean.getObject();
+    }
+
+    @Bean(name = "devTransactionManager")
+    @Primary
+    public DataSourceTransactionManager devTransactionManager()
+            throws SQLException {
+        return new DataSourceTransactionManager(dataSource());
     }
 
 }
