@@ -1,13 +1,19 @@
 package com.zjtelcom.cpct.controller.synchronize;
 
 import com.alibaba.fastjson.JSON;
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.service.event.ContactEvtService;
 import com.zjtelcom.cpct.service.synchronize.SynContactEvtService;
+import com.zjtelcom.cpct.service.synchronize.SynContactEvtTypeService;
+import com.zjtelcom.cpct.service.synchronize.SynEventSorceService;
+import com.zjtelcom.cpct.service.synchronize.SynInterfaceCfgService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -22,22 +28,32 @@ public class SynchronizeController extends BaseController {
 
     @Autowired
     private SynContactEvtService synContactEvtService;
+    @Autowired
+    private SynContactEvtTypeService synContactEvtTypeService;
+    @Autowired
+    private SynEventSorceService synEventSorceService;
+    @Autowired
+    private SynInterfaceCfgService synInterfaceCfgService;
 
 
     /**
      * 单个事件同步
-     * @param params
+     * @param eventId  事件主键id
      * @return
      */
     @PostMapping("singleEvent")
     @CrossOrigin
-    public String singleEvent(@RequestBody Map<String, String> params){
+    public String singleEvent(@RequestParam(value = "eventId", required = true) Long eventId){
         logger.info("同步事件");
-        String eventId = params.get("eventId");  // 事件id
         String roleName="admin";   //  操作角色
-        Map<String, Object> map = synContactEvtService.synchronizeSingleEvent(Long.valueOf(eventId),roleName);
-        //得到事件对象
-        ContactEvt c=(ContactEvt) map.get("ContactEvt");
+        Map<String, Object> map=new HashMap<>();
+       try{
+        map = synContactEvtService.synchronizeSingleEvent(eventId,roleName);
+    } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("[op:SynContactEvtServiceImpl] 通过主键同步单个事件失败！Exception: ",e);
+    }
         return JSON.toJSONString(map);
     }
 
@@ -52,25 +68,29 @@ public class SynchronizeController extends BaseController {
         //角色权限控制
         logger.info("批量事件同步");
         String roleName="admin";   //  操作角色
-        Map<String, Object> map = synContactEvtService.synchronizeBatchEvent(roleName);
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synContactEvtService.synchronizeBatchEvent(roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("[op:SynContactEvtServiceImpl] 批量同步事件失败！Exception: ", e);
+        }
         return  JSON.toJSONString(map);
     }
 
 
     /**
      * 单个事件目录同步
-     * @param params
+     * @param eventTypeId  事件目录主键id
      * @return
      */
     @PostMapping("singleEventType")
     @CrossOrigin
-    public String singleEventType(@RequestBody Map<String, String> params){
-        logger.info("同步事件");
-        String eventId = params.get("eventId");  // 事件id
+    public String singleEventType(@RequestParam(value = "eventTypeId", required = true) Long eventTypeId){
+        logger.info("同步事件目录");
         String roleName="admin";   //  操作角色
-        Map<String, Object> map = null;
-        //得到事件对象
-        ContactEvt c=(ContactEvt) map.get("ContactEvt");
+        Map<String, Object> map = synContactEvtTypeService.synchronizeSingleEventType(eventTypeId,roleName);
         return JSON.toJSONString(map);
     }
 
@@ -83,26 +103,25 @@ public class SynchronizeController extends BaseController {
     @CrossOrigin
     public String batchEventType(){
         //角色权限控制
-        logger.info("批量事件同步");
+        logger.info("批量同步事件目录");
         String roleName="admin";   //  操作角色
-        Map<String, Object> map = synContactEvtService.synchronizeBatchEvent(roleName);
+        Map<String, Object> map = synContactEvtTypeService.synchronizeBatchEventType(roleName);
         return  JSON.toJSONString(map);
     }
 
 
     /**
      * 单个事件源同步
-     * @param params
+     * @param eventSourceId  事件源主键id
      * @return
      */
     @PostMapping("singleEventSource")
     @CrossOrigin
-    public String singleEventSource(@RequestBody Map<String, String> params){
-        String eventId = params.get("eventId");  // 事件id
+    public String singleEventSource(@RequestParam(value = "eventSourceId", required = true) Long eventSourceId){
+        logger.info("同步事件源");
         String roleName="admin";   //  操作角色
-        Map<String, Object> map = null;
         //得到事件对象
-        ContactEvt c=(ContactEvt) map.get("ContactEvt");
+        Map<String, Object> map = synEventSorceService.synchronizeSingleEventSorce(eventSourceId,roleName);
         return JSON.toJSONString(map);
 
     }
@@ -116,25 +135,24 @@ public class SynchronizeController extends BaseController {
     @CrossOrigin
     public String batchEventSource(){
         //角色权限控制
-        logger.info("批量事件同步");
+        logger.info("批量同步事件源");
         String roleName="admin";   //  操作角色
-        Map<String, Object> map = synContactEvtService.synchronizeBatchEvent(roleName);
+        Map<String, Object> map = synEventSorceService.synchronizeBatchEventSorce(roleName);
         return  JSON.toJSONString(map);
     }
 
 
     /**
      * 单个事件源接口同步
-     * @param params
+     * @param eventInterfaceId  事件源接口主键id
      * @return
      */
     @PostMapping("singleEventInterface")
     @CrossOrigin
-    public String singleEventInterface(@RequestBody Map<String, String> params){
-
+    public String singleEventInterface(@RequestParam(value = "eventInterfaceId", required = true) Long eventInterfaceId){
+        logger.info("同步事件源接口");
         String roleName="admin";   //  操作角色
-        Map<String, Object> map = null;
-        ContactEvt c=(ContactEvt) map.get("ContactEvt");
+        Map<String, Object> map = synInterfaceCfgService.synchronizeSingleEventInterface(eventInterfaceId,roleName);
         return JSON.toJSONString(map);
     }
 
@@ -148,9 +166,9 @@ public class SynchronizeController extends BaseController {
     @CrossOrigin
     public String batchEventInterface(){
         //角色权限控制
-        logger.info("批量事件同步");
+        logger.info("批量同步事件源接口");
         String roleName="admin";   //  操作角色
-        Map<String, Object> map = synContactEvtService.synchronizeBatchEvent(roleName);
+        Map<String, Object> map = synInterfaceCfgService.synchronizeBatchEventInterface(roleName);
         return  JSON.toJSONString(map);
     }
 

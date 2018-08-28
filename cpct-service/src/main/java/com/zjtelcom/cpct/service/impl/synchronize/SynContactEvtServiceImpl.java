@@ -4,6 +4,8 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.enums.SynchronizeType;
+import com.zjtelcom.cpct.exception.ServicesException;
+import com.zjtelcom.cpct.exception.SystemException;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.synchronize.SynContactEvtService;
 import com.zjtelcom.cpct.service.synchronize.SynchronizeRecordService;
@@ -34,7 +36,8 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
     @Autowired
     private SynchronizeRecordService synchronizeRecordService;
 
-
+    //同步表名
+    public static final String tableName="event";
 
 
 
@@ -44,33 +47,26 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
      * @param roleName   操作人身份
      * @return
      */
-    @Transactional(value="devTransactionManager")
+    @Transactional(value="prodTransactionManager")
     @Override
     public Map<String, Object> synchronizeSingleEvent(Long eventId, String roleName) {
-        String tableName="event";   //同步表名称
         Map<String,Object> maps = new HashMap<>();
         //查询源数据库
         ContactEvt contactEvt=contactEvtMapper.getEventById(eventId);
-        contactEvt.setContactEvtDesc("测试第一数据源");
-        contactEvtMapper.modContactEvtJt(contactEvt);
-
+        if(contactEvt==null){
+            throw new SystemException("对应事件不存在");
+        }
         //同步时查看是新增还是更新
         ContactEvt eventById = contactEvtPrdMapper.getEventById(eventId);
         if(eventById==null){
-            contactEvtPrdMapper.createContactEvtJt(eventById);
+            contactEvtPrdMapper.createContactEvtJt(contactEvt);
+            synchronizeRecordService.addRecord(roleName,tableName,eventId, SynchronizeType.add.getType());
         }else{
-            eventById.setContactEvtDesc("测试第二数据源");
-            contactEvtPrdMapper.modContactEvtJt(eventById);
+            contactEvtPrdMapper.modContactEvtJt(contactEvt);
+            synchronizeRecordService.addRecord(roleName,tableName,eventId, SynchronizeType.update.getType());
         }
-
-        if(eventId!=null){
-            throw new RuntimeException("我故意抛出的");
-        }
-        //同步完成  新增一条同步记录
-        synchronizeRecordService.addRecord(roleName,tableName,eventId, SynchronizeType.add.getType());
-
-        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
-        maps.put("resultMsg", StringUtils.EMPTY);
+            maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+            maps.put("resultMsg", StringUtils.EMPTY);
         return maps;
     }
 
@@ -80,45 +76,41 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
      * @param roleName
      * @return
      */
-    @Transactional(value="devTransactionManager")
+    @Transactional(value="prodTransactionManager")
     @Override
     public Map<String, Object> synchronizeBatchEvent(String roleName) {
-        String tableName="event";   //同步表名称
         Map<String,Object> maps = new HashMap<>();
         //先查出准生产的所有事件
-        List<ContactEvt> contactEvts = contactEvtMapper.query();
-        logger.info("准生产事件总数："+contactEvts.size());
+        List<ContactEvt> prdList = contactEvtMapper.query();
         //查出生产的所有事件
-        List<ContactEvt> prdContactEvts = contactEvtPrdMapper.query();
-        logger.info("生产事件总数："+prdContactEvts.size());
+        List<ContactEvt> realList = contactEvtPrdMapper.query();
         //三个集合分别表示需要 新增的   修改的    删除的
         List<ContactEvt> addList=new ArrayList<ContactEvt>();
         List<ContactEvt> updateList=new ArrayList<ContactEvt>();
         List<ContactEvt> deleteList=new ArrayList<ContactEvt>();
-        for(ContactEvt c:contactEvts){
-            for (int i = 0; i <prdContactEvts.size() ; i++) {
-                if(c.getContactEvtId()-prdContactEvts.get(i).getContactEvtId()==0){
+        for(ContactEvt c:prdList){
+            for (int i = 0; i <realList.size() ; i++) {
+                if(c.getContactEvtId()-realList.get(i).getContactEvtId()==0){
                     //需要修改的
                     updateList.add(c);
                     break;
-                }else if(i==prdContactEvts.size()-1){
+                }else if(i==realList.size()-1){
                     //需要新增的  准生产存在，生产不存在
                     addList.add(c);
                 }
             }
         }
         //查出需要删除的事件
-        for(ContactEvt c:prdContactEvts){
-            for (int i = 0; i <contactEvts.size() ; i++) {
-                if(c.getContactEvtId()-contactEvts.get(i).getContactEvtId()==0){
+        for(ContactEvt c:realList){
+            for (int i = 0; i <prdList.size() ; i++) {
+                if(c.getContactEvtId()-prdList.get(i).getContactEvtId()==0){
                     break;
-                }else if (i==contactEvts.size()-1){
+                }else if (i==prdList.size()-1){
                     //需要删除的   生产存在,准生产不存在
                     deleteList.add(c);
                 }
             }
         }
-        System.out.println(addList.size()+"  "+updateList.size()+"  "+deleteList.size());
         //开始新增
         for(ContactEvt c:addList){
             contactEvtPrdMapper.createContactEvtJt(c);
@@ -135,11 +127,13 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
             synchronizeRecordService.addRecord(roleName,tableName,c.getContactEvtId(), SynchronizeType.delete.getType());
         }
 
-
-
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
+
         return maps;
     }
+
+
+
 
 }

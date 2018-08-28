@@ -24,4 +24,6 @@ public interface ContactEvtTypePrdMapper {
     List<ContactEvtType> qryContactEvtTypeList(QryContactEvtTypeReq qryContactEvtTypeReq);
 
     int createContactEvtType(ContactEvtType contactEvtType);
+
+
 }

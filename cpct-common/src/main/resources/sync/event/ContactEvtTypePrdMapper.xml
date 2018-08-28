@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zjtelcom.cpct.dao.event.ContactEvtTypeMapper">
+<mapper namespace="com.zjtelcom.cpct_prd.dao.event.ContactEvtTypePrdMapper">
     <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.dto.event.ContactEvtType">
         <id column="EVT_TYPE_ID" jdbcType="BIGINT" property="evtTypeId"/>
         <result column="EVT_TYPE_NBR" jdbcType="VARCHAR" property="contactEvtTypeCode"/>
@@ -98,12 +98,12 @@
     </select>
 
     <insert id="createContactEvtType" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtType">
-    insert into event_type (EVT_TYPE_NBR, EVT_TYPE_NAME,
+    insert into event_type (EVT_TYPE_ID,EVT_TYPE_NBR, EVT_TYPE_NAME,
     PAR_EVT_TYPE_ID, EVT_TYPE_DESC, STATUS_CD,
     CREATE_STAFF, UPDATE_STAFF, CREATE_DATE,
     STATUS_DATE, UPDATE_DATE, REMARK
     )
-    values (#{contactEvtTypeCode,jdbcType=VARCHAR}, #{contactEvtName,jdbcType=VARCHAR},
+    values (#{evtTypeId,jdbcType=BIGINT},#{contactEvtTypeCode,jdbcType=VARCHAR}, #{contactEvtName,jdbcType=VARCHAR},
     #{parEvtTypeId,jdbcType=BIGINT}, #{evtTypeDesc,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR},
     #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP},
     #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
@@ -114,40 +114,18 @@
     <update id="modContactEvtType" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtType">
         update event_type
         set
-        <if test="contactEvtTypeCode != null and contactEvtTypeCode != ''">
             EVT_TYPE_NBR = #{contactEvtTypeCode,jdbcType=VARCHAR},
-        </if>
-        <if test="contactEvtName != null and contactEvtName != ''">
             EVT_TYPE_NAME = #{contactEvtName,jdbcType=VARCHAR},
-        </if>
-        <if test="parEvtTypeId != null and parEvtTypeId != 0 ">
             PAR_EVT_TYPE_ID = #{parEvtTypeId,jdbcType=BIGINT},
-        </if>
-        <if test="evtTypeDesc != null and evtTypeDesc != ''">
             EVT_TYPE_DESC = #{evtTypeDesc,jdbcType=VARCHAR},
-        </if>
-        <if test="statusCd != null and statusCd != ''">
             STATUS_CD = #{statusCd,jdbcType=VARCHAR},
-        </if>
-        <if test="createStaff != null and createStaff != 0">
             CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
-        </if>
-        <if test="updateStaff != null and updateStaff != 0">
             UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
-        </if>
-        <if test="createDate != null">
             CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
-        </if>
-        <if test="statusDate != null">
             STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
-        </if>
-        <if test="updateDate != null">
             UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
-        </if>
-        <if test="remark != null and remark != ''">
             REMARK = #{remark,jdbcType=VARCHAR},
-        </if>
-        EVT_TYPE_ID =#{evtTypeId,jdbcType=BIGINT}
+            EVT_TYPE_ID =#{evtTypeId,jdbcType=BIGINT}
         where EVT_TYPE_ID = #{evtTypeId,jdbcType=BIGINT}
     </update>
 
