@@ -29,7 +29,10 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.EagleDatabaseConfCache;
 import com.zjtelcom.cpct.service.TryCalcService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
-import com.zjtelcom.cpct.util.*;
+import com.zjtelcom.cpct.util.CopyPropertiesUtil;
+import com.zjtelcom.cpct.util.DateUtil;
+import com.zjtelcom.cpct.util.SqlUtil;
+import com.zjtelcom.cpct.util.UserUtil;
 import com.zjtelcom.cpct.validator.ValidateResult;
 import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
 import com.zjtelcom.cpct.vo.grouping.TarGrpVO;
@@ -46,7 +49,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
-import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 /**
  * @Description 目标分群serviceImpl
@@ -73,28 +75,6 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     private InjectionLabelMapper injectionLabelMapper;
     @Autowired
     private InjectionLabelValueMapper injectionLabelValueMapper;
-
-
-    /**
-     * 复制客户分群 返回
-     * @param tarGrpId
-     * @return
-     */
-    @Override
-    public Map<String, Object> copyTarGrp(Long tarGrpId) {
-        Map<String,Object> result = new HashMap<>();
-        TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpId);
-        if (tarGrp==null){
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "请选择下拉框运算类型");
-            return result;
-        }
-        List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
-        TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
-        detail.setTarGrpConditions(conditionList);
-        result = createTarGrp(detail);
-        return result;
-    }
 
     /**
      * 新增目标分群
