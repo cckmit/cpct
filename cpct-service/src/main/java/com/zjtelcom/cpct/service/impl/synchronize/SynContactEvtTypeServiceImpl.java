@@ -53,7 +53,6 @@ public class SynContactEvtTypeServiceImpl extends BaseService implements SynCont
     @Override
     public Map<String, Object> synchronizeSingleEventType(Long eventId, String roleName) {
         Map<String,Object> maps = new HashMap<>();
-        try {
         ContactEvtType contactEvtType = contactEvtTypeMapper.selectByPrimaryKey(eventId);
         if(contactEvtType==null){
             throw new SystemException("对应事件目录不存在");
@@ -70,11 +69,7 @@ public class SynContactEvtTypeServiceImpl extends BaseService implements SynCont
 
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
-        } catch (Exception e) {
-            maps.put("resultCode", CommonConstant.CODE_FAIL);
-            maps.put("resultMsg", e.getMessage());
-            logger.error("[op:SynContactEvtTypeServiceImpl] 通过主键同步单个事件目录失败"+tableName+"！Exception: ", eventId, e);
-        }
+
         return maps;
     }
 
@@ -87,7 +82,6 @@ public class SynContactEvtTypeServiceImpl extends BaseService implements SynCont
     @Override
     public Map<String, Object> synchronizeBatchEventType(String roleName) {
         Map<String,Object> maps = new HashMap<>();
-        try {
         //查出准生产的所有事件目录
         List<ContactEvtType> prdList = contactEvtTypeMapper.qryContactEvtTypeList(new QryContactEvtTypeReq());
         //查出生产环境所有事件目录
@@ -138,11 +132,7 @@ public class SynContactEvtTypeServiceImpl extends BaseService implements SynCont
 
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
-        } catch (Exception e) {
-            maps.put("resultCode", CommonConstant.CODE_FAIL);
-            maps.put("resultMsg", e.getMessage());
-            logger.error("[op:SynContactEvtTypeServiceImpl] 批量同步事件目录失败 "+tableName+"！ Exception: ",e);
-        }
+
         return maps;
     }
 }

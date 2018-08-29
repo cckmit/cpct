@@ -49,7 +49,6 @@ public class SynInterfaceCfgServiceImpl extends BaseService implements SynInterf
     @Override
     public Map<String, Object> synchronizeSingleEventInterface(Long eventId, String roleName) {
         Map<String,Object> maps = new HashMap<>();
-        try {
         InterfaceCfg interfaceCfg = interfaceCfgMapper.selectByPrimaryKey(eventId);
         if(interfaceCfg==null){
             throw new SystemException("对应事件源接口不存在");
@@ -66,11 +65,7 @@ public class SynInterfaceCfgServiceImpl extends BaseService implements SynInterf
 
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
-    } catch (Exception e) {
-        maps.put("resultCode", CommonConstant.CODE_FAIL);
-        maps.put("resultMsg", e.getMessage());
-        logger.error("[op:SynInterfaceCfgServiceImpl] 通过主键同步单个事件源接口 "+tableName+"失败！Exception: ", eventId, e);
-    }
+
         return maps;
     }
 
@@ -84,7 +79,6 @@ public class SynInterfaceCfgServiceImpl extends BaseService implements SynInterf
     @Override
     public Map<String, Object> synchronizeBatchEventInterface(String roleName) {
         Map<String,Object> maps = new HashMap<>();
-        try {
         List<InterfaceCfg> prdList = interfaceCfgMapper.selectAll();
         List<InterfaceCfg> realList = interfaceCfgPrdMapper.selectAll();
 
@@ -135,11 +129,7 @@ public class SynInterfaceCfgServiceImpl extends BaseService implements SynInterf
 
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
-    } catch (Exception e) {
-        maps.put("resultCode", CommonConstant.CODE_FAIL);
-        maps.put("resultMsg", e.getMessage());
-        logger.error("[op:SynInterfaceCfgServiceImpl] 批量同步事件源接口 "+tableName+"失败！Exception: ", e);
-        }
+
         return maps;
     }
 }

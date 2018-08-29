@@ -52,7 +52,7 @@ public class SynchronizeController extends BaseController {
     } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("[op:SynContactEvtServiceImpl] 通过主键同步单个事件失败！Exception: ",e);
+            logger.error("[op:SynContactEvtServiceImpl] 通过主键同步单个事件失败！Exception: ",eventId,e);
     }
         return JSON.toJSONString(map);
     }
@@ -90,7 +90,14 @@ public class SynchronizeController extends BaseController {
     public String singleEventType(@RequestParam(value = "eventTypeId", required = true) Long eventTypeId){
         logger.info("同步事件目录");
         String roleName="admin";   //  操作角色
-        Map<String, Object> map = synContactEvtTypeService.synchronizeSingleEventType(eventTypeId,roleName);
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synContactEvtTypeService.synchronizeSingleEventType(eventTypeId,roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("[op:SynContactEvtTypeServiceImpl] 通过主键同步单个事件目录失败！Exception: ",eventTypeId,e);
+        }
         return JSON.toJSONString(map);
     }
 
@@ -105,7 +112,14 @@ public class SynchronizeController extends BaseController {
         //角色权限控制
         logger.info("批量同步事件目录");
         String roleName="admin";   //  操作角色
-        Map<String, Object> map = synContactEvtTypeService.synchronizeBatchEventType(roleName);
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map =synContactEvtTypeService.synchronizeBatchEventType(roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("[op:SynContactEvtTypeServiceImpl] 批量同步事件目录失败！Exception: ", e);
+        }
         return  JSON.toJSONString(map);
     }
 
@@ -121,7 +135,14 @@ public class SynchronizeController extends BaseController {
         logger.info("同步事件源");
         String roleName="admin";   //  操作角色
         //得到事件对象
-        Map<String, Object> map = synEventSorceService.synchronizeSingleEventSorce(eventSourceId,roleName);
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map =synEventSorceService.synchronizeSingleEventSorce(eventSourceId,roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("[op:SynEventSorceServiceImpl] 通过主键同步单个事件源失败！Exception: ",eventSourceId,e);
+        }
         return JSON.toJSONString(map);
 
     }
@@ -137,7 +158,14 @@ public class SynchronizeController extends BaseController {
         //角色权限控制
         logger.info("批量同步事件源");
         String roleName="admin";   //  操作角色
-        Map<String, Object> map = synEventSorceService.synchronizeBatchEventSorce(roleName);
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synEventSorceService.synchronizeBatchEventSorce(roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("[op:SynEventSorceServiceImpl] 批量同步事件源失败！Exception: ", e);
+        }
         return  JSON.toJSONString(map);
     }
 
@@ -152,7 +180,14 @@ public class SynchronizeController extends BaseController {
     public String singleEventInterface(@RequestParam(value = "eventInterfaceId", required = true) Long eventInterfaceId){
         logger.info("同步事件源接口");
         String roleName="admin";   //  操作角色
-        Map<String, Object> map = synInterfaceCfgService.synchronizeSingleEventInterface(eventInterfaceId,roleName);
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synInterfaceCfgService.synchronizeSingleEventInterface(eventInterfaceId,roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("[op:SynInterfaceCfgServiceImpl] 通过主键同步单个事件源接口失败！Exception: ",eventInterfaceId,e);
+        }
         return JSON.toJSONString(map);
     }
 
@@ -168,7 +203,14 @@ public class SynchronizeController extends BaseController {
         //角色权限控制
         logger.info("批量同步事件源接口");
         String roleName="admin";   //  操作角色
-        Map<String, Object> map = synInterfaceCfgService.synchronizeBatchEventInterface(roleName);
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synInterfaceCfgService.synchronizeBatchEventInterface(roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("[op:SynContactEvtServiceImpl] 批量同步事件源接口失败！Exception: ", e);
+        }
         return  JSON.toJSONString(map);
     }
 

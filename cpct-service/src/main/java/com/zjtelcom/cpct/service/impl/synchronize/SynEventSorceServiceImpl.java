@@ -50,7 +50,6 @@ public class SynEventSorceServiceImpl extends BaseService implements SynEventSor
     @Override
     public Map<String, Object> synchronizeSingleEventSorce(Long eventId, String roleName) {
         Map<String,Object> maps = new HashMap<>();
-        try {
         EventSorceDO eventSorceDO = eventSorceMapper.selectByPrimaryKey(eventId);
         if(eventSorceDO==null){
             throw new SystemException("对应事件源不存在");
@@ -66,11 +65,7 @@ public class SynEventSorceServiceImpl extends BaseService implements SynEventSor
 
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
-    } catch (Exception e) {
-        maps.put("resultCode", CommonConstant.CODE_FAIL);
-        maps.put("resultMsg", e.getMessage());
-        logger.error("[op:SynEventSorceServiceImpl] 通过主键同步单个事件源 "+tableName+"失败！Exception: ", eventId, e);
-    }
+
         return maps;
     }
 
@@ -83,7 +78,6 @@ public class SynEventSorceServiceImpl extends BaseService implements SynEventSor
     @Override
     public Map<String, Object> synchronizeBatchEventSorce(String roleName) {
         Map<String,Object> maps = new HashMap<>();
-        try {
         //查看准生产环境所有事件源
         List<EventSorceDO> prdList = eventSorceMapper.selectAll();
         //查看生产环境所有事件源
@@ -135,11 +129,7 @@ public class SynEventSorceServiceImpl extends BaseService implements SynEventSor
 
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
-    } catch (Exception e) {
-        maps.put("resultCode", CommonConstant.CODE_FAIL);
-        maps.put("resultMsg", e.getMessage());
-        logger.error("[op:SynEventSorceServiceImpl] 批量同步数据源 "+tableName+"失败！Exception: ", e);
-        }
+
         return maps;
     }
 }
