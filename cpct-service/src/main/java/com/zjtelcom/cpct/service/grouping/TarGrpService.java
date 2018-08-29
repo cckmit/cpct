@@ -39,4 +39,6 @@ public interface TarGrpService {
 
     Map<String,Object> delTarGrp(TarGrpDetail tarGrpDetail);
 
+    Map<String,Object> copyTarGrp(Long tarGrpId);
+
 }

@@ -183,24 +183,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         return result;
     }
 
-    //弃用
-    private JSONObject searchInfoFromEs(List<TrialOperationParam> operationVOList, String[] fieldList)throws Exception {
-        HttpClient httpClient = HttpClients.createDefault();
-
-        String url = "https://localhost/es/searchBatchInfo";
-
-        Map<String, String> paramHeader = new HashMap<>();
-        paramHeader.put("Accept", "application/xml");
-        Map<String, String> paramBody = new HashMap<>();
-        paramBody.put("operationVOList", operationVOList.toString());
-        paramBody.put("fieldList", fieldList.toString());
-        String result = HTTPSClientUtil.doPost(httpClient, url, paramHeader, paramBody);
-        //String result = HTTPSClientUtil.doGet(httpsClient, url, null, null);
-        System.out.println(result);
-        JSONObject jsonObject = JSONObject.parseObject(result);
-        return jsonObject;
-    }
-
 
     /**
      * 刷新列表
