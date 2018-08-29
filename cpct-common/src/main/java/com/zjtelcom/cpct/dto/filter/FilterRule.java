@@ -19,6 +19,38 @@ public class FilterRule extends BaseEntity implements Serializable{
     private String channelContacts;//渠道执行次数
     private Date effectiveDate;//生效时间
     private Date failureDate;//失效时间
+    private String labelCode;
+    private String chooseProduct;
+    private String expression;
+
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public String getLabelCode() {
+        return labelCode;
+    }
+
+    public void setLabelCode(String labelCode) {
+        this.labelCode = labelCode;
+    }
+
+    public String getChooseProduct() {
+        return chooseProduct;
+    }
+
+    public void setChooseProduct(String chooseProduct) {
+        this.chooseProduct = chooseProduct;
+    }
+
+    public String getExpression() {
+        return expression;
+    }
+
+    public void setExpression(String expression) {
+        this.expression = expression;
+    }
 
     public Long getRuleId() {
         return ruleId;

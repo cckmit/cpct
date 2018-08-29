@@ -11,7 +11,7 @@ public class QuestionDetail {
 
     private String qstDetailValue;//题库明细答案
 
-    private String qstDetailInputType;//题库明细输入类型
+    private String qstDetailInputType;//题库明细输入类型 :1000	输入	;2000 选择
 
     private String statusCd;
 

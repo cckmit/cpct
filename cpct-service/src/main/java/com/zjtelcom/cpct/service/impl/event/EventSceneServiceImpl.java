@@ -4,11 +4,14 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.event.EventSceneMapper;
 import com.zjtelcom.cpct.dao.event.EventSceneTypeMapper;
 import com.zjtelcom.cpct.dao.event.EvtSceneCamRelMapper;
+import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.event.EventSceneDO;
 import com.zjtelcom.cpct.domain.event.EventSceneTypeDO;
+import com.zjtelcom.cpct.dto.campaign.MktCampaign;
 import com.zjtelcom.cpct.dto.event.*;
 import com.zjtelcom.cpct.request.event.*;
 import com.zjtelcom.cpct.response.event.QryeventSceneRsp;
@@ -43,6 +46,8 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
     private EvtSceneCamRelMapper evtSceneCamRelMapper;
     @Autowired
     private EventSceneTypeMapper eventSceneTypeMapper;
+    @Autowired
+    private MktCampaignMapper campaignMapper;
 
 
     /**
@@ -167,9 +172,16 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
         }
         //将活动相关信息插入返回实体类
         List<EvtSceneCamRel> evtSceneCamRels = evtSceneCamRelMapper.selectCamsByEvtSceneId(eventScene.getEventSceneId());
-        eventSceneDetail.setEvtSceneCamRels(evtSceneCamRels);
-
-
+        List<EvtSceneCamRelDetail> detailList = new ArrayList<>();
+        for (EvtSceneCamRel rel : evtSceneCamRels){
+            EvtSceneCamRelDetail detail = BeanUtil.create(rel,new EvtSceneCamRelDetail());
+            MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(detail.getMktCampaignId());
+            if (campaign!=null){
+                detail.setCampaignName(campaign.getMktCampaignName());
+            }
+            detailList.add(detail);
+        }
+        eventSceneDetail.setDetailList(detailList);
         viewEventSceneRsp.setEventSceneDetail(eventSceneDetail);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
@@ -223,6 +235,7 @@ public class EventSceneServiceImpl extends BaseService implements EventSceneServ
                         evtSceneCamRelMapper.updateByPrimaryKey(evtSceneCamRelT);
                     } else {
                         EvtSceneCamRel evtScRel = BeanUtil.create(editVO,new EvtSceneCamRel());
+                        evtScRel.setEventSceneId(eventSceneDetailT.getEventSceneId());
                         evtScRel.setUpdateDate(DateUtil.getCurrentTime());
                         evtScRel.setStatusDate(DateUtil.getCurrentTime());
                         evtScRel.setUpdateStaff(UserUtil.loginId());
