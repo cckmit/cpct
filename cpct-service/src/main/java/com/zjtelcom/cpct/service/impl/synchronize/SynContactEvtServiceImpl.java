@@ -47,7 +47,6 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
      * @param roleName   操作人身份
      * @return
      */
-    @Transactional(value="prodTransactionManager")
     @Override
     public Map<String, Object> synchronizeSingleEvent(Long eventId, String roleName) {
         Map<String,Object> maps = new HashMap<>();
@@ -76,7 +75,6 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
      * @param roleName
      * @return
      */
-    @Transactional(value="prodTransactionManager")
     @Override
     public Map<String, Object> synchronizeBatchEvent(String roleName) {
         Map<String,Object> maps = new HashMap<>();

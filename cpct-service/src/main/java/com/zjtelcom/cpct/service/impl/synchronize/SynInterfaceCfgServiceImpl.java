@@ -45,7 +45,6 @@ public class SynInterfaceCfgServiceImpl extends BaseService implements SynInterf
      * @param roleName
      * @return
      */
-    @Transactional(value="prodTransactionManager")
     @Override
     public Map<String, Object> synchronizeSingleEventInterface(Long eventId, String roleName) {
         Map<String,Object> maps = new HashMap<>();
@@ -75,7 +74,6 @@ public class SynInterfaceCfgServiceImpl extends BaseService implements SynInterf
      * @param roleName
      * @return
      */
-    @Transactional(value="prodTransactionManager")
     @Override
     public Map<String, Object> synchronizeBatchEventInterface(String roleName) {
         Map<String,Object> maps = new HashMap<>();

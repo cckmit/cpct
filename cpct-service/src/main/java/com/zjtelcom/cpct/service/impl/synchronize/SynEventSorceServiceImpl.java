@@ -46,7 +46,6 @@ public class SynEventSorceServiceImpl extends BaseService implements SynEventSor
      * @param roleName
      * @return
      */
-    @Transactional(value="prodTransactionManager")
     @Override
     public Map<String, Object> synchronizeSingleEventSorce(Long eventId, String roleName) {
         Map<String,Object> maps = new HashMap<>();
@@ -74,7 +73,6 @@ public class SynEventSorceServiceImpl extends BaseService implements SynEventSor
      * @param roleName
      * @return
      */
-    @Transactional(value="prodTransactionManager")
     @Override
     public Map<String, Object> synchronizeBatchEventSorce(String roleName) {
         Map<String,Object> maps = new HashMap<>();
