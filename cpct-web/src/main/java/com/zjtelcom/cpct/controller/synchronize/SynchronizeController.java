@@ -45,7 +45,8 @@ public class SynchronizeController extends BaseController {
     @CrossOrigin
     public String singleEvent(@RequestParam(value = "eventId", required = true) Long eventId){
         logger.info("同步事件");
-        String roleName="admin";   //  操作角色
+        //   权限控制
+        String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
        try{
         map = synContactEvtService.synchronizeSingleEvent(eventId,roleName);
@@ -67,7 +68,7 @@ public class SynchronizeController extends BaseController {
     public String batchEvent(){
         //角色权限控制
         logger.info("批量事件同步");
-        String roleName="admin";   //  操作角色
+        String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
             map = synContactEvtService.synchronizeBatchEvent(roleName);
@@ -89,7 +90,7 @@ public class SynchronizeController extends BaseController {
     @CrossOrigin
     public String singleEventType(@RequestParam(value = "eventTypeId", required = true) Long eventTypeId){
         logger.info("同步事件目录");
-        String roleName="admin";   //  操作角色
+        String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
             map = synContactEvtTypeService.synchronizeSingleEventType(eventTypeId,roleName);
@@ -111,7 +112,7 @@ public class SynchronizeController extends BaseController {
     public String batchEventType(){
         //角色权限控制
         logger.info("批量同步事件目录");
-        String roleName="admin";   //  操作角色
+        String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
             map =synContactEvtTypeService.synchronizeBatchEventType(roleName);
@@ -133,7 +134,7 @@ public class SynchronizeController extends BaseController {
     @CrossOrigin
     public String singleEventSource(@RequestParam(value = "eventSourceId", required = true) Long eventSourceId){
         logger.info("同步事件源");
-        String roleName="admin";   //  操作角色
+        String roleName=getRole();   //  操作角色
         //得到事件对象
         Map<String, Object> map=new HashMap<>();
         try{
@@ -157,7 +158,7 @@ public class SynchronizeController extends BaseController {
     public String batchEventSource(){
         //角色权限控制
         logger.info("批量同步事件源");
-        String roleName="admin";   //  操作角色
+        String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
             map = synEventSorceService.synchronizeBatchEventSorce(roleName);
@@ -179,7 +180,7 @@ public class SynchronizeController extends BaseController {
     @CrossOrigin
     public String singleEventInterface(@RequestParam(value = "eventInterfaceId", required = true) Long eventInterfaceId){
         logger.info("同步事件源接口");
-        String roleName="admin";   //  操作角色
+        String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
             map = synInterfaceCfgService.synchronizeSingleEventInterface(eventInterfaceId,roleName);
@@ -202,7 +203,7 @@ public class SynchronizeController extends BaseController {
     public String batchEventInterface(){
         //角色权限控制
         logger.info("批量同步事件源接口");
-        String roleName="admin";   //  操作角色
+        String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
             map = synInterfaceCfgService.synchronizeBatchEventInterface(roleName);
@@ -215,7 +216,15 @@ public class SynchronizeController extends BaseController {
     }
 
 
+    /**
+     * 权限控制 获取角色身份
+     * @return
+     */
+    public String getRole(){
+        String role="admin";
 
+        return role;
+    }
 
 
 

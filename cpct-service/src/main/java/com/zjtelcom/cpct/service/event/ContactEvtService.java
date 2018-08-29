@@ -37,4 +37,3 @@ public interface ContactEvtService {
     Map<String,Object> evtDetails(ContactEvt contactEvt);
 
 }
-

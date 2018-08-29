@@ -365,7 +365,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         contactEventDetail.setFilterRules(filterRuleList);
         if (contactEvt.getMktCampaignType()!=null){
             String paramKey = ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey();
-            SysParams systemParam = sysParamsMapper.findParamsByValue(paramKey,contactEvt.getMktCampaignType());
+           SysParams systemParam = sysParamsMapper.findParamsByValue(paramKey,contactEvt.getMktCampaignType());
             if (systemParam!=null){
                 contactEventDetail.setMktCampaignTypeName(systemParam.getParamName());
             }
