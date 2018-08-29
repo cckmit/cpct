@@ -99,11 +99,15 @@ public class MessageLabelController extends BaseController {
     /**
      * 查询出所有信息列表
      */
-    @GetMapping("queryMessages")
+    @PostMapping("queryMessages")
     @CrossOrigin
-    public String queryMessages() {
+    public String queryMessages(@RequestBody HashMap<String,String> param) {
         Map<String, Object> map = new HashMap<>();
-        map = messageLabelService.queryMessages();
+        String columnType = null;
+        if (param.get("displayColumnType")!=null){
+            columnType =  param.get("displayColumnType");
+        }
+        map = messageLabelService.queryMessages(columnType);
         return JSON.toJSONString(map);
     }
 

@@ -1,14 +1,12 @@
 package com.zjtelcom.cpct.dto.channel;
 
+import com.zjtelcom.cpct.domain.channel.Message;
+import com.zjtelcom.cpct.domain.channel.MessageLabel;
+
+import java.io.Serializable;
 import java.util.List;
 
-/**
- * 信息展示实体类
- *
- * @author penyu
- */
-public class MessageVO {
-
+public class MessageLabelInfo  implements Serializable {
     /**
      * 信息表ID
      */
@@ -20,7 +18,11 @@ public class MessageVO {
     private String messageName;
 
     /**
-     * 标签信息集合
+     * 信息编码
+     */
+    private String messageCode;
+    /**
+     * 标签信息
      */
     private List<LabelDTO> labelDTOList;
 
@@ -37,14 +39,6 @@ public class MessageVO {
         this.checked = checked;
     }
 
-    public List<LabelDTO> getLabelDTOList() {
-        return labelDTOList;
-    }
-
-    public void setLabelDTOList(List<LabelDTO> labelDTOList) {
-        this.labelDTOList = labelDTOList;
-    }
-
     public Long getMessageId() {
         return messageId;
     }
@@ -59,5 +53,21 @@ public class MessageVO {
 
     public void setMessageName(String messageName) {
         this.messageName = messageName;
+    }
+
+    public String getMessageCode() {
+        return messageCode;
+    }
+
+    public void setMessageCode(String messageCode) {
+        this.messageCode = messageCode;
+    }
+
+    public List<LabelDTO> getLabelDTOList() {
+        return labelDTOList;
+    }
+
+    public void setLabelDTOList(List<LabelDTO> labelDTOList) {
+        this.labelDTOList = labelDTOList;
     }
 }

@@ -5,26 +5,27 @@ import com.google.gson.JsonObject;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 import com.zjtelcom.cpct.dto.grouping.*;
 import com.zjtelcom.cpct.dto.strategy.MktStrategy;
+import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRuleRel;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
-import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.DateUtil;
-import com.zjtelcom.cpct.util.HTTPSClientUtil;
-import com.zjtelcom.cpct.util.RedisUtils;
+import com.zjtelcom.cpct.util.*;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.*;
@@ -37,7 +38,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Autowired
     private MktCampaignMapper campaignMapper;
     @Autowired
-    private MktStrategyMapper strategyMapper;
+    private MktStrategyConfMapper strategyMapper;
     @Autowired
     private RestTemplate restTemplate;
     @Autowired
@@ -94,9 +95,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     public Map<String, Object> createTrialOperation( TrialOperationVO operationVO) {
         Map<String, Object> result = new HashMap<>();
         //生成批次号
-        String batchNumSt = DateUtil.date2String(new Date())+System.currentTimeMillis();
+        String batchNumSt = DateUtil.date2String(new Date())+ChannelUtil.getRandomStr(2);
         MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(operationVO.getCampaignId());
-        MktStrategy strategy = strategyMapper.selectByPrimaryKey(operationVO.getStrategyId());
+        MktStrategyConfDO strategy = strategyMapper.selectByPrimaryKey(operationVO.getStrategyId());
         if (campaign==null || strategy==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","活动策略信息有误");
@@ -104,7 +105,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         }
         TrialOperation trialOp = BeanUtil.create(operationVO,new TrialOperation());
         trialOp.setCampaignName(campaign.getMktCampaignName());
-        trialOp.setStrategyName(strategy.getStrategyName());
+        trialOp.setStrategyName(strategy.getMktStrategyConfName());
         trialOp.setBatchNum(Long.valueOf(batchNumSt));
         trialOp.setCreateDate(new Date());
         trialOp.setStatusCd("1000");
@@ -135,7 +136,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         Map<String, Object> result = new HashMap<>();
         TrialOperation trialOperation = trialOperationMapper.selectByPrimaryKey(operationVO.getTrialId());
         MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(operationVO.getCampaignId());
-        MktStrategy strategy = strategyMapper.selectByPrimaryKey(operationVO.getStrategyId());
+        MktStrategyConfDO strategy = strategyMapper.selectByPrimaryKey(operationVO.getStrategyId());
         if (campaign==null || strategy==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","活动策略信息有误");
@@ -154,14 +155,22 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             param.setBatchNum(trialOperation.getBatchNum());
             //redis取规则
             String rule = redisUtils.get("EVENT_RULE_"+operationVO.getCampaignId()+"_"+operationVO.getStrategyId()+"_"+ruleRelDO.getMktStrategyConfRuleId()).toString();
+            System.out.println("*************************"+rule);
             param.setRule(rule);
             paramList.add(param);
         }
         request.setOperationVOList(paramList);
-        HashMap<String,Object> response = new HashMap<>();
+        TrialResponse response = new TrialResponse();
 
         try {
-            restTemplate.postForObject(SEARCH_INFO_FROM_ES_URL, request,null);
+            response = restTemplate.postForObject(SEARCH_INFO_FROM_ES_URL, request,TrialResponse.class);
+            if (!response.getResultCode().equals(CODE_SUCCESS)){
+                trialOperation.setStatusCd("2000");
+                trialOperationMapper.updateByPrimaryKey(trialOperation);
+            }else {
+                trialOperation.setStatusCd("3000");
+                trialOperationMapper.updateByPrimaryKey(trialOperation);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             // 抽样试算失败
@@ -169,8 +178,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             trialOperationMapper.updateByPrimaryKey(trialOperation);
         }
         // 抽样试算成功
-        trialOperation.setStatusCd("3000");
-        trialOperationMapper.updateByPrimaryKey(trialOperation);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",null);
         return result;
@@ -204,8 +211,17 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     public Map<String, Object> getTrialListByStrategyId(Long strategyId){
         Map<String,Object> result = new HashMap<>();
         List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyId(strategyId);
+        List<TrialOperationDetail> operationDetailList = new ArrayList<>();
+        for (TrialOperation trialOperation : trialOperations){
+            TrialOperationDetail detail = BeanUtil.create(trialOperation,new TrialOperationDetail());
+            if (trialOperation.getUpdateDate()!=null){
+                Double cost = (double)((trialOperation.getUpdateDate().getTime()-trialOperation.getCreateDate().getTime())/1000);
+                detail.setCost(cost+"s");  
+            }
+            operationDetailList.add(detail);
+        }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",trialOperations);
+        result.put("resultMsg",operationDetailList);
         return result;
     }
 
