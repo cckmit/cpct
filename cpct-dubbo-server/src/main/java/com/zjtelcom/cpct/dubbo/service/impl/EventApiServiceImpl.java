@@ -75,9 +75,6 @@ public class EventApiServiceImpl implements EventApiService {
     private FilterRuleMapper filterRuleMapper; //过滤规则
 
     @Autowired(required = false)
-    private FilterRuleConfMapper filterRuleConfMapper; //过滤规则与策略规则关联表
-
-    @Autowired(required = false)
     private PpmProductMapper ppmProductMapper; //销售品
 
     @Autowired(required = false)
@@ -840,15 +837,13 @@ public class EventApiServiceImpl implements EventApiService {
                     Long tarGrpId = mktStrategyConfRuleDO.getTarGrpId();
                     //获取销售品
                     String productStr = mktStrategyConfRuleDO.getProductId();
-                    //过滤规则id
-                    Long ruleConfId = mktStrategyConfRuleDO.getRuleConfId();
                     //协同渠道配置id
                     String evtContactConfIdStr = mktStrategyConfRuleDO.getEvtContactConfId();
 
                     Long mktStrategyConfRuleId = mktStrategyConfRuleDO.getMktStrategyConfRuleId();
                     //提交线程
                     Future<Map<String, Object>> f = executorService.submit(
-                            new RuleTask(strategyConfId, ISI, tarGrpId, productStr, ruleConfId, evtContactConfIdStr, eventId, activityId,mktStrategyConfRuleId));
+                            new RuleTask(strategyConfId, ISI, tarGrpId, productStr, evtContactConfIdStr, eventId, activityId,mktStrategyConfRuleId));
                     //将线程处理结果添加到结果集
                     threadList.add(f);
                 }
@@ -891,7 +886,6 @@ public class EventApiServiceImpl implements EventApiService {
         private Long strategyConfId; //策略配置id
         private Long tarGrpId;
         private String productStr;
-        private Long ruleConfId;
         private String evtContactConfIdStr;
         private String ISI;
         private String eventId;
@@ -899,12 +893,11 @@ public class EventApiServiceImpl implements EventApiService {
         private Long mktStrategyConfRuleId;
 
         public RuleTask(Long strategyConfId, String ISI, Long tarGrpId
-                , String productStr, Long ruleConfId, String evtContactConfIdStr, String eventId, String activityId,Long mktStrategyConfRuleId) {
+                , String productStr, String evtContactConfIdStr, String eventId, String activityId,Long mktStrategyConfRuleId) {
             this.strategyConfId = strategyConfId;
             this.tarGrpId = tarGrpId;
             this.ISI = ISI;
             this.productStr = productStr;
-            this.ruleConfId = ruleConfId;
             this.evtContactConfIdStr = evtContactConfIdStr;
             this.activityId = activityId;
             this.eventId = eventId;
@@ -997,7 +990,6 @@ public class EventApiServiceImpl implements EventApiService {
                 jsonObject.put("ISI", ISI);
                 jsonObject.put("eventId", eventId);
                 jsonObject.put("activityId", activityId);
-                jsonObject.put("ruleConfId", ruleConfId);
                 jsonObject.put("strategyConfId", strategyConfId);
                 jsonObject.put("target", body);
                 esService.save(jsonObject, IndexList.Label_MODULE);
@@ -1079,7 +1071,6 @@ public class EventApiServiceImpl implements EventApiService {
                     jsonObject.put("ISI", ISI);
                     jsonObject.put("eventId", eventId);
                     jsonObject.put("activityId", activityId);
-                    jsonObject.put("ruleConfId", ruleConfId);
                     jsonObject.put("strategyConfId", strategyConfId);
                     jsonObject.put("productStr", productStr);
                     jsonObject.put("evtContactConfIdStr", evtContactConfIdStr);
@@ -1163,8 +1154,6 @@ public class EventApiServiceImpl implements EventApiService {
                 jsonObject.put("ISI", ISI);
                 jsonObject.put("eventId", eventId);
                 jsonObject.put("activityId", activityId);
-                jsonObject.put("ruleConfId", ruleConfId);
-                jsonObject.put("strategyConfId", strategyConfId);
                 jsonObject.put("productStr", productStr);
                 jsonObject.put("evtContactConfIdStr", evtContactConfIdStr);
                 jsonObject.put("tarGrpId", tarGrpId);

@@ -16,7 +16,6 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.SysArea;
-import com.zjtelcom.cpct.domain.User;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
@@ -30,18 +29,16 @@ import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
-import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct_prd.dao.MktCampaignPrdMapper;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-
-import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 
 /**
  * Description:
@@ -67,6 +64,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
     @Autowired
     private ContactEvtMapper contactEvtMapper;
+
     @Autowired
     private MktCamEvtRelMapper camEvtRelMapper;
 
@@ -87,6 +85,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      */
     @Autowired
     private MktStrategyConfService mktStrategyConfService;
+
+    @Autowired
+    private MktCampaignPrdMapper mktCampaignPrdMapper;
 
     /**
      * 下发城市与活动关联
@@ -111,6 +112,30 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     public Map<String, Object> createMktCampaign(MktCampaignVO mktCampaignVO) throws Exception {
         MktCampaignDO mktCampaignDO = new MktCampaignDO();
         CopyPropertiesUtil.copyBean2Bean(mktCampaignDO, mktCampaignVO);
+        String calcDisplay = "";
+        String isaleDisplay = "";
+        if (mktCampaignVO.getCalcDisplay() != null) {
+            for (int i = 0; i < mktCampaignVO.getCalcDisplay().size(); i++) {
+                if (i == 0) {
+                    calcDisplay += mktCampaignVO.getCalcDisplay().get(i);
+                } else {
+                    calcDisplay = "/" + mktCampaignVO.getCalcDisplay().get(i);
+                }
+            }
+            mktCampaignDO.setCalcDisplay(calcDisplay);
+        }
+
+        if (mktCampaignVO.getIsaleDisplay() != null) {
+            for (int i = 0; i < mktCampaignVO.getIsaleDisplay().size(); i++) {
+                if (i == 0) {
+                    isaleDisplay += mktCampaignVO.getIsaleDisplay().get(i);
+                } else {
+                    isaleDisplay = "/" + mktCampaignVO.getIsaleDisplay().get(i);
+                }
+            }
+            mktCampaignDO.setIsaleDisplay(isaleDisplay);
+        }
+
         // 创建活动基本信息
         mktCampaignDO.setCreateDate(new Date());
         mktCampaignDO.setCreateStaff(UserUtil.loginId());
@@ -179,6 +204,30 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         MktCampaignDO mktCampaignDO = new MktCampaignDO();
         CopyPropertiesUtil.copyBean2Bean(mktCampaignDO, mktCampaignVO);
         // 更新活动基本信息
+        String calcDisplay = "";
+        String isaleDisplay = "";
+        if (mktCampaignVO.getCalcDisplay() != null) {
+            for (int i = 0; i < mktCampaignVO.getCalcDisplay().size(); i++) {
+                if (i == 0) {
+                    calcDisplay += mktCampaignVO.getCalcDisplay().get(i);
+                } else {
+                    calcDisplay = "/" + mktCampaignVO.getCalcDisplay().get(i);
+                }
+            }
+            mktCampaignDO.setCalcDisplay(calcDisplay);
+        }
+
+        if (mktCampaignVO.getIsaleDisplay() != null) {
+            for (int i = 0; i < mktCampaignVO.getIsaleDisplay().size(); i++) {
+                if (i == 0) {
+                    isaleDisplay += mktCampaignVO.getIsaleDisplay().get(i);
+                } else {
+                    isaleDisplay = "/" + mktCampaignVO.getIsaleDisplay().get(i);
+                }
+            }
+            mktCampaignDO.setIsaleDisplay(isaleDisplay);
+        }
+
         mktCampaignDO.setUpdateStaff(UserUtil.loginId());
         mktCampaignDO.setUpdateDate(new Date());
         mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
@@ -235,8 +284,33 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         }*/
         // 获取活动基本信息
         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
+
+
+        // 获取试运算展示列 和 isale展示列
+        List<Long> calcDisplayList = new ArrayList<>();
+        List<Long> isaleDisplayList = new ArrayList<>();
+        String calcDisplayString = mktCampaignDO.getCalcDisplay();
+        String isaleDisplayString = mktCampaignDO.getIsaleDisplay();
+        if (calcDisplayString!=null && !"".equals(calcDisplayString)){
+
+            String[] calcDisplays = calcDisplayString.split("/");
+            for (String calcDisplay:calcDisplays) {
+                calcDisplayList.add(Long.valueOf(calcDisplay));
+            }
+        }
+        if (isaleDisplayString!=null && !"".equals(isaleDisplayString)){
+            String[] isaleDisplays = isaleDisplayString.split("/");
+            for (String isaleDisplay:isaleDisplays) {
+                isaleDisplayList.add(Long.valueOf(isaleDisplay));
+            }
+        }
+
+
+
         MktCampaignVO mktCampaignVO = new MktCampaignVO();
         CopyPropertiesUtil.copyBean2Bean(mktCampaignVO, mktCampaignDO);
+        mktCampaignVO.setCalcDisplay(calcDisplayList);
+        mktCampaignVO.setIsaleDisplay(isaleDisplayList);
         List<MktCamCityRelDO> mktCamCityRelDOList = mktCamCityRelMapper.selectByMktCampaignId(mktCampaignVO.getMktCampaignId());
         for (MktCamCityRelDO mktCamCityRelDO : mktCamCityRelDOList) {
             SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCamCityRelDO.getCityId().intValue());
@@ -326,6 +400,11 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         // 删除活动基本信息
         mktCampaignMapper.deleteByPrimaryKey(mktCampaignId);
 
+        mktCampaignPrdMapper.deleteByPrimaryKey(mktCampaignId);
+
+ //       System.out.println(1/0);
+
+
 
         Map<String, Object> maps = new HashMap<>();
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -341,7 +420,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         MktCampaignPar.setMktCampaignName(mktCampaignName);
         List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListPage(MktCampaignPar);
         List<CampaignVO> voList = new ArrayList<>();
-        for (MktCampaignDO campaignDO : mktCampaignDOList){
+        for (MktCampaignDO campaignDO : mktCampaignDOList) {
             CampaignVO vo = ChannelUtil.map2CampaignVO(campaignDO);
             voList.add(vo);
         }
@@ -351,7 +430,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     }
 
     @Override
-    public Map<String, Object> getCampaignList(String mktCampaignName,String mktCampaignType,Long eventId) {
+    public Map<String, Object> getCampaignList(String mktCampaignName, String mktCampaignType, Long eventId) {
         Map<String, Object> maps = new HashMap<>();
         MktCampaignDO MktCampaignPar = new MktCampaignDO();
         MktCampaignPar.setMktCampaignName(mktCampaignName);
@@ -362,16 +441,16 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 //        }
         MktCampaignPar.setMktCampaignType(mktCampaignType);
         List<Long> relationCamList = new ArrayList<>();
-        if (eventId!=null){
+        if (eventId != null) {
             List<MktCamEvtRel> camEvtRelList = camEvtRelMapper.qryBycontactEvtId(eventId);
-            for (MktCamEvtRel rel : camEvtRelList){
+            for (MktCamEvtRel rel : camEvtRelList) {
                 relationCamList.add(rel.getMktCampaignId());
             }
         }
         List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListPage(MktCampaignPar);
         List<CampaignVO> voList = new ArrayList<>();
-        for (MktCampaignDO campaignDO : mktCampaignDOList){
-            if (relationCamList.contains(campaignDO.getMktCampaignId())){
+        for (MktCampaignDO campaignDO : mktCampaignDOList) {
+            if (relationCamList.contains(campaignDO.getMktCampaignId())) {
                 continue;
             }
             CampaignVO vo = ChannelUtil.map2CampaignVO(campaignDO);

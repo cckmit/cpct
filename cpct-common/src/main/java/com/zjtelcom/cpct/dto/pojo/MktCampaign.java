@@ -36,6 +36,10 @@ public class MktCampaign {
 
     private String mktCampaignDesc;
 
+    private Long calcDisplay;
+
+    private Long isaleDisplay;
+
     private String execType;
 
     private String execInvl;
@@ -308,6 +312,22 @@ public class MktCampaign {
         this.mktCampaignStrategyDetails = mktCampaignStrategyDetails;
     }
 
+    public Long getCalcDisplay() {
+        return calcDisplay;
+    }
+
+    public void setCalcDisplay(Long calcDisplay) {
+        this.calcDisplay = calcDisplay;
+    }
+
+    public Long getIsaleDisplay() {
+        return isaleDisplay;
+    }
+
+    public void setIsaleDisplay(Long isaleDisplay) {
+        this.isaleDisplay = isaleDisplay;
+    }
+
     public List<EventScene> getEventScenes() {
         return eventScenes;
     }
@@ -332,7 +352,7 @@ public class MktCampaign {
                        String mktCampaignName, Date planBeginTime, Date planEndTime,
                        Date beginTime, Date endTime, String mktCampaignType,
                        String mktActivityNbr, String mktActivityTarget,
-                       String mktCampaignDesc, String execType, String execInvl,
+                       String mktCampaignDesc, Long calcDisplay, Long isaleDisplay, String execType, String execInvl,
                        Integer execNum, String statusCd, Date statusDate,
                        Long createStaff, Date createDate, Long updateStaff,
                        Date updateDate, String remark, Long lanId, Long strategyId,
@@ -354,6 +374,8 @@ public class MktCampaign {
 		this.mktActivityNbr = mktActivityNbr;
 		this.mktActivityTarget = mktActivityTarget;
 		this.mktCampaignDesc = mktCampaignDesc;
+		this.calcDisplay = calcDisplay;
+		this.isaleDisplay = isaleDisplay;
 		this.execType = execType;
 		this.execInvl = execInvl;
 		this.execNum = execNum;

@@ -4,9 +4,20 @@ import java.io.Serializable;
 import java.util.List;
 
 public class TrialOperationVO implements Serializable {
+    /**
+     * 试运算标识
+     */
     private Long trialId;
+    /**
+     * 活动标识
+     */
     private Long campaignId;
+    /**
+     * 策略标识
+     */
     private Long strategyId;
+
+
     private List<TrialOperationParam> paramList;
 
 
