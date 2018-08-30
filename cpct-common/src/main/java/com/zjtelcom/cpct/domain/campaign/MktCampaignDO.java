@@ -160,4 +160,20 @@ public class MktCampaignDO extends BaseEntity{
     public void setMktCampaignCategory(String mktCampaignCategory) {
         this.mktCampaignCategory = mktCampaignCategory;
     }
+
+    public String getCalcDisplay() {
+        return calcDisplay;
+    }
+
+    public void setCalcDisplay(String calcDisplay) {
+        this.calcDisplay = calcDisplay;
+    }
+
+    public String getIsaleDisplay() {
+        return isaleDisplay;
+    }
+
+    public void setIsaleDisplay(String isaleDisplay) {
+        this.isaleDisplay = isaleDisplay;
+    }
 }

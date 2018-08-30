@@ -11,6 +11,7 @@ import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
 import com.zjtelcom.cpct.dao.user.UserListMapper;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
@@ -76,9 +77,6 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
     private FilterRuleMapper filterRuleMapper; //过滤规则
 
     @Autowired
-    private FilterRuleConfMapper filterRuleConfMapper; //过滤规则与策略规则关联表
-
-    @Autowired
     private PpmProductMapper ppmProductMapper; //销售品
 
     @Autowired
@@ -98,6 +96,9 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
 
     @Autowired
     private InjectionLabelMapper injectionLabelMapper; //标签因子
+
+    @Autowired
+    private MktStrategyFilterRuleRelMapper mktStrategyFilterRuleRelMapper;
 
 
     /**
@@ -251,14 +252,27 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
                             Long tarGrpId = mktStrategyConfRuleDO.getTarGrpId();
                             //获取销售品
                             String productStr = mktStrategyConfRuleDO.getProductId();
-                            //过滤规则id
-                            Long ruleConfId = mktStrategyConfRuleDO.getRuleConfId();
                             //协同渠道配置id
                             String evtContactConfIdStr = mktStrategyConfRuleDO.getEvtContactConfId();
 
                             //  1.判断活动的过滤规则---------------------------
                             //获取过滤规则
-                            FilterRuleConfDO filterRuleConfDO = filterRuleConfMapper.selectByPrimaryKey(ruleConfId);
+                            boolean ruleFilter = true;
+                            List<Long> filterRuleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(mktCamStrategyConfRelDO.getStrategyConfId());
+                            for (Long FilterRuleId : filterRuleIdList) {
+                                FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(FilterRuleId);
+                                //匹配事件过滤规则
+                                int flag = 0;
+                                flag = userListMapper.checkRule("", filterRule.getRuleId(), null);
+                                if (flag > 0) {
+                                    ruleFilter = false;
+                                }
+                            }
+                            //若存在不符合的规则 结束当前规则循环
+                            if (!ruleFilter) {
+                                return null;
+                            }
+/*                            FilterRuleConfDO filterRuleConfDO = filterRuleConfMapper.selectByPrimaryKey(ruleConfId);
                             String ruleConfIdStr = filterRuleConfDO.getFilterRuleIds();
                             if (ruleConfIdStr != null) {
                                 String[] array = ruleConfIdStr.split(",");
@@ -278,7 +292,7 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
                                 if (!ruleFilter) {
                                     continue;
                                 }
-                            }
+                            }*/
 
                             //  2.判断活动的客户分群规则---------------------------
                             //查询分群规则list

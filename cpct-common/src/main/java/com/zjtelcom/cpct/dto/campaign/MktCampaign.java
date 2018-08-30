@@ -4,6 +4,7 @@ import com.zjtelcom.cpct.BaseEntity;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Author:sunpeng
@@ -66,6 +67,18 @@ public class MktCampaign extends BaseEntity {
      * 营销活动描述
      */
     private String mktCampaignDesc;
+
+    /**
+     * 试运算展示列
+     */
+    private List<Long> calcDisplay;
+
+    /**
+     * isale展示列
+     */
+    private List<Long> isaleDisplay;
+
+
 
     public Long getMktCampaignId() {
         return mktCampaignId;
@@ -153,5 +166,21 @@ public class MktCampaign extends BaseEntity {
 
     public void setMktCampaignDesc(String mktCampaignDesc) {
         this.mktCampaignDesc = mktCampaignDesc;
+    }
+
+    public List<Long> getCalcDisplay() {
+        return calcDisplay;
+    }
+
+    public void setCalcDisplay(List<Long> calcDisplay) {
+        this.calcDisplay = calcDisplay;
+    }
+
+    public List<Long> getIsaleDisplay() {
+        return isaleDisplay;
+    }
+
+    public void setIsaleDisplay(List<Long> isaleDisplay) {
+        this.isaleDisplay = isaleDisplay;
     }
 }

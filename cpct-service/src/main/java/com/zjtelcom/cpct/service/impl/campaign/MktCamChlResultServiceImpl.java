@@ -249,6 +249,47 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
         return mktCamChlConfMap;
     }
 
+    /**
+     * 复制二次协同渠道
+     *
+     * @param parentMktCamChlResultId
+     * @return
+     */
+    @Override
+    public Map<String, Object> copyMktCamChlResult(Long parentMktCamChlResultId) {
+        Map<String, Object> mktCamChlResultMap = new HashMap<>();
+        try {
+            MktCamChlResultDO mktCamChlResultDO = mktCamChlResultMapper.selectByPrimaryKey(parentMktCamChlResultId);
+            mktCamChlResultDO.setMktCamChlResultId(null);
+            mktCamChlResultDO.setCreateDate(new Date());
+            mktCamChlResultDO.setCreateStaff(UserUtil.loginId());
+            mktCamChlResultDO.setUpdateDate(new Date());
+            mktCamChlResultDO.setUpdateStaff(UserUtil.loginId());
+            List<MktCamChlResultConfRelDO> mktCamChlResultConfRelDOList = mktCamChlResultConfRelMapper.selectByMktCamChlResultId(parentMktCamChlResultId);
+
+            List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
+            for (MktCamChlResultConfRelDO mktCamChlResultConfRelDO : mktCamChlResultConfRelDOList) {
+                Map<String, Object> mktCamChlConf = mktCamChlConfService.copyMktCamChlConf(mktCamChlResultConfRelDO.getEvtContactConfId());
+      /*          MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConf.get("mktCamChlConfDetail");
+                mktCamChlConfDetailList.add(mktCamChlConfDetail);*/
+            }
+
+
+
+
+/*            mktCamChlResult.setMktCamChlConfDetailList(mktCamChlConfDetailList);
+            mktCamChlResultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            mktCamChlResultMap.put("mktCamChlResult", mktCamChlResult);*/
+        } catch (Exception e) {
+            logger.error("[op:MktCamChlResultServiceImpl] failed to get mktCamChlResultDO by mktCamChlResultId = {}", parentMktCamChlResultId);
+            mktCamChlResultMap.put("resultCode", CommonConstant.CODE_FAIL);
+            mktCamChlResultMap.put("resultMsg", ErrorCode.GET_MKT_CAM_CHL_CONF_FAILURE.getErrorMsg());
+           // mktCamChlResultMap.put("mktCamChlResult", mktCamChlResult);
+        }
+        return mktCamChlResultMap;
+    }
+
+
     @Override
     public Map<String, Object> selectAllMktCamChlResult() {
 

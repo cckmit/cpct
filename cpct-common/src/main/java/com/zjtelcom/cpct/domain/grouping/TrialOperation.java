@@ -1,34 +1,36 @@
 package com.zjtelcom.cpct.domain.grouping;
 
-import java.util.Date;
+import com.zjtelcom.cpct.BaseEntity;
 
-public class TrialOperation {
+public class TrialOperation extends BaseEntity {
+    /**
+     * 试运算标识
+     */
     private Long id;
-
+    /**
+     * 活动标识
+     */
     private Long campaignId;
-
+    /**
+     * 活动名称
+     */
     private String campaignName;
-
+    /**
+     * 策略标识
+     */
     private Long strategyId;
-
+    /**
+     * 策略名称
+     */
     private String strategyName;
-
+    /**
+     * 批次号
+     */
     private Long batchNum;
 
-
-    private String statusCd;//1000 试算中；2000 试算异常；3000 试算成功
-
-    private Long createStaff;
-
-    private Long updateStaff;
-
-    private Date createDate;
-
-    private Date statusDate;
-
-    private Date updateDate;
-
-    private String remark;
+    /**
+     * 状态  1000 试算中；2000 试算异常；3000 试算成功
+     */
 
     public Long getId() {
         return id;
@@ -78,60 +80,4 @@ public class TrialOperation {
         this.batchNum = batchNum;
     }
 
-
-    public String getStatusCd() {
-        return statusCd;
-    }
-
-    public void setStatusCd(String statusCd) {
-        this.statusCd = statusCd;
-    }
-
-    public Long getCreateStaff() {
-        return createStaff;
-    }
-
-    public void setCreateStaff(Long createStaff) {
-        this.createStaff = createStaff;
-    }
-
-    public Long getUpdateStaff() {
-        return updateStaff;
-    }
-
-    public void setUpdateStaff(Long updateStaff) {
-        this.updateStaff = updateStaff;
-    }
-
-    public Date getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
-
-    public Date getStatusDate() {
-        return statusDate;
-    }
-
-    public void setStatusDate(Date statusDate) {
-        this.statusDate = statusDate;
-    }
-
-    public Date getUpdateDate() {
-        return updateDate;
-    }
-
-    public void setUpdateDate(Date updateDate) {
-        this.updateDate = updateDate;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
 }

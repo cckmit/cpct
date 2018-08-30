@@ -3,7 +3,8 @@
  * <p/>
  * Copyright 2018 Netease, Inc. All rights reserved.
  * NETEASE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
+ *//*
+
 package com.zjtelcom.cpct.service.impl.campaign;
 
 import com.alibaba.fastjson.JSON;
@@ -24,12 +25,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+*/
 /**
  * Description:
  * author: linchao
  * date: 2018/07/03 17:05
  * version: V1.0
- */
+ *//*
+
 @Transactional
 @Service
 public class FilterRuleConfServiceImpl extends BaseService implements FilterRuleConfService {
@@ -145,4 +148,4 @@ public class FilterRuleConfServiceImpl extends BaseService implements FilterRule
         }
         return filterRuleConfMap;
     }
-}
+}*/

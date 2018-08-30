@@ -1,11 +1,34 @@
 package com.zjtelcom.cpct.dto.grouping;
 
+import com.zjtelcom.cpct.domain.channel.MktProductRule;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
+
 import java.io.Serializable;
+import java.util.List;
 
 public class TrialOperationParam implements Serializable {
+    /**
+     * 规则标识
+     */
     private Long ruleId;
+    /**
+     * 规则表达式
+     */
     private String rule;
+    /**
+     * 批次号
+     */
     private Long batchNum;
+
+    /**
+     * 销售品集合
+     */
+    private List<MktProductRule> mktProductRuleList;
+
+    /**
+     * 推送渠道集合
+     */
+    private List<MktCamChlConfDetail> mktCamChlConfDetailList;
 
 
     public Long getRuleId() {
@@ -30,6 +53,22 @@ public class TrialOperationParam implements Serializable {
 
     public void setBatchNum(Long batchNum) {
         this.batchNum = batchNum;
+    }
+
+    public List<MktProductRule> getMktProductRuleList() {
+        return mktProductRuleList;
+    }
+
+    public void setMktProductRuleList(List<MktProductRule> mktProductRuleList) {
+        this.mktProductRuleList = mktProductRuleList;
+    }
+
+    public List<MktCamChlConfDetail> getMktCamChlConfDetailList() {
+        return mktCamChlConfDetailList;
+    }
+
+    public void setMktCamChlConfDetailList(List<MktCamChlConfDetail> mktCamChlConfDetailList) {
+        this.mktCamChlConfDetailList = mktCamChlConfDetailList;
     }
 }
 

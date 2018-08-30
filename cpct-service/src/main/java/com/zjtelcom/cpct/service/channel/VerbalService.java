@@ -20,6 +20,6 @@ public interface VerbalService {
 
     Map<String,Object> delVerbal(Long userId,Long verbalId);
 
-
+    Map<String, Object> copyVerbal(Long contactConfId,Long newConfId);
 
 }
