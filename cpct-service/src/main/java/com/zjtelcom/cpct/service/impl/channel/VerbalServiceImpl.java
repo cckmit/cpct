@@ -38,6 +38,37 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
     private ContactChannelMapper channelMapper;
 
     /**
+     * 复制痛痒点
+     * @param contactConfId
+     * @return
+     */
+    @Override
+    public Map<String, Object> copyVerbal(Long contactConfId,Long newConfId) {
+        Map<String,Object> map = getVerbalListByConfId(1L,contactConfId);
+        if (!map.get("resultCode").equals(CODE_SUCCESS)){
+            return map;
+        }
+        List<VerbalVO> verbalVOList = (List<VerbalVO>)map.get("resultMsg");
+        for (VerbalVO verbalVO : verbalVOList){
+            VerbalAddVO addVO = BeanUtil.create(verbalVO,new VerbalAddVO());
+            addVO.setContactConfId(newConfId);
+            List<VerbalConditionAddVO> conditionAddVOList = new ArrayList<>();
+            for (VerbalConditionVO conditionVO : verbalVO.getConditionList()){
+                VerbalConditionAddVO conditionAddVO = BeanUtil.create(conditionVO,new VerbalConditionAddVO());
+                conditionAddVOList.add(conditionAddVO);
+            }
+            addVO.setAddVOList(conditionAddVOList);
+            Map<String, Object> addMap = addVerbal(1L,addVO);
+            if (!addMap.get("resultCode").equals(CODE_SUCCESS)){
+                return addMap;
+            }
+        }
+        map.put("resultCode", CODE_SUCCESS);
+        map.put("resultMsg", "添加成功");
+        return map;
+    }
+
+    /**
      * 添加痛痒点话术
      */
     @Override

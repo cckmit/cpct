@@ -50,6 +50,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         Page pageInfo = filterRuleReq.getPageInfo();
         PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
         List<FilterRule> filterRules = filterRuleMapper.qryFilterRule(filterRuleReq.getFilterRule());
+
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("filterRules", filterRules);
