@@ -60,7 +60,7 @@ public class TarGrpController extends BaseController {
     public String createTarGrp(@RequestBody TarGrpDetail tarGrpDetail) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            maps = tarGrpService.createTarGrp(tarGrpDetail);
+            maps = tarGrpService.createTarGrp(tarGrpDetail,false);
         } catch (Exception e) {
             logger.error("[op:TarGrpController] fail to createTarGrp for tarGrpDetail = {}!" +
                     " Exception: ", JSONArray.toJSON(tarGrpDetail), e);
