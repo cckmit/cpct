@@ -23,6 +23,17 @@ public class DisplayColumnVO{
 
     private String displayColumnTypeName;
 
+    private String statusCd;
+
+
+    public String getStatusCd() {
+        return statusCd;
+    }
+
+    public void setStatusCd(String statusCd) {
+        this.statusCd = statusCd;
+    }
+
     public String getDisplayColumnTypeName() {
         return displayColumnTypeName;
     }

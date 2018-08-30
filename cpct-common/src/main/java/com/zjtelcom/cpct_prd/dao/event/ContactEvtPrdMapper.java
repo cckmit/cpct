@@ -1,11 +1,11 @@
-package com.zjtelcom.cpct.dao.event;
+package com.zjtelcom.cpct_prd.dao.event;
 
 import com.zjtelcom.cpct.domain.event.EventDO;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
-import com.zjtelcom.cpct.dto.event.EventList;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
 /**
@@ -15,7 +15,7 @@ import java.util.List;
  */
 @Mapper
 @Repository
-public interface ContactEvtMapper {
+public interface ContactEvtPrdMapper {
 
     List<ContactEvt> listEvents(ContactEvt contactEvt);
 
@@ -37,7 +37,7 @@ public interface ContactEvtMapper {
 
     int modContactEvtJt(ContactEvt contactEvt);
 
-    int modContactEvtCode(@Param("contactEvtId") Long contactEvtId , @Param("contactEvtCode") String contactEvtCode);
+    int modContactEvtCode(@Param("contactEvtId") Long contactEvtId, @Param("contactEvtCode") String contactEvtCode);
 
     int modContactEvt(ContactEvt contactEvt);
 

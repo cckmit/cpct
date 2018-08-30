@@ -43,7 +43,8 @@ public class ESClient {
 //            logger.info("invalid cluster address.");
 //            return null;
 //        }
-//        String[] addr = clusterAddr.split(":");
+//        String[] addr = clusterAddr.split(":");;.'
+
 //        if (addr.length != 2) {
 //            logger.info("invalid cluster address.");
 //            return null;

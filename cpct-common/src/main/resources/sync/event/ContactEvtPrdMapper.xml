@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct_prd.dao.event.ContactEvtPrdMapper">
+    <resultMap id="resultMapper" type="com.zjtelcom.cpct.dto.event.ContactEvt">
+        <id column="EVENT_ID" jdbcType="BIGINT" property="contactEvtId" />
+        <result column="INTERFACE_CFG_ID" jdbcType="BIGINT" property="interfaceCfgId" />
+        <result column="EVENT_NBR" jdbcType="VARCHAR" property="contactEvtCode" />
+        <result column="EVENT_NAME" jdbcType="VARCHAR" property="contactEvtName" />
+        <result column="EVT_MAPPED_ADDR" jdbcType="VARCHAR" property="evtMappedAddr" />
+        <result column="EVT_MAPPED_IP" jdbcType="VARCHAR" property="evtMappedIp" />
+        <result column="EVT_PROCOTOL_TYPE" jdbcType="VARCHAR" property="evtProcotolType" />
+        <result column="EVT_MAPPED_FUN_NAME" jdbcType="VARCHAR" property="evtMappedFunName" />
+        <result column="MKT_CAMPAIGN_TYPE" jdbcType="VARCHAR" property="mktCampaignType" />
+        <result column="REC_CAMPAIGN_AMOUNT" jdbcType="VARCHAR" property="recCampaignAmount" />
+        <result column="EVENT_DESC" jdbcType="VARCHAR" property="contactEvtDesc" />
+        <result column="EVT_TYPE_ID" jdbcType="BIGINT" property="contactEvtTypeId" />
+        <result column="EVENT_TRIG_TYPE" jdbcType="VARCHAR" property="evtTrigType" />
+        <result column="EXT_EVENT_ID" jdbcType="BIGINT" property="extEventId" />
+        <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+        <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+        <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+
+    <sql id="eventJoin">
+        LEFT JOIN event_type t ON t.EVT_TYPE_ID = e.EVT_TYPE_ID
+    </sql>
+
+
+    <!--查询列表方法-->
+    <select id="listEvents" resultType="com.zjtelcom.cpct.dto.event.ContactEvt">
+        select
+        e.EVENT_ID contactEvtId,
+        e.EVENT_NBR contactEvtCode,
+        e.EVENT_NAME contactEvtName,
+        e.EVENT_DESC contactEvtDesc,
+        t.EVT_TYPE_NAME contactEvtTypeName,
+        e.STATUS_CD statusCd
+        from event e
+        <include refid="eventJoin"/>
+        where 1=1
+        <if test="contactEvtName != null and contactEvtName != ''">
+            and e.EVENT_NAME LIKE CONCAT(CONCAT('%',#{contactEvtName}),'%')
+        </if>
+        <if test="contactEvtTypeId != null and contactEvtTypeId != 0">
+            and e.EVT_TYPE_ID = #{contactEvtTypeId}
+        </if>
+    </select>
+
+    <!--查询方法(只设置id与name两个查询条件)-->
+    <select id="query" resultMap="resultMapper">
+        select * from event
+
+        where 1=1
+        <if test="id != null and id != 0">
+            and id = #{id}
+        </if>
+        <if test="name != null and name != ''">
+            and name = #{name}
+        </if>
+    </select>
+
+    <!--插入操作,useGeneratedKeys代表支持自动生成序列号,keyProperty代表自动生成序列号的属性为id-->
+    <insert id="createContactEvtJt"
+            parameterType="com.zjtelcom.cpct.dto.event.ContactEvt">
+        insert into event (
+        EVENT_ID,
+        INTERFACE_CFG_ID,
+        EVENT_NBR,
+        EVENT_NAME,
+        EVT_MAPPED_ADDR,
+        EVT_MAPPED_IP,
+        EVT_PROCOTOL_TYPE,
+        EVT_MAPPED_FUN_NAME,
+        EVENT_DESC,
+        EVT_TYPE_ID,
+        EVENT_TRIG_TYPE,
+        EXT_EVENT_ID,
+        STATUS_CD,
+        CREATE_STAFF,
+        UPDATE_STAFF,
+        CREATE_DATE,
+        STATUS_DATE,
+        UPDATE_DATE,
+        MKT_CAMPAIGN_TYPE,
+        REMARK)
+        values (
+        #{contactEvtId,jdbcType=BIGINT},
+        #{interfaceCfgId,jdbcType=BIGINT},
+        #{contactEvtCode,jdbcType=VARCHAR},
+        #{contactEvtName,jdbcType=VARCHAR},
+        #{evtMappedAddr,jdbcType=VARCHAR},
+        #{evtMappedIp,jdbcType=VARCHAR},
+        #{evtProcotolType,jdbcType=VARCHAR},
+        #{evtMappedFunName,jdbcType=VARCHAR},
+        #{contactEvtDesc,jdbcType=VARCHAR},
+        #{contactEvtTypeId,jdbcType=BIGINT},
+        #{evtTrigType,jdbcType=VARCHAR},
+        #{extEventId,jdbcType=BIGINT},
+        #{statusCd,jdbcType=VARCHAR},
+        #{createStaff,jdbcType=BIGINT},
+        #{updateStaff,jdbcType=BIGINT},
+        #{createDate,jdbcType=TIMESTAMP},
+        #{statusDate,jdbcType=TIMESTAMP},
+        #{updateDate,jdbcType=TIMESTAMP},
+        #{mktCampaignType,jdbcType=VARCHAR},
+        #{remark,jdbcType=VARCHAR})
+    </insert>
+
+    <!--插入操作,useGeneratedKeys代表支持自动生成序列号,keyProperty代表自动生成序列号的属性为id-->
+    <!--由于采用了自动生成序列号,因此id不需要在mapper文件中写出来-->
+    <insert id="createContactEvt" keyProperty="contactEvtId" useGeneratedKeys="true"
+            parameterType="com.zjtelcom.cpct.dto.event.ContactEvt">
+        insert into event (
+        INTERFACE_CFG_ID,
+        EVENT_NBR,
+        EVENT_NAME,
+        EVT_MAPPED_ADDR,
+        EVT_MAPPED_IP,
+        EVT_PROCOTOL_TYPE,
+        EVT_MAPPED_FUN_NAME,
+        EVENT_DESC,
+        EVT_TYPE_ID,
+        EVENT_TRIG_TYPE,
+        EXT_EVENT_ID,
+        STATUS_CD,
+        CREATE_STAFF,
+        UPDATE_STAFF,
+        CREATE_DATE,
+        STATUS_DATE,
+        UPDATE_DATE,
+        MKT_CAMPAIGN_TYPE,
+        REC_CAMPAIGN_AMOUNT,
+        REMARK)
+        values (
+        #{interfaceCfgId,jdbcType=BIGINT},
+        #{contactEvtCode,jdbcType=VARCHAR},
+        #{contactEvtName,jdbcType=VARCHAR},
+        #{evtMappedAddr,jdbcType=VARCHAR},
+        #{evtMappedIp,jdbcType=VARCHAR},
+        #{evtProcotolType,jdbcType=VARCHAR},
+        #{evtMappedFunName,jdbcType=VARCHAR},
+        #{contactEvtDesc,jdbcType=VARCHAR},
+        #{contactEvtTypeId,jdbcType=BIGINT},
+        #{evtTrigType,jdbcType=VARCHAR},
+        #{extEventId,jdbcType=BIGINT},
+        #{statusCd,jdbcType=VARCHAR},
+        #{createStaff,jdbcType=BIGINT},
+        #{updateStaff,jdbcType=BIGINT},
+        #{createDate,jdbcType=TIMESTAMP},
+        #{statusDate,jdbcType=TIMESTAMP},
+        #{updateDate,jdbcType=TIMESTAMP},
+        #{mktCampaignType,jdbcType=VARCHAR},
+        #{recCampaignAmount,jdbcType=VARCHAR},
+        #{remark,jdbcType=VARCHAR})
+    </insert>
+
+    <!--更新操作-->
+    <update id="update">
+        update menu
+        <set>
+            <if test="name != null">name = #{name}</if>
+            <if test="remark != null">remark = #{remark}</if>
+            <if test="createDate != null">create_datetime = #{createDate}</if>
+            <if test="updateDate != null">update_datetime = #{updateDate}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="delEvent" parameterType="java.lang.Long">
+        delete from event
+        where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
+    </delete>
+
+    <!--开启/关闭事件-->
+    <update id="updateEventStatusCd">
+        update event
+        set STATUS_CD = #{statusCd}
+        where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
+    </update>
+
+    <!--修改事件编码-->
+    <update id="modContactEvtCode">
+        update event
+        set EVENT_NBR = #{contactEvtCode}
+        where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
+    </update>
+
+    <!--查询方法，通过id查询-->
+    <select id="getEventById" resultMap="resultMapper">
+        select * from event
+        where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
+    </select>
+
+    <update id="updateEvent" parameterType="com.zjtelcom.cpct.dto.event.ContactEvt">
+        update event
+        set
+        <if test="interfaceCfgId != null and interfaceCfgId != 0">
+            INTERFACE_CFG_ID = #{interfaceCfgId,jdbcType=BIGINT},
+        </if>
+        <if test="contactEvtCode != null and contactEvtCode != ''">
+            EVENT_NBR = #{contactEvtCode,jdbcType=VARCHAR},
+        </if>
+        <if test="contactEvtName != null and contactEvtName != ''">
+            EVENT_NAME = #{contactEvtName,jdbcType=VARCHAR},
+        </if>
+        <if test="evtMappedAddr != null and evtMappedAddr != ''">
+            EVT_MAPPED_ADDR = #{evtMappedAddr,jdbcType=VARCHAR},
+        </if>
+        <if test="evtMappedIp != null and evtMappedIp != ''">
+            EVT_MAPPED_IP = #{evtMappedIp,jdbcType=VARCHAR},
+        </if>
+        <if test="evtProcotolType != null and evtProcotolType != ''">
+            EVT_PROCOTOL_TYPE = #{evtProcotolType,jdbcType=VARCHAR},
+        </if>
+        <if test="evtMappedFunName != null and evtMappedFunName != ''">
+            EVT_MAPPED_FUN_NAME = #{evtMappedFunName,jdbcType=VARCHAR},
+        </if>
+        <if test="eventDesc != null and eventDesc != ''">
+            EVENT_DESC = #{eventDesc,jdbcType=VARCHAR},
+        </if>
+        <if test="evtTypeId != null and evtTypeId != 0">
+            EVT_TYPE_ID = #{evtTypeId,jdbcType=BIGINT},
+        </if>
+        <if test="eventTrigType != null and eventTrigType != ''">
+            EVENT_TRIG_TYPE = #{eventTrigType,jdbcType=VARCHAR},
+        </if>
+        <if test="extEventId != null and extEventId != 0">
+            EXT_EVENT_ID = #{extEventId,jdbcType=BIGINT},
+        </if>
+        <if test="statusCd != null and statusCd != ''">
+            STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+        </if>
+        <if test="mktCampaignType != null and mktCampaignType != ''">
+            MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR},
+        </if>
+        <if test="recCampaignAmount != null and recCampaignAmount != ''">
+            REC_CAMPAIGN_AMOUNT = #{recCampaignAmount,jdbcType=VARCHAR},
+        </if>
+        <if test="createStaff != null and createStaff != 0">
+            CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+        </if>
+        <if test="updateStaff != null and updateStaff != 0">
+            UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        </if>
+        <if test="createDate != null">
+            CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="statusDate != null">
+            STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="updateDate != null">
+            UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="remark != null and remark != ''">
+            REMARK = #{remark,jdbcType=VARCHAR},
+        </if>
+        EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
+        where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
+    </update>
+
+    <update id="modContactEvtJt" parameterType="com.zjtelcom.cpct.dto.event.ContactEvt">
+        update event
+        set
+            INTERFACE_CFG_ID = #{interfaceCfgId,jdbcType=BIGINT},
+            EVENT_NBR = #{contactEvtCode,jdbcType=VARCHAR},
+            EVENT_NAME = #{contactEvtName,jdbcType=VARCHAR},
+            EVT_MAPPED_ADDR = #{evtMappedAddr,jdbcType=VARCHAR},
+            EVT_MAPPED_IP = #{evtMappedIp,jdbcType=VARCHAR},
+            EVT_PROCOTOL_TYPE = #{evtProcotolType,jdbcType=VARCHAR},
+            EVT_MAPPED_FUN_NAME = #{evtMappedFunName,jdbcType=VARCHAR},
+            MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR},
+            EVENT_DESC = #{contactEvtDesc,jdbcType=VARCHAR},
+            EVT_TYPE_ID = #{contactEvtTypeId,jdbcType=BIGINT},
+            EVENT_TRIG_TYPE = #{evtTrigType,jdbcType=VARCHAR},
+            EXT_EVENT_ID = #{extEventId,jdbcType=BIGINT},
+            STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+            CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+            UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+            CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+            STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+            UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+            REMARK = #{remark,jdbcType=VARCHAR},
+        EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
+        where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
+    </update>
+
+    <update id="modContactEvt" parameterType="com.zjtelcom.cpct.dto.event.ContactEvt">
+        update event
+        set
+        <if test="interfaceCfgId != null and interfaceCfgId != 0">
+            INTERFACE_CFG_ID = #{interfaceCfgId,jdbcType=BIGINT},
+        </if>
+        <if test="contactEvtCode != null and contactEvtCode != ''">
+            EVENT_NBR = #{contactEvtCode,jdbcType=VARCHAR},
+        </if>
+        <if test="contactEvtName != null and contactEvtName != ''">
+            EVENT_NAME = #{contactEvtName,jdbcType=VARCHAR},
+        </if>
+        <if test="evtMappedAddr != null and evtMappedAddr != ''">
+            EVT_MAPPED_ADDR = #{evtMappedAddr,jdbcType=VARCHAR},
+        </if>
+        <if test="evtMappedIp != null and evtMappedIp != ''">
+            EVT_MAPPED_IP = #{evtMappedIp,jdbcType=VARCHAR},
+        </if>
+        <if test="evtProcotolType != null and evtProcotolType != ''">
+            EVT_PROCOTOL_TYPE = #{evtProcotolType,jdbcType=VARCHAR},
+        </if>
+        <if test="evtMappedFunName != null and evtMappedFunName != ''">
+            EVT_MAPPED_FUN_NAME = #{evtMappedFunName,jdbcType=VARCHAR},
+        </if>
+        <if test="contactEvtDesc != null and contactEvtDesc != ''">
+            EVENT_DESC = #{contactEvtDesc,jdbcType=VARCHAR},
+        </if>
+        <if test="contactEvtTypeId != null and contactEvtTypeId != 0">
+            EVT_TYPE_ID = #{contactEvtTypeId,jdbcType=BIGINT},
+        </if>
+        <if test="evtTrigType != null and evtTrigType != ''">
+            EVENT_TRIG_TYPE = #{evtTrigType,jdbcType=VARCHAR},
+        </if>
+        <if test="extEventId != null and extEventId != 0">
+            EXT_EVENT_ID = #{extEventId,jdbcType=BIGINT},
+        </if>
+        <if test="mktCampaignType != null and mktCampaignType != ''">
+            MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR},
+        </if>
+        <if test="statusCd != null and statusCd != ''">
+            STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+        </if>
+        <if test="createStaff != null and createStaff != 0">
+            CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+        </if>
+        <if test="updateStaff != null and updateStaff != 0">
+            UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        </if>
+        <if test="createDate != null">
+            CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="statusDate != null">
+            STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="updateDate != null">
+            UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="remark != null and remark != ''">
+            REMARK = #{remark,jdbcType=VARCHAR},
+        </if>
+        EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
+        where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
+    </update>
+
+    <!--查询方法，通过id查询-->
+    <select id="getEventByEventNbr" resultMap="resultMapper" parameterType="java.lang.String">
+        select * from event
+        where EVENT_NBR = #{eventNbr,jdbcType=VARCHAR}
+    </select>
+
+</mapper>
