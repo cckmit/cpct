@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 /**
  * @Description 目标分群serviceImpl
@@ -91,7 +92,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
         TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
         detail.setTarGrpConditions(conditionList);
-        result = createTarGrp(detail);
+        result = createTarGrp(detail,true);
         return result;
     }
 
@@ -100,7 +101,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
      */
     @Transactional(readOnly = false)
     @Override
-    public Map<String, Object> createTarGrp(TarGrpDetail tarGrpDetail) {
+    public Map<String, Object> createTarGrp(TarGrpDetail tarGrpDetail,boolean isCopy) {
         TarGrp tarGrp = new TarGrp();
         Map<String, Object> maps = new HashMap<>();
         //插入客户分群记录
@@ -110,7 +111,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         tarGrp.setStatusDate(DateUtil.getCurrentTime());
         tarGrp.setUpdateStaff(UserUtil.loginId());
         tarGrp.setCreateStaff(UserUtil.loginId());
-        tarGrp.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+        if (isCopy){
+            tarGrp.setStatusCd("2000");
+        }else {
+            tarGrp.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+        }
         tarGrpMapper.createTarGrp(tarGrp);
         List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
         for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
