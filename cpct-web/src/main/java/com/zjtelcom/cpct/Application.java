@@ -15,6 +15,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
 
@@ -24,7 +25,7 @@ import org.springframework.web.client.RestTemplate;
 
 
 //@ImportResource({ "classpath:dubbo/*.xml","classpath:task/*.xml" })
-//@ImportResource({ "classpath:dubbo/*.xml"})
+@ImportResource({ "classpath:dubbo/*.xml"})
 @ComponentScan(value={"com.zjtelcom.cpct"})
 //@MapperScan("com.zjtelcom.cpct.dao")
 @EnableTransactionManagement
