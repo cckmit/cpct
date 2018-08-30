@@ -28,29 +28,11 @@ import javax.sql.DataSource;
 @MapperScan(basePackages = "com.zjtelcom.cpct.dao", sqlSessionFactoryRef = "masterSqlSessionFactory")
 public class DataSourceConfig {
 
-//    @Bean
-//    @Primary
-//    @ConfigurationProperties(prefix = "spring.datasource")
-//    public DataSource dataSource() {
-//        return DataSourceBuilder.create().type(DruidDataSource.class).build();
-//    }
-//
-//    @Primary
-//    @Bean(name = "masterSqlSessionFactory")
-//    public SqlSessionFactory sqlSessionFactory(@Qualifier("dataSource")DataSource dataSource) throws Exception {
-//        SqlSessionFactoryBean sessionFactoryBean = new SqlSessionFactoryBean();
-//        sessionFactoryBean.setDataSource(dataSource);
-//        sessionFactoryBean.setMapperLocations(new PathMatchingResourcePatternResolver()
-//                .getResources("classpath:mybatis/*/*.xml"));
-//        return sessionFactoryBean.getObject();
-//    }
-
-
     @Bean
     @Primary
-    @ConfigurationProperties(prefix = "spring.jta.atomikos.datasource")
+    @ConfigurationProperties(prefix = "spring.datasource")
     public DataSource dataSource() {
-        return new AtomikosDataSourceBean();
+        return DataSourceBuilder.create().type(DruidDataSource.class).build();
     }
 
     @Primary
@@ -58,11 +40,29 @@ public class DataSourceConfig {
     public SqlSessionFactory sqlSessionFactory(@Qualifier("dataSource")DataSource dataSource) throws Exception {
         SqlSessionFactoryBean sessionFactoryBean = new SqlSessionFactoryBean();
         sessionFactoryBean.setDataSource(dataSource);
-        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        sessionFactoryBean.setMapperLocations(resolver.getResources("classpath:mybatis/*/*.xml"));
+        sessionFactoryBean.setMapperLocations(new PathMatchingResourcePatternResolver()
+                .getResources("classpath:mybatis/*/*.xml"));
         return sessionFactoryBean.getObject();
     }
 
+
+//    @Bean
+//    @Primary
+//    @ConfigurationProperties(prefix = "spring.jta.atomikos.datasource")
+//    public DataSource dataSource() {
+//        return new AtomikosDataSourceBean();
+//    }
+//
+//    @Primary
+//    @Bean(name = "masterSqlSessionFactory")
+//    public SqlSessionFactory sqlSessionFactory(@Qualifier("dataSource")DataSource dataSource) throws Exception {
+//        SqlSessionFactoryBean sessionFactoryBean = new SqlSessionFactoryBean();
+//        sessionFactoryBean.setDataSource(dataSource);
+//        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+//        sessionFactoryBean.setMapperLocations(resolver.getResources("classpath:mybatis/*/*.xml"));
+//        return sessionFactoryBean.getObject();
+//    }
+//
 
 
 }
