@@ -29,36 +29,36 @@ import java.sql.SQLException;
 @MapperScan(basePackages = "com.zjtelcom.cpct_prd.dao", sqlSessionFactoryRef = "prdSqlSessionFactory")
 public class DataSourcePrdConfig {
 
-//
-//    @Bean
-//    @ConfigurationProperties(prefix = "spring.datasource_prd")
-//    public DataSource datasourcePrd() {
-//        return DataSourceBuilder.create().type(DruidDataSource.class).build();
-//    }
-//
-//    @Bean(name = "prdSqlSessionFactory")
-//    public SqlSessionFactory sqlSessionFactory(@Qualifier("datasourcePrd") DataSource dataSource) throws Exception {
-//        SqlSessionFactoryBean sessionFactoryBean = new SqlSessionFactoryBean();
-//        sessionFactoryBean.setDataSource(dataSource);
-//        sessionFactoryBean.setMapperLocations(new PathMatchingResourcePatternResolver()
-//                .getResources("classpath*:sync/*/*.xml"));
-//        return sessionFactoryBean.getObject();
-//    }
-
 
     @Bean
-    @ConfigurationProperties(prefix = "spring.jta.atomikos.datasource_prd")
+    @ConfigurationProperties(prefix = "spring.datasource_prd")
     public DataSource datasourcePrd() {
-        return new AtomikosDataSourceBean();
+        return DataSourceBuilder.create().type(DruidDataSource.class).build();
     }
 
     @Bean(name = "prdSqlSessionFactory")
     public SqlSessionFactory sqlSessionFactory(@Qualifier("datasourcePrd") DataSource dataSource) throws Exception {
         SqlSessionFactoryBean sessionFactoryBean = new SqlSessionFactoryBean();
         sessionFactoryBean.setDataSource(dataSource);
-        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        sessionFactoryBean.setMapperLocations(resolver.getResources("classpath*:sync/*/*.xml"));
+        sessionFactoryBean.setMapperLocations(new PathMatchingResourcePatternResolver()
+                .getResources("classpath*:sync/*/*.xml"));
         return sessionFactoryBean.getObject();
     }
+
+
+//    @Bean
+//    @ConfigurationProperties(prefix = "spring.jta.atomikos.datasource_prd")
+//    public DataSource datasourcePrd() {
+//        return new AtomikosDataSourceBean();
+//    }
+//
+//    @Bean(name = "prdSqlSessionFactory")
+//    public SqlSessionFactory sqlSessionFactory(@Qualifier("datasourcePrd") DataSource dataSource) throws Exception {
+//        SqlSessionFactoryBean sessionFactoryBean = new SqlSessionFactoryBean();
+//        sessionFactoryBean.setDataSource(dataSource);
+//        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+//        sessionFactoryBean.setMapperLocations(resolver.getResources("classpath*:sync/*/*.xml"));
+//        return sessionFactoryBean.getObject();
+//    }
 
 }
