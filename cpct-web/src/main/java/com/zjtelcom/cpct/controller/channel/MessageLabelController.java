@@ -99,11 +99,15 @@ public class MessageLabelController extends BaseController {
     /**
      * 查询出所有信息列表
      */
-    @GetMapping("queryMessages")
+    @PostMapping("queryMessages")
     @CrossOrigin
-    public String queryMessages() {
+    public String queryMessages(@RequestBody HashMap<String,String> param) {
         Map<String, Object> map = new HashMap<>();
-        map = messageLabelService.queryMessages();
+        String columnType = null;
+        if (param.get("displayColumnType")!=null){
+            columnType =  param.get("displayColumnType");
+        }
+        map = messageLabelService.queryMessages(columnType);
         return JSON.toJSONString(map);
     }
 
@@ -126,10 +130,14 @@ public class MessageLabelController extends BaseController {
     public String queryDisplays(@RequestBody HashMap<String,String> param) {
         Map<String, Object> map = new HashMap<>();
         String displayName = null;
+        String displayType = null;
         if (param.get("displayName")!=null){
             displayName = param.get("displayName");
         }
-        map = messageLabelService.queryDisplays(displayName);
+        if (param.get("displayType")!=null){
+            displayType = param.get("displayType");
+        }
+        map = messageLabelService.queryDisplays(displayName,displayType);
         return JSON.toJSONString(map);
     }
 

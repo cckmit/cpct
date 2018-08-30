@@ -72,7 +72,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
                 questRelMapper.deleteByPrimaryKey(questRel.getRelId());
             }
         }
-        return questionnaireRel(userId, req, result, questionnaire);
+        return questionnaireRel(userId, req, result, questionnaire,false);
     }
 
     /**
@@ -148,17 +148,17 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
         questionnaire.setCreateStaff(UserUtil.loginId());
         questionnaire.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
         questionnaireMapper.insert(questionnaire);
-        return questionnaireRel(userId, questionReq, result, questionnaire);
+        return questionnaireRel(userId, questionReq, result, questionnaire,true);
     }
 
-    private Map<String, Object> questionnaireRel(Long userId, QuestionReq questionReq, Map<String, Object> result, Questionnaire questionnaire) {
+    private Map<String, Object> questionnaireRel(Long userId, QuestionReq questionReq, Map<String, Object> result, Questionnaire questionnaire,boolean isAdd) {
         Long naireId = questionnaire.getNaireId();
-        for (InputQuestionAddVO inputQuestionAddVO : questionReq.getInputQuestionAddVOList()){
-            //添加问题及答案
-            QuestionAddVO questionAddVO = BeanUtil.create(inputQuestionAddVO,new QuestionAddVO());
-            Map<String, Object> map = addQuestion(userId, naireId, questionAddVO);
-            if (map != null) return map;
-        }
+//        for (InputQuestionAddVO inputQuestionAddVO : questionReq.getInputQuestionAddVOList()){
+//            //添加问题及答案
+//            QuestionAddVO questionAddVO = BeanUtil.create(inputQuestionAddVO,new QuestionAddVO());
+//            Map<String, Object> map = addQuestion(userId, naireId, questionAddVO);
+//            if (map != null) return map;
+//        }
         for (MultiQuestionAddVO multiQuestionAddVO : questionReq.getMultiQuestionAddVOList()){
             //添加问题及答案
             QuestionAddVO questionAddVO = BeanUtil.create(multiQuestionAddVO,new QuestionAddVO());
@@ -171,9 +171,15 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
             Map<String, Object> map = addQuestion(userId, naireId, questionAddVO);
             if (map != null) return map;
         }
-        result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","添加成功");
-        return result;
+        if (isAdd){
+            result.put("resultCode",CODE_SUCCESS);
+            result.put("resultMsg","创建成功");
+            return result;
+        }else {
+            result.put("resultCode",CODE_SUCCESS);
+            result.put("resultMsg","编辑成功");
+            return result;
+        }
     }
 
     private Map<String, Object> addQuestion(Long userId, Long naireId, QuestionAddVO questionAddVO) {

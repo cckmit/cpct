@@ -34,7 +34,7 @@ public interface MessageLabelService {
     /**
      * 查询出所有信息
      */
-    Map<String,Object> queryMessages();
+    Map<String,Object> queryMessages(String displayColumnType);
 
     /**
      * 新增标签组
@@ -44,7 +44,7 @@ public interface MessageLabelService {
     /**
      * 查询出所有展示列
      */
-    Map<String,Object> queryDisplays(String displayName);
+    Map<String,Object> queryDisplays(String displayName,String displayType);
 
     /**
      * 保存展示列所有信息

@@ -1,3 +1,4 @@
+/*
 package com.zjtelcom.cpct.dao.campaign;
 
 
@@ -19,4 +20,4 @@ public interface FilterRuleConfMapper {
     List<FilterRuleConfDO> selectAll();
 
     int updateByPrimaryKey(FilterRuleConfDO filterRuleConfDO);
-}
+}*/

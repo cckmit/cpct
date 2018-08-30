@@ -50,16 +50,18 @@ public class QuestionServiceImpl implements QuestionService {
             return map;
         }
         Long questionId = Long.valueOf(map.get("questionId").toString());
-        for (QuestionDetailAddVO detailAddVO : addVO.getQuestionDetailAddVOList()){
-            QuestionDetail detail = BeanUtil.create(detailAddVO,new QuestionDetail());
-            detail.setQuestionId(questionId);
-            detail.setCreateDate(DateUtil.getCurrentTime());
-            detail.setUpdateDate(DateUtil.getCurrentTime());
-            detail.setStatusDate(DateUtil.getCurrentTime());
-            detail.setUpdateStaff(UserUtil.loginId());
-            detail.setCreateStaff(UserUtil.loginId());
-            detail.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-            questionDetailMapper.insert(detail);
+        if (addVO.getQuestionDetailAddVOList()!=null){
+            for (QuestionDetailAddVO detailAddVO : addVO.getQuestionDetailAddVOList()){
+                QuestionDetail detail = BeanUtil.create(detailAddVO,new QuestionDetail());
+                detail.setQuestionId(questionId);
+                detail.setCreateDate(DateUtil.getCurrentTime());
+                detail.setUpdateDate(DateUtil.getCurrentTime());
+                detail.setStatusDate(DateUtil.getCurrentTime());
+                detail.setUpdateStaff(UserUtil.loginId());
+                detail.setCreateStaff(UserUtil.loginId());
+                detail.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                questionDetailMapper.insert(detail);
+            }
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");

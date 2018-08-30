@@ -6,13 +6,11 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.user.UserListMapper;
-import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.user.UserList;
 import com.zjtelcom.cpct.request.filter.FilterRuleReq;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.filter.FilterRuleService;
-import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UserUtil;
@@ -206,6 +204,24 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("filterRule", filterRule);
         return maps;
+    }
+
+
+    /**
+     * 根据过滤规则id集合查询过滤规则集合
+     */
+    @Override
+    public Map<String, Object> getFilterRule(List<Integer> filterRuleIdList) {
+        Map<String, Object> map = new HashMap<>();
+        List<FilterRule> filterRuleList = new ArrayList<>();
+        for (Integer filterRuleId : filterRuleIdList) {
+            FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId.longValue());
+            filterRuleList.add(filterRule);
+        }
+        map.put("resultCode", CommonConstant.CODE_SUCCESS);
+        map.put("resultMsg", StringUtils.EMPTY);
+        map.put("filterRuleList", filterRuleList);
+        return map;
     }
 
 }

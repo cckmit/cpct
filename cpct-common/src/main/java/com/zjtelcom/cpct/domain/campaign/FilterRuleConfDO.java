@@ -1,3 +1,4 @@
+/*
 package com.zjtelcom.cpct.domain.campaign;
 
 import java.util.Date;
@@ -62,4 +63,4 @@ public class FilterRuleConfDO {
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
     }
-}
+}*/

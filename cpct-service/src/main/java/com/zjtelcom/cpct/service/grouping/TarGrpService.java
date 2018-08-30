@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public interface TarGrpService {
 
-    Map<String, Object> createTarGrp(TarGrpDetail tarGrpDetail);
+    Map<String, Object> createTarGrp(TarGrpDetail tarGrpDetail,boolean isCopy);
 
     Map<String, Object> saveTagNumFetch(Long mktCamGrpRulId, List<TarGrpCondition> tarGrpConditionDTOList);
 
@@ -38,5 +38,7 @@ public interface TarGrpService {
     Map<String,Object> modTarGrp(TarGrpDetail tarGrpDetail);
 
     Map<String,Object> delTarGrp(TarGrpDetail tarGrpDetail);
+
+    Map<String,Object> copyTarGrp(Long tarGrpId);
 
 }

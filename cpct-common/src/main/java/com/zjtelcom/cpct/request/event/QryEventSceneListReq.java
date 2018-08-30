@@ -13,6 +13,29 @@ public class QryEventSceneListReq implements Serializable{
     private Long eventSceneId;//事件场景id
     private String eventSceneNbr;//事件场景编码
     private String eventSceneName;//事件场景名称
+    private Integer page;
+    private Integer pageSize;
+
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public Integer getPage() {
+        return page;
+    }
+
+    public void setPage(Integer page) {
+        this.page = page;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
 
     public Long getEventSceneId() {
         return eventSceneId;

@@ -68,13 +68,11 @@ public class StrategyTask implements Callable<List<Map<String, Object>>> {
                 Long tarGrpId = mktStrategyConfRuleDO.getTarGrpId();
                 //获取销售品
                 String productStr = mktStrategyConfRuleDO.getProductId();
-                //过滤规则id
-                Long ruleConfId = mktStrategyConfRuleDO.getRuleConfId();
                 //协同渠道配置id
                 String evtContactConfIdStr = mktStrategyConfRuleDO.getEvtContactConfId();
 
                 //提交线程
-                Future<List<Map<String, Object>>> f = executorService.submit(new RuleTask(strategyConfId,tarGrpId,productStr,ruleConfId,evtContactConfIdStr));
+                Future<List<Map<String, Object>>> f = executorService.submit(new RuleTask(strategyConfId,tarGrpId,productStr,evtContactConfIdStr));
                 //将线程处理结果添加到结果集
                 threadList.add(f);
 

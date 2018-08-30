@@ -25,6 +25,19 @@ public class DisplayColumnLabel extends BaseEntity{
     private Long displayId;
 
 
+    /**
+     * 默认展示列类型
+     */
+    private Long messageType;
+
+
+    public Long getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(Long messageType) {
+        this.messageType = messageType;
+    }
 
     public Long getDisplayId() {
         return displayId;

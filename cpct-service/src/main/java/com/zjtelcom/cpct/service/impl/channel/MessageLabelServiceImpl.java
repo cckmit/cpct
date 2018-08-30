@@ -5,8 +5,11 @@ import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.dao.system.SystemParamMapper;
 import com.zjtelcom.cpct.domain.channel.*;
+import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.channel.*;
+import com.zjtelcom.cpct.dto.system.SystemParam;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.request.channel.DisplayAllMessageReq;
 import com.zjtelcom.cpct.request.channel.MessageReq;
@@ -43,6 +46,8 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
     private DisplayColumnMapper displayColumnMapper;
     @Autowired
     private DisplayColumnLabelMapper displayColumnLabelMapper;
+    @Autowired
+    private SystemParamMapper systemParamMapper;
 
 
     /**
@@ -75,21 +80,46 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
     public Map<String, Object> queryLabelListByDisplayId(DisplayColumn req) {
         Map<String, Object> maps = new HashMap<>();
         List<DisplayColumnLabel> realList = displayColumnLabelMapper.findListByDisplayId(req.getDisplayColumnId());
-        List<Label> labelList = new ArrayList<>();
+        List<LabelDTO> labelList = new ArrayList<>();
+        List<Long> messageTypes = new ArrayList<>();
+
         for (DisplayColumnLabel real : realList){
             Label label = injectionLabelMapper.selectByPrimaryKey(real.getInjectionLabelId());
             if (label==null){
                 continue;
             }
-            labelList.add(label);
+            LabelDTO labelDTO = new LabelDTO();
+            labelDTO.setInjectionLabelId(label.getInjectionLabelId());
+            labelDTO.setInjectionLabelName(label.getInjectionLabelName());
+            labelDTO.setMessageType(real.getMessageType());
+            labelList.add(labelDTO);
+            if (!messageTypes.contains(real.getMessageType())){
+                messageTypes.add(real.getMessageType());
+            }
         }
-        List<LabelDTO> labelDTOList = new ArrayList<>();
-        for (Label label : labelList) {
-            LabelDTO labelDTO = BeanUtil.create(label,new LabelDTO());
-            labelDTOList.add(labelDTO);
+        List<MessageLabelInfo> mlInfoList = new ArrayList<>();
+        for (int i = 0;i<messageTypes.size();i++){
+
+            Long messageType = messageTypes.get(i);
+            Message messages = messageMapper.selectByPrimaryKey(messageType);
+            MessageLabelInfo info = BeanUtil.create(messages,new MessageLabelInfo());
+            List<LabelDTO> dtoList = new ArrayList<>();
+            for (LabelDTO dto : labelList){
+                if (messageType.equals(dto.getMessageType())){
+                    dtoList.add(dto);
+                }
+            }
+            info.setLabelDTOList(dtoList);
+            //判断是否选中
+            if (dtoList.isEmpty()){
+                info.setChecked("1");//false
+            }else {
+                info.setChecked("0");//true
+            }
+            mlInfoList.add(info);
         }
         maps.put("resultCode", CODE_SUCCESS);
-        maps.put("resultMsg", labelDTOList);
+        maps.put("resultMsg",mlInfoList);
         return maps;
 
     }
@@ -185,16 +215,23 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
      * 查询出所有信息
      */
     @Override
-    public Map<String, Object> queryMessages() {
+    public Map<String, Object> queryMessages(String displayColumnType) {
         Map<String, Object> maps = new HashMap<>();
         List<MessageVO> messageVOList = new ArrayList<>();
         List<Message> messageList = messageMapper.selectAll();
         for (Message message : messageList) {
+            if (message.getMessageName().equals("固定信息") && displayColumnType!=null && displayColumnType.equals("2000")){
+                continue;
+            }
             MessageVO messageVO = BeanUtil.create(message,new MessageVO());
+            messageVO.setChecked("0");
             Map<String,Object> labelMaps = qureyMessageLabel(message);
             if (labelMaps.get("resultCode").equals(CODE_SUCCESS)){
                 MessageLabelDTO messageLabelDTO = (MessageLabelDTO)labelMaps.get("messageLabelDTO");
                 List<LabelDTO> list = messageLabelDTO.getMessageLabelId();
+                for (LabelDTO labelDTO : list){
+                    labelDTO.setMessageType(message.getMessageId());
+                }
                 messageVO.setLabelDTOList(list);
             }
             messageVOList.add(messageVO);
@@ -227,14 +264,16 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
      * 查询出所有展示列
      */
     @Override
-    public Map<String, Object> queryDisplays(String displayName) {
+    public Map<String, Object> queryDisplays(String displayName,String displayType) {
         Map<String, Object> maps = new HashMap<>();
         List<DisplayColumnVO> displayColumnVOList = new ArrayList<>();
-        List<DisplayColumn> displayColumnList = displayColumnMapper.selectAll();
+        List<DisplayColumn> displayColumnList = displayColumnMapper.findDisplayListByParam(displayName,displayType);
         for (DisplayColumn displayColumn : displayColumnList) {
-            DisplayColumnVO displayColumnVO = new DisplayColumnVO();
-            displayColumnVO.setDisplayColumnId(displayColumn.getDisplayColumnId());
-            displayColumnVO.setDisplayColumnName(displayColumn.getDisplayColumnName());
+            DisplayColumnVO displayColumnVO = BeanUtil.create(displayColumn,new DisplayColumnVO());
+            SystemParam sysParams = systemParamMapper.selectByParamKey("DISPLAY_CLOUMN_TYPE",displayColumn.getDisplayColumnType());
+            if (sysParams!=null){
+                displayColumnVO.setDisplayColumnTypeName(sysParams.getParamName());
+            }
             displayColumnVOList.add(displayColumnVO);
         }
         maps.put("resultCode", CODE_SUCCESS);
@@ -249,11 +288,30 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
     @Override
     public Map<String, Object> createDisplayAllMessage(DisplayAllMessageReq displayAllMessageReq) {
         Map<String, Object> maps = new HashMap<>();
-        List<Long> injectionLabelIds = displayAllMessageReq.getInjectionLabelIds();
-        for (Long injectionLabelId : injectionLabelIds) {
+        DisplayColumn displayColumn = displayColumnMapper.selectByPrimaryKey(displayAllMessageReq.getDisplayColumnId());
+        if (displayColumn==null){
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg", "展示列不存在");
+            return maps;
+        }
+        List<DisplayLabelInfo> injectionLabelIds = displayAllMessageReq.getInjectionLabelIds();
+        List<DisplayLabelInfo> labelInfoList = new ArrayList<>();
+        List<DisplayColumnLabel> oldRels = displayColumnLabelMapper.findListByDisplayId(displayAllMessageReq.getDisplayColumnId());
+        //校验展示列是否与标签已关联，已关联跳过
+        for (DisplayLabelInfo info : injectionLabelIds){
+            for (DisplayColumnLabel oldInfo : oldRels){
+                if (oldInfo.getInjectionLabelId().equals(info.getLabelId())){
+                    continue;
+                }
+            }
+            labelInfoList.add(info);
+        }
+        //关联关系添加
+        for (DisplayLabelInfo labelInfo : labelInfoList) {
             DisplayColumnLabel displayColumnLabel = new DisplayColumnLabel();
             displayColumnLabel.setDisplayId(displayAllMessageReq.getDisplayColumnId());
-            displayColumnLabel.setInjectionLabelId(injectionLabelId);
+            displayColumnLabel.setInjectionLabelId(labelInfo.getLabelId());
+            displayColumnLabel.setMessageType(labelInfo.getMessageTypeId());
             displayColumnLabel.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
             displayColumnLabel.setCreateStaff(UserUtil.loginId());
             displayColumnLabel.setUpdateStaff(UserUtil.loginId());
@@ -264,6 +322,8 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         }
         DisplayColumn dc = new DisplayColumn();
         dc.setDisplayColumnId(displayAllMessageReq.getDisplayColumnId());
+        displayColumn.setStatusCd("2000");
+        displayColumnMapper.updateByPrimaryKey(displayColumn);
         return  queryLabelListByDisplayId(dc);
     }
 
@@ -275,7 +335,10 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         Map<String, Object> map = new HashMap<>();
         Page page = displayAllMessageReq.getPage();
         PageHelper.startPage(page.getPage(),page.getPageSize());
-        List<Long> injectionLabelIds = displayAllMessageReq.getInjectionLabelIds();
+        List<Long> injectionLabelIds = new ArrayList<>();
+        for (DisplayLabelInfo labelInfo : displayAllMessageReq.getInjectionLabelIds()){
+            injectionLabelIds.add(labelInfo.getLabelId());
+        }
         List<Label> labelList = injectionLabelMapper.queryLabelsExceptSelected(injectionLabelIds,displayAllMessageReq.getLabelName());
         Page info = new Page(new PageInfo(labelList));
         List<LabelDTO> labelDTOList = new ArrayList<>();

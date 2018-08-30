@@ -22,7 +22,16 @@ public class ContactEvtItem extends BaseEntity {
     private Integer evtItemLength;//记录事件采集项值的长度
     private Integer standardSort;//记录事件采集项的标准化的顺序
     private String isMainParam;//是否是主参
+    private String isLabel;
     private String evtItemDesc;//采集项描述
+
+    public String getIsLabel() {
+        return isLabel;
+    }
+
+    public void setIsLabel(String isLabel) {
+        this.isLabel = isLabel;
+    }
 
     public String getIsMainParam() {
         return isMainParam;

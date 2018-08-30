@@ -18,6 +18,18 @@ public class LabelDTO implements Serializable {
      */
     private String injectionLabelName;
 
+
+    private Long messageType;
+
+
+    public Long getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(Long messageType) {
+        this.messageType = messageType;
+    }
+
     public Long getInjectionLabelId() {
         return injectionLabelId;
     }

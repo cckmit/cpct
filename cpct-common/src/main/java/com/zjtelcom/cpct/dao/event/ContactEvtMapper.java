@@ -41,4 +41,6 @@ public interface ContactEvtMapper {
 
     int modContactEvt(ContactEvt contactEvt);
 
+    List<ContactEvt> query();
+
 }

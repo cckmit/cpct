@@ -29,4 +29,6 @@ public interface MktCamChlResultService {
 
     Map<String,Object> selectAllMktCamChlResult();
 
+    Map<String, Object> copyMktCamChlResult(Long parentMktCamChlResultId);
+
 }
