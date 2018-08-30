@@ -180,8 +180,11 @@ public class EsServiceImpl implements EsService {
                         id = Long.valueOf(map.get("ruleId").toString());
                         name = map.get("ruleName").toString();
                     }
+                    //todo 规则id 暂时没有
                     ruleInfo.setId(id);
+                    //todo 规则名称有吗
                     ruleInfo.setName(name);
+                    //todo 命中结果；命中实例
                     ruleInfo.setResult(true);
                     ruleInfo.setHitEntity("命中得对象");
 
@@ -247,8 +250,10 @@ public class EsServiceImpl implements EsService {
 
     private List<Map<String,Object>>[] hitsToMapList4More( SearchHits hits) {
         List<Map<String,Object>>[] result = new List[hits.getHits().length];
+
         for(int j = 0; j < hits.getHits().length; j++) {
             List<Map<String, Object>> mapList = new ArrayList<>();
+            Map<String, Object> map = new HashMap<>();
             String source = hits.getHits()[j].getSourceAsString();
             System.out.println(source);
             Map<String, Object> stringMap = hits.getHits()[j].getSourceAsMap();
@@ -341,7 +346,6 @@ public class EsServiceImpl implements EsService {
                 .setExplain(true).execute().actionGet();
         return myresponse.getHits();
     }
-
 
 
     private BoolQueryBuilder getBoolQueryBuilderByActivityId(String isi,String activityId) {

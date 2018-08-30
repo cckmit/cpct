@@ -340,7 +340,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             map.put("resultMsg","事件不存在");
             return map;
         }
-        CopyPropertiesUtil.copyBean2Bean(contactEventDetail,contactEvt);
+        CopyPropertiesUtil.copyBean2Bean(contactEventDetail, contactEvt);
         ContactEvtType evtType = evtTypeMapper.selectByPrimaryKey(contactEvt.getContactEvtTypeId());
         if (evtType!=null){
             contactEventDetail.setEventTypeName(evtType.getContactEvtName());

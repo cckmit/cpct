@@ -3,7 +3,6 @@ package com.zjtelcom.cpct.service.impl.api;
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.rule.RuleResult;
-import com.zjtelcom.cpct.dao.campaign.FilterRuleConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfAttrMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamStrategyConfRelMapper;
@@ -12,8 +11,8 @@ import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
 import com.zjtelcom.cpct.dao.user.UserListMapper;
-import com.zjtelcom.cpct.domain.campaign.FilterRuleConfDO;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
@@ -31,9 +30,6 @@ public class RuleTask implements Callable<List<Map<String, Object>>> {
 
     @Autowired
     private FilterRuleMapper filterRuleMapper; //过滤规则
-
-    @Autowired
-    private FilterRuleConfMapper filterRuleConfMapper; //过滤规则与策略规则关联表
 
     @Autowired
     private UserListMapper userListMapper; //过滤规则（红名单、黑名单数据）
@@ -71,6 +67,9 @@ public class RuleTask implements Callable<List<Map<String, Object>>> {
     @Autowired
     private InjectionLabelMapper injectionLabelMapper; //标签因子
 
+    @Autowired
+    private MktStrategyFilterRuleRelMapper mktStrategyFilterRuleRelMapper;
+
 
     private Long strategyConfId; //策略配置id
 
@@ -78,17 +77,14 @@ public class RuleTask implements Callable<List<Map<String, Object>>> {
 
     private String productStr;
 
-    private Long ruleConfId;
-
     private String evtContactConfIdStr;
 
     private RedisUtils redisUtils;
 
-    public RuleTask(Long strategyConfId, Long tarGrpId, String productStr, Long ruleConfId, String evtContactConfIdStr) {
+    public RuleTask(Long strategyConfId, Long tarGrpId, String productStr, String evtContactConfIdStr) {
         this.strategyConfId = strategyConfId;
         this.tarGrpId = tarGrpId;
         this.productStr = productStr;
-        this.ruleConfId = ruleConfId;
         this.evtContactConfIdStr = evtContactConfIdStr;
     }
 
@@ -100,11 +96,26 @@ public class RuleTask implements Callable<List<Map<String, Object>>> {
 
         //  1.判断活动的过滤规则---------------------------
         //获取过滤规则
-        FilterRuleConfDO filterRuleConfDO = filterRuleConfMapper.selectByPrimaryKey(ruleConfId);
-        String ruleConfIdStr = filterRuleConfDO.getFilterRuleIds();
-        if (ruleConfIdStr != null) {
+        //FilterRuleConfDO filterRuleConfDO = filterRuleConfMapper.selectByPrimaryKey(ruleConfId);
+        boolean ruleFilter = true;
+        List<Long> FilterRuleList = mktStrategyFilterRuleRelMapper.selectByStrategyId(strategyConfId);
+        for (Long FilterRuleId : FilterRuleList) {
+            FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(FilterRuleId);
+            //匹配事件过滤规则
+            int flag = 0;
+            flag = userListMapper.checkRule("", filterRule.getRuleId(), null);
+            if (flag > 0) {
+                ruleFilter = false;
+            }
+        }
+        //若存在不符合的规则 结束当前规则循环
+        if (!ruleFilter) {
+            return null;
+        }
+        //String ruleConfIdStr = filterRuleConfDO.getFilterRuleIds();
+/*        if (ruleConfIdStr != null) {
             String[] array = ruleConfIdStr.split(",");
-            boolean ruleFilter = true;
+
             for (String str : array) {
                 //获取具体规则
                 FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.parseLong(str));
@@ -120,7 +131,7 @@ public class RuleTask implements Callable<List<Map<String, Object>>> {
             if (!ruleFilter) {
                 return null;
             }
-        }
+        }*/
 
         //  2.判断活动的客户分群规则---------------------------
         //判断匹配结果，如匹配则向下进行，如不匹配则continue结束本次循环

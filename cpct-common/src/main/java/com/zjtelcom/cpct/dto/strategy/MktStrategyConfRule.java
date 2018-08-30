@@ -40,11 +40,6 @@ public class MktStrategyConfRule {
      */
     private List<MktCamChlResult> mktCamChlResultList;
 
-    /**
-     * 过滤规则配置Id
-     */
-    private Long ruleConfId;
-
 
     public Long getMktStrategyConfRuleId() {
         return mktStrategyConfRuleId;
@@ -76,14 +71,6 @@ public class MktStrategyConfRule {
 
     public void setMktCamChlConfList(List<MktCamChlConf> mktCamChlConfList) {
         this.mktCamChlConfList = mktCamChlConfList;
-    }
-
-    public Long getRuleConfId() {
-        return ruleConfId;
-    }
-
-    public void setRuleConfId(Long ruleConfId) {
-        this.ruleConfId = ruleConfId;
     }
 
     public String getMktStrategyConfRuleName() {

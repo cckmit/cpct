@@ -23,10 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Description 规律规则controller
@@ -42,6 +39,26 @@ public class FilterRuleController extends BaseController {
     @Autowired
     private UserListMapper userListMapper;
 
+
+    /**
+     * 通过过滤标签集合获取标签列表
+     *
+     * @param params
+     * @return
+     */
+    @RequestMapping("/qryFilterRuleByIdList")
+    @CrossOrigin
+    public String qryFilterRuleByIdList(@RequestBody Map<String, Object> params) {
+        Map<String, Object> filterRuleListMap = new HashMap<>();
+        List<Integer> filterRuleIdList = (List<Integer>) params.get("filterRuleIdList");
+        try {
+            filterRuleListMap = filterRuleService.getFilterRule(filterRuleIdList);
+        } catch (Exception e) {
+            logger.error("[op:FilterRuleController] fail to get filterRuleIdList by filterRuleIdList = {}! Exception: ", JSONArray.toJSON(filterRuleIdList), e);
+            return JSON.toJSONString(filterRuleListMap);
+        }
+        return JSON.toJSONString(filterRuleListMap);
+    }
 
     /**
      * 查询过滤规则列表(含分页)

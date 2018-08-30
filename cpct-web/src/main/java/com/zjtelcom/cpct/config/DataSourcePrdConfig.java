@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.jta.atomikos.AtomikosDataSourceBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -28,19 +29,35 @@ import java.sql.SQLException;
 @MapperScan(basePackages = "com.zjtelcom.cpct_prd.dao", sqlSessionFactoryRef = "prdSqlSessionFactory")
 public class DataSourcePrdConfig {
 
+//
+//    @Bean
+//    @ConfigurationProperties(prefix = "spring.datasource_prd")
+//    public DataSource datasourcePrd() {
+//        return DataSourceBuilder.create().type(DruidDataSource.class).build();
+//    }
+//
+//    @Bean(name = "prdSqlSessionFactory")
+//    public SqlSessionFactory sqlSessionFactory(@Qualifier("datasourcePrd") DataSource dataSource) throws Exception {
+//        SqlSessionFactoryBean sessionFactoryBean = new SqlSessionFactoryBean();
+//        sessionFactoryBean.setDataSource(dataSource);
+//        sessionFactoryBean.setMapperLocations(new PathMatchingResourcePatternResolver()
+//                .getResources("classpath*:sync/*/*.xml"));
+//        return sessionFactoryBean.getObject();
+//    }
+
 
     @Bean
-    @ConfigurationProperties(prefix = "spring.datasource_prd")
+    @ConfigurationProperties(prefix = "spring.jta.atomikos.datasource_prd")
     public DataSource datasourcePrd() {
-        return DataSourceBuilder.create().type(DruidDataSource.class).build();
+        return new AtomikosDataSourceBean();
     }
 
     @Bean(name = "prdSqlSessionFactory")
     public SqlSessionFactory sqlSessionFactory(@Qualifier("datasourcePrd") DataSource dataSource) throws Exception {
         SqlSessionFactoryBean sessionFactoryBean = new SqlSessionFactoryBean();
         sessionFactoryBean.setDataSource(dataSource);
-        sessionFactoryBean.setMapperLocations(new PathMatchingResourcePatternResolver()
-                .getResources("classpath*:sync/*/*.xml"));
+        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        sessionFactoryBean.setMapperLocations(resolver.getResources("classpath*:sync/*/*.xml"));
         return sessionFactoryBean.getObject();
     }
 
