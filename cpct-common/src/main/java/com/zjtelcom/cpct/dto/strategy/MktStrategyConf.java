@@ -39,7 +39,7 @@ public class MktStrategyConf {
     /**
      * 过滤规则id集合
      */
-    private List<Long>  filterRuleList;
+    private List<Long>  filterRuleIdList;
 
     public Long getMktStrategyConfId() {
         return mktStrategyConfId;
@@ -89,11 +89,11 @@ public class MktStrategyConf {
         this.areaIdList = areaIdList;
     }
 
-    public List<Long> getFilterRuleList() {
-        return filterRuleList;
+    public List<Long> getFilterRuleIdList() {
+        return filterRuleIdList;
     }
 
-    public void setFilterRuleList(List<Long> filterRuleList) {
-        this.filterRuleList = filterRuleList;
+    public void setFilterRuleIdList(List<Long> filterRuleIdList) {
+        this.filterRuleIdList = filterRuleIdList;
     }
 }

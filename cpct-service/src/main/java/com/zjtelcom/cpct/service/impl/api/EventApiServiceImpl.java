@@ -258,8 +258,8 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
                             //  1.判断活动的过滤规则---------------------------
                             //获取过滤规则
                             boolean ruleFilter = true;
-                            List<Long> FilterRuleList = mktStrategyFilterRuleRelMapper.selectByStrategyId(mktCamStrategyConfRelDO.getStrategyConfId());
-                            for (Long FilterRuleId : FilterRuleList) {
+                            List<Long> filterRuleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(mktCamStrategyConfRelDO.getStrategyConfId());
+                            for (Long FilterRuleId : filterRuleIdList) {
                                 FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(FilterRuleId);
                                 //匹配事件过滤规则
                                 int flag = 0;

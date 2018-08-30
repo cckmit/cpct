@@ -22,7 +22,10 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.BaseService;
+import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlResultService;
+import com.zjtelcom.cpct.service.channel.ProductService;
+import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
@@ -60,6 +63,15 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
 
     @Autowired
     private MktCamChlResultService mktCamChlResultService;
+
+    @Autowired
+    private MktCamChlConfService mktCamChlConfService;
+
+    @Autowired
+    private TarGrpService tarGrpService;
+
+    @Autowired
+    private ProductService productService;
 
     /**
      * 添加策略规则
@@ -351,6 +363,59 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             logger.error("[op:MktStrategyConfRuleServiceImpl] failed to delete the mktStrategyConfRuleDO by mktStrategyConfRuleId = {}", mktStrategyConfRuleId);
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_FAIL);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.DELETE_MKT_RULE_STR_CONF_RULE_FAILURE.getErrorMsg());
+        }
+        return mktStrategyConfRuleMap;
+    }
+
+
+    /**
+     * 复制策略规则
+     *
+     * @param parentMktStrategyConfRuleId
+     * @return
+     */
+    @Override
+    public Map<String, Object> copyMktStrategyConfRule(Long parentMktStrategyConfRuleId){
+        Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();
+        MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(parentMktStrategyConfRuleId);
+
+        /**
+         * 客户分群配置
+         */
+        tarGrpService.copyTarGrp(mktStrategyConfRuleDO.getTarGrpId());
+        
+        /**
+         * 销售品配置
+         */
+        List<Long> productIdList = new ArrayList<>();
+        if (mktStrategyConfRuleDO.getProductId() != null) {
+            String[] productIds = mktStrategyConfRuleDO.getProductId().split("/");
+            for (int i = 0; i < productIds.length; i++) {
+                if (productIds[i] != "" && !"".equals(productIds[i])) {
+                    productIdList.add(Long.valueOf(productIds[i]));
+                }
+            }
+        }
+        productService.addProductRule(UserUtil.loginId(), productIdList);
+
+        /**
+         * 协同渠道配置
+         */
+        String[] evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
+        if(evtContactConfIds!=null && !"".equals(evtContactConfIds[0])){
+            for (String evtContactConfId : evtContactConfIds){
+                mktCamChlConfService.copyMktCamChlConf(Long.valueOf(evtContactConfId));
+            }
+        }
+
+        /**
+         * 二次协同结果
+         */
+        String[] mktCamChlResultIds = mktStrategyConfRuleDO.getMktCamChlResultId().split("/");
+        if(mktCamChlResultIds!=null && !"".equals(mktCamChlResultIds[0])){
+            for(String mktCamChlResultId : mktCamChlResultIds){
+                mktCamChlResultService.copyMktCamChlResult(Long.valueOf(mktCamChlResultId));
+            }
         }
         return mktStrategyConfRuleMap;
     }

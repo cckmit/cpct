@@ -208,4 +208,22 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         return maps;
     }
 
+
+    /**
+     * 根据过滤规则id集合查询过滤规则集合
+     */
+    @Override
+    public Map<String, Object> getFilterRule(List<Integer> filterRuleIdList) {
+        Map<String, Object> map = new HashMap<>();
+        List<FilterRule> filterRuleList = new ArrayList<>();
+        for (Integer filterRuleId : filterRuleIdList) {
+            FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId.longValue());
+            filterRuleList.add(filterRule);
+        }
+        map.put("resultCode", CommonConstant.CODE_SUCCESS);
+        map.put("resultMsg", StringUtils.EMPTY);
+        map.put("filterRuleList", filterRuleList);
+        return map;
+    }
+
 }

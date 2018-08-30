@@ -16,6 +16,7 @@ import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
 import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
 import com.zjtelcom.cpct.domain.Rule;
 import com.zjtelcom.cpct.domain.RuleDetail;
+import com.zjtelcom.cpct.domain.User;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.channel.CamScript;
@@ -428,5 +429,60 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
 
         rule.setListData(ruleDetails);
         return rule;
+    }
+
+
+    /**
+     * 复制首次协同渠道
+     *
+     * @param parentEvtContactConfId
+     * @return
+     */
+    @Override
+    public Map<String, Object> copyMktCamChlConf(Long parentEvtContactConfId) {
+        Map<String, Object> mktCamChlConfMap = new HashMap<>();
+        try {
+            // 获取原协同渠道
+            MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(parentEvtContactConfId);
+            mktCamChlConfDO.setEvtContactConfId(null);
+            mktCamChlConfDO.setCreateStaff(UserUtil.loginId());
+            mktCamChlConfDO.setCreateDate(new Date());
+            mktCamChlConfDO.setUpdateStaff(UserUtil.loginId());
+            mktCamChlConfDO.setUpdateDate(new Date());
+            // 新增协同渠道
+            mktCamChlConfMapper.insert(mktCamChlConfDO);
+            Long childEvtContactConfId = mktCamChlConfDO.getEvtContactConfId();
+            // 获取原渠道的属性
+            List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(parentEvtContactConfId);
+            // 获取原渠道的规则，通过parentEvtContactConfId获取规则放入属性中
+            String rule = ruleSelect(parentEvtContactConfId);
+
+            for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
+                mktCamChlConfAttrDO.setContactChlAttrRstrId(null);
+                mktCamChlConfAttrDO.setEvtContactConfId(childEvtContactConfId);
+
+                if (mktCamChlConfAttrDO.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
+                    mktCamChlConfAttrDO.setAttrValue(childEvtContactConfId.toString());
+                    //协同渠道自策略规则保存
+                    mktCamChlConfAttrDO.setAttrValue(rule);
+                    String params = mktCamChlConfAttrDO.getAttrValue();
+                    ruleInsert(childEvtContactConfId, params);
+                }
+                mktCamChlConfAttrMapper.insert(mktCamChlConfAttrDO);
+            }
+            // 查询痛痒点话术列表
+            verbalService.copyVerbal(parentEvtContactConfId, childEvtContactConfId);
+
+            // 查询脚本
+
+            mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            mktCamChlConfMap.put("resultMsg", ErrorCode.SAVE_CAM_CHL_CONF_SUCCESS.getErrorMsg());
+            mktCamChlConfMap.put("mktCamChlConfDO", mktCamChlConfDO);
+        } catch (Exception e) {
+            logger.error("[op:MktCamChlConfServiceImpl] fail to getMktCamChlConfDO by parentEvtContactConfId = {}", parentEvtContactConfId, e);
+            mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            mktCamChlConfMap.put("resultMsg", ErrorCode.SAVE_CAM_CHL_CONF_FAILURE.getErrorMsg());
+        }
+        return mktCamChlConfMap;
     }
 }

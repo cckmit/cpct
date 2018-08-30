@@ -42,7 +42,7 @@
     from mkt_strategy_filter_rule_rel
     where MKT_STRATEGY_FILTER_RULE_REL_ID = #{mktStrategyFilterRuleRelId,jdbcType=BIGINT}
   </select>
-  <select id="selectByStrategyId" parameterType="java.lang.Long" resultType="java.util.List">
+  <select id="selectByStrategyId" parameterType="java.lang.Long" resultType="java.lang.Long">
     select RULE_ID
     from mkt_strategy_filter_rule_rel
     where STRATEGY_ID = #{strategyId,jdbcType=BIGINT}

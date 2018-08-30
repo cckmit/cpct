@@ -50,42 +50,51 @@ import java.util.*;
 @Transactional
 public class MktCampaignServiceImpl extends BaseService implements MktCampaignService {
 
+    /**
+     * 营销活动
+     */
     @Autowired
     private MktCampaignMapper mktCampaignMapper;
 
+    /**
+     * 活动关联
+     */
     @Autowired
     private MktCampaignRelMapper mktCampaignRelMapper;
 
+    /**
+     * 活动与事件关联
+     */
     @Autowired
     private MktCamEvtRelMapper mktCamEvtRelMapper;
-
+    /**
+     * 系统参数
+     */
     @Autowired
     private SysParamsMapper sysParamsMapper;
-
+    /**
+     * 事件
+     */
     @Autowired
     private ContactEvtMapper contactEvtMapper;
-
-    @Autowired
-    private MktCamEvtRelMapper camEvtRelMapper;
-
     /**
      * 策略配置和活动关联
      */
     @Autowired
     private MktCamStrategyConfRelMapper mktCamStrategyConfRelMapper;
-
     /**
      * 策略配置基本信息
      */
     @Autowired
     private MktStrategyConfMapper mktStrategyConfMapper;
-
     /**
      * 策略配置service
      */
     @Autowired
     private MktStrategyConfService mktStrategyConfService;
-
+    /**
+     * 活动（同步生产）
+     */
     @Autowired
     private MktCampaignPrdMapper mktCampaignPrdMapper;
 
@@ -156,6 +165,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCamCityRelMapper.insert(mktCamCityRelDO);
         }
 
+
 /*
         // 创建活动与活动之间的关系
         for (Long applyRegionIds : mktCampaignVO.getApplyRegionIds()) {
@@ -171,6 +181,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignRelMapper.insert(mktCampaignRelDO);
         }
 */
+
 
         //创建活动与事件的关联
         for (EventDTO eventDTO : mktCampaignVO.getEventDTOS()) {
@@ -284,33 +295,30 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         }*/
         // 获取活动基本信息
         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
-
-
         // 获取试运算展示列 和 isale展示列
         List<Long> calcDisplayList = new ArrayList<>();
         List<Long> isaleDisplayList = new ArrayList<>();
         String calcDisplayString = mktCampaignDO.getCalcDisplay();
         String isaleDisplayString = mktCampaignDO.getIsaleDisplay();
-        if (calcDisplayString!=null && !"".equals(calcDisplayString)){
+        if (calcDisplayString != null && !"".equals(calcDisplayString)) {
 
             String[] calcDisplays = calcDisplayString.split("/");
-            for (String calcDisplay:calcDisplays) {
+            for (String calcDisplay : calcDisplays) {
                 calcDisplayList.add(Long.valueOf(calcDisplay));
             }
         }
-        if (isaleDisplayString!=null && !"".equals(isaleDisplayString)){
+        if (isaleDisplayString != null && !"".equals(isaleDisplayString)) {
             String[] isaleDisplays = isaleDisplayString.split("/");
-            for (String isaleDisplay:isaleDisplays) {
+            for (String isaleDisplay : isaleDisplays) {
                 isaleDisplayList.add(Long.valueOf(isaleDisplay));
             }
         }
-
-
-
         MktCampaignVO mktCampaignVO = new MktCampaignVO();
         CopyPropertiesUtil.copyBean2Bean(mktCampaignVO, mktCampaignDO);
         mktCampaignVO.setCalcDisplay(calcDisplayList);
         mktCampaignVO.setIsaleDisplay(isaleDisplayList);
+
+        // 获取下发城市集合
         List<MktCamCityRelDO> mktCamCityRelDOList = mktCamCityRelMapper.selectByMktCampaignId(mktCampaignVO.getMktCampaignId());
         for (MktCamCityRelDO mktCamCityRelDO : mktCamCityRelDOList) {
             SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCamCityRelDO.getCityId().intValue());
@@ -399,13 +407,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
  */
         // 删除活动基本信息
         mktCampaignMapper.deleteByPrimaryKey(mktCampaignId);
-
-        mktCampaignPrdMapper.deleteByPrimaryKey(mktCampaignId);
-
- //       System.out.println(1/0);
-
-
-
         Map<String, Object> maps = new HashMap<>();
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
@@ -442,7 +443,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         MktCampaignPar.setMktCampaignType(mktCampaignType);
         List<Long> relationCamList = new ArrayList<>();
         if (eventId != null) {
-            List<MktCamEvtRel> camEvtRelList = camEvtRelMapper.qryBycontactEvtId(eventId);
+            List<MktCamEvtRel> camEvtRelList = mktCamEvtRelMapper.qryBycontactEvtId(eventId);
             for (MktCamEvtRel rel : camEvtRelList) {
                 relationCamList.add(rel.getMktCampaignId());
             }
@@ -527,8 +528,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
             mktCampaignVOList.add(mktCampaignVO);
         }
-
-
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("mktCampaigns", mktCampaignVOList);
@@ -552,65 +551,62 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         return maps;
     }
 
+
     /**
-     * 新增营销活动（编码：5013010002 ）
+     * 发布并下发活动
      *
-     * @param mktCampaignDetail
+     * @param mktCampaignId
      * @return
+     * @throws Exception
      */
-/*
-    @Override
-    public int createMktCampaign(MktCampaignDetail mktCampaignDetail) throws Exception {
 
-        //获取活动主表信息
-        MktCampaignDO mktCampaign = new MktCampaignDO();
-        CopyPropertiesUtil.copyBean2Bean(mktCampaign, mktCampaignDetail);//映射字段
-        //保存主表信息
-        int i = mktCampaignMapper.insert(mktCampaign);
-        //获取主表id
-        Long mainId = mktCampaign.getMktCampaignId();
-*/
+    public Map<String, Object> publishMktCampaign(Long mktCampaignId) throws Exception {
+        // 获取当前活动信息
+        MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
+        // 获取当前活动标识
+        Long parentMktCampaignId = mktCampaignDO.getMktCampaignId();
+        // 获取活动下策略的集合
+        List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByMktCampaignId(parentMktCampaignId);
+        // 获取生失效时间
+        Date effDate = mktCampaignDO.getPlanBeginTime();
+        Date expDate = mktCampaignDO.getPlanEndTime();
+        // 获取当前活动的下发城市集合
+        List<MktCamCityRelDO> mktCamCityRelDOList = mktCamCityRelMapper.selectByMktCampaignId(parentMktCampaignId);
+        // 遍历活动下发城市集合
+        for (MktCamCityRelDO mktCamCityRelDO : mktCamCityRelDOList) {
+            // 为下发城市生成新的活动
+            mktCampaignDO.setMktCampaignId(null);
+            mktCampaignDO.setCreateDate(new Date());
+            mktCampaignDO.setCreateStaff(UserUtil.loginId());
+            mktCampaignDO.setUpdateDate(new Date());
+            mktCampaignDO.setUpdateStaff(UserUtil.loginId());
+            mktCampaignMapper.insert(mktCampaignDO);
+            // 获取新的活动的Id
+            Long childMktCampaignId = mktCampaignDO.getMktCampaignId();
+            // 与父活动进行关联
+            MktCampaignRelDO mktCampaignRelDO = new MktCampaignRelDO();
+            mktCampaignRelDO.setaMktCampaignId(parentMktCampaignId);
+            mktCampaignRelDO.setzMktCampaignId(childMktCampaignId);
+            mktCampaignRelDO.setApplyRegionId(mktCamCityRelDO.getCityId());
+            mktCampaignRelDO.setEffDate(effDate);
+            mktCampaignRelDO.setExpDate(expDate);
+            mktCampaignRelDO.setRelType("1000");   //  1000-父子关系
+            mktCampaignRelDO.setCreateDate(new Date());
+            mktCampaignRelDO.setCreateStaff(UserUtil.loginId());
+            mktCampaignRelDO.setUpdateDate(new Date());
+            mktCampaignRelDO.setCreateStaff(UserUtil.loginId());
+            mktCampaignRelDO.setStatusCd("1000");  // 1000-有效
+            mktCampaignRelDO.setStatusDate(new Date());
+            mktCampaignRelMapper.insert(mktCampaignRelDO);
 
-    //分群信息
-/*        List<MktCamGrpRul> mktCamGrpRuls = mktCampaignDetail.getMktCamGrpRuls();
-        //todo 保存分群信息
+            // 遍历活动下策略的集合
+            for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {
 
-
-        //策略信息
-        List<MktStrategyDetail> mktCampaignStrategyDetails = mktCampaignDetail.getMktCampaignStrategyDetails();
-        //todo 保存策略
-
-        //营销活动条目
-        List<MktCamItem> mktCamItems = mktCampaignDetail.getMktCamItems();
-        //todo 营销活动条目*/
-
-    //事件
-//        List<ContactEvt> mktCampaignEvts = mktCampaignDetail.getMktCampaignEvts();
-    //事件场景
-//        List<EventScene> eventScenes = mktCampaignDetail.getEventScenes();
-    //todo 保存事件关联
-
-/*
-
-        return 0;
+            }
+        }
+        return null;
     }
-*/
-
-    /**
-     * 修改营销活动（编码：5013010003 ）
-     *
-     * @param mktCampaignDetail
-     * @return
-     */
-/*    @Override
-    public int modMktCampaign(MktCampaignDetail mktCampaignDetail) throws Exception {
-        //映射字段
-        MktCampaignDO mktCampaign = new MktCampaignDO();
-        CopyPropertiesUtil.copyBean2Bean(mktCampaign, mktCampaignDetail);
-        mktCampaignMapper.updateByPrimaryKey(mktCampaign);
 
 
-        return 0;
-    }*/
 
 }
