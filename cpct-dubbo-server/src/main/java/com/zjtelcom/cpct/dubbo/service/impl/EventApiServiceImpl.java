@@ -67,9 +67,6 @@ public class EventApiServiceImpl implements EventApiService {
     private FilterRuleMapper filterRuleMapper; //过滤规则
 
     @Autowired(required = false)
-    private FilterRuleConfMapper filterRuleConfMapper; //过滤规则与策略规则关联表
-
-    @Autowired(required = false)
     private PpmProductMapper ppmProductMapper; //销售品
 
     @Autowired(required = false)
@@ -233,8 +230,6 @@ public class EventApiServiceImpl implements EventApiService {
                     return result;
                 }
                 //获取所有资产
-
-
 
                 for (int i = 0; i < 10; i++) {
                     //资产级
@@ -489,7 +484,8 @@ public class EventApiServiceImpl implements EventApiService {
                     //获取销售品
                     String productStr = mktStrategyConfRuleDO.getProductId();
                     //过滤规则id
-                    Long ruleConfId = mktStrategyConfRuleDO.getRuleConfId();
+//                    Long ruleConfId = mktStrategyConfRuleDO.getRuleConfId();
+                    Long ruleConfId = 0L;
                     //协同渠道配置id
                     String evtContactConfIdStr = mktStrategyConfRuleDO.getEvtContactConfId();
                     //规则id
