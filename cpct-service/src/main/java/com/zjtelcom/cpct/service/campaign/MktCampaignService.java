@@ -44,4 +44,6 @@ public interface MktCampaignService {
 
 //    Map<String,Object> qryMktCampaignList (MktCampaignVO mktCampaignVO);
 
+    Map<String, Object> publishMktCampaign(Long mktCampaignId) throws Exception;
+
 }

@@ -11,6 +11,7 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlResultConfRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlResultMapper;
 import com.zjtelcom.cpct.domain.User;
+import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlResultConfRelDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlResultDO;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
@@ -71,6 +72,9 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
         try {
             //存储结果信息
             CopyPropertiesUtil.copyBean2Bean(mktCamChlResultDO, mktCamChlResult);
+            if (mktCamChlResult.getMktCamChlResultId() != null) {
+                mktCamChlResult.setMktCamChlResultId(null);
+            }
             mktCamChlResultDO.setCreateStaff(UserUtil.loginId());
             mktCamChlResultDO.setCreateDate(new Date());
             mktCamChlResultDO.setUpdateStaff(UserUtil.loginId());
@@ -265,26 +269,36 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
             mktCamChlResultDO.setCreateStaff(UserUtil.loginId());
             mktCamChlResultDO.setUpdateDate(new Date());
             mktCamChlResultDO.setUpdateStaff(UserUtil.loginId());
+            // 新增结果 并获取Id
+            mktCamChlResultMapper.insert(mktCamChlResultDO);
+            Long mktCamChlResultId = mktCamChlResultDO.getMktCamChlResultId();
+            // 获取原二次协同渠道下结果的推送渠道
             List<MktCamChlResultConfRelDO> mktCamChlResultConfRelDOList = mktCamChlResultConfRelMapper.selectByMktCamChlResultId(parentMktCamChlResultId);
-
             List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
+            // 遍历获取原二次协同渠道下结果的推送渠道
             for (MktCamChlResultConfRelDO mktCamChlResultConfRelDO : mktCamChlResultConfRelDOList) {
-                Map<String, Object> mktCamChlConf = mktCamChlConfService.copyMktCamChlConf(mktCamChlResultConfRelDO.getEvtContactConfId());
-      /*          MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConf.get("mktCamChlConfDetail");
-                mktCamChlConfDetailList.add(mktCamChlConfDetail);*/
+                // 复制推送渠道
+                Map<String, Object> mktCamChlConfMap = mktCamChlConfService.copyMktCamChlConf(mktCamChlResultConfRelDO.getEvtContactConfId());
+                MktCamChlConfDO mktCamChlConfDO = (MktCamChlConfDO) mktCamChlConfMap.get("mktCamChlConfDO");
+                // 新的推送渠道与新的结果简历关联
+                if (mktCamChlConfDO != null) {
+                    // 结果与推送渠道的关联
+                    MktCamChlResultConfRelDO childCamChlResultConfRelDO = new MktCamChlResultConfRelDO();
+                    childCamChlResultConfRelDO.setMktCamChlResultId(mktCamChlResultId);
+                    childCamChlResultConfRelDO.setEvtContactConfId(mktCamChlConfDO.getEvtContactConfId());
+                    childCamChlResultConfRelDO.setCreateStaff(UserUtil.loginId());
+                    childCamChlResultConfRelDO.setCreateDate(new Date());
+                    childCamChlResultConfRelDO.setUpdateStaff(UserUtil.loginId());
+                    childCamChlResultConfRelDO.setUpdateDate(new Date());
+                    mktCamChlResultConfRelMapper.insert(childCamChlResultConfRelDO);
+                }
             }
-
-
-
-
-/*            mktCamChlResult.setMktCamChlConfDetailList(mktCamChlConfDetailList);
             mktCamChlResultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
-            mktCamChlResultMap.put("mktCamChlResult", mktCamChlResult);*/
+            mktCamChlResultMap.put("mktCamChlResultDO", mktCamChlResultDO);
         } catch (Exception e) {
             logger.error("[op:MktCamChlResultServiceImpl] failed to get mktCamChlResultDO by mktCamChlResultId = {}", parentMktCamChlResultId);
             mktCamChlResultMap.put("resultCode", CommonConstant.CODE_FAIL);
             mktCamChlResultMap.put("resultMsg", ErrorCode.GET_MKT_CAM_CHL_CONF_FAILURE.getErrorMsg());
-           // mktCamChlResultMap.put("mktCamChlResult", mktCamChlResult);
         }
         return mktCamChlResultMap;
     }
@@ -292,7 +306,6 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
 
     @Override
     public Map<String, Object> selectAllMktCamChlResult() {
-
         return null;
     }
 }

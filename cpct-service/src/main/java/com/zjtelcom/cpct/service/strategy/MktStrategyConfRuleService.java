@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.service.strategy;
 
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 
+import java.util.List;
 import java.util.Map;
 
 public interface MktStrategyConfRuleService {
@@ -18,6 +19,10 @@ public interface MktStrategyConfRuleService {
 
     Map<String, Object> deleteMktStrategyConfRule(Long mktStrategyConfRuleId);
 
-    Map<String, Object> copyMktStrategyConfRule(Long parentMktStrategyConfRuleId);
+    Map<String, Object> copyMktStrategyConfRule(Long parentMktStrategyConfRuleId)throws Exception;
+
+    Map<String, Object> copyMktStrategyConfRule(MktStrategyConfRule mktStrategyConfRule) throws Exception;
+
+    Map<String, Object> updateProductIds(List<Long> productIdList, Long ruleId);
 
 }
