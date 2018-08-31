@@ -382,7 +382,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         /**
          * 客户分群配置
          */
-        tarGrpService.copyTarGrp(mktStrategyConfRuleDO.getTarGrpId());
+        tarGrpService.copyTarGrp(mktStrategyConfRuleDO.getTarGrpId(),true);
         
         /**
          * 销售品配置
