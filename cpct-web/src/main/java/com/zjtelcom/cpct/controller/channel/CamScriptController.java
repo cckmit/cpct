@@ -23,6 +23,8 @@ public class CamScriptController extends BaseController {
     @Autowired
     private CamScriptService camScriptService;
 
+
+
     /**
      * 添加营销活动脚本
      */
@@ -32,7 +34,7 @@ public class CamScriptController extends BaseController {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
-            result = camScriptService.addCamScript(userId,addVO);
+            result = camScriptService.copyCamScript(671L,1L);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to addCamScript",e);
             result.put("resultCode",CODE_FAIL);

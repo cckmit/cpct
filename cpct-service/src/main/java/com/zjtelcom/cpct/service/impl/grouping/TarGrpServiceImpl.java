@@ -81,7 +81,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
      * @return
      */
     @Override
-    public Map<String, Object> copyTarGrp(Long tarGrpId) {
+    public Map<String, Object> copyTarGrp(Long tarGrpId,boolean isCopy) {
         Map<String,Object> result = new HashMap<>();
         TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpId);
         if (tarGrp==null){
@@ -92,7 +92,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
         TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
         detail.setTarGrpConditions(conditionList);
-        result = createTarGrp(detail,true);
+        result = createTarGrp(detail,isCopy);
         return result;
     }
 
