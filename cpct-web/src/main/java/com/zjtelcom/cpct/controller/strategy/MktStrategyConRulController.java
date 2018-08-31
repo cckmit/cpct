@@ -7,6 +7,7 @@
 package com.zjtelcom.cpct.controller.strategy;
 
 import com.alibaba.fastjson.JSON;
+import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -75,5 +76,19 @@ public class MktStrategyConRulController {
             map = mktStrategyConfRuleService.listAllMktStrategyConfRuleForName(mktStrategyConfId);
         }
         return JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 通过规则内容复制策略规则
+     *
+     * @param mktStrategyConfRule
+     * @return
+     */
+    @RequestMapping(value = "/copyMktStrategyConfRule", method = RequestMethod.POST)
+    @CrossOrigin
+    public String copyMktStrategyConfRule(@RequestBody MktStrategyConfRule mktStrategyConfRule) throws Exception {
+        Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.copyMktStrategyConfRule(mktStrategyConfRule);
+        return JSON.toJSONString(mktStrategyConfRuleMap);
     }
 }

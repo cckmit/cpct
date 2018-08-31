@@ -44,17 +44,33 @@
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO">
     update mkt_strategy_conf_rule
-    set MKT_STRATEGY_CONF_RULE_NAME = #{mktStrategyConfRuleName,jdbcType=VARCHAR},
+    set
+    <if test="mktStrategyConfRuleName != null and mktStrategyConfRuleName != ''">
+      MKT_STRATEGY_CONF_RULE_NAME = #{mktStrategyConfRuleName,jdbcType=VARCHAR},
+    </if>
+    <if test="tarGrpId != null and tarGrpId != ''">
       TAR_GRP_ID = #{tarGrpId,jdbcType=BIGINT},
+    </if>
+    <if test="productId != null and productId != ''">
       PRODUCT_ID = #{productId,jdbcType=VARCHAR},
+    </if>
+    <if test="evtContactConfId != null and evtContactConfId != ''">
       EVT_CONTACT_CONF_ID = #{evtContactConfId,jdbcType=VARCHAR},
+    </if>
+    <if test="mktCamChlResultId != null and mktCamChlResultId != ''">
       MKT_CAM_CHL_RESULT_ID = #{mktCamChlResultId,jdbcType=VARCHAR},
+    </if>
+    <if test="createStaff != null and createStaff != ''">
       CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+    </if>
+    <if test="createDate != null and createDate != ''">
       CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+    </if>
       UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
       UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
     where MKT_STRATEGY_CONF_RULE_ID = #{mktStrategyConfRuleId,jdbcType=BIGINT}
   </update>
+
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select MKT_STRATEGY_CONF_RULE_ID, MKT_STRATEGY_CONF_RULE_NAME, TAR_GRP_ID, PRODUCT_ID,
     EVT_CONTACT_CONF_ID, MKT_CAM_CHL_RESULT_ID, CREATE_STAFF, CREATE_DATE,
