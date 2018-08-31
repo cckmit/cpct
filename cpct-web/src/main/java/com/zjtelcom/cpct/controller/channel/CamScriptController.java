@@ -34,7 +34,7 @@ public class CamScriptController extends BaseController {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
-            result = camScriptService.copyCamScript(671L,1L);
+            result = camScriptService.addCamScript(userId,addVO);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to addCamScript",e);
             result.put("resultCode",CODE_FAIL);
