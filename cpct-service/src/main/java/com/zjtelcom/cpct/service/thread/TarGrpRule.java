@@ -74,6 +74,7 @@ public class TarGrpRule extends Thread {
                     labelResult.setLabelName(label.getInjectionLabelName());
                     labelResult.setRightOperand(label.getRightOperand());
                     labelResult.setRightParam(tarGrpConditionDOs.get(i).getRightParam());
+                    labelResult.setClassName(label.getClassName());
                     labelResultList.add(labelResult);
                     if ("7100".equals(type)) {
                         express.append("!");

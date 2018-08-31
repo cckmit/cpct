@@ -39,6 +39,19 @@ public class LabelResult {
      */
     private Boolean result; // ture--命中， false--未命中
 
+    /**
+     * 是否是大数据标签
+     */
+    private String className;
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
     public String getLabelCode() {
         return labelCode;
     }

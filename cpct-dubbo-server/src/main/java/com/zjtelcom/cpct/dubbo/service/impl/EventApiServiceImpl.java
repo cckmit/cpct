@@ -144,7 +144,7 @@ public class EventApiServiceImpl implements EventApiService {
         String integrationId = "";  //资产集成编码
         String accNbr = "";   //资产号
         String custNbr = "";   //客户编号  客户级
-        boolean isCust = false; //帕努单是否客户级
+        boolean isCust = false; //判断是否客户级
         for (Map<String, Object> label : labelList) {
             Map<String, String> lab = (Map<String, String>) label.get("trigger");
             if ("INTEGRATION_ID".equals(lab.get("key"))) {
