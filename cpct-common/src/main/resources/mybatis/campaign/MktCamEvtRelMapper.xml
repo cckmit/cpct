@@ -99,13 +99,6 @@
       order by CAMPAIGN_SEQ asc
     </select>
 
-    <select id="listActByEventId" parameterType="java.lang.Long" resultMap="BaseResultMap">
-      select MKT_CAMP_EVT_REL_ID, MKT_CAMPAIGN_ID, CAMPAIGN_SEQ, EVENT_ID,LEVEL_CONFIG, WHETHER_CONFIG
-      from mkt_cam_evt_rel
-      where EVENT_ID = #{eventId,jdbcType=BIGINT}
-      order by CAMPAIGN_SEQ asc
-    </select>
-
     <select id="findByCampaignIdAndEvtId" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select MKT_CAMP_EVT_REL_ID, MKT_CAMPAIGN_ID, CAMPAIGN_SEQ, EVENT_ID,LEVEL_CONFIG, WHETHER_CONFIG,
      STATUS_CD, STATUS_DATE,
