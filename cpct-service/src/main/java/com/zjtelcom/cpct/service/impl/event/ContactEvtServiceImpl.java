@@ -351,26 +351,26 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         contactEventDetail.setContactEvtItems(contactEvtItems);
 
         //查询出事件匹配规则
-        ContactEvtMatchRul contactEvtMatchRul = new ContactEvtMatchRul();
-        contactEvtMatchRul.setContactEvtId(contactEvtId);
-        List<ContactEvtMatchRul> contactEvtMatchRuls = contactEvtMatchRulMapper.listEventMatchRuls(contactEvtMatchRul);
-        List<FilterRule> filterRuleList = new ArrayList<>();
-        FilterRule filterRule = new FilterRule();
-        for (ContactEvtMatchRul contactEvtMatchRul1 : contactEvtMatchRuls) {
-            filterRule.setRuleId(Long.valueOf(contactEvtMatchRul1.getEvtRulExpression()));
-            List<FilterRule> filterRules = filterRuleMapper.qryFilterRule(filterRule);
-            if (filterRules != null) {
-                filterRuleList.add(filterRules.get(0));
-            }
-        }
-        contactEventDetail.setFilterRules(filterRuleList);
-        if (contactEvt.getMktCampaignType()!=null){
-            String paramKey = ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey();
-           SysParams systemParam = sysParamsMapper.findParamsByValue(paramKey,contactEvt.getMktCampaignType());
-            if (systemParam!=null){
-                contactEventDetail.setMktCampaignTypeName(systemParam.getParamName());
-            }
-        }
+//        ContactEvtMatchRul contactEvtMatchRul = new ContactEvtMatchRul();
+//        contactEvtMatchRul.setContactEvtId(contactEvtId);
+//        List<ContactEvtMatchRul> contactEvtMatchRuls = contactEvtMatchRulMapper.listEventMatchRuls(contactEvtMatchRul);
+//        List<FilterRule> filterRuleList = new ArrayList<>();
+//        FilterRule filterRule = new FilterRule();
+//        for (ContactEvtMatchRul contactEvtMatchRul1 : contactEvtMatchRuls) {
+//            filterRule.setRuleId(Long.valueOf(contactEvtMatchRul1.getEvtRulExpression()));
+//            List<FilterRule> filterRules = filterRuleMapper.qryFilterRule(filterRule);
+//            if (filterRules != null) {
+//                filterRuleList.add(filterRules.get(0));
+//            }
+//        }
+//        contactEventDetail.setFilterRules(filterRuleList);
+//        if (contactEvt.getMktCampaignType()!=null){
+//            String paramKey = ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey();
+//           SysParams systemParam = sysParamsMapper.findParamsByValue(paramKey,contactEvt.getMktCampaignType());
+//            if (systemParam!=null){
+//                contactEventDetail.setMktCampaignTypeName(systemParam.getParamName());
+//            }
+//        }
         //获取所有活动
         List<MktCamEvtRel> mktCamEvtRels = new ArrayList<>();
         mktCamEvtRels = mktCamEvtRelMapper.qryBycontactEvtId(contactEvt.getContactEvtId());
