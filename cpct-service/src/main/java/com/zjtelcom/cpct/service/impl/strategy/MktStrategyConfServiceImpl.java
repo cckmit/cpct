@@ -517,6 +517,21 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
         mktStrategyConfDO.setUpdateStaff(UserUtil.loginId());
         mktStrategyConfMapper.insert(mktStrategyConfDO);
         Long childMktStrategyConfId = mktStrategyConfDO.getMktStrategyConfId();
+
+        //获取策略对应的过滤规则
+        List<Long> ruleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(parentMktStrategyConfId);
+        // 与新的策略建立关联
+        for (Long ruleId : ruleIdList) {
+            MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO = new MktStrategyFilterRuleRelDO();
+            mktStrategyFilterRuleRelDO.setStrategyId(childMktStrategyConfId);
+            mktStrategyFilterRuleRelDO.setRuleId(ruleId);
+            mktStrategyFilterRuleRelDO.setCreateDate(new Date());
+            mktStrategyFilterRuleRelDO.setCreateStaff(UserUtil.loginId());
+            mktStrategyFilterRuleRelDO.setUpdateDate(new Date());
+            mktStrategyFilterRuleRelDO.setUpdateStaff(UserUtil.loginId());
+            mktStrategyFilterRuleRelMapper.insert(mktStrategyFilterRuleRelDO);
+        }
+        // 遍历规则
         for (MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO : mktStrategyConfRuleRelDOList) {
             // 复制获取规则
             Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.copyMktStrategyConfRule(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId());

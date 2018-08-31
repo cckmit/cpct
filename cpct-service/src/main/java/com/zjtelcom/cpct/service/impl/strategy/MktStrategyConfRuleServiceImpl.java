@@ -116,8 +116,9 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             if (mktStrategyConfRule.getMktCamChlResultList() != null) {
                 String mktCamChlResultIds = "";
                 for (int i = 0; i < mktStrategyConfRule.getMktCamChlResultList().size(); i++) {
-//                    Map<String, Object> mktCamChlResultMap = mktCamChlResultService.saveMktCamChlResult(mktStrategyConfRule.getMktCamChlResultList().get(i));
-                    Long mktCamChlResultId = mktStrategyConfRule.getMktCamChlResultList().get(i).getMktCamChlResultId();
+                    Map<String, Object> mktCamChlResultMap = mktCamChlResultService.saveMktCamChlResult(mktStrategyConfRule.getMktCamChlResultList().get(i));
+                   // Long mktCamChlResultId = mktStrategyConfRule.getMktCamChlResultList().get(i).getMktCamChlResultId();
+                    Long mktCamChlResultId =(Long) mktCamChlResultMap.get("mktCamChlResultId");
                     if (i == 0) {
                         mktCamChlResultIds += mktCamChlResultId;
                     } else {
@@ -495,9 +496,10 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
          */
         List<MktCamChlResult> mktCamChlResultList = new ArrayList<>();
         for (MktCamChlResult mktCamChlResult : parentMktStrategyConfRule.getMktCamChlResultList()) {
-            Map<String, Object> mktCamChlResultMap = mktCamChlResultService.copyMktCamChlResult(mktCamChlResult.getMktCamChlResultId());
-            MktCamChlResultDO childMktCamChlResultDO = (MktCamChlResultDO) mktCamChlResultMap.get("mktCamChlResultDO");
-            MktCamChlResult childMktCamChlResult = BeanUtil.create(childMktCamChlResultDO, new MktCamChlResult());
+//            Map<String, Object> mktCamChlResultMap = mktCamChlResultService.copyMktCamChlResult(mktCamChlResult.getMktCamChlResultId());
+//            MktCamChlResultDO childMktCamChlResultDO = (MktCamChlResultDO) mktCamChlResultMap.get("mktCamChlResultDO");
+            MktCamChlResult childMktCamChlResult = BeanUtil.create(mktCamChlResult, new MktCamChlResult());
+            childMktCamChlResult.setMktCamChlResultId(null);
             mktCamChlResultList.add(childMktCamChlResult);
         }
 
