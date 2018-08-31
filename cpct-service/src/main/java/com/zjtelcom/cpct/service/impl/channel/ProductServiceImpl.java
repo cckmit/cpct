@@ -12,6 +12,7 @@ import com.zjtelcom.cpct.domain.channel.MktProductRule;
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ProductService;
+import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.UserUtil;
@@ -70,6 +71,31 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         return result;
     }
 
+
+    /**
+     * 复制营销活动推荐条目
+     * @param userId
+     * @param ItemIdList
+     * @return
+     */
+    @Override
+    public Map<String, Object> copyProductRule(Long userId, List<Long> ItemIdList) {
+        Map<String,Object> result = new HashMap<>();
+        List<Long> ruleIdList = new ArrayList<>();
+        for (Long itemId : ItemIdList) {
+            MktCamItem item = camItemMapper.selectByPrimaryKey(itemId);
+            if (item == null) {
+                continue;
+            }
+            MktCamItem newItem = BeanUtil.create(item, new MktCamItem());
+            newItem.setMktCamItemId(null);
+            camItemMapper.insert(newItem);
+            ruleIdList.add(newItem.getMktCamItemId());
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("ruleIdList",ruleIdList);
+        return result;
+    }
 
     @Override
     @Transactional

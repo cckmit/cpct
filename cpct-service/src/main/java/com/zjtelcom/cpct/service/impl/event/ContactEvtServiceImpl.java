@@ -54,6 +54,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
 
     public static final int EVTCODE_MAX_LENGTH = 9;//事件编码最大长度
     public static final String EVTD_INDEX = "EVTD";//事件编码前缀
+
     @Autowired
     private ContactEvtMapper contactEvtMapper;
     @Autowired

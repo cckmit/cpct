@@ -23,6 +23,8 @@ public class CamScriptController extends BaseController {
     @Autowired
     private CamScriptService camScriptService;
 
+
+
     /**
      * 添加营销活动脚本
      */

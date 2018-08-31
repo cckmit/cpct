@@ -19,6 +19,8 @@ public interface ProductService {
 
     Map<String,Object> getProductRuleList(Long userId,List<Long> ruleIdList);
 
+    Map<String,Object> copyProductRule(Long userId,List<Long> ItemIdList);
+
 
 
 

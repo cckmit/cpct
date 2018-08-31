@@ -25,6 +25,30 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
     private MktCamScriptMapper camScriptMapper;
 
 
+    /**
+     * 复制活动脚本
+     * @param contactConfId
+     * @param newConfId
+     * @return
+     */
+    @Override
+    public Map<String, Object> copyCamScript(Long contactConfId, Long newConfId) {
+        Map<String,Object> result = new HashMap<>();
+
+        CamScript script = camScriptMapper.selectByConfId(contactConfId);
+        if (script==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","活动脚本不存在");
+            return result;
+        }
+        CamScript newScript = BeanUtil.create(script,new CamScript());
+        newScript.setMktCampaignScptId(null);
+        newScript.setEvtContactConfId(newConfId);
+        camScriptMapper.insert(newScript);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",newScript);
+        return result;
+    }
 
     @Override
     public Map<String,Object> addCamScript(Long userId, CamScriptAddVO addVO) {
@@ -97,7 +121,7 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
             vo = ChannelUtil.map2CamScriptVO(script);
         }catch (Exception e){
             e.printStackTrace();
-            logger.error("[op:ChannelServiceImpl] fail to listChannel ", e);
+            logger.error("[op:ChannelServiceImpl] fail to listChannel", e);
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",vo);
