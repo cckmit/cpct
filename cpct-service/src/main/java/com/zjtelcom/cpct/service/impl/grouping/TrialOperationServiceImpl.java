@@ -97,21 +97,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         Sheet sheet = wb.getSheetAt(0);
         Integer rowNums = sheet.getLastRowNum() + 1;
         for (int i = 0; i < rowNums; i++) {
+            Map<String,Object> customers = new HashMap<>();
             Row row = sheet.getRow(i);
             for (int j = 0; j < row.getLastCellNum(); j++) {
                 Cell cell = row.getCell(j);
-                switch (j) {
-                    case 1:
+//                customers.put(cell.get,cell.getStringCellValue());
 
-                        break;
-                    case 2:
-                        cell.setCellType(CellType.STRING);
-
-                        break;
-                    case 3:
-
-                        break;
-                }
             }
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -186,36 +177,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         List<TrialOperationParam> paramList = new ArrayList<>();
         List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(operationVO.getStrategyId());
         for (MktStrategyConfRuleRelDO ruleRelDO : ruleRelList) {
-            TrialOperationParam param = new TrialOperationParam();
-            // 获取规则Id
-            Long ruleId = ruleRelDO.getMktStrategyConfRuleId();
-            param.setRuleId(ruleId);
-
-            // 获取规则信息
-            Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.getMktStrategyConfRule(ruleId);
-            MktStrategyConfRule mktStrategyConfRule = (MktStrategyConfRule) mktStrategyConfRuleMap.get("mktStrategyConfRule");
-
-            // 获取销售品集合
-            Map<String, Object> productRuleListMap = productService.getProductRuleList(UserUtil.loginId(), mktStrategyConfRule.getProductIdlist());
-            List<MktProductRule> mktProductRuleList = (List<MktProductRule>) productRuleListMap.get("ruleList");
-            param.setMktProductRuleList(mktProductRuleList);
-
-            // 获取推送渠道
-            List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
-            List<MktCamChlConf> mktCamChlConfList = mktStrategyConfRule.getMktCamChlConfList();
-            for (MktCamChlConf mktCamChlConf : mktCamChlConfList) {
-                Map<String, Object> mktCamChlConfDetailMap = mktCamChlConfService.getMktCamChlConf(mktCamChlConf.getEvtContactConfId());
-                MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConfDetailMap.get("mktCamChlConfDetail");
-                mktCamChlConfDetailList.add(mktCamChlConfDetail);
-            }
-            param.setMktCamChlConfDetailList(mktCamChlConfDetailList);
-
-            // 设置批次号
-            param.setBatchNum(trialOperation.getBatchNum());
-            //redis取规则
-            String rule = redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleRelDO.getMktStrategyConfRuleId()).toString();
-            System.out.println("*************************" + rule);
-            param.setRule(rule);
+            TrialOperationParam param = getTrialOperationParam(operationVO, trialOperation.getBatchNum(), ruleRelDO.getMktStrategyConfRuleId());
             paramList.add(param);
         }
         request.setOperationVOList(paramList);
@@ -242,6 +204,39 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         return result;
     }
 
+
+    private TrialOperationParam getTrialOperationParam(TrialOperationVO operationVO,Long batchNum,Long ruleId) {
+        TrialOperationParam param = new TrialOperationParam();
+
+        param.setRuleId(ruleId);
+
+        // 获取规则信息
+        Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.getMktStrategyConfRule(ruleId);
+        MktStrategyConfRule mktStrategyConfRule = (MktStrategyConfRule) mktStrategyConfRuleMap.get("mktStrategyConfRule");
+
+        // 获取销售品集合
+        Map<String, Object> productRuleListMap = productService.getProductRuleList(UserUtil.loginId(), mktStrategyConfRule.getProductIdlist());
+        List<MktProductRule> mktProductRuleList = (List<MktProductRule>) productRuleListMap.get("ruleList");
+        param.setMktProductRuleList(mktProductRuleList);
+
+        // 获取推送渠道
+        List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
+        List<MktCamChlConf> mktCamChlConfList = mktStrategyConfRule.getMktCamChlConfList();
+        for (MktCamChlConf mktCamChlConf : mktCamChlConfList) {
+            Map<String, Object> mktCamChlConfDetailMap = mktCamChlConfService.getMktCamChlConf(mktCamChlConf.getEvtContactConfId());
+            MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConfDetailMap.get("mktCamChlConfDetail");
+            mktCamChlConfDetailList.add(mktCamChlConfDetail);
+        }
+        param.setMktCamChlConfDetailList(mktCamChlConfDetailList);
+
+        // 设置批次号
+        param.setBatchNum(batchNum);
+        //redis取规则
+        String rule = redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId).toString();
+        System.out.println("*************************" + rule);
+        param.setRule(rule);
+        return param;
+    }
 
 
     /**

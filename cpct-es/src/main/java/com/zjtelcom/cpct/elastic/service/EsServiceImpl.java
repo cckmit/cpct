@@ -140,6 +140,7 @@ public class EsServiceImpl implements EsService {
             Long id = null;
             String name = null;
             boolean booleanResult;
+            String reason = null;
             for (Map<String,Object> map : activity){
                 id = Long.valueOf(map.get("activityId").toString());
                 name = map.get("activityName").toString();
@@ -149,6 +150,7 @@ public class EsServiceImpl implements EsService {
             //todo 命中结果；命中实例
             activityInfo.setResult(true);
             activityInfo.setHitEntity("命中得对象");
+            activityInfo.setReason("命中原因");
 
             //查询策略信息
             SearchHits strategyHits = searchStrategyByParam(param,activityInfo.getId().toString());
@@ -167,6 +169,7 @@ public class EsServiceImpl implements EsService {
                 //todo 命中结果；命中实例
                 strategyInfo.setResult(true);
                 strategyInfo.setHitEntity("命中得对象");
+                strategyInfo.setReason("命中原因");
 
 
                 //查询规则信息
@@ -187,6 +190,7 @@ public class EsServiceImpl implements EsService {
                     //todo 命中结果；命中实例
                     ruleInfo.setResult(true);
                     ruleInfo.setHitEntity("命中得对象");
+                    ruleInfo.setReason("命中原因");
 
                     //查询标签实例信息
                     //todo 规则id 暂无

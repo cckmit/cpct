@@ -12,6 +12,7 @@ import com.zjtelcom.cpct.domain.channel.MktProductRule;
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ProductService;
+import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.MapUtil;
@@ -32,6 +33,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     private PpmProductMapper productMapper;
     @Autowired
     private MktCamItemMapper camItemMapper;
+    @Autowired
+    private MktStrategyConfRuleService strategyConfRuleService;
 
 
     @Override
@@ -99,7 +102,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
     @Override
     @Transactional
-    public Map<String, Object> addProductRule(Long userId, List<Long> productIdList) {
+    public Map<String, Object> addProductRule(Long strategyRuleId, List<Long> productIdList) {
         Map<String,Object> result = new HashMap<>();
         List<Long> ruleIdList = new ArrayList<>();
         for (Long productId : productIdList){
@@ -121,6 +124,9 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             item.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
             camItemMapper.insert(item);
             ruleIdList.add(item.getMktCamItemId());
+        }
+        if (strategyRuleId!=null){
+            strategyConfRuleService.updateProductIds(ruleIdList,strategyRuleId);
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",ruleIdList);
@@ -170,15 +176,19 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     }
 
     @Override
-    public Map<String, Object> delProductRule(Long userId, Long ruleId) {
+    public Map<String, Object> delProductRule(Long strategyRuleId, Long ruleId,List<Long> itemRuleIdList) {
         Map<String,Object> result = new HashMap<>();
-        MktCamItem rule = camItemMapper.selectByPrimaryKey(ruleId);
-        if (rule==null){
-            result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg","推荐条目不存在");
-            return result;
+        if (strategyRuleId!=null){
+            strategyConfRuleService.updateProductIds(itemRuleIdList,strategyRuleId);
+        }else {
+            MktCamItem rule = camItemMapper.selectByPrimaryKey(ruleId);
+            if (rule==null){
+                result.put("resultCode",CODE_FAIL);
+                result.put("resultMsg","推荐条目不存在");
+                return result;
+            }
+            camItemMapper.deleteByPrimaryKey(ruleId);
         }
-        camItemMapper.deleteByPrimaryKey(ruleId);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
         return result;

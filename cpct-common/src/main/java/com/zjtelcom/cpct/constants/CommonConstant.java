@@ -7,8 +7,8 @@ package com.zjtelcom.cpct.constants;
  */
 public class CommonConstant {
 
-    public static final String CODE_SUCCESS = "0"; //成功
-    public static final String CODE_FAIL = "1"; //失败
+    public static final String CODE_SUCCESS = "200"; //成功
+    public static final String CODE_FAIL = "500"; //失败
 
     public static final String STATUSCD_EFFECTIVE = "1000";
 
