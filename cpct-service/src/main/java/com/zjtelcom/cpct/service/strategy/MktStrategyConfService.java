@@ -6,14 +6,16 @@ import java.util.Map;
 
 public interface MktStrategyConfService {
 
-    public Map<String, Object> saveMktStrategyConf(MktStrategyConfDetail mktStrategyConfDetail) throws Exception;
+    Map<String, Object> saveMktStrategyConf(MktStrategyConfDetail mktStrategyConfDetail) throws Exception;
 
-    public Map<String, Object> updateMktStrategyConf(MktStrategyConfDetail mktStrategyConfDetail) throws Exception;
+    Map<String, Object> updateMktStrategyConf(MktStrategyConfDetail mktStrategyConfDetail) throws Exception;
 
-    public Map<String, Object> getMktStrategyConf(Long mktStrategyConfId) throws Exception;
+    Map<String, Object> getMktStrategyConf(Long mktStrategyConfId) throws Exception;
 
-    public Map<String, Object> listAllMktStrategyConf();
+    Map<String, Object> listAllMktStrategyConf();
 
-    public Map<String, Object> deleteMktStrategyConf(Long mktStrategyConfId) throws Exception;
+    Map<String, Object> deleteMktStrategyConf(Long mktStrategyConfId) throws Exception;
+
+    Map<String, Object> copyMktStrategyConf(Long parentMktStrategyConfId)  throws Exception;
 
 }

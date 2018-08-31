@@ -10,7 +10,6 @@
     <dubbo:application name="33.1083" />
 
     <dubbo:registry protocol="dubbo" address="134.96.253.86:8033"/>
-    <!--<dubbo:registry protocol="dubbo" address="127.0.0.1:9090"/>-->
 
     <!-- 暴露服务 -->
     <dubbo:protocol name="dubbo" port="30323"/>
@@ -18,8 +17,7 @@
 
     <!-- 注册 -->
     <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.EventApiService" ref="eventApiServiceImpl" version="1.0" >
-        <dubbo:method name="deal" servicecode="33.1083.CalculateCPC" timeout="5000"/>
-        <dubbo:method name="deal"  />
+        <dubbo:method name="deal" servicecode="33.1083.CalculateCPC" timeout="10000"/>
     </dubbo:service>
 
 </beans>
