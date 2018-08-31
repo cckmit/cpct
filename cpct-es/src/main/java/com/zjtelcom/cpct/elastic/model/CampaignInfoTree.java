@@ -9,9 +9,18 @@ public class CampaignInfoTree implements Serializable {
     private String name;
     private boolean result;
     private String hitEntity;
+    private String reason;
     private List<CampaignInfoTree> children;
     private List<Map<String,Object>>[] labelList;
 
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
 
     public List<CampaignInfoTree> getChildren() {
         return children;
