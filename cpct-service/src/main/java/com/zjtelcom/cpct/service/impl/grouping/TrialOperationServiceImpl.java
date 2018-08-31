@@ -97,10 +97,11 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         Sheet sheet = wb.getSheetAt(0);
         Integer rowNums = sheet.getLastRowNum() + 1;
         for (int i = 0; i < rowNums; i++) {
+            Map<String,Object> customers = new HashMap<>();
             Row row = sheet.getRow(i);
             for (int j = 0; j < row.getLastCellNum(); j++) {
                 Cell cell = row.getCell(j);
-
+//                customers.put(cell.get,cell.getStringCellValue());
 
             }
         }
@@ -202,6 +203,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         result.put("resultMsg", null);
         return result;
     }
+
 
     private TrialOperationParam getTrialOperationParam(TrialOperationVO operationVO,Long batchNum,Long ruleId) {
         TrialOperationParam param = new TrialOperationParam();

@@ -11,11 +11,11 @@ public interface ProductService {
 
     Map<String,Object>  getProductList(Long userId,Map<String,Object> params);
 
-    Map<String,Object> addProductRule(Long userId,List<Long> productIdList);
+    Map<String,Object> addProductRule(Long strategyRuleId,List<Long> productIdList);
 
     Map<String,Object> editProductRule(Long userId,Long ruleId,String remark);
 
-    Map<String,Object> delProductRule(Long userId,Long ruleId);
+    Map<String,Object> delProductRule(Long strategyRuleId,Long ruleId,List<Long> itemRuleIdList);
 
     Map<String,Object> getProductRuleList(Long userId,List<Long> ruleIdList);
 
