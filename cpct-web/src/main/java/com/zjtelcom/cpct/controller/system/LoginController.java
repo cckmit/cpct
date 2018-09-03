@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping("${adminPath}")
 public class LoginController extends BaseController {
 
     @Autowired
