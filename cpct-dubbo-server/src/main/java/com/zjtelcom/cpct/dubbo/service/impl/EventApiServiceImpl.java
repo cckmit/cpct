@@ -249,9 +249,9 @@
 //
 //            }
 //
-//            Future<Map<String, Object>> f = executorService.submit(new ActivityTask(params, camEvtRelDO.getMktCampaignId(), eventNbr));
-//            //将线程处理结果添加到结果集
-//            threadList.add(f);
+////            Future<Map<String, Object>> f = executorService.submit(new ActivityTask(params, camEvtRelDO.getMktCampaignId(), eventNbr));
+////            //将线程处理结果添加到结果集
+////            threadList.add(f);
 //
 //        }
 //        //获取结果
@@ -674,15 +674,15 @@
 //                System.out.println("查询标签失败:" + httpResult.getString("result_msg"));
 //            }
 //
-//            //判断参数是否有无值的
-//            if (context.size() != paramsSize) {
-//                //有参数没有查询出实例数据
-//                ruleMap.put("hit", true);
-//                ruleMap.put("msg", "标签取值参数实例不足");
-//                return ruleMap;
-//            }
+//            //判断参数是否有无值的 todo
+////            if (context.size() != paramsSize) {
+////                //有参数没有查询出实例数据
+////                ruleMap.put("hit", true);
+////                ruleMap.put("msg", "标签取值参数实例不足");
+////                return ruleMap;
+////            }
 //
-//
+//            context.put("MKT_GROUP5", "11");
 //            //判断redis中是否存在
 //            String express = "";
 //            if (redisUtils.exists(key)) {
@@ -782,19 +782,29 @@
 //            try {
 //                //规则引擎计算
 //                System.out.println(express);
-//                RuleResult ruleResult = runner.executeRule(express, context, true, true);
+//                RuleResult ruleResult = null;
 //
-////                RuleResult ruleResult = runner.executeRule(express, context, true, true);
+//                try {
+//
+//                    ruleResult = runner.executeRule(express, context, true, true);
+//
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//
+//                    ruleMap.put("hit", false);
+//                    ruleMap.put("msg", "规则引擎计算失败");
+//                    return ruleMap;
+//                }
 //
 //                System.out.println("result=" + ruleResult.getResult());
 //                System.out.println("Tree=" + ruleResult.getRule().toTree());
 //                System.out.println("TraceMap=" + ruleResult.getTraceMap());
 //                //初始化返回结果中的销售品条目
 //                List<Map<String, String>> productList = new ArrayList<>();
-//                if (ruleResult != null) {
+//                if (ruleResult.getResult() != null && ((Boolean) ruleResult.getResult())) {
 //                    //查询销售品列表
 //                    if (productStr != null && !"".equals(productStr)) {
-//                        String[] productArray = productStr.split(",");
+//                        String[] productArray = productStr.split("/");
 //                        for (String str : productArray) {
 //                            Map<String, String> product = new HashMap<>();
 //                            PpmProduct ppmProduct = ppmProductMapper.selectByPrimaryKey(Long.parseLong(str));
@@ -861,12 +871,15 @@
 //                    //关闭线程池
 //                    executorService.shutdown();
 //                } else {
-//                    //判断失败 返回
-//                    return Collections.EMPTY_MAP;
+//                    ruleMap.put("hit", false);
+//                    ruleMap.put("msg", "规则引擎匹配未通过");
+//                    return ruleMap;
 //                }
 //            } catch (Exception e) {
 //                e.printStackTrace();
+//
 //                //todo 异常处理
+//
 //            }
 //            return ruleMap;
 //        }
