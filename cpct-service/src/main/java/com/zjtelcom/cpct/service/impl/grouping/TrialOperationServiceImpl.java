@@ -89,7 +89,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
      */
     @Transactional(readOnly = false)
     @Override
-    public Map<String, Object> importUserList(MultipartFile multipartFile, Long ruleId) throws IOException {
+    public Map<String, Object> importUserList(MultipartFile multipartFile,TrialOperationVO operation,Long ruleId) throws IOException {
         Map<String, Object> maps = new HashMap<>();
 
         InputStream inputStream = multipartFile.getInputStream();
@@ -101,9 +101,28 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             Row row = sheet.getRow(i);
             for (int j = 0; j < row.getLastCellNum(); j++) {
                 Cell cell = row.getCell(j);
-//                customers.put(cell.get,cell.getStringCellValue());
-
+                customers.put(cell.getCellFormula(),cell.getStringCellValue());
             }
+
+//            Map<String, Object> customerMap = (Map<String, Object>) redisService.hget(String.valueOf(batchNum + mktStrategyConfRuleId), customerList.get(j));
+//            //遍历推送渠道
+//            for (MktCamChlConfDetail mktCamChlConfDetail : mktCamChlConfDetailList) {
+//                // 遍历销售品
+//                for (MktProductRule mktProductRule : mktProductList) {
+//                    Map<String, Object> mktIssueDetailMap = new HashMap<>();
+//                    mktIssueDetailMap.put("batchNum", batchNum);
+//                    mktIssueDetailMap.put("mktProductRule", mktProductRule);
+//                    mktIssueDetailMap.put("mktCamChlConfDetail", mktCamChlConfDetail);
+//                    mktIssueDetailMap.put("mktStrategyConfRuleId", mktStrategyConfRuleId);
+//                    mktIssueDetailMap.put("customerMap", customerMap);
+//                    // 将客户信息，销售品，推送渠道存入redis
+//                    redisService.hset("ISSUE_" + batchNum + mktStrategyConfRuleId, "customerId", mktIssueDetailMap);
+//                }
+//            }
+
+
+
+
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
@@ -114,7 +133,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
     /**
      * 新增策略试运算记录
-     *
      * @param operationVO
      * @return
      */
