@@ -362,13 +362,13 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                             // 添加规则的信息 并返回
                             mktStrategyConfRuleMap = mktStrategyConfRuleService.saveMktStrategyConfRule(mktStrategyConfRule);
                             // 策略规则 Id
-                            Long mktStrategyConfRuleId = (Long) mktStrategyConfRuleMap.get("MktStrategyConfRuleId");
+                            MktStrategyConfRuleDO mktStrategyConfRuleDO = (MktStrategyConfRuleDO) mktStrategyConfRuleMap.get("mktStrategyConfRuleDO");
                             // 建立策略配置和规则的关系
                             MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO = new MktStrategyConfRuleRelDO();
                             mktStrategyConfRuleRelDO.setCreateDate(new Date());
                             mktStrategyConfRuleRelDO.setCreateStaff(UserUtil.loginId());
                             mktStrategyConfRuleRelDO.setMktStrategyConfId(mktStrategyConfId);
-                            mktStrategyConfRuleRelDO.setMktStrategyConfRuleId(mktStrategyConfRuleId);
+                            mktStrategyConfRuleRelDO.setMktStrategyConfRuleId(mktStrategyConfRuleDO.getMktStrategyConfRuleId());
                             mktStrategyConfRuleRelDO.setUpdateStaff(UserUtil.loginId());
                             mktStrategyConfRuleRelDO.setUpdateDate(new Date());
                             mktStrategyConfRuleRelMapper.insert(mktStrategyConfRuleRelDO);
@@ -503,7 +503,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
     }
 
 
-    public Map<String, Object> copyMktStrategyConf(Long parentMktStrategyConfId) {
+    public Map<String, Object> copyMktStrategyConf(Long parentMktStrategyConfId) throws Exception {
         Map<String, Object> mktStrategyConfMap = new HashMap<>();
         // 通过原策略id 获取原策略基本信息
         MktStrategyConfDO mktStrategyConfDO = mktStrategyConfMapper.selectByPrimaryKey(parentMktStrategyConfId);
@@ -517,9 +517,34 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
         mktStrategyConfDO.setUpdateStaff(UserUtil.loginId());
         mktStrategyConfMapper.insert(mktStrategyConfDO);
         Long childMktStrategyConfId = mktStrategyConfDO.getMktStrategyConfId();
+
+        //获取策略对应的过滤规则
+        List<Long> ruleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(parentMktStrategyConfId);
+        // 与新的策略建立关联
+        for (Long ruleId : ruleIdList) {
+            MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO = new MktStrategyFilterRuleRelDO();
+            mktStrategyFilterRuleRelDO.setStrategyId(childMktStrategyConfId);
+            mktStrategyFilterRuleRelDO.setRuleId(ruleId);
+            mktStrategyFilterRuleRelDO.setCreateDate(new Date());
+            mktStrategyFilterRuleRelDO.setCreateStaff(UserUtil.loginId());
+            mktStrategyFilterRuleRelDO.setUpdateDate(new Date());
+            mktStrategyFilterRuleRelDO.setUpdateStaff(UserUtil.loginId());
+            mktStrategyFilterRuleRelMapper.insert(mktStrategyFilterRuleRelDO);
+        }
+        // 遍历规则
         for (MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO : mktStrategyConfRuleRelDOList) {
             // 复制获取规则
-            mktStrategyConfRuleService.copyMktStrategyConfRule(  mktStrategyConfRuleRelDO.getMktStrategyConfRuleId());
+            Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.copyMktStrategyConfRule(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId());
+            Long mktStrategyConfRuleId = (Long) mktStrategyConfRuleMap.get("mktStrategyConfRuleId");
+            // 简历策略和规则的关系
+            MktStrategyConfRuleRelDO childMktStrategyConfRuleRelDO = new MktStrategyConfRuleRelDO();
+            childMktStrategyConfRuleRelDO.setMktStrategyConfId(childMktStrategyConfId);
+            childMktStrategyConfRuleRelDO.setMktStrategyConfRuleId(mktStrategyConfRuleId);
+            childMktStrategyConfRuleRelDO.setCreateDate(new Date());
+            childMktStrategyConfRuleRelDO.setCreateStaff(UserUtil.loginId());
+            childMktStrategyConfRuleRelDO.setUpdateDate(new Date());
+            childMktStrategyConfRuleRelDO.setUpdateStaff(UserUtil.loginId());
+            mktStrategyConfRuleRelMapper.insert(childMktStrategyConfRuleRelDO);
         }
         mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
         mktStrategyConfMap.put("childMktStrategyConfId", childMktStrategyConfId);

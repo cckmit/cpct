@@ -73,9 +73,8 @@ public class PpmProductController extends BaseController  {
     @CrossOrigin
     public Map<String, Object> addProductRule(@RequestBody ProductParam param) {
         Map<String ,Object> result = new HashMap<>();
-        Long userId = UserUtil.loginId();
         try {
-            result = productService.addProductRule(userId,param.getIdList());
+            result = productService.addProductRule(param.getStrategyRuleId(),param.getIdList());
         }catch (Exception e){
             logger.error("[op:PpmProductController] fail to addProductRule",e);
             result.put("resultCode",CODE_FAIL);
@@ -141,8 +140,19 @@ public class PpmProductController extends BaseController  {
         Map<String, Object> result = new HashMap<>();
         Long userId = UserUtil.loginId();
         try {
-            Long ruleId = Long.valueOf(params.get("ruleId").toString());
-            result = productService.delProductRule(userId, ruleId);
+            Long strategyRuleId = null;
+            Long ruleId = null;
+            List<Long> itemRuleIdList = null;
+            if (params.get("strategyRuleId")!=null){
+                 strategyRuleId = Long.valueOf(params.get("strategyRuleId").toString());
+            }
+            if (params.get("ruleId")!=null){
+                ruleId = Long.valueOf(params.get("ruleId").toString());
+            }
+            if (params.get("itemRuleIdList")!=null){
+                itemRuleIdList = (List<java.lang.Long>) params.get("itemRuleIdList");
+            }
+            result = productService.delProductRule(strategyRuleId, ruleId,itemRuleIdList);
         } catch (Exception e) {
             logger.error("[op:PpmProductController] fail to delProductRule", e);
             result.put("resultCode", CODE_FAIL);
