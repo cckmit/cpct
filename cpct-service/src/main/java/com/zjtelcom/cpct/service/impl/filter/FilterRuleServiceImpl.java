@@ -5,12 +5,16 @@ import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
+import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.dao.user.UserListMapper;
+import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
+import com.zjtelcom.cpct.dto.filter.FilterRuleVO;
 import com.zjtelcom.cpct.dto.user.UserList;
 import com.zjtelcom.cpct.request.filter.FilterRuleReq;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.filter.FilterRuleService;
+import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UserUtil;
@@ -40,6 +44,8 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
     private UserListMapper userListMapper;
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired
+    private SysParamsMapper sysParamsMapper;
 
     /**
      * 过滤规则列表（含分页）
@@ -50,10 +56,20 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         Page pageInfo = filterRuleReq.getPageInfo();
         PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
         List<FilterRule> filterRules = filterRuleMapper.qryFilterRule(filterRuleReq.getFilterRule());
+        Page page = new Page(new PageInfo(filterRules));
+        List<FilterRuleVO> voList = new ArrayList<>();
+        for (FilterRule rule : filterRules){
+            FilterRuleVO vo = BeanUtil.create(rule,new FilterRuleVO());
+            SysParams sysParams = sysParamsMapper.findParamsByValue("FILTER_RULE_TYPE",rule.getFilterType());
+            if (sysParams!=null){
+                vo.setFilterTypeName(sysParams.getParamName());
+            }
+            voList.add(vo);
+        }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
-        maps.put("filterRules", filterRules);
-        maps.put("pageInfo", new Page(new PageInfo(filterRules)));
+        maps.put("filterRules", voList);
+        maps.put("pageInfo",page);
         return maps;
     }
 
@@ -184,6 +200,10 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         filterRule.setUpdateStaff(UserUtil.loginId());
         filterRule.setCreateStaff(UserUtil.loginId());
         filterRule.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+        //销售品互斥过滤 加labelcode
+        if (filterRule.getFilterType().equals("3000")){
+            filterRule.setLabelCode("PROM_LIST");
+        }
         filterRuleMapper.createFilterRule(filterRule);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
@@ -199,6 +219,9 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         Map<String, Object> maps = new HashMap<>();
         filterRule.setUpdateDate(DateUtil.getCurrentTime());
         filterRule.setUpdateStaff(UserUtil.loginId());
+        if (filterRule.getFilterType().equals("3000")){
+            filterRule.setLabelCode("PROM_LIST");
+        }
         filterRuleMapper.modFilterRule(filterRule);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
