@@ -92,6 +92,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     public Map<String, Object> importUserList(MultipartFile multipartFile,TrialOperationVO operation,Long ruleId) throws IOException {
         Map<String, Object> maps = new HashMap<>();
 
+        String batchNumSt = DateUtil.date2String(new Date()) + ChannelUtil.getRandomStr(2);
+        //获取销售品及规则列表
+        TrialOperationParam param = getTrialOperationParam(operation,Long.valueOf(batchNumSt),ruleId);
+
         InputStream inputStream = multipartFile.getInputStream();
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
         Sheet sheet = wb.getSheetAt(0);
@@ -103,26 +107,14 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 Cell cell = row.getCell(j);
                 customers.put(cell.getCellFormula(),cell.getStringCellValue());
             }
-
-//            Map<String, Object> customerMap = (Map<String, Object>) redisService.hget(String.valueOf(batchNum + mktStrategyConfRuleId), customerList.get(j));
-//            //遍历推送渠道
-//            for (MktCamChlConfDetail mktCamChlConfDetail : mktCamChlConfDetailList) {
-//                // 遍历销售品
-//                for (MktProductRule mktProductRule : mktProductList) {
-//                    Map<String, Object> mktIssueDetailMap = new HashMap<>();
-//                    mktIssueDetailMap.put("batchNum", batchNum);
-//                    mktIssueDetailMap.put("mktProductRule", mktProductRule);
-//                    mktIssueDetailMap.put("mktCamChlConfDetail", mktCamChlConfDetail);
-//                    mktIssueDetailMap.put("mktStrategyConfRuleId", mktStrategyConfRuleId);
-//                    mktIssueDetailMap.put("customerMap", customerMap);
-//                    // 将客户信息，销售品，推送渠道存入redis
-//                    redisService.hset("ISSUE_" + batchNum + mktStrategyConfRuleId, "customerId", mktIssueDetailMap);
-//                }
-//            }
-
-
-
-
+            Map<String, Object> mktIssueDetailMap = new HashMap<>();
+            mktIssueDetailMap.put("batchNum",batchNumSt);
+            mktIssueDetailMap.put("mktProductRule",param.getRule());
+            mktIssueDetailMap.put("mktCamChlConfDetail",param.getMktCamChlConfDetailList());
+            mktIssueDetailMap.put("mktStrategyConfRuleId",param.getMktProductRuleList());
+            mktIssueDetailMap.put("customerMap", customers);
+            // 将客户信息，销售品，推送渠道存入redis
+            redisUtils.add("ISSUE_" + batchNumSt + "customerId", mktIssueDetailMap);
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);

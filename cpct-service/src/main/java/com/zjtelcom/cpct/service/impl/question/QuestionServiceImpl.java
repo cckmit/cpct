@@ -101,12 +101,68 @@ public class QuestionServiceImpl implements QuestionService {
         question.setUpdateStaff(userId);
         questionMapper.updateByPrimaryKey(question);
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
-        result.put("resultMsg","添加成功");
+        result.put("resultMsg","编辑问题");
         return result;
     }
 
+    /**
+     * 删除问题
+     * @param userId
+     * @param questionId
+     * @return
+     */
     @Override
     public Map<String, Object> delQuestion(Long userId, Long questionId) {
-        return null;
+        Map<String,Object> result = new HashMap<>();
+        Question question = questionMapper.selectByPrimaryKey(questionId);
+        if (question==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","问题不存在");
+            return result;
+        }
+        questionMapper.deleteByPrimaryKey(questionId);
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
+        result.put("resultMsg","删除成功");
+        return result;
+    }
+
+
+    @Override
+    public Map<String, Object> modQuestionDetail(Long userId,  QuestionDetail editVO) {
+        Map<String,Object> result = new HashMap<>();
+        QuestionDetail detail = questionDetailMapper.selectByPrimaryKey(editVO.getQstDetailId());
+        if (detail==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","选项不存在");
+            return result;
+        }
+        BeanUtil.copy(editVO,detail);
+        detail.setUpdateDate(new Date());
+        detail.setUpdateStaff(userId);
+        questionDetailMapper.updateByPrimaryKey(detail);
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
+        result.put("resultMsg","编辑成功");
+        return result;
+    }
+
+    /**
+     *删除选项
+     * @param userId
+     * @param questionDetailId
+     * @return
+     */
+    @Override
+    public Map<String, Object> delQuestionDetail(Long userId, Long questionDetailId) {
+        Map<String,Object> result = new HashMap<>();
+        QuestionDetail detail = questionDetailMapper.selectByPrimaryKey(questionDetailId);
+        if (detail==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","选项不存在");
+            return result;
+        }
+        questionDetailMapper.deleteByPrimaryKey(questionDetailId);
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
+        result.put("resultMsg","删除成功");
+        return result;
     }
 }
