@@ -21,7 +21,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("${adminPath}/campaignRel")
-public class MktCampaignController {
+public class MktCampaignRelController {
     @Autowired
     private MktCampaignRelService mktCampaignRelService;
 
@@ -32,7 +32,7 @@ public class MktCampaignController {
      */
     @RequestMapping(value = "/getMktCampaignRel", method = RequestMethod.POST)
     @CrossOrigin
-    public String qryMktCampaignList(@RequestBody Map<String, String> params) throws Exception {
+    public String getMktCampaignRel(@RequestBody Map<String, String> params) throws Exception {
         Long mktCampaignId =Long.valueOf(params.get("mktCampaignId"));
         Map<String, Object> mktCampaignRel = mktCampaignRelService.getMktCampaignRel(mktCampaignId);
         return JSON.toJSONString(mktCampaignRel);
