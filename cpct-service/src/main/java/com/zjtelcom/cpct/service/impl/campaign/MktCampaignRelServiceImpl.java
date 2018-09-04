@@ -81,7 +81,7 @@ public class MktCampaignRelServiceImpl extends BaseService implements MktCampaig
         }
         // 获取父活动
         List<Map<String, Object>> parentCampaignMapList = new ArrayList<>();
-        List<MktCampaignRelDO> zCampaignRelDOList = mktCampaignRelMapper.selectByAmktCampaignId(mktCampaignId, StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+        List<MktCampaignRelDO> zCampaignRelDOList = mktCampaignRelMapper.selectByZmktCampaignId(mktCampaignId, StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
         for (MktCampaignRelDO mktCampaignRelDO : zCampaignRelDOList) {
             MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignRelDO.getaMktCampaignId());
             Map<String, Object> mktCampaignMap = new HashMap<>();
