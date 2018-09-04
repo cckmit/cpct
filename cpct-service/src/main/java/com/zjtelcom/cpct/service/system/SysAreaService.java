@@ -29,4 +29,6 @@ public interface SysAreaService {
 
     Map<String, Object> saveCityTORedis();
 
+    Map<String, Object> listCityByParentId(Integer parentCityId);
+
 }

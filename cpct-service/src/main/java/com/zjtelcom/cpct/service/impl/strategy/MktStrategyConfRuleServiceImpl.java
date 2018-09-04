@@ -117,8 +117,8 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 String mktCamChlResultIds = "";
                 for (int i = 0; i < mktStrategyConfRule.getMktCamChlResultList().size(); i++) {
                     Map<String, Object> mktCamChlResultMap = mktCamChlResultService.saveMktCamChlResult(mktStrategyConfRule.getMktCamChlResultList().get(i));
-                   // Long mktCamChlResultId = mktStrategyConfRule.getMktCamChlResultList().get(i).getMktCamChlResultId();
-                    Long mktCamChlResultId =(Long) mktCamChlResultMap.get("mktCamChlResultId");
+                    // Long mktCamChlResultId = mktStrategyConfRule.getMktCamChlResultList().get(i).getMktCamChlResultId();
+                    Long mktCamChlResultId = (Long) mktCamChlResultMap.get("mktCamChlResultId");
                     if (i == 0) {
                         mktCamChlResultIds += mktCamChlResultId;
                     } else {
@@ -467,12 +467,15 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
     public Map<String, Object> copyMktStrategyConfRule(MktStrategyConfRule parentMktStrategyConfRule) throws Exception {
         Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();
         MktStrategyConfRule mktStrategyConfRule = new MktStrategyConfRule();
-
+        Long tarGrpId = null;
         /**
          * 客户分群配置
          */
         Map<String, Object> tarGrpMap = tarGrpService.copyTarGrp(parentMktStrategyConfRule.getTarGrpId(), false);
         TarGrp tarGrp = (TarGrp) tarGrpMap.get("tarGrp");
+        if (tarGrp != null) {
+            tarGrpId = tarGrp.getTarGrpId();
+        }
         /**
          * 销售品配置
          */
@@ -503,7 +506,8 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktCamChlResultList.add(childMktCamChlResult);
         }
 
-        mktStrategyConfRule.setTarGrpId(tarGrp.getTarGrpId());
+        mktStrategyConfRule.setMktStrategyConfRuleName(parentMktStrategyConfRule.getMktStrategyConfRuleName());
+        mktStrategyConfRule.setTarGrpId(tarGrpId);
         mktStrategyConfRule.setProductIdlist(ruleIdList);
         mktStrategyConfRule.setMktCamChlConfList(mktCamChlConfList);
         mktStrategyConfRule.setMktCamChlResultList(mktCamChlResultList);
@@ -521,7 +525,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
      * @return
      */
     @Override
-    public Map<String, Object> updateProductIds(List<Long> productIdList, Long ruleId){
+    public Map<String, Object> updateProductIds(List<Long> productIdList, Long ruleId) {
         Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();
         MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
         String productIds = "";

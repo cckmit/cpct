@@ -34,6 +34,7 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.thread.TarGrpRule;
+import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UserUtil;
@@ -502,7 +503,14 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
         return mktStrategyConfMap;
     }
 
-
+    /**
+     * 通过原策略id复制策略
+     *
+     * @param parentMktStrategyConfId
+     * @return
+     * @throws Exception
+     */
+    @Override
     public Map<String, Object> copyMktStrategyConf(Long parentMktStrategyConfId) throws Exception {
         Map<String, Object> mktStrategyConfMap = new HashMap<>();
         // 通过原策略id 获取原策略基本信息
@@ -549,6 +557,33 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
         mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
         mktStrategyConfMap.put("childMktStrategyConfId", childMktStrategyConfId);
         return mktStrategyConfMap;
+    }
+
+
+    /**
+     * 复制策略详情
+     *
+     * @param mktStrategyConfDetail
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public Map<String, Object> copyMktStrategyConf(MktStrategyConfDetail mktStrategyConfDetail) throws Exception {
+        Map<String, Object> mktStrategyConfDetailMap = new HashMap<>();
+        MktStrategyConfDetail mktStrategyConfDetailCopy = BeanUtil.create(mktStrategyConfDetail, new MktStrategyConfDetail());
+        // 获取规则列表
+        List<MktStrategyConfRule> mktStrategyConfRuleList = mktStrategyConfDetail.getMktStrategyConfRuleList();
+        if (mktStrategyConfRuleList != null && mktStrategyConfRuleList.size() > 0) {
+            List<MktStrategyConfRule> mktStrategyConfRuleCopyList = new ArrayList<>();
+            for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfRuleList) {
+                Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.copyMktStrategyConfRule(mktStrategyConfRule);
+                MktStrategyConfRule mktStrategyConfRuleCopy = (MktStrategyConfRule) mktStrategyConfRuleMap.get("mktStrategyConfRule");
+                mktStrategyConfRuleCopyList.add(mktStrategyConfRuleCopy);
+            }
+            mktStrategyConfDetailCopy.setMktStrategyConfRuleList(mktStrategyConfRuleCopyList);
+        }
+        mktStrategyConfDetailMap.put("mktStrategyConfDetail", mktStrategyConfDetailCopy);
+        return mktStrategyConfDetailMap;
     }
 
     @Override
