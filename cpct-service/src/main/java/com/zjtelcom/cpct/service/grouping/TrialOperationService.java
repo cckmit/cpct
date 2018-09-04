@@ -20,7 +20,7 @@ public interface TrialOperationService  {
 
     Map<String,Object> issueTrialResult(TrialOperation trialOperation);
 
-    Map<String,Object> importUserList(MultipartFile multipartFile , Long ruleId ) throws IOException;
+    Map<String,Object> importUserList(MultipartFile multipartFile ,TrialOperationVO operation, Long ruleId ) throws IOException;
 
 
 

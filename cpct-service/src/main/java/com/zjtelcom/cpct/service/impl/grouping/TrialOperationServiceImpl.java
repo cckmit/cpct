@@ -89,8 +89,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
      */
     @Transactional(readOnly = false)
     @Override
-    public Map<String, Object> importUserList(MultipartFile multipartFile, Long ruleId) throws IOException {
+    public Map<String, Object> importUserList(MultipartFile multipartFile,TrialOperationVO operation,Long ruleId) throws IOException {
         Map<String, Object> maps = new HashMap<>();
+
+        String batchNumSt = DateUtil.date2String(new Date()) + ChannelUtil.getRandomStr(2);
+        //获取销售品及规则列表
+        TrialOperationParam param = getTrialOperationParam(operation,Long.valueOf(batchNumSt),ruleId);
 
         InputStream inputStream = multipartFile.getInputStream();
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
@@ -101,9 +105,16 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             Row row = sheet.getRow(i);
             for (int j = 0; j < row.getLastCellNum(); j++) {
                 Cell cell = row.getCell(j);
-//                customers.put(cell.get,cell.getStringCellValue());
-
+                customers.put(cell.getCellFormula(),cell.getStringCellValue());
             }
+            Map<String, Object> mktIssueDetailMap = new HashMap<>();
+            mktIssueDetailMap.put("batchNum",batchNumSt);
+            mktIssueDetailMap.put("mktProductRule",param.getRule());
+            mktIssueDetailMap.put("mktCamChlConfDetail",param.getMktCamChlConfDetailList());
+            mktIssueDetailMap.put("mktStrategyConfRuleId",param.getMktProductRuleList());
+            mktIssueDetailMap.put("customerMap", customers);
+            // 将客户信息，销售品，推送渠道存入redis
+            redisUtils.add("ISSUE_" + batchNumSt + "customerId", mktIssueDetailMap);
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
@@ -114,7 +125,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
     /**
      * 新增策略试运算记录
-     *
      * @param operationVO
      * @return
      */
