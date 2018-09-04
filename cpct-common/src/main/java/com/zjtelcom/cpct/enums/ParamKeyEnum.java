@@ -14,11 +14,11 @@ package com.zjtelcom.cpct.enums;
  */
 public enum ParamKeyEnum {
 
-    STATUS_CD("statusCd", "状态"),
-    MKT_CAMPAIGN_CATEGORY("mktCampaignCategory", "活动类别"),
-    TIGGER_TYPE("tiggerType", "触发类型"),
-    EXEC_TYPE("execType", "活动周期"),
-    MKT_CAMPAIGN_TYPE("mktCampaignType", "活动分类"),;
+    STATUS_CD("CAM-0001", "statusCd"),    //状态
+    MKT_CAMPAIGN_CATEGORY("CAM-C-0037", "mktCampaignCategory"),  //活动类别
+    TIGGER_TYPE("CAM-C-0009", "tiggerType"),  // 触发类型
+    EXEC_TYPE("CAM-C-0034", "execType"), // 活动周期
+    MKT_CAMPAIGN_TYPE("CAM-C-0033", "mktCampaignType");  //活动分类
 
     private String paramKey;
     private String paramName;

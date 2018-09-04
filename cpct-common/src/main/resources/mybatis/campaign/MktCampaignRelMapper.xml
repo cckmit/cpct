@@ -2,16 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zjtelcom.cpct.dao.campaign.MktCampaignRelMapper">
     <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.campaign.MktCampaignRelDO">
-        <id column="MKT_CAMPAIGN_REL_ID" jdbcType="DECIMAL" property="mktCampaignRelId"/>
+        <id column="MKT_CAMPAIGN_REL_ID" jdbcType="BIGINT" property="mktCampaignRelId"/>
         <result column="REL_TYPE" jdbcType="VARCHAR" property="relType"/>
-        <result column="A_MKT_CAMPAIGN_ID" jdbcType="DECIMAL" property="aMktCampaignId"/>
-        <result column="Z_MKT_CAMPAIGN_ID" jdbcType="DECIMAL" property="zMktCampaignId"/>
+        <result column="A_MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="aMktCampaignId"/>
+        <result column="Z_MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="zMktCampaignId"/>
         <result column="EFF_DATE" jdbcType="TIMESTAMP" property="effDate"/>
         <result column="EXP_DATE" jdbcType="TIMESTAMP" property="expDate"/>
-        <result column="APPLY_REGION_ID" jdbcType="DECIMAL" property="applyRegionId"/>
+        <result column="APPLY_REGION_ID" jdbcType="BIGINT" property="applyRegionId"/>
         <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd"/>
-        <result column="CREATE_STAFF" jdbcType="DECIMAL" property="createStaff"/>
-        <result column="UPDATE_STAFF" jdbcType="DECIMAL" property="updateStaff"/>
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff"/>
         <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
         <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate"/>
         <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
@@ -19,11 +19,11 @@
     </resultMap>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
       delete from mkt_campaign_rel
-      where MKT_CAMPAIGN_REL_ID = #{mktCampaignRelId,jdbcType=DECIMAL}
+      where MKT_CAMPAIGN_REL_ID = #{mktCampaignRelId,jdbcType=BIGINT}
     </delete>
     <delete id="deleteByAmktCampaignId" parameterType="java.lang.Long">
         delete from mkt_campaign_rel
-        where A_MKT_CAMPAIGN_ID = #{aMktCampaignId,jdbcType=DECIMAL}
+        where A_MKT_CAMPAIGN_ID = #{aMktCampaignId,jdbcType=BIGINT}
     </delete>
     <insert id="insert" useGeneratedKeys="true" keyProperty="mktCampaignRelId" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignRelDO">
       insert into mkt_campaign_rel (MKT_CAMPAIGN_REL_ID, REL_TYPE, A_MKT_CAMPAIGN_ID,
@@ -31,29 +31,29 @@
         APPLY_REGION_ID, STATUS_CD, CREATE_STAFF,
         UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
         UPDATE_DATE, REMARK)
-      values (#{mktCampaignRelId,jdbcType=DECIMAL}, #{relType,jdbcType=VARCHAR}, #{aMktCampaignId,jdbcType=DECIMAL},
-        #{zMktCampaignId,jdbcType=DECIMAL}, #{effDate,jdbcType=TIMESTAMP}, #{expDate,jdbcType=TIMESTAMP},
-        #{applyRegionId,jdbcType=DECIMAL}, #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=DECIMAL},
-        #{updateStaff,jdbcType=DECIMAL}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP},
+      values (#{mktCampaignRelId,jdbcType=BIGINT}, #{relType,jdbcType=VARCHAR}, #{aMktCampaignId,jdbcType=BIGINT},
+        #{zMktCampaignId,jdbcType=BIGINT}, #{effDate,jdbcType=TIMESTAMP}, #{expDate,jdbcType=TIMESTAMP},
+        #{applyRegionId,jdbcType=BIGINT}, #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT},
+        #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP},
         #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR})
     </insert>
 
     <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignRelDO">
       update mkt_campaign_rel
       set REL_TYPE = #{relType,jdbcType=VARCHAR},
-        A_MKT_CAMPAIGN_ID = #{aMktCampaignId,jdbcType=DECIMAL},
-        Z_MKT_CAMPAIGN_ID = #{zMktCampaignId,jdbcType=DECIMAL},
+        A_MKT_CAMPAIGN_ID = #{aMktCampaignId,jdbcType=BIGINT},
+        Z_MKT_CAMPAIGN_ID = #{zMktCampaignId,jdbcType=BIGINT},
         EFF_DATE = #{effDate,jdbcType=TIMESTAMP},
         EXP_DATE = #{expDate,jdbcType=TIMESTAMP},
-        APPLY_REGION_ID = #{applyRegionId,jdbcType=DECIMAL},
+        APPLY_REGION_ID = #{applyRegionId,jdbcType=BIGINT},
         STATUS_CD = #{statusCd,jdbcType=VARCHAR},
-        CREATE_STAFF = #{createStaff,jdbcType=DECIMAL},
-        UPDATE_STAFF = #{updateStaff,jdbcType=DECIMAL},
+        CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+        UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
         CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
         STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
         UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
         REMARK = #{remark,jdbcType=VARCHAR}
-      where MKT_CAMPAIGN_REL_ID = #{mktCampaignRelId,jdbcType=DECIMAL}
+      where MKT_CAMPAIGN_REL_ID = #{mktCampaignRelId,jdbcType=BIGINT}
     </update>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -61,14 +61,29 @@
       EXP_DATE, APPLY_REGION_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
       UPDATE_DATE, REMARK
       from mkt_campaign_rel
-      where MKT_CAMPAIGN_REL_ID = #{mktCampaignRelId,jdbcType=DECIMAL}
+      where MKT_CAMPAIGN_REL_ID = #{mktCampaignRelId,jdbcType=BIGINT}
     </select>
-    <select id="selectByAmktCampaignId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    <select id="selectByAmktCampaignId" resultMap="BaseResultMap">
         select MKT_CAMPAIGN_REL_ID, REL_TYPE, A_MKT_CAMPAIGN_ID, Z_MKT_CAMPAIGN_ID, EFF_DATE,
         EXP_DATE, APPLY_REGION_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
         UPDATE_DATE, REMARK
         from mkt_campaign_rel
-        where A_MKT_CAMPAIGN_ID = #{aMktCampaignId,jdbcType=DECIMAL}
+        where A_MKT_CAMPAIGN_ID = #{aMktCampaignId,jdbcType=BIGINT}
+        AND STATUS_CD = #{statusCd,jdbcType=VARCHAR}
+    </select>
+    <select id="selectByZmktCampaignId" resultMap="BaseResultMap">
+        select MKT_CAMPAIGN_REL_ID, REL_TYPE, A_MKT_CAMPAIGN_ID, Z_MKT_CAMPAIGN_ID, EFF_DATE,
+        EXP_DATE, APPLY_REGION_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+        UPDATE_DATE, REMARK
+        from mkt_campaign_rel
+        where Z_MKT_CAMPAIGN_ID = #{zMktCampaignId,jdbcType=BIGINT}
+        AND STATUS_CD = #{statusCd,jdbcType=VARCHAR}
+    </select>
+    <select id="selectCountByAmktCampaignId" resultType="java.lang.Integer">
+        select COUNT (*)
+        from mkt_campaign_rel
+        where A_MKT_CAMPAIGN_ID = #{aMktCampaignId,jdbcType=BIGINT}
+        AND STATUS_CD = #{statusCd,jdbcType=VARCHAR}
     </select>
     <select id="selectAll" resultMap="BaseResultMap">
       select MKT_CAMPAIGN_REL_ID, REL_TYPE, A_MKT_CAMPAIGN_ID, Z_MKT_CAMPAIGN_ID, EFF_DATE,
