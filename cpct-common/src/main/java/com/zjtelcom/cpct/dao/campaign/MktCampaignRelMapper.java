@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.dao.campaign;
 
 import com.zjtelcom.cpct.domain.campaign.MktCampaignRelDO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,7 +18,11 @@ public interface MktCampaignRelMapper {
 
     MktCampaignRelDO selectByPrimaryKey(Long mktCampaignRelId);
 
-    List<MktCampaignRelDO> selectByAmktCampaignId(Long mktCampaignRelId);
+    List<MktCampaignRelDO> selectByAmktCampaignId(@Param("aMktCampaignId") Long aMktCampaignId, @Param("statusCd")String statusCd);
+
+    List<MktCampaignRelDO> selectByZmktCampaignId(@Param("zMktCampaignId") Long zMktCampaignId, @Param("statusCd")String statusCd);
+
+    int selectCountByAmktCampaignId(@Param("aMktCampaignId") Long aMktCampaignId, @Param("statusCd")String statusCd);
 
     List<MktCampaignRelDO> selectAll();
 

@@ -41,8 +41,16 @@ public class SysAreaController {
      */
     @RequestMapping(value = "/listSysCity", method = RequestMethod.POST)
     @CrossOrigin
-    public String listSysCity() {
-        Map<String, Object> map = sysAreaService.listSysCity();
+    public String listSysCity(@RequestBody  Map<String, Object> params) {
+        String landId = (String) params.get("lanId");
+        Integer areaId;
+        if (landId == null || "".equals(landId) || "null".equals(landId)) {
+            //TODO 获取当前用户所在地区
+            areaId = 8330000;
+        } else {
+            areaId = Integer.valueOf(landId);
+        }
+        Map<String, Object> map = sysAreaService.listCityByParentId(areaId);
         return JSON.toJSONString(map);
     }
 
