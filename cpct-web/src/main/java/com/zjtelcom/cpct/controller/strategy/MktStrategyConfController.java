@@ -112,4 +112,22 @@ public class MktStrategyConfController extends BaseController {
         }
         return JSON.toJSONString(map);
     }
+
+    /**
+     * 复制策略
+     *
+     * @param mktStrategyConfDetail
+     * @return
+     */
+    @RequestMapping(value = "/copyMktStrategyConf", method = RequestMethod.POST)
+    @CrossOrigin
+    public String copyMktStrategyConf(@RequestBody MktStrategyConfDetail mktStrategyConfDetail){
+        Map<String, Object> map = new HashMap<>();
+        try {
+            map = mktStrategyConfService.copyMktStrategyConf(mktStrategyConfDetail);
+        } catch (Exception e) {
+            logger.error("[op:MktStrategyConfController] failed to copy mktStrategyConfDetail = {}", JSON.toJSON(mktStrategyConfDetail), e);
+        }
+        return JSON.toJSONString(map);
+    }
 }

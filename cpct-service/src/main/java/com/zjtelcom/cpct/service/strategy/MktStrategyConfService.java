@@ -18,4 +18,6 @@ public interface MktStrategyConfService {
 
     Map<String, Object> copyMktStrategyConf(Long parentMktStrategyConfId)  throws Exception;
 
+    Map<String, Object> copyMktStrategyConf(MktStrategyConfDetail mktStrategyConfDetail) throws Exception;
+
 }

@@ -192,6 +192,8 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
      */
     @Override
     public Map<String, Object> listEventSorceAll() {
+
+
         Map<String, Object> eventSorceMap = new HashMap<>();
         try {
             List<EventSorceDO> eventSorceDOList = eventSorceMapper.selectAll();

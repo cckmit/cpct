@@ -71,13 +71,22 @@ public class MktCampaign extends BaseEntity {
     /**
      * 试运算展示列
      */
-    private List<Long> calcDisplay;
+    private Long calcDisplay;
 
     /**
      * isale展示列
      */
-    private List<Long> isaleDisplay;
+    private Long isaleDisplay;
 
+    /**
+     * 创建渠道
+     */
+    private String createChannel;
+
+    /**
+     * 二次营销中的上次活动的Id
+     */
+    private Long preMktCampaignId;
 
 
     public Long getMktCampaignId() {
@@ -168,19 +177,35 @@ public class MktCampaign extends BaseEntity {
         this.mktCampaignDesc = mktCampaignDesc;
     }
 
-    public List<Long> getCalcDisplay() {
+    public Long getCalcDisplay() {
         return calcDisplay;
     }
 
-    public void setCalcDisplay(List<Long> calcDisplay) {
+    public void setCalcDisplay(Long calcDisplay) {
         this.calcDisplay = calcDisplay;
     }
 
-    public List<Long> getIsaleDisplay() {
+    public Long getIsaleDisplay() {
         return isaleDisplay;
     }
 
-    public void setIsaleDisplay(List<Long> isaleDisplay) {
+    public void setIsaleDisplay(Long isaleDisplay) {
         this.isaleDisplay = isaleDisplay;
+    }
+
+    public String getCreateChannel() {
+        return createChannel;
+    }
+
+    public void setCreateChannel(String createChannel) {
+        this.createChannel = createChannel;
+    }
+
+    public Long getPreMktCampaignId() {
+        return preMktCampaignId;
+    }
+
+    public void setPreMktCampaignId(Long preMktCampaignId) {
+        this.preMktCampaignId = preMktCampaignId;
     }
 }

@@ -38,6 +38,7 @@
         e.EVENT_NBR contactEvtCode,
         e.EVENT_NAME contactEvtName,
         e.EVENT_DESC contactEvtDesc,
+        e.MKT_CAMPAIGN_TYPE mktCampaignType,
         t.EVT_TYPE_NAME contactEvtTypeName,
         e.STATUS_CD statusCd
         from event e

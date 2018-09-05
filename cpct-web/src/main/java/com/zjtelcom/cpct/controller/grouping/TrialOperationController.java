@@ -9,7 +9,9 @@ import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +30,28 @@ public class TrialOperationController extends BaseController {
     private TrialOperationService operationService;
 
 
-
+    /**
+     * 客户清单导入试运算
+     * @param multipartFile
+     * @param operation
+     * @param ruleId
+     * @return
+     * @throws IOException
+     */
+    @PostMapping("importUserList")
+    @CrossOrigin
+    public Map<String, Object> importUserList(MultipartFile multipartFile, TrialOperationVO operation, Long ruleId)throws IOException{
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = operationService.importUserList(multipartFile,operation,ruleId);
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to importUserList", e);
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", " fail to importUserList");
+            return result;
+        }
+        return result;
+    }
 
     /**
      * 新增策略试运算
@@ -44,7 +67,7 @@ public class TrialOperationController extends BaseController {
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to searchBatchInfo", e);
             result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", " fail to searchBatchInfo");
+            result.put("resultMsg", "fail to searchBatchInfo");
             return result;
         }
         return result;

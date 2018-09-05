@@ -19,8 +19,8 @@ public class FilterRule extends BaseEntity implements Serializable{
     private String channelContacts;//渠道执行次数
     private Date effectiveDate;//生效时间
     private Date failureDate;//失效时间
-    private String labelCode;
-    private String chooseProduct;
+    private String labelCode;//
+    private String chooseProduct;//选择的销售品
     private String expression;
 
 
