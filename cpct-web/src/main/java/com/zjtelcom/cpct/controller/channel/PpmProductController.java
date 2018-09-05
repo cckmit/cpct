@@ -143,10 +143,10 @@ public class PpmProductController extends BaseController  {
             Long strategyRuleId = null;
             Long ruleId = null;
             List<Long> itemRuleIdList = null;
-            if (params.get("strategyRuleId")!=null){
+            if (params.get("strategyRuleId")!=null && !params.get("strategyRuleId").equals("")){
                  strategyRuleId = Long.valueOf(params.get("strategyRuleId").toString());
             }
-            if (params.get("ruleId")!=null){
+            if (params.get("ruleId")!=null && !params.get("ruleId").equals("")){
                 ruleId = Long.valueOf(params.get("ruleId").toString());
             }
             if (params.get("itemRuleIdList")!=null){
