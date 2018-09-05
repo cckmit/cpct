@@ -97,6 +97,15 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
         return result;
     }
 
+    /**
+     * 分页列表
+     * @param evtSrcId
+     * @param interfaceName
+     * @param interfaceType
+     * @param page
+     * @param pageSize
+     * @return
+     */
     @Override
     public Map<String, Object> listInterfaceCfg(Long evtSrcId,String interfaceName,String interfaceType,Integer page,Integer pageSize){
         Map<String,Object> result = new HashMap<>();
@@ -104,6 +113,29 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
         List<InterfaceCfg> cfgList = interfaceCfgMapper.findInterfaceCfgListByParam(evtSrcId,interfaceName,interfaceType);
         Page info = new Page(new PageInfo(cfgList));
         List<InterfaceCfgVO> voList = new ArrayList<>();
+        getVOList(cfgList, voList);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",voList);
+        result.put("page",info);
+        return result;
+    }
+
+    /**
+     * 无分页
+     * @return
+     */
+    @Override
+    public Map<String, Object> getInterfaceCfgList() {
+        Map<String,Object> result = new HashMap<>();
+        List<InterfaceCfg> cfgList = interfaceCfgMapper.selectAll();
+        List<InterfaceCfgVO> voList = new ArrayList<>();
+        getVOList(cfgList, voList);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",voList);
+        return result;
+    }
+
+    private void getVOList(List<InterfaceCfg> cfgList, List<InterfaceCfgVO> voList) {
         for (InterfaceCfg interfaceCfg1 : cfgList){
             EventSorceDO eventSorce = eventSorceMapper.selectByPrimaryKey(interfaceCfg1.getEvtSrcId());
             if (eventSorce==null){
@@ -121,10 +153,6 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
             }
             voList.add(vo);
         }
-        result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",voList);
-        result.put("page",info);
-        return result;
     }
 
     @Override

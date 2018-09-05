@@ -15,4 +15,5 @@ public interface InterfaceCfgService {
 
     Map<String,Object> getInterfaceCfgDetail(InterfaceCfg interfaceCfg);
 
+    Map<String,Object> getInterfaceCfgList();
 }
