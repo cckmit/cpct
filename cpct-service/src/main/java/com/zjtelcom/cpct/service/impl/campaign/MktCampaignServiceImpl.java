@@ -32,6 +32,7 @@ import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
+import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UserUtil;
 import com.zjtelcom.cpct_prd.dao.MktCampaignPrdMapper;
 import org.apache.commons.lang.StringUtils;
@@ -110,6 +111,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      */
     @Autowired
     private SysAreaMapper sysAreaMapper;
+
+    /**
+     *
+     */
+    @Autowired
+    private RedisUtils redisUtils;
 
     /**
      * 添加活动基本信息 并建立关系
@@ -558,6 +565,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 isRelation = true;
             }
             mktCampaignVO.setRelation(isRelation);
+            if(mktCampaignVO.getLanId()!=null){
+                SysArea sysArea = (SysArea) redisUtils.get(mktCampaignVO.getLanId().toString());
+                mktCampaignVO.setLandName(sysArea.getName());
+            }
             mktCampaignVOList.add(mktCampaignVO);
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
