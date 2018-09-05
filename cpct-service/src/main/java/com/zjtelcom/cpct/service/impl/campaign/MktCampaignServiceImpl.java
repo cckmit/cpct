@@ -495,7 +495,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     }
 
     /**
-     * 查询活动列表
+     * 查询活动列表（分页）
      */
     @Override
     public Map<String, Object> qryMktCampaignListPage(String mktCampaignName, String statusCd, String tiggerType, String mktCampaignType, Integer page, Integer pageSize) {
@@ -550,6 +550,14 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
                 mktCampaignVO.setEventDTOS(eventDTOList);
             }
+            Boolean isRelation = false;
+            //判断该活动是否有有效的父/子活动
+            int countA = mktCampaignRelMapper.selectCountByAmktCampaignId(mktCampaignDO.getMktCampaignId(), StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+            int countZ = mktCampaignRelMapper.selectCountByZmktCampaignId(mktCampaignDO.getMktCampaignId(), StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+            if (countA != 0 || countZ != 0) {
+                isRelation = true;
+            }
+            mktCampaignVO.setRelation(isRelation);
             mktCampaignVOList.add(mktCampaignVO);
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -583,7 +591,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      * @return
      * @throws Exception
      */
-
+    @Override
     public Map<String, Object> publishMktCampaign(Long mktCampaignId) throws Exception {
         Map<String, Object> mktCampaignMap = new HashMap<>();
         // 获取当前活动信息

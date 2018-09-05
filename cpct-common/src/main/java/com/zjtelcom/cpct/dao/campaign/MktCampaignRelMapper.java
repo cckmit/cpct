@@ -24,6 +24,8 @@ public interface MktCampaignRelMapper {
 
     int selectCountByAmktCampaignId(@Param("aMktCampaignId") Long aMktCampaignId, @Param("statusCd")String statusCd);
 
+    int selectCountByZmktCampaignId(@Param("zMktCampaignId") Long aMktCampaignId, @Param("statusCd")String statusCd);
+
     List<MktCampaignRelDO> selectAll();
 
     int updateByPrimaryKey(MktCampaignRelDO mktCampaignRelDO);
