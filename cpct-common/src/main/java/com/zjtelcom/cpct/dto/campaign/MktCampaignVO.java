@@ -77,14 +77,14 @@ public class MktCampaignVO extends MktCampaign {
     private Integer execNum;
 
     /**
-     * 状态Id
-     */
-    private String statusCd;
-
-    /**
      * 状态value
      */
     private String statusCdValue;
+
+    /**
+     * 该活动是否有有效的父/子活动
+     */
+    private Boolean isRelation;
 
     /**
      * 活动关联策略集合
@@ -161,14 +161,6 @@ public class MktCampaignVO extends MktCampaign {
         this.execNum = execNum;
     }
 
-    public String getStatusCd() {
-        return statusCd;
-    }
-
-    public void setStatusCd(String statusCd) {
-        this.statusCd = statusCd;
-    }
-
     public String getMktCampaignTypeValue() {
         return mktCampaignTypeValue;
     }
@@ -216,5 +208,13 @@ public class MktCampaignVO extends MktCampaign {
 
     public void setMktStrategyConfDetailList(List<MktStrategyConfDetail> mktStrategyConfDetailList) {
         this.mktStrategyConfDetailList = mktStrategyConfDetailList;
+    }
+
+    public Boolean getRelation() {
+        return isRelation;
+    }
+
+    public void setRelation(Boolean relation) {
+        isRelation = relation;
     }
 }
