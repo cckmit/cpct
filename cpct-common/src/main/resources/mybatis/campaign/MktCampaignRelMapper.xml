@@ -80,13 +80,13 @@
         AND STATUS_CD = #{statusCd,jdbcType=VARCHAR}
     </select>
     <select id="selectCountByAmktCampaignId" resultType="java.lang.Integer">
-        select COUNT (*)
+        select COUNT(*)
         from mkt_campaign_rel
         where A_MKT_CAMPAIGN_ID = #{aMktCampaignId,jdbcType=BIGINT}
         AND STATUS_CD = #{statusCd,jdbcType=VARCHAR}
     </select>
     <select id="selectCountByZmktCampaignId" resultType="java.lang.Integer">
-        select COUNT (*)
+        select COUNT(*)
         from mkt_campaign_rel
         where Z_MKT_CAMPAIGN_ID = #{zMktCampaignId,jdbcType=BIGINT}
         AND STATUS_CD = #{statusCd,jdbcType=VARCHAR}
