@@ -43,6 +43,7 @@ public class LoginController extends BaseController {
      */
     @RequestMapping(value = "login", method = RequestMethod.POST)
     @ResponseBody
+    @CrossOrigin
     public String doLogin(@RequestBody Map<String, String> params) {
 
         String username = params.get("username");
