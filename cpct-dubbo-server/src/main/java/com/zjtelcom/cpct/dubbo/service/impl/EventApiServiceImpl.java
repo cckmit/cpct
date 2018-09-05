@@ -460,44 +460,44 @@ public class EventApiServiceImpl implements EventApiService {
                 return Collections.EMPTY_MAP;
             }
             //下发地市校验
-            if (mktStrategyConf.getAreaId() != null && !"".equals(mktStrategyConf.getAreaId())) {
-                String[] strArrayCity = mktStrategyConf.getAreaId().split("/");
-                boolean areaCheck = true;
-                for (String str : strArrayCity) {
-                    String lanId = params.get("lanId");
-                    if (lanId != null) {
-                        if (lanId.equals(str)) {
-                            areaCheck = false;
-                            break;
-                        }
-                    } else {
-                        //下发地址获取异常 lanId
-                        strategyMap.put("msg", "下发地址获取异常");
-
-                        esJson.put("hit", "false");
-                        esJson.put("msg", "下发地址获取异常");
-                        esService.save(esJson, IndexList.STRATEGY_MODULE);
-                        return Collections.EMPTY_MAP;
-                    }
-                }
-
-                if (areaCheck) {
-                    strategyMap.put("msg", "下发地址不符");
-
-                    esJson.put("hit", "false");
-                    esJson.put("msg", "下发地址不符");
-                    esService.save(esJson, IndexList.STRATEGY_MODULE);
-                    return Collections.EMPTY_MAP;
-                }
-            } else {
-                //下发地市数据异常
-                strategyMap.put("msg", "下发地市数据异常");
-
-                esJson.put("hit", "false");
-                esJson.put("msg", "下发地市数据异常");
-                esService.save(esJson, IndexList.STRATEGY_MODULE);
-                return Collections.EMPTY_MAP;
-            }
+//            if (mktStrategyConf.getAreaId() != null && !"".equals(mktStrategyConf.getAreaId())) {
+//                String[] strArrayCity = mktStrategyConf.getAreaId().split("/");
+//                boolean areaCheck = true;
+//                for (String str : strArrayCity) {
+//                    String lanId = params.get("lanId");
+//                    if (lanId != null) {
+//                        if (lanId.equals(str)) {
+//                            areaCheck = false;
+//                            break;
+//                        }
+//                    } else {
+//                        //下发地址获取异常 lanId
+//                        strategyMap.put("msg", "下发地址获取异常");
+//
+//                        esJson.put("hit", "false");
+//                        esJson.put("msg", "下发地址获取异常");
+//                        esService.save(esJson, IndexList.STRATEGY_MODULE);
+//                        return Collections.EMPTY_MAP;
+//                    }
+//                }
+//
+//                if (areaCheck) {
+//                    strategyMap.put("msg", "下发地址不符");
+//
+//                    esJson.put("hit", "false");
+//                    esJson.put("msg", "下发地址不符");
+//                    esService.save(esJson, IndexList.STRATEGY_MODULE);
+//                    return Collections.EMPTY_MAP;
+//                }
+//            } else {
+//                //下发地市数据异常
+//                strategyMap.put("msg", "下发地市数据异常");
+//
+//                esJson.put("hit", "false");
+//                esJson.put("msg", "下发地市数据异常");
+//                esService.save(esJson, IndexList.STRATEGY_MODULE);
+//                return Collections.EMPTY_MAP;
+//            }
             //判断下发渠道
             if (mktStrategyConf.getChannelsId() != null && !"".equals(mktStrategyConf.getChannelsId())) {
                 String[] strArrayChannelsId = mktStrategyConf.getChannelsId().split("/");
@@ -674,10 +674,10 @@ public class EventApiServiceImpl implements EventApiService {
             //构造查询参数值
             JSONObject param = new JSONObject();
             //查询标识
-            param.put("reqId", "reqId_0605202636_887_44_732"); //自动生成 todo
-            param.put("queryNum", params.get("accNbr"));
+//            param.put("reqId", "reqId_0605202636_887_44_732"); //自动生成 todo
+            param.put("queryNum", privateParams.get("accNbr"));
             param.put("c3", params.get("lanId"));
-            param.put("queryId", params.get("integrationId"));
+            param.put("queryId", privateParams.get("integrationId"));
             //查询标签列表
             Map<String, String> queryFields = new HashMap<>();
             //从redis获取规则使用的所有标签
@@ -889,7 +889,7 @@ public class EventApiServiceImpl implements EventApiService {
                 if (ruleResult.getResult() != null && ((Boolean) ruleResult.getResult())) {
 
                     //拼接返回结果
-                    ruleMap.put("orderISI", privateParams.get("reqId")); //流水号
+                    ruleMap.put("orderISI", params.get("reqId")); //流水号
                     ruleMap.put("activityId", privateParams.get("activityId")); //活动编码
                     ruleMap.put("activityName", privateParams.get("activityName")); //活动名称
                     ruleMap.put("skipCheck", privateParams.get("activityName")); //调过预校验 todo
@@ -1074,8 +1074,8 @@ public class EventApiServiceImpl implements EventApiService {
             MktCamChlConfDO mktCamChlConf = mktCamChlConfMapper.selectByPrimaryKey(evtContactConfId);
 
             //渠道级别信息
-            channel.put("keyNote", ""); //痛痒点话术（必填）
-            channel.put("remark", ""); //备注字段
+//            channel.put("keyNote", ""); //痛痒点话术（必填）
+//            channel.put("remark", ""); //备注字段
             channel.put("channelId", mktCamChlConf.getContactChlId());
             channel.put("channelConfId", mktCamChlConf.getContactChlId()); //执行渠道推送配置标识(MKT_CAM_CHL_CONF表主键) （必填） todo 林超
 
@@ -1121,8 +1121,6 @@ public class EventApiServiceImpl implements EventApiService {
 //        List<Map> resultList = userDetailServ.getUserDetail(queryId, idType, queryFields, channelType ,"");
 //        //System.out.println(ex + "回参:" + resultList);
 //        ex+="回参:" + resultList;
-//        log.info(ex);
-//        /*日志*/LogS.i().iLog(sn, ab, md,System.currentTimeMillis()-sTme, "1");
 //        return RtUtil.sjRt("0", resultList);
 //    }
 
