@@ -32,6 +32,7 @@ import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
+import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UserUtil;
 import com.zjtelcom.cpct_prd.dao.MktCampaignPrdMapper;
 import org.apache.commons.lang.StringUtils;
@@ -110,6 +111,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      */
     @Autowired
     private SysAreaMapper sysAreaMapper;
+
+    /**
+     *
+     */
+    @Autowired
+    private RedisUtils redisUtils;
 
     /**
      * 添加活动基本信息 并建立关系
@@ -495,7 +502,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     }
 
     /**
-     * 查询活动列表
+     * 查询活动列表（分页）
      */
     @Override
     public Map<String, Object> qryMktCampaignListPage(String mktCampaignName, String statusCd, String tiggerType, String mktCampaignType, Integer page, Integer pageSize) {
@@ -550,6 +557,18 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
                 mktCampaignVO.setEventDTOS(eventDTOList);
             }
+            Boolean isRelation = false;
+            //判断该活动是否有有效的父/子活动
+            int countA = mktCampaignRelMapper.selectCountByAmktCampaignId(mktCampaignDO.getMktCampaignId(), StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+            int countZ = mktCampaignRelMapper.selectCountByZmktCampaignId(mktCampaignDO.getMktCampaignId(), StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+            if (countA != 0 || countZ != 0) {
+                isRelation = true;
+            }
+            mktCampaignVO.setRelation(isRelation);
+            if(mktCampaignVO.getLanId()!=null){
+                SysArea sysArea = (SysArea) redisUtils.get(mktCampaignVO.getLanId().toString());
+                mktCampaignVO.setLandName(sysArea.getName());
+            }
             mktCampaignVOList.add(mktCampaignVO);
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -583,7 +602,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      * @return
      * @throws Exception
      */
-
+    @Override
     public Map<String, Object> publishMktCampaign(Long mktCampaignId) throws Exception {
         Map<String, Object> mktCampaignMap = new HashMap<>();
         // 获取当前活动信息
