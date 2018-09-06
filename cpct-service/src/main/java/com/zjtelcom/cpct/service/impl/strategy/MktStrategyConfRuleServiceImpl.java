@@ -520,10 +520,10 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
     /**
      * 更新规则下销售品
      *
-     * @param productIdList
+             * @param productIdList
      * @param ruleId
      * @return
-     */
+             */
     @Override
     public Map<String, Object> updateProductIds(List<Long> productIdList, Long ruleId) {
         Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();

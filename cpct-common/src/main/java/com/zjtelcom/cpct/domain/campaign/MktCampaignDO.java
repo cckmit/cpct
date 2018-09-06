@@ -24,6 +24,7 @@ public class MktCampaignDO extends BaseEntity{
     private String execInvl;
     private Integer execNum;
     private String createChannel;
+    private int relCount;
 
     public Long getCalcDisplay() {
         return calcDisplay;
@@ -167,5 +168,13 @@ public class MktCampaignDO extends BaseEntity{
 
     public void setCreateChannel(String createChannel) {
         this.createChannel = createChannel;
+    }
+
+    public int getRelCount() {
+        return relCount;
+    }
+
+    public void setRelCount(int relCount) {
+        this.relCount = relCount;
     }
 }
