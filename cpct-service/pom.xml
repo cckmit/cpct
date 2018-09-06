@@ -30,10 +30,10 @@
             <artifactId>cpct-cache</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.zjtelcom.cpct</groupId>
-            <artifactId>cpct-dubbo-server</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.zjtelcom.cpct</groupId>-->
+            <!--<artifactId>cpct-dubbo-server</artifactId>-->
+        <!--</dependency>-->
 
         <!-- PageHelper 分页插件 -->
         <dependency>

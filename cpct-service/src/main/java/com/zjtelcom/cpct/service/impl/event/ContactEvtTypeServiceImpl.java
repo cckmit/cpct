@@ -6,9 +6,11 @@ import com.zjtelcom.cpct.dao.event.ContactEvtTypeMapper;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.ContactEvtType;
 import com.zjtelcom.cpct.dto.event.EventTypeDTO;
+import com.zjtelcom.cpct.dto.event.EventTypeVO;
 import com.zjtelcom.cpct.request.event.QryContactEvtTypeReq;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.ContactEvtTypeService;
+import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang.StringUtils;
@@ -20,6 +22,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 
 /**
  * @Description EventTypeServiceImpl
@@ -90,8 +94,7 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
         contactEvtType.setUpdateStaff(UserUtil.loginId());
         contactEvtType.setCreateStaff(UserUtil.loginId());
         contactEvtType.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-        contactEvtType.setParEvtTypeId(contactEvtType.getEvtTypeId());
-        contactEvtType.setEvtTypeId(EVT_TYPE_ID_NULL);
+        contactEvtType.setParEvtTypeId(contactEvtType.getParEvtTypeId());
         contactEvtTypeMapper.createContactEvtType(contactEvtType);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
@@ -106,16 +109,20 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
     @Override
     public Map<String, Object> getEventTypeDTOById(Long evtTypeId) {
         Map<String, Object> maps = new HashMap<>();
-        ContactEvtType contactEvtType = new ContactEvtType();
-        try {
-            contactEvtType = contactEvtTypeMapper.selectByPrimaryKey(evtTypeId);
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("[op:ContactEvtTypeServiceImpl] fail to getEventTypeDTOById ", e);
+        ContactEvtType contactEvtType = contactEvtTypeMapper.selectByPrimaryKey(evtTypeId);
+        if (contactEvtType==null){
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg", "目录不存在");
+            return maps;
+        }
+        EventTypeVO vo = BeanUtil.create(contactEvtType,new EventTypeVO());
+        ContactEvtType parent = contactEvtTypeMapper.selectByPrimaryKey(contactEvtType.getParEvtTypeId());
+        if (parent!=null){
+            vo.setParentName(parent.getContactEvtName());
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
-        maps.put("contactEvtType", contactEvtType);
+        maps.put("contactEvtType",vo);
         return maps;
     }
 
@@ -148,11 +155,11 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
         List<ContactEvt> contactEvtList = contactEvtMapper.listEvents(contactEvt);
         List<ContactEvtType> contactEvtTypeList = contactEvtTypeMapper.qryContactEvtTypeList(qryContactEvtTypeReq);
         if (contactEvtList.size() > 0) {
-            maps.put("resultCode", CommonConstant.CODE_FAIL);
+            maps.put("resultCode", CODE_FAIL);
             maps.put("resultMsg", "事件类型已关联事件，不可删除！");
             return maps;
         } else if (contactEvtTypeList.size() > 0) {
-            maps.put("resultCode", CommonConstant.CODE_FAIL);
+            maps.put("resultCode", CODE_FAIL);
             maps.put("resultMsg", "事件类型有子类，不可删除！");
             return maps;
         } else {

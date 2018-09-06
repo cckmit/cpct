@@ -50,7 +50,7 @@
         <if test="contactEvtTypeId != null and contactEvtTypeId != 0">
             and e.EVT_TYPE_ID = #{contactEvtTypeId}
         </if>
-        order by CREATE_DATE desc
+        ORDER BY e.CREATE_DATE DESC
     </select>
 
     <!--查询方法(只设置id与name两个查询条件)-->
