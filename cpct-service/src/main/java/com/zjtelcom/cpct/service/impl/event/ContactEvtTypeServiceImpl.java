@@ -11,6 +11,7 @@ import com.zjtelcom.cpct.request.event.QryContactEvtTypeReq;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.ContactEvtTypeService;
 import com.zjtelcom.cpct.util.BeanUtil;
+import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang.StringUtils;
@@ -95,6 +96,7 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
         contactEvtType.setCreateStaff(UserUtil.loginId());
         contactEvtType.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
         contactEvtType.setParEvtTypeId(contactEvtType.getParEvtTypeId());
+        contactEvtType.setContactEvtTypeCode("ET"+ChannelUtil.getRandomStr(6));
         contactEvtTypeMapper.createContactEvtType(contactEvtType);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
