@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.OfferCatalogLocationMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.OfferCatalogLocation">
+    <id column="OFFER_CAT_LOC_ID" jdbcType="DECIMAL" property="offerCatLocId" />
+    <result column="OFFER_ID" jdbcType="DECIMAL" property="offerId" />
+    <result column="CATALOG_ITEM_ID" jdbcType="DECIMAL" property="catalogItemId" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="DECIMAL" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="DECIMAL" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from offer_catalog_location
+    where OFFER_CAT_LOC_ID = #{offerCatLocId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.OfferCatalogLocation">
+    insert into offer_catalog_location (OFFER_CAT_LOC_ID, OFFER_ID, CATALOG_ITEM_ID, 
+      STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+      CREATE_DATE, UPDATE_DATE, STATUS_DATE, 
+      REMARK)
+    values (#{offerCatLocId,jdbcType=DECIMAL}, #{offerId,jdbcType=DECIMAL}, #{catalogItemId,jdbcType=DECIMAL}, 
+      #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=DECIMAL}, #{updateStaff,jdbcType=DECIMAL}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.OfferCatalogLocation">
+    update offer_catalog_location
+    set OFFER_ID = #{offerId,jdbcType=DECIMAL},
+      CATALOG_ITEM_ID = #{catalogItemId,jdbcType=DECIMAL},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=DECIMAL},
+      UPDATE_STAFF = #{updateStaff,jdbcType=DECIMAL},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where OFFER_CAT_LOC_ID = #{offerCatLocId,jdbcType=DECIMAL}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select OFFER_CAT_LOC_ID, OFFER_ID, CATALOG_ITEM_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+    CREATE_DATE, UPDATE_DATE, STATUS_DATE, REMARK
+    from offer_catalog_location
+    where OFFER_CAT_LOC_ID = #{offerCatLocId,jdbcType=DECIMAL}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select OFFER_CAT_LOC_ID, OFFER_ID, CATALOG_ITEM_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+    CREATE_DATE, UPDATE_DATE, STATUS_DATE, REMARK
+    from offer_catalog_location
+  </select>
+
+  <select id="selectByCatalogItemId" resultMap="BaseResultMap">
+    select OFFER_CAT_LOC_ID, OFFER_ID, CATALOG_ITEM_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    CREATE_DATE, UPDATE_DATE, STATUS_DATE, REMARK
+    from offer_catalog_location
+    where CATALOG_ITEM_ID = #{catalogItemId}
+  </select>
+
+</mapper>
