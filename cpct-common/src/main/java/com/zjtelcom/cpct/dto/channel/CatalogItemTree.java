@@ -3,20 +3,11 @@ package com.zjtelcom.cpct.dto.channel;
 import java.io.Serializable;
 import java.util.List;
 
-public class LabelCatalogTree implements Serializable {
+public class CatalogItemTree implements Serializable {
     private Long id;
     private String name;
-    private List<LabelCatalogTree> children;
-    private List<LabelVO> labelVOList;
+    private List<CatalogItemTree> children;
 
-
-    public List<LabelVO> getLabelVOList() {
-        return labelVOList;
-    }
-
-    public void setLabelVOList(List<LabelVO> labelVOList) {
-        this.labelVOList = labelVOList;
-    }
 
     public Long getId() {
         return id;
@@ -34,11 +25,11 @@ public class LabelCatalogTree implements Serializable {
         this.name = name;
     }
 
-    public List<LabelCatalogTree> getChildren() {
+    public List<CatalogItemTree> getChildren() {
         return children;
     }
 
-    public void setChildren(List<LabelCatalogTree> children) {
+    public void setChildren(List<CatalogItemTree> children) {
         this.children = children;
     }
 }

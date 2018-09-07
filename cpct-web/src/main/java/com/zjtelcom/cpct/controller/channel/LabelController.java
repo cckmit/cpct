@@ -63,7 +63,7 @@ public class LabelController extends BaseController {
         return result;
     }
 
-    @GetMapping("listLabelCatalog")
+    @PostMapping("listLabelCatalog")
     @CrossOrigin
     public Map<String, Object> listLabelCatalog() {
         Map<String,Object> result = new HashMap<>();
@@ -77,6 +77,22 @@ public class LabelController extends BaseController {
         }
         return result;
     }
+
+    @PostMapping("listLabelByCatalogId")
+    @CrossOrigin
+    public Map<String, Object> listLabelByCatalogId(@RequestBody HashMap<String,Long> param) {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = labelCatalogService.listLabelByCatalogId(param.get("catalogId"));
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to listLabelByCatalogId",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to listLabelByCatalogId");
+            return result;
+        }
+        return result;
+    }
+
 
 
 //    @PostMapping("syncLabelInfo")

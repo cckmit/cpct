@@ -6,9 +6,12 @@ import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelCatalog;
 import com.zjtelcom.cpct.dto.channel.LabelCatalogTree;
+import com.zjtelcom.cpct.dto.channel.LabelDTO;
+import com.zjtelcom.cpct.dto.channel.LabelVO;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.LabelCatalogService;
 import com.zjtelcom.cpct.util.BeanUtil;
+import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +68,26 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
         return result;
     }
 
+
+    /**
+     * 通过目录节点获取标签列表
+     * @param catalogId
+     * @return
+     */
+    @Override
+    public Map<String, Object> listLabelByCatalogId(Long catalogId) {
+        Map<String,Object> result = new HashMap<>();
+        List<Label> labelList = labelMapper.findLabelListByCatalogId(catalogId);
+        List<LabelDTO> voList = new ArrayList<>();
+        for (Label label : labelList){
+            LabelDTO vo = BeanUtil.create(label,new LabelDTO());
+            voList.add(vo);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",voList);
+        return result;
+    }
+
     /**
      * 标签树
      * @return
@@ -96,17 +119,15 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
                     thirdTree.setId(third.getCatalogId());
                     thirdTree.setName(third.getCatalogName());
 
-                    List<LabelCatalogTree> forceTreeList = new ArrayList<>();
+                    List<LabelVO> labelVOList = new ArrayList<>();
                     for (Label label : allLabels) {
                         if (label.getCatalogId()==null || !label.getCatalogId().equals(third.getCatalogId())){
                             continue;
                         }
-                        LabelCatalogTree forceTree = new LabelCatalogTree();
-                        forceTree.setId(label.getInjectionLabelId());
-                        forceTree.setName(label.getInjectionLabelName());
-                        forceTreeList.add(forceTree);
+                        LabelVO vo = ChannelUtil.map2LabelVO(label);
+                        labelVOList.add(vo);
                     }
-                    thirdTree.setChildren(forceTreeList);
+                    thirdTree.setLabelVOList(labelVOList);
                     thirdTreeList.add(thirdTree);
                 }
                 twiceTree.setChildren(thirdTreeList);
@@ -119,8 +140,6 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
         result.put("resultMsg",resultTree);
         return result;
     }
-
-
 
     private List<LabelCatalog> getCatalogListByParentId(List<LabelCatalog> allList,Long catalogId){
         List<LabelCatalog> resultList = new ArrayList<>();
