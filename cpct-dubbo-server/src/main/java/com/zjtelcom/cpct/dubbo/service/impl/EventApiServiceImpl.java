@@ -813,6 +813,15 @@ public class EventApiServiceImpl implements EventApiService {
                     } else if ("7000".equals(type) || "7100".equals(type)) {
                         expressSb.append(" in ");
                         express1.append(" in ");
+                    } else if ("7200".equals(type)) {
+                        expressSb.append(" in ");
+                        express1.append(" in ");
+
+                        expressSb.append(" <= ").append("\"").append(tarGrpConditionDOs.get(i).getRightParam()).append("\"");
+                        expressSb.append(" && ");
+                        expressSb.append(label.getInjectionLabelCode());
+                        expressSb.append(" <= ").append("\"").append(tarGrpConditionDOs.get(i).getRightParam()).append("\"");
+
                     }
 
                     if ("7000".equals(type) || "7100".equals(type)) {
@@ -829,6 +838,8 @@ public class EventApiServiceImpl implements EventApiService {
                         }
                         expressSb.append(")");
                         express1.append(")");
+                    } else if ("8000".equals(type)) {
+                        //do nothing...
                     } else {
                         expressSb.append("\"").append(tarGrpConditionDOs.get(i).getRightParam()).append("\"");//  真实值
                         express1.append("\"").append(tarGrpConditionDOs.get(i).getRightParam()).append("\"");//  真实值
@@ -1110,6 +1121,12 @@ public class EventApiServiceImpl implements EventApiService {
             return channel;
         }
     }
+
+//        private String splicingExpression(String type) {
+//
+//
+//            return null;
+//        }
 
 
 //    public Map<String, Object> getUserDetail_331040(String sn,String ab,String queryId, String idType, Map<String, Object> queryFields, String channelType) {
