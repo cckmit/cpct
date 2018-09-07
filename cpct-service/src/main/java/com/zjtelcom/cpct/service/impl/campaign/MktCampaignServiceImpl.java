@@ -32,6 +32,7 @@ import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
+import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UserUtil;
 import com.zjtelcom.cpct_prd.dao.MktCampaignPrdMapper;
 import org.apache.commons.lang.StringUtils;
@@ -110,6 +111,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      */
     @Autowired
     private SysAreaMapper sysAreaMapper;
+
+    /**
+     *
+     */
+    @Autowired
+    private RedisUtils redisUtils;
 
     /**
      * 添加活动基本信息 并建立关系
@@ -519,23 +526,31 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         for (MktCampaignDO mktCampaignDO : mktCampaignDOList) {
             MktCampaignVO mktCampaignVO = new MktCampaignVO();
             try {
-                CopyPropertiesUtil.copyBean2Bean(mktCampaignVO, mktCampaignDO);
+                //CopyPropertiesUtil.copyBean2Bean(mktCampaignVO, mktCampaignDO);
+                mktCampaignVO.setMktCampaignId(mktCampaignDO.getMktCampaignId());
+                mktCampaignVO.setMktCampaignName(mktCampaignDO.getMktCampaignName());
+                mktCampaignVO.setMktActivityNbr(mktCampaignDO.getMktActivityNbr());
+                mktCampaignVO.setPlanBeginTime(mktCampaignDO.getPlanBeginTime());
+                mktCampaignVO.setPlanEndTime(mktCampaignDO.getPlanEndTime());
+                mktCampaignVO.setCreateChannel(mktCampaignDO.getCreateChannel());
             } catch (Exception e) {
                 logger.error("Excetion:", e);
             }
-            mktCampaignVO.setTiggerTypeValue(paramMap.
-                    get(ParamKeyEnum.TIGGER_TYPE.getParamKey() + mktCampaignDO.getTiggerType()));
+/*            mktCampaignVO.setTiggerTypeValue(paramMap.
+                    get(ParamKeyEnum.TIGGER_TYPE.getParamKey() + mktCampaignDO.getTiggerType()));*/
             mktCampaignVO.setMktCampaignCategoryValue(paramMap.
                     get(ParamKeyEnum.MKT_CAMPAIGN_CATEGORY.getParamKey() + mktCampaignDO.getMktCampaignCategory()));
             mktCampaignVO.setMktCampaignTypeValue(paramMap.
                     get(ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey() + mktCampaignDO.getMktCampaignType()));
             mktCampaignVO.setStatusCdValue(paramMap.
                     get(ParamKeyEnum.STATUS_CD.getParamKey() + mktCampaignDO.getStatusCd()));
+/*
             mktCampaignVO.setExecTypeValue(paramMap.
                     get(ParamKeyEnum.EXEC_TYPE.getParamKey() + mktCampaignDO.getExecType()));
+*/
 
             // 获取活动关联的事件
-            List<MktCamEvtRelDO> mktCamEvtRelDOList = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignDO.getMktCampaignId());
+/*            List<MktCamEvtRelDO> mktCamEvtRelDOList = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignDO.getMktCampaignId());
             if (mktCamEvtRelDOList != null) {
                 List<EventDTO> eventDTOList = new ArrayList<>();
                 for (MktCamEvtRelDO mktCamEvtRelDO : mktCamEvtRelDOList) {
@@ -549,15 +564,18 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     }
                 }
                 mktCampaignVO.setEventDTOS(eventDTOList);
-            }
+            }*/
             Boolean isRelation = false;
             //判断该活动是否有有效的父/子活动
-            int countA = mktCampaignRelMapper.selectCountByAmktCampaignId(mktCampaignDO.getMktCampaignId(), StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
-            int countZ = mktCampaignRelMapper.selectCountByZmktCampaignId(mktCampaignDO.getMktCampaignId(), StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
-            if (countA != 0 || countZ != 0) {
+           if (mktCampaignDO.getRelCount() != 0 ) {
                 isRelation = true;
             }
+
             mktCampaignVO.setRelation(isRelation);
+            if(mktCampaignDO.getLanId()!=null){
+                SysArea sysArea = (SysArea) redisUtils.get(mktCampaignDO.getLanId().toString());
+                mktCampaignVO.setLandName(sysArea.getName());
+            }
             mktCampaignVOList.add(mktCampaignVO);
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);

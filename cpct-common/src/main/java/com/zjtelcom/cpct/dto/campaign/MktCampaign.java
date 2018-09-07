@@ -88,6 +88,11 @@ public class MktCampaign extends BaseEntity {
      */
     private Long preMktCampaignId;
 
+    /**
+     * 所属地市名称
+     */
+    private String landName;
+
 
     public Long getMktCampaignId() {
         return mktCampaignId;
@@ -207,5 +212,13 @@ public class MktCampaign extends BaseEntity {
 
     public void setPreMktCampaignId(Long preMktCampaignId) {
         this.preMktCampaignId = preMktCampaignId;
+    }
+
+    public String getLandName() {
+        return landName;
+    }
+
+    public void setLandName(String landName) {
+        this.landName = landName;
     }
 }
