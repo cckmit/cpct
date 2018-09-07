@@ -22,6 +22,7 @@ public class Label extends BaseEntity {
     private Integer scope;
     private Integer isShared;
     private String className;
+    private Long catalogId;
 
 
 }
