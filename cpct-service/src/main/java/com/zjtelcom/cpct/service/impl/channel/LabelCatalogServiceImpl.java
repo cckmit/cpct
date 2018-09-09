@@ -101,22 +101,22 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
 
         for (LabelCatalog first : firstList){
             LabelCatalogTree firstTree = new LabelCatalogTree();
-            firstTree.setId(first.getCatalogId());
-            firstTree.setName(first.getCatalogName());
+            firstTree.setInjectionLabelId(first.getCatalogId());
+            firstTree.setInjectionLabelName(first.getCatalogName());
 
             List<CatalogTreeTwo> twiceTreeList = new ArrayList<>();
             List<LabelCatalog> twiceList = getCatalogListByParentId(allCatalogs,first.getCatalogId());
             for (LabelCatalog twice : twiceList){
                 CatalogTreeTwo twiceTree = new CatalogTreeTwo();
-                twiceTree.setId(twice.getCatalogId());
-                twiceTree.setName(twice.getCatalogName());
+                twiceTree.setInjectionLabelId(twice.getCatalogId());
+                twiceTree.setInjectionLabelName(twice.getCatalogName());
 
                 List<CatalogTreeThree> thirdTreeList = new ArrayList<>();
                 List<LabelCatalog> thirdList = getCatalogListByParentId(allCatalogs,twice.getCatalogId());
                 for (LabelCatalog third : thirdList){
                     CatalogTreeThree thirdTree = new CatalogTreeThree();
-                    thirdTree.setId(third.getCatalogId());
-                    thirdTree.setName(third.getCatalogName());
+                    thirdTree.setInjectionLabelId(third.getCatalogId());
+                    thirdTree.setInjectionLabelName(third.getCatalogName());
 
                     List<LabelVO> labelVOList = new ArrayList<>();
                     for (Label label : allLabels) {

@@ -4,25 +4,25 @@ import java.io.Serializable;
 import java.util.List;
 
 public class LabelCatalogTree implements Serializable {
-    private Long id;
-    private String name;
+    private Long injectionLabelId;
+    private String injectionLabelName;
     private List<CatalogTreeTwo> children;
 
 
-    public Long getId() {
-        return id;
+    public Long getInjectionLabelId() {
+        return injectionLabelId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setInjectionLabelId(Long injectionLabelId) {
+        this.injectionLabelId = injectionLabelId;
     }
 
-    public String getName() {
-        return name;
+    public String getInjectionLabelName() {
+        return injectionLabelName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setInjectionLabelName(String injectionLabelName) {
+        this.injectionLabelName = injectionLabelName;
     }
 
     public List<CatalogTreeTwo> getChildren() {
