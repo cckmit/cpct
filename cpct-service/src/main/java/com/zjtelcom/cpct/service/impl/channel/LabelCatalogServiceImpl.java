@@ -5,9 +5,7 @@ import com.zjtelcom.cpct.dao.channel.InjectionLabelCatalogMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelCatalog;
-import com.zjtelcom.cpct.dto.channel.LabelCatalogTree;
-import com.zjtelcom.cpct.dto.channel.LabelDTO;
-import com.zjtelcom.cpct.dto.channel.LabelVO;
+import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.LabelCatalogService;
 import com.zjtelcom.cpct.util.BeanUtil;
@@ -105,17 +103,18 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
             LabelCatalogTree firstTree = new LabelCatalogTree();
             firstTree.setId(first.getCatalogId());
             firstTree.setName(first.getCatalogName());
-            List<LabelCatalogTree> twiceTreeList = new ArrayList<>();
+
+            List<CatalogTreeTwo> twiceTreeList = new ArrayList<>();
             List<LabelCatalog> twiceList = getCatalogListByParentId(allCatalogs,first.getCatalogId());
             for (LabelCatalog twice : twiceList){
-                LabelCatalogTree twiceTree = new LabelCatalogTree();
+                CatalogTreeTwo twiceTree = new CatalogTreeTwo();
                 twiceTree.setId(twice.getCatalogId());
                 twiceTree.setName(twice.getCatalogName());
 
-                List<LabelCatalogTree> thirdTreeList = new ArrayList<>();
+                List<CatalogTreeThree> thirdTreeList = new ArrayList<>();
                 List<LabelCatalog> thirdList = getCatalogListByParentId(allCatalogs,twice.getCatalogId());
                 for (LabelCatalog third : thirdList){
-                    LabelCatalogTree thirdTree = new LabelCatalogTree();
+                    CatalogTreeThree thirdTree = new CatalogTreeThree();
                     thirdTree.setId(third.getCatalogId());
                     thirdTree.setName(third.getCatalogName());
 
@@ -127,7 +126,7 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
                         LabelVO vo = ChannelUtil.map2LabelVO(label);
                         labelVOList.add(vo);
                     }
-                    thirdTree.setLabelVOList(labelVOList);
+                    thirdTree.setChildren(labelVOList);
                     thirdTreeList.add(thirdTree);
                 }
                 twiceTree.setChildren(thirdTreeList);
