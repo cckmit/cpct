@@ -8,6 +8,12 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * @Description:
+ * @author: linchao
+ * @date: 2018/09/06 16:14
+ * @version: V1.0
+ */
 @Mapper
 @Repository
 public interface MktCampaignMapper {

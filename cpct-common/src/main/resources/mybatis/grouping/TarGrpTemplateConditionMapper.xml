@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.grouping.TarGrpTemplateConditionMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.grouping.TarGrpTemplateConditionDO">
+    <id column="CONDITION_ID" jdbcType="BIGINT" property="conditionId" />
+    <result column="TAR_GRP_TEMPLATE_ID" jdbcType="BIGINT" property="tarGrpTemplateId" />
+    <result column="LEFT_PARAM" jdbcType="VARCHAR" property="leftParam" />
+    <result column="LEFT_PARAM_TYPE" jdbcType="VARCHAR" property="leftParamType" />
+    <result column="OPER_TYPE" jdbcType="VARCHAR" property="operType" />
+    <result column="RIGHT_PARAM" jdbcType="VARCHAR" property="rightParam" />
+    <result column="RIGHT_PARAM_TYPE" jdbcType="VARCHAR" property="rightParamType" />
+    <result column="CONDITION_TEXT" jdbcType="VARCHAR" property="conditionText" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from tar_grp_template_condition
+    where CONDITION_ID = #{conditionId,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByTarGrpTemplateId" parameterType="java.lang.Long">
+    delete from tar_grp_template_condition
+    where TAR_GRP_TEMPLATE_ID = #{tarGrpTemplateId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.grouping.TarGrpTemplateConditionDO">
+    insert into tar_grp_template_condition (CONDITION_ID, TAR_GRP_TEMPLATE_ID, LEFT_PARAM, 
+      LEFT_PARAM_TYPE, OPER_TYPE, RIGHT_PARAM, 
+      RIGHT_PARAM_TYPE, CONDITION_TEXT, STATUS_CD, 
+      CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
+      STATUS_DATE, UPDATE_DATE, REMARK
+      )
+    values (#{conditionId,jdbcType=BIGINT}, #{tarGrpTemplateId,jdbcType=BIGINT}, #{leftParam,jdbcType=VARCHAR}, 
+      #{leftParamType,jdbcType=VARCHAR}, #{operType,jdbcType=VARCHAR}, #{rightParam,jdbcType=VARCHAR}, 
+      #{rightParamType,jdbcType=VARCHAR}, #{conditionText,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR}, 
+      #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.grouping.TarGrpTemplateConditionDO">
+    update tar_grp_template_condition
+    set
+    <if test="tarGrpTemplateId != null and tarGrpTemplateId != ''">
+      TAR_GRP_TEMPLATE_ID = #{tarGrpTemplateId,jdbcType=BIGINT},
+    </if>
+    <if test="leftParam != null and leftParam != ''">
+      LEFT_PARAM = #{leftParam,jdbcType=VARCHAR},
+    </if>
+    <if test="leftParamType != null and leftParamType != ''">
+      LEFT_PARAM_TYPE = #{leftParamType,jdbcType=VARCHAR},
+    </if>
+    <if test="operType != null and operType != ''">
+      OPER_TYPE = #{operType,jdbcType=VARCHAR},
+    </if>
+    <if test="rightParam != null and rightParam != ''">
+      RIGHT_PARAM = #{rightParam,jdbcType=VARCHAR},
+    </if>
+    <if test="rightParamType != null and rightParamType != ''">
+      RIGHT_PARAM_TYPE = #{rightParamType,jdbcType=VARCHAR},
+    </if>
+    <if test="conditionText != null and conditionText != ''">
+      CONDITION_TEXT = #{conditionText,jdbcType=VARCHAR},
+    </if>
+    <if test="statusCd != null and statusCd != ''">
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+    </if>
+    <if test="createStaff != null and createStaff != ''">
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+    </if>
+    <if test="updateStaff != null and updateStaff != ''">
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+    </if>
+    <if test="createDate != null">
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+    </if>
+    <if test="statusDate != null">
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+    </if>
+    <if test="remark != null and remark != ''">
+      REMARK = #{remark,jdbcType=VARCHAR},
+    </if>
+    UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
+    where CONDITION_ID = #{conditionId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select CONDITION_ID, TAR_GRP_TEMPLATE_ID, LEFT_PARAM, LEFT_PARAM_TYPE, OPER_TYPE, 
+    RIGHT_PARAM, RIGHT_PARAM_TYPE, CONDITION_TEXT, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from tar_grp_template_condition
+    where CONDITION_ID = #{conditionId,jdbcType=BIGINT}
+  </select>
+  <select id="selectByTarGrpTemplateId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select CONDITION_ID, TAR_GRP_TEMPLATE_ID, LEFT_PARAM, LEFT_PARAM_TYPE, OPER_TYPE,
+    RIGHT_PARAM, RIGHT_PARAM_TYPE, CONDITION_TEXT, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from tar_grp_template_condition
+    where TAR_GRP_TEMPLATE_ID = #{tarGrpTemplateId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select CONDITION_ID, TAR_GRP_TEMPLATE_ID, LEFT_PARAM, LEFT_PARAM_TYPE, OPER_TYPE, 
+    RIGHT_PARAM, RIGHT_PARAM_TYPE, CONDITION_TEXT, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from tar_grp_template_condition
+  </select>
+</mapper>
