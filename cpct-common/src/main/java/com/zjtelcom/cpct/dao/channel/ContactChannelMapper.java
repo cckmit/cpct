@@ -31,4 +31,6 @@ public interface ContactChannelMapper {
 
     List<Channel> findChildList();
 
+    Channel selectByCode(@Param("code")String code);
+
 }
