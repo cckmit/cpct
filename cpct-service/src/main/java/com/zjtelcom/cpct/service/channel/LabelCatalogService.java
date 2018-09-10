@@ -14,6 +14,8 @@ public interface LabelCatalogService  {
 
     Map<String,Object> listLabelCatalog();
 
+    Map<String,Object> listLabelByCatalogId(Long catalogId);
+
 
 
 }

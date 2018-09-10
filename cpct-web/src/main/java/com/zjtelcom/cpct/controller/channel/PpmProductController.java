@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.controller.channel;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
 import com.zjtelcom.cpct.dto.channel.ProductParam;
+import com.zjtelcom.cpct.service.channel.CatalogService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.UserUtil;
@@ -23,6 +24,52 @@ public class PpmProductController extends BaseController  {
 
     @Autowired
     private ProductService productService;
+    @Autowired
+    private CatalogService catalogService;
+
+
+
+
+    /**
+     *通过目录节点获取销售品
+     * @return
+     */
+    @PostMapping("listOfferByCatalogId")
+    @CrossOrigin
+    public Map<String, Object> listOfferByCatalogId(@RequestBody HashMap<String,Object> param) {
+        Map<String ,Object> result = new HashMap<>();
+        try {
+            Integer page = MapUtil.getIntNum(param.get("page"));
+            Integer pageSize = MapUtil.getIntNum(param.get("pageSize"));
+            String productName = MapUtil.getString(param.get("productName"));
+            result = catalogService.listOfferByCatalogId(Long.valueOf(param.get("catalogId").toString()),productName,page,pageSize);
+        }catch (Exception e){
+            logger.error("[op:PpmProductController] fail to listOfferByCatalogId",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to listOfferByCatalogId");
+            return result;
+        }
+        return result;
+    }
+
+    /**
+     *获取销售品目录树
+     * @return
+     */
+    @PostMapping("listProductTree")
+    @CrossOrigin
+    public Map<String, Object> listProductTree() {
+        Map<String ,Object> result = new HashMap<>();
+        try {
+            result = catalogService.listProductTree();
+        }catch (Exception e){
+            logger.error("[op:PpmProductController] fail to listProductTree",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to listProductTree");
+            return result;
+        }
+        return result;
+    }
 
 
     /**

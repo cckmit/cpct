@@ -220,4 +220,15 @@
 
   </select>
 
+  <select id="findLabelListByCatalogId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC,
+    LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK,FIT_DOMAIN, RIGHT_OPERAND, CONDITION_TYPE,
+    OPERATOR,SCOPE,TAG_ROW_ID,IS_SHARED,CATALOG_ID, CLASS_NAME
+    from injection_label
+    where CATALOG_ID = #{catalogId}
+  </select>
+
+
+
 </mapper>

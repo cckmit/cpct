@@ -12,4 +12,13 @@ public class MapUtil {
     }
 
 
+    public static String getString(Object obj){
+        try {
+            return  String.valueOf(obj);
+        }catch (Throwable e){
+
+        }
+        return  null;
+    }
+
 }
