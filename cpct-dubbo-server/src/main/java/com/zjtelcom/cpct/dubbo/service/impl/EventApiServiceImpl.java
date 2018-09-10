@@ -814,13 +814,18 @@ public class EventApiServiceImpl implements EventApiService {
                         expressSb.append(" in ");
                         express1.append(" in ");
                     } else if ("7200".equals(type)) {
-                        expressSb.append(" in ");
-                        express1.append(" in ");
 
-                        expressSb.append(" <= ").append("\"").append(tarGrpConditionDOs.get(i).getRightParam()).append("\"");
+                        String[] strArray = tarGrpConditionDOs.get(i).getRightParam().split(",");
+
+                        expressSb.append(" >= ").append("\"").append(strArray[0]).append("\"");
                         expressSb.append(" && ");
                         expressSb.append(label.getInjectionLabelCode());
-                        expressSb.append(" <= ").append("\"").append(tarGrpConditionDOs.get(i).getRightParam()).append("\"");
+                        expressSb.append(" <= ").append("\"").append(strArray[1]).append("\"");
+
+                        express1.append(" >= ").append("\"").append(strArray[0]).append("\"");
+                        express1.append(" && ");
+                        express1.append(label.getInjectionLabelCode());
+                        express1.append(" <= ").append("\"").append(strArray[1]).append("\"");
 
                     }
 
@@ -838,7 +843,7 @@ public class EventApiServiceImpl implements EventApiService {
                         }
                         expressSb.append(")");
                         express1.append(")");
-                    } else if ("8000".equals(type)) {
+                    } else if ("7200".equals(type)) {
                         //do nothing...
                     } else {
                         expressSb.append("\"").append(tarGrpConditionDOs.get(i).getRightParam()).append("\"");//  真实值
@@ -848,20 +853,27 @@ public class EventApiServiceImpl implements EventApiService {
                     expressSb.append(")");
                     express1.append(") {return true} else {return false}");
                     System.out.println(express1.toString());
-                    RuleResult ruleResult1 = runner.executeRule(express1.toString(), context, true, true);
 
-                    for (LabelResult labelResult : labelResultList) {
-                        if (label.getInjectionLabelCode().equals(labelResult.getLabelCode())) {
+                    try {
+                        RuleResult ruleResult1 = runner.executeRule(express1.toString(), context, true, true);
 
-                            if (null != ruleResult1.getResult()) {
-                                labelResult.setResult((Boolean) ruleResult1.getResult());
-                            } else {
-                                labelResult.setResult(false);
+                        for (LabelResult labelResult : labelResultList) {
+                            if (label.getInjectionLabelCode().equals(labelResult.getLabelCode())) {
+
+                                if (null != ruleResult1.getResult()) {
+                                    labelResult.setResult((Boolean) ruleResult1.getResult());
+                                } else {
+                                    labelResult.setResult(false);
+                                }
+
                             }
-
                         }
+                        jsonobj.put("labelResultList", JSONArray.toJSON(labelResultList));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.out.println("单个标签判断出错");
                     }
-                    jsonobj.put("labelResultList", JSONArray.toJSON(labelResultList));
+
 
                     if (i + 1 != tarGrpConditionDOs.size()) {
                         expressSb.append("&&");
