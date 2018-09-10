@@ -6,7 +6,7 @@ public interface CatalogService {
 
     Map<String,Object> listProductTree();
 
-    Map<String,Object> listOfferByCatalogId(Long catalogId);
+    Map<String,Object> listOfferByCatalogId(Long catalogId,String productName,Integer page,Integer pageSize);
 
 
 

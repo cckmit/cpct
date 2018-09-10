@@ -109,4 +109,18 @@
     from offer
     where OFFER_NAME  LIKE CONCAT(CONCAT('%',#{offerName}),'%')
   </select>
+
+  <select id="selectByPrimaryKeyAndName" resultMap="BaseResultMap">
+    select OFFER_ID, OFFER_TYPE, OFFER_SYS_TYPE, OFFER_NAME, OFFER_SYS_NAME, OFFER_SYS_PY_NAME,
+    OFFER_NBR, EXT_OFFER_ID, OFFER_DESC, EFF_DATE, MANAGE_GRADE, EXP_DATE, OFFER_PROVIDER_ID,
+    BRAND_ID, VALUE_ADDED_FLAG, INITIAL_CRED_VALUE, PRICING_PLAN_ID, IS_INDEPENDENT,
+    REMARK, MANAGE_REGION_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+    UPDATE_DATE
+    from offer
+    where OFFER_ID = #{offerId,jdbcType=DECIMAL}
+    <if test="productName != null and productName != ''">
+      and OFFER_NAME  LIKE CONCAT(CONCAT('%',#{productName}),'%')
+    </if>
+  </select>
+
 </mapper>
