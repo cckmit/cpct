@@ -6,9 +6,11 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
 import com.zjtelcom.cpct.dao.channel.MktProductRuleMapper;
+import com.zjtelcom.cpct.dao.channel.OfferMapper;
 import com.zjtelcom.cpct.dao.channel.PpmProductMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.channel.MktProductRule;
+import com.zjtelcom.cpct.domain.channel.Offer;
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ProductService;
@@ -30,7 +32,7 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 public class ProductServiceImpl extends BaseService implements ProductService {
 
     @Autowired
-    private PpmProductMapper productMapper;
+    private OfferMapper productMapper;
     @Autowired
     private MktCamItemMapper camItemMapper;
     @Autowired
@@ -42,13 +44,13 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         Map<String,Object> result = new HashMap<>();
         List<String> nameList = new ArrayList<>();
         for (Long productId : productIdList){
-            PpmProduct product = productMapper.selectByPrimaryKey(productId);
+            Offer product = productMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
             if (product==null){
                 result.put("resultCode",CODE_FAIL);
                 result.put("resultMsg","产品不存在");
                 return result;
             }
-            nameList.add(product.getProductName());
+            nameList.add(product.getOfferName());
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",nameList);
@@ -58,7 +60,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     @Override
     public Map<String,Object> getProductList(Long userId,Map<String,Object> params){
         Map<String,Object> result = new HashMap<>();
-        List<PpmProduct> productList = new ArrayList<>();
+        List<Offer> productList = new ArrayList<>();
             Integer page = MapUtil.getIntNum(params.get("page"));
             Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
             String productName = null;
@@ -66,7 +68,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 productName = params.get("productName").toString();
             }
             PageHelper.startPage(page,pageSize);
-            productList = productMapper.findByProductName(productName);
+            productList = productMapper.findByName(productName);
             Page pageInfo = new Page(new PageInfo(productList));
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",productList);
@@ -106,7 +108,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         Map<String,Object> result = new HashMap<>();
         List<Long> ruleIdList = new ArrayList<>();
         for (Long productId : productIdList){
-            PpmProduct product = productMapper.selectByPrimaryKey(productId);
+            Offer product = productMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
             if (product==null){
                 result.put("resultCode",CODE_FAIL);
                 result.put("resultMsg","产品不存在");
@@ -114,7 +116,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             }
             MktCamItem item = new MktCamItem();
             item.setItemId(productId);
-            item.setItemType(product.getProductType());
+            item.setItemType(product.getOfferType());
             item.setCreateDate(new Date());
             item.setCreateDate(DateUtil.getCurrentTime());
             item.setUpdateDate(DateUtil.getCurrentTime());
@@ -160,14 +162,14 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 result.put("resultMsg","推荐条目不存在");
                 return result;
             }
-            PpmProduct product = productMapper.selectByPrimaryKey(item.getItemId());
+            Offer product = productMapper.selectByPrimaryKey(Integer.valueOf(item.getItemId().toString()));
             if (product==null){
                 continue;
             }
             MktProductRule rule = new MktProductRule();
             rule.setId(item.getMktCamItemId());
             rule.setProductId(item.getItemId());
-            rule.setProductName(product.getProductName());
+            rule.setProductName(product.getOfferName());
             ruleList.add(rule);
         }
         result.put("resultCode",CODE_SUCCESS);

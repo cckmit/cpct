@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.controller.channel;
 
+import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dto.channel.CamScriptAddVO;
 import com.zjtelcom.cpct.dto.channel.CamScriptEditVO;

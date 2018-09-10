@@ -6,6 +6,7 @@ import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dto.channel.LabelAddVO;
 import com.zjtelcom.cpct.dto.channel.LabelEditVO;
 import com.zjtelcom.cpct.dto.channel.QryMktScriptReq;
+import com.zjtelcom.cpct.service.channel.LabelCatalogService;
 import com.zjtelcom.cpct.service.channel.LabelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
@@ -25,7 +26,74 @@ public class LabelController extends BaseController {
     @Autowired
     private LabelService labelService;
     @Autowired
+    private LabelCatalogService labelCatalogService;
+    @Autowired
     private InjectionLabelMapper labelMapper;
+
+    @PostMapping("batchAdd")
+    @CrossOrigin
+    public Map<String, Object> batchAdd(@RequestBody HashMap<String,Object> param) {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            List<String> stringList = (List<String>)param.get("nameList");
+            result = labelCatalogService.batchAdd(stringList,Long.valueOf(param.get("parentId").toString()),Long.valueOf(param.get("level").toString()));
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to addLabelCatalog",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addLabelCatalog");
+            return result;
+        }
+        return result;
+    }
+
+
+
+    @PostMapping("addLabelCatalog")
+    @CrossOrigin
+    public Map<String, Object> addLabelCatalog(@RequestBody LabelCatalog param) {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = labelCatalogService.addLabelCatalog(param);
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to addLabelCatalog",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addLabelCatalog");
+            return result;
+        }
+        return result;
+    }
+
+    @PostMapping("listLabelCatalog")
+    @CrossOrigin
+    public Map<String, Object> listLabelCatalog() {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = labelCatalogService.listLabelCatalog();
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to listLabelCatalog",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to listLabelCatalog");
+            return result;
+        }
+        return result;
+    }
+
+    @PostMapping("listLabelByCatalogId")
+    @CrossOrigin
+    public Map<String, Object> listLabelByCatalogId(@RequestBody HashMap<String,Long> param) {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = labelCatalogService.listLabelByCatalogId(param.get("catalogId"));
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to listLabelByCatalogId",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to listLabelByCatalogId");
+            return result;
+        }
+        return result;
+    }
+
+
 
 //    @PostMapping("syncLabelInfo")
 //    @CrossOrigin

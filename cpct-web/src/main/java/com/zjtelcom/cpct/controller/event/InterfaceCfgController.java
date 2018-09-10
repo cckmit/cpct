@@ -93,6 +93,21 @@ public class InterfaceCfgController extends BaseController {
         return result;
     }
 
+    @PostMapping("getInterfaceCfgList")
+    @CrossOrigin
+    public Map<String, Object> getInterfaceCfgList() {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = interfaceCfgService.getInterfaceCfgList();
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to getInterfaceCfgList",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to getInterfaceCfgList");
+            return result;
+        }
+        return result;
+    }
+
     @PostMapping("getInterfaceCfgDetail")
     @CrossOrigin
     public Map<String, Object> getInterfaceCfgDetail(@RequestBody InterfaceCfg interfaceCfg) {

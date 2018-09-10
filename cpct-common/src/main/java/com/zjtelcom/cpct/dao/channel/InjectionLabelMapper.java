@@ -29,6 +29,8 @@ public interface InjectionLabelMapper {
 
     List<Label> findByParam(@Param("labelName")String labelName,@Param("fitDomain")String fitDomain);
 
+    List<Label> findLabelListByCatalogId(@Param("catalogId")Long catalogId);
+
     int updateByPrimaryKey(Label record);
 
     int deleteAll();
