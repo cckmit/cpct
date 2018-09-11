@@ -233,6 +233,12 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
     @Override
     public Map<String, Object> createParentChannel(Long userId, ContactChannelDetail parentAddVO) {
         Map<String,Object> result = new HashMap<>();
+        Channel ch = channelMapper.selectByCode(parentAddVO.getContactChlCode());
+        if (ch!=null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","渠道编码已存在");
+            return result;
+        }
         Channel channel = BeanUtil.create(parentAddVO,new Channel());
         channel.setParentId(0L);
         channel.setChannelType(null);//主动被动
@@ -265,6 +271,12 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         if (parent==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","父级渠道不存在");
+            return result;
+        }
+        Channel exist = channelMapper.selectByCode(addVO.getContactChlCode());
+        if (exist!=null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","渠道编码已存在");
             return result;
         }
         Channel channel = BeanUtil.create(addVO,new Channel());
