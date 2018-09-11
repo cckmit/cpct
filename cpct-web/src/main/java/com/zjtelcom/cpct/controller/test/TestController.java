@@ -59,6 +59,17 @@ public class TestController extends BaseController {
     }
 
 
+/*
+    @RequestMapping(value = "/getMktCampaignApi", method = RequestMethod.POST)
+    @CrossOrigin
+    public String getMktCampaignApi(@RequestBody  Map<String, Object> params) throws Exception {
+        Long mktCampaignId = Long.valueOf((String) params.get("mktCampaignId"));
+        Map<String, Object> map = mktCampaignApiService.qryMktCampaignDetail(mktCampaignId);
+        return JSON.toJSONString(map);
+    }
+*/
+
+
 
 
 }

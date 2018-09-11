@@ -7,19 +7,29 @@
 package com.zjtelcom.cpct.service.impl.grouping;
 
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateMapper;
+import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateConditionDO;
 import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO;
+import com.zjtelcom.cpct.dto.channel.OperatorDetail;
+import com.zjtelcom.cpct.dto.grouping.TarGrpTemConditionVO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpTemplateCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpTemplateDetail;
+import com.zjtelcom.cpct.enums.FitDomain;
 import com.zjtelcom.cpct.enums.LeftParamType;
+import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.enums.RightParamType;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.grouping.TarGrpTemplateService;
 import com.zjtelcom.cpct.util.BeanUtil;
+import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +52,9 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     @Autowired
     private TarGrpTemplateConditionMapper tarGrpTemplateConditionMapper;
 
+    @Autowired
+    private InjectionLabelMapper injectionLabelMapper;
+
     /**
      * 新增目标分群模板
      *
@@ -63,14 +76,14 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         tarGrpTemplateMapper.insert(tarGrpTemplateDO);
         Long tarGrpTemplateId = tarGrpTemplateDO.getTarGrpTemplateId();
         // 新增目标分群模板条件
-        if (tarGrpTemplateDetail.getTarGrpTemplateConditionList() != null && tarGrpTemplateDetail.getTarGrpTemplateConditionList().size() > 0) {
-            for (TarGrpTemplateCondition tarGrpTemplateCondition : tarGrpTemplateDetail.getTarGrpTemplateConditionList()) {
-                if (tarGrpTemplateCondition.getOperType() == null || tarGrpTemplateCondition.getOperType().equals("")) {
+        if (tarGrpTemplateDetail.getTarGrpTemConditionVOList() != null && tarGrpTemplateDetail.getTarGrpTemConditionVOList().size() > 0) {
+            for (TarGrpTemConditionVO tarGrpTemConditionVO : tarGrpTemplateDetail.getTarGrpTemConditionVOList()) {
+                if (tarGrpTemConditionVO.getOperType() == null || tarGrpTemConditionVO.getOperType().equals("")) {
                     tarGrpTemplateMap.put("resultCode", CommonConstant.CODE_FAIL);
                     tarGrpTemplateMap.put("resultMsg", "请选择下拉框运算类型");
                     return tarGrpTemplateMap;
                 }
-                TarGrpTemplateConditionDO tarGrpTemplateConditionDO = BeanUtil.create(tarGrpTemplateCondition, new TarGrpTemplateConditionDO());
+                TarGrpTemplateConditionDO tarGrpTemplateConditionDO = BeanUtil.create(tarGrpTemConditionVO, new TarGrpTemplateConditionDO());
                 tarGrpTemplateConditionDO.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
                 tarGrpTemplateConditionDO.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
                 tarGrpTemplateConditionDO.setTarGrpTemplateId(tarGrpTemplateId);
@@ -102,15 +115,15 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         tarGrpTemplateMapper.updateByPrimaryKey(tarGrpTemplateDO);
         Long tarGrpTemplateId = tarGrpTemplateDetail.getTarGrpTemplateId();
         // 新增目标分群模板条件
-        if (tarGrpTemplateDetail.getTarGrpTemplateConditionList() != null && tarGrpTemplateDetail.getTarGrpTemplateConditionList().size() > 0) {
-            for (TarGrpTemplateCondition tarGrpTemplateCondition : tarGrpTemplateDetail.getTarGrpTemplateConditionList()) {
-                if (tarGrpTemplateCondition.getOperType() == null || tarGrpTemplateCondition.getOperType().equals("")) {
+        if (tarGrpTemplateDetail.getTarGrpTemConditionVOList() != null && tarGrpTemplateDetail.getTarGrpTemConditionVOList().size() > 0) {
+            for (TarGrpTemConditionVO tarGrpTemConditionVO : tarGrpTemplateDetail.getTarGrpTemConditionVOList()) {
+                if (tarGrpTemConditionVO.getOperType() == null || tarGrpTemConditionVO.getOperType().equals("")) {
                     tarGrpTemplateMap.put("resultCode", CommonConstant.CODE_FAIL);
                     tarGrpTemplateMap.put("resultMsg", "请选择下拉框运算类型");
                     return tarGrpTemplateMap;
                 }
-                TarGrpTemplateConditionDO tarGrpTemplateConditionDO = BeanUtil.create(tarGrpTemplateCondition, new TarGrpTemplateConditionDO());
-                if (tarGrpTemplateCondition.getConditionId() != null) {
+                TarGrpTemplateConditionDO tarGrpTemplateConditionDO = BeanUtil.create(tarGrpTemConditionVO, new TarGrpTemplateConditionDO());
+                if (tarGrpTemConditionVO.getConditionId() != null) {
                     tarGrpTemplateConditionDO.setUpdateStaff(UserUtil.loginId());
                     tarGrpTemplateConditionDO.setUpdateDate(new Date());
                     tarGrpTemplateConditionMapper.updateByPrimaryKey(tarGrpTemplateConditionDO);
@@ -146,6 +159,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         // 分页获取目标分群模板
         PageHelper.startPage(page, pageSize);
         List<TarGrpTemplateDO> tarGrpTemplateDOList = tarGrpTemplateMapper.selectByName(tarGrpTemplateName);
+        Page pageInfo = new Page(new PageInfo(tarGrpTemplateDOList));
         List<TarGrpTemplateDetail> tarGrpTemplateDetailList = new ArrayList<>();
         for (TarGrpTemplateDO tarGrpTemplateDO : tarGrpTemplateDOList) {
             TarGrpTemplateDetail tarGrpTemplateDetail = BeanUtil.create(tarGrpTemplateDO, new TarGrpTemplateDetail());
@@ -153,6 +167,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         }
         tarGrpTemplateMap.put("resultCode", CommonConstant.CODE_SUCCESS);
         tarGrpTemplateMap.put("tarGrpTemplateDetailList", tarGrpTemplateDetailList);
+        tarGrpTemplateMap.put("pageInfo", pageInfo);
         return tarGrpTemplateMap;
     }
 
@@ -191,12 +206,67 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         TarGrpTemplateDetail tarGrpTemplateDetail = BeanUtil.create(tarGrpTemplateDO, new TarGrpTemplateDetail());
         // 获取目标分群模板的对应的条件
         List<TarGrpTemplateConditionDO> tarGrpTemplateConditionDOS = tarGrpTemplateConditionMapper.selectByTarGrpTemplateId(tarGrpTemplateId);
-        List<TarGrpTemplateCondition> tarGrpTemplateConditionList = new ArrayList<>();
+        List<TarGrpTemConditionVO> tarGrpTemConditionVOList = new ArrayList<>();
         for (TarGrpTemplateConditionDO tarGrpTemplateConditionDO : tarGrpTemplateConditionDOS) {
-            TarGrpTemplateCondition tarGrpTemplateCondition = BeanUtil.create(tarGrpTemplateConditionDO, new TarGrpTemplateCondition());
-            tarGrpTemplateConditionList.add(tarGrpTemplateCondition);
+            //TarGrpTemConditionVO tarGrpTemplateCondition = BeanUtil.create(tarGrpTemplateConditionDO, new TarGrpTemConditionVO());
+            TarGrpTemConditionVO tarGrpTemConditionVO = BeanUtil.create(tarGrpTemplateConditionDO, new TarGrpTemConditionVO());
+            List<String> valueList = new ArrayList<>();
+            List<OperatorDetail> operatorList = new ArrayList<>();
+            //塞入左参中文名
+            Label label = injectionLabelMapper.selectByPrimaryKey(Long.valueOf(tarGrpTemConditionVO.getLeftParam()));
+            if (label==null){
+                continue;
+            }
+            tarGrpTemConditionVO.setLeftParamName(label.getInjectionLabelName());
+            //塞入领域
+            FitDomain fitDomain = null;
+            if (label.getFitDomain() != null) {
+                fitDomain = FitDomain.getFitDomain(Integer.parseInt(label.getFitDomain()));
+                tarGrpTemConditionVO.setFitDomainId(Long.valueOf(fitDomain.getValue()));
+                tarGrpTemConditionVO.setFitDomainName(fitDomain.getDescription());
+            }
+            //将操作符转为中文
+            if (tarGrpTemConditionVO.getOperType()!=null && !tarGrpTemConditionVO.getOperType().equals("")){
+                Operator op = Operator.getOperator(Integer.parseInt(tarGrpTemConditionVO.getOperType()));
+                tarGrpTemConditionVO.setOperTypeName(op.getDescription());
+            }
+            //todo 通过左参id
+            String operators = label.getOperator();
+            String[] operator = operators.split(",");
+            if (operator.length > 1) {
+                for (int i = 0; i < operator.length; i++) {
+                    Operator opTT = Operator.getOperator(Integer.parseInt(operator[i]));
+                    OperatorDetail operatorDetail = new OperatorDetail();
+                    operatorDetail.setOperName(opTT.getDescription());
+                    operatorDetail.setOperValue(opTT.getValue());
+                    operatorList.add(operatorDetail);
+                }
+            } else {
+                if (operator.length == 1) {
+                    OperatorDetail operatorDetail = new OperatorDetail();
+                    Operator opTT = Operator.getOperator(Integer.parseInt(operator[0]));
+                    operatorDetail.setOperName(opTT.getDescription());
+                    operatorDetail.setOperValue(opTT.getValue());
+                    operatorList.add(operatorDetail);
+                }
+            }
+            String rightOperand = label.getRightOperand();
+            String[] rightOperands = rightOperand.split(",");
+            if (rightOperands.length > 1) {
+                for (int i = 0; i < rightOperands.length; i++) {
+                    valueList.add(rightOperands[i]);
+                }
+            } else {
+                if (rightOperands.length == 1) {
+                    valueList.add(rightOperands[0]);
+                }
+            }
+            tarGrpTemConditionVO.setValueList(valueList);
+            tarGrpTemConditionVO.setConditionType(label.getConditionType());
+            tarGrpTemConditionVO.setOperatorList(operatorList);
+            tarGrpTemConditionVOList.add(tarGrpTemConditionVO);
         }
-        tarGrpTemplateDetail.setTarGrpTemplateConditionList(tarGrpTemplateConditionList);
+        tarGrpTemplateDetail.setTarGrpTemConditionVOList(tarGrpTemConditionVOList);
         tarGrpTemplateMap.put("resultCode", CommonConstant.CODE_SUCCESS);
         tarGrpTemplateMap.put("tarGrpTemplateDetail", tarGrpTemplateDetail);
         return tarGrpTemplateMap;
