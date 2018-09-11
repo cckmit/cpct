@@ -33,6 +33,7 @@ import com.zjtelcom.cpct.util.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -100,12 +101,14 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
         Sheet sheet = wb.getSheetAt(0);
         Integer rowNums = sheet.getLastRowNum() + 1;
-        for (int i = 0; i < rowNums; i++) {
+        for (int i = 1; i < rowNums-1; i++) {
             Map<String,Object> customers = new HashMap<>();
+            Row rowFirst = sheet.getRow(0);
             Row row = sheet.getRow(i);
-            for (int j = 0; j < row.getLastCellNum(); j++) {
+            for (int j = 0; j < row.getLastCellNum(); j++){
+                Cell cellTitle = rowFirst.getCell(j);
                 Cell cell = row.getCell(j);
-                customers.put(cell.getCellFormula(),cell.getStringCellValue());
+                customers.put(cellTitle.getStringCellValue(),getCellValue(cell));
             }
             Map<String, Object> mktIssueDetailMap = new HashMap<>();
             mktIssueDetailMap.put("batchNum",batchNumSt);
@@ -117,10 +120,42 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             redisUtils.add("ISSUE_" + batchNumSt + "customerId", mktIssueDetailMap);
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
-        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("resultMsg","导入成功");
         return maps;
     }
 
+    private Object getCellValue(Cell cell) {
+        Object cellValue;
+        switch (cell.getCellTypeEnum()){
+            case NUMERIC://数字
+                cellValue = cell.getNumericCellValue() + "";
+                break;
+            case STRING: // 字符串
+                cellValue = cell.getStringCellValue();
+                break;
+
+            case BOOLEAN: // Boolean
+                cellValue = cell.getBooleanCellValue() + "";
+                break;
+
+            case FORMULA: // 公式
+                cellValue = cell.getCellFormula() + "";
+                break;
+
+            case BLANK: // 空值
+                cellValue = "";
+                break;
+
+            case ERROR: // 故障
+                cellValue = "非法字符";
+                break;
+
+            default:
+                cellValue = "未知类型";
+                break;
+        }
+        return cellValue;
+    }
 
 
     /**
@@ -242,9 +277,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         // 设置批次号
         param.setBatchNum(batchNum);
         //redis取规则
-        String rule = redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId).toString();
-        System.out.println("*************************" + rule);
-        param.setRule(rule);
+//        String rule = redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId).toString();
+//        System.out.println("*************************" + rule);
+//        param.setRule(rule);
         return param;
     }
 
