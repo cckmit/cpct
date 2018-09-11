@@ -12,6 +12,8 @@
         <result column="LABEL_CODE" jdbcType="VARCHAR" property="labelCode"/>
         <result column="CHOOSE_PRODUCT" jdbcType="VARCHAR" property="chooseProduct"/>
         <result column="EXPRESSION" jdbcType="VARCHAR" property="expression"/>
+        <result column="DAY_START" jdbcType="TIMESTAMP" property="dayStart"/>
+        <result column="DAY_END" jdbcType="TIMESTAMP" property="dayEnd"/>
         <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd"/>
         <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
         <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff"/>
@@ -27,12 +29,13 @@
     <insert id="insert" parameterType="com.zjtelcom.cpct.dto.filter.FilterRule">
     insert into filter_rule (RULE_ID, RULE_NAME, FILTER_TYPE, 
       EXECUTION_CHANNEL, CHANNEL_CONTACTS, EFFECTIVE_DATE, 
-      FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,STATUS_CD, CREATE_STAFF,
+      FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF,
       UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
       UPDATE_DATE, REMARK)
     values (#{ruleId,jdbcType=BIGINT}, #{ruleName,jdbcType=VARCHAR}, #{filterType,jdbcType=VARCHAR}, 
       #{executionChannel,jdbcType=VARCHAR}, #{channelContacts,jdbcType=VARCHAR}, #{effectiveDate,jdbcType=TIMESTAMP}, 
       #{failureDate,jdbcType=TIMESTAMP},  #{labelCode,jdbcType=VARCHAR}, #{chooseProduct,jdbcType=VARCHAR}, #{expression,jdbcType=VARCHAR},
+      #{dayStart,jdbcType=TIMESTAMP}, #{dayEnd,jdbcType=TIMESTAMP},
       #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT},
       #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, 
       #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR})
@@ -48,6 +51,8 @@
       LABEL_CODE =  #{labelCode,jdbcType=VARCHAR},
       CHOOSE_PRODUCT = #{chooseProduct,jdbcType=VARCHAR},
       EXPRESSION = #{expression,jdbcType=VARCHAR},
+      DAY_START = #{dayStart,jdbcType=TIMESTAMP},
+      DAY_END =  #{dayEnd,jdbcType=TIMESTAMP},
       STATUS_CD = #{statusCd,jdbcType=VARCHAR},
       CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
       UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
@@ -66,14 +71,14 @@
   </select>
     <select id="selectAll" resultMap="BaseResultMap">
     select RULE_ID, RULE_NAME, FILTER_TYPE, EXECUTION_CHANNEL, CHANNEL_CONTACTS, EFFECTIVE_DATE,
-    FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
+    FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
     REMARK
     from filter_rule
   </select>
 
     <select id="qryFilterRule" resultMap="BaseResultMap">
         select RULE_ID, RULE_NAME, FILTER_TYPE, EXECUTION_CHANNEL, CHANNEL_CONTACTS, EFFECTIVE_DATE,
-        FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
+        FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
         REMARK
         from filter_rule
         where 1 = 1
@@ -92,7 +97,7 @@
 
     <select id="getFilterRule" parameterType="com.zjtelcom.cpct.dto.filter.FilterRule" resultMap="BaseResultMap">
         select RULE_ID, RULE_NAME, FILTER_TYPE, EXECUTION_CHANNEL, CHANNEL_CONTACTS, EFFECTIVE_DATE,
-        FAILURE_DATE, LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
+        FAILURE_DATE, LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
         REMARK
         from filter_rule
         where RULE_ID = #{ruleId,jdbcType=BIGINT}
@@ -101,13 +106,14 @@
     <insert id="createFilterRule" parameterType="com.zjtelcom.cpct.dto.filter.FilterRule">
         insert into filter_rule (RULE_ID, RULE_NAME, FILTER_TYPE,
         EXECUTION_CHANNEL, CHANNEL_CONTACTS, EFFECTIVE_DATE,
-        FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION, STATUS_CD, CREATE_STAFF,
+        FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END, STATUS_CD, CREATE_STAFF,
         UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
         UPDATE_DATE, REMARK)
         values (#{ruleId,jdbcType=BIGINT}, #{ruleName,jdbcType=VARCHAR}, #{filterType,jdbcType=VARCHAR},
         #{executionChannel,jdbcType=VARCHAR}, #{channelContacts,jdbcType=VARCHAR}, #{effectiveDate,jdbcType=TIMESTAMP},
         #{failureDate,jdbcType=TIMESTAMP},#{labelCode,jdbcType=VARCHAR},#{chooseProduct,jdbcType=VARCHAR},
-         #{expression,jdbcType=VARCHAR},#{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT},
+         #{expression,jdbcType=VARCHAR},#{dayStart,jdbcType=TIMESTAMP}, #{dayEnd,jdbcType=TIMESTAMP},
+         #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT},
         #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP},
         #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR})
     </insert>
@@ -141,6 +147,12 @@
         </if>
         <if test="expression != null and expression != ''">
             EXPRESSION = #{expression,jdbcType=VARCHAR},
+        </if>
+        <if test="dayStart != null ">
+            DAY_START = #{dayStart,jdbcType=TIMESTAMP},
+        </if>
+        <if test="dayEnd != null ">
+            DAY_END = #{dayEnd,jdbcType=TIMESTAMP},
         </if>
         <if test="updateStaff != null and updateStaff != 0">
             UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},

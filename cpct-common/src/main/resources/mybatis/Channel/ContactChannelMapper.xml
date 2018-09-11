@@ -118,6 +118,13 @@
     where PARENT_ID > 0
   </select>
 
+  <select id="selectByCode" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select CONTACT_CHL_ID, CONTACT_CHL_CODE, CONTACT_CHL_NAME, CONTACT_CHL_TYPE, CONTACT_CHL_DESC, PARENT_ID, CHANNEL_TYPE,
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF, REGION_ID, STATUS_DATE, UPDATE_DATE, CREATE_DATE, START_TIME, END_TIME,
+    REMARK
+    from contact_channel
+    where CONTACT_CHL_CODE = #{code}
+  </select>
 
 
 

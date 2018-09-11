@@ -3,11 +3,10 @@ package com.zjtelcom.cpct.dto.channel;
 import java.io.Serializable;
 import java.util.List;
 
-public class LabelCatalogTree implements Serializable {
+public class CatalogTreeTwo implements Serializable {
     private Long injectionLabelId;
     private String injectionLabelName;
-    private List<CatalogTreeTwo> children;
-
+    private List<CatalogTreeThree> children;
 
     public Long getInjectionLabelId() {
         return injectionLabelId;
@@ -25,11 +24,11 @@ public class LabelCatalogTree implements Serializable {
         this.injectionLabelName = injectionLabelName;
     }
 
-    public List<CatalogTreeTwo> getChildren() {
+    public List<CatalogTreeThree> getChildren() {
         return children;
     }
 
-    public void setChildren(List<CatalogTreeTwo> children) {
+    public void setChildren(List<CatalogTreeThree> children) {
         this.children = children;
     }
 }

@@ -31,15 +31,18 @@ public class PpmProductController extends BaseController  {
 
 
     /**
-     *获取销售品目录树
+     *通过目录节点获取销售品
      * @return
      */
     @PostMapping("listOfferByCatalogId")
     @CrossOrigin
-    public Map<String, Object> listOfferByCatalogId(@RequestBody HashMap<String,Long> param) {
+    public Map<String, Object> listOfferByCatalogId(@RequestBody HashMap<String,Object> param) {
         Map<String ,Object> result = new HashMap<>();
         try {
-            result = catalogService.listOfferByCatalogId(param.get("catalogId"));
+            Integer page = MapUtil.getIntNum(param.get("page"));
+            Integer pageSize = MapUtil.getIntNum(param.get("pageSize"));
+            String productName = MapUtil.getString(param.get("productName"));
+            result = catalogService.listOfferByCatalogId(Long.valueOf(param.get("catalogId").toString()),productName,page,pageSize);
         }catch (Exception e){
             logger.error("[op:PpmProductController] fail to listOfferByCatalogId",e);
             result.put("resultCode",CODE_FAIL);

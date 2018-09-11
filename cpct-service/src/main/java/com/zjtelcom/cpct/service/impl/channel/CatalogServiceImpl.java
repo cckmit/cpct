@@ -1,5 +1,8 @@
 package com.zjtelcom.cpct.service.impl.channel;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.CatalogItemMapper;
 import com.zjtelcom.cpct.dao.channel.ObjCatItemRelMapper;
 import com.zjtelcom.cpct.dao.channel.OfferCatalogLocationMapper;
@@ -43,12 +46,14 @@ public class CatalogServiceImpl extends BaseService implements CatalogService {
      * @return
      */
     @Override
-    public Map<String, Object> listOfferByCatalogId(Long catalogId) {
+    public Map<String, Object> listOfferByCatalogId(Long catalogId,String productName,Integer page,Integer pageSize) {
         Map<String,Object> result = new HashMap<>();
         List<PpmProduct> offerList = new ArrayList<>();
+        PageHelper.startPage(page,pageSize);
         List<OfferCatalogLocation> catalogLocations = offerCatalogLocationMapper.selectByCatalogItemId(catalogId);
+
         for (OfferCatalogLocation catalogLocation : catalogLocations){
-            Offer offer = offerMapper.selectByPrimaryKey(catalogLocation.getOfferId());
+            Offer offer = offerMapper.selectByPrimaryKeyAndName(catalogLocation.getOfferId(),productName);
             if (offer!=null){
                 PpmProduct product = new PpmProduct();
                 product.setProductId(Long.valueOf(offer.getOfferId()));
@@ -56,8 +61,10 @@ public class CatalogServiceImpl extends BaseService implements CatalogService {
                 offerList.add(product);
             }
         }
+        Page pa = new Page(new PageInfo(offerList));
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",offerList);
+        result.put("page",pa);
         return result;
     }
 

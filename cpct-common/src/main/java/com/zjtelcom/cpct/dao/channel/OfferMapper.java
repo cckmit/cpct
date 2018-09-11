@@ -17,5 +17,7 @@ public interface OfferMapper {
 
     List<Offer> findByName(@Param("offerName")String name);
 
+    Offer selectByPrimaryKeyAndName(@Param("offerId") Integer offerId,@Param("productName")String productName);
+
     int updateByPrimaryKey(Offer record);
 }
