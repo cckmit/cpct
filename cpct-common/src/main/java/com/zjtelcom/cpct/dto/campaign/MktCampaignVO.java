@@ -82,6 +82,11 @@ public class MktCampaignVO extends MktCampaign {
     private String statusCdValue;
 
     /**
+     * 活动目录名称
+     */
+    private String directoryName;
+
+    /**
      * 该活动是否有有效的父/子活动
      */
     private Boolean isRelation;
@@ -216,5 +221,13 @@ public class MktCampaignVO extends MktCampaign {
 
     public void setRelation(Boolean relation) {
         isRelation = relation;
+    }
+
+    public String getDirectoryName() {
+        return directoryName;
+    }
+
+    public void setDirectoryName(String directoryName) {
+        this.directoryName = directoryName;
     }
 }

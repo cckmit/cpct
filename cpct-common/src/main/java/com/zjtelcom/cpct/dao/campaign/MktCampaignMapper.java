@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.dao.campaign;
 
 
+import com.zjtelcom.cpct.domain.campaign.MktCampaignCountDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -27,7 +28,7 @@ public interface MktCampaignMapper {
 
     int updateByPrimaryKey(MktCampaignDO mktCampaignDO);
 
-    List<MktCampaignDO> qryMktCampaignListPage(MktCampaignDO mktCampaignDO);
+    List<MktCampaignCountDO> qryMktCampaignListPage(MktCampaignDO mktCampaignDO);
 
     void changeMktCampaignStatus(@Param("mktCampaignId")Long mktCampaignId, @Param("statusCd")String statusCd);
 

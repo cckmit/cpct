@@ -84,6 +84,11 @@ public class MktCampaign extends BaseEntity {
     private String createChannel;
 
     /**
+     * 活动目录标识
+     */
+    private Long directoryId;
+
+    /**
      * 二次营销中的上次活动的Id
      */
     private Long preMktCampaignId;
@@ -93,6 +98,14 @@ public class MktCampaign extends BaseEntity {
      */
     private String landName;
 
+
+    public Long getDirectoryId() {
+        return directoryId;
+    }
+
+    public void setDirectoryId(Long directoryId) {
+        this.directoryId = directoryId;
+    }
 
     public Long getMktCampaignId() {
         return mktCampaignId;
