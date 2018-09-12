@@ -15,6 +15,8 @@ import java.util.Map;
  */
 public interface TarGrpService {
 
+    Map<String, Object> createTarGrpByTemplateId(Long templateId);
+
     Map<String, Object> createTarGrp(TarGrpDetail tarGrpDetail,boolean isCopy);
 
     Map<String, Object> saveTagNumFetch(Long mktCamGrpRulId, List<TarGrpCondition> tarGrpConditionDTOList);
