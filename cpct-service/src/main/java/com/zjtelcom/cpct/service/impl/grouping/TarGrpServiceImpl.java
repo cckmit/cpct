@@ -172,6 +172,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             tarGrpCondition.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
             tarGrpConditionMapper.insert(tarGrpCondition);
         }
+
         //插入客户分群条件
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
