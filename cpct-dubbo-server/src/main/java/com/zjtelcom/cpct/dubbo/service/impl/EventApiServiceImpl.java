@@ -144,6 +144,8 @@ public class EventApiServiceImpl implements EventApiService {
         params.put("accNbr", accNbr); //资产号码
         params.put("integrationId", integrationId); //资产集成编码
 
+        //异步 todo
+        CalculateCPC(params);
 
         result.put("reqId", reqId);
         result.put("resultCode", "1");
@@ -469,6 +471,7 @@ public class EventApiServiceImpl implements EventApiService {
             privateParams.put("activityId", mktCampaign.getMktActivityNbr()); //活动编码
             privateParams.put("activityName", mktCampaign.getMktCampaignName()); //活动名称
             privateParams.put("activityType", mktCampaign.getMktCampaignType()); //活动类型
+            privateParams.put("skipCheck", ""); //是否校验  todo
 
             //es log
             esJson.put("orderId", reqId);
@@ -1051,7 +1054,7 @@ public class EventApiServiceImpl implements EventApiService {
                     ruleMap.put("orderISI", params.get("reqId")); //流水号
                     ruleMap.put("activityId", privateParams.get("activityId")); //活动编码
                     ruleMap.put("activityName", privateParams.get("activityName")); //活动名称
-                    ruleMap.put("skipCheck", privateParams.get("activityName")); //调过预校验 todo
+                    ruleMap.put("skipCheck", ""); //调过预校验 todo
                     ruleMap.put("orderPriority", privateParams.get("orderPriority")); //活动优先级
                     ruleMap.put("integrationId", privateParams.get("integrationId")); //集成编号（必填）
                     ruleMap.put("accNbr", privateParams.get("accNbr")); //业务号码（必填）
@@ -1068,6 +1071,7 @@ public class EventApiServiceImpl implements EventApiService {
                             product.put("productName", ppmProduct.getProductName());
                             product.put("productType", ppmProduct.getProductType());
                             product.put("productFlag", "销售品标签");  //todo 销售品标签
+                            product.put("productPriority", "销售品优先级");  //todo 销售品优先级
                             System.out.println("*********************product --->>>" + JSON.toJSON(product));
                             productList.add(product);
                         }
@@ -1102,7 +1106,7 @@ public class EventApiServiceImpl implements EventApiService {
                         //协同渠道规则表id（自建表）
                         Long evtContactConfId = Long.parseLong(str);
                         //提交线程
-                        Future<Map<String, Object>> f = executorService.submit(new ChannelTask(evtContactConfId, productList, privateParams));
+                        Future<Map<String, Object>> f = executorService.submit(new ChannelTask(params,evtContactConfId, productList, privateParams));
                         //将线程处理结果添加到结果集
                         threadList.add(f);
                     }
@@ -1193,11 +1197,13 @@ public class EventApiServiceImpl implements EventApiService {
         private Long evtContactConfId;
 
         private List<Map<String, String>> productList;
+        private Map<String, String> params;
         private Map<String, String> privateParams;
 
-        public ChannelTask(Long evtContactConfId, List<Map<String, String>> productList, Map<String, String> privateParams) {
+        public ChannelTask(Map<String, String> params,Long evtContactConfId, List<Map<String, String>> productList, Map<String, String> privateParams) {
             this.evtContactConfId = evtContactConfId;
             this.productList = productList;
+            this.params = params;
             this.privateParams = privateParams;
         }
 
@@ -1233,8 +1239,6 @@ public class EventApiServiceImpl implements EventApiService {
             MktCamChlConfDO mktCamChlConf = mktCamChlConfMapper.selectByPrimaryKey(evtContactConfId);
 
             //渠道级别信息
-//            channel.put("keyNote", ""); //痛痒点话术（必填）
-//            channel.put("remark", ""); //备注字段
             channel.put("channelId", mktCamChlConf.getContactChlId());
             channel.put("channelConfId", mktCamChlConf.getContactChlId()); //执行渠道推送配置标识(MKT_CAM_CHL_CONF表主键) （必填） todo 林超
 
@@ -1244,6 +1248,12 @@ public class EventApiServiceImpl implements EventApiService {
             //返回结果中添加销售品信息
             channel.put("productList", productList);
 
+            //接触账号 todo
+            channel.put("reason", "");
+
+            //调查问卷 todo
+            channel.put("questionId", "");
+
             //查询渠道子策略 这里老系统暂时不返回
 //              List<MktVerbalCondition> mktVerbalConditions = mktVerbalConditionMapper.findConditionListByVerbalId(evtContactConfId);
 
@@ -1251,7 +1261,7 @@ public class EventApiServiceImpl implements EventApiService {
             CamScript camScript = mktCamScriptMapper.selectByConfId(evtContactConfId);
             if (camScript != null) {
                 //返回结果中添加脚本信息
-                channel.put("reason", camScript.getScriptDesc());
+                channel.put("contactScript", camScript.getScriptDesc());
             }
             //查询话术
             List<MktVerbal> mktVerbals = mktVerbalMapper.findVerbalListByConfId(evtContactConfId);
@@ -1264,7 +1274,7 @@ public class EventApiServiceImpl implements EventApiService {
             }
             if (mktVerbals != null && mktVerbals.size() > 0) {
                 //返回结果中添加话术信息
-                channel.put("keyNote", mktVerbals.get(0).getScriptDesc());
+                channel.put("reason", mktVerbals.get(0).getScriptDesc());
             }
             return channel;
         }

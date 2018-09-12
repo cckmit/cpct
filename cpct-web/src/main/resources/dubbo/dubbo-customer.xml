@@ -19,4 +19,9 @@
         <dubbo:method name="deal" servicecode="33.1083.CalculateCPC" timeout="5000"/>
     </dubbo:reference>
 
+    <!--<dubbo:reference interface="com.zjtelcom.cpct.service.api.MktCampaignApiService" id="mktCampaignApiService"-->
+                     <!--version="1.0" retries="0" check="false">-->
+        <!--<dubbo:method name="qryMktCampaignDetail" servicecode="33.1083.qryMktCampaignDetail" timeout="5000"/>-->
+    <!--</dubbo:reference>-->
+
 </beans>
