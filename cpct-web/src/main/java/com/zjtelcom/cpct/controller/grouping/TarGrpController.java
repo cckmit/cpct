@@ -34,6 +34,21 @@ public class TarGrpController extends BaseController {
     private TrialOperationService operationService;
 
 
+    @RequestMapping("/createTarGrpByTemplateId")
+    @CrossOrigin
+    public String createTarGrpByTemplateId(@RequestBody HashMap<String,Long> param) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = tarGrpService.createTarGrpByTemplateId(param.get("templateId"));
+        } catch (Exception e) {
+            logger.error("[op:TarGrpController] fail to saveTagNumFetch for tarGrpDTO = {}!" +
+                    " Exception: ", JSONArray.toJSON(maps), e);
+            return FastJsonUtils.objToJson(maps);
+        }
+        return FastJsonUtils.objToJson(maps);
+    }
+
+
     /**
      * 新增目标分群 （暂时废弃）
      */
