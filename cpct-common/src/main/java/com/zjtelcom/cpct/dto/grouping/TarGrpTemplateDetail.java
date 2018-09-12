@@ -15,7 +15,7 @@ public class TarGrpTemplateDetail {
 
     private String tarGrpTemplateDesc;
 
-    private List<TarGrpTemplateCondition> tarGrpTemplateConditionList;
+    private List<TarGrpTemConditionVO> tarGrpTemConditionVOList;
 
     public Long getTarGrpTemplateId() {
         return tarGrpTemplateId;
@@ -41,11 +41,11 @@ public class TarGrpTemplateDetail {
         this.tarGrpTemplateDesc = tarGrpTemplateDesc;
     }
 
-    public List<TarGrpTemplateCondition> getTarGrpTemplateConditionList() {
-        return tarGrpTemplateConditionList;
+    public List<TarGrpTemConditionVO> getTarGrpTemConditionVOList() {
+        return tarGrpTemConditionVOList;
     }
 
-    public void setTarGrpTemplateConditionList(List<TarGrpTemplateCondition> tarGrpTemplateConditionList) {
-        this.tarGrpTemplateConditionList = tarGrpTemplateConditionList;
+    public void setTarGrpTemConditionVOList(List<TarGrpTemConditionVO> tarGrpTemConditionVOList) {
+        this.tarGrpTemConditionVOList = tarGrpTemConditionVOList;
     }
 }

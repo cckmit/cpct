@@ -22,7 +22,25 @@ public class FilterRule extends BaseEntity implements Serializable{
     private String labelCode;//
     private String chooseProduct;//选择的销售品
     private String expression;
+    private String dayStart;
+    private String dayEnd;
 
+
+    public String getDayStart() {
+        return dayStart;
+    }
+
+    public void setDayStart(String dayStart) {
+        this.dayStart = dayStart;
+    }
+
+    public String getDayEnd() {
+        return dayEnd;
+    }
+
+    public void setDayEnd(String dayEnd) {
+        this.dayEnd = dayEnd;
+    }
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
