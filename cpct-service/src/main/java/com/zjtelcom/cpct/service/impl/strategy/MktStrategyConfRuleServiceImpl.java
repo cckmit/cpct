@@ -139,11 +139,14 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktCpcAlgorithmsRulDO.setRuleDesc("");
             mktCpcAlgorithmsRulDO.setRuleExpression(mktStrategyConfRule.getTarGrpId() + "");
             mktCpcAlgorithmsRulMapper.insert(mktCpcAlgorithmsRulDO);
-            //关联表
+            //cpc算法规则关联表
             MktCamStrategyConfRelDO mktCamStrategyConfRelDO = new MktCamStrategyConfRelDO();
             mktCamStrategyConfRelDO.setMktCampaignId(1L);
             mktCamStrategyConfRelDO.setStrategyConfId(mktCpcAlgorithmsRulDO.getAlgorithmsRulId());
             mktCamStrategyConfRelMapper.insert(mktCamStrategyConfRelDO);
+            //cpc算法表
+
+
 
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.SAVE_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
