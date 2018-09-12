@@ -2,7 +2,6 @@ package com.zjtelcom.cpct.dto.strategy;
 
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
-import com.zjtelcom.cpct.dto.channel.VerbalVO;
 
 import java.util.List;
 
