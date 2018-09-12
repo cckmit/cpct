@@ -13,14 +13,19 @@ import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
+import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateConditionMapper;
+import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.domain.grouping.TarGrpConditionDO;
+import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateConditionDO;
+import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
+import com.zjtelcom.cpct.dto.grouping.TarGrpTemConditionVO;
 import com.zjtelcom.cpct.dto.system.SystemParam;
 import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.model.EagleDatabaseConfig;
@@ -57,6 +62,10 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 @Transactional
 public class TarGrpServiceImpl extends BaseService implements TarGrpService {
 
+    @Autowired
+    private TarGrpTemplateMapper tarGrpTemplateMapper;
+    @Autowired
+    private TarGrpTemplateConditionMapper tarGrpTemplateConditionMapper;
     @Autowired
     private TarGrpMapper tarGrpMapper;
     @Autowired
@@ -95,6 +104,34 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         result = createTarGrp(detail,isCopy);
         return result;
     }
+
+
+    /**
+     * 模板创建客户分群
+     * @param templateId
+     * @return
+     */
+    @Override
+    public Map<String, Object> createTarGrpByTemplateId(Long templateId) {
+        Map<String, Object> result = new HashMap<>();
+        TarGrpTemplateDO template = tarGrpTemplateMapper.selectByPrimaryKey(templateId);
+        if (template==null){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "模板不存在");
+            return result;
+        }
+        List<TarGrpTemplateConditionDO> conditionDOList = tarGrpTemplateConditionMapper.selectByTarGrpTemplateId(templateId);
+
+        TarGrpDetail addVO = BeanUtil.create(template,new TarGrpDetail());
+        List<TarGrpCondition> conditionAdd = new ArrayList<>();
+        for (TarGrpTemplateConditionDO conditionDO : conditionDOList){
+            TarGrpCondition con = BeanUtil.create(conditionDO,new TarGrpCondition());
+            conditionAdd.add(con);
+        }
+        addVO.setTarGrpConditions(conditionAdd);
+        return createTarGrp(addVO,false);
+    }
+
 
     /**
      * 新增目标分群

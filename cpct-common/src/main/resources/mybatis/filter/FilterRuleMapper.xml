@@ -88,6 +88,7 @@
         <if test="filterType != null and filterType != ''">
             AND FILTER_TYPE = #{filterType}
         </if>
+        ORDER BY RULE_ID DESC
     </select>
 
     <delete id="delFilterRule" parameterType="com.zjtelcom.cpct.dto.filter.FilterRule">
@@ -164,7 +165,7 @@
             REMARK = #{remark,jdbcType=VARCHAR},
         </if>
         RULE_ID = #{ruleId,jdbcType=BIGINT}
-        where RULE_ID = #{ruleId,jdbcType=BIGINT}
+        where RULE_ID = #{ruleId,jdbcType=BIGINT}.ii
     </update>
 
 </mapper>
