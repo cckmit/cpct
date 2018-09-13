@@ -16,7 +16,7 @@ public interface EventSceneTypeMapper {
 
     int updateByPrimaryKey(EventSceneTypeDO record);
 
-    List<EventSceneTypeDO> listEventSceneTypes(@Param("evtSceneTypeId") Long evtSceneTypeId, @Param("parEvtSceneTypeId") Long parEvtSceneTypeId);
+    List<EventSceneTypeDO> listEventSceneTypes(@Param("evtSceneTypeId") Long evtSceneTypeId,@Param("parEvtSceneTypeId") Long parEvtSceneTypeId);
 
     int saveEventSceneType(EventSceneTypeDO eventTypeDO);
 

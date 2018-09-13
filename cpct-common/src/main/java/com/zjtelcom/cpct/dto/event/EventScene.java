@@ -18,6 +18,16 @@ public class EventScene extends BaseEntity{
     private Long eventId;//事件标识
     private Long extEventSceneId;//外部事件场景标识
     private String contactEvtCode;//事件编码
+    private Long eventSceneTypeId;//事件场景目录id
+
+
+    public Long getEventSceneTypeId() {
+        return eventSceneTypeId;
+    }
+
+    public void setEventSceneTypeId(Long eventSceneTypeId) {
+        this.eventSceneTypeId = eventSceneTypeId;
+    }
 
     public String getActType() {
         return actType;

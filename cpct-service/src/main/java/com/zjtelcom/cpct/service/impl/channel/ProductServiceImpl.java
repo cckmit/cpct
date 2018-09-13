@@ -3,21 +3,27 @@ package com.zjtelcom.cpct.service.impl.channel;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
+import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
 import com.zjtelcom.cpct.dao.channel.MktProductRuleMapper;
+import com.zjtelcom.cpct.dao.channel.OfferMapper;
 import com.zjtelcom.cpct.dao.channel.PpmProductMapper;
+import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.channel.MktProductRule;
+import com.zjtelcom.cpct.domain.channel.Offer;
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ProductService;
+import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
+import com.zjtelcom.cpct.util.BeanUtil;
+import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.MapUtil;
+import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -26,9 +32,11 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 public class ProductServiceImpl extends BaseService implements ProductService {
 
     @Autowired
-    private PpmProductMapper productMapper;
+    private OfferMapper productMapper;
     @Autowired
-    private MktProductRuleMapper ruleMapper;
+    private MktCamItemMapper camItemMapper;
+    @Autowired
+    private MktStrategyConfRuleService strategyConfRuleService;
 
 
     @Override
@@ -36,13 +44,13 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         Map<String,Object> result = new HashMap<>();
         List<String> nameList = new ArrayList<>();
         for (Long productId : productIdList){
-            PpmProduct product = productMapper.selectByPrimaryKey(productId);
+            Offer product = productMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
             if (product==null){
                 result.put("resultCode",CODE_FAIL);
                 result.put("resultMsg","产品不存在");
                 return result;
             }
-            nameList.add(product.getProductName());
+            nameList.add(product.getOfferName());
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",nameList);
@@ -52,7 +60,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     @Override
     public Map<String,Object> getProductList(Long userId,Map<String,Object> params){
         Map<String,Object> result = new HashMap<>();
-        List<PpmProduct> productList = new ArrayList<>();
+        List<Offer> productList = new ArrayList<>();
             Integer page = MapUtil.getIntNum(params.get("page"));
             Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
             String productName = null;
@@ -60,7 +68,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 productName = params.get("productName").toString();
             }
             PageHelper.startPage(page,pageSize);
-            productList = productMapper.findByProductName(productName);
+            productList = productMapper.findByName(productName);
             Page pageInfo = new Page(new PageInfo(productList));
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",productList);
@@ -69,23 +77,58 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     }
 
 
+    /**
+     * 复制营销活动推荐条目
+     * @param userId
+     * @param ItemIdList
+     * @return
+     */
+    @Override
+    public Map<String, Object> copyProductRule(Long userId, List<Long> ItemIdList) {
+        Map<String,Object> result = new HashMap<>();
+        List<Long> ruleIdList = new ArrayList<>();
+        for (Long itemId : ItemIdList) {
+            MktCamItem item = camItemMapper.selectByPrimaryKey(itemId);
+            if (item == null) {
+                continue;
+            }
+            MktCamItem newItem = BeanUtil.create(item, new MktCamItem());
+            newItem.setMktCamItemId(null);
+            camItemMapper.insert(newItem);
+            ruleIdList.add(newItem.getMktCamItemId());
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("ruleIdList",ruleIdList);
+        return result;
+    }
+
     @Override
     @Transactional
-    public Map<String, Object> addProductRule(Long userId, List<Long> productIdList) {
+    public Map<String, Object> addProductRule(Long strategyRuleId, List<Long> productIdList) {
         Map<String,Object> result = new HashMap<>();
         List<Long> ruleIdList = new ArrayList<>();
         for (Long productId : productIdList){
-            PpmProduct product = productMapper.selectByPrimaryKey(productId);
+            Offer product = productMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
             if (product==null){
                 result.put("resultCode",CODE_FAIL);
                 result.put("resultMsg","产品不存在");
                 return result;
             }
-            MktProductRule rule = new MktProductRule();
-            rule.setProductId(productId);
-            rule.setProductName(product.getProductName());
-            ruleMapper.insert(rule);
-            ruleIdList.add(rule.getId());
+            MktCamItem item = new MktCamItem();
+            item.setItemId(productId);
+            item.setItemType(product.getOfferType());
+            item.setCreateDate(new Date());
+            item.setCreateDate(DateUtil.getCurrentTime());
+            item.setUpdateDate(DateUtil.getCurrentTime());
+            item.setStatusDate(DateUtil.getCurrentTime());
+            item.setUpdateStaff(UserUtil.loginId());
+            item.setCreateStaff(UserUtil.loginId());
+            item.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+            camItemMapper.insert(item);
+            ruleIdList.add(item.getMktCamItemId());
+        }
+        if (strategyRuleId!=null){
+            strategyConfRuleService.updateProductIds(ruleIdList,strategyRuleId);
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",ruleIdList);
@@ -95,14 +138,14 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     @Override
     public Map<String, Object> editProductRule(Long userId, Long ruleId, String remark) {
         Map<String,Object> result = new HashMap<>();
-        MktProductRule rule = ruleMapper.selectByPrimaryKey(ruleId);
+        MktCamItem rule = camItemMapper.selectByPrimaryKey(ruleId);
         if (rule==null){
             result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg","关联销售品记录不存在");
+            result.put("resultMsg","推荐条目不存在");
             return result;
         }
         rule.setRemark(remark);
-        ruleMapper.updateByPrimaryKey(rule);
+        camItemMapper.updateByPrimaryKey(rule);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","编辑成功");
         return result;
@@ -113,12 +156,20 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         Map<String,Object> result = new HashMap<>();
         List<MktProductRule> ruleList = new ArrayList<>();
         for (Long ruleId : ruleIdList){
-            MktProductRule rule = ruleMapper.selectByPrimaryKey(ruleId);
-            if (rule==null){
+            MktCamItem item = camItemMapper.selectByPrimaryKey(ruleId);
+            if (item==null){
                 result.put("resultCode",CODE_FAIL);
-                result.put("resultMsg","关联销售品记录不存在");
+                result.put("resultMsg","推荐条目不存在");
                 return result;
             }
+            Offer product = productMapper.selectByPrimaryKey(Integer.valueOf(item.getItemId().toString()));
+            if (product==null){
+                continue;
+            }
+            MktProductRule rule = new MktProductRule();
+            rule.setId(item.getMktCamItemId());
+            rule.setProductId(item.getItemId());
+            rule.setProductName(product.getOfferName());
             ruleList.add(rule);
         }
         result.put("resultCode",CODE_SUCCESS);
@@ -127,15 +178,19 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     }
 
     @Override
-    public Map<String, Object> delProductRule(Long userId, Long ruleId) {
+    public Map<String, Object> delProductRule(Long strategyRuleId, Long ruleId,List<Long> itemRuleIdList) {
         Map<String,Object> result = new HashMap<>();
-        MktProductRule rule = ruleMapper.selectByPrimaryKey(ruleId);
-        if (rule==null){
-            result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg","关联销售品记录不存在");
-            return result;
+        if (strategyRuleId!=null){
+            strategyConfRuleService.updateProductIds(itemRuleIdList,strategyRuleId);
+        }else {
+            MktCamItem rule = camItemMapper.selectByPrimaryKey(ruleId);
+            if (rule==null){
+                result.put("resultCode",CODE_FAIL);
+                result.put("resultMsg","推荐条目不存在");
+                return result;
+            }
+            camItemMapper.deleteByPrimaryKey(ruleId);
         }
-        ruleMapper.deleteByPrimaryKey(ruleId);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
         return result;

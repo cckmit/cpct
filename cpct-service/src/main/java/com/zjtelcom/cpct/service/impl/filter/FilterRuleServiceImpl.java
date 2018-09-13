@@ -5,12 +5,16 @@ import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
+import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.dao.user.UserListMapper;
+import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
+import com.zjtelcom.cpct.dto.filter.FilterRuleVO;
 import com.zjtelcom.cpct.dto.user.UserList;
 import com.zjtelcom.cpct.request.filter.FilterRuleReq;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.filter.FilterRuleService;
+import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UserUtil;
@@ -40,6 +44,8 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
     private UserListMapper userListMapper;
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired
+    private SysParamsMapper sysParamsMapper;
 
     /**
      * 过滤规则列表（含分页）
@@ -50,10 +56,20 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         Page pageInfo = filterRuleReq.getPageInfo();
         PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
         List<FilterRule> filterRules = filterRuleMapper.qryFilterRule(filterRuleReq.getFilterRule());
+        Page page = new Page(new PageInfo(filterRules));
+        List<FilterRuleVO> voList = new ArrayList<>();
+        for (FilterRule rule : filterRules){
+            FilterRuleVO vo = BeanUtil.create(rule,new FilterRuleVO());
+            SysParams sysParams = sysParamsMapper.findParamsByValue("FILTER_RULE_TYPE",rule.getFilterType());
+            if (sysParams!=null){
+                vo.setFilterTypeName(sysParams.getParamName());
+            }
+            voList.add(vo);
+        }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
-        maps.put("filterRules", filterRules);
-        maps.put("pageInfo", new Page(new PageInfo(filterRules)));
+        maps.put("filterRules", voList);
+        maps.put("pageInfo",page);
         return maps;
     }
 
@@ -77,12 +93,13 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
     @Override
     public Map<String, Object> importUserList(MultipartFile multipartFile, Long ruleId) throws IOException {
         Map<String, Object> maps = new HashMap<>();
-        UserList userList = new UserList();
+
         InputStream inputStream = multipartFile.getInputStream();
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
         Sheet sheet = wb.getSheetAt(0);
         Integer rowNums = sheet.getLastRowNum() + 1;
-        for (int i = 1; i < rowNums; i++) {
+        for (int i = 0; i < rowNums; i++) {
+            UserList userList = new UserList();
             Row row = sheet.getRow(i);
             for (int j = 0; j < row.getLastCellNum(); j++) {
                 Cell cell = row.getCell(j);
@@ -104,9 +121,11 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
                 continue;
             }
             userList.setRuleId(ruleId);
-            userList.setCreateDate(DateUtil.getCurrentTime());
-            userList.setUpdateDate(DateUtil.getCurrentTime());
-            userList.setStatusDate(DateUtil.getCurrentTime());
+            userList.setCreateDate(new Date());
+            userList.setUpdateDate(new Date());
+            userList.setStatusDate(new Date());
+            userList.setRemark("123");
+            userList.setLanId(1L);
             userList.setUpdateStaff(UserUtil.loginId());
             userList.setCreateStaff(UserUtil.loginId());
             userList.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
@@ -117,8 +136,8 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
             redisUtils.hmSet(String.valueOf(userList.getUserId()), "userPhone", userList.getUserPhone());
             redisUtils.hmSet(String.valueOf(userList.getUserId()), "filterType", userList.getFilterType());
             redisUtils.hmSet(String.valueOf(userList.getUserId()), "ruleId", String.valueOf(ruleId));
+            System.out.println(redisUtils.hmGet(String.valueOf(userList.getUserId()), "userName"));
         }
-        System.out.println(redisUtils.hmGet(String.valueOf(userList.getUserId()), "userName"));
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         return maps;
@@ -181,6 +200,10 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         filterRule.setUpdateStaff(UserUtil.loginId());
         filterRule.setCreateStaff(UserUtil.loginId());
         filterRule.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+        //销售品互斥过滤 加labelcode
+        if (filterRule.getFilterType().equals("3000")){
+            filterRule.setLabelCode("PROM_LIST");
+        }
         filterRuleMapper.createFilterRule(filterRule);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
@@ -196,11 +219,32 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         Map<String, Object> maps = new HashMap<>();
         filterRule.setUpdateDate(DateUtil.getCurrentTime());
         filterRule.setUpdateStaff(UserUtil.loginId());
+        if (filterRule.getFilterType().equals("3000")){
+            filterRule.setLabelCode("PROM_LIST");
+        }
         filterRuleMapper.modFilterRule(filterRule);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("filterRule", filterRule);
         return maps;
+    }
+
+
+    /**
+     * 根据过滤规则id集合查询过滤规则集合
+     */
+    @Override
+    public Map<String, Object> getFilterRule(List<Integer> filterRuleIdList) {
+        Map<String, Object> map = new HashMap<>();
+        List<FilterRule> filterRuleList = new ArrayList<>();
+        for (Integer filterRuleId : filterRuleIdList) {
+            FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId.longValue());
+            filterRuleList.add(filterRule);
+        }
+        map.put("resultCode", CommonConstant.CODE_SUCCESS);
+        map.put("resultMsg", StringUtils.EMPTY);
+        map.put("filterRuleList", filterRuleList);
+        return map;
     }
 
 }

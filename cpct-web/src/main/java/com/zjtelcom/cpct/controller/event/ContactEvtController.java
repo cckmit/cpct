@@ -10,6 +10,7 @@ import com.zjtelcom.cpct.request.event.ContactEvtReq;
 import com.zjtelcom.cpct.request.event.CreateContactEvtJtReq;
 import com.zjtelcom.cpct.request.event.CreateContactEvtReq;
 import com.zjtelcom.cpct.service.event.ContactEvtService;
+import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -32,6 +33,23 @@ public class ContactEvtController extends BaseController {
     @Autowired
     private ContactEvtService contactEvtService;
 
+
+    /**
+     * 获取事件类型列表
+     * @return
+     */
+    @RequestMapping("listMktCampaignType")
+    @CrossOrigin
+    public Map<String, Object> listMktCampaignType() {
+        Map<String, Object> maps = new HashMap<>();
+        Long userId = UserUtil.loginId();
+        try {
+            maps = contactEvtService.listMktCampaignType(userId);
+        } catch (Exception e) {
+            logger.error("[op:EventController] fail to listMktCampaignType");
+        }
+        return maps;
+    }
     /**
      * 查询事件列表（含分页）
      */

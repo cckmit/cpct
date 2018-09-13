@@ -9,6 +9,7 @@ public enum Operator {
     EQUAL(3000,"等于"),
     NOT_EQUAL(4000,"不等于"),
     IN(7000,"包含"),
+    BETWEEN(7200,"区间于"),
     NOT_IN(7100,"不包含"),
     AND(8000,"并且"),
     OR(9000,"或者");
@@ -21,11 +22,26 @@ public enum Operator {
         this.description = description;
     }
 
+
     public static Operator getOperator(Integer value){
         Operator[] allType = Operator.values();
         Operator op = null;
         for (Operator operator : allType){
             if (operator.getValue().equals(value)){
+                op = operator;
+            }
+        }
+        return op;
+    }
+
+    public static Operator getOperator(String description){
+        Operator[] allType = Operator.values();
+        Operator op = null;
+        if (description==null || description.equals("")){
+            return null;
+        }
+        for (Operator operator : allType){
+            if (operator.getDescription().equals(description)){
                 op = operator;
             }
         }

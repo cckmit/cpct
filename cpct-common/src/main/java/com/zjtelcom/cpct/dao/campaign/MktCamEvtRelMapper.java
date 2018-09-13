@@ -19,7 +19,11 @@ public interface MktCamEvtRelMapper {
 
     MktCamEvtRelDO selectByPrimaryKey(Long mktCampEvtRelId);
 
-    List<MktCamEvtRelDO> qryByMktCampaignId(Long mktCampaignId);
+    MktCamEvtRelDO findByCampaignIdAndEvtId(@Param("campaignId")Long campaignId,@Param("evtId")Long evtId);
+
+    List<MktCamEvtRelDO> selectByMktCampaignId(Long mktCampaignId);
+
+    List<MktCamEvtRelDO> findRelListByEvtId(@Param("contactEvtId") Long contactEvtId);
 
     List<MktCamEvtRelDO> selectAll();
 
@@ -28,5 +32,9 @@ public interface MktCamEvtRelMapper {
     List<MktCamEvtRel> qryBycontactEvtId(@Param("contactEvtId") Long contactEvtId);
 
     List<Long> listActivityByEventId(@Param("eventId") Long eventId);
+
+    List<MktCamEvtRelDO> listActByEventId(@Param("eventId") Long eventId);
+
+
 
 }

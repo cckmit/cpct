@@ -9,11 +9,9 @@ package com.zjtelcom.cpct.controller.system;
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.service.system.SysAreaService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,8 +29,70 @@ public class SysAreaController {
 
     @RequestMapping(value = "/listSysArea", method = RequestMethod.POST)
     @CrossOrigin
-    public String listSysArea(){
+    public String listSysArea() {
         Map<String, Object> map = sysAreaService.listSysArea();
         return JSON.toJSONString(map);
     }
+
+    /**
+     * 获取地市级别列表
+     *
+     * @return
+     */
+    @RequestMapping(value = "/listSysCity", method = RequestMethod.POST)
+    @CrossOrigin
+    public String listSysCity(@RequestBody  Map<String, Object> params) {
+        String landId = (String) params.get("lanId");
+        Integer areaId;
+        if (landId == null || "".equals(landId) || "null".equals(landId)) {
+            //TODO 获取当前用户所在地区
+            areaId = 8330000;
+        } else {
+            areaId = Integer.valueOf(landId);
+        }
+        Map<String, Object> map = sysAreaService.listCityByParentId(areaId);
+        return JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 获取下发城市树
+     *
+     * @return
+     */
+    @RequestMapping(value = "/listSysAreaTree", method = RequestMethod.POST)
+    @CrossOrigin
+    public String listSysAreaTree() {
+        Map<String, Object> map = sysAreaService.listAllAreaTrea();
+        return JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 获取选中的城市
+     *
+     * @param params
+     * @return
+     */
+    @RequestMapping(value = "/getCityTable", method = RequestMethod.POST)
+    @CrossOrigin
+    public String getCityTable(@RequestBody  Map<String, Object> params) {
+        List<Integer> areaIds = (List<Integer>) params.get("areaIds");
+        Map<String, Object> cityTableMap = sysAreaService.getCityTable(areaIds);
+        return JSON.toJSONString(cityTableMap);
+    }
+
+    /**
+     * 初始化城市数据到redis
+     *
+     * @return
+     */
+    @RequestMapping(value = "/saveCityTORedis", method = RequestMethod.POST)
+    @CrossOrigin
+    public String saveCityTORedis() {
+        Map<String, Object> map = sysAreaService.saveCityTORedis();
+        return JSON.toJSONString(map);
+    }
+
+
 }

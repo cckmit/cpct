@@ -11,10 +11,12 @@ import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
 import com.zjtelcom.cpct.dao.user.UserListMapper;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.event.EventDO;
+/*import com.zjtelcom.cpct.domainain.strategy.MktStrategyConfDO;*/
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
@@ -28,6 +30,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 @Service
 @Transactional
@@ -71,9 +77,6 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
     private FilterRuleMapper filterRuleMapper; //过滤规则
 
     @Autowired
-    private FilterRuleConfMapper filterRuleConfMapper; //过滤规则与策略规则关联表
-
-    @Autowired
     private PpmProductMapper ppmProductMapper; //销售品
 
     @Autowired
@@ -94,13 +97,16 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
     @Autowired
     private InjectionLabelMapper injectionLabelMapper; //标签因子
 
+    @Autowired
+    private MktStrategyFilterRuleRelMapper mktStrategyFilterRuleRelMapper;
+
 
     /**
      * 事件触发接口实现
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Map CalculateCPC(Map<String, Object> map) throws Exception {
+    public Map deal(Map<String, Object> map) throws Exception {
         //初始化返回结果
         Map<String, Object> result = new HashMap();
 
@@ -246,14 +252,27 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
                             Long tarGrpId = mktStrategyConfRuleDO.getTarGrpId();
                             //获取销售品
                             String productStr = mktStrategyConfRuleDO.getProductId();
-                            //过滤规则id
-                            Long ruleConfId = mktStrategyConfRuleDO.getRuleConfId();
                             //协同渠道配置id
                             String evtContactConfIdStr = mktStrategyConfRuleDO.getEvtContactConfId();
 
                             //  1.判断活动的过滤规则---------------------------
                             //获取过滤规则
-                            FilterRuleConfDO filterRuleConfDO = filterRuleConfMapper.selectByPrimaryKey(ruleConfId);
+                            boolean ruleFilter = true;
+                            List<Long> filterRuleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(mktCamStrategyConfRelDO.getStrategyConfId());
+                            for (Long FilterRuleId : filterRuleIdList) {
+                                FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(FilterRuleId);
+                                //匹配事件过滤规则
+                                int flag = 0;
+                                flag = userListMapper.checkRule("", filterRule.getRuleId(), null);
+                                if (flag > 0) {
+                                    ruleFilter = false;
+                                }
+                            }
+                            //若存在不符合的规则 结束当前规则循环
+                            if (!ruleFilter) {
+                                return null;
+                            }
+/*                            FilterRuleConfDO filterRuleConfDO = filterRuleConfMapper.selectByPrimaryKey(ruleConfId);
                             String ruleConfIdStr = filterRuleConfDO.getFilterRuleIds();
                             if (ruleConfIdStr != null) {
                                 String[] array = ruleConfIdStr.split(",");
@@ -273,7 +292,7 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
                                 if (!ruleFilter) {
                                     continue;
                                 }
-                            }
+                            }*/
 
                             //  2.判断活动的客户分群规则---------------------------
                             //查询分群规则list
@@ -452,10 +471,131 @@ public class EventApiServiceImpl extends BaseService implements EventApiService 
 
         return result;
     }
-
-
+/*
     @Override
+    @SuppressWarnings("unchecked")
+    public Map CalculateCPC(Map<String, Object> map) throws Exception {
+        //初始化返回结果
+        Map<String, Object> result = new HashMap();
+
+        //获取当前时间
+        Date now = new Date();
+
+        //获取事件code
+        String eventNbr = (String) map.get("eventId");
+        //获取流水号
+        String ISI = (String) map.get("ISI");
+
+        //从map中取出参数
+//        EventReportDTO eventReportDTO = new EventReportDTO();
+//        eventReportDTO.setEventId((String) map.get("eventId")); //事件code
+//        eventReportDTO.setC4((String) map.get("C4")); //C4代码
+//        eventReportDTO.setChannelId((String) map.get("channelId")); //渠道
+//        eventReportDTO.setISI((String) map.get("ISI")); //流水号
+//        eventReportDTO.setLanId(Long.valueOf((String) map.get("lanId"))); //本地网标识
+
+        //构造返回参数
+        result.put("custId", "客户编码");
+        result.put("CPCResultCode", "1");
+        result.put("CPCResultMsg", "success");
+        result.put("ISI", ISI);
+
+        //获取标签因子集合
+        List<Map<String, Object>> labelList = (List<Map<String, Object>>) map.get("triggers");
+
+        //根据事件code查询事件信息
+        ContactEvt event = contactEvtMapper.getEventByEventNbr(eventNbr);
+
+        //获取事件id
+        Long eventId = event.getContactEvtId();
+        //获取事件推荐活动数
+        int recCampaignAmount;
+        String recCampaignAmountStr = event.getRecCampaignAmount();
+        if (recCampaignAmountStr == null || "".equals(recCampaignAmountStr)) {
+            recCampaignAmount = 0;
+        } else {
+            recCampaignAmount = Integer.parseInt(recCampaignAmountStr);
+        }
+
+        //获取事件过滤规则
+        ContactEvtMatchRul contactEvtMatchRulParam = new ContactEvtMatchRul();
+        contactEvtMatchRulParam.setContactEvtId(eventId);
+        List<ContactEvtMatchRul> contactEvtMatchRuls = contactEvtMatchRulMapper.listEventMatchRuls(contactEvtMatchRulParam);
+        //遍历事件过滤规则匹配
+        if (contactEvtMatchRuls != null && contactEvtMatchRuls.size() > 0) {
+            //匹配事件过滤规则
+            int flag = 0;
+            for (ContactEvtMatchRul contactEvtMatchRul : contactEvtMatchRuls) {
+                flag = userListMapper.checkRule("", contactEvtMatchRul.getEvtMatchRulId(), null);
+                if (flag > 0) {
+                    result.put("CPCResultCode", "0");
+                    result.put("CPCResultMsg", "事件过滤拦截");
+                    return result;
+                }
+            }
+        }
+
+        //根据事件id 查询所有关联活动（根据优先级排序 正序）
+        List<Long> activityIds = mktCamEvtRelMapper.listActivityByEventId(eventId);
+
+        //初始化返回结果中的工单信息
+        List<Map<String, Object>> orderList = new ArrayList<>();
+
+        //遍历活动id  查询并匹配活动规则 需要根据事件推荐活动数 取前n个活动
+        int max = activityIds.size();
+        if (recCampaignAmount != 0) {
+            //事件推荐活动数
+            if (activityIds.size() > recCampaignAmount) {
+                max = recCampaignAmount;
+            }
+        }
+
+
+        //初始化结果集
+        List<Future<Map<String, Object>>> threadList = new ArrayList<>();
+        //初始化线程池
+        ExecutorService executorService = Executors.newCachedThreadPool();
+
+        //遍历活动
+        for (int j = 0; j < max; j++) {
+
+            //活动id
+            Long activityId = activityIds.get(j);
+            //提交线程
+            Future<Map<String, Object>> f = executorService.submit(new ActivityTask(ISI, activityId));
+            //将线程处理结果添加到结果集
+            threadList.add(f);
+        }
+
+
+
+        //获取结果
+        try {
+            for (Future<Map<String, Object>> future : threadList) {
+                orderList.add(future.get());
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            //发生异常关闭线程池
+            executorService.shutdown();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            //发生异常关闭线程池
+            executorService.shutdown();
+            return null;
+        }
+
+        //关闭线程池
+        executorService.shutdown();
+
+        //返回结果
+        result.put("orderList", orderList);
+
+        return result;
+    }
+
+   @Override
     public void cpc() {
 
-    }
+    }*/
 }

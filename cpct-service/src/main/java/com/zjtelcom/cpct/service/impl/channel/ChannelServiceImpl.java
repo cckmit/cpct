@@ -5,15 +5,18 @@ import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.domain.channel.Channel;
+import com.zjtelcom.cpct.domain.channel.MktProductRule;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.ChannelType;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ChannelService;
+/*import com.zjtelcom.cpct.service.impl.api.ClTest;*/
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.*;
 
@@ -25,21 +28,55 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
 
     @Autowired
     private ContactChannelMapper channelMapper;
+/*
+    @Autowired
+    private ClTestRepository testRepository;*/
 
+
+    @Override
+    public Map<String, Object> listAllChildChannelList() {
+        Map<String,Object> result = new HashMap<>();
+        List<Channel> channelList = channelMapper.findChildList();
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",channelList);
+        return result;
+    }
+
+
+    @Override
+    public Map<String, Object> listChannelByIdList(List<Long> idList) {
+        Map<String,Object> result = new HashMap<>();
+        List<Channel> channelList = new ArrayList<>();
+        for (Long id : idList){
+            Channel channel = channelMapper.selectByPrimaryKey(id);
+            if (channel==null){
+                result.put("resultCode",CODE_FAIL);
+                result.put("resultMsg","渠道不存在");
+                return result;
+            }
+            channelList.add(channel);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",channelList);
+        return result;
+
+    }
 
     @Override
     public Map<String, Object> listChannelTree(Long userId) {
         Map<String,Object> result = new HashMap<>();
         Channel channel = channelMapper.selectChannel4AllChannel(-1L);
-        ChannelDetail allChannel = new ChannelDetail();
+        List<ChannelDetail> chList = new ArrayList<>();
         List<ChannelDetail> parentDetailList = new ArrayList<>();
         List<Channel> parentList = channelMapper.findParentList();
         listParent(parentDetailList, parentList);
+        ChannelDetail allChannel = new ChannelDetail();
         allChannel.setChannelName(channel.getContactChlName());
         allChannel.setChannelId(channel.getContactChlId());
-        allChannel.setChildrenList(parentDetailList);
+        allChannel.setChildren(parentDetailList);
+        chList.add(allChannel);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",allChannel);
+        result.put("resultMsg",chList);
         return result;
     }
 
@@ -52,11 +89,14 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
                 ChannelDetail childDetail = new ChannelDetail();
                 childDetail.setChannelId(child.getContactChlId());
                 childDetail.setChannelName(child.getContactChlName());
+                if (child.getRemark()!=null && !child.getRemark().equals("")){
+                    childDetail.setRemark(child.getRemark());
+                }
                 childDetailList.add(childDetail);
             }
-            parentDetail.setChannelId(parent.getParentId());
+            parentDetail.setChannelId(parent.getContactChlId());
             parentDetail.setChannelName(parent.getContactChlName());
-            parentDetail.setChildrenList(childDetailList);
+            parentDetail.setChildren(childDetailList);
             parentDetailList.add(parentDetail);
         }
     }
@@ -138,12 +178,12 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
             for (Channel child : childList){
                 if (child.getChannelType().equals(ChannelType.INITIATIVE.getValue().toString())){
                     ChannelDetail detail = getDetail(child);
-                    detail.setChildrenList(null);
+                    detail.setChildren(null);
                     initChildList.add(detail);
                     initCount += 1;
                 }else {
                     ChannelDetail detail = getDetail(child);
-                    detail.setChildrenList(null);
+                    detail.setChildren(null);
                     passChildList.add(detail);
                     passCount += 1;
                 }
@@ -196,6 +236,12 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
     @Override
     public Map<String, Object> createParentChannel(Long userId, ContactChannelDetail parentAddVO) {
         Map<String,Object> result = new HashMap<>();
+        Channel ch = channelMapper.selectByCode(parentAddVO.getContactChlCode());
+        if (ch!=null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","渠道编码已存在");
+            return result;
+        }
         Channel channel = BeanUtil.create(parentAddVO,new Channel());
         channel.setParentId(0L);
         channel.setChannelType(null);//主动被动
@@ -211,7 +257,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
     }
 
     /**
-     * 添加子渠道
+     * 添加渠道
      * @param userId
      * @param addVO
      * @return
@@ -230,12 +276,24 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
             result.put("resultMsg","父级渠道不存在");
             return result;
         }
+        Channel exist = channelMapper.selectByCode(addVO.getContactChlCode());
+        if (exist!=null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","渠道编码已存在");
+            return result;
+        }
         Channel channel = BeanUtil.create(addVO,new Channel());
+        Channel ch = channelMapper.selectChannel4AllChannel(-1L);
+        if (addVO.getParentId().equals(ch.getContactChlId())){
+            channel.setParentId(0L);
+        }
         channel.setCreateDate(new Date());
         channel.setUpdateDate(new Date());
         channel.setCreateStaff(userId);
         channel.setUpdateStaff(userId);
         channel.setStatusCd("1000");
+        channel.setChannelType("0");
+        channel.setContactChlType("10000");
         channelMapper.insert(channel);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
@@ -251,7 +309,18 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
             result.put("resultMsg","渠道不存在");
             return result;
         }
-        BeanUtil.copy(editVO,channel);
+        if (!channel.getContactChlName().equals(editVO.getContactChlName())){
+            channel.setContactChlName(editVO.getContactChlName());
+        }
+        if (!channel.getContactChlCode().equals(editVO.getContactChlCode())){
+            channel.setContactChlCode(editVO.getContactChlCode());
+        }
+        if (!channel.getStartTime().equals(editVO.getStartTime())){
+            channel.setStartTime(editVO.getStartTime());
+        }
+        if (!channel.getEndTime().equals(editVO.getEndTime())){
+            channel.setEndTime(editVO.getEndTime());
+        }
         channel.setUpdateDate(new Date());
         channel.setUpdateStaff(userId);
         channelMapper.updateByPrimaryKey(channel);
@@ -266,8 +335,12 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         Channel channel = channelMapper.selectByPrimaryKey(channelDetail.getChannelId());
         if (channel==null){
             result.put("resultCode",CODE_FAIL);
-
             result.put("resultMsg","渠道不存在");
+            return result;
+        }
+        if (channel.getContactChlName().equals("所有渠道")){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","根渠道无法删除！");
             return result;
         }
         channelMapper.deleteByPrimaryKey(channelDetail.getChannelId());
@@ -298,6 +371,11 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         ChannelVO vo = new ChannelVO();
         try {
             Channel channel = channelMapper.selectByPrimaryKey(channelId);
+            if (channel==null){
+                result.put("resultCode",CODE_FAIL);
+                result.put("resultMsg","渠道不存在");
+                return result;
+            }
             vo = ChannelUtil.map2ChannelVO(channel);
         }catch (Exception e){
             e.printStackTrace();
@@ -307,4 +385,17 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         result.put("resultMsg",vo);
         return result;
     }
+
+    @Override
+    public Object addAcount() {
+/*            ClTest clTest = new ClTest();
+            clTest.setId(Long.valueOf(ChannelUtil.getRandomStr(5)));
+            testRepository.save(clTest);
+            logger.info("333333");*/
+
+        return "success";
+    }
+
+
+
 }

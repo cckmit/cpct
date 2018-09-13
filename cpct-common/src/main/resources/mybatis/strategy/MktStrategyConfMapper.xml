@@ -7,6 +7,7 @@
     <result column="BEGIN_TIME" jdbcType="DATE" property="beginTime" />
     <result column="END_TIME" jdbcType="DATE" property="endTime" />
     <result column="CHANNELS_ID" jdbcType="VARCHAR" property="channelsId" />
+    <result column="AREA_ID" jdbcType="VARCHAR" property="areaId" />
     <result column="CREATE_STAFF" jdbcType="VARCHAR" property="createStaff" />
     <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
     <result column="UPDATE_STAFF" jdbcType="VARCHAR" property="updateStaff" />
@@ -19,12 +20,12 @@
   <insert id="insert" useGeneratedKeys="true" keyProperty="mktStrategyConfId" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO">
     insert into mkt_strategy_conf (MKT_STRATEGY_CONF_ID, MKT_STRATEGY_CONF_NAME, 
       BEGIN_TIME, END_TIME, CHANNELS_ID, 
-      CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, 
-      UPDATE_DATE)
-    values (#{mktStrategyConfId,jdbcType=BIGINT}, #{mktStrategyConfName,jdbcType=VARCHAR}, 
+      AREA_ID, CREATE_STAFF, CREATE_DATE,
+      UPDATE_STAFF, UPDATE_DATE)
+    values (#{mktStrategyConfId,jdbcType=BIGINT}, #{mktStrategyConfName,jdbcType=VARCHAR},
       #{beginTime,jdbcType=DATE}, #{endTime,jdbcType=DATE}, #{channelsId,jdbcType=VARCHAR},
-      #{createStaff,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=VARCHAR}, 
-      #{updateDate,jdbcType=TIMESTAMP})
+      #{areaId,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP},
+      #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP})
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO">
     update mkt_strategy_conf
@@ -32,21 +33,22 @@
       BEGIN_TIME = #{beginTime,jdbcType=DATE},
       END_TIME = #{endTime,jdbcType=DATE},
       CHANNELS_ID = #{channelsId,jdbcType=VARCHAR},
-      CREATE_STAFF = #{createStaff,jdbcType=VARCHAR},
+      AREA_ID = #{areaId,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
       CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
-      UPDATE_STAFF = #{updateStaff,jdbcType=VARCHAR},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
       UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
     where MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select MKT_STRATEGY_CONF_ID, MKT_STRATEGY_CONF_NAME, BEGIN_TIME, END_TIME, CHANNELS_ID, 
-    CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+    AREA_ID, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
     from mkt_strategy_conf
     where MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=BIGINT}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
     select MKT_STRATEGY_CONF_ID, MKT_STRATEGY_CONF_NAME, BEGIN_TIME, END_TIME, CHANNELS_ID, 
-    CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+    AREA_ID, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
     from mkt_strategy_conf
   </select>
 </mapper>

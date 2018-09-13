@@ -61,7 +61,7 @@ public interface SystemParamMapper {
      */
     List<SystemParam> queryAllSystemParam();
     
-    SystemParam selectByParamKey(@Param("paramKey") String paramKey);
+    SystemParam selectByParamKey(@Param("paramKey") String paramKey,@Param("value")String value);
 
 
 	List<SystemParam> findParamKeyIn(String paramKey);

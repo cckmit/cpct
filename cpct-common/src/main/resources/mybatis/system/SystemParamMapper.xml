@@ -79,7 +79,7 @@
         select
         <include refid="Base_Column_List"/>
         from fpc_m_system_param
-        where param_key = #{paramKey}
+        where param_key = #{paramKey} and param_value = #{value}
     </select>
 
     <!-- add method queryAllSystemParam-->

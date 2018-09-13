@@ -13,10 +13,12 @@ public interface CamScriptService {
 
     Map<String,Object> editCamScript(Long userId, CamScriptEditVO editVO);
 
-    Map<String,Object> deleteCamScript(Long userId,List<Long> camScriptIdList);
+    Map<String,Object> deleteCamScript(Long userId,Long camScriptId);
 
     Map<String,Object> getCamScriptList(Long userId, Long evtContactConfId );
 
     Map<String,Object> getCamScriptVODetail(Long userId,Long camScriptId);
+
+    Map<String,Object> copyCamScript(Long contactConfId,Long newConfId);
 
 }

@@ -1,3 +1,4 @@
+/*
 package com.zjtelcom.cpct.dto.campaign;
 
 import com.zjtelcom.cpct.dto.filter.FilterRule;
@@ -27,4 +28,4 @@ public class FilterRuleConf {
     }
 
 
-}
+}*/

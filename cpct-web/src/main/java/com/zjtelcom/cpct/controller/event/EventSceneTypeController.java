@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.controller.event;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.event.EventSceneTypeDO;
@@ -8,11 +9,12 @@ import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.event.EventSceneTypeService;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description 事件场景目录controller
@@ -29,7 +31,7 @@ public class EventSceneTypeController extends BaseController {
     /**
      * 查询事件场景目录列表
      */
-    @RequestMapping("/listEventSceneTypes")
+    @PostMapping("/listEventSceneTypes")
     @CrossOrigin
     public String listEventSceneTypes() {
         List<EventSceneTypeDTO> eventTypeDTOS = new ArrayList<>();
@@ -45,9 +47,9 @@ public class EventSceneTypeController extends BaseController {
     /**
      * 新增事件场景目录保存
      */
-    @RequestMapping("/saveEventSceneTypes")
+    @PostMapping("/saveEventSceneTypes")
     @CrossOrigin
-    public String saveEventSceneTypes(EventSceneTypeDO eventSceneTypeDO) {
+    public String saveEventSceneTypes(@RequestBody EventSceneTypeDO eventSceneTypeDO) {
         try {
             eventSceneTypeService.saveEventSceneType(eventSceneTypeDO);
         } catch (Exception e) {
@@ -60,10 +62,11 @@ public class EventSceneTypeController extends BaseController {
     /**
      * 编辑事件场景目录
      */
-    @RequestMapping("/editEventSceneType")
+    @PostMapping("/editEventSceneType")
     @CrossOrigin
-    public String editEventSceneType(@Param("evtSceneTypeId") Long evtSceneTypeId) {
+    public String editEventSceneType(@RequestBody HashMap<String,Long> param) {
         EventSceneTypeDTO eventTypeDTO = new EventSceneTypeDTO();
+        Long evtSceneTypeId = param.get("evtSceneTypeId");
         try {
             eventTypeDTO = eventSceneTypeService.getEventSceneTypeDTOById(evtSceneTypeId);
         } catch (Exception e) {
@@ -76,31 +79,34 @@ public class EventSceneTypeController extends BaseController {
     /**
      * 编辑事件场景目录保存
      */
-    @RequestMapping("/updateEventSceneType")
+    @PostMapping("/updateEventSceneType")
     @CrossOrigin
-    public String updateEventSceneType(EventSceneTypeDO eventTypeDO) {
+    public String updateEventSceneType(@RequestBody EventSceneTypeDO eventTypeDO) {
+        Map<String, Object> maps = new HashMap<>();
         try {
-            eventSceneTypeService.updateEventSceneType(eventTypeDO);
+            maps = eventSceneTypeService.updateEventSceneType(eventTypeDO);
         } catch (Exception e) {
             logger.error("[op:EventTypeController] fail to updateEventSceneType eventTypeDO = {}! Exception: ", JSONArray.toJSON(eventTypeDO), e);
             return initFailRespInfo(ErrorCode.UPDATE_EVENTTYPE_FAILURE.getErrorMsg(), ErrorCode.UPDATE_EVENTTYPE_FAILURE.getErrorCode());
         }
-        return initSuccRespInfo(null);
+        return JSON.toJSONString(maps);
     }
 
     /**
      * 删除事件场景目录
      */
-    @RequestMapping("/delEventSceneType")
+    @PostMapping("/delEventSceneType")
     @CrossOrigin
-    public String delEventSceneType(@Param("evtSceneTypeId") Long evtSceneTypeId) {
+    public String delEventSceneType(@RequestBody HashMap<String,Long> param) {
+        Map<String, Object> maps = new HashMap<>();
+        Long evtSceneTypeId = param.get("evtSceneTypeId");
         try {
-            eventSceneTypeService.delEventSceneType(evtSceneTypeId);
+            maps = eventSceneTypeService.delEventSceneType(evtSceneTypeId);
         } catch (Exception e) {
             logger.error("[op:EventTypeController] fail to delEventType evtTypeId = {}! Exception: ", evtSceneTypeId, e);
             return initFailRespInfo(ErrorCode.DEL_EVENTTYPE_FAILURE.getErrorMsg(), ErrorCode.DEL_EVENTTYPE_FAILURE.getErrorCode());
         }
-        return initSuccRespInfo(null);
+        return JSON.toJSONString(maps);
     }
 
 }

@@ -28,7 +28,6 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
         PageHelper.startPage(page,pageSize);
         List<SysParams> list = sysParamsMapper.selectAll(paramName, configType);
         Page pageInfo = new Page(new PageInfo(list));
-
         result.put("resultCode","0");
         result.put("resultMsg","");
         result.put("data",list);
@@ -93,7 +92,7 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
 
         sysParamsMapper.deleteByPrimaryKey(id);
         result.put("resultCode","0");
-
+        result.put("resultMsg","保存成功");
         return result;
     }
 
@@ -138,19 +137,19 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
     public Map<String, Object> listParamsByKeyForCampaign() {
         Map<String,Object> result = new HashMap<>();
         List<SysParams> statusParams = sysParamsMapper.listParamsByKeyForCampaign(ParamKeyEnum.STATUS_CD.getParamKey());
-        result.put(statusParams.get(0).getParamKey(), statusParams);
+        result.put(ParamKeyEnum.STATUS_CD.getParamName(), statusParams);
 
         List<SysParams> tiggerParams = sysParamsMapper.listParamsByKeyForCampaign(ParamKeyEnum.TIGGER_TYPE.getParamKey());
-        result.put(tiggerParams.get(0).getParamKey(), tiggerParams);
+        result.put(ParamKeyEnum.TIGGER_TYPE.getParamName(), tiggerParams);
 
         List<SysParams> campaignParams = sysParamsMapper.listParamsByKeyForCampaign(ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey());
-        result.put(campaignParams.get(0).getParamKey(), campaignParams);
+        result.put(ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamName(), campaignParams);
 
         List<SysParams> execParams = sysParamsMapper.listParamsByKeyForCampaign(ParamKeyEnum.EXEC_TYPE.getParamKey());
-        result.put(execParams.get(0).getParamKey(), execParams);
+        result.put(ParamKeyEnum.EXEC_TYPE.getParamName(), execParams);
 
         List<SysParams> mktCampaignCategoryParams = sysParamsMapper.listParamsByKeyForCampaign(ParamKeyEnum.MKT_CAMPAIGN_CATEGORY.getParamKey());
-        result.put(mktCampaignCategoryParams.get(0).getParamKey(), mktCampaignCategoryParams);
+        result.put(ParamKeyEnum.MKT_CAMPAIGN_CATEGORY.getParamName(), mktCampaignCategoryParams);
 
         return result;
     }

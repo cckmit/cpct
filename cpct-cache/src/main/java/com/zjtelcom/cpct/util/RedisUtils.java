@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 public class RedisUtils {
+
     @Autowired
     private RedisTemplate redisTemplate;
 
@@ -127,6 +128,7 @@ public class RedisUtils {
         hash.put(key, hashKey, value);
     }
 
+
     /**
      * 哈希获取数据
      *
@@ -137,6 +139,18 @@ public class RedisUtils {
     public Object hmGet(String key, Object hashKey) {
         HashOperations<String, Object, Object> hash = redisTemplate.opsForHash();
         return hash.get(key, hashKey);
+    }
+
+    /**
+     * 哈希获取数据
+     *
+     * @param key
+     * @return Map<HK, HV>
+     */
+    public Object hKeys(String key) {
+        HashOperations<String, Object, Object> hash = redisTemplate.opsForHash();
+        return hash.entries(key);
+
     }
 
     /**

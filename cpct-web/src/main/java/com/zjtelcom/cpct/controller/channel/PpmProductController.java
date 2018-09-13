@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.controller.channel;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
 import com.zjtelcom.cpct.dto.channel.ProductParam;
+import com.zjtelcom.cpct.service.channel.CatalogService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.UserUtil;
@@ -23,6 +24,52 @@ public class PpmProductController extends BaseController  {
 
     @Autowired
     private ProductService productService;
+    @Autowired
+    private CatalogService catalogService;
+
+
+
+
+    /**
+     *通过目录节点获取销售品
+     * @return
+     */
+    @PostMapping("listOfferByCatalogId")
+    @CrossOrigin
+    public Map<String, Object> listOfferByCatalogId(@RequestBody HashMap<String,Object> param) {
+        Map<String ,Object> result = new HashMap<>();
+        try {
+            Integer page = MapUtil.getIntNum(param.get("page"));
+            Integer pageSize = MapUtil.getIntNum(param.get("pageSize"));
+            String productName = MapUtil.getString(param.get("productName"));
+            result = catalogService.listOfferByCatalogId(Long.valueOf(param.get("catalogId").toString()),productName,page,pageSize);
+        }catch (Exception e){
+            logger.error("[op:PpmProductController] fail to listOfferByCatalogId",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to listOfferByCatalogId");
+            return result;
+        }
+        return result;
+    }
+
+    /**
+     *获取销售品目录树
+     * @return
+     */
+    @PostMapping("listProductTree")
+    @CrossOrigin
+    public Map<String, Object> listProductTree() {
+        Map<String ,Object> result = new HashMap<>();
+        try {
+            result = catalogService.listProductTree();
+        }catch (Exception e){
+            logger.error("[op:PpmProductController] fail to listProductTree",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to listProductTree");
+            return result;
+        }
+        return result;
+    }
 
 
     /**
@@ -73,9 +120,8 @@ public class PpmProductController extends BaseController  {
     @CrossOrigin
     public Map<String, Object> addProductRule(@RequestBody ProductParam param) {
         Map<String ,Object> result = new HashMap<>();
-        Long userId = UserUtil.loginId();
         try {
-            result = productService.addProductRule(userId,param.getIdList());
+            result = productService.addProductRule(param.getStrategyRuleId(),param.getIdList());
         }catch (Exception e){
             logger.error("[op:PpmProductController] fail to addProductRule",e);
             result.put("resultCode",CODE_FAIL);
@@ -141,8 +187,19 @@ public class PpmProductController extends BaseController  {
         Map<String, Object> result = new HashMap<>();
         Long userId = UserUtil.loginId();
         try {
-            Long ruleId = Long.valueOf(params.get("ruleId").toString());
-            result = productService.delProductRule(userId, ruleId);
+            Long strategyRuleId = null;
+            Long ruleId = null;
+            List<Long> itemRuleIdList = null;
+            if (params.get("strategyRuleId")!=null && !params.get("strategyRuleId").equals("")){
+                 strategyRuleId = Long.valueOf(params.get("strategyRuleId").toString());
+            }
+            if (params.get("ruleId")!=null && !params.get("ruleId").equals("")){
+                ruleId = Long.valueOf(params.get("ruleId").toString());
+            }
+            if (params.get("itemRuleIdList")!=null){
+                itemRuleIdList = (List<java.lang.Long>) params.get("itemRuleIdList");
+            }
+            result = productService.delProductRule(strategyRuleId, ruleId,itemRuleIdList);
         } catch (Exception e) {
             logger.error("[op:PpmProductController] fail to delProductRule", e);
             result.put("resultCode", CODE_FAIL);

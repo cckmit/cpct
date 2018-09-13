@@ -6,6 +6,7 @@ import com.zjtelcom.cpct.request.filter.FilterRuleReq;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,5 +31,7 @@ public interface FilterRuleService {
     Map<String,Object> importUserList(MultipartFile multipartFile ,Long ruleId) throws IOException;
 
     Map<String,Object> listUserList(UserList userList) throws IOException;
+
+    Map<String, Object> getFilterRule(List<Integer> filterRuleIdList);
 
 }

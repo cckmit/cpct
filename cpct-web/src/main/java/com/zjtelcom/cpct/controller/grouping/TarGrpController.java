@@ -7,12 +7,16 @@ import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDTO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
+import com.zjtelcom.cpct.dto.grouping.TrialOperationVO;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
+import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.util.FastJsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 
 
 /**
@@ -26,6 +30,24 @@ public class TarGrpController extends BaseController {
 
     @Autowired
     private TarGrpService tarGrpService;
+    @Autowired
+    private TrialOperationService operationService;
+
+
+    @RequestMapping("/createTarGrpByTemplateId")
+    @CrossOrigin
+    public String createTarGrpByTemplateId(@RequestBody HashMap<String,Long> param) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = tarGrpService.createTarGrpByTemplateId(param.get("templateId"));
+        } catch (Exception e) {
+            logger.error("[op:TarGrpController] fail to saveTagNumFetch for tarGrpDTO = {}!" +
+                    " Exception: ", JSONArray.toJSON(maps), e);
+            return FastJsonUtils.objToJson(maps);
+        }
+        return FastJsonUtils.objToJson(maps);
+    }
+
 
     /**
      * 新增目标分群 （暂时废弃）
@@ -53,7 +75,7 @@ public class TarGrpController extends BaseController {
     public String createTarGrp(@RequestBody TarGrpDetail tarGrpDetail) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            maps = tarGrpService.createTarGrp(tarGrpDetail);
+            maps = tarGrpService.createTarGrp(tarGrpDetail,false);
         } catch (Exception e) {
             logger.error("[op:TarGrpController] fail to createTarGrp for tarGrpDetail = {}!" +
                     " Exception: ", JSONArray.toJSON(tarGrpDetail), e);

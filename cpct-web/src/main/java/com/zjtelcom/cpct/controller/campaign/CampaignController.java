@@ -2,16 +2,21 @@ package com.zjtelcom.cpct.controller.campaign;
 
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.controller.BaseController;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
+import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignVO;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
-import com.zjtelcom.cpct.request.campaign.QryMktCampaignListReq;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
+import com.zjtelcom.cpct.service.thread.TarGrpRule;
+import com.zjtelcom.cpct.util.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @RestController
 @RequestMapping("${adminPath}/campaign")
@@ -22,6 +27,16 @@ public class CampaignController extends BaseController {
 
     @Autowired
     private MktStrategyConfService mktStrategyConfService;
+
+    @Autowired
+    private TarGrpConditionMapper tarGrpConditionMapper;
+
+    @Autowired
+    private InjectionLabelMapper injectionLabelMapper;
+
+    @Autowired
+    private RedisUtils redisUtils;
+
     /**
      * 查询活动列表(分页)
      *
@@ -37,6 +52,30 @@ public class CampaignController extends BaseController {
         Integer page = Integer.parseInt(params.get("page"));    // 页码
         Integer pageSize = Integer.parseInt(params.get("pageSize")); // 条数
         Map<String, Object> map = mktCampaignService.qryMktCampaignListPage(mktCampaignName, statusCd, tiggerType, mktCampaignType, page, pageSize);
+        return JSON.toJSONString(map);
+    }
+
+    @RequestMapping(value = "/getCampaignList", method = RequestMethod.POST)
+    @CrossOrigin
+    public String getCampaignList(@RequestBody Map<String, Object> params) throws Exception {
+        String mktCampaignName = params.get("mktCampaignName").toString();  // 活动名称
+        Long eventId = null;
+        String mktCampaignType = null;
+        if (params.get("eventId") != null) {
+            eventId = Long.valueOf(params.get("eventId").toString());
+        }
+        if (params.get("mktCampaignType")!=null && !params.get("mktCampaignType").equals("")){
+            mktCampaignType = params.get("mktCampaignType").toString(); // 活动
+        }
+        Map<String, Object> map = mktCampaignService.getCampaignList(mktCampaignName, mktCampaignType, eventId);
+        return JSON.toJSONString(map);
+    }
+
+    @RequestMapping(value = "/getCampaignList4EventScene", method = RequestMethod.POST)
+    @CrossOrigin
+    public String getCampaignList4EventScene(@RequestBody Map<String, String> params) throws Exception {
+        String mktCampaignName = params.get("mktCampaignName");  // 活动名称
+        Map<String, Object> map = mktCampaignService.getCampaignList4EventScene(mktCampaignName);
         return JSON.toJSONString(map);
     }
 
@@ -116,11 +155,45 @@ public class CampaignController extends BaseController {
      * @throws Exception
      */
     @RequestMapping(value = "/changeMktCampaignStatus", method = RequestMethod.POST)
+    @CrossOrigin
     public String changeMktCampaignStatus(@RequestBody Map<String, String> params) throws Exception {
         Long mktCampaignId = Long.valueOf(params.get("mktCampaignId"));
         String statusCd = params.get("statusCd");
         Map<String, Object> map = mktCampaignService.changeMktCampaignStatus(mktCampaignId, statusCd);
 
         return JSON.toJSONString(map);
+    }
+
+
+    @RequestMapping(value = "/test", method = RequestMethod.POST)
+    @CrossOrigin
+    public String test(@RequestBody Map<String, String> params) throws Exception {
+        Long tarGrpId = Long.valueOf(params.get("tarGrpId"));
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        for (int i = 1; i < 3; i++) {
+            MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
+            mktStrategyConfRuleDO.setMktStrategyConfRuleId(Long.valueOf(i));
+            mktStrategyConfRuleDO.setTarGrpId(null);
+            // 线程池执行规则存入redis
+            executorService.submit(new TarGrpRule(Long.valueOf(i), Long.valueOf(i), mktStrategyConfRuleDO, redisUtils, tarGrpConditionMapper, injectionLabelMapper));
+        }
+        return null;
+    }
+
+    /**
+     * 发布并下发活动
+     *
+     * @param params
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/publishMktCampaign", method = RequestMethod.POST)
+    @CrossOrigin
+    public String publishMktCampaign(@RequestBody Map<String, String> params) throws Exception {
+        Long parentMktCampaignId = Long.valueOf(params.get("mktCampaignId"));
+        String statusCd = params.get("statusCd");
+        Map<String, Object> mktCampaignMap = mktCampaignService.publishMktCampaign(parentMktCampaignId);
+        mktCampaignService.changeMktCampaignStatus(parentMktCampaignId, statusCd);
+        return JSON.toJSONString(mktCampaignMap);
     }
 }

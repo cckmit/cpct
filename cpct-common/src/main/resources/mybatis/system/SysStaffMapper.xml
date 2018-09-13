@@ -81,13 +81,22 @@
         from sys_staff
         where 1=1
         <if test="status != null and status != ''">
-        and STAFF_ACCOUNT like CONCAT('%',#{staffAccount,jdbcType=VARCHAR},'%')
-    </if>
+            and STAFF_ACCOUNT like CONCAT('%',#{staffAccount,jdbcType=VARCHAR},'%')
+        </if>
         <if test="status != null and status != ''">
             and STAFF_NAME like CONCAT('%',#{staffName,jdbcType=VARCHAR},'%')
         </if>
         <if test="status != null and status != 0">
             and STATUS = #{status,jdbcType=BIGINT}
+        </if>
+        <if test="cityId != null and cityId != 0">
+            and CITY_ID = #{cityId,jdbcType=BIGINT}
+        </if>
+        <if test="channelId != null and channelId != 0">
+            and CHANNEL_ID = #{channelId,jdbcType=BIGINT}
+        </if>
+        <if test="loginStatus != null and loginStatus != 0">
+            and LOGIN_STATUS = #{loginStatus,jdbcType=BIGINT}
         </if>
         order by CREATE_DATE desc
     </select>

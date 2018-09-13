@@ -1,9 +1,12 @@
 package com.zjtelcom.cpct.dao.campaign;
 
 import com.zjtelcom.cpct.domain.campaign.MktCamStrategyConfRelDO;
+import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
+@Mapper
+@Repository
 public interface MktCamStrategyConfRelMapper {
     int deleteByPrimaryKey(Long camStrConfRelId);
 

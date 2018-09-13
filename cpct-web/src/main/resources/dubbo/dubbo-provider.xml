@@ -6,18 +6,18 @@
     http://code.alibabatech.com/schema/dubbo
     http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 
-    <!-- 提供方应用信息，用于计算依赖关系 -->
-    <!--<dubbo:application name="33.1059" />-->
+    <!--&lt;!&ndash; 提供方应用信息，用于计算依赖关系 &ndash;&gt;-->
+    <!--<dubbo:application name="33.1083" />-->
 
-    <!-- 注册中心暴露服务地址 -->
-    <!-- <dubbo:registry address="multicast://224.5.6.7:1234" /> -->
+    <!--<dubbo:registry protocol="zookeeper" address="dubbo://134.96.253.86:8033"/>-->
 
-    <!-- <dubbo:registry protocol="zookeeper" address="10.170.219.98:2181,10.173.55.173x:2181" /> -->
-    <!--<dubbo:registry protocol="zookeeper" address="dubbo://134.96.159.11:8033" />-->
+    <!--&lt;!&ndash; 暴露服务 &ndash;&gt;-->
+    <!--<dubbo:protocol name="dubbo" port="30323" />-->
+    <!--<dubbo:monitor protocol="registry" />-->
 
-    <!-- 暴露服务 -->
-    <!--<dubbo:protocol name="${dubbo.protocol.name}" port="${dubbo.protocol.port}" />-->
-
-    <!--<dubbo:service interface="com.chengli.springboot.example.service.ExampleService"-->
-                   <!--ref="exampleServiceImpl" retries="0" timeout="6000" />-->
+    <!--&lt;!&ndash; 注册 &ndash;&gt;-->
+    <!--<dubbo:service interface="com.zjtelcom.cpct.service.api.EventApiService" ref="eventApiServiceImpl" version="1.0" >-->
+        <!--<dubbo:method name="deal" servicecode="33.1083.CalculateCPC" timeout="5000"/>-->
+    <!--</dubbo:service>-->
+    
 </beans>

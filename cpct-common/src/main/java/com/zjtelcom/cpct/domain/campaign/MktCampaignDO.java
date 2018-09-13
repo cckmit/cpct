@@ -18,9 +18,29 @@ public class MktCampaignDO extends BaseEntity{
     private String mktActivityNbr;
     private String mktActivityTarget;
     private String mktCampaignDesc;
+    private Long calcDisplay;
+    private Long isaleDisplay;
     private String execType;
     private String execInvl;
     private Integer execNum;
+    private String createChannel;
+    private int relCount;
+
+    public Long getCalcDisplay() {
+        return calcDisplay;
+    }
+
+    public void setCalcDisplay(Long calcDisplay) {
+        this.calcDisplay = calcDisplay;
+    }
+
+    public Long getIsaleDisplay() {
+        return isaleDisplay;
+    }
+
+    public void setIsaleDisplay(Long isaleDisplay) {
+        this.isaleDisplay = isaleDisplay;
+    }
 
     public Long getMktCampaignId() {
         return mktCampaignId;
@@ -140,5 +160,21 @@ public class MktCampaignDO extends BaseEntity{
 
     public void setMktCampaignCategory(String mktCampaignCategory) {
         this.mktCampaignCategory = mktCampaignCategory;
+    }
+
+    public String getCreateChannel() {
+        return createChannel;
+    }
+
+    public void setCreateChannel(String createChannel) {
+        this.createChannel = createChannel;
+    }
+
+    public int getRelCount() {
+        return relCount;
+    }
+
+    public void setRelCount(int relCount) {
+        this.relCount = relCount;
     }
 }

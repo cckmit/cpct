@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.OfferMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.Offer">
+    <id column="OFFER_ID" jdbcType="DECIMAL" property="offerId" />
+    <result column="OFFER_TYPE" jdbcType="VARCHAR" property="offerType" />
+    <result column="OFFER_SYS_TYPE" jdbcType="VARCHAR" property="offerSysType" />
+    <result column="OFFER_NAME" jdbcType="VARCHAR" property="offerName" />
+    <result column="OFFER_SYS_NAME" jdbcType="VARCHAR" property="offerSysName" />
+    <result column="OFFER_SYS_PY_NAME" jdbcType="VARCHAR" property="offerSysPyName" />
+    <result column="OFFER_NBR" jdbcType="VARCHAR" property="offerNbr" />
+    <result column="EXT_OFFER_ID" jdbcType="VARCHAR" property="extOfferId" />
+    <result column="OFFER_DESC" jdbcType="VARCHAR" property="offerDesc" />
+    <result column="EFF_DATE" jdbcType="TIMESTAMP" property="effDate" />
+    <result column="MANAGE_GRADE" jdbcType="VARCHAR" property="manageGrade" />
+    <result column="EXP_DATE" jdbcType="TIMESTAMP" property="expDate" />
+    <result column="OFFER_PROVIDER_ID" jdbcType="VARCHAR" property="offerProviderId" />
+    <result column="BRAND_ID" jdbcType="DECIMAL" property="brandId" />
+    <result column="VALUE_ADDED_FLAG" jdbcType="VARCHAR" property="valueAddedFlag" />
+    <result column="INITIAL_CRED_VALUE" jdbcType="DECIMAL" property="initialCredValue" />
+    <result column="PRICING_PLAN_ID" jdbcType="DECIMAL" property="pricingPlanId" />
+    <result column="IS_INDEPENDENT" jdbcType="VARCHAR" property="isIndependent" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="MANAGE_REGION_ID" jdbcType="DECIMAL" property="manageRegionId" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="DECIMAL" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="DECIMAL" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from offer
+    where OFFER_ID = #{offerId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.Offer">
+    insert into offer (OFFER_ID, OFFER_TYPE, OFFER_SYS_TYPE, 
+      OFFER_NAME, OFFER_SYS_NAME, OFFER_SYS_PY_NAME, 
+      OFFER_NBR, EXT_OFFER_ID, OFFER_DESC, 
+      EFF_DATE, MANAGE_GRADE, EXP_DATE, 
+      OFFER_PROVIDER_ID, BRAND_ID, VALUE_ADDED_FLAG, 
+      INITIAL_CRED_VALUE, PRICING_PLAN_ID, IS_INDEPENDENT, 
+      REMARK, MANAGE_REGION_ID, STATUS_CD, 
+      CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
+      STATUS_DATE, UPDATE_DATE)
+    values (#{offerId,jdbcType=DECIMAL}, #{offerType,jdbcType=VARCHAR}, #{offerSysType,jdbcType=VARCHAR}, 
+      #{offerName,jdbcType=VARCHAR}, #{offerSysName,jdbcType=VARCHAR}, #{offerSysPyName,jdbcType=VARCHAR}, 
+      #{offerNbr,jdbcType=VARCHAR}, #{extOfferId,jdbcType=VARCHAR}, #{offerDesc,jdbcType=VARCHAR}, 
+      #{effDate,jdbcType=TIMESTAMP}, #{manageGrade,jdbcType=VARCHAR}, #{expDate,jdbcType=TIMESTAMP}, 
+      #{offerProviderId,jdbcType=VARCHAR}, #{brandId,jdbcType=DECIMAL}, #{valueAddedFlag,jdbcType=VARCHAR}, 
+      #{initialCredValue,jdbcType=DECIMAL}, #{pricingPlanId,jdbcType=DECIMAL}, #{isIndependent,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{manageRegionId,jdbcType=DECIMAL}, #{statusCd,jdbcType=VARCHAR}, 
+      #{createStaff,jdbcType=DECIMAL}, #{updateStaff,jdbcType=DECIMAL}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.Offer">
+    update offer
+    set OFFER_TYPE = #{offerType,jdbcType=VARCHAR},
+      OFFER_SYS_TYPE = #{offerSysType,jdbcType=VARCHAR},
+      OFFER_NAME = #{offerName,jdbcType=VARCHAR},
+      OFFER_SYS_NAME = #{offerSysName,jdbcType=VARCHAR},
+      OFFER_SYS_PY_NAME = #{offerSysPyName,jdbcType=VARCHAR},
+      OFFER_NBR = #{offerNbr,jdbcType=VARCHAR},
+      EXT_OFFER_ID = #{extOfferId,jdbcType=VARCHAR},
+      OFFER_DESC = #{offerDesc,jdbcType=VARCHAR},
+      EFF_DATE = #{effDate,jdbcType=TIMESTAMP},
+      MANAGE_GRADE = #{manageGrade,jdbcType=VARCHAR},
+      EXP_DATE = #{expDate,jdbcType=TIMESTAMP},
+      OFFER_PROVIDER_ID = #{offerProviderId,jdbcType=VARCHAR},
+      BRAND_ID = #{brandId,jdbcType=DECIMAL},
+      VALUE_ADDED_FLAG = #{valueAddedFlag,jdbcType=VARCHAR},
+      INITIAL_CRED_VALUE = #{initialCredValue,jdbcType=DECIMAL},
+      PRICING_PLAN_ID = #{pricingPlanId,jdbcType=DECIMAL},
+      IS_INDEPENDENT = #{isIndependent,jdbcType=VARCHAR},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      MANAGE_REGION_ID = #{manageRegionId,jdbcType=DECIMAL},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=DECIMAL},
+      UPDATE_STAFF = #{updateStaff,jdbcType=DECIMAL},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
+    where OFFER_ID = #{offerId,jdbcType=DECIMAL}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select OFFER_ID, OFFER_TYPE, OFFER_SYS_TYPE, OFFER_NAME, OFFER_SYS_NAME, OFFER_SYS_PY_NAME, 
+    OFFER_NBR, EXT_OFFER_ID, OFFER_DESC, EFF_DATE, MANAGE_GRADE, EXP_DATE, OFFER_PROVIDER_ID, 
+    BRAND_ID, VALUE_ADDED_FLAG, INITIAL_CRED_VALUE, PRICING_PLAN_ID, IS_INDEPENDENT, 
+    REMARK, MANAGE_REGION_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
+    UPDATE_DATE
+    from offer
+    where OFFER_ID = #{offerId,jdbcType=DECIMAL}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select OFFER_ID, OFFER_TYPE, OFFER_SYS_TYPE, OFFER_NAME, OFFER_SYS_NAME, OFFER_SYS_PY_NAME, 
+    OFFER_NBR, EXT_OFFER_ID, OFFER_DESC, EFF_DATE, MANAGE_GRADE, EXP_DATE, OFFER_PROVIDER_ID, 
+    BRAND_ID, VALUE_ADDED_FLAG, INITIAL_CRED_VALUE, PRICING_PLAN_ID, IS_INDEPENDENT, 
+    REMARK, MANAGE_REGION_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
+    UPDATE_DATE
+    from offer
+  </select>
+
+  <select id="findByName" resultMap="BaseResultMap">
+    select OFFER_ID, OFFER_TYPE, OFFER_SYS_TYPE, OFFER_NAME, OFFER_SYS_NAME, OFFER_SYS_PY_NAME,
+    OFFER_NBR, EXT_OFFER_ID, OFFER_DESC, EFF_DATE, MANAGE_GRADE, EXP_DATE, OFFER_PROVIDER_ID,
+    BRAND_ID, VALUE_ADDED_FLAG, INITIAL_CRED_VALUE, PRICING_PLAN_ID, IS_INDEPENDENT,
+    REMARK, MANAGE_REGION_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+    UPDATE_DATE
+    from offer
+    where OFFER_NAME  LIKE CONCAT(CONCAT('%',#{offerName}),'%')
+  </select>
+
+  <select id="selectByPrimaryKeyAndName" resultMap="BaseResultMap">
+    select OFFER_ID, OFFER_TYPE, OFFER_SYS_TYPE, OFFER_NAME, OFFER_SYS_NAME, OFFER_SYS_PY_NAME,
+    OFFER_NBR, EXT_OFFER_ID, OFFER_DESC, EFF_DATE, MANAGE_GRADE, EXP_DATE, OFFER_PROVIDER_ID,
+    BRAND_ID, VALUE_ADDED_FLAG, INITIAL_CRED_VALUE, PRICING_PLAN_ID, IS_INDEPENDENT,
+    REMARK, MANAGE_REGION_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+    UPDATE_DATE
+    from offer
+    where OFFER_ID = #{offerId,jdbcType=DECIMAL}
+    <if test="productName != null and productName != ''">
+      and OFFER_NAME  LIKE CONCAT(CONCAT('%',#{productName}),'%')
+    </if>
+  </select>
+
+</mapper>

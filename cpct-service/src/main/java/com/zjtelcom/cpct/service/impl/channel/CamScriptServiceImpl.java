@@ -25,17 +25,53 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
     private MktCamScriptMapper camScriptMapper;
 
 
+    /**
+     * 复制活动脚本
+     * @param contactConfId
+     * @param newConfId
+     * @return
+     */
+    @Override
+    public Map<String, Object> copyCamScript(Long contactConfId, Long newConfId) {
+        Map<String,Object> result = new HashMap<>();
+
+        CamScript script = camScriptMapper.selectByConfId(contactConfId);
+        if (script==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","活动脚本不存在");
+            return result;
+        }
+        CamScript newScript = BeanUtil.create(script,new CamScript());
+        newScript.setMktCampaignScptId(null);
+        newScript.setEvtContactConfId(newConfId);
+        camScriptMapper.insert(newScript);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",newScript);
+        return result;
+    }
 
     @Override
     public Map<String,Object> addCamScript(Long userId, CamScriptAddVO addVO) {
         Map<String,Object> result = new HashMap<>();
-        CamScript script = BeanUtil.create(addVO,new CamScript());
-        script.setCreateDate(new Date());
-        script.setUpdateDate(new Date());
-        script.setCreateStaff(userId);
-        script.setUpdateStaff(userId);
-        script.setStatusCd("1000");
-        camScriptMapper.insert(script);
+        CamScript script = camScriptMapper.selectByConfId(addVO.getEvtContactConfId());
+        if (script!=null){
+            //todo copy结果为null需要处理
+            BeanUtil.copy(addVO,script);
+            script.setMktCampaignId(123L);
+            script.setUpdateDate(new Date());
+            script.setUpdateStaff(userId);
+            camScriptMapper.updateByPrimaryKey(script);
+        }else {
+             script = BeanUtil.create(addVO,new CamScript());
+            //todo 添加活动id
+            script.setMktCampaignId(123L);
+            script.setCreateDate(new Date());
+            script.setUpdateDate(new Date());
+            script.setCreateStaff(userId);
+            script.setUpdateStaff(userId);
+            script.setStatusCd("1000");
+            camScriptMapper.insert(script);
+        }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
         return result;
@@ -60,17 +96,15 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
     }
 
     @Override
-    public Map<String,Object> deleteCamScript(Long userId, List<Long> camScriptIdList) {
+    public Map<String,Object> deleteCamScript(Long userId, Long camScriptId) {
         Map<String,Object> result = new HashMap<>();
-        for (Long id : camScriptIdList){
-            CamScript script = camScriptMapper.selectByPrimaryKey(id);
+            CamScript script = camScriptMapper.selectByPrimaryKey(camScriptId);
             if (script==null){
                 result.put("resultCode",CODE_FAIL);
                 result.put("resultMsg","活动关联脚本信息不存在");
                 return result;
             }
-            camScriptMapper.deleteByPrimaryKey(id);
-        }
+            camScriptMapper.deleteByPrimaryKey(camScriptId);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
         return result;
@@ -87,7 +121,7 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
             vo = ChannelUtil.map2CamScriptVO(script);
         }catch (Exception e){
             e.printStackTrace();
-            logger.error("[op:ChannelServiceImpl] fail to listChannel ", e);
+            logger.error("[op:ChannelServiceImpl] fail to listChannel", e);
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",vo);

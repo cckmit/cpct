@@ -34,9 +34,9 @@ public class MktStrategyConfRuleDO extends BaseEntity {
     private String evtContactConfId;
 
     /**
-     * 过滤规则配置Id
+     * 二次协同结果Id
      */
-    private Long ruleConfId;
+    private String mktCamChlResultId;
 
     public Long getMktStrategyConfRuleId() {
         return mktStrategyConfRuleId;
@@ -70,13 +70,6 @@ public class MktStrategyConfRuleDO extends BaseEntity {
         this.evtContactConfId = evtContactConfId;
     }
 
-    public Long getRuleConfId() {
-        return ruleConfId;
-    }
-
-    public void setRuleConfId(Long ruleConfId) {
-        this.ruleConfId = ruleConfId;
-    }
 
     public String getMktStrategyConfRuleName() {
         return mktStrategyConfRuleName;
@@ -84,5 +77,13 @@ public class MktStrategyConfRuleDO extends BaseEntity {
 
     public void setMktStrategyConfRuleName(String mktStrategyConfRuleName) {
         this.mktStrategyConfRuleName = mktStrategyConfRuleName;
+    }
+
+    public String getMktCamChlResultId() {
+        return mktCamChlResultId;
+    }
+
+    public void setMktCamChlResultId(String mktCamChlResultId) {
+        this.mktCamChlResultId = mktCamChlResultId;
     }
 }

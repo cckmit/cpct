@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.strategy.MktCamStrategyRelMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.pojo.MktCamStrategyRel">
+    <id column="CAMP_STR_REL_ID" jdbcType="BIGINT" property="campStrRelId" />
+    <result column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId" />
+    <result column="STRATEGY_ID" jdbcType="BIGINT" property="strategyId" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="LAN_ID" jdbcType="BIGINT" property="lanId" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from mkt_cam_strategy_rel
+    where CAMP_STR_REL_ID = #{campStrRelId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.pojo.MktCamStrategyRel">
+    insert into mkt_cam_strategy_rel (CAMP_STR_REL_ID, MKT_CAMPAIGN_ID, STRATEGY_ID, 
+      STATUS_CD, STATUS_DATE, CREATE_STAFF, 
+      CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, 
+      REMARK, LAN_ID)
+    values (#{campStrRelId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{strategyId,jdbcType=BIGINT}, 
+      #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR}, #{lanId,jdbcType=BIGINT})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.pojo.MktCamStrategyRel">
+    update mkt_cam_strategy_rel
+    set MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},
+      STRATEGY_ID = #{strategyId,jdbcType=BIGINT},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      LAN_ID = #{lanId,jdbcType=BIGINT}
+    where CAMP_STR_REL_ID = #{campStrRelId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select CAMP_STR_REL_ID, MKT_CAMPAIGN_ID, STRATEGY_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, 
+    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
+    from mkt_cam_strategy_rel
+    where CAMP_STR_REL_ID = #{campStrRelId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select CAMP_STR_REL_ID, MKT_CAMPAIGN_ID, STRATEGY_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, 
+    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
+    from mkt_cam_strategy_rel
+  </select>
+</mapper>

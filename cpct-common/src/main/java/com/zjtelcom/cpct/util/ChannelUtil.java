@@ -1,8 +1,11 @@
 package com.zjtelcom.cpct.util;
 
+import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
+import com.zjtelcom.cpct.dto.campaign.CampaignVO;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.Operator;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +20,35 @@ public class ChannelUtil  {
         String str = uuid.toString();
         String uuidStr=str.replace("-", "");
         return uuidStr;
+    }
+    public static CampaignVO map2CampaignVO(MktCampaignDO campaignDO){
+        CampaignVO vo = BeanUtil.create(campaignDO,new CampaignVO());
+        vo.setCampaignId(campaignDO.getMktCampaignId());
+        vo.setCampaignName(campaignDO.getMktCampaignName());
+        return vo;
+    }
+
+    public static String StringList2String(List<String> stringList){
+        if (stringList == null || stringList.isEmpty()){
+            return "";
+        }
+        String[] sts = new String[stringList.size()];
+        for (int i = 0;i<sts.length;i++){
+            sts[i] = stringList.get(i);
+        }
+        return StringUtils.join(sts,",");
+    }
+
+
+    public static String List2String(List<Integer> idList){
+        if (idList == null || idList.isEmpty()){
+            return "";
+        }
+        Integer[] ids = new Integer[idList.size()];
+        for (int i = 0;i<ids.length;i++){
+            ids[i] = idList.get(i);
+        }
+        return StringUtils.join(ids,",");
     }
 
     public static ChannelVO map2ChannelVO(Channel channel){
@@ -35,7 +67,7 @@ public class ChannelUtil  {
     }
     public static LabelVO map2LabelVO(Label label){
         LabelVO vo = BeanUtil.create(label,new LabelVO());
-        if (label.getOperator()!=null){
+        if (label.getOperator()!=null && !label.getOperator().equals("")){
             List<String> opratorList = StringToList(label.getOperator());
             List<OperatorDetail> opStList  = new ArrayList<>();
             for (String operator : opratorList){
@@ -53,6 +85,11 @@ public class ChannelUtil  {
         if (label.getRightOperand()!=null && !label.getRightOperand().equals("")){
             valueList = StringToList(label.getRightOperand());
         }
+        if (label.getScope().equals(0)){
+            vo.setScope("自有标签");
+        }else {
+            vo.setScope("大数据标签");
+        }
         vo.setValueList(valueList);
         return vo;
     }
@@ -68,16 +105,17 @@ public class ChannelUtil  {
     }
 
     public static String getRandomStr(int length) {
-        char[] chars = "23456789ABCDEFGHJKMNPQRSTUVWXYZ".toCharArray();
+        char[] chars = "23456789".toCharArray();
         Random r = new Random(System.currentTimeMillis());
         String string = "";
 
         for(int i = 0; i < length; ++i) {
-            string = string + chars[r.nextInt(31)];
+            string = string + chars[r.nextInt(8)];
         }
 
         return string;
     }
+
 
     public static List<String> StringToList(String var1) {
         String[] array = var1.split(",");

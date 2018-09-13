@@ -64,7 +64,7 @@
     </select>
 
     <select id="listParamsByKey" resultType="Map">
-        select PARAM_NAME as name, PARAM_VALUE value
+        select PARAM_NAME as label, PARAM_VALUE value
         from sys_params
         where PARAM_KEY = #{paramKey,jdbcType=VARCHAR}
     </select>
@@ -74,7 +74,7 @@
         PARAM_KEY, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
         from sys_params
         where PARAM_NAME = #{key,jdbcType=VARCHAR}
-        and PARAM_KEY = #{keyWords,jdbcType=VARCHAR}
+        and PARAM_KEY = #{keyWord,jdbcType=VARCHAR}
     </select>
 
     <select id="getParamsByValue" resultType="Map">
@@ -82,9 +82,16 @@
         PARAM_KEY, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
         from sys_params
         where PARAM_VALUE = #{value,jdbcType=VARCHAR}
-        and PARAM_KEY = #{keyWords,jdbcType=VARCHAR}
+        and PARAM_KEY = #{keyWord,jdbcType=VARCHAR}
     </select>
 
+    <select id="findParamsByValue" resultMap="BaseResultMap">
+        select PARAM_ID, PARAM_NAME, PARAM_VALUE, CONFIG_TYPE, MODIFY_FLAG, DESCRIPTION,
+        PARAM_KEY, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
+        from sys_params
+        where PARAM_VALUE = #{value,jdbcType=VARCHAR}
+        and PARAM_KEY = #{keyWord,jdbcType=VARCHAR}
+    </select>
 
     <select id="listParamsByKeyForCampaign" resultMap="BaseResultMap">
         select PARAM_ID, PARAM_NAME, PARAM_VALUE, CONFIG_TYPE, MODIFY_FLAG, DESCRIPTION,

@@ -6,10 +6,8 @@ import com.zjtelcom.cpct.bean.RespInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.domain.channel.*;
-import com.zjtelcom.cpct.dto.channel.LabelAddVO;
-import com.zjtelcom.cpct.dto.channel.LabelGrpVO;
-import com.zjtelcom.cpct.dto.channel.LabelVO;
-import com.zjtelcom.cpct.dto.channel.LabelValueVO;
+import com.zjtelcom.cpct.dto.channel.*;
+import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.LabelService;
 import com.zjtelcom.cpct.util.BeanUtil;
@@ -34,6 +32,39 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     @Autowired
     private InjectionLabelGrpMbrMapper labelGrpMbrMapper;
 
+    /**
+     *共享
+     * @param userId
+     * @param labelId
+     * @return
+     */
+    @Override
+    public Map<String, Object> shared(Long userId, Long labelId) {
+        Map<String,Object> result = new HashMap<>();
+        Label label = labelMapper.selectByPrimaryKey(labelId);
+        if (label==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","标签信息不存在");
+            return result;
+        }
+        if (label.getIsShared().equals(1)){
+            label.setIsShared(0);
+            label.setUpdateDate(new Date());
+            label.setUpdateStaff(userId);
+            labelMapper.updateByPrimaryKey(label);
+            result.put("resultCode",CODE_SUCCESS);
+            result.put("resultMsg","分享成功");
+            return result;
+        }else {
+            label.setIsShared(1);
+            label.setUpdateDate(new Date());
+            label.setUpdateStaff(userId);
+            labelMapper.updateByPrimaryKey(label);
+            result.put("resultCode",CODE_SUCCESS);
+            result.put("resultMsg","取消分享成功");
+            return result;
+        }
+    }
 
     @Override
     public Map<String, Object> getLabelListByParam(Long userId, Map<String, Object> params) {
@@ -105,28 +136,50 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","标签已存在");
             return result;
-        }   Label label = BeanUtil.create(addVO,new Label());
-            label.setCreateDate(new Date());
-            label.setUpdateDate(new Date());
-            label.setCreateStaff(userId);
-            label.setUpdateStaff(userId);
-            label.setStatusCd("1000");
-            labelMapper.insert(label);
+        }
+        Label label = BeanUtil.create(addVO,new Label());
+        operatorValodate(label, addVO.getOperatorList());
+        label.setScope(0);
+        label.setLabelType("1000");
+        //todo 系统添加待确认
+        label.setLabelDataType("1000");
+        label.setLabelValueType("1000");
+
+        label.setCreateDate(new Date());
+        label.setUpdateDate(new Date());
+        label.setCreateStaff(userId);
+        label.setUpdateStaff(userId);
+        label.setStatusCd("1000");
+        labelMapper.insert(label);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
         return result;
     }
 
+    private void operatorValodate(Label label, List<String> operatorList) {
+        if (operatorList != null) {
+            List<Integer> opValueList = new ArrayList<>();
+            for (String st : operatorList) {
+                Operator op = Operator.getOperator(st);
+                if (op != null) {
+                    opValueList.add(op.getValue());
+                }
+            }
+            label.setOperator(ChannelUtil.List2String(opValueList));
+        }
+    }
+
     @Override
-    public Map<String,Object> editLabel(Long userId, Label editVO) {
+    public Map<String,Object> editLabel(Long userId, LabelEditVO editVO) {
         Map<String,Object> result = new HashMap<>();
-        Label label = labelMapper.selectByPrimaryKey(editVO.getInjectionLabelId());
+        Label label = labelMapper.selectByPrimaryKey(editVO.getLabelId());
         if (label==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","标签信息不存在");
             return result;
         }
         BeanUtil.copy(editVO,label);
+        operatorValodate(label, editVO.getOperatorList());
         label.setUpdateDate(new Date());
         label.setUpdateStaff(userId);
         labelMapper.updateByPrimaryKey(label);
@@ -144,6 +197,11 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             result.put("resultMsg","标签信息不存在");
             return result;
         }
+        if (label.getScope().equals(1)){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","大数据标签不能删除");
+            return result;
+        }
         labelMapper.deleteByPrimaryKey(labelId);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
@@ -151,25 +209,17 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     }
 
     @Override
-    public Map<String,Object> getLabelList(Long userId, Map<String, Object> params, Integer page, Integer pageSize) {
+    public Map<String,Object> getLabelList(Long userId, String labelName, String labelCode, Integer scope, String conditionType, String fitDomain, Integer page, Integer pageSize) {
         Map<String,Object> result = new HashMap<>();
         List<LabelVO> voList = new ArrayList<>();
         List<Label> labelList = new ArrayList<>();
-            String labelName = null;
-            String fitDomain = null;
-            if (params.get("labelName")!=null){
-                labelName = params.get("labelName").toString();
-            }
-            if (params.get("fitDomain")!=null){
-                fitDomain = params.get("fitDomain").toString();
-            }
-            PageHelper.startPage(page,pageSize);
-            labelList = labelMapper.findByParam(labelName,fitDomain);
-            Page pageInfo = new Page(new PageInfo(labelList));
-            for (Label label : labelList){
-                LabelVO vo = ChannelUtil.map2LabelVO(label);
-                voList.add(vo);
-            }
+        PageHelper.startPage(page,pageSize);
+        labelList = labelMapper.findLabelList(labelName,fitDomain,labelCode,scope,conditionType);
+        Page pageInfo = new Page(new PageInfo(labelList));
+        for (Label label : labelList){
+            LabelVO vo = ChannelUtil.map2LabelVO(label);
+            voList.add(vo);
+        }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",voList);
         result.put("page",pageInfo);

@@ -103,6 +103,7 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
             String scriptName = null;
             Date createTime = null;
             Date updateTime = null;
+            String scriptType = null;
             if (req.getParams().get("scriptName")!=null){
                 scriptName = req.getParams().get("scriptName").toString();
             }
@@ -112,8 +113,11 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
             if (req.getParams().get("updateTime")!=null){
                 updateTime = new Date(Long.valueOf(req.getParams().get("updateTime").toString()));
             }
+            if (req.getParams().get("scriptType")!=null){
+                scriptType = req.getParams().get("scriptType").toString();
+            }
             PageHelper.startPage(req.getPage(),req.getPageSize());
-            scriptList = scriptMapper.selectAll(scriptName,createTime,updateTime);
+            scriptList = scriptMapper.selectAll(scriptName,createTime,updateTime,scriptType);
             Page info = new Page(new PageInfo(scriptList));
             for (Script script : scriptList){
                 ScriptVO vo = ChannelUtil.map2ScriptVO(script);

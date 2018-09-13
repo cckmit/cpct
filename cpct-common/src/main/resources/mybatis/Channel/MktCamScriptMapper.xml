@@ -19,7 +19,7 @@
     delete from mkt_cam_script
     where MKT_CAMPAIGN_SCPT_ID = #{mktCampaignScptId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.CamScript">
+  <insert id="insert" useGeneratedKeys="true" keyProperty="mktCampaignScptId" parameterType="com.zjtelcom.cpct.domain.channel.CamScript">
     insert into mkt_cam_script (MKT_CAMPAIGN_SCPT_ID, MKT_CAMPAIGN_ID, EVT_CONTACT_CONF_ID, 
       SCRIPT_DESC, STATUS_CD, STATUS_DATE, 
       CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, 

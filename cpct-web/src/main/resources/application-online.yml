@@ -1,23 +1,66 @@
 #端口配置
 server:
-  port: 8088
+  port: 30321
 
-#数据库相关配置
 spring:
+# 第一数据源
   datasource:
-    url: jdbc:mysql://116.62.129.215:3306/fpc_system?useUnicode=true&characterEncoding=UTF-8&useSSL=true
-    username: yannis
-    password: 123456
     driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://134.96.252.170:30304/cpct_system?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: root
+    password: xc.cpct
+
+# 第二数据源
+  datasource_prd:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://134.96.252.170:30304/cpct_system?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: root
+    password: xc.cpct
+
+#spring:
+#  jta:
+#    enabled: true
+#    service: com.atomikos.icatch.standalone.UserTransactionServiceFactory
+#    max-actives: 200
+#    enable-logging: false
+#    atomikos:
+#      datasource:
+#          unique-resource-name: dataSource
+#          xa-data-source-class-name: com.alibaba.druid.pool.xa.DruidXADataSource
+#          xa-properties:
+#            driverClassName: com.mysql.jdbc.Driver
+#            url: jdbc:mysql://134.96.252.170:30304/cpct_system?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+#            username: root
+#            password: xc.cpct
+#      datasource_prd:
+#          unique-resource-name: datasourcePrd
+#          xa-data-source-class-name: com.alibaba.druid.pool.xa.DruidXADataSource
+#          xa-properties:
+#            driverClassName: com.mysql.jdbc.Driver
+#            url: jdbc:mysql://134.96.252.170:30304/cpct_system?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+#            username: root
+#            password: xc.cpct
+
 
 #redis相关配置
   redis:
-    host: 47.94.168.117
-    port: 6379
-    password: 9bOCHtdJkNZ1hb2e35OmgIrLvGEaBXuT2udRBQNt5VQ
+    host: 134.96.252.170
+    port: 30305
+    password: xc.cpct
     pool:
       max-active: 8
       max-wait: -1
       max-idle: 8
       min-idle: 0
     timeout: 30000
+  #ES
+  elasticsearch:
+      ip: 134.108.3.30
+      port: 9300
+      pool: 5
+      cluster:
+        name: es-cpct
+
+
+
+

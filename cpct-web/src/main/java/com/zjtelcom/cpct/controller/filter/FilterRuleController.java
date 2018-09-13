@@ -4,11 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
+import com.zjtelcom.cpct.dao.user.UserListMapper;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.user.UserList;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.request.filter.FilterRuleReq;
 import com.zjtelcom.cpct.service.filter.FilterRuleService;
+import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -21,9 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Description 规律规则controller
@@ -36,6 +36,29 @@ public class FilterRuleController extends BaseController {
 
     @Autowired
     private FilterRuleService filterRuleService;
+    @Autowired
+    private UserListMapper userListMapper;
+
+
+    /**
+     * 通过过滤标签集合获取标签列表
+     *
+     * @param params
+     * @return
+     */
+    @RequestMapping("/qryFilterRuleByIdList")
+    @CrossOrigin
+    public String qryFilterRuleByIdList(@RequestBody Map<String, Object> params) {
+        Map<String, Object> filterRuleListMap = new HashMap<>();
+        List<Integer> filterRuleIdList = (List<Integer>) params.get("filterRuleIdList");
+        try {
+            filterRuleListMap = filterRuleService.getFilterRule(filterRuleIdList);
+        } catch (Exception e) {
+            logger.error("[op:FilterRuleController] fail to get filterRuleIdList by filterRuleIdList = {}! Exception: ", JSONArray.toJSON(filterRuleIdList), e);
+            return JSON.toJSONString(filterRuleListMap);
+        }
+        return JSON.toJSONString(filterRuleListMap);
+    }
 
     /**
      * 查询过滤规则列表(含分页)

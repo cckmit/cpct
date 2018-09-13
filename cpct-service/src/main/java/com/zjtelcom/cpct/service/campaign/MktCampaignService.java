@@ -28,6 +28,10 @@ public interface MktCampaignService {
 
     Map<String,Object> qryMktCampaignListPage (String mktCampaignName, String statusCd, String tiggerType, String mktCampaignType, Integer page, Integer pageSize);
 
+    Map<String,Object> getCampaignList (String mktCampaignName,String mktCampaignType,Long eventId);
+
+    Map<String,Object> getCampaignList4EventScene (String mktCampaignName);
+
     Map<String,Object> createMktCampaign(MktCampaignVO mktCampaignVO) throws Exception;
 
     Map<String,Object> delMktCampaign(Long mktCampaignId) throws Exception;
@@ -39,5 +43,7 @@ public interface MktCampaignService {
     Map<String,Object> changeMktCampaignStatus(Long mktCampaignId, String statusCd) throws Exception;
 
 //    Map<String,Object> qryMktCampaignList (MktCampaignVO mktCampaignVO);
+
+    Map<String, Object> publishMktCampaign(Long mktCampaignId) throws Exception;
 
 }

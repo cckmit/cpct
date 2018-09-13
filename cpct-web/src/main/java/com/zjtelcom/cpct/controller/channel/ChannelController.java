@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
@@ -18,6 +19,45 @@ public class ChannelController extends BaseController {
     @Autowired
     private ChannelService channelService;
 
+
+    @PostMapping("listAllChildChannelList")
+    @CrossOrigin
+    public Map<String, Object> listAllChildChannelList() {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = channelService.listAllChildChannelList();
+        } catch (Exception e) {
+            logger.error("[op:ChannelController] fail to listChannelByIdList",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to listChannelByIdList");
+            return result;
+        }
+        return result;
+    }
+
+
+    /**
+     *活动页--获取渠道
+     * @param param
+     * @return
+     */
+    @PostMapping("listChannelByIdList")
+    @CrossOrigin
+    public Map<String, Object> listChannelByIdList(@RequestBody HashMap<String,List<Long>> param ) {
+        Long userId = UserUtil.loginId();
+        Map<String,Object> result = new HashMap<>();
+        try {
+            List<Long> idList = param.get("idList");
+            result = channelService.listChannelByIdList(idList);
+        } catch (Exception e) {
+            logger.error("[op:ChannelController] fail to listChannelByIdList",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to listChannelByIdList");
+            return result;
+        }
+        return result;
+    }
 
     /**
      * 渠道管理渠道树
@@ -245,12 +285,13 @@ public class ChannelController extends BaseController {
     /**
      * 获取渠道详情
      */
-    @GetMapping("getChannelDetail")
+    @PostMapping("getChannelDetail")
     @CrossOrigin
-    public Map<String,Object> getChannelDetail(Long channelId) {
+    public Map<String,Object> getChannelDetail(@RequestBody HashMap<String,Long> param) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
+            Long channelId = param.get("channelId");
             result = channelService.getChannelDetail(userId,channelId);
         } catch (Exception e) {
             logger.error("[op:ChannelController] fail to deleteChannel",e);

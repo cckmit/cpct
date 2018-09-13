@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * 痛痒点
+ */
 public class VerbalVO implements Serializable {
 
     private Long verbalId;
@@ -18,8 +21,11 @@ public class VerbalVO implements Serializable {
 
     private String channelName;
 
-    private List<VerbalConditionVO> conditionList;
+    private Long channelParentId;
 
+    private String channelParentName;
+
+    private List<VerbalConditionVO> conditionList;
 
     private String statusCd;
 
@@ -29,6 +35,22 @@ public class VerbalVO implements Serializable {
 
     private String remark;
 
+
+    public Long getChannelParentId() {
+        return channelParentId;
+    }
+
+    public void setChannelParentId(Long channelParentId) {
+        this.channelParentId = channelParentId;
+    }
+
+    public String getChannelParentName() {
+        return channelParentName;
+    }
+
+    public void setChannelParentName(String channelParentName) {
+        this.channelParentName = channelParentName;
+    }
 
     public String getChannelName() {
         return channelName;

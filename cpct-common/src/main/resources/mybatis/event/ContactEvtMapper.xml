@@ -38,6 +38,7 @@
         e.EVENT_NBR contactEvtCode,
         e.EVENT_NAME contactEvtName,
         e.EVENT_DESC contactEvtDesc,
+        e.MKT_CAMPAIGN_TYPE mktCampaignType,
         t.EVT_TYPE_NAME contactEvtTypeName,
         e.STATUS_CD statusCd
         from event e
@@ -49,6 +50,7 @@
         <if test="contactEvtTypeId != null and contactEvtTypeId != 0">
             and e.EVT_TYPE_ID = #{contactEvtTypeId}
         </if>
+        ORDER BY e.CREATE_DATE DESC
     </select>
 
     <!--查询方法(只设置id与name两个查询条件)-->

@@ -1,7 +1,7 @@
 package com.zjtelcom.cpct.dto.strategy;
 
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
-import com.zjtelcom.cpct.dto.channel.VerbalVO;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 
 import java.util.List;
 
@@ -35,11 +35,10 @@ public class MktStrategyConfRule {
     private List<MktCamChlConf> mktCamChlConfList;
 
     /**
-     * 过滤规则配置Id
+     * 二次协同渠道结果集合
      */
-    private Long ruleConfId;
+    private List<MktCamChlResult> mktCamChlResultList;
 
-    private   List<VerbalVO> verbalVOList;
 
     public Long getMktStrategyConfRuleId() {
         return mktStrategyConfRuleId;
@@ -73,14 +72,6 @@ public class MktStrategyConfRule {
         this.mktCamChlConfList = mktCamChlConfList;
     }
 
-    public Long getRuleConfId() {
-        return ruleConfId;
-    }
-
-    public void setRuleConfId(Long ruleConfId) {
-        this.ruleConfId = ruleConfId;
-    }
-
     public String getMktStrategyConfRuleName() {
         return mktStrategyConfRuleName;
     }
@@ -89,11 +80,11 @@ public class MktStrategyConfRule {
         this.mktStrategyConfRuleName = mktStrategyConfRuleName;
     }
 
-    public List<VerbalVO> getVerbalVOList() {
-        return verbalVOList;
+    public List<MktCamChlResult> getMktCamChlResultList() {
+        return mktCamChlResultList;
     }
 
-    public void setVerbalVOList(List<VerbalVO> verbalVOList) {
-        this.verbalVOList = verbalVOList;
+    public void setMktCamChlResultList(List<MktCamChlResult> mktCamChlResultList) {
+        this.mktCamChlResultList = mktCamChlResultList;
     }
 }

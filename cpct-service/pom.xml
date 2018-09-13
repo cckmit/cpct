@@ -30,6 +30,11 @@
             <artifactId>cpct-cache</artifactId>
         </dependency>
 
+        <!--<dependency>-->
+            <!--<groupId>com.zjtelcom.cpct</groupId>-->
+            <!--<artifactId>cpct-dubbo-server</artifactId>-->
+        <!--</dependency>-->
+
         <!-- PageHelper 分页插件 -->
         <dependency>
             <groupId>com.github.pagehelper</groupId>
@@ -50,6 +55,12 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zjtelcom.cpct</groupId>
+            <artifactId>cpct-es</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
 
     </dependencies>

@@ -13,14 +13,19 @@ import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
+import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateConditionMapper;
+import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.domain.grouping.TarGrpConditionDO;
+import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateConditionDO;
+import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
+import com.zjtelcom.cpct.dto.grouping.TarGrpTemConditionVO;
 import com.zjtelcom.cpct.dto.system.SystemParam;
 import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.model.EagleDatabaseConfig;
@@ -29,10 +34,7 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.EagleDatabaseConfCache;
 import com.zjtelcom.cpct.service.TryCalcService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
-import com.zjtelcom.cpct.util.CopyPropertiesUtil;
-import com.zjtelcom.cpct.util.DateUtil;
-import com.zjtelcom.cpct.util.SqlUtil;
-import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct.validator.ValidateResult;
 import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
 import com.zjtelcom.cpct.vo.grouping.TarGrpVO;
@@ -48,6 +50,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+
 /**
  * @Description 目标分群serviceImpl
  * @Author pengy
@@ -57,6 +62,10 @@ import java.util.Map;
 @Transactional
 public class TarGrpServiceImpl extends BaseService implements TarGrpService {
 
+    @Autowired
+    private TarGrpTemplateMapper tarGrpTemplateMapper;
+    @Autowired
+    private TarGrpTemplateConditionMapper tarGrpTemplateConditionMapper;
     @Autowired
     private TarGrpMapper tarGrpMapper;
     @Autowired
@@ -74,12 +83,62 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     @Autowired
     private InjectionLabelValueMapper injectionLabelValueMapper;
 
+
+    /**
+     * 复制客户分群 返回
+     * @param tarGrpId
+     * @return
+     */
+    @Override
+    public Map<String, Object> copyTarGrp(Long tarGrpId,boolean isCopy) {
+        Map<String,Object> result = new HashMap<>();
+        TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpId);
+        if (tarGrp==null){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "请选择下拉框运算类型");
+            return result;
+        }
+        List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
+        TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
+        detail.setTarGrpConditions(conditionList);
+        result = createTarGrp(detail,isCopy);
+        return result;
+    }
+
+
+    /**
+     * 模板创建客户分群
+     * @param templateId
+     * @return
+     */
+    @Override
+    public Map<String, Object> createTarGrpByTemplateId(Long templateId) {
+        Map<String, Object> result = new HashMap<>();
+        TarGrpTemplateDO template = tarGrpTemplateMapper.selectByPrimaryKey(templateId);
+        if (template==null){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "模板不存在");
+            return result;
+        }
+        List<TarGrpTemplateConditionDO> conditionDOList = tarGrpTemplateConditionMapper.selectByTarGrpTemplateId(templateId);
+
+        TarGrpDetail addVO = BeanUtil.create(template,new TarGrpDetail());
+        List<TarGrpCondition> conditionAdd = new ArrayList<>();
+        for (TarGrpTemplateConditionDO conditionDO : conditionDOList){
+            TarGrpCondition con = BeanUtil.create(conditionDO,new TarGrpCondition());
+            conditionAdd.add(con);
+        }
+        addVO.setTarGrpConditions(conditionAdd);
+        return createTarGrp(addVO,false);
+    }
+
+
     /**
      * 新增目标分群
      */
     @Transactional(readOnly = false)
     @Override
-    public Map<String, Object> createTarGrp(TarGrpDetail tarGrpDetail) {
+    public Map<String, Object> createTarGrp(TarGrpDetail tarGrpDetail,boolean isCopy) {
         TarGrp tarGrp = new TarGrp();
         Map<String, Object> maps = new HashMap<>();
         //插入客户分群记录
@@ -89,10 +148,19 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         tarGrp.setStatusDate(DateUtil.getCurrentTime());
         tarGrp.setUpdateStaff(UserUtil.loginId());
         tarGrp.setCreateStaff(UserUtil.loginId());
-        tarGrp.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+        if (isCopy){
+            tarGrp.setStatusCd("2000");
+        }else {
+            tarGrp.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+        }
         tarGrpMapper.createTarGrp(tarGrp);
         List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
         for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
+            if (tarGrpCondition.getOperType()==null || tarGrpCondition.getOperType().equals("")){
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg", "请选择下拉框运算类型");
+                return maps;
+            }
             tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
             tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
             tarGrpCondition.setTarGrpId(tarGrp.getTarGrpId());
@@ -138,7 +206,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             mktCamGrpRulMapper.updateByPrimaryKey(mktCamGrpRul);
 
         } catch (Exception e) {
-            maps.put("resultCode", CommonConstant.CODE_FAIL);
+            maps.put("resultCode", CODE_FAIL);
             maps.put("resultMsg", ErrorCode.SAVE_TAR_GRP_FAILURE.getErrorMsg());
             maps.put("tarGrp", StringUtils.EMPTY);
             logger.error("[op:TarGrpServiceImpl] fail to saveTagNumFetch ", e);
@@ -159,7 +227,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         try {
             tarGrpConditionMapper.deleteByPrimaryKey(conditionId);
         } catch (Exception e) {
-            mapsT.put("resultCode", CommonConstant.CODE_FAIL);
+            mapsT.put("resultCode", CODE_FAIL);
             mapsT.put("resultMsg", ErrorCode.DEL_TAR_GRP_CONDITION_FAILURE.getErrorMsg());
             mapsT.put("resultObject", StringUtils.EMPTY);
             logger.error("[op:TarGrpServiceImpl] fail to delTarGrpCondition ", e);
@@ -201,6 +269,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
             TarGrpCondition tarGrpCondition1 = tarGrpConditionMapper.selectByPrimaryKey(tarGrpCondition.getConditionId());
             if (tarGrpCondition1 == null) {
+                if (tarGrpCondition.getOperType()==null || tarGrpCondition.getOperType().equals("")){
+                    maps.put("resultCode", CODE_FAIL);
+                    maps.put("resultMsg", "请选择下拉框运算类型");
+                    return maps;
+                }
                 tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
                 tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
                 tarGrpCondition.setTarGrpId(tarGrp.getTarGrpId());
@@ -284,17 +357,22 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             CopyPropertiesUtil.copyBean2Bean(tarGrpConditionVO, tarGrpCondition);
             //塞入左参中文名
             Label label = injectionLabelMapper.selectByPrimaryKey(Long.valueOf(tarGrpConditionVO.getLeftParam()));
+            if (label==null){
+                continue;
+            }
             tarGrpConditionVO.setLeftParamName(label.getInjectionLabelName());
             //塞入领域
             FitDomain fitDomain = null;
             if (label.getFitDomain() != null) {
                 fitDomain = FitDomain.getFitDomain(Integer.parseInt(label.getFitDomain()));
+                tarGrpConditionVO.setFitDomainId(Long.valueOf(fitDomain.getValue()));
+                tarGrpConditionVO.setFitDomainName(fitDomain.getDescription());
             }
-            tarGrpConditionVO.setFitDomainId(Long.valueOf(fitDomain.getValue()));
-            tarGrpConditionVO.setFitDomainName(fitDomain.getDescription());
             //将操作符转为中文
-            Operator op = Operator.getOperator(Integer.parseInt(tarGrpConditionVO.getOperType()));
-            tarGrpConditionVO.setOperTypeName(op.getDescription());
+            if (tarGrpConditionVO.getOperType()!=null && !tarGrpConditionVO.getOperType().equals("")){
+                Operator op = Operator.getOperator(Integer.parseInt(tarGrpConditionVO.getOperType()));
+                tarGrpConditionVO.setOperTypeName(op.getDescription());
+            }
             //todo 通过左参id
             String operators = label.getOperator();
             String[] operator = operators.split(",");
@@ -384,9 +462,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         Map<String, String> result = new HashMap<String, String>(2);
 
         try {
+            //获取策略列表
             List<Map<String, Object>> policyList = calcReqModel.getPolicyList();
-//            ValidateResult validateResult = tryCalcService.validate(serialNum, calcReqModel);
-            ValidateResult validateResult = new ValidateResult();
+            //拼装sql前验证
+            ValidateResult validateResult = tryCalcService.validate(serialNum, calcReqModel);
+//            ValidateResult validateResult = new ValidateResult();
             validateResult.setResult(true);
             validateResult.setMessage("111");
             validateResult.setCode("111");

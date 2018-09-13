@@ -4,6 +4,7 @@ import com.zjtelcom.cpct.BaseEntity;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Author:sunpeng
@@ -66,6 +67,32 @@ public class MktCampaign extends BaseEntity {
      * 营销活动描述
      */
     private String mktCampaignDesc;
+
+    /**
+     * 试运算展示列
+     */
+    private Long calcDisplay;
+
+    /**
+     * isale展示列
+     */
+    private Long isaleDisplay;
+
+    /**
+     * 创建渠道
+     */
+    private String createChannel;
+
+    /**
+     * 二次营销中的上次活动的Id
+     */
+    private Long preMktCampaignId;
+
+    /**
+     * 所属地市名称
+     */
+    private String landName;
+
 
     public Long getMktCampaignId() {
         return mktCampaignId;
@@ -153,5 +180,45 @@ public class MktCampaign extends BaseEntity {
 
     public void setMktCampaignDesc(String mktCampaignDesc) {
         this.mktCampaignDesc = mktCampaignDesc;
+    }
+
+    public Long getCalcDisplay() {
+        return calcDisplay;
+    }
+
+    public void setCalcDisplay(Long calcDisplay) {
+        this.calcDisplay = calcDisplay;
+    }
+
+    public Long getIsaleDisplay() {
+        return isaleDisplay;
+    }
+
+    public void setIsaleDisplay(Long isaleDisplay) {
+        this.isaleDisplay = isaleDisplay;
+    }
+
+    public String getCreateChannel() {
+        return createChannel;
+    }
+
+    public void setCreateChannel(String createChannel) {
+        this.createChannel = createChannel;
+    }
+
+    public Long getPreMktCampaignId() {
+        return preMktCampaignId;
+    }
+
+    public void setPreMktCampaignId(Long preMktCampaignId) {
+        this.preMktCampaignId = preMktCampaignId;
+    }
+
+    public String getLandName() {
+        return landName;
+    }
+
+    public void setLandName(String landName) {
+        this.landName = landName;
     }
 }

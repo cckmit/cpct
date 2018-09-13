@@ -6,6 +6,7 @@ import com.zjtelcom.cpct.dto.event.EventSceneTypeDTO;
 import com.zjtelcom.cpct.dto.event.EventTypeDTO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description 事件场景目录service
@@ -21,7 +22,7 @@ public interface EventSceneTypeService {
 
     EventSceneTypeDTO getEventSceneTypeDTOById(Long evtSceneTypeId);
 
-    void updateEventSceneType(EventSceneTypeDO eventSceneTypeDO);
+    Map<String, Object> updateEventSceneType(EventSceneTypeDO eventSceneTypeDO);
 
-    void delEventSceneType(Long evtSceneTypeId);
+    Map<String, Object> delEventSceneType(Long evtSceneTypeId);
 }

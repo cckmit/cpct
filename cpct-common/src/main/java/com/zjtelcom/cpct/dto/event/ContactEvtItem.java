@@ -21,6 +21,33 @@ public class ContactEvtItem extends BaseEntity {
     private String isNullable;//记录事件采集项的内容是否可空。1是 0否
     private Integer evtItemLength;//记录事件采集项值的长度
     private Integer standardSort;//记录事件采集项的标准化的顺序
+    private String isMainParam;//是否是主参
+    private String isLabel;//是否为标签
+    private String evtItemDesc;//采集项描述
+
+    public String getIsLabel() {
+        return isLabel;
+    }
+
+    public void setIsLabel(String isLabel) {
+        this.isLabel = isLabel;
+    }
+
+    public String getIsMainParam() {
+        return isMainParam;
+    }
+
+    public void setIsMainParam(String isMainParam) {
+        this.isMainParam = isMainParam;
+    }
+
+    public String getEvtItemDesc() {
+        return evtItemDesc;
+    }
+
+    public void setEvtItemDesc(String evtItemDesc) {
+        this.evtItemDesc = evtItemDesc;
+    }
 
     public String getActType() {
         return actType;

@@ -21,4 +21,14 @@ public interface SysAreaService {
 
     Map<String, Object> listSysArea();
 
+    Map<String, Object> listSysCity();
+
+    Map<String, Object> listAllAreaTrea();
+
+    Map<String, Object> getCityTable(List<Integer> areaIds);
+
+    Map<String, Object> saveCityTORedis();
+
+    Map<String, Object> listCityByParentId(Integer parentCityId);
+
 }

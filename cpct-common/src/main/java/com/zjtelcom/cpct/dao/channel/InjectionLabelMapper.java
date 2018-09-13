@@ -25,7 +25,11 @@ public interface InjectionLabelMapper {
 
     List<Label> selectAll();
 
+    List<Label> findLabelList(@Param("labelName")String labelName,@Param("fitDomain")String fitDomain,@Param("labelCode")String labelCode,@Param("scope")Integer scope,@Param("conditionType")String conditionType);
+
     List<Label> findByParam(@Param("labelName")String labelName,@Param("fitDomain")String fitDomain);
+
+    List<Label> findLabelListByCatalogId(@Param("catalogId")Long catalogId);
 
     int updateByPrimaryKey(Label record);
 
@@ -35,7 +39,7 @@ public interface InjectionLabelMapper {
 
     List<Label> queryTriggerByLeftOpers(@Param("record") List<Map<String, String>> record);
 
-
+    List<Label> queryLabelsExceptSelected(@Param("injectionLabelIds") List<Long> injectionLabelIds,@Param("labelName")String labelName);
 
 
 }

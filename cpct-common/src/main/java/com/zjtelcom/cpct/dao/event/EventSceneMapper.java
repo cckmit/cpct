@@ -12,13 +12,15 @@ import java.util.List;
 public interface EventSceneMapper {
     int deleteByPrimaryKey(Long eventSceneId);
 
-    int insert(EventSceneDO record);
+    int insert(EventScene record);
 
-    EventSceneDO selectByPrimaryKey(Long eventSceneId);
+    EventScene selectByPrimaryKey(Long eventSceneId);
 
     List<EventSceneDO> selectAll();
 
     int updateByPrimaryKey(EventScene record);
+
+    int updateById(EventScene record);
 
     List<EventScene> qryEventSceneList(QryEventSceneListReq qryEventSceneListReq);
 
