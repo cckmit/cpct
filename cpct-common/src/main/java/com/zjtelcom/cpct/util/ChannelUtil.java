@@ -1,12 +1,16 @@
 package com.zjtelcom.cpct.util;
 
+import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dto.campaign.CampaignVO;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.Operator;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -14,6 +18,7 @@ import java.util.UUID;
 
 @Component
 public class ChannelUtil  {
+
 
     public static String getUUID(){
         UUID uuid=UUID.randomUUID();
@@ -76,7 +81,8 @@ public class ChannelUtil  {
         CamScriptVO vo = BeanUtil.create(script,new CamScriptVO());
         return vo;
     }
-    public static LabelVO map2LabelVO(Label label){
+
+    public static LabelVO map2LabelVO(Label label,List<LabelValue> labelValueList){
         LabelVO vo = BeanUtil.create(label,new LabelVO());
         if (label.getOperator()!=null && !label.getOperator().equals("")){
             List<String> opratorList = StringToList(label.getOperator());
@@ -93,8 +99,8 @@ public class ChannelUtil  {
             vo.setOperatorList(opStList);
         }
         List<String> valueList = new ArrayList<>();
-        if (label.getRightOperand()!=null && !label.getRightOperand().equals("")){
-            valueList = StringToList(label.getRightOperand());
+        if (labelValueList!=null && !labelValueList.isEmpty()){
+            valueList = valueList2StList(labelValueList);
         }
         if (label.getScope().equals(0)){
             vo.setScope("自有标签");
@@ -126,6 +132,18 @@ public class ChannelUtil  {
 
         return string;
     }
+
+
+    public static List<String> valueList2StList(List<LabelValue> valueList){
+        List<String> stringList = new ArrayList<>();
+        for (LabelValue labelValue : valueList){
+            if (labelValue.getLabelValue()!=null){
+                stringList.add(labelValue.getLabelValue());
+            }
+        }
+        return stringList;
+    }
+
 
 
     public static List<String> StringToList(String var1) {

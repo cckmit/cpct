@@ -3,8 +3,10 @@ package com.zjtelcom.cpct.service.impl.channel;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelCatalogMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelCatalog;
+import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.LabelCatalogService;
@@ -28,6 +30,8 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
     private InjectionLabelMapper labelMapper;
     @Autowired
     private InjectionLabelCatalogMapper labelCatalogMapper;
+    @Autowired
+    private InjectionLabelValueMapper labelValueMapper;
 
 
     @Override
@@ -123,7 +127,8 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
                         if (label.getCatalogId()==null || !label.getCatalogId().equals(third.getCatalogId())){
                             continue;
                         }
-                        LabelVO vo = ChannelUtil.map2LabelVO(label);
+                        List<LabelValue> valueList = labelValueMapper.selectByLabelId(label.getInjectionLabelId());
+                        LabelVO vo = ChannelUtil.map2LabelVO(label,valueList);
                         labelVOList.add(vo);
                     }
                     thirdTree.setChildren(labelVOList);

@@ -83,7 +83,8 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             }
             labelList = labelMapper.findByParam(labelName,fitDomain);
             for (Label label : labelList){
-                LabelVO vo = ChannelUtil.map2LabelVO(label);
+                List<LabelValue> valueList = labelValueMapper.selectByLabelId(label.getInjectionLabelId());
+                LabelVO vo = ChannelUtil.map2LabelVO(label,valueList);
                 voList.add(vo);
             }
         }catch (Exception e){
@@ -218,7 +219,8 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         labelList = labelMapper.findLabelList(labelName,fitDomain,labelCode,scope,conditionType);
         Page pageInfo = new Page(new PageInfo(labelList));
         for (Label label : labelList){
-            LabelVO vo = ChannelUtil.map2LabelVO(label);
+            List<LabelValue> valueList = labelValueMapper.selectByLabelId(label.getInjectionLabelId());
+            LabelVO vo = ChannelUtil.map2LabelVO(label,valueList);
             voList.add(vo);
         }
         result.put("resultCode",CODE_SUCCESS);
@@ -233,7 +235,8 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         LabelVO vo = new LabelVO();
         try {
             Label label = labelMapper.selectByPrimaryKey(labelId);
-            vo = ChannelUtil.map2LabelVO(label);
+            List<LabelValue> valueList = labelValueMapper.selectByLabelId(label.getInjectionLabelId());
+            vo = ChannelUtil.map2LabelVO(label,valueList);
         }catch (Exception e){
             e.printStackTrace();
             logger.error("[op:LabelServiceImpl] fail to getLabelDetail ", e);
@@ -443,7 +446,8 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         for (LabelGrpMbr grpMbr : lgmList){
             Label label = labelMapper.selectByPrimaryKey(grpMbr.getInjectionLabelId());
             if (label!=null){
-                LabelVO labelVO = ChannelUtil.map2LabelVO(label);
+                List<LabelValue> valueList = labelValueMapper.selectByLabelId(label.getInjectionLabelId());
+                LabelVO labelVO = ChannelUtil.map2LabelVO(label,valueList);
                 labelVOList.add(labelVO);
             }
         }

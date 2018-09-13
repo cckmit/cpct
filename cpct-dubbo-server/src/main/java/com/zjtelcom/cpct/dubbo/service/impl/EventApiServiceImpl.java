@@ -100,6 +100,7 @@ public class EventApiServiceImpl implements EventApiService {
     private ContactEvtItemMapper contactEvtItemMapper;  // 事件采集项
 
 
+
     @Override
     @SuppressWarnings("unchecked")
     public Map deal(Map<String, Object> map) {
