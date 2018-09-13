@@ -7,7 +7,7 @@
         <result column="A_MKT_CAMPAIGN_ID" jdbcType="DECIMAL" property="aMktCampaignId"/>
         <result column="Z_MKT_CAMPAIGN_ID" jdbcType="DECIMAL" property="zMktCampaignId"/>
         <result column="EFF_DATE" jdbcType="TIMESTAMP" property="effDate"/>
-        <result column="EXP_DATE" jdbcType="TIMESTAMP" property="expDate"/>
+        <result column="EXP_DATE" jdbcselectByAmktCampaignIdType="TIMESTAMP" property="expDate"/>
         <result column="APPLY_REGION_ID" jdbcType="DECIMAL" property="applyRegionId"/>
         <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd"/>
         <result column="CREATE_STAFF" jdbcType="DECIMAL" property="createStaff"/>
