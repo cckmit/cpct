@@ -39,8 +39,8 @@ public class PpmProductController extends BaseController  {
     public Map<String, Object> listOfferByCatalogId(@RequestBody HashMap<String,Object> param) {
         Map<String ,Object> result = new HashMap<>();
         try {
-            Integer page = MapUtil.getIntNum(param.get("page"));
-            Integer pageSize = MapUtil.getIntNum(param.get("pageSize"));
+            Integer page = Integer.valueOf(param.get("page").toString());
+            Integer pageSize = Integer.valueOf(param.get("pageSize").toString());
             String productName = MapUtil.getString(param.get("productName"));
             result = catalogService.listOfferByCatalogId(Long.valueOf(param.get("catalogId").toString()),productName,page,pageSize);
         }catch (Exception e){

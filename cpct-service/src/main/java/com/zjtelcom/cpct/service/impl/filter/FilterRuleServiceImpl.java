@@ -4,20 +4,23 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.channel.OfferMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.dao.user.UserListMapper;
+import com.zjtelcom.cpct.domain.channel.Offer;
+import com.zjtelcom.cpct.domain.channel.PpmProduct;
 import com.zjtelcom.cpct.domain.system.SysParams;
+import com.zjtelcom.cpct.dto.channel.OfferDetail;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
+import com.zjtelcom.cpct.dto.filter.FilterRuleAddVO;
 import com.zjtelcom.cpct.dto.filter.FilterRuleVO;
 import com.zjtelcom.cpct.dto.user.UserList;
 import com.zjtelcom.cpct.request.filter.FilterRuleReq;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.filter.FilterRuleService;
-import com.zjtelcom.cpct.util.BeanUtil;
+import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct.util.DateUtil;
-import com.zjtelcom.cpct.util.RedisUtils;
-import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -28,6 +31,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.util.*;
+import java.util.logging.Filter;
+
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 
 /**
  * @Description 规律规则实现类
@@ -46,6 +52,8 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
     private RedisUtils redisUtils;
     @Autowired
     private SysParamsMapper sysParamsMapper;
+    @Autowired
+    private OfferMapper offerMapper;
 
     /**
      * 过滤规则列表（含分页）
@@ -182,9 +190,22 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
     public Map<String, Object> getFilterRule(FilterRule filterRule) {
         Map<String, Object> map = new HashMap<>();
         FilterRule filterRuleT = filterRuleMapper.getFilterRule(filterRule);
+        FilterRuleVO vo = BeanUtil.create(filterRuleT,new FilterRuleVO());
+        if (filterRuleT.getChooseProduct()!=null && !filterRuleT.getChooseProduct().equals("")){
+            List<Long> idList = ChannelUtil.StringToidList(filterRuleT.getChooseProduct());
+            List<OfferDetail> productList = new ArrayList<>();
+            for (Long id : idList){
+                Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(id.toString()));
+                if (offer!=null){
+                    OfferDetail offerDetail = BeanUtil.create(offer,new OfferDetail());
+                    productList.add(offerDetail);
+                }
+            }
+            vo.setProductList(productList);
+        }
         map.put("resultCode", CommonConstant.CODE_SUCCESS);
         map.put("resultMsg", StringUtils.EMPTY);
-        map.put("filterRule", filterRuleT);
+        map.put("filterRule", vo);
         return map;
     }
 
@@ -192,14 +213,16 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
      * 新建过滤规则
      */
     @Override
-    public Map<String, Object> createFilterRule(FilterRule filterRule) {
+    public Map<String, Object> createFilterRule(FilterRuleAddVO addVO) {
         Map<String, Object> maps = new HashMap<>();
+        FilterRule filterRule = BeanUtil.create(addVO,new FilterRule());
         filterRule.setCreateDate(DateUtil.getCurrentTime());
         filterRule.setUpdateDate(DateUtil.getCurrentTime());
         filterRule.setStatusDate(DateUtil.getCurrentTime());
         filterRule.setUpdateStaff(UserUtil.loginId());
         filterRule.setCreateStaff(UserUtil.loginId());
         filterRule.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+        filterRule.setChooseProduct(ChannelUtil.idList2String(addVO.getChooseProduct()));
         //销售品互斥过滤 加labelcode
         if (filterRule.getFilterType().equals("3000")){
             filterRule.setLabelCode("PROM_LIST");
@@ -215,10 +238,18 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
      * 修改过滤规则
      */
     @Override
-    public Map<String, Object> modFilterRule(FilterRule filterRule) {
+    public Map<String, Object> modFilterRule(FilterRuleAddVO editVO) {
         Map<String, Object> maps = new HashMap<>();
+        FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(editVO.getRuleId());
+        if (filterRule==null){
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg", StringUtils.EMPTY);
+            return maps;
+        }
+        BeanUtil.copy(editVO,filterRule);
         filterRule.setUpdateDate(DateUtil.getCurrentTime());
         filterRule.setUpdateStaff(UserUtil.loginId());
+        filterRule.setChooseProduct(ChannelUtil.idList2String(editVO.getChooseProduct()));
         if (filterRule.getFilterType().equals("3000")){
             filterRule.setLabelCode("PROM_LIST");
         }

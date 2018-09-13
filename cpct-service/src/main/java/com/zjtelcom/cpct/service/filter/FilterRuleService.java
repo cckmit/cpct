@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.service.filter;
 
 import com.zjtelcom.cpct.dto.filter.FilterRule;
+import com.zjtelcom.cpct.dto.filter.FilterRuleAddVO;
 import com.zjtelcom.cpct.dto.user.UserList;
 import com.zjtelcom.cpct.request.filter.FilterRuleReq;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,9 +23,9 @@ public interface FilterRuleService {
 
     Map<String,Object> getFilterRule(FilterRule filterRule);
 
-    Map<String,Object> createFilterRule(FilterRule filterRule);
+    Map<String,Object> createFilterRule(FilterRuleAddVO addVO);
 
-    Map<String,Object> modFilterRule(FilterRule filterRule);
+    Map<String,Object> modFilterRule(FilterRuleAddVO editVO);
 
     Map<String,Object> qryFilterRules(FilterRuleReq filterRuleReq);
 

@@ -12,6 +12,7 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.LabelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
+import com.zjtelcom.cpct.util.MapUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -304,24 +305,24 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         Map<String,Object> result = new HashMap<>();
         List<LabelGrp> grpList = new ArrayList<>();
         List<LabelGrpVO> voList = new ArrayList<>();
-        try {
+        Integer page = MapUtil.getIntNum(params.get("page"));
+        Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
             String grpName = null;
             if (params.get("grpName")!=null){
                 grpName = params.get("grpName").toString();
             }
+            PageHelper.startPage(page,pageSize);
             grpList = labelGrpMapper.findByParams(grpName);
+            Page pa = new Page(new PageInfo(grpList));
             for (LabelGrp grp : grpList){
                 LabelGrpVO vo = BeanUtil.create(grp,new LabelGrpVO());
                 List<LabelVO> labelVOList = getLabelVOList(grp.getGrpId());
                 vo.setLabelList(labelVOList);
                 voList.add(vo);
             }
-        }catch (Exception e){
-            e.printStackTrace();
-            logger.error("[op:LabelServiceImpl] fail to getLabelGrpList ", e);
-        }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",voList);
+        result.put("page",pa);
         return result;
     }
 
@@ -329,14 +330,13 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     public Map<String,Object> getLabelGrpDetail(Long userId, Long labelGrpId) {
         Map<String,Object> result = new HashMap<>();
         LabelGrp labelGrp = new LabelGrp();
-        try {
             labelGrp = labelGrpMapper.selectByPrimaryKey(labelGrpId);
-        }catch (Exception e){
-            e.printStackTrace();
-            logger.error("[op:LabelServiceImpl] fail to getLabelGrpDetail ", e);
-        }
+            LabelGrpVO vo = BeanUtil.create(labelGrp,new LabelGrpVO());
+            List<LabelVO> labelVOList = getLabelVOList(labelGrp.getGrpId());
+            vo.setLabelList(labelVOList);
+
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",labelGrp);
+        result.put("resultMsg",vo);
         return result;
     }
 
