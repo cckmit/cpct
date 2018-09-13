@@ -3,13 +3,7 @@ package com.zjtelcom.cpct.controller.synchronize;
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
-import com.zjtelcom.cpct.dto.event.ContactEvt;
-import com.zjtelcom.cpct.service.event.ContactEvtService;
-import com.zjtelcom.cpct.service.synchronize.SynContactEvtService;
-import com.zjtelcom.cpct.service.synchronize.SynContactEvtTypeService;
-import com.zjtelcom.cpct.service.synchronize.SynEventSorceService;
-import com.zjtelcom.cpct.service.synchronize.SynInterfaceCfgService;
-import org.apache.commons.lang.StringUtils;
+import com.zjtelcom.cpct.service.synchronize.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +28,10 @@ public class SynchronizeController extends BaseController {
     private SynEventSorceService synEventSorceService;
     @Autowired
     private SynInterfaceCfgService synInterfaceCfgService;
+    @Autowired
+    private SynEventSceneService synEventSceneService;
+    @Autowired
+    private SynEventSceneTypeService synEventSceneTypeService;
 
 
     /**
@@ -214,6 +212,95 @@ public class SynchronizeController extends BaseController {
         }
         return  JSON.toJSONString(map);
     }
+
+
+    /**
+     * 单个事件场景同步
+     * @param eventSceneId
+     * @return
+     */
+    @PostMapping("singleEventScene")
+    @CrossOrigin
+    public String singleEventScene(@RequestParam(value = "eventSceneId", required = true) Long eventSceneId){
+        logger.info("同步事件场景");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synEventSceneService.synchronizeSingleEventScene(eventSceneId,roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("[op:SynInterfaceCfgServiceImpl] 通过主键同步单个事件目录失败！Exception: ",eventSceneId,e);
+        }
+        return JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 批量事件场景同步
+     * @return
+     */
+    @PostMapping("batchEventScene")
+    @CrossOrigin
+    public String batchEventScene(){
+        //角色权限控制
+        logger.info("批量同步事件场景");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synEventSceneService.synchronizeBatchEventScene(roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("[op:SynContactEvtServiceImpl] 批量同步事件目录失败！Exception: ", e);
+        }
+        return  JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 单个事件场景目录同步
+     * @param eventSceneTypeId  事件场景目录主键
+     * @return
+     */
+    @PostMapping("singleEventSceneType")
+    @CrossOrigin
+    public String singleEventSceneType(@RequestParam(value = "eventSceneTypeId", required = true) Long eventSceneTypeId){
+        logger.info("同步事件场景目录");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synEventSceneTypeService.synchronizeSingleEventSceneType(eventSceneTypeId,roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("[op:SynInterfaceCfgServiceImpl] 通过主键同步单个事件场景目录失败！Exception: ",eventSceneTypeId,e);
+        }
+        return JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 批量同步事件场景目录
+     * @return
+     */
+    @PostMapping("batchEventSceneType")
+    @CrossOrigin
+    public String batchEventSceneType(){
+        //角色权限控制
+        logger.info("批量同步事件场景目录");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synEventSceneTypeService.synchronizeBatchEventSceneType(roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("[op:SynContactEvtServiceImpl] 批量同步事件场景目录失败！Exception: ", e);
+        }
+        return  JSON.toJSONString(map);
+    }
+
 
 
     /**

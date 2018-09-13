@@ -38,7 +38,7 @@ public class SynEventSorceServiceImpl extends BaseService implements SynEventSor
     private SynchronizeRecordService synchronizeRecordService;
 
     //同步表名
-    public static final String tableName="event_sorce";
+    private static final String tableName="event_sorce";
 
     /**
      * 单个事件源同步

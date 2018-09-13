@@ -37,7 +37,7 @@ public class SynInterfaceCfgServiceImpl extends BaseService implements SynInterf
     private SynchronizeRecordService synchronizeRecordService;
 
     //同步表名
-    public static final String tableName="interface_cfg";
+    private static final String tableName="interface_cfg";
 
     /**
      * 同步单个数据源接口

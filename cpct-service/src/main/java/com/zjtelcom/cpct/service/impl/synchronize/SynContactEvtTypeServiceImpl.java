@@ -40,7 +40,7 @@ public class SynContactEvtTypeServiceImpl extends BaseService implements SynCont
     private ContactEvtTypePrdMapper contactEvtTypePrdMapper;
 
     //同步表名
-    public static final String tableName="event_type";
+    private static final String tableName="event_type";
 
 
     /**
