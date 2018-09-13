@@ -146,7 +146,7 @@ public class FilterRuleController extends BaseController {
      */
     @RequestMapping("/modFilterRule")
     @CrossOrigin
-    public String modFilterRule(@RequestBody FilterRule filterRule) {
+    public String modFilterRule(@RequestBody FilterRuleAddVO filterRule) {
         Map<String, Object> maps = new HashMap<>();
         try {
             maps = filterRuleService.modFilterRule(filterRule);

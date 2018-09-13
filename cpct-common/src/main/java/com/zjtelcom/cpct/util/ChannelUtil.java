@@ -40,6 +40,17 @@ public class ChannelUtil  {
     }
 
 
+    public static String idList2String(List<Long> idList){
+        if (idList == null || idList.isEmpty()){
+            return "";
+        }
+        Long[] ids = new Long[idList.size()];
+        for (int i = 0;i<ids.length;i++){
+            ids[i] = idList.get(i);
+        }
+        return StringUtils.join(ids,",");
+    }
+
     public static String List2String(List<Integer> idList){
         if (idList == null || idList.isEmpty()){
             return "";
@@ -123,6 +134,16 @@ public class ChannelUtil  {
         for (String str : array)
         {
             list.add(str);
+        }
+        return list;
+    }
+
+    public static List<Long> StringToidList(String var1) {
+        String[] array = var1.split(",");
+        List<Long> list = new ArrayList<Long>();
+        for (String str : array)
+        {
+            list.add(Long.valueOf(str));
         }
         return list;
     }

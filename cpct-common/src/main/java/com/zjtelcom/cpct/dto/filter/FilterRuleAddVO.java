@@ -2,17 +2,28 @@ package com.zjtelcom.cpct.dto.filter;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 public class FilterRuleAddVO implements Serializable {
 
+    private Long ruleId;//规则标识
     private String ruleName;//规则名称
     private String filterType;//过滤类型
     private Date effectiveDate;//生效时间
     private Date failureDate;//失效时间
-    private String[] chooseProduct;//选择的销售品
+    private List<Long> chooseProduct;//选择的销售品
     private String expression;
-    private String dayStart;
-    private String dayEnd;
+    private Date dayStart;
+    private Date dayEnd;
+
+
+    public Long getRuleId() {
+        return ruleId;
+    }
+
+    public void setRuleId(Long ruleId) {
+        this.ruleId = ruleId;
+    }
 
     public String getRuleName() {
         return ruleName;
@@ -46,11 +57,27 @@ public class FilterRuleAddVO implements Serializable {
         this.failureDate = failureDate;
     }
 
-    public String[] getChooseProduct() {
+    public Date getDayStart() {
+        return dayStart;
+    }
+
+    public void setDayStart(Date dayStart) {
+        this.dayStart = dayStart;
+    }
+
+    public Date getDayEnd() {
+        return dayEnd;
+    }
+
+    public void setDayEnd(Date dayEnd) {
+        this.dayEnd = dayEnd;
+    }
+
+    public List<Long> getChooseProduct() {
         return chooseProduct;
     }
 
-    public void setChooseProduct(String[] chooseProduct) {
+    public void setChooseProduct(List<Long> chooseProduct) {
         this.chooseProduct = chooseProduct;
     }
 
@@ -62,19 +89,5 @@ public class FilterRuleAddVO implements Serializable {
         this.expression = expression;
     }
 
-    public String getDayStart() {
-        return dayStart;
-    }
 
-    public void setDayStart(String dayStart) {
-        this.dayStart = dayStart;
-    }
-
-    public String getDayEnd() {
-        return dayEnd;
-    }
-
-    public void setDayEnd(String dayEnd) {
-        this.dayEnd = dayEnd;
-    }
 }
