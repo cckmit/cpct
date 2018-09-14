@@ -4,6 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.service.synchronize.*;
+import com.zjtelcom.cpct.service.synchronize.channel.SynChannelService;
+import com.zjtelcom.cpct.service.synchronize.label.SynLabelService;
+import com.zjtelcom.cpct.service.synchronize.script.SynScriptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +35,12 @@ public class SynchronizeController extends BaseController {
     private SynEventSceneService synEventSceneService;
     @Autowired
     private SynEventSceneTypeService synEventSceneTypeService;
-
+    @Autowired
+    private SynScriptService synScriptService;
+    @Autowired
+    private SynLabelService synLabelService;
+    @Autowired
+    private SynChannelService synChannelService;
 
     /**
      * 单个事件同步
@@ -297,6 +305,138 @@ public class SynchronizeController extends BaseController {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
             logger.error("[op:SynContactEvtServiceImpl] 批量同步事件场景目录失败！Exception: ", e);
+        }
+        return  JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 单个渠道同步
+     * @param channelId  渠道id
+     * @return
+     */
+    @PostMapping("singleContactChannel")
+    @CrossOrigin
+    public String singleContactChannel(@RequestParam(value = "channelId", required = true) Long channelId){
+        logger.info("同步渠道");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synChannelService.synchronizeSingleChannel(channelId,roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("[op:SynInterfaceCfgServiceImpl] 通过渠道id同步单个渠道失败！Exception: ",channelId,e);
+        }
+        return JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 批量渠道同步
+     * @return
+     */
+    @PostMapping("batchContactChannel")
+    @CrossOrigin
+    public String batchContactChannel(){
+        //角色权限控制
+        logger.info("批量同步渠道");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synChannelService.synchronizeBatchChannel(roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("[op:SynContactEvtServiceImpl] 批量同步渠道失败！Exception: ", e);
+        }
+        return  JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 单个接触脚本同步
+     * @param scriptId
+     * @return
+     */
+    @PostMapping("singleScript")
+    @CrossOrigin
+    public String singleScript(@RequestParam(value = "scriptId", required = true) Long scriptId){
+        logger.info("同步接触脚本");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synScriptService.synchronizeScript(scriptId,roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("[op:SynInterfaceCfgServiceImpl] 通过接触脚本id同步单个接触脚本失败！Exception: ",scriptId,e);
+        }
+        return JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 批量同步接触脚本
+     * @return
+     */
+    @PostMapping("batchContactScript")
+    @CrossOrigin
+    public String batchContactScript(){
+        //角色权限控制
+        logger.info("批量同步接触脚本");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synScriptService.synchronizeBatchScript(roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("[op:SynContactEvtServiceImpl] 批量同步接触脚本失败！Exception: ", e);
+        }
+        return  JSON.toJSONString(map);
+    }
+
+
+    /**
+     *
+     * @param labelId
+     * @return
+     */
+    @PostMapping("singleLabel")
+    @CrossOrigin
+    public String singleLabel(@RequestParam(value = "labelId", required = true) Long labelId){
+        logger.info("同步标签");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synLabelService.synchronizeSingleLabel(labelId,roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("[op:SynInterfaceCfgServiceImpl] 通过标签id同步单个标签失败！Exception: ",labelId,e);
+        }
+        return JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 批量同步标签
+     * @return
+     */
+    @PostMapping("batchLabel")
+    @CrossOrigin
+    public String batchLabel(){
+        //角色权限控制
+        logger.info("批量同步标签");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synLabelService.synchronizeBatchLabel(roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("[op:SynContactEvtServiceImpl] 批量同步标签失败！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }

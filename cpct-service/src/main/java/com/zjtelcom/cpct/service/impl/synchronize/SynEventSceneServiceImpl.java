@@ -47,9 +47,12 @@ public class SynEventSceneServiceImpl implements SynEventSceneService {
     public Map<String, Object> synchronizeSingleEventScene(Long eventSceneId, String roleName) {
         Map<String,Object> maps = new HashMap<>();
         EventScene eventScene = eventSceneMapper.selectByPrimaryKey(eventSceneId);
+
         if(null==eventScene){
             throw new SystemException("对应事件场景不存在");
         }
+        eventScene.setEventSceneDesc("第一数据源第一数据源");
+        eventSceneMapper.updateById(eventScene);
         EventScene eventScene1 = eventScenePrdMapper.selectByPrimaryKey(eventSceneId);
         if(null==eventScene1){
             eventScenePrdMapper.createEventScene(eventScene);
@@ -58,7 +61,7 @@ public class SynEventSceneServiceImpl implements SynEventSceneService {
             eventScenePrdMapper.updateById(eventScene);
             synchronizeRecordService.addRecord(roleName,tableName,eventSceneId, SynchronizeType.update.getType());
         }
-
+        System.out.println(1/0);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
 

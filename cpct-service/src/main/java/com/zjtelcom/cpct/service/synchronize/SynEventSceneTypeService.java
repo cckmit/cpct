@@ -3,7 +3,7 @@ package com.zjtelcom.cpct.service.synchronize;
 import java.util.Map;
 
 /**
- * @Description 事件场景目录service
+ * @Description 同步事件场景目录
  * @Author pengy
  * @Date 2018/6/21 9:45
  */

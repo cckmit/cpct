@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * @Auther: anson
  * @Date: 2018/9/13
- * @Description:
+ * @Description:同步事件场景
  */
 public interface SynEventSceneService {
 
