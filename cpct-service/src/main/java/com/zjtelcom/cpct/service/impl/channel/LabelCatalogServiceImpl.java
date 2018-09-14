@@ -4,6 +4,7 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelCatalogMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
+import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelCatalog;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
@@ -17,10 +18,7 @@ import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
@@ -140,6 +138,7 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
             firstTree.setChildren(twiceTreeList);
             resultTree.add(firstTree);
         }
+
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",resultTree);
         return result;

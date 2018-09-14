@@ -5,6 +5,7 @@ import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dto.channel.LabelAddVO;
 import com.zjtelcom.cpct.dto.channel.LabelEditVO;
+import com.zjtelcom.cpct.dto.channel.LabelGrpParam;
 import com.zjtelcom.cpct.dto.channel.QryMktScriptReq;
 import com.zjtelcom.cpct.service.channel.LabelCatalogService;
 import com.zjtelcom.cpct.service.channel.LabelService;
@@ -30,6 +31,7 @@ public class LabelController extends BaseController {
     private LabelCatalogService labelCatalogService;
     @Autowired
     private InjectionLabelMapper labelMapper;
+
 
     @PostMapping("batchAdd")
     @CrossOrigin
@@ -113,31 +115,6 @@ public class LabelController extends BaseController {
 //    }
 
 
-    @GetMapping("labelhits")
-    @CrossOrigin
-    public void labelhits() {
-        List<Label> labelList = labelMapper.selectAll();
-        for (Label label : labelList){
-            if (label.getFitDomain()==null){
-                continue;
-            }
-            switch(label.getFitDomain()){
-                    case "YD":
-                        label.setFitDomain("1");
-                        break;
-                    case "KD":
-                        label.setFitDomain("2");
-                        break;
-                    case "GH":
-                        label.setFitDomain("3");
-                        break;
-                    case "ITV":
-                        label.setFitDomain("4");
-                        break;
-                }
-                labelMapper.updateByPrimaryKey(label);
-        }
-    }
 
     @PostMapping("shared")
     @CrossOrigin
@@ -407,6 +384,23 @@ public class LabelController extends BaseController {
         return result;
     }
 
+    /**
+     * 标签组关联标签
+     */
+    @PostMapping("relateLabelGrp")
+    @CrossOrigin
+    public Map<String,Object> relateLabelGrp(@RequestBody LabelGrpParam param) {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = labelService.relateLabelGrp(param);
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to getLabelGrpDetail",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
+        }
+        return result;
+    }
 
     /**
      * 添加标签组成员

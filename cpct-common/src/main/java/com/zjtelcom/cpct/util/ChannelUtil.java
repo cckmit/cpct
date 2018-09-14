@@ -7,6 +7,7 @@ import com.zjtelcom.cpct.dto.campaign.CampaignVO;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.Operator;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.usermodel.Cell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -154,6 +155,39 @@ public class ChannelUtil  {
             list.add(str);
         }
         return list;
+    }
+
+    public static Object getCellValue(Cell cell) {
+        Object cellValue;
+        switch (cell.getCellTypeEnum()){
+            case NUMERIC://数字
+                cellValue = cell.getNumericCellValue() + "";
+                break;
+            case STRING: // 字符串
+                cellValue = cell.getStringCellValue();
+                break;
+
+            case BOOLEAN: // Boolean
+                cellValue = cell.getBooleanCellValue() + "";
+                break;
+
+            case FORMULA: // 公式
+                cellValue = cell.getCellFormula() + "";
+                break;
+
+            case BLANK: // 空值
+                cellValue = "";
+                break;
+
+            case ERROR: // 故障
+                cellValue = "非法字符";
+                break;
+
+            default:
+                cellValue = "未知类型";
+                break;
+        }
+        return cellValue;
     }
 
     public static List<Long> StringToidList(String var1) {

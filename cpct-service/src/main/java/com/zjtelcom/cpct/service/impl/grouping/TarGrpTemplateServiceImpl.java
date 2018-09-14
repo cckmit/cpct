@@ -219,12 +219,12 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             }
             tarGrpTemConditionVO.setLeftParamName(label.getInjectionLabelName());
             //塞入领域
-            FitDomain fitDomain = null;
-            if (label.getFitDomain() != null) {
-                fitDomain = FitDomain.getFitDomain(Integer.parseInt(label.getFitDomain()));
-                tarGrpTemConditionVO.setFitDomainId(Long.valueOf(fitDomain.getValue()));
-                tarGrpTemConditionVO.setFitDomainName(fitDomain.getDescription());
-            }
+//            FitDomain fitDomain = null;
+//            if (label.getFitDomain() != null) {
+//                fitDomain = FitDomain.getFitDomain(Integer.parseInt(label.getFitDomain()));
+//                tarGrpTemConditionVO.setFitDomainId(Long.valueOf(fitDomain.getValue()));
+//                tarGrpTemConditionVO.setFitDomainName(fitDomain.getDescription());
+//            }
             //将操作符转为中文
             if (tarGrpTemConditionVO.getOperType()!=null && !tarGrpTemConditionVO.getOperType().equals("")){
                 Operator op = Operator.getOperator(Integer.parseInt(tarGrpTemConditionVO.getOperType()));
