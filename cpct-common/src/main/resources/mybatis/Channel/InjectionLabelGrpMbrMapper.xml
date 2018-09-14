@@ -65,4 +65,14 @@
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
     from injection_label_grp_mbr
   </select>
+
+
+  <!-- 批量插入 -->
+  <delete id="deleteBatch" parameterType="java.util.List">
+    delete from injection_label_grp_mbr
+    where GRP_MBR_ID in
+    <foreach collection="arr" item="idList" index="no" open="(" separator="," close=")" >
+      #{idList}
+    </foreach>
+  </delete>
 </mapper>

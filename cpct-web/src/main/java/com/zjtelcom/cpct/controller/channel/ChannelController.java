@@ -86,10 +86,9 @@ public class ChannelController extends BaseController {
     @GetMapping("getChannelTreeList")
     @CrossOrigin
     public Map<String, Object> getChannelTreeList() {
-        Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
-            result = channelService.getChannelTreeList(userId);
+            result = channelService.getChannelTreeList(1L);
         } catch (Exception e) {
             logger.error("[op:ChannelController] fail to getParentList",e);
             result.put("resultCode",CODE_FAIL);

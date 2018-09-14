@@ -39,7 +39,11 @@ public interface InjectionLabelMapper {
 
     List<Label> queryTriggerByLeftOpers(@Param("record") List<Map<String, String>> record);
 
+
+
     List<Label> queryLabelsExceptSelected(@Param("injectionLabelIds") List<Long> injectionLabelIds,@Param("labelName")String labelName);
+
+    List<Label> listLabelByIdList(@Param("injectionLabelIds") List<Long> injectionLabelIds);
 
 
 }

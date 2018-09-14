@@ -5,11 +5,13 @@ import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dto.channel.LabelAddVO;
 import com.zjtelcom.cpct.dto.channel.LabelEditVO;
+import com.zjtelcom.cpct.dto.channel.LabelGrpParam;
 import com.zjtelcom.cpct.dto.channel.QryMktScriptReq;
 import com.zjtelcom.cpct.service.channel.LabelCatalogService;
 import com.zjtelcom.cpct.service.channel.LabelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
+import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +31,7 @@ public class LabelController extends BaseController {
     private LabelCatalogService labelCatalogService;
     @Autowired
     private InjectionLabelMapper labelMapper;
+
 
     @PostMapping("batchAdd")
     @CrossOrigin
@@ -112,31 +115,6 @@ public class LabelController extends BaseController {
 //    }
 
 
-    @GetMapping("labelhits")
-    @CrossOrigin
-    public void labelhits() {
-        List<Label> labelList = labelMapper.selectAll();
-        for (Label label : labelList){
-            if (label.getFitDomain()==null){
-                continue;
-            }
-            switch(label.getFitDomain()){
-                    case "YD":
-                        label.setFitDomain("1");
-                        break;
-                    case "KD":
-                        label.setFitDomain("2");
-                        break;
-                    case "GH":
-                        label.setFitDomain("3");
-                        break;
-                    case "ITV":
-                        label.setFitDomain("4");
-                        break;
-                }
-                labelMapper.updateByPrimaryKey(label);
-        }
-    }
 
     @PostMapping("shared")
     @CrossOrigin
@@ -334,7 +312,7 @@ public class LabelController extends BaseController {
      */
     @PostMapping("editLabelGrp")
     @CrossOrigin
-    public Map<String,Object> editLabelGrp(LabelGrp editVO) {
+    public Map<String,Object> editLabelGrp(@RequestBody LabelGrp editVO) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
@@ -354,11 +332,11 @@ public class LabelController extends BaseController {
      */
     @PostMapping("deleteLabelGrp")
     @CrossOrigin
-    public Map<String,Object> deleteLabelGrp(Long labelGrpId) {
+    public Map<String,Object> deleteLabelGrp(@RequestBody HashMap<String,Long> param) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
-            result = labelService.deleteLabelGrp(userId,labelGrpId);
+            result = labelService.deleteLabelGrp(userId,param.get("labelGrpId"));
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to deleteLabelGrp",e);
             result.put("resultCode",CODE_FAIL);
@@ -377,8 +355,6 @@ public class LabelController extends BaseController {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
-//            Integer page = MapUtil.getIntNum(params.get("page"));
-//            Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
             result = labelService.getLabelGrpList(userId,params);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to getScriptList",e);
@@ -392,13 +368,13 @@ public class LabelController extends BaseController {
     /**
      * 获取标签组详情
      */
-    @GetMapping("getLabelGrpDetail")
+    @PostMapping("getLabelGrpDetail")
     @CrossOrigin
-    public Map<String,Object> getLabelGrpDetail( Long labelGrpId) {
+    public Map<String,Object> getLabelGrpDetail(@RequestBody HashMap<String,Long> param) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
-            result = labelService.getLabelGrpDetail(1L,labelGrpId);
+            result = labelService.getLabelGrpDetail(1L,param.get("labelGrpId"));
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to getLabelGrpDetail",e);
             result.put("resultCode",CODE_FAIL);
@@ -408,6 +384,23 @@ public class LabelController extends BaseController {
         return result;
     }
 
+    /**
+     * 标签组关联标签
+     */
+    @PostMapping("relateLabelGrp")
+    @CrossOrigin
+    public Map<String,Object> relateLabelGrp(@RequestBody LabelGrpParam param) {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = labelService.relateLabelGrp(param);
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to getLabelGrpDetail",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
+        }
+        return result;
+    }
 
     /**
      * 添加标签组成员

@@ -25,7 +25,7 @@ public interface FilterRuleService {
 
     Map<String,Object> createFilterRule(FilterRuleAddVO addVO);
 
-    Map<String,Object> modFilterRule(FilterRule filterRule);
+    Map<String,Object> modFilterRule(FilterRuleAddVO editVO);
 
     Map<String,Object> qryFilterRules(FilterRuleReq filterRuleReq);
 

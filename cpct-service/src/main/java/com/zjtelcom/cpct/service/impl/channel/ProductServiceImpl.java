@@ -12,6 +12,7 @@ import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.channel.MktProductRule;
 import com.zjtelcom.cpct.domain.channel.Offer;
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
+import com.zjtelcom.cpct.dto.channel.OfferDetail;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
@@ -42,15 +43,14 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     @Override
     public Map<String, Object> getProductNameById(Long userId, List<Long> productIdList) {
         Map<String,Object> result = new HashMap<>();
-        List<String> nameList = new ArrayList<>();
+        List<OfferDetail> nameList = new ArrayList<>();
         for (Long productId : productIdList){
             Offer product = productMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
             if (product==null){
-                result.put("resultCode",CODE_FAIL);
-                result.put("resultMsg","产品不存在");
-                return result;
+                continue;
             }
-            nameList.add(product.getOfferName());
+            OfferDetail offerDetail = BeanUtil.create(product,new OfferDetail());
+            nameList.add(offerDetail);
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",nameList);
