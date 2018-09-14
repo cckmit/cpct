@@ -665,6 +665,7 @@ public class EventApiServiceImpl implements EventApiService {
                 esJson.put("hit", "false");
                 esJson.put("msg", "下发渠道数据异常");
                 esService.save(esJson, IndexList.STRATEGY_MODULE);
+
                 return Collections.EMPTY_MAP;
             }
 

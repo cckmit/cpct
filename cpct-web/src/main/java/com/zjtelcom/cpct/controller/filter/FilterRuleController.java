@@ -6,6 +6,7 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.user.UserListMapper;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
+import com.zjtelcom.cpct.dto.filter.FilterRuleAddVO;
 import com.zjtelcom.cpct.dto.user.UserList;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.request.filter.FilterRuleReq;
@@ -129,7 +130,7 @@ public class FilterRuleController extends BaseController {
      */
     @RequestMapping("/createFilterRule")
     @CrossOrigin
-    public String createFilterRule(@RequestBody FilterRule filterRule) {
+    public String createFilterRule(@RequestBody FilterRuleAddVO filterRule) {
         Map<String, Object> maps = new HashMap<>();
         try {
             maps = filterRuleService.createFilterRule(filterRule);

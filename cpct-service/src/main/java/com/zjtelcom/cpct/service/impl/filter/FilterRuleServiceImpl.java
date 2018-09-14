@@ -9,6 +9,7 @@ import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.dao.user.UserListMapper;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
+import com.zjtelcom.cpct.dto.filter.FilterRuleAddVO;
 import com.zjtelcom.cpct.dto.filter.FilterRuleVO;
 import com.zjtelcom.cpct.dto.user.UserList;
 import com.zjtelcom.cpct.request.filter.FilterRuleReq;
@@ -192,8 +193,9 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
      * 新建过滤规则
      */
     @Override
-    public Map<String, Object> createFilterRule(FilterRule filterRule) {
+    public Map<String, Object> createFilterRule(FilterRuleAddVO addVO) {
         Map<String, Object> maps = new HashMap<>();
+        FilterRule filterRule = BeanUtil.create(addVO,new FilterRule());
         filterRule.setCreateDate(DateUtil.getCurrentTime());
         filterRule.setUpdateDate(DateUtil.getCurrentTime());
         filterRule.setStatusDate(DateUtil.getCurrentTime());
