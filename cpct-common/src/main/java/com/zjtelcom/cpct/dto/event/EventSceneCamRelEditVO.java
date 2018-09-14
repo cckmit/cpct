@@ -8,7 +8,6 @@ public class EventSceneCamRelEditVO implements Serializable {
     private Integer campaignSeq;
     private Long mktCampaignId;
     private Integer levelConfig;
-    private Integer whetherConfig;
 
     public Long getEventSceneId() {
         return eventSceneId;
@@ -42,11 +41,4 @@ public class EventSceneCamRelEditVO implements Serializable {
         this.levelConfig = levelConfig;
     }
 
-    public Integer getWhetherConfig() {
-        return whetherConfig;
-    }
-
-    public void setWhetherConfig(Integer whetherConfig) {
-        this.whetherConfig = whetherConfig;
-    }
 }
