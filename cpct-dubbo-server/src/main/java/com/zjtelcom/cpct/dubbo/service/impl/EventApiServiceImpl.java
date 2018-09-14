@@ -674,6 +674,28 @@ public class EventApiServiceImpl implements EventApiService {
                 return Collections.EMPTY_MAP;
             }
 
+
+            //验证过滤规则
+            List<Long> filterRuleIds = mktStrategyFilterRuleRelMapper.selectByStrategyId(strategyConfId);
+            if(filterRuleIds != null && filterRuleIds.size() > 0) {
+                //循环并判断过滤规则
+                for(Long filterRuleId : filterRuleIds) {
+                    FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId);
+                    //判断过滤类型(红名单，黑名单)
+                    if("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
+
+                    } else if ("3000".equals(filterRule.getFilterType())) {  //销售品过滤
+
+                    } else if ("4000".equals(filterRule.getFilterType())) {  //表达式过滤
+
+                    } else if ("5000".equals(filterRule.getFilterType())) {  //销售品过滤
+
+                    }
+
+                }
+
+            }
+
             //根据策略id获取策略下发规则列表
             List<MktStrategyConfRuleDO> mktStrategyConfRuleDOS = mktStrategyConfRuleMapper.selectByMktStrategyConfId(strategyConfId);
             //遍历规则↓↓↓↓↓↓↓↓↓↓
