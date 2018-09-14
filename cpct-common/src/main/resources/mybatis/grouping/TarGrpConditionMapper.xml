@@ -11,7 +11,7 @@
         <result column="RIGHT_PARAM" jdbcType="VARCHAR" property="rightParam"/>
         <result column="RIGHT_PARAM_TYPE" jdbcType="VARCHAR" property="rightParamType"/>
         <result column="CONDITION_TEXT" jdbcType="VARCHAR" property="conditionText"/>
-        <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd"/>
+        <result column="STATUS_CD" jdbcType="listTarGrpConditionVARCHAR" property="statusCd"/>
         <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
         <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff"/>
         <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
