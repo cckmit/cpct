@@ -16,10 +16,15 @@ public interface QuestionService {
 
     Map<String,Object> modQuestion(Long userId, QuestionEditVO editVO);
 
-    Map<String,Object> delQuestion(Long userId,Long questionId);
+    Map<String,Object> listQuestion();
 
-    Map<String,Object> modQuestionDetail(Long userId, QuestionDetail detail);
 
-    Map<String,Object> delQuestionDetail(Long userId,Long questionDetailId);
+
+
+//    Map<String,Object> delQuestion(Long userId,Long questionId);
+//
+//    Map<String,Object> modQuestionDetail(Long userId, QuestionDetail detail);
+//
+//    Map<String,Object> delQuestionDetail(Long userId,Long questionDetailId);
 
 }

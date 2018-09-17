@@ -18,6 +18,7 @@
     <resultMap id="BaseResultMapT" type="com.zjtelcom.cpct.dto.campaign.MktCamEvtRel">
         <id column="MKT_CAMP_EVT_REL_ID" jdbcType="BIGINT" property="mktCampEvtRelId"/>
         <result column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId"/>
+        <result column="CAMPAIGN_SEQ" jdbcType="INTEGER" property="campaignSeq"/>
         <result column="EVENT_ID" jdbcType="BIGINT" property="eventId"/>
         <result column="LEVEL_CONFIG" jdbcType="INTEGER" property="levelConfig" />
         <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd"/>
@@ -42,7 +43,7 @@
     CREATE_STAFF, CREATE_DATE, UPDATE_STAFF,
     UPDATE_DATE)
     values (#{mktCampEvtRelId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{campaignSeq,jdbcType=INTEGER},
-    #{eventId,jdbcType=BIGINT}, #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{levelConfig,jdbcType=INTEGER},jdbcType=INTEGER},
+    #{eventId,jdbcType=BIGINT}, #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{levelConfig,jdbcType=INTEGER},
     #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT},
     #{updateDate,jdbcType=TIMESTAMP})
   </insert>
@@ -75,9 +76,9 @@
   </select>
 
     <select id="qryBycontactEvtId" parameterType="java.lang.Long" resultMap="BaseResultMapT">
-    select MKT_CAMP_EVT_REL_ID, MKT_CAMPAIGN_ID, EVENT_ID,LEVEL_CONFIG,
-     STATUS_CD, STATUS_DATE, CREATE_STAFF,
-    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+    select MKT_CAMP_EVT_REL_ID, MKT_CAMPAIGN_ID, CAMPAIGN_SEQ, EVENT_ID,LEVEL_CONFIG,
+     STATUS_CD, STATUS_DATE,
+    CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
     from mkt_cam_evt_rel
     where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
   </select>
