@@ -278,7 +278,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
      */
     public void ruleInsert(Long evtContactConfId, String param) {
         //转换为json对象
-        if (param != null) {
+        if (param != null && !"null".equals(param)) {
             JSONObject jsonObject = JSONObject.parseObject(param);
             System.out.println(jsonObject.toString());
             //解析参数
