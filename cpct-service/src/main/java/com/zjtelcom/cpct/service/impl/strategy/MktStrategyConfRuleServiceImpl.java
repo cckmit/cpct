@@ -377,17 +377,25 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
      * 通过父规则Id复制策略规则
      *
      * @param parentMktStrategyConfRuleId
+     * @param isPublish                   是否为发布操作
      * @return
      */
     @Override
-    public Map<String, Object> copyMktStrategyConfRule(Long parentMktStrategyConfRuleId) throws Exception {
+    public Map<String, Object> copyMktStrategyConfRule(Long parentMktStrategyConfRuleId, Boolean isPublish) throws Exception {
         Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();
         MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(parentMktStrategyConfRuleId);
         MktStrategyConfRuleDO chiledMktStrategyConfRuleDO = new MktStrategyConfRuleDO();
         /**
          * 客户分群配置
          */
-        Map<String, Object> tarGrpMap = tarGrpService.copyTarGrp(mktStrategyConfRuleDO.getTarGrpId(), true);
+        //判断是否为发布操作
+        Map<String, Object> tarGrpMap = new HashMap<>();
+        if (isPublish) {
+            tarGrpMap = tarGrpService.copyTarGrp(mktStrategyConfRuleDO.getTarGrpId(), true);
+        } else {
+            tarGrpMap = tarGrpService.copyTarGrp(mktStrategyConfRuleDO.getTarGrpId(), false);
+        }
+
         TarGrp tarGrp = (TarGrp) tarGrpMap.get("tarGrp");
         /**
          * 销售品配置
@@ -447,10 +455,16 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             }
         }
         chiledMktStrategyConfRuleDO.setMktStrategyConfRuleName(mktStrategyConfRuleDO.getMktStrategyConfRuleName());
-        chiledMktStrategyConfRuleDO.setTarGrpId(tarGrp.getTarGrpId());
+        if (tarGrp != null) {
+            chiledMktStrategyConfRuleDO.setTarGrpId(tarGrp.getTarGrpId());
+        }
         chiledMktStrategyConfRuleDO.setProductId(childProductIds);
         chiledMktStrategyConfRuleDO.setEvtContactConfId(childEvtContactConfIds);
         chiledMktStrategyConfRuleDO.setMktCamChlResultId(childMktCamChlResultIds);
+        chiledMktStrategyConfRuleDO.setCreateDate(new Date());
+        chiledMktStrategyConfRuleDO.setCreateStaff(UserUtil.loginId());
+        chiledMktStrategyConfRuleDO.setUpdateDate(new Date());
+        chiledMktStrategyConfRuleDO.setUpdateStaff(UserUtil.loginId());
         mktStrategyConfRuleMapper.insert(chiledMktStrategyConfRuleDO);
         mktStrategyConfRuleMap.put("mktStrategyConfRuleId", chiledMktStrategyConfRuleDO.getMktStrategyConfRuleId());
         return mktStrategyConfRuleMap;
@@ -520,10 +534,10 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
     /**
      * 更新规则下销售品
      *
-             * @param productIdList
+     * @param productIdList
      * @param ruleId
      * @return
-             */
+     */
     @Override
     public Map<String, Object> updateProductIds(List<Long> productIdList, Long ruleId) {
         Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();

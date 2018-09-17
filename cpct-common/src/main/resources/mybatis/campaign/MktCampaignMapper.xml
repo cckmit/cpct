@@ -28,9 +28,10 @@
         <result column="REMARK" jdbcType="VARCHAR" property="remark"/>
         <result column="LAN_ID" jdbcType="BIGINT" property="lanId"/>
         <result column="CREATE_CHANNEL" jdbcType="VARCHAR" property="createChannel" />
+        <result column="DIRECTORY_ID" jdbcType="BIGINT" property="directoryId" />
     </resultMap>
 
-    <resultMap id="countResultMap" type="com.zjtelcom.cpct.domain.campaign.MktCampaignDO">
+    <resultMap id="countResultMap" type="com.zjtelcom.cpct.domain.campaign.MktCampaignCountDO">
         <id column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId"/>
         <result column="TIGGER_TYPE" jdbcType="VARCHAR" property="tiggerType"/>
         <result column="MKT_CAMPAIGN_NAME" jdbcType="VARCHAR" property="mktCampaignName"/>
@@ -43,6 +44,7 @@
         <result column="LAN_ID" jdbcType="BIGINT" property="lanId"/>
         <result column="CREATE_CHANNEL" jdbcType="VARCHAR" property="createChannel" />
         <result column="REL_COUNT" javaType="INT" property="relCount" />
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
     </resultMap>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
@@ -60,7 +62,7 @@
       EXEC_TYPE, EXEC_INVL, EXEC_NUM,
       STATUS_CD, STATUS_DATE, CREATE_STAFF,
       CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
-      REMARK, LAN_ID, CREATE_CHANNEL)
+      REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID)
     values (#{mktCampaignId,jdbcType=BIGINT}, #{tiggerType,jdbcType=VARCHAR}, #{mktCampaignName,jdbcType=VARCHAR},
       #{planBeginTime,jdbcType=DATE}, #{planEndTime,jdbcType=DATE}, #{beginTime,jdbcType=DATE},
       #{endTime,jdbcType=DATE}, #{mktCampaignType,jdbcType=VARCHAR}, #{mktCampaignCategory,jdbcType=VARCHAR},
@@ -69,7 +71,8 @@
       #{execType,jdbcType=VARCHAR}, #{execInvl,jdbcType=VARCHAR}, #{execNum,jdbcType=INTEGER},
       #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT},
       #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP},
-      #{remark,jdbcType=VARCHAR}, #{lanId,jdbcType=BIGINT}, #{createChannel,jdbcType=VARCHAR})
+      #{remark,jdbcType=VARCHAR}, #{lanId,jdbcType=BIGINT}, #{createChannel,jdbcType=VARCHAR},
+      #{directoryId,jdbcType=BIGINT})
     </insert>
 
     <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignDO">
@@ -98,6 +101,7 @@
         <if test= "updateDate!=null">UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},</if>
         <if test= "remark!=null">REMARK = #{remark,jdbcType=VARCHAR},</if>
         <if test= "createChannel!=null">CREATE_CHANNEL = #{createChannel,jdbcType=VARCHAR},</if>
+        <if test= "directoryId!=null">DIRECTORY_ID = #{directoryId,jdbcType=BIGINT},</if>
         LAN_ID = #{lanId,jdbcType=BIGINT}
     where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
     </update>
@@ -106,7 +110,7 @@
     select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
     BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MKT_CAMPAIGN_CATEGORY, MKT_ACTIVITY_NBR,
     MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD,
-    STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL
+    STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID
     from mkt_campaign
     where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
     </select>
@@ -115,7 +119,7 @@
     select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
     BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MKT_CAMPAIGN_CATEGORY, MKT_ACTIVITY_NBR,
     MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD,
-    STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL
+    STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID
     from mkt_campaign order by UPDATE_DATE desc
     </select>
 
@@ -145,7 +149,7 @@
 
     <select id="qryMktCampaignListPage" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignDO" resultMap="countResultMap">
         select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
-        BEGIN_TIME,  MKT_CAMPAIGN_CATEGORY, MKT_ACTIVITY_NBR,  STATUS_CD, STATUS_DATE, LAN_ID, CREATE_CHANNEL,
+        MKT_CAMPAIGN_TYPE,  MKT_CAMPAIGN_CATEGORY, MKT_ACTIVITY_NBR,  STATUS_CD, LAN_ID, CREATE_CHANNEL, CREATE_DATE,
         (
             SELECT
               count(*)
@@ -189,7 +193,7 @@
         select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
         BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MKT_CAMPAIGN_CATEGORY, MKT_ACTIVITY_NBR, MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC,
         CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE,
-        UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, CITY_LEVEL
+        UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID
         from mkt_campaign
         where 1 = 1
         <if test="mktCampaignId != null and mktCampaignId != ''">
@@ -248,6 +252,9 @@
         </if>
         <if test="createChannel != null and createChannel != ''">
             AND CREATE_CHANNEL = #{createChannel,jdbcType=VARCHAR}
+        </if>
+        <if test="directoryId != null and directoryId != ''">
+            AND DIRECTORY_ID = #{directoryId,jdbcType=BIGINT}
         </if>
         order by UPDATE_DATE desc
     </select>
