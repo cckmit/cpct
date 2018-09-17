@@ -529,8 +529,8 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     public Map<String, Object> evtDetails(ContactEvt contactEvt) {
         Map<String,Object> maps = new HashMap<>();
         contactEvt = contactEvtMapper.getEventById(contactEvt.getContactEvtId());
-        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
-        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("resultCode", .CODE_SUCCESS);
+        maps.put("resultMsg", StCommonConstantringUtils.EMPTY);
         maps.put("ContactEvt", contactEvt);
         return maps;
     }
