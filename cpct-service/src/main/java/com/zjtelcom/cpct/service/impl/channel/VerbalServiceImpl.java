@@ -1,13 +1,7 @@
 package com.zjtelcom.cpct.service.impl.channel;
 
-import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
-import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
-import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
-import com.zjtelcom.cpct.dao.channel.MktVerbalMapper;
-import com.zjtelcom.cpct.domain.channel.Channel;
-import com.zjtelcom.cpct.domain.channel.Label;
-import com.zjtelcom.cpct.domain.channel.MktVerbal;
-import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
+import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.domain.channel.*;
 
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.ConditionType;
@@ -36,6 +30,8 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
     private InjectionLabelMapper labelMapper;
     @Autowired
     private ContactChannelMapper channelMapper;
+    @Autowired
+    private InjectionLabelValueMapper labelValueMapper;
 
     /**
      * 复制痛痒点
@@ -166,8 +162,9 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
                     vo.setConditionType(label.getConditionType());
                 }
                 vo.setLeftParamName(label.getInjectionLabelName());
-                if (label.getRightOperand() != null) {
-                    vo.setValueList(ChannelUtil.StringToList(label.getRightOperand()));
+                List<LabelValue> valueList = labelValueMapper.selectByLabelId(label.getInjectionLabelId());
+                if (!valueList.isEmpty()) {
+                    vo.setValueList(ChannelUtil.valueList2StList(valueList));
                 }
                 setOperator(vo, label);
             }

@@ -5,10 +5,7 @@ import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelGrp;
 import com.zjtelcom.cpct.domain.channel.LabelGrpMbr;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
-import com.zjtelcom.cpct.dto.channel.LabelAddVO;
-import com.zjtelcom.cpct.dto.channel.LabelEditVO;
-import com.zjtelcom.cpct.dto.channel.LabelVO;
-import com.zjtelcom.cpct.dto.channel.QryMktScriptReq;
+import com.zjtelcom.cpct.dto.channel.*;
 
 import java.util.List;
 import java.util.Map;
@@ -42,6 +39,8 @@ public interface LabelService {
     Map<String,Object> getLabelGrpList(Long userId, Map<String,Object> params);
 
     Map<String,Object> getLabelGrpDetail(Long userId,Long labelGrpId);
+
+    Map<String,Object> relateLabelGrp(LabelGrpParam param);
 
 
 

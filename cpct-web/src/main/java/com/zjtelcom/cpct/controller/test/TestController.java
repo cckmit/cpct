@@ -13,6 +13,7 @@ import com.zjtelcom.cpct.service.EngineTestService;
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.service.api.MktCampaignApiService;
+import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +37,9 @@ public class TestController extends BaseController {
     @Autowired(required = false)
     private MktCampaignApiService mktCampaignApiService;
 
+    @Autowired
+    private MktCampaignApiService mktCampaignApiService;
+
 
     @RequestMapping(value = "/rule", method = RequestMethod.POST)
     @CrossOrigin
@@ -57,6 +61,8 @@ public class TestController extends BaseController {
         System.out.println("Tree=" + ruleResult.getRule().toTree());
         System.out.println("TraceMap=" + ruleResult.getTraceMap());
 
+
+
         return null;
     }
 
@@ -75,18 +81,14 @@ public class TestController extends BaseController {
     }
 
 
-/*
+
     @RequestMapping(value = "/getMktCampaignApi", method = RequestMethod.POST)
     @CrossOrigin
     public String getMktCampaignApi(@RequestBody  Map<String, Object> params) throws Exception {
-        Long mktCampaignId = Long.valueOf((String) params.get("mktCampaignId"));
+        Long mktCampaignId = Long.valueOf((Integer)params.get("mktCampaignId"));
         Map<String, Object> map = mktCampaignApiService.qryMktCampaignDetail(mktCampaignId);
         return JSON.toJSONString(map);
     }
-*/
-
-
-
 
 }
 
