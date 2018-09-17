@@ -14,6 +14,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 
@@ -43,6 +45,13 @@ public class DataSourceConfig {
         sessionFactoryBean.setMapperLocations(new PathMatchingResourcePatternResolver()
                 .getResources("classpath:mybatis/*/*.xml"));
         return sessionFactoryBean.getObject();
+    }
+
+    @Bean(name = "TransactionManager")
+    @Primary
+    public PlatformTransactionManager testTransactionManager(@Qualifier("dataSource") DataSource dataSource) {
+        DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dataSource);
+        return dataSourceTransactionManager;
     }
 
 
