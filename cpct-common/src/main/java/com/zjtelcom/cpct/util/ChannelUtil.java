@@ -1,12 +1,17 @@
 package com.zjtelcom.cpct.util;
 
+import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dto.campaign.CampaignVO;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.Operator;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -14,6 +19,7 @@ import java.util.UUID;
 
 @Component
 public class ChannelUtil  {
+
 
     public static String getUUID(){
         UUID uuid=UUID.randomUUID();
@@ -40,6 +46,17 @@ public class ChannelUtil  {
     }
 
 
+    public static String idList2String(List<Long> idList){
+        if (idList == null || idList.isEmpty()){
+            return "";
+        }
+        Long[] ids = new Long[idList.size()];
+        for (int i = 0;i<ids.length;i++){
+            ids[i] = idList.get(i);
+        }
+        return StringUtils.join(ids,",");
+    }
+
     public static String List2String(List<Integer> idList){
         if (idList == null || idList.isEmpty()){
             return "";
@@ -65,7 +82,8 @@ public class ChannelUtil  {
         CamScriptVO vo = BeanUtil.create(script,new CamScriptVO());
         return vo;
     }
-    public static LabelVO map2LabelVO(Label label){
+
+    public static LabelVO map2LabelVO(Label label,List<LabelValue> labelValueList){
         LabelVO vo = BeanUtil.create(label,new LabelVO());
         if (label.getOperator()!=null && !label.getOperator().equals("")){
             List<String> opratorList = StringToList(label.getOperator());
@@ -82,8 +100,8 @@ public class ChannelUtil  {
             vo.setOperatorList(opStList);
         }
         List<String> valueList = new ArrayList<>();
-        if (label.getRightOperand()!=null && !label.getRightOperand().equals("")){
-            valueList = StringToList(label.getRightOperand());
+        if (labelValueList!=null && !labelValueList.isEmpty()){
+            valueList = valueList2StList(labelValueList);
         }
         if (label.getScope().equals(0)){
             vo.setScope("自有标签");
@@ -117,12 +135,67 @@ public class ChannelUtil  {
     }
 
 
+    public static List<String> valueList2StList(List<LabelValue> valueList){
+        List<String> stringList = new ArrayList<>();
+        for (LabelValue labelValue : valueList){
+            if (labelValue.getLabelValue()!=null){
+                stringList.add(labelValue.getLabelValue());
+            }
+        }
+        return stringList;
+    }
+
+
+
     public static List<String> StringToList(String var1) {
         String[] array = var1.split(",");
         List<String> list = new ArrayList<String>();
         for (String str : array)
         {
             list.add(str);
+        }
+        return list;
+    }
+
+    public static Object getCellValue(Cell cell) {
+        Object cellValue;
+        switch (cell.getCellTypeEnum()){
+            case NUMERIC://数字
+                cellValue = cell.getNumericCellValue() + "";
+                break;
+            case STRING: // 字符串
+                cellValue = cell.getStringCellValue();
+                break;
+
+            case BOOLEAN: // Boolean
+                cellValue = cell.getBooleanCellValue() + "";
+                break;
+
+            case FORMULA: // 公式
+                cellValue = cell.getCellFormula() + "";
+                break;
+
+            case BLANK: // 空值
+                cellValue = "";
+                break;
+
+            case ERROR: // 故障
+                cellValue = "非法字符";
+                break;
+
+            default:
+                cellValue = "未知类型";
+                break;
+        }
+        return cellValue;
+    }
+
+    public static List<Long> StringToidList(String var1) {
+        String[] array = var1.split(",");
+        List<Long> list = new ArrayList<Long>();
+        for (String str : array)
+        {
+            list.add(Long.valueOf(str));
         }
         return list;
     }

@@ -108,7 +108,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             for (int j = 0; j < row.getLastCellNum(); j++){
                 Cell cellTitle = rowFirst.getCell(j);
                 Cell cell = row.getCell(j);
-                customers.put(cellTitle.getStringCellValue(),getCellValue(cell));
+                customers.put(cellTitle.getStringCellValue(),ChannelUtil.getCellValue(cell));
             }
             Map<String, Object> mktIssueDetailMap = new HashMap<>();
             mktIssueDetailMap.put("batchNum",batchNumSt);
@@ -124,38 +124,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         return maps;
     }
 
-    private Object getCellValue(Cell cell) {
-        Object cellValue;
-        switch (cell.getCellTypeEnum()){
-            case NUMERIC://数字
-                cellValue = cell.getNumericCellValue() + "";
-                break;
-            case STRING: // 字符串
-                cellValue = cell.getStringCellValue();
-                break;
 
-            case BOOLEAN: // Boolean
-                cellValue = cell.getBooleanCellValue() + "";
-                break;
-
-            case FORMULA: // 公式
-                cellValue = cell.getCellFormula() + "";
-                break;
-
-            case BLANK: // 空值
-                cellValue = "";
-                break;
-
-            case ERROR: // 故障
-                cellValue = "非法字符";
-                break;
-
-            default:
-                cellValue = "未知类型";
-                break;
-        }
-        return cellValue;
-    }
 
 
     /**

@@ -100,6 +100,7 @@ public class EventApiServiceImpl implements EventApiService {
     private ContactEvtItemMapper contactEvtItemMapper;  // 事件采集项
 
 
+
     @Override
     @SuppressWarnings("unchecked")
     public Map deal(Map<String, Object> map) {
@@ -662,6 +663,7 @@ public class EventApiServiceImpl implements EventApiService {
                 esJson.put("hit", "false");
                 esJson.put("msg", "下发渠道数据异常");
                 esService.save(esJson, IndexList.STRATEGY_MODULE);
+
                 return Collections.EMPTY_MAP;
             }
 
