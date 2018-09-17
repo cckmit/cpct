@@ -196,4 +196,20 @@ public class CampaignController extends BaseController {
         mktCampaignService.changeMktCampaignStatus(parentMktCampaignId, statusCd);
         return JSON.toJSONString(mktCampaignMap);
     }
+
+    /**
+     * 升级活动
+     *
+     * @param params
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/upgradeMktCampaign", method = RequestMethod.POST)
+    @CrossOrigin
+    public String upgradeMktCampaign(@RequestBody Map<String, String> params) throws Exception {
+        Long parentMktCampaignId = Long.valueOf(params.get("mktCampaignId"));
+        Map<String, Object> mktCampaignMap = mktCampaignService.upgradeMktCampaign(parentMktCampaignId);
+    //    mktCampaignService.changeMktCampaignStatus(parentMktCampaignId, statusCd);
+        return JSON.toJSONString(mktCampaignMap);
+    }
 }

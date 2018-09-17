@@ -24,7 +24,16 @@ public class FilterRule extends BaseEntity implements Serializable{
     private String expression;
     private Date dayStart;
     private Date dayEnd;
+    private String userList;
 
+
+    public String getUserList() {
+        return userList;
+    }
+
+    public void setUserList(String userList) {
+        this.userList = userList;
+    }
 
     public Date getDayStart() {
         return dayStart;

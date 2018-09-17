@@ -1,29 +1,19 @@
-/**
- * @(#)MktCampaignVO.java, 2018/7/7.
- * <p/>
- * Copyright 2018 Netease, Inc. All rights reserved.
- * NETEASE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-package com.zjtelcom.cpct.dto.campaign;
+package com.zjtelcom.cpct.dubbo.model;
 
+import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.CityProperty;
+import com.zjtelcom.cpct.dto.campaign.MktCampaign;
+import com.zjtelcom.cpct.dto.channel.MessageLabelInfo;
 import com.zjtelcom.cpct.dto.event.EventDTO;
-import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
-import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 
 import java.util.List;
 
-/**
- * Description:
- * author: linchao
- * date: 2018/07/07 15:25
- * version: V1.0
- */
-public class MktCampaignVO extends MktCampaign {
+
+public class MktCampaignResp extends MktCampaign{
 
     /**
      * 活动关联的事件
-      */
+     */
     private List<EventDTO> eventDTOS;
 
     /**
@@ -44,7 +34,7 @@ public class MktCampaignVO extends MktCampaign {
     /**
      * 下发地市Id
      */
-    private List<CityProperty> applyRegionIdList;
+    private List<SysArea> sysAreaList;
 
     /**
      * 触发类型Value
@@ -82,25 +72,24 @@ public class MktCampaignVO extends MktCampaign {
     private String statusCdValue;
 
     /**
-     * 活动目录名称
-     */
-    private String directoryName;
-
-    /**
      * 该活动是否有有效的父/子活动
      */
     private Boolean isRelation;
 
     /**
-     * 活动关联策略集合
+     * 试运算展示列
      */
-    private List<MktStrategyConf> mktStrategyConfList;
+    private List<MessageLabelInfo> calcDisplayList;
 
     /**
-     * 活动关联策略详情集合
+     * isale展示列
      */
-    private List<MktStrategyConfDetail> mktStrategyConfDetailList;
+    private List<MessageLabelInfo> isaleDisplayList;
 
+    /**
+     * 策略配置信息
+     */
+    List<MktStrategyConfResp> mktStrategyConfRespList;
 
     public List<EventDTO> getEventDTOS() {
         return eventDTOS;
@@ -108,6 +97,14 @@ public class MktCampaignVO extends MktCampaign {
 
     public void setEventDTOS(List<EventDTO> eventDTOS) {
         this.eventDTOS = eventDTOS;
+    }
+
+    public String getMktCampaignTypeValue() {
+        return mktCampaignTypeValue;
+    }
+
+    public void setMktCampaignTypeValue(String mktCampaignTypeValue) {
+        this.mktCampaignTypeValue = mktCampaignTypeValue;
     }
 
     public String getMktCampaignCategoryValue() {
@@ -126,12 +123,20 @@ public class MktCampaignVO extends MktCampaign {
         this.mktCampaignCategory = mktCampaignCategory;
     }
 
-    public List<CityProperty> getApplyRegionIdList() {
-        return applyRegionIdList;
+    public List<SysArea> getSysAreaList() {
+        return sysAreaList;
     }
 
-    public void setApplyRegionIdList(List<CityProperty> applyRegionIdList) {
-        this.applyRegionIdList = applyRegionIdList;
+    public void setSysAreaList(List<SysArea> sysAreaList) {
+        this.sysAreaList = sysAreaList;
+    }
+
+    public String getTiggerTypeValue() {
+        return tiggerTypeValue;
+    }
+
+    public void setTiggerTypeValue(String tiggerTypeValue) {
+        this.tiggerTypeValue = tiggerTypeValue;
     }
 
     public String getTiggerType() {
@@ -140,6 +145,14 @@ public class MktCampaignVO extends MktCampaign {
 
     public void setTiggerType(String tiggerType) {
         this.tiggerType = tiggerType;
+    }
+
+    public String getExecTypeValue() {
+        return execTypeValue;
+    }
+
+    public void setExecTypeValue(String execTypeValue) {
+        this.execTypeValue = execTypeValue;
     }
 
     public String getExecType() {
@@ -166,53 +179,12 @@ public class MktCampaignVO extends MktCampaign {
         this.execNum = execNum;
     }
 
-    public String getMktCampaignTypeValue() {
-        return mktCampaignTypeValue;
-    }
-
-    public void setMktCampaignTypeValue(String mktCampaignTypeValue) {
-        this.mktCampaignTypeValue = mktCampaignTypeValue;
-    }
-
-    public String getTiggerTypeValue() {
-        return tiggerTypeValue;
-    }
-
-    public void setTiggerTypeValue(String tiggerTypeValue) {
-        this.tiggerTypeValue = tiggerTypeValue;
-    }
-
-    public String getExecTypeValue() {
-        return execTypeValue;
-    }
-
-    public void setExecTypeValue(String execTypeValue) {
-        this.execTypeValue = execTypeValue;
-    }
-
-
     public String getStatusCdValue() {
         return statusCdValue;
     }
 
     public void setStatusCdValue(String statusCdValue) {
         this.statusCdValue = statusCdValue;
-    }
-
-    public List<MktStrategyConf> getMktStrategyConfList() {
-        return mktStrategyConfList;
-    }
-
-    public void setMktStrategyConfList(List<MktStrategyConf> mktStrategyConfList) {
-        this.mktStrategyConfList = mktStrategyConfList;
-    }
-
-    public List<MktStrategyConfDetail> getMktStrategyConfDetailList() {
-        return mktStrategyConfDetailList;
-    }
-
-    public void setMktStrategyConfDetailList(List<MktStrategyConfDetail> mktStrategyConfDetailList) {
-        this.mktStrategyConfDetailList = mktStrategyConfDetailList;
     }
 
     public Boolean getRelation() {
@@ -223,11 +195,27 @@ public class MktCampaignVO extends MktCampaign {
         isRelation = relation;
     }
 
-    public String getDirectoryName() {
-        return directoryName;
+    public List<MktStrategyConfResp> getMktStrategyConfRespList() {
+        return mktStrategyConfRespList;
     }
 
-    public void setDirectoryName(String directoryName) {
-        this.directoryName = directoryName;
+    public void setMktStrategyConfRespList(List<MktStrategyConfResp> mktStrategyConfRespList) {
+        this.mktStrategyConfRespList = mktStrategyConfRespList;
+    }
+
+    public List<MessageLabelInfo> getCalcDisplayList() {
+        return calcDisplayList;
+    }
+
+    public void setCalcDisplayList(List<MessageLabelInfo> calcDisplayList) {
+        this.calcDisplayList = calcDisplayList;
+    }
+
+    public List<MessageLabelInfo> getIsaleDisplayList() {
+        return isaleDisplayList;
+    }
+
+    public void setIsaleDisplayList(List<MessageLabelInfo> isaleDisplayList) {
+        this.isaleDisplayList = isaleDisplayList;
     }
 }

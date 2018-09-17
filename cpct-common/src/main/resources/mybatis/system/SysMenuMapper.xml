@@ -8,7 +8,7 @@
         <result column="MENU_TYPE" jdbcType="BIGINT" property="menuType"/>
         <result column="PARENT_MENU_ID" jdbcType="BIGINT" property="parentMenuId"/>
         <result column="MENU_NEXT_ID" jdbcType="INTEGER" property="menuNextId"/>
-        <result column="MENU_URL" jdbcTypselectByRoleIde="VARCHAR" property="menuUrl"/>
+        <result column="MENU_URL" jdbcType="VARCHAR" property="menuUrl"/>
         <result column="MENU_REMARK" jdbcType="VARCHAR" property="menuRemark"/>
         <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
         <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>

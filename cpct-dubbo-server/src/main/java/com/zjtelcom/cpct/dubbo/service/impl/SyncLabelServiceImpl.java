@@ -106,7 +106,6 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         label.setStatusCd(STATUSCD_EFFECTIVE);
         label.setCreateStaff(UserUtil.loginId());
         label.setCreateDate(new Date());
-        label.setFitDomain("1");
         label.setConditionType(tagModel.getShowFlag());
         //todo 标签操作符 对应显示类型
         label.setOperator(String.valueOf(Operator.EQUAL.getValue()));

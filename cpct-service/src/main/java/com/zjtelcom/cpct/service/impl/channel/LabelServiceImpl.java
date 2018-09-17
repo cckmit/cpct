@@ -13,6 +13,7 @@ import com.zjtelcom.cpct.service.channel.LabelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.MapUtil;
+import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -83,7 +84,8 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             }
             labelList = labelMapper.findByParam(labelName,fitDomain);
             for (Label label : labelList){
-                LabelVO vo = ChannelUtil.map2LabelVO(label);
+                List<LabelValue> valueList = labelValueMapper.selectByLabelId(label.getInjectionLabelId());
+                LabelVO vo = ChannelUtil.map2LabelVO(label,valueList);
                 voList.add(vo);
             }
         }catch (Exception e){
@@ -218,7 +220,8 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         labelList = labelMapper.findLabelList(labelName,fitDomain,labelCode,scope,conditionType);
         Page pageInfo = new Page(new PageInfo(labelList));
         for (Label label : labelList){
-            LabelVO vo = ChannelUtil.map2LabelVO(label);
+            List<LabelValue> valueList = labelValueMapper.selectByLabelId(label.getInjectionLabelId());
+            LabelVO vo = ChannelUtil.map2LabelVO(label,valueList);
             voList.add(vo);
         }
         result.put("resultCode",CODE_SUCCESS);
@@ -233,7 +236,8 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         LabelVO vo = new LabelVO();
         try {
             Label label = labelMapper.selectByPrimaryKey(labelId);
-            vo = ChannelUtil.map2LabelVO(label);
+            List<LabelValue> valueList = labelValueMapper.selectByLabelId(label.getInjectionLabelId());
+            vo = ChannelUtil.map2LabelVO(label,valueList);
         }catch (Exception e){
             e.printStackTrace();
             logger.error("[op:LabelServiceImpl] fail to getLabelDetail ", e);
@@ -331,6 +335,11 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         Map<String,Object> result = new HashMap<>();
         LabelGrp labelGrp = new LabelGrp();
             labelGrp = labelGrpMapper.selectByPrimaryKey(labelGrpId);
+            if (labelGrp==null){
+                result.put("resultCode",CODE_FAIL);
+                result.put("resultMsg","标签组不存在");
+                return result;
+            }
             LabelGrpVO vo = BeanUtil.create(labelGrp,new LabelGrpVO());
             List<LabelVO> labelVOList = getLabelVOList(labelGrp.getGrpId());
             vo.setLabelList(labelVOList);
@@ -339,6 +348,48 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         result.put("resultMsg",vo);
         return result;
     }
+
+
+    /**
+     * 标签组关联标签
+     * @param param
+     * @return
+     */
+    @Override
+    public Map<String, Object> relateLabelGrp(LabelGrpParam param) {
+        Map<String,Object> result = new HashMap<>();
+        LabelGrp labelGrp = labelGrpMapper.selectByPrimaryKey(param.getLabelGrpId());
+        if (labelGrp==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","标签组不存在");
+            return result;
+        }
+        List<LabelGrpMbr> grpMbrList = labelGrpMbrMapper.findListByGrpId(param.getLabelGrpId());
+//        List<Long> idList = new ArrayList<>();
+        for (LabelGrpMbr mbr : grpMbrList){
+            labelGrpMbrMapper.deleteByPrimaryKey(mbr.getGrpMbrId());
+        }
+//        labelGrpMbrMapper.deleteBatch(idList);
+
+        List<Label> labels = labelMapper.listLabelByIdList(param.getLabelIdList());
+        for (Label label : labels){
+            if (label!=null){
+                LabelGrpMbr labelGrpMbr = new LabelGrpMbr();
+                labelGrpMbr.setGrpId(param.getLabelGrpId());
+                labelGrpMbr.setInjectionLabelId(label.getInjectionLabelId());
+                labelGrpMbr.setCreateDate(new Date());
+                labelGrpMbr.setCreateStaff(UserUtil.loginId());
+                labelGrpMbr.setStatusCd("1000");
+                labelGrpMbrMapper.insert(labelGrpMbr);
+            }
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","添加成功");
+        return result;
+    }
+
+
+
 
     //标签组成员关系表
     @Override
@@ -443,7 +494,8 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         for (LabelGrpMbr grpMbr : lgmList){
             Label label = labelMapper.selectByPrimaryKey(grpMbr.getInjectionLabelId());
             if (label!=null){
-                LabelVO labelVO = ChannelUtil.map2LabelVO(label);
+                List<LabelValue> valueList = labelValueMapper.selectByLabelId(label.getInjectionLabelId());
+                LabelVO labelVO = ChannelUtil.map2LabelVO(label,valueList);
                 labelVOList.add(labelVO);
             }
         }

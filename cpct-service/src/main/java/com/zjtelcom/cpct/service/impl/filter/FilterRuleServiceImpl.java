@@ -106,48 +106,46 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
         Sheet sheet = wb.getSheetAt(0);
         Integer rowNums = sheet.getLastRowNum() + 1;
+        List<String> resultList = new ArrayList<>();
+        String key = "USER_LIST_"+ChannelUtil.getRandomStr(5);
         for (int i = 0; i < rowNums; i++) {
-            UserList userList = new UserList();
             Row row = sheet.getRow(i);
-            for (int j = 0; j < row.getLastCellNum(); j++) {
-                Cell cell = row.getCell(j);
-                switch (j) {
-                    case 0:
-                        userList.setUserName(cell.getStringCellValue());
-                        break;
-                    case 1:
-                        cell.setCellType(CellType.STRING);
-                        userList.setUserPhone(cell.getStringCellValue());
-                        break;
-                    case 2:
-                        userList.setFilterType(cell.getStringCellValue());
-                        break;
-                }
+            if (row.getLastCellNum()>=2){
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg","请返回检查模板格式");
+                return maps;
             }
-            UserList userListT = userListMapper.getUserList(userList);
-            if (userListT != null) {
-                continue;
-            }
-            userList.setRuleId(ruleId);
-            userList.setCreateDate(new Date());
-            userList.setUpdateDate(new Date());
-            userList.setStatusDate(new Date());
-            userList.setRemark("123");
-            userList.setLanId(1L);
-            userList.setUpdateStaff(UserUtil.loginId());
-            userList.setCreateStaff(UserUtil.loginId());
-            userList.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-            userListMapper.insert(userList);
+//            for (int j = 0; j < row.getLastCellNum(); j++) {
+            Cell cell = row.getCell(0);
+            String cellValue = ChannelUtil.getCellValue(cell).toString();
+            resultList.add(cellValue);
+//            }
+//            UserList userListT = userListMapper.getUserList(userList);
+//            if (userListT != null) {
+//                continue;
+//            }
+//            userList.setRuleId(ruleId);
+//            userList.setCreateDate(new Date());
+//            userList.setUpdateDate(new Date());
+//            userList.setStatusDate(new Date());
+//            userList.setRemark("123");
+//            userList.setLanId(1L);
+//            userList.setUpdateStaff(UserUtil.loginId());
+//            userList.setCreateStaff(UserUtil.loginId());
+//            userList.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+//            userListMapper.insert(userList);
+//
+//            //新用户存入redis;.
+//            redisUtils.hmSet(String.valueOf(userList.getUserId()), "userName", userList.getUserName());
+//            redisUtils.hmSet(String.valueOf(userList.getUserId()), "userPhone", userList.getUserPhone());
+//            redisUtils.hmSet(String.valueOf(userList.getUserId()), "filterType", userList.getFilterType());
+//            redisUtils.hmSet(key, "userList",cellValue );
+//            System.out.println(redisUtils.hmGet(key, "userList"));
 
-            //新用户存入redis;.
-            redisUtils.hmSet(String.valueOf(userList.getUserId()), "userName", userList.getUserName());
-            redisUtils.hmSet(String.valueOf(userList.getUserId()), "userPhone", userList.getUserPhone());
-            redisUtils.hmSet(String.valueOf(userList.getUserId()), "filterType", userList.getFilterType());
-            redisUtils.hmSet(String.valueOf(userList.getUserId()), "ruleId", String.valueOf(ruleId));
-            System.out.println(redisUtils.hmGet(String.valueOf(userList.getUserId()), "userName"));
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
-        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("resultMsg", ChannelUtil.StringList2String(resultList));
+        maps.put("key",key);
         return maps;
     }
 
