@@ -5,8 +5,15 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.service.synchronize.*;
 import com.zjtelcom.cpct.service.synchronize.channel.SynChannelService;
+import com.zjtelcom.cpct.service.synchronize.filter.SynFilterRuleService;
 import com.zjtelcom.cpct.service.synchronize.label.SynLabelService;
+import com.zjtelcom.cpct.service.synchronize.label.SynMessageLabelService;
 import com.zjtelcom.cpct.service.synchronize.script.SynScriptService;
+import com.zjtelcom.cpct.service.synchronize.sys.SynSysMenuService;
+import com.zjtelcom.cpct.service.synchronize.sys.SynSysParamsService;
+import com.zjtelcom.cpct.service.synchronize.sys.SynSysRoleService;
+import com.zjtelcom.cpct.service.synchronize.sys.SynSysStaffService;
+import com.zjtelcom.cpct.service.synchronize.template.SynTarGrpTemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,6 +48,20 @@ public class SynchronizeController extends BaseController {
     private SynLabelService synLabelService;
     @Autowired
     private SynChannelService synChannelService;
+    @Autowired
+    private SynSysStaffService synSysStaffService;
+    @Autowired
+    private SynSysRoleService synSysRoleService;
+    @Autowired
+    private SynSysMenuService synSysMenuService;
+    @Autowired
+    private SynSysParamsService synSysParamsService;
+    @Autowired
+    private SynFilterRuleService synFilterRuleService;
+    @Autowired
+    private SynMessageLabelService synMessageLabelService;
+    @Autowired
+    private SynTarGrpTemplateService synTarGrpTemplateService;
 
     /**
      * 单个事件同步
@@ -216,7 +237,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("[op:SynContactEvtServiceImpl] 批量同步事件源接口失败！Exception: ", e);
+            logger.error("批量同步事件源接口失败！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -238,7 +259,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("[op:SynInterfaceCfgServiceImpl] 通过主键同步单个事件目录失败！Exception: ",eventSceneId,e);
+            logger.error("通过主键同步单个事件目录失败！Exception: ",eventSceneId,e);
         }
         return JSON.toJSONString(map);
     }
@@ -260,7 +281,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("[op:SynContactEvtServiceImpl] 批量同步事件目录失败！Exception: ", e);
+            logger.error("批量同步事件目录失败！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -282,7 +303,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("[op:SynInterfaceCfgServiceImpl] 通过主键同步单个事件场景目录失败！Exception: ",eventSceneTypeId,e);
+            logger.error("通过主键同步单个事件场景目录失败！Exception: ",eventSceneTypeId,e);
         }
         return JSON.toJSONString(map);
     }
@@ -304,7 +325,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("[op:SynContactEvtServiceImpl] 批量同步事件场景目录失败！Exception: ", e);
+            logger.error("批量同步事件场景目录失败！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -326,7 +347,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("[op:SynInterfaceCfgServiceImpl] 通过渠道id同步单个渠道失败！Exception: ",channelId,e);
+            logger.error("通过渠道id同步单个渠道失败！Exception: ",channelId,e);
         }
         return JSON.toJSONString(map);
     }
@@ -348,7 +369,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("[op:SynContactEvtServiceImpl] 批量同步渠道失败！Exception: ", e);
+            logger.error("批量同步渠道失败！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -370,7 +391,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("[op:SynInterfaceCfgServiceImpl] 通过接触脚本id同步单个接触脚本失败！Exception: ",scriptId,e);
+            logger.error("通过接触脚本id同步单个接触脚本失败！Exception: ",scriptId,e);
         }
         return JSON.toJSONString(map);
     }
@@ -392,29 +413,213 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("[op:SynContactEvtServiceImpl] 批量同步接触脚本失败！Exception: ", e);
+            logger.error("批量同步接触脚本失败！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
 
 
     /**
-     *
-     * @param labelId
+     * 同步单个用户
+     * @param staffId
      * @return
      */
-    @PostMapping("singleLabel")
+    @PostMapping("singleStaff")
     @CrossOrigin
-    public String singleLabel(@RequestParam(value = "labelId", required = true) Long labelId){
-        logger.info("同步标签");
+    public String singleStaff(@RequestParam(value = "staffId", required = true) Long staffId){
+        logger.info("同步单个用户");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
-            map = synLabelService.synchronizeSingleLabel(labelId,roleName);
+            map = synSysStaffService.synchronizeSingleStaff(staffId,roleName);
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("[op:SynInterfaceCfgServiceImpl] 通过标签id同步单个标签失败！Exception: ",labelId,e);
+            logger.error("通过id同步单个用户信息失败！Exception: ",staffId,e);
+        }
+        return JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 批量同步用户信息
+     * @return
+     */
+    @PostMapping("batchStaff")
+    @CrossOrigin
+    public String batchStaff(){
+        //角色权限控制
+        logger.info("批量同步用户信息");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synSysStaffService.synchronizeBatchStaff(roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("批量同步用户信息失败！Exception: ", e);
+        }
+        return  JSON.toJSONString(map);
+    }
+
+
+
+
+    /**
+     * 同步单个角色信息
+     * @param roleId
+     * @return
+     */
+    @PostMapping("singleRole")
+    @CrossOrigin
+    public String singleRole(@RequestParam(value = "roleId", required = true) Long roleId){
+        logger.info("同步单个角色信息");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synSysRoleService.synchronizeSingleRole(roleId,roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("通过id同步单个角色信息失败！Exception: ",roleId,e);
+        }
+        return JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 批量同步角色信息
+     * @return
+     */
+    @PostMapping("batchRole")
+    @CrossOrigin
+    public String batchRole(){
+        //角色权限控制
+        logger.info("批量同步角色信息");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synSysRoleService.synchronizeBatchRole(roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("批量同步角色信息失败！Exception: ", e);
+        }
+        return  JSON.toJSONString(map);
+    }
+
+
+
+
+    /**
+     * 同步单个菜单信息
+     * @param menuId
+     * @return
+     */
+    @PostMapping("singleMenu")
+    @CrossOrigin
+    public String singleMenu(@RequestParam(value = "menuId", required = true) Long menuId){
+        logger.info("同步单个菜单信息");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synSysMenuService.synchronizeSingleMenu(menuId,roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("通过id同步单个菜单信息失败！Exception: ",menuId,e);
+        }
+        return JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 批量同步菜单信息
+     * @return
+     */
+    @PostMapping("batchMenu")
+    @CrossOrigin
+    public String batchMenu(){
+        //角色权限控制
+        logger.info("批量同步菜单信息");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synSysMenuService.synchronizeBatchMenu(roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("批量同步菜单信息失败！Exception: ", e);
+        }
+        return  JSON.toJSONString(map);
+    }
+
+
+
+
+    /**
+     * 同步单个静态参数
+     * @param paramId
+     * @return
+     */
+    @PostMapping("singleParams")
+    @CrossOrigin
+    public String singleParams(@RequestParam(value = "paramId", required = true) Long paramId){
+        logger.info("同步单个静态参数");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synSysParamsService.synchronizeSingleParam(paramId,roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("通过标签id同步单个静态参数失败！Exception: ",paramId,e);
+        }
+        return JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 批量同步静态参数
+     * @return
+     */
+    @PostMapping("batchParams")
+    @CrossOrigin
+    public String batchParams(){
+        //角色权限控制
+        logger.info("批量同步静态参数");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synSysParamsService.synchronizeBatchParam(roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("批量同步静态参数失败！Exception: ", e);
+        }
+        return  JSON.toJSONString(map);
+    }
+
+
+
+
+    /**
+     * 同步单个过滤规则
+     * @param ruleId
+     * @return
+     */
+    @PostMapping("singleFilterRule")
+    @CrossOrigin
+    public String singleFilterRule(@RequestParam(value = "ruleId", required = true) Long ruleId){
+        logger.info("同步单个过滤规则");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synFilterRuleService.synchronizeSingleFilterRule(ruleId,roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error(" 通过id同步单个过滤规则失败！Exception: ",ruleId,e);
         }
         return JSON.toJSONString(map);
     }
@@ -424,22 +629,117 @@ public class SynchronizeController extends BaseController {
      * 批量同步标签
      * @return
      */
-    @PostMapping("batchLabel")
+    @PostMapping("batchFilterRule")
     @CrossOrigin
-    public String batchLabel(){
+    public String batchFilterRule(){
         //角色权限控制
-        logger.info("批量同步标签");
+        logger.info("批量同步过滤规则");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
-            map = synLabelService.synchronizeBatchLabel(roleName);
+            map = synFilterRuleService.synchronizeBatchFilterRule(roleName);
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("[op:SynContactEvtServiceImpl] 批量同步标签失败！Exception: ", e);
+            logger.error("批量同步过滤规则！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
+
+
+
+
+    /**
+     * 同步单个试运算标签展示列
+     * @param labelId
+     * @return
+     */
+    @PostMapping("singleMessageLabel")
+    @CrossOrigin
+    public String singleMessageLabel(@RequestParam(value = "labelId", required = true) Long labelId){
+        logger.info("同步单个试运算标签展示列");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synMessageLabelService.synchronizeSingleMessageLabel(labelId,roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("通过id同步单个试运算标签展示列失败！Exception: ",labelId,e);
+        }
+        return JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 批量同步试运算标签展示列
+     * @return
+     */
+    @PostMapping("batchMessageLabel")
+    @CrossOrigin
+    public String batchMessageLabel(){
+        //角色权限控制
+        logger.info("批量同步试运算标签展示列");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synMessageLabelService.synchronizeBatchMessageLabel(roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("批量同步试运算标签展示列！Exception: ", e);
+        }
+        return  JSON.toJSONString(map);
+    }
+
+
+
+
+    /**
+     * 同步单个分群模板
+     * @param templateId
+     * @return
+     */
+    @PostMapping("singleTemplate")
+    @CrossOrigin
+    public String singleTemplate(@RequestParam(value = "templateId", required = true) Long templateId){
+        logger.info("同步单个分群模板");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synTarGrpTemplateService.synchronizeSingleTemplate(templateId,roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("通过id同步单个分群模板失败！Exception: ",templateId,e);
+        }
+        return JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 批量同步标签
+     * @return
+     */
+    @PostMapping("batchTemplate")
+    @CrossOrigin
+    public String batchTemplate(){
+        //角色权限控制
+        logger.info("批量同步分群模板");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synTarGrpTemplateService.synchronizeBatchTemplate(roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("批量同步分群模板！Exception: ", e);
+        }
+        return  JSON.toJSONString(map);
+    }
+
+
+
 
 
 
