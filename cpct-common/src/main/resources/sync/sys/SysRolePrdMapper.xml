@@ -19,10 +19,11 @@
     </delete>
 
     <insert id="insert" parameterType="com.zjtelcom.cpct.domain.system.SysRole">
-    insert into sys_role (ROLE_NAME, ROLE_CODE,REMARK,
-      CREATE_DATE, CREATE_STAFF)
+    insert into sys_role (ROLE_ID,ROLE_NAME, ROLE_CODE,REMARK,
+      CREATE_DATE, CREATE_STAFF,UPDATE_DATE,UPDATE_STAFF)
     values (#{roleName,jdbcType=VARCHAR}, #{roleCode,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR},
-      #{createDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT})
+      #{createDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT},
+      #{updateDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT})
     </insert>
 
     <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.system.SysRole">
@@ -30,6 +31,8 @@
       set ROLE_NAME = #{roleName,jdbcType=VARCHAR},
         REMARK = #{remark,jdbcType=VARCHAR},
         ROLE_CODE = #{roleCode,jdbcType=VARCHAR},
+        CREATE_DATE=#{createDate,jdbcType=TIMESTAMP},
+        CREATE_STAFF=#{createStaff,jdbcType=BIGINT},
         UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
         UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT}
       where ROLE_ID = #{roleId,jdbcType=BIGINT}
@@ -68,5 +71,10 @@
         from sys_role
         order by ROLE_ID asc
     </select>
+
+
+
+
+
 
 </mapper>
