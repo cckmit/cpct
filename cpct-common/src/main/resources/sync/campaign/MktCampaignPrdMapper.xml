@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zjtelcom.cpct_prd.dao.MktCampaignPrdMapper">
+<mapper namespace="com.zjtelcom.cpct_prd.dao.campaign.MktCampaignPrdMapper">
     <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.campaign.MktCampaignDO">
         <id column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId"/>
         <result column="TIGGER_TYPE" jdbcType="VARCHAR" property="tiggerType"/>
@@ -55,6 +55,33 @@
       #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP},
       #{remark,jdbcType=VARCHAR}, #{lanId,jdbcType=BIGINT})
     </insert>
+
+<!--
+    <insert id="insertBatch" parameterType="java.util.List" useGeneratedKeys="true"
+            keyProperty="mktCampaignId">
+        insert into mkt_campaign (MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME,
+        PLAN_BEGIN_TIME, PLAN_END_TIME, BEGIN_TIME,
+        END_TIME, MKT_CAMPAIGN_TYPE, MKT_CAMPAIGN_CATEGORY,
+        MKT_ACTIVITY_NBR, MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC,
+        CALC_DISPLAY,ISALE_DISPLAY,
+        EXEC_TYPE, EXEC_INVL, EXEC_NUM,
+        STATUS_CD, STATUS_DATE, CREATE_STAFF,
+        CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
+        REMARK, LAN_ID)
+        values
+        <foreach collection="list" item="campaign" index="index" separator="," >
+            (#{campaign.mktCampaignId,jdbcType=BIGINT}, #{campaign.tiggerType,jdbcType=VARCHAR}, #{campaign.mktCampaignName,jdbcType=VARCHAR},
+            #{campaign.planBeginTime,jdbcType=DATE}, #{campaign.planEndTime,jdbcType=DATE}, #{campaign.beginTime,jdbcType=DATE},
+            #{campaign.endTime,jdbcType=DATE}, #{campaign.mktCampaignType,jdbcType=VARCHAR}, #{campaign.mktCampaignCategory,jdbcType=VARCHAR},
+            #{campaign.mktActivityNbr,jdbcType=VARCHAR}, #{campaign.mktActivityTarget,jdbcType=VARCHAR}, #{campaign.mktCampaignDesc,jdbcType=VARCHAR},
+            #{campaign.calcDisplay,jdbcType=VARCHAR}, #{campaign.isaleDisplay,jdbcType=VARCHAR},
+            #{campaign.execType,jdbcType=VARCHAR}, #{campaign.execInvl,jdbcType=VARCHAR}, #{campaign.execNum,jdbcType=INTEGER},
+            #{campaign.statusCd,jdbcType=VARCHAR}, #{campaign.statusDate,jdbcType=TIMESTAMP}, #{campaign.createStaff,jdbcType=BIGINT},
+            #{campaign.createDate,jdbcType=TIMESTAMP}, #{campaign.updateStaff,jdbcType=BIGINT}, #{campaign.updateDate,jdbcType=TIMESTAMP},
+            #{campaign.remark,jdbcType=VARCHAR}, #{campaign.lanId,jdbcType=BIGINT})
+        </foreach>
+    </insert>
+-->
 
     <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignDO">
       update mkt_campaign

@@ -1,10 +1,10 @@
-package com.zjtelcom.cpct.dao.strategy;
+package com.zjtelcom.cpct_prd.dao.strategy;
 
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 
 import java.util.List;
 
-public interface  MktStrategyConfRuleRelMapper {
+public interface MktStrategyConfRuleRelPrdMapper {
     int deleteByPrimaryKey(Long mktStrategyConfRuleRelId);
 
     int deleteByMktStrategyConfId(Long mktStrategyConfId);
@@ -16,8 +16,6 @@ public interface  MktStrategyConfRuleRelMapper {
     MktStrategyConfRuleRelDO selectByPrimaryKey(Long mktStrategyConfRuleRelId);
 
     List<MktStrategyConfRuleRelDO> selectByMktStrategyConfId(Long mktStrategyConfId);
-
-    MktStrategyConfRuleRelDO selectByRuleId(Long ruleId);
 
     List<MktStrategyConfRuleRelDO> selectAll();
 
