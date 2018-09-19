@@ -1,10 +1,12 @@
-package com.zjtelcom.cpct.domain.question;
+package com.zjtelcom.cpct.dto.question;
 
-import com.zjtelcom.cpct.BaseEntity;
+import com.zjtelcom.cpct.domain.question.QuestRel;
 
-import java.util.Date;
+import java.io.Serializable;
+import java.util.List;
 
-public class Questionnaire extends BaseEntity{
+public class QuestionnaireParam implements Serializable {
+
     private Long naireId;
 
     private String naireName;
@@ -17,10 +19,29 @@ public class Questionnaire extends BaseEntity{
 
     private String naireDesc;
 
-    private String startTip;
+    private List<Long> questionIdList;
 
-    private String endTip;
+    private Integer page;
 
+    private Integer pageSize;
+
+
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public Integer getPage() {
+        return page;
+    }
+
+    public void setPage(Integer page) {
+        this.page = page;
+    }
 
     public Long getNaireId() {
         return naireId;
@@ -70,20 +91,11 @@ public class Questionnaire extends BaseEntity{
         this.naireDesc = naireDesc;
     }
 
-    public String getStartTip() {
-        return startTip;
+    public List<Long> getQuestionIdList() {
+        return questionIdList;
     }
 
-    public void setStartTip(String startTip) {
-        this.startTip = startTip;
+    public void setQuestionIdList(List<Long> questionIdList) {
+        this.questionIdList = questionIdList;
     }
-
-    public String getEndTip() {
-        return endTip;
-    }
-
-    public void setEndTip(String endTip) {
-        this.endTip = endTip;
-    }
-
 }

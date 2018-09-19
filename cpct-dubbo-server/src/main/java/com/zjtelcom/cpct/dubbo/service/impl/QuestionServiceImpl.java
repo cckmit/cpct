@@ -35,7 +35,6 @@ public class QuestionServiceImpl implements QuestionService {
     @Autowired
     private MktQuestionDetailMapper questionDetailMapper;
 
-
     /**
      * 问卷详情
      * @param questionnaireId
@@ -68,7 +67,6 @@ public class QuestionServiceImpl implements QuestionService {
                     detailVOS.add(detailVO);
                 }
                 vo.setQuestionDetailList(detailVOS);
-                voList.add(vo);
             }
         }
         resultRep.setQuestionVOList(voList);

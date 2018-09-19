@@ -1,10 +1,10 @@
 package com.zjtelcom.cpct.service.question;
 
 import com.zjtelcom.cpct.domain.question.Question;
-import com.zjtelcom.cpct.domain.question.QuestionDetail;
+import com.zjtelcom.cpct.domain.question.Questionnaire;
 import com.zjtelcom.cpct.dto.question.QuestionAddVO;
-import com.zjtelcom.cpct.dto.question.QuestionDetailAddVO;
 import com.zjtelcom.cpct.dto.question.QuestionEditVO;
+import com.zjtelcom.cpct.dto.question.QuestionnaireParam;
 
 import java.util.Map;
 
@@ -16,12 +16,11 @@ public interface QuestionService {
 
     Map<String,Object> modQuestion(Long userId, QuestionEditVO editVO);
 
-    Map<String,Object> listQuestion();
+    Map<String,Object> listQuestion(Question param,Integer page,Integer pageSize);
 
+    Map<String,Object> getQuestionDetail(Long questionId);
 
-
-
-//    Map<String,Object> delQuestion(Long userId,Long questionId);
+    Map<String,Object> delQuestion(Long userId,Long questionId);
 //
 //    Map<String,Object> modQuestionDetail(Long userId, QuestionDetail detail);
 //

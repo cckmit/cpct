@@ -122,13 +122,6 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         label.setLabelDataType(ChannelUtil.getDataType(tagModel.getSourceTableColumnType()));
         label.setCreateDate(new Date());
         labelMapper.insert(label);
-        if (!valueModelList.isEmpty()){
-            Map<String,Object> map = syncLabelValue(valueModelList,label.getInjectionLabelId());
-            if (map.get("resultCode").equals(CODE_SUCCESS)){
-                label.setRightOperand(map.get("valueString").toString());
-                labelMapper.updateByPrimaryKey(label);
-            }
-        }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","新增成功");
         return result;

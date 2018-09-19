@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.util;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
+import com.zjtelcom.cpct.domain.question.Question;
 import com.zjtelcom.cpct.dto.campaign.CampaignVO;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.Operator;
@@ -19,6 +20,56 @@ import java.util.UUID;
 
 @Component
 public class ChannelUtil  {
+
+
+    public static String getQuestionType(Question question){
+        String st = "";
+        switch (question.getQuestionType()){
+            case "1000":
+                st = "单选题";
+                break;
+            case "2000":
+                st = "多选题";
+                break;
+        }
+        return st;
+    }
+
+    public static String getAnswerType(Question question){
+        //1000	日期输入框;2000	下拉选择框;3000	文本输入框;4000	单选框;5000	字符编辑框;6000	是与否控制框;7000	数值输入框;8000	多选框;9000	文本标签
+        String st = "";
+        switch (question.getAnswerType()){
+            case "1000":
+                st = "日期输入框";
+                break;
+            case "2000":
+                st = "下拉选择框";
+                break;
+            case "3000":
+                st = "文本输入框";
+                break;
+            case "4000":
+                st = "单选框";
+                break;
+            case "5000":
+                st = "字符编辑框";
+                break;
+            case "6000":
+                st = "是与否控制框";
+                break;
+            case "7000":
+                st = "数值输入框";
+                break;
+            case "8000":
+                st = "多选框";
+                break;
+            case "9000":
+                st = "文本标签";
+                break;
+        }
+        return st;
+    }
+
 
 
     public static String getUUID(){

@@ -49,6 +49,109 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
 
     /**
+     * 创建问卷
+     * @param addVO
+     * @return
+     */
+    @Override
+    public Map<String, Object> createQuestionnaire(QuestionnaireParam addVO) {
+        Map<String,Object> result = new HashMap<>();
+        //添加调研问卷记录
+        Questionnaire questionnaire = BeanUtil.create(addVO,new Questionnaire());
+        questionnaire.setCreateDate(DateUtil.getCurrentTime());
+        questionnaire.setUpdateDate(DateUtil.getCurrentTime());
+        questionnaire.setStatusDate(DateUtil.getCurrentTime());
+        questionnaire.setUpdateStaff(UserUtil.loginId());
+        questionnaire.setCreateStaff(UserUtil.loginId());
+        questionnaire.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+        questionnaireMapper.insert(questionnaire);
+        List<QuestRel> questRelList = getQuestRels(addVO, questionnaire);
+        questRelMapper.insertBatch(questRelList);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","创建成功");
+        return result;
+    }
+
+    /**
+     * 编辑问卷
+     * @param editvo
+     * @return
+     */
+    @Override
+    public Map<String, Object> modQuestionnaire(QuestionnaireParam editvo) {
+        Map<String,Object> result = new HashMap<>();
+        //添加调研问卷记录
+        Questionnaire questionnaire = BeanUtil.create(editvo,new Questionnaire());
+
+        questionnaire.setUpdateDate(DateUtil.getCurrentTime());
+        questionnaire.setUpdateStaff(UserUtil.loginId());
+        questionnaireMapper.updateByPrimaryKey(questionnaire);
+        questRelMapper.deleteByNaireId(questionnaire.getNaireId());
+        List<QuestRel> questRelList = getQuestRels(editvo, questionnaire);
+        questRelMapper.insertBatch(questRelList);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","编辑成功");
+        return result;
+    }
+
+
+    private List<QuestRel> getQuestRels(QuestionnaireParam editvo, Questionnaire questionnaire) {
+        List<QuestRel> questRelList = new ArrayList<>();
+        for (Long id : editvo.getQuestionIdList()){
+            QuestRel questRel = new QuestRel();
+            questRel.setQuestionId(id);
+            questRel.setNaireId(questionnaire.getNaireId());
+            questRel.setCreateDate(DateUtil.getCurrentTime());
+            questRel.setUpdateDate(DateUtil.getCurrentTime());
+            questRel.setStatusDate(DateUtil.getCurrentTime());
+            questRel.setUpdateStaff(UserUtil.loginId());
+            questRel.setCreateStaff(UserUtil.loginId());
+            questRel.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+            questRelMapper.insert(questRel);
+            questRelList.add(questRel);
+
+        }
+        return questRelList;
+    }
+
+    /**
+     * 获取问卷
+     * @param questionnaireId
+     * @return
+     */
+    @Override
+    public Map<String, Object> getQuestionnaire(Long questionnaireId) {
+        Map<String,Object> result = new HashMap<>();
+        QuestionRep resultRep = new QuestionRep();
+        Questionnaire questionnaire = questionnaireMapper.selectByPrimaryKey(questionnaireId);
+        if (questionnaire==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","调研问卷不存在");
+            return result;
+        }
+        resultRep.setQuestionnaire(questionnaire);
+        List<QuestionModel> voList = new ArrayList<>();
+        List<QuestRel> questRelList = questRelMapper.findRelListByQuestionnaireId(questionnaireId);
+        for (QuestRel questRel : questRelList){
+            Question question = questionMapper.selectByPrimaryKey(questRel.getQuestionId());
+            if (question!=null){
+                Map<String,Object> questionDetail = questionService.getQuestionDetail(question.getQuestionId());
+                QuestionModel vo = (QuestionModel)questionDetail.get("date");
+                voList.add(vo);
+            }
+        }
+        resultRep.setQuestionVOList(voList);
+        result.put("resutlCode",CODE_SUCCESS);
+        result.put("resultMsg",resultRep);
+        return result;
+    }
+
+
+
+
+
+    //--------------------------------------------------------------------------------------------------------------------------------------------------------
+    /**
      * 编辑调研问卷
      * @param userId
      * @param req
@@ -153,12 +256,6 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
     private Map<String, Object> questionnaireRel(Long userId, QuestionReq questionReq, Map<String, Object> result, Questionnaire questionnaire,boolean isAdd) {
         Long naireId = questionnaire.getNaireId();
-//        for (InputQuestionAddVO inputQuestionAddVO : questionReq.getInputQuestionAddVOList()){
-//            //添加问题及答案
-//            QuestionAddVO questionAddVO = BeanUtil.create(inputQuestionAddVO,new QuestionAddVO());
-//            Map<String, Object> map = addQuestion(userId, naireId, questionAddVO);
-//            if (map != null) return map;
-//        }
         for (MultiQuestionAddVO multiQuestionAddVO : questionReq.getMultiQuestionAddVOList()){
             //添加问题及答案
             QuestionAddVO questionAddVO = BeanUtil.create(multiQuestionAddVO,new QuestionAddVO());
@@ -232,7 +329,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
                 voList.add(vo);
             }
         }
-        resultRep.setQuestionVOList(voList);
+//        resultRep.setQuestionVOList(voList);
         result.put("resutlCode",CODE_SUCCESS);
         result.put("resultMsg",resultRep);
         return result;

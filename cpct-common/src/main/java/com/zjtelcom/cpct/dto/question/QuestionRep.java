@@ -7,7 +7,8 @@ import java.util.List;
 
 public class QuestionRep implements Serializable {
     private Questionnaire questionnaire;
-    private List<QuestionVO> questionVOList;
+    private List<QuestionModel> questionVOList;
+
 
     public Questionnaire getQuestionnaire() {
         return questionnaire;
@@ -17,11 +18,11 @@ public class QuestionRep implements Serializable {
         this.questionnaire = questionnaire;
     }
 
-    public List<QuestionVO> getQuestionVOList() {
+    public List<QuestionModel> getQuestionVOList() {
         return questionVOList;
     }
 
-    public void setQuestionVOList(List<QuestionVO> questionVOList) {
+    public void setQuestionVOList(List<QuestionModel> questionVOList) {
         this.questionVOList = questionVOList;
     }
 }

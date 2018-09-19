@@ -14,9 +14,20 @@ public class QuestionEditVO implements Serializable {
 
     private String answerType;
 
+    private String reset;
+
     private String defaultAnswer;
 
     private List<QuestionDetailAddVO> questionDetailAddVOList;
+
+
+    public String getReset() {
+        return reset;
+    }
+
+    public void setReset(String reset) {
+        this.reset = reset;
+    }
 
     public List<QuestionDetailAddVO> getQuestionDetailAddVOList() {
         return questionDetailAddVOList;
