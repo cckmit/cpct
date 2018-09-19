@@ -341,7 +341,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             map.put("resultMsg","事件不存在");
             return map;
         }
-        CopyPropertiesUtil.copyBean2Bean(contactEventDetail, contactEvt);
+        BeanUtil.copy(contactEvt,contactEventDetail);
         ContactEvtType evtType = evtTypeMapper.selectByPrimaryKey(contactEvt.getContactEvtTypeId());
         if (evtType!=null){
             contactEventDetail.setEventTypeName(evtType.getContactEvtName());
@@ -373,7 +373,9 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
 //        }
         //获取所有活动
         List<MktCamEvtRel> mktCamEvtRels = new ArrayList<>();
+
         mktCamEvtRels = mktCamEvtRelMapper.qryBycontactEvtId(contactEvt.getContactEvtId());
+
         for (MktCamEvtRel rel : mktCamEvtRels){
             MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(rel.getMktCampaignId());
             if (campaign!=null){
@@ -529,8 +531,8 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     public Map<String, Object> evtDetails(ContactEvt contactEvt) {
         Map<String,Object> maps = new HashMap<>();
         contactEvt = contactEvtMapper.getEventById(contactEvt.getContactEvtId());
-        maps.put("resultCode", .CODE_SUCCESS);
-        maps.put("resultMsg", StCommonConstantringUtils.EMPTY);
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("ContactEvt", contactEvt);
         return maps;
     }

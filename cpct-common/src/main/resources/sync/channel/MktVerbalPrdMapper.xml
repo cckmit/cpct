@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct_prd.dao.channel.MktVerbalPrdMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.MktVerbal">
+    <id column="VERBAL_ID" jdbcType="BIGINT" property="verbalId" />
+    <result column="CAMPAIGN_ID" jdbcType="BIGINT" property="campaignId" />
+    <result column="CONTACT_CONF_ID" jdbcType="BIGINT" property="contactConfId" />
+    <result column="SCRIPT_DESC" jdbcType="VARCHAR" property="scriptDesc" />
+    <result column="CHANNEL_ID" jdbcType="BIGINT" property="channelId" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from mkt_verbal
+    where VERBAL_ID = #{verbalId,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByConfId" parameterType="java.lang.Long">
+    delete from mkt_verbal
+    where CONTACT_CONF_ID = #{contactConfId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" keyProperty="verbalId" useGeneratedKeys="true"
+          parameterType="com.zjtelcom.cpct.domain.channel.MktVerbal">
+    insert into mkt_verbal (VERBAL_ID, CAMPAIGN_ID, CONTACT_CONF_ID, 
+      SCRIPT_DESC, CHANNEL_ID, STATUS_CD, 
+      CREATE_STAFF, CREATE_DATE, REMARK
+      )
+    values (#{verbalId,jdbcType=BIGINT}, #{campaignId,jdbcType=BIGINT}, #{contactConfId,jdbcType=BIGINT}, 
+      #{scriptDesc,jdbcType=VARCHAR}, #{channelId,jdbcType=BIGINT}, #{statusCd,jdbcType=VARCHAR}, 
+      #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.MktVerbal">
+    update mkt_verbal
+    set CAMPAIGN_ID = #{campaignId,jdbcType=BIGINT},
+      CONTACT_CONF_ID = #{contactConfId,jdbcType=BIGINT},
+      SCRIPT_DESC = #{scriptDesc,jdbcType=VARCHAR},
+      CHANNEL_ID = #{channelId,jdbcType=BIGINT},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where VERBAL_ID = #{verbalId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select VERBAL_ID, CAMPAIGN_ID, CONTACT_CONF_ID, SCRIPT_DESC, CHANNEL_ID, STATUS_CD, 
+    CREATE_STAFF, CREATE_DATE, REMARK
+    from mkt_verbal
+    where VERBAL_ID = #{verbalId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select VERBAL_ID, CAMPAIGN_ID, CONTACT_CONF_ID, SCRIPT_DESC, CHANNEL_ID, STATUS_CD, 
+    CREATE_STAFF, CREATE_DATE, REMARK
+    from mkt_verbal
+  </select>
+
+  <select id="findVerbalListByConfId" resultMap="BaseResultMap">
+    select VERBAL_ID, CAMPAIGN_ID, CONTACT_CONF_ID, SCRIPT_DESC, CHANNEL_ID, STATUS_CD,
+    CREATE_STAFF, CREATE_DATE, REMARK
+    from mkt_verbal where CONTACT_CONF_ID = #{confId}
+  </select>
+
+
+</mapper>

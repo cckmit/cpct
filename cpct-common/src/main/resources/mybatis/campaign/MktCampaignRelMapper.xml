@@ -7,13 +7,8 @@
         <result column="A_MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="aMktCampaignId"/>
         <result column="Z_MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="zMktCampaignId"/>
         <result column="EFF_DATE" jdbcType="TIMESTAMP" property="effDate"/>
-<<<<<<< HEAD
-        <result column="EXP_DATE" jdbcselectByAmktCampaignIdType="TIMESTAMP" property="expDate"/>
-        <result column="APPLY_REGION_ID" jdbcType="DECIMAL" property="applyRegionId"/>
-=======
         <result column="EXP_DATE" jdbcType="TIMESTAMP" property="expDate"/>
         <result column="APPLY_REGION_ID" jdbcType="BIGINT" property="applyRegionId"/>
->>>>>>> c09f31cc15db51b867d78cdd55f531651220ca04
         <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd"/>
         <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
         <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff"/>
