@@ -74,9 +74,7 @@ public class SynSysRoleServiceImpl implements SynSysRoleService {
     @Override
     public Map<String, Object> synchronizeBatchRole(String roleName) {
         Map<String,Object> maps = new HashMap<>();
-        //先查出准生产的所有事件
         List<SysRole> prdList = sysRoleMapper.selectByParams(null,null);
-        //查出生产的所有事件
         List<SysRole> realList = sysRolePrdMapper.selectByParams(null,null);
         //三个集合分别表示需要 新增的   修改的    删除的
         List<SysRole> addList=new ArrayList<SysRole>();
@@ -94,7 +92,6 @@ public class SynSysRoleServiceImpl implements SynSysRoleService {
                 }
             }
         }
-        //查出需要删除的事件
         for(SysRole c:realList){
             for (int i = 0; i <prdList.size() ; i++) {
                 if(c.getRoleId()-prdList.get(i).getRoleId()==0){

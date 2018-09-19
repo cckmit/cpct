@@ -91,7 +91,6 @@ public class SynChannelServiceImpl implements SynChannelService {
                 }
             }
         }
-        //查出需要删除的事件
         for(Channel c:realList){
             for (int i = 0; i <prdList.size() ; i++) {
                 if(c.getContactChlId()-prdList.get(i).getContactChlId()==0){

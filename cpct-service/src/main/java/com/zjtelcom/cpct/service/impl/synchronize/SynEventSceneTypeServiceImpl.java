@@ -96,7 +96,7 @@ public class SynEventSceneTypeServiceImpl implements SynEventSceneTypeService {
                 }
             }
         }
-        //查出需要删除的事件
+        //查出需要删除的事件场景目录
         for(EventSceneTypeDO c:realList){
             for (int i = 0; i <prdList.size() ; i++) {
                 if(c.getEvtSceneTypeId()-prdList.get(i).getEvtSceneTypeId()==0){

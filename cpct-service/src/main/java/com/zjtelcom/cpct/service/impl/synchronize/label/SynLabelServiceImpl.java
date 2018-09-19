@@ -92,7 +92,6 @@ public class SynLabelServiceImpl implements SynLabelService{
                 }
             }
         }
-        //查出需要删除的事件
         for(Label c:realList){
             for (int i = 0; i <prdList.size() ; i++) {
                 if(c.getInjectionLabelId()-prdList.get(i).getInjectionLabelId()==0){

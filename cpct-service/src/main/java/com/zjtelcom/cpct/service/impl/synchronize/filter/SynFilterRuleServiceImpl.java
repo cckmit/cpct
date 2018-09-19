@@ -74,9 +74,7 @@ public class SynFilterRuleServiceImpl implements SynFilterRuleService {
     @Override
     public Map<String, Object> synchronizeBatchFilterRule(String roleName) {
         Map<String,Object> maps = new HashMap<>();
-        //先查出准生产的所有事件
         List<FilterRule> prdList = filterRuleMapper.selectAll();
-        //查出生产的所有事件
         List<FilterRule> realList = filterRulePrdMapper.selectAll();
         //三个集合分别表示需要 新增的   修改的    删除的
         List<FilterRule> addList=new ArrayList<FilterRule>();
@@ -94,7 +92,6 @@ public class SynFilterRuleServiceImpl implements SynFilterRuleService {
                 }
             }
         }
-        //查出需要删除的事件
         for(FilterRule c:realList){
             for (int i = 0; i <prdList.size() ; i++) {
                 if(c.getRuleId()-prdList.get(i).getRuleId()==0){

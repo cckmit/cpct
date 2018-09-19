@@ -91,7 +91,6 @@ public class SynScriptServiceImpl implements SynScriptService{
                 }
             }
         }
-        //查出需要删除的事件
         for(Script c:realList){
             for (int i = 0; i <prdList.size() ; i++) {
                 if(c.getScriptId()-prdList.get(i).getScriptId()==0){

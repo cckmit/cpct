@@ -101,7 +101,7 @@ public class SynEventSceneServiceImpl implements SynEventSceneService {
                 }
             }
         }
-        //查出需要删除的事件
+        //查出需要删除的事件场景
         for(EventScene c:realList){
             for (int i = 0; i <prdList.size() ; i++) {
                 if(c.getEventSceneId()-prdList.get(i).getEventSceneId()==0){

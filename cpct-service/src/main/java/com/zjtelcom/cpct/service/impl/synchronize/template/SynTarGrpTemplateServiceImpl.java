@@ -74,9 +74,7 @@ public class SynTarGrpTemplateServiceImpl implements SynTarGrpTemplateService{
     @Override
     public Map<String, Object> synchronizeBatchTemplate(String roleName) {
         Map<String,Object> maps = new HashMap<>();
-        //先查出准生产的所有事件
         List<TarGrpTemplateDO> prdList = tarGrpTemplateMapper.selectAll();
-        //查出生产的所有事件
         List<TarGrpTemplateDO> realList = tarGrpTemplatePrdMapper.selectAll();
         //三个集合分别表示需要 新增的   修改的    删除的
         List<TarGrpTemplateDO> addList=new ArrayList<TarGrpTemplateDO>();
@@ -94,7 +92,6 @@ public class SynTarGrpTemplateServiceImpl implements SynTarGrpTemplateService{
                 }
             }
         }
-        //查出需要删除的事件
         for(TarGrpTemplateDO c:realList){
             for (int i = 0; i <prdList.size() ; i++) {
                 if(c.getTarGrpTemplateId()-prdList.get(i).getTarGrpTemplateId()==0){

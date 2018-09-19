@@ -75,9 +75,7 @@ public class SynSysStaffServiceImpl implements SynSysStaffService{
     @Override
     public Map<String, Object> synchronizeBatchStaff(String roleName) {
         Map<String,Object> maps = new HashMap<>();
-        //先查出准生产的所有事件
         List<SysStaff> prdList = sysStaffMapper.selectAll(new SysStaff());
-        //查出生产的所有事件
         List<SysStaff> realList = sysStaffPrdMapper.selectAll(new SysStaff());
         //三个集合分别表示需要 新增的   修改的    删除的
         List<SysStaff> addList=new ArrayList<SysStaff>();
@@ -95,7 +93,6 @@ public class SynSysStaffServiceImpl implements SynSysStaffService{
                 }
             }
         }
-        //查出需要删除的事件
         for(SysStaff c:realList){
             for (int i = 0; i <prdList.size() ; i++) {
                 if(c.getStaffId()-prdList.get(i).getStaffId()==0){

@@ -73,9 +73,7 @@ public class SynSysParamsServiceImpl implements SynSysParamsService {
     @Override
     public Map<String, Object> synchronizeBatchParam(String roleName) {
         Map<String,Object> maps = new HashMap<>();
-        //先查出准生产的所有事件
         List<SysParams> prdList = sysParamsMapper.selectAll(null,null);
-        //查出生产的所有事件
         List<SysParams> realList = sysParamsPrdMapper.selectAll(null,null);
         //三个集合分别表示需要 新增的   修改的    删除的
         List<SysParams> addList=new ArrayList<SysParams>();
@@ -93,7 +91,6 @@ public class SynSysParamsServiceImpl implements SynSysParamsService {
                 }
             }
         }
-        //查出需要删除的事件
         for(SysParams c:realList){
             for (int i = 0; i <prdList.size() ; i++) {
                 if(c.getParamId()-prdList.get(i).getParamId()==0){

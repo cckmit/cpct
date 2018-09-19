@@ -39,7 +39,7 @@ public class SynMessageLabelServiceImpl implements SynMessageLabelService{
 
     /**
      * 同步单个试运算展示列配置
-     * @param labelId    事件id
+     * @param labelId    标签id
      * @param roleName   操作人身份
      * @return
      */
@@ -73,9 +73,7 @@ public class SynMessageLabelServiceImpl implements SynMessageLabelService{
     @Override
     public Map<String, Object> synchronizeBatchMessageLabel(String roleName) {
         Map<String,Object> maps = new HashMap<>();
-        //先查出准生产的所有事件
         List<MessageLabel> prdList = messageLabelMapper.selectAll();
-        //查出生产的所有事件
         List<MessageLabel> realList = messageLabelPrdMapper.selectAll();
         //三个集合分别表示需要 新增的   修改的    删除的
         List<MessageLabel> addList=new ArrayList<MessageLabel>();
@@ -93,7 +91,6 @@ public class SynMessageLabelServiceImpl implements SynMessageLabelService{
                 }
             }
         }
-        //查出需要删除的事件
         for(MessageLabel c:realList){
             for (int i = 0; i <prdList.size() ; i++) {
                 if(c.getMessageLabelId()-prdList.get(i).getMessageLabelId()==0){

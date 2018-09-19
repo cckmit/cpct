@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.service.synchronize.*;
+import com.zjtelcom.cpct.service.synchronize.campaign.SynMktCampaignRelService;
 import com.zjtelcom.cpct.service.synchronize.channel.SynChannelService;
 import com.zjtelcom.cpct.service.synchronize.filter.SynFilterRuleService;
 import com.zjtelcom.cpct.service.synchronize.label.SynLabelService;
@@ -62,6 +63,10 @@ public class SynchronizeController extends BaseController {
     private SynMessageLabelService synMessageLabelService;
     @Autowired
     private SynTarGrpTemplateService synTarGrpTemplateService;
+    @Autowired
+    private SynMktCampaignRelService synMktCampaignRelService;
+
+
 
     /**
      * 单个事件同步
@@ -738,6 +743,50 @@ public class SynchronizeController extends BaseController {
         return  JSON.toJSONString(map);
     }
 
+
+
+    /**
+     * 同步单个营销维挽活动
+     * @param campaignRelId
+     * @return
+     */
+    @PostMapping("singleCampaignRel")
+    @CrossOrigin
+    public String singleCampaignRel(@RequestParam(value = "campaignRelId", required = true) Long campaignRelId){
+        logger.info("同步单个营销维挽活动");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synMktCampaignRelService.synchronizeSingleCampaignRel(campaignRelId,roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("通过id同步单个营销维挽活动失败！Exception: ",campaignRelId,e);
+        }
+        return JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 批量同步营销维挽活动
+     * @return
+     */
+    @PostMapping("batchCampaignRel")
+    @CrossOrigin
+    public String batchCampaignRel(){
+        //角色权限控制
+        logger.info("批量同步营销维挽活动");
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synMktCampaignRelService.synchronizeBatchCampaignRel(roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("批量同步营销维挽活动！Exception: ", e);
+        }
+        return  JSON.toJSONString(map);
+    }
 
 
 
