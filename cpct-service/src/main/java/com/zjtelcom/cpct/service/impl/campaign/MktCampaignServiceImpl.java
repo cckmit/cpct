@@ -24,7 +24,6 @@ import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.EventDTO;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
-import com.zjtelcom.cpct.enums.AreaLeveL;
 import com.zjtelcom.cpct.enums.ParamKeyEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
@@ -34,7 +33,7 @@ import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UserUtil;
-import com.zjtelcom.cpct_prd.dao.MktCampaignPrdMapper;
+import com.zjtelcom.cpct_prd.dao.campaign.MktCampaignPrdMapper;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -94,12 +93,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      */
     @Autowired
     private MktStrategyConfService mktStrategyConfService;
-    /**
-     * 活动（同步生产）
-     */
-    @Autowired
-    private MktCampaignPrdMapper mktCampaignPrdMapper;
-
     /**
      * 下发城市与活动关联
      */
@@ -611,7 +604,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         mktCampaignDO.setMktCampaignId(null);
         // 升级后为 服务+营销活动
         mktCampaignDO.setMktCampaignType("3000");
-        mktCampaignDO.setStatusCd("1000");
+        mktCampaignDO.setStatusCd("2001");
         mktCampaignDO.setStatusDate(new Date());
         mktCampaignDO.setCreateDate(new Date());
         mktCampaignDO.setCreateStaff(UserUtil.loginId());
