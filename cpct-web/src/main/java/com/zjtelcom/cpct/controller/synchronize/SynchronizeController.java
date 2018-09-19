@@ -92,14 +92,14 @@ public class SynchronizeController extends BaseController {
 
 
     /**
-     * 批量事件同步
+     * 全量事件同步
      * @return
      */
-    @PostMapping("batchEvent")
+    @RequestMapping("batchEvent")
     @CrossOrigin
     public String batchEvent(){
         //角色权限控制
-        logger.info("批量事件同步");
+        logger.info("全量事件同步");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -107,7 +107,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("[op:SynContactEvtServiceImpl] 批量同步事件失败！Exception: ", e);
+            logger.error("[op:SynContactEvtServiceImpl] 全量同步事件失败！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -136,14 +136,14 @@ public class SynchronizeController extends BaseController {
 
 
     /**
-     * 批量事件目录同步
+     * 全量事件目录同步
      * @return
      */
-    @PostMapping("batchEventType")
+    @RequestMapping("batchEventType")
     @CrossOrigin
     public String batchEventType(){
         //角色权限控制
-        logger.info("批量同步事件目录");
+        logger.info("全量同步事件目录");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -151,7 +151,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("[op:SynContactEvtTypeServiceImpl] 批量同步事件目录失败！Exception: ", e);
+            logger.error("[op:SynContactEvtTypeServiceImpl] 全量同步事件目录失败！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -182,14 +182,14 @@ public class SynchronizeController extends BaseController {
 
 
     /**
-     * 批量事件源同步
+     * 全量事件源同步
      * @return
      */
-    @PostMapping("batchEventSource")
+    @RequestMapping("batchEventSource")
     @CrossOrigin
     public String batchEventSource(){
         //角色权限控制
-        logger.info("批量同步事件源");
+        logger.info("全量同步事件源");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -197,7 +197,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("[op:SynEventSorceServiceImpl] 批量同步事件源失败！Exception: ", e);
+            logger.error("[op:SynEventSorceServiceImpl] 全量同步事件源失败！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -227,14 +227,14 @@ public class SynchronizeController extends BaseController {
 
 
     /**
-     * 批量事件源接口同步
+     * 全量事件源接口同步
      * @return
      */
-    @PostMapping("batchEventInterface")
+    @RequestMapping("batchEventInterface")
     @CrossOrigin
     public String batchEventInterface(){
         //角色权限控制
-        logger.info("批量同步事件源接口");
+        logger.info("全量同步事件源接口");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -242,7 +242,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("批量同步事件源接口失败！Exception: ", e);
+            logger.error("全量同步事件源接口失败！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -271,14 +271,14 @@ public class SynchronizeController extends BaseController {
 
 
     /**
-     * 批量事件场景同步
+     * 全量事件场景同步
      * @return
      */
-    @PostMapping("batchEventScene")
+    @RequestMapping("batchEventScene")
     @CrossOrigin
     public String batchEventScene(){
         //角色权限控制
-        logger.info("批量同步事件场景");
+        logger.info("全量同步事件场景");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -286,7 +286,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("批量同步事件目录失败！Exception: ", e);
+            logger.error("全量同步事件目录失败！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -315,14 +315,14 @@ public class SynchronizeController extends BaseController {
 
 
     /**
-     * 批量同步事件场景目录
+     * 全量同步事件场景目录
      * @return
      */
-    @PostMapping("batchEventSceneType")
+    @RequestMapping("batchEventSceneType")
     @CrossOrigin
     public String batchEventSceneType(){
         //角色权限控制
-        logger.info("批量同步事件场景目录");
+        logger.info("全量同步事件场景目录");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -330,7 +330,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("批量同步事件场景目录失败！Exception: ", e);
+            logger.error("全量同步事件场景目录失败！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -359,14 +359,14 @@ public class SynchronizeController extends BaseController {
 
 
     /**
-     * 批量渠道同步
+     * 全量渠道同步
      * @return
      */
-    @PostMapping("batchContactChannel")
+    @RequestMapping("batchContactChannel")
     @CrossOrigin
     public String batchContactChannel(){
         //角色权限控制
-        logger.info("批量同步渠道");
+        logger.info("全量同步渠道");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -374,7 +374,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("批量同步渠道失败！Exception: ", e);
+            logger.error("全量同步渠道失败！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -385,7 +385,7 @@ public class SynchronizeController extends BaseController {
      * @param scriptId
      * @return
      */
-    @PostMapping("singleScript")
+    @PostMapping("singleContactScript")
     @CrossOrigin
     public String singleScript(@RequestParam(value = "scriptId", required = true) Long scriptId){
         logger.info("同步接触脚本");
@@ -403,14 +403,14 @@ public class SynchronizeController extends BaseController {
 
 
     /**
-     * 批量同步接触脚本
+     * 全量同步接触脚本
      * @return
      */
-    @PostMapping("batchContactScript")
+    @RequestMapping("batchContactScript")
     @CrossOrigin
     public String batchContactScript(){
         //角色权限控制
-        logger.info("批量同步接触脚本");
+        logger.info("全量同步接触脚本");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -418,7 +418,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("批量同步接触脚本失败！Exception: ", e);
+            logger.error("全量同步接触脚本失败！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -447,14 +447,14 @@ public class SynchronizeController extends BaseController {
 
 
     /**
-     * 批量同步用户信息
+     * 全量同步用户信息
      * @return
      */
-    @PostMapping("batchStaff")
+    @RequestMapping("batchStaff")
     @CrossOrigin
     public String batchStaff(){
         //角色权限控制
-        logger.info("批量同步用户信息");
+        logger.info("全量同步用户信息");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -462,7 +462,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("批量同步用户信息失败！Exception: ", e);
+            logger.error("全量同步用户信息失败！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -493,14 +493,14 @@ public class SynchronizeController extends BaseController {
 
 
     /**
-     * 批量同步角色信息
+     * 全量同步角色信息
      * @return
      */
-    @PostMapping("batchRole")
+    @RequestMapping("batchRole")
     @CrossOrigin
     public String batchRole(){
         //角色权限控制
-        logger.info("批量同步角色信息");
+        logger.info("全量同步角色信息");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -508,7 +508,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("批量同步角色信息失败！Exception: ", e);
+            logger.error("全量同步角色信息失败！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -539,14 +539,14 @@ public class SynchronizeController extends BaseController {
 
 
     /**
-     * 批量同步菜单信息
+     * 全量同步菜单信息
      * @return
      */
-    @PostMapping("batchMenu")
+    @RequestMapping("batchMenu")
     @CrossOrigin
     public String batchMenu(){
         //角色权限控制
-        logger.info("批量同步菜单信息");
+        logger.info("全量同步菜单信息");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -554,7 +554,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("批量同步菜单信息失败！Exception: ", e);
+            logger.error("全量同步菜单信息失败！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -585,14 +585,14 @@ public class SynchronizeController extends BaseController {
 
 
     /**
-     * 批量同步静态参数
+     * 全量同步静态参数
      * @return
      */
-    @PostMapping("batchParams")
+    @RequestMapping("batchParams")
     @CrossOrigin
     public String batchParams(){
         //角色权限控制
-        logger.info("批量同步静态参数");
+        logger.info("全量同步静态参数");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -600,7 +600,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("批量同步静态参数失败！Exception: ", e);
+            logger.error("全量同步静态参数失败！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -631,14 +631,14 @@ public class SynchronizeController extends BaseController {
 
 
     /**
-     * 批量同步标签
+     * 全量同步过滤规则
      * @return
      */
-    @PostMapping("batchFilterRule")
+    @RequestMapping("batchFilterRule")
     @CrossOrigin
     public String batchFilterRule(){
         //角色权限控制
-        logger.info("批量同步过滤规则");
+        logger.info("全量同步过滤规则");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -646,7 +646,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("批量同步过滤规则！Exception: ", e);
+            logger.error("全量同步过滤规则！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -677,14 +677,14 @@ public class SynchronizeController extends BaseController {
 
 
     /**
-     * 批量同步试运算标签展示列
+     * 全量同步试运算标签展示列
      * @return
      */
-    @PostMapping("batchMessageLabel")
+    @RequestMapping("batchMessageLabel")
     @CrossOrigin
     public String batchMessageLabel(){
         //角色权限控制
-        logger.info("批量同步试运算标签展示列");
+        logger.info("全量同步试运算标签展示列");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -692,7 +692,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("批量同步试运算标签展示列！Exception: ", e);
+            logger.error("全量同步试运算标签展示列！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -723,14 +723,14 @@ public class SynchronizeController extends BaseController {
 
 
     /**
-     * 批量同步标签
+     * 全量同步分群模板
      * @return
      */
-    @PostMapping("batchTemplate")
+    @RequestMapping("batchTemplate")
     @CrossOrigin
     public String batchTemplate(){
         //角色权限控制
-        logger.info("批量同步分群模板");
+        logger.info("全量同步分群模板");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -738,7 +738,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("批量同步分群模板！Exception: ", e);
+            logger.error("全量同步分群模板！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -768,14 +768,14 @@ public class SynchronizeController extends BaseController {
 
 
     /**
-     * 批量同步营销维挽活动
+     * 全量同步营销维挽活动
      * @return
      */
-    @PostMapping("batchCampaignRel")
+    @RequestMapping("batchCampaignRel")
     @CrossOrigin
     public String batchCampaignRel(){
         //角色权限控制
-        logger.info("批量同步营销维挽活动");
+        logger.info("全量同步营销维挽活动");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -783,7 +783,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("批量同步营销维挽活动！Exception: ", e);
+            logger.error("全量同步营销维挽活动！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }

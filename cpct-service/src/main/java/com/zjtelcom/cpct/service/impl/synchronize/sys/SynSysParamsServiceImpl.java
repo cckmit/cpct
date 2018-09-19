@@ -34,6 +34,7 @@ public class SynSysParamsServiceImpl implements SynSysParamsService {
     @Autowired
     private SysParamsMapper sysParamsMapper;
 
+
     //同步表名
     private static final String tableName="sys_params";
 

@@ -21,7 +21,7 @@
     <insert id="insert" parameterType="com.zjtelcom.cpct.domain.system.SysRole">
     insert into sys_role (ROLE_ID,ROLE_NAME, ROLE_CODE,REMARK,
       CREATE_DATE, CREATE_STAFF,UPDATE_DATE,UPDATE_STAFF)
-    values (#{roleName,jdbcType=VARCHAR}, #{roleCode,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR},
+    values ( #{roleId,jdbcType=BIGINT},#{roleName,jdbcType=VARCHAR}, #{roleCode,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR},
       #{createDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT},
       #{updateDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT})
     </insert>
