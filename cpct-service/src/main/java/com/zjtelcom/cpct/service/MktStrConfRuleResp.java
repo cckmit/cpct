@@ -24,16 +24,6 @@ public class MktStrConfRuleResp {
     private String mktStrategyConfRuleName;
 
     /**
-     * 目标分群条件
-     */
-    private List<TarGrpConditionVO> tarGrpConditionList;
-
-    /**
-     * 销售品
-     */
-    private List<Offer> offerList;
-
-    /**
      * 协同渠道配置集合
      */
     List<MktCamChlConfDetail> mktCamChlConfDetailList;
@@ -76,19 +66,4 @@ public class MktStrConfRuleResp {
         this.mktCamChlResultList = mktCamChlResultList;
     }
 
-    public List<TarGrpConditionVO> getTarGrpConditionList() {
-        return tarGrpConditionList;
-    }
-
-    public void setTarGrpConditionList(List<TarGrpConditionVO> tarGrpConditionList) {
-        this.tarGrpConditionList = tarGrpConditionList;
-    }
-
-    public List<Offer> getOfferList() {
-        return offerList;
-    }
-
-    public void setOfferList(List<Offer> offerList) {
-        this.offerList = offerList;
-    }
 }
