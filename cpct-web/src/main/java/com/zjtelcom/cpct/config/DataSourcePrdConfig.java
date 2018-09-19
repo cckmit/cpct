@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -45,6 +46,11 @@ public class DataSourcePrdConfig {
         return sessionFactoryBean.getObject();
     }
 
+    @Bean(name = "TransactionManager")
+    public PlatformTransactionManager testTransactionManager(@Qualifier("dataSource") DataSource dataSource) {
+        DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dataSource);
+        return dataSourceTransactionManager;
+    }
 
 //    @Bean
 //    @ConfigurationProperties(prefix = "spring.jta.atomikos.datasource_prd")
