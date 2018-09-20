@@ -6,6 +6,7 @@ import com.zjtelcom.cpct.domain.question.Question;
 import com.zjtelcom.cpct.dto.question.QuestionAddVO;
 import com.zjtelcom.cpct.dto.question.QuestionEditVO;
 import com.zjtelcom.cpct.dto.question.QuestionReq;
+import com.zjtelcom.cpct.dto.question.QuestionnaireParam;
 import com.zjtelcom.cpct.service.question.QuestionService;
 import com.zjtelcom.cpct.service.question.QuestionnaireService;
 import com.zjtelcom.cpct.util.FastJsonUtils;
@@ -120,30 +121,70 @@ public class QuestionController extends BaseController {
         return maps;
     }
 
-    //-------------------------------------------------------------------------------------------------------------------------------------------------------
-    @PostMapping("delQuestionnaire")
+
+    /**
+     * 创建问卷-新
+     * @param addVO
+     * @return
+     */
+    @PostMapping("createQuestionnaire")
     @CrossOrigin
-    public Map<String, Object> delQuestionnaire(@RequestBody QuestionReq req) {
+    public Map<String, Object> createQuestionnaire(@RequestBody  QuestionnaireParam addVO) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            maps = questionnaireService.delQuestionnaire(1L,req);
+            maps = questionnaireService.createQuestionnaire(addVO);
+        } catch (Exception e) {
+            logger.error("[op:TarGrpController] fail to createQuestionnaire ", e);
+        }
+        return maps;
+    }
+
+
+    /**
+     * 编辑问卷-新
+     * @param editvo
+     * @return
+     */
+    @PostMapping("modQuestionnaire")
+    @CrossOrigin
+    public Map<String, Object> modQuestionnaire(@RequestBody QuestionnaireParam editvo) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = questionnaireService.modQuestionnaire(editvo);
+        } catch (Exception e) {
+            logger.error("[op:TarGrpController] fail to modQuestionnaire ", e);
+        }
+        return maps;
+    }
+
+    /**
+     * 获取问卷-新
+     * @param
+     * @return
+     */
+    @PostMapping("getQuestionnaire")
+    @CrossOrigin
+    public Map<String, Object> getQuestionnaire(@RequestBody HashMap<String,Long> params) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = questionnaireService.getQuestionnaire(params.get("questionnaireId"));
+        } catch (Exception e) {
+            logger.error("[op:TarGrpController] fail to modQuestionnaire ", e);
+        }
+        return maps;
+    }
+
+    @PostMapping("delQuestionnaire")
+    @CrossOrigin
+    public Map<String, Object> delQuestionnaire(@RequestBody HashMap<String,Long> params) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = questionnaireService.delQuestionnaire(params.get("questionnaireId"));
         } catch (Exception e) {
             logger.error("[op:TarGrpController] fail to delQuestionnaire ", e);
         }
         return maps;
 
-    }
-
-    @PostMapping("modQuestionnaire")
-    @CrossOrigin
-    public Map<String, Object> modQuestionnaire(@RequestBody QuestionReq req) {
-        Map<String, Object> maps = new HashMap<>();
-        try {
-            maps = questionnaireService.modQuestionnaire(1L,req);
-        } catch (Exception e) {
-            logger.error("[op:TarGrpController] fail to createQuestionnaire ", e);
-        }
-        return maps;
     }
 
     @PostMapping("getQuestionnaireList")
@@ -159,34 +200,51 @@ public class QuestionController extends BaseController {
         return maps;
     }
 
-    @PostMapping("createQuestionnaire")
-    @CrossOrigin
-    public Map<String, Object> createQuestionnaire(@RequestBody QuestionReq questionReq) {
-        Map<String, Object> maps = new HashMap<>();
-        Long userId = UserUtil.loginId();
-        try {
-            maps = questionnaireService.createQuestionnaire(userId,questionReq);
-        } catch (Exception e) {
-            logger.error("[op:TarGrpController] fail to createQuestionnaire ", e);
-        }
-        return maps;
-    }
+    //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+//    @PostMapping("modQuestionnaire")
+//    @CrossOrigin
+//    public Map<String, Object> modQuestionnaire(@RequestBody QuestionReq req) {
+//        Map<String, Object> maps = new HashMap<>();
+//        try {
+//            maps = questionnaireService.modQuestionnaire(1L,req);
+//        } catch (Exception e) {
+//            logger.error("[op:TarGrpController] fail to createQuestionnaire ", e);
+//        }
+//        return maps;
+//    }
 
 
 
-    @PostMapping("listQuestionListByQuestionId")
-    @CrossOrigin
-    public Map<String, Object> listQuestionListByQuestionId(@RequestBody HashMap<String,Long> param) {
-        Map<String, Object> maps = new HashMap<>();
-        Long userId = UserUtil.loginId();
-        try {
-            Long questionnaireId = param.get("questionnaireId");
-            maps = questionnaireService.listQuestionListByQuestionId(userId,questionnaireId);
-        } catch (Exception e) {
-            logger.error("[op:TarGrpController] fail to listQuestionListByQuestionId ", e);
-        }
-        return maps;
-    }
+//    @PostMapping("createQuestionnaire")
+//    @CrossOrigin
+//    public Map<String, Object> createQuestionnaire(@RequestBody QuestionReq questionReq) {
+//        Map<String, Object> maps = new HashMap<>();
+//        Long userId = UserUtil.loginId();
+//        try {
+//            maps = questionnaireService.createQuestionnaire(userId,questionReq);
+//        } catch (Exception e) {
+//            logger.error("[op:TarGrpController] fail to createQuestionnaire ", e);
+//        }
+//        return maps;
+//    }
+
+
+
+//    @PostMapping("listQuestionListByQuestionId")
+//    @CrossOrigin
+//    public Map<String, Object> listQuestionListByQuestionId(@RequestBody HashMap<String,Long> param) {
+//        Map<String, Object> maps = new HashMap<>();
+//        Long userId = UserUtil.loginId();
+//        try {
+//            Long questionnaireId = param.get("questionnaireId");
+//            maps = questionnaireService.listQuestionListByQuestionId(userId,questionnaireId);
+//        } catch (Exception e) {
+//            logger.error("[op:TarGrpController] fail to listQuestionListByQuestionId ", e);
+//        }
+//        return maps;
+//    }
 
 
 

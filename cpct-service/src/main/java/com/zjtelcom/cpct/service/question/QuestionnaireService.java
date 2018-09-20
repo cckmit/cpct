@@ -23,7 +23,7 @@ public interface QuestionnaireService {
 
     Map<String,Object> modQuestionnaire(Long userId,QuestionReq req);
 
-    Map<String,Object> delQuestionnaire(Long userId,QuestionReq req);
+    Map<String,Object> delQuestionnaire(Long questionnaireId);
 
 
 }

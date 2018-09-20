@@ -10,6 +10,8 @@ public class QuestionModel implements Serializable {
 
     private String questionType;//1000 单选题；2000多选题
 
+    private String questionOrder;
+
     private String questionTypeName;
 
     private String questionDesc;
@@ -28,6 +30,14 @@ public class QuestionModel implements Serializable {
 
     private List<QuestionDetailVO> questionDetailList;
 
+
+    public String getQuestionOrder() {
+        return questionOrder;
+    }
+
+    public void setQuestionOrder(String questionOrder) {
+        this.questionOrder = questionOrder;
+    }
 
     public String getTime() {
         return time;

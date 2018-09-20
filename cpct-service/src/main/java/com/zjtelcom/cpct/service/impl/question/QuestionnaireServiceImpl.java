@@ -54,6 +54,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
      * @return
      */
     @Override
+    @Transactional
     public Map<String, Object> createQuestionnaire(QuestionnaireParam addVO) {
         Map<String,Object> result = new HashMap<>();
         //添加调研问卷记录
@@ -64,9 +65,9 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
         questionnaire.setUpdateStaff(UserUtil.loginId());
         questionnaire.setCreateStaff(UserUtil.loginId());
         questionnaire.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+        questionnaire.setNairePoints(100);
         questionnaireMapper.insert(questionnaire);
         List<QuestRel> questRelList = getQuestRels(addVO, questionnaire);
-        questRelMapper.insertBatch(questRelList);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","创建成功");
         return result;
@@ -80,15 +81,19 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     @Override
     public Map<String, Object> modQuestionnaire(QuestionnaireParam editvo) {
         Map<String,Object> result = new HashMap<>();
+        Questionnaire questionnaire = questionnaireMapper.selectByPrimaryKey(editvo.getNaireId());
+        if (questionnaire==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","调研问卷不存在");
+            return result;
+        }
         //添加调研问卷记录
-        Questionnaire questionnaire = BeanUtil.create(editvo,new Questionnaire());
-
+        BeanUtil.copy(editvo,questionnaire);
         questionnaire.setUpdateDate(DateUtil.getCurrentTime());
         questionnaire.setUpdateStaff(UserUtil.loginId());
         questionnaireMapper.updateByPrimaryKey(questionnaire);
         questRelMapper.deleteByNaireId(questionnaire.getNaireId());
         List<QuestRel> questRelList = getQuestRels(editvo, questionnaire);
-        questRelMapper.insertBatch(questRelList);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","编辑成功");
         return result;
@@ -136,7 +141,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
             Question question = questionMapper.selectByPrimaryKey(questRel.getQuestionId());
             if (question!=null){
                 Map<String,Object> questionDetail = questionService.getQuestionDetail(question.getQuestionId());
-                QuestionModel vo = (QuestionModel)questionDetail.get("date");
+                QuestionModel vo = (QuestionModel)questionDetail.get("data");
                 voList.add(vo);
             }
         }
@@ -180,14 +185,13 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
     /**
      * 删除调研问卷
-     * @param userId
-     * @param req
+     * @param questionnaireId
      * @return
      */
     @Override
-    public Map<String, Object> delQuestionnaire(Long userId, QuestionReq req) {
+    public Map<String, Object> delQuestionnaire(Long questionnaireId) {
         Map<String,Object> result = new HashMap<>();
-        Questionnaire questionnaire = questionnaireMapper.selectByPrimaryKey(req.getQuestionnaire().getNaireId());
+        Questionnaire questionnaire = questionnaireMapper.selectByPrimaryKey(questionnaireId);
         if (questionnaire==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","调研问卷不存在");

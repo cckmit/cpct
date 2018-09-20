@@ -73,6 +73,7 @@ public class QuestionServiceImpl implements QuestionService {
         vo.setAnswerTypeName(ChannelUtil.getAnswerType(question));
         vo.setQuestionTypeName(ChannelUtil.getQuestionType(question));
         vo.setCheckList(new ArrayList<String>());
+        vo.setQuestionOrder(question.getQuestionId().toString());
         List<QuestionDetail> questionDetailList = questionDetailMapper.findDetailListByQuestionId(question.getQuestionId());
         List<QuestionDetailVO> detailVOS = new ArrayList<>();
         for (QuestionDetail detail : questionDetailList){
