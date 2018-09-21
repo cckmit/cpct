@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.Map;
 
 public interface MktQuestionnaireMapper {
     int deleteByPrimaryKey(Long naireId);
@@ -16,7 +17,7 @@ public interface MktQuestionnaireMapper {
 
     List<Questionnaire> selectAll();
 
-    List<Questionnaire> findQuestionnaireListByParam(@Param("naireName")String naireName,@Param("naireType")String naireType);
+    List<Questionnaire> findQuestionnaireListByParam(@Param("map")Map<String,Object> params);
 
 //    Page<Questionnaire> findNairePageByParam(@Param("naireName")String naireName, @Param("naireType")String naireType);
 

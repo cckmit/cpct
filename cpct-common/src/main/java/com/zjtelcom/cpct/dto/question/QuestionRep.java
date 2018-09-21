@@ -6,15 +6,15 @@ import java.io.Serializable;
 import java.util.List;
 
 public class QuestionRep implements Serializable {
-    private Questionnaire questionnaire;
+    private QuestionnaireVO questionnaire;
     private List<QuestionModel> questionVOList;
 
 
-    public Questionnaire getQuestionnaire() {
+    public QuestionnaireVO getQuestionnaire() {
         return questionnaire;
     }
 
-    public void setQuestionnaire(Questionnaire questionnaire) {
+    public void setQuestionnaire(QuestionnaireVO questionnaire) {
         this.questionnaire = questionnaire;
     }
 

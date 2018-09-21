@@ -9,7 +9,9 @@ import java.util.Map;
 public interface QuestionnaireService {
 
 
-    Map<String,Object> createQuestionnaire(QuestionnaireParam addVO);
+    Map<String,Object> createQuestionnaire(QuestionnaireParam addVO,boolean isSave);
+
+    Map<String,Object> releaseQuestionnaire(QuestionnaireParam addVO);
 
     Map<String,Object> modQuestionnaire(QuestionnaireParam editvo);
 

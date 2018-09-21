@@ -186,6 +186,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         // 通过活动id获取关联的标签字段数组
         String[] fieldList = new String[10];
 
+
+
+
         TrialRequest request = new TrialRequest();
         request.setFieldList(fieldList);
         List<TrialOperationParam> paramList = new ArrayList<>();

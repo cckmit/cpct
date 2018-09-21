@@ -123,7 +123,7 @@ public class QuestionController extends BaseController {
 
 
     /**
-     * 创建问卷-新
+     * 保存问卷-新
      * @param addVO
      * @return
      */
@@ -132,7 +132,24 @@ public class QuestionController extends BaseController {
     public Map<String, Object> createQuestionnaire(@RequestBody  QuestionnaireParam addVO) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            maps = questionnaireService.createQuestionnaire(addVO);
+            maps = questionnaireService.createQuestionnaire(addVO,true);
+        } catch (Exception e) {
+            logger.error("[op:TarGrpController] fail to createQuestionnaire ", e);
+        }
+        return maps;
+    }
+
+    /**
+     * 发布问卷-新
+     * @param addVO
+     * @return
+     */
+    @PostMapping("releaseQuestionnaire")
+    @CrossOrigin
+    public Map<String, Object> releaseQuestionnaire(@RequestBody QuestionnaireParam addVO) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = questionnaireService.releaseQuestionnaire(addVO);
         } catch (Exception e) {
             logger.error("[op:TarGrpController] fail to createQuestionnaire ", e);
         }

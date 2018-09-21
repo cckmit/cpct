@@ -15,10 +15,8 @@ import com.zjtelcom.cpct.domain.question.Questionnaire;
 import com.zjtelcom.cpct.dto.question.*;
 import com.zjtelcom.cpct.service.question.QuestionService;
 import com.zjtelcom.cpct.service.question.QuestionnaireService;
-import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.DateUtil;
-import com.zjtelcom.cpct.util.MapUtil;
-import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.service.system.SysParamsService;
+import com.zjtelcom.cpct.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +44,8 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     private MktQuestionMapper questionMapper;
     @Autowired
     private MktQuestionDetailMapper questionDetailMapper;
-
+    @Autowired
+    private SysParamsService sysParamsService;
 
     /**
      * 创建问卷
@@ -55,7 +54,18 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
      */
     @Override
     @Transactional
-    public Map<String, Object> createQuestionnaire(QuestionnaireParam addVO) {
+    public Map<String, Object> releaseQuestionnaire(QuestionnaireParam addVO) {
+        return createQuestionnaire(addVO,false);
+    }
+
+    /**
+     * 创建问卷
+     * @param addVO
+     * @return
+     */
+    @Override
+    @Transactional
+    public Map<String, Object> createQuestionnaire(QuestionnaireParam addVO,boolean isSave) {
         Map<String,Object> result = new HashMap<>();
         //添加调研问卷记录
         Questionnaire questionnaire = BeanUtil.create(addVO,new Questionnaire());
@@ -64,7 +74,11 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
         questionnaire.setStatusDate(DateUtil.getCurrentTime());
         questionnaire.setUpdateStaff(UserUtil.loginId());
         questionnaire.setCreateStaff(UserUtil.loginId());
-        questionnaire.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+        if (isSave){
+            questionnaire.setStatusCd("1000");//草稿
+        }else {
+            questionnaire.setStatusCd("2000");//已发布
+        }
         questionnaire.setNairePoints(100);
         questionnaireMapper.insert(questionnaire);
         List<QuestRel> questRelList = getQuestRels(addVO, questionnaire);
@@ -134,7 +148,9 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
             result.put("resultMsg","调研问卷不存在");
             return result;
         }
-        resultRep.setQuestionnaire(questionnaire);
+        QuestionnaireVO questionnaireVO = BeanUtil.create(questionnaire,new QuestionnaireVO());
+        questionnaireVO.setNaireTypeName(ChannelUtil.getNaireType(questionnaire));
+        resultRep.setQuestionnaire(questionnaireVO);
         List<QuestionModel> voList = new ArrayList<>();
         List<QuestRel> questRelList = questRelMapper.findRelListByQuestionnaireId(questionnaireId);
         for (QuestRel questRel : questRelList){
@@ -212,23 +228,18 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     @Override
     public Map<String, Object> getQuestionnaireList(Long userId, Map<String, Object> param) {
         Map<String,Object> result = new HashMap<>();
-        String naireName = null;
-        String naireType = null;
         Integer page = MapUtil.getIntNum(param.get("page").toString());
         Integer pageSize =  MapUtil.getIntNum(param.get("pageSize").toString());
-        if (param.get("naireName")!=null){
-            naireName = param.get("naireName").toString();
-        }
-        if (param.get("naireType")!=null){
-            naireType = param.get("naireType").toString();
-        }
 
         PageHelper.startPage(page,pageSize);
-        List<Questionnaire> questionnaireList = questionnaireMapper.findQuestionnaireListByParam(naireName,naireType);
+        List<Questionnaire> questionnaireList = questionnaireMapper.findQuestionnaireListByParam(param);
         Page info = new Page(new PageInfo(questionnaireList));
         List<QuestionnaireVO> voList = new ArrayList<>();
         for (Questionnaire questionnaire: questionnaireList){
             QuestionnaireVO vo = BeanUtil.create(questionnaire,new QuestionnaireVO());
+            vo.setNaireTypeName(ChannelUtil.getNaireType(questionnaire));
+            Map<String,String> statusParam = sysParamsService.getParamsByValue("QUEST_001",questionnaire.getStatusCd());
+            vo.setStatusSt(statusParam.get("PARAM_NAME"));
             voList.add(vo);
         }
         result.put("resultCode",CODE_SUCCESS);
@@ -320,7 +331,9 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
             result.put("resultMsg","调研问卷不存在");
             return result;
         }
-        resultRep.setQuestionnaire(questionnaire);
+        QuestionnaireVO questionnaireVO = BeanUtil.create(questionnaire,new QuestionnaireVO());
+        questionnaireVO.setNaireTypeName(ChannelUtil.getNaireType(questionnaire));
+        resultRep.setQuestionnaire(questionnaireVO);
         List<QuestionVO> voList = new ArrayList<>();
         List<QuestRel> questRelList = questRelMapper.findRelListByQuestionnaireId(questionnaireId);
         for (QuestRel questRel : questRelList){

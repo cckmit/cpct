@@ -4,6 +4,7 @@ import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.question.Question;
+import com.zjtelcom.cpct.domain.question.Questionnaire;
 import com.zjtelcom.cpct.dto.campaign.CampaignVO;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.Operator;
@@ -22,6 +23,9 @@ import java.util.UUID;
 public class ChannelUtil  {
 
 
+
+
+
     public static String getQuestionType(Question question){
         String st = "";
         if (question.getQuestionType()==null || question.getQuestionType().equals("")){
@@ -33,6 +37,22 @@ public class ChannelUtil  {
                 break;
             case "2000":
                 st = "多选题";
+                break;
+        }
+        return st;
+    }
+
+    public static String getNaireType(Questionnaire questionnaire){
+        String st = "";
+        if (questionnaire.getNaireType()==null || questionnaire.getNaireType().equals("")){
+            return st;
+        }
+        switch (questionnaire.getNaireType()){
+            case "1000":
+                st = "营销问卷";
+                break;
+            case "2000":
+                st = "维挽问卷";
                 break;
         }
         return st;
