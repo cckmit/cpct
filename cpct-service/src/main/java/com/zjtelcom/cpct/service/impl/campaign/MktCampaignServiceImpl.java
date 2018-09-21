@@ -413,6 +413,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         MktCampaignPar.setTiggerType(tiggerType);
         MktCampaignPar.setMktCampaignType(mktCampaignType);
         PageHelper.startPage(page, pageSize);
+
         List<MktCampaignCountDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListPage(MktCampaignPar);
 
         // 获取所有的sysParam

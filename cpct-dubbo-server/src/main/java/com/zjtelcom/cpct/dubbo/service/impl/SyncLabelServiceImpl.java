@@ -188,7 +188,6 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         List<String> stringList = new ArrayList<>();
         for (TagValueModel info : valueModelList){
             LabelValue value = BeanUtil.create(info,new LabelValue());
-            value.setLabelValue("");
             value.setInjectionLabelId(labelId);
             value.setValueDesc(info.getTagValueName());
             value.setValueName(info.getTagValueName());

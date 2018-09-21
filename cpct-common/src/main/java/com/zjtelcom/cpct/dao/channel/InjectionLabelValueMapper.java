@@ -26,4 +26,6 @@ public interface InjectionLabelValueMapper {
     int deleteAll();
 
     int insertBatch(@Param("record")List<LabelValue> record);
+
+    int deleteByLabelId(@Param("labelId")Long labelId);
 }

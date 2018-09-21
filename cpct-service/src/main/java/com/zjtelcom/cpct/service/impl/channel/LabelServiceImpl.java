@@ -154,6 +154,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         label.setUpdateStaff(userId);
         label.setStatusCd("1000");
         labelMapper.insert(label);
+        insertLabelValue(label,addVO.getRightOperand());
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
         return result;
@@ -186,9 +187,29 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         label.setUpdateDate(new Date());
         label.setUpdateStaff(userId);
         labelMapper.updateByPrimaryKey(label);
+        labelValueMapper.deleteByLabelId(label.getInjectionLabelId());
+        insertLabelValue(label,editVO.getRightOperand());
+
+
+
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","添加成功");
+        result.put("resultMsg","编辑成功");
         return result;
+    }
+
+    private void insertLabelValue(Label label,String rightOpreand) {
+        List<String> valueList = ChannelUtil.StringToList(rightOpreand);
+        for (String st : valueList){
+            LabelValue value = new LabelValue();
+            value.setInjectionLabelId(label.getInjectionLabelId());
+            value.setValueDesc(st);
+            value.setValueName(st);
+            value.setLabelValue(st);
+            value.setCreateDate(new Date());
+            value.setStatusCd("1000");
+            value.setUpdateDate(new Date());
+            labelValueMapper.insert(value);
+        }
     }
 
     @Override
@@ -207,7 +228,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         }
         labelMapper.deleteByPrimaryKey(labelId);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","添加成功");
+        result.put("resultMsg","删除成功");
         return result;
     }
 
@@ -300,7 +321,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         //todo 存在关联关系的标签组 不能删除
         labelGrpMapper.deleteByPrimaryKey(labelGrpId);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","添加成功");
+        result.put("resultMsg","删除成功");
         return result;
     }
 
@@ -440,7 +461,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         labelGrpMbr.setUpdateStaff(userId);
         labelGrpMbrMapper.updateByPrimaryKey(labelGrpMbr);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","添加成功");
+        result.put("resultMsg","编辑成功");
         return result;
     }
 
@@ -455,7 +476,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         }
         labelGrpMbrMapper.deleteByPrimaryKey(labelGrpMbrId);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","添加成功");
+        result.put("resultMsg","删除成功");
         return result;
     }
 
@@ -532,7 +553,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         labelValue.setUpdateStaff(userId);
         labelValueMapper.updateByPrimaryKey(labelValue);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","添加成功");
+        result.put("resultMsg","编辑成功");
         return result;
     }
 
@@ -547,7 +568,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         }
         labelValueMapper.deleteByPrimaryKey(labelValueId);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","添加成功");
+        result.put("resultMsg","删除成功");
         return result;
     }
 
