@@ -57,7 +57,7 @@ public class MktCampaignVO extends MktCampaign {
     private String tiggerType;
 
     /**
-     * 活动周期类型Id
+     * 活动周期类型value
      */
     private String execTypeValue;
 

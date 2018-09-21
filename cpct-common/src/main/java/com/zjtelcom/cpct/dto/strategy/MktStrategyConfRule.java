@@ -20,6 +20,16 @@ public class MktStrategyConfRule {
     private String mktStrategyConfRuleName;
 
     /**
+     * 营销活动标识
+     */
+    private Long mktCampaignId;
+
+    /**
+     * 策略配置标识
+     */
+    private Long StrategyConfId;
+
+    /**
      * 客户分群配置Id
      */
     private Long tarGrpId;
@@ -86,5 +96,21 @@ public class MktStrategyConfRule {
 
     public void setMktCamChlResultList(List<MktCamChlResult> mktCamChlResultList) {
         this.mktCamChlResultList = mktCamChlResultList;
+    }
+
+    public Long getMktCampaignId() {
+        return mktCampaignId;
+    }
+
+    public void setMktCampaignId(Long mktCampaignId) {
+        this.mktCampaignId = mktCampaignId;
+    }
+
+    public Long getStrategyConfId() {
+        return StrategyConfId;
+    }
+
+    public void setStrategyConfId(Long strategyConfId) {
+        StrategyConfId = strategyConfId;
     }
 }
