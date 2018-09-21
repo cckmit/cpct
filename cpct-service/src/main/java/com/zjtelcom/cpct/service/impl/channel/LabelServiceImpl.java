@@ -7,6 +7,8 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dto.channel.*;
+import com.zjtelcom.cpct.enums.ConditionType;
+import com.zjtelcom.cpct.enums.LabelCondition;
 import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.LabelService;
@@ -137,11 +139,11 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         Label labelValodate = labelMapper.selectByLabelCode(addVO.getInjectionLabelCode());
         if (labelValodate!=null){
             result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg","标签已存在");
+            result.put("resultMsg","唯一标识符不能重复");
             return result;
         }
         Label label = BeanUtil.create(addVO,new Label());
-        operatorValodate(label, addVO.getOperatorList());
+        operatorValodate(label, addVO.getConditionType());
         label.setScope(0);
         label.setLabelType("1000");
         //todo 系统添加待确认
@@ -160,16 +162,20 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         return result;
     }
 
-    private void operatorValodate(Label label, List<String> operatorList) {
-        if (operatorList != null) {
+    private void operatorValodate(Label label,String conditionType) {
+        if (conditionType != null && !conditionType.equals("")) {
             List<Integer> opValueList = new ArrayList<>();
-            for (String st : operatorList) {
-                Operator op = Operator.getOperator(st);
-                if (op != null) {
-                    opValueList.add(op.getValue());
+
+            if (conditionType.equals(LabelCondition.SINGLE.getValue().toString())){
+                label.setOperator(Operator.EQUAL.getValue().toString());
+            }else if (conditionType.equals(LabelCondition.MULTI.getValue().toString())){
+                label.setOperator(Operator.IN.getValue().toString());
+            }else {
+                for (Operator operator : Operator.values()) {
+                    opValueList.add(operator.getValue());
                 }
+                label.setOperator(ChannelUtil.List2String(opValueList));
             }
-            label.setOperator(ChannelUtil.List2String(opValueList));
         }
     }
 
@@ -183,7 +189,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             return result;
         }
         BeanUtil.copy(editVO,label);
-        operatorValodate(label, editVO.getOperatorList());
+        operatorValodate(label, editVO.getConditionType());
         label.setUpdateDate(new Date());
         label.setUpdateStaff(userId);
         labelMapper.updateByPrimaryKey(label);

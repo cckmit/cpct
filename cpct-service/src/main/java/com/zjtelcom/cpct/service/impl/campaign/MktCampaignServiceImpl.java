@@ -401,6 +401,62 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         return maps;
     }
 
+    @Override
+    public Map<String, Object> qryMktCampaignList4Sync(Map<String,Object> params, Integer page, Integer pageSize) {
+        Map<String, Object> maps = new HashMap<>();
+        PageHelper.startPage(page, pageSize);
+
+        List<MktCampaignCountDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListPage4Sync(params);
+
+        // 获取所有的sysParam
+        Map<String, String> paramMap = new HashMap<>();
+        List<SysParams> sysParamList = sysParamsMapper.selectAll("", 0L);
+        for (SysParams sysParams : sysParamList) {
+            paramMap.put(sysParams.getParamKey() + sysParams.getParamValue(), sysParams.getParamName());
+        }
+
+        List<MktCampaignVO> mktCampaignVOList = new ArrayList<>();
+        for (MktCampaignCountDO mktCampaignCountDO : mktCampaignDOList) {
+            MktCampaignVO mktCampaignVO = new MktCampaignVO();
+            try {
+                mktCampaignVO.setMktCampaignId(mktCampaignCountDO.getMktCampaignId());
+                mktCampaignVO.setMktCampaignName(mktCampaignCountDO.getMktCampaignName());
+                mktCampaignVO.setMktActivityNbr(mktCampaignCountDO.getMktActivityNbr());
+                mktCampaignVO.setPlanEndTime(mktCampaignCountDO.getPlanEndTime());
+                mktCampaignVO.setPlanBeginTime(mktCampaignCountDO.getPlanBeginTime());
+                mktCampaignVO.setCreateChannel(mktCampaignCountDO.getCreateChannel());
+                mktCampaignVO.setCreateDate(mktCampaignCountDO.getCreateDate());
+                mktCampaignVO.setUpdateDate(mktCampaignCountDO.getUpdateDate());
+                if (mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode()) ||
+                        mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_CHECKED.getStatusCode())){
+                    mktCampaignVO.setStatusExamine(StatusCode.STATUS_CODE_CHECKED.getStatusMsg());
+                }else {
+                    mktCampaignVO.setStatusExamine(StatusCode.STATUS_CODE_UNCHECK.getStatusMsg());
+                }
+            } catch (Exception e) {
+                logger.error("Excetion:", e);
+            }
+            mktCampaignVO.setMktCampaignCategoryValue(paramMap.
+                    get(ParamKeyEnum.MKT_CAMPAIGN_CATEGORY.getParamKey() + mktCampaignCountDO.getMktCampaignCategory()));
+            mktCampaignVO.setMktCampaignTypeValue(paramMap.
+                    get(ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey() + mktCampaignCountDO.getMktCampaignType()));
+            mktCampaignVO.setStatusCdValue(paramMap.
+                    get(ParamKeyEnum.STATUS_CD.getParamKey() + mktCampaignCountDO.getStatusCd()));
+            Boolean isRelation = false;
+            //判断该活动是否有有效的父/子活动
+            if (mktCampaignCountDO.getRelCount() != 0) {
+                isRelation = true;
+            }
+            mktCampaignVO.setRelation(isRelation);
+            mktCampaignVOList.add(mktCampaignVO);
+        }
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("mktCampaigns", mktCampaignVOList);
+        maps.put("pageInfo", new Page(new PageInfo(mktCampaignDOList)));
+        return maps;
+    }
+
     /**
      * 查询活动列表（分页）
      */

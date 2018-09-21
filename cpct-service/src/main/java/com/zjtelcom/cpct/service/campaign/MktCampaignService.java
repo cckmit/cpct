@@ -7,11 +7,13 @@
 package com.zjtelcom.cpct.service.campaign;
 
 
+import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.dto.campaign.MktCampaign;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignVO;
 import com.zjtelcom.cpct.request.campaign.QryMktCampaignListReq;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -27,6 +29,8 @@ public interface MktCampaignService {
     int modMktCampaign(MktCampaignDetail mktCampaignDetail) throws Exception;*/
 
     Map<String,Object> qryMktCampaignListPage (String mktCampaignName, String statusCd, String tiggerType, String mktCampaignType, Integer page, Integer pageSize);
+
+    Map<String,Object> qryMktCampaignList4Sync (Map<String,Object> params, Integer page, Integer pageSize);
 
     Map<String,Object> getCampaignList (String mktCampaignName,String mktCampaignType,Long eventId);
 
