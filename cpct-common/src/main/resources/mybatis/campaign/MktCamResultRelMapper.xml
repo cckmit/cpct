@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.campaign.MktCamResultRelMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.campaign.MktCamResultRelDO">
+    <id column="MKT_CAM_RESULT_REL_ID" jdbcType="BIGINT" property="mktCamResultRelId" />
+    <result column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId" />
+    <result column="MKT_RESULT_ID" jdbcType="BIGINT" property="mktResultId" />
+    <result column="STATUS" jdbcType="VARCHAR" property="status" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from mkt_cam_result_rel
+    where MKT_CAM_RESULT_REL_ID = #{mktCamResultRelId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamResultRelDO">
+    insert into mkt_cam_result_rel (MKT_CAM_RESULT_REL_ID, MKT_CAMPAIGN_ID, MKT_RESULT_ID, 
+      STATUS, CREATE_STAFF, CREATE_DATE, 
+      UPDATE_STAFF, UPDATE_DATE)·
+    values (#{mktCamResultRelId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{mktResultId,jdbcType=BIGINT}, 
+      #{status,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamResultRelDO">
+    update mkt_cam_result_rel
+    set
+    <if test="mktCampaignId != null and mktCampaignId != ''">
+      MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+    </if>
+    <if test="mktResultId != null and mktResultId != ''">
+      MKT_RESULT_ID = #{mktResultId,jdbcType=BIGINT},
+    </if>
+    <if test="status != null and status != ''">
+      STATUS = #{status,jdbcType=VARCHAR},
+    </if>
+    UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+    UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
+    where MKT_CAM_RESULT_REL_ID = #{mktCamResultRelId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_CAM_RESULT_REL_ID, MKT_CAMPAIGN_ID, MKT_RESULT_ID, STATUS, CREATE_STAFF, 
+    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+    from mkt_cam_result_rel
+    where MKT_CAM_RESULT_REL_ID = #{mktCamResultRelId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select MKT_CAM_RESULT_REL_ID, MKT_CAMPAIGN_ID, MKT_RESULT_ID, STATUS, CREATE_STAFF, 
+    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+    from mkt_cam_result_rel
+  </select>
+  <update id="changeStatusByMktCampaignId" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamResultRelDO">
+    update mkt_cam_result_rel
+    set MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+    <if test="mktResultId != null and mktResultId != ''">
+      MKT_RESULT_ID = #{mktResultId,jdbcType=BIGINT},
+    </if>
+    <if test="status != null and status != ''">
+      STATUS = #{status,jdbcType=VARCHAR},
+    </if>
+     UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+     UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
+    where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+  </update>
+  <select id="selectAllGroupByMktCampaignId" resultType="java.lang.Long">
+    select MKT_CAMPAIGN_ID
+    from mkt_cam_result_rel
+    GROUP BY MKT_CAMPAIGN_ID
+  </select>
+
+</mapper>

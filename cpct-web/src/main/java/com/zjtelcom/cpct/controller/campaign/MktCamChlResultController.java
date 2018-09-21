@@ -135,4 +135,23 @@ public class MktCamChlResultController extends BaseController {
     }
 
 
+    /**
+     * 查询所有 有二次协同 且二次协同为工单，且有效的
+     *
+     * @return
+     */
+    @RequestMapping(value = "/selectResultByMktCampaignId", method = RequestMethod.POST)
+    @CrossOrigin
+    public String selectResultByMktCampaignId() {
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            resultMap = mktCamChlResultService.selectResultByMktCampaignId();
+        } catch (Exception e) {
+            logger.error("[op:MktCamChlConfController] failed to select Result By MktCampaignId Exception: ", e);
+        }
+        return JSON.toJSONString(resultMap);
+    }
+
+
+
 }

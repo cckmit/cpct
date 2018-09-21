@@ -14,6 +14,10 @@ public class MktCamChlResult {
      */
     private String mktCamChlResultName;
     /**
+     * 结果类型：0-结果， 1-工单
+     */
+    private String resultType;
+    /**
      * 营销结果Id
      */
     private Long result;
@@ -27,6 +31,13 @@ public class MktCamChlResult {
      */
     List<MktCamChlConfDetail> mktCamChlConfDetailList;
 
+    public String getResultType() {
+        return resultType;
+    }
+
+    public void setResultType(String resultType) {
+        this.resultType = resultType;
+    }
 
     public Long getMktCamChlResultId() {
         return mktCamChlResultId;
