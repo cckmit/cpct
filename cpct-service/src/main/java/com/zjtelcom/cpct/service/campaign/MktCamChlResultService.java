@@ -31,4 +31,6 @@ public interface MktCamChlResultService {
 
     Map<String, Object> copyMktCamChlResult(Long parentMktCamChlResultId);
 
+    Map<String, Object> selectResultByMktCampaignId();
+
 }
