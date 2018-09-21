@@ -6,6 +6,8 @@
  */
 package com.zjtelcom.cpct.service.synchronize;
 
+import java.util.Map;
+
 /**
  * @Description:
  * @author: linchao
@@ -13,4 +15,7 @@ package com.zjtelcom.cpct.service.synchronize;
  * @version: V1.0
  */
 public interface SynchronizeCampaignService {
+
+    Map<String, Object> synchronizeCampaign(Long mktCampaignId) throws Exception;
+
 }

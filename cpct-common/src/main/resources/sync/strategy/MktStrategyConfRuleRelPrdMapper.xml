@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct_prd.dao.strategy.MktStrategyConfRuleRelPrdMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO">
+    <id column="MKT_STRATEGY_CONF_RULE_REL_ID" jdbcType="BIGINT" property="mktStrategyConfRuleRelId" />
+    <result column="MKT_STRATEGY_CONF_ID" jdbcType="BIGINT" property="mktStrategyConfId" />
+    <result column="MKT_STRATEGY_CONF_RULE_ID" jdbcType="BIGINT" property="mktStrategyConfRuleId" />
+    <result column="CREATE_STAFF" jdbcType="VARCHAR" property="createStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_STAFF" jdbcType="VARCHAR" property="updateStaff" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from mkt_strategy_conf_rule_rel
+    where MKT_STRATEGY_CONF_RULE_REL_ID = #{mktStrategyConfRuleRelId,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByMktStrategyConfId" parameterType="java.lang.Long">
+    delete from mkt_strategy_conf_rule_rel
+    where MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByMktStrategyConfRulId" parameterType="java.lang.Long">
+    delete from mkt_strategy_conf_rule_rel
+    where MKT_STRATEGY_CONF_RULE_ID = #{mktStrategyConfRuleId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" useGeneratedKeys="true" keyProperty="mktStrategyConfRuleRelId" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO">
+    insert into mkt_strategy_conf_rule_rel (MKT_STRATEGY_CONF_RULE_REL_ID, MKT_STRATEGY_CONF_ID, 
+      MKT_STRATEGY_CONF_RULE_ID, CREATE_STAFF, CREATE_DATE, 
+      UPDATE_STAFF, UPDATE_DATE)
+    values (#{mktStrategyConfRuleRelId,jdbcType=BIGINT}, #{mktStrategyConfId,jdbcType=BIGINT}, 
+      #{mktStrategyConfRuleId,jdbcType=BIGINT}, #{createStaff,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateStaff,jdbcType=VARCHAR}, #{updateDate,jdbcType=TIMESTAMP})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO">
+    update mkt_strategy_conf_rule_rel
+    set MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=BIGINT},
+      MKT_STRATEGY_CONF_RULE_ID = #{mktStrategyConfRuleId,jdbcType=BIGINT},
+      CREATE_STAFF = #{createStaff,jdbcType=VARCHAR},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_STAFF = #{updateStaff,jdbcType=VARCHAR},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
+    where MKT_STRATEGY_CONF_RULE_REL_ID = #{mktStrategyConfRuleRelId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_STRATEGY_CONF_RULE_REL_ID, MKT_STRATEGY_CONF_ID, MKT_STRATEGY_CONF_RULE_ID,
+    CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+    from mkt_strategy_conf_rule_rel
+    where MKT_STRATEGY_CONF_RULE_REL_ID = #{mktStrategyConfRuleRelId,jdbcType=BIGINT}
+  </select>
+  <select id="selectByMktStrategyConfId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_STRATEGY_CONF_RULE_REL_ID, MKT_STRATEGY_CONF_ID, MKT_STRATEGY_CONF_RULE_ID,
+    CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+    from mkt_strategy_conf_rule_rel
+    where MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select MKT_STRATEGY_CONF_RULE_REL_ID, MKT_STRATEGY_CONF_ID, MKT_STRATEGY_CONF_RULE_ID, 
+    CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+    from mkt_strategy_conf_rule_rel
+  </select>
+</mapper>

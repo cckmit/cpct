@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
@@ -34,6 +35,11 @@ public class QuestionServiceImpl implements QuestionService {
     @Autowired
     private MktQuestionDetailMapper questionDetailMapper;
 
+
+    @Override
+    public Map<String, Object> listQuestion() {
+        return null;
+    }
 
     /**
      * 添加问卷问题及答案
@@ -51,17 +57,7 @@ public class QuestionServiceImpl implements QuestionService {
         }
         Long questionId = Long.valueOf(map.get("questionId").toString());
         if (addVO.getQuestionDetailAddVOList()!=null){
-            for (QuestionDetailAddVO detailAddVO : addVO.getQuestionDetailAddVOList()){
-                QuestionDetail detail = BeanUtil.create(detailAddVO,new QuestionDetail());
-                detail.setQuestionId(questionId);
-                detail.setCreateDate(DateUtil.getCurrentTime());
-                detail.setUpdateDate(DateUtil.getCurrentTime());
-                detail.setStatusDate(DateUtil.getCurrentTime());
-                detail.setUpdateStaff(UserUtil.loginId());
-                detail.setCreateStaff(UserUtil.loginId());
-                detail.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-                questionDetailMapper.insert(detail);
-            }
+            batchAddQuestionDetail(addVO.getQuestionDetailAddVOList(),questionId);
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
@@ -69,6 +65,51 @@ public class QuestionServiceImpl implements QuestionService {
         return result;
     }
 
+
+
+
+    /**
+     * 编辑问题
+     * @param userId
+     * @param editVO
+     * @return
+     */
+    @Override
+    public Map<String, Object> modQuestion(Long userId, QuestionEditVO editVO) {
+        Map<String,Object> result = new HashMap<>();
+        Question question = questionMapper.selectByPrimaryKey(editVO.getQuestionId());
+        if (question==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","问题不存在");
+            return result;
+        }
+        BeanUtil.copy(editVO,question);
+        question.setUpdateDate(new Date());
+        question.setUpdateStaff(userId);
+        questionMapper.updateByPrimaryKey(question);
+        //删除问题下面所有选项
+        questionDetailMapper.deleteByQuestionId(question.getQuestionId());
+        //添加问卷问题选项内容
+        batchAddQuestionDetail(editVO.getQuestionDetailAddVOList(),question.getQuestionId());
+
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
+        result.put("resultMsg","编辑成功");
+        return result;
+    }
+
+    private void batchAddQuestionDetail(List<QuestionDetailAddVO> addVOList,Long questionId){
+        for (QuestionDetailAddVO detailAddVO : addVOList){
+            QuestionDetail detail = BeanUtil.create(detailAddVO,new QuestionDetail());
+            detail.setQuestionId(questionId);
+            detail.setCreateDate(DateUtil.getCurrentTime());
+            detail.setUpdateDate(DateUtil.getCurrentTime());
+            detail.setStatusDate(DateUtil.getCurrentTime());
+            detail.setUpdateStaff(UserUtil.loginId());
+            detail.setCreateStaff(UserUtil.loginId());
+            detail.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+            questionDetailMapper.insert(detail);
+        }
+    }
 
     @Override
     public Map<String, Object> createQuestion(Long userId, Question addVO) {
@@ -87,82 +128,66 @@ public class QuestionServiceImpl implements QuestionService {
         return result;
     }
 
-    @Override
-    public Map<String, Object> modQuestion(Long userId, QuestionEditVO editVO) {
-        Map<String,Object> result = new HashMap<>();
-        Question question = questionMapper.selectByPrimaryKey(editVO.getQuestionId());
-        if (question==null){
-            result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg","问题不存在");
-            return result;
-        }
-        BeanUtil.copy(editVO,question);
-        question.setUpdateDate(new Date());
-        question.setUpdateStaff(userId);
-        questionMapper.updateByPrimaryKey(question);
-        result.put("resultCode", CommonConstant.CODE_SUCCESS);
-        result.put("resultMsg","编辑问题");
-        return result;
-    }
-
-    /**
-     * 删除问题
-     * @param userId
-     * @param questionId
-     * @return
-     */
-    @Override
-    public Map<String, Object> delQuestion(Long userId, Long questionId) {
-        Map<String,Object> result = new HashMap<>();
-        Question question = questionMapper.selectByPrimaryKey(questionId);
-        if (question==null){
-            result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg","问题不存在");
-            return result;
-        }
-        questionMapper.deleteByPrimaryKey(questionId);
-        result.put("resultCode", CommonConstant.CODE_SUCCESS);
-        result.put("resultMsg","删除成功");
-        return result;
-    }
-
-
-    @Override
-    public Map<String, Object> modQuestionDetail(Long userId,  QuestionDetail editVO) {
-        Map<String,Object> result = new HashMap<>();
-        QuestionDetail detail = questionDetailMapper.selectByPrimaryKey(editVO.getQstDetailId());
-        if (detail==null){
-            result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg","选项不存在");
-            return result;
-        }
-        BeanUtil.copy(editVO,detail);
-        detail.setUpdateDate(new Date());
-        detail.setUpdateStaff(userId);
-        questionDetailMapper.updateByPrimaryKey(detail);
-        result.put("resultCode", CommonConstant.CODE_SUCCESS);
-        result.put("resultMsg","编辑成功");
-        return result;
-    }
-
-    /**
-     *删除选项
-     * @param userId
-     * @param questionDetailId
-     * @return
-     */
-    @Override
-    public Map<String, Object> delQuestionDetail(Long userId, Long questionDetailId) {
-        Map<String,Object> result = new HashMap<>();
-        QuestionDetail detail = questionDetailMapper.selectByPrimaryKey(questionDetailId);
-        if (detail==null){
-            result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg","选项不存在");
-            return result;
-        }
-        questionDetailMapper.deleteByPrimaryKey(questionDetailId);
-        result.put("resultCode", CommonConstant.CODE_SUCCESS);
-        result.put("resultMsg","删除成功");
-        return result;
-    }
+//    /**
+//     * 删除问题
+//     * @param userId
+//     * @param questionId
+//     * @return
+//     */
+//    @Override
+//    public Map<String, Object> delQuestion(Long userId, Long questionId) {
+//        Map<String,Object> result = new HashMap<>();
+//        Question question = questionMapper.selectByPrimaryKey(questionId);
+//        if (question==null){
+//            result.put("resultCode",CODE_FAIL);
+//            result.put("resultMsg","问题不存在");
+//            return result;
+//        }
+//        questionMapper.deleteByPrimaryKey(questionId);
+//        result.put("resultCode", CommonConstant.CODE_SUCCESS);
+//        result.put("resultMsg","删除成功");
+//        return result;
+//    }
+//
+//
+//    //弃用
+//    @Override
+//    public Map<String, Object> modQuestionDetail(Long userId,  QuestionDetail editVO) {
+//        Map<String,Object> result = new HashMap<>();
+//        QuestionDetail detail = questionDetailMapper.selectByPrimaryKey(editVO.getQstDetailId());
+//        if (detail==null){
+//            result.put("resultCode",CODE_FAIL);
+//            result.put("resultMsg","选项不存在");
+//            return result;
+//        }
+//        BeanUtil.copy(editVO,detail);
+//        detail.setUpdateDate(new Date());
+//        detail.setUpdateStaff(userId);
+//        questionDetailMapper.updateByPrimaryKey(detail);
+//        result.put("resultCode", CommonConstant.CODE_SUCCESS);
+//        result.put("resultMsg","编辑成功");
+//        return result;
+//    }
+//
+//    //弃用
+//    /**
+//     *删除选项
+//     * @param userId
+//     * @param questionDetailId
+//     * @return
+//     */
+//    @Override
+//    public Map<String, Object> delQuestionDetail(Long userId, Long questionDetailId) {
+//        Map<String,Object> result = new HashMap<>();
+//        QuestionDetail detail = questionDetailMapper.selectByPrimaryKey(questionDetailId);
+//        if (detail==null){
+//            result.put("resultCode",CODE_FAIL);
+//            result.put("resultMsg","选项不存在");
+//            return result;
+//        }
+//        questionDetailMapper.deleteByPrimaryKey(questionDetailId);
+//        result.put("resultCode", CommonConstant.CODE_SUCCESS);
+//        result.put("resultMsg","删除成功");
+//        return result;
+//    }
 }

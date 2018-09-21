@@ -57,4 +57,10 @@
     CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
     from mkt_strategy_conf_rule_rel
   </select>
+  <select id="selectByRuleId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_STRATEGY_CONF_RULE_REL_ID, MKT_STRATEGY_CONF_ID, MKT_STRATEGY_CONF_RULE_ID,
+    CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+    from mkt_strategy_conf_rule_rel
+    where MKT_STRATEGY_CONF_RULE_ID = #{mktStrategyConfRuleId,jdbcType=BIGINT}
+  </select>
 </mapper>

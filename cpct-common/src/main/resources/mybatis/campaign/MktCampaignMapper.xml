@@ -159,10 +159,12 @@
                 (
                   r.A_MKT_CAMPAIGN_ID = t.MKT_CAMPAIGN_ID
                   AND r.STATUS_CD = 1000
+                  AND r.REL_TYPE = 1000
                 )
                 OR (
                   r.Z_MKT_CAMPAIGN_ID = t.MKT_CAMPAIGN_ID
                   AND r.STATUS_CD = 1000
+                  AND r.REL_TYPE = 1000
                 )
             ) AS REL_COUNT
               from mkt_campaign t
