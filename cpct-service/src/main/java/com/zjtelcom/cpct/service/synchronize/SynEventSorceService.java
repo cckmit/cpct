@@ -6,15 +6,12 @@
  */
 package com.zjtelcom.cpct.service.synchronize;
 
-import com.zjtelcom.cpct.dto.event.EventSorce;
-
 import java.util.Map;
 
 /**
- * Description:
- * author: linchao
- * date: 2018/08/20 15:57
- * version: V1.0
+ * @Description 同步事件源
+ * @Author pengy
+ * @Date: 2018/8/28
  */
 public interface SynEventSorceService {
 

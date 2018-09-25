@@ -37,6 +37,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         Map<String, Object> resultMap = new HashMap<String, Object>();
         SysStaff user = null;
         try{
+
             user = sysStaffMapper.queryUserByName(userName);
         } catch(Exception e){
             e.printStackTrace();

@@ -2,7 +2,6 @@ package com.zjtelcom.cpct.service.impl.synchronize;
 
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.event.InterfaceCfgMapper;
-import com.zjtelcom.cpct.domain.event.EventSorceDO;
 import com.zjtelcom.cpct.domain.event.InterfaceCfg;
 import com.zjtelcom.cpct.enums.SynchronizeType;
 import com.zjtelcom.cpct.exception.SystemException;
@@ -37,7 +36,7 @@ public class SynInterfaceCfgServiceImpl extends BaseService implements SynInterf
     private SynchronizeRecordService synchronizeRecordService;
 
     //同步表名
-    public static final String tableName="interface_cfg";
+    private static final String tableName="interface_cfg";
 
     /**
      * 同步单个数据源接口
@@ -96,7 +95,7 @@ public class SynInterfaceCfgServiceImpl extends BaseService implements SynInterf
                 }
             }
         }
-        //查出需要删除的事件
+        //查出需要删除的事件源接口
         for(InterfaceCfg c:realList){
             for (int i = 0; i <prdList.size() ; i++) {
                 if(c.getInterfaceCfgId()-prdList.get(i).getInterfaceCfgId()==0){

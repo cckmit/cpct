@@ -12,6 +12,7 @@ import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.dao.system.SystemParamMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamEvtRelDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.domain.event.InterfaceCfg;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.campaign.MktCampaign;
@@ -77,6 +78,8 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     private MktCampaignMapper campaignMapper;
     @Autowired
     private ContactEvtTypeMapper evtTypeMapper;
+    @Autowired
+    private InterfaceCfgMapper interfaceCfgMapper;
 
 
     /**
@@ -341,11 +344,16 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             map.put("resultMsg","事件不存在");
             return map;
         }
-        CopyPropertiesUtil.copyBean2Bean(contactEventDetail, contactEvt);
+        BeanUtil.copy(contactEvt,contactEventDetail);
         ContactEvtType evtType = evtTypeMapper.selectByPrimaryKey(contactEvt.getContactEvtTypeId());
         if (evtType!=null){
             contactEventDetail.setEventTypeName(evtType.getContactEvtName());
         }
+        InterfaceCfg interfaceCfg = interfaceCfgMapper.selectByPrimaryKey(contactEvt.getInterfaceCfgId());
+        if (interfaceCfg!=null){
+            contactEventDetail.setInterfaceName(interfaceCfg.getInterfaceName());
+        }
+
         //查询出事件采集项
         List<ContactEvtItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId());
         contactEventDetail.setContactEvtItems(contactEvtItems);
@@ -373,7 +381,9 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
 //        }
         //获取所有活动
         List<MktCamEvtRel> mktCamEvtRels = new ArrayList<>();
+
         mktCamEvtRels = mktCamEvtRelMapper.qryBycontactEvtId(contactEvt.getContactEvtId());
+
         for (MktCamEvtRel rel : mktCamEvtRels){
             MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(rel.getMktCampaignId());
             if (campaign!=null){
@@ -494,6 +504,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                 relIdList.add(mktCamEvtRel.getMktCampEvtRelId());
                 MktCamEvtRelDO mktCamEvtRelDO = mktCamEvtRelMapper.findByCampaignIdAndEvtId(mktCamEvtRel.getMktCampaignId(),evtDetail.getContactEvtId());
                 if (mktCamEvtRelDO != null) {
+                    BeanUtil.copy(mktCamEvtRel,mktCamEvtRelDO);
                     mktCamEvtRelDO.setUpdateDate(DateUtil.getCurrentTime());
                     mktCamEvtRelDO.setUpdateStaff(UserUtil.loginId());
                     mktCamEvtRelMapper.updateByPrimaryKey(mktCamEvtRelDO);

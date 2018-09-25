@@ -17,4 +17,8 @@ public interface MktQuestionDetailMapper {
     List<QuestionDetail> findDetailListByQuestionId(@Param("questionId")Long questionId);
 
     int updateByPrimaryKey(QuestionDetail record);
+
+    int deleteInBatch(@Param("idList")List<Long> idList);
+
+    int deleteByQuestionId(@Param("questionId")Long questionId);
 }

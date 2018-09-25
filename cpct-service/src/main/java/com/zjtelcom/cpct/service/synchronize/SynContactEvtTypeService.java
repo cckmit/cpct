@@ -1,14 +1,11 @@
 package com.zjtelcom.cpct.service.synchronize;
 
-import com.zjtelcom.cpct.dto.event.ContactEvtType;
-import com.zjtelcom.cpct.request.event.QryContactEvtTypeReq;
-
 import java.util.Map;
 
 /**
- * @Description EventTypeService
- * @Author pengy
- * @Date 2018/6/21 9:45
+ * @Auther: anson
+ * @Date: 2018/8/28
+ * @Description:同步事件目录
  */
 
 public interface SynContactEvtTypeService {

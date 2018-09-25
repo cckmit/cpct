@@ -18,7 +18,7 @@ public class MapUtil {
         }catch (Throwable e){
 
         }
-        return  null;
+        return  "";
     }
 
 }

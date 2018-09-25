@@ -11,13 +11,20 @@ import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.thread.TarGrpRule;
+import com.zjtelcom.cpct.util.DateUtil;
+import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
+import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 
 @RestController
 @RequestMapping("${adminPath}/campaign")
@@ -37,6 +44,63 @@ public class CampaignController extends BaseController {
 
     @Autowired
     private RedisUtils redisUtils;
+
+
+    /**
+     * 同步活动列表--活动延期
+     *
+     * @return
+     */
+    @PostMapping("/delayCampaign4Sync")
+    @CrossOrigin
+    public Map<String, Object> delayCampaign4Sync(@RequestBody Map<String,Object> params){
+        Map<String,Object> result = new HashMap<>();
+        try {
+            Long campaignId = Long.valueOf(params.get("campaignId").toString());
+            Date lastTime = new Date(Long.valueOf(params.get("lastTime").toString()));
+            result = mktCampaignService.delayCampaign4Sync(campaignId,lastTime);
+        } catch (Exception e) {
+            logger.error("[op:CampaignController] fail to delayCampaign4Sync",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to delayCampaign4Sync");
+            return result;
+        }
+        return result;
+    }
+
+    /**
+     * 同步活动列表--活动审核
+     *
+     * @return
+     */
+    @PostMapping("/examineCampaign4Sync")
+    @CrossOrigin
+    public Map<String, Object> examineCampaign4Sync(@RequestBody Map<String,Long> params){
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = mktCampaignService.examineCampaign4Sync(params.get("campaignId"));
+        } catch (Exception e) {
+            logger.error("[op:CampaignController] fail to examineCampaign4Sync",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to examineCampaign4Sync");
+            return result;
+        }
+        return result;
+    }
+
+    /**
+     * 同步活动列表(分页)
+     *
+     * @return
+     */
+    @PostMapping("/qryMktCampaignList4Sync")
+    @CrossOrigin
+    public String qryMktCampaignList4Sync(@RequestBody Map<String,Object> params) throws Exception {
+        Integer page = MapUtil.getIntNum(params.get("page"));  // 页码
+        Integer pageSize = MapUtil.getIntNum(params.get("pageSize")); // 条数
+        Map<String, Object> map = mktCampaignService.qryMktCampaignList4Sync(params, page, pageSize);
+        return JSON.toJSONString(map);
+    }
 
     /**
      * 查询活动列表(分页)

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct_prd.dao.template.TarGrpTemplatePrdMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO">
+        <id column="TAR_GRP_TEMPLATE_ID" jdbcType="BIGINT" property="tarGrpTemplateId"/>
+        <result column="TAR_GRP_TEMPLATE_NAME" jdbcType="VARCHAR" property="tarGrpTemplateName"/>
+        <result column="TAR_GRP_TEMPLATE_DESC" jdbcType="VARCHAR" property="tarGrpTemplateDesc"/>
+        <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd"/>
+        <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate"/>
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff"/>
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from tar_grp_template
+    where TAR_GRP_TEMPLATE_ID = #{tarGrpTemplateId,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="tarGrpTemplateId"
+            parameterType="com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO">
+    insert into tar_grp_template (TAR_GRP_TEMPLATE_ID, TAR_GRP_TEMPLATE_NAME, 
+      TAR_GRP_TEMPLATE_DESC, STATUS_CD, STATUS_DATE, 
+      CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, 
+      UPDATE_DATE)
+    values (#{tarGrpTemplateId,jdbcType=BIGINT}, #{tarGrpTemplateName,jdbcType=VARCHAR},
+      #{tarGrpTemplateDesc,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP},
+      #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, 
+      #{updateDate,jdbcType=TIMESTAMP})
+  </insert>
+    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO">
+        update tar_grp_template
+        set
+        <if test="tarGrpTemplateName != null and tarGrpTemplateName != ''">
+            TAR_GRP_TEMPLATE_NAME = #{tarGrpTemplateName,jdbcType=VARCHAR},
+        </if>
+        <if test="tarGrpTemplateDesc != null and tarGrpTemplateDesc != ''">
+            TAR_GRP_TEMPLATE_DESC = #{tarGrpTemplateDesc,jdbcType=VARCHAR},
+        </if>
+        <if test="statusDate != null">
+            STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="createStaff != null and createStaff != ''">
+            CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+        </if>
+        <if test="createDate != null">
+            CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="updateStaff != null and updateStaff != ''">
+            UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        </if>
+        UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
+        where TAR_GRP_TEMPLATE_ID = #{tarGrpTemplateId,jdbcType=BIGINT}
+    </update>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select TAR_GRP_TEMPLATE_ID, TAR_GRP_TEMPLATE_NAME, TAR_GRP_TEMPLATE_DESC, STATUS_CD, STATUS_DATE, 
+    CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+    from tar_grp_template
+    where TAR_GRP_TEMPLATE_ID = #{tarGrpTemplateId,jdbcType=BIGINT}
+  </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+    select TAR_GRP_TEMPLATE_ID, TAR_GRP_TEMPLATE_NAME, TAR_GRP_TEMPLATE_DESC, STATUS_CD, STATUS_DATE,
+    CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+    from tar_grp_template order by UPDATE_DATE desc
+  </select>
+    <select id="selectByName" resultMap="BaseResultMap">
+        select TAR_GRP_TEMPLATE_ID, TAR_GRP_TEMPLATE_NAME, TAR_GRP_TEMPLATE_DESC, STATUS_CD, STATUS_DATE,
+        CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+        from tar_grp_template
+        where 1 = 1
+        <if test="tarGrpTemplateName != null and tarGrpTemplateName != ''">
+            AND TAR_GRP_TEMPLATE_NAME LIKE CONCAT('%', #{tarGrpTemplateName, jdbcType=VARCHAR}, '%')
+        </if>
+        order by UPDATE_DATE desc
+    </select>
+</mapper>

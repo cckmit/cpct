@@ -37,7 +37,7 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
     private SynchronizeRecordService synchronizeRecordService;
 
     //同步表名
-    public static final String tableName="event";
+    private static final String tableName="event";
 
 
 

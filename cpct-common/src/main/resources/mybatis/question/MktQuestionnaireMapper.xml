@@ -73,12 +73,16 @@
     REMARK
     from mkt_questionnaire
     where 1=1
-    <if test="naireName !=null and naireName != ''">
-      and NAIRE_NAME LIKE CONCAT(CONCAT('%',#{naireName}),'%')
+    <if test="map.naireName !=null and map.naireName != ''">
+      and NAIRE_NAME LIKE CONCAT(CONCAT('%',#{map.naireName}),'%')
     </if>
-    <if test="naireType !=null and naireType != ''">
-      and NAIRE_TYPE = #{naireType}
+    <if test="map.naireType !=null and map.naireType != ''">
+      and NAIRE_TYPE = #{map.naireType}
     </if>
+    <if test="map.status !=null and map.status != ''">
+      and  STATUS_CD = #{map.status}
+    </if>
+
   </select>
 
     <select id="findNairePageByParam" resultMap="BaseResultMap">
