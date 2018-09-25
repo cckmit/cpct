@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct_prd.dao.sys.SysRolePrdMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.system.SysRole">
+        <id column="ROLE_ID" jdbcType="BIGINT" property="roleId"/>
+        <result column="ROLE_CODE" jdbcType="VARCHAR" property="roleCode"/>
+        <result column="ROLE_NAME" jdbcType="VARCHAR" property="roleName"/>
+        <result column="REMARK" jdbcType="VARCHAR" property="remark"/>
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff"/>
+    </resultMap>
+
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from sys_role
+    where ROLE_ID = #{roleId,jdbcType=BIGINT}
+    </delete>
+
+    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.system.SysRole">
+    insert into sys_role (ROLE_ID,ROLE_NAME, ROLE_CODE,REMARK,
+      CREATE_DATE, CREATE_STAFF,UPDATE_DATE,UPDATE_STAFF)
+    values ( #{roleId,jdbcType=BIGINT},#{roleName,jdbcType=VARCHAR}, #{roleCode,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR},
+      #{createDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT},
+      #{updateDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT})
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.system.SysRole">
+      update sys_role
+      set ROLE_NAME = #{roleName,jdbcType=VARCHAR},
+        REMARK = #{remark,jdbcType=VARCHAR},
+        ROLE_CODE = #{roleCode,jdbcType=VARCHAR},
+        CREATE_DATE=#{createDate,jdbcType=TIMESTAMP},
+        CREATE_STAFF=#{createStaff,jdbcType=BIGINT},
+        UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+        UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT}
+      where ROLE_ID = #{roleId,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+      select ROLE_ID, ROLE_NAME, ROLE_CODE,REMARK, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
+      from sys_role
+      where ROLE_ID = #{roleId,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectByParams" resultMap="BaseResultMap">
+        select ROLE_ID, ROLE_NAME, ROLE_CODE,REMARK, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
+        from sys_role
+        where 1=1
+        <if test="roleId != null and roleId != 0">
+            and ROLE_ID = #{roleId,jdbcType=BIGINT}
+        </if>
+        <if test="roleName != null and roleName != ''">
+            and ROLE_NAME = #{roleName,jdbcType=VARCHAR}
+        </if>
+        order by CREATE_DATE desc
+    </select>
+
+    <select id="selectByStaffId" resultMap="BaseResultMap" parameterType="Long">
+        select sr.ROLE_ID, sr.ROLE_NAME,ROLE_CODE
+        from sys_role sr
+        left join sys_staff_role ssr
+        on sr.ROLE_ID = ssr.ROLE_ID
+        where ssr.STAFF_ID = #{staffId,jdbcType=VARCHAR}
+    </select>
+
+
+    <select id="selectAll" resultType="Map">
+        select ROLE_ID as value, ROLE_NAME as name
+        from sys_role
+        order by ROLE_ID asc
+    </select>
+
+
+
+
+
+
+</mapper>
