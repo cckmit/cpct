@@ -1,15 +1,17 @@
 package com.zjtelcom.cpct.dto.question;
 
-import java.io.Serializable;
+import com.zjtelcom.cpct.domain.question.QuestRel;
 
-public class QuestionnaireVO implements Serializable {
+import java.io.Serializable;
+import java.util.List;
+
+public class QuestionnaireParam implements Serializable {
+
     private Long naireId;
 
     private String naireName;
 
     private String naireType;//1000	营销问卷;2000	维挽问卷
-
-    private String naireTypeName;
 
     private String markType;
 
@@ -17,33 +19,28 @@ public class QuestionnaireVO implements Serializable {
 
     private String naireDesc;
 
-    private String status;
+    private List<Long> questionIdList;
 
-    private String statusSt;
+    private Integer page;
+
+    private Integer pageSize;
 
 
-    public String getStatusSt() {
-        return statusSt;
+
+    public Integer getPageSize() {
+        return pageSize;
     }
 
-    public void setStatusSt(String statusSt) {
-        this.statusSt = statusSt;
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
     }
 
-    public String getStatus() {
-        return status;
+    public Integer getPage() {
+        return page;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getNaireTypeName() {
-        return naireTypeName;
-    }
-
-    public void setNaireTypeName(String naireTypeName) {
-        this.naireTypeName = naireTypeName;
+    public void setPage(Integer page) {
+        this.page = page;
     }
 
     public Long getNaireId() {
@@ -92,5 +89,13 @@ public class QuestionnaireVO implements Serializable {
 
     public void setNaireDesc(String naireDesc) {
         this.naireDesc = naireDesc;
+    }
+
+    public List<Long> getQuestionIdList() {
+        return questionIdList;
+    }
+
+    public void setQuestionIdList(List<Long> questionIdList) {
+        this.questionIdList = questionIdList;
     }
 }

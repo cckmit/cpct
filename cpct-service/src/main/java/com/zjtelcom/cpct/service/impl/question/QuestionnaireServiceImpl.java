@@ -15,10 +15,8 @@ import com.zjtelcom.cpct.domain.question.Questionnaire;
 import com.zjtelcom.cpct.dto.question.*;
 import com.zjtelcom.cpct.service.question.QuestionService;
 import com.zjtelcom.cpct.service.question.QuestionnaireService;
-import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.DateUtil;
-import com.zjtelcom.cpct.util.MapUtil;
-import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.service.system.SysParamsService;
+import com.zjtelcom.cpct.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,8 +44,134 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     private MktQuestionMapper questionMapper;
     @Autowired
     private MktQuestionDetailMapper questionDetailMapper;
+    @Autowired
+    private SysParamsService sysParamsService;
+
+    /**
+     * 创建问卷
+     * @param addVO
+     * @return
+     */
+    @Override
+    @Transactional
+    public Map<String, Object> releaseQuestionnaire(QuestionnaireParam addVO) {
+        return createQuestionnaire(addVO,false);
+    }
+
+    /**
+     * 创建问卷
+     * @param addVO
+     * @return
+     */
+    @Override
+    @Transactional
+    public Map<String, Object> createQuestionnaire(QuestionnaireParam addVO,boolean isSave) {
+        Map<String,Object> result = new HashMap<>();
+        //添加调研问卷记录
+        Questionnaire questionnaire = BeanUtil.create(addVO,new Questionnaire());
+        questionnaire.setCreateDate(DateUtil.getCurrentTime());
+        questionnaire.setUpdateDate(DateUtil.getCurrentTime());
+        questionnaire.setStatusDate(DateUtil.getCurrentTime());
+        questionnaire.setUpdateStaff(UserUtil.loginId());
+        questionnaire.setCreateStaff(UserUtil.loginId());
+        if (isSave){
+            questionnaire.setStatusCd("1000");//草稿
+        }else {
+            questionnaire.setStatusCd("2000");//已发布
+        }
+        questionnaire.setNairePoints(100);
+        questionnaireMapper.insert(questionnaire);
+        List<QuestRel> questRelList = getQuestRels(addVO, questionnaire);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","创建成功");
+        return result;
+    }
+
+    /**
+     * 编辑问卷
+     * @param editvo
+     * @return
+     */
+    @Override
+    public Map<String, Object> modQuestionnaire(QuestionnaireParam editvo) {
+        Map<String,Object> result = new HashMap<>();
+        Questionnaire questionnaire = questionnaireMapper.selectByPrimaryKey(editvo.getNaireId());
+        if (questionnaire==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","调研问卷不存在");
+            return result;
+        }
+        //添加调研问卷记录
+        BeanUtil.copy(editvo,questionnaire);
+        questionnaire.setUpdateDate(DateUtil.getCurrentTime());
+        questionnaire.setUpdateStaff(UserUtil.loginId());
+        questionnaireMapper.updateByPrimaryKey(questionnaire);
+        questRelMapper.deleteByNaireId(questionnaire.getNaireId());
+        List<QuestRel> questRelList = getQuestRels(editvo, questionnaire);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","编辑成功");
+        return result;
+    }
 
 
+    private List<QuestRel> getQuestRels(QuestionnaireParam editvo, Questionnaire questionnaire) {
+        List<QuestRel> questRelList = new ArrayList<>();
+        for (Long id : editvo.getQuestionIdList()){
+            QuestRel questRel = new QuestRel();
+            questRel.setQuestionId(id);
+            questRel.setNaireId(questionnaire.getNaireId());
+            questRel.setCreateDate(DateUtil.getCurrentTime());
+            questRel.setUpdateDate(DateUtil.getCurrentTime());
+            questRel.setStatusDate(DateUtil.getCurrentTime());
+            questRel.setUpdateStaff(UserUtil.loginId());
+            questRel.setCreateStaff(UserUtil.loginId());
+            questRel.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+            questRelMapper.insert(questRel);
+            questRelList.add(questRel);
+
+        }
+        return questRelList;
+    }
+
+    /**
+     * 获取问卷
+     * @param questionnaireId
+     * @return
+     */
+    @Override
+    public Map<String, Object> getQuestionnaire(Long questionnaireId) {
+        Map<String,Object> result = new HashMap<>();
+        QuestionRep resultRep = new QuestionRep();
+        Questionnaire questionnaire = questionnaireMapper.selectByPrimaryKey(questionnaireId);
+        if (questionnaire==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","调研问卷不存在");
+            return result;
+        }
+        QuestionnaireVO questionnaireVO = BeanUtil.create(questionnaire,new QuestionnaireVO());
+        questionnaireVO.setNaireTypeName(ChannelUtil.getNaireType(questionnaire));
+        resultRep.setQuestionnaire(questionnaireVO);
+        List<QuestionModel> voList = new ArrayList<>();
+        List<QuestRel> questRelList = questRelMapper.findRelListByQuestionnaireId(questionnaireId);
+        for (QuestRel questRel : questRelList){
+            Question question = questionMapper.selectByPrimaryKey(questRel.getQuestionId());
+            if (question!=null){
+                Map<String,Object> questionDetail = questionService.getQuestionDetail(question.getQuestionId());
+                QuestionModel vo = (QuestionModel)questionDetail.get("data");
+                voList.add(vo);
+            }
+        }
+        resultRep.setQuestionVOList(voList);
+        result.put("resutlCode",CODE_SUCCESS);
+        result.put("resultMsg",resultRep);
+        return result;
+    }
+
+
+
+
+
+    //--------------------------------------------------------------------------------------------------------------------------------------------------------
     /**
      * 编辑调研问卷
      * @param userId
@@ -77,14 +201,13 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
     /**
      * 删除调研问卷
-     * @param userId
-     * @param req
+     * @param questionnaireId
      * @return
      */
     @Override
-    public Map<String, Object> delQuestionnaire(Long userId, QuestionReq req) {
+    public Map<String, Object> delQuestionnaire(Long questionnaireId) {
         Map<String,Object> result = new HashMap<>();
-        Questionnaire questionnaire = questionnaireMapper.selectByPrimaryKey(req.getQuestionnaire().getNaireId());
+        Questionnaire questionnaire = questionnaireMapper.selectByPrimaryKey(questionnaireId);
         if (questionnaire==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","调研问卷不存在");
@@ -105,23 +228,18 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     @Override
     public Map<String, Object> getQuestionnaireList(Long userId, Map<String, Object> param) {
         Map<String,Object> result = new HashMap<>();
-        String naireName = null;
-        String naireType = null;
         Integer page = MapUtil.getIntNum(param.get("page").toString());
         Integer pageSize =  MapUtil.getIntNum(param.get("pageSize").toString());
-        if (param.get("naireName")!=null){
-            naireName = param.get("naireName").toString();
-        }
-        if (param.get("naireType")!=null){
-            naireType = param.get("naireType").toString();
-        }
 
         PageHelper.startPage(page,pageSize);
-        List<Questionnaire> questionnaireList = questionnaireMapper.findQuestionnaireListByParam(naireName,naireType);
+        List<Questionnaire> questionnaireList = questionnaireMapper.findQuestionnaireListByParam(param);
         Page info = new Page(new PageInfo(questionnaireList));
         List<QuestionnaireVO> voList = new ArrayList<>();
         for (Questionnaire questionnaire: questionnaireList){
             QuestionnaireVO vo = BeanUtil.create(questionnaire,new QuestionnaireVO());
+            vo.setNaireTypeName(ChannelUtil.getNaireType(questionnaire));
+            Map<String,String> statusParam = sysParamsService.getParamsByValue("QUEST_001",questionnaire.getStatusCd());
+            vo.setStatusSt(statusParam.get("PARAM_NAME"));
             voList.add(vo);
         }
         result.put("resultCode",CODE_SUCCESS);
@@ -153,12 +271,6 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
     private Map<String, Object> questionnaireRel(Long userId, QuestionReq questionReq, Map<String, Object> result, Questionnaire questionnaire,boolean isAdd) {
         Long naireId = questionnaire.getNaireId();
-//        for (InputQuestionAddVO inputQuestionAddVO : questionReq.getInputQuestionAddVOList()){
-//            //添加问题及答案
-//            QuestionAddVO questionAddVO = BeanUtil.create(inputQuestionAddVO,new QuestionAddVO());
-//            Map<String, Object> map = addQuestion(userId, naireId, questionAddVO);
-//            if (map != null) return map;
-//        }
         for (MultiQuestionAddVO multiQuestionAddVO : questionReq.getMultiQuestionAddVOList()){
             //添加问题及答案
             QuestionAddVO questionAddVO = BeanUtil.create(multiQuestionAddVO,new QuestionAddVO());
@@ -219,7 +331,9 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
             result.put("resultMsg","调研问卷不存在");
             return result;
         }
-        resultRep.setQuestionnaire(questionnaire);
+        QuestionnaireVO questionnaireVO = BeanUtil.create(questionnaire,new QuestionnaireVO());
+        questionnaireVO.setNaireTypeName(ChannelUtil.getNaireType(questionnaire));
+        resultRep.setQuestionnaire(questionnaireVO);
         List<QuestionVO> voList = new ArrayList<>();
         List<QuestRel> questRelList = questRelMapper.findRelListByQuestionnaireId(questionnaireId);
         for (QuestRel questRel : questRelList){
@@ -232,7 +346,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
                 voList.add(vo);
             }
         }
-        resultRep.setQuestionVOList(voList);
+//        resultRep.setQuestionVOList(voList);
         result.put("resutlCode",CODE_SUCCESS);
         result.put("resultMsg",resultRep);
         return result;

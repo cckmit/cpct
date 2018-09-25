@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zjtelcom.cpct.dao.question.MktQuestionnaireMapper">
+<mapper namespace="com.zjtelcom.cpct_prd.dao.question.MktQuestionnairePrdMapper">
   <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.question.Questionnaire">
     <id column="NAIRE_ID" jdbcType="BIGINT" property="naireId" />
     <result column="NAIRE_NAME" jdbcType="VARCHAR" property="naireName" />
@@ -73,16 +73,12 @@
     REMARK
     from mkt_questionnaire
     where 1=1
-    <if test="map.naireName !=null and map.naireName != ''">
-      and NAIRE_NAME LIKE CONCAT(CONCAT('%',#{map.naireName}),'%')
+    <if test="naireName !=null and naireName != ''">
+      and NAIRE_NAME LIKE CONCAT(CONCAT('%',#{naireName}),'%')
     </if>
-    <if test="map.naireType !=null and map.naireType != ''">
-      and NAIRE_TYPE = #{map.naireType}
+    <if test="naireType !=null and naireType != ''">
+      and NAIRE_TYPE = #{naireType}
     </if>
-    <if test="map.status !=null and map.status != ''">
-      and  STATUS_CD = #{map.status}
-    </if>
-
   </select>
 
     <select id="findNairePageByParam" resultMap="BaseResultMap">

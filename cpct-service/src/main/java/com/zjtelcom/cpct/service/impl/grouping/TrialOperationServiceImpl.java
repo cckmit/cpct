@@ -11,6 +11,7 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlResultConfRelDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.domain.channel.DisplayColumn;
 import com.zjtelcom.cpct.domain.channel.MktProductRule;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
@@ -18,6 +19,7 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
+import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.grouping.*;
 import com.zjtelcom.cpct.dto.strategy.MktStrategy;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
@@ -26,6 +28,7 @@ import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRuleRel;
 import com.zjtelcom.cpct.dto.user.UserList;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
+import com.zjtelcom.cpct.service.channel.MessageLabelService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
@@ -67,6 +70,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private MktStrategyConfRuleRelMapper ruleRelMapper;
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired
+    private MessageLabelService messageLabelService;
     /**
      * 销售品service
      */
@@ -184,7 +189,14 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             return result;
         }
         // 通过活动id获取关联的标签字段数组
-        String[] fieldList = new String[10];
+        DisplayColumn req = new DisplayColumn();
+        req.setDisplayColumnId(campaign.getCalcDisplay());
+        Map<String,Object> labelMap = messageLabelService.queryLabelListByDisplayId(req);
+        List<LabelDTO> labelDTOList = (List<LabelDTO>)labelMap.get("labels");
+        String[] fieldList = new String[labelDTOList.size()];
+        for (int i = 0 ; i< labelDTOList.size();i++){
+            fieldList[i] = labelDTOList.get(i).getLabelCode();
+        }
 
         TrialRequest request = new TrialRequest();
         request.setFieldList(fieldList);

@@ -1,14 +1,12 @@
-package com.zjtelcom.cpct.dao.question;
+package com.zjtelcom.cpct_prd.dao.question;
 
 
 import com.zjtelcom.cpct.domain.question.Questionnaire;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.data.domain.Page;
 
 import java.util.List;
-import java.util.Map;
 
-public interface MktQuestionnaireMapper {
+public interface MktQuestionnairePrdMapper {
     int deleteByPrimaryKey(Long naireId);
 
     int insert(Questionnaire record);
@@ -17,7 +15,7 @@ public interface MktQuestionnaireMapper {
 
     List<Questionnaire> selectAll();
 
-    List<Questionnaire> findQuestionnaireListByParam(@Param("map")Map<String,Object> params);
+    List<Questionnaire> findQuestionnaireListByParam(@Param("naireName") String naireName, @Param("naireType") String naireType);
 
 //    Page<Questionnaire> findNairePageByParam(@Param("naireName")String naireName, @Param("naireType")String naireType);
 

@@ -190,6 +190,7 @@
     <if test="conditionType != null and conditionType != ''">
       and CONDITION_TYPE = #{conditionType}
     </if>
+    order by CREATE_DATE desc
   </select>
 
   <select id="queryLabelsExceptSelected" parameterType="java.util.List" resultMap="BaseResultMap">

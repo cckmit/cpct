@@ -1,8 +1,9 @@
-package com.zjtelcom.cpct.dubbo.model;
+package com.zjtelcom.cpct.dto.question;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class QuestionDetailVO {
+public class QuestionDetailVO implements Serializable {
     private Long qstDetailId;
 
     private Long questionId;
@@ -13,8 +14,16 @@ public class QuestionDetailVO {
 
     private String qstDetailInputType;//题库明细输入类型 :1000	输入	;2000 选择
 
-    private String statusCd;
+    private String remark;
 
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
 
     public Long getQstDetailId() {
         return qstDetailId;
@@ -55,14 +64,4 @@ public class QuestionDetailVO {
     public void setQstDetailInputType(String qstDetailInputType) {
         this.qstDetailInputType = qstDetailInputType;
     }
-
-    public String getStatusCd() {
-        return statusCd;
-    }
-
-    public void setStatusCd(String statusCd) {
-        this.statusCd = statusCd;
-    }
-
-
 }

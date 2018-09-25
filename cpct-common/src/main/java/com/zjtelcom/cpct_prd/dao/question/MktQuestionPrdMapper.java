@@ -1,4 +1,4 @@
-package com.zjtelcom.cpct.dao.question;
+package com.zjtelcom.cpct_prd.dao.question;
 
 
 
@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-public interface MktQuestionMapper {
+public interface MktQuestionPrdMapper {
     int deleteByPrimaryKey(Long questionId);
 
     int insert(Question record);
@@ -18,5 +18,5 @@ public interface MktQuestionMapper {
 
     int updateByPrimaryKey(Question record);
 
-    List<Question> selectByParam(@Param("map")Question question);
+    List<Question> selectByParam(@Param("map") Question question);
 }
