@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct_prd.dao.label.InjectionLabelPrdMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.Label">
+    <id column="INJECTION_LABEL_ID" jdbcType="BIGINT" property="injectionLabelId" />
+    <result column="INJECTION_LABEL_CODE" jdbcType="VARCHAR" property="injectionLabelCode" />
+    <result column="INJECTION_LABEL_NAME" jdbcType="VARCHAR" property="injectionLabelName" />
+    <result column="INJECTION_LABEL_DESC" jdbcType="VARCHAR" property="injectionLabelDesc" />
+    <result column="LABEL_TYPE" jdbcType="VARCHAR" property="labelType" />
+    <result column="LABEL_VALUE_TYPE" jdbcType="VARCHAR" property="labelValueType" />
+    <result column="LABEL_DATA_TYPE" jdbcType="VARCHAR" property="labelDataType" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="FIT_DOMAIN" jdbcType="VARCHAR" property="fitDomain" />
+    <result column="RIGHT_OPERAND" jdbcType="VARCHAR" property="rightOperand" />
+    <result column="CONDITION_TYPE" jdbcType="VARCHAR" property="conditionType" />
+    <result column="OPERATOR" jdbcType="VARCHAR" property="operator" />
+    <result column="SCOPE" jdbcType="INTEGER" property="scope" />
+    <result column="TAG_ROW_ID" jdbcType="BIGINT" property="tagRowId" />
+    <result column="IS_SHARED" jdbcType="INTEGER" property="isShared" />
+    <result column="CATALOG_ID" jdbcType="BIGINT" property="catalogId" />
+    <result column="CLASS_NAME" jdbcType="VARCHAR" property="className" />
+
+  </resultMap>
+
+  <resultMap id="BaseResultMapT" type="com.zjtelcom.cpct.domain.channel.Label">
+    <id column="INJECTION_LABEL_ID" jdbcType="BIGINT" property="injectionLabelId" />
+    <result column="INJECTION_LABEL_NAME" jdbcType="VARCHAR" property="injectionLabelName" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from injection_label
+    where INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.Label" useGeneratedKeys="true" keyProperty="injectionLabelId">
+  insert into injection_label (INJECTION_LABEL_ID, INJECTION_LABEL_CODE,
+      INJECTION_LABEL_NAME, INJECTION_LABEL_DESC,
+      LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE,
+      STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+      CREATE_DATE, STATUS_DATE, UPDATE_DATE,
+      REMARK, FIT_DOMAIN, RIGHT_OPERAND,
+      CONDITION_TYPE, OPERATOR, SCOPE,
+      TAG_ROW_ID, IS_SHARED, CATALOG_ID,
+      CLASS_NAME)
+    values (#{injectionLabelId,jdbcType=BIGINT}, #{injectionLabelCode,jdbcType=VARCHAR},
+      #{injectionLabelName,jdbcType=VARCHAR}, #{injectionLabelDesc,jdbcType=VARCHAR},
+      #{labelType,jdbcType=VARCHAR}, #{labelValueType,jdbcType=VARCHAR}, #{labelDataType,jdbcType=VARCHAR},
+      #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT},
+      #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP},
+      #{remark,jdbcType=VARCHAR}, #{fitDomain,jdbcType=VARCHAR}, #{rightOperand,jdbcType=VARCHAR},
+      #{conditionType,jdbcType=VARCHAR}, #{operator,jdbcType=VARCHAR}, #{scope,jdbcType=INTEGER},
+      #{tagRowId,jdbcType=BIGINT}, #{isShared,jdbcType=INTEGER}, #{catalogId,jdbcType=BIGINT},
+      #{className,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.Label">
+    update injection_label
+    set INJECTION_LABEL_CODE = #{injectionLabelCode,jdbcType=VARCHAR},
+      INJECTION_LABEL_NAME = #{injectionLabelName,jdbcType=VARCHAR},
+      INJECTION_LABEL_DESC = #{injectionLabelDesc,jdbcType=VARCHAR},
+      LABEL_TYPE = #{labelType,jdbcType=VARCHAR},
+      LABEL_VALUE_TYPE = #{labelValueType,jdbcType=VARCHAR},
+      LABEL_DATA_TYPE = #{labelDataType,jdbcType=VARCHAR},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      FIT_DOMAIN = #{fitDomain,jdbcType=VARCHAR},
+      RIGHT_OPERAND = #{rightOperand,jdbcType=VARCHAR},
+      CONDITION_TYPE = #{conditionType,jdbcType=VARCHAR},
+      OPERATOR = #{operator,jdbcType=VARCHAR},
+      SCOPE = #{scope,jdbcType=INTEGER},
+      TAG_ROW_ID = #{tagRowId,jdbcType=BIGINT},
+      IS_SHARED = #{isShared,jdbcType=INTEGER},
+       CATALOG_ID = #{catalogId,jdbcType=BIGINT},
+      CLASS_NAME = #{className,jdbcType=VARCHAR}
+    where INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC, 
+    LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK, FIT_DOMAIN, RIGHT_OPERAND, CONDITION_TYPE,
+    OPERATOR,SCOPE,TAG_ROW_ID,IS_SHARED, CATALOG_ID,CLASS_NAME
+    from injection_label
+    where INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC, 
+    LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK, FIT_DOMAIN, RIGHT_OPERAND, CONDITION_TYPE,
+    OPERATOR,SCOPE,TAG_ROW_ID,IS_SHARED,CATALOG_ID, CLASS_NAME
+    from injection_label
+  </select>
+
+  <delete id="deleteAll">
+  	delete from injection_label
+  </delete>
+
+  <!-- 批量插入 -->
+  <insert id="insertBatch" parameterType="java.util.List">
+    insert into injection_label (INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC,
+    LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK,FIT_DOMAIN, RIGHT_OPERAND, CONDITION_TYPE,OPERATOR,SCOPE,TAG_ROW_ID,
+    IS_SHARED,CATALOG_ID, CLASS_NAME)
+    values
+    <foreach collection="record" item="item" index="i" separator=",">
+      (#{injectionLabelId,jdbcType=BIGINT}, #{injectionLabelCode,jdbcType=VARCHAR},
+      #{injectionLabelName,jdbcType=VARCHAR}, #{injectionLabelDesc,jdbcType=VARCHAR},
+      #{labelType,jdbcType=VARCHAR}, #{labelValueType,jdbcType=VARCHAR}, #{labelDataType,jdbcType=VARCHAR},
+      #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT},
+      #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP},
+      #{remark,jdbcType=VARCHAR}, #{fitDomain,jdbcType=VARCHAR}, #{rightOperand,jdbcType=VARCHAR},
+      #{conditionType,jdbcType=VARCHAR},#{operator,jdbcType=VARCHAR},#{scope,jdbcType=INTEGER},
+      #{tagRowId,jdbcType=BIGINT}, #{isShared,jdbcType=INTEGER},#{catalogId,jdbcType=BIGINT}, #{className,jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+  <!--< 参数查询 >-->
+  <select id="findByParam" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC,
+    LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK,FIT_DOMAIN, RIGHT_OPERAND, CONDITION_TYPE,
+    OPERATOR,SCOPE,TAG_ROW_ID,IS_SHARED,CATALOG_ID, CLASS_NAME
+    from injection_label
+    where 1=1
+    <if test="labelName != null and labelName != ''">
+      and INJECTION_LABEL_NAME LIKE CONCAT(CONCAT('%',#{labelName}),'%')
+    </if>
+    <if test="fitDomain != null and fitDomain != ''">
+      and FIT_DOMAIN = #{fitDomain}
+    </if>
+
+  </select>
+
+  <!--< 参数查询 >-->
+  <select id="selectByLabelCode" parameterType="java.lang.String" resultMap="BaseResultMap">
+  select INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC,
+  LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+  CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK,FIT_DOMAIN, RIGHT_OPERAND, CONDITION_TYPE,
+  OPERATOR,SCOPE,TAG_ROW_ID,IS_SHARED,CATALOG_ID, CLASS_NAME
+  from injection_label
+  where INJECTION_LABEL_CODE = #{labelCode}
+  </select>
+
+
+  <select id="queryTriggerByLeftOpers" parameterType="java.util.List" resultMap="BaseResultMap">
+    select
+    INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC,
+    LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK, FIT_DOMAIN, RIGHT_OPERAND, CONDITION_TYPE,
+    OPERATOR,SCOPE,TAG_ROW_ID,IS_SHARED,CATALOG_ID, CLASS_NAME
+    from fpc_system.injection_label
+    <where>
+      <if test="null != record and record.size > 0">
+        INJECTION_LABEL_ID in
+        <foreach collection="record" item="item" open="(" close=")" separator=",">
+          #{item.injectionLabelId}
+        </foreach>
+      </if>
+    </where>
+  </select>
+
+  <!--< 参数查询 >-->
+  <select id="selectByTagRowId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+  select INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC,
+  LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+  CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK,FIT_DOMAIN, RIGHT_OPERAND, CONDITION_TYPE,
+  OPERATOR,SCOPE,TAG_ROW_ID,IS_SHARED, CATALOG_ID,CLASS_NAME
+  from injection_label
+  where TAG_ROW_ID = #{tagRowId}
+  </select>
+
+
+  <select id="findLabelList" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC,
+    LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK,FIT_DOMAIN, RIGHT_OPERAND, CONDITION_TYPE,
+    OPERATOR,SCOPE,TAG_ROW_ID,IS_SHARED,CATALOG_ID, CLASS_NAME
+    from injection_label
+    where 1=1
+    <if test="labelName != null and labelName != ''">
+      and INJECTION_LABEL_NAME LIKE CONCAT(CONCAT('%',#{labelName}),'%')
+    </if>
+    <if test="fitDomain != null and fitDomain != ''">
+      and FIT_DOMAIN = #{fitDomain}
+    </if>
+    <if test="labelCode != null and labelCode != ''">
+      and INJECTION_LABEL_CODE LIKE CONCAT(CONCAT('%',#{labelCode}),'%')
+    </if>
+    <if test="scope != null">
+      and SCOPE = #{scope}
+    </if>
+    <if test="conditionType != null and conditionType != ''">
+      and CONDITION_TYPE = #{conditionType}
+    </if>
+  </select>
+
+  <select id="queryLabelsExceptSelected" parameterType="java.util.List" resultMap="BaseResultMap">
+      select INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC,
+        LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+        CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK,FIT_DOMAIN, RIGHT_OPERAND, CONDITION_TYPE,
+        OPERATOR,SCOPE,TAG_ROW_ID,IS_SHARED,CATALOG_ID, CLASS_NAME
+      from injection_label
+    <where>
+      <if test="null != injectionLabelIds and injectionLabelIds.size > 0">
+        INJECTION_LABEL_ID not in
+        <foreach collection="injectionLabelIds" item="item" open="(" close=")" separator=",">
+          #{item}
+        </foreach>
+      </if>
+      <if test="labelName != null and labelName != ''">
+        and INJECTION_LABEL_NAME LIKE CONCAT(CONCAT('%',#{labelName}),'%')
+      </if>
+    </where>
+
+  </select>
+
+  <select id="findLabelListByCatalogId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC,
+    LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK,FIT_DOMAIN, RIGHT_OPERAND, CONDITION_TYPE,
+    OPERATOR,SCOPE,TAG_ROW_ID,IS_SHARED,CATALOG_ID, CLASS_NAME
+    from injection_label
+    where CATALOG_ID = #{catalogId}
+  </select>
+
+
+
+</mapper>

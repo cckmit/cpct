@@ -5,7 +5,7 @@ import com.zjtelcom.cpct.dto.synchronize.SynchronizeRecord;
 /**
  * @Auther: anson
  * @Date: 2018/8/27
- * @Description:
+ * @Description:同步记录
  */
 public interface SynchronizeRecordService {
 

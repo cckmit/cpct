@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct_prd.dao.channel.ContactChannelPrdMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.Channel">
+    <id column="CONTACT_CHL_ID" jdbcType="BIGINT" property="contactChlId" />
+    <result column="CONTACT_CHL_CODE" jdbcType="VARCHAR" property="contactChlCode" />
+    <result column="CONTACT_CHL_NAME" jdbcType="VARCHAR" property="contactChlName" />
+    <result column="CONTACT_CHL_TYPE" jdbcType="VARCHAR" property="contactChlType" />
+    <result column="CONTACT_CHL_DESC" jdbcType="VARCHAR" property="contactChlDesc" />
+    <result column="PARENT_ID" jdbcType="BIGINT" property="parentId" />
+    <result column="CHANNEL_TYPE" jdbcType="VARCHAR" property="channelType" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="REGION_ID" jdbcType="BIGINT" property="regionId" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from contact_channel
+    where CONTACT_CHL_ID = #{contactChlId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.Channel" useGeneratedKeys="true" keyProperty="contactChlId">
+    insert into contact_channel (CONTACT_CHL_ID, CONTACT_CHL_CODE, CONTACT_CHL_NAME,
+    CONTACT_CHL_TYPE, CONTACT_CHL_DESC, PARENT_ID,
+    CHANNEL_TYPE, STATUS_CD, CREATE_STAFF,
+    UPDATE_STAFF, REGION_ID, STATUS_DATE,
+    UPDATE_DATE, CREATE_DATE, REMARK
+    )
+    values (#{contactChlId,jdbcType=BIGINT}, #{contactChlCode,jdbcType=VARCHAR}, #{contactChlName,jdbcType=VARCHAR},
+    #{contactChlType,jdbcType=VARCHAR}, #{contactChlDesc,jdbcType=VARCHAR}, #{parentId,jdbcType=BIGINT},
+    #{channelType,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT},
+    #{updateStaff,jdbcType=BIGINT}, #{regionId,jdbcType=BIGINT}, #{statusDate,jdbcType=TIMESTAMP},
+    #{updateDate,jdbcType=TIMESTAMP}, #{createDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+    )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.Channel">
+    update contact_channel
+    set CONTACT_CHL_CODE = #{contactChlCode,jdbcType=VARCHAR},
+    CONTACT_CHL_NAME = #{contactChlName,jdbcType=VARCHAR},
+    CONTACT_CHL_TYPE = #{contactChlType,jdbcType=VARCHAR},
+    CONTACT_CHL_DESC = #{contactChlDesc,jdbcType=VARCHAR},
+    PARENT_ID = #{parentId,jdbcType=BIGINT},
+    CHANNEL_TYPE = #{channelType,jdbcType=VARCHAR},
+    STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+    CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+    UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+    REGION_ID = #{regionId,jdbcType=BIGINT},
+    STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+    UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+    CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+    REMARK = #{remark,jdbcType=VARCHAR}
+    where CONTACT_CHL_ID = #{contactChlId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select CONTACT_CHL_ID, CONTACT_CHL_CODE, CONTACT_CHL_NAME, CONTACT_CHL_TYPE, CONTACT_CHL_DESC,
+    PARENT_ID, CHANNEL_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, REGION_ID, STATUS_DATE,
+    UPDATE_DATE, CREATE_DATE, REMARK
+    from contact_channel
+    where CONTACT_CHL_ID = #{contactChlId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select CONTACT_CHL_ID, CONTACT_CHL_CODE, CONTACT_CHL_NAME, CONTACT_CHL_TYPE, CONTACT_CHL_DESC,
+    PARENT_ID, CHANNEL_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, REGION_ID, STATUS_DATE,
+    UPDATE_DATE, CREATE_DATE, REMARK
+    from contact_channel channel
+    where 1=1
+    <if test="channelName != null and channelName != ''">
+      and channel.CONTACT_CHL_NAME LIKE CONCAT(CONCAT('%',#{channelName}),'%')
+    </if>
+
+  </select>
+
+  <select id="selectByType" resultMap="BaseResultMap">
+    select CONTACT_CHL_ID, CONTACT_CHL_CODE, CONTACT_CHL_NAME, CONTACT_CHL_TYPE, CONTACT_CHL_DESC, PARENT_ID, CHANNEL_TYPE,
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF, REGION_ID, STATUS_DATE, UPDATE_DATE, CREATE_DATE,
+    REMARK
+    from contact_channel channel
+    where 1=1 and channel.CONTACT_CHL_TYPE = #{channelType}
+  </select>
+
+  <select id="findParentList" resultMap="BaseResultMap">
+    select CONTACT_CHL_ID, CONTACT_CHL_CODE, CONTACT_CHL_NAME, CONTACT_CHL_TYPE, CONTACT_CHL_DESC, PARENT_ID, CHANNEL_TYPE,
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF, REGION_ID, STATUS_DATE, UPDATE_DATE, CREATE_DATE,
+    REMARK
+    from contact_channel
+    where PARENT_ID = 0
+  </select>
+
+  <select id="findChildListByParentId" resultMap="BaseResultMap">
+    select CONTACT_CHL_ID, CONTACT_CHL_CODE, CONTACT_CHL_NAME, CONTACT_CHL_TYPE, CONTACT_CHL_DESC, PARENT_ID, CHANNEL_TYPE,
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF, REGION_ID, STATUS_DATE, UPDATE_DATE, CREATE_DATE,
+    REMARK
+    from contact_channel channel
+    where PARENT_ID = #{parentId}
+  </select>
+
+  <select id="selectChannel4AllChannel" resultMap="BaseResultMap">
+    select CONTACT_CHL_ID, CONTACT_CHL_CODE, CONTACT_CHL_NAME, CONTACT_CHL_TYPE, CONTACT_CHL_DESC, PARENT_ID, CHANNEL_TYPE,
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF, REGION_ID, STATUS_DATE, UPDATE_DATE, CREATE_DATE,
+    REMARK
+    from contact_channel channel
+    where PARENT_ID = #{parentId}
+  </select>
+
+
+  <select id="findChildList" resultMap="BaseResultMap">
+    select CONTACT_CHL_ID, CONTACT_CHL_CODE, CONTACT_CHL_NAME, CONTACT_CHL_TYPE, CONTACT_CHL_DESC, PARENT_ID, CHANNEL_TYPE,
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF, REGION_ID, STATUS_DATE, UPDATE_DATE, CREATE_DATE,
+    REMARK
+    from contact_channel
+    where PARENT_ID > 0
+  </select>
+
+  <select id="selectByCode" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select CONTACT_CHL_ID, CONTACT_CHL_CODE, CONTACT_CHL_NAME, CONTACT_CHL_TYPE, CONTACT_CHL_DESC, PARENT_ID, CHANNEL_TYPE,
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF, REGION_ID, STATUS_DATE, UPDATE_DATE, CREATE_DATE,
+    REMARK
+    from contact_channel
+    where CONTACT_CHL_CODE = #{code}
+  </select>
+
+
+
+</mapper>

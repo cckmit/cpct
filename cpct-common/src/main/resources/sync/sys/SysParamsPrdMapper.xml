@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct_prd.dao.sys.SysParamsPrdMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.system.SysParams">
+        <id column="PARAM_ID" jdbcType="BIGINT" property="paramId"/>
+        <result column="PARAM_NAME" jdbcType="VARCHAR" property="paramName"/>
+        <result column="PARAM_VALUE" jdbcType="VARCHAR" property="paramValue"/>
+        <result column="CONFIG_TYPE" jdbcType="BIGINT" property="configType"/>
+        <result column="MODIFY_FLAG" jdbcType="BIGINT" property="modifyFlag"/>
+        <result column="DESCRIPTION" jdbcType="VARCHAR" property="description"/>
+        <result column="PARAM_KEY" jdbcType="VARCHAR" property="paramKey"/>
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff"/>
+    </resultMap>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from sys_params
+    where PARAM_ID = #{paramId,jdbcType=BIGINT}
+    </delete>
+
+    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.system.SysParams">
+    insert into sys_params (PARAM_ID,PARAM_NAME, PARAM_VALUE,
+      CONFIG_TYPE, MODIFY_FLAG, DESCRIPTION, 
+      PARAM_KEY, CREATE_DATE, CREATE_STAFF,UPDATE_DATE,UPDATE_STAFF)
+    values (#{paramId,jdbcType=BIGINT},#{paramName,jdbcType=VARCHAR}, #{paramValue,jdbcType=VARCHAR},
+      #{configType,jdbcType=BIGINT}, #{modifyFlag,jdbcType=BIGINT}, #{description,jdbcType=VARCHAR}, 
+      #{paramKey,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT},
+      #{updateDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT})
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.system.SysParams">
+    update sys_params
+    set PARAM_NAME = #{paramName,jdbcType=VARCHAR},
+      PARAM_VALUE = #{paramValue,jdbcType=VARCHAR},
+      CONFIG_TYPE = #{configType,jdbcType=BIGINT},
+      MODIFY_FLAG = #{modifyFlag,jdbcType=BIGINT},
+      DESCRIPTION = #{description,jdbcType=VARCHAR},
+      PARAM_KEY = #{paramKey,jdbcType=VARCHAR},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE= #{createDate,jdbcType=TIMESTAMP},
+      CREATE_STAFF= #{createStaff,jdbcType=BIGINT}
+    where PARAM_ID = #{paramId,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select PARAM_ID, PARAM_NAME, PARAM_VALUE, CONFIG_TYPE, MODIFY_FLAG, DESCRIPTION, 
+    PARAM_KEY, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
+    from sys_params
+    where PARAM_ID = #{paramId,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select PARAM_ID, PARAM_NAME, PARAM_VALUE, CONFIG_TYPE, MODIFY_FLAG, DESCRIPTION,
+        PARAM_KEY, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
+        from sys_params
+        where 1=1
+        <if test="paramName != null and paramName != ''">
+            and PARAM_NAME like CONCAT('%',#{paramName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="configType != null and configType != 0">
+            and CONFIG_TYPE = #{configType,jdbcType=VARCHAR}
+        </if>
+        order by CREATE_DATE desc
+    </select>
+
+    <select id="listParamsByKey" resultType="Map">
+        select PARAM_NAME as label, PARAM_VALUE value
+        from sys_params
+        where PARAM_KEY = #{paramKey,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getParamsByKey" resultType="Map">
+        select PARAM_ID, PARAM_NAME, PARAM_VALUE, CONFIG_TYPE, MODIFY_FLAG, DESCRIPTION,
+        PARAM_KEY, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
+        from sys_params
+        where PARAM_NAME = #{key,jdbcType=VARCHAR}
+        and PARAM_KEY = #{keyWord,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getParamsByValue" resultType="Map">
+        select PARAM_ID, PARAM_NAME, PARAM_VALUE, CONFIG_TYPE, MODIFY_FLAG, DESCRIPTION,
+        PARAM_KEY, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
+        from sys_params
+        where PARAM_VALUE = #{value,jdbcType=VARCHAR}
+        and PARAM_KEY = #{keyWord,jdbcType=VARCHAR}
+    </select>
+
+    <select id="findParamsByValue" resultMap="BaseResultMap">
+        select PARAM_ID, PARAM_NAME, PARAM_VALUE, CONFIG_TYPE, MODIFY_FLAG, DESCRIPTION,
+        PARAM_KEY, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
+        from sys_params
+        where PARAM_VALUE = #{value,jdbcType=VARCHAR}
+        and PARAM_KEY = #{keyWord,jdbcType=VARCHAR}
+    </select>
+
+    <select id="listParamsByKeyForCampaign" resultMap="BaseResultMap">
+        select PARAM_ID, PARAM_NAME, PARAM_VALUE, CONFIG_TYPE, MODIFY_FLAG, DESCRIPTION,
+        PARAM_KEY, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
+        from sys_params
+        where PARAM_KEY = #{paramKey,jdbcType=VARCHAR}
+        ORDER BY PARAM_VALUE
+    </select>
+
+</mapper>
