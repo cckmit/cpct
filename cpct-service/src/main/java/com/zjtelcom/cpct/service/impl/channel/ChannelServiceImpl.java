@@ -315,12 +315,6 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         if (!channel.getContactChlCode().equals(editVO.getContactChlCode())){
             channel.setContactChlCode(editVO.getContactChlCode());
         }
-        if (!channel.getStartTime().equals(editVO.getStartTime())){
-            channel.setStartTime(editVO.getStartTime());
-        }
-        if (!channel.getEndTime().equals(editVO.getEndTime())){
-            channel.setEndTime(editVO.getEndTime());
-        }
         channel.setUpdateDate(new Date());
         channel.setUpdateStaff(userId);
         channelMapper.updateByPrimaryKey(channel);

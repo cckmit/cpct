@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.dto.question;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class QuestionEditVO implements Serializable {
     private Long questionId;
@@ -14,6 +15,16 @@ public class QuestionEditVO implements Serializable {
     private String answerType;
 
     private String defaultAnswer;
+
+    private List<QuestionDetailAddVO> questionDetailAddVOList;
+
+    public List<QuestionDetailAddVO> getQuestionDetailAddVOList() {
+        return questionDetailAddVOList;
+    }
+
+    public void setQuestionDetailAddVOList(List<QuestionDetailAddVO> questionDetailAddVOList) {
+        this.questionDetailAddVOList = questionDetailAddVOList;
+    }
 
     public Long getQuestionId() {
         return questionId;

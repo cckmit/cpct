@@ -18,6 +18,8 @@ public interface MktStrategyFilterRuleRelMapper {
 
     List<Long> selectByStrategyId(Long strategyId);
 
+    List<MktStrategyFilterRuleRelDO> selectRuleByStrategyId(Long strategyId);
+
     List<MktStrategyFilterRuleRelDO> selectAll();
 
     int updateByPrimaryKey(MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO);

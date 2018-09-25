@@ -9,24 +9,25 @@ package com.zjtelcom.cpct.service.impl.strategy;
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCamResultRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamStrategyConfRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCpcAlgorithmsRulMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
-import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
-import com.zjtelcom.cpct.domain.campaign.MktCamChlResultDO;
-import com.zjtelcom.cpct.domain.campaign.MktCamStrategyConfRelDO;
-import com.zjtelcom.cpct.domain.campaign.MktCpcAlgorithmsRulDO;
+import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
+import com.zjtelcom.cpct.dto.channel.CamScriptAddVO;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.enums.ErrorCode;
+import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlResultService;
+import com.zjtelcom.cpct.service.channel.CamScriptService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
@@ -77,6 +78,12 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private MktCamResultRelMapper mktCamResultRelMapper;
+
+    @Autowired
+    private CamScriptService camScriptService;
+
     /**
      * 添加策略规则
      *
@@ -108,6 +115,12 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     } else {
                         evtContactConfIds += "/" + mktStrategyConfRule.getMktCamChlConfList().get(i).getEvtContactConfId();
                     }
+                    // 保存话术
+                    CamScriptAddVO camScriptAddVO = new CamScriptAddVO();
+                    camScriptAddVO.setEvtContactConfId(mktStrategyConfRule.getMktCamChlConfList().get(i).getEvtContactConfId());
+                    camScriptAddVO.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
+                    camScriptAddVO.setScriptDesc(mktStrategyConfRule.getMktCamChlConfList().get(i).getScriptDesc());
+                    camScriptService.addCamScript(UserUtil.loginId(), camScriptAddVO);
                 }
                 mktStrategyConfRuleDO.setEvtContactConfId(evtContactConfIds);
             }
@@ -117,12 +130,24 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 String mktCamChlResultIds = "";
                 for (int i = 0; i < mktStrategyConfRule.getMktCamChlResultList().size(); i++) {
                     Map<String, Object> mktCamChlResultMap = mktCamChlResultService.saveMktCamChlResult(mktStrategyConfRule.getMktCamChlResultList().get(i));
-                    // Long mktCamChlResultId = mktStrategyConfRule.getMktCamChlResultList().get(i).getMktCamChlResultId();
-                    Long mktCamChlResultId = (Long) mktCamChlResultMap.get("mktCamChlResultId");
+                    MktCamChlResultDO mktCamChlResultDO = (MktCamChlResultDO) mktCamChlResultMap.get("mktCamChlResultDO");
+                    Long mktCamChlResultId = mktCamChlResultDO.getMktCamChlResultId();
                     if (i == 0) {
                         mktCamChlResultIds += mktCamChlResultId;
                     } else {
                         mktCamChlResultIds += "/" + mktCamChlResultId;
+                    }
+                    // 判断类型是否为工单类型 , 保存二次营销结果和活动的关联
+                    if ("1".equals(mktCamChlResultDO.getResultType())) {
+                        MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();
+                        mktCamResultRelDO.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
+                        mktCamResultRelDO.setMktResultId(mktCamChlResultDO.getMktCamChlResultId());
+                        mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_NOTACTIVE.getStatusCode()); // 未生效
+                        mktCamResultRelDO.setCreateDate(new Date());
+                        mktCamResultRelDO.setCreateStaff(UserUtil.loginId());
+                        mktCamResultRelDO.setUpdateDate(new Date());
+                        mktCamResultRelDO.setUpdateStaff(UserUtil.loginId());
+                        mktCamResultRelMapper.insert(mktCamResultRelDO);
                     }
                 }
                 mktStrategyConfRuleDO.setMktCamChlResultId(mktCamChlResultIds);
@@ -184,11 +209,21 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             }
             if (mktStrategyConfRule.getMktCamChlConfList() != null) {
                 for (int i = 0; i < mktStrategyConfRule.getMktCamChlConfList().size(); i++) {
+                    Long evtContactConfId = mktStrategyConfRule.getMktCamChlConfList().get(i).getEvtContactConfId();
+
+                    CamScriptAddVO camScriptAddVO = new CamScriptAddVO();
+                    camScriptAddVO.setEvtContactConfId(evtContactConfId);
+                    camScriptAddVO.setMktCampaignId(mktStrategyConfRule.getMktCamChlConfList().get(i).getMktCampaignId());
+                    camScriptAddVO.setScriptDesc(mktStrategyConfRule.getMktCamChlConfList().get(i).getScriptDesc());
+                    camScriptService.addCamScript(UserUtil.loginId(), camScriptAddVO);
+
                     if (i == 0) {
-                        evtContactConfIds += mktStrategyConfRule.getMktCamChlConfList().get(i).getEvtContactConfId();
+                        evtContactConfIds += evtContactConfId;
                     } else {
-                        evtContactConfIds += "/" + mktStrategyConfRule.getMktCamChlConfList().get(i).getEvtContactConfId();
+                        evtContactConfIds += "/" + evtContactConfId;
                     }
+
+
                 }
                 mktStrategyConfRuleDO.setEvtContactConfId(evtContactConfIds);
             }
@@ -203,7 +238,8 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     } else {
                         // 新增结果信息
                         Map<String, Object> mktCamChlResultMap = mktCamChlResultService.saveMktCamChlResult(mktCamChlResult);
-                        mktCamChlResultId = (Long) mktCamChlResultMap.get("mktCamChlResultId");
+                        MktCamChlResultDO mktCamChlResultDO = (MktCamChlResultDO) mktCamChlResultMap.get("mktCamChlResultDO");
+                        mktCamChlResultId = mktCamChlResultDO.getMktCamChlResultId();
                     }
                     if (i == 0) {
                         mktCamChlResultIds += mktCamChlResultId;
@@ -377,17 +413,25 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
      * 通过父规则Id复制策略规则
      *
      * @param parentMktStrategyConfRuleId
+     * @param isPublish                   是否为发布操作
      * @return
      */
     @Override
-    public Map<String, Object> copyMktStrategyConfRule(Long parentMktStrategyConfRuleId) throws Exception {
+    public Map<String, Object> copyMktStrategyConfRule(Long parentMktStrategyConfRuleId, Boolean isPublish) throws Exception {
         Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();
         MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(parentMktStrategyConfRuleId);
         MktStrategyConfRuleDO chiledMktStrategyConfRuleDO = new MktStrategyConfRuleDO();
         /**
          * 客户分群配置
          */
-        Map<String, Object> tarGrpMap = tarGrpService.copyTarGrp(mktStrategyConfRuleDO.getTarGrpId(), true);
+        //判断是否为发布操作
+        Map<String, Object> tarGrpMap = new HashMap<>();
+        if (isPublish) {
+            tarGrpMap = tarGrpService.copyTarGrp(mktStrategyConfRuleDO.getTarGrpId(), true);
+        } else {
+            tarGrpMap = tarGrpService.copyTarGrp(mktStrategyConfRuleDO.getTarGrpId(), false);
+        }
+
         TarGrp tarGrp = (TarGrp) tarGrpMap.get("tarGrp");
         /**
          * 销售品配置
@@ -447,10 +491,16 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             }
         }
         chiledMktStrategyConfRuleDO.setMktStrategyConfRuleName(mktStrategyConfRuleDO.getMktStrategyConfRuleName());
-        chiledMktStrategyConfRuleDO.setTarGrpId(tarGrp.getTarGrpId());
+        if (tarGrp != null) {
+            chiledMktStrategyConfRuleDO.setTarGrpId(tarGrp.getTarGrpId());
+        }
         chiledMktStrategyConfRuleDO.setProductId(childProductIds);
         chiledMktStrategyConfRuleDO.setEvtContactConfId(childEvtContactConfIds);
         chiledMktStrategyConfRuleDO.setMktCamChlResultId(childMktCamChlResultIds);
+        chiledMktStrategyConfRuleDO.setCreateDate(new Date());
+        chiledMktStrategyConfRuleDO.setCreateStaff(UserUtil.loginId());
+        chiledMktStrategyConfRuleDO.setUpdateDate(new Date());
+        chiledMktStrategyConfRuleDO.setUpdateStaff(UserUtil.loginId());
         mktStrategyConfRuleMapper.insert(chiledMktStrategyConfRuleDO);
         mktStrategyConfRuleMap.put("mktStrategyConfRuleId", chiledMktStrategyConfRuleDO.getMktStrategyConfRuleId());
         return mktStrategyConfRuleMap;
@@ -520,10 +570,10 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
     /**
      * 更新规则下销售品
      *
-             * @param productIdList
+     * @param productIdList
      * @param ruleId
      * @return
-             */
+     */
     @Override
     public Map<String, Object> updateProductIds(List<Long> productIdList, Long ruleId) {
         Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();

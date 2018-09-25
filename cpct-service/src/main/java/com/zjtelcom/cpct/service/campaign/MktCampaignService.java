@@ -46,4 +46,6 @@ public interface MktCampaignService {
 
     Map<String, Object> publishMktCampaign(Long mktCampaignId) throws Exception;
 
+    Map<String, Object> upgradeMktCampaign(Long mktCampaignId) throws Exception;
+
 }

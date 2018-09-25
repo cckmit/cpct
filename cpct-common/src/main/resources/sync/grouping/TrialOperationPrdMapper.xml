@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct_prd.dao.grouping.TrialOperationPrdMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.grouping.TrialOperation">
+    <id column="ID" jdbcType="BIGINT" property="id" />
+    <result column="CAMPAIGN_ID" jdbcType="BIGINT" property="campaignId" />
+    <result column="CAMPAIGN_NAME" jdbcType="VARCHAR" property="campaignName" />
+    <result column="STRATEGY_ID" jdbcType="BIGINT" property="strategyId" />
+    <result column="STRATEGY_NAME" jdbcType="VARCHAR" property="strategyName" />
+    <result column="BATCH_NUM" jdbcType="BIGINT" property="batchNum" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from trial_operation
+    where ID = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.grouping.TrialOperation" useGeneratedKeys="true" keyProperty="id">
+    insert into trial_operation (ID, CAMPAIGN_ID, CAMPAIGN_NAME, 
+      STRATEGY_ID, STRATEGY_NAME, BATCH_NUM,  STATUS_CD,
+      CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
+      STATUS_DATE, UPDATE_DATE, REMARK
+      )
+    values (#{id,jdbcType=BIGINT}, #{campaignId,jdbcType=BIGINT}, #{campaignName,jdbcType=VARCHAR}, 
+      #{strategyId,jdbcType=BIGINT}, #{strategyName,jdbcType=VARCHAR}, #{batchNum,jdbcType=BIGINT}, 
+      #{statusCd,jdbcType=VARCHAR},
+      #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.grouping.TrialOperation">
+    update trial_operation
+    set CAMPAIGN_ID = #{campaignId,jdbcType=BIGINT},
+      CAMPAIGN_NAME = #{campaignName,jdbcType=VARCHAR},
+      STRATEGY_ID = #{strategyId,jdbcType=BIGINT},
+      STRATEGY_NAME = #{strategyName,jdbcType=VARCHAR},
+      BATCH_NUM = #{batchNum,jdbcType=BIGINT},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
+    REMARK
+    from trial_operation
+    where ID = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
+    REMARK
+    from trial_operation
+  </select>
+
+  <select id="findOperationListByRuleId" resultMap="BaseResultMap">
+    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
+    REMARK
+    from trial_operation
+    where RULE_ID = #{ruleId}
+  </select>
+
+  <select id="findOperationListByStrategyId" resultMap="BaseResultMap">
+    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM,  STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
+    REMARK
+    from trial_operation
+    where STRATEGY_ID = #{strategyId}
+    order by CREATE_DATE desc
+  </select>
+
+
+
+
+
+</mapper>

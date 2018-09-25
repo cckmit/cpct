@@ -7,6 +7,7 @@ import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignVO;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
+import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.thread.TarGrpRule;
@@ -194,6 +195,22 @@ public class CampaignController extends BaseController {
         String statusCd = params.get("statusCd");
         Map<String, Object> mktCampaignMap = mktCampaignService.publishMktCampaign(parentMktCampaignId);
         mktCampaignService.changeMktCampaignStatus(parentMktCampaignId, statusCd);
+        return JSON.toJSONString(mktCampaignMap);
+    }
+
+    /**
+     * 升级活动
+     *
+     * @param params
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/upgradeMktCampaign", method = RequestMethod.POST)
+    @CrossOrigin
+    public String upgradeMktCampaign(@RequestBody Map<String, String> params) throws Exception {
+        Long parentMktCampaignId = Long.valueOf(params.get("mktCampaignId"));
+        Map<String, Object> mktCampaignMap = mktCampaignService.upgradeMktCampaign(parentMktCampaignId);
+        mktCampaignService.changeMktCampaignStatus(parentMktCampaignId, StatusCode.STATUS_CODE_ROLL.getStatusCode());
         return JSON.toJSONString(mktCampaignMap);
     }
 }

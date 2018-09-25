@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct_prd.dao.grouping.TarGrpPrdMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.dto.grouping.TarGrp">
+        <id column="TAR_GRP_ID" jdbcType="BIGINT" property="tarGrpId"/>
+        <result column="TAR_GRP_NAME" jdbcType="VARCHAR" property="tarGrpName"/>
+        <result column="TAR_GRP_DESC" jdbcType="VARCHAR" property="tarGrpDesc"/>
+        <result column="TAR_GRP_TYPE" jdbcType="VARCHAR" property="tarGrpType"/>
+        <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd"/>
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff"/>
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate"/>
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
+        <result column="REMARK" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from tar_grp
+    where TAR_GRP_ID = #{tarGrpId,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" keyProperty="tarGrpId" useGeneratedKeys="true"
+            parameterType="com.zjtelcom.cpct.dto.grouping.TarGrp">
+    insert into tar_grp (TAR_GRP_NAME, TAR_GRP_DESC,
+      TAR_GRP_TYPE, STATUS_CD, CREATE_STAFF, 
+      UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
+      UPDATE_DATE, REMARK)
+    values (#{tarGrpName,jdbcType=VARCHAR}, #{tarGrpDesc,jdbcType=VARCHAR},
+      #{tarGrpType,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, 
+      #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR})
+  </insert>
+    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.dto.grouping.TarGrp">
+    update tar_grp
+    set TAR_GRP_NAME = #{tarGrpName,jdbcType=VARCHAR},
+      TAR_GRP_DESC = #{tarGrpDesc,jdbcType=VARCHAR},
+      TAR_GRP_TYPE = #{tarGrpType,jdbcType=VARCHAR},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where TAR_GRP_ID = #{tarGrpId,jdbcType=BIGINT}
+  </update>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select TAR_GRP_ID, TAR_GRP_NAME, TAR_GRP_DESC, TAR_GRP_TYPE, STATUS_CD, CREATE_STAFF, 
+    UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from tar_grp
+    where TAR_GRP_ID = #{tarGrpId,jdbcType=BIGINT}
+  </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+    select TAR_GRP_ID, TAR_GRP_NAME, TAR_GRP_DESC, TAR_GRP_TYPE, STATUS_CD, CREATE_STAFF, 
+    UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from tar_grp
+  </select>
+
+    <insert id="createTarGrp" keyProperty="tarGrpId" useGeneratedKeys="true"
+            parameterType="com.zjtelcom.cpct.dto.grouping.TarGrp">
+    insert into tar_grp (TAR_GRP_ID, TAR_GRP_NAME, TAR_GRP_DESC,
+    TAR_GRP_TYPE, STATUS_CD, CREATE_STAFF,
+    UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+    UPDATE_DATE, REMARK)
+    values (#{tarGrpId,jdbcType=BIGINT},  #{tarGrpName,jdbcType=VARCHAR}, #{tarGrpDesc,jdbcType=VARCHAR},
+    #{tarGrpType,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT},
+    #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP},
+    #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR})
+  </insert>
+
+    <update id="modTarGrp" parameterType="com.zjtelcom.cpct.dto.grouping.TarGrp">
+        update tar_grp
+        set
+        <if test="tarGrpName != null and tarGrpName != ''">
+            TAR_GRP_NAME = #{tarGrpName,jdbcType=VARCHAR},
+        </if>
+        <if test="tarGrpDesc != null and tarGrpDesc != ''">
+            TAR_GRP_DESC = #{tarGrpDesc,jdbcType=VARCHAR},
+        </if>
+        <if test="tarGrpType != null and tarGrpType != ''">
+            TAR_GRP_TYPE = #{tarGrpType,jdbcType=VARCHAR},
+        </if>
+        <if test="statusCd != null and statusCd != ''">
+            STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+        </if>
+        <if test="createStaff != null">
+            CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+        </if>
+        <if test="updateStaff != null and updateStaff != 0">
+            UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        </if>
+        <if test="createDate != null">
+            CREATE_DATE = #{createDate},
+        </if>
+        <if test="statusDate != null ">
+            STATUS_DATE = #{statusDate},
+        </if>
+        <if test="updateDate != null ">
+            UPDATE_DATE = #{updateDate},
+        </if>
+        <if test="remark != null and remark != ''">
+            REMARK = #{remark,jdbcType=VARCHAR},
+        </if>
+        TAR_GRP_ID = #{tarGrpId,jdbcType=BIGINT}
+        where TAR_GRP_ID = #{tarGrpId,jdbcType=BIGINT}
+    </update>
+
+    <delete id="delTarGrp" parameterType="java.lang.Long">
+        delete from tar_grp
+        where TAR_GRP_ID = #{tarGrpId,jdbcType=BIGINT}
+    </delete>
+
+</mapper>

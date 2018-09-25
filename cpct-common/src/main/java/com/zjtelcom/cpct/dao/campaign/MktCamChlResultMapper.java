@@ -1,9 +1,12 @@
 package com.zjtelcom.cpct.dao.campaign;
 
 import com.zjtelcom.cpct.domain.campaign.MktCamChlResultDO;
+import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
+@Mapper
+@Repository
 public interface MktCamChlResultMapper {
     int deleteByPrimaryKey(Long mktCamChlResultId);
 
@@ -14,4 +17,6 @@ public interface MktCamChlResultMapper {
     List<MktCamChlResultDO> selectAll();
 
     int updateByPrimaryKey(MktCamChlResultDO mktCamChlResultDO);
+
+    List<MktCamChlResultDO> selectResultByMktCampaignId(Long mktCampaignId);
 }

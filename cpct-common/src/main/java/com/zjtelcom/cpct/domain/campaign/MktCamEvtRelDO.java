@@ -13,7 +13,6 @@ public class MktCamEvtRelDO {
 
     private Integer levelConfig;
 
-    private Integer whetherConfig;
 
     private String statusCd;
 
@@ -35,13 +34,6 @@ public class MktCamEvtRelDO {
         this.levelConfig = levelConfig;
     }
 
-    public Integer getWhetherConfig() {
-        return whetherConfig;
-    }
-
-    public void setWhetherConfig(Integer whetherConfig) {
-        this.whetherConfig = whetherConfig;
-    }
 
     public Long getMktCampEvtRelId() {
         return mktCampEvtRelId;

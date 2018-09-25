@@ -15,6 +15,10 @@ import com.zjtelcom.cpct.service.synchronize.sys.SynSysParamsService;
 import com.zjtelcom.cpct.service.synchronize.sys.SynSysRoleService;
 import com.zjtelcom.cpct.service.synchronize.sys.SynSysStaffService;
 import com.zjtelcom.cpct.service.synchronize.template.SynTarGrpTemplateService;
+import com.zjtelcom.cpct.dto.event.ContactEvt;
+import com.zjtelcom.cpct.service.event.ContactEvtService;
+import com.zjtelcom.cpct.service.synchronize.*;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +28,7 @@ import java.util.Map;
 /**
  * @Auther: anson
  * @Date: 2018/8/27
- * @Description:同步数据  准生产数据同步到生产环境
+ * @Description:同步数据 准生产数据同步到生产环境
  */
 @RestController
 @RequestMapping("${adminPath}/synchronize")
@@ -66,32 +70,37 @@ public class SynchronizeController extends BaseController {
     @Autowired
     private SynMktCampaignRelService synMktCampaignRelService;
 
+    @Autowired
+    private SynchronizeCampaignService synchronizeCampaignService;
 
 
     /**
      * 单个事件同步
-     * @param eventId  事件主键id
+     *
+     * @param eventId 事件主键id
      * @return
      */
     @PostMapping("singleEvent")
     @CrossOrigin
-    public String singleEvent(@RequestParam(value = "eventId", required = true) Long eventId){
+    public String singleEvent(@RequestParam(value = "eventId", required = true) Long eventId) {
         logger.info("同步事件");
         //   权限控制
-        String roleName=getRole();   //  操作角色
-        Map<String, Object> map=new HashMap<>();
-       try{
-        map = synContactEvtService.synchronizeSingleEvent(eventId,roleName);
-    } catch (Exception e) {
+        String roleName = getRole();   //  操作角色
+        Map<String, Object> map = new HashMap<>();
+        try {
+            map = synContactEvtService.synchronizeSingleEvent(eventId, roleName);
+        } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("[op:SynContactEvtServiceImpl] 通过主键同步单个事件失败！Exception: ",eventId,e);
-    }
+            logger.error("[op:SynContactEvtServiceImpl] 通过主键同步单个事件失败！Exception: ", eventId, e);
+        }
         return JSON.toJSONString(map);
     }
 
 
     /**
+     * 批量事件同步
+     *
      * 全量事件同步
      * @return
      */
@@ -803,13 +812,13 @@ public class SynchronizeController extends BaseController {
     }
 
 
-
-
-
-
-
-
-
+    @PostMapping("/synchronizeCampaign")
+    @CrossOrigin
+    public String synchronizeCampaignServiceImpl(@RequestBody Map<String, Object> params) throws Exception {
+        Long mktCampaignId = Long.valueOf((Integer) params.get("mktCampaignId"));
+        Map<String, Object> synchronizeCampaignMap = synchronizeCampaignService.synchronizeCampaign(mktCampaignId);
+        return JSON.toJSONString(synchronizeCampaignMap);
+    }
 
 
 }

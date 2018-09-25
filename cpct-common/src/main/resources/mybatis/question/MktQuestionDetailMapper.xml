@@ -65,5 +65,19 @@
     where QUESTION_ID = #{questionId}
   </select>
 
+  <delete id="deleteInBatch" parameterType="list">
+    delete from mkt_question_detail
+    where QUESTION_ID in
+    <foreach collection="list" item="item" open="(" separator="," close=")" index="no">
+      #{idList}
+    </foreach>
+  </delete>
+
+  <delete id="deleteByQuestionId" parameterType="java.lang.Long">
+    delete from mkt_question_detail
+    where QUESTION_ID = #{questionId}
+  </delete>
+
+
 
 </mapper>

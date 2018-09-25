@@ -1,6 +1,7 @@
-package com.zjtelcom.cpct_prd.dao;
+package com.zjtelcom.cpct_prd.dao.campaign;
 
 
+import com.zjtelcom.cpct.domain.campaign.MktCampaignCountDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -8,6 +9,12 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * @Description:
+ * @author: linchao
+ * @date: 2018/09/06 16:14
+ * @version: V1.0
+ */
 @Mapper
 @Repository
 public interface MktCampaignPrdMapper {
@@ -21,7 +28,7 @@ public interface MktCampaignPrdMapper {
 
     int updateByPrimaryKey(MktCampaignDO mktCampaignDO);
 
-    List<MktCampaignDO> qryMktCampaignListPage(MktCampaignDO mktCampaignDO);
+    List<MktCampaignCountDO> qryMktCampaignListPage(MktCampaignDO mktCampaignDO);
 
     void changeMktCampaignStatus(@Param("mktCampaignId") Long mktCampaignId, @Param("statusCd") String statusCd);
 

@@ -57,7 +57,7 @@ public class MktCampaignVO extends MktCampaign {
     private String tiggerType;
 
     /**
-     * 活动周期类型Id
+     * 活动周期类型value
      */
     private String execTypeValue;
 
@@ -80,6 +80,11 @@ public class MktCampaignVO extends MktCampaign {
      * 状态value
      */
     private String statusCdValue;
+
+    /**
+     * 活动目录名称
+     */
+    private String directoryName;
 
     /**
      * 该活动是否有有效的父/子活动
@@ -216,5 +221,13 @@ public class MktCampaignVO extends MktCampaign {
 
     public void setRelation(Boolean relation) {
         isRelation = relation;
+    }
+
+    public String getDirectoryName() {
+        return directoryName;
+    }
+
+    public void setDirectoryName(String directoryName) {
+        this.directoryName = directoryName;
     }
 }
