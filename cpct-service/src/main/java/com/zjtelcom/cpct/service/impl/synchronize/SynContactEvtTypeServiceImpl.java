@@ -2,14 +2,11 @@ package com.zjtelcom.cpct.service.impl.synchronize;
 
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.event.ContactEvtTypeMapper;
-import com.zjtelcom.cpct.domain.event.EventTypeDO;
-import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.ContactEvtType;
 import com.zjtelcom.cpct.enums.SynchronizeType;
 import com.zjtelcom.cpct.exception.SystemException;
 import com.zjtelcom.cpct.request.event.QryContactEvtTypeReq;
 import com.zjtelcom.cpct.service.BaseService;
-import com.zjtelcom.cpct.service.event.ContactEvtTypeService;
 import com.zjtelcom.cpct.service.synchronize.SynContactEvtTypeService;
 import com.zjtelcom.cpct.service.synchronize.SynchronizeRecordService;
 import com.zjtelcom.cpct_prd.dao.event.ContactEvtTypePrdMapper;
@@ -40,7 +37,7 @@ public class SynContactEvtTypeServiceImpl extends BaseService implements SynCont
     private ContactEvtTypePrdMapper contactEvtTypePrdMapper;
 
     //同步表名
-    public static final String tableName="event_type";
+    private static final String tableName="event_type";
 
 
     /**
@@ -100,7 +97,7 @@ public class SynContactEvtTypeServiceImpl extends BaseService implements SynCont
                 }
             }
         }
-        //查出需要删除的事件
+        //查出需要删除的事件目录
         for(ContactEvtType c:realList){
             for (int i = 0; i <prdList.size() ; i++) {
                 if(c.getEvtTypeId()-prdList.get(i).getEvtTypeId()==0){
