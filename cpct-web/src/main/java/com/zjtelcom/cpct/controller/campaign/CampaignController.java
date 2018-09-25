@@ -89,6 +89,25 @@ public class CampaignController extends BaseController {
     }
 
     /**
+     * 活动审核--同步列表
+     * @return
+     */
+    @PostMapping("/getCampaignEndTime4Sync")
+    @CrossOrigin
+    public Map<String, Object> getCampaignEndTime4Sync(@RequestBody Map<String,Long> params){
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = mktCampaignService.getCampaignEndTime4Sync(params.get("campaignId"));
+        } catch (Exception e) {
+            logger.error("[op:CampaignController] fail to getCampaignEndTime4Sync",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to getCampaignEndTime4Sync");
+            return result;
+        }
+        return result;
+    }
+
+    /**
      * 同步活动列表(分页)
      *
      * @return

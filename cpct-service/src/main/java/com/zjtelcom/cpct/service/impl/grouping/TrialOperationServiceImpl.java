@@ -260,7 +260,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         //redis取规则
 //        String rule = redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId).toString();
 //        System.out.println("*************************" + rule);
-//        param.setRule(rule);
+        String rule = "T0_ACT_DAYS > 30 && T0_ACT_DAYS < 80";
+        param.setRule(rule);
         return param;
     }
 

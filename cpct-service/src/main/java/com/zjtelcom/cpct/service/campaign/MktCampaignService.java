@@ -55,6 +55,8 @@ public interface MktCampaignService {
 
     Map<String,Object> examineCampaign4Sync (Long campaignId);
 
+    Map<String,Object> getCampaignEndTime4Sync (Long campaignId);
+
     Map<String,Object> delayCampaign4Sync (Long campaignId, Date lastTime);
 
 }
