@@ -43,12 +43,6 @@ public class DataSourcePrdConfig {
     }
 
     @Bean(name = "TransactionManager")
-    public PlatformTransactionManager testTransactionManager(@Qualifier("dataSource") DataSource dataSource) {
-        DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dataSource);
-        return dataSourceTransactionManager;
-    }
-
-    @Bean(name = "TransactionPrdManager")
     public PlatformTransactionManager testTransactionManager(@Qualifier("datasourcePrd") DataSource dataSource) {
         DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dataSource);
         return dataSourceTransactionManager;

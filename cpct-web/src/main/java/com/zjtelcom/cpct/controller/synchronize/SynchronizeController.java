@@ -15,10 +15,6 @@ import com.zjtelcom.cpct.service.synchronize.sys.SynSysParamsService;
 import com.zjtelcom.cpct.service.synchronize.sys.SynSysRoleService;
 import com.zjtelcom.cpct.service.synchronize.sys.SynSysStaffService;
 import com.zjtelcom.cpct.service.synchronize.template.SynTarGrpTemplateService;
-import com.zjtelcom.cpct.dto.event.ContactEvt;
-import com.zjtelcom.cpct.service.event.ContactEvtService;
-import com.zjtelcom.cpct.service.synchronize.*;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
