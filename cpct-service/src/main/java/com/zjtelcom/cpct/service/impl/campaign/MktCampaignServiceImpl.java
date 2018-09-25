@@ -41,6 +41,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+
 /**
  * Description:
  * author: linchao
@@ -401,6 +404,13 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         return maps;
     }
 
+    /**
+     * 活动同步列表
+     * @param params
+     * @param page
+     * @param pageSize
+     * @return
+     */
     @Override
     public Map<String, Object> qryMktCampaignList4Sync(Map<String,Object> params, Integer page, Integer pageSize) {
         Map<String, Object> maps = new HashMap<>();
@@ -454,6 +464,65 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("mktCampaigns", mktCampaignVOList);
         maps.put("pageInfo", new Page(new PageInfo(mktCampaignDOList)));
+        return maps;
+    }
+
+
+    /**
+     * 活动审核--同步列表
+     * @param campaignId
+     * @return
+     */
+    @Override
+    public Map<String, Object> examineCampaign4Sync(Long campaignId) {
+        Map<String, Object> maps = new HashMap<>();
+        MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(campaignId);
+        if (campaignDO==null){
+            maps.put("resultCode",CODE_FAIL);
+            maps.put("resultMsg", "活动不存在");
+            return maps;
+        }
+        if (!campaignDO.getStatusCd().equals(StatusCode.STATUS_CODE_UNCHECK.getStatusCode())) {
+            maps.put("resultCode",CODE_FAIL);
+            maps.put("resultMsg", "非待审核活动");
+            return maps;
+        }
+        campaignDO.setStatusCd(StatusCode.STATUS_CODE_CHECKED.getStatusCode());
+        mktCampaignMapper.updateByPrimaryKey(campaignDO);
+        maps.put("resultCode",CODE_SUCCESS);
+        maps.put("resultMsg", "已审核");
+        return maps;
+    }
+
+    /**
+     * 活动延期--同步列表
+     * @param campaignId
+     * @param lastTime
+     * @return
+     */
+    @Override
+    public Map<String, Object> delayCampaign4Sync(Long campaignId, Date lastTime) {
+        Map<String, Object> maps = new HashMap<>();
+        MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(campaignId);
+        if (campaignDO==null){
+            maps.put("resultCode",CODE_FAIL);
+            maps.put("resultMsg", "活动不存在");
+            return maps;
+        }
+        if (lastTime.before(campaignDO.getPlanEndTime())){
+            maps.put("resultCode",CODE_FAIL);
+            maps.put("resultMsg", "时间只能后延");
+            return maps;
+        }
+        List<MktStrategyConfDO> strategyConfList = mktStrategyConfMapper.selectByCampaignId(campaignId);
+        for (MktStrategyConfDO strategy : strategyConfList) {
+            strategy.setEndTime(lastTime);
+            mktStrategyConfMapper.updateByPrimaryKey(strategy);
+        }
+        campaignDO.setPlanEndTime(lastTime);
+        mktCampaignMapper.updateByPrimaryKey(campaignDO);
+        maps.put("resultCode",CODE_SUCCESS);
+        maps.put("resultMsg", "延期成功");
         return maps;
     }
 

@@ -13,6 +13,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCampaignDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignVO;
 import com.zjtelcom.cpct.request.campaign.QryMktCampaignListReq;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,8 +30,6 @@ public interface MktCampaignService {
     int modMktCampaign(MktCampaignDetail mktCampaignDetail) throws Exception;*/
 
     Map<String,Object> qryMktCampaignListPage (String mktCampaignName, String statusCd, String tiggerType, String mktCampaignType, Integer page, Integer pageSize);
-
-    Map<String,Object> qryMktCampaignList4Sync (Map<String,Object> params, Integer page, Integer pageSize);
 
     Map<String,Object> getCampaignList (String mktCampaignName,String mktCampaignType,Long eventId);
 
@@ -51,5 +50,11 @@ public interface MktCampaignService {
     Map<String, Object> publishMktCampaign(Long mktCampaignId) throws Exception;
 
     Map<String, Object> upgradeMktCampaign(Long mktCampaignId) throws Exception;
+
+    Map<String,Object> qryMktCampaignList4Sync (Map<String,Object> params, Integer page, Integer pageSize);
+
+    Map<String,Object> examineCampaign4Sync (Long campaignId);
+
+    Map<String,Object> delayCampaign4Sync (Long campaignId, Date lastTime);
 
 }
