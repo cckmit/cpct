@@ -11,12 +11,6 @@ import java.util.List;
 
 
 public class MktCampaignResp extends MktCampaign{
-
-    /**
-     * 活动关联的事件
-     */
-    private List<EventDTO> eventDTOS;
-
     /**
      * 营销活动分类value
      */
@@ -48,57 +42,14 @@ public class MktCampaignResp extends MktCampaign{
     private String tiggerType;
 
     /**
-     * 活动周期类型Id
-     */
-    private String execTypeValue;
-
-    /**
-     * 活动周期类型
-     */
-    private String execType;
-
-    /**
-     * 执行间隔
-     */
-    private String execInvl;
-
-    /**
-     * 执行次数
-     */
-    private Integer execNum;
-
-    /**
      * 状态value
      */
     private String statusCdValue;
 
     /**
-     * 该活动是否有有效的父/子活动
-     */
-    private Boolean isRelation;
-
-    /**
-     * 试运算展示列
-     */
-    private List<MessageLabelInfo> calcDisplayList;
-
-    /**
-     * isale展示列
-     */
-    private List<MessageLabelInfo> isaleDisplayList;
-
-    /**
      * 策略配置信息
      */
     List<MktStrategyConfResp> mktStrategyConfRespList;
-
-    public List<EventDTO> getEventDTOS() {
-        return eventDTOS;
-    }
-
-    public void setEventDTOS(List<EventDTO> eventDTOS) {
-        this.eventDTOS = eventDTOS;
-    }
 
     public String getMktCampaignTypeValue() {
         return mktCampaignTypeValue;
@@ -148,38 +99,6 @@ public class MktCampaignResp extends MktCampaign{
         this.tiggerType = tiggerType;
     }
 
-    public String getExecTypeValue() {
-        return execTypeValue;
-    }
-
-    public void setExecTypeValue(String execTypeValue) {
-        this.execTypeValue = execTypeValue;
-    }
-
-    public String getExecType() {
-        return execType;
-    }
-
-    public void setExecType(String execType) {
-        this.execType = execType;
-    }
-
-    public String getExecInvl() {
-        return execInvl;
-    }
-
-    public void setExecInvl(String execInvl) {
-        this.execInvl = execInvl;
-    }
-
-    public Integer getExecNum() {
-        return execNum;
-    }
-
-    public void setExecNum(Integer execNum) {
-        this.execNum = execNum;
-    }
-
     public String getStatusCdValue() {
         return statusCdValue;
     }
@@ -188,13 +107,6 @@ public class MktCampaignResp extends MktCampaign{
         this.statusCdValue = statusCdValue;
     }
 
-    public Boolean getRelation() {
-        return isRelation;
-    }
-
-    public void setRelation(Boolean relation) {
-        isRelation = relation;
-    }
 
     public List<MktStrategyConfResp> getMktStrategyConfRespList() {
         return mktStrategyConfRespList;
@@ -204,19 +116,4 @@ public class MktCampaignResp extends MktCampaign{
         this.mktStrategyConfRespList = mktStrategyConfRespList;
     }
 
-    public List<MessageLabelInfo> getCalcDisplayList() {
-        return calcDisplayList;
-    }
-
-    public void setCalcDisplayList(List<MessageLabelInfo> calcDisplayList) {
-        this.calcDisplayList = calcDisplayList;
-    }
-
-    public List<MessageLabelInfo> getIsaleDisplayList() {
-        return isaleDisplayList;
-    }
-
-    public void setIsaleDisplayList(List<MessageLabelInfo> isaleDisplayList) {
-        this.isaleDisplayList = isaleDisplayList;
-    }
 }

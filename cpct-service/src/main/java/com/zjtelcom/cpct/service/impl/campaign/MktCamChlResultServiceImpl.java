@@ -8,14 +8,18 @@ package com.zjtelcom.cpct.service.impl.campaign;
 
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.constants.CommonConstant;
-import com.zjtelcom.cpct.dao.campaign.MktCamChlResultConfRelMapper;
-import com.zjtelcom.cpct.dao.campaign.MktCamChlResultMapper;
+import com.zjtelcom.cpct.dao.campaign.*;
+import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.domain.User;
+import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlResultConfRelDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlResultDO;
+import com.zjtelcom.cpct.domain.channel.Channel;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
+import com.zjtelcom.cpct.dto.campaign.MktCamResultRelDeatil;
 import com.zjtelcom.cpct.dto.channel.CamScriptAddVO;
 import com.zjtelcom.cpct.dto.channel.VerbalAddVO;
 import com.zjtelcom.cpct.dto.channel.VerbalEditVO;
@@ -25,8 +29,10 @@ import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlResultService;
 import com.zjtelcom.cpct.service.channel.CamScriptService;
 import com.zjtelcom.cpct.service.channel.VerbalService;
+import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.UserUtil;
+import groovy.transform.ASTTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,14 +56,22 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
     private MktCamChlResultConfRelMapper mktCamChlResultConfRelMapper;
 
     @Autowired
+    private MktCamChlConfMapper mktCamChlConfMapper;
+
+    @Autowired
     private MktCamChlConfService mktCamChlConfService;
 
     @Autowired
-    private VerbalService verbalService;
+    MktCamResultRelMapper mktCamResultRelMapper;
+
+    @Autowired
+    ContactChannelMapper contactChannelMapper;
+
+    @Autowired
+    private MktCamChlConfAttrMapper mktCamChlConfAttrMapper;
 
     @Autowired
     private CamScriptService camScriptService;
-
     /**
      * 添加二次协同结果
      *
@@ -96,6 +110,12 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
                         mktCamChlResultConfRelDO.setUpdateDate(new Date());
                         mktCamChlResultConfRelMapper.insert(mktCamChlResultConfRelDO);
                     }
+                    // 保存话术
+                    CamScriptAddVO camScriptAddVO = new CamScriptAddVO();
+                    camScriptAddVO.setEvtContactConfId(mktCamChlConfDetail.getEvtContactConfId());
+                    camScriptAddVO.setMktCampaignId(mktCamChlConfDetail.getMktCampaignId());
+                    camScriptAddVO.setScriptDesc(mktCamChlConfDetail.getScriptDesc());
+                    camScriptService.addCamScript(UserUtil.loginId(), camScriptAddVO);
                 }
             }
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -104,7 +124,7 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
             logger.error("[op:MktCamChlResultServiceImpl] failed to save mktCamChlResult = {}", mktCamChlResult);
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_FAIL);
             mktCamChlConfMap.put("resultMsg", ErrorCode.SAVE_MKT_CAM_CHL_CONF_FAILURE.getErrorMsg());
-            mktCamChlConfMap.put("mktCamChlResultId", mktCamChlResultId);
+            mktCamChlConfMap.put("mktCamChlResultDO", mktCamChlResultDO);
         }
         return mktCamChlConfMap;
     }
@@ -157,6 +177,19 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
             mktCamChlResultDO.setUpdateStaff(UserUtil.loginId());
             mktCamChlResultDO.setUpdateDate(new Date());
             mktCamChlResultMapper.updateByPrimaryKey(mktCamChlResultDO);
+
+            // 添加/编辑话术
+            if (mktCamChlResult.getMktCamChlConfDetailList()!= null) {
+                for (int i = 0; i < mktCamChlResult.getMktCamChlConfDetailList().size(); i++) {
+                    // 保存话术
+                    CamScriptAddVO camScriptAddVO = new CamScriptAddVO();
+                    camScriptAddVO.setEvtContactConfId(mktCamChlResult.getMktCamChlConfDetailList().get(i).getEvtContactConfId());
+                    camScriptAddVO.setMktCampaignId(mktCamChlResult.getMktCamChlConfDetailList().get(i).getMktCampaignId());
+                    camScriptAddVO.setScriptDesc(mktCamChlResult.getMktCamChlConfDetailList().get(i).getScriptDesc());
+                    camScriptService.addCamScript(UserUtil.loginId(), camScriptAddVO);
+                }
+            }
+
 /*
             if (mktCamChlResult.getMktCamChlConfDetailList() != null) {
                 for (MktCamChlConfDetail mktCamChlConfDetail : mktCamChlResult.getMktCamChlConfDetailList()) {
@@ -301,6 +334,56 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
             mktCamChlResultMap.put("resultMsg", ErrorCode.GET_MKT_CAM_CHL_CONF_FAILURE.getErrorMsg());
         }
         return mktCamChlResultMap;
+    }
+
+
+    /**
+     * 查询所有 有二次协同 且二次协同为工单，且有效的
+     *
+     * @return
+     */
+    @Override
+    public Map<String, Object> selectResultByMktCampaignId() {
+        Map<String, Object> resultMap = new HashMap<>();
+        List<Long> mktCampaignIdList = mktCamResultRelMapper.selectAllGroupByMktCampaignId();
+        List<MktCamResultRelDeatil> mktCamResultRelDeatilList = new ArrayList<>();
+        for (Long mktCampaignId : mktCampaignIdList) {
+            MktCamResultRelDeatil mktCamResultRelDeatil = new MktCamResultRelDeatil();
+            List<MktCamChlResultDO> mktCamChlResultDOList = mktCamChlResultMapper.selectResultByMktCampaignId(mktCampaignId);
+            List<MktCamChlResult> mktCamChlResultList = new ArrayList<>();
+            for (MktCamChlResultDO mktCamChlResultDO : mktCamChlResultDOList) {
+                MktCamChlResult mktCamChlResult = BeanUtil.create(mktCamChlResultDO, new MktCamChlResult());
+                List<MktCamChlResultConfRelDO> mktCamChlResultConfRelDOList = mktCamChlResultConfRelMapper.selectByMktCamChlResultId(mktCamChlResultDO.getMktCamChlResultId());
+                List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
+                for (MktCamChlResultConfRelDO mktCamChlResultConfRelDO : mktCamChlResultConfRelDOList) {
+                    MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(mktCamChlResultConfRelDO.getEvtContactConfId());
+                    MktCamChlConfDetail mktCamChlConfDetail = BeanUtil.create(mktCamChlConfDO, new MktCamChlConfDetail());
+                    // 获取触点渠道编码
+                    Channel channel = contactChannelMapper.selectByPrimaryKey(mktCamChlConfDetail.getContactChlId());
+                    if (channel != null) {
+                        mktCamChlConfDetail.setContactChlCode(channel.getContactChlCode());
+                    }
+                    mktCamChlConfDetailList.add(mktCamChlConfDetail);
+                    // 获取属性
+                    List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(mktCamChlConfDetail.getEvtContactConfId());
+                    List<MktCamChlConfAttr> mktCamChlConfAttrList = new ArrayList<>();
+                    for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
+                        MktCamChlConfAttr mktCamChlConfAttr = BeanUtil.create(mktCamChlConfAttrDO, new MktCamChlConfAttr());
+                        mktCamChlConfAttrList.add(mktCamChlConfAttr);
+                    }
+                    mktCamChlConfDetail.setMktCamChlConfAttrList(mktCamChlConfAttrList);
+                }
+                mktCamChlResult.setMktCamChlConfDetailList(mktCamChlConfDetailList);
+                mktCamChlResultList.add(mktCamChlResult);
+            }
+            mktCamResultRelDeatil.setMktCampaignId(mktCampaignId);
+            mktCamResultRelDeatil.setMktCamChlResultList(mktCamChlResultList);
+            mktCamResultRelDeatilList.add(mktCamResultRelDeatil);
+        }
+        resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+        resultMap.put("resultMsg", "success");
+        resultMap.put("mktCamResultRelDeatilList", mktCamResultRelDeatilList);
+        return resultMap;
     }
 
 

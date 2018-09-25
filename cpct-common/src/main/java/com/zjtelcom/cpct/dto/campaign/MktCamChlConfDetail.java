@@ -13,6 +13,11 @@ public class MktCamChlConfDetail extends MktCamChlConf{
     private List<MktCamQuest> mktCamQuestList;
 */
 
+    /**
+     * 推送渠道编码
+     */
+    private String contactChlCode;
+
     private List<MktCamChlConfAttr> mktCamChlConfAttrList;
 
     private List<VerbalVO> verbalVOList;
@@ -41,5 +46,13 @@ public class MktCamChlConfDetail extends MktCamChlConf{
 
     public void setCamScript(CamScript camScript) {
         this.camScript = camScript;
+    }
+
+    public String getContactChlCode() {
+        return contactChlCode;
+    }
+
+    public void setContactChlCode(String contactChlCode) {
+        this.contactChlCode = contactChlCode;
     }
 }

@@ -117,6 +117,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Autowired
     private MktCamDirectoryMapper mktCamDirectoryMapper;
 
+    @Autowired
+    private MktCamResultRelMapper mktCamResultRelMapper;
+
     /**
      * 添加活动基本信息 并建立关系
      *
@@ -624,6 +627,23 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     public Map<String, Object> changeMktCampaignStatus(Long mktCampaignId, String statusCd) throws Exception {
         Map<String, Object> maps = new HashMap<>();
         mktCampaignMapper.changeMktCampaignStatus(mktCampaignId, statusCd);
+        // 判断是否是发布活动, 是该状态生效
+        if(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)){
+            MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();
+            mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+            mktCamResultRelDO.setMktCampaignId(mktCampaignId);
+            mktCamResultRelDO.setUpdateDate(new Date());
+            mktCamResultRelDO.setUpdateStaff(UserUtil.loginId());
+            mktCamResultRelMapper.changeStatusByMktCampaignId(mktCamResultRelDO);
+        } else  if(StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd) || StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)) {
+            // 暂停或者下线, 该状态为未生效
+            MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();
+            mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_NOTACTIVE.getStatusCode());
+            mktCamResultRelDO.setMktCampaignId(mktCampaignId);
+            mktCamResultRelDO.setUpdateDate(new Date());
+            mktCamResultRelDO.setUpdateStaff(UserUtil.loginId());
+            mktCamResultRelMapper.changeStatusByMktCampaignId(mktCamResultRelDO);
+        }
         return maps;
     }
 
@@ -730,7 +750,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         mktCampaignDO.setMktCampaignId(null);
         // 升级后为 服务+营销活动
         mktCampaignDO.setMktCampaignType("3000");
-        mktCampaignDO.setStatusCd("2001");
+        mktCampaignDO.setStatusCd(StatusCode.STATUS_CODE_DRAFT.getStatusCode());
         mktCampaignDO.setStatusDate(new Date());
         mktCampaignDO.setCreateDate(new Date());
         mktCampaignDO.setCreateStaff(UserUtil.loginId());
@@ -747,7 +767,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         mktCampaignRelDO.setApplyRegionId(mktCampaignDO.getLanId());
         mktCampaignRelDO.setEffDate(mktCampaignDO.getPlanBeginTime());
         mktCampaignRelDO.setExpDate(mktCampaignDO.getPlanEndTime());
-        mktCampaignRelDO.setStatusCd("1000");
+        mktCampaignRelDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
         mktCampaignRelDO.setStatusDate(new Date());
         mktCampaignRelDO.setCreateDate(new Date());
         mktCampaignRelDO.setCreateStaff(UserUtil.loginId());
