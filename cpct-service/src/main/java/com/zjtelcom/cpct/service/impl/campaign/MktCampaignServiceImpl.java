@@ -623,7 +623,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
             mktCampaignVO.setRelation(isRelation);
             if (mktCampaignCountDO.getLanId() != null) {
-                SysArea sysArea = (SysArea) redisUtils.get(mktCampaignCountDO.getLanId().toString());
+                SysArea sysArea = (SysArea) redisUtils.get("CITY_"+mktCampaignCountDO.getLanId().toString());
                 mktCampaignVO.setLandName(sysArea.getName());
             }
             mktCampaignVOList.add(mktCampaignVO);
