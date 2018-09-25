@@ -480,7 +480,7 @@ public class SynchronizeController extends BaseController {
      * @param roleId
      * @return
      */
-    @PostMapping("singleRole")
+    @RequestMapping("singleRole")
     @CrossOrigin
     public String singleRole(@RequestParam(value = "roleId", required = true) Long roleId){
         logger.info("同步单个角色信息");
