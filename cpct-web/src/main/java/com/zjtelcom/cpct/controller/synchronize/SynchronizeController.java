@@ -1,10 +1,13 @@
 package com.zjtelcom.cpct.controller.synchronize;
 
 import com.alibaba.fastjson.JSON;
+import com.zjhcsoft.eagle.main.dubbo.model.policy.ResponseHeaderModel;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.service.synchronize.*;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynMktCampaignRelService;
+import com.zjtelcom.cpct.service.synchronize.campaign.SyncActivityService;
+import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.service.synchronize.channel.SynChannelService;
 import com.zjtelcom.cpct.service.synchronize.filter.SynFilterRuleService;
 import com.zjtelcom.cpct.service.synchronize.label.SynLabelService;
@@ -68,6 +71,9 @@ public class SynchronizeController extends BaseController {
 
     @Autowired
     private SynchronizeCampaignService synchronizeCampaignService;
+
+    @Autowired
+    private SyncActivityService syncActivityService;
 
 
     /**
@@ -769,6 +775,27 @@ public class SynchronizeController extends BaseController {
             logger.error("通过id同步单个营销维挽活动失败！Exception: ",campaignRelId,e);
         }
         return JSON.toJSONString(map);
+    }
+
+    /**
+     * 同步活动到大数据
+     * @param mktCampaignId
+     * @return
+     */
+    @PostMapping("/syncActivity")
+    @CrossOrigin
+    public String SyncActivity(@RequestParam(value = "mktCampaignId", required = true) Long mktCampaignId){
+        logger.info("同步单个营销维挽活动");
+        String roleName=getRole();   //  操作角色
+        ResponseHeaderModel responseHeaderModel = new ResponseHeaderModel();
+        try{
+            responseHeaderModel = syncActivityService.SyncActivity(mktCampaignId);
+        } catch (Exception e) {
+            responseHeaderModel.setResultMessage("1");
+            responseHeaderModel.setResultMessage ("failed");
+            logger.error("同步活动到大数据失败！Exception: ", mktCampaignId, e);
+        }
+        return JSON.toJSONString(responseHeaderModel);
     }
 
 
