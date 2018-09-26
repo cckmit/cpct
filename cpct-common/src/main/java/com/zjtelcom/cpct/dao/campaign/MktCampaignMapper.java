@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description:
@@ -29,6 +30,8 @@ public interface MktCampaignMapper {
     int updateByPrimaryKey(MktCampaignDO mktCampaignDO);
 
     List<MktCampaignCountDO> qryMktCampaignListPage(MktCampaignDO mktCampaignDO);
+
+    List<MktCampaignCountDO> qryMktCampaignListPage4Sync(@Param("map") Map<String,Object> map);
 
     void changeMktCampaignStatus(@Param("mktCampaignId")Long mktCampaignId, @Param("statusCd")String statusCd);
 

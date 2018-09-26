@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct_prd.dao.question.MktQuestionnairePrdMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.question.Questionnaire">
+    <id column="NAIRE_ID" jdbcType="BIGINT" property="naireId" />
+    <result column="NAIRE_NAME" jdbcType="VARCHAR" property="naireName" />
+    <result column="NAIRE_TYPE" jdbcType="VARCHAR" property="naireType" />
+    <result column="MARK_TYPE" jdbcType="VARCHAR" property="markType" />
+    <result column="NAIRE_POINTS" jdbcType="BIGINT" property="nairePoints" />
+    <result column="NAIRE_DESC" jdbcType="VARCHAR" property="naireDesc" />
+    <result column="START_TIP" jdbcType="VARCHAR" property="startTip" />
+    <result column="END_TIP" jdbcType="VARCHAR" property="endTip" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from mkt_questionnaire
+    where NAIRE_ID = #{naireId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.question.Questionnaire" useGeneratedKeys="true" keyProperty="naireId">
+    insert into mkt_questionnaire (NAIRE_ID, NAIRE_NAME, NAIRE_TYPE, 
+      MARK_TYPE, NAIRE_POINTS, NAIRE_DESC, 
+      START_TIP, END_TIP, STATUS_CD, 
+      STATUS_DATE, CREATE_STAFF, CREATE_DATE, 
+      UPDATE_STAFF, UPDATE_DATE, REMARK
+      )
+    values (#{naireId,jdbcType=BIGINT}, #{naireName,jdbcType=VARCHAR}, #{naireType,jdbcType=VARCHAR}, 
+      #{markType,jdbcType=VARCHAR}, #{nairePoints,jdbcType=BIGINT}, #{naireDesc,jdbcType=VARCHAR}, 
+      #{startTip,jdbcType=VARCHAR}, #{endTip,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR}, 
+      #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.question.Questionnaire">
+    update mkt_questionnaire
+    set NAIRE_NAME = #{naireName,jdbcType=VARCHAR},
+      NAIRE_TYPE = #{naireType,jdbcType=VARCHAR},
+      MARK_TYPE = #{markType,jdbcType=VARCHAR},
+      NAIRE_POINTS = #{nairePoints,jdbcType=BIGINT},
+      NAIRE_DESC = #{naireDesc,jdbcType=VARCHAR},
+      START_TIP = #{startTip,jdbcType=VARCHAR},
+      END_TIP = #{endTip,jdbcType=VARCHAR},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where NAIRE_ID = #{naireId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select NAIRE_ID, NAIRE_NAME, NAIRE_TYPE, MARK_TYPE, NAIRE_POINTS, NAIRE_DESC, START_TIP, 
+    END_TIP, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, 
+    REMARK
+    from mkt_questionnaire
+    where NAIRE_ID = #{naireId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select NAIRE_ID, NAIRE_NAME, NAIRE_TYPE, MARK_TYPE, NAIRE_POINTS, NAIRE_DESC, START_TIP, 
+    END_TIP, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, 
+    REMARK
+    from mkt_questionnaire
+  </select>
+  <select id="findQuestionnaireListByParam" resultMap="BaseResultMap">
+    select NAIRE_ID, NAIRE_NAME, NAIRE_TYPE, MARK_TYPE, NAIRE_POINTS, NAIRE_DESC, START_TIP,
+    END_TIP, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
+    REMARK
+    from mkt_questionnaire
+    where 1=1
+    <if test="naireName !=null and naireName != ''">
+      and NAIRE_NAME LIKE CONCAT(CONCAT('%',#{naireName}),'%')
+    </if>
+    <if test="naireType !=null and naireType != ''">
+      and NAIRE_TYPE = #{naireType}
+    </if>
+  </select>
+
+    <select id="findNairePageByParam" resultMap="BaseResultMap">
+        select NAIRE_ID, NAIRE_NAME, NAIRE_TYPE, MARK_TYPE, NAIRE_POINTS, NAIRE_DESC, START_TIP,
+        END_TIP, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
+        REMARK
+        from mkt_questionnaire
+        where 1=1
+        <if test="NAIRE_NAME !=null and NAIRE_NAME != ''">
+            and NAIRE_NAME LIKE CONCAT(CONCAT('%',#{naireName}),'%')
+        </if>
+        <if test="NAIRE_TYPE !=null and NAIRE_TYPE != ''">
+            and NAIRE_TYPE = #{naireType}
+        </if>
+    </select>
+
+
+</mapper>

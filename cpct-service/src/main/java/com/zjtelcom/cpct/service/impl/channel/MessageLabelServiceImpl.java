@@ -92,6 +92,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
             labelDTO.setInjectionLabelId(label.getInjectionLabelId());
             labelDTO.setInjectionLabelName(label.getInjectionLabelName());
             labelDTO.setMessageType(real.getMessageType());
+            labelDTO.setLabelCode(label.getInjectionLabelCode());
             labelList.add(labelDTO);
             if (!messageTypes.contains(real.getMessageType())){
                 messageTypes.add(real.getMessageType());
@@ -120,6 +121,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         }
         maps.put("resultCode", CODE_SUCCESS);
         maps.put("resultMsg",mlInfoList);
+        maps.put("labels",labelList);
         return maps;
 
     }

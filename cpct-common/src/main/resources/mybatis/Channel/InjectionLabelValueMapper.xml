@@ -84,6 +84,10 @@
     where INJECTION_LABEL_ID = #{labelId}
   </select>
 
+  <delete id="deleteByLabelId" parameterType="java.lang.Long">
+    delete from injection_label_value
+    where INJECTION_LABEL_ID = #{labelId,jdbcType=BIGINT}
+  </delete>
 
 
 </mapper>

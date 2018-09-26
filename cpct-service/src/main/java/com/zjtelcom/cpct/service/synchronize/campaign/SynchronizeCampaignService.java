@@ -4,7 +4,7 @@
  * Copyright 2018 Netease, Inc. All rights reserved.
  * NETEASE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  */
-package com.zjtelcom.cpct.service.synchronize;
+package com.zjtelcom.cpct.service.synchronize.campaign;
 
 import java.util.Map;
 
@@ -16,6 +16,6 @@ import java.util.Map;
  */
 public interface SynchronizeCampaignService {
 
-    Map<String, Object> synchronizeCampaign(Long mktCampaignId) throws Exception;
+    Map<String, Object> synchronizeCampaign(Long mktCampaignId, String roleName) throws Exception;
 
 }

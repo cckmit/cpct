@@ -17,4 +17,6 @@ public interface MktCamChlResultMapper {
     List<MktCamChlResultDO> selectAll();
 
     int updateByPrimaryKey(MktCamChlResultDO mktCamChlResultDO);
+
+    List<MktCamChlResultDO> selectResultByMktCampaignId(Long mktCampaignId);
 }

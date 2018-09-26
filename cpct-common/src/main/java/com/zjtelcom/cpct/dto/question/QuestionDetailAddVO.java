@@ -11,6 +11,18 @@ public class QuestionDetailAddVO implements Serializable {
 
     private String qstDetailInputType;//题库明细输入类型
 
+    private String remark;
+
+
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
     public Long getQuestionId() {
         return questionId;
     }

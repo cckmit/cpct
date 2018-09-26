@@ -3,7 +3,6 @@ package com.zjtelcom.cpct.service.impl.synchronize;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.event.EventSorceMapper;
 import com.zjtelcom.cpct.domain.event.EventSorceDO;
-import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.enums.SynchronizeType;
 import com.zjtelcom.cpct.exception.SystemException;
 import com.zjtelcom.cpct.service.BaseService;
@@ -38,7 +37,7 @@ public class SynEventSorceServiceImpl extends BaseService implements SynEventSor
     private SynchronizeRecordService synchronizeRecordService;
 
     //同步表名
-    public static final String tableName="event_sorce";
+    private static final String tableName="event_sorce";
 
     /**
      * 单个事件源同步
@@ -97,7 +96,7 @@ public class SynEventSorceServiceImpl extends BaseService implements SynEventSor
                 }
             }
         }
-        //查出需要删除的事件
+        //查出需要删除的事件源
         for(EventSorceDO c:realList){
             for (int i = 0; i <prdList.size() ; i++) {
                 if(c.getEvtSrcId()-prdList.get(i).getEvtSrcId()==0){

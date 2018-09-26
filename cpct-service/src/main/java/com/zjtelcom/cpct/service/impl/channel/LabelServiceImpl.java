@@ -7,6 +7,8 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dto.channel.*;
+import com.zjtelcom.cpct.enums.ConditionType;
+import com.zjtelcom.cpct.enums.LabelCondition;
 import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.LabelService;
@@ -137,11 +139,11 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         Label labelValodate = labelMapper.selectByLabelCode(addVO.getInjectionLabelCode());
         if (labelValodate!=null){
             result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg","标签已存在");
+            result.put("resultMsg","唯一标识符不能重复");
             return result;
         }
         Label label = BeanUtil.create(addVO,new Label());
-        operatorValodate(label, addVO.getOperatorList());
+        operatorValodate(label, addVO.getConditionType());
         label.setScope(0);
         label.setLabelType("1000");
         //todo 系统添加待确认
@@ -154,21 +156,26 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         label.setUpdateStaff(userId);
         label.setStatusCd("1000");
         labelMapper.insert(label);
+        insertLabelValue(label,addVO.getRightOperand());
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
         return result;
     }
 
-    private void operatorValodate(Label label, List<String> operatorList) {
-        if (operatorList != null) {
+    private void operatorValodate(Label label,String conditionType) {
+        if (conditionType != null && !conditionType.equals("")) {
             List<Integer> opValueList = new ArrayList<>();
-            for (String st : operatorList) {
-                Operator op = Operator.getOperator(st);
-                if (op != null) {
-                    opValueList.add(op.getValue());
+
+            if (conditionType.equals(LabelCondition.SINGLE.getValue().toString())){
+                label.setOperator(Operator.EQUAL.getValue().toString());
+            }else if (conditionType.equals(LabelCondition.MULTI.getValue().toString())){
+                label.setOperator(Operator.IN.getValue().toString());
+            }else {
+                for (Operator operator : Operator.values()) {
+                    opValueList.add(operator.getValue());
                 }
+                label.setOperator(ChannelUtil.List2String(opValueList));
             }
-            label.setOperator(ChannelUtil.List2String(opValueList));
         }
     }
 
@@ -182,13 +189,33 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             return result;
         }
         BeanUtil.copy(editVO,label);
-        operatorValodate(label, editVO.getOperatorList());
+        operatorValodate(label, editVO.getConditionType());
         label.setUpdateDate(new Date());
         label.setUpdateStaff(userId);
         labelMapper.updateByPrimaryKey(label);
+        labelValueMapper.deleteByLabelId(label.getInjectionLabelId());
+        insertLabelValue(label,editVO.getRightOperand());
+
+
+
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","添加成功");
+        result.put("resultMsg","编辑成功");
         return result;
+    }
+
+    private void insertLabelValue(Label label,String rightOpreand) {
+        List<String> valueList = ChannelUtil.StringToList(rightOpreand);
+        for (String st : valueList){
+            LabelValue value = new LabelValue();
+            value.setInjectionLabelId(label.getInjectionLabelId());
+            value.setValueDesc(st);
+            value.setValueName(st);
+            value.setLabelValue(st);
+            value.setCreateDate(new Date());
+            value.setStatusCd("1000");
+            value.setUpdateDate(new Date());
+            labelValueMapper.insert(value);
+        }
     }
 
     @Override
@@ -207,7 +234,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         }
         labelMapper.deleteByPrimaryKey(labelId);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","添加成功");
+        result.put("resultMsg","删除成功");
         return result;
     }
 
@@ -300,7 +327,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         //todo 存在关联关系的标签组 不能删除
         labelGrpMapper.deleteByPrimaryKey(labelGrpId);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","添加成功");
+        result.put("resultMsg","删除成功");
         return result;
     }
 
@@ -440,7 +467,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         labelGrpMbr.setUpdateStaff(userId);
         labelGrpMbrMapper.updateByPrimaryKey(labelGrpMbr);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","添加成功");
+        result.put("resultMsg","编辑成功");
         return result;
     }
 
@@ -455,7 +482,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         }
         labelGrpMbrMapper.deleteByPrimaryKey(labelGrpMbrId);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","添加成功");
+        result.put("resultMsg","删除成功");
         return result;
     }
 
@@ -532,7 +559,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         labelValue.setUpdateStaff(userId);
         labelValueMapper.updateByPrimaryKey(labelValue);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","添加成功");
+        result.put("resultMsg","编辑成功");
         return result;
     }
 
@@ -547,7 +574,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         }
         labelValueMapper.deleteByPrimaryKey(labelValueId);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","添加成功");
+        result.put("resultMsg","删除成功");
         return result;
     }
 

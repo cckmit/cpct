@@ -28,6 +28,11 @@ public class MktCamChlConf extends BaseEntity {
     private String evtContactConfName;
 
     /**
+     * 痛痒点话术描述
+     */
+    private String scriptDesc;
+
+    /**
      * 营销活动标识
      */
     private Long mktCampaignId;
@@ -103,4 +108,11 @@ public class MktCamChlConf extends BaseEntity {
         this.ruleExpression = ruleExpression;
     }
 
+    public String getScriptDesc() {
+        return scriptDesc;
+    }
+
+    public void setScriptDesc(String scriptDesc) {
+        this.scriptDesc = scriptDesc;
+    }
 }
