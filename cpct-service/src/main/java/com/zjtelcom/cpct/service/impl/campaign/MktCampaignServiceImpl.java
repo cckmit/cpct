@@ -485,7 +485,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             maps.put("resultMsg", "活动不存在");
             return maps;
         }
-        if (!campaignDO.getStatusCd().equals(StatusCode.STATUS_CODE_UNCHECK.getStatusCode())) {
+        if (campaignDO.getStatusCd().equals(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode()) ||
+                campaignDO.getStatusCd().equals(StatusCode.STATUS_CODE_CHECKED.getStatusCode())) {
             maps.put("resultCode",CODE_FAIL);
             maps.put("resultMsg", "非待审核活动");
             return maps;
@@ -494,6 +495,26 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         mktCampaignMapper.updateByPrimaryKey(campaignDO);
         maps.put("resultCode",CODE_SUCCESS);
         maps.put("resultMsg", "已审核");
+        return maps;
+    }
+
+
+    /**
+     * 活动当前结束时间
+     * @param campaignId
+     * @return
+     */
+    @Override
+    public Map<String, Object> getCampaignEndTime4Sync(Long campaignId) {
+        Map<String, Object> maps = new HashMap<>();
+        MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(campaignId);
+        if (campaignDO==null){
+            maps.put("resultCode",CODE_FAIL);
+            maps.put("resultMsg", "活动不存在");
+            return maps;
+        }
+        maps.put("resultCode",CODE_SUCCESS);
+        maps.put("resultMsg",campaignDO.getPlanEndTime());
         return maps;
     }
 
@@ -602,7 +623,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
             mktCampaignVO.setRelation(isRelation);
             if (mktCampaignCountDO.getLanId() != null) {
-                SysArea sysArea = (SysArea) redisUtils.get(mktCampaignCountDO.getLanId().toString());
+                SysArea sysArea = (SysArea) redisUtils.get("CITY_"+mktCampaignCountDO.getLanId().toString());
                 mktCampaignVO.setLandName(sysArea.getName());
             }
             mktCampaignVOList.add(mktCampaignVO);
