@@ -18,5 +18,5 @@ import java.util.Map;
  */
 public interface SyncActivityService {
 
-    ResponseHeaderModel SyncActivity(Long mktCampaignId);
+    ResponseHeaderModel SyncActivity(Long mktCampaignId, String roleName);
 }
