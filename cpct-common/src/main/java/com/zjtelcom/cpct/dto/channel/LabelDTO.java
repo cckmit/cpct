@@ -21,6 +21,16 @@ public class LabelDTO implements Serializable {
 
     private Long messageType;
 
+    private String labelCode;
+
+
+    public String getLabelCode() {
+        return labelCode;
+    }
+
+    public void setLabelCode(String labelCode) {
+        this.labelCode = labelCode;
+    }
 
     public Long getMessageType() {
         return messageType;

@@ -5,8 +5,6 @@ public class Label {
 
     private String conditionName;
 
-    //    private Integer conditionGroupId;
-
     private String conditionType;
 
     private String description;
@@ -15,13 +13,12 @@ public class Label {
 
     private String operator;
 
-    private String rightOperand;
-
     private Integer valueId;
 
     private String eagleName;
 
     private Integer isShared;
+
     
     public Integer getIsShared() {
 		return isShared;
@@ -46,15 +43,6 @@ public class Label {
     public void setConditionName(String conditionName) {
         this.conditionName = conditionName == null ? null : conditionName.trim();
     }
-
-    //    public Integer getConditionGroupId() {
-    //        return conditionGroupId;
-    //    }
-
-    //    public void setConditionGroupId(Integer conditionGroupId) {
-    //        this.conditionGroupId = conditionGroupId;
-    //    }
-
     public String getConditionType() {
         return conditionType;
     }
@@ -85,14 +73,6 @@ public class Label {
 
     public void setOperator(String operator) {
         this.operator = operator == null ? null : operator.trim();
-    }
-
-    public String getRightOperand() {
-        return rightOperand;
-    }
-
-    public void setRightOperand(String rightOperand) {
-        this.rightOperand = rightOperand == null ? null : rightOperand.trim();
     }
 
     public Integer getValueId() {

@@ -38,7 +38,6 @@ import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UserUtil;
-import org.apache.commons.io.CopyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -235,8 +234,8 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             // 遍历策略下对应的规则
             try {
                 for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfDetail.getMktStrategyConfRuleList()) {
+                    mktStrategyConfRule.setMktCampaignId(mktStrategyConfDetail.getMktCampaignId());
                     Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.saveMktStrategyConfRule(mktStrategyConfRule);
-
                     // 返回策略规则
                     MktStrategyConfRuleDO mktStrategyConfRuleDO = (MktStrategyConfRuleDO) mktStrategyConfRuleMap.get("mktStrategyConfRuleDO");
                     // 建立策略配置和规则的关系
@@ -355,6 +354,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                 try {
                     for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfDetail.getMktStrategyConfRuleList()) {
                         Map<String, Object> mktStrategyConfRuleMap;
+                        mktStrategyConfRule.setMktCampaignId(mktStrategyConfDetail.getMktCampaignId());
                         //判断规则是否是修改还是新增
                         if (mktStrategyConfRule.getMktStrategyConfRuleId() != null && mktStrategyConfRule.getMktStrategyConfRuleId() != 0) {
                             // 修改规则的信息 并返回

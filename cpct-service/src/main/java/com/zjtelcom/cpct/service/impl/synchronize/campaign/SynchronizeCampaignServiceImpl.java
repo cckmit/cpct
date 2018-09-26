@@ -30,7 +30,8 @@ import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.service.BaseService;
-import com.zjtelcom.cpct.service.synchronize.SynchronizeCampaignService;
+import com.zjtelcom.cpct.service.synchronize.SynchronizeRecordService;
+import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import com.zjtelcom.cpct_prd.dao.campaign.*;
@@ -175,13 +176,13 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
     private InjectionLabelMapper injectionLabelMapper;
 
     @Autowired
-    private InjectionLabelValueMapper labelValueMapper;
+    private SynchronizeRecordService synchronizeRecordService;
 
-    @Autowired
-    private ContactChannelMapper channelMapper;
+    //同步表名
+    private static final String tableName="mkt_campaign";
 
     @Override
-    public Map<String, Object> synchronizeCampaign(Long mktCampaignId) throws Exception {
+    public Map<String, Object> synchronizeCampaign(Long mktCampaignId, String roleName) throws Exception {
         // 判断该活动是否存在
         Map<String, Object> synchronizeCampaignMap = new HashMap<>();
         MktCampaignDO mktCampaignPrdDO = mktCampaignPrdMapper.selectByPrimaryKey(mktCampaignId);
@@ -189,9 +190,11 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
         if (mktCampaignPrdDO != null) {
             // 更新活动
             mktCampaignPrdMapper.updateByPrimaryKey(mktCampaignDO);
+            synchronizeRecordService.addRecord(roleName,tableName, mktCampaignDO.getMktCampaignId(), SynchronizeType.update.getType());
         } else {
             // 新增活动
             mktCampaignPrdMapper.insert(mktCampaignDO);
+            synchronizeRecordService.addRecord(roleName,tableName, mktCampaignDO.getMktCampaignId(), SynchronizeType.add.getType());
         }
 
         // 删除下发城市
@@ -230,7 +233,7 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
         }
         synchronizeCampaignMap.put("mktCampaignId", mktCampaignId);
         synchronizeCampaignMap.put("resultCode", CommonConstant.CODE_SUCCESS);
-        synchronizeCampaignMap.put("resultMsg", "success");
+        synchronizeCampaignMap.put("resultMsg", "同步成功！");
         return synchronizeCampaignMap;
     }
 

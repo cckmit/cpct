@@ -18,4 +18,8 @@ public interface MktQstQuestRelMapper {
     List<QuestRel> findRelListByQuestionnaireId(@Param("questionnaireId")Long questionnaireId);
 
     int updateByPrimaryKey(QuestRel record);
+
+    int insertBatch(@Param("relList") List<QuestRel> questRelList);
+
+    int deleteByNaireId(@Param("naireId") Long naireId);
 }

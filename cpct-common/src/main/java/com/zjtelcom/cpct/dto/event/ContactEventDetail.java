@@ -23,46 +23,6 @@ public class ContactEventDetail extends ContactEvt{
     private List<MktCamEvtRel> mktCamEvtRels;
     private String mktCampaignTypeName;
     private String eventTypeName;
+    private String interfaceName;
 
-
-
-    public List<ContactEvtItem> getContactEvtItems() {
-        return contactEvtItems;
-    }
-
-    public void setContactEvtItems(List<ContactEvtItem> contactEvtItems) {
-        this.contactEvtItems = contactEvtItems;
-    }
-
-    public List<ContactEvtMatchRul> getContactEvtMatchRuls() {
-        return contactEvtMatchRuls;
-    }
-
-    public void setContactEvtMatchRuls(List<ContactEvtMatchRul> contactEvtMatchRuls) {
-        this.contactEvtMatchRuls = contactEvtMatchRuls;
-    }
-
-    public List<ContactEvtTrigRul> getContactEvtTrigRuls() {
-        return contactEvtTrigRuls;
-    }
-
-    public void setContactEvtTrigRuls(List<ContactEvtTrigRul> contactEvtTrigRuls) {
-        this.contactEvtTrigRuls = contactEvtTrigRuls;
-    }
-
-    public InterfaceCfgDetail getInterfaceCfgDetail() {
-        return interfaceCfgDetail;
-    }
-
-    public void setInterfaceCfgDetail(InterfaceCfgDetail interfaceCfgDetail) {
-        this.interfaceCfgDetail = interfaceCfgDetail;
-    }
-
-    public List<FilterRule> getFilterRules() {
-        return filterRules;
-    }
-
-    public void setFilterRules(List<FilterRule> filterRules) {
-        this.filterRules = filterRules;
-    }
 }

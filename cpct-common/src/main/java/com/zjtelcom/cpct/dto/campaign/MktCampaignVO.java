@@ -11,6 +11,7 @@ import com.zjtelcom.cpct.dto.event.EventDTO;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -57,7 +58,7 @@ public class MktCampaignVO extends MktCampaign {
     private String tiggerType;
 
     /**
-     * 活动周期类型Id
+     * 活动周期类型value
      */
     private String execTypeValue;
 
@@ -81,6 +82,9 @@ public class MktCampaignVO extends MktCampaign {
      */
     private String statusCdValue;
 
+
+    private String statusExamine;
+
     /**
      * 活动目录名称
      */
@@ -101,6 +105,15 @@ public class MktCampaignVO extends MktCampaign {
      */
     private List<MktStrategyConfDetail> mktStrategyConfDetailList;
 
+
+
+    public String getStatusExamine() {
+        return statusExamine;
+    }
+
+    public void setStatusExamine(String statusExamine) {
+        this.statusExamine = statusExamine;
+    }
 
     public List<EventDTO> getEventDTOS() {
         return eventDTOS;

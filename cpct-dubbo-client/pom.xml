@@ -42,10 +42,10 @@
             <artifactId>aspectjweaver</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>com.springsource.org.apache.commons.io</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.commons</groupId>-->
+            <!--<artifactId>com.springsource.org.apache.commons.io</artifactId>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>com.ctzj.ppm</groupId>
