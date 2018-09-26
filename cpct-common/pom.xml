@@ -108,6 +108,12 @@
             <artifactId>jna</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.zjhcsoft.eagle</groupId>
+            <artifactId>dubbo-eagle-service</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
     </dependencies>
 
 
