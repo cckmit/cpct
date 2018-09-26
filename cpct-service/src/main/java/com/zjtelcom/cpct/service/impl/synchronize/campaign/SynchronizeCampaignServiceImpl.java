@@ -30,7 +30,7 @@ import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.service.BaseService;
-import com.zjtelcom.cpct.service.synchronize.SynchronizeCampaignService;
+import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import com.zjtelcom.cpct_prd.dao.campaign.*;

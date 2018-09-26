@@ -18,6 +18,8 @@ public interface OfferMapper {
 
     List<Offer> selectAll();
 
+    Offer selectByCamItemId(Long camItemId);
+
     List<Offer> findByName(@Param("offerName")String name);
 
     Offer selectByPrimaryKeyAndName(@Param("offerId") Integer offerId,@Param("productName")String productName);

@@ -143,6 +143,9 @@
         <if test="map.mktCampaignType != null and map.mktCampaignType != ''">
             AND MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR}
         </if>
+        <if test="map.mktCampaignCategory != null and map.mktCampaignCategory != ''">
+            AND mktCampaignCategory = #{mktCampaignCategory,jdbcType=VARCHAR}
+        </if>
         <if test="map.activityNbr != null and map.activityNbr != ''">
             AND MKT_ACTIVITY_NBR like CONCAT('%',#{map.activityNbr,jdbcType=VARCHAR},'%')
         </if>
@@ -185,6 +188,9 @@
         </if>
         <if test="tiggerType != null and tiggerType != ''">
             AND t.TIGGER_TYPE = #{tiggerType,jdbcType=VARCHAR}
+        </if>
+        <if test="mktCampaignCategory != null and mktCampaignCategory != ''">
+            AND mktCampaignCategory = #{mktCampaignCategory,jdbcType=VARCHAR}
         </if>
         <if test="mktCampaignType != null and mktCampaignType != ''">
             AND t.MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR}
