@@ -9,6 +9,7 @@
         <result column="PARENT_MENU_ID" jdbcType="BIGINT" property="parentMenuId"/>
         <result column="MENU_NEXT_ID" jdbcType="INTEGER" property="menuNextId"/>
         <result column="MENU_URL" jdbcType="VARCHAR" property="menuUrl"/>
+        <result column="SYNC_URL" jdbcType="VARCHAR" property="syncUrl"/>
         <result column="MENU_REMARK" jdbcType="VARCHAR" property="menuRemark"/>
         <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
         <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
@@ -23,7 +24,7 @@
 
     <insert id="insert" parameterType="com.zjtelcom.cpct.domain.system.SysMenu">
       insert into sys_menu (MENU_ID, MENU_NAME, MENU_IMG,
-        MENU_TYPE, PARENT_MENU_ID, MENU_NEXT_ID,
+        MENU_TYPE, PARENT_MENU_ID, MENU_NEXT_ID,SYNC_URL,
         MENU_URL, MENU_REMARK, CREATE_DATE,
         CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
         )
@@ -42,6 +43,7 @@
         PARENT_MENU_ID = #{parentMenuId,jdbcType=BIGINT},
         MENU_NEXT_ID = #{menuNextId,jdbcType=INTEGER},
         MENU_URL = #{menuUrl,jdbcType=VARCHAR},
+        SYNC_URL = #{syncUrl,jdbcType=VARCHAR},
         MENU_REMARK = #{menuRemark,jdbcType=VARCHAR},
         CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
         CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
@@ -51,14 +53,14 @@
     </update>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-      select MENU_ID, MENU_NAME, MENU_IMG, MENU_TYPE, PARENT_MENU_ID, MENU_NEXT_ID, MENU_URL,
+      select MENU_ID, MENU_NAME, MENU_IMG, MENU_TYPE, PARENT_MENU_ID, MENU_NEXT_ID, MENU_URL,SYNC_URL,
       MENU_REMARK, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
       from sys_menu
       where MENU_ID = #{menuId,jdbcType=BIGINT}
     </select>
 
     <select id="selectAll" resultMap="BaseResultMap">
-      select MENU_ID, MENU_NAME, MENU_IMG, MENU_TYPE, PARENT_MENU_ID, MENU_NEXT_ID, MENU_URL,
+      select MENU_ID, MENU_NAME, MENU_IMG, MENU_TYPE, PARENT_MENU_ID, MENU_NEXT_ID, MENU_URL,SYNC_URL,
       MENU_REMARK, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
       from sys_menu
       order by PARENT_MENU_ID asc,MENU_NEXT_ID asc
@@ -74,7 +76,7 @@
     </select>
 
     <select id="listMenuByLevel" resultMap="BaseResultMap" parameterType="Long">
-      select sm.MENU_ID, sm.MENU_NAME, sm.MENU_IMG, sm.MENU_TYPE, sm.PARENT_MENU_ID, sm.MENU_NEXT_ID, sm.MENU_URL
+      select sm.MENU_ID, sm.MENU_NAME, sm.MENU_IMG, sm.MENU_TYPE, sm.PARENT_MENU_ID, sm.MENU_NEXT_ID, sm.MENU_URL,sm.SYNC_URL
       from sys_menu sm
       where sm.MENU_TYPE = #{menuType,jdbcType=BIGINT}
       order by sm.PARENT_MENU_ID asc,sm.MENU_NEXT_ID asc
@@ -82,7 +84,7 @@
 
 
     <select id="listMenuById" resultMap="BaseResultMap" parameterType="Long">
-      select sm.MENU_ID, sm.MENU_NAME, sm.MENU_IMG, sm.MENU_TYPE, sm.PARENT_MENU_ID,sm.MENU_NEXT_ID,
+      select sm.MENU_ID, sm.MENU_NAME, sm.MENU_IMG, sm.MENU_TYPE, sm.PARENT_MENU_ID,sm.MENU_NEXT_ID,sm.SYNC_URL
        sm.MENU_NEXT_ID, sm.MENU_URL,sm.MENU_REMARK,sm2.MENU_NAME as parentMenuName
       from sys_menu sm
       left join sys_menu sm2
