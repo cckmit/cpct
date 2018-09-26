@@ -248,19 +248,20 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         // 获取推送渠道
         List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
         List<MktCamChlConf> mktCamChlConfList = mktStrategyConfRule.getMktCamChlConfList();
-        for (MktCamChlConf mktCamChlConf : mktCamChlConfList) {
-            Map<String, Object> mktCamChlConfDetailMap = mktCamChlConfService.getMktCamChlConf(mktCamChlConf.getEvtContactConfId());
-            MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConfDetailMap.get("mktCamChlConfDetail");
-            mktCamChlConfDetailList.add(mktCamChlConfDetail);
+        if (mktCamChlConfList!=null){
+            for (MktCamChlConf mktCamChlConf : mktCamChlConfList) {
+                Map<String, Object> mktCamChlConfDetailMap = mktCamChlConfService.getMktCamChlConf(mktCamChlConf.getEvtContactConfId());
+                MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConfDetailMap.get("mktCamChlConfDetail");
+                mktCamChlConfDetailList.add(mktCamChlConfDetail);
+            }
         }
         param.setMktCamChlConfDetailList(mktCamChlConfDetailList);
 
         // 设置批次号
         param.setBatchNum(batchNum);
         //redis取规则
-//        String rule = redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId).toString();
-//        System.out.println("*************************" + rule);
-        String rule = "T0_ACT_DAYS > 30 && T0_ACT_DAYS < 80";
+        String rule = redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId).toString();
+        System.out.println("*************************" + rule);
         param.setRule(rule);
         return param;
     }
