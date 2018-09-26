@@ -16,6 +16,8 @@ public class QuestionAddVO implements Serializable {
 
     private List<QuestionDetailAddVO> questionDetailAddVOList;
 
+    private String reset;
+
     //关系表属性
     private Integer questionOrder;
 
@@ -25,6 +27,15 @@ public class QuestionAddVO implements Serializable {
 
     private Short isMust;
 
+
+
+    public String getReset() {
+        return reset;
+    }
+
+    public void setReset(String reset) {
+        this.reset = reset;
+    }
 
     public Integer getQuestionOrder() {
         return questionOrder;

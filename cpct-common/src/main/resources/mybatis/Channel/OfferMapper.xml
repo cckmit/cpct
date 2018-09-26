@@ -123,4 +123,15 @@
     </if>
   </select>
 
+  <select id="selectByCamItemId" resultMap="BaseResultMap">
+     select o.OFFER_ID, o.OFFER_TYPE, o.OFFER_SYS_TYPE, o.OFFER_NAME, o.OFFER_SYS_NAME, o.OFFER_SYS_PY_NAME,
+    o.OFFER_NBR, o.EXT_OFFER_ID, o.OFFER_DESC, o.EFF_DATE, o.MANAGE_GRADE, o.EXP_DATE, o.OFFER_PROVIDER_ID,
+    o.BRAND_ID, o.VALUE_ADDED_FLAG, o.INITIAL_CRED_VALUE, o.PRICING_PLAN_ID, o.IS_INDEPENDENT,
+    o.REMARK, o.MANAGE_REGION_ID, o.STATUS_CD, o.CREATE_STAFF, o.UPDATE_STAFF, o.CREATE_DATE, o.STATUS_DATE,
+    o.UPDATE_DATE
+    from offer o , mkt_cam_item t
+	where t.ITEM_ID = o.OFFER_ID
+	and t.MKT_CAM_ITEM_ID =  #{mktCamItemId, jdbcType=BIGINT}
+  </select>
+
 </mapper>

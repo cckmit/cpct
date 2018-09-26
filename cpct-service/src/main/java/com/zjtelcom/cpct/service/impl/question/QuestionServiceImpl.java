@@ -1,15 +1,22 @@
 package com.zjtelcom.cpct.service.impl.question;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
+import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.question.MktQstQuestRelMapper;
 import com.zjtelcom.cpct.dao.question.MktQuestionDetailMapper;
 import com.zjtelcom.cpct.dao.question.MktQuestionMapper;
+import com.zjtelcom.cpct.dao.question.MktQuestionnaireMapper;
+import com.zjtelcom.cpct.domain.question.QuestRel;
 import com.zjtelcom.cpct.domain.question.Question;
 import com.zjtelcom.cpct.domain.question.QuestionDetail;
-import com.zjtelcom.cpct.dto.question.QuestionAddVO;
-import com.zjtelcom.cpct.dto.question.QuestionDetailAddVO;
-import com.zjtelcom.cpct.dto.question.QuestionEditVO;
+import com.zjtelcom.cpct.domain.question.Questionnaire;
+import com.zjtelcom.cpct.dto.question.*;
 import com.zjtelcom.cpct.service.question.QuestionService;
 import com.zjtelcom.cpct.util.BeanUtil;
+import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang.StringUtils;
@@ -17,10 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -34,12 +38,78 @@ public class QuestionServiceImpl implements QuestionService {
     private MktQuestionMapper questionMapper;
     @Autowired
     private MktQuestionDetailMapper questionDetailMapper;
+    @Autowired
+    private MktQuestionnaireMapper questionnaireMapper;
+    @Autowired
+    private MktQstQuestRelMapper questRelMapper;
 
 
+
+    /**
+     * 获取题库问题详情
+     * @param questionId
+     * @return
+     */
     @Override
-    public Map<String, Object> listQuestion() {
-        return null;
+    public Map<String, Object> getQuestionDetail(Long questionId) {
+        Map<String,Object> result = new HashMap<>();
+        Question question = questionMapper.selectByPrimaryKey(questionId);
+        if (question==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","问题不存在");
+            return result;
+        }
+        QuestionModel vo = getQuestionModel(question);
+        result.put("resutlCode",CODE_SUCCESS);
+        result.put("resultMsg",null);
+        result.put("data",vo);
+        return result;
+
+
     }
+
+    private QuestionModel getQuestionModel(Question question) {
+        QuestionModel vo = BeanUtil.create(question,new QuestionModel());
+        vo.setAnswerTypeName(ChannelUtil.getAnswerType(question));
+        vo.setQuestionTypeName(ChannelUtil.getQuestionType(question));
+        vo.setCheckList(new ArrayList<String>());
+        vo.setQuestionOrder(question.getQuestionId().toString());
+        List<QuestionDetail> questionDetailList = questionDetailMapper.findDetailListByQuestionId(question.getQuestionId());
+        List<QuestionDetailVO> detailVOS = new ArrayList<>();
+        for (QuestionDetail detail : questionDetailList){
+            QuestionDetailVO detailVO = BeanUtil.create(detail,new QuestionDetailVO());
+            detailVO.setQstDetailOrder(Integer.valueOf(detail.getQstDetailId().toString()));
+            detailVOS.add(detailVO);
+        }
+        vo.setQuestionDetailList(detailVOS);
+        return vo;
+    }
+
+    /**
+     * 获取题库列表
+     * @return
+     */
+    @Override
+    public Map<String, Object> listQuestion(Question param, Integer page,Integer pageSize) {
+        Map<String,Object> result = new HashMap<>();
+        List<QuestionModel> voList = new ArrayList<>();
+        PageHelper.startPage(page,pageSize);
+        List<Question> questionList = questionMapper.selectByParam(param);
+        Page pageInfo = new Page(new PageInfo(questionList));
+        for (Question question : questionList){
+            if (question!=null){
+                QuestionModel vo = getQuestionModel(question);
+                voList.add(vo);
+            }
+        }
+        result.put("resutlCode",CODE_SUCCESS);
+        result.put("resultMsg",null);
+        result.put("data",voList);
+        result.put("page",pageInfo);
+        return result;
+    }
+
+
 
     /**
      * 添加问卷问题及答案
@@ -64,8 +134,6 @@ public class QuestionServiceImpl implements QuestionService {
         result.put("questionId",questionId);
         return result;
     }
-
-
 
 
     /**
@@ -128,26 +196,26 @@ public class QuestionServiceImpl implements QuestionService {
         return result;
     }
 
-//    /**
-//     * 删除问题
-//     * @param userId
-//     * @param questionId
-//     * @return
-//     */
-//    @Override
-//    public Map<String, Object> delQuestion(Long userId, Long questionId) {
-//        Map<String,Object> result = new HashMap<>();
-//        Question question = questionMapper.selectByPrimaryKey(questionId);
-//        if (question==null){
-//            result.put("resultCode",CODE_FAIL);
-//            result.put("resultMsg","问题不存在");
-//            return result;
-//        }
-//        questionMapper.deleteByPrimaryKey(questionId);
-//        result.put("resultCode", CommonConstant.CODE_SUCCESS);
-//        result.put("resultMsg","删除成功");
-//        return result;
-//    }
+    /**
+     * 删除问题
+     * @param userId
+     * @param questionId
+     * @return
+     */
+    @Override
+    public Map<String, Object> delQuestion(Long userId, Long questionId) {
+        Map<String,Object> result = new HashMap<>();
+        Question question = questionMapper.selectByPrimaryKey(questionId);
+        if (question==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","问题不存在");
+            return result;
+        }
+        questionMapper.deleteByPrimaryKey(questionId);
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
+        result.put("resultMsg","删除成功");
+        return result;
+    }
 //
 //
 //    //弃用

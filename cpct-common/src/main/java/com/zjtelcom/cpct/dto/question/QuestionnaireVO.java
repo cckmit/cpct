@@ -9,12 +9,42 @@ public class QuestionnaireVO implements Serializable {
 
     private String naireType;//1000	营销问卷;2000	维挽问卷
 
+    private String naireTypeName;
+
     private String markType;
 
     private Integer nairePoints;
 
     private String naireDesc;
 
+    private String status;
+
+    private String statusSt;
+
+
+    public String getStatusSt() {
+        return statusSt;
+    }
+
+    public void setStatusSt(String statusSt) {
+        this.statusSt = statusSt;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getNaireTypeName() {
+        return naireTypeName;
+    }
+
+    public void setNaireTypeName(String naireTypeName) {
+        this.naireTypeName = naireTypeName;
+    }
 
     public Long getNaireId() {
         return naireId;

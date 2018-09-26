@@ -24,7 +24,7 @@ import com.zjtelcom.cpct.strategyengine.Combination;
 import freemarker.template.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.io.FileUtils;
+//import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.aspectj.weaver.patterns.ThisOrTargetAnnotationPointcut;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -425,7 +425,8 @@ public final class SqlUtil {
             // 获取ftl文件
             Resource resource = resolver.getResource("classpath:config/trycalc.ftl");
             try {
-                String ftl = FileUtils.readFileToString(resource.getFile(), "UTF-8");
+//                String ftl = FileUtils.readFileToString(resource.getFile(), "UTF-8");
+                String ftl = "";
                 // 创建模板对象
                 template = new Template(ftl, new StringReader(ftl), config);
 
