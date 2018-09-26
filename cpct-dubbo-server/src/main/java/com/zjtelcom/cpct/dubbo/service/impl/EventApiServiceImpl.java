@@ -103,7 +103,8 @@ public class EventApiServiceImpl implements EventApiService {
     @Autowired(required = false)
     private ContactEvtItemMapper contactEvtItemMapper;  // 事件采集项
 
-
+    @Autowired(required = false)
+    private DisplayColumnLabelMapper displayColumnLabelMapper; // 展示列
 
     @Override
     @SuppressWarnings("unchecked")
