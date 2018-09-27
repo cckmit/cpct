@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct_prd.dao.campaign.MktCpcAlgorithmsRulPrdMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.campaign.MktCpcAlgorithmsRulDO">
+    <id column="ALGORITHMS_RUL_ID" jdbcType="BIGINT" property="algorithmsRulId" />
+    <result column="ALGORITHMS_RUL_NAME" jdbcType="VARCHAR" property="algorithmsRulName" />
+    <result column="RULE_DESC" jdbcType="VARCHAR" property="ruleDesc" />
+    <result column="RULE_EXPRESSION" jdbcType="VARCHAR" property="ruleExpression" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from mkt_cpc_algorithms_rul
+    where ALGORITHMS_RUL_ID = #{algorithmsRulId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" useGeneratedKeys="true" keyProperty="algorithmsRulId" parameterType="com.zjtelcom.cpct.domain.campaign.MktCpcAlgorithmsRulDO">
+    insert into mkt_cpc_algorithms_rul (ALGORITHMS_RUL_ID, ALGORITHMS_RUL_NAME, 
+      RULE_DESC, RULE_EXPRESSION, STATUS_CD, 
+      CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
+      UPDATE_DATE, STATUS_DATE, REMARK
+      )
+    values (#{algorithmsRulId,jdbcType=BIGINT}, #{algorithmsRulName,jdbcType=VARCHAR}, 
+      #{ruleDesc,jdbcType=VARCHAR}, #{ruleExpression,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR}, 
+      #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktCpcAlgorithmsRulDO">
+    update mkt_cpc_algorithms_rul
+    set ALGORITHMS_RUL_NAME = #{algorithmsRulName,jdbcType=VARCHAR},
+      RULE_DESC = #{ruleDesc,jdbcType=VARCHAR},
+      RULE_EXPRESSION = #{ruleExpression,jdbcType=VARCHAR},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where ALGORITHMS_RUL_ID = #{algorithmsRulId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select ALGORITHMS_RUL_ID, ALGORITHMS_RUL_NAME, RULE_DESC, RULE_EXPRESSION, STATUS_CD, 
+    CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, UPDATE_DATE, STATUS_DATE, REMARK
+    from mkt_cpc_algorithms_rul
+    where ALGORITHMS_RUL_ID = #{algorithmsRulId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select ALGORITHMS_RUL_ID, ALGORITHMS_RUL_NAME, RULE_DESC, RULE_EXPRESSION, STATUS_CD, 
+    CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, UPDATE_DATE, STATUS_DATE, REMARK
+    from mkt_cpc_algorithms_rul
+  </select>
+</mapper>

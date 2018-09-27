@@ -119,9 +119,9 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
                 }
             }
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
-            mktCamChlConfMap.put("mktCamChlResultId", mktCamChlResultId);
+            mktCamChlConfMap.put("mktCamChlResultDO", mktCamChlResultDO);
         } catch (Exception e) {
-            logger.error("[op:MktCamChlResultServiceImpl] failed to save mktCamChlResult = {}", mktCamChlResult);
+            logger.error("[op:MktCamChlResultServiceImpl] failed to save mktCamChlResult = {}, Expertion:", mktCamChlResult, e);
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_FAIL);
             mktCamChlConfMap.put("resultMsg", ErrorCode.SAVE_MKT_CAM_CHL_CONF_FAILURE.getErrorMsg());
             mktCamChlConfMap.put("mktCamChlResultDO", mktCamChlResultDO);

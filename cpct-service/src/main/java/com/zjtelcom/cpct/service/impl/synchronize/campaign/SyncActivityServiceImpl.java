@@ -51,7 +51,7 @@ public class SyncActivityServiceImpl implements SyncActivityService {
     private MktVerbalMapper mktVerbalMapper;
 
     @Override
-    public ResponseHeaderModel SyncActivity(Long mktCampaignId) {
+    public ResponseHeaderModel SyncActivity(Long mktCampaignId, String roleName) {
         // 获取活动基本信息
         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
         ActivityModel activityModel = new ActivityModel();
@@ -121,7 +121,7 @@ public class SyncActivityServiceImpl implements SyncActivityService {
         activityModel.setPolicyList(policyList);
         ResponseHeaderModel responseHeaderModel = new ResponseHeaderModel();
         responseHeaderModel.setResultCode("0");
-        responseHeaderModel.setResultMessage("success");
+        responseHeaderModel.setResultMessage("同步成功！");
         return responseHeaderModel;
     }
 }

@@ -29,7 +29,7 @@ public interface MktCampaignService {
 
     int modMktCampaign(MktCampaignDetail mktCampaignDetail) throws Exception;*/
 
-    Map<String,Object> qryMktCampaignListPage (String mktCampaignName, String statusCd, String tiggerType, String mktCampaignType, Integer page, Integer pageSize);
+    Map<String,Object> qryMktCampaignListPage (Map<String, Object> params);
 
     Map<String,Object> getCampaignList (String mktCampaignName,String mktCampaignType,Long eventId);
 
