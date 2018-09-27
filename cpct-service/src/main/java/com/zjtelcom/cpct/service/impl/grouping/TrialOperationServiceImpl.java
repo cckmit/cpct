@@ -316,6 +316,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         List<Label> labelList = labelMapper.selectAll();
         for (String key : hitsList.keySet()){
             Map<String,Object> searchMap = (Map<String, Object>)((Map<String, Object>)hitsList.get(key)).get("searchHitMap");
+            TrialOperationParam ruleInfoMap = new TrialOperationParam();
+            if (((Map<String, Object>)hitsList.get(key)).get("ruleInfo")!=null){
+                ruleInfoMap = (TrialOperationParam)((Map<String, Object>)hitsList.get(key)).get("ruleInfo");
+            }
             for (String set : searchMap.keySet()){
                 if (labelCodeList.size() < searchMap.keySet().size() ){
                     labelCodeList.add(set);
@@ -333,6 +337,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 map.put("strategyId",operation.getStrategyId());
                 map.put("strategyName",operation.getStrategyName());
                 map.put("batchNum",operation.getBatchNum());
+                map.put("ruleId",ruleInfoMap.getRuleId()==null ? "" : ruleInfoMap.getRuleId());
+                map.put("ruleName",ruleInfoMap.getRuleName()==null ? "" : ruleInfoMap.getRuleName());
                 userList.add(map);
             }
         }
