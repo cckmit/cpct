@@ -128,14 +128,8 @@ public class CampaignController extends BaseController {
      */
     @RequestMapping(value = "/listCampaignPage", method = RequestMethod.POST)
     @CrossOrigin
-    public String qryMktCampaignList(@RequestBody Map<String, String> params) throws Exception {
-        String mktCampaignName = params.get("mktCampaignName");  // 活动名称
-        String statusCd = params.get("statusCd");               // 活动状态
-        String tiggerType = params.get("tiggerType");           // 活动触发类型
-        String mktCampaignType = params.get("mktCampaignType"); // 活动
-        Integer page = Integer.parseInt(params.get("page"));    // 页码
-        Integer pageSize = Integer.parseInt(params.get("pageSize")); // 条数
-        Map<String, Object> map = mktCampaignService.qryMktCampaignListPage(mktCampaignName, statusCd, tiggerType, mktCampaignType, page, pageSize);
+    public String qryMktCampaignList(@RequestBody Map<String, Object> params) throws Exception {
+        Map<String, Object> map = mktCampaignService.qryMktCampaignListPage(params);
         return JSON.toJSONString(map);
     }
 

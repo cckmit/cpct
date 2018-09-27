@@ -8,8 +8,7 @@ public interface EventApiService {
 
     Map<String, Object> CalculateCPC(Map<String, String> map);
 
-//    Map<String, Object> CalculateCPC(Map<String, Object> map) throws Exception;
+    Map<String, Object> SecondChannelSynergy(Map<String, String> map);
 
-//    void cpc();
 
 }

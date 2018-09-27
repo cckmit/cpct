@@ -144,7 +144,7 @@
             AND MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR}
         </if>
         <if test="map.mktCampaignCategory != null and map.mktCampaignCategory != ''">
-            AND mktCampaignCategory = #{mktCampaignCategory,jdbcType=VARCHAR}
+            AND MKT_CAMPAIGN_CATEGORY = #{mktCampaignCategory,jdbcType=VARCHAR}
         </if>
         <if test="map.activityNbr != null and map.activityNbr != ''">
             AND MKT_ACTIVITY_NBR like CONCAT('%',#{map.activityNbr,jdbcType=VARCHAR},'%')
@@ -190,10 +190,16 @@
             AND t.TIGGER_TYPE = #{tiggerType,jdbcType=VARCHAR}
         </if>
         <if test="mktCampaignCategory != null and mktCampaignCategory != ''">
-            AND mktCampaignCategory = #{mktCampaignCategory,jdbcType=VARCHAR}
+            AND t.MKT_CAMPAIGN_CATEGORY = #{mktCampaignCategory,jdbcType=VARCHAR}
         </if>
         <if test="mktCampaignType != null and mktCampaignType != ''">
             AND t.MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR}
+        </if>
+        <if test="lanId != null and lanId != ''">
+            AND t.LAN_ID = #{lanId,jdbcType=BIGINT}
+        </if>
+        <if test="createChannel != null and createChannel != ''">
+            AND t.CREATE_CHANNEL = #{createChannel,jdbcType=VARCHAR}
         </if>
         order by t.UPDATE_DATE desc
     </select>

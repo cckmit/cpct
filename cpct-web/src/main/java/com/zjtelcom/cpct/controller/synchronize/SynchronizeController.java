@@ -1,12 +1,10 @@
 package com.zjtelcom.cpct.controller.synchronize;
 
 import com.alibaba.fastjson.JSON;
-import com.zjhcsoft.eagle.main.dubbo.model.policy.ResponseHeaderModel;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.service.synchronize.*;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynMktCampaignRelService;
-import com.zjtelcom.cpct.service.synchronize.campaign.SyncActivityService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.service.synchronize.channel.SynChannelService;
 import com.zjtelcom.cpct.service.synchronize.filter.SynFilterRuleService;
@@ -72,22 +70,16 @@ public class SynchronizeController extends BaseController {
     @Autowired
     private SynchronizeCampaignService synchronizeCampaignService;
 
-    @Autowired
-    private SyncActivityService syncActivityService;
-
 
     /**
      * 单个事件同步
-     *
-     * @param eventId 事件主键id
      * @return
      */
     @PostMapping("singleEvent")
     @CrossOrigin
-    public String singleEvent(@RequestParam(value = "eventId", required = true) Long eventId) {
-        logger.info("同步事件");
-        //   权限控制
+    public String singleEvent(@RequestBody Map<String, Object> params) {
         String roleName = getRole();   //  操作角色
+        Long eventId = Long.valueOf((Integer) params.get("eventId"));
         Map<String, Object> map = new HashMap<>();
         try {
             map = synContactEvtService.synchronizeSingleEvent(eventId, roleName);
@@ -102,15 +94,11 @@ public class SynchronizeController extends BaseController {
 
     /**
      * 批量事件同步
-     *
-     * 全量事件同步
      * @return
      */
     @RequestMapping("batchEvent")
     @CrossOrigin
     public String batchEvent(){
-        //角色权限控制
-        logger.info("全量事件同步");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -126,14 +114,13 @@ public class SynchronizeController extends BaseController {
 
     /**
      * 单个事件目录同步
-     * @param eventTypeId  事件目录主键id
      * @return
      */
     @PostMapping("singleEventType")
     @CrossOrigin
-    public String singleEventType(@RequestParam(value = "eventTypeId", required = true) Long eventTypeId){
-        logger.info("同步事件目录");
+    public String singleEventType(@RequestBody Map<String, Object> params){
         String roleName=getRole();   //  操作角色
+        Long eventTypeId = Long.valueOf((Integer) params.get("eventTypeId"));
         Map<String, Object> map=new HashMap<>();
         try{
             map = synContactEvtTypeService.synchronizeSingleEventType(eventTypeId,roleName);
@@ -153,8 +140,6 @@ public class SynchronizeController extends BaseController {
     @RequestMapping("batchEventType")
     @CrossOrigin
     public String batchEventType(){
-        //角色权限控制
-        logger.info("全量同步事件目录");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -170,14 +155,13 @@ public class SynchronizeController extends BaseController {
 
     /**
      * 单个事件源同步
-     * @param eventSourceId  事件源主键id
      * @return
      */
     @PostMapping("singleEventSource")
     @CrossOrigin
-    public String singleEventSource(@RequestParam(value = "eventSourceId", required = true) Long eventSourceId){
-        logger.info("同步事件源");
+    public String singleEventSource(@RequestBody Map<String, Object> params){
         String roleName=getRole();   //  操作角色
+        Long eventSourceId = Long.valueOf((Integer) params.get("eventSourceId"));
         //得到事件对象
         Map<String, Object> map=new HashMap<>();
         try{
@@ -199,8 +183,6 @@ public class SynchronizeController extends BaseController {
     @RequestMapping("batchEventSource")
     @CrossOrigin
     public String batchEventSource(){
-        //角色权限控制
-        logger.info("全量同步事件源");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -216,14 +198,13 @@ public class SynchronizeController extends BaseController {
 
     /**
      * 单个事件源接口同步
-     * @param eventInterfaceId  事件源接口主键id
      * @return
      */
     @PostMapping("singleEventInterface")
     @CrossOrigin
-    public String singleEventInterface(@RequestParam(value = "eventInterfaceId", required = true) Long eventInterfaceId){
-        logger.info("同步事件源接口");
+    public String singleEventInterface(@RequestBody Map<String, Object> params){
         String roleName=getRole();   //  操作角色
+        Long eventInterfaceId = Long.valueOf((Integer) params.get("eventInterfaceId"));
         Map<String, Object> map=new HashMap<>();
         try{
             map = synInterfaceCfgService.synchronizeSingleEventInterface(eventInterfaceId,roleName);
@@ -244,8 +225,6 @@ public class SynchronizeController extends BaseController {
     @RequestMapping("batchEventInterface")
     @CrossOrigin
     public String batchEventInterface(){
-        //角色权限控制
-        logger.info("全量同步事件源接口");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -261,14 +240,13 @@ public class SynchronizeController extends BaseController {
 
     /**
      * 单个事件场景同步
-     * @param eventSceneId
      * @return
      */
     @PostMapping("singleEventScene")
     @CrossOrigin
-    public String singleEventScene(@RequestParam(value = "eventSceneId", required = true) Long eventSceneId){
-        logger.info("同步事件场景");
+    public String singleEventScene(@RequestBody Map<String, Object> params){
         String roleName=getRole();   //  操作角色
+        Long eventSceneId = Long.valueOf((Integer) params.get("eventSceneId"));
         Map<String, Object> map=new HashMap<>();
         try{
             map = synEventSceneService.synchronizeSingleEventScene(eventSceneId,roleName);
@@ -288,8 +266,6 @@ public class SynchronizeController extends BaseController {
     @RequestMapping("batchEventScene")
     @CrossOrigin
     public String batchEventScene(){
-        //角色权限控制
-        logger.info("全量同步事件场景");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -305,14 +281,13 @@ public class SynchronizeController extends BaseController {
 
     /**
      * 单个事件场景目录同步
-     * @param eventSceneTypeId  事件场景目录主键
      * @return
      */
     @PostMapping("singleEventSceneType")
     @CrossOrigin
-    public String singleEventSceneType(@RequestParam(value = "eventSceneTypeId", required = true) Long eventSceneTypeId){
-        logger.info("同步事件场景目录");
+    public String singleEventSceneType(@RequestBody Map<String, Object> params){
         String roleName=getRole();   //  操作角色
+        Long eventSceneTypeId = Long.valueOf((Integer) params.get("eventSceneTypeId"));
         Map<String, Object> map=new HashMap<>();
         try{
             map = synEventSceneTypeService.synchronizeSingleEventSceneType(eventSceneTypeId,roleName);
@@ -332,8 +307,6 @@ public class SynchronizeController extends BaseController {
     @RequestMapping("batchEventSceneType")
     @CrossOrigin
     public String batchEventSceneType(){
-        //角色权限控制
-        logger.info("全量同步事件场景目录");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -349,14 +322,13 @@ public class SynchronizeController extends BaseController {
 
     /**
      * 单个渠道同步
-     * @param channelId  渠道id
      * @return
      */
     @PostMapping("singleContactChannel")
     @CrossOrigin
-    public String singleContactChannel(@RequestParam(value = "channelId", required = true) Long channelId){
-        logger.info("同步渠道");
+    public String singleContactChannel(@RequestBody Map<String, Object> params){
         String roleName=getRole();   //  操作角色
+        Long channelId = Long.valueOf((Integer) params.get("channelId"));
         Map<String, Object> map=new HashMap<>();
         try{
             map = synChannelService.synchronizeSingleChannel(channelId,roleName);
@@ -376,8 +348,6 @@ public class SynchronizeController extends BaseController {
     @RequestMapping("batchContactChannel")
     @CrossOrigin
     public String batchContactChannel(){
-        //角色权限控制
-        logger.info("全量同步渠道");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -393,14 +363,13 @@ public class SynchronizeController extends BaseController {
 
     /**
      * 单个接触脚本同步
-     * @param scriptId
      * @return
      */
     @PostMapping("singleContactScript")
     @CrossOrigin
-    public String singleScript(@RequestParam(value = "scriptId", required = true) Long scriptId){
-        logger.info("同步接触脚本");
+    public String singleScript(@RequestBody Map<String, Object> params){
         String roleName=getRole();   //  操作角色
+        Long scriptId = Long.valueOf((Integer) params.get("scriptId"));
         Map<String, Object> map=new HashMap<>();
         try{
             map = synScriptService.synchronizeScript(scriptId,roleName);
@@ -420,8 +389,6 @@ public class SynchronizeController extends BaseController {
     @RequestMapping("batchContactScript")
     @CrossOrigin
     public String batchContactScript(){
-        //角色权限控制
-        logger.info("全量同步接触脚本");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -437,14 +404,13 @@ public class SynchronizeController extends BaseController {
 
     /**
      * 同步单个用户
-     * @param staffId
      * @return
      */
     @PostMapping("singleStaff")
     @CrossOrigin
-    public String singleStaff(@RequestParam(value = "staffId", required = true) Long staffId){
-        logger.info("同步单个用户");
+    public String singleStaff(@RequestBody Map<String, Object> params){
         String roleName=getRole();   //  操作角色
+        Long staffId = Long.valueOf((Integer) params.get("staffId"));
         Map<String, Object> map=new HashMap<>();
         try{
             map = synSysStaffService.synchronizeSingleStaff(staffId,roleName);
@@ -464,8 +430,6 @@ public class SynchronizeController extends BaseController {
     @RequestMapping("batchStaff")
     @CrossOrigin
     public String batchStaff(){
-        //角色权限控制
-        logger.info("全量同步用户信息");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -483,14 +447,13 @@ public class SynchronizeController extends BaseController {
 
     /**
      * 同步单个角色信息
-     * @param roleId
      * @return
      */
     @RequestMapping("singleRole")
     @CrossOrigin
-    public String singleRole(@RequestParam(value = "roleId", required = true) Long roleId){
-        logger.info("同步单个角色信息");
+    public String singleRole(@RequestBody Map<String, Object> params){
         String roleName=getRole();   //  操作角色
+        Long roleId = Long.valueOf((Integer) params.get("roleId"));
         Map<String, Object> map=new HashMap<>();
         try{
             map = synSysRoleService.synchronizeSingleRole(roleId,roleName);
@@ -510,8 +473,6 @@ public class SynchronizeController extends BaseController {
     @RequestMapping("batchRole")
     @CrossOrigin
     public String batchRole(){
-        //角色权限控制
-        logger.info("全量同步角色信息");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -529,14 +490,13 @@ public class SynchronizeController extends BaseController {
 
     /**
      * 同步单个菜单信息
-     * @param menuId
      * @return
      */
     @PostMapping("singleMenu")
     @CrossOrigin
-    public String singleMenu(@RequestParam(value = "menuId", required = true) Long menuId){
-        logger.info("同步单个菜单信息");
+    public String singleMenu(@RequestBody Map<String, Object> params){
         String roleName=getRole();   //  操作角色
+        Long menuId = Long.valueOf((Integer) params.get("menuId"));
         Map<String, Object> map=new HashMap<>();
         try{
             map = synSysMenuService.synchronizeSingleMenu(menuId,roleName);
@@ -556,8 +516,6 @@ public class SynchronizeController extends BaseController {
     @RequestMapping("batchMenu")
     @CrossOrigin
     public String batchMenu(){
-        //角色权限控制
-        logger.info("全量同步菜单信息");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -575,14 +533,13 @@ public class SynchronizeController extends BaseController {
 
     /**
      * 同步单个静态参数
-     * @param paramId
      * @return
      */
     @PostMapping("singleParams")
     @CrossOrigin
-    public String singleParams(@RequestParam(value = "paramId", required = true) Long paramId){
-        logger.info("同步单个静态参数");
+    public String singleParams(@RequestBody Map<String, Object> params){
         String roleName=getRole();   //  操作角色
+        Long paramId = Long.valueOf((Integer) params.get("paramId"));
         Map<String, Object> map=new HashMap<>();
         try{
             map = synSysParamsService.synchronizeSingleParam(paramId,roleName);
@@ -602,8 +559,6 @@ public class SynchronizeController extends BaseController {
     @RequestMapping("batchParams")
     @CrossOrigin
     public String batchParams(){
-        //角色权限控制
-        logger.info("全量同步静态参数");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -621,14 +576,13 @@ public class SynchronizeController extends BaseController {
 
     /**
      * 同步单个过滤规则
-     * @param ruleId
      * @return
      */
     @PostMapping("singleFilterRule")
     @CrossOrigin
-    public String singleFilterRule(@RequestParam(value = "ruleId", required = true) Long ruleId){
-        logger.info("同步单个过滤规则");
+    public String singleFilterRule(@RequestBody Map<String, Object> params){
         String roleName=getRole();   //  操作角色
+        Long ruleId = Long.valueOf((Integer) params.get("ruleId"));
         Map<String, Object> map=new HashMap<>();
         try{
             map = synFilterRuleService.synchronizeSingleFilterRule(ruleId,roleName);
@@ -648,8 +602,6 @@ public class SynchronizeController extends BaseController {
     @RequestMapping("batchFilterRule")
     @CrossOrigin
     public String batchFilterRule(){
-        //角色权限控制
-        logger.info("全量同步过滤规则");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -667,14 +619,13 @@ public class SynchronizeController extends BaseController {
 
     /**
      * 同步单个试运算标签展示列
-     * @param labelId
      * @return
      */
     @PostMapping("singleMessageLabel")
     @CrossOrigin
-    public String singleMessageLabel(@RequestParam(value = "labelId", required = true) Long labelId){
-        logger.info("同步单个试运算标签展示列");
+    public String singleMessageLabel(@RequestBody Map<String, Object> params){
         String roleName=getRole();   //  操作角色
+        Long labelId = Long.valueOf((Integer) params.get("labelId"));
         Map<String, Object> map=new HashMap<>();
         try{
             map = synMessageLabelService.synchronizeSingleMessageLabel(labelId,roleName);
@@ -694,8 +645,6 @@ public class SynchronizeController extends BaseController {
     @RequestMapping("batchMessageLabel")
     @CrossOrigin
     public String batchMessageLabel(){
-        //角色权限控制
-        logger.info("全量同步试运算标签展示列");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -713,14 +662,13 @@ public class SynchronizeController extends BaseController {
 
     /**
      * 同步单个分群模板
-     * @param templateId
      * @return
      */
     @PostMapping("singleTemplate")
     @CrossOrigin
-    public String singleTemplate(@RequestParam(value = "templateId", required = true) Long templateId){
-        logger.info("同步单个分群模板");
+    public String singleTemplate(@RequestBody Map<String, Object> params){
         String roleName=getRole();   //  操作角色
+        Long templateId = Long.valueOf((Integer) params.get("templateId"));
         Map<String, Object> map=new HashMap<>();
         try{
             map = synTarGrpTemplateService.synchronizeSingleTemplate(templateId,roleName);
@@ -740,8 +688,6 @@ public class SynchronizeController extends BaseController {
     @RequestMapping("batchTemplate")
     @CrossOrigin
     public String batchTemplate(){
-        //角色权限控制
-        logger.info("全量同步分群模板");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -758,14 +704,13 @@ public class SynchronizeController extends BaseController {
 
     /**
      * 同步单个营销维挽活动
-     * @param campaignRelId
      * @return
      */
     @PostMapping("singleCampaignRel")
     @CrossOrigin
-    public String singleCampaignRel(@RequestParam(value = "campaignRelId", required = true) Long campaignRelId){
-        logger.info("同步单个营销维挽活动");
+    public String singleCampaignRel(@RequestBody Map<String, Object> params){
         String roleName=getRole();   //  操作角色
+        Long campaignRelId = Long.valueOf((Integer) params.get("campaignRelId"));
         Map<String, Object> map=new HashMap<>();
         try{
             map = synMktCampaignRelService.synchronizeSingleCampaignRel(campaignRelId,roleName);
@@ -777,27 +722,6 @@ public class SynchronizeController extends BaseController {
         return JSON.toJSONString(map);
     }
 
-    /**
-     * 同步活动到大数据
-     * @param mktCampaignId
-     * @return
-     */
-    @PostMapping("/syncActivity")
-    @CrossOrigin
-    public String SyncActivity(@RequestParam(value = "mktCampaignId", required = true) Long mktCampaignId){
-        logger.info("同步单个营销维挽活动");
-        String roleName=getRole();   //  操作角色
-        ResponseHeaderModel responseHeaderModel = new ResponseHeaderModel();
-        try{
-            responseHeaderModel = syncActivityService.SyncActivity(mktCampaignId);
-        } catch (Exception e) {
-            responseHeaderModel.setResultMessage("1");
-            responseHeaderModel.setResultMessage ("failed");
-            logger.error("同步活动到大数据失败！Exception: ", mktCampaignId, e);
-        }
-        return JSON.toJSONString(responseHeaderModel);
-    }
-
 
     /**
      * 全量同步营销维挽活动
@@ -806,8 +730,6 @@ public class SynchronizeController extends BaseController {
     @RequestMapping("batchCampaignRel")
     @CrossOrigin
     public String batchCampaignRel(){
-        //角色权限控制
-        logger.info("全量同步营销维挽活动");
         String roleName=getRole();   //  操作角色
         Map<String, Object> map=new HashMap<>();
         try{
@@ -839,7 +761,8 @@ public class SynchronizeController extends BaseController {
     @CrossOrigin
     public String synchronizeCampaignServiceImpl(@RequestBody Map<String, Object> params) throws Exception {
         Long mktCampaignId = Long.valueOf((Integer) params.get("mktCampaignId"));
-        Map<String, Object> synchronizeCampaignMap = synchronizeCampaignService.synchronizeCampaign(mktCampaignId);
+        String roleName = getRole();   //  操作角色
+        Map<String, Object> synchronizeCampaignMap = synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
         return JSON.toJSONString(synchronizeCampaignMap);
     }
 
