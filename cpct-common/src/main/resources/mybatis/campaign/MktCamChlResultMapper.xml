@@ -24,7 +24,7 @@
     values (#{mktCamChlResultId,jdbcType=BIGINT}, #{mktCamChlResultName,jdbcType=VARCHAR}, 
       #{resultType,jdbcType=VARCHAR}, #{result,jdbcType=BIGINT}, #{reason,jdbcType=BIGINT},
       #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT},
-      #{updateDate,jdbcType=TIMESTAMP})
+      #{updateDate,jdbcType=TIMESTAMP}
       )
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamChlResultDO">
