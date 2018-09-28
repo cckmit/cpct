@@ -221,15 +221,18 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             response = restTemplate.postForObject(SEARCH_INFO_FROM_ES_URL, request, TrialResponse.class);
             if (!response.getResultCode().equals(CODE_SUCCESS)) {
                 trialOperation.setStatusCd("2000");
+                trialOperation.setUpdateDate(new Date());
                 trialOperationMapper.updateByPrimaryKey(trialOperation);
             } else {
                 trialOperation.setStatusCd("3000");
+                trialOperation.setUpdateDate(new Date());
                 trialOperationMapper.updateByPrimaryKey(trialOperation);
             }
         } catch (Exception e) {
             e.printStackTrace();
             // 抽样试算失败
             trialOperation.setStatusCd("2000");
+            trialOperation.setUpdateDate(new Date());
             trialOperationMapper.updateByPrimaryKey(trialOperation);
         }
         // 抽样试算成功
@@ -316,35 +319,32 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         List<Label> labelList = labelMapper.selectAll();
         for (String key : hitsList.keySet()){
             Map<String,Object> searchMap = (Map<String, Object>)((Map<String, Object>)hitsList.get(key)).get("searchHitMap");
-            TrialOperationParam ruleInfoMap = new TrialOperationParam();
+            Map<String,Object> ruleInfoMap = new HashMap<>();
             if (((Map<String, Object>)hitsList.get(key)).get("ruleInfo")!=null){
-                ruleInfoMap = (TrialOperationParam)((Map<String, Object>)hitsList.get(key)).get("ruleInfo");
+                ruleInfoMap = (Map<String,Object>)((Map<String, Object>)hitsList.get(key)).get("ruleInfo");
             }
+            Map<String,Object> map = new HashMap<>();
             for (String set : searchMap.keySet()){
                 if (labelCodeList.size() < searchMap.keySet().size() ){
                     labelCodeList.add(set);
                 }
-                Map<String,Object> map = new HashMap<>();
-                String setSt = "";
-                for (Label label : labelList){
-                    if (label.getInjectionLabelCode().equals(set)){
-                        setSt = label.getInjectionLabelName();
-                    }
+//                List<SimpleInfo>
+                TrialOperationDetail detail = BeanUtil.create(operation,new TrialOperationDetail());
+                if (ruleInfoMap.get("ruleId")==null){
+                    detail.setRuleId((Long) ruleInfoMap.get("ruleId"));
                 }
-                map.put(setSt,searchMap.get(set));
-                map.put("campaignId",operation.getCampaignId());
-                map.put("campaignName",operation.getCampaignName());
-                map.put("strategyId",operation.getStrategyId());
-                map.put("strategyName",operation.getStrategyName());
-                map.put("batchNum",operation.getBatchNum());
-                map.put("ruleId",ruleInfoMap.getRuleId()==null ? "" : ruleInfoMap.getRuleId());
-                map.put("ruleName",ruleInfoMap.getRuleName()==null ? "" : ruleInfoMap.getRuleName());
+                if (ruleInfoMap.get("ruleName")==null){
+                    detail.setRuleName(ruleInfoMap.get("ruleName").toString());
+                }
+//                map.put(setSt,searchMap.get(set));
+                map.put("operateInfo",detail);
                 userList.add(map);
             }
         }
-        List<String> titleList = labelMapper.listLabelByCodeList(labelCodeList);
-
-        vo.setTitleList(titleList);
+        if (labelCodeList.size()>0){
+            List<String> titleList = labelMapper.listLabelByCodeList(labelCodeList);
+            vo.setTitleList(titleList);
+        }
         vo.setHitsList(userList);
 
         result.put("resultCode", CODE_SUCCESS);
