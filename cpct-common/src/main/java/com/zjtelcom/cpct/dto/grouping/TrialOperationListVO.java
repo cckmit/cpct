@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class TrialOperationListVO  implements Serializable {
 
-    private List<String> titleList;
+    private List<SimpleInfo> titleList;
 
     private List<Map<String,Object>> hitsList;
 
@@ -18,11 +18,11 @@ public class TrialOperationListVO  implements Serializable {
     //todo 分区域人数
 
 
-    public List<String> getTitleList() {
+    public List<SimpleInfo> getTitleList() {
         return titleList;
     }
 
-    public void setTitleList(List<String> titleList) {
+    public void setTitleList(List<SimpleInfo> titleList) {
         this.titleList = titleList;
     }
 

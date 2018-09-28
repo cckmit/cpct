@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.dao.channel;
 
 
 import com.zjtelcom.cpct.domain.channel.Label;
+import com.zjtelcom.cpct.dto.grouping.SimpleInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -45,7 +46,7 @@ public interface InjectionLabelMapper {
 
     List<Label> listLabelByIdList(@Param("injectionLabelIds") List<Long> injectionLabelIds);
 
-    List<String> listLabelByCodeList(@Param("codeList") List<String> codeList);
+    List<SimpleInfo> listLabelByCodeList(@Param("codeList") List<String> codeList);
 
 
 }

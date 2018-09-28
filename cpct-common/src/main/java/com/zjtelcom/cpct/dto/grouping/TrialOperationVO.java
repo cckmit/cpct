@@ -12,14 +12,48 @@ public class TrialOperationVO implements Serializable {
      * 活动标识
      */
     private Long campaignId;
+
+    /**
+     * 活动名称
+     */
+    private String campaignName;
+
+    /**
+     * 活动类型
+     */
+    private String campaignType;
     /**
      * 策略标识
      */
     private Long strategyId;
 
+    /**
+     * 策略名称
+     */
+    private String strategyName;
+    /**
+     * 批次号
+     */
+    private Long batchNum;
+
+    /**
+     * 本地网
+     */
+    private Long lanId;
+
 
     private List<TrialOperationParam> paramList;
 
+    private String[] fieldList;
+
+
+    public String[] getFieldList() {
+        return fieldList;
+    }
+
+    public void setFieldList(String[] fieldList) {
+        this.fieldList = fieldList;
+    }
 
     public Long getTrialId() {
         return trialId;
@@ -53,6 +87,44 @@ public class TrialOperationVO implements Serializable {
         this.strategyId = strategyId;
     }
 
+    public Long getBatchNum() {
+        return batchNum;
+    }
 
+    public void setBatchNum(Long batchNum) {
+        this.batchNum = batchNum;
+    }
+
+    public String getStrategyName() {
+        return strategyName;
+    }
+
+    public void setStrategyName(String strategyName) {
+        this.strategyName = strategyName;
+    }
+
+    public String getCampaignName() {
+        return campaignName;
+    }
+
+    public void setCampaignName(String campaignName) {
+        this.campaignName = campaignName;
+    }
+
+    public String getCampaignType() {
+        return campaignType;
+    }
+
+    public void setCampaignType(String campaignType) {
+        this.campaignType = campaignType;
+    }
+
+    public Long getLanId() {
+        return lanId;
+    }
+
+    public void setLanId(Long lanId) {
+        this.lanId = lanId;
+    }
 }
 

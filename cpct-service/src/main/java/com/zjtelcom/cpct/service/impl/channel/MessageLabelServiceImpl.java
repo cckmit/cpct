@@ -298,13 +298,12 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         }
         List<DisplayLabelInfo> injectionLabelIds = displayAllMessageReq.getInjectionLabelIds();
         List<DisplayLabelInfo> labelInfoList = new ArrayList<>();
-        List<DisplayColumnLabel> oldRels = displayColumnLabelMapper.findListByDisplayId(displayAllMessageReq.getDisplayColumnId());
+        List<Long> oldRels = displayColumnLabelMapper.findOldIdListByDisplayId(displayAllMessageReq.getDisplayColumnId());
+
         //校验展示列是否与标签已关联，已关联跳过
         for (DisplayLabelInfo info : injectionLabelIds){
-            for (DisplayColumnLabel oldInfo : oldRels){
-                if (oldInfo.getInjectionLabelId().equals(info.getLabelId())){
-                    continue;
-                }
+            if (oldRels.contains(info.getLabelId())){
+                continue;
             }
             labelInfoList.add(info);
         }
