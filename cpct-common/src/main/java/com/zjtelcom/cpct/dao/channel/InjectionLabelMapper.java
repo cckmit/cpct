@@ -45,5 +45,7 @@ public interface InjectionLabelMapper {
 
     List<Label> listLabelByIdList(@Param("injectionLabelIds") List<Long> injectionLabelIds);
 
+    List<String> listLabelByCodeList(@Param("codeList") List<String> codeList);
+
 
 }
