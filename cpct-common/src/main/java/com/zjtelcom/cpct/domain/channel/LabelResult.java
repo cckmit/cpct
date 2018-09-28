@@ -24,6 +24,7 @@ public class LabelResult {
      */
     private String labelName;
 
+
     /**
      * 参考值
      */

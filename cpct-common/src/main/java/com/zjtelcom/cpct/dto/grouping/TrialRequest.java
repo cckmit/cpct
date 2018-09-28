@@ -6,6 +6,7 @@ import java.util.List;
 public class TrialRequest implements Serializable {
 
     private List<TrialOperationParam> operationVOList;
+
     private String[] fieldList;
 
     public List<TrialOperationParam> getOperationVOList() {

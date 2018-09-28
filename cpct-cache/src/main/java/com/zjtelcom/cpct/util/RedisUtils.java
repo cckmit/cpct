@@ -20,6 +20,9 @@ public class RedisUtils {
     @Autowired
     private RedisTemplate redisTemplate;
 
+//    @Autowired
+//    private HashOperations<String,String,Object> hashOperations;
+
     /**
      * 写入缓存
      *
@@ -223,6 +226,17 @@ public class RedisUtils {
         ZSetOperations<String, Object> zset = redisTemplate.opsForZSet();
         return zset.rangeByScore(key, scoure, scoure1);
     }
+//
+//    /**
+//     * 查询该key下所有值
+//     *
+//     * @param key 查询的key
+//     * @return Map<HK, HV>
+//     */
+//    public Object hget(String key) {
+//        return hashOperations.entries(key);
+//    }
+
 
     /**
      * 通过表达式匹配获取所有key

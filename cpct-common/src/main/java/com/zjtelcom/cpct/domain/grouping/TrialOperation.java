@@ -28,9 +28,12 @@ public class TrialOperation extends BaseEntity {
      */
     private Long batchNum;
 
+
+
     /**
      * 状态  1000 试算中；2000 试算异常；3000 试算成功
      */
+
 
     public Long getId() {
         return id;

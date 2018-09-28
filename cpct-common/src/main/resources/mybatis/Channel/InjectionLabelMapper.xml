@@ -239,6 +239,21 @@
     where CATALOG_ID = #{catalogId}
   </select>
 
+  <select id="listLabelByCodeList" parameterType="java.util.List" resultType="com.zjtelcom.cpct.dto.grouping.SimpleInfo">
+    select INJECTION_LABEL_NAME as name,INJECTION_LABEL_CODE as value
+    from injection_label
+    <where>
+      <if test="null != codeList and codeList.size > 0">
+        INJECTION_LABEL_CODE  in
+        <foreach collection="codeList" item="item" open="(" close=")" separator=",">
+          #{item}
+        </foreach>
+      </if>
+    </where>
+
+  </select>
+
+
 
 
 </mapper>

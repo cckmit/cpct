@@ -27,5 +27,7 @@ public interface DisplayColumnLabelMapper {
 
     List<DisplayColumnLabel> findListByDisplayId(@Param("displayId")Long displayId);
 
+    List<Long> findOldIdListByDisplayId(@Param("displayId")Long displayId);
+
     int updateByPrimaryKey(DisplayColumnLabel record);
 }

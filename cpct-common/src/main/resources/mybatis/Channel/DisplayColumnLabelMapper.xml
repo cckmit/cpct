@@ -71,5 +71,14 @@
   </select>
 
 
+  <select id="findOldIdListByDisplayId" resultType="java.lang.Long">
+    select INJECTION_LABEL_ID
+    from display_column_label
+    where  DISPLAY_ID = #{displayId}
+  </select>
+
+
+
+
 
 </mapper>
