@@ -19,7 +19,6 @@ import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.City;
 import com.zjtelcom.cpct.domain.campaign.CityProperty;
-import com.zjtelcom.cpct.domain.campaign.MktCamChlResultDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamStrategyConfRelDO;
 import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.channel.Label;
@@ -484,8 +483,9 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                     List<MktCamChlResult> mktCamChlResultList = new ArrayList<>();
                     for (int i = 0; i < mktCamChlResultIds.length; i++) {
                         if (mktCamChlResultIds[i] != null && !"".equals(mktCamChlResultIds[i])) {
-                            MktCamChlResultDO mktCamChlResultDO = mktCamChlResultMapper.selectByPrimaryKey(Long.valueOf(mktCamChlResultIds[i]));
-                            MktCamChlResult mktCamChlResult = BeanUtil.create(mktCamChlResultDO, new MktCamChlResult());
+                            MktCamChlResult mktCamChlResult = new MktCamChlResult();
+                            mktCamChlResultMapper.selectByPrimaryKey(Long.valueOf(mktCamChlResultIds[i]));
+
                             mktCamChlResult.setMktCamChlResultId(Long.valueOf(mktCamChlResultIds[i]));
                             mktCamChlResultList.add(mktCamChlResult);
                         }
