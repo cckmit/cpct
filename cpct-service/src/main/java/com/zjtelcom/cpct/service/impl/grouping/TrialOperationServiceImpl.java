@@ -189,8 +189,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         Map<String, Object> result = new HashMap<>();
         TrialOperation trialOperation = trialOperationMapper.selectByPrimaryKey(operationVO.getTrialId());
         MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(operationVO.getCampaignId());
-        MktStrategyConfDO strategy = strategyMapper.selectByPrimaryKey(operationVO.getStrategyId());
-        if (campaign == null || strategy == null) {
+        if (campaign == null) {
             result.put("resultCode", CODE_FAIL);
             result.put("resultMsg", "活动策略信息有误");
             return result;
@@ -205,7 +204,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             fieldList[i] = labelDTOList.get(i).getLabelCode();
         }
 
-        TrialRequest request = new TrialRequest();
+        TrialOperationVO request = BeanUtil.create(operationVO,new TrialOperationVO());
         request.setFieldList(fieldList);
         List<TrialOperationParam> paramList = new ArrayList<>();
         List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(operationVO.getStrategyId());
@@ -213,7 +212,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             TrialOperationParam param = getTrialOperationParam(operationVO, trialOperation.getBatchNum(), ruleRelDO.getMktStrategyConfRuleId());
             paramList.add(param);
         }
-        request.setOperationVOList(paramList);
+        request.setParamList(paramList);
         TrialResponse response = new TrialResponse();
 
         try {
