@@ -38,7 +38,6 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
-            <version>${druid.version}</version>
         </dependency>
 
         <dependency>
@@ -53,9 +52,19 @@
             <artifactId>spring-boot-starter-jta-atomikos</artifactId>
         </dependency>
 
+        <!--<dependency>-->
+            <!--<groupId>com.alibaba</groupId>-->
+            <!--<artifactId>dubbo</artifactId>-->
+        <!--</dependency>-->
+
         <dependency>
-            <groupId>com.alibaba</groupId>
+            <groupId>com.zjhcsoft</groupId>
             <artifactId>dubbo</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javassist</groupId>
+            <artifactId>javassist</artifactId>
         </dependency>
 
         <dependency>
