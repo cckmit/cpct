@@ -50,6 +50,7 @@
         <json-lib.version>2.4</json-lib.version>
         <jna.version>3.0.9</jna.version>
         <elasticsearch.version>6.3.1</elasticsearch.version>
+        <bss-cooperate.version>1.0</bss-cooperate.version>
 
     </properties>
 
@@ -364,6 +365,13 @@
                 <groupId>org.elasticsearch.plugin</groupId>
                 <artifactId>transport-netty4-client</artifactId>
                 <version>${elasticsearch.version}</version>
+            </dependency>
+
+            <!-- 引入协同中心dubbo服务jar包 -->
+            <dependency>
+                <groupId>com.ctzj.smt.bss</groupId>
+                <artifactId>bss-cooperate</artifactId>
+                <version>${bss-cooperate.version}</version>
             </dependency>
 
         </dependencies>

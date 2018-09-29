@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.dubbo.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ctzj.smt.bss.cooperate.query.service.dubbo.IContactTaskReceiptService;
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.rule.RuleResult;
@@ -105,6 +106,9 @@ public class EventApiServiceImpl implements EventApiService {
 
     @Autowired(required = false)
     private DisplayColumnLabelMapper displayColumnLabelMapper; // 展示列
+
+    @Autowired(required = false)
+    private IContactTaskReceiptService iContactTaskReceiptService; //协同中心dubbo
 
     @Override
     @SuppressWarnings("unchecked")
@@ -407,6 +411,16 @@ public class EventApiServiceImpl implements EventApiService {
 
             //调用协同中心回调接口
 
+            Map<String, Object> back = iContactTaskReceiptService.contactTaskReceipt(result);
+
+            if(back != null ) {
+                if("1".equals(back.get("resultCode"))) {
+                    System.out.println("协同中心接口回调调用成功");
+                    return null;
+                }
+            }
+
+            System.out.println("协同中心接口回调调用失败" + back.get("resultMsg"));
 
             return result;
         }

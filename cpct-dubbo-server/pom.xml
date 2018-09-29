@@ -60,6 +60,11 @@
             <artifactId>javassist</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.ctzj.smt.bss</groupId>
+            <artifactId>bss-cooperate</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
