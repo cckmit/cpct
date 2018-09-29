@@ -15,7 +15,11 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+
 import java.lang.reflect.Method;
 
 /**
@@ -70,11 +74,15 @@ public class RedisConfig extends CachingConfigurerSupport {
     }
 
     @Bean
-    public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory factory) {
-        StringRedisTemplate template = new StringRedisTemplate(factory);
-        setSerializer(template); //设置序列化工具，这样ReportBean不需要实现Serializable接口
-        template.afterPropertiesSet();
-        return template;
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
+        //设置序列化工具，这样ReportBean不需要实现Serializable接口
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+        redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());
+        redisTemplate.setConnectionFactory(factory);
+        return redisTemplate;
     }
 
     private void setSerializer(StringRedisTemplate template) {
