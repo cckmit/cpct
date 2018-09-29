@@ -11,10 +11,7 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.domain.User;
-import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
-import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
-import com.zjtelcom.cpct.domain.campaign.MktCamChlResultConfRelDO;
-import com.zjtelcom.cpct.domain.campaign.MktCamChlResultDO;
+import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
@@ -72,6 +69,9 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
 
     @Autowired
     private CamScriptService camScriptService;
+
+    @Autowired
+    private MktCampaignMapper mktCampaignMapper;
     /**
      * 添加二次协同结果
      *
@@ -343,12 +343,11 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
      * @return
      */
     @Override
-    public Map<String, Object> selectResultByMktCampaignId() {
+    public Map<String, Object> selectResultList() {
         Map<String, Object> resultMap = new HashMap<>();
         List<Long> mktCampaignIdList = mktCamResultRelMapper.selectAllGroupByMktCampaignId();
         List<MktCamResultRelDeatil> mktCamResultRelDeatilList = new ArrayList<>();
         for (Long mktCampaignId : mktCampaignIdList) {
-            MktCamResultRelDeatil mktCamResultRelDeatil = new MktCamResultRelDeatil();
             List<MktCamChlResultDO> mktCamChlResultDOList = mktCamChlResultMapper.selectResultByMktCampaignId(mktCampaignId);
             List<MktCamChlResult> mktCamChlResultList = new ArrayList<>();
             for (MktCamChlResultDO mktCamChlResultDO : mktCamChlResultDOList) {
@@ -376,7 +375,9 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
                 mktCamChlResult.setMktCamChlConfDetailList(mktCamChlConfDetailList);
                 mktCamChlResultList.add(mktCamChlResult);
             }
-            mktCamResultRelDeatil.setMktCampaignId(mktCampaignId);
+
+            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
+            MktCamResultRelDeatil mktCamResultRelDeatil = BeanUtil.create(mktCampaignDO, new MktCamResultRelDeatil());
             mktCamResultRelDeatil.setMktCamChlResultList(mktCamChlResultList);
             mktCamResultRelDeatilList.add(mktCamResultRelDeatil);
         }
