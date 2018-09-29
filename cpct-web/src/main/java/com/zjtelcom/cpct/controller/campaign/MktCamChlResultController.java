@@ -145,7 +145,7 @@ public class MktCamChlResultController extends BaseController {
     public String selectResultByMktCampaignId() {
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            resultMap = mktCamChlResultService.selectResultByMktCampaignId();
+            resultMap = mktCamChlResultService.selectResultList();
         } catch (Exception e) {
             logger.error("[op:MktCamChlConfController] failed to select Result By MktCampaignId Exception: ", e);
         }
