@@ -20,5 +20,7 @@ public class CommonConstant {
 
     public static final String STRATEGY_TRIAL_TO_REDIS_URL = "http://localhost:8080/es/strategyTrialToRedis";//策略试运算下发
 
+    public static final String CPC_MATCH_FILE_TO_FTP = "http://localhost:8080/es/cpcMatchFileToFtp";//策略试运算下发
+
 
 }
