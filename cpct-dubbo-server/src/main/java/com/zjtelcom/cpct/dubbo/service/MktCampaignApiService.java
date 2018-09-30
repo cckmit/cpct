@@ -17,4 +17,5 @@ public interface MktCampaignApiService {
 
     Map<String, Object> qryMktCampaignDetail(Long mktCampaignId) throws Exception;
 
+
 }
