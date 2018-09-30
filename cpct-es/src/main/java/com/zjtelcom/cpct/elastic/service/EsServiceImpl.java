@@ -183,17 +183,13 @@ public class EsServiceImpl implements EsService {
                         id = Long.valueOf(map.get("ruleId").toString());
                         name = map.get("ruleName").toString();
                     }
-                    //todo 规则id 暂时没有
                     ruleInfo.setId(id);
-                    //todo 规则名称有吗
                     ruleInfo.setName(name);
-                    //todo 命中结果；命中实例
                     ruleInfo.setResult(true);
                     ruleInfo.setHitEntity("命中得对象");
                     ruleInfo.setReason("命中原因");
 
                     //查询标签实例信息
-                    //todo 规则id 暂无
                     SearchHits labelInfoHits = searchLabelByRuleId(param,ruleInfo.getId().toString());
                     List<Map<String,Object>>[] labelInfoList = hitsToMapList4More(labelInfoHits);
 
@@ -220,6 +216,12 @@ public class EsServiceImpl implements EsService {
         return result;
     }
 
+    /**
+     *规则弹窗---活动命中查询
+     * @param ruleId
+     * @param isi
+     * @return
+     */
     @Override
     public Map<String, Object> searchLabelInfoByRuleId(String ruleId, String isi) {
         Map<String,Object> result = new HashMap<>();
@@ -240,6 +242,7 @@ public class EsServiceImpl implements EsService {
         return result;
     }
 
+    //命中数据转换成MapList
     private List<Map<String, Object>> hitsToMapList(List<Map<String, Object>> mapList, SearchHits hits) {
         for(int j = 0; j < hits.getHits().length; j++) {
             Map<String,Object> map = new HashMap<>();
@@ -252,6 +255,7 @@ public class EsServiceImpl implements EsService {
         return mapList;
     }
 
+    //命中数据转换成list 数组 （可优化）
     private List<Map<String,Object>>[] hitsToMapList4More( SearchHits hits) {
         List<Map<String,Object>>[] result = new List[hits.getHits().length];
 
@@ -267,6 +271,18 @@ public class EsServiceImpl implements EsService {
         return result;
     }
 
+
+    /**
+     * ES查询方法 获取命中对象
+     * @return
+     */
+    private SearchHits getSearchHits(BoolQueryBuilder boolQueryBuilder, SearchRequestBuilder builder,int from) {
+        SearchResponse myresponse = builder.setQuery(boolQueryBuilder)
+                .setFrom(from).setSize(1)
+//                .setFetchSource(fields,null)
+                .setExplain(true).execute().actionGet();
+        return myresponse.getHits();
+    }
 
 
     /**
@@ -319,8 +335,6 @@ public class EsServiceImpl implements EsService {
     }
 
 
-
-
     /**
      *事件索引查询
      */
@@ -343,15 +357,7 @@ public class EsServiceImpl implements EsService {
     }
 
 
-    private SearchHits getSearchHits(BoolQueryBuilder boolQueryBuilder, SearchRequestBuilder builder,int from) {
-        SearchResponse myresponse = builder.setQuery(boolQueryBuilder)
-                .setFrom(from).setSize(1)
-//                .setFetchSource(fields,null)
-                .setExplain(true).execute().actionGet();
-        return myresponse.getHits();
-    }
-
-
+    //活动id isi 组装查询条件
     private BoolQueryBuilder getBoolQueryBuilderByActivityId(String isi,String activityId) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
@@ -362,6 +368,7 @@ public class EsServiceImpl implements EsService {
         return boolQueryBuilder;
     }
 
+    //策略id isi 组装查询条件
     private BoolQueryBuilder getBoolQueryBuilderByStrategyId(String isi,String strategyId) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
@@ -372,6 +379,7 @@ public class EsServiceImpl implements EsService {
         return boolQueryBuilder;
     }
 
+    //规则id isi 组装查询条件
     private BoolQueryBuilder getBoolQueryBuilderByRuleId(String isi,String ruleId) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
@@ -382,6 +390,7 @@ public class EsServiceImpl implements EsService {
         return boolQueryBuilder;
     }
 
+    //isi 组装查询条件
     private BoolQueryBuilder getBoolQueryBuilder(String ISI) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
@@ -399,6 +408,7 @@ public class EsServiceImpl implements EsService {
         return boolQueryBuilder;
     }
 
+    //事件编码组装查询条件
     private BoolQueryBuilder getBoolQueryBuilderByEventCode(String eventCode ) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
@@ -408,7 +418,7 @@ public class EsServiceImpl implements EsService {
         return boolQueryBuilder;
     }
 
-
+    //资产号码和时间段组装查询条件
     private BoolQueryBuilder getBoolQueryBuilderByAssetNumber(String assetNumber,Date startTime,Date endTime) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
