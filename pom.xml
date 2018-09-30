@@ -51,6 +51,7 @@
         <jna.version>3.0.9</jna.version>
         <elasticsearch.version>6.3.1</elasticsearch.version>
         <bss-cooperate.version>1.0</bss-cooperate.version>
+        <ctg-cache.version>1.9.3</ctg-cache.version>
 
     </properties>
 
@@ -153,15 +154,15 @@
 
             <!--dubbo-->
             <!--<dependency>-->
-                <!--<groupId>com.alibaba</groupId>-->
-                <!--<artifactId>dubbo</artifactId>-->
-                <!--<exclusions>-->
-                    <!--<exclusion>-->
-                        <!--<groupId>org.springframework</groupId>-->
-                        <!--<artifactId>spring</artifactId>-->
-                    <!--</exclusion>-->
-                <!--</exclusions>-->
-                <!--<version>${dubbo.version}</version>-->
+            <!--<groupId>com.alibaba</groupId>-->
+            <!--<artifactId>dubbo</artifactId>-->
+            <!--<exclusions>-->
+            <!--<exclusion>-->
+            <!--<groupId>org.springframework</groupId>-->
+            <!--<artifactId>spring</artifactId>-->
+            <!--</exclusion>-->
+            <!--</exclusions>-->
+            <!--<version>${dubbo.version}</version>-->
             <!--</dependency>-->
 
             <!-- 电信提供的dubbo包 -->
@@ -308,9 +309,9 @@
 
             <!-- ppm-dubbo -->
             <!--<dependency>-->
-                <!--<groupId>com.ctzj.ppm</groupId>-->
-                <!--<artifactId>ppm-dubbo</artifactId>-->
-                <!--<version>${ppm-dubbo.version}</version>-->
+            <!--<groupId>com.ctzj.ppm</groupId>-->
+            <!--<artifactId>ppm-dubbo</artifactId>-->
+            <!--<version>${ppm-dubbo.version}</version>-->
             <!--</dependency>-->
 
             <!-- HttpClient -->
@@ -372,6 +373,13 @@
                 <groupId>com.ctzj.smt.bss</groupId>
                 <artifactId>bss-cooperate</artifactId>
                 <version>${bss-cooperate.version}</version>
+            </dependency>
+
+            <!-- 引入集团redis缓存包 -->
+            <dependency>
+                <groupId>com.ctg.itrdc.cache</groupId>
+                <artifactId>ctg-cache-control</artifactId>
+                <version>${ctg-cache.version}</version>
             </dependency>
 
         </dependencies>
