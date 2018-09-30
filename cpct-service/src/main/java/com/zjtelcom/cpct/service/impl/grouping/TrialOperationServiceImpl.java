@@ -189,8 +189,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         Map<String, Object> result = new HashMap<>();
         TrialOperation trialOperation = trialOperationMapper.selectByPrimaryKey(operationVO.getTrialId());
         MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(operationVO.getCampaignId());
-        MktStrategyConfDO strategy = strategyMapper.selectByPrimaryKey(operationVO.getStrategyId());
-        if (campaign == null || strategy == null) {
+        if (campaign == null) {
             result.put("resultCode", CODE_FAIL);
             result.put("resultMsg", "活动策略信息有误");
             return result;
@@ -205,7 +204,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             fieldList[i] = labelDTOList.get(i).getLabelCode();
         }
 
-        TrialRequest request = new TrialRequest();
+        TrialOperationVO request = BeanUtil.create(operationVO,new TrialOperationVO());
         request.setFieldList(fieldList);
         List<TrialOperationParam> paramList = new ArrayList<>();
         List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(operationVO.getStrategyId());
@@ -213,7 +212,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             TrialOperationParam param = getTrialOperationParam(operationVO, trialOperation.getBatchNum(), ruleRelDO.getMktStrategyConfRuleId());
             paramList.add(param);
         }
-        request.setOperationVOList(paramList);
+        request.setParamList(paramList);
         TrialResponse response = new TrialResponse();
 
         try {
@@ -357,16 +356,32 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Override
     public Map<String, Object> issueTrialResult(TrialOperation trialOperation) {
         Map<String, Object> result = new HashMap<>();
-        //todo 入参： 批次号、销售品列表、渠道信息列表
+        TrialOperation operation = trialOperationMapper.selectByPrimaryKey(trialOperation.getId());
+        if (operation==null){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "试运算记录不存在");
+            return result;
+        }
+        BeanUtil.copy(operation,trialOperation);
+
         // 通过活动id获取关联的标签字段数组
-        String[] fieldList = new String[10];
         MktCampaignDO campaignDO = campaignMapper.selectByPrimaryKey(trialOperation.getCampaignId());
-        if (campaignDO == null) {
+        if (campaignDO==null){
             result.put("resultCode", CODE_FAIL);
             result.put("resultMsg", "活动不存在");
             return result;
         }
-        TrialOperationVO request = BeanUtil.create(trialOperation, new TrialOperationVO());
+        // 通过活动id获取关联的标签字段数组
+        DisplayColumn req = new DisplayColumn();
+        req.setDisplayColumnId(campaignDO.getCalcDisplay());
+        Map<String,Object> labelMap = messageLabelService.queryLabelListByDisplayId(req);
+        List<LabelDTO> labelDTOList = (List<LabelDTO>)labelMap.get("labels");
+        String[] fieldList = new String[labelDTOList.size()];
+        for (int i = 0 ; i< labelDTOList.size();i++){
+            fieldList[i] = labelDTOList.get(i).getLabelCode();
+        }
+
+        TrialOperationVO request = BeanUtil.create(trialOperation,new TrialOperationVO());
         request.setFieldList(fieldList);
         request.setCampaignType(campaignDO.getMktCampaignType());
         request.setLanId(campaignDO.getLanId());
