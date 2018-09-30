@@ -9,13 +9,10 @@ package com.zjtelcom.cpct.controller.campaign;
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
-import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
-import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlResultService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.spring.web.json.Json;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -145,7 +142,7 @@ public class MktCamChlResultController extends BaseController {
     public String selectResultByMktCampaignId() {
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            resultMap = mktCamChlResultService.selectResultByMktCampaignId();
+            resultMap = mktCamChlResultService.selectResultList();
         } catch (Exception e) {
             logger.error("[op:MktCamChlConfController] failed to select Result By MktCampaignId Exception: ", e);
         }

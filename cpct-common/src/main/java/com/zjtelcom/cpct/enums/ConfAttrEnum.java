@@ -14,12 +14,16 @@ package com.zjtelcom.cpct.enums;
  */
 public enum ConfAttrEnum {
 
-    START_DATE(1000L, "生效日期"),
-    END_DATE(1001L, "失效日期"),
-    START_TIME(1002L, "开始时间"),
-    END_TIME(1003L, "结束时间"),
-    QUESTION(1004L, "调查问卷"),
-    RULE(1005L, "协同规则");
+    START_TIME_1(500600010001L, "开始时间"),
+    END_TIME_1(500600010002L, "结束时间"),
+    START_TIME_2(500600010003L, "开始时间"),
+    END_TIME_2(500600010004L, "结束时间"),
+    ACCOUNT(500600010005L, "接触账号"),
+    START_DATE(500600010006L, "生效日期"),
+    END_DATE(500600010007L, "失效日期"),
+    QUESTION(500600010010L, "调查问卷"),
+    RULE(500600010011L, "协同规则"),
+    PUSH_TYPE(500600010012L, "推送渠道");
 
     private Long arrId;
     private String arrName;

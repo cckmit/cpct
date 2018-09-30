@@ -5,7 +5,6 @@ import lombok.Data;
 
 import java.util.Date;
 
-@Data
 public class SysMenu extends BaseEntity {
 
     /**
@@ -44,6 +43,11 @@ public class SysMenu extends BaseEntity {
     private String menuUrl;
 
     /**
+     * 同步地址
+     */
+    private String syncUrl;
+
+    /**
      * 菜单描述
      */
     private String menuRemark;
@@ -61,4 +65,123 @@ public class SysMenu extends BaseEntity {
      */
     private String parentMenuName;
 
+    public Long getMenuId() {
+        return menuId;
+    }
+
+    public void setMenuId(Long menuId) {
+        this.menuId = menuId;
+    }
+
+    public String getMenuName() {
+        return menuName;
+    }
+
+    public void setMenuName(String menuName) {
+        this.menuName = menuName;
+    }
+
+    public String getMenuImg() {
+        return menuImg;
+    }
+
+    public void setMenuImg(String menuImg) {
+        this.menuImg = menuImg;
+    }
+
+    public Long getMenuType() {
+        return menuType;
+    }
+
+    public void setMenuType(Long menuType) {
+        this.menuType = menuType;
+    }
+
+    public Long getParentMenuId() {
+        return parentMenuId;
+    }
+
+    public void setParentMenuId(Long parentMenuId) {
+        this.parentMenuId = parentMenuId;
+    }
+
+    public Integer getMenuNextId() {
+        return menuNextId;
+    }
+
+    public void setMenuNextId(Integer menuNextId) {
+        this.menuNextId = menuNextId;
+    }
+
+    public String getMenuUrl() {
+        return menuUrl;
+    }
+
+    public void setMenuUrl(String menuUrl) {
+        this.menuUrl = menuUrl;
+    }
+
+    public String getSyncUrl() {
+        return syncUrl;
+    }
+
+    public void setSyncUrl(String syncUrl) {
+        this.syncUrl = syncUrl;
+    }
+
+    public String getMenuRemark() {
+        return menuRemark;
+    }
+
+    public void setMenuRemark(String menuRemark) {
+        this.menuRemark = menuRemark;
+    }
+
+    @Override
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    @Override
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    @Override
+    public Long getCreateStaff() {
+        return createStaff;
+    }
+
+    @Override
+    public void setCreateStaff(Long createStaff) {
+        this.createStaff = createStaff;
+    }
+
+    @Override
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    @Override
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
+
+    @Override
+    public Long getUpdateStaff() {
+        return updateStaff;
+    }
+
+    @Override
+    public void setUpdateStaff(Long updateStaff) {
+        this.updateStaff = updateStaff;
+    }
+
+    public String getParentMenuName() {
+        return parentMenuName;
+    }
+
+    public void setParentMenuName(String parentMenuName) {
+        this.parentMenuName = parentMenuName;
+    }
 }

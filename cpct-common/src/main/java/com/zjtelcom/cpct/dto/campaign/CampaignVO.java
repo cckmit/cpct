@@ -3,15 +3,15 @@ package com.zjtelcom.cpct.dto.campaign;
 import java.io.Serializable;
 
 public class CampaignVO implements Serializable {
-    private Long campaignId;
+    private Long mktCampaignId;
     private String campaignName;
 
-    public Long getCampaignId() {
-        return campaignId;
+    public Long getMktCampaignId() {
+        return mktCampaignId;
     }
 
-    public void setCampaignId(Long campaignId) {
-        this.campaignId = campaignId;
+    public void setMktCampaignId(Long mktCampaignId) {
+        this.mktCampaignId = mktCampaignId;
     }
 
     public String getCampaignName() {
