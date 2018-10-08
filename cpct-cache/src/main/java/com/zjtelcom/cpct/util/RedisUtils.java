@@ -1,10 +1,18 @@
 package com.zjtelcom.cpct.util;
 
+import com.ctg.itrdc.cache.pool.CtgJedisPool;
+import com.ctg.itrdc.cache.pool.CtgJedisPoolConfig;
+import com.ctg.itrdc.cache.pool.CtgJedisPoolException;
+import com.ctg.itrdc.cache.pool.ProxyJedis;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.HostAndPort;
+import redis.clients.jedis.JedisPoolConfig;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -244,6 +252,51 @@ public class RedisUtils {
     public Set<Object> keys(String pattern) {
         Set<Object> set = redisTemplate.keys(pattern);
         return set;
+    }
+
+
+
+
+    public static void main(String[] args) throws CtgJedisPoolException {
+
+
+        List<HostAndPort> hostAndPortList = new ArrayList();
+        // 接入机的ip和端口号
+        HostAndPort host = new HostAndPort("134.96.231.228" ,40201);
+        hostAndPortList.add(host);
+
+        GenericObjectPoolConfig poolConfig = new JedisPoolConfig();
+        poolConfig.setMaxIdle(5); //最大空闲连接数
+        poolConfig.setMaxTotal(10 ); // 最大连接数（空闲+使用中），不超过应用线程数，建议为应用线程数的一半
+        poolConfig.setMinIdle(5); //保持的最小空闲连接数
+        poolConfig.setMaxWaitMillis(3000);
+
+        CtgJedisPoolConfig config = new CtgJedisPoolConfig(hostAndPortList);
+
+        config.setDatabase(4970)
+//                .setClientName("bss_cpct_common_user")
+                .setPassword("bss_cpct_common_user123")
+                .setPoolConfig(poolConfig)
+                .setPeriod(1000)
+                .setMonitorTimeout(100);
+
+        CtgJedisPool pool = new CtgJedisPool(config);
+
+        ProxyJedis jedis = new ProxyJedis();
+        try {
+            jedis = pool.getResource();
+            //sendCommand 可能会抛出 运行时异常
+            jedis.set("test", "123");
+            //sendCommand 可能会抛出 运行时异常
+            jedis.get("test");
+            System.out.println(jedis.get("test"));
+            jedis.close();
+        } catch (Throwable je){
+            je.printStackTrace();
+            jedis.close();
+        }
+        pool.close();
+
     }
 
 }
