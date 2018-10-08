@@ -63,7 +63,7 @@
         <!-- 引入协同中心dubbo服务jar包 -->
         <dependency>
             <groupId>com.ctzj.smt.bss</groupId>
-            <artifactId>bss-cooperate</artifactId>
+            <artifactId>bss-cooperate-service-api</artifactId>
         </dependency>
 
 
@@ -80,7 +80,6 @@
                     <mainClass>com.zjtelcom.cpct.DubboServerApplication</mainClass>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
 
