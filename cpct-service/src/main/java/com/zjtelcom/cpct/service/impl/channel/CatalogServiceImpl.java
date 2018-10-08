@@ -58,7 +58,7 @@ public class CatalogServiceImpl extends BaseService implements CatalogService {
                 PpmProduct product = new PpmProduct();
                 product.setProductId(Long.valueOf(offer.getOfferId()));
                 product.setProductName(offer.getOfferName());
-                offerList.add(product);
+               offerList.add(product);
             }
         }
         Page pa = new Page(new PageInfo(offerList));

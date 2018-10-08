@@ -17,7 +17,7 @@ public interface ChannelService {
 
     Map<String,Object> listChannelByIdList(List<Long> idList);
 
-    Map<String,Object> listChannelTree(Long userId);
+    Map<String,Object> listChannelTree(Long userId,String channelName);
 
     Map<String,Object> getChannelTreeList(Long userId);
 
