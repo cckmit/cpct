@@ -284,17 +284,17 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
             result.put("resultMsg","父级渠道不存在");
             return result;
         }
-        Channel exist = channelMapper.selectByCode(addVO.getContactChlCode());
+        String channelCode = "CHL"+DateUtil.date2String(new Date())+ChannelUtil.getRandomStr(4);
+        Channel exist = channelMapper.selectByCode(channelCode);
         if (exist!=null){
-            result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg","渠道编码已存在");
-            return result;
+             channelCode = "CHL"+DateUtil.date2String(new Date())+ChannelUtil.getRandomStr(4);
         }
         Channel channel = BeanUtil.create(addVO,new Channel());
         Channel ch = channelMapper.selectChannel4AllChannel(-1L);
         if (addVO.getParentId().equals(ch.getContactChlId())){
             channel.setParentId(0L);
         }
+        channel.setContactChlCode(channelCode);
         channel.setCreateDate(new Date());
         channel.setUpdateDate(new Date());
         channel.setCreateStaff(userId);
