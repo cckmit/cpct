@@ -735,6 +735,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 MktCamEvtRelDO childMktCamEvtRelDO = new MktCamEvtRelDO();
                 childMktCamEvtRelDO.setMktCampaignId(childMktCampaignId);
                 childMktCamEvtRelDO.setEventId(childMktCamEvtRelDO.getEventId());
+                childMktCamEvtRelDO.setStatusCd("1000");
+                childMktCamEvtRelDO.setStatusDate(new Date());
                 childMktCamEvtRelDO.setCreateDate(new Date());
                 childMktCamEvtRelDO.setCreateStaff(UserUtil.loginId());
                 childMktCamEvtRelDO.setUpdateDate(new Date());
