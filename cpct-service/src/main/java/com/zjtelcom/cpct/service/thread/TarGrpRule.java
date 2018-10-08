@@ -111,7 +111,7 @@ public class TarGrpRule extends Thread {
             redisUtils.set(key, express);
 
             // 将所有的标签集合存入redis
-            redisUtils.set(key + "_LABEL", labelResultList);
+            redisUtils.set(key + "_LABEL", JSON.toJSONString(labelResultList));
         }
     }
 
