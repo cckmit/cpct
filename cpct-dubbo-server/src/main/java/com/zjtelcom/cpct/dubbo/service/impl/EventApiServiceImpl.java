@@ -26,13 +26,10 @@ import com.zjtelcom.cpct.dto.event.ContactEvtItem;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
-import com.zjtelcom.cpct.dubbo.task.RuleTask;
 import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.elastic.service.EsService;
-import com.zjtelcom.cpct.util.CollectionUtils;
 import com.zjtelcom.cpct.util.HttpUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,67 +40,67 @@ import java.util.concurrent.*;
 //@Transactional
 public class EventApiServiceImpl implements EventApiService {
 
-    @Autowired(required = false)
+    @Autowired
     private ContactEvtMapper contactEvtMapper; //事件总表
 
-    @Autowired(required = false)
+    @Autowired
     private MktCamEvtRelMapper mktCamEvtRelMapper; //事件与活动关联表
 
-    @Autowired(required = false)
+    @Autowired
     private MktCampaignMapper mktCampaignMapper; //活动基本信息
 
-    @Autowired(required = false)
+    @Autowired
     private UserListMapper userListMapper; //过滤规则（红名单、黑名单数据）
 
-    @Autowired(required = false)
+    @Autowired
     private TarGrpConditionMapper tarGrpConditionMapper; //分群规则条件表
 
-    @Autowired(required = false)
+    @Autowired
     private MktCamStrategyConfRelMapper mktCamStrategyConfRelMapper; //活动策略关联
 
-    @Autowired(required = false)
+    @Autowired
     private MktStrategyConfMapper mktStrategyConfMapper; //策略基本信息
 
-    @Autowired(required = false)
+    @Autowired
     private MktStrategyConfRuleMapper mktStrategyConfRuleMapper;//策略规则
 
-    @Autowired(required = false)
+    @Autowired
     private FilterRuleMapper filterRuleMapper; //过滤规则
 
-    @Autowired(required = false)
+    @Autowired
     private MktStrategyFilterRuleRelMapper mktStrategyFilterRuleRelMapper;//过滤规则与策略关系
 
-    @Autowired(required = false)
+    @Autowired
     private PpmProductMapper ppmProductMapper; //销售品
 
-    @Autowired(required = false)
+    @Autowired
     private MktCamChlConfAttrMapper mktCamChlConfAttrMapper; //协同渠道配置基本信息
 
-    @Autowired(required = false)
+    @Autowired
     private MktCamChlConfMapper mktCamChlConfMapper; //协同渠道配置的渠道
 
-    @Autowired(required = false)
+    @Autowired
     private MktVerbalConditionMapper mktVerbalConditionMapper; //规则存储公共表（此处查询协同渠道子策略规则和话术规则）
 
-    @Autowired(required = false)
+    @Autowired
     private MktCamScriptMapper mktCamScriptMapper; //营销脚本
 
-    @Autowired(required = false)
+    @Autowired
     private MktVerbalMapper mktVerbalMapper; //话术
 
-    @Autowired(required = false)
+    @Autowired
     private InjectionLabelMapper injectionLabelMapper; //标签因子
 
-    @Autowired(required = false)
+    @Autowired
     private EsService esService;  //es存储
 
-    @Autowired(required = false)
+    @Autowired
     private RedisUtils redisUtils;  // redis方法
 
-    @Autowired(required = false)
+    @Autowired
     private ContactEvtItemMapper contactEvtItemMapper;  // 事件采集项
 
-    @Autowired(required = false)
+    @Autowired
     private DisplayColumnLabelMapper displayColumnLabelMapper; // 展示列
 
     @Autowired(required = false)

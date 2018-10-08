@@ -256,6 +256,35 @@ public class RedisUtils {
 
 
 
+    private CtgJedisPool initCatch() {
+
+
+        List<HostAndPort> hostAndPortList = new ArrayList();
+        // 接入机的ip和端口号
+        HostAndPort host = new HostAndPort("134.96.231.228" ,40201);
+        hostAndPortList.add(host);
+
+        GenericObjectPoolConfig poolConfig = new JedisPoolConfig();
+        poolConfig.setMaxIdle(5); //最大空闲连接数
+        poolConfig.setMaxTotal(10 ); // 最大连接数（空闲+使用中），不超过应用线程数，建议为应用线程数的一半
+        poolConfig.setMinIdle(5); //保持的最小空闲连接数
+        poolConfig.setMaxWaitMillis(3000);
+
+        CtgJedisPoolConfig config = new CtgJedisPoolConfig(hostAndPortList);
+
+        config.setDatabase(4970)
+                .setPassword("bss_cpct_common_user#bss_cpct_common_user123")
+                .setPoolConfig(poolConfig)
+                .setPeriod(1000)
+                .setMonitorTimeout(100);
+
+        CtgJedisPool pool = new CtgJedisPool(config);
+
+        return pool;
+    }
+
+
+
 
     public static void main(String[] args) throws CtgJedisPoolException {
 
@@ -274,8 +303,7 @@ public class RedisUtils {
         CtgJedisPoolConfig config = new CtgJedisPoolConfig(hostAndPortList);
 
         config.setDatabase(4970)
-//                .setClientName("bss_cpct_common_user")
-                .setPassword("bss_cpct_common_user123")
+                .setPassword("bss_cpct_common_user#bss_cpct_common_user123")
                 .setPoolConfig(poolConfig)
                 .setPeriod(1000)
                 .setMonitorTimeout(100);
