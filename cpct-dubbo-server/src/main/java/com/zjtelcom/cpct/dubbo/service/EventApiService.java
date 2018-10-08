@@ -8,5 +8,11 @@ public interface EventApiService {
 
     Map<String, Object> SecondChannelSynergy(Map<String, String> map);
 
+    /**
+     * 首次协同cpc同步
+     * @param map
+     * @return
+     */
+    Map<String, Object> CalculateCPCSync(Map<String, String> map);
 
 }

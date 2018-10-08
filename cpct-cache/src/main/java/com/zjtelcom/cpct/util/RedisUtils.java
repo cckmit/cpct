@@ -50,6 +50,37 @@ public class RedisUtils {
         return result;
     }
 
+
+    /**
+     * 更换集团redis方法
+     * @param key
+     * @param value
+     * @return
+     */
+    public boolean setRedis(final String key, Object value) {
+        boolean result = false;
+
+        CtgJedisPool ctgJedisPool = initCatch();
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                //sendCommand 可能会抛出 运行时异常
+//                jedis.set(key, value);
+                //sendCommand 可能会抛出 运行时异常
+                jedis.close();
+                result = true;
+            } catch (Throwable je){
+                je.printStackTrace();
+                jedis.close();
+            }
+            ctgJedisPool.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
     /**
      * 写入缓存设置时效时间
      *
@@ -114,6 +145,32 @@ public class RedisUtils {
         return redisTemplate.hasKey(key);
     }
 
+
+    /**
+     * 更换集团redis方法
+     * @param key
+     * @return
+     */
+    public boolean existsRedis(final String key) {
+        CtgJedisPool ctgJedisPool = initCatch();
+        boolean result = false;
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                result = jedis.exists(key);
+                jedis.close();
+            } catch (Throwable je){
+                je.printStackTrace();
+                jedis.close();
+            }
+            ctgJedisPool.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
     /**
      * 读取缓存
      *
@@ -124,6 +181,32 @@ public class RedisUtils {
         Object result = null;
         ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
         result = operations.get(key);
+        return result;
+    }
+
+
+    /**
+     * 更换集团redis方法
+     * @param key
+     * @return
+     */
+    public Object getRedis(final String key) {
+        CtgJedisPool ctgJedisPool = initCatch();
+        String result = null;
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                result = jedis.get(key);
+                jedis.close();
+            } catch (Throwable je){
+                je.printStackTrace();
+                jedis.close();
+            }
+            ctgJedisPool.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return result;
     }
 
@@ -138,7 +221,6 @@ public class RedisUtils {
         HashOperations<String, Object, Object> hash = redisTemplate.opsForHash();
         hash.put(key, hashKey, value);
     }
-
 
     /**
      * 哈希获取数据
