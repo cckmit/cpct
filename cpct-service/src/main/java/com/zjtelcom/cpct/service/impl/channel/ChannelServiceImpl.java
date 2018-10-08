@@ -63,13 +63,13 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
     }
 
     @Override
-    public Map<String, Object> listChannelTree(Long userId) {
+    public Map<String, Object> listChannelTree(Long userId,String channelName) {
         Map<String,Object> result = new HashMap<>();
         Channel channel = channelMapper.selectChannel4AllChannel(-1L);
         List<ChannelDetail> chList = new ArrayList<>();
         List<ChannelDetail> parentDetailList = new ArrayList<>();
         List<Channel> parentList = channelMapper.findParentList();
-        listParent(parentDetailList, parentList);
+        listParent(parentDetailList, parentList,channelName);
         ChannelDetail allChannel = new ChannelDetail();
         allChannel.setChannelName(channel.getContactChlName());
         allChannel.setChannelId(channel.getContactChlId());
@@ -80,12 +80,15 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         return result;
     }
 
-    private void listParent(List<ChannelDetail> parentDetailList, List<Channel> parentList) {
+    private void listParent(List<ChannelDetail> parentDetailList, List<Channel> parentList,String channelName) {
         for (Channel parent : parentList){
             ChannelDetail parentDetail = new ChannelDetail();
             List<Channel> childList = channelMapper.findChildListByParentId(parent.getContactChlId());
             List<ChannelDetail> childDetailList = new ArrayList<>();
             for (Channel child : childList){
+                if (channelName!=null && !channelName.equals("") && !child.getContactChlName().contains(channelName)){
+                    continue;
+                }
                 ChannelDetail childDetail = new ChannelDetail();
                 childDetail.setChannelId(child.getContactChlId());
                 childDetail.setChannelName(child.getContactChlName());
@@ -106,7 +109,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         Map<String,Object> result = new HashMap<>();
         List<ChannelDetail> parentDetailList = new ArrayList<>();
         List<Channel> parentList = channelMapper.findParentList();
-        listParent(parentDetailList, parentList);
+        listParent(parentDetailList, parentList,null);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",parentDetailList);
         return result;

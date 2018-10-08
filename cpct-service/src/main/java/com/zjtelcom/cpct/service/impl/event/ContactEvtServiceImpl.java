@@ -147,6 +147,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         for (ContactEvtDetail evtDetail : evtDetailList) {
             //插入事件主题信息
             ContactEvt contactEvt = evtDetail;
+            contactEvt.setContactEvtCode("");
             contactEvt.setCreateDate(DateUtil.getCurrentTime());
             contactEvt.setUpdateDate(DateUtil.getCurrentTime());
             contactEvt.setStatusDate(DateUtil.getCurrentTime());
@@ -355,6 +356,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         }
 
         //查询出事件采集项
+
         List<ContactEvtItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId());
         contactEventDetail.setContactEvtItems(contactEvtItems);
 

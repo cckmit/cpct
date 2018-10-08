@@ -4,6 +4,7 @@ import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dto.channel.ContactChannelDetail;
 import com.zjtelcom.cpct.service.channel.ChannelService;
 import com.zjtelcom.cpct.util.UserUtil;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,13 +64,13 @@ public class ChannelController extends BaseController {
      * 渠道管理渠道树
      * @return
      */
-    @GetMapping("listChannelTree")
+    @PostMapping("listChannelTree")
     @CrossOrigin
-    public Map<String, Object> listChannelTree() {
+    public Map<String, Object> listChannelTree(@RequestBody HashMap<String,String> param) {
         Long userId = UserUtil.loginId();
         Map<String,Object> result = new HashMap<>();
         try {
-            result = channelService.listChannelTree(userId);
+            result = channelService.listChannelTree(userId,param.get("channelName"));
         } catch (Exception e) {
             logger.error("[op:ChannelController] fail to listChannelTree",e);
             result.put("resultCode",CODE_FAIL);
