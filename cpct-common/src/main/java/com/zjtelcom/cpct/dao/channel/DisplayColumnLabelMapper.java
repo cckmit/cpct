@@ -30,4 +30,6 @@ public interface DisplayColumnLabelMapper {
     List<Long> findOldIdListByDisplayId(@Param("displayId")Long displayId);
 
     int updateByPrimaryKey(DisplayColumnLabel record);
+
+    int deleteByDisplayId(@Param("displayId")Long displayColumnLabelId);
 }

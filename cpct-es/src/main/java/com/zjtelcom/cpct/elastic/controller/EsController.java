@@ -49,7 +49,11 @@ public class EsController {
     private EsService esService;
 
 
-
+    /**
+     *规则弹窗---活动命中查询
+     * @param param
+     * @return
+     */
     @RequestMapping("/searchLabelInfoByRuleId")
     @ResponseBody
     public Map<String, Object> searchLabelInfoByRuleId(@RequestBody HashMap<String,Object> param) {
@@ -57,6 +61,11 @@ public class EsController {
     }
 
 
+    /**
+     *活动命中数量查询
+     * @param param
+     * @return
+     */
     @RequestMapping("/searchCampaignHitsTotal")
     @ResponseBody
     public Map<String, Object> searchCampaignHitsTotal(@RequestBody CampaignHitParam param) {
@@ -103,75 +112,6 @@ public class EsController {
     }
 
 
-    //不能用  电脑会死机
-    @RequestMapping("/batchInsert")
-    @ResponseBody
-    public String batchInsert() {
-        ExecutorService executorService = Executors.newCachedThreadPool();
-        for (int i = 0 ;i<6000 ; i++){
-            executorService.submit(new ElasticSearchDemo(esService));
-        }
-//        for (int i = 0 ;i<1000 ; i++){
-//            esService.add();
-//        }
-        return "success";
-    }
-
-    /**
-     * 插入记录
-     * @return
-     */
-    @RequestMapping("/insertJson")
-    @ResponseBody
-    public String insertJson() {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", DateUtil.formatDate(new Date()));
-        jsonObject.put("age", 25);
-        jsonObject.put("name", "j-" + new Random(100).nextInt());
-        jsonObject.put("date", new Date());
-        for (int i = 0;i<980 ;i++){
-            jsonObject.put("TEST"+i,i+1);
-        }
-        String id = ElasticsearchUtil.addData(jsonObject, indexName, esType, jsonObject.getString("id"));
-        return id;
-    }
-
-    /**
-     * 删除记录
-     * @return
-     */
-    @RequestMapping("/delete")
-    @ResponseBody
-    public String delete(String id) {
-        if(StringUtils.isNotBlank(id)) {
-            ElasticsearchUtil.deleteDataById(indexName, esType, id);
-            return "删除id=" + id;
-        }
-        else{
-            return "id为空";
-        }
-    }
-
-    /**
-     * 更新数据
-     * @return
-     */
-    @RequestMapping("/update")
-    @ResponseBody
-    public String update(String id) {
-        if(StringUtils.isNotBlank(id)) {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("id", id);
-            jsonObject.put("age", 31);
-            jsonObject.put("name", "修改");
-            jsonObject.put("date", new Date());
-            ElasticsearchUtil.updateDataById(jsonObject, indexName, esType, id);
-            return "id=" + id;
-        }
-        else{
-            return "id为空";
-        }
-    }
 
     /**
      * 获取数据
