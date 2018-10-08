@@ -141,6 +141,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
             return maps;
         }
         displayColumnMapper.deleteByPrimaryKey(displayColumn.getDisplayColumnId());
+        displayColumnLabelMapper.deleteByDisplayId(req.getDisplayColumnId());
         maps.put("resultCode", CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         return maps;

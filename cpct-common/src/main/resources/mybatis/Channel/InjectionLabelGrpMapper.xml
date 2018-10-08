@@ -60,6 +60,7 @@
     <if test="grpName !=null and grpName != ''">
       and GRP_NAME LIKE CONCAT(CONCAT('%',#{grpName}),'%')
     </if>
+    order by CREATE_DATE desc
   </select>
 
   <select id="findByGrpName" resultMap="BaseResultMap">
@@ -68,5 +69,7 @@
     from injection_label_grp
     where GRP_NAME = #{grpName}
   </select>
+
+
 
 </mapper>
