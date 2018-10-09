@@ -13,6 +13,6 @@ public interface EventApiService {
      * @param map
      * @return
      */
-    Map<String, Object> CalculateCPCSync(Map<String, String> map);
+    Map<String, Object> CalculateCPCSync(Map<String, Object> map);
 
 }
