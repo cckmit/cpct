@@ -50,18 +50,25 @@ public class CatalogServiceImpl extends BaseService implements CatalogService {
         Map<String,Object> result = new HashMap<>();
         List<PpmProduct> offerList = new ArrayList<>();
         PageHelper.startPage(page,pageSize);
-        List<OfferCatalogLocation> catalogLocations = offerCatalogLocationMapper.selectByCatalogItemId(catalogId);
-
-        for (OfferCatalogLocation catalogLocation : catalogLocations){
-            Offer offer = offerMapper.selectByPrimaryKeyAndName(catalogLocation.getOfferId(),productName);
-            if (offer!=null){
-                PpmProduct product = new PpmProduct();
-                product.setProductId(Long.valueOf(offer.getOfferId()));
-                product.setProductName(offer.getOfferName());
-               offerList.add(product);
-            }
+//        List<OfferCatalogLocation> catalogLocations = offerCatalogLocationMapper.selectByCatalogItemId(catalogId);
+//
+//        for (OfferCatalogLocation catalogLocation : catalogLocations){
+//            Offer offer = offerMapper.selectByPrimaryKeyAndName(catalogLocation.getOfferId(),productName);
+//            if (offer!=null){
+//                PpmProduct product = new PpmProduct();
+//                product.setProductId(Long.valueOf(offer.getOfferId()));
+//                product.setProductName(offer.getOfferName());
+//               offerList.add(product);
+//            }
+//        }
+        List<Offer> productList = offerMapper.listByCatalogItemId(catalogId);
+        Page pa = new Page(new PageInfo(productList));
+        for (Offer offer : productList){
+            PpmProduct product = new PpmProduct();
+            product.setProductId(Long.valueOf(offer.getOfferId()));
+            product.setProductName(offer.getOfferName());
+            offerList.add(product);
         }
-        Page pa = new Page(new PageInfo(offerList));
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",offerList);
         result.put("page",pa);
