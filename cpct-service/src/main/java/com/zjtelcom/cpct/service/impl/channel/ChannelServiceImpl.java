@@ -1,10 +1,12 @@
 package com.zjtelcom.cpct.service.impl.channel;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.domain.channel.Channel;
+import com.zjtelcom.cpct.domain.channel.LabelResult;
 import com.zjtelcom.cpct.domain.channel.MktProductRule;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.ChannelType;
@@ -14,6 +16,7 @@ import com.zjtelcom.cpct.service.channel.ChannelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
+import com.zjtelcom.cpct.util.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +31,8 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
 
     @Autowired
     private ContactChannelMapper channelMapper;
+    @Autowired
+    private RedisUtils redisUtils;
 /*
     @Autowired
     private ClTestRepository testRepository;*/
@@ -64,6 +69,11 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
 
     @Override
     public Map<String, Object> listChannelTree(Long userId,String channelName) {
+
+        List<LabelResult> list = (List<LabelResult>)redisUtils.get("EVENT_RULE_403_421_500_LABEL");
+
+        redisUtils.set("EVENT_RULE_403_421_500_LABEL_MAP",JSON.toJSONString(list));
+
         Map<String,Object> result = new HashMap<>();
         Channel channel = channelMapper.selectChannel4AllChannel(-1L);
         List<ChannelDetail> chList = new ArrayList<>();
@@ -96,6 +106,11 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
                     childDetail.setRemark(child.getRemark());
                 }
                 childDetailList.add(childDetail);
+            }
+            if (channelName!=null && !channelName.equals("")){
+                if (childDetailList.isEmpty() && !parent.getContactChlName().contains(channelName)){
+                    continue;
+                }
             }
             parentDetail.setChannelId(parent.getContactChlId());
             parentDetail.setChannelName(parent.getContactChlName());
@@ -279,17 +294,22 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
             result.put("resultMsg","父级渠道不存在");
             return result;
         }
-        Channel exist = channelMapper.selectByCode(addVO.getContactChlCode());
-        if (exist!=null){
+        if (parent.getParentId()!=0){
             result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg","渠道编码已存在");
+            result.put("resultMsg","已经是最末级节点，请选择上一级节点添加");
             return result;
+        }
+        String channelCode = "CHL"+DateUtil.date2String(new Date())+ChannelUtil.getRandomStr(4);
+        Channel exist = channelMapper.selectByCode(channelCode);
+        if (exist!=null){
+             channelCode = "CHL"+DateUtil.date2String(new Date())+ChannelUtil.getRandomStr(4);
         }
         Channel channel = BeanUtil.create(addVO,new Channel());
         Channel ch = channelMapper.selectChannel4AllChannel(-1L);
         if (addVO.getParentId().equals(ch.getContactChlId())){
             channel.setParentId(0L);
         }
+        channel.setContactChlCode(channelCode);
         channel.setCreateDate(new Date());
         channel.setUpdateDate(new Date());
         channel.setCreateStaff(userId);
