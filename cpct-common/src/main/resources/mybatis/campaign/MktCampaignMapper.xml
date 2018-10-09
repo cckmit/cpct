@@ -99,11 +99,12 @@
         <if test= "createStaff!=null">CREATE_STAFF = #{createStaff,jdbcType=BIGINT},</if>
         <if test= "createDate!=null">CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},</if>
         <if test= "updateStaff!=null">UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},</if>
-        <if test= "updateDate!=null">UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},</if>
         <if test= "remark!=null">REMARK = #{remark,jdbcType=VARCHAR},</if>
         <if test= "createChannel!=null">CREATE_CHANNEL = #{createChannel,jdbcType=VARCHAR},</if>
         <if test= "directoryId!=null">DIRECTORY_ID = #{directoryId,jdbcType=BIGINT},</if>
-        LAN_ID = #{lanId,jdbcType=BIGINT}
+        <if test= "lanId!=null">LAN_ID = #{lanId,jdbcType=BIGINT},</if>
+        UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
+
     where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
     </update>
 

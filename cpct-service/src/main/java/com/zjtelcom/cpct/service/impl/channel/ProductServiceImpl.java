@@ -170,6 +170,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             rule.setId(item.getMktCamItemId());
             rule.setProductId(item.getItemId());
             rule.setProductName(product.getOfferName());
+            rule.setRemark(item.getRemark());
             ruleList.add(rule);
         }
         result.put("resultCode",CODE_SUCCESS);

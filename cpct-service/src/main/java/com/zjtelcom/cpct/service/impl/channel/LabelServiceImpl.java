@@ -516,10 +516,9 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     }
 
     private List<LabelVO> getLabelVOList(Long labelGrpId) {
-        List<LabelGrpMbr> lgmList = labelGrpMbrMapper.findListByGrpId(labelGrpId);
+        List<Label> labelList = labelMapper.listLabelByGrpId(labelGrpId);
         List<LabelVO> labelVOList = new ArrayList<>();
-        for (LabelGrpMbr grpMbr : lgmList){
-            Label label = labelMapper.selectByPrimaryKey(grpMbr.getInjectionLabelId());
+        for (Label label : labelList){
             if (label!=null){
                 List<LabelValue> valueList = labelValueMapper.selectByLabelId(label.getInjectionLabelId());
                 LabelVO labelVO = ChannelUtil.map2LabelVO(label,valueList);

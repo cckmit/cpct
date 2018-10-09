@@ -371,6 +371,9 @@
         <if test="statusCd != null and statusCd != ''">
             STATUS_CD = #{statusCd,jdbcType=VARCHAR},
         </if>
+        <if test="recCampaignAmount != null and recCampaignAmount != ''">
+            REC_CAMPAIGN_AMOUNT = #{recCampaignAmount,jdbcType=VARCHAR},
+        </if>
         <if test="createStaff != null and createStaff != 0">
             CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
         </if>

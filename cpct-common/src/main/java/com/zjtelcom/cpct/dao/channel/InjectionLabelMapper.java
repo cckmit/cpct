@@ -48,5 +48,7 @@ public interface InjectionLabelMapper {
 
     List<SimpleInfo> listLabelByCodeList(@Param("codeList") List<String> codeList);
 
+    List<Label> listLabelByGrpId(@Param("grpId")Long grpId);
+
 
 }

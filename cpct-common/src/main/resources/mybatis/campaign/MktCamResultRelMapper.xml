@@ -52,7 +52,7 @@
   </select>
   <update id="changeStatusByMktCampaignId" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamResultRelDO">
     update mkt_cam_result_rel
-    set MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+    set MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},
     <if test="mktResultId != null and mktResultId != ''">
       MKT_RESULT_ID = #{mktResultId,jdbcType=BIGINT},
     </if>
