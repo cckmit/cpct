@@ -1,13 +1,17 @@
 package com.zjtelcom.cpct.controller.synchronize;
 
 import com.alibaba.fastjson.JSON;
+import com.zjtelcom.cpct.config.RedisConfig;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
+import com.zjtelcom.cpct.domain.question.Question;
+import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.service.synchronize.*;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynMktCampaignRelService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.service.synchronize.channel.SynChannelService;
 import com.zjtelcom.cpct.service.synchronize.filter.SynFilterRuleService;
+import com.zjtelcom.cpct.service.synchronize.label.SynLabelGrpService;
 import com.zjtelcom.cpct.service.synchronize.label.SynLabelService;
 import com.zjtelcom.cpct.service.synchronize.label.SynMessageLabelService;
 import com.zjtelcom.cpct.service.synchronize.script.SynScriptService;
@@ -16,7 +20,10 @@ import com.zjtelcom.cpct.service.synchronize.sys.SynSysParamsService;
 import com.zjtelcom.cpct.service.synchronize.sys.SynSysRoleService;
 import com.zjtelcom.cpct.service.synchronize.sys.SynSysStaffService;
 import com.zjtelcom.cpct.service.synchronize.template.SynTarGrpTemplateService;
+import lombok.val;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -66,9 +73,13 @@ public class SynchronizeController extends BaseController {
     private SynTarGrpTemplateService synTarGrpTemplateService;
     @Autowired
     private SynMktCampaignRelService synMktCampaignRelService;
-
     @Autowired
     private SynchronizeCampaignService synchronizeCampaignService;
+    @Autowired
+    private SynLabelGrpService synLabelGrpService;
+    @Autowired
+    private SynQuestionService synQuestionService;
+
 
 
     /**
@@ -609,7 +620,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("全量同步过滤规则！Exception: ", e);
+            logger.error("全量同步过滤规则失败！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -652,7 +663,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("全量同步试运算标签展示列！Exception: ", e);
+            logger.error("全量同步试运算标签展示列失败！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -695,7 +706,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("全量同步分群模板！Exception: ", e);
+            logger.error("全量同步分群模板失败！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -737,7 +748,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("全量同步营销维挽活动！Exception: ", e);
+            logger.error("全量同步营销维挽活动失败！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -751,9 +762,11 @@ public class SynchronizeController extends BaseController {
      * @return
      */
     public String getRole(){
-        String role="admin";
-
-        return role;
+        SysStaff sysStaff = (SysStaff) SecurityUtils.getSubject().getPrincipal();
+        if(sysStaff==null){
+            return "admin";
+        }
+        return sysStaff.getStaffCode();
     }
 
 
@@ -765,6 +778,90 @@ public class SynchronizeController extends BaseController {
         Map<String, Object> synchronizeCampaignMap = synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
         return JSON.toJSONString(synchronizeCampaignMap);
     }
+
+
+    /**
+     * 全量同步标签
+     * @return
+     */
+    @RequestMapping("batchInjectionLabel")
+    @CrossOrigin
+    public String batchInjectionLabel(){
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synLabelService.synchronizeBatchLabel(roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("全量同步标签失败！Exception: ", e);
+        }
+        return  JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 全量同步标签组
+     * @return
+     */
+    @RequestMapping("batchInjectionLabelGrp")
+    @CrossOrigin
+    public String batchInjectionLabelGrp(){
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synLabelGrpService.synchronizeBatchLabel(roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("全量同步标签组失败！Exception: ", e);
+        }
+        return  JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 全量同步调查问卷
+     * @return
+     */
+    @RequestMapping("batchQuestion")
+    @CrossOrigin
+    public String batchQuestionn(){
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synQuestionService.synchronizeBatchQuestion(roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("全量同步调查问卷失败！Exception: ", e);
+        }
+        return  JSON.toJSONString(map);
+    }
+
+
+
+    /**
+     * 全量同步问卷题库
+     * @return
+     */
+    @RequestMapping("batchQuestionBank")
+    @CrossOrigin
+    public String batchQuestionnBank(){
+        String roleName=getRole();   //  操作角色
+        Map<String, Object> map=new HashMap<>();
+        try{
+            map = synQuestionService.synchronizeBatchQuestionBank(roleName);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", e.getMessage());
+            logger.error("全量同步问卷题库失败！Exception: ", e);
+        }
+        return  JSON.toJSONString(map);
+    }
+
+
+
 
 
 }

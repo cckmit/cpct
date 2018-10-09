@@ -75,6 +75,7 @@ public class TarGrpRule extends Thread {
                     labelResult.setRightOperand(label.getRightOperand());
                     labelResult.setRightParam(tarGrpConditionDOs.get(i).getRightParam());
                     labelResult.setClassName(label.getClassName());
+                    labelResult.setOperType(type);
                     labelResultList.add(labelResult);
                     if ("7100".equals(type)) {
                         express.append("!");
@@ -110,7 +111,7 @@ public class TarGrpRule extends Thread {
             redisUtils.set(key, express);
 
             // 将所有的标签集合存入redis
-            redisUtils.set(key + "_LABEL", labelResultList);
+            redisUtils.set(key + "_LABEL", JSON.toJSONString(labelResultList));
         }
     }
 

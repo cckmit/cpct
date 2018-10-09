@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * @Auther: anson
  * @Date: 2018/9/17
- * @Description:
+ * @Description: 标签列同步
  */
 @Service
 @Transactional

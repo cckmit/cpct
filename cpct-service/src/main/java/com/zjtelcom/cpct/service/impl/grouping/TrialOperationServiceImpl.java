@@ -406,19 +406,23 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             // 获取推送渠道
             List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
             List<MktCamChlConf> mktCamChlConfList = mktStrategyConfRule.getMktCamChlConfList();
-            for (MktCamChlConf mktCamChlConf : mktCamChlConfList) {
-                Map<String, Object> mktCamChlConfDetailMap = mktCamChlConfService.getMktCamChlConf(mktCamChlConf.getEvtContactConfId());
-                MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConfDetailMap.get("mktCamChlConfDetail");
-                mktCamChlConfDetail.setIsSecondCoop("1");   // 设置为首次协同
-                mktCamChlConfDetailList.add(mktCamChlConfDetail);
+            if(mktCamChlConfList!=null){
+                for (MktCamChlConf mktCamChlConf : mktCamChlConfList) {
+                    Map<String, Object> mktCamChlConfDetailMap = mktCamChlConfService.getMktCamChlConf(mktCamChlConf.getEvtContactConfId());
+                    MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConfDetailMap.get("mktCamChlConfDetail");
+                    mktCamChlConfDetail.setIsSecondCoop("1");   // 设置为首次协同
+                    mktCamChlConfDetailList.add(mktCamChlConfDetail);
+                }
             }
 
             List<MktCamChlResult> mktCamChlResultList = mktStrategyConfRule.getMktCamChlResultList();
-            for (MktCamChlResult mktCamChlResult : mktCamChlResultList) {
-                List<MktCamChlConfDetail> confDetailResultList = mktCamChlResult.getMktCamChlConfDetailList();
-                for (MktCamChlConfDetail mktCamChlConfDetail : confDetailResultList) {
-                    mktCamChlConfDetail.setIsSecondCoop("0");  // 设置为二次协同
-                    mktCamChlConfDetailList.add(mktCamChlConfDetail);
+            if(mktCamChlResultList!=null){
+                for (MktCamChlResult mktCamChlResult : mktCamChlResultList) {
+                    List<MktCamChlConfDetail> confDetailResultList = mktCamChlResult.getMktCamChlConfDetailList();
+                    for (MktCamChlConfDetail mktCamChlConfDetail : confDetailResultList) {
+                        mktCamChlConfDetail.setIsSecondCoop("0");  // 设置为二次协同
+                        mktCamChlConfDetailList.add(mktCamChlConfDetail);
+                    }
                 }
             }
             param.setMktCamChlConfDetailList(mktCamChlConfDetailList);
@@ -434,7 +438,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         request.setParamList(paramList);
         try {
             //todo 待验证
-            restTemplate.postForObject(STRATEGY_TRIAL_TO_REDIS_URL, request, null);
+            restTemplate.postForObject(CPC_MATCH_FILE_TO_FTP, request, TrialResponse.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
