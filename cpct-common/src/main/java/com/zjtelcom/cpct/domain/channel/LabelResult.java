@@ -24,6 +24,8 @@ public class LabelResult {
      */
     private String labelName;
 
+
+    private String operType;
     /**
      * 参考值
      */
@@ -43,6 +45,15 @@ public class LabelResult {
      * 是否是大数据标签
      */
     private String className;
+
+
+    public String getOperType() {
+        return operType;
+    }
+
+    public void setOperType(String operType) {
+        this.operType = operType;
+    }
 
     public void setClassName(String className) {
         this.className = className;

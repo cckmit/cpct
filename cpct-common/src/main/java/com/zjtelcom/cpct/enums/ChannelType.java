@@ -1,8 +1,8 @@
 package com.zjtelcom.cpct.enums;
 
 public enum ChannelType {
-    INITIATIVE(0,"主动"),
-    PASSIVE(1,"被动");
+    INITIATIVE(0,"人工"),
+    PASSIVE(1,"自动");
 
 
     private Integer value;

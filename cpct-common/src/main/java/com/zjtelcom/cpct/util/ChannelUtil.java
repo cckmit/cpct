@@ -103,7 +103,7 @@ public class ChannelUtil  {
     }
     public static CampaignVO map2CampaignVO(MktCampaignDO campaignDO){
         CampaignVO vo = BeanUtil.create(campaignDO,new CampaignVO());
-        vo.setCampaignId(campaignDO.getMktCampaignId());
+        vo.setMktCampaignId(campaignDO.getMktCampaignId());
         vo.setCampaignName(campaignDO.getMktCampaignName());
         return vo;
     }

@@ -67,7 +67,6 @@
         <if test="remark != null and remark != ''">
             REMARK = #{remark,jdbcType=VARCHAR},
         </if>
-        EVT_TYPE_ID =#{evtTypeId,jdbcType=BIGINT}
         where EVT_TYPE_ID = #{evtTypeId,jdbcType=BIGINT}
     </update>
 

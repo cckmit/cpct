@@ -11,6 +11,11 @@ public class TrialOperationParam implements Serializable {
      * 规则标识
      */
     private Long ruleId;
+
+    /**
+     * 规则名字
+     */
+    private String ruleName;
     /**
      * 规则表达式
      */
@@ -30,6 +35,14 @@ public class TrialOperationParam implements Serializable {
      */
     private List<MktCamChlConfDetail> mktCamChlConfDetailList;
 
+
+    public String getRuleName() {
+        return ruleName;
+    }
+
+    public void setRuleName(String ruleName) {
+        this.ruleName = ruleName;
+    }
 
     public Long getRuleId() {
         return ruleId;

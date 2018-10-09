@@ -239,6 +239,33 @@
     where CATALOG_ID = #{catalogId}
   </select>
 
+  <select id="listLabelByCodeList" parameterType="java.util.List" resultType="com.zjtelcom.cpct.dto.grouping.SimpleInfo">
+    select INJECTION_LABEL_NAME as name,INJECTION_LABEL_CODE as value
+    from injection_label
+    <where>
+      <if test="null != codeList and codeList.size > 0">
+        INJECTION_LABEL_CODE  in
+        <foreach collection="codeList" item="item" open="(" close=")" separator=",">
+          #{item}
+        </foreach>
+      </if>
+    </where>
+
+  </select>
+
+  <!--< 参数查询 >-->
+  <select id="listLabelByGrpId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+  select label.INJECTION_LABEL_ID, label.INJECTION_LABEL_CODE, label.INJECTION_LABEL_NAME, label.INJECTION_LABEL_DESC,
+  label.LABEL_TYPE, label.LABEL_VALUE_TYPE, label.LABEL_DATA_TYPE, label.STATUS_CD, label.CREATE_STAFF, label.UPDATE_STAFF,
+  label.CREATE_DATE, label.STATUS_DATE, label.UPDATE_DATE, label.REMARK, label.RIGHT_OPERAND, label.CONDITION_TYPE,
+  label.OPERATOR,label.SCOPE,label.TAG_ROW_ID,label.IS_SHARED, label.CATALOG_ID,label.CLASS_NAME
+  from injection_label label left join injection_label_grp_mbr  mbr on label.INJECTION_LABEL_ID = mbr.INJECTION_LABEL_ID
+  left join injection_label_grp grp on grp.GRP_ID = mbr.GRP_ID
+  where grp.GRP_ID = #{grpId}
+  </select>
+
+
+
 
 
 </mapper>

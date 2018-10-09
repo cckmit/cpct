@@ -100,6 +100,7 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
         List<LabelCatalog> firstList = labelCatalogMapper.findByLevelId(1L);
         List<Label> allLabels = labelMapper.selectAll();
         List<LabelCatalog> allCatalogs = labelCatalogMapper.selectAll();
+        List<LabelValue> valueList = labelValueMapper.selectAll();
 
         for (LabelCatalog first : firstList){
             LabelCatalogTree firstTree = new LabelCatalogTree();
@@ -125,8 +126,13 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
                         if (label.getCatalogId()==null || !label.getCatalogId().equals(third.getCatalogId())){
                             continue;
                         }
-                        List<LabelValue> valueList = labelValueMapper.selectByLabelId(label.getInjectionLabelId());
-                        LabelVO vo = ChannelUtil.map2LabelVO(label,valueList);
+                        List<LabelValue> values = new ArrayList<>();
+                        for (LabelValue value : valueList){
+                            if (value.getInjectionLabelId()!=null && value.getInjectionLabelId().equals(label.getInjectionLabelId())){
+                                values.add(value);
+                            }
+                        }
+                        LabelVO vo = ChannelUtil.map2LabelVO(label,values);
                         labelVOList.add(vo);
                     }
                     thirdTree.setChildren(labelVOList);

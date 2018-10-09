@@ -142,8 +142,11 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
     @Override
     public Map<String, Object> listMenuById(Map<String, String> params) {
         Map<String, Object> result = new HashMap<>();
-
-        Long menuId = Long.parseLong(params.get("menuId"));
+        String menuIdStr = params.get("menuId");
+        Long menuId = 0L;
+        if(menuIdStr != null && !"".equals(menuIdStr)) {
+            menuId = Long.parseLong(params.get("menuId"));
+        }
 
         List<SysMenu> list = sysMenuMapper.listMenuById(menuId);
         result.put("resultCode", "0");

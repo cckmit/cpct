@@ -147,6 +147,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         for (ContactEvtDetail evtDetail : evtDetailList) {
             //插入事件主题信息
             ContactEvt contactEvt = evtDetail;
+            contactEvt.setContactEvtCode("");
             contactEvt.setCreateDate(DateUtil.getCurrentTime());
             contactEvt.setUpdateDate(DateUtil.getCurrentTime());
             contactEvt.setStatusDate(DateUtil.getCurrentTime());
@@ -355,6 +356,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         }
 
         //查询出事件采集项
+
         List<ContactEvtItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId());
         contactEventDetail.setContactEvtItems(contactEvtItems);
 
@@ -489,22 +491,19 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                     contactEvtItemMapper.deleteByPrimaryKey(oldItem.getEvtItemId());
                 }
             }
-            //更新事件匹配规则
-//            contactEvtMatchRuls = evtDetail.getContactEvtMatchRuls();
-//            for (ContactEvtMatchRul contactEvtMatchRul : contactEvtMatchRuls) {
-//                contactEvtMatchRul.setUpdateDate(DateUtil.getCurrentTime());
-//                contactEvtMatchRul.setUpdateStaff(UserUtil.loginId());
-//                contactEvtMatchRulMapper.modContactEvtMatchRul(contactEvtMatchRul);
-//            }
             //更新活动
             mktCamEvtRels = evtDetail.getMktCamEvtRels();
             List<MktCamEvtRel> oldRelList = mktCamEvtRelMapper.qryBycontactEvtId(evtDetail.getContactEvtId());
             List<Long> relIdList = new ArrayList<>();
             for (MktCamEvtRel mktCamEvtRel : mktCamEvtRels) {
-                relIdList.add(mktCamEvtRel.getMktCampEvtRelId());
+                if (mktCamEvtRel.getMktCampEvtRelId()!=null){
+                    relIdList.add(mktCamEvtRel.getMktCampEvtRelId());
+                }
                 MktCamEvtRelDO mktCamEvtRelDO = mktCamEvtRelMapper.findByCampaignIdAndEvtId(mktCamEvtRel.getMktCampaignId(),evtDetail.getContactEvtId());
                 if (mktCamEvtRelDO != null) {
-                    BeanUtil.copy(mktCamEvtRel,mktCamEvtRelDO);
+                    mktCamEvtRelDO.setCampaignSeq(mktCamEvtRel.getCampaignSeq());
+                    mktCamEvtRelDO.setMktCampaignId(mktCamEvtRel.getMktCampaignId());
+                    mktCamEvtRelDO.setLevelConfig(mktCamEvtRel.getLevelConfig());
                     mktCamEvtRelDO.setUpdateDate(DateUtil.getCurrentTime());
                     mktCamEvtRelDO.setUpdateStaff(UserUtil.loginId());
                     mktCamEvtRelMapper.updateByPrimaryKey(mktCamEvtRelDO);

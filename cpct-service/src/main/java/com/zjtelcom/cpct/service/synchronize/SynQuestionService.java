@@ -10,4 +10,9 @@ public interface SynQuestionService {
 
     Map<String,Object> synQuestion(Long questionnaireId);
 
+
+    Map<String,Object> synchronizeBatchQuestion(String roleName);
+
+    Map<String,Object> synchronizeBatchQuestionBank(String roleName);
+
 }

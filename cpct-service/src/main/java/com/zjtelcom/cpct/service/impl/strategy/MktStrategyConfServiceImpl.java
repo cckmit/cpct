@@ -9,6 +9,7 @@ package com.zjtelcom.cpct.service.impl.strategy;
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCamChlResultMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamStrategyConfRelMapper;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
@@ -134,6 +135,9 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
      */
     @Autowired
     private MktStrategyFilterRuleRelMapper mktStrategyFilterRuleRelMapper;
+
+    @Autowired
+    private MktCamChlResultMapper mktCamChlResultMapper;
 
 
     /**
@@ -480,6 +484,8 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                     for (int i = 0; i < mktCamChlResultIds.length; i++) {
                         if (mktCamChlResultIds[i] != null && !"".equals(mktCamChlResultIds[i])) {
                             MktCamChlResult mktCamChlResult = new MktCamChlResult();
+                            mktCamChlResultMapper.selectByPrimaryKey(Long.valueOf(mktCamChlResultIds[i]));
+
                             mktCamChlResult.setMktCamChlResultId(Long.valueOf(mktCamChlResultIds[i]));
                             mktCamChlResultList.add(mktCamChlResult);
                         }

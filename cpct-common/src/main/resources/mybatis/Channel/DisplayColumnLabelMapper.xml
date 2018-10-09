@@ -71,5 +71,21 @@
   </select>
 
 
+  <select id="findOldIdListByDisplayId" resultType="java.lang.Long">
+    select INJECTION_LABEL_ID
+    from display_column_label
+    where  DISPLAY_ID = #{displayId}
+  </select>
+
+  <delete id="deleteByDisplayId" parameterType="java.lang.Long">
+    delete from display_column_label
+    where DISPLAY_ID = #{displayId,jdbcType=BIGINT}
+  </delete>
+
+
+
+
+
+
 
 </mapper>

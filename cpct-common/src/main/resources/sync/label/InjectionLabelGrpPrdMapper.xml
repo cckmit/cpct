@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zjtelcom.cpct.dao.channel.InjectionLabelGrpMapper">
+<mapper namespace="com.zjtelcom.cpct_prd.dao.label.InjectionLabelGrpPrdMapper">
   <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.LabelGrp">
     <id column="GRP_ID" jdbcType="BIGINT" property="grpId" />
     <result column="GRP_NAME" jdbcType="VARCHAR" property="grpName" />
@@ -60,7 +60,6 @@
     <if test="grpName !=null and grpName != ''">
       and GRP_NAME LIKE CONCAT(CONCAT('%',#{grpName}),'%')
     </if>
-    order by CREATE_DATE desc
   </select>
 
   <select id="findByGrpName" resultMap="BaseResultMap">
@@ -69,7 +68,5 @@
     from injection_label_grp
     where GRP_NAME = #{grpName}
   </select>
-
-
 
 </mapper>
