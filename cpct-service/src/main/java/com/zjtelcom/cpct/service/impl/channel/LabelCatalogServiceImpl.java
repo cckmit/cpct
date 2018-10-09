@@ -94,6 +94,21 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
      */
     @Override
     public Map<String, Object> listLabelCatalog() {
+//        List<Label> resuList = new ArrayList<>();
+//        List<Label> labels = labelMapper.selectAllByCondition();
+//        List<LabelValue> vas = labelValueMapper.selectAll();
+//        List<Long> idlist = new ArrayList<>();
+//        for (LabelValue value : vas){
+//            idlist.add(value.getInjectionLabelId());
+//        }
+//        for (Label label : labels){
+//            if (!idlist.contains(label.getInjectionLabelId())){
+//                label.setConditionType("4");
+//                label.setOperator("2000,3000,1000,4000,6000,5000,7000,7200");
+//                labelMapper.updateByPrimaryKey(label);
+//            }
+//        }
+
         Map<String,Object> result = new HashMap<>();
         List<LabelCatalogTree> resultTree = new ArrayList<>();
 

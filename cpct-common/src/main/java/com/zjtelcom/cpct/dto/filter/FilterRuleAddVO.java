@@ -1,5 +1,8 @@
 package com.zjtelcom.cpct.dto.filter;
 
+import com.zjtelcom.cpct.dto.channel.VerbalConditionAddVO;
+import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -16,7 +19,43 @@ public class FilterRuleAddVO implements Serializable {
     private Date dayStart;
     private Date dayEnd;
     private String userList;
+    private VerbalConditionAddVO condition;//过扰规则条件
+    private String days;
+    private String times;
+    private String offerInfo;
 
+
+    public VerbalConditionAddVO getCondition() {
+        return condition;
+    }
+
+    public void setCondition(VerbalConditionAddVO condition) {
+        this.condition = condition;
+    }
+
+    public String getDays() {
+        return days;
+    }
+
+    public void setDays(String days) {
+        this.days = days;
+    }
+
+    public String getTimes() {
+        return times;
+    }
+
+    public void setTimes(String times) {
+        this.times = times;
+    }
+
+    public String getOfferInfo() {
+        return offerInfo;
+    }
+
+    public void setOfferInfo(String offerInfo) {
+        this.offerInfo = offerInfo;
+    }
 
     public String getUserList() {
         return userList;
