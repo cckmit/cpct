@@ -14,11 +14,11 @@ public class CommonConstant {
 
     public static final String CONTENTTYPE = "application/vnd.ms-excel;charset=utf-8";
 
-    public static final String SEARCH_INFO_FROM_ES_URL = "http://localhost:8070/es/searchBatchInfo";//试运算接口
+    public static final String SEARCH_INFO_FROM_ES_URL = "http://localhost:8080/es/searchBatchInfo";//试运算接口
 
-    public static final String FIND_BATCH_HITS_LIST_URL = "http://localhost:8070/es/findBatchHitsList";//redis查询抽样试算结果清单
+    public static final String FIND_BATCH_HITS_LIST_URL = "http://localhost:8080/es/findBatchHitsList";//redis查询抽样试算结果清单
 
-    public static final String STRATEGY_TRIAL_TO_REDIS_URL = "http://localhost:8070/es/strategyTrialToRedis";//策略试运算下发
+    public static final String STRATEGY_TRIAL_TO_REDIS_URL = "http://localhost:8080/es/strategyTrialToRedis";//策略试运算下发
 
     public static final String CPC_MATCH_FILE_TO_FTP = "http://localhost:8080/es/cpcMatchFileToFtp";//策略试运算下发
 

@@ -76,7 +76,7 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
         script.setUpdateStaff(userId);
         scriptMapper.updateByPrimaryKey(script);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","添加成功");
+        result.put("resultMsg","修改成功");
         return result;
     }
 
@@ -91,7 +91,7 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
         }
         scriptMapper.deleteByPrimaryKey(mktScript.getScriptId());
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","添加成功");
+        result.put("resultMsg","删除成功");
         return result;
     }
 

@@ -13,8 +13,10 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.event.EventSceneMapper;
 import com.zjtelcom.cpct.dao.event.EventSorceMapper;
+import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.dao.system.SysStaffMapper;
 import com.zjtelcom.cpct.domain.event.EventSorceDO;
+import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.event.EventSorce;
 import com.zjtelcom.cpct.service.BaseService;
@@ -43,6 +45,8 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
 
     @Autowired
     private SysStaffMapper sysStaffMapper;
+    @Autowired
+    private SysParamsMapper sysParamsMapper;
 
     /**
      * 新增事件源
@@ -81,12 +85,17 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
     public Map<String, Object> getEventSorce(Long evtSrcId) {
         Map<String, Object> eventSorceMap = new HashMap<>();
         try {
+
             EventSorceDO eventSorceDO = eventSorceMapper.selectByPrimaryKey(evtSrcId);
             SysStaff createSysStaff = sysStaffMapper.selectByPrimaryKey(eventSorceDO.getCreateStaff());
             SysStaff updateSysStaff = sysStaffMapper.selectByPrimaryKey(eventSorceDO.getCreateStaff());
             EventSorce eventSorce = BeanUtil.create(eventSorceDO, new EventSorce());
             eventSorce.setCreateStaffName(createSysStaff.getStaffName());
             eventSorce.setUpdateStaffName(updateSysStaff.getStaffName());
+            if (eventSorceDO.getRegionId()!=null){
+                SysParams sysParams = sysParamsMapper.findParamsByValue("LOC-0001",eventSorceDO.getRegionId().toString());
+                eventSorce.setRegionName(sysParams.getParamName());
+            }
             eventSorceMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             eventSorceMap.put("resultMsg", "查询事件源成功！");
             eventSorceMap.put("eventSorce", eventSorce);
@@ -171,6 +180,10 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
                 EventSorce eventSorce = BeanUtil.create(eventSorceDO, new EventSorce());
                 eventSorce.setCreateStaffName(createSysStaff.getStaffName());
                 eventSorce.setUpdateStaffName(updateSysStaff.getStaffName());
+                if (eventSorceDO.getRegionId()!=null){
+                    SysParams sysParams = sysParamsMapper.findParamsByValue("LOC-0001",eventSorceDO.getRegionId().toString());
+                    eventSorce.setRegionName(sysParams.getParamName());
+                }
                 eventSorcesList.add(eventSorce);
             }
             eventSorceMap.put("resultCode", CommonConstant.CODE_SUCCESS);
