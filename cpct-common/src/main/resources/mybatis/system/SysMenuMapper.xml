@@ -84,8 +84,8 @@
 
 
     <select id="listMenuById" resultMap="BaseResultMap" parameterType="Long">
-      select sm.MENU_ID, sm.MENU_NAME, sm.MENU_IMG, sm.MENU_TYPE, sm.PARENT_MENU_ID,sm.MENU_NEXT_ID,sm.SYNC_URL
-       sm.MENU_NEXT_ID, sm.MENU_URL,sm.MENU_REMARK,sm2.MENU_NAME as parentMenuName
+      select sm.MENU_ID, sm.MENU_NAME, sm.MENU_IMG, sm.MENU_TYPE, sm.PARENT_MENU_ID, sm.MENU_NEXT_ID, sm.SYNC_URL,
+              sm.MENU_NEXT_ID,  sm.MENU_URL, sm.MENU_REMARK, sm2.MENU_NAME as parentMenuName
       from sys_menu sm
       left join sys_menu sm2
       on sm.PARENT_MENU_ID = sm2.MENU_ID

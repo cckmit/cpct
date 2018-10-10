@@ -14,8 +14,7 @@ public interface SysRoleMapper {
 
     SysRole selectByPrimaryKey(Long roleId);
 
-    List<SysRole> selectByParams(@Param("roleId") Long roleId,
-                            @Param("roleName") String roleName);
+    List<SysRole> selectByParams(@Param("roleName") String roleName);
 
     List<Map<String,Object>> selectAll();
 

@@ -9,7 +9,7 @@ import java.util.Map;
 
 public interface SysParamsService {
 
-    Map<String, Object> listParams(String paramName, Long configType, Integer page, Integer pageSize);
+    Map<String, Object> listParams(String paramName, String paramKey, Integer page, Integer pageSize);
 
     Map<String, Object> saveParams(SysParams sysParams);
 
