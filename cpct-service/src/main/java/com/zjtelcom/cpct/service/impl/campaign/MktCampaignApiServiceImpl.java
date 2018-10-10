@@ -123,7 +123,7 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
         MktCampaignResp mktCampaignResp = BeanUtil.create(mktCampaignDO, new MktCampaignResp());
         // 获取所有的sysParam
         Map<String, String> paramMap = new HashMap<>();
-        List<SysParams> sysParamList = sysParamsMapper.selectAll("", 0L);
+        List<SysParams> sysParamList = sysParamsMapper.selectAll("", "");
         for (SysParams sysParams : sysParamList) {
             paramMap.put(sysParams.getParamKey() + sysParams.getParamValue(), sysParams.getParamName());
         }

@@ -293,7 +293,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         }
         // 获取所有的sysParam
         Map<String, String> paramMap = new HashMap<>();
-        List<SysParams> sysParamList = sysParamsMapper.selectAll("", 0L);
+        List<SysParams> sysParamList = sysParamsMapper.selectAll("", "");
         for (SysParams sysParams : sysParamList) {
             paramMap.put(sysParams.getParamKey() + sysParams.getParamValue(), sysParams.getParamName());
         }
@@ -424,7 +424,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
         // 获取所有的sysParam
         Map<String, String> paramMap = new HashMap<>();
-        List<SysParams> sysParamList = sysParamsMapper.selectAll("", 0L);
+        List<SysParams> sysParamList = sysParamsMapper.selectAll("", "");
         for (SysParams sysParams : sysParamList) {
             paramMap.put(sysParams.getParamKey() + sysParams.getParamValue(), sysParams.getParamName());
         }
@@ -575,7 +575,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
         // 获取所有的sysParam
         Map<String, String> paramMap = new HashMap<>();
-        List<SysParams> sysParamList = sysParamsMapper.selectAll("", 0L);
+        List<SysParams> sysParamList = sysParamsMapper.selectAll("", "");
         for (SysParams sysParams : sysParamList) {
             paramMap.put(sysParams.getParamKey() + sysParams.getParamValue(), sysParams.getParamName());
         }
