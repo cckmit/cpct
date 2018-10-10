@@ -6,7 +6,7 @@ import com.zjtelcom.cpct.domain.system.SysRoleMenu;
 import java.util.List;
 
 public interface SysRoleMenuMapper {
-    int deleteByPrimaryKey(Long authorityId);
+    int deleteByPrimaryKey(Long roleId);
 
     int insert(SysRoleMenu record);
 

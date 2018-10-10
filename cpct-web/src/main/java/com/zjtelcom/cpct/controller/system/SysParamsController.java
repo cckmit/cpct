@@ -35,12 +35,12 @@ public class SysParamsController extends BaseController {
         Map result = new HashMap();
 
         String paramName = params.get("paramName");
-        Long configType = Long.parseLong(params.get("configType"));
+        String paramKey = params.get("paramKey");
         Integer page = Integer.parseInt(params.get("page"));
         Integer pageSize = Integer.parseInt(params.get("pageSize"));
 
         try {
-            result = sysParamsService.listParams(paramName, configType, page, pageSize);
+            result = sysParamsService.listParams(paramName, paramKey, page, pageSize);
         } catch (Exception e) {
             logger.error("[op:SysParamsController] fail to listParams Exception: ", e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());

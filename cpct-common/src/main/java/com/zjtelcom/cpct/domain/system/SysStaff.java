@@ -47,6 +47,26 @@ public class SysStaff extends BaseEntity implements Serializable {
 
     private Long updateStaff;
 
+    /**
+     * 员工角色
+     */
+    private String roleName;
+
+    /**
+     * 所属渠道
+     */
+    private String channelName;
+
+    /**
+     * 所属地市
+     */
+    private String cityName;
+
+    /**
+     * 登录状态
+     */
+    private String loginName;
+
     public Long getStaffId() {
         return staffId;
     }
@@ -191,4 +211,35 @@ public class SysStaff extends BaseEntity implements Serializable {
         this.loginStatus = loginStatus;
     }
 
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
+
+    public String getChannelName() {
+        return channelName;
+    }
+
+    public void setChannelName(String channelName) {
+        this.channelName = channelName;
+    }
+
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
+
+    public String getLoginName() {
+        return loginName;
+    }
+
+    public void setLoginName(String loginName) {
+        this.loginName = loginName;
+    }
 }

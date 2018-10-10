@@ -41,11 +41,29 @@ public class TrialOperationVO implements Serializable {
      */
     private Long lanId;
 
-
+    /**
+     * 规则集合
+     */
     private List<TrialOperationParam> paramList;
 
+    /**
+     * 展示列标签数组
+     */
     private String[] fieldList;
 
+    /**
+     * 是策略试运算
+     */
+    private boolean isSample;
+
+
+    public boolean isSample() {
+        return isSample;
+    }
+
+    public void setSample(boolean sample) {
+        isSample = sample;
+    }
 
     public String[] getFieldList() {
         return fieldList;
