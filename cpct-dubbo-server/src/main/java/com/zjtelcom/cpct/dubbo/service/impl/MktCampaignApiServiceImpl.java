@@ -1,9 +1,6 @@
 package com.zjtelcom.cpct.dubbo.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
-import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.*;
@@ -33,7 +30,6 @@ import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRuleRel;
 import com.zjtelcom.cpct.dubbo.model.MktCampaignResp;
 import com.zjtelcom.cpct.dubbo.model.MktStrConfRuleResp;
 import com.zjtelcom.cpct.dubbo.model.MktStrategyConfResp;
-import com.zjtelcom.cpct.dubbo.model.QryMktCampaignListReq;
 import com.zjtelcom.cpct.dubbo.service.MktCampaignApiService;
 import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.util.*;

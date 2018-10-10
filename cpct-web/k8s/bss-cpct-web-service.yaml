@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bss-cpct-web
+  labels:
+    name: bss-cpct-web
+spec:
+  type: NodePort
+  ports:
+  - port: 30801
+    nodePort: 30801
+  selector:
+    name: bss-cpct-web
