@@ -1,9 +1,6 @@
 package com.zjtelcom.cpct.dubbo.service.impl;
 
-import com.alibaba.dubbo.config.annotation.Service;
-import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelCatalogMapper;
-import com.zjtelcom.cpct.dto.event.Catalog;
 import com.zjtelcom.cpct.dubbo.model.LabelCatalog;
 import com.zjtelcom.cpct.dubbo.model.LabelCatalogModel;
 import com.zjtelcom.cpct.dubbo.service.CatalogService;
@@ -11,6 +8,7 @@ import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +18,7 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 @Service
 public class CatalogServiceImpl implements CatalogService {
-    @Autowired
+    @Autowired(required = false)
     private InjectionLabelCatalogMapper labelCatalogMapper;
 
 

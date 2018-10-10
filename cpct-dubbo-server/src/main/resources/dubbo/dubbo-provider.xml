@@ -7,23 +7,58 @@
     http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 
     <!-- 提供方应用信息，用于计算依赖关系 -->
-    <dubbo:application name="33.1083" />
+    <dubbo:application name="00.1083"/>
 
-    <dubbo:registry protocol="dubbo" address="134.96.253.86:8033"/>
+    <!--<dubbo:registry protocol="dubbo" address="134.96.253.86:8033"/>-->
+    <dubbo:registry protocol="dubbo" address="134.96.159.11:8033"/>
 
     <!-- 暴露服务 -->
-    <dubbo:protocol name="dubbo" port="30323"/>
+    <!--<dubbo:protocol name="dubbo" port="30323"/>-->
+    <dubbo:protocol name="dubbo" port="30803"/>
     <dubbo:monitor protocol="registry" />
 
     <!-- 注册 -->
+    <!-- 策略cpct计算服务 -->
     <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.EventApiService" ref="eventApiServiceImpl" version="1.0" >
-        <dubbo:method name="deal" servicecode="33.1083.CalculateCPC" timeout="10000"/>
+        <dubbo:method name="CalculateCPC" servicecode="00.1083.CalculateCPC" timeout="10000"/>
     </dubbo:service>
 
+    <!-- 二次协同查询服务 -->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.MktCamChlResultApiService" ref="mktCamChlResultApiServiceImpl" version="1.0" >
+        <dubbo:method name="selectResultList" servicecode="00.1083.selectResultList" timeout="10000"/>
+    </dubbo:service>
 
+    <!-- 编码查询事件详情服务 -->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.ChannelService" ref="channelServiceImpl" version="1.0" >
+        <dubbo:method name="getEventDetail" servicecode="00.1083.getEventDetail" timeout="10000"/>
+    </dubbo:service>
 
+    <!-- 名单导入服务 -->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.ChannelService" ref="channelServiceImpl" version="1.0" >
+        <dubbo:method name="importRuleUserList" servicecode="00.1083.importRuleUserList" timeout="10000"/>
+    </dubbo:service>
 
+    <!-- 营销活动详情服务 -->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.MktCampaignApiService" ref="mktCampaignApiServiceImpl" version="1.0" >
+        <dubbo:method name="qryMktCampaignDetail" servicecode="00.1083.qryMktCampaignDetail" timeout="10000"/>
+    </dubbo:service>
 
+    <!-- 编码查询渠道详细服务 -->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.ChannelService" ref="channelServiceImpl" version="1.0" >
+        <dubbo:method name="getChannelDetail" servicecode="00.1083.getChannelDetail" timeout="10000"/>
+    </dubbo:service>
+
+    <!-- 调查问卷详情查询服务 -->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.QuestionService" ref="questionServiceImpl" version="1.0" >
+        <dubbo:method name="getQuestionnaireDetail" servicecode="00.1083.getQuestionnaireDetail" timeout="10000"/>
+    </dubbo:service>
+
+    <!-- 订阅 -->
+    <!-- cpc计算协同中心回调 -->
+    <dubbo:reference interface="com.ctzj.smt.bss.cooperate.query.service.dubbo.IContactTaskReceiptService" id="eventApiService"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="contactTaskReceipt" servicecode="00.1079.CPCResultFeedback" timeout="5000"/>
+    </dubbo:reference>
 
 
 </beans>
