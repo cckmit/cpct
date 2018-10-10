@@ -1,0 +1,320 @@
+package com.zjtelcom.cpct.service.impl.filter;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.zjtelcom.cpct.common.Page;
+import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
+import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
+import com.zjtelcom.cpct.dao.channel.OfferMapper;
+import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
+import com.zjtelcom.cpct.dao.system.SysParamsMapper;
+import com.zjtelcom.cpct.dao.user.UserListMapper;
+import com.zjtelcom.cpct.domain.channel.Label;
+import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
+import com.zjtelcom.cpct.domain.channel.Offer;
+import com.zjtelcom.cpct.domain.channel.PpmProduct;
+import com.zjtelcom.cpct.domain.system.SysParams;
+import com.zjtelcom.cpct.dto.channel.OfferDetail;
+import com.zjtelcom.cpct.dto.filter.FilterRule;
+import com.zjtelcom.cpct.dto.filter.FilterRuleAddVO;
+import com.zjtelcom.cpct.dto.filter.FilterRuleVO;
+import com.zjtelcom.cpct.dto.user.UserList;
+import com.zjtelcom.cpct.enums.ConditionType;
+import com.zjtelcom.cpct.request.filter.FilterRuleReq;
+import com.zjtelcom.cpct.service.BaseService;
+import com.zjtelcom.cpct.service.filter.FilterRuleService;
+import com.zjtelcom.cpct.util.*;
+import com.zjtelcom.cpct.util.DateUtil;
+import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.*;
+import java.util.*;
+import java.util.logging.Filter;
+
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
+
+/**
+ * @Description 规律规则实现类
+ * @Author pengy
+ * @Date 2018/6/21 9:46
+ */
+@Service
+@Transactional
+public class FilterRuleServiceImpl extends BaseService implements FilterRuleService {
+
+    @Autowired
+    private FilterRuleMapper filterRuleMapper;
+    @Autowired
+    private UserListMapper userListMapper;
+    @Autowired
+    private RedisUtils redisUtils;
+    @Autowired
+    private SysParamsMapper sysParamsMapper;
+    @Autowired
+    private OfferMapper offerMapper;
+    @Autowired
+    private MktVerbalConditionMapper verbalConditionMapper;
+    @Autowired
+    private InjectionLabelMapper labelMapper;
+
+
+    /**
+     * 过滤规则列表（含分页）
+     */
+    @Override
+    public Map<String, Object> qryFilterRule(FilterRuleReq filterRuleReq) {
+        Map<String, Object> maps = new HashMap<>();
+        Page pageInfo = filterRuleReq.getPageInfo();
+        PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
+        List<FilterRule> filterRules = filterRuleMapper.qryFilterRule(filterRuleReq.getFilterRule());
+        Page page = new Page(new PageInfo(filterRules));
+        List<FilterRuleVO> voList = new ArrayList<>();
+        for (FilterRule rule : filterRules){
+            FilterRuleVO vo = BeanUtil.create(rule,new FilterRuleVO());
+            SysParams sysParams = sysParamsMapper.findParamsByValue("FILTER_RULE_TYPE",rule.getFilterType());
+            if (sysParams!=null){
+                vo.setFilterTypeName(sysParams.getParamName());
+            }
+            voList.add(vo);
+        }
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("filterRules", voList);
+        maps.put("pageInfo",page);
+        return maps;
+    }
+
+    /**
+     * 过滤规则列表（不含分页）
+     */
+    @Override
+    public Map<String, Object> qryFilterRules(FilterRuleReq filterRuleReq) {
+        Map<String, Object> maps = new HashMap<>();
+        List<FilterRule> filterRules = filterRuleMapper.qryFilterRule(filterRuleReq.getFilterRule());
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("filterRules", filterRules);
+        return maps;
+    }
+
+    /**
+     * 导入用户名单
+     */
+    @Transactional(readOnly = false)
+    @Override
+    public Map<String, Object> importUserList(MultipartFile multipartFile, Long ruleId) throws IOException {
+        Map<String, Object> maps = new HashMap<>();
+
+        InputStream inputStream = multipartFile.getInputStream();
+        XSSFWorkbook wb = new XSSFWorkbook(inputStream);
+        Sheet sheet = wb.getSheetAt(0);
+        Integer rowNums = sheet.getLastRowNum() + 1;
+        List<String> resultList = new ArrayList<>();
+        String key = "USER_LIST_"+ChannelUtil.getRandomStr(5);
+        for (int i = 0; i < rowNums; i++) {
+            Row row = sheet.getRow(i);
+            if (row.getLastCellNum()>=2){
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg","请返回检查模板格式");
+                return maps;
+            }
+//            for (int j = 0; j < row.getLastCellNum(); j++) {
+            Cell cell = row.getCell(0);
+            String cellValue = ChannelUtil.getCellValue(cell).toString();
+            resultList.add(cellValue);
+//            }
+//            UserList userListT = userListMapper.getUserList(userList);
+//            if (userListT != null) {
+//                continue;
+//            }
+//            userList.setRuleId(ruleId);
+//            userList.setCreateDate(new Date());
+//            userList.setUpdateDate(new Date());
+//            userList.setStatusDate(new Date());
+//            userList.setRemark("123");
+//            userList.setLanId(1L);
+//            userList.setUpdateStaff(UserUtil.loginId());
+//            userList.setCreateStaff(UserUtil.loginId());
+//            userList.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+//            userListMapper.insert(userList);
+//
+//            //新用户存入redis;.
+//            redisUtils.hmSet(String.valueOf(userList.getUserId()), "userName", userList.getUserName());
+//            redisUtils.hmSet(String.valueOf(userList.getUserId()), "userPhone", userList.getUserPhone());
+//            redisUtils.hmSet(String.valueOf(userList.getUserId()), "filterType", userList.getFilterType());
+//            redisUtils.hmSet(key, "userList",cellValue );
+//            System.out.println(redisUtils.hmGet(key, "userList"));
+
+        }
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", ChannelUtil.StringList2String(resultList));
+        maps.put("key",key);
+        return maps;
+    }
+
+    /**
+     * 从缓存中获取用户列表
+     */
+    @Override
+    public Map<String, Object> listUserList(UserList userList) throws IOException {
+        Map<String, Object> maps = new HashMap<>();
+        List<UserList> userLists = new ArrayList<>();
+        Set<Object> keys = redisUtils.keys("[1-9]*");
+        for (Object str : keys) {
+            UserList userListT = new UserList();
+            userListT.setUserName(String.valueOf(redisUtils.hmGet((String) str, "userName")));
+            userListT.setUserPhone(String.valueOf(redisUtils.hmGet((String) str, "userPhone")));
+            userLists.add(userListT);
+        }
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("userLists", userLists);
+        return maps;
+    }
+
+    /**
+     * 删除过滤规则
+     */
+    @Override
+    public Map<String, Object> delFilterRule(FilterRule filterRule) {
+        Map<String, Object> maps = new HashMap<>();
+        filterRuleMapper.delFilterRule(filterRule);
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        return maps;
+    }
+
+    /**
+     * 查询单个过滤规则
+     */
+    @Override
+    public Map<String, Object> getFilterRule(FilterRule filterRule) {
+        Map<String, Object> map = new HashMap<>();
+        FilterRule filterRuleT = filterRuleMapper.getFilterRule(filterRule);
+        FilterRuleVO vo = BeanUtil.create(filterRuleT,new FilterRuleVO());
+        if (filterRuleT.getChooseProduct()!=null && !filterRuleT.getChooseProduct().equals("")){
+            List<Long> idList = ChannelUtil.StringToidList(filterRuleT.getChooseProduct());
+            List<OfferDetail> productList = new ArrayList<>();
+            for (Long id : idList){
+                Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(id.toString()));
+                if (offer!=null){
+                    OfferDetail offerDetail = BeanUtil.create(offer,new OfferDetail());
+                    productList.add(offerDetail);
+                }
+            }
+            vo.setProductList(productList);
+        }
+        if (filterRuleT.getConditionId()!=null){
+            MktVerbalCondition condition = verbalConditionMapper.selectByPrimaryKey(filterRuleT.getConditionId());
+            if (condition!=null){
+                Label label = labelMapper.selectByPrimaryKey(Long.valueOf(condition.getLeftParam()));
+                if (label!=null){
+                    vo.setConditionName(label.getInjectionLabelName());
+                    vo.setOperType(condition.getOperType());
+                    vo.setRightParam(condition.getRightParam());
+                }
+            }
+        }
+        map.put("resultCode", CommonConstant.CODE_SUCCESS);
+        map.put("resultMsg", StringUtils.EMPTY);
+        map.put("filterRule", vo);
+        return map;
+    }
+
+    /**
+     * 新建过滤规则
+     */
+    @Override
+    public Map<String, Object> createFilterRule(FilterRuleAddVO addVO) {
+        Map<String, Object> maps = new HashMap<>();
+        FilterRule filterRule = BeanUtil.create(addVO,new FilterRule());
+        filterRule.setCreateDate(DateUtil.getCurrentTime());
+        filterRule.setUpdateDate(DateUtil.getCurrentTime());
+        filterRule.setStatusDate(DateUtil.getCurrentTime());
+        filterRule.setUpdateStaff(UserUtil.loginId());
+        filterRule.setCreateStaff(UserUtil.loginId());
+        filterRule.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+        filterRule.setChooseProduct(ChannelUtil.idList2String(addVO.getChooseProduct()));
+        //销售品互斥过滤 加labelcode
+        if (filterRule.getFilterType().equals("3000")){
+            filterRule.setLabelCode("PROM_LIST");
+        }
+        if (addVO.getCondition()!=null){
+            MktVerbalCondition condition = BeanUtil.create(addVO,new MktVerbalCondition());
+            condition.setVerbalId(0L);
+            condition.setConditionType(ConditionType.FILTER_RULE.getValue().toString());
+            verbalConditionMapper.insert(condition);
+            filterRule.setConditionId(condition.getConditionId());
+        }
+        filterRuleMapper.createFilterRule(filterRule);
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("filterRule", filterRule);
+        return maps;
+    }
+
+    /**
+     * 修改过滤规则
+     */
+    @Override
+    public Map<String, Object> modFilterRule(FilterRuleAddVO editVO) {
+        Map<String, Object> maps = new HashMap<>();
+        FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(editVO.getRuleId());
+        if (filterRule==null){
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg", StringUtils.EMPTY);
+            return maps;
+        }
+        BeanUtil.copy(editVO,filterRule);
+        filterRule.setUpdateDate(DateUtil.getCurrentTime());
+        filterRule.setUpdateStaff(UserUtil.loginId());
+        filterRule.setChooseProduct(ChannelUtil.idList2String(editVO.getChooseProduct()));
+        if (filterRule.getFilterType().equals("3000")){
+            filterRule.setLabelCode("PROM_LIST");
+        }
+
+        if (editVO.getCondition()!=null){
+            //先删除原始条件
+            if (filterRule.getConditionId()!=null){
+                verbalConditionMapper.deleteByVerbalId(ConditionType.FILTER_RULE.getValue().toString(),filterRule.getConditionId());
+            }
+            //添加新条件
+            MktVerbalCondition condition = BeanUtil.create(editVO,new MktVerbalCondition());
+            condition.setVerbalId(0L);
+            condition.setConditionType(ConditionType.FILTER_RULE.getValue().toString());
+            verbalConditionMapper.insert(condition);
+            filterRule.setConditionId(condition.getConditionId());
+        }
+        filterRuleMapper.modFilterRule(filterRule);
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("filterRule", filterRule);
+        return maps;
+    }
+
+
+    /**
+     * 根据过滤规则id集合查询过滤规则集合
+     */
+    @Override
+    public Map<String, Object> getFilterRule(List<Integer> filterRuleIdList) {
+        Map<String, Object> map = new HashMap<>();
+        List<FilterRule> filterRuleList = new ArrayList<>();
+        for (Integer filterRuleId : filterRuleIdList) {
+            FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId.longValue());
+            filterRuleList.add(filterRule);
+        }
+        map.put("resultCode", CommonConstant.CODE_SUCCESS);
+        map.put("resultMsg", StringUtils.EMPTY);
+        map.put("filterRuleList", filterRuleList);
+        return map;
+    }
+
+}
