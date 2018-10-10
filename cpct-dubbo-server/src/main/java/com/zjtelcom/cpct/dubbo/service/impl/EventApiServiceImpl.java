@@ -1824,9 +1824,8 @@ public class EventApiServiceImpl implements EventApiService {
     }
 
 
-
     @Override
-    public  Map<String, Object> CalculateCPCSync(Map<String, String> map) {
+    public  Map<String, Object> CalculateCPCSync(Map<String, Object> map) {
         //初始化返回结果
         Map<String, Object> result = new HashMap();
 
