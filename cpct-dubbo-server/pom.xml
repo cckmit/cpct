@@ -45,11 +45,26 @@
             <artifactId>QLExpress</artifactId>
         </dependency>
 
+        <!--<dependency>-->
+            <!--<groupId>com.alibaba</groupId>-->
+            <!--<artifactId>dubbo</artifactId>-->
+        <!--</dependency>-->
+
         <dependency>
-            <groupId>com.alibaba</groupId>
+            <groupId>com.zjhcsoft</groupId>
             <artifactId>dubbo</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>javassist</groupId>
+            <artifactId>javassist</artifactId>
+        </dependency>
+
+        <!-- 引入协同中心dubbo服务jar包 -->
+        <dependency>
+            <groupId>com.ctzj.smt.bss</groupId>
+            <artifactId>bss-cooperate-service-api</artifactId>
+        </dependency>
 
 
     </dependencies>
@@ -65,7 +80,6 @@
                     <mainClass>com.zjtelcom.cpct.DubboServerApplication</mainClass>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
 

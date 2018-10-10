@@ -1,6 +1,5 @@
 package com.zjtelcom.cpct.dubbo.service.impl;
 
-import com.alibaba.dubbo.config.annotation.Service;
 import com.zjtelcom.cpct.dao.question.MktQstQuestRelMapper;
 import com.zjtelcom.cpct.dao.question.MktQuestionDetailMapper;
 import com.zjtelcom.cpct.dao.question.MktQuestionMapper;
@@ -13,6 +12,7 @@ import com.zjtelcom.cpct.dubbo.model.*;
 import com.zjtelcom.cpct.dubbo.service.QuestionService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,15 +24,15 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 @Service
 public class QuestionServiceImpl implements QuestionService {
-    @Autowired
+    @Autowired(required = false)
     private MktQuestionnaireMapper questionnaireMapper;
-    @Autowired
+    @Autowired(required = false)
     private QuestionService questionService;
-    @Autowired
+    @Autowired(required = false)
     private MktQstQuestRelMapper questRelMapper;
-    @Autowired
+    @Autowired(required = false)
     private MktQuestionMapper questionMapper;
-    @Autowired
+    @Autowired(required = false)
     private MktQuestionDetailMapper questionDetailMapper;
 
     /**

@@ -4,11 +4,15 @@ import java.util.Map;
 
 public interface EventApiService {
 
-    Map<String, Object> deal(Map<String, Object> map);
-
-    Map<String, Object> CalculateCPC(Map<String, String> map);
+    Map<String, Object> CalculateCPC(Map<String, Object> map);
 
     Map<String, Object> SecondChannelSynergy(Map<String, String> map);
 
+    /**
+     * 首次协同cpc同步
+     * @param map
+     * @return
+     */
+    Map<String, Object> CalculateCPCSync(Map<String, Object> map);
 
 }

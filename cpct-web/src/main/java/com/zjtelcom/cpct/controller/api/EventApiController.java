@@ -31,12 +31,39 @@ public class EventApiController extends BaseController {
     public String eventInput(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> params) {
         Map result = new HashMap();
         try {
-            result = eventApiService.deal(params);
-//            eventApiService.cpc();
+            result = eventApiService.CalculateCPC(params);
         } catch (Exception e) {
             e.printStackTrace();
             return initFailRespInfo(e.getMessage(),"");
         }
         return initSuccRespInfo(result);
     }
+
+    @RequestMapping("/CalculateCPCSync")
+    @CrossOrigin
+    public String eventInputSync(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> params) {
+        Map result = new HashMap();
+        try {
+            result = eventApiService.CalculateCPCSync(params);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return initFailRespInfo(e.getMessage(),"");
+        }
+        return initSuccRespInfo(result);
+    }
+
+
+    @RequestMapping("/SecondChannelSynergy")
+    @CrossOrigin
+    public String SecondChannelSynergy(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> params) {
+        Map result = new HashMap();
+        try {
+            result = eventApiService.SecondChannelSynergy(params);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return initFailRespInfo(e.getMessage(),"");
+        }
+        return initSuccRespInfo(result);
+    }
+
 }
