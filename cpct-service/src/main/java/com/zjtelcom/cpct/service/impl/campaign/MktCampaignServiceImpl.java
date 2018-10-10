@@ -591,38 +591,17 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 mktCampaignVO.setPlanEndTime(mktCampaignCountDO.getPlanEndTime());
                 mktCampaignVO.setCreateChannel(mktCampaignCountDO.getCreateChannel());
                 mktCampaignVO.setCreateDate(mktCampaignCountDO.getCreateDate());
+                mktCampaignVO.setPreMktCampaignId(mktCampaignCountDO.getPreMktCampaignId());
             } catch (Exception e) {
                 logger.error("Excetion:", e);
             }
-/*            mktCampaignVO.setTiggerTypeValue(paramMap.
-                    get(ParamKeyEnum.TIGGER_TYPE.getParamKey() + mktCampaignDO.getTiggerType()));*/
             mktCampaignVO.setMktCampaignCategoryValue(paramMap.
                     get(ParamKeyEnum.MKT_CAMPAIGN_CATEGORY.getParamKey() + mktCampaignCountDO.getMktCampaignCategory()));
             mktCampaignVO.setMktCampaignTypeValue(paramMap.
                     get(ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey() + mktCampaignCountDO.getMktCampaignType()));
             mktCampaignVO.setStatusCdValue(paramMap.
                     get(ParamKeyEnum.STATUS_CD.getParamKey() + mktCampaignCountDO.getStatusCd()));
-/*
-            mktCampaignVO.setExecTypeValue(paramMap.
-                    get(ParamKeyEnum.EXEC_TYPE.getParamKey() + mktCampaignDO.getExecType()));
-*/
 
-            // 获取活动关联的事件
-/*            List<MktCamEvtRelDO> mktCamEvtRelDOList = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignDO.getMktCampaignId());
-            if (mktCamEvtRelDOList != null) {
-                List<EventDTO> eventDTOList = new ArrayList<>();
-                for (MktCamEvtRelDO mktCamEvtRelDO : mktCamEvtRelDOList) {
-                    Long eventId = mktCamEvtRelDO.getEventId();
-                    ContactEvt contactEvt = contactEvtMapper.getEventById(eventId);
-                    if (contactEvt != null) {
-                        EventDTO eventDTO = new EventDTO();
-                        eventDTO.setEventId(eventId);
-                        eventDTO.setEventName(contactEvt.getContactEvtName());
-                        eventDTOList.add(eventDTO);
-                    }
-                }
-                mktCampaignVO.setEventDTOS(eventDTOList);
-            }*/
             Boolean isRelation = false;
             //判断该活动是否有有效的父/子活动
             if (mktCampaignCountDO.getRelCount() != 0) {
