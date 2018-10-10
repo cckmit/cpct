@@ -103,12 +103,6 @@
 
             <dependency>
                 <groupId>com.zjtelcom.cpct</groupId>
-                <artifactId>cpct-dubbo-server</artifactId>
-                <version>${cpct.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.zjtelcom.cpct</groupId>
                 <artifactId>cpct-service</artifactId>
                 <version>${cpct.version}</version>
             </dependency>
@@ -306,13 +300,6 @@
                 <artifactId>spring-boot-starter-data-redis</artifactId>
                 <version>${redis.version}</version>
             </dependency>
-
-            <!-- ppm-dubbo -->
-            <!--<dependency>-->
-            <!--<groupId>com.ctzj.ppm</groupId>-->
-            <!--<artifactId>ppm-dubbo</artifactId>-->
-            <!--<version>${ppm-dubbo.version}</version>-->
-            <!--</dependency>-->
 
             <!-- HttpClient -->
             <dependency>
