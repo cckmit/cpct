@@ -24,8 +24,6 @@ public class ChannelUtil  {
 
 
 
-
-
     public static String getQuestionType(Question question){
         String st = "";
         if (question.getQuestionType()==null || question.getQuestionType().equals("")){
