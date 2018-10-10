@@ -76,15 +76,6 @@ public class MktCampaignResp extends MktCampaign{
      */
     private Boolean isRelation;
 
-    /**
-     * 试运算展示列
-     */
-    private List<MessageLabelInfo> calcDisplayList;
-
-    /**
-     * isale展示列
-     */
-    private List<MessageLabelInfo> isaleDisplayList;
 
     /**
      * 策略配置信息
@@ -201,21 +192,5 @@ public class MktCampaignResp extends MktCampaign{
 
     public void setMktStrategyConfRespList(List<MktStrategyConfResp> mktStrategyConfRespList) {
         this.mktStrategyConfRespList = mktStrategyConfRespList;
-    }
-
-    public List<MessageLabelInfo> getCalcDisplayList() {
-        return calcDisplayList;
-    }
-
-    public void setCalcDisplayList(List<MessageLabelInfo> calcDisplayList) {
-        this.calcDisplayList = calcDisplayList;
-    }
-
-    public List<MessageLabelInfo> getIsaleDisplayList() {
-        return isaleDisplayList;
-    }
-
-    public void setIsaleDisplayList(List<MessageLabelInfo> isaleDisplayList) {
-        this.isaleDisplayList = isaleDisplayList;
     }
 }
