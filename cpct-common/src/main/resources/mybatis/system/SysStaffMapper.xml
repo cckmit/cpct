@@ -13,11 +13,16 @@
         <result column="CHANNEL_ID" jdbcType="BIGINT" property="channelId"/>
         <result column="CITY_ID" jdbcType="BIGINT" property="cityId"/>
         <result column="STATUS" jdbcType="BIGINT" property="status"/>
+        <result column="LOGIN_STATUS" jdbcType="BIGINT" property="loginStatus"/>
         <result column="LAST_LOGIN" jdbcType="TIMESTAMP" property="lastLogin"/>
         <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
         <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
         <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
         <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff"/>
+        <result column="ROLE_NAME" jdbcType="VARCHAR" property="roleName"/>
+        <result column="CONTACT_CHL_NAME" jdbcType="VARCHAR" property="channelName"/>
+        <result column="name" jdbcType="VARCHAR" property="cityName"/>
+        <result column="PARAM_NAME" jdbcType="VARCHAR" property="loginName"/>
     </resultMap>
 
     <!-- 根据用户名查询用户信息 -->
@@ -75,30 +80,35 @@
     </select>
 
     <select id="selectAll" resultMap="BaseResultMap">
-        select STAFF_ID, STAFF_CODE,STAFF_ACCOUNT, STAFF_NAME, STAFF_PHONE, STAFF_TELEPHONE,
-        STAFF_EMAIL, CHANNEL_ID, CITY_ID, STATUS, LAST_LOGIN, CREATE_DATE, CREATE_STAFF,
-        UPDATE_DATE, UPDATE_STAFF
-        from sys_staff
+        select sf.STAFF_ID, sf.STAFF_CODE, sf.STAFF_ACCOUNT, sf.STAFF_NAME, sf.STAFF_PHONE, sf.STAFF_TELEPHONE,
+        sf.STAFF_EMAIL, sf.CHANNEL_ID, sf.CITY_ID, sf.STATUS, sf.LOGIN_STATUS, sf.LAST_LOGIN, sf.CREATE_DATE,
+        sf.CREATE_STAFF, sf.UPDATE_DATE, sf.UPDATE_STAFF, re.ROLE_NAME, cc.CONTACT_CHL_NAME, sa.name, sp.PARAM_NAME
+        from sys_staff as sf
+        left join sys_staff_role as sr on sf.STAFF_ID = sr.STAFF_ID
+        left join sys_role as re on sr.ROLE_ID = re.ROLE_ID
+        left join contact_channel as cc on sf.CHANNEL_ID = cc.CONTACT_CHL_ID
+        left join sys_area as sa on sf.CITY_ID = sa.area_id
+        left join sys_params as sp on sf.LOGIN_STATUS = sp.PARAM_ID
         where 1=1
-        <if test="status != null and status != ''">
-            and STAFF_ACCOUNT like CONCAT('%',#{staffAccount,jdbcType=VARCHAR},'%')
+        <if test="staffAccount != null and staffAccount != ''">
+            and sf.STAFF_ACCOUNT like CONCAT('%',#{staffAccount,jdbcType=VARCHAR},'%')
         </if>
-        <if test="status != null and status != ''">
-            and STAFF_NAME like CONCAT('%',#{staffName,jdbcType=VARCHAR},'%')
+        <if test="staffName != null and staffName != ''">
+            and sf.STAFF_NAME like CONCAT('%',#{staffName,jdbcType=VARCHAR},'%')
         </if>
         <if test="status != null and status != 0">
-            and STATUS = #{status,jdbcType=BIGINT}
+            and sf.STATUS = #{status,jdbcType=BIGINT}
         </if>
         <if test="cityId != null and cityId != 0">
-            and CITY_ID = #{cityId,jdbcType=BIGINT}
+            and sf.CITY_ID = #{cityId,jdbcType=BIGINT}
         </if>
         <if test="channelId != null and channelId != 0">
-            and CHANNEL_ID = #{channelId,jdbcType=BIGINT}
+            and sf.CHANNEL_ID = #{channelId,jdbcType=BIGINT}
         </if>
         <if test="loginStatus != null and loginStatus != 0">
-            and LOGIN_STATUS = #{loginStatus,jdbcType=BIGINT}
+            and sf.LOGIN_STATUS = #{loginStatus,jdbcType=BIGINT}
         </if>
-        order by CREATE_DATE desc
+        order by sf.CREATE_DATE desc
     </select>
 
     <update id="changeStatus" parameterType="com.zjtelcom.cpct.domain.system.SysStaff">

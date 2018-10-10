@@ -29,12 +29,11 @@ public class SysRoleController extends BaseController {
         Map result = new HashMap();
 
         String roleName = params.get("roleName");
-        Long roleId = Long.parseLong(params.get("roleId"));
         Integer page = Integer.parseInt(params.get("page"));
         Integer pageSize = Integer.parseInt(params.get("pageSize"));
 
         try {
-            result = sysRoleService.listRole(roleId,roleName,page,pageSize);
+            result = sysRoleService.listRole(roleName,page,pageSize);
         } catch (Exception e) {
             logger.error("[op:SysRoleController] fail to listRole Exception: ", e);
             return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());

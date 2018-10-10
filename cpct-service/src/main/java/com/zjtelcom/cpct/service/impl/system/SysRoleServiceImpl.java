@@ -26,10 +26,10 @@ public class SysRoleServiceImpl extends BaseService implements SysRoleService {
     private SysRoleMenuMapper sysRoleMenuMapper;
 
     @Override
-    public Map<String, Object> listRole(Long roleId, String RoleName, int page, int pageSize) {
+    public Map<String, Object> listRole(String RoleName, int page, int pageSize) {
         Map<String, Object> result = new HashMap<>();
         PageHelper.startPage(page, pageSize);
-        List<SysRole> list = sysRoleMapper.selectByParams(roleId, RoleName);
+        List<SysRole> list = sysRoleMapper.selectByParams(RoleName);
         Page pageInfo = new Page(new PageInfo(list));
 
         result.put("resultCode", "0");

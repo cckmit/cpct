@@ -23,10 +23,10 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
     private SysParamsMapper sysParamsMapper;
 
     @Override
-    public Map<String,Object> listParams(String paramName, Long configType,Integer page,Integer pageSize) {
+    public Map<String,Object> listParams(String paramName, String paramKey,Integer page,Integer pageSize) {
         Map<String,Object> result = new HashMap<>();
         PageHelper.startPage(page,pageSize);
-        List<SysParams> list = sysParamsMapper.selectAll(paramName, configType);
+        List<SysParams> list = sysParamsMapper.selectAll(paramName, paramKey);
         Page pageInfo = new Page(new PageInfo(list));
         result.put("resultCode","0");
         result.put("resultMsg","");
