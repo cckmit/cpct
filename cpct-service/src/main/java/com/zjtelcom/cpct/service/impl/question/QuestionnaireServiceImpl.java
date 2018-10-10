@@ -47,6 +47,25 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     @Autowired
     private SysParamsService sysParamsService;
 
+
+    /**
+     * 所有问卷列表
+     * @return
+     */
+    @Override
+    public Map<String, Object> listSimpleNaire() {
+        Map<String,Object> result = new HashMap<>();
+        List<Questionnaire> questionnaireList = questionnaireMapper.selectAll();
+        List<QuestionnaireVO> voList = new ArrayList<>();
+        for (Questionnaire questionnaire : questionnaireList){
+            QuestionnaireVO questionnaireVO = BeanUtil.create(questionnaire,new QuestionnaireVO());
+            voList.add(questionnaireVO);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",voList);
+        return result;
+    }
+
     /**
      * 创建问卷
      * @param addVO

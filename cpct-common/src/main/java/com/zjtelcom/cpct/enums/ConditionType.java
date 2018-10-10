@@ -2,7 +2,8 @@ package com.zjtelcom.cpct.enums;
 
 public enum ConditionType {
     CHANNEL(0,"痛痒点脚本条件"),
-    CONTACT_CONF(1,"推送渠道条件");
+    CONTACT_CONF(1,"推送渠道条件"),
+    FILTER_RULE(3,"过滤规则条件");
 
     private Integer value;
     private String description;
