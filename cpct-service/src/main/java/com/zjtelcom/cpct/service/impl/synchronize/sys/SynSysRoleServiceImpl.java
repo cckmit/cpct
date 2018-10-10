@@ -74,7 +74,7 @@ public class SynSysRoleServiceImpl implements SynSysRoleService {
     @Override
     public Map<String, Object> synchronizeBatchRole(String roleName) {
         Map<String,Object> maps = new HashMap<>();
-        List<SysRole> prdList = sysRoleMapper.selectByParams(null,null);
+        List<SysRole> prdList = sysRoleMapper.selectByParams(null);
         List<SysRole> realList = sysRolePrdMapper.selectByParams(null,null);
         //三个集合分别表示需要 新增的   修改的    删除的
         List<SysRole> addList=new ArrayList<SysRole>();
