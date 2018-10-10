@@ -376,12 +376,6 @@
             </dependency>
 
             <!-- 引入集团redis缓存包 -->
-            <!--<dependency>-->
-                <!--<groupId>com.ctg.itrdc.cache</groupId>-->
-                <!--<artifactId>ctg-cache-control</artifactId>-->
-                <!--<version>${ctg-cache.version}</version>-->
-            <!--</dependency>-->
-
             <dependency>
                 <groupId>com.ctg.itrdc.cache</groupId>
                 <artifactId>ctg-cache-client</artifactId>
