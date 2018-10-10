@@ -161,6 +161,10 @@ public class EventApiServiceImpl implements EventApiService {
         return result;
     }
 
+    @Override
+    public Map<String, Object> SecondChannelSynergy(Map<String, Object> map) {
+        return null;
+    }
 
     /**
      * 异步调用协同中心回调接口
@@ -1812,21 +1816,8 @@ public class EventApiServiceImpl implements EventApiService {
         }
     }
 
-
-    /**
-     * 二次协同
-     * @param map
-     * @return
-     */
     @Override
-    public Map<String, Object> SecondChannelSynergy(Map<String, String> map) {
-        return null;
-    }
-
-
-
-    @Override
-    public  Map<String, Object> CalculateCPCSync(Map<String, String> map) {
+    public Map<String, Object> CalculateCPCSync(Map<String, Object> map) {
         //初始化返回结果
         Map<String, Object> result = new HashMap();
 
