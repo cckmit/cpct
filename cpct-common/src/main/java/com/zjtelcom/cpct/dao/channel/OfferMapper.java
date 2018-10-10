@@ -26,5 +26,7 @@ public interface OfferMapper {
 
     List<Offer> listByCatalogItemId(@Param("catalogId")Long catalogId);
 
+    List<String> listByOfferIdList(@Param("list")List<Long> offerList);
+
     int updateByPrimaryKey(Offer record);
 }

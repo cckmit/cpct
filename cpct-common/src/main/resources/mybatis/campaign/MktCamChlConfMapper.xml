@@ -65,4 +65,17 @@
     where EVT_CONTACT_CONF_ID = #{evtContactConfId,jdbcType=BIGINT}
   </select>
 
+  <select id="listByIdList" resultMap="BaseResultMap" >
+    select EVT_CONTACT_CONF_ID, EVT_CONTACT_CONF_NAME, MKT_CAMPAIGN_ID, CONTACT_CHL_ID,
+    PUSH_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, UPDATE_DATE, STATUS_DATE,
+    REMARK
+    from mkt_cam_chl_conf
+    where EVT_CONTACT_CONF_ID in
+    <foreach collection="list" item="item" open="(" close=")" separator=",">
+      #{item}
+    </foreach>
+  </select>
+
+
+
 </mapper>

@@ -81,6 +81,9 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
         verbalMapper.insert(verbal);
         //删除旧的条件
         for (VerbalConditionAddVO vcAddVO : addVO.getAddVOList()) {
+            if (vcAddVO.getOperType()==null){
+
+            }
             //类型为标签时
             MktVerbalCondition mktVerbalCondition = BeanUtil.create(vcAddVO, new MktVerbalCondition());
             mktVerbalCondition.setVerbalId(verbal.getVerbalId());
