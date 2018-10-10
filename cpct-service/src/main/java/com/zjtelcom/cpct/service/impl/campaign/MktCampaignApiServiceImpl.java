@@ -28,6 +28,7 @@ import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.EventDTO;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
+import com.zjtelcom.cpct.dto.filter.FilterRuleModel;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRuleRel;
 import com.zjtelcom.cpct.enums.*;
@@ -71,28 +72,11 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
      */
     @Autowired
     private MktCampaignMapper mktCampaignMapper;
-
-    /**
-     * 活动关联
-     */
-    @Autowired
-    private MktCampaignRelMapper mktCampaignRelMapper;
-
-    /**
-     * 活动与事件关联
-     */
-    @Autowired
-    private MktCamEvtRelMapper mktCamEvtRelMapper;
     /**
      * 系统参数
      */
     @Autowired
     private SysParamsMapper sysParamsMapper;
-    /**
-     * 事件
-     */
-    @Autowired
-    private ContactEvtMapper contactEvtMapper;
     /**
      * 策略配置和活动关联
      */
@@ -104,32 +88,13 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
     @Autowired
     private MktStrategyConfMapper mktStrategyConfMapper;
 
-    /**
-     * 下发城市与活动关联
-     */
-    @Autowired
-    private MktCamCityRelMapper mktCamCityRelMapper;
-
     @Autowired
     private ContactChannelMapper contactChannelMapper;
-    /**
-     * 下发地市
-     */
-    @Autowired
-    private SysAreaMapper sysAreaMapper;
-
-    /**
-     * 策略与过滤规则的关系
-     */
-    @Autowired
-    private MktStrategyFilterRuleRelMapper mktStrategyFilterRuleRelMapper;
-
     /**
      * 策略配置规则Mapper
      */
     @Autowired
     private MktStrategyConfRuleMapper mktStrategyConfRuleMapper;
-
     /**
      * 首次协同
      */
@@ -137,16 +102,7 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
     private MktCamChlConfMapper mktCamChlConfMapper;
 
     @Autowired
-    private RedisUtils redisUtils;
-
-    @Autowired
     private FilterRuleMapper filterRuleMapper;
-
-    @Autowired
-    private OfferMapper offerMapper;
-
-    @Autowired
-    private MktCamItemMapper mktCamItemMapper;
 
     @Autowired
     private MktCamChlResultMapper mktCamChlResultMapper;
@@ -155,58 +111,16 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
     private MktCamChlResultConfRelMapper mktCamChlResultConfRelMapper;
 
     @Autowired
-    private MktCamChlConfAttrMapper mktCamChlConfAttrMapper;
-
-    @Autowired
     private MktVerbalConditionMapper mktVerbalConditionMapper;
 
     @Autowired
     private InjectionLabelMapper injectionLabelMapper;
 
-    @Autowired
-    private ContactChannelMapper channelMapper;
-
-    @Autowired
-    private MktVerbalMapper verbalMapper;
-
-    @Autowired
-    private MktVerbalConditionMapper verbalConditionMapper;
-
-    @Autowired
-    private InjectionLabelMapper labelMapper;
-
-    @Autowired
-    private MktCamScriptMapper camScriptMapper;
-
-    @Autowired
-    private TarGrpConditionMapper tarGrpConditionMapper;
-
-    @Autowired
-    private MessageMapper messageMapper;
-
-    @Autowired
-    private DisplayColumnLabelMapper displayColumnLabelMapper;
-
     @Override
     public Map<String, Object> qryMktCampaignDetail(Long mktCampaignId) throws Exception {
-        // 获取关系
-        List<MktCampaignRelDO> mktCampaignRelDOList = mktCampaignRelMapper.selectByAmktCampaignId(mktCampaignId, StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
-        List<CityProperty> applyRegionIds = new ArrayList<>();
         // 获取活动基本信息
         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
         MktCampaignResp mktCampaignResp = BeanUtil.create(mktCampaignDO, new MktCampaignResp());
-
-        // 获取下发城市集合
-/*
-        List<MktCamCityRelDO> mktCamCityRelDOList = mktCamCityRelMapper.selectByMktCampaignId(mktCampaignDO.getMktCampaignId());
-        List<SysArea> sysAreaList = new ArrayList<>();
-        for (MktCamCityRelDO mktCamCityRelDO : mktCamCityRelDOList) {
-            SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCamCityRelDO.getCityId().intValue());
-            sysAreaList.add(sysArea);
-        }
-        mktCampaignResp.setSysAreaList(sysAreaList);
-
-*/
         // 获取所有的sysParam
         Map<String, String> paramMap = new HashMap<>();
         List<SysParams> sysParamList = sysParamsMapper.selectAll("", 0L);
@@ -221,39 +135,6 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
                 get(ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey() + mktCampaignDO.getMktCampaignType()));
         mktCampaignResp.setStatusCdValue(paramMap.
                 get(ParamKeyEnum.STATUS_CD.getParamKey() + mktCampaignDO.getStatusCd()));
-
-        // 获取活动关联的事件
-/*
-        List<MktCamEvtRelDO> mktCamEvtRelDOList = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignDO.getMktCampaignId());
-        if (mktCamEvtRelDOList != null) {
-            List<EventDTO> eventDTOList = new ArrayList<>();
-            for (MktCamEvtRelDO mktCamEvtRelDO : mktCamEvtRelDOList) {
-                Long eventId = mktCamEvtRelDO.getEventId();
-                ContactEvt contactEvt = contactEvtMapper.getEventById(eventId);
-                if (contactEvt != null) {
-                    EventDTO eventDTO = new EventDTO();
-                    eventDTO.setEventId(eventId);
-                    eventDTO.setEventName(contactEvt.getContactEvtName());
-                    eventDTOList.add(eventDTO);
-                }
-            }
-            mktCampaignResp.setEventDTOS(eventDTOList);
-        }
- */
-        // 获取试运算展示列标签
-/*
-        DisplayColumn calcDisplay = new DisplayColumn();
-        calcDisplay.setDisplayColumnId(mktCampaignDO.getCalcDisplay());
-        Map<String, Object> calcDisplayListMap = queryLabelListByDisplayId(calcDisplay);
-        mktCampaignResp.setCalcDisplayList((List<MessageLabelInfo>) calcDisplayListMap.get("resultMsg"));
-
-        // 获取isale展示列标签
-        DisplayColumn isaleDisplay = new DisplayColumn();
-        isaleDisplay.setDisplayColumnId(mktCampaignDO.getIsaleDisplay());
-        Map<String, Object> isaleDisplayListMap = queryLabelListByDisplayId(isaleDisplay);
-        mktCampaignResp.setIsaleDisplayList((List<MessageLabelInfo>) isaleDisplayListMap.get("resultMsg"));
-*/
-
 
         // 获取活动关联策略集合
         List<MktStrategyConfResp> mktStrategyConfRespList = new ArrayList<>();
@@ -319,16 +200,30 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
 */
 
         // 获取过滤规则集合
-/*
-        List<Long> filterRuleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(mktStrategyConfId);
-        List<FilterRule> filterRuleList = new ArrayList<>();
+        List<FilterRuleModel> filterRuleModels = filterRuleMapper.selectFilterRuleByStrategyId(mktStrategyConfId);
+        mktStrategyConfResp.setFilterRuleModelList(filterRuleModels);
+        /*        List<Long> filterRuleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(mktStrategyConfId);
+        List<FilterRuleModel> filterRuleModelList = new ArrayList<>();
         for (Long filterRuleId : filterRuleIdList) {
+            = new FilterRuleModel();
             FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId);
-            filterRuleList.add(filterRule);
-        }
-        mktStrategyConfResp.setFilterRuleList(filterRuleList);
+            if ("2000".equals(filterRule.getFilterType())){
+                MktVerbalCondition mktVerbalCondition = mktVerbalConditionMapper.selectByPrimaryKey(filterRule.getConditionId());
+                FilterRuleModel filterRuleModel = BeanUtil.create(filterRule, new FilterRuleModel());
 
-*/
+                // 查询标签名称
+
+                filterRuleModel.setOperType(mktVerbalCondition.getOperType());
+                filterRuleModel.setLabelCode(mktVerbalCondition.get);
+  *//*              filterRuleModel
+                filterRuleModel
+                        filterRuleModel
+                filterRuleModel*//*
+            }
+            //filterRuleList.add(filterRule);
+        }*/
+
+
 
         //查询与策略匹配的所有规则
         List<MktStrConfRuleResp> mktStrConfRuleRespList = new ArrayList<>();
@@ -529,208 +424,6 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
         rule.setListData(ruleDetails);
         return rule;
     }
-/*
-    public Map<String, Object> getVerbalListByConfId(Long userId, Long confId) {
-        Map<String, Object> result = new HashMap<>();
-        //todo 推送渠道对象
-        List<MktVerbal> verbalList = verbalMapper.findVerbalListByConfId(confId);
-        List<VerbalVO> verbalVOS = new ArrayList<>();
-        for (MktVerbal verbal : verbalList) {
-            if (verbal == null) {
-                result.put("resultCode", CODE_FAIL);
-                result.put("resultMsg", "痛痒点话术不存在");
-                return result;
-            }
-            VerbalVO verbalVO = supplementVo(ChannelUtil.map2VerbalVO(verbal), verbal);
-            verbalVOS.add(verbalVO);
-        }
-        result.put("resultCode", CODE_SUCCESS);
-        result.put("resultMsg", verbalVOS);
-        return result;
-    }
-
- */
-    /**
-     * 痛痒点话术返回结果包装
-     */
-/*
-    private VerbalVO supplementVo(VerbalVO verbalVO, MktVerbal verbal) {
-        List<VerbalConditionVO> conditionVOList = new ArrayList<>();
-        List<MktVerbalCondition> conditions = verbalConditionMapper.findChannelConditionListByVerbalId(verbal.getVerbalId());
-        for (MktVerbalCondition condition : conditions) {
-            VerbalConditionVO vo = BeanUtil.create(condition, new VerbalConditionVO());
-            vo.setOperName(Operator.getOperator(Integer.valueOf(condition.getOperType())).getDescription());
-            if (!condition.getLeftParamType().equals("2000")) {
-                Label label = labelMapper.selectByPrimaryKey(Long.valueOf(condition.getLeftParam()));
-                if (label.getConditionType() != null && !label.getConditionType().equals("")) {
-                    vo.setConditionType(label.getConditionType());
-                }
-                vo.setLeftParamName(label.getInjectionLabelName());
-                if (label.getRightOperand() != null) {
-                    vo.setValueList(ChannelUtil.StringToList(label.getRightOperand()));
-                }
-                setOperator(vo, label);
-            }
-            conditionVOList.add(vo);
-        }
-        verbalVO.setConditionList(conditionVOList);
-        Channel channel = channelMapper.selectByPrimaryKey(verbalVO.getChannelId());
-        if (channel != null) {
-            verbalVO.setChannelName(channel.getContactChlName());
-            verbalVO.setChannelParentId(channel.getParentId());
-            Channel parent = channelMapper.selectByPrimaryKey(channel.getParentId());
-            if (parent != null) {
-                verbalVO.setChannelParentName(parent.getContactChlName());
-            }
-        }
-        return verbalVO;
-    }
-
- */
-
-
-/*
-
-
-    private void setOperator(VerbalConditionVO vo, Label label) {
-        if (label.getOperator() != null && !label.getOperator().equals("")) {
-            List<String> opratorList = ChannelUtil.StringToList(label.getOperator());
-            List<OperatorDetail> opStList = new ArrayList<>();
-            for (String operator : opratorList) {
-                Operator op = Operator.getOperator(Integer.valueOf(operator));
-                OperatorDetail detail = new OperatorDetail();
-                if (op != null) {
-                    detail.setOperValue(op.getValue());
-                    detail.setOperName(op.getDescription());
-                }
-                opStList.add(detail);
-            }
-            vo.setOperatorList(opStList);
-        }
-    }
-
-
-*/
-
-/*
-
-    public List<TarGrpConditionVO> listTarGrpCondition(Long tarGrpId) throws Exception {
-        List<TarGrpCondition> listTarGrpCondition = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
-        List<TarGrpConditionVO> grpConditionList = new ArrayList<>();
-        List<TarGrpVO> tarGrpVOS = new ArrayList<>();//传回前端展示信息
-        for (TarGrpCondition tarGrpCondition : listTarGrpCondition) {
-            List<String> valueList = new ArrayList<>();
-            List<OperatorDetail> operatorList = new ArrayList<>();
-            TarGrpConditionVO tarGrpConditionVO = new TarGrpConditionVO();
-            CopyPropertiesUtil.copyBean2Bean(tarGrpConditionVO, tarGrpCondition);
-            //塞入左参中文名
-            Label label = injectionLabelMapper.selectByPrimaryKey(Long.valueOf(tarGrpConditionVO.getLeftParam()));
-            if (label == null) {
-                continue;
-            }
-            tarGrpConditionVO.setLeftParamName(label.getInjectionLabelName());
-            //将操作符转为中文
-            if (tarGrpConditionVO.getOperType() != null && !tarGrpConditionVO.getOperType().equals("")) {
-                Operator op = Operator.getOperator(Integer.parseInt(tarGrpConditionVO.getOperType()));
-                tarGrpConditionVO.setOperTypeName(op.getDescription());
-            }
-            //todo 通过左参id
-            String operators = label.getOperator();
-            String[] operator = operators.split(",");
-            if (operator.length > 1) {
-                for (int i = 0; i < operator.length; i++) {
-                    Operator opTT = Operator.getOperator(Integer.parseInt(operator[i]));
-                    OperatorDetail operatorDetail = new OperatorDetail();
-                    operatorDetail.setOperName(opTT.getDescription());
-                    operatorDetail.setOperValue(opTT.getValue());
-                    operatorList.add(operatorDetail);
-                }
-            } else {
-                if (operator.length == 1) {
-                    OperatorDetail operatorDetail = new OperatorDetail();
-                    Operator opTT = Operator.getOperator(Integer.parseInt(operator[0]));
-                    operatorDetail.setOperName(opTT.getDescription());
-                    operatorDetail.setOperValue(opTT.getValue());
-                    operatorList.add(operatorDetail);
-                }
-            }
-            String rightOperand = label.getRightOperand();
-            String[] rightOperands = rightOperand.split(",");
-            if (rightOperands.length > 1) {
-                for (int i = 0; i < rightOperands.length; i++) {
-                    valueList.add(rightOperands[i]);
-                }
-            } else {
-                if (rightOperands.length == 1) {
-                    valueList.add(rightOperands[0]);
-                }
-            }
-            tarGrpConditionVO.setConditionType(label.getConditionType());
-            tarGrpConditionVO.setValueList(valueList);
-            tarGrpConditionVO.setOperatorList(operatorList);
-            grpConditionList.add(tarGrpConditionVO);
-        }
-        return grpConditionList;
-    }
-
-*/
-
-    /**
-     * 获取展示列标签列表
-     *
-     * @param req
-     * @return
-     */
-/*
-
-    public Map<String, Object> queryLabelListByDisplayId(DisplayColumn req) {
-        Map<String, Object> maps = new HashMap<>();
-        List<DisplayColumnLabel> realList = displayColumnLabelMapper.findListByDisplayId(req.getDisplayColumnId());
-        List<LabelDTO> labelList = new ArrayList<>();
-        List<Long> messageTypes = new ArrayList<>();
-
-        for (DisplayColumnLabel real : realList) {
-            Label label = injectionLabelMapper.selectByPrimaryKey(real.getInjectionLabelId());
-            if (label == null) {
-                continue;
-            }
-            LabelDTO labelDTO = new LabelDTO();
-            labelDTO.setInjectionLabelId(label.getInjectionLabelId());
-            labelDTO.setInjectionLabelName(label.getInjectionLabelName());
-            labelDTO.setMessageType(real.getMessageType());
-            labelList.add(labelDTO);
-            if (!messageTypes.contains(real.getMessageType())) {
-                messageTypes.add(real.getMessageType());
-            }
-        }
-        List<MessageLabelInfo> mlInfoList = new ArrayList<>();
-        for (int i = 0; i < messageTypes.size(); i++) {
-
-            Long messageType = messageTypes.get(i);
-            Message messages = messageMapper.selectByPrimaryKey(messageType);
-            MessageLabelInfo info = BeanUtil.create(messages, new MessageLabelInfo());
-            List<LabelDTO> dtoList = new ArrayList<>();
-            for (LabelDTO dto : labelList) {
-                if (messageType.equals(dto.getMessageType())) {
-                    dtoList.add(dto);
-                }
-            }
-            info.setLabelDTOList(dtoList);
-            //判断是否选中
-            if (dtoList.isEmpty()) {
-                info.setChecked("1");//false
-            } else {
-                info.setChecked("0");//true
-            }
-            mlInfoList.add(info);
-        }
-        maps.put("resultCode", CODE_SUCCESS);
-        maps.put("resultMsg", mlInfoList);
-        return maps;
-
-    }
-
-*/
 
 
     /**
