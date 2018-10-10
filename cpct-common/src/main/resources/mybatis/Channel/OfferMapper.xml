@@ -144,12 +144,12 @@
 	where ocl.CATALOG_ITEM_ID = #{catalogId} and ocl.OFFER_ID = o.OFFER_ID
   </select>
 
-  <select id="listByOfferIdList" resultMap="BaseResultMap">
+  <select id="listByOfferIdList" resultType="java.lang.String">
      select o.OFFER_NAME
     from offer o left join mkt_cam_item i on i.ITEM_ID = o.OFFER_ID
     where i.MKT_CAM_ITEM_ID in
-    <foreach collection="list" item="item" open="(" separator="," close=")" index="no">
-      #{offerList}
+    <foreach collection="list" item="item" open="(" close=")" separator=",">
+      #{item}
     </foreach>
   </select>
 
