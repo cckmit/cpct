@@ -271,6 +271,15 @@ public class ChannelUtil  {
         }
         return list;
     }
+    public static List<Long> StringToIdList(String var1) {
+        String[] array = var1.split("/");
+        List<Long> list = new ArrayList<Long>();
+        for (String str : array)
+        {
+            list.add(Long.valueOf(str));
+        }
+        return list;
+    }
 
     public static String getDataType(String dataType){
         //1000	日期型;1100	日期时间型;1200	字符型;1300	浮点型;1400	整数型;1500	布尔型;1600	计算型
