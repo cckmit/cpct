@@ -293,7 +293,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         }
         // 获取所有的sysParam
         Map<String, String> paramMap = new HashMap<>();
-        List<SysParams> sysParamList = sysParamsMapper.selectAll("", 0L);
+        List<SysParams> sysParamList = sysParamsMapper.selectAll("", "");
         for (SysParams sysParams : sysParamList) {
             paramMap.put(sysParams.getParamKey() + sysParams.getParamValue(), sysParams.getParamName());
         }
@@ -424,7 +424,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
         // 获取所有的sysParam
         Map<String, String> paramMap = new HashMap<>();
-        List<SysParams> sysParamList = sysParamsMapper.selectAll("", 0L);
+        List<SysParams> sysParamList = sysParamsMapper.selectAll("", "");
         for (SysParams sysParams : sysParamList) {
             paramMap.put(sysParams.getParamKey() + sysParams.getParamValue(), sysParams.getParamName());
         }
@@ -441,10 +441,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 mktCampaignVO.setCreateChannel(mktCampaignCountDO.getCreateChannel());
                 mktCampaignVO.setCreateDate(mktCampaignCountDO.getCreateDate());
                 mktCampaignVO.setUpdateDate(mktCampaignCountDO.getUpdateDate());
-                if (mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode()) || mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_CHECKED.getStatusCode())) {
-                    mktCampaignVO.setStatusExamine(StatusCode.STATUS_CODE_CHECKED.getStatusMsg());
+                if (mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode()) || mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_PASS.getStatusCode())) {
+                    mktCampaignVO.setStatusExamine(StatusCode.STATUS_CODE_PASS.getStatusMsg());
                 } else {
-                    mktCampaignVO.setStatusExamine(StatusCode.STATUS_CODE_UNCHECK.getStatusMsg());
+                    mktCampaignVO.setStatusExamine(StatusCode.STATUS_CODE_CHECKING.getStatusMsg());
                 }
             } catch (Exception e) {
                 logger.error("Excetion:", e);
@@ -486,15 +486,15 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             maps.put("resultMsg", "活动不存在");
             return maps;
         }
-        if (campaignDO.getStatusCd().equals(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode()) || campaignDO.getStatusCd().equals(StatusCode.STATUS_CODE_CHECKED.getStatusCode())) {
+        if (campaignDO.getStatusCd().equals(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode()) || campaignDO.getStatusCd().equals(StatusCode.STATUS_CODE_PASS.getStatusCode())) {
             maps.put("resultCode", CODE_FAIL);
             maps.put("resultMsg", "非待审核活动");
             return maps;
         }
-        campaignDO.setStatusCd(StatusCode.STATUS_CODE_CHECKED.getStatusCode());
+        campaignDO.setStatusCd(StatusCode.STATUS_CODE_PASS.getStatusCode());
         mktCampaignMapper.updateByPrimaryKey(campaignDO);
         maps.put("resultCode", CODE_SUCCESS);
-        maps.put("resultMsg", "已审核");
+        maps.put("resultMsg", "已通过");
         return maps;
     }
 
@@ -575,7 +575,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
         // 获取所有的sysParam
         Map<String, String> paramMap = new HashMap<>();
-        List<SysParams> sysParamList = sysParamsMapper.selectAll("", 0L);
+        List<SysParams> sysParamList = sysParamsMapper.selectAll("", "");
         for (SysParams sysParams : sysParamList) {
             paramMap.put(sysParams.getParamKey() + sysParams.getParamValue(), sysParams.getParamName());
         }
@@ -591,38 +591,17 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 mktCampaignVO.setPlanEndTime(mktCampaignCountDO.getPlanEndTime());
                 mktCampaignVO.setCreateChannel(mktCampaignCountDO.getCreateChannel());
                 mktCampaignVO.setCreateDate(mktCampaignCountDO.getCreateDate());
+                mktCampaignVO.setPreMktCampaignId(mktCampaignCountDO.getPreMktCampaignId());
             } catch (Exception e) {
                 logger.error("Excetion:", e);
             }
-/*            mktCampaignVO.setTiggerTypeValue(paramMap.
-                    get(ParamKeyEnum.TIGGER_TYPE.getParamKey() + mktCampaignDO.getTiggerType()));*/
             mktCampaignVO.setMktCampaignCategoryValue(paramMap.
                     get(ParamKeyEnum.MKT_CAMPAIGN_CATEGORY.getParamKey() + mktCampaignCountDO.getMktCampaignCategory()));
             mktCampaignVO.setMktCampaignTypeValue(paramMap.
                     get(ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey() + mktCampaignCountDO.getMktCampaignType()));
             mktCampaignVO.setStatusCdValue(paramMap.
                     get(ParamKeyEnum.STATUS_CD.getParamKey() + mktCampaignCountDO.getStatusCd()));
-/*
-            mktCampaignVO.setExecTypeValue(paramMap.
-                    get(ParamKeyEnum.EXEC_TYPE.getParamKey() + mktCampaignDO.getExecType()));
-*/
 
-            // 获取活动关联的事件
-/*            List<MktCamEvtRelDO> mktCamEvtRelDOList = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignDO.getMktCampaignId());
-            if (mktCamEvtRelDOList != null) {
-                List<EventDTO> eventDTOList = new ArrayList<>();
-                for (MktCamEvtRelDO mktCamEvtRelDO : mktCamEvtRelDOList) {
-                    Long eventId = mktCamEvtRelDO.getEventId();
-                    ContactEvt contactEvt = contactEvtMapper.getEventById(eventId);
-                    if (contactEvt != null) {
-                        EventDTO eventDTO = new EventDTO();
-                        eventDTO.setEventId(eventId);
-                        eventDTO.setEventName(contactEvt.getContactEvtName());
-                        eventDTOList.add(eventDTO);
-                    }
-                }
-                mktCampaignVO.setEventDTOS(eventDTOList);
-            }*/
             Boolean isRelation = false;
             //判断该活动是否有有效的父/子活动
             if (mktCampaignCountDO.getRelCount() != 0) {

@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.service.impl.system;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.domain.system.SysRole;
@@ -23,12 +24,12 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
     private SysParamsMapper sysParamsMapper;
 
     @Override
-    public Map<String,Object> listParams(String paramName, Long configType,Integer page,Integer pageSize) {
+    public Map<String,Object> listParams(String paramName, String paramKey,Integer page,Integer pageSize) {
         Map<String,Object> result = new HashMap<>();
         PageHelper.startPage(page,pageSize);
-        List<SysParams> list = sysParamsMapper.selectAll(paramName, configType);
+        List<SysParams> list = sysParamsMapper.selectAll(paramName, paramKey);
         Page pageInfo = new Page(new PageInfo(list));
-        result.put("resultCode","0");
+        result.put("resultCode",CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","");
         result.put("data",list);
         result.put("pageInfo",pageInfo);
@@ -49,7 +50,7 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
         sysParams.setCreateDate(new Date());
 
         int flag = sysParamsMapper.insert(sysParams);
-        result.put("resultCode","0");
+        result.put("resultCode",CommonConstant.CODE_SUCCESS);
 
         return result;
     }
@@ -66,7 +67,7 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
         sysParams.setUpdateStaff(loginId);
         sysParams.setUpdateDate(new Date());
         int flag = sysParamsMapper.updateByPrimaryKey(sysParams);
-        result.put("resultCode","0");
+        result.put("resultCode",CommonConstant.CODE_SUCCESS);
 
         return result;
     }
@@ -78,7 +79,7 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
             //todo 为空异常
         }
         List<SysParams> sysParams = sysParamsMapper.selectByPrimaryKey(id);
-        result.put("resultCode","0");
+        result.put("resultCode",CommonConstant.CODE_SUCCESS);
         result.put("data",sysParams);
 
         return result;
@@ -91,7 +92,7 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
         //todo 验证是否可以删除
 
         sysParamsMapper.deleteByPrimaryKey(id);
-        result.put("resultCode","0");
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","保存成功");
         return result;
     }
@@ -105,7 +106,7 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
         list = sysParamsMapper.listParamsByKey(key);
 
         result.put("data",list);
-        result.put("code","0");
+        result.put("code",CommonConstant.CODE_SUCCESS);
 
         return result;
     }

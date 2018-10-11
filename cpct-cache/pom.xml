@@ -46,6 +46,17 @@
             <artifactId>spring-web</artifactId>
         </dependency>
 
+        <!-- 引入集团redis缓存包 -->
+        <!--<dependency>-->
+            <!--<groupId>com.ctg.itrdc.cache</groupId>-->
+            <!--<artifactId>ctg-cache-control</artifactId>-->
+        <!--</dependency>-->
+
+        <dependency>
+            <groupId>com.ctg.itrdc.cache</groupId>
+            <artifactId>ctg-cache-client</artifactId>
+        </dependency>
+
     </dependencies>
 
 

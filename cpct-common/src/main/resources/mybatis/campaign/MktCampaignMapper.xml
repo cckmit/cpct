@@ -44,6 +44,7 @@
         <result column="LAN_ID" jdbcType="BIGINT" property="lanId"/>
         <result column="CREATE_CHANNEL" jdbcType="VARCHAR" property="createChannel" />
         <result column="REL_COUNT" javaType="INT" property="relCount" />
+        <result column="A_MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="preMktCampaignId"/>
         <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
         <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
     </resultMap>
@@ -178,7 +179,15 @@
                   AND r.STATUS_CD = 1000
                   AND r.REL_TYPE = 1000
                 )
-            ) AS REL_COUNT
+            ) AS REL_COUNT,
+        (
+            SELECT
+            r.A_MKT_CAMPAIGN_ID
+            FROM
+            mkt_campaign_rel r
+            WHERE
+            t.MKT_CAMPAIGN_ID = r.Z_MKT_CAMPAIGN_ID
+            ) AS A_MKT_CAMPAIGN_ID
               from mkt_campaign t
         where 1 = 1
         <if test="mktCampaignName != null and mktCampaignName != ''">

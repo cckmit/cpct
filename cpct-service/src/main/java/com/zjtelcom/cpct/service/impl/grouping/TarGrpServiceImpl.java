@@ -352,7 +352,6 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         List<TarGrpConditionVO> grpConditionList = new ArrayList<>();
         List<TarGrpVO> tarGrpVOS = new ArrayList<>();//传回前端展示信息
         for (TarGrpCondition tarGrpCondition : listTarGrpCondition) {
-            List<String> valueList = new ArrayList<>();
             List<OperatorDetail> operatorList = new ArrayList<>();
             TarGrpConditionVO tarGrpConditionVO = new TarGrpConditionVO();
             CopyPropertiesUtil.copyBean2Bean(tarGrpConditionVO, tarGrpCondition);
@@ -361,6 +360,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             if (label==null){
                 continue;
             }
+            List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(label.getInjectionLabelId());
+            List<String> valueList = ChannelUtil.valueList2StList(labelValues);
             tarGrpConditionVO.setLeftParamName(label.getInjectionLabelName());
             //塞入领域
 //            FitDomain fitDomain = null;
@@ -392,17 +393,6 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                     operatorDetail.setOperName(opTT.getDescription());
                     operatorDetail.setOperValue(opTT.getValue());
                     operatorList.add(operatorDetail);
-                }
-            }
-            String rightOperand = label.getRightOperand();
-            String[] rightOperands = rightOperand.split(",");
-            if (rightOperands.length > 1) {
-                for (int i = 0; i < rightOperands.length; i++) {
-                    valueList.add(rightOperands[i]);
-                }
-            } else {
-                if (rightOperands.length == 1) {
-                    valueList.add(rightOperands[0]);
                 }
             }
             tarGrpConditionVO.setConditionType(label.getConditionType());

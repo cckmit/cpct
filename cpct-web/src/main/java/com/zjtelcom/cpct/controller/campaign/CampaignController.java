@@ -122,7 +122,7 @@ public class CampaignController extends BaseController {
     }
 
     /**
-     * 查询活动列表(分页)
+     * 查询活动列表(分页，活动总览)
      *
      * @return
      */
@@ -133,6 +133,12 @@ public class CampaignController extends BaseController {
         return JSON.toJSONString(map);
     }
 
+    /**
+     * 获取活动列表
+     * @param params
+     * @return
+     * @throws Exception
+     */
     @RequestMapping(value = "/getCampaignList", method = RequestMethod.POST)
     @CrossOrigin
     public String getCampaignList(@RequestBody Map<String, Object> params) throws Exception {
@@ -287,7 +293,7 @@ public class CampaignController extends BaseController {
     public String upgradeMktCampaign(@RequestBody Map<String, String> params) throws Exception {
         Long parentMktCampaignId = Long.valueOf(params.get("mktCampaignId"));
         Map<String, Object> mktCampaignMap = mktCampaignService.upgradeMktCampaign(parentMktCampaignId);
-        mktCampaignService.changeMktCampaignStatus(parentMktCampaignId, StatusCode.STATUS_CODE_ROLL.getStatusCode());
+     //   mktCampaignService.changeMktCampaignStatus(parentMktCampaignId, StatusCode.STATUS_CODE_ROLL.getStatusCode());
         return JSON.toJSONString(mktCampaignMap);
     }
 }

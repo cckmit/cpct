@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.system.SysStaffMapper;
 import com.zjtelcom.cpct.dao.system.SysStaffRoleMapper;
 import com.zjtelcom.cpct.domain.system.SysStaff;
@@ -46,7 +47,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
             resultMap.put("msg", "根据用户名查询用户信息失败!");
             return resultMap;
         }
-        resultMap.put("code", "0");
+        resultMap.put("code", CommonConstant.CODE_SUCCESS);
         resultMap.put("data", user);
         logger.info("根据用户名查询用户信息,参数={},返回值={}",userName, JSON.toJSONString(user));
         return resultMap;
@@ -96,7 +97,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         List<SysStaff> list = sysStaffMapper.selectAll(sysStaff);
         Page pageInfo = new Page(new PageInfo(list));
 
-        result.put("resultCode","0");
+        result.put("resultCode",CommonConstant.CODE_SUCCESS);
         result.put("data",list);
         result.put("pageInfo",pageInfo);
 
@@ -114,7 +115,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         int count = sysStaffMapper.checkCodeRepeat(sysStaff.getStaffAccount());
         if (count > 0) {
             //todo 异常 账号重复
-            result.put("resultCode","0");
+            result.put("resultCode",CommonConstant.CODE_SUCCESS);
             result.put("resultMsg","账号重复");
             return result;
         }
@@ -150,7 +151,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
             throw new Exception();
         }
 
-        result.put("resultCode","0");
+        result.put("resultCode",CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","保存成功");
         return result;
     }
@@ -186,7 +187,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
             //todo flag<1 判断失败抛出业务异常
         }
 
-        result.put("resultCode","0");
+        result.put("resultCode",CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","保存成功");
 
         return result;
@@ -207,7 +208,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         params.setUpdateDate(new Date());
         sysStaffMapper.changeStatus(params);
 
-        result.put("resultCode","0");
+        result.put("resultCode",CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","保存成功");
         return result;
     }
@@ -227,7 +228,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         }
         SysStaff sysStaff = sysStaffMapper.selectByPrimaryKey(id);
 
-        result.put("resultCode","0");
+        result.put("resultCode",CommonConstant.CODE_SUCCESS);
         result.put("data",sysStaff);
         return result;
     }
@@ -252,7 +253,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         password = (new SimpleHash("md5", password).toHex());
 
         sysStaffMapper.updatePassword(id, password);
-        result.put("resultCode","0");
+        result.put("resultCode",CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","修改成功");
         return result;
     }
@@ -262,7 +263,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
     public Map<String,Object> lastLogin(String staffCode) {
         Map<String,Object> result = new HashMap<>();
         sysStaffMapper.lastLogin(staffCode);
-        result.put("resultCode","0");
+        result.put("resultCode",CommonConstant.CODE_SUCCESS);
         return result;
     }
 }

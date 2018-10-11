@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.service;
 import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
+import com.zjtelcom.cpct.dto.filter.FilterRuleModel;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 
 import java.util.List;
@@ -19,6 +20,8 @@ public class MktStrategyConfResp extends MktStrategyConf {
      */
     private List<MktStrConfRuleResp> mktStrConfRuleRespList;
 
+    private List<FilterRuleModel> filterRuleModelList;
+
     public List<MktStrConfRuleResp> getMktStrConfRuleRespList() {
         return mktStrConfRuleRespList;
     }
@@ -34,5 +37,12 @@ public class MktStrategyConfResp extends MktStrategyConf {
     public void setMktCampaignId(Long mktCampaignId) {
         this.mktCampaignId = mktCampaignId;
     }
-    
+
+    public List<FilterRuleModel> getFilterRuleModelList() {
+        return filterRuleModelList;
+    }
+
+    public void setFilterRuleModelList(List<FilterRuleModel> filterRuleModelList) {
+        this.filterRuleModelList = filterRuleModelList;
+    }
 }

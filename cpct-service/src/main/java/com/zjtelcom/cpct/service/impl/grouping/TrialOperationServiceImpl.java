@@ -2,16 +2,23 @@ package com.zjtelcom.cpct.service.impl.grouping;
 
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.JsonObject;
+import com.sun.corba.se.spi.ior.ObjectKey;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
+import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
+import com.zjtelcom.cpct.dao.channel.OfferMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyMapper;
+import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlResultConfRelDO;
+import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.domain.channel.CamScript;
 import com.zjtelcom.cpct.domain.channel.DisplayColumn;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.MktProductRule;
@@ -29,6 +36,7 @@ import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRuleRel;
 import com.zjtelcom.cpct.dto.user.UserList;
+import com.zjtelcom.cpct.pojo.MktCamScript;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
 import com.zjtelcom.cpct.service.channel.MessageLabelService;
@@ -80,6 +88,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private MktStrategyConfRuleMapper ruleMapper;
     @Autowired
     private InjectionLabelMapper labelMapper;
+    @Autowired
+    private OfferMapper offerMapper;
+    @Autowired
+    private MktCamChlConfMapper chlConfMapper;
+    @Autowired
+    private MktCamScriptMapper scriptMapper;
 
     /**
      * 销售品service
@@ -97,6 +111,105 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Autowired
     private MktCamChlConfService mktCamChlConfService;
 
+    /**
+     * 抽样业务校验
+     * @param operationVO
+     * @return
+     */
+    @Override
+    public Map<String, Object> businessCheck(TrialOperationVO operationVO) {
+        Map<String, Object> result = new HashMap<>();
+        MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(operationVO.getCampaignId());
+        if (campaign == null) {
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "活动策略信息有误");
+            return result;
+        }
+        // 通过活动id获取关联的标签字段数组
+        DisplayColumn req = new DisplayColumn();
+        req.setDisplayColumnId(campaign.getCalcDisplay());
+        Map<String, Object> labelMap = messageLabelService.queryLabelListByDisplayId(req);
+        List<LabelDTO> labelDTOList = (List<LabelDTO>) labelMap.get("labels");
+        String[] fieldList = new String[labelDTOList.size()];
+        for (int i = 0; i < labelDTOList.size(); i++) {
+            fieldList[i] = labelDTOList.get(i).getLabelCode();
+        }
+
+        TrialOperationVO request = BeanUtil.create(operationVO,new TrialOperationVO());
+        request.setFieldList(fieldList);
+        //抽样业务校验
+        request.setSample(false);
+        List<TrialOperationParam> paramList = new ArrayList<>();
+        List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(operationVO.getStrategyId());
+        for (MktStrategyConfRuleRelDO ruleRelDO : ruleRelList) {
+            TrialOperationParam param = getTrialOperationParam(operationVO,null, ruleRelDO.getMktStrategyConfRuleId(),true);
+            paramList.add(param);
+        }
+        request.setParamList(paramList);
+        TrialResponse response = new TrialResponse();
+
+        try {
+            response = restTemplate.postForObject(SEARCH_INFO_FROM_ES_URL, request, TrialResponse.class);
+            //todo 返回信息结果封装
+        } catch (Exception e) {
+            e.printStackTrace();
+            // 抽样试算失败
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "抽样校验失败");
+            return result;
+        }
+        if (!response.getResultCode().equals(CODE_SUCCESS)){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "抽样校验失败");
+            return result;
+        }
+
+        List<Map<String,Object>> customers = new ArrayList<>();
+        //抽样数据结果拼装
+        for (String ruleIdSt : response.getHitsList().keySet()){
+            Long ruleId = Long.valueOf(ruleIdSt);
+            List<Map<String,Object>> customerList = (List<Map<String,Object>>) response.getHitsList().get(ruleIdSt);
+            for (Map<String,Object> customer : customerList) {
+                customer.putAll(getProductAndChannelByRuleId(ruleId));
+
+
+
+                customers.add(customer);
+            }
+        }
+        result.put("data",customers);
+        // 抽样试算成功
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", null);
+        return result;
+    }
+
+    public Map<String,Object> getProductAndChannelByRuleId(Long ruleId){
+        Map<String,Object> result = new HashMap<>();
+        //添加规则下的销售品
+        MktStrategyConfRuleDO rule = ruleMapper.selectByPrimaryKey(ruleId);
+        if (rule.getProductId()!=null){
+            List<Long> itemIdList = ChannelUtil.StringToIdList(rule.getProductId());
+            List<String> itemList = offerMapper.listByOfferIdList(itemIdList);
+            result.put("product",ChannelUtil.StringList2String(itemList));
+        }
+        StringBuffer st = new StringBuffer();
+        if (rule.getEvtContactConfId()!=null){
+            List<Long> channelIdList = ChannelUtil.StringToIdList(rule.getEvtContactConfId());
+            List<MktCamChlConfDO> chlConfList = chlConfMapper.listByIdList(channelIdList);
+            for (MktCamChlConfDO chlConf : chlConfList){
+                CamScript script = scriptMapper.selectByConfId(chlConf.getEvtContactConfId());
+                st.append(chlConf.getEvtContactConfName()).append("(")
+                        .append(script.getScriptDesc()==null? "" : script.getScriptDesc())
+                        .append(")");
+            }
+            result.put("channel",st);
+        }
+        //todo 渠道及推荐指引
+        return result;
+    }
+
+
 
     /**
      * 导入试运算清单
@@ -108,7 +221,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
         String batchNumSt = DateUtil.date2String(new Date()) + ChannelUtil.getRandomStr(2);
         //获取销售品及规则列表
-        TrialOperationParam param = getTrialOperationParam(operation, Long.valueOf(batchNumSt), ruleId);
+        TrialOperationParam param = getTrialOperationParam(operation, Long.valueOf(batchNumSt), ruleId,false);
 
         InputStream inputStream = multipartFile.getInputStream();
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
@@ -206,15 +319,17 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
         TrialOperationVO request = BeanUtil.create(operationVO,new TrialOperationVO());
         request.setFieldList(fieldList);
+        //策略试运算
+        request.setSample(true);
+        //todo 待测试
         List<TrialOperationParam> paramList = new ArrayList<>();
         List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(operationVO.getStrategyId());
         for (MktStrategyConfRuleRelDO ruleRelDO : ruleRelList) {
-            TrialOperationParam param = getTrialOperationParam(operationVO, trialOperation.getBatchNum(), ruleRelDO.getMktStrategyConfRuleId());
+            TrialOperationParam param = getTrialOperationParam(operationVO, trialOperation.getBatchNum(), ruleRelDO.getMktStrategyConfRuleId(),true);
             paramList.add(param);
         }
         request.setParamList(paramList);
         TrialResponse response = new TrialResponse();
-
         try {
             response = restTemplate.postForObject(SEARCH_INFO_FROM_ES_URL, request, TrialResponse.class);
             if (!response.getResultCode().equals(CODE_SUCCESS)) {
@@ -240,34 +355,35 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     }
 
 
-    private TrialOperationParam getTrialOperationParam(TrialOperationVO operationVO, Long batchNum, Long ruleId) {
+    private TrialOperationParam getTrialOperationParam(TrialOperationVO operationVO, Long batchNum, Long ruleId,boolean isSample) {
         TrialOperationParam param = new TrialOperationParam();
         param.setRuleId(ruleId);
         MktStrategyConfRuleDO confRule = ruleMapper.selectByPrimaryKey(ruleId);
         if (confRule != null) {
             param.setRuleName(confRule.getMktStrategyConfRuleName());
         }
-        // 获取规则信息
-        Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.getMktStrategyConfRule(ruleId);
-        MktStrategyConfRule mktStrategyConfRule = (MktStrategyConfRule) mktStrategyConfRuleMap.get("mktStrategyConfRule");
+        if (!isSample){
+            // 获取规则信息
+            Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.getMktStrategyConfRule(ruleId);
+            MktStrategyConfRule mktStrategyConfRule = (MktStrategyConfRule) mktStrategyConfRuleMap.get("mktStrategyConfRule");
 
-        // 获取销售品集合
-        Map<String, Object> productRuleListMap = productService.getProductRuleList(UserUtil.loginId(), mktStrategyConfRule.getProductIdlist());
-        List<MktProductRule> mktProductRuleList = (List<MktProductRule>) productRuleListMap.get("resultMsg");
-        param.setMktProductRuleList(mktProductRuleList);
+            // 获取销售品集合
+            Map<String, Object> productRuleListMap = productService.getProductRuleList(UserUtil.loginId(), mktStrategyConfRule.getProductIdlist());
+            List<MktProductRule> mktProductRuleList = (List<MktProductRule>) productRuleListMap.get("resultMsg");
+            param.setMktProductRuleList(mktProductRuleList);
 
-        // 获取推送渠道
-        List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
-        List<MktCamChlConf> mktCamChlConfList = mktStrategyConfRule.getMktCamChlConfList();
-        if (mktCamChlConfList != null) {
-            for (MktCamChlConf mktCamChlConf : mktCamChlConfList) {
-                Map<String, Object> mktCamChlConfDetailMap = mktCamChlConfService.getMktCamChlConf(mktCamChlConf.getEvtContactConfId());
-                MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConfDetailMap.get("mktCamChlConfDetail");
-                mktCamChlConfDetailList.add(mktCamChlConfDetail);
+            // 获取推送渠道
+            List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
+            List<MktCamChlConf> mktCamChlConfList = mktStrategyConfRule.getMktCamChlConfList();
+            if (mktCamChlConfList != null) {
+                for (MktCamChlConf mktCamChlConf : mktCamChlConfList) {
+                    Map<String, Object> mktCamChlConfDetailMap = mktCamChlConfService.getMktCamChlConf(mktCamChlConf.getEvtContactConfId());
+                    MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConfDetailMap.get("mktCamChlConfDetail");
+                    mktCamChlConfDetailList.add(mktCamChlConfDetail);
+                }
             }
+            param.setMktCamChlConfDetailList(mktCamChlConfDetailList);
         }
-        param.setMktCamChlConfDetailList(mktCamChlConfDetailList);
-
         // 设置批次号
         param.setBatchNum(batchNum);
         //redis取规则
