@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.org.OrgTreeMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.org.OrgTree">
+        <id column="area_id" jdbcType="INTEGER" property="areaId"/>
+        <result column="area_name" jdbcType="VARCHAR" property="areaName"/>
+        <result column="sum_area_id" jdbcType="INTEGER" property="sumAreaId"/>
+        <result column="area_type_id" jdbcType="INTEGER" property="areaTypeId"/>
+        <result column="state" jdbcType="VARCHAR" property="state"/>
+        <result column="state_date" jdbcType="DATE" property="stateDate"/>
+        <result column="latnid" jdbcType="INTEGER" property="latnid"/>
+        <result column="serve_type_id" jdbcType="INTEGER" property="serveTypeId"/>
+        <result column="city_type" jdbcType="VARCHAR" property="cityType"/>
+        <result column="view_tree_flag" jdbcType="VARCHAR" property="viewTreeFlag"/>
+        <result column="grid_flg" jdbcType="VARCHAR" property="gridFlg"/>
+        <result column="zj_area_flg" jdbcType="VARCHAR" property="zjAreaFlg"/>
+        <result column="bzjd_flg" jdbcType="VARCHAR" property="bzjdFlg"/>
+        <result column="standard_code" jdbcType="VARCHAR" property="standardCode"/>
+        <result column="xn_flag" jdbcType="VARCHAR" property="xnFlag"/>
+        <result column="bm_flag" jdbcType="VARCHAR" property="bmFlag"/>
+        <result column="area_type" jdbcType="VARCHAR" property="areaType"/>
+        <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+        <result column="srzx_flg" jdbcType="VARCHAR" property="srzxFlg"/>
+        <result column="cbjd_flg" jdbcType="VARCHAR" property="cbjdFlg"/>
+        <result column="type_name" jdbcType="VARCHAR" property="typeName"/>
+        <result column="comments" jdbcType="VARCHAR" property="comments"/>
+        <result column="group_code" jdbcType="VARCHAR" property="groupCode"/>
+        <result column="cbjs_flg" jdbcType="VARCHAR" property="cbjsFlg"/>
+    </resultMap>
+
+
+
+    <resultMap id="ReturnResultMap" type="com.zjtelcom.cpct.domain.org.OrgTreeDO">
+        <id column="area_id" jdbcType="INTEGER" property="areaId"/>
+        <result column="area_name" jdbcType="VARCHAR" property="areaName"/>
+        <result column="sum_area_id" jdbcType="INTEGER" property="sumAreaId"/>
+        <result column="area_type_id" jdbcType="INTEGER" property="areaTypeId"/>
+    </resultMap>
+
+
+    <sql id="Base_Column_List">
+       area_id, area_name, sum_area_id,
+      area_type_id, state, state_date,
+      latnid, serve_type_id, city_type,
+      view_tree_flag, grid_flg, zj_area_flg,
+      bzjd_flg, standard_code, xn_flag,
+      bm_flag, area_type, order_id,
+      srzx_flg, cbjd_flg, type_name,
+      comments, group_code, cbjs_flg
+    </sql>
+
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from fpc_org_tree
+    where area_id = #{areaId,jdbcType=INTEGER}
+  </delete>
+
+    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.org.OrgTree">
+    insert into fpc_org_tree (area_id, area_name, sum_area_id, 
+      area_type_id, state, state_date, 
+      latnid, serve_type_id, city_type, 
+      view_tree_flag, grid_flg, zj_area_flg, 
+      bzjd_flg, standard_code, xn_flag, 
+      bm_flag, area_type, order_id, 
+      srzx_flg, cbjd_flg, type_name, 
+      comments, group_code, cbjs_flg
+      )
+    values (#{areaId,jdbcType=INTEGER}, #{areaName,jdbcType=VARCHAR}, #{sumAreaId,jdbcType=INTEGER}, 
+      #{areaTypeId,jdbcType=INTEGER}, #{state,jdbcType=VARCHAR}, #{stateDate,jdbcType=DATE}, 
+      #{latnid,jdbcType=INTEGER}, #{serveTypeId,jdbcType=INTEGER}, #{cityType,jdbcType=VARCHAR}, 
+      #{viewTreeFlag,jdbcType=VARCHAR}, #{gridFlg,jdbcType=VARCHAR}, #{zjAreaFlg,jdbcType=VARCHAR}, 
+      #{bzjdFlg,jdbcType=VARCHAR}, #{standardCode,jdbcType=VARCHAR}, #{xnFlag,jdbcType=VARCHAR}, 
+      #{bmFlag,jdbcType=VARCHAR}, #{areaType,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, 
+      #{srzxFlg,jdbcType=VARCHAR}, #{cbjdFlg,jdbcType=VARCHAR}, #{typeName,jdbcType=VARCHAR}, 
+      #{comments,jdbcType=VARCHAR}, #{groupCode,jdbcType=VARCHAR}, #{cbjsFlg,jdbcType=VARCHAR}
+      )
+  </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.org.OrgTree">
+    update fpc_org_tree
+    set area_name = #{areaName,jdbcType=VARCHAR},
+      sum_area_id = #{sumAreaId,jdbcType=INTEGER},
+      area_type_id = #{areaTypeId,jdbcType=INTEGER},
+      state = #{state,jdbcType=VARCHAR},
+      state_date = #{stateDate,jdbcType=DATE},
+      latnid = #{latnid,jdbcType=INTEGER},
+      serve_type_id = #{serveTypeId,jdbcType=INTEGER},
+      city_type = #{cityType,jdbcType=VARCHAR},
+      view_tree_flag = #{viewTreeFlag,jdbcType=VARCHAR},
+      grid_flg = #{gridFlg,jdbcType=VARCHAR},
+      zj_area_flg = #{zjAreaFlg,jdbcType=VARCHAR},
+      bzjd_flg = #{bzjdFlg,jdbcType=VARCHAR},
+      standard_code = #{standardCode,jdbcType=VARCHAR},
+      xn_flag = #{xnFlag,jdbcType=VARCHAR},
+      bm_flag = #{bmFlag,jdbcType=VARCHAR},
+      area_type = #{areaType,jdbcType=VARCHAR},
+      order_id = #{orderId,jdbcType=VARCHAR},
+      srzx_flg = #{srzxFlg,jdbcType=VARCHAR},
+      cbjd_flg = #{cbjdFlg,jdbcType=VARCHAR},
+      type_name = #{typeName,jdbcType=VARCHAR},
+      comments = #{comments,jdbcType=VARCHAR},
+      group_code = #{groupCode,jdbcType=VARCHAR},
+      cbjs_flg = #{cbjsFlg,jdbcType=VARCHAR}
+    where area_id = #{areaId,jdbcType=INTEGER}
+  </update>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select  <include refid="Base_Column_List"/>
+    from fpc_org_tree
+    where area_id = #{areaId,jdbcType=INTEGER}
+  </select>
+
+
+    <select id="selectAll" resultMap="BaseResultMap">
+    select  <include refid="Base_Column_List"/>
+    from fpc_org_tree
+  </select>
+
+
+    <!-- 批量添加数据 -->
+    <insert id="addBatch" parameterType="Object">
+        insert into fpc_org_tree
+        (area_id, area_name, sum_area_id,
+        area_type_id, state, state_date,
+        latnid, serve_type_id, city_type,
+        view_tree_flag, grid_flg, zj_area_flg,
+        bzjd_flg, standard_code, xn_flag,
+        bm_flag, area_type, order_id,
+        srzx_flg, cbjd_flg, type_name,
+        comments, group_code, cbjs_flg)
+        values
+        <foreach collection="list" item="item" open="" close="" separator=",">
+            (
+            #{item.areaId,jdbcType=INTEGER}, #{item.areaName,jdbcType=VARCHAR}, #{item.sumAreaId,jdbcType=INTEGER},
+            #{item.areaTypeId,jdbcType=INTEGER}, #{item.state,jdbcType=VARCHAR}, #{item.stateDate,jdbcType=DATE},
+            #{item.latnid,jdbcType=INTEGER}, #{item.serveTypeId,jdbcType=INTEGER}, #{item.cityType,jdbcType=VARCHAR},
+            #{item.viewTreeFlag,jdbcType=VARCHAR}, #{item.gridFlg,jdbcType=VARCHAR}, #{item.zjAreaFlg,jdbcType=VARCHAR},
+            #{item.bzjdFlg,jdbcType=VARCHAR}, #{item.standardCode,jdbcType=VARCHAR}, #{item.xnFlag,jdbcType=VARCHAR},
+            #{item.bmFlag,jdbcType=VARCHAR}, #{item.areaType,jdbcType=VARCHAR}, #{item.orderId,jdbcType=VARCHAR},
+            #{item.srzxFlg,jdbcType=VARCHAR}, #{item.cbjdFlg,jdbcType=VARCHAR}, #{item.typeName,jdbcType=VARCHAR},
+            #{item.comments,jdbcType=VARCHAR}, #{item.groupCode,jdbcType=VARCHAR}, #{item.cbjsFlg,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+
+    <select id="queryList" resultMap="BaseResultMap" parameterType="com.zjtelcom.cpct.domain.org.OrgTree">
+        select
+        <include refid="Base_Column_List" />
+        from fpc_org_tree
+        where 1=1
+        <if test="areaId != null and areaId != ''">
+            and area_id = #{areaId}
+        </if>
+        <if test="areaName != null and areaName != ''">
+            and area_name = #{areaName}
+        </if>
+        <if test="sumAreaId != null and sumAreaId != ''">
+            and sum_area_id = #{sumAreaId}
+        </if>
+        <if test="areaTypeId != null and areaTypeId != ''">
+            and area_type_id = #{areaTypeId}
+        </if>
+        <if test="state != null and state != ''">
+            and state = #{state}
+        </if>
+        <if test="latnid != null">
+            and latnid = #{latnid}
+        </if>
+        <if test="cbjsFlg != null and cbjsFlg != ''">
+            and cbjs_flg = #{cbjsFlg}
+        </if>
+        <if test="cityType != null ">
+            and city_type = #{cityType}
+        </if>
+        order by state_date desc
+    </select>
+
+
+    <!--删除所有数据-->
+    <delete id="deleteAll">
+        delete from fpc_org_tree
+    </delete>
+
+
+    <!--通过父菜单查询子菜单-->
+    <select id="selectBySumAreaId" parameterType="java.lang.Integer" resultMap="ReturnResultMap">
+        select area_id, area_name, sum_area_id,area_type_id
+        from fpc_org_tree
+        where sum_area_id = #{sumAreaId,jdbcType=INTEGER}
+    </select>
+
+    <!--查询首级菜单-->
+    <select id="selectMenu" parameterType="java.lang.Integer" resultMap="ReturnResultMap">
+        select area_id, area_name, sum_area_id,area_type_id
+        from fpc_org_tree
+        where sum_area_id is null
+    </select>
+
+</mapper>

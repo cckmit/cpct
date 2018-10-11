@@ -82,7 +82,6 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
-
         <dependency>
             <groupId>net.sf.json-lib</groupId>
             <artifactId>json-lib</artifactId>
@@ -108,6 +107,19 @@
         <dependency>
             <groupId>com.sun.jna</groupId>
             <artifactId>jna</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zjhcsoft.eagle</groupId>
+            <artifactId>dubbo-eagle-service</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <!--ftp-->
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+            <version>3.3</version>
         </dependency>
 
     </dependencies>
