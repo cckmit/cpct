@@ -29,6 +29,7 @@ import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
+import com.zjtelcom.cpct.service.synchronize.campaign.SyncActivityService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
@@ -119,6 +120,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
     @Autowired
     private MktCamResultRelMapper mktCamResultRelMapper;
+
+    @Autowired
+    private SyncActivityService syncActivityService;
 
     /**
      * 添加活动基本信息 并建立关系
@@ -664,7 +668,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      * @throws Exception
      */
     @Override
-    public Map<String, Object> publishMktCampaign(Long mktCampaignId) throws Exception {
+    public Map<String, Object> publishMktCampaign(final Long mktCampaignId) throws Exception {
         Map<String, Object> mktCampaignMap = new HashMap<>();
         // 获取当前活动信息
         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
@@ -739,6 +743,13 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 chaildMktCamStrategyConfRelDO.setUpdateStaff(UserUtil.loginId());
                 mktCamStrategyConfRelMapper.insert(chaildMktCamStrategyConfRelDO);
             }
+            //  发布活动时异步去同步大数据
+            new Thread(){
+                @Override
+                public void run(){
+                    syncActivityService.syncActivity(mktCampaignId);
+                }
+            }.start();
         }
         mktCampaignMap.put("childMktCampaignIdList", childMktCampaignIdList);
         return mktCampaignMap;
