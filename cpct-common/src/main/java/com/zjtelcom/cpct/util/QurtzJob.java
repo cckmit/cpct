@@ -13,10 +13,10 @@ import java.io.IOException;
 @Component
 public class QurtzJob {
 
-    @Scheduled(cron="0/30 * * * * ?")
-    public void job(){
-        System.out.println("每30秒执行一次");
-    }
+//    @Scheduled(cron="0/30 * * * * ?")
+//    public void job(){
+//        System.out.println("每30秒执行一次");
+//    }
 
 
     /**
