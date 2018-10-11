@@ -87,7 +87,8 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
         Long parentMenuId = Long.parseLong(params.get("parentMenuId"));
         Integer menuNextId = Integer.parseInt(params.get("menuNextId"));
         String menuUrl = params.get("menuUrl");
-        String remark = params.get("remark");
+        String menuRemark = params.get("menuRemark");
+        String syncUrl = params.get("syncUrl");
 
         SysMenu menu = new SysMenu();
         menu.setMenuName(menuName);
@@ -95,7 +96,8 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
         menu.setParentMenuId(parentMenuId);
         menu.setMenuNextId(menuNextId);
         menu.setMenuUrl(menuUrl);
-        menu.setRemark(remark);
+        menu.setMenuRemark(menuRemark);
+        menu.setSyncUrl(syncUrl);
 
         sysMenuMapper.insert(menu);
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -112,7 +114,9 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
         Long menuType = Long.parseLong(params.get("menuType"));
         Long parentMenuId = Long.parseLong(params.get("parentMenuId"));
         String menuUrl = params.get("menuUrl");
-        String remark = params.get("remark");
+        String menuRemark = params.get("menuRemark");
+        String syncUrl = params.get("syncUrl");
+        Integer menuNextId = Integer.parseInt(params.get("menuNextId"));
 
         SysMenu menu = new SysMenu();
         menu.setMenuId(menuId);
@@ -120,7 +124,9 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
         menu.setMenuType(menuType);
         menu.setParentMenuId(parentMenuId);
         menu.setMenuUrl(menuUrl);
-        menu.setRemark(remark);
+        menu.setMenuRemark(menuRemark);
+        menu.setSyncUrl(syncUrl);
+        menu.setMenuNextId(menuNextId);
 
         sysMenuMapper.updateByPrimaryKey(menu);
         result.put("resultCode", CommonConstant.CODE_SUCCESS);

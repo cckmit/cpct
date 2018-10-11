@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.campaign.MktOperatorLogMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.campaign.MktOperatorLogDO">
+        <id column="OPERATION_ID" jdbcType="BIGINT" property="operationId" />
+        <result column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId" />
+        <result column="MKT_ACTIVITY_NBR" jdbcType="VARCHAR" property="mktActivityNbr" />
+        <result column="MKT_CAMPAIGN_NAME" jdbcType="VARCHAR" property="mktCampaignName" />
+        <result column="MKT_CAMPAIGN_STATE_BEFORE" jdbcType="VARCHAR" property="mktCampaignStateBefore" />
+        <result column="MKT_CAMPAIGN_STATE_AFTER" jdbcType="VARCHAR" property="mktCampaignStateAfter" />
+        <result column="OPERATOR_ACCOUNT" jdbcType="VARCHAR" property="operatorAccount" />
+        <result column="OPERATION_TYPE" jdbcType="VARCHAR" property="operatorType" />
+        <result column="OPERATION_DATE" jdbcType="TIMESTAMP" property="operatorDate" />
+    </resultMap>
+
+    <insert id="insertOperation" parameterType="com.zjtelcom.cpct.domain.campaign.MktOperatorLogDO">
+        insert into mkt_operator_log (OPERATION_ID, MKT_CAMPAIGN_ID, MKT_ACTIVITY_NBR, MKT_CAMPAIGN_NAME,
+          MKT_CAMPAIGN_STATE_BEFORE, MKT_CAMPAIGN_STATE_AFTER, OPERATOR_ACCOUNT, OPERATION_TYPE, OPERATION_DATE
+          )
+        values (#{operationId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT},#{mktActivityNbr,jdbcType=VARCHAR},
+          #{mktCampaignName,jdbcType=VARCHAR}, #{mktCampaignStateBefore,jdbcType=VARCHAR}, #{mktCampaignStateAfter,jdbcType=VARCHAR},
+          #{operatorAccount,jdbcType=VARCHAR}, #{operatorType,jdbcType=VARCHAR}, #{operatorDate,jdbcType=TIMESTAMP})
+    </insert>
+</mapper>

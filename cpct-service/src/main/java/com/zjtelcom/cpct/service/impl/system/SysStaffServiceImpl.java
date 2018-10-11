@@ -43,7 +43,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         } catch(Exception e){
             e.printStackTrace();
             logger.error("根据用户名查询用户信息异常,参数={},异常={}",userName);
-            resultMap.put("code", "1");
+            resultMap.put("code", CommonConstant.CODE_FAIL);
             resultMap.put("msg", "根据用户名查询用户信息失败!");
             return resultMap;
         }
@@ -134,7 +134,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         int flag = sysStaffMapper.insert(sysStaff);
         if (flag < 1) {
             //todo flag<1 判断失败抛出业务异常
-            result.put("resultCode","1");
+            result.put("resultCode",CommonConstant.CODE_FAIL);
             result.put("resultMsg","员工信息保存失败");
             throw new Exception();
         }
@@ -146,7 +146,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         flag = sysStaffRoleMapper.insert(sysStaffRole);
         if (flag < 1) {
             //todo flag<1 判断失败抛出业务异常
-            result.put("resultCode","1");
+            result.put("resultCode",CommonConstant.CODE_FAIL);
             result.put("resultMsg","员工角色信息保存失败");
             throw new Exception();
         }
