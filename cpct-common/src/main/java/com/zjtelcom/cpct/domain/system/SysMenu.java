@@ -65,6 +65,11 @@ public class SysMenu extends BaseEntity {
      */
     private String parentMenuName;
 
+    /**
+     * 菜单级别名称
+     */
+    private String menuTypeName;
+
     public Long getMenuId() {
         return menuId;
     }
@@ -183,5 +188,13 @@ public class SysMenu extends BaseEntity {
 
     public void setParentMenuName(String parentMenuName) {
         this.parentMenuName = parentMenuName;
+    }
+
+    public String getMenuTypeName() {
+        return menuTypeName;
+    }
+
+    public void setMenuTypeName(String menuTypeName) {
+        this.menuTypeName = menuTypeName;
     }
 }

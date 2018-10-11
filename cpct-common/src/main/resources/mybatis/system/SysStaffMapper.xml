@@ -88,7 +88,7 @@
         left join sys_role as re on sr.ROLE_ID = re.ROLE_ID
         left join contact_channel as cc on sf.CHANNEL_ID = cc.CONTACT_CHL_ID
         left join sys_area as sa on sf.CITY_ID = sa.area_id
-        left join sys_params as sp on sf.LOGIN_STATUS = sp.PARAM_ID
+        left join sys_params as sp on sf.LOGIN_STATUS = sp.PARAM_VALUE and sp.PARAM_KEY = "SYSYTEM_LOGIN_STATUS"
         where 1=1
         <if test="staffAccount != null and staffAccount != ''">
             and sf.STAFF_ACCOUNT like CONCAT('%',#{staffAccount,jdbcType=VARCHAR},'%')
