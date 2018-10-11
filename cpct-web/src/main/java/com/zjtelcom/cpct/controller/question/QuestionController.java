@@ -36,7 +36,7 @@ public class QuestionController extends BaseController {
      * 获取问卷列表（不分页）
      * @return
      */
-    @GetMapping("listSimpleNaire")
+    @PostMapping("listSimpleNaire")
     @CrossOrigin
     public Map<String, Object> listSimpleNaire() {
         Map<String, Object> maps = new HashMap<>();
