@@ -16,6 +16,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ImportResource;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
 
@@ -29,7 +30,7 @@ import org.springframework.web.client.RestTemplate;
 @ComponentScan(value={"com.zjtelcom.cpct"})
 @EnableTransactionManagement
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class,DataSourceTransactionManagerAutoConfiguration.class, MybatisAutoConfiguration.class})
-
+@EnableScheduling
 public class Application {
 
     @Bean
@@ -43,5 +44,7 @@ public class Application {
         SpringApplication.run(Application.class, args);
         logger.info("***********CPCT*********启动**********");
     }
+
+
 }
 

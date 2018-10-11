@@ -15,6 +15,7 @@
         <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
         <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
         <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff"/>
+        <result column="PARAM_NAME" jdbcType="VARCHAR" property="menuTypeName"/>
     </resultMap>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
@@ -29,7 +30,7 @@
         CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
         )
       values (#{menuId,jdbcType=BIGINT}, #{menuName,jdbcType=VARCHAR}, #{menuImg,jdbcType=VARCHAR},
-        #{menuType,jdbcType=BIGINT}, #{parentMenuId,jdbcType=BIGINT}, #{menuNextId,jdbcType=INTEGER},
+        #{menuType,jdbcType=BIGINT}, #{parentMenuId,jdbcType=BIGINT}, #{menuNextId,jdbcType=INTEGER}, #{syncUrl,jdbcType=VARCHAR},
         #{menuUrl,jdbcType=VARCHAR}, #{menuRemark,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP},
         #{createStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}
         )
@@ -85,10 +86,10 @@
 
     <select id="listMenuById" resultMap="BaseResultMap" parameterType="Long">
       select sm.MENU_ID, sm.MENU_NAME, sm.MENU_IMG, sm.MENU_TYPE, sm.PARENT_MENU_ID, sm.MENU_NEXT_ID, sm.SYNC_URL,
-              sm.MENU_NEXT_ID,  sm.MENU_URL, sm.MENU_REMARK, sm2.MENU_NAME as parentMenuName
+              sm.MENU_NEXT_ID,  sm.MENU_URL, sm.MENU_REMARK, sm2.MENU_NAME as parentMenuName, sp.PARAM_NAME
       from sys_menu sm
-      left join sys_menu sm2
-      on sm.PARENT_MENU_ID = sm2.MENU_ID
+      left join sys_menu sm2 on sm.PARENT_MENU_ID = sm2.MENU_ID
+      left join sys_params sp on sm.MENU_TYPE = sp.PARAM_VALUE and sp.PARAM_KEY = "MENU_TYPE"
       where sm.MENU_ID = #{menuId,jdbcType=BIGINT}
       or sm.PARENT_MENU_ID = #{menuId,jdbcType=BIGINT}
       order by sm.PARENT_MENU_ID asc,sm.MENU_NEXT_ID asc
