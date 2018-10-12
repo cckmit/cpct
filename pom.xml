@@ -50,7 +50,7 @@
         <json-lib.version>2.4</json-lib.version>
         <jna.version>3.0.9</jna.version>
         <elasticsearch.version>6.3.1</elasticsearch.version>
-        <bss-cooperate.version>1.0</bss-cooperate.version>
+        <bss-cooperate.version>1.0.8</bss-cooperate.version>
         <ctg-cache.version>2.3.1_P1</ctg-cache.version>
 
     </properties>

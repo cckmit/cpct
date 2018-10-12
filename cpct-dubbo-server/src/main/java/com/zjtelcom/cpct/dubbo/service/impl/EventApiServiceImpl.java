@@ -3,7 +3,7 @@ package com.zjtelcom.cpct.dubbo.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ctzj.smt.bss.cooperate.query.service.dubbo.IContactTaskReceiptService;
+import com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService;
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.rule.RuleResult;
@@ -1875,12 +1875,12 @@ public class EventApiServiceImpl implements EventApiService {
         Map<String, Object> result = new HashMap();
 
         // 解析掺入参数'
-        String activityId = (String) map.get("activityId");
-        String ruleId = (String) map.get("ruleId");
-        String resultNbr = (String) map.get("resultNbr");
-        String accNbr = (String) map.get("accNbr");
-        String integrationId = (String) map.get("integrationId");
-        String custId = (String) map.get("custId");
+//        String activityId = (String) map.get("activityId");
+//        String ruleId = (String) map.get("ruleId");
+//        String resultNbr = (String) map.get("resultNbr");
+//        String accNbr = (String) map.get("accNbr");
+//        String integrationId = (String) map.get("integrationId");
+//        String custId = (String) map.get("custId");
 
 
 

@@ -17,10 +17,10 @@
 
     <!-- 注册 -->
     <!-- 策略cpct计算服务 -->
-    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.EventApiService" ref="eventApiServiceImpl" version="1.0" >
-        <dubbo:method name="CalculateCPC" servicecode="00.1083.CalculateCPC" timeout="10000"/>
-        <dubbo:method name="CalculateCPCSync" servicecode="33.1083.CalculateCPCSync" timeout="5000"/>
-    </dubbo:service>
+    <dubbo:reference interface="com.zjpii.biz.serv.YzServ" id="yzServ"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="5000"/>
+    </dubbo:reference>
 
 
 

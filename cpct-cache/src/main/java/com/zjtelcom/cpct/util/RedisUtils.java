@@ -395,9 +395,7 @@ public class RedisUtils {
         ProxyJedis jedis = new ProxyJedis();
         try {
             jedis = pool.getResource();
-            //sendCommand 可能会抛出 运行时异常
             jedis.set("test", "123");
-            //sendCommand 可能会抛出 运行时异常
             jedis.get("test");
             System.out.println(jedis.get("test"));
             jedis.close();
