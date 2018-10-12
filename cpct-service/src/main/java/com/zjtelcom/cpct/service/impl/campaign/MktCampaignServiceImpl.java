@@ -693,6 +693,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setCreateStaff(UserUtil.loginId());
             mktCampaignDO.setUpdateDate(new Date());
             mktCampaignDO.setUpdateStaff(UserUtil.loginId());
+            mktCampaignDO.setStatusCd(StatusCode.STATUS_CODE_DRAFT.getStatusCode());
             mktCampaignMapper.insert(mktCampaignDO);
             // 获取新的活动的Id
             Long childMktCampaignId = mktCampaignDO.getMktCampaignId();

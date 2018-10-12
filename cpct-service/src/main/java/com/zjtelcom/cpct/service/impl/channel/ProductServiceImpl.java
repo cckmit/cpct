@@ -87,15 +87,17 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     public Map<String, Object> copyProductRule(Long userId, List<Long> ItemIdList) {
         Map<String,Object> result = new HashMap<>();
         List<Long> ruleIdList = new ArrayList<>();
-        for (Long itemId : ItemIdList) {
-            MktCamItem item = camItemMapper.selectByPrimaryKey(itemId);
-            if (item == null) {
-                continue;
+        if(ItemIdList!=null && ItemIdList.size()>0){
+            for (Long itemId : ItemIdList) {
+                MktCamItem item = camItemMapper.selectByPrimaryKey(itemId);
+                if (item == null) {
+                    continue;
+                }
+                MktCamItem newItem = BeanUtil.create(item, new MktCamItem());
+                newItem.setMktCamItemId(null);
+                camItemMapper.insert(newItem);
+                ruleIdList.add(newItem.getMktCamItemId());
             }
-            MktCamItem newItem = BeanUtil.create(item, new MktCamItem());
-            newItem.setMktCamItemId(null);
-            camItemMapper.insert(newItem);
-            ruleIdList.add(newItem.getMktCamItemId());
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("ruleIdList",ruleIdList);
