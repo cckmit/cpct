@@ -24,8 +24,6 @@ public class ChannelUtil  {
 
 
 
-
-
     public static String getQuestionType(Question question){
         String st = "";
         if (question.getQuestionType()==null || question.getQuestionType().equals("")){
@@ -266,6 +264,15 @@ public class ChannelUtil  {
 
     public static List<Long> StringToidList(String var1) {
         String[] array = var1.split(",");
+        List<Long> list = new ArrayList<Long>();
+        for (String str : array)
+        {
+            list.add(Long.valueOf(str));
+        }
+        return list;
+    }
+    public static List<Long> StringToIdList(String var1) {
+        String[] array = var1.split("/");
         List<Long> list = new ArrayList<Long>();
         for (String str : array)
         {

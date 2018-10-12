@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.controller.synchronize;
 
 import com.alibaba.fastjson.JSON;
+import com.zjhcsoft.eagle.main.dubbo.model.policy.ResponseHeaderModel;
 import com.zjtelcom.cpct.config.RedisConfig;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
@@ -8,6 +9,7 @@ import com.zjtelcom.cpct.domain.question.Question;
 import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.service.synchronize.*;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynMktCampaignRelService;
+import com.zjtelcom.cpct.service.synchronize.campaign.SyncActivityService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.service.synchronize.channel.SynChannelService;
 import com.zjtelcom.cpct.service.synchronize.filter.SynFilterRuleService;
@@ -79,6 +81,8 @@ public class SynchronizeController extends BaseController {
     private SynLabelGrpService synLabelGrpService;
     @Autowired
     private SynQuestionService synQuestionService;
+    @Autowired
+    private SyncActivityService syncActivityService;
 
 
 
@@ -754,6 +758,28 @@ public class SynchronizeController extends BaseController {
     }
 
 
+    /**
+     * 同步活动到大数据
+     *
+     * @param params
+     * @return
+     */
+    @PostMapping("/syncActivity")
+    @CrossOrigin
+    public String SyncActivity(@RequestBody Map<String, Object> params) {
+        logger.info("同步单个营销维挽活动");
+        Long mktCampaignId = Long.valueOf((Integer) params.get("mktCampaignId"));
+        String roleName = getRole();   //  操作角色
+        ResponseHeaderModel responseHeaderModel = new ResponseHeaderModel();
+        try {
+            responseHeaderModel = syncActivityService.syncActivity(mktCampaignId);
+        } catch (Exception e) {
+            responseHeaderModel.setResultMessage("1");
+            responseHeaderModel.setResultMessage("同步失败！");
+            logger.error("同步活动到大数据失败！Exception: ", mktCampaignId, e);
+        }
+        return JSON.toJSONString(responseHeaderModel);
+    }
 
 
 

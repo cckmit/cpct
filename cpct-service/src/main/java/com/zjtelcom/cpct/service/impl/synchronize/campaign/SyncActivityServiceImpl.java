@@ -51,7 +51,7 @@ public class SyncActivityServiceImpl implements SyncActivityService {
     private MktVerbalMapper mktVerbalMapper;
 
     @Override
-    public ResponseHeaderModel SyncActivity(Long mktCampaignId, String roleName) {
+    public ResponseHeaderModel syncActivity(Long mktCampaignId) {
         // 获取活动基本信息
         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
         ActivityModel activityModel = new ActivityModel();

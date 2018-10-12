@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.service.impl.system;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.system.SysMenuMapper;
 import com.zjtelcom.cpct.domain.system.SysMenu;
 import com.zjtelcom.cpct.service.BaseService;
@@ -56,7 +57,7 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
             parent.put("children",childArray);
         }
 
-        result.put("resultCode", "0");
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("data", parentArray);
 
         return result;
@@ -71,7 +72,7 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
     public Map<String, Object> listMenuByRoleId(Long roleId) {
         Map<String, Object> result = new HashMap<>();
         List<SysMenu> list = sysMenuMapper.selectByRoleId(roleId);
-        result.put("resultCode", "0");
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("data", list);
 
         return result;
@@ -86,7 +87,8 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
         Long parentMenuId = Long.parseLong(params.get("parentMenuId"));
         Integer menuNextId = Integer.parseInt(params.get("menuNextId"));
         String menuUrl = params.get("menuUrl");
-        String remark = params.get("remark");
+        String menuRemark = params.get("menuRemark");
+        String syncUrl = params.get("syncUrl");
 
         SysMenu menu = new SysMenu();
         menu.setMenuName(menuName);
@@ -94,10 +96,11 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
         menu.setParentMenuId(parentMenuId);
         menu.setMenuNextId(menuNextId);
         menu.setMenuUrl(menuUrl);
-        menu.setRemark(remark);
+        menu.setMenuRemark(menuRemark);
+        menu.setSyncUrl(syncUrl);
 
         sysMenuMapper.insert(menu);
-        result.put("resultCode", "0");
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg", "保存成功");
         return result;
     }
@@ -111,7 +114,9 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
         Long menuType = Long.parseLong(params.get("menuType"));
         Long parentMenuId = Long.parseLong(params.get("parentMenuId"));
         String menuUrl = params.get("menuUrl");
-        String remark = params.get("remark");
+        String menuRemark = params.get("menuRemark");
+        String syncUrl = params.get("syncUrl");
+        Integer menuNextId = Integer.parseInt(params.get("menuNextId"));
 
         SysMenu menu = new SysMenu();
         menu.setMenuId(menuId);
@@ -119,10 +124,12 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
         menu.setMenuType(menuType);
         menu.setParentMenuId(parentMenuId);
         menu.setMenuUrl(menuUrl);
-        menu.setRemark(remark);
+        menu.setMenuRemark(menuRemark);
+        menu.setSyncUrl(syncUrl);
+        menu.setMenuNextId(menuNextId);
 
         sysMenuMapper.updateByPrimaryKey(menu);
-        result.put("resultCode", "0");
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg", "保存成功");
         return result;
     }
@@ -134,7 +141,7 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
         Long menuId = Long.parseLong(params.get("menuId"));
 
         sysMenuMapper.deleteByPrimaryKey(menuId);
-        result.put("resultCode", "0");
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg", "删除成功");
         return result;
     }
@@ -149,7 +156,7 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
         }
 
         List<SysMenu> list = sysMenuMapper.listMenuById(menuId);
-        result.put("resultCode", "0");
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("data", list);
 
         return result;
@@ -171,13 +178,13 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
             sysMenu.setMenuId(0L);
             sysMenu.setMenuName("系统菜单");
             list.add(sysMenu);
-            result.put("resultCode", "0");
+            result.put("resultCode", CommonConstant.CODE_SUCCESS);
             result.put("data", list);
             return result;
         }
 
         list = sysMenuMapper.listMenuByLevel(level);
-        result.put("resultCode", "0");
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("data", list);
 
         return result;

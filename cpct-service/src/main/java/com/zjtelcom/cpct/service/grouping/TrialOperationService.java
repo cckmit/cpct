@@ -22,6 +22,9 @@ public interface TrialOperationService  {
 
     Map<String,Object> importUserList(MultipartFile multipartFile ,TrialOperationVO operation, Long ruleId ) throws IOException;
 
+    Map<String,Object> businessCheck(TrialOperationVO operationVO);
+
+
 
 
 

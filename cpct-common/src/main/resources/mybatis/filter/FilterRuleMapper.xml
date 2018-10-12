@@ -21,11 +21,24 @@
         <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate"/>
         <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
         <result column="REMARK" jdbcType="VARCHAR" property="remark"/>
-        <result column="CONDITION_ID" jdbcType="BIGINT" property="conditionId" />
-        <result column="DAYS" jdbcType="VARCHAR" property="days" />
-        <result column="TIMES" jdbcType="VARCHAR" property="times" />
-        <result column="OFFER_INFO" jdbcType="VARCHAR" property="offerInfo" />
+        <result column="CONDITION_ID" jdbcType="BIGINT" property="conditionId"/>
+        <result column="DAYS" jdbcType="VARCHAR" property="days"/>
+        <result column="TIMES" jdbcType="VARCHAR" property="times"/>
+        <result column="OFFER_INFO" jdbcType="VARCHAR" property="offerInfo"/>
     </resultMap>
+
+    <resultMap id="FilterRuleModelMap" type="com.zjtelcom.cpct.dto.filter.FilterRuleModel">
+        <id column="RULE_ID" jdbcType="BIGINT" property="ruleId"/>
+        <result column="RULE_NAME" jdbcType="VARCHAR" property="ruleName"/>
+        <result column="FILTER_TYPE" jdbcType="VARCHAR" property="filterType"/>
+        <result column="INJECTION_LABEL_CODE" jdbcType="VARCHAR" property="labelCode"/>
+        <result column="INJECTION_LABEL_NAME" jdbcType="VARCHAR" property="labelName"/>
+        <result column="OPER_TYPE" jdbcType="VARCHAR" property="operType"/>
+        <result column="RIGHT_PARAM" jdbcType="VARCHAR" property="rightParam"/>
+        <result column="DAYS" jdbcType="VARCHAR" property="days"/>
+        <result column="TIMES" jdbcType="VARCHAR" property="times"/>
+    </resultMap>
+
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from filter_rule
     where RULE_ID = #{ruleId,jdbcType=BIGINT}
@@ -190,5 +203,29 @@
         RULE_ID = #{ruleId,jdbcType=BIGINT}
         where RULE_ID = #{ruleId,jdbcType=BIGINT}.ii
     </update>
+
+    <select id="selectFilterRuleByStrategyId" parameterType="java.lang.Long" resultMap="FilterRuleModelMap">
+    SELECT
+        f.RULE_ID,
+        f.RULE_NAME,
+        f.FILTER_TYPE,
+        f.DAYS,
+        f.TIMES,
+        c.OPER_TYPE,
+        c.RIGHT_PARAM,
+        l.INJECTION_LABEL_CODE,
+        l.INJECTION_LABEL_NAME
+    FROM
+        filter_rule f,
+        mkt_verbal_condition c,
+        injection_label l,
+        mkt_strategy_filter_rule_rel r
+    WHERE
+        r.STRATEGY_ID = #{strategyId, jdbcType=VARCHAR}
+        AND f.RULE_ID = r.RULE_ID
+        AND f.FILTER_TYPE = 6000
+        AND c.CONDITION_ID = f.CONDITION_ID
+        AND c.LEFT_PARAM = l.INJECTION_LABEL_ID
+    </select>
 
 </mapper>

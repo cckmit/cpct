@@ -22,6 +22,8 @@ import com.zjtelcom.cpct.dto.event.EventSorce;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.EventSorceService;
 import com.zjtelcom.cpct.util.BeanUtil;
+import com.zjtelcom.cpct.util.ChannelUtil;
+import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -59,6 +61,7 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
         Map<String, Object> eventSorceMap = new HashMap<>();
         try {
             EventSorceDO eventSorceDO = BeanUtil.create(eventSorce, new EventSorceDO());
+            eventSorceDO.setEvtSrcCode("ERC"+DateUtil.date2String(new Date())+ChannelUtil.getRandomStr(4));
             eventSorceDO.setCreateStaff(UserUtil.loginId());
             eventSorceDO.setCreateDate(new Date());
             eventSorceDO.setUpdateStaff(UserUtil.loginId());

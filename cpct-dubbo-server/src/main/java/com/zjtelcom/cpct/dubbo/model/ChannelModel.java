@@ -13,6 +13,15 @@ public class ChannelModel implements Serializable {
     private Long parentId;
     private Date startTime;//可接触时间段
     private Date endTime;
+    private String channelType;//人工/被动
+
+    public String getChannelType() {
+        return channelType;
+    }
+
+    public void setChannelType(String channelType) {
+        this.channelType = channelType;
+    }
 
     public Long getContactChlId() {
         return contactChlId;
