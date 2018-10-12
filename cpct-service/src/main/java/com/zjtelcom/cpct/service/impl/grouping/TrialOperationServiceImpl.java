@@ -130,9 +130,24 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         req.setDisplayColumnId(campaign.getCalcDisplay());
         Map<String, Object> labelMap = messageLabelService.queryLabelListByDisplayId(req);
         List<LabelDTO> labelDTOList = (List<LabelDTO>) labelMap.get("labels");
-        String[] fieldList = new String[labelDTOList.size()];
-        for (int i = 0; i < labelDTOList.size(); i++) {
-            fieldList[i] = labelDTOList.get(i).getLabelCode();
+        List<String> codeList = new ArrayList<>();
+        for (LabelDTO labelDTO : labelDTOList) {
+            codeList.add(labelDTO.getLabelCode());
+        }
+        //添加固定查询标签
+        if (!codeList.contains("ACC_NBR")){
+            codeList.add("ACC_NBR");
+        }
+        if (!codeList.contains("LAN_NAME")){
+            codeList.add("LAN_NAME");
+        }
+        if (!codeList.contains("CCUST_NAME")){
+            codeList.add("CCUST_NAME");
+        }
+
+        String[] fieldList = new String[codeList.size()];
+        for (int i = 0; i < codeList.size(); i++) {
+            fieldList[i] = codeList.get(i);
         }
 
         TrialOperationVO request = BeanUtil.create(operationVO,new TrialOperationVO());
@@ -171,9 +186,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             List<Map<String,Object>> customerList = (List<Map<String,Object>>) response.getHitsList().get(ruleIdSt);
             for (Map<String,Object> customer : customerList) {
                 customer.putAll(getProductAndChannelByRuleId(ruleId));
-
-
-
                 customers.add(customer);
             }
         }
@@ -201,7 +213,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 CamScript script = scriptMapper.selectByConfId(chlConf.getEvtContactConfId());
                 st.append(chlConf.getEvtContactConfName()).append("(")
                         .append(script.getScriptDesc()==null? "" : script.getScriptDesc())
-                        .append(")");
+                        .append(")；");
             }
             result.put("channel",st);
         }
@@ -387,8 +399,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         // 设置批次号
         param.setBatchNum(batchNum);
         //redis取规则
-        String rule = redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId).toString();
-        System.out.println("*************************" + rule);
+        Object ruleOb = redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId);
+        String rule = "";
+        if (ruleOb!=null){
+            rule = ruleOb.toString();
+            System.out.println("*************************" + rule);
+        }
         param.setRule(rule);
         return param;
     }
