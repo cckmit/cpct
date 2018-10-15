@@ -19,7 +19,5 @@ public interface MktOperatorLogMapper {
     /*
     **活动操作记录查找
      */
-    List<MktOperatorLogDO> selectByPrimaryKey(@Param("mktActivityNbr") String mktActivityNbr,
-                                              @Param("mktCampaignName") String mktCampaignName,
-                                              @Param("operatorAccount") String operatorAccount);
+    List<MktOperatorLogDO> selectByPrimaryKey(MktOperatorLogDO mktOperatorLogDO);
 }
