@@ -10,7 +10,7 @@
         <result column="MKT_CAMPAIGN_STATE_AFTER" jdbcType="VARCHAR" property="mktCampaignStateAfter" />
         <result column="OPERATOR_ACCOUNT" jdbcType="VARCHAR" property="operatorAccount" />
         <result column="OPERATION_TYPE" jdbcType="VARCHAR" property="operatorType" />
-        <result column="OPERATION_DATE" jdbcType="TIMESTAMP" property="operatorDate" />
+        <result column="OPERATOR_DATE" jdbcType="TIMESTAMP" property="operatorDate" />
     </resultMap>
 
     <insert id="insertOperation" parameterType="com.zjtelcom.cpct.domain.campaign.MktOperatorLogDO">
@@ -21,4 +21,20 @@
           #{mktCampaignName,jdbcType=VARCHAR}, #{mktCampaignStateBefore,jdbcType=VARCHAR}, #{mktCampaignStateAfter,jdbcType=VARCHAR},
           #{operatorAccount,jdbcType=VARCHAR}, #{operatorType,jdbcType=VARCHAR}, #{operatorDate,jdbcType=TIMESTAMP})
     </insert>
+    
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select OPERATION_ID, MKT_CAMPAIGN_ID, MKT_ACTIVITY_NBR, MKT_CAMPAIGN_NAME, MKT_CAMPAIGN_STATE_BEFORE,
+          MKT_CAMPAIGN_STATE_AFTER, OPERATOR_ACCOUNT, OPERATION_TYPE, OPERATION_DATE
+        from mkt_operator_log
+        where 1=1
+        <if test="mktActivityNbr != null and mktActivityNbr != ''">
+            AND MKT_ACTIVITY_NBR = #{mktActivityNbr,jdbcType=VARCHAR}
+        </if>
+        <if test="mktCampaignName != null and mktCampaignName != ''">
+            AND MKT_CAMPAIGN_NAME like CONCAT('%',#{mktCampaignName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="operatorAccount != null and operatorAccount != ''">
+            AND OPERATOR_ACCOUNT = #{operatorAccount,jdbcType=VARCHAR}
+        </if>
+    </select>
 </mapper>

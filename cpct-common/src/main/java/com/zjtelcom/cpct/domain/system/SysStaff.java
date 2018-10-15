@@ -53,6 +53,11 @@ public class SysStaff extends BaseEntity implements Serializable {
     private String roleName;
 
     /**
+     * 员工角色
+     */
+    private Long roleId;
+
+    /**
      * 所属渠道
      */
     private String channelName;
@@ -241,5 +246,13 @@ public class SysStaff extends BaseEntity implements Serializable {
 
     public void setLoginName(String loginName) {
         this.loginName = loginName;
+    }
+
+    public Long getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(Long roleId) {
+        this.roleId = roleId;
     }
 }
