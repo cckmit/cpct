@@ -15,7 +15,6 @@ public class Label extends BaseEntity {
     private String labelValueType;//1000输入型;2000	枚举型
     private String labelDataType;//1000	日期型;1100	日期时间型;1200	字符型;1300	浮点型;1400	整数型;1500	布尔型;1600	计算型
 
-//    private String fitDomain;//适用域  四种域 PHY-MAN-0022 移动  PHY-MAN-0001 固话  INT-MAN-0010 宽带 OTH-MAN-0034 ITV
     private String rightOperand;//右操作符（标签值）
     private String conditionType;//单选多选框
     private String operator;//运算符
@@ -23,6 +22,45 @@ public class Label extends BaseEntity {
     private Integer isShared;
     private String className;
     private Long catalogId;
+    private String labRelevantFlag;
+
+    private String labMissRate;
+
+    private String labObjectCode;
+
+    private String labObject;
+
+    private String labLevel1;
+
+    private String labLevel1Name;
+
+    private String labLevel2;
+
+    private String labLevel2Name;
+
+    private String labLevel3;
+
+    private String labLevel3Name;
+
+    private String labLevel4;
+
+    private String labLevel4Name;
+
+    private String labLevel5;
+
+    private String labLevel5Name;
+
+    private String labLevel6;
+
+    private String labLevel6Name;
+
+    private String labUpdateFeq;
+
+    private String labBusiDesc;
+
+    private String labTechDesc;
+
+    private String labState;
 
 
 }
