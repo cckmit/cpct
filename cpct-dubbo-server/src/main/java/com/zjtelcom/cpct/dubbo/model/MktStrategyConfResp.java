@@ -1,8 +1,7 @@
 package com.zjtelcom.cpct.dubbo.model;
 
-import com.zjtelcom.cpct.domain.SysArea;
-import com.zjtelcom.cpct.domain.channel.Channel;
-import com.zjtelcom.cpct.dto.filter.FilterRule;
+
+import com.zjtelcom.cpct.dto.filter.FilterRuleModel;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 
 import java.util.List;
@@ -19,20 +18,7 @@ public class MktStrategyConfResp extends MktStrategyConf {
      */
     private List<MktStrConfRuleResp> mktStrConfRuleRespList;
 
-    /**
-     * 策略适用地址
-     */
-    private List<SysArea> areaList;
-
-    /**
-     * 过滤规则
-     */
-    private List<FilterRule> filterRuleList;
-
-    /**
-     * 策略适用渠道
-     */
-    private List<Channel> channelsList;
+    private List<FilterRuleModel> filterRuleModelList;
 
     public List<MktStrConfRuleResp> getMktStrConfRuleRespList() {
         return mktStrConfRuleRespList;
@@ -50,27 +36,11 @@ public class MktStrategyConfResp extends MktStrategyConf {
         this.mktCampaignId = mktCampaignId;
     }
 
-    public List<SysArea> getAreaList() {
-        return areaList;
+    public List<FilterRuleModel> getFilterRuleModelList() {
+        return filterRuleModelList;
     }
 
-    public void setAreaList(List<SysArea> areaList) {
-        this.areaList = areaList;
-    }
-
-    public List<FilterRule> getFilterRuleList() {
-        return filterRuleList;
-    }
-
-    public void setFilterRuleList(List<FilterRule> filterRuleList) {
-        this.filterRuleList = filterRuleList;
-    }
-
-    public List<Channel> getChannelsList() {
-        return channelsList;
-    }
-
-    public void setChannelsList(List<Channel> channelsList) {
-        this.channelsList = channelsList;
+    public void setFilterRuleModelList(List<FilterRuleModel> filterRuleModelList) {
+        this.filterRuleModelList = filterRuleModelList;
     }
 }

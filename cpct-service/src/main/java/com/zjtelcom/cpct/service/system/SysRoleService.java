@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface SysRoleService {
 
-    Map<String, Object> listRole(Long roleId, String RoleName,int page,int pageSize);
+    Map<String, Object> listRole(String RoleName,int page,int pageSize);
 
     Map<String, Object> saveRole(SysRole sysRole);
 

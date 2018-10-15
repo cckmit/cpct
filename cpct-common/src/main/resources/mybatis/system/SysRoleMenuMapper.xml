@@ -8,7 +8,7 @@
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from sys_role_menu
-    where AUTHORITY_ID = #{authorityId,jdbcType=BIGINT}
+    where ROLE_ID = #{roleId,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.system.SysRoleMenu">
     insert into sys_role_menu (AUTHORITY_ID, ROLE_ID, MENU_ID
