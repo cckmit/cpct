@@ -1,6 +1,6 @@
-package com.zjtelcom.cpct.dubbo.model;
+package cpct.dubbo.model;
 
-public class TagModel {
+public class LabelModel {
     private Long tagRowId;//标签表主键
     private Long ctasTableDefinitionRowId;//源表定义主键
     private String tagName;//标签名称
