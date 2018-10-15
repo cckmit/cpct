@@ -1,8 +1,9 @@
 package com.zjtelcom.cpct.domain.strategy;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class MktStrategyConfDO {
+public class MktStrategyConfDO  implements Serializable {
     /**
      * 策略配置Id
      */

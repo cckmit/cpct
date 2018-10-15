@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.dto.channel;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -7,7 +8,7 @@ import java.util.List;
  *
  * @author penyu
  */
-public class MessageVO {
+public class MessageVO implements Serializable {
 
     /**
      * 信息表ID

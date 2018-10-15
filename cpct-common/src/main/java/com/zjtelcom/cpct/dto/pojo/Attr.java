@@ -9,6 +9,8 @@
 
 package com.zjtelcom.cpct.dto.pojo;
 
+import java.io.Serializable;
+
 /**
  * 扩展属性取值列表
  * @author taowenwu
@@ -17,7 +19,7 @@ package com.zjtelcom.cpct.dto.pojo;
  * @since JDK1.8
  */
 
-public class Attr {
+public class Attr implements Serializable {
     private String cd;
 
     private String name;

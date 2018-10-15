@@ -10,6 +10,8 @@
 package com.zjtelcom.cpct.dto.pojo;
 
 
+import java.io.Serializable;
+
 /**
  * 集团cpc公共请求对象
  * @author taowenwu
@@ -18,7 +20,7 @@ package com.zjtelcom.cpct.dto.pojo;
  * @since JDK1.7
  */
 
-public class CpcGroupRequest<T> {
+public class CpcGroupRequest<T> implements Serializable {
 
     private ContractReqRoot<T> ContractRoot;
 

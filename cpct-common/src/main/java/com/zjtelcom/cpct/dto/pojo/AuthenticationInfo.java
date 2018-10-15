@@ -9,6 +9,8 @@
 
 package com.zjtelcom.cpct.dto.pojo;
 
+import java.io.Serializable;
+
 /**
  * 安全控制信息对象</br>
  * 安全控制信息对象,包含系统用户工号等信息
@@ -18,7 +20,7 @@ package com.zjtelcom.cpct.dto.pojo;
  * @since
  */
 
-public class AuthenticationInfo {
+public class AuthenticationInfo implements Serializable {
     private String sysUserId;
 
     private String sysUserPostId;

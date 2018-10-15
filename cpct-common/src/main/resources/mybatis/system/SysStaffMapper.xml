@@ -19,6 +19,7 @@
         <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
         <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
         <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff"/>
+        <result column="ROLE_ID" jdbcType="BIGINT" property="roleId"/>
         <result column="ROLE_NAME" jdbcType="VARCHAR" property="roleName"/>
         <result column="CONTACT_CHL_NAME" jdbcType="VARCHAR" property="channelName"/>
         <result column="name" jdbcType="VARCHAR" property="cityName"/>
@@ -65,7 +66,6 @@
         STAFF_EMAIL = #{staffEmail,jdbcType=VARCHAR},
         CHANNEL_ID = #{channelId,jdbcType=BIGINT},
         CITY_ID = #{cityId,jdbcType=BIGINT},
-        STATUS = #{status,jdbcType=BIGINT},
         UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
         UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT}
       where STAFF_ID = #{staffId,jdbcType=BIGINT}
@@ -82,7 +82,7 @@
     <select id="selectAll" resultMap="BaseResultMap">
         select sf.STAFF_ID, sf.STAFF_CODE, sf.STAFF_ACCOUNT, sf.STAFF_NAME, sf.STAFF_PHONE, sf.STAFF_TELEPHONE,
         sf.STAFF_EMAIL, sf.CHANNEL_ID, sf.CITY_ID, sf.STATUS, sf.LOGIN_STATUS, sf.LAST_LOGIN, sf.CREATE_DATE,
-        sf.CREATE_STAFF, sf.UPDATE_DATE, sf.UPDATE_STAFF, re.ROLE_NAME, cc.CONTACT_CHL_NAME, sa.name, sp.PARAM_NAME
+        sf.CREATE_STAFF, sf.UPDATE_DATE, sf.UPDATE_STAFF, re.ROLE_ID, re.ROLE_NAME, cc.CONTACT_CHL_NAME, sa.name, sp.PARAM_NAME
         from sys_staff as sf
         left join sys_staff_role as sr on sf.STAFF_ID = sr.STAFF_ID
         left join sys_role as re on sr.ROLE_ID = re.ROLE_ID

@@ -30,6 +30,7 @@ import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlResultApiService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,6 +43,7 @@ import java.util.Map;
  * @date: 2018/10/12 16:56
  * @version: V1.0
  */
+@Service
 public class MktCamChlResultApiServiceImpl extends BaseService implements MktCamChlResultApiService {
 
     @Autowired
@@ -148,7 +150,9 @@ public class MktCamChlResultApiServiceImpl extends BaseService implements MktCam
         paramMap.put("taskChlList", taskChlList);
         if (taskChlList != null && taskChlList.size() > 0) {
             paramMap.put("resultCode", 1);
+        } else {
+            paramMap.put("resultCode", 1000);
         }
-        return null;
+        return paramMap;
     }
 }

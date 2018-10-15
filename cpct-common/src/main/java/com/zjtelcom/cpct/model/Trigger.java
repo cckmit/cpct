@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.model;
 
-public class Trigger {
+import java.io.Serializable;
+
+public class Trigger implements Serializable {
     private Integer conditionId;
 
     private String conditionName;

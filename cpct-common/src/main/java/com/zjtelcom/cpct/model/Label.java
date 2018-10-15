@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.model;
 
-public class Label {
+import java.io.Serializable;
+
+public class Label implements Serializable {
     private Integer conditionId;
 
     private String conditionName;

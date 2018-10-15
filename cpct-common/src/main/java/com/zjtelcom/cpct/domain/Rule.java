@@ -1,8 +1,9 @@
 package com.zjtelcom.cpct.domain;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Rule {
+public class Rule implements Serializable {
 
 
     private String type;

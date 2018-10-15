@@ -1,8 +1,9 @@
 package com.zjtelcom.cpct.domain.channel;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Offer {
+public class Offer implements Serializable {
     private Integer offerId;
 
     private String offerType;

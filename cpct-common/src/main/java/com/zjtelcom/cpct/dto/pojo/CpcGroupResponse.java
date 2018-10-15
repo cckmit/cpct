@@ -9,6 +9,8 @@
 
 package com.zjtelcom.cpct.dto.pojo;
 
+import java.io.Serializable;
+
 /**
  * 集团cpc公共应答对象
  * @author taowenwu
@@ -17,7 +19,7 @@ package com.zjtelcom.cpct.dto.pojo;
  * @since
  */
 
-public class CpcGroupResponse {
+public class CpcGroupResponse  implements Serializable {
 
     private ContractRespRoot contractRoot;
 

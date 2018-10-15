@@ -9,6 +9,8 @@
 
 package com.zjtelcom.cpct.dto.pojo;
 
+import java.io.Serializable;
+
 /**
  * 集团公共服务应答对象
  * @author taowenwu
@@ -17,7 +19,7 @@ package com.zjtelcom.cpct.dto.pojo;
  * @since JDK1.7
  */
 
-public class SvcRespCont {
+public class SvcRespCont implements Serializable {
     private String resultCode;
 
     private String resultMsg;

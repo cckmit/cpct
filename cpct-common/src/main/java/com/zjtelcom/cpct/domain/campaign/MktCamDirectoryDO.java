@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.domain.campaign;
 
-public class MktCamDirectoryDO {
+import java.io.Serializable;
+
+public class MktCamDirectoryDO  implements Serializable {
     private Long mktCamDirectoryId;
 
     private String mktCamDirectoryName;

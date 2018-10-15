@@ -2,9 +2,10 @@ package com.zjtelcom.cpct.dto.pojo;
 
 import com.zjtelcom.cpct.dto.event.EventSceneDetail;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class EventScenePo {
+public class EventScenePo implements Serializable {
 
 	
 	private RequestTemplateInst requestTemplateInst;
