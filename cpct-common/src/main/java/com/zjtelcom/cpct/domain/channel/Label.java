@@ -62,5 +62,9 @@ public class Label extends BaseEntity {
 
     private String labState;
 
+    private String labManageType;
+
+    private String labTagCode;
+
 
 }

@@ -44,6 +44,8 @@
     <result column="LAB_BUSI_DESC" jdbcType="VARCHAR" property="labBusiDesc" />
     <result column="LAB_TECH_DESC" jdbcType="VARCHAR" property="labTechDesc" />
     <result column="LAB_STATE" jdbcType="VARCHAR" property="labState" />
+    <result column="LAB_MANAGE_TYPE" jdbcType="VARCHAR" property="labManageType" />
+    <result column="LAB_TAG_CODE" jdbcType="VARCHAR" property="labTagCode" />
   </resultMap>
 
   <resultMap id="BaseResultMapT" type="com.zjtelcom.cpct.domain.channel.Label">
@@ -54,7 +56,7 @@
     delete from injection_label
     where INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.InjectionLabel">
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.Label">
     insert into injection_label (INJECTION_LABEL_ID, INJECTION_LABEL_CODE,
       INJECTION_LABEL_NAME, INJECTION_LABEL_DESC,
       LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE,
@@ -69,7 +71,8 @@
       LAB_LEVEL3_NAME, LAB_LEVEL4, LAB_LEVEL4_NAME,
       LAB_LEVEL5, LAB_LEVEL5_NAME, LAB_LEVEL6,
       LAB_LEVEL6_NAME, LAB_UPDATE_FEQ, LAB_BUSI_DESC,
-      LAB_TECH_DESC, LAB_STATE)
+      LAB_TECH_DESC, LAB_STATE, LAB_MANAGE_TYPE,
+      LAB_TAG_CODE)
     values (#{injectionLabelId,jdbcType=BIGINT}, #{injectionLabelCode,jdbcType=VARCHAR},
       #{injectionLabelName,jdbcType=VARCHAR}, #{injectionLabelDesc,jdbcType=VARCHAR},
       #{labelType,jdbcType=VARCHAR}, #{labelValueType,jdbcType=VARCHAR}, #{labelDataType,jdbcType=VARCHAR},
@@ -84,9 +87,10 @@
       #{labLevel3Name,jdbcType=VARCHAR}, #{labLevel4,jdbcType=VARCHAR}, #{labLevel4Name,jdbcType=VARCHAR},
       #{labLevel5,jdbcType=VARCHAR}, #{labLevel5Name,jdbcType=VARCHAR}, #{labLevel6,jdbcType=VARCHAR},
       #{labLevel6Name,jdbcType=VARCHAR}, #{labUpdateFeq,jdbcType=VARCHAR}, #{labBusiDesc,jdbcType=VARCHAR},
-      #{labTechDesc,jdbcType=VARCHAR}, #{labState,jdbcType=VARCHAR})
+      #{labTechDesc,jdbcType=VARCHAR}, #{labState,jdbcType=VARCHAR}, #{labManageType,jdbcType=VARCHAR},
+      #{labTagCode,jdbcType=VARCHAR})
   </insert>
-  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.InjectionLabel">
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.Label">
     update injection_label
     set INJECTION_LABEL_CODE = #{injectionLabelCode,jdbcType=VARCHAR},
       INJECTION_LABEL_NAME = #{injectionLabelName,jdbcType=VARCHAR},
@@ -128,7 +132,9 @@
       LAB_UPDATE_FEQ = #{labUpdateFeq,jdbcType=VARCHAR},
       LAB_BUSI_DESC = #{labBusiDesc,jdbcType=VARCHAR},
       LAB_TECH_DESC = #{labTechDesc,jdbcType=VARCHAR},
-      LAB_STATE = #{labState,jdbcType=VARCHAR}
+      LAB_STATE = #{labState,jdbcType=VARCHAR},
+      LAB_MANAGE_TYPE = #{labManageType,jdbcType=VARCHAR},
+      LAB_TAG_CODE = #{labTagCode,jdbcType=VARCHAR}
     where INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -138,7 +144,8 @@
     SCOPE, TAG_ROW_ID, IS_SHARED, CATALOG_ID, CLASS_NAME, LAB_RELEVANT_FLAG, LAB_MISS_RATE,
     LAB_OBJECT_CODE, LAB_OBJECT, LAB_LEVEL1, LAB_LEVEL1_NAME, LAB_LEVEL2, LAB_LEVEL2_NAME,
     LAB_LEVEL3, LAB_LEVEL3_NAME, LAB_LEVEL4, LAB_LEVEL4_NAME, LAB_LEVEL5, LAB_LEVEL5_NAME,
-    LAB_LEVEL6, LAB_LEVEL6_NAME, LAB_UPDATE_FEQ, LAB_BUSI_DESC, LAB_TECH_DESC, LAB_STATE
+    LAB_LEVEL6, LAB_LEVEL6_NAME, LAB_UPDATE_FEQ, LAB_BUSI_DESC, LAB_TECH_DESC, LAB_STATE,
+    LAB_MANAGE_TYPE, LAB_TAG_CODE
     from injection_label
     where INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT}
   </select>
@@ -149,7 +156,8 @@
     SCOPE, TAG_ROW_ID, IS_SHARED, CATALOG_ID, CLASS_NAME, LAB_RELEVANT_FLAG, LAB_MISS_RATE,
     LAB_OBJECT_CODE, LAB_OBJECT, LAB_LEVEL1, LAB_LEVEL1_NAME, LAB_LEVEL2, LAB_LEVEL2_NAME,
     LAB_LEVEL3, LAB_LEVEL3_NAME, LAB_LEVEL4, LAB_LEVEL4_NAME, LAB_LEVEL5, LAB_LEVEL5_NAME,
-    LAB_LEVEL6, LAB_LEVEL6_NAME, LAB_UPDATE_FEQ, LAB_BUSI_DESC, LAB_TECH_DESC, LAB_STATE
+    LAB_LEVEL6, LAB_LEVEL6_NAME, LAB_UPDATE_FEQ, LAB_BUSI_DESC, LAB_TECH_DESC, LAB_STATE,
+    LAB_MANAGE_TYPE, LAB_TAG_CODE
     from injection_label
   </select>
 
