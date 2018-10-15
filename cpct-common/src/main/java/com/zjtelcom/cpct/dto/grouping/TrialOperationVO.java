@@ -56,6 +56,16 @@ public class TrialOperationVO implements Serializable {
      */
     private boolean isSample;
 
+    /**
+     * 活动优先级 0-10
+     */
+    private Long camLevel;
+
+    /**
+     * 创建人账号
+     */
+    private String staffCode;
+
 
     public boolean isSample() {
         return isSample;
@@ -143,6 +153,22 @@ public class TrialOperationVO implements Serializable {
 
     public void setLanId(Long lanId) {
         this.lanId = lanId;
+    }
+
+    public Long getCamLevel() {
+        return camLevel;
+    }
+
+    public void setCamLevel(Long camLevel) {
+        this.camLevel = camLevel;
+    }
+
+    public String getStaffCode() {
+        return staffCode;
+    }
+
+    public void setStaffCode(String staffCode) {
+        this.staffCode = staffCode;
     }
 }
 
