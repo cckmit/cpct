@@ -17,11 +17,17 @@
 
     <!-- 注册 -->
     <!-- 策略cpct计算服务 -->
-    <dubbo:reference interface="com.zjpii.biz.serv.YzServ" id="yzServ"
-                     version="1.0" retries="0" check="false">
-        <dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="5000"/>
-    </dubbo:reference>
+    <!--<dubbo:reference interface="com.zjpii.biz.serv.YzServ" id="yzServ"-->
+                     <!--version="1.0" retries="0" check="false">-->
+        <!--<dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="5000"/>-->
+    <!--</dubbo:reference>-->
 
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.EventApiService" ref="eventApiServiceImpl" version="1.0" >
+        <!-- 策略cpct计算服务 -->
+        <dubbo:method name="CalculateCPC" servicecode="00.1083.CalculateCPC" timeout="10000"/>
+        <!-- 策略cpct计算服务（同步） -->
+        <dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="10000"/>
+    </dubbo:service>
 
 
 </beans>
