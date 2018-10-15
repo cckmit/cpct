@@ -1,7 +1,9 @@
 package com.zjtelcom.cpct.dao.filter;
 
 import com.zjtelcom.cpct.dto.filter.FilterRule;
+import com.zjtelcom.cpct.dto.filter.FilterRuleModel;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 
@@ -27,5 +29,7 @@ public interface FilterRuleMapper {
     int createFilterRule(FilterRule filterRule);
 
     int modFilterRule(FilterRule filterRule);
+
+    List<FilterRuleModel> selectFilterRuleByStrategyId(@Param("strategyId") Long strategyId);
 
 }

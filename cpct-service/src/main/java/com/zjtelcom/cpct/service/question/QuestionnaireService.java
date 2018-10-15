@@ -27,5 +27,7 @@ public interface QuestionnaireService {
 
     Map<String,Object> delQuestionnaire(Long questionnaireId);
 
+    Map<String,Object> listSimpleNaire();
+
 
 }

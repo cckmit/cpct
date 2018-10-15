@@ -31,6 +31,26 @@ public class TrialOperationController extends BaseController {
 
 
     /**
+     * 抽样业务校验
+     * @param operation
+     * @return
+     */
+    @PostMapping("businessCheck")
+    @CrossOrigin
+    public Map<String, Object> businessCheck(@RequestBody TrialOperationVO operation){
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = operationService.businessCheck(operation);
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to businessCheck", e);
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", " fail to businessCheck");
+            return result;
+        }
+        return result;
+    }
+
+    /**
      * 客户清单导入试运算
      * @param multipartFile
      * @param operation

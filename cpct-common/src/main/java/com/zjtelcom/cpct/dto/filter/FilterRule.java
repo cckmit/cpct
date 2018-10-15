@@ -25,7 +25,42 @@ public class FilterRule extends BaseEntity implements Serializable{
     private Date dayStart;
     private Date dayEnd;
     private String userList;
+    private Long conditionId;
+    private String days;
+    private String times;
+    private String offerInfo;
 
+    public Long getConditionId() {
+        return conditionId;
+    }
+
+    public void setConditionId(Long conditionId) {
+        this.conditionId = conditionId;
+    }
+
+    public String getDays() {
+        return days;
+    }
+
+    public void setDays(String days) {
+        this.days = days;
+    }
+
+    public String getTimes() {
+        return times;
+    }
+
+    public void setTimes(String times) {
+        this.times = times;
+    }
+
+    public String getOfferInfo() {
+        return offerInfo;
+    }
+
+    public void setOfferInfo(String offerInfo) {
+        this.offerInfo = offerInfo;
+    }
 
     public String getUserList() {
         return userList;

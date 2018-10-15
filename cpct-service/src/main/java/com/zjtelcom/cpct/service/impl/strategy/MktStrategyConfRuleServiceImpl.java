@@ -172,7 +172,6 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             //cpc算法表
 
 
-
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.SAVE_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
             mktStrategyConfRuleMap.put("mktStrategyConfRuleDO", mktStrategyConfRuleDO);
@@ -540,23 +539,27 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
          * 协同渠道配置
          */
         List<MktCamChlConf> mktCamChlConfList = new ArrayList<>();
-        for (MktCamChlConf mktCamChlConf : parentMktStrategyConfRule.getMktCamChlConfList()) {
-            Map<String, Object> mktCamChlConfMap = mktCamChlConfService.copyMktCamChlConf(mktCamChlConf.getEvtContactConfId());
-            MktCamChlConfDO mktCamChlConfDO = (MktCamChlConfDO) mktCamChlConfMap.get("mktCamChlConfDO");
-            MktCamChlConf camChlConf = BeanUtil.create(mktCamChlConfDO, new MktCamChlConf());
-            mktCamChlConfList.add(camChlConf);
+        if (parentMktStrategyConfRule.getMktCamChlConfList() != null && parentMktStrategyConfRule.getMktCamChlConfList().size() > 0) {
+            for (MktCamChlConf mktCamChlConf : parentMktStrategyConfRule.getMktCamChlConfList()) {
+                Map<String, Object> mktCamChlConfMap = mktCamChlConfService.copyMktCamChlConf(mktCamChlConf.getEvtContactConfId());
+                MktCamChlConfDO mktCamChlConfDO = (MktCamChlConfDO) mktCamChlConfMap.get("mktCamChlConfDO");
+                MktCamChlConf camChlConf = BeanUtil.create(mktCamChlConfDO, new MktCamChlConf());
+                mktCamChlConfList.add(camChlConf);
+            }
         }
 
         /**
          * 二次协同结果
          */
         List<MktCamChlResult> mktCamChlResultList = new ArrayList<>();
-        for (MktCamChlResult mktCamChlResult : parentMktStrategyConfRule.getMktCamChlResultList()) {
+        if (parentMktStrategyConfRule.getMktCamChlResultList() != null && parentMktStrategyConfRule.getMktCamChlResultList().size() > 0) {
+            for (MktCamChlResult mktCamChlResult : parentMktStrategyConfRule.getMktCamChlResultList()) {
 //            Map<String, Object> mktCamChlResultMap = mktCamChlResultService.copyMktCamChlResult(mktCamChlResult.getMktCamChlResultId());
 //            MktCamChlResultDO childMktCamChlResultDO = (MktCamChlResultDO) mktCamChlResultMap.get("mktCamChlResultDO");
-            MktCamChlResult childMktCamChlResult = BeanUtil.create(mktCamChlResult, new MktCamChlResult());
-            childMktCamChlResult.setMktCamChlResultId(null);
-            mktCamChlResultList.add(childMktCamChlResult);
+                MktCamChlResult childMktCamChlResult = BeanUtil.create(mktCamChlResult, new MktCamChlResult());
+                childMktCamChlResult.setMktCamChlResultId(null);
+                mktCamChlResultList.add(childMktCamChlResult);
+            }
         }
 
         mktStrategyConfRule.setMktStrategyConfRuleName(parentMktStrategyConfRule.getMktStrategyConfRuleName());

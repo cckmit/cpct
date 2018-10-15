@@ -20,13 +20,11 @@ public enum StatusCode {
 
     STATUS_CODE_DRAFT("草稿", "2001"),
     STATUS_CODE_PUBLISHED("已发布", "2002"),
-    STATUS_CODE_UNPUBLISH("未发布", "2003"),
-    STATUS_CODE_CHECKED("已审核", "2004"),
-    STATUS_CODE_CHECKING("审核中", "2005"),
-    STATUS_CODE_UNCHECK("待审核", "2006"),
-    STATUS_CODE_UNPASS("未通过", "2007"),
-    STATUS_CODE_STOP("已暂停", "2008"),
-    STATUS_CODE_ROLL("已下线", "2009");
+    STATUS_CODE_PASS("已通过", "2003"),
+    STATUS_CODE_CHECKING("审核中", "2004"),
+    STATUS_CODE_UNPASS("未通过", "2005"),
+    STATUS_CODE_STOP("已暂停", "2006"),
+    STATUS_CODE_ROLL("已下线", "2007");
 
 
 
