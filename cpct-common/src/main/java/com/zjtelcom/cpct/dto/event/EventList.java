@@ -2,13 +2,15 @@ package com.zjtelcom.cpct.dto.event;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * @Description EventList
  * @Author pengy
  * @Date 2018/6/21 9:58
  */
 @Data
-public class EventList{
+public class EventList implements Serializable {
 
     private Long eventId; //事件主键标识
     private String eventNbr;//记录事件的编码信息

@@ -1,8 +1,9 @@
 package com.zjtelcom.cpct.domain.campaign;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class MktCamChlResultConfRelDO {
+public class MktCamChlResultConfRelDO  implements Serializable {
     private Long mktCamChlResultConfRelId;
 
     private Long mktCamChlResultId;

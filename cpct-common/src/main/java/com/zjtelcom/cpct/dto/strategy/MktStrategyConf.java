@@ -2,10 +2,11 @@ package com.zjtelcom.cpct.dto.strategy;
 
 import com.zjtelcom.cpct.domain.channel.Channel;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class MktStrategyConf {
+public class MktStrategyConf implements Serializable {
     /**
      * 策略配置Id
      */

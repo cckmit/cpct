@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.dto.pojo;
 
-public class ActType {
+import java.io.Serializable;
+
+public class ActType implements Serializable {
 	
 	public static String KIP = "KIP";
 	public static String ADD = "ADD";

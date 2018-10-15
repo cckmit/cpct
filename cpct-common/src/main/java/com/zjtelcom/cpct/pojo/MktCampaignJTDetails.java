@@ -17,6 +17,7 @@ import com.zjtelcom.cpct.dto.event.EventScene;
 import com.zjtelcom.cpct.dto.event.EvtSceneCamRel;
 import com.zjtelcom.cpct.dto.strategy.MktStrategy;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,7 @@ import java.util.Map;
  * @since JDK1.7
  */
 
-public class MktCampaignJTDetails {
+public class MktCampaignJTDetails implements Serializable {
     //客户分群规则
     private List<MktCamGrpRul> mktCamGrpRuls = new ArrayList<>();
 

@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.dto.grouping;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -8,7 +9,7 @@ import java.util.List;
  * @date: 2018/09/06 16:14
  * @version: V1.0
  */
-public class TarGrpTemplateDetail {
+public class TarGrpTemplateDetail implements Serializable {
     private Long tarGrpTemplateId;
 
     private String tarGrpTemplateName;

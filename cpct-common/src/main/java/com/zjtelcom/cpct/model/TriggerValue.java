@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.model;
 
-public class TriggerValue {
+import java.io.Serializable;
+
+public class TriggerValue implements Serializable {
     private Integer valueId;
 
     private String domain;

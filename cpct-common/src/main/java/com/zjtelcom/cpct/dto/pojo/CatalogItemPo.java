@@ -3,9 +3,10 @@ package com.zjtelcom.cpct.dto.pojo;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class CatalogItemPo {
+public class CatalogItemPo implements Serializable {
 
 	private String actType;
 

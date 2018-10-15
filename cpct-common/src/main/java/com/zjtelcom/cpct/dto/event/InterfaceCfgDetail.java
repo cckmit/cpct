@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.dto.event;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -10,7 +11,7 @@ import java.util.List;
  * @Date 2018/6/26 14:23
  */
 @Data
-public class InterfaceCfgDetail {
+public class InterfaceCfgDetail implements Serializable {
 
     private List<InterfaceCfgParam> interfaceCfgParams;
 

@@ -1,10 +1,11 @@
 package com.zjtelcom.cpct.pojo;
 
 
+import java.io.Serializable;
 import java.util.Date;
 
 
-public class MktCamScript {
+public class MktCamScript implements Serializable {
     private Long mktCampaignScptId;
 
     private Long mktCampaignId;

@@ -2,13 +2,15 @@ package com.zjtelcom.cpct.bean;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * Description: response object
  * author: pengy
  * date: 2018/3/26 19:11
  */
 @Data
-public class RespInfo {
+public class RespInfo implements Serializable {
 
     private String code;
     private String msg; //失败描述

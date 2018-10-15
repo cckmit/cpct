@@ -12,6 +12,7 @@ package com.zjtelcom.cpct.dto.pojo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.io.Serializable;
 import java.util.Date;
 
 
@@ -24,7 +25,7 @@ import java.util.Date;
  * @since
  */
 
-public class TcpRespCont {
+public class TcpRespCont implements Serializable {
 
     private String transactionId;
 

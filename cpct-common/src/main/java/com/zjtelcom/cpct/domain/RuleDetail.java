@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.domain;
 
-public class RuleDetail {
+import java.io.Serializable;
+
+public class RuleDetail implements Serializable {
 
     private Integer id;
 

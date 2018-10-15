@@ -2,10 +2,12 @@ package com.zjtelcom.cpct.common;
 
 import com.github.pagehelper.PageInfo;
 
+import java.io.Serializable;
+
 /**
  * 分页
  */
-public class Page {
+public class Page  implements Serializable {
 
     /**
      * 页码

@@ -6,13 +6,15 @@
  */
 package com.zjtelcom.cpct.domain.campaign;
 
+import java.io.Serializable;
+
 /**
  * Description:
  * author: linchao
  * date: 2018/06/26 10:05
  * version: V1.0
  */
-public class CityProperty {
+public class CityProperty  implements Serializable {
 
     /**
      * 城市属性Id

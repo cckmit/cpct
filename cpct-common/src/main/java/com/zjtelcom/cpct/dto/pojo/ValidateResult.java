@@ -9,6 +9,8 @@
 
 package com.zjtelcom.cpct.dto.pojo;
 
+import java.io.Serializable;
+
 /**
  * 校验结果
  * @author taowenwu
@@ -17,7 +19,7 @@ package com.zjtelcom.cpct.dto.pojo;
  * @since
  */
 
-public class ValidateResult {
+public class ValidateResult implements Serializable {
     private boolean flag;
 
     private String message;

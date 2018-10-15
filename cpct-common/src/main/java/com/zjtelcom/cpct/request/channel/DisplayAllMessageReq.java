@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.request.channel;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dto.channel.DisplayLabelInfo;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -10,7 +11,7 @@ import java.util.List;
  *
  * @author pengyu
  */
-public class DisplayAllMessageReq {
+public class DisplayAllMessageReq  implements Serializable {
 
     private Long displayColumnId;
 
