@@ -13,6 +13,8 @@ public class MktCamChlConfAttr extends BaseEntity {
 
     private String attrValue;
 
+    private String attrValueName;
+
     public Long getContactChlAttrRstrId() {
         return contactChlAttrRstrId;
     }
@@ -53,4 +55,11 @@ public class MktCamChlConfAttr extends BaseEntity {
         this.attrValue = attrValue;
     }
 
+    public String getAttrValueName() {
+        return attrValueName;
+    }
+
+    public void setAttrValueName(String attrValueName) {
+        this.attrValueName = attrValueName;
+    }
 }
