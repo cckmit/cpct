@@ -17,6 +17,7 @@
         <module>cpct-dubbo-client</module>
         <module>cpct-dubbo-server</module>
         <module>cpct-cache</module>
+        <module>cpct-dubbo-label</module>
     </modules>
 
     <properties>

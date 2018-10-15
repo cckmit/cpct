@@ -247,7 +247,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
             filterRule.setLabelCode("PROM_LIST");
         }
         if (addVO.getCondition()!=null){
-            MktVerbalCondition condition = BeanUtil.create(addVO,new MktVerbalCondition());
+            MktVerbalCondition condition = BeanUtil.create(addVO.getCondition(),new MktVerbalCondition());
             condition.setVerbalId(0L);
             condition.setConditionType(ConditionType.FILTER_RULE.getValue().toString());
             verbalConditionMapper.insert(condition);
