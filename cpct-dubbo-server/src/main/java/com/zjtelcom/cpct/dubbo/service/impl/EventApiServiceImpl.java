@@ -7,6 +7,7 @@ import com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService;
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.rule.RuleResult;
+import com.zjpii.biz.serv.YzServ;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.event.ContactEvtItemMapper;
@@ -100,11 +101,11 @@ public class EventApiServiceImpl implements EventApiService {
     @Autowired
     private ContactEvtItemMapper contactEvtItemMapper;  // 事件采集项
 
-    @Autowired
-    private DisplayColumnLabelMapper displayColumnLabelMapper; // 展示列
-
     @Autowired(required = false)
     private IContactTaskReceiptService iContactTaskReceiptService; //协同中心dubbo
+
+    @Autowired(required = false)
+    private YzServ yzServ; //因子实时查询dubbo服务
 
     @Override
     public Map<String, Object> CalculateCPC(Map<String, Object> map) {
@@ -149,8 +150,7 @@ public class EventApiServiceImpl implements EventApiService {
         params.put("accNbr", accNbr); //资产号码
         params.put("integrationId", integrationId); //资产集成编码
 
-        //异步 todo
-//        CalculateCPC(params);
+        //异步
         AsyncCPC asyncCPC = new AsyncCPC(params);
         asyncCPC.start();
 
@@ -507,20 +507,64 @@ public class EventApiServiceImpl implements EventApiService {
                 return Collections.EMPTY_MAP;
             }
 
-            Map<String,Object> itgTriggers = new HashMap<>();
-            Map<String,Object> displayMap = new HashMap<>();
+            Map<String, Object> itgTriggers = new HashMap<>();
+            Map<String, String> queryFields = new HashMap<>();
+            int i = 0;
 
             //查询展示列 （试算）
-            List<DisplayColumnLabel> calcDisplay = displayColumnLabelMapper.findListByDisplayId(mktCampaign.getCalcDisplay());
+            List<Label> calcDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getCalcDisplay());
             //格式化返回参数结构
-            if(calcDisplay != null) {
-                for(DisplayColumnLabel displayColumnLabel : calcDisplay) {
-//                    displayMap.put("key",displayColumnLabel.get);
+            if (calcDisplay != null) {
+                for (Label label : calcDisplay) {
+                    queryFields.put(String.valueOf(i), label.getInjectionLabelCode());
+                    i++;
+                }
+            }
+            //查询展示列 （iSale）
+            List<Label> iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getIsaleDisplay());
+            if (calcDisplay != null) {
+                for (Label label : iSaleDisplay) {
+                    queryFields.put(String.valueOf(i), label.getInjectionLabelCode());
+                    i++;
                 }
             }
 
-            //查询展示列 （iSale）
-            List<DisplayColumnLabel> isaleDisplay = displayColumnLabelMapper.findListByDisplayId(mktCampaign.getCalcDisplay());
+            JSONObject httpParams = new JSONObject();
+            httpParams.put("queryNum", privateParams.get("accNbr"));
+            httpParams.put("c3", params.get("lanId"));
+            httpParams.put("queryId", privateParams.get("integrationId"));
+            //查询标签列表
+            httpParams.put("queryFields", queryFields);
+            //http查询标签
+            JSONObject resJson = getLabelByPost(httpParams);
+
+            Map<String, Object> triggers = new HashMap<>();
+            if (calcDisplay != null) {
+                for (Label label : calcDisplay) {
+                    if (resJson.containsKey(label.getInjectionLabelCode())) {
+                        triggers.put("key", label.getInjectionLabelCode());
+                        triggers.put("value", resJson.get(label.getInjectionLabelCode()));
+                        triggers.put("display", 0); //todo 确定display字段
+                        triggers.put("name", label.getInjectionLabelName());
+                    }
+                }
+                itgTriggers.put("triggerList", triggers);
+                itgTriggers.put("type", 1);
+            }
+
+            triggers = new HashMap<>();
+            if (iSaleDisplay != null) {
+                for (Label label : iSaleDisplay) {
+                    if (resJson.containsKey(label.getInjectionLabelCode())) {
+                        triggers.put("key", label.getInjectionLabelCode());
+                        triggers.put("value", resJson.get(label.getInjectionLabelCode()));
+                        triggers.put("display", 0); //todo 确定display字段
+                        triggers.put("name", label.getInjectionLabelName());
+                    }
+                }
+                itgTriggers.put("triggerList", triggers);
+                itgTriggers.put("type", 2);
+            }
 
 
             //根据活动id获取策略列表
@@ -533,7 +577,7 @@ public class EventApiServiceImpl implements EventApiService {
             //遍历策略列表
             for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOs) {
                 //提交线程
-                Future<Map<String, Object>> f = executorService.submit(new StrategyTask(params, mktCamStrategyConfRelDO.getStrategyConfId(), privateParams, labelItems,itgTriggers));
+                Future<Map<String, Object>> f = executorService.submit(new StrategyTask(params, mktCamStrategyConfRelDO.getStrategyConfId(), privateParams, labelItems, itgTriggers));
                 //将线程处理结果添加到结果集
                 threadList.add(f);
             }
@@ -578,7 +622,7 @@ public class EventApiServiceImpl implements EventApiService {
         private Map<String, Object> itgTriggers;  //试算展示列
 
 
-        public StrategyTask(Map<String, String> params, Long strategyConfId, Map<String, String> privateParams, Map<String, String> labelItems,Map<String, Object> itgTriggers) {
+        public StrategyTask(Map<String, String> params, Long strategyConfId, Map<String, String> privateParams, Map<String, String> labelItems, Map<String, Object> itgTriggers) {
             this.strategyConfId = strategyConfId;
             this.reqId = params.get("reqId");
             this.params = params;
@@ -675,7 +719,6 @@ public class EventApiServiceImpl implements EventApiService {
                     } else {
                         //下发地址获取异常 lanId
                         strategyMap.put("msg", "下发渠道获取异常");
-
                         esJson.put("hit", "false");
                         esJson.put("msg", "下发渠道获取异常");
                         esService.save(esJson, IndexList.STRATEGY_MODULE);
@@ -685,7 +728,6 @@ public class EventApiServiceImpl implements EventApiService {
 
                 if (channelCheck) {
                     strategyMap.put("msg", "下发渠道不符");
-
                     esJson.put("hit", "false");
                     esJson.put("msg", "下发渠道不符");
                     esService.save(esJson, IndexList.STRATEGY_MODULE);
@@ -694,14 +736,11 @@ public class EventApiServiceImpl implements EventApiService {
             } else {
                 //下发地市数据异常
                 strategyMap.put("msg", "下发渠道数据异常");
-
                 esJson.put("hit", "false");
                 esJson.put("msg", "下发渠道数据异常");
                 esService.save(esJson, IndexList.STRATEGY_MODULE);
-
                 return Collections.EMPTY_MAP;
             }
-
 
             //验证过滤规则
             List<Long> filterRuleIds = mktStrategyFilterRuleRelMapper.selectByStrategyId(strategyConfId);
@@ -719,9 +758,7 @@ public class EventApiServiceImpl implements EventApiService {
                     } else if ("5000".equals(filterRule.getFilterType())) {  //销售品过滤
 
                     }
-
                 }
-
             }
 
             //根据策略id获取策略下发规则列表
@@ -748,7 +785,8 @@ public class EventApiServiceImpl implements EventApiService {
 
                     String mktStrategyConfRuleName = mktStrategyConfRuleDO.getMktStrategyConfRuleName();
                     //提交线程
-                    Future<Map<String, Object>> f = executorService.submit(new RuleTask(params, privateParams, strategyConfId, tarGrpId, productStr, ruleConfId, evtContactConfIdStr, mktStrategyConfRuleId, mktStrategyConfRuleName, labelItems));
+                    Future<Map<String, Object>> f = executorService.submit(new RuleTask(params, privateParams, strategyConfId, tarGrpId, productStr,
+                            ruleConfId, evtContactConfIdStr, mktStrategyConfRuleId, mktStrategyConfRuleName, labelItems, itgTriggers));
                     //将线程处理结果添加到结果集
                     threadList.add(f);
                 }
@@ -799,9 +837,10 @@ public class EventApiServiceImpl implements EventApiService {
         private Map<String, String> params;
         private Map<String, String> privateParams;
         private Map<String, String> labelItems;
+        private Map<String, Object> itgTriggers;
 
-        public RuleTask(Map<String, String> params, Map<String, String> privateParams, Long strategyConfId, Long tarGrpId, String productStr,
-                        Long ruleConfId, String evtContactConfIdStr, Long mktStrategyConfRuleId, String mktStrategyConfRuleName, Map<String, String> labelItems) {
+        public RuleTask(Map<String, String> params, Map<String, String> privateParams, Long strategyConfId, Long tarGrpId, String productStr, Long ruleConfId,
+                        String evtContactConfIdStr, Long mktStrategyConfRuleId, String mktStrategyConfRuleName, Map<String, String> labelItems, Map<String, Object> itgTriggers) {
             this.strategyConfId = strategyConfId;
             this.tarGrpId = tarGrpId;
             this.reqId = params.get("reqId");
@@ -813,6 +852,7 @@ public class EventApiServiceImpl implements EventApiService {
             this.params = params;
             this.privateParams = privateParams;
             this.labelItems = labelItems;
+            this.itgTriggers = itgTriggers;
         }
 
         @Override
@@ -901,26 +941,31 @@ public class EventApiServiceImpl implements EventApiService {
             //记录参数个数
             int paramsSize = queryFields.size();
 
-            String paramStr = param.toString();
             System.out.println("param " + param.toString());
             //验证post回调结果
-            httpResultStr = HttpUtil.post(url, paramStr);
-            if (httpResultStr == null || "".equals(httpResultStr)) {
+//            httpResultStr = HttpUtil.post(url, paramStr);
 
-                System.out.println("查询标签出错");
+            //更换为dubbo因子查询-----------------------------------------------------
+            Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
 
-                esJson.put("hit", "false");
-                esJson.put("msg", "标签实例查询出错");
-                esService.save(esJson, IndexList.STRATEGY_MODULE);
-                return Collections.EMPTY_MAP;
-            }
+//            if (httpResultStr == null || "".equals(httpResultStr)) {
+//
+//                System.out.println("查询标签出错");
+//
+//                esJson.put("hit", "false");
+//                esJson.put("msg", "标签实例查询出错");
+//                esService.save(esJson, IndexList.STRATEGY_MODULE);
+//                return Collections.EMPTY_MAP;
+//            }
             JSONObject jsonobj = new JSONObject();
             //解析返回结果
-            JSONObject httpResult = JSONObject.parseObject(httpResultStr);
-            if (httpResult.getInteger("result_code") == 0) {
-                JSONObject body = httpResult.getJSONObject("msgbody");
-                //ES log 标签实例
+//            JSONObject httpResult = JSONObject.parseObject(httpResultStr);
+//            if (httpResult.getInteger("result_code") == 0) {
+//                JSONObject body = httpResult.getJSONObject("msgbody");
 
+            if ("0".equals((String)dubboResult.get("result_code"))) {
+                JSONObject body = JSON.parseObject((String)dubboResult.get("msgbody"));
+                //ES log 标签实例
                 jsonobj.put("reqId", reqId);
                 jsonobj.put("eventId", params.get("eventCode"));
                 jsonobj.put("activityId", params.get("activityId"));
@@ -946,10 +991,10 @@ public class EventApiServiceImpl implements EventApiService {
 
                 System.out.println("查询标签成功:" + context.toString());
             } else {
-                System.out.println("查询标签失败:" + httpResult.getString("result_msg"));
+//                System.out.println("查询标签失败:" + httpResult.getString("result_msg"));
 
                 esJson.put("hit", "false");
-                esJson.put("msg", "查询标签失败:" + httpResult.getString("result_msg"));
+//                esJson.put("msg", "查询标签失败:" + httpResult.getString("result_msg"));
                 esService.save(esJson, IndexList.STRATEGY_MODULE);
                 return Collections.EMPTY_MAP;
             }
@@ -1087,7 +1132,6 @@ public class EventApiServiceImpl implements EventApiService {
                 RuleResult ruleResult = null;
 
                 try {
-
                     ruleResult = runner.executeRule(express, context, true, true);
 
                 } catch (Exception e) {
@@ -1164,7 +1208,7 @@ public class EventApiServiceImpl implements EventApiService {
                         //协同渠道规则表id（自建表）
                         Long evtContactConfId = Long.parseLong(str);
                         //提交线程
-                        Future<Map<String, Object>> f = executorService.submit(new ChannelTask(params, evtContactConfId, productList, privateParams));
+                        Future<Map<String, Object>> f = executorService.submit(new ChannelTask(params, evtContactConfId, productList, privateParams, itgTriggers));
                         //将线程处理结果添加到结果集
                         threadList.add(f);
                     }
@@ -1257,12 +1301,15 @@ public class EventApiServiceImpl implements EventApiService {
         private List<Map<String, String>> productList;
         private Map<String, String> params;
         private Map<String, String> privateParams;
+        private Map<String, Object> itgTriggers;
 
-        public ChannelTask(Map<String, String> params, Long evtContactConfId, List<Map<String, String>> productList, Map<String, String> privateParams) {
+        public ChannelTask(Map<String, String> params, Long evtContactConfId, List<Map<String, String>> productList,
+                           Map<String, String> privateParams, Map<String, Object> itgTriggers) {
             this.evtContactConfId = evtContactConfId;
             this.productList = productList;
             this.params = params;
             this.privateParams = privateParams;
+            this.itgTriggers = itgTriggers;
         }
 
         @Override
@@ -1307,7 +1354,7 @@ public class EventApiServiceImpl implements EventApiService {
             channel.put("productList", productList);
 
             //接触账号 todo
-            channel.put("reason", "");
+            channel.put("contactAccount", "");
 
             //调查问卷 todo
             channel.put("questionId", "");
@@ -1334,6 +1381,9 @@ public class EventApiServiceImpl implements EventApiService {
                 //返回结果中添加话术信息
                 channel.put("reason", mktVerbals.get(0).getScriptDesc());
             }
+
+            channel.put("itgTriggers", itgTriggers);
+
             return channel;
         }
     }
@@ -1416,6 +1466,32 @@ public class EventApiServiceImpl implements EventApiService {
 
 
         return result;
+    }
+
+    private JSONObject getLabelByPost(JSONObject param) {
+        //查询标签实例数据
+        String httpResultStr;
+        String url = "http://134.96.216.156:8110/in"; //标签查询地址
+
+        String paramStr = param.toString();
+        System.out.println("param " + param.toString());
+        //验证post回调结果
+//        httpResultStr = HttpUtil.post(url, paramStr);
+
+        Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
+
+        if ("0".equals((String)dubboResult.get("result_code"))) {
+            JSONObject body = JSON.parseObject((String)dubboResult.get("msgbody"));
+
+//        //解析返回结果
+//        JSONObject httpResult = JSONObject.parseObject(httpResultStr);
+//        if (httpResult.getInteger("result_code") == 0) {
+//            JSONObject body = httpResult.getJSONObject("msgbody");
+            return body;
+        } else {
+//            System.out.println("查询标签失败:" + httpResult.getString("result_msg"));
+            return new JSONObject();
+        }
     }
 
 
