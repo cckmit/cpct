@@ -345,6 +345,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     @Override
     public Map<String, Object> listTarGrpCondition(Long tarGrpId) throws Exception {
         Map<String, Object> maps = new HashMap<>();
+        if (tarGrpId==null){
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg","");
+            return maps;
+        }
         //通过mktCamGrpRulId获取所有活动关联关系
 //        MktCamGrpRul mktCamGrpRul = mktCamGrpRulMapper.selectByPrimaryKey(mktCamGrpRulId);
 //        TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(mktCamGrpRul.getTarGrpId());

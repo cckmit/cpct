@@ -15,7 +15,7 @@
 
     <insert id="insertOperation" parameterType="com.zjtelcom.cpct.domain.campaign.MktOperatorLogDO">
         insert into mkt_operator_log (OPERATION_ID, MKT_CAMPAIGN_ID, MKT_ACTIVITY_NBR, MKT_CAMPAIGN_NAME,
-          MKT_CAMPAIGN_STATE_BEFORE, MKT_CAMPAIGN_STATE_AFTER, OPERATOR_ACCOUNT, OPERATION_TYPE, OPERATION_DATE
+          MKT_CAMPAIGN_STATE_BEFORE, MKT_CAMPAIGN_STATE_AFTER, OPERATOR_ACCOUNT, OPERATION_TYPE, OPERATOR_DATE
           )
         values (#{operationId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT},#{mktActivityNbr,jdbcType=VARCHAR},
           #{mktCampaignName,jdbcType=VARCHAR}, #{mktCampaignStateBefore,jdbcType=VARCHAR}, #{mktCampaignStateAfter,jdbcType=VARCHAR},
@@ -24,7 +24,7 @@
     
     <select id="selectByPrimaryKey" resultMap="BaseResultMap">
         select OPERATION_ID, MKT_CAMPAIGN_ID, MKT_ACTIVITY_NBR, MKT_CAMPAIGN_NAME, MKT_CAMPAIGN_STATE_BEFORE,
-          MKT_CAMPAIGN_STATE_AFTER, OPERATOR_ACCOUNT, OPERATION_TYPE, OPERATION_DATE
+          MKT_CAMPAIGN_STATE_AFTER, OPERATOR_ACCOUNT, OPERATION_TYPE, OPERATOR_DATE
         from mkt_operator_log
         where 1=1
         <if test="mktActivityNbr != null and mktActivityNbr != ''">
