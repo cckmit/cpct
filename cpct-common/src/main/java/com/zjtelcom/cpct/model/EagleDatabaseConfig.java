@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.model;
 
-public class EagleDatabaseConfig {
+import java.io.Serializable;
+
+public class EagleDatabaseConfig implements Serializable {
     private Long dbConfRowId;
 
     private String dbConfName;

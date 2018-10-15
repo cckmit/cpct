@@ -10,6 +10,7 @@
 package com.zjtelcom.cpct.dto.pojo;
 
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -22,7 +23,7 @@ import java.util.List;
  * @since
  */
 
-public class RequestTemplateInst {
+public class RequestTemplateInst implements Serializable {
     private Long requestTemplateInstId;
 
     private String name;

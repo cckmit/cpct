@@ -1,10 +1,11 @@
 package com.zjtelcom.cpct.pojo;
 
 
+import java.io.Serializable;
 import java.util.Date;
 
 
-public class MktCamRecomCalcRel {
+public class MktCamRecomCalcRel implements Serializable {
     private Long evtRecomCalcRelId;
 
     private Long mktCampaignId;

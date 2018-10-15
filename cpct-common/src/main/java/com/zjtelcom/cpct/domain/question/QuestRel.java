@@ -1,8 +1,9 @@
 package com.zjtelcom.cpct.domain.question;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class QuestRel {
+public class QuestRel implements Serializable {
     private Long relId;
 
     private Long naireId;

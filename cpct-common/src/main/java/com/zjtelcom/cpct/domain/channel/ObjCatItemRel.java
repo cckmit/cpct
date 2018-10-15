@@ -1,8 +1,9 @@
 package com.zjtelcom.cpct.domain.channel;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class ObjCatItemRel {
+public class ObjCatItemRel implements Serializable {
     private Long relId;
 
     private String objType;

@@ -3,10 +3,11 @@ package com.zjtelcom.cpct.domain.channel;
 import com.zjtelcom.cpct.enums.ConditionType;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
-public class MktVerbalCondition {
+public class MktVerbalCondition implements Serializable {
     private Long conditionId;
 
     private Long verbalId;

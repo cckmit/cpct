@@ -1,8 +1,8 @@
-package com.zjtelcom.cpct.dubbo.model;
+package cpct.dubbo.model;
 
 import java.io.Serializable;
 
-public class TagValueModel implements Serializable {
+public class LabelValueModel implements Serializable {
     private Long tagValueRowId;
     private Long tagRowId;
     private String tagValueName;

@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.model;
 
-public class EagleTagAdaption {
+import java.io.Serializable;
+
+public class EagleTagAdaption implements Serializable {
     private Integer adapId;
 
     private String sourceTableColumnName;

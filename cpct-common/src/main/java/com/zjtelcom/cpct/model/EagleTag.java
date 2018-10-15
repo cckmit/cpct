@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.model;
 
-public class EagleTag {
+import java.io.Serializable;
+
+public class EagleTag implements Serializable {
     private Long tagRowId;
 
     private Long ctasTableDefinitionRowId;

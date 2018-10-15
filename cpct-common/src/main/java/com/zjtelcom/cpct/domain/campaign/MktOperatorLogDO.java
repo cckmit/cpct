@@ -1,8 +1,9 @@
 package com.zjtelcom.cpct.domain.campaign;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class MktOperatorLogDO {
+public class MktOperatorLogDO implements Serializable {
 
     private Long operationId;
 

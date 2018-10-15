@@ -1,8 +1,9 @@
 package com.zjtelcom.cpct.domain.question;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Question {
+public class Question implements Serializable {
     private Long questionId;
 
     private String questionName;

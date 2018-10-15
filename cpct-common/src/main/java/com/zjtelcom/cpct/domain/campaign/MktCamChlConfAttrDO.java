@@ -1,8 +1,9 @@
 package com.zjtelcom.cpct.domain.campaign;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class MktCamChlConfAttrDO {
+public class MktCamChlConfAttrDO  implements Serializable {
     private Long contactChlAttrRstrId;
 
     private Long evtContactConfId;

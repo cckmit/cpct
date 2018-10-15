@@ -6,6 +6,7 @@
  */
 package com.zjtelcom.cpct.dto.campaign;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -15,7 +16,7 @@ import java.util.List;
  * @date: 2018/09/20 15:53
  * @version: V1.0
  */
-public class MktCamResultRelDeatil {
+public class MktCamResultRelDeatil implements Serializable {
 
     private Long mktCampaignId;
 

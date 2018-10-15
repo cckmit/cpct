@@ -1,10 +1,11 @@
 package com.zjtelcom.cpct.pojo;
 
 
+import java.io.Serializable;
 import java.util.Date;
 
 
-public class MktContactEvt {
+public class MktContactEvt implements Serializable {
     private Long contactEvtId;
 
     private Long interfaceCfgId;

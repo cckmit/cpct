@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.model;
 
-public class LabelValue {
+import java.io.Serializable;
+
+public class LabelValue implements Serializable {
     private Integer valueId;
 
     private String domain;

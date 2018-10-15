@@ -6,6 +6,7 @@
  */
 package com.zjtelcom.cpct.domain.campaign;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -14,7 +15,7 @@ import java.util.List;
  * date: 2018/06/26 10:05
  * version: V1.0
  */
-public class City {
+public class City  implements Serializable {
 
     /**
      * 城市Id
