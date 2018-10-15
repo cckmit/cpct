@@ -4,10 +4,14 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
+import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
 import com.zjtelcom.cpct.dao.channel.OfferMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.dao.user.UserListMapper;
+import com.zjtelcom.cpct.domain.channel.Label;
+import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
 import com.zjtelcom.cpct.domain.channel.Offer;
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
 import com.zjtelcom.cpct.domain.system.SysParams;
@@ -16,6 +20,7 @@ import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.filter.FilterRuleAddVO;
 import com.zjtelcom.cpct.dto.filter.FilterRuleVO;
 import com.zjtelcom.cpct.dto.user.UserList;
+import com.zjtelcom.cpct.enums.ConditionType;
 import com.zjtelcom.cpct.request.filter.FilterRuleReq;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.filter.FilterRuleService;
@@ -54,6 +59,11 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
     private SysParamsMapper sysParamsMapper;
     @Autowired
     private OfferMapper offerMapper;
+    @Autowired
+    private MktVerbalConditionMapper verbalConditionMapper;
+    @Autowired
+    private InjectionLabelMapper labelMapper;
+
 
     /**
      * 过滤规则列表（含分页）
@@ -201,6 +211,17 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
             }
             vo.setProductList(productList);
         }
+        if (filterRuleT.getConditionId()!=null){
+            MktVerbalCondition condition = verbalConditionMapper.selectByPrimaryKey(filterRuleT.getConditionId());
+            if (condition!=null){
+                Label label = labelMapper.selectByPrimaryKey(Long.valueOf(condition.getLeftParam()));
+                if (label!=null){
+                    vo.setConditionName(label.getInjectionLabelName());
+                    vo.setOperType(condition.getOperType());
+                    vo.setRightParam(condition.getRightParam());
+                }
+            }
+        }
         map.put("resultCode", CommonConstant.CODE_SUCCESS);
         map.put("resultMsg", StringUtils.EMPTY);
         map.put("filterRule", vo);
@@ -224,6 +245,13 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         //销售品互斥过滤 加labelcode
         if (filterRule.getFilterType().equals("3000")){
             filterRule.setLabelCode("PROM_LIST");
+        }
+        if (addVO.getCondition()!=null){
+            MktVerbalCondition condition = BeanUtil.create(addVO.getCondition(),new MktVerbalCondition());
+            condition.setVerbalId(0L);
+            condition.setConditionType(ConditionType.FILTER_RULE.getValue().toString());
+            verbalConditionMapper.insert(condition);
+            filterRule.setConditionId(condition.getConditionId());
         }
         filterRuleMapper.createFilterRule(filterRule);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -250,6 +278,19 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         filterRule.setChooseProduct(ChannelUtil.idList2String(editVO.getChooseProduct()));
         if (filterRule.getFilterType().equals("3000")){
             filterRule.setLabelCode("PROM_LIST");
+        }
+
+        if (editVO.getCondition()!=null){
+            //先删除原始条件
+            if (filterRule.getConditionId()!=null){
+                verbalConditionMapper.deleteByVerbalId(ConditionType.FILTER_RULE.getValue().toString(),filterRule.getConditionId());
+            }
+            //添加新条件
+            MktVerbalCondition condition = BeanUtil.create(editVO,new MktVerbalCondition());
+            condition.setVerbalId(0L);
+            condition.setConditionType(ConditionType.FILTER_RULE.getValue().toString());
+            verbalConditionMapper.insert(condition);
+            filterRule.setConditionId(condition.getConditionId());
         }
         filterRuleMapper.modFilterRule(filterRule);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);

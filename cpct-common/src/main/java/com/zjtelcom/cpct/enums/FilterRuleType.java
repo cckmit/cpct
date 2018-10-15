@@ -1,10 +1,13 @@
 package com.zjtelcom.cpct.enums;
 
 public enum FilterRuleType {
-    BLACK_LIST(1,"白名单"),
-    WHITE_LIST(2,"黑名单"),
-    PRODUCT_MUTEX(3,"销售品互斥"),
-    EXPRESS(4,"表达式过滤");
+    BLACK_LIST(1000,"白名单"),
+    WHITE_LIST(2000,"黑名单"),
+    PRODUCT_MUTEX(3000,"销售品互斥"),
+    EXPRESS(4000,"表达式过滤"),
+    TIME_SLOT(5000,"时间段过滤"),
+    PERTURBED(6000,"过扰规则"),
+    RELATION_PRODUCT(7000,"关单销售品规则");
 
     private Integer value;
     private String description;

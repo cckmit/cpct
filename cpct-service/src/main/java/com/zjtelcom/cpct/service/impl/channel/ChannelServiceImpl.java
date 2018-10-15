@@ -70,10 +70,6 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
     @Override
     public Map<String, Object> listChannelTree(Long userId,String channelName) {
 
-        List<LabelResult> list = (List<LabelResult>)redisUtils.get("EVENT_RULE_403_421_500_LABEL");
-
-        redisUtils.set("EVENT_RULE_403_421_500_LABEL_MAP",JSON.toJSONString(list));
-
         Map<String,Object> result = new HashMap<>();
         Channel channel = channelMapper.selectChannel4AllChannel(-1L);
         List<ChannelDetail> chList = new ArrayList<>();
@@ -342,7 +338,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         channel.setUpdateStaff(userId);
         channelMapper.updateByPrimaryKey(channel);
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","添加成功");
+        result.put("resultMsg","编辑成功");
         return result;
     }
 
@@ -362,7 +358,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         }
         channelMapper.deleteByPrimaryKey(channelDetail.getChannelId());
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","添加成功");
+        result.put("resultMsg","删除成功");
         return result;
     }
 

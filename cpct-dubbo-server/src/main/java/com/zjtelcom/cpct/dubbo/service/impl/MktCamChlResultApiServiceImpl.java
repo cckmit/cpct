@@ -21,6 +21,8 @@ import com.zjtelcom.cpct.dto.campaign.MktCamResultRelDeatil;
 import com.zjtelcom.cpct.dubbo.service.MktCamChlResultApiService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,6 +35,9 @@ import java.util.Map;
  * @date: 2018/09/21 11:28
  * @version: V1.0
  */
+
+@Service
+@Transactional
 public class MktCamChlResultApiServiceImpl implements MktCamChlResultApiService {
 
     @Autowired

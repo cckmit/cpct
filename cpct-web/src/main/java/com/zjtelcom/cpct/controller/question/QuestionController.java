@@ -28,6 +28,27 @@ public class QuestionController extends BaseController {
     private QuestionService questionService;
 
 
+
+
+
+
+    /**
+     * 获取问卷列表（不分页）
+     * @return
+     */
+    @PostMapping("listSimpleNaire")
+    @CrossOrigin
+    public Map<String, Object> listSimpleNaire() {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = questionnaireService.listSimpleNaire();
+        } catch (Exception e) {
+            logger.error("[op:QuestionController] fail to listSimpleNaire ", e);
+        }
+        return maps;
+
+    }
+
     /**
      * 删除题库问题
      * @param params
