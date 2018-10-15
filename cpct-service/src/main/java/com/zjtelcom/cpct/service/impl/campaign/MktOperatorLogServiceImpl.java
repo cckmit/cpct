@@ -7,13 +7,13 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktOperatorLogMapper;
 import com.zjtelcom.cpct.domain.campaign.MktOperatorLogDO;
 import com.zjtelcom.cpct.service.campaign.MktOperatorLogService;
+import com.zjtelcom.cpct.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 @Transactional
@@ -29,7 +29,22 @@ public class MktOperatorLogServiceImpl implements MktOperatorLogService{
         //获取分页参数
         Integer page = Integer.parseInt(params.get("page"));
         Integer pageSize = Integer.parseInt(params.get("pageSize"));
-
+        Date startTime = null;
+        Date endTime = null;
+        if(params.get("startTime") != null) {
+            try{
+                startTime = DateUtil.string2DateTime4Day(params.get("startTime"));
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        if(params.get("endTime") != null) {
+            try{
+                endTime = DateUtil.string2DateTime4Day(params.get("endTime"));
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
         if(params.containsKey("mktActivityNbr")) {
             String mktActivityNbr = params.get("mktActivityNbr");
             mktOperatorLogDO.setMktActivityNbr(mktActivityNbr);
@@ -46,10 +61,19 @@ public class MktOperatorLogServiceImpl implements MktOperatorLogService{
         //分页
         PageHelper.startPage(page, pageSize);
         List<MktOperatorLogDO> operation = mktOperatorLogMapper.selectByPrimaryKey(mktOperatorLogDO);
-        Page pageInfo = new Page(new PageInfo(operation));
+        List<MktOperatorLogDO> operations =new ArrayList<>();
+        for(int i=0;i<operation.size();i++){
+            Date time = operation.get(i).getOperatorDate();
+            if(startTime==null || endTime==null) {
+                operations.add(operation.get(i));
+            } else if((time.after(startTime) && time.before(endTime)) || time.getTime() == startTime.getTime() || time.getTime() == endTime.getTime()) {
+                operations.add(operation.get(i));
+            }
+        }
+        Page pageInfo = new Page(new PageInfo(operations));
 
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
-        result.put("data",operation);
+        result.put("data",operations);
         result.put("pageInfo",pageInfo);
 
         return result;
