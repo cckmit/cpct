@@ -9,6 +9,8 @@
 
 package com.zjtelcom.cpct.dto.pojo;
 
+import java.io.Serializable;
+
 /**
  * 业务内容对象</br>
  * 每个服务通用的业务信息内容，当客户端发起请求时
@@ -18,7 +20,7 @@ package com.zjtelcom.cpct.dto.pojo;
  * @since JDK1.7
  */
 
-public class SvcReqCont<T> {
+public class SvcReqCont<T>  implements Serializable {
     private AuthenticationInfo authenticationInfo;
 
     private T requestObject;

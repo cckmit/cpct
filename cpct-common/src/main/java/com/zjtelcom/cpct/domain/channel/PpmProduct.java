@@ -2,10 +2,11 @@ package com.zjtelcom.cpct.domain.channel;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
-public class PpmProduct {
+public class PpmProduct implements Serializable {
     private Long productId;
 
     private String productCode;

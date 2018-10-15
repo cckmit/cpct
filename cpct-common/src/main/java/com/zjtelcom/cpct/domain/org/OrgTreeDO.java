@@ -1,11 +1,13 @@
 package com.zjtelcom.cpct.domain.org;
 
+import java.io.Serializable;
+
 /**
  * @Auther: anson
  * @Date: 2018/10/9
  * @Description:标签组织数前端返回特定类  只返回一些实际有用的信息
  */
-public class OrgTreeDO {
+public class OrgTreeDO implements Serializable {
 
 
     /** 营销区域*/

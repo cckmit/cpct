@@ -5,12 +5,13 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * 策略配置规则DTO
  */
-public class MktStrConfRuleResp {
+public class MktStrConfRuleResp implements Serializable {
     /**
      * 策略配置规则Id
      */

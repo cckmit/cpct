@@ -9,6 +9,8 @@
 
 package com.zjtelcom.cpct.pojo;
 
+import java.io.Serializable;
+
 /**
  * 落地分局
  * @author taowenwu
@@ -17,7 +19,7 @@ package com.zjtelcom.cpct.pojo;
  * @since JDK1.7
  */
 
-public class Company {
+public class Company implements Serializable {
     private String companyId;
 
     private String level;

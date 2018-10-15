@@ -1,8 +1,9 @@
 package com.zjtelcom.cpct.dto.pojo;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class EventPo {
+public class EventPo implements Serializable {
 	private RequestTemplateInst requestTemplateInst;
 	private EventDetail contactEvtDetails;
 	

@@ -1,8 +1,9 @@
 package com.zjtelcom.cpct.domain.grouping;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class TarGrpTemplateConditionDO {
+public class TarGrpTemplateConditionDO implements Serializable {
     private Long conditionId;
 
     private Long tarGrpTemplateId;

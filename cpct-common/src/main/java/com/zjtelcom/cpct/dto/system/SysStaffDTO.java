@@ -2,10 +2,11 @@ package com.zjtelcom.cpct.dto.system;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
-public class SysStaffDTO {
+public class SysStaffDTO implements Serializable {
 
     private Long staffId;
 

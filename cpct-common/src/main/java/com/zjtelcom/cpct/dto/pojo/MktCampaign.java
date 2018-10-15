@@ -9,11 +9,12 @@ import com.zjtelcom.cpct.dto.strategy.MktStrategy;
 import com.zjtelcom.cpct.pojo.MktCamChlConf;
 import com.zjtelcom.cpct.pojo.MktContactEvt;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 
-public class MktCampaign {
+public class MktCampaign implements Serializable {
     private Long mktCampaignId;
 
     private String tiggerType;

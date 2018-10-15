@@ -9,6 +9,8 @@
 
 package com.zjtelcom.cpct.dto.pojo;
 
+import java.io.Serializable;
+
 /**
  * 每个服务的通用框架对象
  * 
@@ -18,7 +20,7 @@ package com.zjtelcom.cpct.dto.pojo;
  * @since JDK1.7
  */
 
-public class ContractRespRoot {
+public class ContractRespRoot  implements Serializable {
 	private TcpRespCont tcpCont;
 
 	private SvcRespCont svcCont;

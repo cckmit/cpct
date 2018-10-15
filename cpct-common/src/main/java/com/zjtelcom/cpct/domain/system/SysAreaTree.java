@@ -6,6 +6,7 @@
  */
 package com.zjtelcom.cpct.domain.system;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -14,7 +15,7 @@ import java.util.List;
  * date: 2018/07/19 19:13
  * version: V1.0
  */
-public class SysAreaTree {
+public class SysAreaTree implements Serializable {
     /**
      * 区域标识
      */

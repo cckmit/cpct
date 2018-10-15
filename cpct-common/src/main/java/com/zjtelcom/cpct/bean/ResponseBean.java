@@ -2,6 +2,8 @@ package com.zjtelcom.cpct.bean;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * @Author:HuangHua
  * @Descirption: 服务接口返回bean
@@ -9,7 +11,7 @@ import lombok.Data;
  * @Modified By:
  */
 @Data
-public class ResponseBean {
+public class ResponseBean  implements Serializable {
 
     /**
      * 状态码:0为成功,-1为失败

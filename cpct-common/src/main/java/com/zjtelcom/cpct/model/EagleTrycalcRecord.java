@@ -1,10 +1,11 @@
 package com.zjtelcom.cpct.model;
 
 
+import java.io.Serializable;
 import java.util.Date;
 
 
-public class EagleTrycalcRecord {
+public class EagleTrycalcRecord implements Serializable {
     private Long recordId;
 
     private Integer activityId;

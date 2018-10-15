@@ -1,8 +1,9 @@
 package com.zjtelcom.cpct.domain.strategy;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class MktStrategyFilterRuleRelDO {
+public class MktStrategyFilterRuleRelDO  implements Serializable {
     private Long mktStrategyFilterRuleRelId;
 
     private Long strategyId;

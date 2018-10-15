@@ -1,8 +1,9 @@
 package com.zjtelcom.cpct.dto.campaign;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class MktCampaignRel {
+public class MktCampaignRel implements Serializable {
     private Long mktCampaignRelId;
 
     private String relType;

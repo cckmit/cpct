@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.dto.campaign;
 
+import java.io.Serializable;
 import java.util.List;
 /**
  * @Description:
@@ -7,7 +8,7 @@ import java.util.List;
  * @date: 2018/09/12 10:16
  * @version: V1.0
  */
-public class MktCamDirectory {
+public class MktCamDirectory implements Serializable {
     private Long mktCamDirectoryId;
 
     private String mktCamDirectoryName;

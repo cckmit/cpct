@@ -6,13 +6,15 @@
  */
 package com.zjtelcom.cpct.domain.channel;
 
+import java.io.Serializable;
+
 /**
  * Description:
  * author: linchao
  * date: 2018/08/23 18:20
  * version: V1.0
  */
-public class LabelResult {
+public class LabelResult  implements Serializable {
 
     /**
      * 标签编码

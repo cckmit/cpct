@@ -1,11 +1,12 @@
 package com.zjtelcom.cpct.domain.org;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * 营销组织树
  */
-public class OrgTree {
+public class OrgTree implements Serializable {
     /** 营销区域*/
     private Integer areaId;
 
