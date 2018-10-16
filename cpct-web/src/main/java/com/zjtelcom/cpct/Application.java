@@ -26,7 +26,7 @@ import org.springframework.web.client.RestTemplate;
 
 
 //@ImportResource({ "classpath:dubbo/*.xml","classpath:task/*.xml" })
-//@ImportResource({ "classpath:dubbo/*.xml"})
+@ImportResource({ "classpath:dubbo/dubbo-dev.xml.xml"})
 @ComponentScan(value={"com.zjtelcom.cpct"})
 @EnableTransactionManagement
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class,DataSourceTransactionManagerAutoConfiguration.class, MybatisAutoConfiguration.class})
