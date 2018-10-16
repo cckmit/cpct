@@ -75,12 +75,12 @@ public class MktCamChlResultApiServiceImpl extends BaseService implements MktCam
 
     @Override
     public Map<String, Object> secondChannelSynergy(Map<String, Object> params) {
-        Long activityId = Long.valueOf((String) params.get("activityId"));
-        Long ruleId = Long.valueOf((String) params.get("ruleId"));
+        Long activityId = Long.valueOf((Integer) params.get("activityId"));
+        Long ruleId = Long.valueOf((Integer) params.get("ruleId"));
         Long resultNbr = Long.valueOf((String) params.get("resultNbr"));
         Long accNbr = Long.valueOf((String) params.get("accNbr"));
-        Long integrationId = Long.valueOf((String) params.get("integrationId"));
-        Long custId = Long.valueOf((String) params.get("custId"));
+        Long integrationId = Long.valueOf((Integer) params.get("integrationId"));
+        Long custId = Long.valueOf((Integer) params.get("custId"));
         Map<String, Object> paramMap = new HashMap<>();
         // 通过规则Id获取规则下的结果id
         List<Map<String, Object>> taskChlList = new ArrayList<>();
@@ -131,8 +131,9 @@ public class MktCamChlResultApiServiceImpl extends BaseService implements MktCam
 
                                 // 痛痒点话术
                                 List<MktVerbal> verbalList = mktVerbalMapper.findVerbalListByConfId(mktCamChlConfDO.getEvtContactConfId());
-                                taskChlMap.put("reason", verbalList.get(0)); // 痛痒点话术有多个
-
+                                if(verbalList!=null && verbalList.size()>0){
+                                    taskChlMap.put("reason", verbalList.get(0)); // 痛痒点话术有多个
+                                }
                                 taskChlList.add(taskChlMap);
                             }
                         }
