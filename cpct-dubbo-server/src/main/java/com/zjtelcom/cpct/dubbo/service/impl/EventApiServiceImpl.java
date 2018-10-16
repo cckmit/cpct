@@ -1451,7 +1451,7 @@ public class EventApiServiceImpl implements EventApiService {
      * @return
      */
     @Override
-    public Map<String, Object> SecondChannelSynergy(Map<String, Object> map) {
+    public Map<String, Object> secondChannelSynergy(Map<String, Object> map) {
 
         //初始化返回结果
         Map<String, Object> result = new HashMap();
