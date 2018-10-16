@@ -51,7 +51,7 @@ public class ChannelServiceImpl implements ChannelService {
             Channel channel = channelMapper.selectByCode(channelCode);
             if (channel==null){
                 result.put("resultCode",CODE_FAIL);
-                result.put("resultMsg","渠道不存在");
+                result.put("resultMessage","渠道不存在");
                 return result;
             }
             BeanUtil.copy(channel,vo);
@@ -59,7 +59,7 @@ public class ChannelServiceImpl implements ChannelService {
             e.printStackTrace();
         }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",null);
+        result.put("resultMessage",null);
         result.put("data",vo);
         return result;
     }
@@ -71,7 +71,7 @@ public class ChannelServiceImpl implements ChannelService {
         ContactEvt contactEvt = contactEvtMapper.getEventByEventNbr(evtCode);
         if (contactEvt==null){
             result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg","事件不存在");
+            result.put("resultMessage","事件不存在");
             return result;
         }
         ContactEvtModel evtModel = BeanUtil.create(contactEvt,new ContactEvtModel());
@@ -79,7 +79,7 @@ public class ChannelServiceImpl implements ChannelService {
         List<ContactEvtItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId());
         evtModel.setContactEvtItems(contactEvtItems);
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
-        result.put("resultMsg", StringUtils.EMPTY);
+        result.put("resultMessage", StringUtils.EMPTY);
         result.put("data",evtModel);
         return result;
     }
@@ -91,7 +91,7 @@ public class ChannelServiceImpl implements ChannelService {
         FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(req.getFilterRuleId());
         if (filterRule==null){
             result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "过滤规则不存在");
+            result.put("resultMessage", "过滤规则不存在");
             return result;
         }
         for (UserListModel user : req.getUserList()){
@@ -112,7 +112,7 @@ public class ChannelServiceImpl implements ChannelService {
             userListMapper.insert(userList);
         }
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
-        result.put("resultMsg", "导入成功");
+        result.put("resultMessage", "导入成功");
         return result;
     }
 }

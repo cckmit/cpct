@@ -9,21 +9,23 @@
     <!-- 提供方应用信息，用于计算依赖关系 -->
     <dubbo:application name="00.1083"/>
 
-    <!--<dubbo:registry protocol="dubbo" address="134.96.253.86:8033"/>-->
     <dubbo:registry protocol="dubbo" address="134.96.159.11:8033"/>
 
     <!-- 暴露服务 -->
-    <!--<dubbo:protocol name="dubbo" port="30323"/>-->
     <dubbo:protocol name="dubbo" port="30803"/>
     <dubbo:monitor protocol="registry" />
 
     <!-- 注册 -->
-    <!-- 策略cpct计算服务 -->
+    <!-- 二次协同查询服务 -->
     <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.EventApiService" ref="eventApiServiceImpl" version="1.0" >
+        <!-- 策略cpct计算服务 -->
         <dubbo:method name="CalculateCPC" servicecode="00.1083.CalculateCPC" timeout="10000"/>
+        <!-- 策略cpct计算服务（同步） -->
+        <dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="10000"/>
+        <!-- 二次协同 -->
+        <dubbo:method name="secondChannelSynergy" servicecode="00.1083.SecondChannelSynergy" timeout="10000"/>
     </dubbo:service>
 
-    <!-- 二次协同查询服务 -->
     <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.MktCamChlResultApiService" ref="mktCamChlResultApiServiceImpl" version="1.0" >
         <dubbo:method name="selectResultList" servicecode="00.1083.selectResultList" timeout="10000"/>
     </dubbo:service>
@@ -55,9 +57,15 @@
 
     <!-- 订阅 -->
     <!-- cpc计算协同中心回调 -->
-    <dubbo:reference interface="com.ctzj.smt.bss.cooperate.query.service.dubbo.IContactTaskReceiptService" id="eventApiService"
+    <dubbo:reference interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService" id="eventApiService"
                      version="1.0" retries="0" check="false">
         <dubbo:method name="contactTaskReceipt" servicecode="00.1079.CPCResultFeedback" timeout="5000"/>
+    </dubbo:reference>
+
+    <!-- 因子实时查询 -->
+    <dubbo:reference interface="com.zjpii.biz.serv.YzServ" id="yzServ"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="5000"/>
     </dubbo:reference>
 
 

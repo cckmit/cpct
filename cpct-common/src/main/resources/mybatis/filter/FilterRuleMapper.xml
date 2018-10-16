@@ -201,7 +201,7 @@
             REMARK = #{remark,jdbcType=VARCHAR},
         </if>
         RULE_ID = #{ruleId,jdbcType=BIGINT}
-        where RULE_ID = #{ruleId,jdbcType=BIGINT}.ii
+        where RULE_ID = #{ruleId,jdbcType=BIGINT}
     </update>
 
     <select id="selectFilterRuleByStrategyId" parameterType="java.lang.Long" resultMap="FilterRuleModelMap">
