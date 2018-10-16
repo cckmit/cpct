@@ -15,6 +15,8 @@ import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateMapper;
+import com.zjtelcom.cpct.dao.system.SysAreaMapper;
+import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
@@ -82,6 +84,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     private InjectionLabelMapper injectionLabelMapper;
     @Autowired
     private InjectionLabelValueMapper injectionLabelValueMapper;
+    @Autowired
+    private SysAreaMapper areaMapper;
 
 
     /**
@@ -179,6 +183,18 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         maps.put("tarGrp", tarGrp);
         return maps;
     }
+
+
+//    public List<String> areaList(Integer parentId,List<String> resultList){
+//        List<SysArea> sysAreaList = areaMapper.selectByParnetArea();
+//
+//
+//
+//    }
+
+
+
+
 
     /**
      * 新增目标分群(暂时废弃)
