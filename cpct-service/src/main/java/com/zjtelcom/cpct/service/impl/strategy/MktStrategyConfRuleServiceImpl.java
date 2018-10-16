@@ -8,10 +8,7 @@ package com.zjtelcom.cpct.service.impl.strategy;
 
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.constants.CommonConstant;
-import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
-import com.zjtelcom.cpct.dao.campaign.MktCamResultRelMapper;
-import com.zjtelcom.cpct.dao.campaign.MktCamStrategyConfRelMapper;
-import com.zjtelcom.cpct.dao.campaign.MktCpcAlgorithmsRulMapper;
+import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.domain.campaign.*;
@@ -84,6 +81,8 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
     @Autowired
     private CamScriptService camScriptService;
 
+    @Autowired
+    private MktCamRecomCalcRelMapper mktCamRecomCalcRelMapper;
     /**
      * 添加策略规则
      *
@@ -165,10 +164,10 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktCpcAlgorithmsRulDO.setRuleExpression(mktStrategyConfRule.getTarGrpId() + "");
             mktCpcAlgorithmsRulMapper.insert(mktCpcAlgorithmsRulDO);
             //cpc算法规则关联表
-            MktCamStrategyConfRelDO mktCamStrategyConfRelDO = new MktCamStrategyConfRelDO();
-            mktCamStrategyConfRelDO.setMktCampaignId(1L);
-            mktCamStrategyConfRelDO.setStrategyConfId(mktCpcAlgorithmsRulDO.getAlgorithmsRulId());
-            mktCamStrategyConfRelMapper.insert(mktCamStrategyConfRelDO);
+            MktCamRecomCalcRelDO mktCamRecomCalcRelDO = new MktCamRecomCalcRelDO();
+            mktCamRecomCalcRelDO.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
+            mktCamRecomCalcRelDO.setAlgorithmsRulId(mktCpcAlgorithmsRulDO.getAlgorithmsRulId());
+            mktCamRecomCalcRelMapper.insert(mktCamRecomCalcRelDO);
             //cpc算法表
 
 
