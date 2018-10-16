@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.domain.channel;
 
-public class MktProductRule {
+import java.io.Serializable;
+
+public class MktProductRule implements Serializable {
     private Long id;
 
     private Long productId;

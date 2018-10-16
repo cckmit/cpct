@@ -1,12 +1,13 @@
 package com.zjtelcom.cpct.dto.api;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 /**
  * 事件上报dto
  */
-public class EventReportDTO {
+public class EventReportDTO implements Serializable {
 
     /**
      * 事件流水号

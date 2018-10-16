@@ -156,6 +156,11 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
         }
 
         List<SysMenu> list = sysMenuMapper.listMenuById(menuId);
+        for(int i=0;i<list.size();i++) {
+            if(list.get(i).getMenuType() == 1) {
+                list.get(i).setMenuTypeName("系统菜单");
+            }
+        }
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("data", list);
 

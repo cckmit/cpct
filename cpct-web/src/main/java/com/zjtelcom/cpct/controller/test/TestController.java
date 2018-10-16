@@ -7,8 +7,11 @@ import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
 import com.zjtelcom.cpct.service.EngineTestService;
 import com.alibaba.fastjson.JSON;
+import com.zjtelcom.cpct.service.MktCampaignResp;
+import com.zjtelcom.cpct.service.campaign.MktCamChlResultApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
+import com.zjtelcom.cpct.util.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +33,12 @@ public class TestController extends BaseController {
 
     @Autowired(required = false)
     private MktCampaignApiService mktCampaignApiService;
+
+    @Autowired
+    private MktCamChlResultApiService mktCamChlResultApiService;
+
+    @Autowired
+    private RedisUtils redisUtils;
 
 
 
@@ -76,12 +85,23 @@ public class TestController extends BaseController {
 
     @RequestMapping(value = "/getMktCampaignApi", method = RequestMethod.POST)
     @CrossOrigin
-    public String getMktCampaignApi(@RequestBody  Map<String, Object> params) throws Exception {
+    public MktCampaignResp getMktCampaignApi(@RequestBody  Map<String, Object> params) throws Exception {
         Long mktCampaignId = Long.valueOf((Integer)params.get("mktCampaignId"));
         Map<String, Object> map = mktCampaignApiService.qryMktCampaignDetail(mktCampaignId);
-        return JSON.toJSONString(map);
+       // return JSON.toJSONString(map);
+        redisUtils.setRedis("mktCampaignResp_test", map.get("mktCampaignResp"));
+        MktCampaignResp mktCampaignResp = (MktCampaignResp) redisUtils.getRedis("mktCampaignResp_test");
+      //  return mktCampaignResp;
+        return null;
     }
 
+
+    @RequestMapping(value = "/secondChannelSynergy", method = RequestMethod.POST)
+    @CrossOrigin
+    public String secondChannelSynergy(@RequestBody  Map<String, Object> params) throws Exception {
+        Map<String, Object> map = mktCamChlResultApiService.secondChannelSynergy(params);
+        return JSON.toJSONString(map);
+    }
 }
 
 

@@ -1,8 +1,9 @@
 package com.zjtelcom.cpct.domain.campaign;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class MktCamChlResultDO {
+public class MktCamChlResultDO  implements Serializable {
     /**
      * 二次协同渠道结果标识
      */

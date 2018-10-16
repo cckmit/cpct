@@ -25,6 +25,7 @@ public class MktCampaignDO extends BaseEntity{
     private Integer execNum;
     private String createChannel;
     private Long directoryId;
+    private Long camLevel;
 
     public Long getCalcDisplay() {
         return calcDisplay;
@@ -177,5 +178,13 @@ public class MktCampaignDO extends BaseEntity{
 
     public void setDirectoryId(Long directoryId) {
         this.directoryId = directoryId;
+    }
+
+    public Long getCamLevel() {
+        return camLevel;
+    }
+
+    public void setCamLevel(Long camLevel) {
+        this.camLevel = camLevel;
     }
 }

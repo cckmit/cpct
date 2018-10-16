@@ -113,7 +113,7 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
             if (req.getParams().get("updateTime")!=null){
                 updateTime = new Date(Long.valueOf(req.getParams().get("updateTime").toString()));
             }
-            if (req.getParams().get("scriptType")!=null){
+            if (req.getParams().get("scriptType")!=null && !req.getParams().get("scriptType").equals("-1")){
                 scriptType = req.getParams().get("scriptType").toString();
             }
             PageHelper.startPage(req.getPage(),req.getPageSize());

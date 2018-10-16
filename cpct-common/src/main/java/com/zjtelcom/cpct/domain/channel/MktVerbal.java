@@ -2,10 +2,11 @@ package com.zjtelcom.cpct.domain.channel;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
-public class MktVerbal {
+public class MktVerbal  implements Serializable {
     private Long verbalId;
 
     private Long campaignId;

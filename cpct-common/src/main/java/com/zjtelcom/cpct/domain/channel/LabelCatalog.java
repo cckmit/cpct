@@ -1,8 +1,9 @@
 package com.zjtelcom.cpct.domain.channel;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class LabelCatalog {
+public class LabelCatalog  implements Serializable {
     private Long catalogId;
 
     private String catalogName;

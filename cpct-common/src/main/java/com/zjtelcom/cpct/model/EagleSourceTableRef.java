@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.model;
 
-public class EagleSourceTableRef {
+import java.io.Serializable;
+
+public class EagleSourceTableRef implements Serializable {
     private Long ctasTwoTableRefRowId;
 
     private Long ctasMasterTableRowId;

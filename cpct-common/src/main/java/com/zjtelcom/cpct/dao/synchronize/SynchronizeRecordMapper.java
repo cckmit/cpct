@@ -5,6 +5,8 @@ import com.zjtelcom.cpct.dto.synchronize.SynchronizeRecord;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * @Auther: anson
  * @Date: 2018/8/27
@@ -15,4 +17,6 @@ import org.springframework.stereotype.Repository;
 public interface SynchronizeRecordMapper {
 
     int insert(SynchronizeRecord record);
+
+    List<SynchronizeRecord> selectList(SynchronizeRecord record);
 }

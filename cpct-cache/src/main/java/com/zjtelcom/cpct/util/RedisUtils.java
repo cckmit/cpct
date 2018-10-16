@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.util;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ctg.itrdc.cache.pool.CtgJedisPool;
 import com.ctg.itrdc.cache.pool.CtgJedisPoolConfig;
 import com.ctg.itrdc.cache.pool.CtgJedisPoolException;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Service;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisPoolConfig;
 
-import java.io.Serializable;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -41,9 +42,12 @@ public class RedisUtils {
     public boolean set(final String key, Object value) {
         boolean result = false;
         try {
-            ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-            operations.set(key, value);
-            result = true;
+            // 原方法
+           ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+           operations.set(key, value);
+
+            // 改造后方法
+            // result = setRedis(key, value);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -53,6 +57,7 @@ public class RedisUtils {
 
     /**
      * 更换集团redis方法
+     *
      * @param key
      * @param value
      * @return
@@ -66,11 +71,11 @@ public class RedisUtils {
             try {
                 jedis = ctgJedisPool.getResource();
                 //sendCommand 可能会抛出 运行时异常
-//                jedis.set(key, value);
+                jedis.set(key, serialize(value));
                 //sendCommand 可能会抛出 运行时异常
                 jedis.close();
                 result = true;
-            } catch (Throwable je){
+            } catch (Throwable je) {
                 je.printStackTrace();
                 jedis.close();
             }
@@ -148,6 +153,7 @@ public class RedisUtils {
 
     /**
      * 更换集团redis方法
+     *
      * @param key
      * @return
      */
@@ -160,7 +166,7 @@ public class RedisUtils {
                 jedis = ctgJedisPool.getResource();
                 result = jedis.exists(key);
                 jedis.close();
-            } catch (Throwable je){
+            } catch (Throwable je) {
                 je.printStackTrace();
                 jedis.close();
             }
@@ -179,27 +185,33 @@ public class RedisUtils {
      */
     public Object get(final String key) {
         Object result = null;
+
+        // 原方法
         ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
         result = operations.get(key);
+
+        // 改造后方法
+        //result = getRedis(key);
         return result;
     }
 
 
     /**
      * 更换集团redis方法
+     *
      * @param key
      * @return
      */
     public Object getRedis(final String key) {
         CtgJedisPool ctgJedisPool = initCatch();
-        String result = null;
+        Object result = null;
         try {
             ProxyJedis jedis = new ProxyJedis();
             try {
                 jedis = ctgJedisPool.getResource();
-                result = jedis.get(key);
+                result = unserizlize(jedis.get(key));
                 jedis.close();
-            } catch (Throwable je){
+            } catch (Throwable je) {
                 je.printStackTrace();
                 jedis.close();
             }
@@ -337,28 +349,23 @@ public class RedisUtils {
     }
 
 
-
     private CtgJedisPool initCatch() {
 
 
         List<HostAndPort> hostAndPortList = new ArrayList();
         // 接入机的ip和端口号
-        HostAndPort host = new HostAndPort("134.96.231.228" ,40201);
+        HostAndPort host = new HostAndPort("134.96.231.228", 40201);
         hostAndPortList.add(host);
 
         GenericObjectPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxIdle(5); //最大空闲连接数
-        poolConfig.setMaxTotal(10 ); // 最大连接数（空闲+使用中），不超过应用线程数，建议为应用线程数的一半
+        poolConfig.setMaxTotal(10); // 最大连接数（空闲+使用中），不超过应用线程数，建议为应用线程数的一半
         poolConfig.setMinIdle(5); //保持的最小空闲连接数
         poolConfig.setMaxWaitMillis(3000);
 
         CtgJedisPoolConfig config = new CtgJedisPoolConfig(hostAndPortList);
 
-        config.setDatabase(4970)
-                .setPassword("bss_cpct_common_user#bss_cpct_common_user123")
-                .setPoolConfig(poolConfig)
-                .setPeriod(1000)
-                .setMonitorTimeout(100);
+        config.setDatabase(4970).setPassword("bss_cpct_common_user#bss_cpct_common_user123").setPoolConfig(poolConfig).setPeriod(1000).setMonitorTimeout(100);
 
         CtgJedisPool pool = new CtgJedisPool(config);
 
@@ -366,40 +373,36 @@ public class RedisUtils {
     }
 
 
-
-
     public static void main(String[] args) throws CtgJedisPoolException {
 
 
         List<HostAndPort> hostAndPortList = new ArrayList();
         // 接入机的ip和端口号
-        HostAndPort host = new HostAndPort("134.96.231.228" ,40201);
+        HostAndPort host = new HostAndPort("134.96.231.228", 40201);
         hostAndPortList.add(host);
 
         GenericObjectPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxIdle(5); //最大空闲连接数
-        poolConfig.setMaxTotal(10 ); // 最大连接数（空闲+使用中），不超过应用线程数，建议为应用线程数的一半
+        poolConfig.setMaxTotal(10); // 最大连接数（空闲+使用中），不超过应用线程数，建议为应用线程数的一半
         poolConfig.setMinIdle(5); //保持的最小空闲连接数
         poolConfig.setMaxWaitMillis(3000);
 
         CtgJedisPoolConfig config = new CtgJedisPoolConfig(hostAndPortList);
 
-        config.setDatabase(4970)
-                .setPassword("bss_cpct_common_user#bss_cpct_common_user123")
-                .setPoolConfig(poolConfig)
-                .setPeriod(1000)
-                .setMonitorTimeout(100);
+        config.setDatabase(4970).setPassword("bss_cpct_common_user#bss_cpct_common_user123").setPoolConfig(poolConfig).setPeriod(1000).setMonitorTimeout(100);
 
         CtgJedisPool pool = new CtgJedisPool(config);
 
         ProxyJedis jedis = new ProxyJedis();
         try {
             jedis = pool.getResource();
-            jedis.set("test", "123");
-            jedis.get("test");
-            System.out.println(jedis.get("test"));
+            //sendCommand 可能会抛出 运行时异常
+            //jedis.set("test", "123");
+            //sendCommand 可能会抛出 运行时异常
+            //jedis.get("test");
+            System.out.println(unserizlize(jedis.get("mktCampaignResp_test")));
             jedis.close();
-        } catch (Throwable je){
+        } catch (Throwable je) {
             je.printStackTrace();
             jedis.close();
         }
@@ -407,4 +410,47 @@ public class RedisUtils {
 
     }
 
+    /**
+     * 对象序列化为字符串
+     *
+     * @param obj
+     * @return
+     */
+
+    public static String serialize(Object obj) {
+        String serStr = null;
+        try {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+            objectOutputStream.writeObject(obj);
+            serStr = byteArrayOutputStream.toString("ISO-8859-1");
+            serStr = java.net.URLEncoder.encode(serStr, "UTF-8");
+            objectOutputStream.close();
+            byteArrayOutputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return serStr;
+    }
+
+    /**
+     * 字符串反序列化为对象
+     *
+     * @param serStr
+     * @return
+     */
+    public static Object unserizlize(String serStr) {
+        Object newObj = null;
+        try {
+            String redStr = java.net.URLDecoder.decode(serStr, "UTF-8");
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(redStr.getBytes("ISO-8859-1"));
+            ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+            newObj = objectInputStream.readObject();
+            objectInputStream.close();
+            byteArrayInputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return newObj;
+    }
 }

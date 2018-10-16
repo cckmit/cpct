@@ -14,6 +14,7 @@ import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
 import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
+import com.zjtelcom.cpct.dao.question.MktQuestionnaireMapper;
 import com.zjtelcom.cpct.domain.Rule;
 import com.zjtelcom.cpct.domain.RuleDetail;
 import com.zjtelcom.cpct.domain.User;
@@ -22,6 +23,7 @@ import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.channel.CamScript;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
+import com.zjtelcom.cpct.domain.question.Questionnaire;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
@@ -70,6 +72,9 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
 
     @Autowired
     private MktCamScriptMapper camScriptMapper;
+
+    @Autowired
+    private MktQuestionnaireMapper mktQuestionnaireMapper;
 
     @Override
     public Map<String, Object> saveMktCamChlConf(MktCamChlConfDetail mktCamChlConfDetail) {
@@ -177,10 +182,15 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
                 MktCamChlConfAttr mktCamChlConfAttr = new MktCamChlConfAttr();
                 CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttr, mktCamChlConfAttrDO);
+                // 协同规则
                 if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
                     //通过EvtContactConfId获取规则放入属性中
                     String rule = ruleSelect(mktCamChlConfAttr.getEvtContactConfId());
                     mktCamChlConfAttr.setAttrValue(rule);
+                } else if(mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.QUESTION.getArrId())) {
+                    // 问卷
+                    Questionnaire questionnaire = mktQuestionnaireMapper.selectByPrimaryKey(Long.valueOf(mktCamChlConfAttr.getAttrValue()));
+                    mktCamChlConfAttr.setAttrValueName(questionnaire.getNaireName());
                 }
                 mktCamChlConfAttrList.add(mktCamChlConfAttr);
             }

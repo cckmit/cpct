@@ -1,11 +1,13 @@
 package com.zjtelcom.cpct.domain;
 
+import java.io.Serializable;
+
 /**
  * @Description
  * @Author pengy
  * @Date 2018/6/12 15:43
  */
-public class Test {
+public class Test implements Serializable {
 
     private Long id;
 

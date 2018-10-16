@@ -2,8 +2,10 @@ package com.zjtelcom.cpct.dto.system;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class SystemParam {
+public class SystemParam implements Serializable {
 
     private Integer paramId;
 

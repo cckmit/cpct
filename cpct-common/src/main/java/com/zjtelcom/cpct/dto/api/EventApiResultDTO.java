@@ -2,11 +2,13 @@ package com.zjtelcom.cpct.dto.api;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * 接口调用结果
  */
 @Data
-public class EventApiResultDTO {
+public class EventApiResultDTO implements Serializable {
 
     /**
      * 事件流水号

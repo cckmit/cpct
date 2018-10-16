@@ -1,11 +1,13 @@
 package com.zjtelcom.cpct.dto.channel;
 
+import java.io.Serializable;
+
 /**
  * 展示列实体类
  *
  * @author pengyu
  */
-public class DisplayColumnVO{
+public class DisplayColumnVO implements Serializable {
 
     /**
      * 展示列ID

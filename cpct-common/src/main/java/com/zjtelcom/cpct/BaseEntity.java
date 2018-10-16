@@ -9,7 +9,7 @@ import java.util.Date;
  * @author pengy
  * @date 2018/4/8 10:46
  */
-public abstract class BaseEntity {
+public abstract class BaseEntity implements Serializable {
 
     private String statusCd;//记录状态。1000有效 1100无效  1200	未生效 1300已归档  1001将生效  1002待恢复  1101将失效  1102待失效 1301	待撤消
     private Long createStaff;//创建人

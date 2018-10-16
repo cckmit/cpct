@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.dto.grouping;
 
+import java.io.Serializable;
 import java.util.Date;
 /**
  * @Description:
@@ -7,7 +8,7 @@ import java.util.Date;
  * @date: 2018/09/06 16:14
  * @version: V1.0
  */
-public class TarGrpTemplateCondition {
+public class TarGrpTemplateCondition implements Serializable {
     private Long conditionId;
 
     private Long tarGrpTemplateId;

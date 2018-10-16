@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.model;
 
-public class EagleSourceTableDef {
+import java.io.Serializable;
+
+public class EagleSourceTableDef implements Serializable {
     private Long ctasTableDefinitionRowId;
 
     private String tagTableNameEn;

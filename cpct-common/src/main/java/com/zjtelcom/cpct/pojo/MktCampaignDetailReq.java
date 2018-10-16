@@ -12,6 +12,7 @@ package com.zjtelcom.cpct.pojo;
 
 import com.zjtelcom.cpct.dto.pojo.MktCampaign;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -22,7 +23,7 @@ import java.util.List;
  * @see MktCampaignDetailReq
  * @since JDK1.7
  */
-public class MktCampaignDetailReq {
+public class MktCampaignDetailReq implements Serializable {
     private List<MktCampaign> mktCampaignDetails;
 
     private String transactionId;

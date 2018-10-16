@@ -33,12 +33,9 @@ public interface OrgTreeService {
 
     /**
      * 通过父级菜单查询子菜单
-     * @param sumAreaId
-     * @param page
-     * @param pageSize
      * @return
      */
-    Map<String,Object> selectBySumAreaId(Integer sumAreaId,Integer page, Integer pageSize);
+    Map<String,Object> selectBySumAreaId(Map<String, Object> params);
 
 
 

@@ -3,11 +3,12 @@ package com.zjtelcom.cpct.pojo;
 
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 
-public class MktCamChlConf {
+public class MktCamChlConf implements Serializable {
     // 推送渠道标识
     private Long evtContactConfId;
 

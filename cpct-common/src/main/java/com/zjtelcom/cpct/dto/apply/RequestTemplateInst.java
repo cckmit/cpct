@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.dto.apply;
 
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -8,7 +9,7 @@ import java.util.Date;
  * @Author pengy
  * @Date 2018/6/26 14:29
  */
-public class RequestTemplateInst{
+public class RequestTemplateInst  implements Serializable {
 
     private Long requestTemplateInstId;//配置申请实例ID
     private String name;//名称

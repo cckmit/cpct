@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.dto.api;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -10,7 +11,7 @@ import java.util.Map;
  * 事件触发回调dto
  */
 @Data
-public class EventCallBackDTO {
+public class EventCallBackDTO implements Serializable {
 
 
     /**

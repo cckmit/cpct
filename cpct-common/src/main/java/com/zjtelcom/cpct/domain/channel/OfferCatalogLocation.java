@@ -1,8 +1,9 @@
 package com.zjtelcom.cpct.domain.channel;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class OfferCatalogLocation {
+public class OfferCatalogLocation implements Serializable {
     private Long offerCatLocId;
 
     private Integer offerId;
