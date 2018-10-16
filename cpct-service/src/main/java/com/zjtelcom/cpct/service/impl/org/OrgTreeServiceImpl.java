@@ -115,22 +115,38 @@ public class OrgTreeServiceImpl implements OrgTreeService{
 
     /**
      * 通过父级菜单查询子菜单
-     * @param sumAreaId
+     * @param params
      * @return
      */
     @Override
-    public Map<String,Object> selectBySumAreaId(Integer sumAreaId,Integer page, Integer pageSize) {
+    public Map<String,Object> selectBySumAreaId(Map<String, Object> params) {
+        String areaId= (String) params.get("areaId");
+        String page= (String) params.get("page");
+        String pageSize= (String) params.get("pageSize");
+        Integer id=null;
+        Integer pageId=0;
+        Integer pageSizeId=0;
+        //如果page 和pageSize为空时 传回所有数据
+        if(StringUtils.isNotBlank(page)&&StringUtils.isNotBlank(pageSize)){
+            pageId=Integer.parseInt(page);
+            pageSizeId=Integer.parseInt(pageSize);
+        }
+        if(StringUtils.isNotBlank(areaId)){
+            id=Integer.parseInt(areaId);
+        }
+
+
         Map<String, Object> maps = new HashMap<>();
         boolean tip=false;
-        if(page!=0) {
-            PageHelper.startPage(page, pageSize);
+        if(pageId!=0) {
+            PageHelper.startPage(pageId, pageSizeId);
             tip=true;
         }
         List<OrgTreeDO> list=new ArrayList<>();
-        if(sumAreaId==null){
+        if(id==null){
             list=orgTreeMapper.selectMenu();
         }else{
-            list=orgTreeMapper.selectBySumAreaId(sumAreaId);
+            list=orgTreeMapper.selectBySumAreaId(id);
         }
         Page pageInfo = new Page(new PageInfo(list));
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);

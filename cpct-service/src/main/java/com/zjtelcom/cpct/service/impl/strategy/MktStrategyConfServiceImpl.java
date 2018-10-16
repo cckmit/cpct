@@ -436,11 +436,12 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             // 策略下发渠道
             String[] channelIds = mktStrategyConfDO.getChannelsId().split("/");
             List<Long> channelList = new ArrayList<>();
-            for (String channelId : channelIds) {
-                channelList.add(Long.valueOf(channelId));
+            if(channelIds!=null && !"".equals(channelIds)){
+                for (String channelId : channelIds) {
+                    channelList.add(Long.valueOf(channelId));
+                }
+                mktStrategyConfDetail.setChannelList(channelList);
             }
-            mktStrategyConfDetail.setChannelList(channelList);
-
             // 获取过滤规则集合
             List<Long> filterRuleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(mktStrategyConfId);
             mktStrategyConfDetail.setFilterRuleIdList(filterRuleIdList);

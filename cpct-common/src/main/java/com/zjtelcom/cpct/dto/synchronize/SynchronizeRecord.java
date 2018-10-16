@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.dto.synchronize;
 
 import com.zjtelcom.cpct.BaseEntity;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -14,7 +15,7 @@ public class SynchronizeRecord extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = -7939347752913617953L;
     /** 主键标识*/
-    private Long id;
+    private Long createId;
 
     /** 同步表名称*/
     private String synchronizeName;
@@ -31,12 +32,22 @@ public class SynchronizeRecord extends BaseEntity implements Serializable {
     /** 同步时间*/
     private Date synchronizeTime;
 
-    public Long getId() {
-        return id;
+    /**
+     * 开始时间
+     */
+    private String startTime;
+
+    /**
+     * 结束时间
+     */
+    private String endTime;
+
+    public Long getCreateId() {
+        return createId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setCreateId(Long createId) {
+        this.createId = createId;
     }
 
     public String getSynchronizeName() {
@@ -77,5 +88,30 @@ public class SynchronizeRecord extends BaseEntity implements Serializable {
 
     public void setSynchronizeType(Integer synchronizeType) {
         this.synchronizeType = synchronizeType;
+    }
+
+    public String getStartTime() {
+
+        if(StringUtils.isNotBlank(startTime) && startTime.length() == 10){
+            return startTime + " 00:00:00";
+        }
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getEndTime() {
+
+        if(StringUtils.isNotBlank(endTime) && endTime.length() == 10){
+            return endTime + " 23:59:59";
+        }
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+
+        this.endTime = endTime;
     }
 }

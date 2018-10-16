@@ -2,6 +2,8 @@ package com.zjtelcom.cpct.service.synchronize;
 
 import com.zjtelcom.cpct.dto.synchronize.SynchronizeRecord;
 
+import java.util.Map;
+
 /**
  * @Auther: anson
  * @Date: 2018/8/27
@@ -13,4 +15,10 @@ public interface SynchronizeRecordService {
 
 
     int addRecord(String roleName, String name,Long eventId, Integer type);
+
+
+    Map<String,Object> selectRecordList(Map<String, Object> params);
+
+
+
 }
