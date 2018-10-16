@@ -279,18 +279,20 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         if (filterRule.getFilterType().equals("3000")){
             filterRule.setLabelCode("PROM_LIST");
         }
-
         if (editVO.getCondition()!=null){
-            //先删除原始条件
-            if (filterRule.getConditionId()!=null){
-                verbalConditionMapper.deleteByVerbalId(ConditionType.FILTER_RULE.getValue().toString(),filterRule.getConditionId());
+            if (filterRule.getConditionId()==null){
+                MktVerbalCondition condition = BeanUtil.create(editVO.getCondition(),new MktVerbalCondition());
+                condition.setVerbalId(0L);
+                condition.setConditionType(ConditionType.FILTER_RULE.getValue().toString());
+                verbalConditionMapper.insert(condition);
+                filterRule.setConditionId(condition.getConditionId());
+            }else {
+                MktVerbalCondition condition = verbalConditionMapper.selectByPrimaryKey(filterRule.getConditionId());
+                if (condition!=null){
+                    BeanUtil.copy(editVO.getCondition(),condition);
+                    verbalConditionMapper.updateByPrimaryKey(condition);
+                }
             }
-            //添加新条件
-            MktVerbalCondition condition = BeanUtil.create(editVO,new MktVerbalCondition());
-            condition.setVerbalId(0L);
-            condition.setConditionType(ConditionType.FILTER_RULE.getValue().toString());
-            verbalConditionMapper.insert(condition);
-            filterRule.setConditionId(condition.getConditionId());
         }
         filterRuleMapper.updateByPrimaryKey(filterRule);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);

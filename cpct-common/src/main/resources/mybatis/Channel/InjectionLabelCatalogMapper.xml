@@ -3,6 +3,7 @@
 <mapper namespace="com.zjtelcom.cpct.dao.channel.InjectionLabelCatalogMapper">
   <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.LabelCatalog">
     <id column="CATALOG_ID" jdbcType="BIGINT" property="catalogId" />
+    <result column="CATALOG_CODE" jdbcType="VARCHAR" property="catalogCode" />
     <result column="CATALOG_NAME" jdbcType="VARCHAR" property="catalogName" />
     <result column="PARENT_ID" jdbcType="BIGINT" property="parentId" />
     <result column="LEVEL_ID" jdbcType="BIGINT" property="levelId" />
@@ -19,18 +20,19 @@
     where CATALOG_ID = #{catalogId,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.LabelCatalog">
-    insert into injection_label_catalog (CATALOG_ID, CATALOG_NAME, PARENT_ID, 
+    insert into injection_label_catalog (CATALOG_ID, CATALOG_CODE,CATALOG_NAME, PARENT_ID,
       LEVEL_ID, STATUS_CD, CREATE_STAFF, 
       UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
       UPDATE_DATE, REMARK)
-    values (#{catalogId,jdbcType=BIGINT}, #{catalogName,jdbcType=VARCHAR}, #{parentId,jdbcType=BIGINT}, 
+    values (#{catalogId,jdbcType=BIGINT},  #{catalogCode,jdbcType=VARCHAR},#{catalogName,jdbcType=VARCHAR}, #{parentId,jdbcType=BIGINT},
       #{levelId,jdbcType=BIGINT}, #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, 
       #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, 
       #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR})
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.LabelCatalog">
     update injection_label_catalog
-    set CATALOG_NAME = #{catalogName,jdbcType=VARCHAR},
+    set  CATALOG_CODE = #{catalogCode,jdbcType=VARCHAR},
+    CATALOG_NAME = #{catalogName,jdbcType=VARCHAR},
       PARENT_ID = #{parentId,jdbcType=BIGINT},
       LEVEL_ID = #{levelId,jdbcType=BIGINT},
       STATUS_CD = #{statusCd,jdbcType=VARCHAR},
@@ -43,26 +45,26 @@
     where CATALOG_ID = #{catalogId,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select CATALOG_ID, CATALOG_NAME, PARENT_ID, LEVEL_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+    select CATALOG_ID,CATALOG_CODE, CATALOG_NAME, PARENT_ID, LEVEL_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
     from injection_label_catalog
     where CATALOG_ID = #{catalogId,jdbcType=BIGINT}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
-    select CATALOG_ID, CATALOG_NAME, PARENT_ID, LEVEL_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+    select CATALOG_ID,CATALOG_CODE, CATALOG_NAME, PARENT_ID, LEVEL_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
     from injection_label_catalog
   </select>
 
   <select id="findByLevelId" resultMap="BaseResultMap">
-    select CATALOG_ID, CATALOG_NAME, PARENT_ID, LEVEL_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    select CATALOG_ID,CATALOG_CODE, CATALOG_NAME, PARENT_ID, LEVEL_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
     from injection_label_catalog
     where LEVEL_ID = #{level}
   </select>
 
   <select id="findByParentId" resultMap="BaseResultMap">
-    select CATALOG_ID, CATALOG_NAME, PARENT_ID, LEVEL_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    select CATALOG_ID,CATALOG_CODE, CATALOG_NAME, PARENT_ID, LEVEL_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
     from injection_label_catalog
     where PARENT_ID = #{parentId}
