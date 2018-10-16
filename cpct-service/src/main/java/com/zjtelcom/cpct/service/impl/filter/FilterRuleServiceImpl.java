@@ -292,7 +292,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
             verbalConditionMapper.insert(condition);
             filterRule.setConditionId(condition.getConditionId());
         }
-        filterRuleMapper.modFilterRule(filterRule);
+        filterRuleMapper.updateByPrimaryKey(filterRule);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("filterRule", filterRule);
