@@ -5,23 +5,22 @@ import java.util.List;
 
 public class RecordModel implements Serializable {
 
-    private LabelModel tag;
-    private List<LabelValueModel> tagValueList;
+    private LabModel label;
+    private List<LabValueModel> labelValueList;
 
-    public LabelModel getTag() {
-        return tag;
+    public LabModel getLabel() {
+        return label;
     }
 
-    public void setTag(LabelModel tag) {
-        this.tag = tag;
+    public void setLabel(LabModel label) {
+        this.label = label;
     }
 
-    public List<LabelValueModel> getTagValueList() {
-        return tagValueList;
+    public List<LabValueModel> getLabelValueList() {
+        return labelValueList;
     }
 
-    public void setTagValueList(List<LabelValueModel> tagValueList) {
-        this.tagValueList = tagValueList;
+    public void setLabelValueList(List<LabValueModel> labelValueList) {
+        this.labelValueList = labelValueList;
     }
-
 }

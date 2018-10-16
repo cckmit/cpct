@@ -8,8 +8,8 @@ import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.UserUtil;
-import cpct.dubbo.model.LabelModel;
-import cpct.dubbo.model.LabelValueModel;
+import cpct.dubbo.model.LabModel;
+import cpct.dubbo.model.LabValueModel;
 import cpct.dubbo.model.RecordModel;
 import cpct.dubbo.service.SyncLabelService;
 import org.slf4j.Logger;
@@ -50,12 +50,12 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
     public Map<String, Object> syncLabelInfo(RecordModel record) {
         Map<String,Object> result = new HashMap<>();
         try {
-            switch (record.getTag().getLabState()){
+            switch (record.getLabel().getLabState()){
                 case "3":
                     result = addLabel(record);
                     break;
                 case "5":
-                    result = updateLabel(record);
+                    result = deleteLabel(record);
                     break;
             }
         }catch (Exception e){
@@ -73,46 +73,51 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
      * @param record
      * @return
      */
-    private Map<String,Object> addLabel(RecordModel record){
-        Map<String,Object> result = new HashMap<>();
-        LabelModel tagModel = record.getTag();
-        Label labelValodate = labelMapper.selectByTagRowId(record.getTag().getTagRowId());
-        if (labelValodate!=null){
-            result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg","标签已存在，请选择更新或删除后添加");
-            return result;
+    private Map<String,Object> addLabel(RecordModel record) {
+        Map<String, Object> result = new HashMap<>();
+        LabModel labModel = record.getLabel();
+        Label labelValodate = labelMapper.selectByTagRowId(record.getLabel().getLabRowId());
+        if (labelValodate != null) {
+            labelValueMapper.deleteByLabelId(labelValodate.getInjectionLabelId());
+            labelMapper.deleteByPrimaryKey(labelValodate.getInjectionLabelId());
         }
-        List<LabelValueModel> valueModelList = new ArrayList<>();
-        if (record.getTagValueList()!=null && !record.getTagValueList().isEmpty()){
-            valueModelList = record.getTagValueList();
+        List<LabValueModel> valueModelList = new ArrayList<>();
+        if (record.getLabelValueList() != null && !record.getLabelValueList().isEmpty()) {
+            valueModelList = record.getLabelValueList();
         }
-        Label label = new Label();
-        label.setTagRowId(tagModel.getTagRowId());
-        //todo
-        label.setLabelDataType("");
-        label.setInjectionLabelCode(tagModel.getSourceTableColumnName());
-        label.setInjectionLabelName(tagModel.getTagName());
-        label.setInjectionLabelDesc(tagModel.getTagName());
-        label.setStatusCd(STATUSCD_EFFECTIVE);
-        label.setCreateStaff(UserUtil.loginId());
-        label.setCreateDate(new Date());
-        //todo
-        label.setConditionType("");
-        //todo 标签操作符 对应显示类型
-        label.setOperator(String.valueOf(Operator.EQUAL.getValue()));
+        Label label = BeanUtil.create(labModel, new Label());
+        label.setTagRowId(labModel.getLabRowId());//标签id
+        label.setInjectionLabelName(labModel.getLabName());//标签名称
+        label.setInjectionLabelCode(labModel.getLabEngName());//英文名称
+        //label.setInjectionLabelDesc();
+        label.setLabTagCode(labModel.getLabCode());//标签编码
+
+        label.setConditionType(labModel.getLabType());//标签类型(文本、数值、枚举) 4输入  2多选
+        if(Long.valueOf(labModel.getLabType()) == 4){
+            label.setOperator("2000,3000,1000,4000,6000,5000,7000,7200");
+        }else if(Long.valueOf(labModel.getLabType()) == 2){
+            label.setOperator("7000");
+        }
         label.setScope(1);
         label.setIsShared(0);
+        //label.setCatalogId();
+
         //todo 暂无标签类型
         label.setLabelType("1000");
         //todo 暂无值类型
-        if (record.getTagValueList()!=null && !record.getTagValueList().isEmpty()){
+        if (record.getLabelValueList()!=null && !record.getLabelValueList().isEmpty()){
             label.setLabelValueType("2000");
         }else {
             label.setLabelValueType("1000");
         }
-//        label.setLabelDataType(ChannelUtil.getDataType(tagModel.getSourceTableColumnType()));
+        //label.setLabelDataType(ChannelUtil.getDataType(tagModel.getSourceTableColumnType()));
+
+        label.setStatusCd(STATUSCD_EFFECTIVE);
+        label.setCreateStaff(UserUtil.loginId());
         label.setCreateDate(new Date());
+
         labelMapper.insert(label);
+        syncLabelValue(valueModelList,label.getInjectionLabelId());
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","新增成功");
         return result;
@@ -126,19 +131,14 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
     private Map<String,Object> updateLabel(RecordModel record){
         Map<String,Object> result = new HashMap<>();
         //todo 先删除再添加
-        LabelModel tagModel = record.getTag();
-        Label label = labelMapper.selectByTagRowId(tagModel.getTagRowId());
-        if (label==null){
-            result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg","未找到对应标签");
-            return result;
-        }
-        List<LabelValue> valueList = labelValueMapper.selectByLabelId(label.getInjectionLabelId());
-        if (!valueList.isEmpty()){
-            for (LabelValue value : valueList){
-                labelValueMapper.deleteByPrimaryKey(value.getLabelValueId());
-            }
-        }
+        LabModel tagModel = record.getLabel();
+        Label label = labelMapper.selectByTagRowId(tagModel.getLabRowId());
+//        if (label==null){
+//            result.put("resultCode",CODE_FAIL);
+//            result.put("resultMsg","未找到对应标签");
+//            return result;
+//        }
+        labelValueMapper.deleteByLabelId(label.getInjectionLabelId());
         labelMapper.deleteByPrimaryKey(label.getInjectionLabelId());
         addLabel(record);
         result.put("resultCode",CODE_SUCCESS);
@@ -153,19 +153,15 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
      */
     private Map<String,Object> deleteLabel(RecordModel record){
         Map<String,Object> result = new HashMap<>();
-        LabelModel tagModel = record.getTag();
-        Label label = labelMapper.selectByTagRowId(tagModel.getTagRowId());
+        LabModel tagModel = record.getLabel();
+        Label label = labelMapper.selectByTagRowId(tagModel.getLabRowId());
         if (label==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","未找到对应标签");
             return result;
         }
-        List<LabelValue> valueList = labelValueMapper.selectByLabelId(label.getInjectionLabelId());
-        if (!valueList.isEmpty()){
-            for (LabelValue value : valueList){
-                labelValueMapper.deleteByPrimaryKey(value.getLabelValueId());
-            }
-        }
+//        List<LabelValue> valueList = labelValueMapper.selectByLabelId(label.getInjectionLabelId());
+        labelValueMapper.deleteByLabelId(label.getInjectionLabelId());
         labelMapper.deleteByPrimaryKey(label.getInjectionLabelId());
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
@@ -173,16 +169,16 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
     }
 
 
-    private Map<String,Object> syncLabelValue(List<LabelValueModel> valueModelList,Long labelId) {
+    private Map<String,Object> syncLabelValue(List<LabValueModel> valueModelList, Long labelId) {
         Map<String,Object> result = new HashMap<>();
         List<LabelValue> valueList = new ArrayList<>();
         List<String> stringList = new ArrayList<>();
-        for (LabelValueModel info : valueModelList){
+        for (LabValueModel info : valueModelList){
             LabelValue value = BeanUtil.create(info,new LabelValue());
             value.setInjectionLabelId(labelId);
-            value.setValueDesc(info.getTagValueName());
-            value.setValueName(info.getTagValueName());
-            value.setLabelValue(info.getTagDownValue());
+            value.setValueDesc(info.getValueName());
+            value.setValueName(info.getValueName());
+            value.setLabelValue(info.getLabValue());
             value.setCreateDate(new Date());
             value.setStatusCd("1000");
             value.setUpdateDate(new Date());

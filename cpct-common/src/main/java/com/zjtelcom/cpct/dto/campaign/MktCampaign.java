@@ -98,6 +98,11 @@ public class MktCampaign extends BaseEntity {
      */
     private String landName;
 
+    /**
+     * 活动优先级 0-10
+     */
+    private Long camLevel;
+
 
     public Long getDirectoryId() {
         return directoryId;
@@ -233,5 +238,13 @@ public class MktCampaign extends BaseEntity {
 
     public void setLandName(String landName) {
         this.landName = landName;
+    }
+
+    public Long getCamLevel() {
+        return camLevel;
+    }
+
+    public void setCamLevel(Long camLevel) {
+        this.camLevel = camLevel;
     }
 }

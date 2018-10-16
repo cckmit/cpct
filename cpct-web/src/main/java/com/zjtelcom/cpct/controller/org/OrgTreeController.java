@@ -58,21 +58,13 @@ public class OrgTreeController extends BaseController {
     @CrossOrigin
     public String selectOrg(@RequestBody Map<String, Object> params){
         Map<String, Object> maps = new HashMap<>();
-        String areaId= (String) params.get("areaId");
-        String page= (String) params.get("page");
-        String pageSize= (String) params.get("pageSize");
-        Integer id=null;
-        Integer pageId=0;
-        Integer pageSizeId=0;
-        //如果page 和pageSize为空时 传回所有数据
-        if(StringUtils.isNotBlank(page)&&StringUtils.isNotBlank(pageSize)){
-            pageId=Integer.parseInt(page);
-            pageSizeId=Integer.parseInt(pageSize);
+        try{
+        maps = orgTreeService.selectBySumAreaId(params);
+        } catch (Exception e) {
+            maps.put("resultCode", CommonConstant.CODE_FAIL);
+            maps.put("resultMsg", e.getMessage());
+            logger.error("通过菜单id查询其子菜单失败！Exception: ", e.getMessage());
         }
-        if(StringUtils.isNotBlank(areaId)){
-            id=Integer.parseInt(areaId);
-        }
-        maps = orgTreeService.selectBySumAreaId(id,pageId,pageSizeId);
         return JSON.toJSONString(maps);
     }
 }

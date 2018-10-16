@@ -1,6 +1,6 @@
 #端口配置
 server:
-  port: 30315
+  port: 30321
 
 spring:
 # 第一数据源

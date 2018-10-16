@@ -14,6 +14,7 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyMapper;
+import com.zjtelcom.cpct.dao.system.SysStaffMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlResultConfRelDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
@@ -26,6 +27,7 @@ import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
+import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
@@ -94,6 +96,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private MktCamChlConfMapper chlConfMapper;
     @Autowired
     private MktCamScriptMapper scriptMapper;
+    @Autowired
+    private SysStaffMapper sysStaffMapper;
 
     /**
      * 销售品service
@@ -517,6 +521,11 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         request.setFieldList(fieldList);
         request.setCampaignType(campaignDO.getMktCampaignType());
         request.setLanId(campaignDO.getLanId());
+        request.setCamLevel(campaignDO.getCamLevel());
+
+        // 获取创建人员code
+        SysStaff sysStaff = sysStaffMapper.selectByPrimaryKey(campaignDO.getCreateStaff());
+        request.setStaffCode(sysStaff.getStaffCode());
 
         List<TrialOperationParam> paramList = new ArrayList<>();
         List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(trialOperation.getStrategyId());

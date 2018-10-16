@@ -42,9 +42,12 @@ public class RedisUtils {
     public boolean set(final String key, Object value) {
         boolean result = false;
         try {
-            ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-            operations.set(key, value);
-            result = setRedis(key, value);
+            // 原方法
+           ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+           operations.set(key, value);
+
+            // 改造后方法
+            // result = setRedis(key, value);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -68,7 +71,7 @@ public class RedisUtils {
             try {
                 jedis = ctgJedisPool.getResource();
                 //sendCommand 可能会抛出 运行时异常
-                jedis.set(key, new String(serialize(value)));
+                jedis.set(key, serialize(value));
                 //sendCommand 可能会抛出 运行时异常
                 jedis.close();
                 result = true;
@@ -182,9 +185,13 @@ public class RedisUtils {
      */
     public Object get(final String key) {
         Object result = null;
+
+        // 原方法
         ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
         result = operations.get(key);
-       // result = getRedis(key);
+
+        // 改造后方法
+        //result = getRedis(key);
         return result;
     }
 
@@ -404,13 +411,13 @@ public class RedisUtils {
     }
 
     /**
-     *  对象序列化为字符串
+     * 对象序列化为字符串
      *
      * @param obj
      * @return
      */
 
-    public static String serialize(Object obj){
+    public static String serialize(Object obj) {
         String serStr = null;
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -418,16 +425,11 @@ public class RedisUtils {
             objectOutputStream.writeObject(obj);
             serStr = byteArrayOutputStream.toString("ISO-8859-1");
             serStr = java.net.URLEncoder.encode(serStr, "UTF-8");
-
             objectOutputStream.close();
             byteArrayOutputStream.close();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
         return serStr;
     }
 
@@ -437,7 +439,7 @@ public class RedisUtils {
      * @param serStr
      * @return
      */
-    public static Object unserizlize(String serStr){
+    public static Object unserizlize(String serStr) {
         Object newObj = null;
         try {
             String redStr = java.net.URLDecoder.decode(serStr, "UTF-8");
@@ -446,14 +448,7 @@ public class RedisUtils {
             newObj = objectInputStream.readObject();
             objectInputStream.close();
             byteArrayInputStream.close();
-        } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return newObj;

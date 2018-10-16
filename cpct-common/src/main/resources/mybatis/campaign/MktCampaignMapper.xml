@@ -29,6 +29,7 @@
         <result column="LAN_ID" jdbcType="BIGINT" property="lanId"/>
         <result column="CREATE_CHANNEL" jdbcType="VARCHAR" property="createChannel" />
         <result column="DIRECTORY_ID" jdbcType="BIGINT" property="directoryId" />
+        <result column="CAM_LEVEL" jdbcType="BIGINT" property="camLevel" />
     </resultMap>
 
     <resultMap id="countResultMap" type="com.zjtelcom.cpct.domain.campaign.MktCampaignCountDO">
@@ -64,7 +65,7 @@
       EXEC_TYPE, EXEC_INVL, EXEC_NUM,
       STATUS_CD, STATUS_DATE, CREATE_STAFF,
       CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
-      REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID)
+      REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL)
     values (#{mktCampaignId,jdbcType=BIGINT}, #{tiggerType,jdbcType=VARCHAR}, #{mktCampaignName,jdbcType=VARCHAR},
       #{planBeginTime,jdbcType=DATE}, #{planEndTime,jdbcType=DATE}, #{beginTime,jdbcType=DATE},
       #{endTime,jdbcType=DATE}, #{mktCampaignType,jdbcType=VARCHAR}, #{mktCampaignCategory,jdbcType=VARCHAR},
@@ -74,7 +75,7 @@
       #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT},
       #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP},
       #{remark,jdbcType=VARCHAR}, #{lanId,jdbcType=BIGINT}, #{createChannel,jdbcType=VARCHAR},
-      #{directoryId,jdbcType=BIGINT})
+      #{directoryId,jdbcType=BIGINT},#{camLevel,jdbcType=BIGINT})
     </insert>
 
     <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignDO">
@@ -104,6 +105,7 @@
         <if test= "createChannel!=null">CREATE_CHANNEL = #{createChannel,jdbcType=VARCHAR},</if>
         <if test= "directoryId!=null">DIRECTORY_ID = #{directoryId,jdbcType=BIGINT},</if>
         <if test= "lanId!=null">LAN_ID = #{lanId,jdbcType=BIGINT},</if>
+        <if test= "camLevel!=null">CAM_LEVEL = #{camLevel,jdbcType=BIGINT},</if>
         UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
 
     where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
@@ -113,7 +115,7 @@
     select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
     BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MKT_CAMPAIGN_CATEGORY, MKT_ACTIVITY_NBR,
     MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD,
-    STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID
+    STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL
     from mkt_campaign
     where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
     </select>
@@ -122,7 +124,7 @@
     select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
     BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MKT_CAMPAIGN_CATEGORY, MKT_ACTIVITY_NBR,
     MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD,
-    STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID
+    STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL
     from mkt_campaign order by UPDATE_DATE desc
     </select>
 
@@ -225,7 +227,7 @@
         select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
         BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MKT_CAMPAIGN_CATEGORY, MKT_ACTIVITY_NBR, MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC,
         CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE,
-        UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID
+        UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL
         from mkt_campaign
         where 1 = 1
         <if test="mktCampaignId != null and mktCampaignId != ''">
@@ -287,6 +289,9 @@
         </if>
         <if test="directoryId != null and directoryId != ''">
             AND DIRECTORY_ID = #{directoryId,jdbcType=BIGINT}
+        </if>
+        <if test="camLevel != null and camLevel != ''">
+            AND CAM_LEVEL = #{camLevel,jdbcType=BIGINT}
         </if>
         order by UPDATE_DATE desc
     </select>
