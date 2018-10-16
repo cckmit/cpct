@@ -1,8 +1,10 @@
 package cpct.dubbo.service.impl;
 
+import com.zjtelcom.cpct.dao.channel.InjectionLabelCatalogMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
 import com.zjtelcom.cpct.domain.channel.Label;
+import com.zjtelcom.cpct.domain.channel.LabelCatalog;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.util.BeanUtil;
@@ -34,10 +36,12 @@ import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 @Service
 public class SyncLabelServiceImpl  implements SyncLabelService {
     public static final Logger logger = LoggerFactory.getLogger(SyncLabelServiceImpl.class);
-    @Autowired
+    @Autowired(required = false)
     private InjectionLabelMapper labelMapper;
-    @Autowired
+    @Autowired(required = false)
     private InjectionLabelValueMapper labelValueMapper;
+    @Autowired(required = false)
+    private InjectionLabelCatalogMapper labelCatalogMapper;
 
 
     /**
@@ -118,6 +122,54 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
 
         labelMapper.insert(label);
         syncLabelValue(valueModelList,label.getInjectionLabelId());
+
+        //标签目录插入
+        LabelCatalog labelCatalog =new LabelCatalog();
+        labelCatalog.setStatusCd(STATUSCD_EFFECTIVE);
+        labelCatalog.setCreateStaff(UserUtil.loginId());
+        labelCatalog.setCreateDate(new Date());
+        if(labelCatalogMapper.findByCodeAndName(record.getLabel().getLabLevel1(), Long.valueOf(1)) == null) {
+            labelCatalog.setCatalogCode(record.getLabel().getLabLevel1());
+            labelCatalog.setCatalogName(record.getLabel().getLabLevel1Name());
+            labelCatalog.setLevelId(Long.valueOf(1));
+            labelCatalog.setParentId(Long.valueOf(0));
+            labelCatalogMapper.insert(labelCatalog);
+        }
+        if(labelCatalogMapper.findByCodeAndName(record.getLabel().getLabLevel2(), Long.valueOf(2)) == null) {
+            labelCatalog.setCatalogCode(record.getLabel().getLabLevel2());
+            labelCatalog.setCatalogName(record.getLabel().getLabLevel2Name());
+            labelCatalog.setLevelId(Long.valueOf(2));
+            labelCatalog.setParentId(labelCatalogMapper.findByCodeAndName(record.getLabel().getLabLevel1(), Long.valueOf(1)).getCatalogId());
+            labelCatalogMapper.insert(labelCatalog);
+        }
+        if(labelCatalogMapper.findByCodeAndName(record.getLabel().getLabLevel3(), Long.valueOf(3)) == null) {
+            labelCatalog.setCatalogCode(record.getLabel().getLabLevel3());
+            labelCatalog.setCatalogName(record.getLabel().getLabLevel3Name());
+            labelCatalog.setLevelId(Long.valueOf(3));
+            labelCatalog.setParentId(labelCatalogMapper.findByCodeAndName(record.getLabel().getLabLevel2(), Long.valueOf(2)).getCatalogId());
+            labelCatalogMapper.insert(labelCatalog);
+        }
+        if(labelCatalogMapper.findByCodeAndName(record.getLabel().getLabLevel4(), Long.valueOf(4)) == null) {
+            labelCatalog.setCatalogCode(record.getLabel().getLabLevel4());
+            labelCatalog.setCatalogName(record.getLabel().getLabLevel4Name());
+            labelCatalog.setLevelId(Long.valueOf(4));
+            labelCatalog.setParentId(labelCatalogMapper.findByCodeAndName(record.getLabel().getLabLevel3(), Long.valueOf(3)).getCatalogId());
+            labelCatalogMapper.insert(labelCatalog);
+        }
+        if(labelCatalogMapper.findByCodeAndName(record.getLabel().getLabLevel5(), Long.valueOf(5)) == null) {
+            labelCatalog.setCatalogCode(record.getLabel().getLabLevel5());
+            labelCatalog.setCatalogName(record.getLabel().getLabLevel5Name());
+            labelCatalog.setLevelId(Long.valueOf(5));
+            labelCatalog.setParentId(labelCatalogMapper.findByCodeAndName(record.getLabel().getLabLevel4(), Long.valueOf(4)).getCatalogId());
+            labelCatalogMapper.insert(labelCatalog);
+        }
+        if(labelCatalogMapper.findByCodeAndName(record.getLabel().getLabLevel6(), Long.valueOf(6)) == null) {
+            labelCatalog.setCatalogCode(record.getLabel().getLabLevel6());
+            labelCatalog.setCatalogName(record.getLabel().getLabLevel6Name());
+            labelCatalog.setLevelId(Long.valueOf(6));
+            labelCatalog.setParentId(labelCatalogMapper.findByCodeAndName(record.getLabel().getLabLevel5(), Long.valueOf(5)).getCatalogId());
+            labelCatalogMapper.insert(labelCatalog);
+        }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","新增成功");
         return result;

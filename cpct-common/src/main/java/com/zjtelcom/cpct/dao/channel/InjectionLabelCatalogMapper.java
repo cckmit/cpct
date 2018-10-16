@@ -20,4 +20,6 @@ public interface InjectionLabelCatalogMapper {
     List<LabelCatalog> findByParentId(@Param("parentId")Long parentId);
 
     int updateByPrimaryKey(LabelCatalog record);
+
+    LabelCatalog findByCodeAndName(@Param("catalogCode")String catalogCode, @Param("levelId")Long levelId);
 }
