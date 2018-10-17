@@ -118,6 +118,8 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         Map<String, Object> tarGrpTemplateMap = new HashMap<>();
         TarGrpTemplateDO tarGrpTemplateDO = BeanUtil.create(tarGrpTemplateDetail, new TarGrpTemplateDO());
         // 更新目标分群模板
+        tarGrpTemplateDO.setUpdateDate(new Date());
+        tarGrpTemplateDO.setUpdateStaff(UserUtil.loginId());
         tarGrpTemplateMapper.updateByPrimaryKey(tarGrpTemplateDO);
         Long tarGrpTemplateId = tarGrpTemplateDetail.getTarGrpTemplateId();
         // 新增目标分群模板条件
@@ -129,7 +131,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                     return tarGrpTemplateMap;
                 }
                 TarGrpTemplateConditionDO tarGrpTemplateConditionDO = BeanUtil.create(tarGrpTemConditionVO, new TarGrpTemplateConditionDO());
-                if (tarGrpTemConditionVO.getConditionId() != null) {
+                if (tarGrpTemConditionVO.getConditionId() != null && tarGrpTemConditionVO.getConditionId() !=0 ) {
                     tarGrpTemplateConditionDO.setUpdateStaff(UserUtil.loginId());
                     tarGrpTemplateConditionDO.setUpdateDate(new Date());
                     tarGrpTemplateConditionMapper.updateByPrimaryKey(tarGrpTemplateConditionDO);

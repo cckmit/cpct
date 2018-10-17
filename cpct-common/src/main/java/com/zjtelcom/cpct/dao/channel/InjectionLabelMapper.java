@@ -12,7 +12,8 @@ import java.util.Map;
 
 @Mapper
 @Repository
-public interface InjectionLabelMapper {
+public interface InjectionLabelMapper{
+
     int deleteByPrimaryKey(Long injectionLabelId);
 
     int insert(Label record);

@@ -60,7 +60,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>1.4.3.RELEASE</version>
                 <configuration>
-                    <mainClass>com.zjtelcom.com.zjtelcom.cpct.DubboServerApplication</mainClass>
+                    <mainClass>com.zjtelcom.cpct.LabelServerApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>

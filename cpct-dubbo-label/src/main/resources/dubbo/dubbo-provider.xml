@@ -18,15 +18,11 @@
     <dubbo:monitor protocol="registry" />
 
     <!-- 注册 -->
-    <!-- 策略cpct计算服务 -->
-    <!--<dubbo:service interface="com.zjtelcom.cpct.dubbo.service.EventApiService" ref="eventApiServiceImpl" version="1.0" >-->
-        <!--<dubbo:method name="CalculateCPC" servicecode="00.1083.CalculateCPC" timeout="10000"/>-->
-    <!--</dubbo:service>-->
+    <!-- 标签增量同步 -->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.SyncLabelService" ref="syncLabelService" version="1.0" >
+        <dubbo:method name="syncLabelInfo" servicecode="00.1083.syncLabelInfo" timeout="10000"/>
+    </dubbo:service>
 
-    <!-- 二次协同查询服务 -->
-    <!--<dubbo:service interface="com.zjtelcom.cpct.dubbo.service.MktCamChlResultApiService" ref="mktCamChlResultApiServiceImpl" version="1.0" >-->
-        <!--<dubbo:method name="selectResultList" servicecode="00.1083.selectResultList" timeout="10000"/>-->
-    <!--</dubbo:service>-->
 
 
 
