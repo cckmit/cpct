@@ -113,7 +113,7 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
         List<CatalogTreeParent> resultTree = new ArrayList<>();
 
         List<LabelCatalog> parentList = labelCatalogMapper.findByParentId(String.valueOf(0));
-        List<Label> allLabels = labelMapper.selectAll();
+        List<Label> allLabels = labelMapper.selectByScope(Long.valueOf(1));
         List<LabelCatalog> allCatalogs = labelCatalogMapper.selectAll();
         List<LabelValue> valueList = labelValueMapper.selectAll();
 
@@ -168,7 +168,22 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
             }
             parentTree.setChildren(onceTreeList);
             resultTree.add(parentTree);
+
+
         }
+        List<Label> sysLabel = labelMapper.selectByScope(Long.valueOf(0));
+        List<LabelCatalogTree> sysTreeList = new ArrayList<>();
+        CatalogTreeParent treeParent = new CatalogTreeParent();
+        for(Label la : sysLabel){
+            LabelCatalogTree tree = new LabelCatalogTree();
+            tree.setInjectionLabelId(la.getInjectionLabelId());
+            tree.setInjectionLabelName(la.getInjectionLabelName());
+            sysTreeList.add(tree);
+        }
+        treeParent.setInjectionLabelId(-1L);
+        treeParent.setInjectionLabelName("自有标签");
+        treeParent.setChildren(sysTreeList);
+        resultTree.add(treeParent);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",resultTree);
         return result;
