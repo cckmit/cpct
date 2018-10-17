@@ -1,4 +1,4 @@
-package cpct.dubbo.model;
+package com.zjtelcom.cpct.dubbo.model;
 
 public class LabModel {
     private Long labRowId;//标签id

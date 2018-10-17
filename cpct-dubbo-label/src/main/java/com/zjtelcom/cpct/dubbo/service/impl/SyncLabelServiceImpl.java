@@ -1,23 +1,23 @@
-package cpct.dubbo.service.impl;
+package com.zjtelcom.cpct.dubbo.service.impl;
 
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
-import com.zjtelcom.cpct.enums.Operator;
+import com.zjtelcom.cpct.dubbo.model.LabModel;
+import com.zjtelcom.cpct.dubbo.model.LabValueModel;
+import com.zjtelcom.cpct.dubbo.model.RecordModel;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.UserUtil;
-import cpct.dubbo.model.LabModel;
-import cpct.dubbo.model.LabValueModel;
-import cpct.dubbo.model.RecordModel;
-import cpct.dubbo.service.SyncLabelService;
+import com.zjtelcom.cpct.dubbo.service.SyncLabelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
