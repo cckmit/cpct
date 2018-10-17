@@ -14,6 +14,12 @@ public class TarGrpDetail extends TarGrp implements Serializable{
     private static final long serialVersionUID = -3616668517100761877L;
     private List<TarGrpCondition> tarGrpConditions;
 
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+
     public List<TarGrpCondition> getTarGrpConditions() {
         return tarGrpConditions;
     }
