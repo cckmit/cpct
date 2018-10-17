@@ -21,6 +21,7 @@ import com.zjtelcom.cpct.dto.filter.FilterRuleAddVO;
 import com.zjtelcom.cpct.dto.filter.FilterRuleVO;
 import com.zjtelcom.cpct.dto.user.UserList;
 import com.zjtelcom.cpct.enums.ConditionType;
+import com.zjtelcom.cpct.enums.FilterRuleType;
 import com.zjtelcom.cpct.request.filter.FilterRuleReq;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.filter.FilterRuleService;
@@ -216,6 +217,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
             if (condition!=null){
                 Label label = labelMapper.selectByPrimaryKey(Long.valueOf(condition.getLeftParam()));
                 if (label!=null){
+                    vo.setLabelId(label.getInjectionLabelId());
                     vo.setConditionName(label.getInjectionLabelName());
                     vo.setOperType(condition.getOperType());
                     vo.setRightParam(condition.getRightParam());
@@ -246,7 +248,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         if (filterRule.getFilterType().equals("3000")){
             filterRule.setLabelCode("PROM_LIST");
         }
-        if (addVO.getCondition()!=null){
+        if (addVO.getFilterType().equals(FilterRuleType.PERTURBED.getValue().toString())){
             MktVerbalCondition condition = BeanUtil.create(addVO.getCondition(),new MktVerbalCondition());
             condition.setVerbalId(0L);
             condition.setConditionType(ConditionType.FILTER_RULE.getValue().toString());

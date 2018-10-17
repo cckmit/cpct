@@ -6,6 +6,8 @@ import java.util.Date;
 public class LabelCatalog  implements Serializable {
     private Long catalogId;
 
+    private String catalogCode;
+
     private String catalogName;
 
     private Long parentId;
@@ -25,6 +27,15 @@ public class LabelCatalog  implements Serializable {
     private Date updateDate;
 
     private String remark;
+
+
+    public String getCatalogCode() {
+        return catalogCode;
+    }
+
+    public void setCatalogCode(String catalogCode) {
+        this.catalogCode = catalogCode;
+    }
 
     public Long getCatalogId() {
         return catalogId;

@@ -34,9 +34,10 @@ import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 @Service
 public class SyncLabelServiceImpl  implements SyncLabelService {
     public static final Logger logger = LoggerFactory.getLogger(SyncLabelServiceImpl.class);
-    @Autowired
+
+    @Autowired(required = false)
     private InjectionLabelMapper labelMapper;
-    @Autowired
+    @Autowired(required = false)
     private InjectionLabelValueMapper labelValueMapper;
 
 
