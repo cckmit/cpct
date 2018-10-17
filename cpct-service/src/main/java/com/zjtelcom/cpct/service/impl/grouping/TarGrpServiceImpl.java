@@ -170,12 +170,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 return maps;
             }
             if (tarGrpCondition.getAreaIdList()!=null){
-                final Long targrpId = tarGrp.getTarGrpId();
-                new Thread() {
-                    public void run() {
-                        areaList2Redis(targrpId,tarGrpCondition.getAreaIdList());
-                    }
-                }.start();
+                area2RedisThread(tarGrp, tarGrpCondition);
             }
             tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
             tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
@@ -195,6 +190,23 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         return maps;
     }
 
+    private void area2RedisThread(TarGrp tarGrp, final TarGrpCondition tarGrpCondition) {
+        final Long targrpId = tarGrp.getTarGrpId();
+        List<OrgTreeDO> sysAreaList = new ArrayList<>();
+        for (Integer id : tarGrpCondition.getAreaIdList()){
+            OrgTreeDO orgTreeDO = orgTreeMapper.selectByAreaId(id);
+            if (orgTreeDO!=null){
+                sysAreaList.add(orgTreeDO);
+            }
+        }
+        redisUtils.set("AREA_RULE_ENTITY_"+targrpId,sysAreaList);
+        new Thread() {
+            public void run() {
+                areaList2Redis(targrpId,tarGrpCondition.getAreaIdList());
+            }
+        }.start();
+    }
+
 
     public void areaList2Redis(Long targrpId,List<Integer> areaIdList){
         List<String> resultList = new ArrayList<>();
@@ -202,7 +214,6 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         for (Integer id : areaIdList){
             areaList(id,resultList,sysAreaList);
         }
-        redisUtils.set("AREA_RULE_ENTITY_"+targrpId,sysAreaList);
         redisUtils.set("AREA_RULE_"+targrpId,resultList);
     }
 
@@ -313,6 +324,9 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                     maps.put("resultCode", CODE_FAIL);
                     maps.put("resultMsg", "请选择下拉框运算类型");
                     return maps;
+                }
+                if (tarGrpCondition.getAreaIdList()!=null){
+                    area2RedisThread(tarGrp, tarGrpCondition);
                 }
                 tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
                 tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
@@ -444,12 +458,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             tarGrpConditionVO.setOperatorList(operatorList);
             grpConditionList.add(tarGrpConditionVO);
         }
-        List<SysArea> sysAreaList = (List<SysArea>)redisUtils.get("AREA_RULE_ENTITY_"+tarGrpId);
+        List<OrgTreeDO> sysAreaList = (List<OrgTreeDO>)redisUtils.get("AREA_RULE_ENTITY_"+tarGrpId);
         if (sysAreaList!=null){
             List<SysAreaVO> voList = new ArrayList<>();
-            for (SysArea area : sysAreaList){
+            for (OrgTreeDO area : sysAreaList){
                 SysAreaVO vo = BeanUtil.create(area,new SysAreaVO());
-                vo.setAreaName(area.getName());
                 voList.add(vo);
             }
             TarGrpConditionVO tarGrpConditionVO = new TarGrpConditionVO();
