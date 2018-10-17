@@ -171,6 +171,14 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             }
             if (tarGrpCondition.getAreaIdList()!=null){
                 final Long targrpId = tarGrp.getTarGrpId();
+                List<OrgTreeDO> sysAreaList = new ArrayList<>();
+                for (Integer id : tarGrpCondition.getAreaIdList()){
+                    OrgTreeDO orgTreeDO = orgTreeMapper.selectByAreaId(id);
+                    if (orgTreeDO!=null){
+                        sysAreaList.add(orgTreeDO);
+                    }
+                }
+                redisUtils.set("AREA_RULE_ENTITY_"+targrpId,sysAreaList);
                 new Thread() {
                     public void run() {
                         areaList2Redis(targrpId,tarGrpCondition.getAreaIdList());
@@ -202,7 +210,6 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         for (Integer id : areaIdList){
             areaList(id,resultList,sysAreaList);
         }
-        redisUtils.set("AREA_RULE_ENTITY_"+targrpId,sysAreaList);
         redisUtils.set("AREA_RULE_"+targrpId,resultList);
     }
 
@@ -444,12 +451,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             tarGrpConditionVO.setOperatorList(operatorList);
             grpConditionList.add(tarGrpConditionVO);
         }
-        List<SysArea> sysAreaList = (List<SysArea>)redisUtils.get("AREA_RULE_ENTITY_"+tarGrpId);
+        List<OrgTreeDO> sysAreaList = (List<OrgTreeDO>)redisUtils.get("AREA_RULE_ENTITY_"+tarGrpId);
         if (sysAreaList!=null){
             List<SysAreaVO> voList = new ArrayList<>();
-            for (SysArea area : sysAreaList){
+            for (OrgTreeDO area : sysAreaList){
                 SysAreaVO vo = BeanUtil.create(area,new SysAreaVO());
-                vo.setAreaName(area.getName());
                 voList.add(vo);
             }
             TarGrpConditionVO tarGrpConditionVO = new TarGrpConditionVO();
