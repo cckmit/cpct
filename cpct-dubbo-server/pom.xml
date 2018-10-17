@@ -83,7 +83,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>1.4.3.RELEASE</version>
                 <configuration>
-                    <mainClass>com.zjtelcom.DubboServerApplication</mainClass>
+                    <mainClass>com.zjtelcom.cpct.DubboServerApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>
