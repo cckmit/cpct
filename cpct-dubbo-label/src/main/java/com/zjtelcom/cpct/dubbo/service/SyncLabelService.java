@@ -1,7 +1,7 @@
-package cpct.dubbo.service;
+package com.zjtelcom.cpct.dubbo.service;
 
 
-import cpct.dubbo.model.RecordModel;
+import com.zjtelcom.cpct.dubbo.model.RecordModel;
 
 import java.util.Map;
 

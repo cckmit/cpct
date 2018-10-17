@@ -1,7 +1,7 @@
-package cpct.dubbo.controller;
+package com.zjtelcom.cpct.dubbo.controller;
 
 import com.alibaba.fastjson.JSON;
-import cpct.dubbo.service.SyncLabelService;
+import com.zjtelcom.cpct.dubbo.service.SyncLabelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
