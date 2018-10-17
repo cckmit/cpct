@@ -211,7 +211,7 @@ public class ChannelUtil  {
         List<String> stringList = new ArrayList<>();
         for (LabelValue labelValue : valueList){
             if (labelValue.getLabelValue()!=null){
-                stringList.add(labelValue.getLabelValue());
+                stringList.add(labelValue.getValueName());
             }
         }
         return stringList;
