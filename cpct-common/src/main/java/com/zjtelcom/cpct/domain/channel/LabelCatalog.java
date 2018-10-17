@@ -10,7 +10,7 @@ public class LabelCatalog  implements Serializable {
 
     private String catalogName;
 
-    private Long parentId;
+    private String parentId;
 
     private Long levelId;
 
@@ -52,11 +52,11 @@ public class LabelCatalog  implements Serializable {
         this.catalogName = catalogName;
     }
 
-    public Long getParentId() {
+    public String getParentId() {
         return parentId;
     }
 
-    public void setParentId(Long parentId) {
+    public void setParentId(String parentId) {
         this.parentId = parentId;
     }
 

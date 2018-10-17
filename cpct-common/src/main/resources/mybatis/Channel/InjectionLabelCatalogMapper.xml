@@ -5,7 +5,7 @@
     <id column="CATALOG_ID" jdbcType="BIGINT" property="catalogId" />
     <result column="CATALOG_CODE" jdbcType="VARCHAR" property="catalogCode" />
     <result column="CATALOG_NAME" jdbcType="VARCHAR" property="catalogName" />
-    <result column="PARENT_ID" jdbcType="BIGINT" property="parentId" />
+    <result column="PARENT_ID" jdbcType="VARCHAR" property="parentId" />
     <result column="LEVEL_ID" jdbcType="BIGINT" property="levelId" />
     <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
     <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
@@ -24,7 +24,7 @@
       LEVEL_ID, STATUS_CD, CREATE_STAFF, 
       UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
       UPDATE_DATE, REMARK)
-    values (#{catalogId,jdbcType=BIGINT},  #{catalogCode,jdbcType=VARCHAR},#{catalogName,jdbcType=VARCHAR}, #{parentId,jdbcType=BIGINT},
+    values (#{catalogId,jdbcType=BIGINT},  #{catalogCode,jdbcType=VARCHAR},#{catalogName,jdbcType=VARCHAR}, #{parentId,jdbcType=VARCHAR},
       #{levelId,jdbcType=BIGINT}, #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, 
       #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, 
       #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR})
@@ -33,7 +33,7 @@
     update injection_label_catalog
     set  CATALOG_CODE = #{catalogCode,jdbcType=VARCHAR},
     CATALOG_NAME = #{catalogName,jdbcType=VARCHAR},
-      PARENT_ID = #{parentId,jdbcType=BIGINT},
+      PARENT_ID = #{parentId,jdbcType=VARCHAR},
       LEVEL_ID = #{levelId,jdbcType=BIGINT},
       STATUS_CD = #{statusCd,jdbcType=VARCHAR},
       CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
@@ -70,11 +70,11 @@
     where PARENT_ID = #{parentId}
   </select>
 
-  <select id="findByCodeAndName" resultMap="BaseResultMap">
+  <select id="findByCodeAndLevel" resultMap="BaseResultMap">
     select CATALOG_ID,CATALOG_CODE, CATALOG_NAME, PARENT_ID, LEVEL_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
     from injection_label_catalog
-    where CATALOG_CODE = #{catalogCode} and LEVEL_ID =#{levelId}
+    where CATALOG_CODE = #{catalogCode,jdbcType=VARCHAR} and LEVEL_ID =#{levelId,jdbcType=BIGINT}
   </select>
 
 

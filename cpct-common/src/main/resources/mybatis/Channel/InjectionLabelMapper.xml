@@ -22,7 +22,7 @@
     <result column="SCOPE" jdbcType="INTEGER" property="scope" />
     <result column="TAG_ROW_ID" jdbcType="BIGINT" property="tagRowId" />
     <result column="IS_SHARED" jdbcType="INTEGER" property="isShared" />
-    <result column="CATALOG_ID" jdbcType="BIGINT" property="catalogId" />
+    <result column="CATALOG_ID" jdbcType="VARCHAR" property="catalogId" />
     <result column="CLASS_NAME" jdbcType="VARCHAR" property="className" />
     <result column="LAB_RELEVANT_FLAG" jdbcType="VARCHAR" property="labRelevantFlag" />
     <result column="LAB_MISS_RATE" jdbcType="VARCHAR" property="labMissRate" />
@@ -80,7 +80,7 @@
       #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP},
       #{remark,jdbcType=VARCHAR}, #{rightOperand,jdbcType=VARCHAR}, #{conditionType,jdbcType=VARCHAR},
       #{operator,jdbcType=VARCHAR}, #{scope,jdbcType=INTEGER}, #{tagRowId,jdbcType=BIGINT},
-      #{isShared,jdbcType=INTEGER}, #{catalogId,jdbcType=BIGINT}, #{className,jdbcType=VARCHAR},
+      #{isShared,jdbcType=INTEGER}, #{catalogId,jdbcType=VARCHAR}, #{className,jdbcType=VARCHAR},
       #{labRelevantFlag,jdbcType=VARCHAR}, #{labMissRate,jdbcType=VARCHAR}, #{labObjectCode,jdbcType=VARCHAR},
       #{labObject,jdbcType=VARCHAR}, #{labLevel1,jdbcType=VARCHAR}, #{labLevel1Name,jdbcType=VARCHAR},
       #{labLevel2,jdbcType=VARCHAR}, #{labLevel2Name,jdbcType=VARCHAR}, #{labLevel3,jdbcType=VARCHAR},
@@ -111,7 +111,7 @@
       SCOPE = #{scope,jdbcType=INTEGER},
       TAG_ROW_ID = #{tagRowId,jdbcType=BIGINT},
       IS_SHARED = #{isShared,jdbcType=INTEGER},
-      CATALOG_ID = #{catalogId,jdbcType=BIGINT},
+      CATALOG_ID = #{catalogId,jdbcType=VARCHAR},
       CLASS_NAME = #{className,jdbcType=VARCHAR},
       LAB_RELEVANT_FLAG = #{labRelevantFlag,jdbcType=VARCHAR},
       LAB_MISS_RATE = #{labMissRate,jdbcType=VARCHAR},
@@ -180,7 +180,7 @@
       #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP},
       #{remark,jdbcType=VARCHAR}, #{rightOperand,jdbcType=VARCHAR},
       #{conditionType,jdbcType=VARCHAR},#{operator,jdbcType=VARCHAR},#{scope,jdbcType=INTEGER},
-      #{tagRowId,jdbcType=BIGINT}, #{isShared,jdbcType=INTEGER},#{catalogId,jdbcType=BIGINT}, #{className,jdbcType=VARCHAR})
+      #{tagRowId,jdbcType=BIGINT}, #{isShared,jdbcType=INTEGER},#{catalogId,jdbcType=VARCHAR}, #{className,jdbcType=VARCHAR})
     </foreach>
   </insert>
   <!--< 参数查询 >-->

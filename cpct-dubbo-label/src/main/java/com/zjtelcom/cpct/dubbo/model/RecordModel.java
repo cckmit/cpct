@@ -1,4 +1,4 @@
-package cpct.dubbo.model;
+package com.zjtelcom.cpct.dubbo.model;
 
 import java.io.Serializable;
 import java.util.List;
