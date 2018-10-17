@@ -9,10 +9,19 @@ import java.util.List;
 
 public class FilterRuleVO extends FilterRule implements Serializable {
     private String filterTypeName;
+    private Long labelId;
     private String conditionName;
     private String operType;
     private String rightParam;
     private List<OfferDetail> productList;
+
+    public Long getLabelId() {
+        return labelId;
+    }
+
+    public void setLabelId(Long labelId) {
+        this.labelId = labelId;
+    }
 
     public String getConditionName() {
         return conditionName;

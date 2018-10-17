@@ -11,9 +11,11 @@ import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateMapper;
 import com.zjtelcom.cpct.domain.channel.Label;
+import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateConditionDO;
 import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
@@ -27,6 +29,7 @@ import com.zjtelcom.cpct.enums.RightParamType;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.grouping.TarGrpTemplateService;
 import com.zjtelcom.cpct.util.BeanUtil;
+import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
@@ -54,6 +57,9 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
 
     @Autowired
     private InjectionLabelMapper injectionLabelMapper;
+
+    @Autowired
+    private InjectionLabelValueMapper injectionLabelValueMapper;
 
     /**
      * 新增目标分群模板
@@ -112,6 +118,8 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         Map<String, Object> tarGrpTemplateMap = new HashMap<>();
         TarGrpTemplateDO tarGrpTemplateDO = BeanUtil.create(tarGrpTemplateDetail, new TarGrpTemplateDO());
         // 更新目标分群模板
+        tarGrpTemplateDO.setUpdateDate(new Date());
+        tarGrpTemplateDO.setUpdateStaff(UserUtil.loginId());
         tarGrpTemplateMapper.updateByPrimaryKey(tarGrpTemplateDO);
         Long tarGrpTemplateId = tarGrpTemplateDetail.getTarGrpTemplateId();
         // 新增目标分群模板条件
@@ -123,7 +131,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                     return tarGrpTemplateMap;
                 }
                 TarGrpTemplateConditionDO tarGrpTemplateConditionDO = BeanUtil.create(tarGrpTemConditionVO, new TarGrpTemplateConditionDO());
-                if (tarGrpTemConditionVO.getConditionId() != null) {
+                if (tarGrpTemConditionVO.getConditionId() != null && tarGrpTemConditionVO.getConditionId() !=0 ) {
                     tarGrpTemplateConditionDO.setUpdateStaff(UserUtil.loginId());
                     tarGrpTemplateConditionDO.setUpdateDate(new Date());
                     tarGrpTemplateConditionMapper.updateByPrimaryKey(tarGrpTemplateConditionDO);
@@ -210,11 +218,10 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         for (TarGrpTemplateConditionDO tarGrpTemplateConditionDO : tarGrpTemplateConditionDOS) {
             //TarGrpTemConditionVO tarGrpTemplateCondition = BeanUtil.create(tarGrpTemplateConditionDO, new TarGrpTemConditionVO());
             TarGrpTemConditionVO tarGrpTemConditionVO = BeanUtil.create(tarGrpTemplateConditionDO, new TarGrpTemConditionVO());
-            List<String> valueList = new ArrayList<>();
             List<OperatorDetail> operatorList = new ArrayList<>();
             //塞入左参中文名
             Label label = injectionLabelMapper.selectByPrimaryKey(Long.valueOf(tarGrpTemConditionVO.getLeftParam()));
-            if (label==null){
+            if (label == null) {
                 continue;
             }
             tarGrpTemConditionVO.setLeftParamName(label.getInjectionLabelName());
@@ -226,7 +233,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
 //                tarGrpTemConditionVO.setFitDomainName(fitDomain.getDescription());
 //            }
             //将操作符转为中文
-            if (tarGrpTemConditionVO.getOperType()!=null && !tarGrpTemConditionVO.getOperType().equals("")){
+            if (tarGrpTemConditionVO.getOperType() != null && !tarGrpTemConditionVO.getOperType().equals("")) {
                 Operator op = Operator.getOperator(Integer.parseInt(tarGrpTemConditionVO.getOperType()));
                 tarGrpTemConditionVO.setOperTypeName(op.getDescription());
             }
@@ -250,17 +257,8 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                     operatorList.add(operatorDetail);
                 }
             }
-            String rightOperand = label.getRightOperand();
-            String[] rightOperands = rightOperand.split(",");
-            if (rightOperands.length > 1) {
-                for (int i = 0; i < rightOperands.length; i++) {
-                    valueList.add(rightOperands[i]);
-                }
-            } else {
-                if (rightOperands.length == 1) {
-                    valueList.add(rightOperands[0]);
-                }
-            }
+            List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(label.getInjectionLabelId());
+            List<String> valueList = ChannelUtil.valueList2StList(labelValues);
             tarGrpTemConditionVO.setValueList(valueList);
             tarGrpTemConditionVO.setConditionType(label.getConditionType());
             tarGrpTemConditionVO.setOperatorList(operatorList);

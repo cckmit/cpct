@@ -108,7 +108,6 @@
             <groupId>com.sun.jna</groupId>
             <artifactId>jna</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.zjhcsoft.eagle</groupId>
             <artifactId>dubbo-eagle-service</artifactId>

@@ -180,14 +180,17 @@ public class SysAreaServiceImpl implements SysAreaService {
     // 递归获取所有父节点城市
     private List<SysArea> getParentArea(Integer parentArea, List<SysArea> sysAreaListAll) {
         SysArea sysArea = (SysArea) redisUtils.get("CITY_" + parentArea.toString());
-        if (sysArea.getAreaLevel().equals(AreaLeveL.PROVINCE.getAreaLevel())) {
-            return sysAreaListAll;
-        } else {
-            if (!isContains(sysAreaListAll, sysArea)) {
-                sysAreaListAll.add(sysArea);
+        if(sysArea !=null){
+            if (sysArea.getAreaLevel().equals(AreaLeveL.PROVINCE.getAreaLevel())) {
+                return sysAreaListAll;
+            } else {
+                if (!isContains(sysAreaListAll, sysArea)) {
+                    sysAreaListAll.add(sysArea);
+                }
+                return getParentArea(sysArea.getParentArea(), sysAreaListAll);
             }
-            return getParentArea(sysArea.getParentArea(), sysAreaListAll);
         }
+        return null;
     }
 
 
@@ -237,6 +240,9 @@ public class SysAreaServiceImpl implements SysAreaService {
      */
     private boolean isContains(List<SysArea> sysAreaListAll, SysArea sysArea) {
         boolean isContains = false;
+        if (sysAreaListAll == null || sysAreaListAll.size() == 0 || sysArea == null) {
+            return false;
+        }
         for (int i = 0; i < sysAreaListAll.size(); i++) {
             if (sysAreaListAll.get(i).getAreaId().equals(sysArea.getAreaId())) {
                 return true;
