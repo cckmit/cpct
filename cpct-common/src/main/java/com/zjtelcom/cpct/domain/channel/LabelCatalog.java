@@ -10,7 +10,7 @@ public class LabelCatalog  implements Serializable {
 
     private String catalogName;
 
-    private Long parentId;
+    private String parentId;
 
     private Long levelId;
 
@@ -28,6 +28,13 @@ public class LabelCatalog  implements Serializable {
 
     private String remark;
 
+    public Long getCatalogId() {
+        return catalogId;
+    }
+
+    public void setCatalogId(Long catalogId) {
+        this.catalogId = catalogId;
+    }
 
     public String getCatalogCode() {
         return catalogCode;
@@ -35,14 +42,6 @@ public class LabelCatalog  implements Serializable {
 
     public void setCatalogCode(String catalogCode) {
         this.catalogCode = catalogCode;
-    }
-
-    public Long getCatalogId() {
-        return catalogId;
-    }
-
-    public void setCatalogId(Long catalogId) {
-        this.catalogId = catalogId;
     }
 
     public String getCatalogName() {
@@ -53,11 +52,11 @@ public class LabelCatalog  implements Serializable {
         this.catalogName = catalogName;
     }
 
-    public Long getParentId() {
+    public String getParentId() {
         return parentId;
     }
 
-    public void setParentId(Long parentId) {
+    public void setParentId(String parentId) {
         this.parentId = parentId;
     }
 

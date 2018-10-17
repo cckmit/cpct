@@ -1,23 +1,25 @@
 package com.zjtelcom.cpct.dubbo.service.impl;
 
+import com.zjtelcom.cpct.dao.channel.InjectionLabelCatalogMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
 import com.zjtelcom.cpct.domain.channel.Label;
+import com.zjtelcom.cpct.domain.channel.LabelCatalog;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
+import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.dubbo.model.LabModel;
 import com.zjtelcom.cpct.dubbo.model.LabValueModel;
 import com.zjtelcom.cpct.dubbo.model.RecordModel;
+import com.zjtelcom.cpct.dubbo.service.SyncLabelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.UserUtil;
-import com.zjtelcom.cpct.dubbo.service.SyncLabelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
@@ -34,12 +36,12 @@ import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 @Service
 public class SyncLabelServiceImpl  implements SyncLabelService {
     public static final Logger logger = LoggerFactory.getLogger(SyncLabelServiceImpl.class);
-
     @Autowired(required = false)
     private InjectionLabelMapper labelMapper;
     @Autowired(required = false)
     private InjectionLabelValueMapper labelValueMapper;
-
+    @Autowired(required = false)
+    private InjectionLabelCatalogMapper labelCatalogMapper;
 
     /**
      * 标签同步对外接口
@@ -93,7 +95,11 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         //label.setInjectionLabelDesc();
         label.setLabTagCode(labModel.getLabCode());//标签编码
 
-        label.setConditionType(labModel.getLabType());//标签类型(文本、数值、枚举) 4输入  2多选
+        if (labModel.getLabType() == String.valueOf(1) || labModel.getLabType() == String.valueOf(2)) {
+            label.setConditionType(String.valueOf(4));//标签类型(文本、数值、枚举) 4输入  2多选
+        }else if(labModel.getLabType() == String.valueOf(3)) {
+            label.setConditionType(String.valueOf(2));
+        }
         if(Long.valueOf(labModel.getLabType()) == 4){
             label.setOperator("2000,3000,1000,4000,6000,5000,7000,7200");
         }else if(Long.valueOf(labModel.getLabType()) == 2){
@@ -101,7 +107,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         }
         label.setScope(1);
         label.setIsShared(0);
-        //label.setCatalogId();
+        label.setCatalogId(labModel.getLabObjectCode() + labModel.getLabLevel1() + labModel.getLabLevel2() + labModel.getLabLevel3());
 
         //todo 暂无标签类型
         label.setLabelType("1000");
@@ -119,6 +125,48 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
 
         labelMapper.insert(label);
         syncLabelValue(valueModelList,label.getInjectionLabelId());
+
+//        //标签目录插入
+//        LabelCatalog labelCatalog =new LabelCatalog();
+//        labelCatalog.setStatusCd(STATUSCD_EFFECTIVE);
+//        labelCatalog.setCreateStaff(UserUtil.loginId());
+//        labelCatalog.setCreateDate(new Date());
+//        if(labelCatalogMapper.findByCodeAndLevel(record.getLabel().getLabObjectCode(), Long.valueOf(1)) == null) {
+//            labelCatalog.setCatalogCode(record.getLabel().getLabObjectCode());
+//            labelCatalog.setCatalogName(record.getLabel().getLabObject());
+//            labelCatalog.setLevelId(Long.valueOf(1));
+//            labelCatalog.setParentId("0");
+//            labelCatalogMapper.insert(labelCatalog);
+//        }
+//        if(labelCatalogMapper.findByCodeAndLevel((record.getLabel().getLabObjectCode() + record.getLabel().getLabLevel1()), Long.valueOf(2)) == null) {
+//            labelCatalog.setCatalogCode(record.getLabel().getLabObjectCode() + record.getLabel().getLabLevel1());
+//            labelCatalog.setCatalogName(record.getLabel().getLabLevel1Name());
+//            labelCatalog.setLevelId(Long.valueOf(2));
+//            labelCatalog.setParentId(record.getLabel().getLabObjectCode());
+//            labelCatalogMapper.insert(labelCatalog);
+//        }
+//        if(labelCatalogMapper.findByCodeAndLevel((record.getLabel().getLabObjectCode() + record.getLabel().getLabLevel1() + record.getLabel().getLabLevel2()), Long.valueOf(3)) == null) {
+//            labelCatalog.setCatalogCode(record.getLabel().getLabObjectCode() + record.getLabel().getLabLevel1() + record.getLabel().getLabLevel2());
+//            labelCatalog.setCatalogName(record.getLabel().getLabLevel2Name());
+//            labelCatalog.setLevelId(Long.valueOf(3));
+//            labelCatalog.setParentId(record.getLabel().getLabObjectCode() + record.getLabel().getLabLevel1());
+//            labelCatalogMapper.insert(labelCatalog);
+//        }
+//        if(labelCatalogMapper.findByCodeAndLevel((record.getLabel().getLabObjectCode() + record.getLabel().getLabLevel1() + record.getLabel().getLabLevel2() + record.getLabel().getLabLevel3()), Long.valueOf(4)) == null) {
+//            labelCatalog.setCatalogCode(record.getLabel().getLabObjectCode() + record.getLabel().getLabLevel1() + record.getLabel().getLabLevel2() + record.getLabel().getLabLevel3());
+//            labelCatalog.setCatalogName(record.getLabel().getLabLevel3Name());
+//            labelCatalog.setLevelId(Long.valueOf(4));
+//            labelCatalog.setParentId(record.getLabel().getLabObjectCode() + record.getLabel().getLabLevel1() + record.getLabel().getLabLevel2());
+//            labelCatalogMapper.insert(labelCatalog);
+//        }
+//        if(labelCatalogMapper.findByCodeAndLevel((record.getLabel().getLabObjectCode() + record.getLabel().getLabLevel1() + record.getLabel().getLabLevel2() + record.getLabel().getLabLevel3() + record.getLabel().getLabLevel4()), Long.valueOf(5)) == null) {
+//            labelCatalog.setCatalogCode(record.getLabel().getLabObjectCode() + record.getLabel().getLabLevel1() + record.getLabel().getLabLevel2() + record.getLabel().getLabLevel3() + record.getLabel().getLabLevel4());
+//            labelCatalog.setCatalogName(record.getLabel().getLabLevel4Name());
+//            labelCatalog.setLevelId(Long.valueOf(5));
+//            labelCatalog.setParentId(record.getLabel().getLabObjectCode() + record.getLabel().getLabLevel1() + record.getLabel().getLabLevel2() + record.getLabel().getLabLevel3());
+//            labelCatalogMapper.insert(labelCatalog);
+//        }
+
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","新增成功");
         return result;
@@ -191,5 +239,198 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         result.put("resultMsg","标签值同步成功");
         result.put("valueString",ChannelUtil.StringList2String(stringList));
         return result;
+    }
+
+    /**
+     * 初始化
+     * @return
+     */
+    @Override
+    public Map<String,Object> initialization() {
+        Map<String, Object> result = new HashMap<>();
+
+        //标签数据初始化
+        List<Label> labels = labelMapper.selectAll();
+        for (Label label : labels) {
+            labelMapper.deleteByPrimaryKey(label.getInjectionLabelId());
+            Label labelModel = BeanUtil.create(label, new Label());
+
+            //label.setInjectionLabelDesc();
+
+            if (label.getConditionType() == String.valueOf(1) || label.getConditionType() == String.valueOf(2)) {
+                label.setConditionType(String.valueOf(4));//标签类型(文本、数值、枚举) 4输入  2多选
+            }else if(label.getConditionType() == String.valueOf(3)) {
+                label.setConditionType(String.valueOf(2));
+            }
+            if(Long.valueOf(label.getConditionType()) == 4){
+                label.setOperator("2000,3000,1000,4000,6000,5000,7000,7200");
+            }else if(Long.valueOf(label.getConditionType()) == 2){
+                label.setOperator("7000");
+            }
+            labelModel.setScope(1);
+            labelModel.setIsShared(0);
+            labelModel.setCatalogId(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3());
+
+//            //todo 暂无值类型
+//            if (record.getLabelValueList()!=null && !record.getLabelValueList().isEmpty()){
+//                labelModel.setLabelValueType("2000");
+//            }else {
+//                labelModel.setLabelValueType("1000");
+//            }
+            //label.setLabelDataType(ChannelUtil.getDataType(tagModel.getSourceTableColumnType()));
+
+            labelModel.setStatusCd(STATUSCD_EFFECTIVE);
+            labelModel.setCreateStaff(UserUtil.loginId());
+            labelModel.setCreateDate(new Date());
+
+            labelMapper.insert(labelModel);
+        }
+
+//        //标签目录初始化
+//        List<Label> labels = labelMapper.selectAll();
+//        for (Label label : labels){
+//            //标签目录插入
+//            LabelCatalog labelCatalog =new LabelCatalog();
+//            labelCatalog.setStatusCd(STATUSCD_EFFECTIVE);
+//            labelCatalog.setCreateStaff(UserUtil.loginId());
+//            labelCatalog.setCreateDate(new Date());
+//            if(labelCatalogMapper.findByCodeAndLevel(label.getLabObjectCode(), Long.valueOf(1)) == null) {
+//                labelCatalog.setCatalogCode(label.getLabObjectCode());
+//                labelCatalog.setCatalogName(label.getLabObject());
+//                labelCatalog.setLevelId(Long.valueOf(1));
+//                labelCatalog.setParentId("0");
+//                labelCatalogMapper.insert(labelCatalog);
+//            }
+//            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1()), Long.valueOf(2)) == null) {
+//                labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getLabLevel1());
+//                labelCatalog.setCatalogName(label.getLabLevel1Name());
+//                labelCatalog.setLevelId(Long.valueOf(2));
+//                labelCatalog.setParentId(label.getLabObjectCode());
+//                labelCatalogMapper.insert(labelCatalog);
+//            }
+//            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2()), Long.valueOf(3)) == null) {
+//                labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2());
+//                labelCatalog.setCatalogName(label.getLabLevel2Name());
+//                labelCatalog.setLevelId(Long.valueOf(3));
+//                labelCatalog.setParentId(label.getLabObjectCode() + label.getLabLevel1());
+//                labelCatalogMapper.insert(labelCatalog);
+//            }
+//            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3()), Long.valueOf(4)) == null) {
+//                labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3());
+//                labelCatalog.setCatalogName(label.getLabLevel3Name());
+//                labelCatalog.setLevelId(Long.valueOf(4));
+//                labelCatalog.setParentId(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2());
+//                labelCatalogMapper.insert(labelCatalog);
+//            }
+//            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3() + label.getLabLevel4()), Long.valueOf(5)) == null) {
+//                labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3() + label.getLabLevel4());
+//                labelCatalog.setCatalogName(label.getLabLevel4Name());
+//                labelCatalog.setLevelId(Long.valueOf(5));
+//                labelCatalog.setParentId(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3());
+//                labelCatalogMapper.insert(labelCatalog);
+//            }
+//
+//        }
+
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","新增成功");
+        return result;
+    }
+
+    /**
+     * 标签树
+     * @return
+     */
+    @Override
+    public Map<String, Object> listLabelCatalog() {
+//        List<Label> resuList = new ArrayList<>();
+//        List<Label> labels = labelMapper.selectAllByCondition();
+//        List<LabelValue> vas = labelValueMapper.selectAll();
+//        List<Long> idlist = new ArrayList<>();
+//        for (LabelValue value : vas){
+//            idlist.add(value.getInjectionLabelId());
+//        }
+//        for (Label label : labels){
+//            if (!idlist.contains(label.getInjectionLabelId())){
+//                label.setConditionType("4");
+//                label.setOperator("2000,3000,1000,4000,6000,5000,7000,7200");
+//                labelMapper.updateByPrimaryKey(label);
+//            }
+//        }
+
+        Map<String,Object> result = new HashMap<>();
+        List<CatalogTreeParent> resultTree = new ArrayList<>();
+
+        List<LabelCatalog> parentList = labelCatalogMapper.findByParentId(String.valueOf(0));
+        List<Label> allLabels = labelMapper.selectAll();
+        List<LabelCatalog> allCatalogs = labelCatalogMapper.selectAll();
+        List<LabelValue> valueList = labelValueMapper.selectAll();
+
+        for (LabelCatalog parent : parentList) {
+            CatalogTreeParent parentTree = new CatalogTreeParent();
+            parentTree.setInjectionLabelId(parent.getCatalogId());
+            parentTree.setInjectionLabelName(parent.getCatalogName());
+
+            List<LabelCatalogTree> onceTreeList = new ArrayList<>();
+            List<LabelCatalog> firstList = labelCatalogMapper.findByParentId(parent.getCatalogCode());
+            for (LabelCatalog first : firstList) {
+                LabelCatalogTree firstTree = new LabelCatalogTree();
+                firstTree.setInjectionLabelId(first.getCatalogId());
+                firstTree.setInjectionLabelName(first.getCatalogName());
+
+                List<CatalogTreeTwo> twiceTreeList = new ArrayList<>();
+                List<LabelCatalog> twiceList = getCatalogListByParentId(allCatalogs, first.getCatalogCode());
+                for (LabelCatalog twice : twiceList) {
+                    CatalogTreeTwo twiceTree = new CatalogTreeTwo();
+                    twiceTree.setInjectionLabelId(twice.getCatalogId());
+                    twiceTree.setInjectionLabelName(twice.getCatalogName());
+
+                    List<CatalogTreeThree> thirdTreeList = new ArrayList<>();
+                    List<LabelCatalog> thirdList = getCatalogListByParentId(allCatalogs, twice.getCatalogCode());
+                    for (LabelCatalog third : thirdList) {
+                        CatalogTreeThree thirdTree = new CatalogTreeThree();
+                        thirdTree.setInjectionLabelId(third.getCatalogId());
+                        thirdTree.setInjectionLabelName(third.getCatalogName());
+
+                        List<LabelVO> labelVOList = new ArrayList<>();
+                        for (Label label : allLabels) {
+                            if (label.getCatalogId() == null || !label.getCatalogId().equals(third.getCatalogCode())) {
+                                continue;
+                            }
+                            List<LabelValue> values = new ArrayList<>();
+                            for (LabelValue value : valueList) {
+                                if (value.getInjectionLabelId() != null && value.getInjectionLabelId().equals(label.getInjectionLabelId())) {
+                                    values.add(value);
+                                }
+                            }
+                            LabelVO vo = ChannelUtil.map2LabelVO(label, values);
+                            labelVOList.add(vo);
+                        }
+                        thirdTree.setChildren(labelVOList);
+                        thirdTreeList.add(thirdTree);
+                    }
+                    twiceTree.setChildren(thirdTreeList);
+                    twiceTreeList.add(twiceTree);
+                }
+                firstTree.setChildren(twiceTreeList);
+                onceTreeList.add(firstTree);
+            }
+            parentTree.setChildren(onceTreeList);
+            resultTree.add(parentTree);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",resultTree);
+        return result;
+    }
+
+    private List<LabelCatalog> getCatalogListByParentId(List<LabelCatalog> allList,String catalogCode){
+        List<LabelCatalog> resultList = new ArrayList<>();
+        for (LabelCatalog catalog : allList){
+            if (!catalog.getParentId().equals(catalogCode)){
+                continue;
+            }
+            resultList.add(catalog);
+        }
+        return resultList;
     }
 }
