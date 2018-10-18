@@ -190,6 +190,12 @@
         where sum_area_id = #{sumAreaId,jdbcType=INTEGER}
     </select>
 
+    <select id="selectByAreaId" parameterType="java.lang.Integer" resultMap="ReturnResultMap">
+        select area_id, area_name, sum_area_id,area_type_id
+        from fpc_org_tree
+        where area_id = #{areaId,jdbcType=INTEGER}
+    </select>
+
     <!--查询首级菜单-->
     <select id="selectMenu" parameterType="java.lang.Integer" resultMap="ReturnResultMap">
         select area_id, area_name, sum_area_id,area_type_id

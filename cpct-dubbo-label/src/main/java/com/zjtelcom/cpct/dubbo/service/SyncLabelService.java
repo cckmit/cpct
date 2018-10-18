@@ -10,4 +10,8 @@ public interface SyncLabelService {
 
     Map<String,Object> syncLabelInfo(RecordModel record);
 
+    Map<String, Object> listLabelCatalog();
+
+    Map<String,Object> initialization();
+
 }

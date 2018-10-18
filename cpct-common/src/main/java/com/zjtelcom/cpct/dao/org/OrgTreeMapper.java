@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.dao.org;
 
 import com.zjtelcom.cpct.domain.org.OrgTree;
 import com.zjtelcom.cpct.domain.org.OrgTreeDO;
+import org.apache.ibatis.annotations.Param;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,8 @@ public interface OrgTreeMapper {
     int deleteAll();
 
     List<OrgTreeDO> selectBySumAreaId(Integer sumAreaId);
+
+    OrgTreeDO selectByAreaId(@Param("areaId")Integer areaId);
 
     List<OrgTreeDO> selectMenu();
 
