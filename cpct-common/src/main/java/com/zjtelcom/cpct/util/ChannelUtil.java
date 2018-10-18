@@ -229,6 +229,16 @@ public class ChannelUtil  {
         return list;
     }
 
+    public static List<String> StringToList4LabelValue(String var1) {
+        String[] array = var1.split("/");
+        List<String> list = new ArrayList<String>();
+        for (String str : array)
+        {
+            list.add(str);
+        }
+        return list;
+    }
+
     public static Object getCellValue(Cell cell) {
         Object cellValue;
         switch (cell.getCellTypeEnum()){

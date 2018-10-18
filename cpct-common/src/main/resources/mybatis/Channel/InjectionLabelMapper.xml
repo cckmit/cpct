@@ -56,7 +56,7 @@
     delete from injection_label
     where INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.Label">
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.Label" useGeneratedKeys="true" keyProperty="injectionLabelId">
     insert into injection_label (INJECTION_LABEL_ID, INJECTION_LABEL_CODE,
       INJECTION_LABEL_NAME, INJECTION_LABEL_DESC,
       LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE,
