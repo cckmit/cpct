@@ -381,6 +381,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         MktStrategyConfRuleDO confRule = ruleMapper.selectByPrimaryKey(ruleId);
         if (confRule != null) {
             param.setRuleName(confRule.getMktStrategyConfRuleName());
+            param.setTarGrpId(confRule.getTarGrpId());
         }
         if (!isSample){
             // 获取规则信息
