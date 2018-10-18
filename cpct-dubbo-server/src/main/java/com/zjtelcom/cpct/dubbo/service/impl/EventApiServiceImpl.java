@@ -479,6 +479,8 @@ public class EventApiServiceImpl implements EventApiService {
                 esJson.put("msg", "活动状态未发布");
                 esService.save(esJson, IndexList.ACTIVITY_MODULE);
 
+                System.out.println("活动状态未发布");
+
                 return Collections.EMPTY_MAP;
             }
 
@@ -667,44 +669,44 @@ public class EventApiServiceImpl implements EventApiService {
                 return Collections.EMPTY_MAP;
             }
             //下发地市校验
-//            if (mktStrategyConf.getAreaId() != null && !"".equals(mktStrategyConf.getAreaId())) {
-//                String[] strArrayCity = mktStrategyConf.getAreaId().split("/");
-//                boolean areaCheck = true;
-//                for (String str : strArrayCity) {
-//                    String lanId = params.get("lanId");
-//                    if (lanId != null) {
-//                        if (lanId.equals(str)) {
-//                            areaCheck = false;
-//                            break;
-//                        }
-//                    } else {
-//                        //下发地址获取异常 lanId
-//                        strategyMap.put("msg", "下发地址获取异常");
-//
-//                        esJson.put("hit", "false");
-//                        esJson.put("msg", "下发地址获取异常");
-//                        esService.save(esJson, IndexList.STRATEGY_MODULE);
-//                        return Collections.EMPTY_MAP;
-//                    }
-//                }
-//
-//                if (areaCheck) {
-//                    strategyMap.put("msg", "下发地址不符");
-//
-//                    esJson.put("hit", "false");
-//                    esJson.put("msg", "下发地址不符");
-//                    esService.save(esJson, IndexList.STRATEGY_MODULE);
-//                    return Collections.EMPTY_MAP;
-//                }
-//            } else {
-//                //下发地市数据异常
-//                strategyMap.put("msg", "下发地市数据异常");
-//
-//                esJson.put("hit", "false");
-//                esJson.put("msg", "下发地市数据异常");
-//                esService.save(esJson, IndexList.STRATEGY_MODULE);
-//                return Collections.EMPTY_MAP;
-//            }
+            if (mktStrategyConf.getAreaId() != null && !"".equals(mktStrategyConf.getAreaId())) {
+                String[] strArrayCity = mktStrategyConf.getAreaId().split("/");
+                boolean areaCheck = true;
+                for (String str : strArrayCity) {
+                    String lanId = params.get("lanId");
+                    if (lanId != null) {
+                        if (lanId.equals(str)) {
+                            areaCheck = false;
+                            break;
+                        }
+                    } else {
+                        //下发地址获取异常 lanId
+                        strategyMap.put("msg", "下发地址获取异常");
+
+                        esJson.put("hit", "false");
+                        esJson.put("msg", "下发地址获取异常");
+                        esService.save(esJson, IndexList.STRATEGY_MODULE);
+                        return Collections.EMPTY_MAP;
+                    }
+                }
+
+                if (areaCheck) {
+                    strategyMap.put("msg", "下发地址不符");
+
+                    esJson.put("hit", "false");
+                    esJson.put("msg", "下发地址不符");
+                    esService.save(esJson, IndexList.STRATEGY_MODULE);
+                    return Collections.EMPTY_MAP;
+                }
+            } else {
+                //下发地市数据异常
+                strategyMap.put("msg", "下发地市数据异常");
+
+                esJson.put("hit", "false");
+                esJson.put("msg", "下发地市数据异常");
+                esService.save(esJson, IndexList.STRATEGY_MODULE);
+                return Collections.EMPTY_MAP;
+            }
             //判断下发渠道
             if (mktStrategyConf.getChannelsId() != null && !"".equals(mktStrategyConf.getChannelsId())) {
                 String[] strArrayChannelsId = mktStrategyConf.getChannelsId().split("/");
@@ -943,28 +945,28 @@ public class EventApiServiceImpl implements EventApiService {
 
             System.out.println("param " + param.toString());
             //验证post回调结果
-//            httpResultStr = HttpUtil.post(url, paramStr);
+            httpResultStr = HttpUtil.post(url, param.toString());
 
             //更换为dubbo因子查询-----------------------------------------------------
-            Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
+//            Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
 
-//            if (httpResultStr == null || "".equals(httpResultStr)) {
-//
-//                System.out.println("查询标签出错");
-//
-//                esJson.put("hit", "false");
-//                esJson.put("msg", "标签实例查询出错");
-//                esService.save(esJson, IndexList.STRATEGY_MODULE);
-//                return Collections.EMPTY_MAP;
-//            }
+            if (httpResultStr == null || "".equals(httpResultStr)) {
+
+                System.out.println("查询标签出错");
+
+                esJson.put("hit", "false");
+                esJson.put("msg", "标签实例查询出错");
+                esService.save(esJson, IndexList.STRATEGY_MODULE);
+                return Collections.EMPTY_MAP;
+            }
             JSONObject jsonobj = new JSONObject();
             //解析返回结果
-//            JSONObject httpResult = JSONObject.parseObject(httpResultStr);
-//            if (httpResult.getInteger("result_code") == 0) {
-//                JSONObject body = httpResult.getJSONObject("msgbody");
+            JSONObject httpResult = JSONObject.parseObject(httpResultStr);
+            if (httpResult.getInteger("result_code") == 0) {
+                JSONObject body = httpResult.getJSONObject("msgbody");
 
-            if ("0".equals((String)dubboResult.get("result_code"))) {
-                JSONObject body = JSON.parseObject((String)dubboResult.get("msgbody"));
+//            if ("0".equals((String)dubboResult.get("result_code"))) {
+//                JSONObject body = JSON.parseObject((String)dubboResult.get("msgbody"));
                 //ES log 标签实例
                 jsonobj.put("reqId", reqId);
                 jsonobj.put("eventId", params.get("eventCode"));
@@ -1476,17 +1478,17 @@ public class EventApiServiceImpl implements EventApiService {
         String paramStr = param.toString();
         System.out.println("param " + param.toString());
         //验证post回调结果
-//        httpResultStr = HttpUtil.post(url, paramStr);
+        httpResultStr = HttpUtil.post(url, paramStr);
 
-        Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
+//        Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
 
-        if ("0".equals((String)dubboResult.get("result_code"))) {
-            JSONObject body = JSON.parseObject((String)dubboResult.get("msgbody"));
+//        if ("0".equals((String)dubboResult.get("result_code"))) {
+//            JSONObject body = JSON.parseObject((String)dubboResult.get("msgbody"));
 
-//        //解析返回结果
-//        JSONObject httpResult = JSONObject.parseObject(httpResultStr);
-//        if (httpResult.getInteger("result_code") == 0) {
-//            JSONObject body = httpResult.getJSONObject("msgbody");
+        //解析返回结果
+        JSONObject httpResult = JSONObject.parseObject(httpResultStr);
+        if (httpResult.getInteger("result_code") == 0) {
+            JSONObject body = httpResult.getJSONObject("msgbody");
             return body;
         } else {
 //            System.out.println("查询标签失败:" + httpResult.getString("result_msg"));
