@@ -14,10 +14,18 @@ public class LabelVO implements Serializable {
     private String fitDomain;//适用域
     private String conditionType;//单选多选框
     private List<OperatorDetail> operatorList;//运算符
-    private List<String> valueList;
+    private List<LabelValueVO> valueList;
     private String scope;
     private Integer isShared;
 
+
+    public List<LabelValueVO> getValueList() {
+        return valueList;
+    }
+
+    public void setValueList(List<LabelValueVO> valueList) {
+        this.valueList = valueList;
+    }
 
     public Integer getIsShared() {
         return isShared;
@@ -33,14 +41,6 @@ public class LabelVO implements Serializable {
 
     public void setScope(String scope) {
         this.scope = scope;
-    }
-
-    public List<String> getValueList() {
-        return valueList;
-    }
-
-    public void setValueList(List<String> valueList) {
-        this.valueList = valueList;
     }
 
     public List<OperatorDetail> getOperatorList() {
