@@ -58,7 +58,7 @@ public class EventApiController extends BaseController {
     public String SecondChannelSynergy(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> params) {
         Map result = new HashMap();
         try {
-            result = eventApiService.SecondChannelSynergy(params);
+            result = eventApiService.secondChannelSynergy(params);
         } catch (Exception e) {
             e.printStackTrace();
             return initFailRespInfo(e.getMessage(),"");
