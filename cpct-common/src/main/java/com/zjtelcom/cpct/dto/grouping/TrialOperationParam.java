@@ -26,6 +26,11 @@ public class TrialOperationParam implements Serializable {
     private Long batchNum;
 
     /**
+     * 目标分群id
+     */
+    private Long tarGrpId;
+
+    /**
      * 销售品集合
      */
     private List<MktProductRule> mktProductRuleList;
@@ -35,6 +40,14 @@ public class TrialOperationParam implements Serializable {
      */
     private List<MktCamChlConfDetail> mktCamChlConfDetailList;
 
+
+    public Long getTarGrpId() {
+        return tarGrpId;
+    }
+
+    public void setTarGrpId(Long tarGrpId) {
+        this.tarGrpId = tarGrpId;
+    }
 
     public String getRuleName() {
         return ruleName;
