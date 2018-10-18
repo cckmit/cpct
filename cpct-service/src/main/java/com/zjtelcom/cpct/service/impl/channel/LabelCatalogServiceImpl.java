@@ -168,16 +168,19 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
             }
             parentTree.setChildren(onceTreeList);
             resultTree.add(parentTree);
-
-
         }
-        List<Label> sysLabel = labelMapper.selectByScope(Long.valueOf(0));
+        List<Label> sysLabel = labelMapper.selectByScope(0L);
         List<LabelCatalogTree> sysTreeList = new ArrayList<>();
         CatalogTreeParent treeParent = new CatalogTreeParent();
         for(Label la : sysLabel){
-            LabelCatalogTree tree = new LabelCatalogTree();
-            tree.setInjectionLabelId(la.getInjectionLabelId());
-            tree.setInjectionLabelName(la.getInjectionLabelName());
+            List<LabelValue> values = new ArrayList<>();
+            for (LabelValue value : valueList) {
+                if (value.getInjectionLabelId() != null && value.getInjectionLabelId().equals(la.getInjectionLabelId())) {
+                    values.add(value);
+                }
+            }
+            LabelVO vo = ChannelUtil.map2LabelVO(la, values);
+            LabelCatalogTree tree = BeanUtil.create(vo,new LabelCatalogTree());
             sysTreeList.add(tree);
         }
         treeParent.setInjectionLabelId(-1L);
