@@ -1,7 +1,8 @@
 package com.zjtelcom.cpct.dubbo.controller;
 
 
-//import com.zjpii.biz.serv.YzServ;
+import com.alibaba.fastjson.JSON;
+import com.zjpii.biz.serv.YzServ;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,8 +23,8 @@ public class EventApiTestController {
     @Autowired(required = false)
     private EventApiService eventApiService;
 
-//    @Autowired(required = false)
-//    private YzServ yzServ;
+    @Autowired(required = false)
+    private YzServ yzServ;
 
     @RequestMapping("/cpc")
     @CrossOrigin
@@ -49,7 +50,7 @@ public class EventApiTestController {
             e.printStackTrace();
             return e.getMessage();
         }
-        return result.toString();
+        return JSON.toJSONString(result);
     }
 
 
@@ -58,7 +59,7 @@ public class EventApiTestController {
     public String label(HttpServletRequest request, HttpServletResponse response, @RequestBody String params) {
         Map result = new HashMap();
         try {
-//            result = yzServ.queryYz(params);
+            result = yzServ.queryYz(params);
         } catch (Exception e) {
             e.printStackTrace();
             return e.getMessage();

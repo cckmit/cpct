@@ -669,44 +669,44 @@ public class EventApiServiceImpl implements EventApiService {
                 return Collections.EMPTY_MAP;
             }
             //下发地市校验
-            if (mktStrategyConf.getAreaId() != null && !"".equals(mktStrategyConf.getAreaId())) {
-                String[] strArrayCity = mktStrategyConf.getAreaId().split("/");
-                boolean areaCheck = true;
-                for (String str : strArrayCity) {
-                    String lanId = params.get("lanId");
-                    if (lanId != null) {
-                        if (lanId.equals(str)) {
-                            areaCheck = false;
-                            break;
-                        }
-                    } else {
-                        //下发地址获取异常 lanId
-                        strategyMap.put("msg", "下发地址获取异常");
-
-                        esJson.put("hit", "false");
-                        esJson.put("msg", "下发地址获取异常");
-                        esService.save(esJson, IndexList.STRATEGY_MODULE);
-                        return Collections.EMPTY_MAP;
-                    }
-                }
-
-                if (areaCheck) {
-                    strategyMap.put("msg", "下发地址不符");
-
-                    esJson.put("hit", "false");
-                    esJson.put("msg", "下发地址不符");
-                    esService.save(esJson, IndexList.STRATEGY_MODULE);
-                    return Collections.EMPTY_MAP;
-                }
-            } else {
-                //下发地市数据异常
-                strategyMap.put("msg", "下发地市数据异常");
-
-                esJson.put("hit", "false");
-                esJson.put("msg", "下发地市数据异常");
-                esService.save(esJson, IndexList.STRATEGY_MODULE);
-                return Collections.EMPTY_MAP;
-            }
+//            if (mktStrategyConf.getAreaId() != null && !"".equals(mktStrategyConf.getAreaId())) {
+//                String[] strArrayCity = mktStrategyConf.getAreaId().split("/");
+//                boolean areaCheck = true;
+//                for (String str : strArrayCity) {
+//                    String lanId = params.get("lanId");
+//                    if (lanId != null) {
+//                        if (lanId.equals(str)) {
+//                            areaCheck = false;
+//                            break;
+//                        }
+//                    } else {
+//                        //下发地址获取异常 lanId
+//                        strategyMap.put("msg", "下发地址获取异常");
+//
+//                        esJson.put("hit", "false");
+//                        esJson.put("msg", "下发地址获取异常");
+//                        esService.save(esJson, IndexList.STRATEGY_MODULE);
+//                        return Collections.EMPTY_MAP;
+//                    }
+//                }
+//
+//                if (areaCheck) {
+//                    strategyMap.put("msg", "下发地址不符");
+//
+//                    esJson.put("hit", "false");
+//                    esJson.put("msg", "下发地址不符");
+//                    esService.save(esJson, IndexList.STRATEGY_MODULE);
+//                    return Collections.EMPTY_MAP;
+//                }
+//            } else {
+//                //下发地市数据异常
+//                strategyMap.put("msg", "下发地市数据异常");
+//
+//                esJson.put("hit", "false");
+//                esJson.put("msg", "下发地市数据异常");
+//                esService.save(esJson, IndexList.STRATEGY_MODULE);
+//                return Collections.EMPTY_MAP;
+//            }
             //判断下发渠道
             if (mktStrategyConf.getChannelsId() != null && !"".equals(mktStrategyConf.getChannelsId())) {
                 String[] strArrayChannelsId = mktStrategyConf.getChannelsId().split("/");
@@ -993,7 +993,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                 System.out.println("查询标签成功:" + context.toString());
             } else {
-//                System.out.println("查询标签失败:" + httpResult.getString("result_msg"));
+                System.out.println("查询标签失败:" + httpResult.getString("result_msg"));
 
                 esJson.put("hit", "false");
 //                esJson.put("msg", "查询标签失败:" + httpResult.getString("result_msg"));
