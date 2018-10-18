@@ -211,7 +211,7 @@ public class ChannelUtil  {
         List<String> stringList = new ArrayList<>();
         for (LabelValue labelValue : valueList){
             if (labelValue.getLabelValue()!=null){
-                stringList.add(labelValue.getLabelValue());
+                stringList.add(labelValue.getValueName());
             }
         }
         return stringList;
@@ -221,6 +221,16 @@ public class ChannelUtil  {
 
     public static List<String> StringToList(String var1) {
         String[] array = var1.split(",");
+        List<String> list = new ArrayList<String>();
+        for (String str : array)
+        {
+            list.add(str);
+        }
+        return list;
+    }
+
+    public static List<String> StringToList4LabelValue(String var1) {
+        String[] array = var1.split("/");
         List<String> list = new ArrayList<String>();
         for (String str : array)
         {
