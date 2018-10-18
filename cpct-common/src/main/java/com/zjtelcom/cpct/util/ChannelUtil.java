@@ -171,16 +171,16 @@ public class ChannelUtil  {
             }
             vo.setOperatorList(opStList);
         }
-        List<String> valueList = new ArrayList<>();
+        List<LabelValueVO> valueVOList = new ArrayList<>();
         if (labelValueList!=null && !labelValueList.isEmpty()){
-            valueList = valueList2StList(labelValueList);
+            valueVOList = valueList2VOList(labelValueList);
         }
         if (label.getScope().equals(0)){
             vo.setScope("自有标签");
         }else {
             vo.setScope("大数据标签");
         }
-        vo.setValueList(valueList);
+        vo.setValueList(valueVOList);
         return vo;
     }
 
@@ -213,6 +213,16 @@ public class ChannelUtil  {
             if (labelValue.getLabelValue()!=null){
                 stringList.add(labelValue.getValueName());
             }
+        }
+        return stringList;
+    }
+
+
+    public static List<LabelValueVO> valueList2VOList(List<LabelValue> valueList){
+        List<LabelValueVO> stringList = new ArrayList<>();
+        for (LabelValue labelValue : valueList){
+            LabelValueVO vo = BeanUtil.create(labelValue,new LabelValueVO());
+            stringList.add(vo);
         }
         return stringList;
     }
