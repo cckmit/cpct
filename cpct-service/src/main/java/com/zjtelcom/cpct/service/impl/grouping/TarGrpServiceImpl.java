@@ -16,6 +16,7 @@ import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateMapper;
 import com.zjtelcom.cpct.dao.org.OrgTreeMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
@@ -26,8 +27,10 @@ import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateConditionDO;
 import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO;
 import com.zjtelcom.cpct.domain.org.OrgTree;
 import com.zjtelcom.cpct.domain.org.OrgTreeDO;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.grouping.*;
+import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.dto.system.SystemParam;
 import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.model.EagleDatabaseConfig;
@@ -90,6 +93,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     private RedisUtils redisUtils;
     @Autowired
     private OrgTreeMapper orgTreeMapper;
+    @Autowired
+    private MktStrategyConfRuleMapper ruleMapper;
 
 
     /**
@@ -214,7 +219,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         for (Integer id : areaIdList){
             areaList(id,resultList,sysAreaList);
         }
-        redisUtils.set("AREA_RULE_"+targrpId,resultList);
+        redisUtils.set("AREA_RULE_"+targrpId,resultList.toArray(new String[resultList.size()]));
     }
 
     public List<String> areaList(Integer parentId,List<String> resultList,List<OrgTreeDO> areas){
