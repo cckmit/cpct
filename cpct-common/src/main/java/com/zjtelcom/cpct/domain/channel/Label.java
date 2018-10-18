@@ -22,6 +22,8 @@ public class Label extends BaseEntity {
     private Integer isShared;
     private String className;
     private String catalogId;
+
+
     private String labRelevantFlag;
 
     private String labMissRate;

@@ -144,7 +144,9 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         }
         Label label = BeanUtil.create(addVO,new Label());
         operatorValodate(label, addVO.getConditionType());
+        //
         label.setScope(0);
+        label.setClassName("0");
         label.setLabelType("1000");
         //todo 系统添加待确认
         label.setLabelDataType("1000");
@@ -204,7 +206,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     }
 
     private void insertLabelValue(Label label,String rightOpreand) {
-        List<String> valueList = ChannelUtil.StringToList(rightOpreand);
+        List<String> valueList = ChannelUtil.StringToList4LabelValue(rightOpreand);
         for (String st : valueList){
             LabelValue value = new LabelValue();
             value.setInjectionLabelId(label.getInjectionLabelId());
