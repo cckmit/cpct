@@ -28,6 +28,7 @@ import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO;
 import com.zjtelcom.cpct.domain.org.OrgTree;
 import com.zjtelcom.cpct.domain.org.OrgTreeDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
+import com.zjtelcom.cpct.dto.channel.LabelValueVO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.grouping.*;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
@@ -424,7 +425,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 continue;
             }
             List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(label.getInjectionLabelId());
-            List<String> valueList = ChannelUtil.valueList2StList(labelValues);
+            List<LabelValueVO> valueList = ChannelUtil.valueList2VOList(labelValues);
             tarGrpConditionVO.setLeftParamName(label.getInjectionLabelName());
             //塞入领域
 //            FitDomain fitDomain = null;
