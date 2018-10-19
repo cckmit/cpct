@@ -1,7 +1,10 @@
 package com.zjtelcom.cpct.vo.grouping;
 
 
+import com.zjtelcom.cpct.domain.SysArea;
+import com.zjtelcom.cpct.dto.channel.LabelValueVO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
+import com.zjtelcom.cpct.dto.grouping.SysAreaVO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import java.util.List;
 
@@ -19,10 +22,20 @@ public class TarGrpConditionVO extends TarGrpCondition {
 
     private String conditionType;
 
-    private List<String> valueList;
+    private List<LabelValueVO> valueList;
 
     private List<OperatorDetail> operatorList;//运算符
 
+    private List<SysAreaVO> sysAreaList;
+
+
+    public List<SysAreaVO> getSysAreaList() {
+        return sysAreaList;
+    }
+
+    public void setSysAreaList(List<SysAreaVO> sysAreaList) {
+        this.sysAreaList = sysAreaList;
+    }
 
     public String getConditionType() {
         return conditionType;
@@ -32,11 +45,11 @@ public class TarGrpConditionVO extends TarGrpCondition {
         this.conditionType = conditionType;
     }
 
-    public List<String> getValueList() {
+    public List<LabelValueVO> getValueList() {
         return valueList;
     }
 
-    public void setValueList(List<String> valueList) {
+    public void setValueList(List<LabelValueVO> valueList) {
         this.valueList = valueList;
     }
 

@@ -15,6 +15,8 @@ import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateMapper;
+import com.zjtelcom.cpct.dao.org.OrgTreeMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
@@ -23,11 +25,13 @@ import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.domain.grouping.TarGrpConditionDO;
 import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateConditionDO;
 import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO;
+import com.zjtelcom.cpct.domain.org.OrgTree;
+import com.zjtelcom.cpct.domain.org.OrgTreeDO;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
+import com.zjtelcom.cpct.dto.channel.LabelValueVO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
-import com.zjtelcom.cpct.dto.grouping.TarGrp;
-import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
-import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
-import com.zjtelcom.cpct.dto.grouping.TarGrpTemConditionVO;
+import com.zjtelcom.cpct.dto.grouping.*;
+import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.dto.system.SystemParam;
 import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.model.EagleDatabaseConfig;
@@ -86,6 +90,12 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     private InjectionLabelValueMapper injectionLabelValueMapper;
     @Autowired
     private SysAreaMapper areaMapper;
+    @Autowired
+    private RedisUtils redisUtils;
+    @Autowired
+    private OrgTreeMapper orgTreeMapper;
+    @Autowired
+    private MktStrategyConfRuleMapper ruleMapper;
 
 
     /**
@@ -142,8 +152,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
      */
     @Transactional(readOnly = false)
     @Override
-    public Map<String, Object> createTarGrp(TarGrpDetail tarGrpDetail,boolean isCopy) {
-        TarGrp tarGrp = new TarGrp();
+    public Map<String, Object> createTarGrp(final TarGrpDetail tarGrpDetail, boolean isCopy) {
+         TarGrp tarGrp = new TarGrp();
         Map<String, Object> maps = new HashMap<>();
         //插入客户分群记录
         tarGrp = tarGrpDetail;
@@ -159,11 +169,14 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         }
         tarGrpMapper.createTarGrp(tarGrp);
         List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
-        for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
+        for (final TarGrpCondition tarGrpCondition : tarGrpConditions) {
             if (tarGrpCondition.getOperType()==null || tarGrpCondition.getOperType().equals("")){
                 maps.put("resultCode", CODE_FAIL);
                 maps.put("resultMsg", "请选择下拉框运算类型");
                 return maps;
+            }
+            if (tarGrpCondition.getAreaIdList()!=null){
+                area2RedisThread(tarGrp, tarGrpCondition);
             }
             tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
             tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
@@ -176,7 +189,6 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             tarGrpCondition.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
             tarGrpConditionMapper.insert(tarGrpCondition);
         }
-
         //插入客户分群条件
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
@@ -184,17 +196,45 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         return maps;
     }
 
+    private void area2RedisThread(TarGrp tarGrp, final TarGrpCondition tarGrpCondition) {
+        final Long targrpId = tarGrp.getTarGrpId();
+        List<OrgTreeDO> sysAreaList = new ArrayList<>();
+        for (Integer id : tarGrpCondition.getAreaIdList()){
+            OrgTreeDO orgTreeDO = orgTreeMapper.selectByAreaId(id);
+            if (orgTreeDO!=null){
+                sysAreaList.add(orgTreeDO);
+            }
+        }
+        redisUtils.set("AREA_RULE_ENTITY_"+targrpId,sysAreaList);
+        new Thread() {
+            public void run() {
+                areaList2Redis(targrpId,tarGrpCondition.getAreaIdList());
+            }
+        }.start();
+    }
 
-//    public List<String> areaList(Integer parentId,List<String> resultList){
-//        List<SysArea> sysAreaList = areaMapper.selectByParnetArea();
-//
-//
-//
-//    }
 
+    public void areaList2Redis(Long targrpId,List<Integer> areaIdList){
+        List<String> resultList = new ArrayList<>();
+        List<OrgTreeDO> sysAreaList = new ArrayList<>();
+        for (Integer id : areaIdList){
+            areaList(id,resultList,sysAreaList);
+        }
+        redisUtils.set("AREA_RULE_"+targrpId,resultList.toArray(new String[resultList.size()]));
+    }
 
-
-
+    public List<String> areaList(Integer parentId,List<String> resultList,List<OrgTreeDO> areas){
+        List<OrgTreeDO> sysAreaList = orgTreeMapper.selectBySumAreaId(parentId);
+        if (sysAreaList.isEmpty()){
+            return resultList;
+        }
+        for (OrgTreeDO area : sysAreaList){
+            resultList.add(area.getAreaName());
+            areas.add(area);
+            areaList(area.getAreaId(),resultList,areas);
+        }
+        return resultList;
+    }
 
     /**
      * 新增目标分群(暂时废弃)
@@ -291,6 +331,9 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                     maps.put("resultMsg", "请选择下拉框运算类型");
                     return maps;
                 }
+                if (tarGrpCondition.getAreaIdList()!=null){
+                    area2RedisThread(tarGrp, tarGrpCondition);
+                }
                 tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
                 tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
                 tarGrpCondition.setTarGrpId(tarGrp.getTarGrpId());
@@ -382,7 +425,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 continue;
             }
             List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(label.getInjectionLabelId());
-            List<String> valueList = ChannelUtil.valueList2StList(labelValues);
+            List<LabelValueVO> valueList = ChannelUtil.valueList2VOList(labelValues);
             tarGrpConditionVO.setLeftParamName(label.getInjectionLabelName());
             //塞入领域
 //            FitDomain fitDomain = null;
@@ -419,6 +462,18 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             tarGrpConditionVO.setConditionType(label.getConditionType());
             tarGrpConditionVO.setValueList(valueList);
             tarGrpConditionVO.setOperatorList(operatorList);
+            grpConditionList.add(tarGrpConditionVO);
+        }
+        List<OrgTreeDO> sysAreaList = (List<OrgTreeDO>)redisUtils.get("AREA_RULE_ENTITY_"+tarGrpId);
+        if (sysAreaList!=null){
+            List<SysAreaVO> voList = new ArrayList<>();
+            for (OrgTreeDO area : sysAreaList){
+                SysAreaVO vo = BeanUtil.create(area,new SysAreaVO());
+                voList.add(vo);
+            }
+            TarGrpConditionVO tarGrpConditionVO = new TarGrpConditionVO();
+
+            tarGrpConditionVO.setSysAreaList(voList);
             grpConditionList.add(tarGrpConditionVO);
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);

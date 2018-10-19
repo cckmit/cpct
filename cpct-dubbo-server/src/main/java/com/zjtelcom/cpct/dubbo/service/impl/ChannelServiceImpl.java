@@ -50,7 +50,7 @@ public class ChannelServiceImpl implements ChannelService {
         try {
             Channel channel = channelMapper.selectByCode(channelCode);
             if (channel==null){
-                result.put("resultCode",CODE_FAIL);
+                result.put("resultCode","500");
                 result.put("resultMessage","渠道不存在");
                 return result;
             }
@@ -58,7 +58,7 @@ public class ChannelServiceImpl implements ChannelService {
         }catch (Exception e){
             e.printStackTrace();
         }
-        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultCode","0");
         result.put("resultMessage",null);
         result.put("data",vo);
         return result;
@@ -78,7 +78,7 @@ public class ChannelServiceImpl implements ChannelService {
         //查询出事件采集项
         List<ContactEvtItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId());
         evtModel.setContactEvtItems(contactEvtItems);
-        result.put("resultCode", CommonConstant.CODE_SUCCESS);
+        result.put("resultCode","0");
         result.put("resultMessage", StringUtils.EMPTY);
         result.put("data",evtModel);
         return result;
@@ -111,7 +111,7 @@ public class ChannelServiceImpl implements ChannelService {
             userList.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
             userListMapper.insert(userList);
         }
-        result.put("resultCode", CommonConstant.CODE_SUCCESS);
+        result.put("resultCode","0");
         result.put("resultMessage", "导入成功");
         return result;
     }

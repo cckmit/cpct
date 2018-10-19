@@ -171,16 +171,16 @@ public class ChannelUtil  {
             }
             vo.setOperatorList(opStList);
         }
-        List<String> valueList = new ArrayList<>();
+        List<LabelValueVO> valueVOList = new ArrayList<>();
         if (labelValueList!=null && !labelValueList.isEmpty()){
-            valueList = valueList2StList(labelValueList);
+            valueVOList = valueList2VOList(labelValueList);
         }
         if (label.getScope().equals(0)){
             vo.setScope("自有标签");
         }else {
             vo.setScope("大数据标签");
         }
-        vo.setValueList(valueList);
+        vo.setValueList(valueVOList);
         return vo;
     }
 
@@ -211,8 +211,18 @@ public class ChannelUtil  {
         List<String> stringList = new ArrayList<>();
         for (LabelValue labelValue : valueList){
             if (labelValue.getLabelValue()!=null){
-                stringList.add(labelValue.getLabelValue());
+                stringList.add(labelValue.getValueName());
             }
+        }
+        return stringList;
+    }
+
+
+    public static List<LabelValueVO> valueList2VOList(List<LabelValue> valueList){
+        List<LabelValueVO> stringList = new ArrayList<>();
+        for (LabelValue labelValue : valueList){
+            LabelValueVO vo = BeanUtil.create(labelValue,new LabelValueVO());
+            stringList.add(vo);
         }
         return stringList;
     }
@@ -221,6 +231,16 @@ public class ChannelUtil  {
 
     public static List<String> StringToList(String var1) {
         String[] array = var1.split(",");
+        List<String> list = new ArrayList<String>();
+        for (String str : array)
+        {
+            list.add(str);
+        }
+        return list;
+    }
+
+    public static List<String> StringToList4LabelValue(String var1) {
+        String[] array = var1.split("/");
         List<String> list = new ArrayList<String>();
         for (String str : array)
         {

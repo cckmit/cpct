@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.dto.grouping;
 
 import com.zjtelcom.cpct.BaseEntity;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @Description 目标分群条件
@@ -21,6 +22,19 @@ public class TarGrpCondition extends BaseEntity implements Serializable{
     private String rightParam;//右边参数，类型为注智标签时，对应为注智标签标识；类型为表达式时，为分群条件ID
     private String rightParamType;//参数类型1000	注智标签 2000	表达式 3000	固定值
     private String conditionText;//条件表达式的业务含义，用于前台展示
+    private List<Integer> areaIdList;
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public List<Integer> getAreaIdList() {
+        return areaIdList;
+    }
+
+    public void setAreaIdList(List<Integer> areaIdList) {
+        this.areaIdList = areaIdList;
+    }
 
     public String getActType() {
         return actType;

@@ -38,7 +38,7 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
         for (String st : nameList){
             LabelCatalog addvo = new LabelCatalog();
             addvo.setLevelId(level);
-            addvo.setParentId(parentId);
+//            addvo.setParentId(parentId);
             addvo.setCatalogName(st);
             addLabelCatalog(addvo);
         }
@@ -110,65 +110,92 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
 //        }
 
         Map<String,Object> result = new HashMap<>();
-        List<LabelCatalogTree> resultTree = new ArrayList<>();
+        List<CatalogTreeParent> resultTree = new ArrayList<>();
 
-        List<LabelCatalog> firstList = labelCatalogMapper.findByLevelId(1L);
-        List<Label> allLabels = labelMapper.selectAll();
+        List<LabelCatalog> parentList = labelCatalogMapper.findByParentId(String.valueOf(0));
+        List<Label> allLabels = labelMapper.selectByScope(Long.valueOf(1));
         List<LabelCatalog> allCatalogs = labelCatalogMapper.selectAll();
         List<LabelValue> valueList = labelValueMapper.selectAll();
 
-        for (LabelCatalog first : firstList){
-            LabelCatalogTree firstTree = new LabelCatalogTree();
-            firstTree.setInjectionLabelId(first.getCatalogId());
-            firstTree.setInjectionLabelName(first.getCatalogName());
+        for (LabelCatalog parent : parentList) {
+            CatalogTreeParent parentTree = new CatalogTreeParent();
+            parentTree.setInjectionLabelId(parent.getCatalogId());
+            parentTree.setInjectionLabelName(parent.getCatalogName());
 
-            List<CatalogTreeTwo> twiceTreeList = new ArrayList<>();
-            List<LabelCatalog> twiceList = getCatalogListByParentId(allCatalogs,first.getCatalogId());
-            for (LabelCatalog twice : twiceList){
-                CatalogTreeTwo twiceTree = new CatalogTreeTwo();
-                twiceTree.setInjectionLabelId(twice.getCatalogId());
-                twiceTree.setInjectionLabelName(twice.getCatalogName());
+            List<LabelCatalogTree> onceTreeList = new ArrayList<>();
+            List<LabelCatalog> firstList = labelCatalogMapper.findByParentId(parent.getCatalogCode());
+            for (LabelCatalog first : firstList) {
+                LabelCatalogTree firstTree = new LabelCatalogTree();
+                firstTree.setInjectionLabelId(first.getCatalogId());
+                firstTree.setInjectionLabelName(first.getCatalogName());
 
-                List<CatalogTreeThree> thirdTreeList = new ArrayList<>();
-                List<LabelCatalog> thirdList = getCatalogListByParentId(allCatalogs,twice.getCatalogId());
-                for (LabelCatalog third : thirdList){
-                    CatalogTreeThree thirdTree = new CatalogTreeThree();
-                    thirdTree.setInjectionLabelId(third.getCatalogId());
-                    thirdTree.setInjectionLabelName(third.getCatalogName());
+                List<CatalogTreeTwo> twiceTreeList = new ArrayList<>();
+                List<LabelCatalog> twiceList = getCatalogListByParentId(allCatalogs, first.getCatalogCode());
+                for (LabelCatalog twice : twiceList) {
+                    CatalogTreeTwo twiceTree = new CatalogTreeTwo();
+                    twiceTree.setInjectionLabelId(twice.getCatalogId());
+                    twiceTree.setInjectionLabelName(twice.getCatalogName());
 
-                    List<LabelVO> labelVOList = new ArrayList<>();
-                    for (Label label : allLabels) {
-                        if (label.getCatalogId()==null || !label.getCatalogId().equals(third.getCatalogId())){
-                            continue;
-                        }
-                        List<LabelValue> values = new ArrayList<>();
-                        for (LabelValue value : valueList){
-                            if (value.getInjectionLabelId()!=null && value.getInjectionLabelId().equals(label.getInjectionLabelId())){
-                                values.add(value);
+                    List<CatalogTreeThree> thirdTreeList = new ArrayList<>();
+                    List<LabelCatalog> thirdList = getCatalogListByParentId(allCatalogs, twice.getCatalogCode());
+                    for (LabelCatalog third : thirdList) {
+                        CatalogTreeThree thirdTree = new CatalogTreeThree();
+                        thirdTree.setInjectionLabelId(third.getCatalogId());
+                        thirdTree.setInjectionLabelName(third.getCatalogName());
+
+                        List<LabelVO> labelVOList = new ArrayList<>();
+                        for (Label label : allLabels) {
+                            if (label.getCatalogId() == null || !label.getCatalogId().equals(third.getCatalogCode())) {
+                                continue;
                             }
+                            List<LabelValue> values = new ArrayList<>();
+                            for (LabelValue value : valueList) {
+                                if (value.getInjectionLabelId() != null && value.getInjectionLabelId().equals(label.getInjectionLabelId())) {
+                                    values.add(value);
+                                }
+                            }
+                            LabelVO vo = ChannelUtil.map2LabelVO(label, values);
+                            labelVOList.add(vo);
                         }
-                        LabelVO vo = ChannelUtil.map2LabelVO(label,values);
-                        labelVOList.add(vo);
+                        thirdTree.setChildren(labelVOList);
+                        thirdTreeList.add(thirdTree);
                     }
-                    thirdTree.setChildren(labelVOList);
-                    thirdTreeList.add(thirdTree);
+                    twiceTree.setChildren(thirdTreeList);
+                    twiceTreeList.add(twiceTree);
                 }
-                twiceTree.setChildren(thirdTreeList);
-                twiceTreeList.add(twiceTree);
+                firstTree.setChildren(twiceTreeList);
+                onceTreeList.add(firstTree);
             }
-            firstTree.setChildren(twiceTreeList);
-            resultTree.add(firstTree);
+            parentTree.setChildren(onceTreeList);
+            resultTree.add(parentTree);
         }
-
+        List<Label> sysLabel = labelMapper.selectByScope(0L);
+        List<LabelCatalogTree> sysTreeList = new ArrayList<>();
+        CatalogTreeParent treeParent = new CatalogTreeParent();
+        for(Label la : sysLabel){
+            List<LabelValue> values = new ArrayList<>();
+            for (LabelValue value : valueList) {
+                if (value.getInjectionLabelId() != null && value.getInjectionLabelId().equals(la.getInjectionLabelId())) {
+                    values.add(value);
+                }
+            }
+            LabelVO vo = ChannelUtil.map2LabelVO(la, values);
+            LabelCatalogTree tree = BeanUtil.create(vo,new LabelCatalogTree());
+            sysTreeList.add(tree);
+        }
+        treeParent.setInjectionLabelId(-1L);
+        treeParent.setInjectionLabelName("自有标签");
+        treeParent.setChildren(sysTreeList);
+        resultTree.add(treeParent);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",resultTree);
         return result;
     }
 
-    private List<LabelCatalog> getCatalogListByParentId(List<LabelCatalog> allList,Long catalogId){
+    private List<LabelCatalog> getCatalogListByParentId(List<LabelCatalog> allList,String catalogCode){
         List<LabelCatalog> resultList = new ArrayList<>();
         for (LabelCatalog catalog : allList){
-            if (!catalog.getParentId().equals(catalogId)){
+            if (!catalog.getParentId().equals(catalogCode)){
                 continue;
             }
             resultList.add(catalog);

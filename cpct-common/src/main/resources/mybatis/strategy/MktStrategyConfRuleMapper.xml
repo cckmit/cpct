@@ -96,4 +96,12 @@
     on cr.MKT_STRATEGY_CONF_RULE_ID = crr.MKT_STRATEGY_CONF_RULE_ID
     where crr.MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=BIGINT}
   </select>
+
+  <select id="selectByTarGrpId" resultMap="BaseResultMap" parameterType="Long">
+   select MKT_STRATEGY_CONF_RULE_ID, MKT_STRATEGY_CONF_RULE_NAME, TAR_GRP_ID, PRODUCT_ID,
+    EVT_CONTACT_CONF_ID, MKT_CAM_CHL_RESULT_ID, CREATE_STAFF, CREATE_DATE,
+    UPDATE_STAFF, UPDATE_DATE
+    from mkt_strategy_conf_rule
+    where TAR_GRP_ID = #{tarGrpId,jdbcType=BIGINT}
+  </select>
 </mapper>

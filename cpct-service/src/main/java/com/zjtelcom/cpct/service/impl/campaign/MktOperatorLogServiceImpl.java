@@ -49,7 +49,7 @@ public class MktOperatorLogServiceImpl implements MktOperatorLogService{
             String mktActivityNbr = params.get("mktActivityNbr");
             mktOperatorLogDO.setMktActivityNbr(mktActivityNbr);
         }
-        if(params.containsKey("mktActivityNbr")) {
+        if(params.containsKey("mktCampaignName")) {
             String mktCampaignName = params.get("mktCampaignName");
             mktOperatorLogDO.setMktCampaignName(mktCampaignName);
         }
