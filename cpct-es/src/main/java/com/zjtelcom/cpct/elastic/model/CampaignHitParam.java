@@ -11,25 +11,7 @@ public class CampaignHitParam implements Serializable {
     private String assetNumber;
     private String searchBy;
     private int from;
-    private String accNbr;
-    private String integrationId;
 
-
-    public String getAccNbr() {
-        return accNbr;
-    }
-
-    public void setAccNbr(String accNbr) {
-        this.accNbr = accNbr;
-    }
-
-    public String getIntegrationId() {
-        return integrationId;
-    }
-
-    public void setIntegrationId(String integrationId) {
-        this.integrationId = integrationId;
-    }
 
     public int getFrom() {
         return from;

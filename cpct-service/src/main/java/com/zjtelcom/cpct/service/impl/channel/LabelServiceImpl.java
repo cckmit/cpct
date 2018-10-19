@@ -198,8 +198,6 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         labelValueMapper.deleteByLabelId(label.getInjectionLabelId());
         insertLabelValue(label,editVO.getRightOperand());
 
-
-
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","编辑成功");
         return result;
