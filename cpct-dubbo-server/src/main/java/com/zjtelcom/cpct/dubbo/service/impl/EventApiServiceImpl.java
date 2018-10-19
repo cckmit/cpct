@@ -72,7 +72,7 @@ public class EventApiServiceImpl implements EventApiService {
     private MktStrategyFilterRuleRelMapper mktStrategyFilterRuleRelMapper;//过滤规则与策略关系
 
     @Autowired
-    private PpmProductMapper ppmProductMapper; //销售品
+    private OfferMapper offerMapper; //销售品
 
     @Autowired
     private MktCamChlConfAttrMapper mktCamChlConfAttrMapper; //协同渠道配置基本信息
@@ -1170,10 +1170,10 @@ public class EventApiServiceImpl implements EventApiService {
                         String[] productArray = productStr.split("/");
                         for (String str : productArray) {
                             Map<String, String> product = new HashMap<>();
-                            PpmProduct ppmProduct = ppmProductMapper.selectByPrimaryKey(Long.parseLong(str));
-                            product.put("productCode", ppmProduct.getProductCode());
-                            product.put("productName", ppmProduct.getProductName());
-                            product.put("productType", ppmProduct.getProductType());
+                            Offer offer = offerMapper.selectByPrimaryKey(Integer.parseInt(str));
+                            product.put("productCode", offer.getOfferNbr());
+                            product.put("productName", offer.getOfferName());
+                            product.put("productType", offer.getOfferType());
                             product.put("productFlag", "销售品标签");  //todo 销售品标签
                             product.put("productPriority", "销售品优先级");  //todo 销售品优先级
                             System.out.println("*********************product --->>>" + JSON.toJSON(product));
