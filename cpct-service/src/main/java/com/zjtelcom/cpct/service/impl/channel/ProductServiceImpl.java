@@ -117,6 +117,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 return result;
             }
             MktCamItem item = new MktCamItem();
+            item.setOfferCode(product.getOfferNbr());
+            item.setOfferName(product.getOfferName());
             item.setItemId(productId);
             item.setItemType(product.getOfferType());
             item.setCreateDate(new Date());
