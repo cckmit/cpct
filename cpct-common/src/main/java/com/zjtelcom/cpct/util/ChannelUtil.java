@@ -117,6 +117,18 @@ public class ChannelUtil  {
         return StringUtils.join(sts,",");
     }
 
+    public static String valueVOList2String(List<LabelValueVO> valueVOList){
+        if (valueVOList == null || valueVOList.isEmpty()){
+            return "";
+        }
+        String[] sts = new String[valueVOList.size()];
+        for (int i = 0;i<sts.length;i++){
+            sts[i] = valueVOList.get(i).getValueName();
+        }
+        return StringUtils.join(sts,"/");
+    }
+
+
 
     public static String idList2String(List<Long> idList){
         if (idList == null || idList.isEmpty()){
@@ -174,6 +186,7 @@ public class ChannelUtil  {
         List<LabelValueVO> valueVOList = new ArrayList<>();
         if (labelValueList!=null && !labelValueList.isEmpty()){
             valueVOList = valueList2VOList(labelValueList);
+            vo.setLabelValueSt(valueVOList2String(valueVOList));
         }
         if (label.getScope().equals(0)){
             vo.setScope("自有标签");
@@ -222,6 +235,7 @@ public class ChannelUtil  {
         List<LabelValueVO> stringList = new ArrayList<>();
         for (LabelValue labelValue : valueList){
             LabelValueVO vo = BeanUtil.create(labelValue,new LabelValueVO());
+            vo.setLabelValue(labelValue.getValueName());
             stringList.add(vo);
         }
         return stringList;
