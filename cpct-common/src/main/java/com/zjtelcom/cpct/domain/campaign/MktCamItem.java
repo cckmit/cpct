@@ -53,5 +53,11 @@ public class MktCamItem extends BaseEntity{
      */
     private Long itemGroup;
 
+    private String offerCode;
+
+    private String offerName;
+
+
+
 
 }
