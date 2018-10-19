@@ -496,6 +496,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             return maps;
         }
         campaignDO.setStatusCd(StatusCode.STATUS_CODE_PASS.getStatusCode());
+        campaignDO.setUpdateDate(new Date());
         mktCampaignMapper.updateByPrimaryKey(campaignDO);
         maps.put("resultCode", CODE_SUCCESS);
         maps.put("resultMsg", "已通过");

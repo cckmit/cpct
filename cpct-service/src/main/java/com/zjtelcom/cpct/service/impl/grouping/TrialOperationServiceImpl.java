@@ -338,6 +338,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         }
 
         TrialOperationVO request = BeanUtil.create(operationVO,new TrialOperationVO());
+        request.setBatchNum(trialOperation.getBatchNum());
         request.setFieldList(fieldList);
         //策略试运算
         request.setSample(true);
