@@ -189,6 +189,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             tarGrpCondition.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
             tarGrpConditionMapper.insert(tarGrpCondition);
         }
+        //数据加入redis
+        Map<String,Object> conditionList = listTarGrpCondition(tarGrp.getTarGrpId());
+        if (conditionList.get("resultCode").equals(CODE_SUCCESS)){
+            redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),conditionList.get("listTarGrpCondition"));
+        }
         //插入客户分群条件
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
@@ -350,6 +355,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 tarGrpConditionMapper.modTarGrpCondition(tarGrpCondition);
             }
         }
+        //更新redis分群数据
+        Map<String,Object> conditionList = listTarGrpCondition(tarGrp.getTarGrpId());
+        if (conditionList.get("resultCode").equals(CODE_SUCCESS)){
+            redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),conditionList.get("listTarGrpCondition"));
+        }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         return maps;
@@ -402,7 +412,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
      * 获取目标分群条件信息
      */
     @Override
-    public Map<String, Object> listTarGrpCondition(Long tarGrpId) throws Exception {
+    public Map<String, Object> listTarGrpCondition(Long tarGrpId){
         Map<String, Object> maps = new HashMap<>();
         if (tarGrpId==null){
             maps.put("resultCode", CODE_FAIL);
@@ -418,7 +428,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         for (TarGrpCondition tarGrpCondition : listTarGrpCondition) {
             List<OperatorDetail> operatorList = new ArrayList<>();
             TarGrpConditionVO tarGrpConditionVO = new TarGrpConditionVO();
-            CopyPropertiesUtil.copyBean2Bean(tarGrpConditionVO, tarGrpCondition);
+            BeanUtil.copy(tarGrpCondition,tarGrpConditionVO);
+//            CopyPropertiesUtil.copyBean2Bean(tarGrpConditionVO, tarGrpCondition);
             //塞入左参中文名
             Label label = injectionLabelMapper.selectByPrimaryKey(Long.valueOf(tarGrpConditionVO.getLeftParam()));
             if (label==null){
