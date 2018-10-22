@@ -100,6 +100,19 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
             mktVerbalCondition.setConditionType(ConditionType.CHANNEL.getValue().toString());
             verbalConditionMapper.insert(mktVerbalCondition);
         }
+
+        //更新redis分群数据,先查出来再更新
+        MktCamChlConfDetail detail = (MktCamChlConfDetail)redisUtils.get("MktCamChlConfDetail_"+addVO.getContactConfId());
+        if (detail!=null){
+            Map<String,Object> verbalDetail = getVerbalDetail(1L,verbal.getVerbalId());
+            if (verbalDetail.get("resultCode").equals(CODE_SUCCESS)){
+                VerbalVO verbalVO = (VerbalVO)verbalDetail.get("resultMsg");
+                List<VerbalVO> voList = new ArrayList<>();
+                voList.add(verbalVO);
+                detail.setVerbalVOList(voList);
+                redisUtils.set("MktCamChlConfDetail_"+addVO.getContactConfId(),detail);
+            }
+        }
         result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", "添加成功");
         return result;
@@ -134,7 +147,6 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
             result.put("resultMsg", " fail to editVerbal");
             return result;
         }
-
         result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", "编辑成功");
         return result;
