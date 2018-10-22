@@ -15,9 +15,18 @@ public class LabelVO implements Serializable {
     private String conditionType;//单选多选框
     private List<OperatorDetail> operatorList;//运算符
     private List<LabelValueVO> valueList;
+    private String labelValueSt;
     private String scope;
     private Integer isShared;
 
+
+    public String getLabelValueSt() {
+        return labelValueSt;
+    }
+
+    public void setLabelValueSt(String labelValueSt) {
+        this.labelValueSt = labelValueSt;
+    }
 
     public List<LabelValueVO> getValueList() {
         return valueList;

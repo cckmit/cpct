@@ -173,6 +173,11 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
         try {
             response = restTemplate.postForObject(SEARCH_INFO_FROM_ES_URL, request, TrialResponse.class);
+            if (response.getResultCode().equals(CODE_FAIL)){
+                result.put("resultCode", CODE_FAIL);
+                result.put("resultMsg", "抽样校验失败");
+                return result;
+            }
             //todo 返回信息结果封装
         } catch (Exception e) {
             e.printStackTrace();
@@ -208,13 +213,13 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         Map<String,Object> result = new HashMap<>();
         //添加规则下的销售品
         MktStrategyConfRuleDO rule = ruleMapper.selectByPrimaryKey(ruleId);
-        if (rule.getProductId()!=null){
+        if (rule.getProductId()!=null && !rule.getProductId().equals("")){
             List<Long> itemIdList = ChannelUtil.StringToIdList(rule.getProductId());
             List<String> itemList = offerMapper.listByOfferIdList(itemIdList);
             result.put("product",ChannelUtil.StringList2String(itemList));
         }
         StringBuffer st = new StringBuffer();
-        if (rule.getEvtContactConfId()!=null){
+        if (rule.getEvtContactConfId()!=null && !rule.getEvtContactConfId().equals("")){
             List<Long> channelIdList = ChannelUtil.StringToIdList(rule.getEvtContactConfId());
             List<MktCamChlConfDO> chlConfList = chlConfMapper.listByIdList(channelIdList);
             for (MktCamChlConfDO chlConf : chlConfList){
@@ -338,6 +343,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         }
 
         TrialOperationVO request = BeanUtil.create(operationVO,new TrialOperationVO());
+        request.setBatchNum(trialOperation.getBatchNum());
         request.setFieldList(fieldList);
         //策略试运算
         request.setSample(true);
@@ -466,17 +472,17 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 if (labelCodeList.size() < searchMap.keySet().size()) {
                     labelCodeList.add(set);
                 }
-                map.put("campaignId", operation.getCampaignId());
-                map.put("campaignName", operation.getCampaignName());
-                map.put("strategyId", operation.getStrategyId());
-                map.put("strategyName", operation.getStrategyName());
-                map.put("ruleId", ruleInfoMap.get("ruleId"));
-                map.put("ruleName", ruleInfoMap.get("ruleName").toString());
-                //todo 工单号
-                map.put("orderId", "49736605");
                 map.put(set, searchMap.get(set));
-                userList.add(map);
             }
+            map.put("campaignId", operation.getCampaignId());
+            map.put("campaignName", operation.getCampaignName());
+            map.put("strategyId", operation.getStrategyId());
+            map.put("strategyName", operation.getStrategyName());
+            map.put("ruleId", ruleInfoMap.get("ruleId"));
+            map.put("ruleName", ruleInfoMap.get("ruleName").toString());
+            //todo 工单号
+            map.put("orderId", "49736605");
+            userList.add(map);
         }
         if (labelCodeList.size() > 0) {
             List<SimpleInfo> titleList = labelMapper.listLabelByCodeList(labelCodeList);
