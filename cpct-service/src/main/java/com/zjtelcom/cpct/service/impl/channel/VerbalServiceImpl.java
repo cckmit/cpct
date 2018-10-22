@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.service.impl.channel;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.domain.channel.*;
 
+import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.ConditionType;
 import com.zjtelcom.cpct.enums.Operator;
@@ -10,6 +11,7 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.VerbalService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
+import com.zjtelcom.cpct.util.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +34,8 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
     private ContactChannelMapper channelMapper;
     @Autowired
     private InjectionLabelValueMapper labelValueMapper;
+    @Autowired
+    private RedisUtils redisUtils;
 
     /**
      * 复制痛痒点
@@ -130,6 +134,7 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
             result.put("resultMsg", " fail to editVerbal");
             return result;
         }
+
         result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", "编辑成功");
         return result;
