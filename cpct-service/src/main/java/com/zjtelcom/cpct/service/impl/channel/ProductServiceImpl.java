@@ -12,14 +12,12 @@ import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.channel.MktProductRule;
 import com.zjtelcom.cpct.domain.channel.Offer;
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
 import com.zjtelcom.cpct.dto.channel.OfferDetail;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
-import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.DateUtil;
-import com.zjtelcom.cpct.util.MapUtil;
-import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +36,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     private MktCamItemMapper camItemMapper;
     @Autowired
     private MktStrategyConfRuleService strategyConfRuleService;
+    @Autowired
+    private RedisUtils redisUtils;
 
 
     @Override
@@ -134,6 +134,11 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         if (strategyRuleId!=null){
             strategyConfRuleService.updateProductIds(ruleIdList,strategyRuleId);
         }
+        //redis添加推荐条目数据
+        Map<String,Object> productResult = getProductNameById(1L,productIdList);
+        if (productResult.get("resultCode").equals(CODE_SUCCESS)){
+            redisUtils.set("MKT_CAM_ITEM_"+strategyRuleId,productResult.get("nameList"));
+        }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",ruleIdList);
         return result;
@@ -187,7 +192,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         Map<String,Object> result = new HashMap<>();
         if (strategyRuleId!=null){
             strategyConfRuleService.updateProductIds(itemRuleIdList,strategyRuleId);
-        }else {
             MktCamItem rule = camItemMapper.selectByPrimaryKey(ruleId);
             if (rule==null){
                 result.put("resultCode",CODE_FAIL);
@@ -195,9 +199,23 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 return result;
             }
             camItemMapper.deleteByPrimaryKey(ruleId);
+            //更新redis数据
+            deleteRedisMktCamItem(strategyRuleId,rule);
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
         return result;
+    }
+
+    private void deleteRedisMktCamItem(Long strategyRuleId, MktCamItem item){
+        List<OfferDetail> nameList =  (List<OfferDetail>)redisUtils.get("MKT_CAM_ITEM_"+strategyRuleId);
+        if (nameList!=null){
+            for (OfferDetail offer : nameList){
+                if (Long.valueOf(offer.getOfferId()).equals(item.getItemId())){
+                    nameList.remove(offer);
+                }
+            }
+            redisUtils.set("MKT_CAM_ITEM_"+strategyRuleId,nameList);
+        }
     }
 }
