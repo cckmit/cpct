@@ -106,15 +106,21 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     @Override
     public Map<String, Object> copyTarGrp(Long tarGrpId,boolean isCopy) {
         Map<String,Object> result = new HashMap<>();
-        TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpId);
-        if (tarGrp==null){
+//        TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpId);
+//        if (tarGrp==null){
+//            result.put("resultCode", CODE_FAIL);
+//            result.put("resultMsg", "请选择下拉框运算类型");
+//            return result;
+//        }
+//        List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
+//        TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
+//        detail.setTarGrpConditions(conditionList);
+        TarGrpDetail detail = (TarGrpDetail)redisUtils.get("TAR_GRP_"+tarGrpId);
+        if (detail==null){
             result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "请选择下拉框运算类型");
+            result.put("resultMsg", "客户分群不存在");
             return result;
         }
-        List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
-        TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
-        detail.setTarGrpConditions(conditionList);
         result = createTarGrp(detail,isCopy);
         return result;
     }
@@ -123,7 +129,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     /**
      * 模板创建客户分群
      * @param templateId
-     * @return
+     * @return‘
      */
     @Override
     public Map<String, Object> createTarGrpByTemplateId(Long templateId) {
@@ -192,7 +198,9 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         //数据加入redis
         Map<String,Object> conditionList = listTarGrpCondition(tarGrp.getTarGrpId());
         if (conditionList.get("resultCode").equals(CODE_SUCCESS)){
-            redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),conditionList.get("listTarGrpCondition"));
+            TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
+            detail.setTarGrpConditions((List<TarGrpCondition>) conditionList.get("conditionList"));
+            redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),detail);
         }
         //插入客户分群条件
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -490,6 +498,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("listTarGrpCondition", grpConditionList);
+        maps.put("conditionList",listTarGrpCondition);
         return maps;
     }
 

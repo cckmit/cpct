@@ -89,7 +89,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         List<Long> ruleIdList = new ArrayList<>();
         if(ItemIdList!=null && ItemIdList.size()>0){
             for (Long itemId : ItemIdList) {
-                MktCamItem item = camItemMapper.selectByPrimaryKey(itemId);
+                MktCamItem item = (MktCamItem) redisUtils.get("MKT_CAM_ITEM_"+itemId);
                 if (item == null) {
                     continue;
                 }
@@ -129,15 +129,12 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             item.setCreateStaff(UserUtil.loginId());
             item.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
             camItemMapper.insert(item);
+            //redis添加推荐条目数据
+            redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
             ruleIdList.add(item.getMktCamItemId());
         }
         if (strategyRuleId!=null){
             strategyConfRuleService.updateProductIds(ruleIdList,strategyRuleId);
-        }
-        //redis添加推荐条目数据
-        Map<String,Object> productResult = getProductNameById(1L,productIdList);
-        if (productResult.get("resultCode").equals(CODE_SUCCESS)){
-            redisUtils.set("MKT_CAM_ITEM_"+strategyRuleId,productResult.get("nameList"));
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",ruleIdList);
