@@ -203,8 +203,8 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         for (ContactEventDetail evtDetail : evtDetailList) {
             //插入事件主题信息
             ContactEvt contactEvt = evtDetail;
-            //todo 待确认必填字段
-            contactEvt.setInterfaceCfgId(1L);
+//            //todo 待确认必填字段
+//            contactEvt.setInterfaceCfgId();
 
             contactEvt.setUpdateDate(DateUtil.getCurrentTime());
             contactEvt.setCreateDate(DateUtil.getCurrentTime());
