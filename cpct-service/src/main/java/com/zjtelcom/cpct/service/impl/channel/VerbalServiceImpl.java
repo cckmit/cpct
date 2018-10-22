@@ -38,17 +38,30 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
     private RedisUtils redisUtils;
 
     /**
+     * 复制痛痒点Redis获取数据
+     * @param contactConfId
+     * @return
+     */
+    @Override
+    public Map<String, Object> copyVerbalFromRedis(Long contactConfId, Long newConfId) {
+        return null;
+    }
+
+    /**
      * 复制痛痒点
      * @param contactConfId
      * @return
      */
     @Override
     public Map<String, Object> copyVerbal(Long contactConfId,Long newConfId) {
-        Map<String,Object> map = getVerbalListByConfId(1L,contactConfId);
-        if (!map.get("resultCode").equals(CODE_SUCCESS)){
+        Map<String,Object> map = new HashMap<>();
+        MktCamChlConfDetail detail = (MktCamChlConfDetail) redisUtils.get("MktCamChlConfDetail_"+contactConfId);
+        if (detail==null){
+            map.put("resultCode", CODE_FAIL);
+            map.put("resultMsg", "推送渠道配置不存在");
             return map;
         }
-        List<VerbalVO> verbalVOList = (List<VerbalVO>)map.get("resultMsg");
+        List<VerbalVO> verbalVOList = detail.getVerbalVOList();
         for (VerbalVO verbalVO : verbalVOList){
             VerbalAddVO addVO = BeanUtil.create(verbalVO,new VerbalAddVO());
             addVO.setContactConfId(newConfId);
