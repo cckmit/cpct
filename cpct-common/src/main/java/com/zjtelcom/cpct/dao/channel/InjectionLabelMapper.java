@@ -53,6 +53,6 @@ public interface InjectionLabelMapper{
 
     List<Label> listLabelByGrpId(@Param("grpId")Long grpId);
 
-    List<Label> listLabelByDisplayId(@Param("displayId")Long grpId);
+    List<Label> listLabelByDisplayId(@Param("grpId")Long grpId);
 
 }

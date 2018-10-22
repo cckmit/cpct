@@ -72,7 +72,7 @@ public class EventApiServiceImpl implements EventApiService {
     private MktStrategyFilterRuleRelMapper mktStrategyFilterRuleRelMapper;//过滤规则与策略关系
 
     @Autowired
-    private PpmProductMapper ppmProductMapper; //销售品
+    private MktCamItemMapper mktCamItemMapper; //销售品
 
     @Autowired
     private MktCamChlConfAttrMapper mktCamChlConfAttrMapper; //协同渠道配置基本信息
@@ -479,6 +479,8 @@ public class EventApiServiceImpl implements EventApiService {
                 esJson.put("msg", "活动状态未发布");
                 esService.save(esJson, IndexList.ACTIVITY_MODULE);
 
+                System.out.println("活动状态未发布");
+
                 return Collections.EMPTY_MAP;
             }
 
@@ -750,12 +752,32 @@ public class EventApiServiceImpl implements EventApiService {
                     FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId);
                     //判断过滤类型(红名单，黑名单)
                     if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
-
+                        //查询红名单黑名单列表
+                        int count = userListMapper.checkRule(privateParams.get("accNbr"),filterRule.getRuleId(),filterRule.getFilterType());
+                        if(count > 0) {
+                            System.out.println("红黑名单过滤规则验证被拦截");
+                            esJson.put("hit", "false");
+                            esJson.put("msg", "红黑名单过滤规则验证被拦截");
+                            esService.save(esJson, IndexList.STRATEGY_MODULE);
+                            return Collections.EMPTY_MAP;
+                        }
                     } else if ("3000".equals(filterRule.getFilterType())) {  //销售品过滤
+                        //获取用户已办理销售品，验证互斥
+
 
                     } else if ("4000".equals(filterRule.getFilterType())) {  //表达式过滤
+                        //暂不处理
+                        //do something
+                    } else if ("5000".equals(filterRule.getFilterType())) {  //时间段过滤
+                        //时间段的格式
 
-                    } else if ("5000".equals(filterRule.getFilterType())) {  //销售品过滤
+                        if(compareHourAndMinute(filterRule)) {
+                            System.out.println("过滤时间段验证被拦截");
+                            esJson.put("hit", "false");
+                            esJson.put("msg", "过滤时间段验证被拦截");
+                            esService.save(esJson, IndexList.STRATEGY_MODULE);
+                            return Collections.EMPTY_MAP;
+                        }
 
                     }
                 }
@@ -866,31 +888,6 @@ public class EventApiServiceImpl implements EventApiService {
             List<Map<String, Object>> taskChlList = new ArrayList<>();
 
 
-            //  1.判断过滤规则---------------------------
-            //获取过滤规则
-//            FilterRuleConfDO filterRuleConfDO = filterRuleConfMapper.selectByPrimaryKey(ruleConfId);
-//            String ruleConfIdStr = filterRuleConfDO.getFilterRuleIds();
-//            if (ruleConfIdStr != null) {
-//                String[] array = ruleConfIdStr.split(",");
-//                boolean ruleFilter = true;
-//                for (String str : array) {
-//                    //获取具体规则
-//                    FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.parseLong(str));
-//
-//                    //匹配事件过滤规则
-//                    int flag = 0;
-//                    if (filterRule != null) {
-//                        flag = userListMapper.checkRule("", filterRule.getRuleId(), null);
-//                        if (flag > 0) {
-//                            ruleFilter = false;
-//                        }
-//                    }
-//                }
-//                //若存在不符合的规则 结束当前规则循环
-//                if (!ruleFilter) {
-//                    return Collections.EMPTY_MAP;
-//                }
-//            }
             //  2.判断客户分群规则---------------------------
             //判断匹配结果，如匹配则向下进行，如不匹配则continue结束本次循环
             //拼装redis key
@@ -943,28 +940,28 @@ public class EventApiServiceImpl implements EventApiService {
 
             System.out.println("param " + param.toString());
             //验证post回调结果
-//            httpResultStr = HttpUtil.post(url, paramStr);
+            httpResultStr = HttpUtil.post(url, param.toString());
 
             //更换为dubbo因子查询-----------------------------------------------------
-            Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
+//            Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
 
-//            if (httpResultStr == null || "".equals(httpResultStr)) {
-//
-//                System.out.println("查询标签出错");
-//
-//                esJson.put("hit", "false");
-//                esJson.put("msg", "标签实例查询出错");
-//                esService.save(esJson, IndexList.STRATEGY_MODULE);
-//                return Collections.EMPTY_MAP;
-//            }
+            if (httpResultStr == null || "".equals(httpResultStr)) {
+
+                System.out.println("查询标签出错");
+
+                esJson.put("hit", "false");
+                esJson.put("msg", "标签实例查询出错");
+                esService.save(esJson, IndexList.STRATEGY_MODULE);
+                return Collections.EMPTY_MAP;
+            }
             JSONObject jsonobj = new JSONObject();
             //解析返回结果
-//            JSONObject httpResult = JSONObject.parseObject(httpResultStr);
-//            if (httpResult.getInteger("result_code") == 0) {
-//                JSONObject body = httpResult.getJSONObject("msgbody");
+            JSONObject httpResult = JSONObject.parseObject(httpResultStr);
+            if (httpResult.getInteger("result_code") == 0) {
+                JSONObject body = httpResult.getJSONObject("msgbody");
 
-            if ("0".equals((String)dubboResult.get("result_code"))) {
-                JSONObject body = JSON.parseObject((String)dubboResult.get("msgbody"));
+//            if ("0".equals((String)dubboResult.get("result_code"))) {
+//                JSONObject body = JSON.parseObject((String)dubboResult.get("msgbody"));
                 //ES log 标签实例
                 jsonobj.put("reqId", reqId);
                 jsonobj.put("eventId", params.get("eventCode"));
@@ -991,7 +988,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                 System.out.println("查询标签成功:" + context.toString());
             } else {
-//                System.out.println("查询标签失败:" + httpResult.getString("result_msg"));
+                System.out.println("查询标签失败:" + httpResult.getString("result_msg"));
 
                 esJson.put("hit", "false");
 //                esJson.put("msg", "查询标签失败:" + httpResult.getString("result_msg"));
@@ -1168,12 +1165,17 @@ public class EventApiServiceImpl implements EventApiService {
                         String[] productArray = productStr.split("/");
                         for (String str : productArray) {
                             Map<String, String> product = new HashMap<>();
-                            PpmProduct ppmProduct = ppmProductMapper.selectByPrimaryKey(Long.parseLong(str));
-                            product.put("productCode", ppmProduct.getProductCode());
-                            product.put("productName", ppmProduct.getProductName());
-                            product.put("productType", ppmProduct.getProductType());
+                            MktCamItem mktCamItem = mktCamItemMapper.selectByPrimaryKey(Long.parseLong(str));
+                            product.put("productCode", mktCamItem.getOfferCode());
+                            product.put("productName", mktCamItem.getOfferName());
+                            product.put("productType", mktCamItem.getItemType());
                             product.put("productFlag", "销售品标签");  //todo 销售品标签
-                            product.put("productPriority", "销售品优先级");  //todo 销售品优先级
+                            //销售品优先级
+                            if(mktCamItem.getPriority() != null) {
+                                product.put("productPriority",  mktCamItem.getPriority().toString());
+                            } else {
+                                product.put("productPriority", "0");
+                            }
                             System.out.println("*********************product --->>>" + JSON.toJSON(product));
                             productList.add(product);
                         }
@@ -1476,23 +1478,46 @@ public class EventApiServiceImpl implements EventApiService {
         String paramStr = param.toString();
         System.out.println("param " + param.toString());
         //验证post回调结果
-//        httpResultStr = HttpUtil.post(url, paramStr);
+        httpResultStr = HttpUtil.post(url, paramStr);
 
-        Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
+//        Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
 
-        if ("0".equals((String)dubboResult.get("result_code"))) {
-            JSONObject body = JSON.parseObject((String)dubboResult.get("msgbody"));
+//        if ("0".equals((String)dubboResult.get("result_code"))) {
+//            JSONObject body = JSON.parseObject((String)dubboResult.get("msgbody"));
 
-//        //解析返回结果
-//        JSONObject httpResult = JSONObject.parseObject(httpResultStr);
-//        if (httpResult.getInteger("result_code") == 0) {
-//            JSONObject body = httpResult.getJSONObject("msgbody");
+        //解析返回结果
+        JSONObject httpResult = JSONObject.parseObject(httpResultStr);
+        if (httpResult.getInteger("result_code") == 0) {
+            JSONObject body = httpResult.getJSONObject("msgbody");
             return body;
         } else {
 //            System.out.println("查询标签失败:" + httpResult.getString("result_msg"));
             return new JSONObject();
         }
     }
+
+
+
+    private boolean compareHourAndMinute(FilterRule filterRule) {
+        Boolean result = true;
+
+        Calendar start = Calendar.getInstance();
+        start.setTime(filterRule.getDayStart());
+        Calendar end = Calendar.getInstance();
+        end.setTime(filterRule.getDayEnd());
+        Calendar cal = Calendar.getInstance();
+        int nowHour = cal.get(Calendar.HOUR_OF_DAY);
+        if(nowHour > start.get(Calendar.HOUR_OF_DAY) && nowHour < end.get(Calendar.HOUR_OF_DAY)) {
+            if(nowHour > start.get(Calendar.MINUTE) && nowHour < end.get(Calendar.MINUTE)) {
+                if(nowHour > start.get(Calendar.SECOND) && nowHour < end.get(Calendar.SECOND)) {
+                    result = false;
+                }
+            }
+        }
+
+        return result;
+    }
+
 
 
 }
