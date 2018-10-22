@@ -22,6 +22,8 @@ public interface VerbalService {
 
     Map<String,Object> copyVerbal(Long contactConfId,Long newConfId);
 
+    Map<String,Object> copyVerbalFromRedis(Long contactConfId,Long newConfId);
+
 
 
 }
