@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.MktCampaignRelMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.MktCampaignRel">
+    <id column="MKT_CAMPAIGN_REL_ID" jdbcType="DECIMAL" property="mktCampaignRelId" />
+    <result column="REL_TYPE" jdbcType="VARCHAR" property="relType" />
+    <result column="A_MKT_CAMPAIGN_ID" jdbcType="DECIMAL" property="aMktCampaignId" />
+    <result column="Z_MKT_CAMPAIGN_ID" jdbcType="DECIMAL" property="zMktCampaignId" />
+    <result column="EFF_DATE" jdbcType="TIMESTAMP" property="effDate" />
+    <result column="EXP_DATE" jdbcType="TIMESTAMP" property="expDate" />
+    <result column="APPLY_REGION_ID" jdbcType="DECIMAL" property="applyRegionId" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="DECIMAL" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="DECIMAL" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from mkt_campaign_rel
+    where MKT_CAMPAIGN_REL_ID = #{mktCampaignRelId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.MktCampaignRel">
+    insert into mkt_campaign_rel (MKT_CAMPAIGN_REL_ID, REL_TYPE, A_MKT_CAMPAIGN_ID, 
+      Z_MKT_CAMPAIGN_ID, EFF_DATE, EXP_DATE, 
+      APPLY_REGION_ID, STATUS_CD, CREATE_STAFF, 
+      UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
+      UPDATE_DATE, REMARK)
+    values (#{mktCampaignRelId,jdbcType=DECIMAL}, #{relType,jdbcType=VARCHAR}, #{aMktCampaignId,jdbcType=DECIMAL}, 
+      #{zMktCampaignId,jdbcType=DECIMAL}, #{effDate,jdbcType=TIMESTAMP}, #{expDate,jdbcType=TIMESTAMP}, 
+      #{applyRegionId,jdbcType=DECIMAL}, #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=DECIMAL}, 
+      #{updateStaff,jdbcType=DECIMAL}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.MktCampaignRel">
+    update mkt_campaign_rel
+    set REL_TYPE = #{relType,jdbcType=VARCHAR},
+      A_MKT_CAMPAIGN_ID = #{aMktCampaignId,jdbcType=DECIMAL},
+      Z_MKT_CAMPAIGN_ID = #{zMktCampaignId,jdbcType=DECIMAL},
+      EFF_DATE = #{effDate,jdbcType=TIMESTAMP},
+      EXP_DATE = #{expDate,jdbcType=TIMESTAMP},
+      APPLY_REGION_ID = #{applyRegionId,jdbcType=DECIMAL},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=DECIMAL},
+      UPDATE_STAFF = #{updateStaff,jdbcType=DECIMAL},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where MKT_CAMPAIGN_REL_ID = #{mktCampaignRelId,jdbcType=DECIMAL}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_CAMPAIGN_REL_ID, REL_TYPE, A_MKT_CAMPAIGN_ID, Z_MKT_CAMPAIGN_ID, EFF_DATE, 
+    EXP_DATE, APPLY_REGION_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
+    UPDATE_DATE, REMARK
+    from mkt_campaign_rel
+    where MKT_CAMPAIGN_REL_ID = #{mktCampaignRelId,jdbcType=DECIMAL}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select MKT_CAMPAIGN_REL_ID, REL_TYPE, A_MKT_CAMPAIGN_ID, Z_MKT_CAMPAIGN_ID, EFF_DATE, 
+    EXP_DATE, APPLY_REGION_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
+    UPDATE_DATE, REMARK
+    from mkt_campaign_rel
+  </select>
+</mapper>

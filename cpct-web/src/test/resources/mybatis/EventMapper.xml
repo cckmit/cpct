@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.EventMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.Event">
+    <id column="EVENT_ID" jdbcType="BIGINT" property="eventId" />
+    <result column="INTERFACE_CFG_ID" jdbcType="BIGINT" property="interfaceCfgId" />
+    <result column="EVENT_NBR" jdbcType="VARCHAR" property="eventNbr" />
+    <result column="EVENT_NAME" jdbcType="VARCHAR" property="eventName" />
+    <result column="EVT_MAPPED_ADDR" jdbcType="VARCHAR" property="evtMappedAddr" />
+    <result column="EVT_MAPPED_IP" jdbcType="VARCHAR" property="evtMappedIp" />
+    <result column="EVT_PROCOTOL_TYPE" jdbcType="VARCHAR" property="evtProcotolType" />
+    <result column="EVT_MAPPED_FUN_NAME" jdbcType="VARCHAR" property="evtMappedFunName" />
+    <result column="EVENT_DESC" jdbcType="VARCHAR" property="eventDesc" />
+    <result column="EVT_TYPE_ID" jdbcType="BIGINT" property="evtTypeId" />
+    <result column="EVENT_TRIG_TYPE" jdbcType="VARCHAR" property="eventTrigType" />
+    <result column="EXT_EVENT_ID" jdbcType="BIGINT" property="extEventId" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from event
+    where EVENT_ID = #{eventId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.Event">
+    insert into event (EVENT_ID, INTERFACE_CFG_ID, EVENT_NBR, 
+      EVENT_NAME, EVT_MAPPED_ADDR, EVT_MAPPED_IP, 
+      EVT_PROCOTOL_TYPE, EVT_MAPPED_FUN_NAME, EVENT_DESC, 
+      EVT_TYPE_ID, EVENT_TRIG_TYPE, EXT_EVENT_ID, 
+      STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+      CREATE_DATE, STATUS_DATE, UPDATE_DATE, 
+      REMARK)
+    values (#{eventId,jdbcType=BIGINT}, #{interfaceCfgId,jdbcType=BIGINT}, #{eventNbr,jdbcType=VARCHAR}, 
+      #{eventName,jdbcType=VARCHAR}, #{evtMappedAddr,jdbcType=VARCHAR}, #{evtMappedIp,jdbcType=VARCHAR}, 
+      #{evtProcotolType,jdbcType=VARCHAR}, #{evtMappedFunName,jdbcType=VARCHAR}, #{eventDesc,jdbcType=VARCHAR}, 
+      #{evtTypeId,jdbcType=BIGINT}, #{eventTrigType,jdbcType=VARCHAR}, #{extEventId,jdbcType=BIGINT}, 
+      #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.Event">
+    update event
+    set INTERFACE_CFG_ID = #{interfaceCfgId,jdbcType=BIGINT},
+      EVENT_NBR = #{eventNbr,jdbcType=VARCHAR},
+      EVENT_NAME = #{eventName,jdbcType=VARCHAR},
+      EVT_MAPPED_ADDR = #{evtMappedAddr,jdbcType=VARCHAR},
+      EVT_MAPPED_IP = #{evtMappedIp,jdbcType=VARCHAR},
+      EVT_PROCOTOL_TYPE = #{evtProcotolType,jdbcType=VARCHAR},
+      EVT_MAPPED_FUN_NAME = #{evtMappedFunName,jdbcType=VARCHAR},
+      EVENT_DESC = #{eventDesc,jdbcType=VARCHAR},
+      EVT_TYPE_ID = #{evtTypeId,jdbcType=BIGINT},
+      EVENT_TRIG_TYPE = #{eventTrigType,jdbcType=VARCHAR},
+      EXT_EVENT_ID = #{extEventId,jdbcType=BIGINT},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where EVENT_ID = #{eventId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select EVENT_ID, INTERFACE_CFG_ID, EVENT_NBR, EVENT_NAME, EVT_MAPPED_ADDR, EVT_MAPPED_IP, 
+    EVT_PROCOTOL_TYPE, EVT_MAPPED_FUN_NAME, EVENT_DESC, EVT_TYPE_ID, EVENT_TRIG_TYPE, 
+    EXT_EVENT_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, 
+    REMARK
+    from event
+    where EVENT_ID = #{eventId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select EVENT_ID, INTERFACE_CFG_ID, EVENT_NBR, EVENT_NAME, EVT_MAPPED_ADDR, EVT_MAPPED_IP, 
+    EVT_PROCOTOL_TYPE, EVT_MAPPED_FUN_NAME, EVENT_DESC, EVT_TYPE_ID, EVENT_TRIG_TYPE, 
+    EXT_EVENT_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, 
+    REMARK
+    from event
+  </select>
+</mapper>
