@@ -752,12 +752,32 @@ public class EventApiServiceImpl implements EventApiService {
                     FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId);
                     //判断过滤类型(红名单，黑名单)
                     if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
-
+                        //查询红名单黑名单列表
+                        int count = userListMapper.checkRule(privateParams.get("accNbr"),filterRule.getRuleId(),filterRule.getFilterType());
+                        if(count > 0) {
+                            System.out.println("红黑名单过滤规则验证被拦截");
+                            esJson.put("hit", "false");
+                            esJson.put("msg", "红黑名单过滤规则验证被拦截");
+                            esService.save(esJson, IndexList.STRATEGY_MODULE);
+                            return Collections.EMPTY_MAP;
+                        }
                     } else if ("3000".equals(filterRule.getFilterType())) {  //销售品过滤
+                        //获取用户已办理销售品，验证互斥
+
 
                     } else if ("4000".equals(filterRule.getFilterType())) {  //表达式过滤
+                        //暂不处理
+                        //do something
+                    } else if ("5000".equals(filterRule.getFilterType())) {  //时间段过滤
+                        //时间段的格式
 
-                    } else if ("5000".equals(filterRule.getFilterType())) {  //销售品过滤
+                        if(compareHourAndMinute(filterRule)) {
+                            System.out.println("过滤时间段验证被拦截");
+                            esJson.put("hit", "false");
+                            esJson.put("msg", "过滤时间段验证被拦截");
+                            esService.save(esJson, IndexList.STRATEGY_MODULE);
+                            return Collections.EMPTY_MAP;
+                        }
 
                     }
                 }
@@ -868,31 +888,6 @@ public class EventApiServiceImpl implements EventApiService {
             List<Map<String, Object>> taskChlList = new ArrayList<>();
 
 
-            //  1.判断过滤规则---------------------------
-            //获取过滤规则
-//            FilterRuleConfDO filterRuleConfDO = filterRuleConfMapper.selectByPrimaryKey(ruleConfId);
-//            String ruleConfIdStr = filterRuleConfDO.getFilterRuleIds();
-//            if (ruleConfIdStr != null) {
-//                String[] array = ruleConfIdStr.split(",");
-//                boolean ruleFilter = true;
-//                for (String str : array) {
-//                    //获取具体规则
-//                    FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.parseLong(str));
-//
-//                    //匹配事件过滤规则
-//                    int flag = 0;
-//                    if (filterRule != null) {
-//                        flag = userListMapper.checkRule("", filterRule.getRuleId(), null);
-//                        if (flag > 0) {
-//                            ruleFilter = false;
-//                        }
-//                    }
-//                }
-//                //若存在不符合的规则 结束当前规则循环
-//                if (!ruleFilter) {
-//                    return Collections.EMPTY_MAP;
-//                }
-//            }
             //  2.判断客户分群规则---------------------------
             //判断匹配结果，如匹配则向下进行，如不匹配则continue结束本次循环
             //拼装redis key
@@ -1500,6 +1495,29 @@ public class EventApiServiceImpl implements EventApiService {
             return new JSONObject();
         }
     }
+
+
+
+    private boolean compareHourAndMinute(FilterRule filterRule) {
+        Boolean result = true;
+
+        Calendar start = Calendar.getInstance();
+        start.setTime(filterRule.getDayStart());
+        Calendar end = Calendar.getInstance();
+        end.setTime(filterRule.getDayEnd());
+        Calendar cal = Calendar.getInstance();
+        int nowHour = cal.get(Calendar.HOUR_OF_DAY);
+        if(nowHour > start.get(Calendar.HOUR_OF_DAY) && nowHour < end.get(Calendar.HOUR_OF_DAY)) {
+            if(nowHour > start.get(Calendar.MINUTE) && nowHour < end.get(Calendar.MINUTE)) {
+                if(nowHour > start.get(Calendar.SECOND) && nowHour < end.get(Calendar.SECOND)) {
+                    result = false;
+                }
+            }
+        }
+
+        return result;
+    }
+
 
 
 }
