@@ -241,7 +241,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
         }
 
-        mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignId);
+        mktCamEvtRelMapper.deleteByMktCampaignId(mktCampaignId);
         //创建活动与事件的关联
         for (EventDTO eventDTO : mktCampaignVO.getEventDTOS()) {
             MktCamEvtRelDO mktCamEvtRelDO = new MktCamEvtRelDO();
