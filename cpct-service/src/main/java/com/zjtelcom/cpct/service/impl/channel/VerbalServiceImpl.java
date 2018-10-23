@@ -62,18 +62,20 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
             return map;
         }
         List<VerbalVO> verbalVOList = detail.getVerbalVOList();
-        for (VerbalVO verbalVO : verbalVOList){
-            VerbalAddVO addVO = BeanUtil.create(verbalVO,new VerbalAddVO());
-            addVO.setContactConfId(newConfId);
-            List<VerbalConditionAddVO> conditionAddVOList = new ArrayList<>();
-            for (VerbalConditionVO conditionVO : verbalVO.getConditionList()){
-                VerbalConditionAddVO conditionAddVO = BeanUtil.create(conditionVO,new VerbalConditionAddVO());
-                conditionAddVOList.add(conditionAddVO);
-            }
-            addVO.setAddVOList(conditionAddVOList);
-            Map<String, Object> addMap = addVerbal(1L,addVO);
-            if (!addMap.get("resultCode").equals(CODE_SUCCESS)){
-                return addMap;
+        if(verbalVOList!=null &&verbalVOList.size()>0){
+            for (VerbalVO verbalVO : verbalVOList){
+                VerbalAddVO addVO = BeanUtil.create(verbalVO,new VerbalAddVO());
+                addVO.setContactConfId(newConfId);
+                List<VerbalConditionAddVO> conditionAddVOList = new ArrayList<>();
+                for (VerbalConditionVO conditionVO : verbalVO.getConditionList()){
+                    VerbalConditionAddVO conditionAddVO = BeanUtil.create(conditionVO,new VerbalConditionAddVO());
+                    conditionAddVOList.add(conditionAddVO);
+                }
+                addVO.setAddVOList(conditionAddVOList);
+                Map<String, Object> addMap = addVerbal(1L,addVO);
+                if (!addMap.get("resultCode").equals(CODE_SUCCESS)){
+                    return addMap;
+                }
             }
         }
         map.put("resultCode", CODE_SUCCESS);

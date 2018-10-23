@@ -24,6 +24,7 @@ import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.strategy.*;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
@@ -44,6 +45,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.rmi.MarshalledObject;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -466,17 +468,17 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                 }
                 if (mktStrategyConfRuleDO.getEvtContactConfId() != null) {
                     String[] evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
-                    List<MktCamChlConf> mktCamChlConfList = new ArrayList<>();
+                    List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
                     for (int i = 0; i < evtContactConfIds.length; i++) {
                         if (evtContactConfIds[i] != "" && !"".equals(evtContactConfIds[i])) {
-                            MktCamChlConf mktCamChlConf = new MktCamChlConf();
-                            mktCamChlConf.setEvtContactConfId(Long.valueOf(evtContactConfIds[i]));
+                            MktCamChlConfDetail mktCamChlConfDetail = new MktCamChlConfDetail();
+                            mktCamChlConfDetail.setEvtContactConfId(Long.valueOf(evtContactConfIds[i]));
                             String evtContactConfName = mktCamChlConfMapper.selectforName(Long.valueOf(evtContactConfIds[i]));
-                            mktCamChlConf.setEvtContactConfName(evtContactConfName);
-                            mktCamChlConfList.add(mktCamChlConf);
+                            mktCamChlConfDetail.setEvtContactConfName(evtContactConfName);
+                            mktCamChlConfDetailList.add(mktCamChlConfDetail);
                         }
                     }
-                    mktStrategyConfRule.setMktCamChlConfList(mktCamChlConfList);
+                    mktStrategyConfRule.setMktCamChlConfDetailList(mktCamChlConfDetailList);
                 }
 
                 if (mktStrategyConfRuleDO.getMktCamChlResultId() != null) {
@@ -577,6 +579,8 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
      */
     @Override
     public Map<String, Object> copyMktStrategyConf(MktStrategyConfDetail mktStrategyConfDetail) throws Exception {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+        logger.info("MktStrategyConfDetail-->>>开始：" + simpleDateFormat.format(new Date()));
         Map<String, Object> mktStrategyConfDetailMap = new HashMap<>();
         MktStrategyConfDetail mktStrategyConfDetailCopy = BeanUtil.create(mktStrategyConfDetail, new MktStrategyConfDetail());
         // 获取规则列表
@@ -591,6 +595,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             mktStrategyConfDetailCopy.setMktStrategyConfRuleList(mktStrategyConfRuleCopyList);
         }
         mktStrategyConfDetailMap.put("mktStrategyConfDetail", mktStrategyConfDetailCopy);
+        logger.info("MktStrategyConfDetail-->>>结束：" + simpleDateFormat.format(new Date()));
         return mktStrategyConfDetailMap;
     }
 
