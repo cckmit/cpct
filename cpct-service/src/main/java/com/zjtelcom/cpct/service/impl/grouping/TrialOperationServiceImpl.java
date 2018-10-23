@@ -401,9 +401,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
             // 获取推送渠道
             List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
-            List<MktCamChlConf> mktCamChlConfList = mktStrategyConfRule.getMktCamChlConfList();
+            List<MktCamChlConfDetail> mktCamChlConfList = mktStrategyConfRule.getMktCamChlConfDetailList();
             if (mktCamChlConfList != null) {
-                for (MktCamChlConf mktCamChlConf : mktCamChlConfList) {
+                for (MktCamChlConfDetail mktCamChlConf : mktCamChlConfList) {
                     Map<String, Object> mktCamChlConfDetailMap = mktCamChlConfService.getMktCamChlConf(mktCamChlConf.getEvtContactConfId());
                     MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConfDetailMap.get("mktCamChlConfDetail");
                     mktCamChlConfDetailList.add(mktCamChlConfDetail);
@@ -557,9 +557,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
             // 获取推送渠道
             List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
-            List<MktCamChlConf> mktCamChlConfList = mktStrategyConfRule.getMktCamChlConfList();
+            List<MktCamChlConfDetail> mktCamChlConfList = mktStrategyConfRule.getMktCamChlConfDetailList();
             if(mktCamChlConfList!=null){
-                for (MktCamChlConf mktCamChlConf : mktCamChlConfList) {
+                for (MktCamChlConfDetail mktCamChlConf : mktCamChlConfList) {
                     Map<String, Object> mktCamChlConfDetailMap = mktCamChlConfService.getMktCamChlConf(mktCamChlConf.getEvtContactConfId());
                     MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConfDetailMap.get("mktCamChlConfDetail");
                     mktCamChlConfDetail.setIsSecondCoop("1");   // 设置为首次协同

@@ -96,6 +96,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 MktCamItem newItem = BeanUtil.create(item, new MktCamItem());
                 newItem.setMktCamItemId(null);
                 camItemMapper.insert(newItem);
+                redisUtils.set("MKT_CAM_ITEM_"+newItem.getMktCamItemId(), newItem);
                 ruleIdList.add(newItem.getMktCamItemId());
             }
         }
