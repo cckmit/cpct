@@ -187,8 +187,10 @@ public class EventApiServiceImpl implements EventApiService {
 
             result = new EventTask().call(params);
 
+            System.out.println("开始调用协同中心异步回调");
+
             //调用协同中心回调接口
-            Map<String, Object> back = iContactTaskReceiptService.contactTaskReceipt(result);
+            Map<String, Object> back = iContactTaskReceiptService .contactTaskReceipt(result);
 
             if (back != null) {
                 if ("1".equals(back.get("resultCode"))) {
