@@ -136,25 +136,31 @@
         from mkt_campaign
         where 1 = 1
         <if test="map.mktCampaignName != null and map.mktCampaignName != ''">
-            AND MKT_CAMPAIGN_NAME like CONCAT('%',#{mktCampaignName,jdbcType=VARCHAR},'%')
+            AND MKT_CAMPAIGN_NAME like CONCAT('%',#{map.mktCampaignName,jdbcType=VARCHAR},'%')
         </if>
-        <if test="map.statusCd != null and map.statusCd != ''">
-            AND STATUS_CD = #{statusCd,jdbcType=VARCHAR}
+        <!--<if test="map.statusCd != null and map.statusCd != ''">-->
+            <!--AND STATUS_CD = #{map.statusCd,jdbcType=VARCHAR}-->
+        <!--</if>-->
+        <if test="map.statusCd != null and map.statusCd == 1000''">
+            AND (STATUS_CD = 2002 or STATUS_CD = 2003)
+        </if>
+        <if test="map.statusCd != null and map.statusCd == 2000''">
+            AND STATUS_CD != 2002 and STATUS_CD != 2003)
         </if>
         <if test="map.tiggerType != null and map.tiggerType != ''">
-            AND TIGGER_TYPE = #{tiggerType,jdbcType=VARCHAR}
+            AND TIGGER_TYPE = #{map.tiggerType,jdbcType=VARCHAR}
         </if>
         <if test="map.mktCampaignType != null and map.mktCampaignType != ''">
-            AND MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR}
+            AND MKT_CAMPAIGN_TYPE = #{map.mktCampaignType,jdbcType=VARCHAR}
         </if>
         <if test="map.mktCampaignCategory != null and map.mktCampaignCategory != ''">
-            AND MKT_CAMPAIGN_CATEGORY = #{mktCampaignCategory,jdbcType=VARCHAR}
+            AND MKT_CAMPAIGN_CATEGORY = #{map.mktCampaignCategory,jdbcType=VARCHAR}
         </if>
         <if test="map.activityNbr != null and map.activityNbr != ''">
             AND MKT_ACTIVITY_NBR like CONCAT('%',#{map.activityNbr,jdbcType=VARCHAR},'%')
         </if>
         <if test="map.channel != null and map.channel != ''">
-            AND CREATE_CHANNEL like CONCAT('%',#{channel,jdbcType=VARCHAR},'%')
+            AND CREATE_CHANNEL like CONCAT('%',#{map.channel,jdbcType=VARCHAR},'%')
         </if>
         AND STATUS_CD not in (2001,2003)
         order by UPDATE_DATE desc

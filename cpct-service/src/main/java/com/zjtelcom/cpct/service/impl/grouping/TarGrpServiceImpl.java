@@ -119,7 +119,6 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             result.put("resultMsg", "客户分群不存在");
             return result;
         }
-
         result = createTarGrp(detail,isCopy);
         return result;
     }
