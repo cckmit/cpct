@@ -55,6 +55,7 @@ import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 
 /**
  * @Description 目标分群serviceImpl
@@ -168,6 +169,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         tarGrp.setCreateStaff(UserUtil.loginId());
         if (isCopy) {
             tarGrp.setStatusCd("2000");
+        }else {
+            tarGrp.setStatusCd(STATUSCD_EFFECTIVE);
         }
         tarGrpMapper.createTarGrp(tarGrp);
         List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
@@ -188,7 +191,6 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             tarGrpCondition.setStatusDate(DateUtil.getCurrentTime());
             tarGrpCondition.setUpdateStaff(UserUtil.loginId());
             tarGrpCondition.setCreateStaff(UserUtil.loginId());
-            tarGrpCondition.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
             tarGrpConditionMapper.insert(tarGrpCondition);
         }
         //数据加入redis
@@ -491,7 +493,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             grpConditionList.add(tarGrpConditionVO);
         }
         //倒个序
-        Collections.reverse(grpConditionList);
+//        Collections.reverse(grpConditionList);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("listTarGrpCondition",grpConditionList);
