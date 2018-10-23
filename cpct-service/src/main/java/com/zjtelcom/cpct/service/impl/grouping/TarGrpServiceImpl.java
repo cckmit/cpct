@@ -51,11 +51,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
-import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 
 /**
  * @Description 目标分群serviceImpl
@@ -166,39 +168,41 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         tarGrp.setStatusDate(DateUtil.getCurrentTime());
         tarGrp.setUpdateStaff(UserUtil.loginId());
         tarGrp.setCreateStaff(UserUtil.loginId());
-        if (isCopy) {
+        if (isCopy){
             tarGrp.setStatusCd("2000");
         }else {
-            tarGrp.setStatusCd(STATUSCD_EFFECTIVE);
+            tarGrp.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
         }
         tarGrpMapper.createTarGrp(tarGrp);
         List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
-        for (final TarGrpCondition tarGrpCondition : tarGrpConditions) {
-            if (tarGrpCondition.getOperType()==null || tarGrpCondition.getOperType().equals("")){
-                maps.put("resultCode", CODE_FAIL);
-                maps.put("resultMsg", "请选择下拉框运算类型");
-                return maps;
+        List<TarGrpCondition> conditionList = new ArrayList<>();
+        if(tarGrpConditions!=null && tarGrpConditions.size()>0){
+            for (final TarGrpCondition tarGrpCondition : tarGrpConditions) {
+                if (tarGrpCondition.getOperType()==null || tarGrpCondition.getOperType().equals("")){
+                    maps.put("resultCode", CODE_FAIL);
+                    maps.put("resultMsg", "请选择下拉框运算类型");
+                    return maps;
+                }
+                if (tarGrpCondition.getAreaIdList()!=null){
+                    area2RedisThread(tarGrp, tarGrpCondition);
+                }
+                tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
+                tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
+                tarGrpCondition.setTarGrpId(tarGrp.getTarGrpId());
+                tarGrpCondition.setCreateDate(DateUtil.getCurrentTime());
+                tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
+                tarGrpCondition.setStatusDate(DateUtil.getCurrentTime());
+                tarGrpCondition.setUpdateStaff(UserUtil.loginId());
+                tarGrpCondition.setCreateStaff(UserUtil.loginId());
+                tarGrpCondition.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                tarGrpConditionMapper.insert(tarGrpCondition);
+                conditionList.add(tarGrpCondition);
             }
-            if (tarGrpCondition.getAreaIdList()!=null){
-                area2RedisThread(tarGrp, tarGrpCondition);
-            }
-            tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
-            tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
-            tarGrpCondition.setTarGrpId(tarGrp.getTarGrpId());
-            tarGrpCondition.setCreateDate(DateUtil.getCurrentTime());
-            tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
-            tarGrpCondition.setStatusDate(DateUtil.getCurrentTime());
-            tarGrpCondition.setUpdateStaff(UserUtil.loginId());
-            tarGrpCondition.setCreateStaff(UserUtil.loginId());
-            tarGrpConditionMapper.insert(tarGrpCondition);
         }
         //数据加入redis
-        Map<String,Object> conditionList = listTarGrpCondition(tarGrp.getTarGrpId());
-        if (conditionList.get("resultCode").equals(CODE_SUCCESS)){
-            TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
-            detail.setTarGrpConditions((List<TarGrpCondition>) conditionList.get("conditionList"));
-            redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),detail);
-        }
+        TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
+        detail.setTarGrpConditions(conditionList);
+        redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),detail);
         //插入客户分群条件
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
@@ -352,6 +356,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 tarGrpCondition.setStatusDate(DateUtil.getCurrentTime());
                 tarGrpCondition.setUpdateStaff(UserUtil.loginId());
                 tarGrpCondition.setCreateStaff(UserUtil.loginId());
+                tarGrpCondition.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
                 tarGrpConditionMapper.insert(tarGrpCondition);
             } else {
                 tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
@@ -491,11 +496,10 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             tarGrpConditionVO.setSysAreaList(voList);
             grpConditionList.add(tarGrpConditionVO);
         }
-        //倒个序
-//        Collections.reverse(grpConditionList);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
-        maps.put("listTarGrpCondition",grpConditionList);
+        maps.put("listTarGrpCondition", grpConditionList);
+        maps.put("conditionList",listTarGrpCondition);
         return maps;
     }
 

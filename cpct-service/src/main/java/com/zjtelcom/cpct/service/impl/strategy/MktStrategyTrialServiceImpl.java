@@ -80,8 +80,8 @@ public class MktStrategyTrialServiceImpl implements MktStrategyTrialService {
 
         // 获取协同渠道信息
         List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
-        List<MktCamChlConf> mktCamChlConfList = mktStrategyConfRule.getMktCamChlConfList();
-        for (MktCamChlConf mktCamChlConf : mktCamChlConfList) {
+        List<MktCamChlConfDetail> mktCamChlConfList = mktStrategyConfRule.getMktCamChlConfDetailList();
+        for (MktCamChlConfDetail mktCamChlConf : mktCamChlConfList) {
             Map<String, Object> mktCamChlConfDetailMap = mktCamChlConfService.getMktCamChlConf(mktCamChlConf.getEvtContactConfId());
             MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConfDetailMap.get("mktCamChlConfDetail");
             mktCamChlConfDetailList.add(mktCamChlConfDetail);
