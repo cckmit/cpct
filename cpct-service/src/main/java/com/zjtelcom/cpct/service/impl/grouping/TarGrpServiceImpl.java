@@ -51,10 +51,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -121,6 +118,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             result.put("resultMsg", "客户分群不存在");
             return result;
         }
+
         result = createTarGrp(detail,isCopy);
         return result;
     }
@@ -168,10 +166,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         tarGrp.setStatusDate(DateUtil.getCurrentTime());
         tarGrp.setUpdateStaff(UserUtil.loginId());
         tarGrp.setCreateStaff(UserUtil.loginId());
-        if (isCopy){
+        if (isCopy) {
             tarGrp.setStatusCd("2000");
-        }else {
-            tarGrp.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
         }
         tarGrpMapper.createTarGrp(tarGrp);
         List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
@@ -355,7 +351,6 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 tarGrpCondition.setStatusDate(DateUtil.getCurrentTime());
                 tarGrpCondition.setUpdateStaff(UserUtil.loginId());
                 tarGrpCondition.setCreateStaff(UserUtil.loginId());
-                tarGrpCondition.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
                 tarGrpConditionMapper.insert(tarGrpCondition);
             } else {
                 tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
@@ -495,10 +490,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             tarGrpConditionVO.setSysAreaList(voList);
             grpConditionList.add(tarGrpConditionVO);
         }
+        //倒个序
+        Collections.reverse(grpConditionList);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
-        maps.put("listTarGrpCondition", grpConditionList);
-        maps.put("conditionList",listTarGrpCondition);
+        maps.put("listTarGrpCondition",grpConditionList);
         return maps;
     }
 
