@@ -17,10 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -55,7 +52,7 @@ public class EsController {
      * @return
      */
     @RequestMapping("/searchLabelInfoByRuleId")
-    @ResponseBody
+    @CrossOrigin
     public Map<String, Object> searchLabelInfoByRuleId(@RequestBody HashMap<String,Object> param) {
         return esService.searchLabelInfoByRuleId(param.get("ruleId").toString(),param.get("isi").toString());
     }
@@ -67,7 +64,7 @@ public class EsController {
      * @return
      */
     @RequestMapping("/searchCampaignHitsTotal")
-    @ResponseBody
+    @CrossOrigin
     public Map<String, Object> searchCampaignHitsTotal(@RequestBody CampaignHitParam param) {
         return esService.searchCampaignHitsTotal(param);
     }
@@ -79,7 +76,7 @@ public class EsController {
      * @return
      */
     @RequestMapping("/searchCampaignHitsInfo")
-    @ResponseBody
+    @CrossOrigin
     public Map<String, Object> searchCampaignHitsInfo(@RequestBody CampaignHitParam param) {
         return esService.searchCampaignHitsInfo(param);
     }
@@ -93,7 +90,7 @@ public class EsController {
      * @return
      */
     @RequestMapping("/createIndex")
-    @ResponseBody
+    @CrossOrigin
     public String createIndex(HttpServletRequest request, HttpServletResponse response) {
         if(!ElasticsearchUtil.isIndexExist(indexName)) {
             ElasticsearchUtil.createIndex(indexName);
@@ -105,7 +102,7 @@ public class EsController {
     }
 
     @RequestMapping("/updateMapping")
-    @ResponseBody
+    @CrossOrigin
     public String createIndexMapping(String indexName) {
        ElasticsearchUtil.updateMapping(indexName);
         return "索引mapping更新成功";
@@ -120,7 +117,7 @@ public class EsController {
      * @return
      */
     @RequestMapping("/getData")
-    @ResponseBody
+    @CrossOrigin
     public String getData(String id){
         if(StringUtils.isNotBlank(id)) {
             Map<String, Object> map= ElasticsearchUtil.searchDataById(indexName,esType,id,null);
@@ -137,7 +134,7 @@ public class EsController {
      * @return
      */
     @RequestMapping("/queryMatchData")
-    @ResponseBody
+    @CrossOrigin
     public String queryMatchData() {
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
         boolean matchPhrase = false;
@@ -156,7 +153,7 @@ public class EsController {
      * @return
      */
     @RequestMapping("/queryWildcardData")
-    @ResponseBody
+    @CrossOrigin
     public String queryWildcardData() {
         QueryBuilder queryBuilder = QueryBuilders.wildcardQuery("name.keyword", "j-*466");
         List<Map<String, Object>> list = ElasticsearchUtil.searchListData(indexName, esType, queryBuilder, 10, null, null, null);
@@ -168,7 +165,7 @@ public class EsController {
      * @return
      */
     @RequestMapping("/queryRegexpData")
-    @ResponseBody
+    @CrossOrigin
     public String queryRegexpData() {
         QueryBuilder queryBuilder = QueryBuilders.regexpQuery("name.keyword", "j--[0-9]{1,11}");
         List<Map<String, Object>> list = ElasticsearchUtil.searchListData(indexName, esType, queryBuilder, 10, null, null, null);
@@ -180,7 +177,7 @@ public class EsController {
      * @return
      */
     @RequestMapping("/queryIntRangeData")
-    @ResponseBody
+    @CrossOrigin
     public String queryIntRangeData() {
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
         boolQuery.must(QueryBuilders.rangeQuery("age").from(21)
@@ -194,7 +191,7 @@ public class EsController {
      * @return
      */
     @RequestMapping("/queryDateRangeData")
-    @ResponseBody
+    @CrossOrigin
     public String queryDateRangeData() {
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
         boolQuery.must(QueryBuilders.rangeQuery("date").from("2018-04-25T08:33:44.840Z")
@@ -213,7 +210,7 @@ public class EsController {
      * @return
      */
     @RequestMapping("/queryPage")
-    @ResponseBody
+    @CrossOrigin
     public String queryPage(String startPage,String pageSize){
         if(StringUtils.isNotBlank(startPage)&&StringUtils.isNotBlank(pageSize)) {
             BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();

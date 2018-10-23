@@ -194,7 +194,6 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 tarGrpCondition.setStatusDate(DateUtil.getCurrentTime());
                 tarGrpCondition.setUpdateStaff(UserUtil.loginId());
                 tarGrpCondition.setCreateStaff(UserUtil.loginId());
-                tarGrpCondition.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
                 tarGrpConditionMapper.insert(tarGrpCondition);
                 conditionList.add(tarGrpCondition);
             }
@@ -356,7 +355,6 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 tarGrpCondition.setStatusDate(DateUtil.getCurrentTime());
                 tarGrpCondition.setUpdateStaff(UserUtil.loginId());
                 tarGrpCondition.setCreateStaff(UserUtil.loginId());
-                tarGrpCondition.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
                 tarGrpConditionMapper.insert(tarGrpCondition);
             } else {
                 tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
