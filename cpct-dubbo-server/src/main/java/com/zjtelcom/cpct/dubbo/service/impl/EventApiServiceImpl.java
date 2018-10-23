@@ -943,7 +943,7 @@ public class EventApiServiceImpl implements EventApiService {
             httpResultStr = HttpUtil.post(url, param.toString());
 
             //更换为dubbo因子查询-----------------------------------------------------
-//            Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
+            Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
 
             if (httpResultStr == null || "".equals(httpResultStr)) {
 
@@ -956,12 +956,12 @@ public class EventApiServiceImpl implements EventApiService {
             }
             JSONObject jsonobj = new JSONObject();
             //解析返回结果
-            JSONObject httpResult = JSONObject.parseObject(httpResultStr);
-            if (httpResult.getInteger("result_code") == 0) {
-                JSONObject body = httpResult.getJSONObject("msgbody");
+//            JSONObject httpResult = JSONObject.parseObject(httpResultStr);
+//            if (httpResult.getInteger("result_code") == 0) {
+//                JSONObject body = httpResult.getJSONObject("msgbody");
 
-//            if ("0".equals((String)dubboResult.get("result_code"))) {
-//                JSONObject body = JSON.parseObject((String)dubboResult.get("msgbody"));
+            if ("0".equals((String)dubboResult.get("result_code"))) {
+                JSONObject body = JSON.parseObject((String)dubboResult.get("msgbody"));
                 //ES log 标签实例
                 jsonobj.put("reqId", reqId);
                 jsonobj.put("eventId", params.get("eventCode"));
@@ -988,7 +988,8 @@ public class EventApiServiceImpl implements EventApiService {
 
                 System.out.println("查询标签成功:" + context.toString());
             } else {
-                System.out.println("查询标签失败:" + httpResult.getString("result_msg"));
+//                System.out.println("查询标签失败:" + httpResult.getString("result_msg"));
+                System.out.println("查询标签失败:");
 
                 esJson.put("hit", "false");
 //                esJson.put("msg", "查询标签失败:" + httpResult.getString("result_msg"));
@@ -1478,17 +1479,17 @@ public class EventApiServiceImpl implements EventApiService {
         String paramStr = param.toString();
         System.out.println("param " + param.toString());
         //验证post回调结果
-        httpResultStr = HttpUtil.post(url, paramStr);
+//        httpResultStr = HttpUtil.post(url, paramStr);
 
-//        Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
+        Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
 
-//        if ("0".equals((String)dubboResult.get("result_code"))) {
-//            JSONObject body = JSON.parseObject((String)dubboResult.get("msgbody"));
+        if ("0".equals((String)dubboResult.get("result_code"))) {
+            JSONObject body = JSON.parseObject((String)dubboResult.get("msgbody"));
 
         //解析返回结果
-        JSONObject httpResult = JSONObject.parseObject(httpResultStr);
-        if (httpResult.getInteger("result_code") == 0) {
-            JSONObject body = httpResult.getJSONObject("msgbody");
+//        JSONObject httpResult = JSONObject.parseObject(httpResultStr);
+//        if (httpResult.getInteger("result_code") == 0) {
+//            JSONObject body = httpResult.getJSONObject("msgbody");
             return body;
         } else {
 //            System.out.println("查询标签失败:" + httpResult.getString("result_msg"));
