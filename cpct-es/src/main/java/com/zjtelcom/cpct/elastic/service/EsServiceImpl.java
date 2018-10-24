@@ -394,7 +394,7 @@ public class EsServiceImpl implements EsService {
     private BoolQueryBuilder getBoolQueryBuilder(String ISI) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
-                        rangeQuery("ISI").gt(ISI));
+                        matchQuery("ISI",ISI));
         System.out.println(boolQueryBuilder);
         return boolQueryBuilder;
     }
