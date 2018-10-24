@@ -106,15 +106,21 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     @Override
     public Map<String, Object> copyTarGrp(Long tarGrpId,boolean isCopy) {
         Map<String,Object> result = new HashMap<>();
-        TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpId);
-        if (tarGrp==null){
+//        TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpId);
+//        if (tarGrp==null){
+//            result.put("resultCode", CODE_FAIL);
+//            result.put("resultMsg", "请选择下拉框运算类型");
+//            return result;
+//        }
+//        List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
+//        TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
+//        detail.setTarGrpConditions(conditionList);
+        TarGrpDetail detail = (TarGrpDetail)redisUtils.get("TAR_GRP_"+tarGrpId);
+        if (detail==null){
             result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "请选择下拉框运算类型");
+            result.put("resultMsg", "客户分群不存在");
             return result;
         }
-        List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
-        TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
-        detail.setTarGrpConditions(conditionList);
         result = createTarGrp(detail,isCopy);
         return result;
     }
@@ -123,7 +129,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     /**
      * 模板创建客户分群
      * @param templateId
-     * @return
+     * @return‘
      */
     @Override
     public Map<String, Object> createTarGrpByTemplateId(Long templateId) {
@@ -169,26 +175,33 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         }
         tarGrpMapper.createTarGrp(tarGrp);
         List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
-        for (final TarGrpCondition tarGrpCondition : tarGrpConditions) {
-            if (tarGrpCondition.getOperType()==null || tarGrpCondition.getOperType().equals("")){
-                maps.put("resultCode", CODE_FAIL);
-                maps.put("resultMsg", "请选择下拉框运算类型");
-                return maps;
+        List<TarGrpCondition> conditionList = new ArrayList<>();
+        if(tarGrpConditions!=null && tarGrpConditions.size()>0){
+            for (final TarGrpCondition tarGrpCondition : tarGrpConditions) {
+                if (tarGrpCondition.getOperType()==null || tarGrpCondition.getOperType().equals("")){
+                    maps.put("resultCode", CODE_FAIL);
+                    maps.put("resultMsg", "请选择下拉框运算类型");
+                    return maps;
+                }
+                if (tarGrpCondition.getAreaIdList()!=null){
+                    area2RedisThread(tarGrp, tarGrpCondition);
+                }
+                tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
+                tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
+                tarGrpCondition.setTarGrpId(tarGrp.getTarGrpId());
+                tarGrpCondition.setCreateDate(DateUtil.getCurrentTime());
+                tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
+                tarGrpCondition.setStatusDate(DateUtil.getCurrentTime());
+                tarGrpCondition.setUpdateStaff(UserUtil.loginId());
+                tarGrpCondition.setCreateStaff(UserUtil.loginId());
+                tarGrpConditionMapper.insert(tarGrpCondition);
+                conditionList.add(tarGrpCondition);
             }
-            if (tarGrpCondition.getAreaIdList()!=null){
-                area2RedisThread(tarGrp, tarGrpCondition);
-            }
-            tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
-            tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
-            tarGrpCondition.setTarGrpId(tarGrp.getTarGrpId());
-            tarGrpCondition.setCreateDate(DateUtil.getCurrentTime());
-            tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
-            tarGrpCondition.setStatusDate(DateUtil.getCurrentTime());
-            tarGrpCondition.setUpdateStaff(UserUtil.loginId());
-            tarGrpCondition.setCreateStaff(UserUtil.loginId());
-            tarGrpCondition.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-            tarGrpConditionMapper.insert(tarGrpCondition);
         }
+        //数据加入redis
+        TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
+        detail.setTarGrpConditions(conditionList);
+        redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),detail);
         //插入客户分群条件
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
@@ -342,13 +355,17 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 tarGrpCondition.setStatusDate(DateUtil.getCurrentTime());
                 tarGrpCondition.setUpdateStaff(UserUtil.loginId());
                 tarGrpCondition.setCreateStaff(UserUtil.loginId());
-                tarGrpCondition.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
                 tarGrpConditionMapper.insert(tarGrpCondition);
             } else {
                 tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
                 tarGrpCondition.setUpdateStaff(UserUtil.loginId());
                 tarGrpConditionMapper.modTarGrpCondition(tarGrpCondition);
             }
+        }
+        //更新redis分群数据
+        Map<String,Object> conditionList = listTarGrpCondition(tarGrp.getTarGrpId());
+        if (conditionList.get("resultCode").equals(CODE_SUCCESS)){
+            redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),conditionList.get("listTarGrpCondition"));
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
@@ -402,7 +419,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
      * 获取目标分群条件信息
      */
     @Override
-    public Map<String, Object> listTarGrpCondition(Long tarGrpId) throws Exception {
+    public Map<String, Object> listTarGrpCondition(Long tarGrpId){
         Map<String, Object> maps = new HashMap<>();
         if (tarGrpId==null){
             maps.put("resultCode", CODE_FAIL);
@@ -418,7 +435,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         for (TarGrpCondition tarGrpCondition : listTarGrpCondition) {
             List<OperatorDetail> operatorList = new ArrayList<>();
             TarGrpConditionVO tarGrpConditionVO = new TarGrpConditionVO();
-            CopyPropertiesUtil.copyBean2Bean(tarGrpConditionVO, tarGrpCondition);
+            BeanUtil.copy(tarGrpCondition,tarGrpConditionVO);
+//            CopyPropertiesUtil.copyBean2Bean(tarGrpConditionVO, tarGrpCondition);
             //塞入左参中文名
             Label label = injectionLabelMapper.selectByPrimaryKey(Long.valueOf(tarGrpConditionVO.getLeftParam()));
             if (label==null){
@@ -479,6 +497,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("listTarGrpCondition", grpConditionList);
+        maps.put("conditionList",listTarGrpCondition);
         return maps;
     }
 

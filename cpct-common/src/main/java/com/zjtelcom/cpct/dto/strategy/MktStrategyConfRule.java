@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.dto.strategy;
 
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 
 import java.util.List;
@@ -42,7 +43,7 @@ public class MktStrategyConfRule {
     /**
      * 协同渠道配置集合
      */
-    private List<MktCamChlConf> mktCamChlConfList;
+    private List<MktCamChlConfDetail> mktCamChlConfDetailList;
 
     /**
      * 二次协同渠道结果集合
@@ -74,12 +75,12 @@ public class MktStrategyConfRule {
         this.productIdlist = productIdlist;
     }
 
-    public List<MktCamChlConf> getMktCamChlConfList() {
-        return mktCamChlConfList;
+    public List<MktCamChlConfDetail> getMktCamChlConfDetailList() {
+        return mktCamChlConfDetailList;
     }
 
-    public void setMktCamChlConfList(List<MktCamChlConf> mktCamChlConfList) {
-        this.mktCamChlConfList = mktCamChlConfList;
+    public void setMktCamChlConfDetailList(List<MktCamChlConfDetail> mktCamChlConfDetailList) {
+        this.mktCamChlConfDetailList = mktCamChlConfDetailList;
     }
 
     public String getMktStrategyConfRuleName() {

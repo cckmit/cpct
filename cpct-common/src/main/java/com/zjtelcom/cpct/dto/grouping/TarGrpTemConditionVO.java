@@ -6,6 +6,7 @@
  */
 package com.zjtelcom.cpct.dto.grouping;
 
+import com.zjtelcom.cpct.dto.channel.LabelValueVO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public class TarGrpTemConditionVO extends TarGrpTemplateCondition {
 
     private String conditionType;
 
-    private List<String> valueList;
+    private List<LabelValueVO> valueList;
 
     private List<OperatorDetail> operatorList;//运算符
 
@@ -72,11 +73,11 @@ public class TarGrpTemConditionVO extends TarGrpTemplateCondition {
         this.conditionType = conditionType;
     }
 
-    public List<String> getValueList() {
+    public List<LabelValueVO> getValueList() {
         return valueList;
     }
 
-    public void setValueList(List<String> valueList) {
+    public void setValueList(List<LabelValueVO> valueList) {
         this.valueList = valueList;
     }
 
