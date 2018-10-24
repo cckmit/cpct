@@ -17,7 +17,7 @@
 
     <!-- 注册 -->
     <!-- 标签增量同步 -->
-    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.SyncLabelService" ref="syncLabelService" version="1.0" >
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.SyncLabelService" ref="syncLabelServiceImpl" version="1.0" >
         <dubbo:method name="syncLabelInfo" servicecode="33.1083.syncLabelInfo" timeout="10000"/>
     </dubbo:service>
 
