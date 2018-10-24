@@ -2,6 +2,8 @@
 package com.zjtelcom.cpct.dubbo.service;
 
 import com.zjtelcom.cpct.dubbo.model.QryMktCampaignListReq;
+import com.zjtelcom.cpct.dubbo.model.Ret;
+
 import java.util.Map;
 
 /**
@@ -15,7 +17,7 @@ public interface MktCampaignApiService {
 
   //  Map<String, Object> qryMktCampaignList(QryMktCampaignListReq qryMktCampaignListReq) throws Exception;
 
-    Map<String, Object> qryMktCampaignDetail(Long mktCampaignId) throws Exception;
+    Ret qryMktCampaignDetail(Long mktCampaignId) throws Exception;
 
 
 }
