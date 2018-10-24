@@ -41,8 +41,8 @@ public class ChannelServiceImpl implements ChannelService {
     private FilterRuleMapper filterRuleMapper;
 
     @Override
-    public Ret getChannelDetail(String channelCode) {
-        Ret<ChannelModel> ret = new Ret<>();
+    public RetChannel getChannelDetail(String channelCode) {
+        RetChannel ret = new RetChannel();
         ChannelModel vo = new ChannelModel();
         try {
             Channel channel = channelMapper.selectByCode(channelCode);
