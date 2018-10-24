@@ -486,7 +486,9 @@ public class EventApiServiceImpl implements EventApiService {
                 return Collections.EMPTY_MAP;
             }
 
-            privateParams.put("activityId", mktCampaign.getMktActivityNbr()); //活动编码
+            params.put("activityId", mktCampaign.getMktCampaignId().toString()); //活动编码
+
+            privateParams.put("activityId", mktCampaign.getMktCampaignId().toString()); //活动编码
             privateParams.put("activityName", mktCampaign.getMktCampaignName()); //活动名称
             privateParams.put("activityType", mktCampaign.getMktCampaignType()); //活动类型
             privateParams.put("skipCheck", ""); //是否校验  todo
@@ -959,20 +961,20 @@ public class EventApiServiceImpl implements EventApiService {
 
             System.out.println("param " + param.toString());
             //验证post回调结果
-            httpResultStr = HttpUtil.post(url, param.toString());
+//            httpResultStr = HttpUtil.post(url, param.toString());
 
             //更换为dubbo因子查询-----------------------------------------------------
             Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
 
-            if (httpResultStr == null || "".equals(httpResultStr)) {
-
-                System.out.println("查询标签出错");
-
-                esJson.put("hit", "false");
-                esJson.put("msg", "标签实例查询出错");
-                esService.save(esJson, IndexList.STRATEGY_MODULE);
-                return Collections.EMPTY_MAP;
-            }
+//            if (httpResultStr == null || "".equals(httpResultStr)) {
+//
+//                System.out.println("查询标签出错");
+//
+//                esJson.put("hit", "false");
+//                esJson.put("msg", "标签实例查询出错");
+//                esService.save(esJson, IndexList.STRATEGY_MODULE);
+//                return Collections.EMPTY_MAP;
+//            }
             JSONObject jsonobj = new JSONObject();
             //解析返回结果
 //            JSONObject httpResult = JSONObject.parseObject(httpResultStr);

@@ -57,7 +57,7 @@
 
     <!-- 订阅 -->
     <!-- cpc计算协同中心回调 -->
-    <dubbo:reference interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService" id="eventApiService"
+    <dubbo:reference interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService" id="iContactTaskReceiptService"
                      version="1.0" retries="0" check="false">
         <dubbo:method name="contactTaskReceipt" servicecode="00.1079.CPCResultFeedback" timeout="5000"/>
     </dubbo:reference>
