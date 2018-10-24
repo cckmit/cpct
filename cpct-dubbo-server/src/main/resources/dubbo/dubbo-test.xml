@@ -30,10 +30,6 @@
         <dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="5000"/>
     </dubbo:reference>
 
-    <dubbo:reference id="esService" interface="com.zjtelcom.cpct.dubbo.service.EsService" version="1.0">
-        <dubbo:method name="queryCustomer" servicecode="00.1083.queryCustomer"/>
-    </dubbo:reference>
-
 
 
 </beans>

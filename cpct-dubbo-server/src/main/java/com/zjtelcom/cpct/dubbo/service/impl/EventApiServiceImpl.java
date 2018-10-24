@@ -512,25 +512,32 @@ public class EventApiServiceImpl implements EventApiService {
             }
 
             Map<String, Object> itgTriggers = new HashMap<>();
-            Map<String, String> queryFields = new HashMap<>();
-            int i = 0;
+//            Map<String, String> queryFields = new HashMap<>();
+            StringBuilder querySb = new StringBuilder();
+//            int i = 0;
 
             //查询展示列 （试算）
             List<Label> calcDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getCalcDisplay());
             //格式化返回参数结构
             if (calcDisplay != null) {
                 for (Label label : calcDisplay) {
-                    queryFields.put(String.valueOf(i), label.getInjectionLabelCode());
-                    i++;
+//                    queryFields.put(String.valueOf(i), label.getInjectionLabelCode());
+//                    i++;
+                    querySb.append(label.getInjectionLabelCode()).append(",");
                 }
             }
             //查询展示列 （iSale）
             List<Label> iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getIsaleDisplay());
             if (calcDisplay != null) {
                 for (Label label : iSaleDisplay) {
-                    queryFields.put(String.valueOf(i), label.getInjectionLabelCode());
-                    i++;
+//                    queryFields.put(String.valueOf(i), label.getInjectionLabelCode());
+//                    i++;
+                    querySb.append(label.getInjectionLabelCode()).append(",");
                 }
+            }
+
+            if(querySb.length() > 0) {
+                querySb.deleteCharAt(querySb.length() -1);
             }
 
             JSONObject httpParams = new JSONObject();
@@ -538,9 +545,11 @@ public class EventApiServiceImpl implements EventApiService {
             httpParams.put("c3", params.get("lanId"));
             httpParams.put("queryId", privateParams.get("integrationId"));
             //查询标签列表
-            httpParams.put("queryFields", queryFields);
+            httpParams.put("queryFields", querySb.toString());
             //http查询标签
             JSONObject resJson = getLabelByPost(httpParams);
+
+            System.out.println(resJson.toString());
 
             Map<String, Object> triggers = new HashMap<>();
             if (calcDisplay != null) {
@@ -847,7 +856,7 @@ public class EventApiServiceImpl implements EventApiService {
     }
 
     /**
-     * 获取规则列表
+     * 获取规则列表（规则级）
      */
     class RuleTask implements Callable<Map<String, Object>> {
         private Long strategyConfId; //策略配置id
@@ -908,7 +917,8 @@ public class EventApiServiceImpl implements EventApiService {
             param.put("c3", params.get("lanId"));
             param.put("queryId", privateParams.get("integrationId"));
             //查询标签列表
-            Map<String, String> queryFields = new HashMap<>();
+//            Map<String, String> queryFields = new HashMap<>();
+            StringBuilder queryFieldsSb = new StringBuilder();
             //从redis获取规则使用的所有标签
             List<LabelResult> labelResultList = (List<LabelResult>) redisUtils.get(key + "_LABEL");
             LabelResult lr;
@@ -925,7 +935,8 @@ public class EventApiServiceImpl implements EventApiService {
                     lr.setRightOperand(label.getOperator());
                     lr.setRightParam(label.getRightOperand());
                     labelResultList.add(lr);
-                    queryFields.put(String.valueOf(i), label.getInjectionLabelCode());
+//                    queryFields.put(String.valueOf(i), label.getInjectionLabelCode());
+                    queryFieldsSb.append(label.getInjectionLabelCode()).append(",");
                 }
             } else {
                 //redis中获取标签
@@ -933,12 +944,18 @@ public class EventApiServiceImpl implements EventApiService {
                     if (labelItems.containsKey(String.valueOf(i))) {
                         continue;
                     }
-                    queryFields.put(String.valueOf(i), labelResultList.get(i - 1).getLabelCode());
+//                    queryFields.put(String.valueOf(i), labelResultList.get(i - 1).getLabelCode());
+                    queryFieldsSb.append(labelResultList.get(i - 1).getLabelCode()).append(",");
                 }
             }
-            param.put("queryFields", queryFields);
+
+            if(queryFieldsSb.length() > 0) {
+                queryFieldsSb.deleteCharAt(queryFieldsSb.length() -1);
+            }
+
+            param.put("queryFields", queryFieldsSb.toString());
             //记录参数个数
-            int paramsSize = queryFields.size();
+//            int paramsSize = queryFields.size();
 
             System.out.println("param " + param.toString());
             //验证post回调结果
@@ -962,8 +979,9 @@ public class EventApiServiceImpl implements EventApiService {
 //            if (httpResult.getInteger("result_code") == 0) {
 //                JSONObject body = httpResult.getJSONObject("msgbody");
 
-            if ("0".equals((String)dubboResult.get("result_code"))) {
-                JSONObject body = JSON.parseObject((String)dubboResult.get("msgbody"));
+            if ("0".equals(dubboResult.get("result_code").toString())) {
+                JSONObject body = new JSONObject((HashMap)dubboResult.get("msgbody"));
+                JSONObject labels = new JSONObject((HashMap)body.get("data"));
                 //ES log 标签实例
                 jsonobj.put("reqId", reqId);
                 jsonobj.put("eventId", params.get("eventCode"));
@@ -980,7 +998,7 @@ public class EventApiServiceImpl implements EventApiService {
                 //jsonobj.put("labelResultList", JSONArray.toJSON(labelResultList));
 
                 //拼接规则引擎上下文
-                for (Map.Entry<String, Object> entry : body.entrySet()) {
+                for (Map.Entry<String, Object> entry : labels.entrySet()) {
                     //添加到上下文
                     context.put(entry.getKey(), entry.getValue());
                 }
@@ -1485,9 +1503,8 @@ public class EventApiServiceImpl implements EventApiService {
 
         Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
 
-        if ("0".equals((String)dubboResult.get("result_code"))) {
-            JSONObject body = JSON.parseObject((String)dubboResult.get("msgbody"));
-
+        if ("0".equals(dubboResult.get("result_code").toString())) {
+            JSONObject body = new JSONObject((HashMap)dubboResult.get("msgbody"));
         //解析返回结果
 //        JSONObject httpResult = JSONObject.parseObject(httpResultStr);
 //        if (httpResult.getInteger("result_code") == 0) {
