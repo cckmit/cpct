@@ -19,19 +19,19 @@ public class CommonConstant {
     public static final String CPC_MATCH_FILE_TO_FTP = "http://134.96.252.170:30808/es/cpcMatchFileToFtp";//策略试运算下发上传文件到ftp
 
 
-//    public static final String SEARCH_INFO_FROM_ES_URL = "http://134.96.252.170:30808/es/searchBatchInfo";//试运算接口
-//
-//    public static final String FIND_BATCH_HITS_LIST_URL = "http://134.96.252.170:30808/es/findBatchHitsList";//redis查询抽样试算结果清单
-//
-//    public static final String SEARCH_COUNT_INFO_URL = "http://134.96.252.170:30808/es/searchCountInfo";//策略试运算统计查询
+    public static final String SEARCH_INFO_FROM_ES_URL = "http://134.96.252.170:30808/es/searchBatchInfo";//试运算接口
+
+    public static final String FIND_BATCH_HITS_LIST_URL = "http://134.96.252.170:30808/es/findBatchHitsList";//redis查询抽样试算结果清单
+
+    public static final String SEARCH_COUNT_INFO_URL = "http://134.96.252.170:30808/es/searchCountInfo";//策略试运算统计查询
 
 
     //本地测试用
-    public static final String SEARCH_INFO_FROM_ES_URL = "http://localhost:8080/es/searchBatchInfo";//试运算接口
-
-    public static final String FIND_BATCH_HITS_LIST_URL = "http://localhost:8080/es/findBatchHitsList";//redis查询抽样试算结果清单
-
-    public static final String SEARCH_COUNT_INFO_URL = "http://localhost:8080/es/searchCountInfo";//策略试运算统计查询
+//    public static final String SEARCH_INFO_FROM_ES_URL = "http://localhost:8080/es/searchBatchInfo";//试运算接口
+//
+//    public static final String FIND_BATCH_HITS_LIST_URL = "http://localhost:8080/es/findBatchHitsList";//redis查询抽样试算结果清单
+//
+//    public static final String SEARCH_COUNT_INFO_URL = "http://localhost:8080/es/searchCountInfo";//策略试运算统计查询
 
 
 

@@ -287,12 +287,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         TrialOperation operation = trialOperationMapper.selectByPrimaryKey(batchId);
         if (operation == null) {
             result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "试运算记录不存在");
+            result.put("resultMsg", "统计查询记录出错啦！");
             return result;
         }
-        Object jsonObject =  redisUtils.get("HITS_COUNT_INFO_"+operation.getBatchNum());
+        Map<String,Object> resultMap =  (Map<String, Object>) redisUtils.get("HITS_COUNT_INFO_"+operation.getBatchNum());
         result.put("resultCode", CODE_SUCCESS);
-        result.put("resultMsg", jsonObject);
+        result.put("resultMsg", resultMap);
         return result;
     }
 
@@ -381,6 +381,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             response = restTemplate.postForObject(SEARCH_INFO_FROM_ES_URL, request, TrialResponse.class);
             //同时调用统计查询的功能
             countResponse = restTemplate.postForObject(SEARCH_COUNT_INFO_URL,request,TrialResponse.class);
+            if (countResponse.getResultCode().equals(CODE_SUCCESS)){
+                redisUtils.set("HITS_COUNT_INFO_"+request.getBatchNum(),countResponse.getHitsList());
+            }
             if (!response.getResultCode().equals(CODE_SUCCESS)) {
                 trialOperation.setStatusCd("2000");
                 trialOperation.setUpdateDate(new Date());
