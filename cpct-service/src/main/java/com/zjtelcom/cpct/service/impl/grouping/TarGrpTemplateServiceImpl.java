@@ -18,6 +18,7 @@ import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateConditionDO;
 import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO;
+import com.zjtelcom.cpct.dto.channel.LabelValueVO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.grouping.TarGrpTemConditionVO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpTemplateCondition;
@@ -258,7 +259,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                 }
             }
             List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(label.getInjectionLabelId());
-            List<String> valueList = ChannelUtil.valueList2StList(labelValues);
+            List<LabelValueVO> valueList = ChannelUtil.valueList2VOList(labelValues);
             tarGrpTemConditionVO.setValueList(valueList);
             tarGrpTemConditionVO.setConditionType(label.getConditionType());
             tarGrpTemConditionVO.setOperatorList(operatorList);
