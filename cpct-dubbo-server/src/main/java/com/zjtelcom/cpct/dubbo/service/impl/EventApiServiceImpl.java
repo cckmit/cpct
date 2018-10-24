@@ -193,7 +193,7 @@ public class EventApiServiceImpl implements EventApiService {
             Map<String, Object> back = iContactTaskReceiptService .contactTaskReceipt(result);
 
             if (back != null) {
-                if ("1".equals(back.get("resultCode"))) {
+                if ("1".equals(back.get("CPCResultCode"))) {
                     System.out.println("协同中心接口回调调用成功");
                     return null;
                 }
@@ -221,7 +221,7 @@ public class EventApiServiceImpl implements EventApiService {
             JSONObject esJson = new JSONObject();
 
             //构造返回结果
-            String custId = map.get("reqId");
+            String custId = map.get("custId");
             result.put("reqId", map.get("reqId"));
             result.put("custId", custId);
 
@@ -231,7 +231,7 @@ public class EventApiServiceImpl implements EventApiService {
             //根据事件code查询事件信息
             ContactEvt event = contactEvtMapper.getEventByEventNbr(map.get("eventCode"));
             if (event == null) {
-                result.put("resultMsg", "未找到相关事件");
+                result.put("CPCResultMsg", "未找到相关事件");
                 return result;
             }
             //获取事件id
@@ -279,8 +279,8 @@ public class EventApiServiceImpl implements EventApiService {
                 esJson.put("msg", "事件采集项验证失败，缺少：" + stringBuilder.toString());
                 esService.save(esJson, IndexList.EVENT_MODULE);
 
-                result.put("resultCode", "1000");
-                result.put("resultMsg", "事件采集项验证失败，缺少：" + stringBuilder.toString());
+                result.put("CPCResultCode", "1000");
+                result.put("CPCResultMsg", "事件采集项验证失败，缺少：" + stringBuilder.toString());
                 return result;
             }
 
@@ -491,7 +491,7 @@ public class EventApiServiceImpl implements EventApiService {
             privateParams.put("activityId", mktCampaign.getMktCampaignId().toString()); //活动编码
             privateParams.put("activityName", mktCampaign.getMktCampaignName()); //活动名称
             privateParams.put("activityType", mktCampaign.getMktCampaignType()); //活动类型
-            privateParams.put("skipCheck", ""); //是否校验  todo
+            privateParams.put("skipCheck", "0"); //是否校验  todo
 
             //es log
             esJson.put("orderId", reqId);
@@ -1180,8 +1180,8 @@ public class EventApiServiceImpl implements EventApiService {
                     ruleMap.put("orderPriority", privateParams.get("orderPriority")); //活动优先级
                     ruleMap.put("integrationId", privateParams.get("integrationId")); //集成编号（必填）
                     ruleMap.put("accNbr", privateParams.get("accNbr")); //业务号码（必填）
-                    ruleMap.put("policyId", strategyConfId); //策略编码
-                    ruleMap.put("ruleId", ruleConfId); //规则编码
+                    ruleMap.put("policyId", strategyConfId.toString()); //策略编码
+                    ruleMap.put("ruleId", ruleConfId.toString()); //规则编码
 
                     //查询销售品列表
                     if (productStr != null && !"".equals(productStr)) {
