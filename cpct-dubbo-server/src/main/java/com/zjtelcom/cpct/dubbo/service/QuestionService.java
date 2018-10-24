@@ -1,12 +1,13 @@
 package com.zjtelcom.cpct.dubbo.service;
 
 import com.zjtelcom.cpct.dubbo.model.LabelCatalogModel;
+import com.zjtelcom.cpct.dubbo.model.Ret;
 
 import java.util.Map;
 
 public interface QuestionService {
 
-    Map<String,Object> getQuestionnaireDetail(Long questionnaireId);
+    Ret getQuestionnaireDetail(Long questionnaireId);
 
 
 
