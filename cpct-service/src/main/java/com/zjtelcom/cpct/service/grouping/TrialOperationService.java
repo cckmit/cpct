@@ -24,6 +24,8 @@ public interface TrialOperationService  {
 
     Map<String,Object> businessCheck(TrialOperationVO operationVO);
 
+    Map<String,Object> searchCountInfo(Long batchId);
+
 
 
 

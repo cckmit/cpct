@@ -41,14 +41,16 @@ public class QuestionServiceImpl implements QuestionService {
      * @return
      */
     @Override
-    public Map<String, Object> getQuestionnaireDetail(Long questionnaireId) {
+    public Ret getQuestionnaireDetail(Long questionnaireId) {
+        Ret<QuestionRep> ret = new Ret<>();
         Map<String,Object> result = new HashMap<>();
         QuestionRep resultRep = new QuestionRep();
         Questionnaire questionnaire = questionnaireMapper.selectByPrimaryKey(questionnaireId);
         if (questionnaire==null){
-            result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg","调研问卷不存在");
-            return result;
+            ret.setData(resultRep);
+            ret.setResultMsg("调研问卷不存在");
+            ret.setResultCode(CODE_FAIL);
+            return ret;
         }
         QuestionnaireVO questionnaireVO = BeanUtil.create(questionnaire,new QuestionnaireVO());
         resultRep.setQuestionnaire(questionnaireVO);
@@ -70,9 +72,9 @@ public class QuestionServiceImpl implements QuestionService {
             }
         }
         resultRep.setQuestionVOList(voList);
-        result.put("resutlCode",CODE_SUCCESS);
-        result.put("resultMsg",null);
-        result.put("data",resultRep);
-        return result;
+        ret.setResultCode(CODE_SUCCESS);
+        ret.setData(resultRep);
+        ret.setResultMsg(null);
+        return ret;
     }
 }
