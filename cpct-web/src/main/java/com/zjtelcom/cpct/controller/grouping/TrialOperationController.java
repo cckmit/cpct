@@ -74,6 +74,25 @@ public class TrialOperationController extends BaseController {
     }
 
     /**
+     * 策略试运算统计查询
+     * @return
+     */
+    @PostMapping("searchCountInfo")
+    @CrossOrigin
+    public Map<String, Object> searchCountInfo(@RequestBody HashMap<String, Long> param) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = operationService.searchCountInfo(param.get("batchId"));
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to searchCountInfo", e);
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "fail to searchCountInfo");
+            return result;
+        }
+        return result;
+    }
+
+    /**
      * 新增策略试运算
      * @param operationVO
      * @return

@@ -18,9 +18,7 @@ import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.campaign.*;
 import com.zjtelcom.cpct.dto.filter.FilterRuleModel;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRuleRel;
-import com.zjtelcom.cpct.dubbo.model.MktCampaignResp;
-import com.zjtelcom.cpct.dubbo.model.MktStrConfRuleResp;
-import com.zjtelcom.cpct.dubbo.model.MktStrategyConfResp;
+import com.zjtelcom.cpct.dubbo.model.*;
 import com.zjtelcom.cpct.dubbo.service.MktCampaignApiService;
 import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.util.*;
@@ -34,6 +32,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 /**
  * @Description:
@@ -97,7 +97,8 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
     private InjectionLabelMapper injectionLabelMapper;
 
     @Override
-    public Map<String, Object> qryMktCampaignDetail(Long mktCampaignId) throws Exception {
+    public RetCamResp qryMktCampaignDetail(Long mktCampaignId) throws Exception {
+        RetCamResp ret = new RetCamResp();
         // 获取活动基本信息
         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
         MktCampaignResp mktCampaignResp = BeanUtil.create(mktCampaignDO, new MktCampaignResp());
@@ -124,11 +125,10 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
             mktStrategyConfRespList.add(mktStrategyConfResp);
         }
         mktCampaignResp.setMktStrategyConfRespList(mktStrategyConfRespList);
-        Map<String, Object> maps = new HashMap<>();
-        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
-        maps.put("resultMsg", "success");
-        maps.put("mktCampaignResp", mktCampaignResp);
-        return maps;
+        ret.setResultCode(CODE_SUCCESS);
+        ret.setData(mktCampaignResp);
+        ret.setResultMsg("success");
+        return ret;
     }
 
     /**

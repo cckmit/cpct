@@ -166,7 +166,7 @@ public class FilterRuleController extends BaseController {
         OutputStream ouputStream = null;
         try {
             String fileName = "用户名单.xlsx";
-            File file = new File("cpct-web/src/main/resources/file/用户名单.xlsx");
+            File file = new File("d:/用户名单.xlsx");
             byte[] buffer = new byte[1024];
             FileInputStream fis = null; //文件输入流
             BufferedInputStream bis = null;
@@ -194,7 +194,7 @@ public class FilterRuleController extends BaseController {
             }
         }
 
-        return initSuccRespInfo(null);
+        return initSuccRespInfo("导出成功");
     }
 
     /**

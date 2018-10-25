@@ -131,20 +131,20 @@ public class EsServiceImpl implements EsService {
         //查询活动信息
         param.setIsi(ISI);
         SearchHits activityHits = searchActivityByParam(param);
-        List<Map<String,Object>>[] activityList = hitsToMapList4More( activityHits);
+        List<Map<String,Object>> activityList = hitsToMapList4More(activityHits);
 
 
         List<CampaignInfoTree> activityResult = new ArrayList<>();
-        for (List<Map<String,Object>> activity : activityList){
+        for (Map<String,Object> activity : activityList){
             CampaignInfoTree activityInfo = new CampaignInfoTree();
             Long id = null;
             String name = null;
             boolean booleanResult;
             String reason = null;
-            for (Map<String,Object> map : activity){
-                id = Long.valueOf(map.get("activityId").toString());
-                name = map.get("activityName").toString();
-            }
+
+            id = Long.valueOf(activity.get("activityId").toString());
+            name = activity.get("activityName").toString();
+
             activityInfo.setId(id);
             activityInfo.setName(name);
             //todo 命中结果；命中实例
@@ -154,15 +154,15 @@ public class EsServiceImpl implements EsService {
 
             //查询策略信息
             SearchHits strategyHits = searchStrategyByParam(param,activityInfo.getId().toString());
-            List<Map<String,Object>>[] strategyList = hitsToMapList4More(strategyHits);
+            List<Map<String,Object>> strategyList = hitsToMapList4More(strategyHits);
 
             List<CampaignInfoTree> stratygyResult = new ArrayList<>();
-            for (List<Map<String,Object>> strategy : strategyList){
+            for (Map<String,Object> strategy : strategyList){
                 CampaignInfoTree strategyInfo = new CampaignInfoTree();
-                for (Map<String,Object> map : strategy){
-                    id = Long.valueOf(map.get("strategyConfId").toString());
-                    name = map.get("strategyConfName").toString();
-                }
+
+                id = Long.valueOf(strategy.get("strategyConfId").toString());
+                name = strategy.get("strategyConfName").toString();
+
                 strategyInfo.setId(id);
                 //todo 策略名称有吗
                 strategyInfo.setName(name);
@@ -174,15 +174,15 @@ public class EsServiceImpl implements EsService {
 
                 //查询规则信息
                 SearchHits ruleHits = searchRuleByParam(param,strategyInfo.getId().toString());
-                List<Map<String,Object>>[] ruleList = hitsToMapList4More( ruleHits);
+                List<Map<String,Object>> ruleList = hitsToMapList4More( ruleHits);
 
                 List<CampaignInfoTree> ruleResult = new ArrayList<>();
-                for (List<Map<String,Object>> rule : ruleList){
+                for (Map<String,Object> rule : ruleList){
                     CampaignInfoTree ruleInfo = new CampaignInfoTree();
-                    for (Map<String,Object> map : rule){
-                        id = Long.valueOf(map.get("ruleId").toString());
-                        name = map.get("ruleName").toString();
-                    }
+
+                    id = Long.valueOf(rule.get("ruleId").toString());
+                    name = rule.get("ruleName").toString();
+
                     ruleInfo.setId(id);
                     ruleInfo.setName(name);
                     ruleInfo.setResult(true);
@@ -191,7 +191,7 @@ public class EsServiceImpl implements EsService {
 
                     //查询标签实例信息
                     SearchHits labelInfoHits = searchLabelByRuleId(param,ruleInfo.getId().toString());
-                    List<Map<String,Object>>[] labelInfoList = hitsToMapList4More(labelInfoHits);
+                    List<Map<String,Object>> labelInfoList = hitsToMapList4More(labelInfoHits);
 
                     ruleInfo.setLabelList(labelInfoList);
                     ruleResult.add(ruleInfo);
@@ -256,18 +256,17 @@ public class EsServiceImpl implements EsService {
     }
 
     //命中数据转换成list 数组 （可优化）
-    private List<Map<String,Object>>[] hitsToMapList4More( SearchHits hits) {
-        List<Map<String,Object>>[] result = new List[hits.getHits().length];
+    private List<Map<String,Object>> hitsToMapList4More(SearchHits hits) {
+        List<Map<String,Object>> result = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>();
 
         for(int j = 0; j < hits.getHits().length; j++) {
-            List<Map<String, Object>> mapList = new ArrayList<>();
-            Map<String, Object> map = new HashMap<>();
             String source = hits.getHits()[j].getSourceAsString();
             System.out.println(source);
             Map<String, Object> stringMap = hits.getHits()[j].getSourceAsMap();
-            mapList.add(stringMap);
-            result[j] = mapList;
+            map.putAll(stringMap);
         }
+        result.add(map);
         return result;
     }
 
@@ -394,7 +393,7 @@ public class EsServiceImpl implements EsService {
     private BoolQueryBuilder getBoolQueryBuilder(String ISI) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
-                        rangeQuery("ISI").gt(ISI));
+                        matchQuery("ISI",ISI));
         System.out.println(boolQueryBuilder);
         return boolQueryBuilder;
     }
@@ -412,7 +411,7 @@ public class EsServiceImpl implements EsService {
     private BoolQueryBuilder getBoolQueryBuilderByEventCode(String eventCode ) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
-                        rangeQuery("eventCode").gt(eventCode));
+                        matchQuery("eventCode",eventCode));
         System.out.println(boolQueryBuilder);
 
         return boolQueryBuilder;
@@ -422,7 +421,7 @@ public class EsServiceImpl implements EsService {
     private BoolQueryBuilder getBoolQueryBuilderByAssetNumber(String assetNumber,Date startTime,Date endTime) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
-                        rangeQuery("assetNumber").gt(assetNumber))
+                        matchQuery("assetNumber",assetNumber))
                 .must(QueryBuilders.rangeQuery("startTime").gte(startTime))
                 .must(QueryBuilders.rangeQuery("endTime").lte(endTime));
         System.out.println(boolQueryBuilder);
