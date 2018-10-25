@@ -162,7 +162,7 @@
         <if test="map.channel != null and map.channel != ''">
             AND CREATE_CHANNEL like CONCAT('%',#{map.channel,jdbcType=VARCHAR},'%')
         </if>
-        AND STATUS_CD not in (2001,2003)
+        AND STATUS_CD != 2001
         order by UPDATE_DATE desc
     </select>
 
