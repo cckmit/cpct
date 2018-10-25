@@ -75,10 +75,10 @@ public class CampaignController extends BaseController {
      */
     @PostMapping("/examineCampaign4Sync")
     @CrossOrigin
-    public Map<String, Object> examineCampaign4Sync(@RequestBody Map<String,Long> params){
+    public Map<String, Object> examineCampaign4Sync(@RequestBody Map<String,Object> params){
         Map<String,Object> result = new HashMap<>();
         try {
-            result = mktCampaignService.examineCampaign4Sync(params.get("campaignId"));
+            result = mktCampaignService.examineCampaign4Sync(Long.valueOf(params.get("campaignId").toString()),params.get("statusCd").toString());
         } catch (Exception e) {
             logger.error("[op:CampaignController] fail to examineCampaign4Sync",e);
             result.put("resultCode",CODE_FAIL);
