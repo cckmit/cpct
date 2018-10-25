@@ -499,7 +499,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(parentEvtContactConfId);
             // 获取原渠道的规则，通过parentEvtContactConfId获取规则放入属性中
             String rule = ruleSelect(parentEvtContactConfId);
-
+            List<MktCamChlConfAttr> mktCamChlConfAttrList = new ArrayList<>();
             for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
                 mktCamChlConfAttrDO.setContactChlAttrRstrId(null);
                 mktCamChlConfAttrDO.setEvtContactConfId(childEvtContactConfId);
@@ -511,13 +511,19 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                     //  String params = mktCamChlConfAttrDO.getAttrValue();
                     ruleInsert(childEvtContactConfId, rule);
                 }
-                mktCamChlConfAttrMapper.insert(mktCamChlConfAttrDO);
+                MktCamChlConfAttr mktCamChlConfAttr = BeanUtil.create(mktCamChlConfAttrDO, new MktCamChlConfAttr());
+                mktCamChlConfAttr.setEvtContactConfId(childEvtContactConfId);
+                mktCamChlConfAttrList.add(mktCamChlConfAttr);
             }
+            MktCamChlConfDetail mktCamChlConfDetailNew = BeanUtil.create(mktCamChlConfDO, new MktCamChlConfDetail());
+            mktCamChlConfDetailNew.setMktCamChlConfAttrList(mktCamChlConfAttrList);
+            redisUtils.set("MktCamChlConfDetail_" + mktCamChlConfDetailNew.getEvtContactConfId(), mktCamChlConfDetailNew);
+
             // 查询痛痒点话术列表
             verbalService.copyVerbal(parentEvtContactConfId, childEvtContactConfId);
 
             // 查询脚本
-            camScriptService.copyCamScript(parentEvtContactConfId, childEvtContactConfId);
+            camScriptService.copyCamScript(parentEvtContactConfId, null, childEvtContactConfId);
 
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCamChlConfMap.put("resultMsg", ErrorCode.SAVE_CAM_CHL_CONF_SUCCESS.getErrorMsg());
@@ -538,7 +544,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
      * @return
      */
     @Override
-    public Map<String, Object> copyMktCamChlConfFormRedis(Long parentEvtContactConfId) throws Exception {
+    public Map<String, Object> copyMktCamChlConfFormRedis(Long parentEvtContactConfId, String scriptDesc) throws Exception {
         Map<String, Object> mktCamChlConfMap = new HashMap<>();
         try {
             // 获取原协同渠道
@@ -569,14 +575,17 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                 }
                 mktCamChlConfAttrMapper.insert(mktCamChlConfAttrDO);
                 mktCamChlConfAttr.setContactChlAttrRstrId(mktCamChlConfAttrDO.getContactChlAttrRstrId());
+                mktCamChlConfAttr.setEvtContactConfId(childEvtContactConfId);
                 mktCamChlConfAttrList.add(mktCamChlConfAttr);
             }
             MktCamChlConfDetail mktCamChlConfDetailNew = BeanUtil.create(mktCamChlConfDO, new MktCamChlConfDetail());
             mktCamChlConfDetailNew.setMktCamChlConfAttrList(mktCamChlConfAttrList);
+            redisUtils.set("MktCamChlConfDetail_" + mktCamChlConfDetailNew.getEvtContactConfId(), mktCamChlConfDetailNew);
+
             // 查询痛痒点话术列表
             verbalService.copyVerbal(parentEvtContactConfId, childEvtContactConfId);
             // 查询脚本
-            camScriptService.copyCamScript(parentEvtContactConfId, childEvtContactConfId);
+            camScriptService.copyCamScript(parentEvtContactConfId, scriptDesc, childEvtContactConfId);
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCamChlConfMap.put("resultMsg", ErrorCode.SAVE_CAM_CHL_CONF_SUCCESS.getErrorMsg());
             mktCamChlConfMap.put("mktCamChlConfDetail", mktCamChlConfDetailNew);

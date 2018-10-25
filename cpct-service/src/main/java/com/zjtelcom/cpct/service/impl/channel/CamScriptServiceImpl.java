@@ -37,7 +37,7 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
      * @return
      */
     @Override
-    public Map<String, Object> copyCamScript(Long contactConfId, Long newConfId) {
+    public Map<String, Object> copyCamScript(Long contactConfId, String scriptDesc, Long newConfId) {
         Map<String,Object> result = new HashMap<>();
 
         CamScript script = camScriptMapper.selectByConfId(contactConfId);

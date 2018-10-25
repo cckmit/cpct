@@ -587,12 +587,15 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
         List<MktStrategyConfRule> mktStrategyConfRuleList = mktStrategyConfDetail.getMktStrategyConfRuleList();
         if (mktStrategyConfRuleList != null && mktStrategyConfRuleList.size() > 0) {
             List<MktStrategyConfRule> mktStrategyConfRuleCopyList = new ArrayList<>();
-            for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfRuleList) {
-                Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.copyMktStrategyConfRule(mktStrategyConfRule);
+/*            for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfRuleList) {
+                new MktStrategyConfRuleServiceImpl.CopyMktStrategyConfRuleTask(mktStrategyConfRule);
                 MktStrategyConfRule mktStrategyConfRuleCopy = (MktStrategyConfRule) mktStrategyConfRuleMap.get("mktStrategyConfRule");
                 mktStrategyConfRuleCopyList.add(mktStrategyConfRuleCopy);
-            }
-            mktStrategyConfDetailCopy.setMktStrategyConfRuleList(mktStrategyConfRuleCopyList);
+            }*/
+
+            Map<String, Object> ruleListMap = mktStrategyConfRuleService.copyMktStrategyConfRule(mktStrategyConfRuleList);
+            List<MktStrategyConfRule> ruleList = (List<MktStrategyConfRule>) ruleListMap.get("mktStrategyConfRuleList");
+            mktStrategyConfDetailCopy.setMktStrategyConfRuleList(ruleList);
         }
         mktStrategyConfDetailMap.put("mktStrategyConfDetail", mktStrategyConfDetailCopy);
         logger.info("MktStrategyConfDetail-->>>结束：" + simpleDateFormat.format(new Date()));
