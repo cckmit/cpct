@@ -1,11 +1,14 @@
 package com.zjtelcom.cpct.dubbo.model;
 
-import java.io.Serializable;
+import com.zjtelcom.cpct.dto.campaign.MktCamResultRelDeatil;
 
-public class RetEvent implements Serializable {
+import java.io.Serializable;
+import java.util.List;
+
+public class RetCamResult implements Serializable {
     private String resultCode;
     private String resultMsg;
-    private ContactEvtModel data;
+    private List<MktCamResultRelDeatil> data;
 
     public String getResultCode() {
         return resultCode;
@@ -23,11 +26,11 @@ public class RetEvent implements Serializable {
         this.resultMsg = resultMsg;
     }
 
-    public ContactEvtModel getData() {
+    public List<MktCamResultRelDeatil> getData() {
         return data;
     }
 
-    public void setData(ContactEvtModel data) {
+    public void setData(List<MktCamResultRelDeatil> data) {
         this.data = data;
     }
 }
