@@ -8,13 +8,13 @@ public class CampaignHitResponse implements Serializable {
     private Map<String,Object> labelInfo;
     private Map<String,Object> eventInfo;
     private Map<String,Object> campaignInfo;
-    private Long total;
+    private TotalModel[] total;
 
-    public Long getTotal() {
+    public TotalModel[] getTotal() {
         return total;
     }
 
-    public void setTotal(Long total) {
+    public void setTotal(TotalModel[] total) {
         this.total = total;
     }
 

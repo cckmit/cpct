@@ -331,67 +331,46 @@
 
     <update id="modContactEvt" parameterType="com.zjtelcom.cpct.dto.event.ContactEvt">
         update event
-        set
-        <if test="interfaceCfgId != null and interfaceCfgId != 0">
-            INTERFACE_CFG_ID = #{interfaceCfgId,jdbcType=BIGINT},
-        </if>
-        <if test="contactEvtCode != null and contactEvtCode != ''">
+        set INTERFACE_CFG_ID = #{interfaceCfgId,jdbcType=BIGINT},
+
             EVENT_NBR = #{contactEvtCode,jdbcType=VARCHAR},
-        </if>
-        <if test="contactEvtName != null and contactEvtName != ''">
+
             EVENT_NAME = #{contactEvtName,jdbcType=VARCHAR},
-        </if>
-        <if test="evtMappedAddr != null and evtMappedAddr != ''">
+
             EVT_MAPPED_ADDR = #{evtMappedAddr,jdbcType=VARCHAR},
-        </if>
-        <if test="evtMappedIp != null and evtMappedIp != ''">
+
             EVT_MAPPED_IP = #{evtMappedIp,jdbcType=VARCHAR},
-        </if>
-        <if test="evtProcotolType != null and evtProcotolType != ''">
+
             EVT_PROCOTOL_TYPE = #{evtProcotolType,jdbcType=VARCHAR},
-        </if>
-        <if test="evtMappedFunName != null and evtMappedFunName != ''">
+
             EVT_MAPPED_FUN_NAME = #{evtMappedFunName,jdbcType=VARCHAR},
-        </if>
-        <if test="contactEvtDesc != null and contactEvtDesc != ''">
+
             EVENT_DESC = #{contactEvtDesc,jdbcType=VARCHAR},
-        </if>
-        <if test="contactEvtTypeId != null and contactEvtTypeId != 0">
+
             EVT_TYPE_ID = #{contactEvtTypeId,jdbcType=BIGINT},
-        </if>
-        <if test="evtTrigType != null and evtTrigType != ''">
+
             EVENT_TRIG_TYPE = #{evtTrigType,jdbcType=VARCHAR},
-        </if>
-        <if test="extEventId != null and extEventId != 0">
+
             EXT_EVENT_ID = #{extEventId,jdbcType=BIGINT},
-        </if>
-        <if test="mktCampaignType != null and mktCampaignType != ''">
+
             MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR},
-        </if>
-        <if test="statusCd != null and statusCd != ''">
+
             STATUS_CD = #{statusCd,jdbcType=VARCHAR},
-        </if>
-        <if test="recCampaignAmount != null and recCampaignAmount != ''">
+
             REC_CAMPAIGN_AMOUNT = #{recCampaignAmount,jdbcType=VARCHAR},
-        </if>
-        <if test="createStaff != null and createStaff != 0">
+
             CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
-        </if>
-        <if test="updateStaff != null and updateStaff != 0">
+
             UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
-        </if>
-        <if test="createDate != null">
+
             CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
-        </if>
-        <if test="statusDate != null">
+
             STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
-        </if>
-        <if test="updateDate != null">
+
             UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
-        </if>
-        <if test="remark != null and remark != ''">
+
             REMARK = #{remark,jdbcType=VARCHAR},
-        </if>
+
         EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
         where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
     </update>

@@ -13,10 +13,7 @@ import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.domain.User;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.Channel;
-import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
-import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
-import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
-import com.zjtelcom.cpct.dto.campaign.MktCamResultRelDeatil;
+import com.zjtelcom.cpct.dto.campaign.*;
 import com.zjtelcom.cpct.dto.channel.CamScriptAddVO;
 import com.zjtelcom.cpct.dto.channel.VerbalAddVO;
 import com.zjtelcom.cpct.dto.channel.VerbalEditVO;
@@ -36,6 +33,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Description:
@@ -76,6 +77,7 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
 
     @Autowired
     private RedisUtils redisUtils;
+
     /**
      * 添加二次协同结果
      *
@@ -122,7 +124,7 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
                     camScriptService.addCamScript(UserUtil.loginId(), camScriptAddVO);
                 }
             }
-            redisUtils.set("MktCamChlResult_"+mktCamChlResultId, mktCamChlResult);
+            redisUtils.set("MktCamChlResult_" + mktCamChlResultId, mktCamChlResult);
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCamChlConfMap.put("mktCamChlResultDO", mktCamChlResultDO);
         } catch (Exception e) {
@@ -184,7 +186,7 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
             mktCamChlResultMapper.updateByPrimaryKey(mktCamChlResultDO);
 
             // 添加/编辑话术
-            if (mktCamChlResult.getMktCamChlConfDetailList()!= null) {
+            if (mktCamChlResult.getMktCamChlConfDetailList() != null) {
                 for (int i = 0; i < mktCamChlResult.getMktCamChlConfDetailList().size(); i++) {
                     // 保存话术
                     CamScriptAddVO camScriptAddVO = new CamScriptAddVO();
@@ -195,7 +197,7 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
                 }
             }
 
-            redisUtils.set("MktCamChlResult_"+mktCamChlResult.getMktCamChlResultId(), mktCamChlResult);
+            redisUtils.set("MktCamChlResult_" + mktCamChlResult.getMktCamChlResultId(), mktCamChlResult);
             mktCamChlResultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCamChlResultMap.put("mktCamChlResult", mktCamChlResult);
         } catch (Exception e) {
@@ -226,7 +228,7 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
             mktCamChlResultConfRelMapper.deleteByMktCamChlResultId(mktCamChlResultId);
             //删除二次协同结果
             mktCamChlResultMapper.deleteByPrimaryKey(mktCamChlResultId);
-            redisUtils.remove("MktCamChlResult_"+ mktCamChlResultId);
+            redisUtils.remove("MktCamChlResult_" + mktCamChlResultId);
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCamChlConfMap.put("mktCamChlResultId", mktCamChlResultId);
         } catch (Exception e) {
@@ -292,37 +294,45 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
     /**
      * 复制二次协同渠道(从redis获取数据)
      *
-     * @param parentMktCamChlResultId
+     * @param mktCamChlResult
      * @return
      */
     @Override
-    public Map<String, Object> copyMktCamChlResultFromRedis(Long parentMktCamChlResultId) {
+    public Map<String, Object> copyMktCamChlResultFromRedis(MktCamChlResult mktCamChlResult) {
         Map<String, Object> mktCamChlResultMap = new HashMap<>();
         try {
             // MktCamChlResultDO mktCamChlResultDO = mktCamChlResultMapper.selectByPrimaryKey(parentMktCamChlResultId);
-            MktCamChlResult mktCamChlResult = (MktCamChlResult) redisUtils.get("MktCamChlResult_"+parentMktCamChlResultId);
-            MktCamChlResultDO mktCamChlResultDO = BeanUtil.create(mktCamChlResult, new MktCamChlResultDO());
-            mktCamChlResultDO.setMktCamChlResultId(null);
-            mktCamChlResultDO.setCreateDate(new Date());
-            mktCamChlResultDO.setCreateStaff(UserUtil.loginId());
-            mktCamChlResultDO.setUpdateDate(new Date());
-            mktCamChlResultDO.setUpdateStaff(UserUtil.loginId());
-            // 新增结果 并获取Id
-            mktCamChlResultMapper.insert(mktCamChlResultDO);
-            Long mktCamChlResultId = mktCamChlResultDO.getMktCamChlResultId();
-            // 获取原二次协同渠道下结果的推送渠道
-            List<MktCamChlResultConfRelDO> mktCamChlResultConfRelDOList = mktCamChlResultConfRelMapper.selectByMktCamChlResultId(parentMktCamChlResultId);
+            //初始化结果集
+            List<Future<Map<String, Object>>> threadList = new ArrayList<>();
+            //初始化线程池
+            ExecutorService executorService = Executors.newCachedThreadPool();
+
+            Future<Map<String, Object>> resultFuture = null;
+            if (mktCamChlResult != null) {
+                resultFuture = executorService.submit(new CopyMktCamChlResultTask(mktCamChlResult));
+                threadList.add(resultFuture);
+            }
+            Future<Map<String, Object>> mktCamChlConfFuture = null;
+            if (mktCamChlResult != null) {
+                mktCamChlConfFuture = executorService.submit(new CopyMktCamChlConfTask(mktCamChlResult));
+                threadList.add(mktCamChlConfFuture);
+            }
+
+            MktCamChlResult mktCamChlResultNew = new MktCamChlResult();
+            if (resultFuture != null) {
+                mktCamChlResultNew = (MktCamChlResult) resultFuture.get().get("mktCamChlResult");
+            }
             List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
-            // 遍历获取原二次协同渠道下结果的推送渠道
-            for (MktCamChlResultConfRelDO mktCamChlResultConfRelDO : mktCamChlResultConfRelDOList) {
-                // 复制推送渠道
-                Map<String, Object> mktCamChlConfMap = mktCamChlConfService.copyMktCamChlConfFormRedis(mktCamChlResultConfRelDO.getEvtContactConfId());
-                MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConfMap.get("mktCamChlConfDetail");
+            if (mktCamChlConfFuture != null) {
+                mktCamChlConfDetailList = (List<MktCamChlConfDetail>) mktCamChlConfFuture.get().get("mktCamChlConfDetailList");
+                mktCamChlResultNew.setMktCamChlConfDetailList(mktCamChlConfDetailList);
+            }
+/*            for (MktCamChlConfDetail mktCamChlConfDetail:mktCamChlConfDetailList) {
                 // 新的推送渠道与新的结果简历关联
                 if (mktCamChlConfDetail != null) {
                     // 结果与推送渠道的关联
                     MktCamChlResultConfRelDO childCamChlResultConfRelDO = new MktCamChlResultConfRelDO();
-                    childCamChlResultConfRelDO.setMktCamChlResultId(mktCamChlResultId);
+                    childCamChlResultConfRelDO.setMktCamChlResultId(mktCamChlResultNew.getMktCamChlResultId());
                     childCamChlResultConfRelDO.setEvtContactConfId(mktCamChlConfDetail.getEvtContactConfId());
                     childCamChlResultConfRelDO.setCreateStaff(UserUtil.loginId());
                     childCamChlResultConfRelDO.setCreateDate(new Date());
@@ -330,19 +340,68 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
                     childCamChlResultConfRelDO.setUpdateDate(new Date());
                     mktCamChlResultConfRelMapper.insert(childCamChlResultConfRelDO);
                 }
-                mktCamChlConfDetailList.add(mktCamChlConfDetail);
-            }
-            MktCamChlResult mktCamChlResultNew = BeanUtil.create(mktCamChlResultDO, new MktCamChlResult());
-            mktCamChlResultNew.setMktCamChlConfDetailList(mktCamChlConfDetailList);
-            redisUtils.set("MktCamChlResult_"+mktCamChlResultNew.getMktCamChlResultId(), mktCamChlResultNew);
+            }*/
+
+            // redisUtils.set("MktCamChlResult_" + mktCamChlResultNew.getMktCamChlResultId(), mktCamChlResultNew);
+            executorService.shutdown();
             mktCamChlResultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
-            mktCamChlResultMap.put("mktCamChlResultDO", mktCamChlResultDO);
+            mktCamChlResultMap.put("mktCamChlResult", mktCamChlResultNew);
         } catch (Exception e) {
-            logger.error("[op:MktCamChlResultServiceImpl] failed to get mktCamChlResultDO by mktCamChlResultId = {}", parentMktCamChlResultId);
+            //logger.error("[op:MktCamChlResultServiceImpl] failed to get mktCamChlResultDO by mktCamChlResultId = {}", parentMktCamChlResultId);
             mktCamChlResultMap.put("resultCode", CommonConstant.CODE_FAIL);
             mktCamChlResultMap.put("resultMsg", ErrorCode.GET_MKT_CAM_CHL_CONF_FAILURE.getErrorMsg());
         }
         return mktCamChlResultMap;
+    }
+
+    class CopyMktCamChlResultTask implements Callable<Map<String, Object>> {
+        private MktCamChlResult mktCamChlResult;
+
+        public CopyMktCamChlResultTask(MktCamChlResult mktCamChlResult) {
+            this.mktCamChlResult = mktCamChlResult;
+        }
+
+        @Override
+        public Map<String, Object> call() throws Exception {
+            Map<String, Object> mktCamChlResultMap = new HashMap<>();
+//            MktCamChlResult mktCamChlResult = (MktCamChlResult) redisUtils.get("MktCamChlResult_" + mktCamChlResultId);
+/*            MktCamChlResultDO mktCamChlResultDO = BeanUtil.create(mktCamChlResult, new MktCamChlResultDO());
+            mktCamChlResultDO.setMktCamChlResultId(null);
+            mktCamChlResultDO.setCreateDate(new Date());
+            mktCamChlResultDO.setCreateStaff(UserUtil.loginId());
+            mktCamChlResultDO.setUpdateDate(new Date());
+            mktCamChlResultDO.setUpdateStaff(UserUtil.loginId());*/
+            // 新增结果 并获取Id
+            // mktCamChlResultMapper.insert(mktCamChlResultDO);
+            mktCamChlResultMap.put("mktCamChlResult", mktCamChlResult);
+            return mktCamChlResultMap;
+        }
+    }
+
+    class CopyMktCamChlConfTask implements Callable<Map<String, Object>> {
+        private MktCamChlResult mktCamChlResult;
+
+        public CopyMktCamChlConfTask(MktCamChlResult mktCamChlResult) {
+            this.mktCamChlResult = mktCamChlResult;
+        }
+
+        @Override
+        public Map<String, Object> call() throws Exception {
+            Map<String, Object> mktCamChlConfDetailMap = new HashMap<>();
+            // 获取原二次协同渠道下结果的推送渠道
+            //List<MktCamChlResultConfRelDO> mktCamChlResultConfRelDOList = mktCamChlResultConfRelMapper.selectByMktCamChlResultId(mktCamChlResultId);
+            List<MktCamChlConfDetail> mktCamChlConfDetailList = mktCamChlResult.getMktCamChlConfDetailList();
+            List<MktCamChlConfDetail> mktCamChlConfDetailListNew = new ArrayList<>();
+            // 遍历获取原二次协同渠道下结果的推送渠道
+            for (MktCamChlConfDetail mktCamChlConfDetail : mktCamChlConfDetailList) {
+                // 复制推送渠道
+                Map<String, Object> mktCamChlConfMap = mktCamChlConfService.copyMktCamChlConfFormRedis(mktCamChlConfDetail.getEvtContactConfId(), mktCamChlConfDetail.getScriptDesc());
+                MktCamChlConfDetail mktCamChlConfDetailNew = (MktCamChlConfDetail) mktCamChlConfMap.get("mktCamChlConfDetail");
+                mktCamChlConfDetailListNew.add(mktCamChlConfDetailNew);
+            }
+            mktCamChlConfDetailMap.put("mktCamChlConfDetailList", mktCamChlConfDetailListNew);
+            return mktCamChlConfDetailMap;
+        }
     }
 
 
