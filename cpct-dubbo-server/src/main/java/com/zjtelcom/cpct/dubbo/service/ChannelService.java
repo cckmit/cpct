@@ -1,16 +1,19 @@
 package com.zjtelcom.cpct.dubbo.service;
 
 import com.zjtelcom.cpct.dubbo.model.FilterRuleInputReq;
+import com.zjtelcom.cpct.dubbo.model.Ret;
+import com.zjtelcom.cpct.dubbo.model.RetChannel;
+import com.zjtelcom.cpct.dubbo.model.RetEvent;
 
 import java.util.Map;
 
 public interface ChannelService {
 
-    Map<String,Object> getChannelDetail(String channelCode);
+    RetChannel getChannelDetail(String channelCode);
 
-    Map<String,Object> getEventDetail(String evtCode);
+    RetEvent getEventDetail(String evtCode);
 
-    Map<String,Object> importRuleUserList(FilterRuleInputReq req);
+    Ret importRuleUserList(FilterRuleInputReq req);
 
 
 

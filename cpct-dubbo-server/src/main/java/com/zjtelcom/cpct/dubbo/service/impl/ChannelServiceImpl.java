@@ -11,10 +11,7 @@ import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.ContactEvtItem;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.user.UserList;
-import com.zjtelcom.cpct.dubbo.model.ChannelModel;
-import com.zjtelcom.cpct.dubbo.model.ContactEvtModel;
-import com.zjtelcom.cpct.dubbo.model.FilterRuleInputReq;
-import com.zjtelcom.cpct.dubbo.model.UserListModel;
+import com.zjtelcom.cpct.dubbo.model.*;
 import com.zjtelcom.cpct.dubbo.service.ChannelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.UserUtil;
@@ -44,55 +41,54 @@ public class ChannelServiceImpl implements ChannelService {
     private FilterRuleMapper filterRuleMapper;
 
     @Override
-    public Map<String, Object> getChannelDetail(String channelCode) {
-        Map<String,Object> result = new HashMap<>();
+    public RetChannel getChannelDetail(String channelCode) {
+        RetChannel ret = new RetChannel();
         ChannelModel vo = new ChannelModel();
         try {
             Channel channel = channelMapper.selectByCode(channelCode);
             if (channel==null){
-                result.put("resultCode","500");
-                result.put("resultMessage","渠道不存在");
-                return result;
+                ret.setResultMsg("渠道不存在");
+                ret.setResultCode(CODE_FAIL);
+                return ret;
             }
             BeanUtil.copy(channel,vo);
         }catch (Exception e){
             e.printStackTrace();
         }
-        result.put("resultCode","0");
-        result.put("resultMessage",null);
-        result.put("data",vo);
-        return result;
+        ret.setResultCode("0");
+        ret.setData(vo);
+        ret.setResultMsg(null);
+        return ret;
     }
 
     @Override
-    public Map<String, Object> getEventDetail(String evtCode){
-        Map<String, Object> result = new HashMap<>();
-
+    public RetEvent getEventDetail(String evtCode){
+        RetEvent ret = new RetEvent();
         ContactEvt contactEvt = contactEvtMapper.getEventByEventNbr(evtCode);
         if (contactEvt==null){
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMessage","事件不存在");
-            return result;
+            ret.setResultMsg("事件不存在");
+            ret.setResultCode(CODE_FAIL);
+            return ret;
         }
         ContactEvtModel evtModel = BeanUtil.create(contactEvt,new ContactEvtModel());
         //查询出事件采集项
         List<ContactEvtItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId());
         evtModel.setContactEvtItems(contactEvtItems);
-        result.put("resultCode","0");
-        result.put("resultMessage", StringUtils.EMPTY);
-        result.put("data",evtModel);
-        return result;
+        ret.setResultCode("0");
+        ret.setData(evtModel);
+        ret.setResultMsg(null);
+        return ret;
     }
 
 
     @Override
-    public Map<String, Object> importRuleUserList(FilterRuleInputReq req) {
-        Map<String, Object> result = new HashMap<>();
+    public Ret importRuleUserList(FilterRuleInputReq req) {
+        Ret ret = new Ret();
         FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(req.getFilterRuleId());
         if (filterRule==null){
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMessage", "过滤规则不存在");
-            return result;
+            ret.setResultMsg("过滤规则不存在");
+            ret.setResultCode(CODE_FAIL);
+            return ret;
         }
         for (UserListModel user : req.getUserList()){
             int exists =  userListMapper.checkRule(user.getUserPhone(),user.getRuleId(),null);
@@ -111,8 +107,8 @@ public class ChannelServiceImpl implements ChannelService {
             userList.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
             userListMapper.insert(userList);
         }
-        result.put("resultCode","0");
-        result.put("resultMessage", "导入成功");
-        return result;
+        ret.setResultCode("0");
+        ret.setResultMsg("导入成功");
+        return ret;
     }
 }

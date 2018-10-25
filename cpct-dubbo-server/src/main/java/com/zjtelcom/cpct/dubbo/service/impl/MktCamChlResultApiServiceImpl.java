@@ -18,6 +18,9 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.dto.campaign.MktCamResultRelDeatil;
+import com.zjtelcom.cpct.dubbo.model.Ret;
+import com.zjtelcom.cpct.dubbo.model.RetCamResult;
+import com.zjtelcom.cpct.dubbo.model.RetChannel;
 import com.zjtelcom.cpct.dubbo.service.MktCamChlResultApiService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +31,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 /**
  * @Description:
@@ -64,8 +69,8 @@ public class MktCamChlResultApiServiceImpl implements MktCamChlResultApiService 
      * @return
      */
     @Override
-    public Map<String, Object> selectResultList() {
-        Map<String, Object> resultMap = new HashMap<>();
+    public RetCamResult selectResultList() {
+        RetCamResult ret = new RetCamResult();
         List<Long> mktCampaignIdList = mktCamResultRelMapper.selectAllGroupByMktCampaignId();
         List<MktCamResultRelDeatil> mktCamResultRelDeatilList = new ArrayList<>();
         for (Long mktCampaignId : mktCampaignIdList) {
@@ -101,9 +106,9 @@ public class MktCamChlResultApiServiceImpl implements MktCamChlResultApiService 
             mktCamResultRelDeatil.setMktCamChlResultList(mktCamChlResultList);
             mktCamResultRelDeatilList.add(mktCamResultRelDeatil);
         }
-        resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
-        resultMap.put("resultMsg", "success");
-        resultMap.put("mktCamResultRelDeatilList", mktCamResultRelDeatilList);
-        return resultMap;
+        ret.setResultCode(CODE_SUCCESS);
+        ret.setResultMsg("success");
+        ret.setData(mktCamResultRelDeatilList);
+        return ret;
     }
 }

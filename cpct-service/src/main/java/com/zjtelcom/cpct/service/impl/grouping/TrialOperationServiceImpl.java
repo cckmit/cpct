@@ -277,6 +277,26 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
 
     /**
+     * 策略试运算统计查询
+     * @param batchId
+     * @return
+     */
+    @Override
+    public Map<String, Object> searchCountInfo(Long batchId) {
+        Map<String, Object> result = new HashMap<>();
+        TrialOperation operation = trialOperationMapper.selectByPrimaryKey(batchId);
+        if (operation == null) {
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "统计查询记录出错啦！");
+            return result;
+        }
+        Map<String,Object> resultMap =  (Map<String, Object>) redisUtils.get("HITS_COUNT_INFO_"+operation.getBatchNum());
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", resultMap);
+        return result;
+    }
+
+    /**
      * 新增策略试运算记录
      *
      * @param operationVO
@@ -356,8 +376,14 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         }
         request.setParamList(paramList);
         TrialResponse response = new TrialResponse();
+        TrialResponse countResponse = new TrialResponse();
         try {
             response = restTemplate.postForObject(SEARCH_INFO_FROM_ES_URL, request, TrialResponse.class);
+            //同时调用统计查询的功能
+            countResponse = restTemplate.postForObject(SEARCH_COUNT_INFO_URL,request,TrialResponse.class);
+            if (countResponse.getResultCode().equals(CODE_SUCCESS)){
+                redisUtils.set("HITS_COUNT_INFO_"+request.getBatchNum(),countResponse.getHitsList());
+            }
             if (!response.getResultCode().equals(CODE_SUCCESS)) {
                 trialOperation.setStatusCd("2000");
                 trialOperation.setUpdateDate(new Date());
