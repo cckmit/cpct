@@ -72,11 +72,23 @@
             <artifactId>druid</artifactId>
         </dependency>
 
-            <!-- 引入协同中心dubbo服务jar包 -->
-            <dependency>
-                <groupId>com.ctzj.smt.bss</groupId>
-                <artifactId>bss-cooperate-service-api</artifactId>
-            </dependency>
+        <!-- 引入协同中心dubbo服务jar包 -->
+        <dependency>
+            <groupId>com.ctzj.smt.bss</groupId>
+            <artifactId>bss-cooperate-service-api</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.ctzj.smt.bss</groupId>
+            <artifactId>bss-cooperate-service-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zjtelcom.cpct</groupId>
+            <artifactId>cpct-dubbo</artifactId>
+            <version>1.0</version>
+        </dependency>
 
     </dependencies>
 

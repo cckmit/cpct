@@ -184,21 +184,16 @@ public class EventApiServiceImpl implements EventApiService {
 
             //初始化返回结果
             Map<String, Object> result = new HashMap();
-
             result = new EventTask().call(params);
-
             System.out.println("开始调用协同中心异步回调");
-
             //调用协同中心回调接口
-            Map<String, Object> back = iContactTaskReceiptService .contactTaskReceipt(result);
-
+            Map<String, Object> back = iContactTaskReceiptService.contactTaskReceipt(result);
             if (back != null) {
-                if ("1".equals(back.get("CPCResultCode"))) {
+                if ("1".equals(back.get("resultCode"))) {
                     System.out.println("协同中心接口回调调用成功");
                     return null;
                 }
             }
-
             System.out.println("协同中心接口回调调用失败" + back.get("resultMsg"));
 
             return result;
@@ -211,7 +206,7 @@ public class EventApiServiceImpl implements EventApiService {
     class EventTask {
 
         public Map<String, Object> call(Map<String, String> map) {
-
+            //开始时间
             long begin = System.currentTimeMillis();
 
             //初始化返回结果
@@ -244,6 +239,7 @@ public class EventApiServiceImpl implements EventApiService {
             esJson.put("integrationId", map.get("integrationId"));
             esJson.put("accNbr", map.get("accNbr"));
             esJson.put("custId", custId);
+            esJson.put("evtCollectTime", map.get("evtCollectTime"));
 
             //验证事件采集项
             List<ContactEvtItem> contactEvtItems = contactEvtItemMapper.listEventItem(eventId);
@@ -276,6 +272,7 @@ public class EventApiServiceImpl implements EventApiService {
                 //保存es log
                 long cost = System.currentTimeMillis() - begin;
                 esJson.put("timeCost", cost);
+                esJson.put("hit", false);
                 esJson.put("msg", "事件采集项验证失败，缺少：" + stringBuilder.toString());
                 esService.save(esJson, IndexList.EVENT_MODULE);
 
@@ -283,7 +280,6 @@ public class EventApiServiceImpl implements EventApiService {
                 result.put("CPCResultMsg", "事件采集项验证失败，缺少：" + stringBuilder.toString());
                 return result;
             }
-
 
             //获取事件推荐活动数
             int recCampaignAmount;
@@ -326,6 +322,7 @@ public class EventApiServiceImpl implements EventApiService {
                         //保存es log
                         long cost = System.currentTimeMillis() - begin;
                         esJson.put("timeCost", cost);
+                        esJson.put("hit", false);
                         esJson.put("activityId", camEvtRelDO.getMktCampaignId());
                         esJson.put("msg", "客户级活动，事件采集项未包含客户编码");
                         esService.save(esJson, IndexList.EVENT_MODULE);
@@ -337,44 +334,31 @@ public class EventApiServiceImpl implements EventApiService {
                     }
 
                     //根据客户编码查询所有资产
-                    String httpResultStr;
-                    String url = "http://134.96.216.155:8111/in"; //资产查询
                     //构造查询参数值
                     JSONObject param = new JSONObject();
                     //查询标识
                     param.put("queryNum", map.get("accNbr"));
                     param.put("c3", map.get("lanId"));
                     param.put("queryId", map.get("integrationId"));
-                    Map<String, String> queryFields = new HashMap<>();
-                    queryFields.put("1", "ASSET_INTEG_ID");
+                    String queryFields = "ASSET_INTEG_ID";
                     param.put("queryFields", queryFields);
 
-                    String paramStr = param.toString();
                     System.out.println("param " + param.toString());
+                    Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
+                    System.out.println(dubboResult.toString());
 
-                    //验证post回调结果
-                    httpResultStr = HttpUtil.post(url, paramStr);
-                    if (httpResultStr == null || "".equals(httpResultStr)) {
-
-                        System.out.println("客户级资产查询出错");
-
-//                    esJson.put("hit", "false");
-//                    esJson.put("msg", "客户级资产查询出错");
-//                    esService.save(esJson, IndexList.STRATEGY_MODULE);
-                        return Collections.EMPTY_MAP;
-                    }
-                    //解析返回结果
-                    JSONObject httpResult = JSONObject.parseObject(httpResultStr);
-                    //获取客户下所有资产
                     JSONArray accArray = new JSONArray();
-                    if (httpResult.getString("result_code") != null
-                            && "0".equals(httpResult.getString("result_code"))) {
-                        accArray = httpResult.getJSONArray("msgbody");
-                    } else {
-                        System.out.println("客户级资产查询出错: " + (httpResult.getString("result_msg")));
-                        return Collections.EMPTY_MAP;
-                    }
+                    if ("0".equals(dubboResult.get("result_code").toString())) {
+                        JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
 
+                        return Collections.EMPTY_MAP;
+                    } else {
+                        esJson.put("hit", "false");
+                        esJson.put("msg", "客户级资产查询出错");
+                        esService.save(esJson, IndexList.STRATEGY_MODULE);
+                        System.out.println("客户级资产查询出错");
+                    }
+                    //获取客户下所有资产
                     for (Object o : accArray) {
                         //客户级下，循环资产级
                         Map<String, String> privateParams = new HashMap<>();
@@ -538,8 +522,8 @@ public class EventApiServiceImpl implements EventApiService {
                 }
             }
 
-            if(querySb.length() > 0) {
-                querySb.deleteCharAt(querySb.length() -1);
+            if (querySb.length() > 0) {
+                querySb.deleteCharAt(querySb.length() - 1);
             }
 
             JSONObject httpParams = new JSONObject();
@@ -766,8 +750,8 @@ public class EventApiServiceImpl implements EventApiService {
                     //判断过滤类型(红名单，黑名单)
                     if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
                         //查询红名单黑名单列表
-                        int count = userListMapper.checkRule(privateParams.get("accNbr"),filterRule.getRuleId(),filterRule.getFilterType());
-                        if(count > 0) {
+                        int count = userListMapper.checkRule(privateParams.get("accNbr"), filterRule.getRuleId(), filterRule.getFilterType());
+                        if (count > 0) {
                             System.out.println("红黑名单过滤规则验证被拦截");
                             esJson.put("hit", "false");
                             esJson.put("msg", "红黑名单过滤规则验证被拦截");
@@ -784,7 +768,7 @@ public class EventApiServiceImpl implements EventApiService {
                     } else if ("5000".equals(filterRule.getFilterType())) {  //时间段过滤
                         //时间段的格式
 
-                        if(compareHourAndMinute(filterRule)) {
+                        if (compareHourAndMinute(filterRule)) {
                             System.out.println("过滤时间段验证被拦截");
                             esJson.put("hit", "false");
                             esJson.put("msg", "过滤时间段验证被拦截");
@@ -951,8 +935,8 @@ public class EventApiServiceImpl implements EventApiService {
                 }
             }
 
-            if(queryFieldsSb.length() > 0) {
-                queryFieldsSb.deleteCharAt(queryFieldsSb.length() -1);
+            if (queryFieldsSb.length() > 0) {
+                queryFieldsSb.deleteCharAt(queryFieldsSb.length() - 1);
             }
 
             param.put("queryFields", queryFieldsSb.toString());
@@ -967,8 +951,7 @@ public class EventApiServiceImpl implements EventApiService {
             JSONObject jsonobj = new JSONObject();
 
             if ("0".equals(dubboResult.get("result_code").toString())) {
-                JSONObject body = new JSONObject((HashMap)dubboResult.get("msgbody"));
-                JSONObject labels = new JSONObject((HashMap)body.get("data"));
+                JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
                 //ES log 标签实例
                 jsonobj.put("reqId", reqId);
                 jsonobj.put("eventId", params.get("eventCode"));
@@ -985,7 +968,7 @@ public class EventApiServiceImpl implements EventApiService {
                 //jsonobj.put("labelResultList", JSONArray.toJSON(labelResultList));
 
                 //拼接规则引擎上下文
-                for (Map.Entry<String, Object> entry : labels.entrySet()) {
+                for (Map.Entry<String, Object> entry : body.entrySet()) {
                     //添加到上下文
                     context.put(entry.getKey(), entry.getValue());
                 }
@@ -1179,8 +1162,8 @@ public class EventApiServiceImpl implements EventApiService {
                             product.put("productType", mktCamItem.getItemType());
                             product.put("productFlag", "销售品标签");  //todo 销售品标签
                             //销售品优先级
-                            if(mktCamItem.getPriority() != null) {
-                                product.put("productPriority",  mktCamItem.getPriority().toString());
+                            if (mktCamItem.getPriority() != null) {
+                                product.put("productPriority", mktCamItem.getPriority().toString());
                             } else {
                                 product.put("productPriority", "0");
                             }
@@ -1488,29 +1471,21 @@ public class EventApiServiceImpl implements EventApiService {
 
     private JSONObject getLabelByPost(JSONObject param) {
         //查询标签实例数据
-        String httpResultStr;
-        String url = "http://134.96.216.156:8110/in"; //标签查询地址
-
-        String paramStr = param.toString();
         System.out.println("param " + param.toString());
-        //验证post回调结果
-//        httpResultStr = HttpUtil.post(url, paramStr);
 
         Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
 
         System.out.println(dubboResult.toString());
 
         if ("0".equals(dubboResult.get("result_code").toString())) {
-            JSONObject body = new JSONObject((HashMap)dubboResult.get("msgbody"));
-            JSONObject labels = new JSONObject((HashMap)body.get("data"));
-        //解析返回结果
-            return labels;
+            JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
+            //解析返回结果
+            return body;
         } else {
 //            System.out.println("查询标签失败:" + httpResult.getString("result_msg"));
             return new JSONObject();
         }
     }
-
 
 
     private boolean compareHourAndMinute(FilterRule filterRule) {
@@ -1522,9 +1497,9 @@ public class EventApiServiceImpl implements EventApiService {
         end.setTime(filterRule.getDayEnd());
         Calendar cal = Calendar.getInstance();
         int nowHour = cal.get(Calendar.HOUR_OF_DAY);
-        if(nowHour > start.get(Calendar.HOUR_OF_DAY) && nowHour < end.get(Calendar.HOUR_OF_DAY)) {
-            if(nowHour > start.get(Calendar.MINUTE) && nowHour < end.get(Calendar.MINUTE)) {
-                if(nowHour > start.get(Calendar.SECOND) && nowHour < end.get(Calendar.SECOND)) {
+        if (nowHour > start.get(Calendar.HOUR_OF_DAY) && nowHour < end.get(Calendar.HOUR_OF_DAY)) {
+            if (nowHour > start.get(Calendar.MINUTE) && nowHour < end.get(Calendar.MINUTE)) {
+                if (nowHour > start.get(Calendar.SECOND) && nowHour < end.get(Calendar.SECOND)) {
                     result = false;
                 }
             }
@@ -1532,7 +1507,6 @@ public class EventApiServiceImpl implements EventApiService {
 
         return result;
     }
-
 
 
 }

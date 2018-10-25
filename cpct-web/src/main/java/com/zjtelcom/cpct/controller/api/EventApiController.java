@@ -3,6 +3,10 @@ package com.zjtelcom.cpct.controller.api;
 
 import com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService;
 import com.zjtelcom.cpct.controller.BaseController;
+import com.zjtelcom.cpct.dubbo.model.channel.RetEvent;
+import com.zjtelcom.cpct.dubbo.model.rule.ContactEvtItem;
+import com.zjtelcom.cpct.dubbo.model.rule.ContactEvtModel;
+import com.zjtelcom.cpct.dubbo.service.ChannelService;
 import com.zjtelcom.cpct.service.api.EventApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -13,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -26,6 +31,9 @@ public class EventApiController extends BaseController {
 
     @Autowired(required = false)
     private IContactTaskReceiptService iContactTaskReceiptService;
+
+    @Autowired(required = false)
+    private ChannelService channelService;
 
     /**
      * 事件触发入口
@@ -82,6 +90,28 @@ public class EventApiController extends BaseController {
             return initFailRespInfo(e.getMessage(),"");
         }
         return initSuccRespInfo(result);
+    }
+
+
+    @RequestMapping("/event")
+    @CrossOrigin
+    public String event(@RequestBody String params) {
+        try {
+            RetEvent eventDetail = channelService.getEventDetail(params);
+
+            ContactEvtModel contactEvtModel = eventDetail.getData();
+
+            List<ContactEvtItem> contactEvtItems = contactEvtModel.getContactEvtItems();
+
+            String aa = contactEvtItems.get(0).getEvtItemCode();
+
+            System.out.println(aa);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return initFailRespInfo(e.getMessage(),"");
+        }
+        return initSuccRespInfo(null);
     }
 
 }

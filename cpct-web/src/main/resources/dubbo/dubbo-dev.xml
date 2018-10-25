@@ -18,7 +18,11 @@
         <!--<dubbo:method name="secondChannelSynergy" servicecode="33.1083.SecondChannelSynergy" timeout="5000"/>-->
     </dubbo:reference>
 
-
+    <!-- 编码查询事件详情服务 -->
+    <dubbo:reference interface="com.zjtelcom.cpct.dubbo.service.ChannelService" id="channelService"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="getEventDetail" servicecode="00.1083.getEventDetail" timeout="10000"/>
+    </dubbo:reference>
 
 
 </beans>
