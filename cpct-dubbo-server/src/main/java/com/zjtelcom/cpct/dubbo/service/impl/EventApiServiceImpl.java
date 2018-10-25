@@ -958,28 +958,13 @@ public class EventApiServiceImpl implements EventApiService {
             param.put("queryFields", queryFieldsSb.toString());
             //记录参数个数
 //            int paramsSize = queryFields.size();
-
             System.out.println("param " + param.toString());
-            //验证post回调结果
-//            httpResultStr = HttpUtil.post(url, param.toString());
-
             //更换为dubbo因子查询-----------------------------------------------------
             Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
 
-//            if (httpResultStr == null || "".equals(httpResultStr)) {
-//
-//                System.out.println("查询标签出错");
-//
-//                esJson.put("hit", "false");
-//                esJson.put("msg", "标签实例查询出错");
-//                esService.save(esJson, IndexList.STRATEGY_MODULE);
-//                return Collections.EMPTY_MAP;
-//            }
+            System.out.println(dubboResult.toString());
+
             JSONObject jsonobj = new JSONObject();
-            //解析返回结果
-//            JSONObject httpResult = JSONObject.parseObject(httpResultStr);
-//            if (httpResult.getInteger("result_code") == 0) {
-//                JSONObject body = httpResult.getJSONObject("msgbody");
 
             if ("0".equals(dubboResult.get("result_code").toString())) {
                 JSONObject body = new JSONObject((HashMap)dubboResult.get("msgbody"));
@@ -1341,29 +1326,43 @@ public class EventApiServiceImpl implements EventApiService {
         public Map<String, Object> call() {
             Date now = new Date();
 
+            //初始化返回结果推荐信息
+            Map<String, Object> channel = new HashMap<>();
+
             //查询渠道属性，渠道生失效时间过滤
             List<MktCamChlConfAttrDO> mktCamChlConfAttrs = mktCamChlConfAttrMapper.selectByEvtContactConfId(evtContactConfId);
             boolean checkTime = true;
             for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrs) {
                 //判断渠道生失效时间
-                if (mktCamChlConfAttrDO.getAttrId() == 1000L) {
+                if (mktCamChlConfAttrDO.getAttrId() == 500600010006L) {
                     if (!now.after(new Date(Long.parseLong(mktCamChlConfAttrDO.getAttrValue())))) {
                         checkTime = false;
                     }
                 }
-                if (mktCamChlConfAttrDO.getAttrId() == 1001L) {
+                if (mktCamChlConfAttrDO.getAttrId() == 500600010007L) {
                     if (now.after(new Date(Long.parseLong(mktCamChlConfAttrDO.getAttrValue())))) {
                         checkTime = false;
                     }
                 }
+
+                //获取调查问卷ID
+                if (mktCamChlConfAttrDO.getAttrId() == 500600010010L) {
+                    //调查问卷
+                    channel.put("questionId", mktCamChlConfAttrDO.getAttrValue());
+                }
+
+                //获取推荐账号 todo
+                if (mktCamChlConfAttrDO.getAttrId() == 500600010010L) {
+//                    channel.put("contactAccount", mktCamChlConfAttrDO.getAttrValue());
+                    channel.put("contactAccount", "");
+                }
+
+
             }
 
             if (!checkTime) {
-                return null;
+                return Collections.EMPTY_MAP;
             }
-
-            //初始化返回结果推荐信息
-            Map<String, Object> channel = new HashMap<>();
 
             //查询渠道信息基本信息
             MktCamChlConfDO mktCamChlConf = mktCamChlConfMapper.selectByPrimaryKey(evtContactConfId);
@@ -1377,12 +1376,6 @@ public class EventApiServiceImpl implements EventApiService {
 
             //返回结果中添加销售品信息
             channel.put("productList", productList);
-
-            //接触账号 todo
-            channel.put("contactAccount", "");
-
-            //调查问卷 todo
-            channel.put("questionId", "");
 
             //查询渠道子策略 这里老系统暂时不返回
 //              List<MktVerbalCondition> mktVerbalConditions = mktVerbalConditionMapper.findConditionListByVerbalId(evtContactConfId);
@@ -1505,13 +1498,13 @@ public class EventApiServiceImpl implements EventApiService {
 
         Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
 
+        System.out.println(dubboResult.toString());
+
         if ("0".equals(dubboResult.get("result_code").toString())) {
             JSONObject body = new JSONObject((HashMap)dubboResult.get("msgbody"));
+            JSONObject labels = new JSONObject((HashMap)body.get("data"));
         //解析返回结果
-//        JSONObject httpResult = JSONObject.parseObject(httpResultStr);
-//        if (httpResult.getInteger("result_code") == 0) {
-//            JSONObject body = httpResult.getJSONObject("msgbody");
-            return body;
+            return labels;
         } else {
 //            System.out.println("查询标签失败:" + httpResult.getString("result_msg"));
             return new JSONObject();
