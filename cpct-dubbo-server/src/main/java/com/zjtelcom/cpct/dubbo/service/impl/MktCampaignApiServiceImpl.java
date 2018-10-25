@@ -18,10 +18,7 @@ import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.campaign.*;
 import com.zjtelcom.cpct.dto.filter.FilterRuleModel;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRuleRel;
-import com.zjtelcom.cpct.dubbo.model.MktCampaignResp;
-import com.zjtelcom.cpct.dubbo.model.MktStrConfRuleResp;
-import com.zjtelcom.cpct.dubbo.model.MktStrategyConfResp;
-import com.zjtelcom.cpct.dubbo.model.Ret;
+import com.zjtelcom.cpct.dubbo.model.*;
 import com.zjtelcom.cpct.dubbo.service.MktCampaignApiService;
 import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.util.*;
@@ -100,8 +97,8 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
     private InjectionLabelMapper injectionLabelMapper;
 
     @Override
-    public Ret qryMktCampaignDetail(Long mktCampaignId) throws Exception {
-        Ret<MktCampaignResp> ret = new Ret<>();
+    public RetCamResp qryMktCampaignDetail(Long mktCampaignId) throws Exception {
+        RetCamResp ret = new RetCamResp();
         // 获取活动基本信息
         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
         MktCampaignResp mktCampaignResp = BeanUtil.create(mktCampaignDO, new MktCampaignResp());
