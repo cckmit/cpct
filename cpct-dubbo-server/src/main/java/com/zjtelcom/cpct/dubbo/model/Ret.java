@@ -2,19 +2,11 @@ package com.zjtelcom.cpct.dubbo.model;
 
 import java.io.Serializable;
 
-public class Ret<T> implements Serializable {
+public class Ret implements Serializable {
     private String resultCode;
     private String resultMsg;
-    private T data;
 
 
-    public T getData() {
-        return data;
-    }
-
-    public void setData(T data) {
-        this.data = data;
-    }
 
     public String getResultCode() {
         return resultCode;

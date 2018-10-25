@@ -83,7 +83,7 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     public Ret importRuleUserList(FilterRuleInputReq req) {
-        Ret<QuestionRep> ret = new Ret<>();
+        Ret ret = new Ret();
         FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(req.getFilterRuleId());
         if (filterRule==null){
             ret.setResultMsg("过滤规则不存在");
@@ -108,7 +108,6 @@ public class ChannelServiceImpl implements ChannelService {
             userListMapper.insert(userList);
         }
         ret.setResultCode("0");
-        ret.setData(null);
         ret.setResultMsg("导入成功");
         return ret;
     }
