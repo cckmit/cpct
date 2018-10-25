@@ -62,8 +62,8 @@ public class ChannelServiceImpl implements ChannelService {
     }
 
     @Override
-    public Ret getEventDetail(String evtCode){
-        Ret<ContactEvtModel> ret = new Ret<>();
+    public RetEvent getEventDetail(String evtCode){
+        RetEvent ret = new RetEvent();
         ContactEvt contactEvt = contactEvtMapper.getEventByEventNbr(evtCode);
         if (contactEvt==null){
             ret.setResultMsg("事件不存在");

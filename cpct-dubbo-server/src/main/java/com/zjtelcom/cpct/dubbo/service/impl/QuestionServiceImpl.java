@@ -41,8 +41,8 @@ public class QuestionServiceImpl implements QuestionService {
      * @return
      */
     @Override
-    public Ret getQuestionnaireDetail(Long questionnaireId) {
-        Ret<QuestionRep> ret = new Ret<>();
+    public RetQuestion getQuestionnaireDetail(Long questionnaireId) {
+        RetQuestion ret = new RetQuestion();
         Map<String,Object> result = new HashMap<>();
         QuestionRep resultRep = new QuestionRep();
         Questionnaire questionnaire = questionnaireMapper.selectByPrimaryKey(questionnaireId);

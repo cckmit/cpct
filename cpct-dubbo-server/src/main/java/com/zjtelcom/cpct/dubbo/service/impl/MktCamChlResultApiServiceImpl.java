@@ -19,6 +19,8 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.dto.campaign.MktCamResultRelDeatil;
 import com.zjtelcom.cpct.dubbo.model.Ret;
+import com.zjtelcom.cpct.dubbo.model.RetCamResult;
+import com.zjtelcom.cpct.dubbo.model.RetChannel;
 import com.zjtelcom.cpct.dubbo.service.MktCamChlResultApiService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,8 +69,8 @@ public class MktCamChlResultApiServiceImpl implements MktCamChlResultApiService 
      * @return
      */
     @Override
-    public Ret selectResultList() {
-        Ret<List<MktCamResultRelDeatil>> ret = new Ret<>();
+    public RetCamResult selectResultList() {
+        RetCamResult ret = new RetCamResult();
         List<Long> mktCampaignIdList = mktCamResultRelMapper.selectAllGroupByMktCampaignId();
         List<MktCamResultRelDeatil> mktCamResultRelDeatilList = new ArrayList<>();
         for (Long mktCampaignId : mktCampaignIdList) {
