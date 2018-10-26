@@ -138,9 +138,6 @@
         <if test="map.mktCampaignName != null and map.mktCampaignName != ''">
             AND MKT_CAMPAIGN_NAME like CONCAT('%',#{map.mktCampaignName,jdbcType=VARCHAR},'%')
         </if>
-        <!--<if test="map.statusCd != null and map.statusCd != ''">-->
-            <!--AND STATUS_CD = #{map.statusCd,jdbcType=VARCHAR}-->
-        <!--</if>-->
         <if test="map.statusCd != null and map.statusCd == 1000">
             AND (STATUS_CD = 2002 or STATUS_CD = 2003)
         </if>
@@ -148,7 +145,7 @@
             AND STATUS_CD != 2002 and STATUS_CD != 2003 AND STATUS_CD != 2005
         </if>
         <if test="map.statusCd != null and map.statusCd == 3000">
-            AND STATUS_CD == 2005
+            AND STATUS_CD = 2005
         </if>
         <if test="map.tiggerType != null and map.tiggerType != ''">
             AND TIGGER_TYPE = #{map.tiggerType,jdbcType=VARCHAR}

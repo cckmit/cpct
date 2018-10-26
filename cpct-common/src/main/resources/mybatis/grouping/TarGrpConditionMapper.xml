@@ -196,7 +196,7 @@
       STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
       CREATE_DATE, STATUS_DATE, UPDATE_DATE,
       REMARK)
-      <foreach collection="list" item="item" separator=",">
+      <foreach collection="list" item="item" separator="," index="i">
       values ( #{item.tarGrpId,jdbcType=BIGINT}, #{item.rootFlag,jdbcType=VARCHAR},
       #{item.leftParam,jdbcType=VARCHAR}, #{item.leftParamType,jdbcType=VARCHAR}, #{item.operType,jdbcType=VARCHAR},
       #{item.rightParam,jdbcType=VARCHAR}, #{item.rightParamType,jdbcType=VARCHAR}, #{item.conditionText,jdbcType=VARCHAR},

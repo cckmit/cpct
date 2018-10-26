@@ -89,5 +89,6 @@
     <if test="evtSrcName != null and evtSrcName != ''">
       AND EVT_SRC_NAME like CONCAT('%',#{evtSrcName,jdbcType=VARCHAR},'%')
     </if>
+    ORDER BY UPDATE_DATE DESC
   </select>
 </mapper>
