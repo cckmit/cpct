@@ -2,10 +2,8 @@ package com.zjtelcom.cpct.dubbo.model;
 
 
 import com.zjtelcom.cpct.dto.filter.FilterRuleModel;
-import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 策略配置详情
