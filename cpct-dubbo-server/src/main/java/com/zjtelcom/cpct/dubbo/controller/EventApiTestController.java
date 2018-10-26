@@ -23,7 +23,7 @@ public class EventApiTestController {
     @Autowired(required = false)
     private YzServ yzServ;
 
-    @RequestMapping(value = "/cpc",method = RequestMethod.POST)
+    @RequestMapping(value = "/cpc", method = RequestMethod.POST)
     @CrossOrigin
     public String CalculateCPC(@RequestBody Map<String, Object> params) {
         Map result = new HashMap();
@@ -37,9 +37,16 @@ public class EventApiTestController {
     }
 
 
-    @RequestMapping(value = "/cpcSync",method = RequestMethod.POST)
+    @RequestMapping(value = "/cpcSync", method = RequestMethod.POST)
     @CrossOrigin
-    public String CalculateCPCSync(@RequestBody Map<String, Object> params) {
+    public String CalculateCPCSync(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> params) {
+
+        response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET");
+        response.setHeader("Access-Control-Allow-Headers", "Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With,userId,token");
+
+
         Map result = new HashMap();
         try {
             result = eventApiService.CalculateCPCSync(params);
@@ -51,7 +58,7 @@ public class EventApiTestController {
     }
 
 
-    @RequestMapping(value = "/label",method = RequestMethod.POST)
+    @RequestMapping(value = "/label", method = RequestMethod.POST)
     @CrossOrigin
     public String label(@RequestBody String params) {
         Map result = new HashMap();
@@ -63,9 +70,6 @@ public class EventApiTestController {
         }
         return JSON.toJSONString(result);
     }
-
-
-
 
 
 }

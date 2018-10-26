@@ -478,7 +478,7 @@ public class EventApiServiceImpl implements EventApiService {
             privateParams.put("skipCheck", "0"); //是否校验  todo
 
             //es log
-            esJson.put("orderId", reqId);
+            esJson.put("reqId", reqId);
             esJson.put("integrationId", params.get("integrationId"));
             esJson.put("accNbr", params.get("accNbr"));
             esJson.put("activityId", mktCampaign.getMktCampaignId().toString());
