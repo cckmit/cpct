@@ -19,6 +19,8 @@ import com.zjtelcom.cpct.dto.campaign.*;
 import com.zjtelcom.cpct.dto.filter.FilterRuleModel;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRuleRel;
 import com.zjtelcom.cpct.dubbo.model.*;
+import com.zjtelcom.cpct.dubbo.model.MktCamChlConfDetail;
+import com.zjtelcom.cpct.dubbo.model.MktCamChlResult;
 import com.zjtelcom.cpct.dubbo.service.MktCampaignApiService;
 import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.util.*;
@@ -118,7 +120,7 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
                 get(ParamKeyEnum.STATUS_CD.getParamKey() + mktCampaignDO.getStatusCd()));
 
         // 获取活动关联策略集合
-        List<MktStrategyConfResp> mktStrategyConfRespList = new ArrayList<>();
+        ArrayList<MktStrategyConfResp> mktStrategyConfRespList = new ArrayList<>();
         List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByMktCampaignId(mktCampaignId);
         for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {
             MktStrategyConfResp mktStrategyConfResp = getMktStrategyConf(mktCamStrategyConfRelDO.getStrategyConfId());
@@ -147,18 +149,20 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
 
         // 获取过滤规则集合
         List<FilterRuleModel> filterRuleModels = filterRuleMapper.selectFilterRuleByStrategyId(mktStrategyConfId);
-        mktStrategyConfResp.setFilterRuleModelList(filterRuleModels);
+        ArrayList<FilterRuleModel> filterRuleModelArrayList = new ArrayList<>();
+        filterRuleModelArrayList.addAll(filterRuleModels);
+        mktStrategyConfResp.setFilterRuleModelList(filterRuleModelArrayList);
 
         //查询与策略匹配的所有规则
-        List<MktStrConfRuleResp> mktStrConfRuleRespList = new ArrayList<>();
+        ArrayList<MktStrConfRuleResp> mktStrConfRuleRespList = new ArrayList<>();
         List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(mktStrategyConfId);
-        List<MktStrategyConfRuleRel> mktStrategyConfRuleRelList = new ArrayList<>();
         for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleDOList) {
             MktStrConfRuleResp mktStrConfRuleResp = BeanUtil.create(mktStrategyConfRuleDO, new MktStrConfRuleResp());
 
             if (mktStrategyConfRuleDO.getEvtContactConfId() != null) {
                 String[] evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
-                List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
+                ArrayList<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
+
                 List<MktCamChlConf> mktCamChlConfList = new ArrayList<>();
                 for (int i = 0; i < evtContactConfIds.length; i++) {
                     if (evtContactConfIds[i] != "" && !"".equals(evtContactConfIds[i])) {
@@ -179,13 +183,13 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
 
             if (mktStrategyConfRuleDO.getMktCamChlResultId() != null) {
                 String[] mktCamChlResultIds = mktStrategyConfRuleDO.getMktCamChlResultId().split("/");
-                List<MktCamChlResult> mktCamChlResultList = new ArrayList<>();
+                ArrayList<MktCamChlResult> mktCamChlResultList = new ArrayList<>();
                 for (int i = 0; i < mktCamChlResultIds.length; i++) {
                     if (mktCamChlResultIds[i] != null && !"".equals(mktCamChlResultIds[i])) {
                         MktCamChlResultDO mktCamChlResultDO = mktCamChlResultMapper.selectByPrimaryKey(Long.valueOf(mktCamChlResultIds[i]));
                         MktCamChlResult mktCamChlResult = BeanUtil.create(mktCamChlResultDO, new MktCamChlResult());
                         List<MktCamChlResultConfRelDO> mktCamChlResultConfRelDOList = mktCamChlResultConfRelMapper.selectByMktCamChlResultId(mktCamChlResultDO.getMktCamChlResultId());
-                        List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
+                        ArrayList<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
                         for (MktCamChlResultConfRelDO mktCamChlResultConfRelDO : mktCamChlResultConfRelDOList) {
                             MktCamChlConfDetail mktCamChlConfDetail = getMktCamChlConf(mktCamChlResultConfRelDO.getEvtContactConfId());
                             mktCamChlConfDetailList.add(mktCamChlConfDetail);

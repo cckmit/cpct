@@ -314,6 +314,7 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
             }
             Future<Map<String, Object>> mktCamChlConfFuture = null;
             if (mktCamChlResult != null) {
+                //初始化线程池
                 mktCamChlConfFuture = executorService.submit(new CopyMktCamChlConfTask(mktCamChlResult));
                 threadList.add(mktCamChlConfFuture);
             }
