@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.service.impl.event;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtTypeMapper;
+import com.zjtelcom.cpct.domain.event.EventTypeDO;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.ContactEvtType;
 import com.zjtelcom.cpct.dto.event.EventTypeDTO;
@@ -89,6 +90,12 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
     @Override
     public Map<String, Object> createContactEvtType(ContactEvtType contactEvtType) {
         Map<String, Object> maps = new HashMap<>();
+        List<EventTypeDO> evtTypes = contactEvtTypeMapper.listByEvtTypeName(contactEvtType.getContactEvtName());
+        if (!evtTypes.isEmpty()){
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg","已存在相同名字的目录！");
+            return maps;
+        }
         contactEvtType.setCreateDate(DateUtil.getCurrentTime());
         contactEvtType.setUpdateDate(DateUtil.getCurrentTime());
         contactEvtType.setStatusDate(DateUtil.getCurrentTime());
