@@ -72,11 +72,13 @@
     </update>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-      select STAFF_ID, STAFF_CODE, STAFF_ACCOUNT,STAFF_NAME, STAFF_PHONE, STAFF_TELEPHONE,
-      STAFF_EMAIL, CHANNEL_ID, CITY_ID, STATUS, LAST_LOGIN, CREATE_DATE, CREATE_STAFF,
-      UPDATE_DATE, UPDATE_STAFF
-      from sys_staff
-      where STAFF_ID = #{staffId,jdbcType=BIGINT}
+      select sf.STAFF_ID, sf.STAFF_CODE, sf.STAFF_ACCOUNT, sf.STAFF_NAME, sf.STAFF_PHONE, sf.STAFF_TELEPHONE,
+      sf.STAFF_EMAIL, sf.CHANNEL_ID, sf.CITY_ID, sf.STATUS, sf.LAST_LOGIN, sf.CREATE_DATE, sf.CREATE_STAFF,
+      sf.UPDATE_DATE, sf.UPDATE_STAFF, cc.CONTACT_CHL_NAME, sa.name
+      from sys_staff as sf
+      left join contact_channel as cc on sf.CHANNEL_ID = cc.CONTACT_CHL_ID
+      left join sys_area as sa on sf.CITY_ID = sa.area_id
+      where sf.STAFF_ID = #{staffId,jdbcType=BIGINT}
     </select>
 
     <select id="selectAll" resultMap="BaseResultMap">
