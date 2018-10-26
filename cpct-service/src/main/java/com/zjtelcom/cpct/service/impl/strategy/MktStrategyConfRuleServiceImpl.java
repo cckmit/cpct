@@ -320,9 +320,11 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             if (mktStrategyConfRuleDO.getMktCamChlResultId() != null) {
                 String[] mktCamChlResultIds = mktStrategyConfRuleDO.getMktCamChlResultId().split("/");
                 List<MktCamChlResult> mktCamChlResultList = new ArrayList<>();
-                for (String mktCamChlResultId : mktCamChlResultIds) {
-                    Map<String, Object> mktCamChlResultMap = mktCamChlResultService.getMktCamChlResult(Long.valueOf(mktCamChlResultId));
-                    mktCamChlResultList.add((MktCamChlResult) mktCamChlResultMap.get("mktCamChlResult"));
+                if(mktCamChlResultIds!=null && !"".equals(mktCamChlResultIds[0])){
+                    for (String mktCamChlResultId : mktCamChlResultIds) {
+                        Map<String, Object> mktCamChlResultMap = mktCamChlResultService.getMktCamChlResult(Long.valueOf(mktCamChlResultId));
+                        mktCamChlResultList.add((MktCamChlResult) mktCamChlResultMap.get("mktCamChlResult"));
+                    }
                 }
                 mktStrategyConfRule.setMktCamChlResultList(mktCamChlResultList);
             }
@@ -560,84 +562,6 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
 
         return ruleListMap;
     }
-
-
-
-
- /*       SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
-        logger.info("MktStrategyConfRule-->>>开始：" + simpleDateFormat.format(new Date()));
-        Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();
-        MktStrategyConfRule mktStrategyConfRule = new MktStrategyConfRule();
-        *//**
-     * 客户分群配置
-     *//*
-        logger.info("-------------->>>>>>>>>>>>>>>>>>>>>>>>>复制规则开始：" + simpleDateFormat.format(new Date()));
-
-        //初始化结果集
-        List<Future<Map<String, Object>>> threadList = new ArrayList<>();
-        //初始化线程池
-        ExecutorService executorService = Executors.newCachedThreadPool();
-        Future<Map<String, Object>> tarGrpFuture = null;
-        if (parentMktStrategyConfRule.getTarGrpId() != null) {
-            tarGrpFuture = executorService.submit(new CopyTarGrpTask(parentMktStrategyConfRule.getTarGrpId()));
-            threadList.add(tarGrpFuture);
-        }
-
-        *//**
-     * 销售品配置
-     *//*
-        Future<Map<String, Object>> productFuture = null;
-        if (parentMktStrategyConfRule.getProductIdlist() != null && parentMktStrategyConfRule.getProductIdlist().size() > 0) {
-            productFuture = executorService.submit(new CopyProductRuleTask(parentMktStrategyConfRule.getProductIdlist()));
-            threadList.add(productFuture);
-        }
-        *//**
-     * 协同渠道配置
-     *//*
-        Future<Map<String, Object>> mktCamChlConfFuture = null;
-        if (parentMktStrategyConfRule.getMktCamChlConfDetailList() != null && parentMktStrategyConfRule.getMktCamChlConfDetailList().size() > 0) {
-            mktCamChlConfFuture = executorService.submit(new CopyMktCamChlConfTask(parentMktStrategyConfRule.getMktCamChlConfDetailList()));
-            threadList.add(mktCamChlConfFuture);
-        }
-
-        */
-
-    /**
-     * 二次协同结果
-     *//*
-        Future<Map<String, Object>> mktCamChlResultFuture = null;
-        if (parentMktStrategyConfRule.getMktCamChlResultList() != null && parentMktStrategyConfRule.getMktCamChlResultList().size() > 0) {
-            mktCamChlResultFuture = executorService.submit(new CopyMktCamChlResultTask(parentMktStrategyConfRule.getMktCamChlResultList()));
-            threadList.add(mktCamChlResultFuture);
-        }
-        mktStrategyConfRule.setMktStrategyConfRuleName(parentMktStrategyConfRule.getMktStrategyConfRuleName());
-
-        // 从结果集中获取对应结果数据
-        if (tarGrpFuture != null) {
-            TarGrp tarGrp = (TarGrp) tarGrpFuture.get().get("tarGrp");
-            mktStrategyConfRule.setTarGrpId(tarGrp.getTarGrpId());
-        }
-
-        if (productFuture != null) {
-            List<Long> ruleIdList = (List<Long>) productFuture.get().get("ruleIdList");
-            mktStrategyConfRule.setProductIdlist(ruleIdList);
-        }
-
-        if (mktCamChlConfFuture != null) {
-            List<MktCamChlConfDetail> mktCamChlConfDetailList = (List<MktCamChlConfDetail>) mktCamChlConfFuture.get().get("mktCamChlConfDetailList");
-            mktStrategyConfRule.setMktCamChlConfDetailList(mktCamChlConfDetailList);
-        }
-
-        if (mktCamChlResultFuture != null) {
-            List<MktCamChlResult> mktCamChlResultList = (List<MktCamChlResult>) mktCamChlResultFuture.get().get("mktCamChlResultList");
-            mktStrategyConfRule.setMktCamChlResultList(mktCamChlResultList);
-        }
-        executorService.shutdown();
-        mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
-        mktStrategyConfRuleMap.put("mktStrategyConfRule", mktStrategyConfRule);
-        logger.info("-------------->>>>>>>>>>>>>>>>>>>>>>>>>复制规则结束：" + simpleDateFormat.format(new Date()));
-        return mktStrategyConfRuleMap;*/
-
 
 
     class CopyTarGrpTask implements Callable<Map<String, Object>> {

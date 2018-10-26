@@ -12,6 +12,8 @@ public interface MktCamChlConfAttrMapper {
 
     int insert(MktCamChlConfAttrDO mktCamChlConfAttrDO);
 
+    int insertBatch(List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList);
+
     MktCamChlConfAttrDO selectByPrimaryKey(Long contactChlAttrRstrId);
 
     List<MktCamChlConfAttrDO> selectByEvtContactConfId(Long contactChlAttrRstrId);
