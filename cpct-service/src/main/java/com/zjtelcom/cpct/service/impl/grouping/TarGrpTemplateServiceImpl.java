@@ -123,6 +123,24 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         tarGrpTemplateDO.setUpdateStaff(UserUtil.loginId());
         tarGrpTemplateMapper.updateByPrimaryKey(tarGrpTemplateDO);
         Long tarGrpTemplateId = tarGrpTemplateDetail.getTarGrpTemplateId();
+
+        // 获取原有的标签条件
+        List<TarGrpTemplateConditionDO> tarGrpTemplateConditionDOList = tarGrpTemplateConditionMapper.selectByTarGrpTemplateId(tarGrpTemplateId);
+        List<Long> conditionIdList = new ArrayList<>();
+        List<TarGrpTemConditionVO> conditionVOList = tarGrpTemplateDetail.getTarGrpTemConditionVOList();
+        for (int i = 0; i < tarGrpTemplateConditionDOList.size(); i++) {
+            for (int j = 0; j < conditionVOList.size(); j++) {
+                if (!tarGrpTemplateConditionDOList.get(i).getConditionId().equals(conditionVOList.get(j).getConditionId()) && (j == conditionVOList.size() - 1)) {
+                    conditionIdList.add(tarGrpTemplateConditionDOList.get(i).getConditionId());
+                } else {
+                    break;
+                }
+            }
+        }
+        //批量删除条件
+        if (conditionIdList != null && conditionIdList.size() > 0) {
+            tarGrpTemplateConditionMapper.deleteBatch(conditionIdList);
+        }
         // 新增目标分群模板条件
         if (tarGrpTemplateDetail.getTarGrpTemConditionVOList() != null && tarGrpTemplateDetail.getTarGrpTemConditionVOList().size() > 0) {
             for (TarGrpTemConditionVO tarGrpTemConditionVO : tarGrpTemplateDetail.getTarGrpTemConditionVOList()) {
@@ -132,7 +150,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                     return tarGrpTemplateMap;
                 }
                 TarGrpTemplateConditionDO tarGrpTemplateConditionDO = BeanUtil.create(tarGrpTemConditionVO, new TarGrpTemplateConditionDO());
-                if (tarGrpTemConditionVO.getConditionId() != null && tarGrpTemConditionVO.getConditionId() !=0 ) {
+                if (tarGrpTemConditionVO.getConditionId() != null && tarGrpTemConditionVO.getConditionId() != 0) {
                     tarGrpTemplateConditionDO.setUpdateStaff(UserUtil.loginId());
                     tarGrpTemplateConditionDO.setUpdateDate(new Date());
                     tarGrpTemplateConditionMapper.updateByPrimaryKey(tarGrpTemplateConditionDO);

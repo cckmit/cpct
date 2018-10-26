@@ -4,6 +4,7 @@ package com.zjtelcom.cpct.dubbo.model;
 import com.zjtelcom.cpct.dto.filter.FilterRuleModel;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,17 +17,9 @@ public class MktStrategyConfResp extends MktStrategyConf {
     /**
      * 策略配置下规则列表
      */
-    private List<MktStrConfRuleResp> mktStrConfRuleRespList;
+    private ArrayList<MktStrConfRuleResp> mktStrConfRuleRespList;
 
-    private List<FilterRuleModel> filterRuleModelList;
-
-    public List<MktStrConfRuleResp> getMktStrConfRuleRespList() {
-        return mktStrConfRuleRespList;
-    }
-
-    public void setMktStrConfRuleRespList(List<MktStrConfRuleResp> mktStrConfRuleRespList) {
-        this.mktStrConfRuleRespList = mktStrConfRuleRespList;
-    }
+    private ArrayList<FilterRuleModel> filterRuleModelList;
 
     public Long getMktCampaignId() {
         return mktCampaignId;
@@ -36,11 +29,19 @@ public class MktStrategyConfResp extends MktStrategyConf {
         this.mktCampaignId = mktCampaignId;
     }
 
-    public List<FilterRuleModel> getFilterRuleModelList() {
+    public ArrayList<MktStrConfRuleResp> getMktStrConfRuleRespList() {
+        return mktStrConfRuleRespList;
+    }
+
+    public void setMktStrConfRuleRespList(ArrayList<MktStrConfRuleResp> mktStrConfRuleRespList) {
+        this.mktStrConfRuleRespList = mktStrConfRuleRespList;
+    }
+
+    public ArrayList<FilterRuleModel> getFilterRuleModelList() {
         return filterRuleModelList;
     }
 
-    public void setFilterRuleModelList(List<FilterRuleModel> filterRuleModelList) {
+    public void setFilterRuleModelList(ArrayList<FilterRuleModel> filterRuleModelList) {
         this.filterRuleModelList = filterRuleModelList;
     }
 }

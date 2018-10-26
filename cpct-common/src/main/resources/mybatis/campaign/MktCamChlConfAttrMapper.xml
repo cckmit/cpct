@@ -35,6 +35,21 @@
     #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP},
     #{remark,jdbcType=VARCHAR})
   </insert>
+  <insert id="insertBatch" useGeneratedKeys="true" keyProperty="contactChlAttrRstrId" parameterType="java.util.List">
+    insert into mkt_cam_chl_conf_attr (CONTACT_CHL_ATTR_RSTR_ID, EVT_CONTACT_CONF_ID,
+    ATTR_ID, ATTR_VALUE_ID, ATTR_VALUE,
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    CREATE_DATE, UPDATE_DATE, STATUS_DATE,
+    REMARK)
+    values
+    <foreach collection="list" item="item" index="i" separator="," >
+     (#{item.contactChlAttrRstrId}, #{item.evtContactConfId},
+      #{item.attrId}, #{item.attrValueId}, #{item.attrValue},
+      #{item.statusCd}, #{item.createStaff}, #{item.updateStaff},
+      #{item.createDate}, #{item.updateDate}, #{item.statusDate},
+      #{item.remark})
+    </foreach>
+  </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO">
     update mkt_cam_chl_conf_attr
     set EVT_CONTACT_CONF_ID = #{evtContactConfId,jdbcType=BIGINT},
