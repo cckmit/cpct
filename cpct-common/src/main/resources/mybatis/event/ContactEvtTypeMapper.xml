@@ -34,39 +34,17 @@
     <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtType">
         update event_type
         set
-        <if test="contactEvtTypeCode != null and contactEvtTypeCode != ''">
             EVT_TYPE_NBR = #{contactEvtTypeCode,jdbcType=VARCHAR},
-        </if>
-        <if test="contactEvtName != null and contactEvtName != ''">
             EVT_TYPE_NAME = #{contactEvtName,jdbcType=VARCHAR},
-        </if>
-        <if test="parEvtTypeId != null and parEvtTypeId != 0 ">
             PAR_EVT_TYPE_ID = #{parEvtTypeId,jdbcType=BIGINT},
-        </if>
-        <if test="evtTypeDesc != null and evtTypeDesc != ''">
             EVT_TYPE_DESC = #{evtTypeDesc,jdbcType=VARCHAR},
-        </if>
-        <if test="statusCd != null and statusCd != ''">
             STATUS_CD = #{statusCd,jdbcType=VARCHAR},
-        </if>
-        <if test="createStaff != null and createStaff != 0">
             CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
-        </if>
-        <if test="updateStaff != null and updateStaff != 0">
             UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
-        </if>
-        <if test="createDate != null">
             CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
-        </if>
-        <if test="statusDate != null">
             STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
-        </if>
-        <if test="updateDate != null">
-            UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
-        </if>
-        <if test="remark != null and remark != ''">
+           UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
             REMARK = #{remark,jdbcType=VARCHAR},
-        </if>
         where EVT_TYPE_ID = #{evtTypeId,jdbcType=BIGINT}
     </update>
 
@@ -113,39 +91,25 @@
     <update id="modContactEvtType" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtType">
         update event_type
         set
-        <if test="contactEvtTypeCode != null and contactEvtTypeCode != ''">
             EVT_TYPE_NBR = #{contactEvtTypeCode,jdbcType=VARCHAR},
-        </if>
-        <if test="contactEvtName != null and contactEvtName != ''">
             EVT_TYPE_NAME = #{contactEvtName,jdbcType=VARCHAR},
-        </if>
-        <if test="parEvtTypeId != null and parEvtTypeId != 0 ">
+        <if test="parEvtTypeId != null and parEvtTypeId != ''">
             PAR_EVT_TYPE_ID = #{parEvtTypeId,jdbcType=BIGINT},
         </if>
-        <if test="evtTypeDesc != null and evtTypeDesc != ''">
             EVT_TYPE_DESC = #{evtTypeDesc,jdbcType=VARCHAR},
-        </if>
-        <if test="statusCd != null and statusCd != ''">
+
             STATUS_CD = #{statusCd,jdbcType=VARCHAR},
-        </if>
-        <if test="createStaff != null and createStaff != 0">
+
             CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
-        </if>
-        <if test="updateStaff != null and updateStaff != 0">
+
             UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
-        </if>
-        <if test="createDate != null">
+
             CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
-        </if>
-        <if test="statusDate != null">
+
             STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
-        </if>
-        <if test="updateDate != null">
+
             UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
-        </if>
-        <if test="remark != null and remark != ''">
             REMARK = #{remark,jdbcType=VARCHAR},
-        </if>
         EVT_TYPE_ID =#{evtTypeId,jdbcType=BIGINT}
         where EVT_TYPE_ID = #{evtTypeId,jdbcType=BIGINT}
     </update>
@@ -171,5 +135,12 @@
             and STATUS_CD = #{statusCd}
         </if>
     </select>
+
+    <select id="listByEvtTypeName" resultMap="BaseResultMap">
+    select EVT_TYPE_ID, EVT_TYPE_NBR, EVT_TYPE_NAME, PAR_EVT_TYPE_ID, EVT_TYPE_DESC,
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from event_type
+    where EVT_TYPE_NAME LIKE CONCAT(CONCAT('%',#{name}),'%')
+  </select>
 
 </mapper>
