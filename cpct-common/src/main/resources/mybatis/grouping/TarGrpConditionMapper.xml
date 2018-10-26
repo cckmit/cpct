@@ -189,4 +189,23 @@
         where CONDITION_ID = #{conditionId,jdbcType=BIGINT}
     </delete>
 
+    <insert id="insertByBatch" parameterType="java.util.List" keyProperty="conditionId" useGeneratedKeys="true">
+        insert into tar_grp_condition (CONDITION_ID, TAR_GRP_ID, ROOT_FLAG,
+        LEFT_PARAM, LEFT_PARAM_TYPE, OPER_TYPE,
+        RIGHT_PARAM, RIGHT_PARAM_TYPE, CONDITION_TEXT,
+        STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+        CREATE_DATE, STATUS_DATE, UPDATE_DATE,
+        REMARK)
+      <foreach collection="list" item="item" separator="," index="i">
+      values ( #{item.conditionId,jdbcType=BIGINT},#{item.tarGrpId,jdbcType=BIGINT}, #{item.rootFlag,jdbcType=VARCHAR},
+      #{item.leftParam,jdbcType=VARCHAR}, #{item.leftParamType,jdbcType=VARCHAR}, #{item.operType,jdbcType=VARCHAR},
+      #{item.rightParam,jdbcType=VARCHAR}, #{item.rightParamType,jdbcType=VARCHAR}, #{item.conditionText,jdbcType=VARCHAR},
+      #{item.statusCd,jdbcType=VARCHAR}, #{item.createStaff,jdbcType=BIGINT}, #{item.updateStaff,jdbcType=BIGINT},
+      #{item.createDate,jdbcType=TIMESTAMP}, #{item.statusDate,jdbcType=TIMESTAMP}, #{item.updateDate,jdbcType=TIMESTAMP},
+      #{item.remark,jdbcType=VARCHAR})
+      </foreach>
+  </insert>
+
+
+
 </mapper>

@@ -474,7 +474,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 mktCampaignVO.setUpdateDate(mktCampaignCountDO.getUpdateDate());
                 if (mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode()) || mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_PASS.getStatusCode())) {
                     mktCampaignVO.setStatusExamine(StatusCode.STATUS_CODE_PASS.getStatusMsg());
-                } else {
+                } else if (mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_UNPASS.getStatusCode())){
+                    mktCampaignVO.setStatusExamine(StatusCode.STATUS_CODE_UNPASS.getStatusMsg());
+                }else {
                     mktCampaignVO.setStatusExamine(StatusCode.STATUS_CODE_CHECKING.getStatusMsg());
                 }
             } catch (Exception e) {
@@ -509,7 +511,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      * @return
      */
     @Override
-    public Map<String, Object> examineCampaign4Sync(Long campaignId) {
+    public Map<String, Object> examineCampaign4Sync(Long campaignId,String statusCd) {
         Map<String, Object> maps = new HashMap<>();
         MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(campaignId);
         if (campaignDO == null) {
@@ -522,11 +524,15 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             maps.put("resultMsg", "非待审核活动");
             return maps;
         }
-        campaignDO.setStatusCd(StatusCode.STATUS_CODE_PASS.getStatusCode());
+        campaignDO.setStatusCd(statusCd);
         campaignDO.setUpdateDate(new Date());
         mktCampaignMapper.updateByPrimaryKey(campaignDO);
         maps.put("resultCode", CODE_SUCCESS);
-        maps.put("resultMsg", "已通过");
+        if (statusCd.equals(StatusCode.STATUS_CODE_PASS.getStatusCode())){
+            maps.put("resultMsg", "已通过");
+        }else {
+            maps.put("resultMsg", "已拒绝");
+        }
         return maps;
     }
 

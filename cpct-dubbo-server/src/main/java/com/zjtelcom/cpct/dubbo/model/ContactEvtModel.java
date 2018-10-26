@@ -4,6 +4,7 @@ import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.ContactEvtItem;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ContactEvtModel  implements Serializable {
@@ -25,13 +26,149 @@ public class ContactEvtModel  implements Serializable {
     private String evtTrigType;//记录事件的触发类型,1000实时触发事件 2000定期触发事件 3000人工触发事件
     private String coopType;//记录推送渠道协同类型，
     private Long extEventId;//记录集团下发的事件标识
-    private List<ContactEvtItem> contactEvtItems;
+    private ArrayList<ContactEvtItem> contactEvtItems;
 
-    public List<ContactEvtItem> getContactEvtItems() {
+    public Long getContactEvtId() {
+        return contactEvtId;
+    }
+
+    public void setContactEvtId(Long contactEvtId) {
+        this.contactEvtId = contactEvtId;
+    }
+
+    public Long getInterfaceCfgId() {
+        return interfaceCfgId;
+    }
+
+    public void setInterfaceCfgId(Long interfaceCfgId) {
+        this.interfaceCfgId = interfaceCfgId;
+    }
+
+    public String getContactEvtCode() {
+        return contactEvtCode;
+    }
+
+    public void setContactEvtCode(String contactEvtCode) {
+        this.contactEvtCode = contactEvtCode;
+    }
+
+    public String getContactEvtName() {
+        return contactEvtName;
+    }
+
+    public void setContactEvtName(String contactEvtName) {
+        this.contactEvtName = contactEvtName;
+    }
+
+    public String getEvtMappedAddr() {
+        return evtMappedAddr;
+    }
+
+    public void setEvtMappedAddr(String evtMappedAddr) {
+        this.evtMappedAddr = evtMappedAddr;
+    }
+
+    public String getEvtMappedIp() {
+        return evtMappedIp;
+    }
+
+    public void setEvtMappedIp(String evtMappedIp) {
+        this.evtMappedIp = evtMappedIp;
+    }
+
+    public String getEvtProcotolType() {
+        return evtProcotolType;
+    }
+
+    public void setEvtProcotolType(String evtProcotolType) {
+        this.evtProcotolType = evtProcotolType;
+    }
+
+    public String getEvtMappedFunName() {
+        return evtMappedFunName;
+    }
+
+    public void setEvtMappedFunName(String evtMappedFunName) {
+        this.evtMappedFunName = evtMappedFunName;
+    }
+
+    public String getContactEvtDesc() {
+        return contactEvtDesc;
+    }
+
+    public void setContactEvtDesc(String contactEvtDesc) {
+        this.contactEvtDesc = contactEvtDesc;
+    }
+
+    public String getMktCampaignType() {
+        return mktCampaignType;
+    }
+
+    public void setMktCampaignType(String mktCampaignType) {
+        this.mktCampaignType = mktCampaignType;
+    }
+
+    public String getRecCampaignAmount() {
+        return recCampaignAmount;
+    }
+
+    public void setRecCampaignAmount(String recCampaignAmount) {
+        this.recCampaignAmount = recCampaignAmount;
+    }
+
+    public Long getContactChlId() {
+        return contactChlId;
+    }
+
+    public void setContactChlId(Long contactChlId) {
+        this.contactChlId = contactChlId;
+    }
+
+    public Long getContactEvtTypeId() {
+        return contactEvtTypeId;
+    }
+
+    public void setContactEvtTypeId(Long contactEvtTypeId) {
+        this.contactEvtTypeId = contactEvtTypeId;
+    }
+
+    public String getContactEvtTypeName() {
+        return contactEvtTypeName;
+    }
+
+    public void setContactEvtTypeName(String contactEvtTypeName) {
+        this.contactEvtTypeName = contactEvtTypeName;
+    }
+
+    public String getEvtTrigType() {
+        return evtTrigType;
+    }
+
+    public void setEvtTrigType(String evtTrigType) {
+        this.evtTrigType = evtTrigType;
+    }
+
+    public String getCoopType() {
+        return coopType;
+    }
+
+    public void setCoopType(String coopType) {
+        this.coopType = coopType;
+    }
+
+    public Long getExtEventId() {
+        return extEventId;
+    }
+
+    public void setExtEventId(Long extEventId) {
+        this.extEventId = extEventId;
+    }
+
+    public ArrayList<ContactEvtItem> getContactEvtItems() {
         return contactEvtItems;
     }
 
-    public void setContactEvtItems(List<ContactEvtItem> contactEvtItems) {
+    public void setContactEvtItems(ArrayList<ContactEvtItem> contactEvtItems) {
         this.contactEvtItems = contactEvtItems;
     }
 }

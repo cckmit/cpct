@@ -53,7 +53,7 @@ public interface MktCampaignService {
 
     Map<String,Object> qryMktCampaignList4Sync (Map<String,Object> params, Integer page, Integer pageSize);
 
-    Map<String,Object> examineCampaign4Sync (Long campaignId);
+    Map<String,Object> examineCampaign4Sync (Long campaignId,String statusCd);
 
     Map<String,Object> getCampaignEndTime4Sync (Long campaignId);
 
