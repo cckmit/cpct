@@ -99,6 +99,7 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
         verbal.setStatusCd("1000");
         verbalMapper.insert(verbal);
         //删除旧的条件
+        List<MktVerbalCondition> conditions = new ArrayList<>();
         for (VerbalConditionAddVO vcAddVO : addVO.getAddVOList()) {
             if (vcAddVO.getOperType()==null){
 
@@ -113,8 +114,9 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
                 mktVerbalCondition.setRightParamType("2000");
             }
             mktVerbalCondition.setConditionType(ConditionType.CHANNEL.getValue().toString());
-            verbalConditionMapper.insert(mktVerbalCondition);
+            conditions.add(mktVerbalCondition);
         }
+        verbalConditionMapper.insertByBatch(conditions);
 
         //更新redis分群数据,先查出来再更新
         MktCamChlConfDetail detail = (MktCamChlConfDetail)redisUtils.get("MktCamChlConfDetail_"+addVO.getContactConfId());

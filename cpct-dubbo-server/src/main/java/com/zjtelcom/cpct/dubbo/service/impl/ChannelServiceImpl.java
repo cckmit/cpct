@@ -19,10 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -73,7 +70,8 @@ public class ChannelServiceImpl implements ChannelService {
         ContactEvtModel evtModel = BeanUtil.create(contactEvt,new ContactEvtModel());
         //查询出事件采集项
         List<ContactEvtItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId());
-        evtModel.setContactEvtItems(contactEvtItems);
+        ArrayList<ContactEvtItem> detailVOArrayList = new ArrayList(contactEvtItems);
+        evtModel.setContactEvtItems(detailVOArrayList);
         ret.setResultCode("0");
         ret.setData(evtModel);
         ret.setResultMsg(null);

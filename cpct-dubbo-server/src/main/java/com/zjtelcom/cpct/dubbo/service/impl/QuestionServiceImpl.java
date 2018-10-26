@@ -55,6 +55,8 @@ public class QuestionServiceImpl implements QuestionService {
         QuestionnaireVO questionnaireVO = BeanUtil.create(questionnaire,new QuestionnaireVO());
         resultRep.setQuestionnaire(questionnaireVO);
         List<QuestRel> questRelList = questRelMapper.findRelListByQuestionnaireId(questionnaireId);
+
+
         List<QuestionModel> voList = new ArrayList<>();
         for (QuestRel questRel : questRelList){
             Question question = questionMapper.selectByPrimaryKey(questRel.getQuestionId());
@@ -68,10 +70,12 @@ public class QuestionServiceImpl implements QuestionService {
                     QuestionDetailVO detailVO = BeanUtil.create(detail,new QuestionDetailVO());
                     detailVOS.add(detailVO);
                 }
-                vo.setQuestionDetailList(detailVOS);
+                ArrayList<QuestionDetailVO> detailVOArrayList = new ArrayList(detailVOS);
+                vo.setQuestionDetailList(detailVOArrayList);
             }
         }
-        resultRep.setQuestionVOList(voList);
+        ArrayList<QuestionModel> detailVOArrayList = new ArrayList(voList);
+        resultRep.setQuestionVOList(detailVOArrayList);
         ret.setResultCode(CODE_SUCCESS);
         ret.setData(resultRep);
         ret.setResultMsg(null);
