@@ -152,11 +152,13 @@ public class EsServiceImpl implements EsService {
 
             id = Long.valueOf(activity.get("activityId").toString());
             name = activity.get("activityName").toString();
+            booleanResult = Boolean.valueOf((activity.get("hit")==null ? "true" : activity.get("hit").toString()));
+
 
             activityInfo.setId(id);
             activityInfo.setName(name);
             //todo 命中结果；命中实例
-            activityInfo.setResult(true);
+            activityInfo.setResult(booleanResult);
             activityInfo.setHitEntity("命中得对象");
             activityInfo.setReason("命中原因");
 
@@ -170,12 +172,10 @@ public class EsServiceImpl implements EsService {
 
                 id = Long.valueOf(strategy.get("strategyConfId").toString());
                 name = strategy.get("strategyConfName").toString();
-
+                booleanResult = Boolean.valueOf((strategy.get("hit")==null ? "true" : activity.get("hit").toString()));
                 strategyInfo.setId(id);
-                //todo 策略名称有吗
                 strategyInfo.setName(name);
-                //todo 命中结果；命中实例
-                strategyInfo.setResult(true);
+                strategyInfo.setResult(booleanResult);
                 strategyInfo.setHitEntity("命中得对象");
                 strategyInfo.setReason("命中原因");
 
@@ -272,9 +272,8 @@ public class EsServiceImpl implements EsService {
             String source = hits.getHits()[j].getSourceAsString();
             System.out.println(source);
             Map<String, Object> stringMap = hits.getHits()[j].getSourceAsMap();
-            map.putAll(stringMap);
+            result.add(stringMap);
         }
-        result.add(map);
         return result;
     }
 
@@ -402,9 +401,9 @@ public class EsServiceImpl implements EsService {
     private BoolQueryBuilder getBoolQueryBuilderByActivityId(String isi,String activityId) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
-                        rangeQuery("activityId").gt(activityId))
+                        matchQuery("activityId",activityId))
                 .must(QueryBuilders.
-                        rangeQuery("reqId").gt(isi));
+                        matchQuery("reqId",isi));
         System.out.println(boolQueryBuilder);
         return boolQueryBuilder;
     }
@@ -415,7 +414,7 @@ public class EsServiceImpl implements EsService {
                 .must(QueryBuilders.
                         termQuery("strategyConfId",Long.valueOf(strategyId)))
                 .must(QueryBuilders.
-                        rangeQuery("reqId").gt(isi));
+                        matchQuery("reqId",isi));
         System.out.println(boolQueryBuilder);
         return boolQueryBuilder;
     }
@@ -426,7 +425,7 @@ public class EsServiceImpl implements EsService {
                 .must(QueryBuilders.
                         termQuery("ruleId",(Long.valueOf(ruleId))))
                 .must(QueryBuilders.
-                        rangeQuery("reqId").gt(isi));
+                        matchQuery("reqId",isi));
         System.out.println(boolQueryBuilder);
         return boolQueryBuilder;
     }
@@ -444,7 +443,7 @@ public class EsServiceImpl implements EsService {
     private BoolQueryBuilder getBoolQueryBuilderForTest(String ISI) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
-                        rangeQuery("orderISI").gt(ISI));
+                        matchQuery("reqId",ISI));
         System.out.println(boolQueryBuilder);
         return boolQueryBuilder;
     }

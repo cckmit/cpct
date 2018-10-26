@@ -212,6 +212,12 @@ public class DateUtil {
         return new Date();
     }
 
+    public static String getDetailTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+        String detailTime = sdf.format(new Date());
+        return detailTime;
+    }
+
     /**
      * 上月有多少天
      *

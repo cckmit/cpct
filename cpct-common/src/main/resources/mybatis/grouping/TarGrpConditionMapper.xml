@@ -195,9 +195,9 @@
         RIGHT_PARAM, RIGHT_PARAM_TYPE, CONDITION_TEXT,
         STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
         CREATE_DATE, STATUS_DATE, UPDATE_DATE,
-        REMARK)
+        REMARK) values
       <foreach collection="list" item="item" separator="," index="i">
-      values ( #{item.conditionId,jdbcType=BIGINT},#{item.tarGrpId,jdbcType=BIGINT}, #{item.rootFlag,jdbcType=VARCHAR},
+        ( #{item.conditionId,jdbcType=BIGINT},#{item.tarGrpId,jdbcType=BIGINT}, #{item.rootFlag,jdbcType=VARCHAR},
       #{item.leftParam,jdbcType=VARCHAR}, #{item.leftParamType,jdbcType=VARCHAR}, #{item.operType,jdbcType=VARCHAR},
       #{item.rightParam,jdbcType=VARCHAR}, #{item.rightParamType,jdbcType=VARCHAR}, #{item.conditionText,jdbcType=VARCHAR},
       #{item.statusCd,jdbcType=VARCHAR}, #{item.createStaff,jdbcType=BIGINT}, #{item.updateStaff,jdbcType=BIGINT},
