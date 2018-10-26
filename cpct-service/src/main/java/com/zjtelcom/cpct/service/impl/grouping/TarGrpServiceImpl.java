@@ -177,7 +177,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
         List<TarGrpCondition> conditionList = new ArrayList<>();
         if(tarGrpConditions!=null && tarGrpConditions.size()>0){
-            for (final TarGrpCondition tarGrpCondition : tarGrpConditions) {
+            for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
                 if (tarGrpCondition.getOperType()==null || tarGrpCondition.getOperType().equals("")){
                     maps.put("resultCode", CODE_FAIL);
                     maps.put("resultMsg", "请选择下拉框运算类型");
@@ -194,9 +194,9 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 tarGrpCondition.setStatusDate(DateUtil.getCurrentTime());
                 tarGrpCondition.setUpdateStaff(UserUtil.loginId());
                 tarGrpCondition.setCreateStaff(UserUtil.loginId());
-                tarGrpConditionMapper.insert(tarGrpCondition);
                 conditionList.add(tarGrpCondition);
             }
+            tarGrpConditionMapper.insertByBatch(conditionList);
         }
         //数据加入redis
         TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
@@ -295,7 +295,18 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     public Map<String, Object> delTarGrpCondition(Long conditionId) {
         Map<String, Object> mapsT = new HashMap<>();
         try {
+            TarGrpCondition condition = tarGrpConditionMapper.selectByPrimaryKey(conditionId);
+            if (condition==null){
+                mapsT.put("resultCode", CODE_FAIL);
+                mapsT.put("resultMsg", ErrorCode.DEL_TAR_GRP_CONDITION_FAILURE.getErrorMsg());
+                return mapsT;
+            }
+            Long tarGrpId = condition.getTarGrpId();
             tarGrpConditionMapper.deleteByPrimaryKey(conditionId);
+            List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
+            if (conditionList.isEmpty()){
+                tarGrpMapper.deleteByPrimaryKey(tarGrpId);
+            }
         } catch (Exception e) {
             mapsT.put("resultCode", CODE_FAIL);
             mapsT.put("resultMsg", ErrorCode.DEL_TAR_GRP_CONDITION_FAILURE.getErrorMsg());
@@ -336,6 +347,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         tarGrp.setUpdateStaff(UserUtil.loginId());
         tarGrpMapper.modTarGrp(tarGrp);
         List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
+        List<TarGrpCondition> insertConditions = new ArrayList<>();
         for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
             TarGrpCondition tarGrpCondition1 = tarGrpConditionMapper.selectByPrimaryKey(tarGrpCondition.getConditionId());
             if (tarGrpCondition1 == null) {
@@ -355,11 +367,14 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 tarGrpCondition.setStatusDate(DateUtil.getCurrentTime());
                 tarGrpCondition.setUpdateStaff(UserUtil.loginId());
                 tarGrpCondition.setCreateStaff(UserUtil.loginId());
-                tarGrpConditionMapper.insert(tarGrpCondition);
+                insertConditions.add(tarGrpCondition);
             } else {
                 tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
                 tarGrpCondition.setUpdateStaff(UserUtil.loginId());
                 tarGrpConditionMapper.modTarGrpCondition(tarGrpCondition);
+            }
+            if (!insertConditions.isEmpty()){
+                tarGrpConditionMapper.insertByBatch(insertConditions);
             }
         }
         //更新redis分群数据
