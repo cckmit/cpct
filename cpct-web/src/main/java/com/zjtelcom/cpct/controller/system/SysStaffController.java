@@ -6,9 +6,11 @@ import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.system.SysStaffDTO;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.system.SysStaffService;
+import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.rmi.CORBA.Util;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -153,5 +155,21 @@ public class SysStaffController extends BaseController {
         return JSON.toJSON(result).toString();
     }
 
+    /**
+     * 获取当前用户信息
+     */
+    @RequestMapping(value = "loginInfo", method = RequestMethod.POST)
+    @CrossOrigin
+    public String loginInfo() {
+        Map result = new HashMap();
+        Long staffId = UserUtil.loginId();
+        try {
+            result = sysStaffService.getStaff(staffId);
+        }catch (Exception e) {
+            logger.error("[op:SysStaffController] fail to loginInfo Exception: ", e);
+            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+        }
+        return JSON.toJSON(result).toString();
+    }
 
 }
