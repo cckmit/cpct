@@ -15,6 +15,8 @@ public interface TarGrpTemplateConditionMapper {
 
     int deleteByTarGrpTemplateId(Long tarGrpTemplateId);
 
+    int deleteBatch(List<Long> conditionIds);
+
     int insert(TarGrpTemplateConditionDO tarGrpTemplateConditionDO);
 
     TarGrpTemplateConditionDO selectByPrimaryKey(Long conditionId);
