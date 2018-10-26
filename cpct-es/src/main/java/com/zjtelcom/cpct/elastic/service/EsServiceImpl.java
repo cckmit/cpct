@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.zjtelcom.cpct.elastic.model.CampaignHitParam;
 import com.zjtelcom.cpct.elastic.model.CampaignHitResponse;
 import com.zjtelcom.cpct.elastic.model.CampaignInfoTree;
+import com.zjtelcom.cpct.elastic.model.TotalModel;
 import com.zjtelcom.cpct.elastic.util.ElasticsearchUtil;
 import com.zjtelcom.cpct.elastic.util.EsSearchUtil;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -98,6 +99,13 @@ public class EsServiceImpl implements EsService {
         //查询事件信息
         List<Map<String,Object>> eventList = new ArrayList<>();
         SearchHits hits = searchEventByParam(param);
+        Long total = searchEventCountByParam(param);
+        TotalModel[] totalModels = new TotalModel[total.intValue()];
+        for (int i = 1;i<=total.intValue();i++){
+            TotalModel totalModel = new TotalModel();
+            totalModel.setNumber(String.valueOf(i));
+            totalModels[i-1] = totalModel;
+        }
         for(int j = 0; j < hits.getHits().length; j++) {
             String source = hits.getHits()[j].getSourceAsString();
             System.out.println(source);
@@ -112,9 +120,9 @@ public class EsServiceImpl implements EsService {
         }
         //除事件外其它使用ISI查询
         param.setSearchBy("ISI");
-        param.setIsi(eventList.get(0).get("ISI").toString());
+        param.setIsi(eventList.get(0).get("reqId").toString());
 
-        String ISI = eventList.get(0).get("ISI").toString();
+        String ISI = eventList.get(0).get("reqId").toString();
         //查询标签信息
         List<Map<String,Object>> labelList = new ArrayList<>();
         //查询事件后通过事件isi查询标签信息
@@ -210,7 +218,7 @@ public class EsServiceImpl implements EsService {
         eventList.get(0).remove("activityList");
         response.setLabelInfo(labelInfo);
         response.setEventInfo(eventList.get(0));
-        response.setTotal(Long.parseLong(String.valueOf(eventList.size())));
+        response.setTotal(totalModels);
         result.put("resultCode","0");
         result.put("resultMsg",response);
         return result;
@@ -277,11 +285,24 @@ public class EsServiceImpl implements EsService {
      */
     private SearchHits getSearchHits(BoolQueryBuilder boolQueryBuilder, SearchRequestBuilder builder,int from) {
         SearchResponse myresponse = builder.setQuery(boolQueryBuilder)
+//                .setFrom(from).setSize(1)
+//                .setFetchSource(fields,null)
+                .setExplain(true).execute().actionGet();
+        return myresponse.getHits();
+    }
+
+    /**
+     * ES查询方法 获取命中对象（事件）
+     * @return
+     */
+    private SearchHits getSearchHits4Event(BoolQueryBuilder boolQueryBuilder, SearchRequestBuilder builder,int from) {
+        SearchResponse myresponse = builder.setQuery(boolQueryBuilder)
                 .setFrom(from).setSize(1)
 //                .setFetchSource(fields,null)
                 .setExplain(true).execute().actionGet();
         return myresponse.getHits();
     }
+
 
 
     /**
@@ -343,6 +364,27 @@ public class EsServiceImpl implements EsService {
             case "ISI":
                 boolQueryBuilder = getBoolQueryBuilder(param.getIsi());
                 break;
+            case "EventCode"://资产集成编码
+                boolQueryBuilder = getBoolQueryBuilderByEventCode(param.getEventCode());
+                break;
+            case "AssertNumber"://资产号码
+                boolQueryBuilder = getBoolQueryBuilderByAssetNumber(param.getAssetNumber(),param.getStartTime(),param.getEndTime());
+                break;
+        }
+        SearchRequestBuilder builder = client.prepareSearch(EVENT_MODULE).setTypes(esType);
+        SearchHits hits = getSearchHits4Event(boolQueryBuilder, builder,param.getFrom());
+        return hits;
+    }
+
+    /**
+     *事件索引查询
+     */
+    private Long searchEventCountByParam(CampaignHitParam param) {
+        BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+        switch (param.getSearchBy()){
+            case "ISI":
+                boolQueryBuilder = getBoolQueryBuilder(param.getIsi());
+                break;
             case "EventCode":
                 boolQueryBuilder = getBoolQueryBuilderByEventCode(param.getEventCode());
                 break;
@@ -352,7 +394,7 @@ public class EsServiceImpl implements EsService {
         }
         SearchRequestBuilder builder = client.prepareSearch(EVENT_MODULE).setTypes(esType);
         SearchHits hits = getSearchHits(boolQueryBuilder, builder,param.getFrom());
-        return hits;
+        return hits.getTotalHits();
     }
 
 
@@ -362,7 +404,7 @@ public class EsServiceImpl implements EsService {
                 .must(QueryBuilders.
                         rangeQuery("activityId").gt(activityId))
                 .must(QueryBuilders.
-                        rangeQuery("ISI").gt(isi));
+                        rangeQuery("reqId").gt(isi));
         System.out.println(boolQueryBuilder);
         return boolQueryBuilder;
     }
@@ -373,7 +415,7 @@ public class EsServiceImpl implements EsService {
                 .must(QueryBuilders.
                         termQuery("strategyConfId",Long.valueOf(strategyId)))
                 .must(QueryBuilders.
-                        rangeQuery("ISI").gt(isi));
+                        rangeQuery("reqId").gt(isi));
         System.out.println(boolQueryBuilder);
         return boolQueryBuilder;
     }
@@ -384,7 +426,7 @@ public class EsServiceImpl implements EsService {
                 .must(QueryBuilders.
                         termQuery("ruleId",(Long.valueOf(ruleId))))
                 .must(QueryBuilders.
-                        rangeQuery("ISI").gt(isi));
+                        rangeQuery("reqId").gt(isi));
         System.out.println(boolQueryBuilder);
         return boolQueryBuilder;
     }
@@ -393,7 +435,7 @@ public class EsServiceImpl implements EsService {
     private BoolQueryBuilder getBoolQueryBuilder(String ISI) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
-                        matchQuery("ISI",ISI));
+                        matchQuery("reqId",ISI));
         System.out.println(boolQueryBuilder);
         return boolQueryBuilder;
     }
@@ -407,11 +449,11 @@ public class EsServiceImpl implements EsService {
         return boolQueryBuilder;
     }
 
-    //事件编码组装查询条件
+    //资产集成编码组装查询条件
     private BoolQueryBuilder getBoolQueryBuilderByEventCode(String eventCode ) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
-                        matchQuery("eventCode",eventCode));
+                        matchQuery("integrationId",eventCode));
         System.out.println(boolQueryBuilder);
 
         return boolQueryBuilder;
@@ -421,9 +463,9 @@ public class EsServiceImpl implements EsService {
     private BoolQueryBuilder getBoolQueryBuilderByAssetNumber(String assetNumber,Date startTime,Date endTime) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
-                        matchQuery("assetNumber",assetNumber))
-                .must(QueryBuilders.rangeQuery("startTime").gte(startTime))
-                .must(QueryBuilders.rangeQuery("endTime").lte(endTime));
+                        matchQuery("accNbr",assetNumber));
+//                .must(QueryBuilders.rangeQuery("startTime").gte(startTime))
+//                .must(QueryBuilders.rangeQuery("startTime").lte(endTime));
         System.out.println(boolQueryBuilder);
         return boolQueryBuilder;
     }

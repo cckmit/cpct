@@ -31,7 +31,7 @@ public interface MktCamChlResultService {
 
     Map<String, Object> copyMktCamChlResult(Long parentMktCamChlResultId);
 
-    Map<String, Object> copyMktCamChlResultFromRedis(Long parentMktCamChlResultId);
+    Map<String, Object> copyMktCamChlResultFromRedis(MktCamChlResult mktCamChlResult);
 
     Map<String, Object> selectResultList();
 

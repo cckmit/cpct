@@ -2,11 +2,10 @@ package com.zjtelcom.cpct.dubbo.model;
 
 import java.io.Serializable;
 
-public class Ret implements Serializable {
+public class RetQuestion implements Serializable {
     private String resultCode;
     private String resultMsg;
-
-
+    private QuestionRep data;
 
     public String getResultCode() {
         return resultCode;
@@ -24,5 +23,11 @@ public class Ret implements Serializable {
         this.resultMsg = resultMsg;
     }
 
+    public QuestionRep getData() {
+        return data;
+    }
 
+    public void setData(QuestionRep data) {
+        this.data = data;
+    }
 }

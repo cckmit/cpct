@@ -41,8 +41,8 @@ public class ChannelServiceImpl implements ChannelService {
     private FilterRuleMapper filterRuleMapper;
 
     @Override
-    public Ret getChannelDetail(String channelCode) {
-        Ret<ChannelModel> ret = new Ret<>();
+    public RetChannel getChannelDetail(String channelCode) {
+        RetChannel ret = new RetChannel();
         ChannelModel vo = new ChannelModel();
         try {
             Channel channel = channelMapper.selectByCode(channelCode);
@@ -62,8 +62,8 @@ public class ChannelServiceImpl implements ChannelService {
     }
 
     @Override
-    public Ret getEventDetail(String evtCode){
-        Ret<ContactEvtModel> ret = new Ret<>();
+    public RetEvent getEventDetail(String evtCode){
+        RetEvent ret = new RetEvent();
         ContactEvt contactEvt = contactEvtMapper.getEventByEventNbr(evtCode);
         if (contactEvt==null){
             ret.setResultMsg("事件不存在");
@@ -83,7 +83,7 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     public Ret importRuleUserList(FilterRuleInputReq req) {
-        Ret<QuestionRep> ret = new Ret<>();
+        Ret ret = new Ret();
         FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(req.getFilterRuleId());
         if (filterRule==null){
             ret.setResultMsg("过滤规则不存在");
@@ -108,7 +108,6 @@ public class ChannelServiceImpl implements ChannelService {
             userListMapper.insert(userList);
         }
         ret.setResultCode("0");
-        ret.setData(null);
         ret.setResultMsg("导入成功");
         return ret;
     }

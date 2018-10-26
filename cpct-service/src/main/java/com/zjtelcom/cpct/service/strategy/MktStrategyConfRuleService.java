@@ -21,7 +21,7 @@ public interface MktStrategyConfRuleService {
 
     Map<String, Object> copyMktStrategyConfRule(Long parentMktStrategyConfRuleId, Boolean isPublish)throws Exception;
 
-    Map<String, Object> copyMktStrategyConfRule(MktStrategyConfRule mktStrategyConfRule) throws Exception;
+    Map<String, Object> copyMktStrategyConfRule(List<MktStrategyConfRule> mktStrategyConfRuleList) throws Exception;
 
     Map<String, Object> updateProductIds(List<Long> productIdList, Long ruleId);
 
