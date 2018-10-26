@@ -88,6 +88,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         Map<String,Object> result = new HashMap<>();
         List<Long> ruleIdList = new ArrayList<>();
         if(ItemIdList!=null && ItemIdList.size()>0){
+            List<MktCamItem> mktCamItems = new ArrayList<>();
             for (Long itemId : ItemIdList) {
                 MktCamItem item = (MktCamItem) redisUtils.get("MKT_CAM_ITEM_"+itemId);
                 if (item == null) {
@@ -95,9 +96,13 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 }
                 MktCamItem newItem = BeanUtil.create(item, new MktCamItem());
                 newItem.setMktCamItemId(null);
-                camItemMapper.insert(newItem);
+                mktCamItems.add(newItem);
                 redisUtils.set("MKT_CAM_ITEM_"+newItem.getMktCamItemId(), newItem);
-                ruleIdList.add(newItem.getMktCamItemId());
+
+            }
+            camItemMapper.insertByBatch(mktCamItems);
+            for(MktCamItem item : mktCamItems){
+                ruleIdList.add(item.getMktCamItemId());
             }
         }
         result.put("resultCode",CODE_SUCCESS);
@@ -110,6 +115,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     public Map<String, Object> addProductRule(Long strategyRuleId, List<Long> productIdList) {
         Map<String,Object> result = new HashMap<>();
         List<Long> ruleIdList = new ArrayList<>();
+        List<MktCamItem> mktCamItems = new ArrayList<>();
         for (Long productId : productIdList){
             Offer product = productMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
             if (product==null){
@@ -129,9 +135,12 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             item.setUpdateStaff(UserUtil.loginId());
             item.setCreateStaff(UserUtil.loginId());
             item.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-            camItemMapper.insert(item);
+            mktCamItems.add(item);
             //redis添加推荐条目数据
             redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
+        }
+        camItemMapper.insertByBatch(mktCamItems);
+        for(MktCamItem item : mktCamItems){
             ruleIdList.add(item.getMktCamItemId());
         }
         if (strategyRuleId!=null){
