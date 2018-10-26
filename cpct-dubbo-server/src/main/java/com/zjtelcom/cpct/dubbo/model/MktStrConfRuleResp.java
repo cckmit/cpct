@@ -1,11 +1,11 @@
 package com.zjtelcom.cpct.dubbo.model;
 
 import com.zjtelcom.cpct.domain.channel.Offer;
-import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
-import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,15 +22,39 @@ public class MktStrConfRuleResp implements Serializable {
      */
     private String mktStrategyConfRuleName;
 
+    public String getMktStrategyConfRuleName() {
+        return mktStrategyConfRuleName;
+    }
+
+    public void setMktStrategyConfRuleName(String mktStrategyConfRuleName) {
+        this.mktStrategyConfRuleName = mktStrategyConfRuleName;
+    }
+
+    public ArrayList<MktCamChlConfDetail> getMktCamChlConfDetailList() {
+        return mktCamChlConfDetailList;
+    }
+
+    public void setMktCamChlConfDetailList(ArrayList<MktCamChlConfDetail> mktCamChlConfDetailList) {
+        this.mktCamChlConfDetailList = mktCamChlConfDetailList;
+    }
+
+    public ArrayList<MktCamChlResult> getMktCamChlResultList() {
+        return mktCamChlResultList;
+    }
+
+    public void setMktCamChlResultList(ArrayList<MktCamChlResult> mktCamChlResultList) {
+        this.mktCamChlResultList = mktCamChlResultList;
+    }
+
     /**
      * 协同渠道配置集合
      */
-    List<MktCamChlConfDetail> mktCamChlConfDetailList;
+    private ArrayList<MktCamChlConfDetail> mktCamChlConfDetailList;
 
     /**
      * 二次协同渠道结果集合
      */
-    private List<MktCamChlResult> mktCamChlResultList;
+    private ArrayList<MktCamChlResult> mktCamChlResultList;
 
 
     public Long getMktStrategyConfRuleId() {
@@ -41,28 +65,5 @@ public class MktStrConfRuleResp implements Serializable {
         this.mktStrategyConfRuleId = mktStrategyConfRuleId;
     }
 
-    public List<MktCamChlConfDetail> getMktCamChlConfDetailList() {
-        return mktCamChlConfDetailList;
-    }
-
-    public void setMktCamChlConfDetailList(List<MktCamChlConfDetail> mktCamChlConfDetailList) {
-        this.mktCamChlConfDetailList = mktCamChlConfDetailList;
-    }
-
-    public String getMktStrategyConfRuleName() {
-        return mktStrategyConfRuleName;
-    }
-
-    public void setMktStrategyConfRuleName(String mktStrategyConfRuleName) {
-        this.mktStrategyConfRuleName = mktStrategyConfRuleName;
-    }
-
-    public List<MktCamChlResult> getMktCamChlResultList() {
-        return mktCamChlResultList;
-    }
-
-    public void setMktCamChlResultList(List<MktCamChlResult> mktCamChlResultList) {
-        this.mktCamChlResultList = mktCamChlResultList;
-    }
 
 }

@@ -26,4 +26,7 @@ public interface MktVerbalConditionMapper {
     int deleteByVerbalId(@Param("conditionType") String conditionType,@Param("verbalId")Long verbalId);
 
     int updateByPrimaryKey(MktVerbalCondition record);
+
+    int insertByBatch(@Param("list") List<MktVerbalCondition> record);
+
 }

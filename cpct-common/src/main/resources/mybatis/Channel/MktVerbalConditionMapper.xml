@@ -79,4 +79,21 @@
     from mkt_verbal_condition where CONDITION_TYPE = 0 and VERBAL_ID = #{verbalId}
   </select>
 
+    <insert id="insertByBatch" parameterType="java.util.List" useGeneratedKeys="true"
+            keyProperty="conditionId">
+    insert into mkt_verbal_condition (CONDITION_ID, VERBAL_ID, LEFT_PARAM,
+      LEFT_PARAM_TYPE, OPER_TYPE, RIGHT_PARAM,
+      RIGHT_PARAM_TYPE, STATUS_CD, CREATE_STAFF,
+      CREATE_DATE, STATUS_DATE, REMARK, CONDITION_TYPE
+      )
+      <foreach collection="list" item="item" separator="," index="i">
+      values (#{item.conditionId,jdbcType=BIGINT}, #{item.verbalId,jdbcType=BIGINT}, #{item.leftParam,jdbcType=VARCHAR},
+      #{item.leftParamType,jdbcType=VARCHAR}, #{item.operType,jdbcType=VARCHAR}, #{item.rightParam,jdbcType=VARCHAR},
+      #{item.rightParamType,jdbcType=VARCHAR}, #{item.statusCd,jdbcType=VARCHAR}, #{item.createStaff,jdbcType=BIGINT},
+      #{item.createDate,jdbcType=TIMESTAMP}, #{item.statusDate,jdbcType=TIMESTAMP}, #{item.remark,jdbcType=VARCHAR},
+      #{item.conditionType,jdbcType=VARCHAR}
+      )
+      </foreach>
+  </insert>
+
 </mapper>

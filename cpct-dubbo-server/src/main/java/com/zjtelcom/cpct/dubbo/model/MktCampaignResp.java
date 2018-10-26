@@ -1,20 +1,11 @@
 package com.zjtelcom.cpct.dubbo.model;
 
-import com.zjtelcom.cpct.domain.SysArea;
-import com.zjtelcom.cpct.domain.campaign.CityProperty;
 import com.zjtelcom.cpct.dto.campaign.MktCampaign;
-import com.zjtelcom.cpct.dto.channel.MessageLabelInfo;
-import com.zjtelcom.cpct.dto.event.EventDTO;
 
-import java.util.List;
+import java.util.ArrayList;
 
 
 public class MktCampaignResp extends MktCampaign{
-
-    /**
-     * 活动关联的事件
-     */
-    private List<EventDTO> eventDTOS;
 
     /**
      * 营销活动分类value
@@ -30,11 +21,6 @@ public class MktCampaignResp extends MktCampaign{
      * 活动类别（关系：强制活动，框架活动，自主活动）
      */
     private String mktCampaignCategory;
-
-    /**
-     * 下发地市Id
-     */
-    private List<SysArea> sysAreaList;
 
     /**
      * 触发类型Value
@@ -76,19 +62,11 @@ public class MktCampaignResp extends MktCampaign{
      */
     private Boolean isRelation;
 
-
     /**
      * 策略配置信息
      */
-    List<MktStrategyConfResp> mktStrategyConfRespList;
+    private ArrayList<MktStrategyConfResp> mktStrategyConfRespList;
 
-    public List<EventDTO> getEventDTOS() {
-        return eventDTOS;
-    }
-
-    public void setEventDTOS(List<EventDTO> eventDTOS) {
-        this.eventDTOS = eventDTOS;
-    }
 
     public String getMktCampaignTypeValue() {
         return mktCampaignTypeValue;
@@ -114,13 +92,6 @@ public class MktCampaignResp extends MktCampaign{
         this.mktCampaignCategory = mktCampaignCategory;
     }
 
-    public List<SysArea> getSysAreaList() {
-        return sysAreaList;
-    }
-
-    public void setSysAreaList(List<SysArea> sysAreaList) {
-        this.sysAreaList = sysAreaList;
-    }
 
     public String getTiggerTypeValue() {
         return tiggerTypeValue;
@@ -186,11 +157,11 @@ public class MktCampaignResp extends MktCampaign{
         isRelation = relation;
     }
 
-    public List<MktStrategyConfResp> getMktStrategyConfRespList() {
+    public ArrayList<MktStrategyConfResp> getMktStrategyConfRespList() {
         return mktStrategyConfRespList;
     }
 
-    public void setMktStrategyConfRespList(List<MktStrategyConfResp> mktStrategyConfRespList) {
+    public void setMktStrategyConfRespList(ArrayList<MktStrategyConfResp> mktStrategyConfRespList) {
         this.mktStrategyConfRespList = mktStrategyConfRespList;
     }
 }

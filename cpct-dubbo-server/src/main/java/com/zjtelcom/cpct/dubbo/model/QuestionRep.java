@@ -4,11 +4,12 @@ import com.zjtelcom.cpct.domain.question.Questionnaire;
 import com.zjtelcom.cpct.dto.question.QuestionVO;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class QuestionRep implements Serializable {
     private QuestionnaireVO questionnaire;
-    private List<QuestionModel> questionVOList;
+    private ArrayList<QuestionModel> questionVOList;
 
     public QuestionnaireVO getQuestionnaire() {
         return questionnaire;
@@ -18,11 +19,11 @@ public class QuestionRep implements Serializable {
         this.questionnaire = questionnaire;
     }
 
-    public List<QuestionModel> getQuestionVOList() {
+    public ArrayList<QuestionModel> getQuestionVOList() {
         return questionVOList;
     }
 
-    public void setQuestionVOList(List<QuestionModel> questionVOList) {
+    public void setQuestionVOList(ArrayList<QuestionModel> questionVOList) {
         this.questionVOList = questionVOList;
     }
 }
