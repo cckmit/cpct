@@ -107,6 +107,9 @@ public class EventApiServiceImpl implements EventApiService {
     @Autowired(required = false)
     private YzServ yzServ; //因子实时查询dubbo服务
 
+    @Autowired(required = false)
+    private ContactChannelMapper contactChannelMapper; //渠道信息
+
     @Override
     public Map<String, Object> CalculateCPC(Map<String, Object> map) {
 
@@ -538,6 +541,7 @@ public class EventApiServiceImpl implements EventApiService {
             System.out.println(resJson.toString());
 
             Map<String, Object> triggers = new HashMap<>();
+            List<Map<String, Object>> triggerList = new ArrayList<>();
             if (calcDisplay != null) {
                 for (Label label : calcDisplay) {
                     if (resJson.containsKey(label.getInjectionLabelCode())) {
@@ -546,12 +550,15 @@ public class EventApiServiceImpl implements EventApiService {
                         triggers.put("display", 0); //todo 确定display字段
                         triggers.put("name", label.getInjectionLabelName());
                     }
+
+                    triggerList.add(triggers);
                 }
-                itgTriggers.put("triggerList", triggers);
+                itgTriggers.put("triggerList", triggerList);
                 itgTriggers.put("type", 1);
             }
 
             triggers = new HashMap<>();
+            triggerList = new ArrayList<>();
             if (iSaleDisplay != null) {
                 for (Label label : iSaleDisplay) {
                     if (resJson.containsKey(label.getInjectionLabelCode())) {
@@ -561,7 +568,10 @@ public class EventApiServiceImpl implements EventApiService {
                         triggers.put("name", label.getInjectionLabelName());
                     }
                 }
-                itgTriggers.put("triggerList", triggers);
+
+                triggerList.add(triggers);
+
+                itgTriggers.put("triggerList", triggerList);
                 itgTriggers.put("type", 2);
             }
 
@@ -1351,8 +1361,10 @@ public class EventApiServiceImpl implements EventApiService {
             MktCamChlConfDO mktCamChlConf = mktCamChlConfMapper.selectByPrimaryKey(evtContactConfId);
 
             //渠道级别信息
-            channel.put("channelId", mktCamChlConf.getContactChlId());
-            channel.put("channelConfId", mktCamChlConf.getContactChlId()); //执行渠道推送配置标识(MKT_CAM_CHL_CONF表主键) （必填） todo 林超
+            Channel channelMessage = contactChannelMapper.selectByPrimaryKey(mktCamChlConf.getContactChlId());
+            channel.put("channelId", channelMessage.getContactChlCode());
+            //查询渠道编码
+            channel.put("channelConfId", mktCamChlConf.getContactChlId()); //执行渠道推送配置标识(MKT_CAM_CHL_CONF表主键) （必填）
 
             channel.put("pushType", mktCamChlConf.getPushType()); //推送类型
             channel.put("pushTime", ""); // 推送时间
