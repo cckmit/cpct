@@ -399,7 +399,11 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
     public String ruleSelect(Long evtContactConfId) {
         //唯一ID
         //查询出所有规则
-        List<MktVerbalCondition> mktVerbalConditions = mktVerbalConditionMapper.findConditionListByVerbalId(evtContactConfId);
+        List<MktVerbalCondition> mktVerbalConditions = (List<MktVerbalCondition>) redisUtils.get("RULE_BERBALC_CONDITION_" + evtContactConfId);
+        if (mktVerbalConditions == null) {
+            mktVerbalConditions = mktVerbalConditionMapper.findConditionListByVerbalId(evtContactConfId);
+        }
+
 
         List<MktVerbalCondition> labels = new ArrayList<>(); //标签因子
         List<MktVerbalCondition> expressions = new ArrayList<>(); //表达式
