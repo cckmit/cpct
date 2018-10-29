@@ -506,18 +506,18 @@ public class EventApiServiceImpl implements EventApiService {
 //            int i = 0;
 
             //查询展示列 （试算）
-            List<Label> calcDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getCalcDisplay());
-            //格式化返回参数结构
-            if (calcDisplay != null) {
-                for (Label label : calcDisplay) {
-//                    queryFields.put(String.valueOf(i), label.getInjectionLabelCode());
-//                    i++;
-                    querySb.append(label.getInjectionLabelCode()).append(",");
-                }
-            }
+//            List<Label> calcDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getCalcDisplay());
+//            //格式化返回参数结构
+//            if (calcDisplay != null) {
+//                for (Label label : calcDisplay) {
+////                    queryFields.put(String.valueOf(i), label.getInjectionLabelCode());
+////                    i++;
+//                    querySb.append(label.getInjectionLabelCode()).append(",");
+//                }
+//            }
             //查询展示列 （iSale）
             List<Label> iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getIsaleDisplay());
-            if (calcDisplay != null) {
+            if (iSaleDisplay != null) {
                 for (Label label : iSaleDisplay) {
 //                    queryFields.put(String.valueOf(i), label.getInjectionLabelCode());
 //                    i++;
@@ -542,20 +542,20 @@ public class EventApiServiceImpl implements EventApiService {
 
             Map<String, Object> triggers = new HashMap<>();
             List<Map<String, Object>> triggerList = new ArrayList<>();
-            if (calcDisplay != null) {
-                for (Label label : calcDisplay) {
-                    if (resJson.containsKey(label.getInjectionLabelCode())) {
-                        triggers.put("key", label.getInjectionLabelCode());
-                        triggers.put("value", resJson.get(label.getInjectionLabelCode()));
-                        triggers.put("display", 0); //todo 确定display字段
-                        triggers.put("name", label.getInjectionLabelName());
-                    }
-
-                    triggerList.add(triggers);
-                }
-                itgTriggers.put("triggerList", triggerList);
-                itgTriggers.put("type", 1);
-            }
+//            if (calcDisplay != null) {
+//                for (Label label : calcDisplay) {
+//                    if (resJson.containsKey(label.getInjectionLabelCode())) {
+//                        triggers.put("key", label.getInjectionLabelCode());
+//                        triggers.put("value", resJson.get(label.getInjectionLabelCode()));
+//                        triggers.put("display", 0); //todo 确定display字段
+//                        triggers.put("name", label.getInjectionLabelName());
+//                    }
+//
+//                    triggerList.add(triggers);
+//                }
+//                itgTriggers.put("triggerList", triggerList);
+//                itgTriggers.put("type", 1);
+//            }
 
             triggers = new HashMap<>();
             triggerList = new ArrayList<>();
@@ -572,7 +572,7 @@ public class EventApiServiceImpl implements EventApiService {
                 triggerList.add(triggers);
 
                 itgTriggers.put("triggerList", triggerList);
-                itgTriggers.put("type", 2);
+                itgTriggers.put("type", 1);
             }
 
 
@@ -1363,9 +1363,9 @@ public class EventApiServiceImpl implements EventApiService {
             //渠道级别信息
             Channel channelMessage = contactChannelMapper.selectByPrimaryKey(mktCamChlConf.getContactChlId());
             channel.put("channelId", channelMessage.getContactChlCode());
-            //查询渠道编码
+//            channel.put("channelId", mktCamChlConf.getContactChlId());
+            //查询渠道id
             channel.put("channelConfId", mktCamChlConf.getContactChlId()); //执行渠道推送配置标识(MKT_CAM_CHL_CONF表主键) （必填）
-
             channel.put("pushType", mktCamChlConf.getPushType()); //推送类型
             channel.put("pushTime", ""); // 推送时间
 
