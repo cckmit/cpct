@@ -3,7 +3,6 @@ package com.zjtelcom.cpct.controller.api;
 
 import com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService;
 import com.zjtelcom.cpct.controller.BaseController;
-import com.zjtelcom.cpct.dubbo.service.ChannelService;
 import com.zjtelcom.cpct.service.api.EventApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,9 +23,6 @@ public class EventApiController extends BaseController {
 
     @Autowired(required = false)
     private IContactTaskReceiptService iContactTaskReceiptService;
-
-    @Autowired(required = false)
-    private ChannelService channelService;
 
     /**
      * 事件触发入口
