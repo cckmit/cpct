@@ -223,7 +223,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
 
                     CamScriptAddVO camScriptAddVO = new CamScriptAddVO();
                     camScriptAddVO.setEvtContactConfId(evtContactConfId);
-                    camScriptAddVO.setMktCampaignId(mktStrategyConfRule.getMktCamChlConfDetailList().get(i).getMktCampaignId());
+                    camScriptAddVO.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
                     camScriptAddVO.setScriptDesc(mktStrategyConfRule.getMktCamChlConfDetailList().get(i).getScriptDesc());
                     camScriptService.addCamScript(UserUtil.loginId(), camScriptAddVO);
 
@@ -268,7 +268,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.UPDATE_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
             mktStrategyConfRuleMap.put("mktCamChlResultIds", mktCamChlResultIds);
         } catch (Exception e) {
-            logger.error("[op:MktStrategyConfRuleServiceImpl] failed to update MktStrategyConfRule = {}, mktCamChlResultIds = {}", JSON.toJSON(mktStrategyConfRule), mktCamChlResultIds);
+            logger.error("[op:MktStrategyConfRuleServiceImpl] failed to update MktStrategyConfRule = {}, mktCamChlResultIds = {}", JSON.toJSON(mktStrategyConfRule), mktCamChlResultIds, e);
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_FAIL);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.UPDATE_MKT_RULE_STR_CONF_RULE_FAILURE.getErrorMsg());
             mktStrategyConfRuleMap.put("mktCamChlResultIds", mktCamChlResultIds);
