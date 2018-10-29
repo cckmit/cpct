@@ -349,6 +349,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         tarGrpMapper.modTarGrp(tarGrp);
         List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
         List<TarGrpCondition> insertConditions = new ArrayList<>();
+        List<TarGrpCondition> allCondition = new ArrayList<>();
         for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
             TarGrpCondition tarGrpCondition1 = tarGrpConditionMapper.selectByPrimaryKey(tarGrpCondition.getConditionId());
             if (tarGrpCondition1 == null) {
@@ -373,16 +374,18 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
                 tarGrpCondition.setUpdateStaff(UserUtil.loginId());
                 tarGrpConditionMapper.modTarGrpCondition(tarGrpCondition);
+                allCondition.add(tarGrpCondition);
             }
             if (!insertConditions.isEmpty()){
                 tarGrpConditionMapper.insertByBatch(insertConditions);
             }
+            allCondition.addAll(insertConditions);
         }
         //更新redis分群数据
-        Map<String,Object> conditionList = listTarGrpCondition(tarGrp.getTarGrpId());
-        if (conditionList.get("resultCode").equals(CODE_SUCCESS)){
-            redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),conditionList.get("listTarGrpCondition"));
-        }
+        TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
+        detail.setTarGrpConditions(allCondition);
+        redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),detail);
+
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         return maps;
