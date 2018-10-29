@@ -323,6 +323,12 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             map.put("resultMsg","事件不存在");
             return map;
         }
+        List<MktCamEvtRelDO> relDOList = mktCamEvtRelMapper.listActByEventId(contactEvtId);
+        if (relDOList.size()>0){
+            map.put("resultCode", CODE_FAIL);
+            map.put("resultMsg","事件已关联活动无法删除");
+            return map;
+        }
         contactEvtMapper.delEvent(contactEvtId);
         map.put("resultCode", CommonConstant.CODE_SUCCESS);
         map.put("resultMsg", StringUtils.EMPTY);
