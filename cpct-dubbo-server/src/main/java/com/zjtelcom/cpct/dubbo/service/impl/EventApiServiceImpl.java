@@ -38,7 +38,6 @@ import java.util.*;
 import java.util.concurrent.*;
 
 @Service
-//@Transactional
 public class EventApiServiceImpl implements EventApiService {
 
     @Autowired
@@ -413,7 +412,7 @@ public class EventApiServiceImpl implements EventApiService {
             esJson.put("timeCost", cost);
             esJson.put("orderList", activityList);
             esJson.put("msg", "客户级活动，事件采集项未包含客户编码");
-            esService.save(esJson, IndexList.EVENT_MODULE);
+//            esService.save(esJson, IndexList.EVENT_MODULE);
 
             //构造返回参数
             result.put("CPCResultCode", "1");
@@ -572,7 +571,7 @@ public class EventApiServiceImpl implements EventApiService {
                 triggerList.add(triggers);
 
                 itgTriggers.put("triggerList", triggerList);
-                itgTriggers.put("type", 1);
+                itgTriggers.put("type", "营销信息");
             }
 
 
@@ -606,7 +605,9 @@ public class EventApiServiceImpl implements EventApiService {
                 } else {
                     esJson.put("hit", "false");
                 }
-                esService.save(esJson, IndexList.ACTIVITY_MODULE);
+
+//                esService.save(esJson, IndexList.ACTIVITY_MODULE);
+
             } catch (Exception e) {
                 e.printStackTrace();
 
@@ -846,7 +847,12 @@ public class EventApiServiceImpl implements EventApiService {
             } else {
                 esJson.put("hit", "false");
             }
-            esService.save(esJson, IndexList.STRATEGY_MODULE);
+            try {
+//                esService.save(esJson, IndexList.STRATEGY_MODULE);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             return strategyMap;
         }
     }
@@ -1154,7 +1160,7 @@ public class EventApiServiceImpl implements EventApiService {
                     ruleMap.put("orderISI", params.get("reqId")); //流水号
                     ruleMap.put("activityId", privateParams.get("activityId")); //活动编码
                     ruleMap.put("activityName", privateParams.get("activityName")); //活动名称
-                    ruleMap.put("skipCheck", ""); //调过预校验 todo
+                    ruleMap.put("skipCheck", "0"); //调过预校验 todo
                     ruleMap.put("orderPriority", privateParams.get("orderPriority")); //活动优先级
                     ruleMap.put("integrationId", privateParams.get("integrationId")); //集成编号（必填）
                     ruleMap.put("accNbr", privateParams.get("accNbr")); //业务号码（必填）
@@ -1252,48 +1258,6 @@ public class EventApiServiceImpl implements EventApiService {
             return ruleMap;
         }
 
-        private void executeSingleExpress(List<TarGrpCondition> tarGrpConditionDOs, DefaultContext context, ExpressRunner runner, int i, String type, Label label, String express) {
-            StringBuilder singleExpress = new StringBuilder();
-            singleExpress.append("if(");
-            singleExpress.append("(");
-            singleExpress.append(label.getInjectionLabelCode());
-            if ("1000".equals(type)) {
-                singleExpress.append(">");
-            } else if ("2000".equals(type)) {
-                singleExpress.append("<");
-            } else if ("3000".equals(type)) {
-                singleExpress.append("==");
-            } else if ("4000".equals(type)) {
-                singleExpress.append("!=");
-            } else if ("5000".equals(type)) {
-                singleExpress.append(">=");
-            } else if ("6000".equals(type)) {
-                singleExpress.append("<=");
-            }
-            singleExpress.append(tarGrpConditionDOs.get(i).getRightParam());
-            singleExpress.append(")");
-            singleExpress.append(") {return true} else {return false}");
-            try {
-                RuleResult ruleResult = runner.executeRule(singleExpress.toString(), context, true, true);
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("express", express);
-                jsonObject.put("reqId", reqId);
-                jsonObject.put("eventId", params.get("eventCode"));
-                jsonObject.put("activityId", params.get("activityId"));
-                jsonObject.put("ruleConfId", ruleConfId);
-                jsonObject.put("strategyConfId", strategyConfId);
-                jsonObject.put("productStr", productStr);
-                jsonObject.put("evtContactConfIdStr", evtContactConfIdStr);
-                jsonObject.put("tarGrpId", tarGrpId);
-                jsonObject.put("result", ruleResult.getResult()); //看是否命中
-                jsonObject.put("labelCode", label.getInjectionLabelCode());
-                jsonObject.put("labelName", label.getInjectionLabelName());
-                esService.save(jsonObject, IndexList.Label_MODULE);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }
     }
 
     class ChannelTask implements Callable<Map<String, Object>> {
