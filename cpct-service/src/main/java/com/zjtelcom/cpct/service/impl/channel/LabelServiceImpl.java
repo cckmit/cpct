@@ -397,17 +397,18 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             labelGrpMbrMapper.deleteByPrimaryKey(mbr.getGrpMbrId());
         }
 //        labelGrpMbrMapper.deleteBatch(idList);
-
-        List<Label> labels = labelMapper.listLabelByIdList(param.getLabelIdList());
-        for (Label label : labels){
-            if (label!=null){
-                LabelGrpMbr labelGrpMbr = new LabelGrpMbr();
-                labelGrpMbr.setGrpId(param.getLabelGrpId());
-                labelGrpMbr.setInjectionLabelId(label.getInjectionLabelId());
-                labelGrpMbr.setCreateDate(new Date());
-                labelGrpMbr.setCreateStaff(UserUtil.loginId());
-                labelGrpMbr.setStatusCd("1000");
-                labelGrpMbrMapper.insert(labelGrpMbr);
+        if (!param.getLabelIdList().isEmpty()){
+            List<Label> labels = labelMapper.listLabelByIdList(param.getLabelIdList());
+            for (Label label : labels){
+                if (label!=null){
+                    LabelGrpMbr labelGrpMbr = new LabelGrpMbr();
+                    labelGrpMbr.setGrpId(param.getLabelGrpId());
+                    labelGrpMbr.setInjectionLabelId(label.getInjectionLabelId());
+                    labelGrpMbr.setCreateDate(new Date());
+                    labelGrpMbr.setCreateStaff(UserUtil.loginId());
+                    labelGrpMbr.setStatusCd("1000");
+                    labelGrpMbrMapper.insert(labelGrpMbr);
+                }
             }
         }
         result.put("resultCode",CODE_SUCCESS);

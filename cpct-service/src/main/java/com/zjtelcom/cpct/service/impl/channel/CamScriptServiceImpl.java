@@ -62,14 +62,14 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
         if (script!=null){
             //todo copy结果为null需要处理
             BeanUtil.copy(addVO,script);
-            script.setMktCampaignId(123L);
+            script.setMktCampaignId(addVO.getMktCampaignId());
             script.setUpdateDate(new Date());
             script.setUpdateStaff(userId);
             camScriptMapper.updateByPrimaryKey(script);
         }else {
              script = BeanUtil.create(addVO,new CamScript());
             //todo 添加活动id
-            script.setMktCampaignId(123L);
+            script.setMktCampaignId(addVO.getMktCampaignId());
             script.setCreateDate(new Date());
             script.setUpdateDate(new Date());
             script.setCreateStaff(userId);
