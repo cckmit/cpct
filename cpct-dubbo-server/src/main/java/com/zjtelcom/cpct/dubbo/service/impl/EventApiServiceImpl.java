@@ -410,9 +410,9 @@ public class EventApiServiceImpl implements EventApiService {
             //es log
             long cost = System.currentTimeMillis() - begin;
             esJson.put("timeCost", cost);
-            esJson.put("orderList", activityList);
+            esJson.put("orderList", JSON.toJSON(activityList));
             esJson.put("msg", "客户级活动，事件采集项未包含客户编码");
-//            esService.save(esJson, IndexList.EVENT_MODULE);
+            esService.save(esJson, IndexList.EVENT_MODULE);
 
             //构造返回参数
             result.put("CPCResultCode", "1");
