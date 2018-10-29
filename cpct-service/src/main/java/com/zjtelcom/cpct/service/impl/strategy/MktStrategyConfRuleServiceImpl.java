@@ -243,6 +243,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     MktCamChlResult mktCamChlResult = mktStrategyConfRule.getMktCamChlResultList().get(i);
                     if (mktCamChlResult.getMktCamChlResultId() != null && mktCamChlResult.getMktCamChlResultId() != 0) {
                         // 修改已有的结果信息
+                        mktCamChlResult.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
                         mktCamChlResultService.updateMktCamChlResult(mktCamChlResult);
                         mktCamChlResultId = mktCamChlResult.getMktCamChlResultId();
                     } else {

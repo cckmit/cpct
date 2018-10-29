@@ -26,6 +26,10 @@ public class MktCamChlResult implements Serializable {
      * 原因Id
      */
     private Long reason;
+    /**
+     * 营销活动标识
+     */
+    private Long mktCampaignId;
 
     /**
      * 推送渠道集合
@@ -78,5 +82,12 @@ public class MktCamChlResult implements Serializable {
 
     public void setMktCamChlConfDetailList(List<MktCamChlConfDetail> mktCamChlConfDetailList) {
         this.mktCamChlConfDetailList = mktCamChlConfDetailList;
+    }
+    public Long getMktCampaignId() {
+        return mktCampaignId;
+    }
+
+    public void setMktCampaignId(Long mktCampaignId) {
+        this.mktCampaignId = mktCampaignId;
     }
 }
