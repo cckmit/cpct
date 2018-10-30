@@ -75,4 +75,13 @@
       #{idList}
     </foreach>
   </delete>
+
+  <select id="findListBylabelId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select GRP_MBR_ID, GRP_ID, INJECTION_LABEL_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from injection_label_grp_mbr
+    where INJECTION_LABEL_ID = #{labelId}
+  </select>
+
+
 </mapper>
