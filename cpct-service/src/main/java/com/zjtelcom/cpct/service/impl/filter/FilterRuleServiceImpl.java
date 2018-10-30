@@ -112,7 +112,12 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
     @Override
     public Map<String, Object> importUserList(MultipartFile multipartFile, Long ruleId) throws IOException {
         Map<String, Object> maps = new HashMap<>();
-
+        FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(ruleId);
+        if (filterRule==null){
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg","过滤规则不存在");
+            return maps;
+        }
         InputStream inputStream = multipartFile.getInputStream();
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
         Sheet sheet = wb.getSheetAt(0);
@@ -154,8 +159,10 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
 //            System.out.println(redisUtils.hmGet(key, "userList"));
 
         }
+        filterRule.setUserList(ChannelUtil.StringList2String(resultList));
+        filterRuleMapper.updateByPrimaryKey(filterRule);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
-        maps.put("resultMsg", ChannelUtil.StringList2String(resultList));
+        maps.put("resultMsg", filterRule.getUserList());
         maps.put("key",key);
         return maps;
     }

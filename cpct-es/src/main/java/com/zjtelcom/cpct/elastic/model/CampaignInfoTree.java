@@ -7,7 +7,7 @@ import java.util.Map;
 public class CampaignInfoTree implements Serializable {
     private Long id;
     private String name;
-    private boolean result;
+    private String result;
     private String hitEntity;
     private String reason;
     private List<CampaignInfoTree> children;
@@ -54,11 +54,11 @@ public class CampaignInfoTree implements Serializable {
         this.name = name;
     }
 
-    public boolean isResult() {
+    public String getResult() {
         return result;
     }
 
-    public void setResult(boolean result) {
+    public void setResult(String result) {
         this.result = result;
     }
 
