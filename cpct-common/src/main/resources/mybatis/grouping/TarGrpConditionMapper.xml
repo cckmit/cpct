@@ -214,4 +214,17 @@
     where LEFT_PARAM = #{labelId,jdbcType=BIGINT}
   </select>
 
+    <delete id="deleteBatch" parameterType="java.util.List">
+        delete from tar_grp_condition
+        where CONDITION_ID IN
+        <foreach collection="list" item="item" open="(" separator="," close=")" index="index">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="deleteByTarGrpTemplateId" parameterType="java.lang.Long">
+    delete from tar_grp_condition
+    where TAR_GRP_ID = #{tarGrpTemplateId,jdbcType=BIGINT}
+  </delete>
+
 </mapper>
