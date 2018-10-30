@@ -88,6 +88,8 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         tarGrpTemplateDO.setCreateDate(new Date());
         tarGrpTemplateDO.setUpdateStaff(UserUtil.loginId());
         tarGrpTemplateDO.setUpdateDate(new Date());
+        //todo 待验证
+        tarGrpTemplateDO.setRemark("0");
 
         // 新增目标分群模板
         tarGrpMapper.createTarGrp(tarGrpTemplateDO);
@@ -129,6 +131,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         Map<String, Object> tarGrpTemplateMap = new HashMap<>();
         TarGrp tarGrpTemplateDO = BeanUtil.create(tarGrpTemplateDetail, new TarGrp());
         // 更新目标分群模板
+        tarGrpTemplateDO.setTarGrpId(tarGrpTemplateDetail.getTarGrpTemplateId());
         tarGrpTemplateDO.setTarGrpName(tarGrpTemplateDetail.getTarGrpTemplateName()==null ? "" : tarGrpTemplateDetail.getTarGrpTemplateName() );
         tarGrpTemplateDO.setTarGrpDesc(tarGrpTemplateDetail.getTarGrpTemplateDesc()==null ? "" : tarGrpTemplateDetail.getTarGrpTemplateDesc() );
         tarGrpTemplateDO.setUpdateDate(new Date());
@@ -194,10 +197,11 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     @Override
     public Map<String, Object> listTarGrpTemplatePage(String tarGrpTemplateName,String tarGrpType, Integer page, Integer pageSize) {
         Map<String, Object> tarGrpTemplateMap = new HashMap<>();
-        List<Long> tarRelList = strategyConfRuleMapper.listTarGrpIdList();
+//        List<Long> tarRelList = strategyConfRuleMapper.listTarGrpIdList();
+
         // 分页获取目标分群模板
         PageHelper.startPage(page, pageSize);
-        List<TarGrp> tarGrpTemplateDOList = tarGrpMapper.selectByName(tarGrpTemplateName,tarRelList,tarGrpType);
+        List<TarGrp> tarGrpTemplateDOList = tarGrpMapper.selectByName(tarGrpTemplateName,tarGrpType,"0");
         Page pageInfo = new Page(new PageInfo(tarGrpTemplateDOList));
         List<TarGrpTemplateDetail> tarGrpTemplateDetailList = new ArrayList<>();
         for (TarGrp tarGrpTemplateDO : tarGrpTemplateDOList) {

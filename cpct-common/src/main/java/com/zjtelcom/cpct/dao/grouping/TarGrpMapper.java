@@ -27,6 +27,6 @@ public interface TarGrpMapper {
 
     int delTarGrp(TarGrp tarGrp);
 
-    List<TarGrp> selectByName(@Param("tarGrpTemplateName") String tarGrpTemplateName,@Param("list")List<Long> idList ,@Param("tarGrpType")String tarGrpType);
+    List<TarGrp> selectByName(@Param("tarGrpTemplateName") String tarGrpTemplateName,@Param("tarGrpType")String tarGrpType,@Param("remark")String remark);
 
 }
