@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 /**
@@ -101,35 +102,42 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
     @Override
     public RetCamResp qryMktCampaignDetail(Long mktCampaignId) throws Exception {
         RetCamResp ret = new RetCamResp();
+        MktCampaignResp mktCampaignResp = new MktCampaignResp();
         // 获取活动基本信息
         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
-        MktCampaignResp mktCampaignResp = BeanUtil.create(mktCampaignDO, new MktCampaignResp());
-        // 获取所有的sysParam
-        Map<String, String> paramMap = new HashMap<>();
-        List<SysParams> sysParamList = sysParamsMapper.selectAll("", "");
-        for (SysParams sysParams : sysParamList) {
-            paramMap.put(sysParams.getParamKey() + sysParams.getParamValue(), sysParams.getParamName());
-        }
-        mktCampaignResp.setTiggerTypeValue(paramMap.
-                get(ParamKeyEnum.TIGGER_TYPE.getParamKey() + mktCampaignDO.getTiggerType()));
-        mktCampaignResp.setMktCampaignCategoryValue(paramMap.
-                get(ParamKeyEnum.MKT_CAMPAIGN_CATEGORY.getParamKey() + mktCampaignDO.getMktCampaignCategory()));
-        mktCampaignResp.setMktCampaignTypeValue(paramMap.
-                get(ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey() + mktCampaignDO.getMktCampaignType()));
-        mktCampaignResp.setStatusCdValue(paramMap.
-                get(ParamKeyEnum.STATUS_CD.getParamKey() + mktCampaignDO.getStatusCd()));
+        try {
+            mktCampaignResp = BeanUtil.create(mktCampaignDO, new MktCampaignResp());
+            // 获取所有的sysParam
+            Map<String, String> paramMap = new HashMap<>();
+            List<SysParams> sysParamList = sysParamsMapper.selectAll("", "");
+            for (SysParams sysParams : sysParamList) {
+                paramMap.put(sysParams.getParamKey() + sysParams.getParamValue(), sysParams.getParamName());
+            }
+            mktCampaignResp.setTiggerTypeValue(paramMap.
+                    get(ParamKeyEnum.TIGGER_TYPE.getParamKey() + mktCampaignDO.getTiggerType()));
+            mktCampaignResp.setMktCampaignCategoryValue(paramMap.
+                    get(ParamKeyEnum.MKT_CAMPAIGN_CATEGORY.getParamKey() + mktCampaignDO.getMktCampaignCategory()));
+            mktCampaignResp.setMktCampaignTypeValue(paramMap.
+                    get(ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey() + mktCampaignDO.getMktCampaignType()));
+            mktCampaignResp.setStatusCdValue(paramMap.
+                    get(ParamKeyEnum.STATUS_CD.getParamKey() + mktCampaignDO.getStatusCd()));
 
-        // 获取活动关联策略集合
-        ArrayList<MktStrategyConfResp> mktStrategyConfRespList = new ArrayList<>();
-        List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByMktCampaignId(mktCampaignId);
-        for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {
-            MktStrategyConfResp mktStrategyConfResp = getMktStrategyConf(mktCamStrategyConfRelDO.getStrategyConfId());
-            mktStrategyConfRespList.add(mktStrategyConfResp);
+            // 获取活动关联策略集合
+            ArrayList<MktStrategyConfResp> mktStrategyConfRespList = new ArrayList<>();
+            List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByMktCampaignId(mktCampaignId);
+            for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {
+                MktStrategyConfResp mktStrategyConfResp = getMktStrategyConf(mktCamStrategyConfRelDO.getStrategyConfId());
+                mktStrategyConfRespList.add(mktStrategyConfResp);
+            }
+            mktCampaignResp.setMktStrategyConfRespList(mktStrategyConfRespList);
+            ret.setResultCode(CODE_SUCCESS);
+            ret.setData(mktCampaignResp);
+            ret.setResultMsg("success");
+        } catch (Exception e) {
+            ret.setResultCode(CODE_FAIL);
+            ret.setResultMsg("failed");
+            ret.setData(mktCampaignResp);
         }
-        mktCampaignResp.setMktStrategyConfRespList(mktStrategyConfRespList);
-        ret.setResultCode(CODE_SUCCESS);
-        ret.setData(mktCampaignResp);
-        ret.setResultMsg("success");
         return ret;
     }
 
