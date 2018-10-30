@@ -104,4 +104,9 @@
     from mkt_strategy_conf_rule
     where TAR_GRP_ID = #{tarGrpId,jdbcType=BIGINT}
   </select>
+
+  <select id="listTarGrpIdList" resultType="java.lang.Long">
+    select TAR_GRP_ID
+    from mkt_strategy_conf_rule
+  </select>
 </mapper>

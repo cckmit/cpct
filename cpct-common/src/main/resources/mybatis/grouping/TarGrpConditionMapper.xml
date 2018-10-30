@@ -73,13 +73,13 @@
         <if test="updateStaff != null and updateStaff != 0">
             UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
         </if>
-        <if test="createDate != null and createDate != ''">
+        <if test="createDate != null">
             CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
         </if>
-        <if test="statusDate != null and statusDate != ''">
+        <if test="statusDate != null">
             STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
         </if>
-        <if test="updateDate != null and updateDate != ''">
+        <if test="updateDate != null">
             UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
         </if>
         <if test="remark != null and remark != ''">
@@ -213,5 +213,18 @@
     from tar_grp_condition
     where LEFT_PARAM = #{labelId,jdbcType=BIGINT}
   </select>
+
+    <delete id="deleteBatch" parameterType="java.util.List">
+        delete from tar_grp_condition
+        where CONDITION_ID IN
+        <foreach collection="list" item="item" open="(" separator="," close=")" index="index">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="deleteByTarGrpTemplateId" parameterType="java.lang.Long">
+    delete from tar_grp_condition
+    where TAR_GRP_ID = #{tarGrpTemplateId,jdbcType=BIGINT}
+  </delete>
 
 </mapper>

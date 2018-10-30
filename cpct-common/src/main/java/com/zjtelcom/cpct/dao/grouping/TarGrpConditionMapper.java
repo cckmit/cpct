@@ -36,4 +36,8 @@ public interface TarGrpConditionMapper {
 
     List<TarGrpCondition> findListBylabelId(@Param("labelId")Long labelId);
 
+    int deleteBatch(List<Long> conditionIds);
+
+    int deleteByTarGrpTemplateId(Long tarGrpTemplateId);
+
 }

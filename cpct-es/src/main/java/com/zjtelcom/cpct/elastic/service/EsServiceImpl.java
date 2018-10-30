@@ -174,7 +174,7 @@ public class EsServiceImpl implements EsService {
                 CampaignInfoTree strategyInfo = new CampaignInfoTree();
 
                 id = Long.valueOf(strategy.get("strategyConfId").toString());
-                name = strategy.get("strategyConfName").toString();
+                name = strategy.get("strategyConfName")==null ? "" : strategy.get("strategyConfName").toString();
                 booleanResult = strategy.get("hit")==null ? "false" : strategy.get("hit").toString();
                 if (booleanResult.equals("false")){
                     booleanResult = booleanResult+(strategy.get("msg")==null ? "(未知原因)" : "("+strategy.get("msg")+")");
@@ -194,7 +194,7 @@ public class EsServiceImpl implements EsService {
                     CampaignInfoTree ruleInfo = new CampaignInfoTree();
 
                     id = Long.valueOf(rule.get("ruleId").toString());
-                    name = rule.get("ruleName").toString();
+                    name = rule.get("ruleName")==null ? "" : rule.get("ruleName").toString();
                     booleanResult = rule.get("hit")==null ? "false" : rule.get("hit").toString();
                     if (booleanResult.equals("false")){
                         booleanResult = booleanResult+(rule.get("msg")==null ? "(未知原因)" : "("+rule.get("msg")+")");
