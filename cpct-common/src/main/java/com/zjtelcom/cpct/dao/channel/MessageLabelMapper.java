@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.dao.channel;
 
+import com.zjtelcom.cpct.domain.channel.LabelGrpMbr;
 import com.zjtelcom.cpct.domain.channel.Message;
 import com.zjtelcom.cpct.domain.channel.MessageLabel;
 import com.zjtelcom.cpct.dto.channel.MessageLabelDTO;
@@ -30,5 +31,7 @@ public interface MessageLabelMapper {
     List<MessageLabel> qureyMessageLabel(Message message);
 
     List<MessageLabel> qureyMessageLabelByMessageId(@Param("messageId")Long messageId);
+
+    List<MessageLabel> findListBylabelId(@Param("labelId")Long labelId);
 
 }

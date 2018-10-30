@@ -96,4 +96,13 @@
       </foreach>
   </insert>
 
+    <select id="findListBylabelId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select CONDITION_ID, VERBAL_ID, LEFT_PARAM, LEFT_PARAM_TYPE, OPER_TYPE, RIGHT_PARAM,
+    RIGHT_PARAM_TYPE, STATUS_CD, CREATE_STAFF, CREATE_DATE, STATUS_DATE, REMARK, CONDITION_TYPE
+    from mkt_verbal_condition
+    where LEFT_PARAM = #{labelId,jdbcType=BIGINT}
+  </select>
+
+
+
 </mapper>
