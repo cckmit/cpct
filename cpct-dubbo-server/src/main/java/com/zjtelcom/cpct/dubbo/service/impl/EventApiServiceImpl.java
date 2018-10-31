@@ -257,7 +257,6 @@ public class EventApiServiceImpl implements EventApiService {
                         || "INTEGRATION_ID".equals(contactEvtItem.getEvtItemCode())
                         || "custId".equals(contactEvtItem.getEvtItemCode())) {
 
-
                     continue;
                 }
                 if (evtParams != null && evtParams.containsKey(contactEvtItem.getEvtItemCode())) {
@@ -392,6 +391,9 @@ public class EventApiServiceImpl implements EventApiService {
                     privateParams.put("isCust", "1"); //是否是客户级
                     privateParams.put("accNbr", map.get("accNbr"));
                     privateParams.put("integrationId", map.get("integrationId"));
+                    if(camEvtRelDO.getCampaignSeq() == null) {
+                        camEvtRelDO.setCampaignSeq(0);
+                    }
                     privateParams.put("orderPriority", camEvtRelDO.getCampaignSeq().toString());
                     //资产级
                     Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, camEvtRelDO.getMktCampaignId(), privateParams, labelItems, evtTriggers));
@@ -830,7 +832,6 @@ public class EventApiServiceImpl implements EventApiService {
                         //do something
                     } else if ("5000".equals(filterRule.getFilterType())) {  //时间段过滤
                         //时间段的格式
-
                         if (compareHourAndMinute(filterRule)) {
                             System.out.println("过滤时间段验证被拦截");
                             esJson.put("hit", "false");
