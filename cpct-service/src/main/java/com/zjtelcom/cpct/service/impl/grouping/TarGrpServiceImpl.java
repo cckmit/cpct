@@ -186,6 +186,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 if (tarGrpCondition.getAreaIdList()!=null){
                     area2RedisThread(tarGrp, tarGrpCondition);
                 }
+                tarGrpCondition.setConditionId(null);
                 tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
                 tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
                 tarGrpCondition.setTarGrpId(tarGrp.getTarGrpId());
@@ -348,6 +349,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         tarGrpMapper.modTarGrp(tarGrp);
         List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
         List<TarGrpCondition> insertConditions = new ArrayList<>();
+        List<TarGrpCondition> allCondition = new ArrayList<>();
         for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
             TarGrpCondition tarGrpCondition1 = tarGrpConditionMapper.selectByPrimaryKey(tarGrpCondition.getConditionId());
             if (tarGrpCondition1 == null) {
@@ -356,32 +358,35 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                     maps.put("resultMsg", "请选择下拉框运算类型");
                     return maps;
                 }
+                TarGrpCondition condition = BeanUtil.create(tarGrpCondition,new TarGrpCondition());
                 if (tarGrpCondition.getAreaIdList()!=null){
                     area2RedisThread(tarGrp, tarGrpCondition);
                 }
-                tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
-                tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
-                tarGrpCondition.setTarGrpId(tarGrp.getTarGrpId());
-                tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
-                tarGrpCondition.setCreateDate(DateUtil.getCurrentTime());
-                tarGrpCondition.setStatusDate(DateUtil.getCurrentTime());
-                tarGrpCondition.setUpdateStaff(UserUtil.loginId());
-                tarGrpCondition.setCreateStaff(UserUtil.loginId());
-                insertConditions.add(tarGrpCondition);
+                condition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
+                condition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
+                condition.setTarGrpId(tarGrp.getTarGrpId());
+                condition.setUpdateDate(DateUtil.getCurrentTime());
+                condition.setCreateDate(DateUtil.getCurrentTime());
+                condition.setStatusDate(DateUtil.getCurrentTime());
+                condition.setUpdateStaff(UserUtil.loginId());
+                condition.setCreateStaff(UserUtil.loginId());
+                insertConditions.add(condition);
             } else {
                 tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
                 tarGrpCondition.setUpdateStaff(UserUtil.loginId());
                 tarGrpConditionMapper.modTarGrpCondition(tarGrpCondition);
-            }
-            if (!insertConditions.isEmpty()){
-                tarGrpConditionMapper.insertByBatch(insertConditions);
+                allCondition.add(tarGrpCondition);
             }
         }
+        if (!insertConditions.isEmpty()){
+            tarGrpConditionMapper.insertByBatch(insertConditions);
+        }
+        allCondition.addAll(insertConditions);
         //更新redis分群数据
-        Map<String,Object> conditionList = listTarGrpCondition(tarGrp.getTarGrpId());
-        if (conditionList.get("resultCode").equals(CODE_SUCCESS)){
-            redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),conditionList.get("listTarGrpCondition"));
-        }
+        TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
+        detail.setTarGrpConditions(allCondition);
+        redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),detail);
+
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         return maps;

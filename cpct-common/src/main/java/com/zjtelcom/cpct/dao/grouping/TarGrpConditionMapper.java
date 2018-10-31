@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.dao.grouping;
 
+import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
 import com.zjtelcom.cpct.domain.grouping.TarGrpConditionDO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import org.apache.ibatis.annotations.Mapper;
@@ -32,5 +33,11 @@ public interface TarGrpConditionMapper {
     int delTarGrpCondition(TarGrpCondition tarGrpCondition);
 
     int insertByBatch(@Param("list") List<TarGrpCondition> record);
+
+    List<TarGrpCondition> findListBylabelId(@Param("labelId")Long labelId);
+
+    int deleteBatch(List<Long> conditionIds);
+
+    int deleteByTarGrpTemplateId(Long tarGrpTemplateId);
 
 }

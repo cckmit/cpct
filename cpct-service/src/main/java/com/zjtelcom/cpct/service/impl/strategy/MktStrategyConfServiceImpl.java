@@ -438,7 +438,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             // 策略下发渠道
             String[] channelIds = mktStrategyConfDO.getChannelsId().split("/");
             List<Long> channelList = new ArrayList<>();
-            if(channelIds!=null && !"".equals(channelIds)){
+            if(channelIds!=null && !"".equals(channelIds[0])){
                 for (String channelId : channelIds) {
                     channelList.add(Long.valueOf(channelId));
                 }

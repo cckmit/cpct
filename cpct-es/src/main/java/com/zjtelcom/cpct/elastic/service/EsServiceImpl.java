@@ -1,12 +1,14 @@
 package com.zjtelcom.cpct.elastic.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.zjtelcom.cpct.domain.channel.LabelResult;
 import com.zjtelcom.cpct.elastic.model.CampaignHitParam;
 import com.zjtelcom.cpct.elastic.model.CampaignHitResponse;
 import com.zjtelcom.cpct.elastic.model.CampaignInfoTree;
 import com.zjtelcom.cpct.elastic.model.TotalModel;
 import com.zjtelcom.cpct.elastic.util.ElasticsearchUtil;
 import com.zjtelcom.cpct.elastic.util.EsSearchUtil;
+import com.zjtelcom.cpct.enums.Operator;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
@@ -147,18 +149,21 @@ public class EsServiceImpl implements EsService {
             CampaignInfoTree activityInfo = new CampaignInfoTree();
             Long id = null;
             String name = null;
-            boolean booleanResult;
+            String booleanResult = null;
             String reason = null;
 
             id = Long.valueOf(activity.get("activityId").toString());
             name = activity.get("activityName").toString();
+            booleanResult = activity.get("hit")==null ? "false" : activity.get("hit").toString();
+            if (booleanResult.equals("false")){
+                booleanResult = booleanResult+(activity.get("msg")==null ? "(未知原因)" : "("+activity.get("msg")+")");
+            }
 
             activityInfo.setId(id);
             activityInfo.setName(name);
             //todo 命中结果；命中实例
-            activityInfo.setResult(true);
+            activityInfo.setResult(booleanResult);
             activityInfo.setHitEntity("命中得对象");
-            activityInfo.setReason("命中原因");
 
             //查询策略信息
             SearchHits strategyHits = searchStrategyByParam(param,activityInfo.getId().toString());
@@ -169,15 +174,15 @@ public class EsServiceImpl implements EsService {
                 CampaignInfoTree strategyInfo = new CampaignInfoTree();
 
                 id = Long.valueOf(strategy.get("strategyConfId").toString());
-                name = strategy.get("strategyConfName").toString();
-
+                name = strategy.get("strategyConfName")==null ? "" : strategy.get("strategyConfName").toString();
+                booleanResult = strategy.get("hit")==null ? "false" : strategy.get("hit").toString();
+                if (booleanResult.equals("false")){
+                    booleanResult = booleanResult+(strategy.get("msg")==null ? "(未知原因)" : "("+strategy.get("msg")+")");
+                }
                 strategyInfo.setId(id);
-                //todo 策略名称有吗
                 strategyInfo.setName(name);
-                //todo 命中结果；命中实例
-                strategyInfo.setResult(true);
+                strategyInfo.setResult(booleanResult);
                 strategyInfo.setHitEntity("命中得对象");
-                strategyInfo.setReason("命中原因");
 
 
                 //查询规则信息
@@ -189,13 +194,15 @@ public class EsServiceImpl implements EsService {
                     CampaignInfoTree ruleInfo = new CampaignInfoTree();
 
                     id = Long.valueOf(rule.get("ruleId").toString());
-                    name = rule.get("ruleName").toString();
-
+                    name = rule.get("ruleName")==null ? "" : rule.get("ruleName").toString();
+                    booleanResult = rule.get("hit")==null ? "false" : rule.get("hit").toString();
+                    if (booleanResult.equals("false")){
+                        booleanResult = booleanResult+(rule.get("msg")==null ? "(未知原因)" : "("+rule.get("msg")+")");
+                    }
                     ruleInfo.setId(id);
                     ruleInfo.setName(name);
-                    ruleInfo.setResult(true);
+                    ruleInfo.setResult(booleanResult);
                     ruleInfo.setHitEntity("命中得对象");
-                    ruleInfo.setReason("命中原因");
 
                     //查询标签实例信息
                     SearchHits labelInfoHits = searchLabelByRuleId(param,ruleInfo.getId().toString());
@@ -242,7 +249,11 @@ public class EsServiceImpl implements EsService {
         Map<String,Object> labelInfo = new HashMap<>();
         for (Map<String,Object> label : labelList){
             if (label.get("labelResultList")!=null){
-                labelInfo.put("labelResultList",label.get("labelResultList"));
+                List<Map<String,Object>> labelResults = (List<Map<String, Object>>) label.get("labelResultList");
+                for (Map<String,Object> map : labelResults){
+                    map.put("operType",Operator.getOperator(Integer.valueOf(map.get("operType").toString())).getDescription());
+                }
+                labelInfo.put("labelResultList",labelResults);
             }
         }
         result.put("rusultCode","0");
@@ -272,9 +283,8 @@ public class EsServiceImpl implements EsService {
             String source = hits.getHits()[j].getSourceAsString();
             System.out.println(source);
             Map<String, Object> stringMap = hits.getHits()[j].getSourceAsMap();
-            map.putAll(stringMap);
+            result.add(stringMap);
         }
-        result.add(map);
         return result;
     }
 
@@ -402,9 +412,9 @@ public class EsServiceImpl implements EsService {
     private BoolQueryBuilder getBoolQueryBuilderByActivityId(String isi,String activityId) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
-                        rangeQuery("activityId").gt(activityId))
+                        matchQuery("activityId",activityId))
                 .must(QueryBuilders.
-                        rangeQuery("reqId").gt(isi));
+                        matchQuery("reqId",isi));
         System.out.println(boolQueryBuilder);
         return boolQueryBuilder;
     }
@@ -415,7 +425,7 @@ public class EsServiceImpl implements EsService {
                 .must(QueryBuilders.
                         termQuery("strategyConfId",Long.valueOf(strategyId)))
                 .must(QueryBuilders.
-                        rangeQuery("reqId").gt(isi));
+                        matchQuery("reqId",isi));
         System.out.println(boolQueryBuilder);
         return boolQueryBuilder;
     }
@@ -426,7 +436,7 @@ public class EsServiceImpl implements EsService {
                 .must(QueryBuilders.
                         termQuery("ruleId",(Long.valueOf(ruleId))))
                 .must(QueryBuilders.
-                        rangeQuery("reqId").gt(isi));
+                        matchQuery("reqId",isi));
         System.out.println(boolQueryBuilder);
         return boolQueryBuilder;
     }
@@ -444,7 +454,7 @@ public class EsServiceImpl implements EsService {
     private BoolQueryBuilder getBoolQueryBuilderForTest(String ISI) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
-                        rangeQuery("orderISI").gt(ISI));
+                        matchQuery("reqId",ISI));
         System.out.println(boolQueryBuilder);
         return boolQueryBuilder;
     }

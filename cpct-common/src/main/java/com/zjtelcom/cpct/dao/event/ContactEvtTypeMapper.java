@@ -4,6 +4,7 @@ import com.zjtelcom.cpct.domain.event.EventTypeDO;
 import com.zjtelcom.cpct.dto.event.ContactEvtType;
 import com.zjtelcom.cpct.request.event.QryContactEvtTypeReq;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 
@@ -23,4 +24,6 @@ public interface ContactEvtTypeMapper {
     List<ContactEvtType> qryContactEvtTypeList(QryContactEvtTypeReq qryContactEvtTypeReq);
 
     int createContactEvtType(ContactEvtType contactEvtType);
+
+    List<EventTypeDO> listByEvtTypeName(@Param("name")String name);
 }

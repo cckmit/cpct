@@ -75,7 +75,7 @@
       CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
       REMARK, LAN_ID)
     values
-    <foreach collection="list" item="item" separator=",">
+    <foreach collection="list" item="item" separator="," index="i">
     (#{item.mktCamItemId,jdbcType=BIGINT}, #{item.mktCampaignId,jdbcType=BIGINT}, #{item.itemType,jdbcType=VARCHAR},
       #{item.itemId,jdbcType=BIGINT}, #{item.priority,jdbcType=BIGINT}, #{item.itemGroup,jdbcType=BIGINT}, #{item.offerCode,jdbcType=VARCHAR},#{item.offerName,jdbcType=VARCHAR},
       #{item.statusCd,jdbcType=VARCHAR}, #{item.statusDate,jdbcType=TIMESTAMP}, #{item.createStaff,jdbcType=BIGINT},
@@ -83,5 +83,4 @@
       #{item.remark,jdbcType=VARCHAR}, #{item.lanId,jdbcType=BIGINT})
     </foreach>
   </insert>
-
 </mapper>

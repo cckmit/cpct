@@ -92,16 +92,16 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             for (Long itemId : ItemIdList) {
                 MktCamItem item = (MktCamItem) redisUtils.get("MKT_CAM_ITEM_"+itemId);
                 if (item == null) {
-                    continue;
+                    item = camItemMapper.selectByPrimaryKey(itemId);
+                    redisUtils.set("MKT_CAM_ITEM_"+itemId, item);
                 }
                 MktCamItem newItem = BeanUtil.create(item, new MktCamItem());
                 newItem.setMktCamItemId(null);
                 mktCamItems.add(newItem);
-                redisUtils.set("MKT_CAM_ITEM_"+newItem.getMktCamItemId(), newItem);
-
             }
             camItemMapper.insertByBatch(mktCamItems);
             for(MktCamItem item : mktCamItems){
+                redisUtils.set("MKT_CAM_ITEM_" + item.getMktCamItemId(), item);
                 ruleIdList.add(item.getMktCamItemId());
             }
         }

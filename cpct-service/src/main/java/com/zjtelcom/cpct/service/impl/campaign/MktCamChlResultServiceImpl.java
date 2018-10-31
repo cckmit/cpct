@@ -185,13 +185,24 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
             mktCamChlResultDO.setUpdateDate(new Date());
             mktCamChlResultMapper.updateByPrimaryKey(mktCamChlResultDO);
 
+            mktCamChlResultConfRelMapper.deleteByMktCamChlResultId(mktCamChlResult.getMktCamChlResultId());
+
             // 添加/编辑话术
             if (mktCamChlResult.getMktCamChlConfDetailList() != null) {
                 for (int i = 0; i < mktCamChlResult.getMktCamChlConfDetailList().size(); i++) {
+                    MktCamChlResultConfRelDO mktCamChlResultConfRelDO = new MktCamChlResultConfRelDO();
+                    mktCamChlResultConfRelDO.setMktCamChlResultId(mktCamChlResult.getMktCamChlResultId());
+                    mktCamChlResultConfRelDO.setEvtContactConfId(mktCamChlResult.getMktCamChlConfDetailList().get(i).getEvtContactConfId());
+                    mktCamChlResultConfRelDO.setCreateStaff(UserUtil.loginId());
+                    mktCamChlResultConfRelDO.setCreateDate(new Date());
+                    mktCamChlResultConfRelDO.setUpdateStaff(UserUtil.loginId());
+                    mktCamChlResultConfRelDO.setUpdateDate(new Date());
+                    mktCamChlResultConfRelMapper.insert(mktCamChlResultConfRelDO);
+
                     // 保存话术
                     CamScriptAddVO camScriptAddVO = new CamScriptAddVO();
                     camScriptAddVO.setEvtContactConfId(mktCamChlResult.getMktCamChlConfDetailList().get(i).getEvtContactConfId());
-                    camScriptAddVO.setMktCampaignId(mktCamChlResult.getMktCamChlConfDetailList().get(i).getMktCampaignId());
+                    camScriptAddVO.setMktCampaignId(mktCamChlResult.getMktCampaignId());
                     camScriptAddVO.setScriptDesc(mktCamChlResult.getMktCamChlConfDetailList().get(i).getScriptDesc());
                     camScriptService.addCamScript(UserUtil.loginId(), camScriptAddVO);
                 }
@@ -201,7 +212,7 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
             mktCamChlResultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCamChlResultMap.put("mktCamChlResult", mktCamChlResult);
         } catch (Exception e) {
-            logger.error("[op:MktCamChlResultServiceImpl] failed to update mktCamChlResult = {}", JSON.toJSON(mktCamChlResult));
+            logger.error("[op:MktCamChlResultServiceImpl] failed to update mktCamChlResult = {}", JSON.toJSON(mktCamChlResult), e);
             mktCamChlResultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCamChlResultMap.put("resultMsg", ErrorCode.GET_MKT_CAM_CHL_CONF_FAILURE.getErrorMsg());
             mktCamChlResultMap.put("mktCamChlResult", mktCamChlResult);
