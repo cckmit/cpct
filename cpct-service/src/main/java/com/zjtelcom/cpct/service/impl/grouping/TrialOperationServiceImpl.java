@@ -58,6 +58,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -150,7 +151,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         TrialResponse response = new TrialResponse();
 
         try {
-            response = restTemplate.postForObject(SEARCH_INFO_FROM_ES_URL, request, TrialResponse.class);
+            response = restTemplate.postForObject("http://134.96.252.170:30808/es/searchBatchInfo", request, TrialResponse.class);
             if (response.getResultCode().equals(CODE_FAIL)){
                 result.put("resultCode", CODE_FAIL);
                 result.put("resultMsg", "抽样校验失败");
@@ -349,9 +350,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         TrialResponse response = new TrialResponse();
         TrialResponse countResponse = new TrialResponse();
         try {
-            response = restTemplate.postForObject(SEARCH_INFO_FROM_ES_URL, request, TrialResponse.class);
+            response = restTemplate.postForObject("http://134.96.252.170:30808/es/searchBatchInfo", request, TrialResponse.class);
             //同时调用统计查询的功能
-            countResponse = restTemplate.postForObject(SEARCH_COUNT_INFO_URL,request,TrialResponse.class);
+            countResponse = restTemplate.postForObject("http://134.96.252.170:30808/es/searchCountInfo",request,TrialResponse.class);
             if (countResponse.getResultCode().equals(CODE_SUCCESS)){
                 redisUtils.set("HITS_COUNT_INFO_"+request.getBatchNum(),countResponse.getHitsList());
             }
@@ -472,7 +473,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         try {
             Map<String, Long> param = new HashMap<>();
             param.put("batchId", operation.getBatchNum());
-            response = restTemplate.postForObject(FIND_BATCH_HITS_LIST_URL, param, TrialResponse.class);
+            response = restTemplate.postForObject( "http://134.96.252.170:30808/es/findBatchHitsList", param, TrialResponse.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
