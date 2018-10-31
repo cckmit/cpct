@@ -58,6 +58,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -134,29 +135,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             return result;
         }
         // 通过活动id获取关联的标签字段数组
-        DisplayColumn req = new DisplayColumn();
-        req.setDisplayColumnId(campaign.getCalcDisplay());
-        Map<String, Object> labelMap = messageLabelService.queryLabelListByDisplayId(req);
-        List<LabelDTO> labelDTOList = (List<LabelDTO>) labelMap.get("labels");
-        List<String> codeList = new ArrayList<>();
-        for (LabelDTO labelDTO : labelDTOList) {
-            codeList.add(labelDTO.getLabelCode());
-        }
-        //添加固定查询标签
-        if (!codeList.contains("ACC_NBR")){
-            codeList.add("ACC_NBR");
-        }
-        if (!codeList.contains("LAN_NAME")){
-            codeList.add("LAN_NAME");
-        }
-        if (!codeList.contains("CCUST_NAME")){
-            codeList.add("CCUST_NAME");
-        }
-
-        String[] fieldList = new String[codeList.size()];
-        for (int i = 0; i < codeList.size(); i++) {
-            fieldList[i] = codeList.get(i);
-        }
+        String[] fieldList = getStrings(campaign);
 
         TrialOperationVO request = BeanUtil.create(operationVO,new TrialOperationVO());
         request.setFieldList(fieldList);
@@ -172,7 +151,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         TrialResponse response = new TrialResponse();
 
         try {
-            response = restTemplate.postForObject(SEARCH_INFO_FROM_ES_URL, request, TrialResponse.class);
+            response = restTemplate.postForObject("http://134.96.252.170:30808/es/searchBatchInfo", request, TrialResponse.class);
             if (response.getResultCode().equals(CODE_FAIL)){
                 result.put("resultCode", CODE_FAIL);
                 result.put("resultMsg", "抽样校验失败");
@@ -352,15 +331,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "活动策略信息有误");
             return result;
         }
-        // 通过活动id获取关联的标签字段数组
-        DisplayColumn req = new DisplayColumn();
-        req.setDisplayColumnId(campaign.getCalcDisplay());
-        Map<String, Object> labelMap = messageLabelService.queryLabelListByDisplayId(req);
-        List<LabelDTO> labelDTOList = (List<LabelDTO>) labelMap.get("labels");
-        String[] fieldList = new String[labelDTOList.size()];
-        for (int i = 0; i < labelDTOList.size(); i++) {
-            fieldList[i] = labelDTOList.get(i).getLabelCode();
-        }
+        String[] fieldList = getStrings(campaign);
+
 
         TrialOperationVO request = BeanUtil.create(operationVO,new TrialOperationVO());
         request.setBatchNum(trialOperation.getBatchNum());
@@ -378,9 +350,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         TrialResponse response = new TrialResponse();
         TrialResponse countResponse = new TrialResponse();
         try {
-            response = restTemplate.postForObject(SEARCH_INFO_FROM_ES_URL, request, TrialResponse.class);
+            response = restTemplate.postForObject("http://134.96.252.170:30808/es/searchBatchInfo", request, TrialResponse.class);
             //同时调用统计查询的功能
-            countResponse = restTemplate.postForObject(SEARCH_COUNT_INFO_URL,request,TrialResponse.class);
+            countResponse = restTemplate.postForObject("http://134.96.252.170:30808/es/searchCountInfo",request,TrialResponse.class);
             if (countResponse.getResultCode().equals(CODE_SUCCESS)){
                 redisUtils.set("HITS_COUNT_INFO_"+request.getBatchNum(),countResponse.getHitsList());
             }
@@ -404,6 +376,35 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", null);
         return result;
+    }
+
+    private String[] getStrings(MktCampaignDO campaign) {
+        // 通过活动id获取关联的标签字段数组
+        DisplayColumn req = new DisplayColumn();
+        req.setDisplayColumnId(campaign.getCalcDisplay());
+        Map<String, Object> labelMap = messageLabelService.queryLabelListByDisplayId(req);
+        List<LabelDTO> labelDTOList = (List<LabelDTO>) labelMap.get("labels");
+        List<String> codeList = new ArrayList<>();
+        for (LabelDTO labelDTO : labelDTOList) {
+            codeList.add(labelDTO.getLabelCode());
+        }
+        //添加固定查询标签
+        if (!codeList.contains("ACCS_NBR")){
+            codeList.add("ACC_NBR");
+        }
+        if (!codeList.contains("LAN_NAME")){
+            codeList.add("LAN_NAME");
+        }
+        if (!codeList.contains("CCUST_NAME")){
+            codeList.add("CCUST_NAME");
+        } if (!codeList.contains("CCUST_ID")){
+            codeList.add("CCUST_ID");
+        }
+        String[] fieldList = new String[codeList.size()];
+        for (int i = 0; i < codeList.size(); i++) {
+            fieldList[i] = codeList.get(i);
+        }
+        return fieldList;
     }
 
 
@@ -472,7 +473,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         try {
             Map<String, Long> param = new HashMap<>();
             param.put("batchId", operation.getBatchNum());
-            response = restTemplate.postForObject(FIND_BATCH_HITS_LIST_URL, param, TrialResponse.class);
+            response = restTemplate.postForObject( "http://134.96.252.170:30808/es/findBatchHitsList", param, TrialResponse.class);
         } catch (Exception e) {
             e.printStackTrace();
         }

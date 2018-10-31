@@ -31,7 +31,7 @@ public interface InjectionLabelMapper{
 
     List<Label> findLabelList(@Param("labelName")String labelName,@Param("fitDomain")String fitDomain,@Param("labelCode")String labelCode,@Param("scope")Integer scope,@Param("conditionType")String conditionType);
 
-    List<Label> findByParam(@Param("labelName")String labelName,@Param("fitDomain")String fitDomain);
+    List<Label> findByParam(@Param("labelName")String labelName);
 
     List<Label> findLabelListByCatalogId(@Param("catalogId")Long catalogId);
 

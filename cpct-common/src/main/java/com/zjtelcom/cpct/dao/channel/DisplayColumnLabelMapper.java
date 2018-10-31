@@ -32,4 +32,6 @@ public interface DisplayColumnLabelMapper {
     int updateByPrimaryKey(DisplayColumnLabel record);
 
     int deleteByDisplayId(@Param("displayId")Long displayColumnLabelId);
+
+    List<DisplayColumnLabel> listByLabelId(@Param("labelId")Long labelId);
 }

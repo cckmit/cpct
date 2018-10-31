@@ -66,6 +66,14 @@
     where MESSAGE_ID = #{messageId,jdbcType=BIGINT}
   </select>
 
+    <select id="findListBylabelId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MESSAGE_LABEL_ID, MESSAGE_ID, INJECTION_LABEL_ID, STATUS_CD, CREATE_STAFF,
+    UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from message_label
+    where INJECTION_LABEL_ID = #{labelId,jdbcType=BIGINT}
+  </select>
+
+
 
 
 </mapper>
