@@ -85,14 +85,14 @@ public class TestController extends BaseController {
 
     @RequestMapping(value = "/getMktCampaignApi", method = RequestMethod.POST)
     @CrossOrigin
-    public MktCampaignResp getMktCampaignApi(@RequestBody  Map<String, Object> params) throws Exception {
+    public String getMktCampaignApi(@RequestBody  Map<String, Object> params) throws Exception {
         Long mktCampaignId = Long.valueOf((Integer)params.get("mktCampaignId"));
         Map<String, Object> map = mktCampaignApiService.qryMktCampaignDetail(mktCampaignId);
        // return JSON.toJSONString(map);
-        redisUtils.setRedis("mktCampaignResp_test", map.get("mktCampaignResp"));
-        MktCampaignResp mktCampaignResp = (MktCampaignResp) redisUtils.getRedis("mktCampaignResp_test");
+       // redisUtils.setRedis("mktCampaignResp_test", map.get("mktCampaignResp"));
+      //  MktCampaignResp mktCampaignResp = (MktCampaignResp) redisUtils.getRedis("mktCampaignResp_test");
       //  return mktCampaignResp;
-        return null;
+        return JSON.toJSONString(map);
     }
 
 
