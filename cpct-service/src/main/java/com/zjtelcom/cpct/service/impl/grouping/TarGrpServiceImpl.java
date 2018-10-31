@@ -358,29 +358,30 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                     maps.put("resultMsg", "请选择下拉框运算类型");
                     return maps;
                 }
+                TarGrpCondition condition = BeanUtil.create(tarGrpCondition,new TarGrpCondition());
                 if (tarGrpCondition.getAreaIdList()!=null){
                     area2RedisThread(tarGrp, tarGrpCondition);
                 }
-                tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
-                tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
-                tarGrpCondition.setTarGrpId(tarGrp.getTarGrpId());
-                tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
-                tarGrpCondition.setCreateDate(DateUtil.getCurrentTime());
-                tarGrpCondition.setStatusDate(DateUtil.getCurrentTime());
-                tarGrpCondition.setUpdateStaff(UserUtil.loginId());
-                tarGrpCondition.setCreateStaff(UserUtil.loginId());
-                insertConditions.add(tarGrpCondition);
+                condition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
+                condition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
+                condition.setTarGrpId(tarGrp.getTarGrpId());
+                condition.setUpdateDate(DateUtil.getCurrentTime());
+                condition.setCreateDate(DateUtil.getCurrentTime());
+                condition.setStatusDate(DateUtil.getCurrentTime());
+                condition.setUpdateStaff(UserUtil.loginId());
+                condition.setCreateStaff(UserUtil.loginId());
+                insertConditions.add(condition);
             } else {
                 tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
                 tarGrpCondition.setUpdateStaff(UserUtil.loginId());
                 tarGrpConditionMapper.modTarGrpCondition(tarGrpCondition);
                 allCondition.add(tarGrpCondition);
             }
-            if (!insertConditions.isEmpty()){
-                tarGrpConditionMapper.insertByBatch(insertConditions);
-            }
-            allCondition.addAll(insertConditions);
         }
+        if (!insertConditions.isEmpty()){
+            tarGrpConditionMapper.insertByBatch(insertConditions);
+        }
+        allCondition.addAll(insertConditions);
         //更新redis分群数据
         TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
         detail.setTarGrpConditions(allCondition);
