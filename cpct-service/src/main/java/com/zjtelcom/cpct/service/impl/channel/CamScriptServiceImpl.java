@@ -8,11 +8,13 @@ import com.zjtelcom.cpct.dto.channel.CamScriptAddVO;
 import com.zjtelcom.cpct.dto.channel.CamScriptEditVO;
 import com.zjtelcom.cpct.dto.channel.CamScriptVO;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
+import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.CamScriptService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
+import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,16 +41,22 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
     @Override
     public Map<String, Object> copyCamScript(Long contactConfId, String scriptDesc, Long newConfId) {
         Map<String,Object> result = new HashMap<>();
-
+/*
         CamScript script = camScriptMapper.selectByConfId(contactConfId);
         if (script==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","活动脚本不存在");
             return result;
-        }
-        CamScript newScript = BeanUtil.create(script,new CamScript());
-        newScript.setMktCampaignScptId(null);
+        }*/
+        CamScript newScript = new CamScript();
+        newScript.setScriptDesc(scriptDesc);
+        newScript.setMktCampaignId(0L);
         newScript.setEvtContactConfId(newConfId);
+        newScript.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+        newScript.setCreateDate(new Date());
+        newScript.setCreateStaff(UserUtil.loginId());
+        newScript.setUpdateDate(new Date());
+        newScript.setUpdateStaff(UserUtil.loginId());
         camScriptMapper.insert(newScript);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",newScript);
