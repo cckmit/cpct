@@ -260,7 +260,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                     continue;
                 }
-                if (evtParams.containsKey(contactEvtItem.getEvtItemCode())) {
+                if (evtParams != null && evtParams.containsKey(contactEvtItem.getEvtItemCode())) {
                     //筛选出作为标签使用的事件采集项
                     if ("0".equals(contactEvtItem.getIsLabel())) {
                         labelItems.put(contactEvtItem.getEvtItemCode(), evtParams.getString(contactEvtItem.getEvtItemCode()));
@@ -274,6 +274,10 @@ public class EventApiServiceImpl implements EventApiService {
                     //记录缺少的事件采集项
                     stringBuilder.append(contactEvtItem.getEvtItemCode()).append("、");
                 }
+            }
+
+            if (stringBuilder.length() > 0) {
+                stringBuilder.deleteCharAt(stringBuilder.length() - 1);
             }
 
             //事件采集项返回参数
@@ -851,6 +855,7 @@ public class EventApiServiceImpl implements EventApiService {
                 for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleDOS) {
                     //获取分群id
                     Long tarGrpId = mktStrategyConfRuleDO.getTarGrpId();
+
                     //获取销售品
                     String productStr = mktStrategyConfRuleDO.getProductId();
                     //过滤规则id
@@ -943,8 +948,13 @@ public class EventApiServiceImpl implements EventApiService {
         @Override
         public Map<String, Object> call() throws Exception {
 
-            //初始化es log
+            //初始化es log   标签使用
             JSONObject esJson = new JSONObject();
+            //初始化es log   规则使用
+            JSONObject jsonObject = new JSONObject();
+
+            jsonObject.put("ruleId", ruleId);
+            jsonObject.put("ruleName", ruleName);
 
             Map<String, Object> ruleMap = new HashMap<>();
             //初始化返回结果中的推荐信息列表
@@ -970,6 +980,17 @@ public class EventApiServiceImpl implements EventApiService {
             //从redis获取规则使用的所有标签
             List<LabelResult> labelResultList = (List<LabelResult>) redisUtils.get(key + "_LABEL");
 //            LabelResult lr;
+
+            //如果分群id为空
+            if(tarGrpId == null) {
+
+                jsonObject.put("hit", "false");
+                jsonObject.put("msg", "分群ID异常");
+                esService.save(jsonObject, IndexList.RULE_MODULE);
+                return Collections.EMPTY_MAP;
+
+            }
+
             if (labelResultList == null || labelResultList.size() <= 0) {
                 labelResultList = new ArrayList<>();
                 //redis中没有，从数据库查询标签
@@ -1230,15 +1251,13 @@ public class EventApiServiceImpl implements EventApiService {
                 System.out.println("Tree=" + ruleResult.getRule().toTree());
                 System.out.println("TraceMap=" + ruleResult.getTraceMap());
 
-                JSONObject jsonObject = new JSONObject();
+
                 jsonObject.put("express", express);
                 jsonObject.put("reqId", reqId);
                 jsonObject.put("eventId", params.get("eventCode"));
                 jsonObject.put("activityId", params.get("activityId"));
                 jsonObject.put("ruleConfId", ruleConfId);
                 jsonObject.put("strategyConfId", strategyConfId);
-                jsonObject.put("ruleId", ruleId);
-                jsonObject.put("ruleName", ruleName);
                 jsonObject.put("productStr", productStr);
                 jsonObject.put("evtContactConfIdStr", evtContactConfIdStr);
                 jsonObject.put("tarGrpId", tarGrpId);
@@ -1330,7 +1349,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                     jsonObject.put("hit", "false");
                     jsonObject.put("msg", "规则引擎匹配未通过");
-                    esService.save(esJson, IndexList.RULE_MODULE);
+                    esService.save(jsonObject, IndexList.RULE_MODULE);
                     return Collections.EMPTY_MAP;
                 }
 
