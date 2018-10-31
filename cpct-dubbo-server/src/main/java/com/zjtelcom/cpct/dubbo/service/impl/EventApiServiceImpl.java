@@ -309,12 +309,12 @@ public class EventApiServiceImpl implements EventApiService {
 
             //遍历活动id  查询并匹配活动规则 需要根据事件推荐活动数 取前n个活动
             int max = mktCamEvtRelDOs.size();
-            if (recCampaignAmount != 0) {
-                //事件推荐活动数
-                if (mktCamEvtRelDOs.size() > recCampaignAmount) {
-                    max = recCampaignAmount;
-                }
-            }
+//            if (recCampaignAmount != 0) {
+//                //事件推荐活动数
+//                if (mktCamEvtRelDOs.size() > recCampaignAmount) {
+//                    max = recCampaignAmount;
+//                }
+//            }
             //初始化结果集
             List<Future<Map<String, Object>>> threadList = new ArrayList<>();
             //初始化线程池
@@ -415,6 +415,26 @@ public class EventApiServiceImpl implements EventApiService {
             //关闭线程池
             executorService.shutdown();
 
+            //判断事件推荐活动数，按照优先级排序
+            if (activityList.size() > 0) {
+                Collections.sort(activityList, new Comparator<Map<String, Object>>() {
+                    public int compare(Map o1, Map o2) {
+                        if (!o1.containsKey("orderPriority")) {
+                            o1.put("orderPriority", "0");
+                        }
+                        if (!o2.containsKey("orderPriority")) {
+                            o2.put("orderPriority", "0");
+                        }
+                        return Integer.parseInt((String) o2.get("orderPriority")) - Integer.parseInt((String) o1.get("orderPriority"));
+                    }
+                });
+
+                if (recCampaignAmount != 0 && recCampaignAmount < activityList.size()) {
+                    //事件推荐活动数
+                    activityList = activityList.subList(0, recCampaignAmount - 1);
+                }
+            }
+
             //es log
             long cost = System.currentTimeMillis() - begin;
             esJson.put("timeCost", cost);
@@ -472,15 +492,15 @@ public class EventApiServiceImpl implements EventApiService {
             MktCampaignDO mktCampaign = mktCampaignMapper.selectByPrimaryKey(activityId);
 
             //判断活动状态
-            if (!"2002".equals(mktCampaign.getStatusCd())) {
-                esJson.put("hit", "false");
-                esJson.put("msg", "活动状态未发布");
-                esService.save(esJson, IndexList.ACTIVITY_MODULE);
-
-                System.out.println("活动状态未发布");
-
-                return Collections.EMPTY_MAP;
-            }
+//            if (!"2002".equals(mktCampaign.getStatusCd())) {
+//                esJson.put("hit", "false");
+//                esJson.put("msg", "活动状态未发布");
+//                esService.save(esJson, IndexList.ACTIVITY_MODULE);
+//
+//                System.out.println("活动状态未发布");
+//
+//                return Collections.EMPTY_MAP;
+//            }
 
             params.put("activityId", mktCampaign.getMktCampaignId().toString()); //活动编码
 
@@ -527,31 +547,34 @@ public class EventApiServiceImpl implements EventApiService {
 //            }
             //查询展示列 （iSale）
             List<Label> iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getIsaleDisplay());
-            if (iSaleDisplay != null) {
+            if (iSaleDisplay != null && iSaleDisplay.size() > 0) {
                 for (Label label : iSaleDisplay) {
 //                    queryFields.put(String.valueOf(i), label.getInjectionLabelCode());
 //                    i++;
                     querySb.append(label.getInjectionLabelCode()).append(",");
                 }
-            }
 
-            if (querySb.length() > 0) {
-                querySb.deleteCharAt(querySb.length() - 1);
-            }
+                if (querySb.length() > 0) {
+                    querySb.deleteCharAt(querySb.length() - 1);
+                }
 
-            JSONObject httpParams = new JSONObject();
-            httpParams.put("queryNum", privateParams.get("accNbr"));
-            httpParams.put("c3", params.get("lanId"));
-            httpParams.put("queryId", privateParams.get("integrationId"));
-            //查询标签列表
-            httpParams.put("queryFields", querySb.toString());
-            //http查询标签
-            JSONObject resJson = getLabelByPost(httpParams);
+                JSONObject httpParams = new JSONObject();
+                httpParams.put("queryNum", privateParams.get("accNbr"));
+                httpParams.put("c3", params.get("lanId"));
+                httpParams.put("queryId", privateParams.get("integrationId"));
+                //查询标签列表
+                httpParams.put("queryFields", querySb.toString());
+                //http查询标签
+                JSONObject resJson = getLabelByPost(httpParams);
 
-            System.out.println(resJson.toString());
+                System.out.println(resJson.toString());
 
-            Map<String, Object> triggers = new HashMap<>();
-            List<Map<String, Object>> triggerList = new ArrayList<>();
+                Map<String, Object> triggers = new HashMap<>();
+                List<Map<String, Object>> triggerList = new ArrayList<>();
+
+                triggers = new HashMap<>();
+                triggerList = new ArrayList<>();
+
 //            if (calcDisplay != null) {
 //                for (Label label : calcDisplay) {
 //                    if (resJson.containsKey(label.getInjectionLabelCode())) {
@@ -567,26 +590,24 @@ public class EventApiServiceImpl implements EventApiService {
 //                itgTriggers.put("type", 1);
 //            }
 
-            triggers = new HashMap<>();
-            triggerList = new ArrayList<>();
-            if (iSaleDisplay != null) {
-                for (Label label : iSaleDisplay) {
-                    if (resJson.containsKey(label.getInjectionLabelCode())) {
-                        triggers.put("key", label.getInjectionLabelCode());
-                        triggers.put("value", resJson.get(label.getInjectionLabelCode()));
-                        triggers.put("display", 0); //todo 确定display字段
-                        triggers.put("name", label.getInjectionLabelName());
+                if (iSaleDisplay != null) {
+                    for (Label label : iSaleDisplay) {
+                        if (resJson.containsKey(label.getInjectionLabelCode())) {
+                            triggers.put("key", label.getInjectionLabelCode());
+                            triggers.put("value", resJson.get(label.getInjectionLabelCode()));
+                            triggers.put("display", 0); //todo 确定display字段
+                            triggers.put("name", label.getInjectionLabelName());
+                        }
                     }
+
+                    triggerList.add(triggers);
+
+                    itgTrigger.put("triggerList", triggerList);
+                    itgTrigger.put("type", "营销信息");
                 }
 
-                triggerList.add(triggers);
-
-                itgTrigger.put("triggerList", triggerList);
-                itgTrigger.put("type", "营销信息");
+                itgTriggers.add(itgTrigger);
             }
-
-            itgTriggers.add(itgTrigger);
-
 
             //根据活动id获取策略列表
             List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOs = mktCamStrategyConfRelMapper.selectByMktCampaignId(activityId);
@@ -1103,10 +1124,15 @@ public class EventApiServiceImpl implements EventApiService {
 
                         String[] strArray = tarGrpConditionDOs.get(i).getRightParam().split(",");
 
-                        expressSb.append(" >= ").append("\"").append(strArray[0]).append("\"");
+//                        expressSb.append(" >= ").append("\"").append(strArray[0]).append("\"").append(")");
+//                        expressSb.append(" && ").append("((");
+//                        expressSb.append(label.getInjectionLabelCode()).append(")");
+//                        expressSb.append(" <= ").append("\"").append(strArray[1]).append("\"");
+
+                        expressSb.append(" >= ").append(strArray[0]);
                         expressSb.append(" && ").append("(");
                         expressSb.append(label.getInjectionLabelCode()).append(")");
-                        expressSb.append(" <= ").append("\"").append(strArray[1]).append("\"");
+                        expressSb.append(" <= ").append(strArray[1]);
 
                         express1.append(" >= ").append("\"").append(strArray[0]).append("\"");
                         express1.append(" && ").append("(");
@@ -1183,9 +1209,11 @@ public class EventApiServiceImpl implements EventApiService {
                 //规则引擎计算
                 System.out.println(express);
                 RuleResult ruleResult = null;
-
+                System.out.println(context.toString());
+                ExpressRunner runnerQ = new ExpressRunner();
                 try {
-                    ruleResult = runner.executeRule(express, context, true, true);
+                    ruleResult = runnerQ.executeRule(express, context, true, true);
+//                    ruleResult = runnerQ.executeRule("if((\"130\") >= \"99\" && (\"130\") <= \"169\") {return true} else {return false}", context, false, true);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1216,11 +1244,11 @@ public class EventApiServiceImpl implements EventApiService {
                 jsonObject.put("tarGrpId", tarGrpId);
 
 
-                esService.save(jsonObject, IndexList.RULE_MODULE);
-
                 //初始化返回结果中的销售品条目
                 List<Map<String, String>> productList = new ArrayList<>();
                 if (ruleResult.getResult() != null && ((Boolean) ruleResult.getResult())) {
+
+                    jsonObject.put("hit", true);
 
                     //拼接返回结果
                     ruleMap.put("orderISI", params.get("reqId")); //流水号
@@ -1305,6 +1333,8 @@ public class EventApiServiceImpl implements EventApiService {
                     esService.save(esJson, IndexList.RULE_MODULE);
                     return Collections.EMPTY_MAP;
                 }
+
+                esService.save(jsonObject, IndexList.RULE_MODULE);
             } catch (Exception e) {
                 e.printStackTrace();
 
