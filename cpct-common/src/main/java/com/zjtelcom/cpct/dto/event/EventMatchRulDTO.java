@@ -13,6 +13,7 @@ import java.io.Serializable;
 @Data
 public class EventMatchRulDTO extends BaseEntity implements Serializable {
 
+    private String actType;//  KIP=保持/ADD=新增/MOD=修改/DEL=删除
     private Long evtMatchRulId;//记录事件的规则标识主键
     private Long eventId;//事件主键标识
     private String evtRulName;//记录事件规则的名称

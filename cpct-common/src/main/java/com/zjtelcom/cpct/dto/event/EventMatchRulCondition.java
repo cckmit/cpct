@@ -7,6 +7,7 @@ import java.util.List;
 
 public class EventMatchRulCondition extends BaseEntity implements Serializable {
 
+    private String actType;//  KIP=保持/ADD=新增/MOD=修改/DEL=删除
     private Long conditionId; //事件规则条件标识
     private Long evtMatchRulId;//事件规则标识
     private String leftParam;//左边参数，类型为注智标签时，对应为注智标签标识；类型为表达式时，为分群条件ID
@@ -16,6 +17,14 @@ public class EventMatchRulCondition extends BaseEntity implements Serializable {
     private String rightParamType;//参数类型1000	注智标签 2000	表达式 3000	固定值
     private String conditionText;//条件表达式的业务含义，用于前台展示
     private List<Integer> areaIdList;
+
+    public String getActType() {
+        return actType;
+    }
+
+    public void setActType(String actType) {
+        this.actType = actType;
+    }
 
     public List<Integer> getAreaIdList() {
         return areaIdList;
