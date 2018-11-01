@@ -359,12 +359,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             if (!response.getResultCode().equals(CODE_SUCCESS)) {
                 trialOperation.setStatusCd("2000");
                 trialOperation.setUpdateDate(new Date());
-                trialOperation.setRemark("ES查询错误");
+                trialOperation.setRemark(response.getResultMsg());
                 trialOperationMapper.updateByPrimaryKey(trialOperation);
             } else {
                 trialOperation.setStatusCd("3000");
                 trialOperation.setUpdateDate(new Date());
-                trialOperation.setRemark("查询成功");
+                trialOperation.setRemark(response.getResultMsg());
                 trialOperationMapper.updateByPrimaryKey(trialOperation);
             }
         } catch (Exception e) {

@@ -5,8 +5,17 @@ import java.util.Map;
 
 public class TrialResponse implements Serializable {
     private String resultCode;
+    private String resultMsg;
     private Map<String,Object>  hitsList;
     private Long total;
+
+    public String getResultMsg() {
+        return resultMsg;
+    }
+
+    public void setResultMsg(String resultMsg) {
+        this.resultMsg = resultMsg;
+    }
 
     public Long getTotal() {
         return total;
