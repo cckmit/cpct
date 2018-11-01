@@ -11,6 +11,17 @@ public class MktProductRule implements Serializable {
 
     private String remark;
 
+    private Long priority;
+
+
+    public Long getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Long priority) {
+        this.priority = priority;
+    }
+
     public Long getId() {
         return id;
     }
