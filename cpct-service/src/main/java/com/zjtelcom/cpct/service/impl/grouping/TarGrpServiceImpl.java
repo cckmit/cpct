@@ -134,17 +134,17 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     @Override
     public Map<String, Object> createTarGrpByTemplateId(Long templateId) {
         Map<String, Object> result = new HashMap<>();
-        TarGrpTemplateDO template = tarGrpTemplateMapper.selectByPrimaryKey(templateId);
+        TarGrp template = tarGrpMapper.selectByPrimaryKey(templateId);
         if (template==null){
             result.put("resultCode", CODE_FAIL);
             result.put("resultMsg", "模板不存在");
             return result;
         }
-        List<TarGrpTemplateConditionDO> conditionDOList = tarGrpTemplateConditionMapper.selectByTarGrpTemplateId(templateId);
+        List<TarGrpCondition> conditionDOList = tarGrpConditionMapper.listTarGrpCondition(templateId);
 
         TarGrpDetail addVO = BeanUtil.create(template,new TarGrpDetail());
         List<TarGrpCondition> conditionAdd = new ArrayList<>();
-        for (TarGrpTemplateConditionDO conditionDO : conditionDOList){
+        for (TarGrpCondition conditionDO : conditionDOList){
             TarGrpCondition con = BeanUtil.create(conditionDO,new TarGrpCondition());
             conditionAdd.add(con);
         }
