@@ -44,6 +44,7 @@ public class DataSourceConfig {
         sessionFactoryBean.setDataSource(dataSource);
         sessionFactoryBean.setMapperLocations(new PathMatchingResourcePatternResolver()
                 .getResources("classpath:mybatis/*/*.xml"));
+
         return sessionFactoryBean.getObject();
     }
 

@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.service.impl.channel;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zjhcsoft.eagle.main.dubbo.service.RealTimeEventService;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.channel.MktScriptMapper;

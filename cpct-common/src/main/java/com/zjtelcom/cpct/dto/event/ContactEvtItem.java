@@ -25,6 +25,7 @@ public class ContactEvtItem extends BaseEntity {
     private String isLabel;//是否为标签
     private String evtItemDesc;//采集项描述
 
+
     public String getIsLabel() {
         return isLabel;
     }

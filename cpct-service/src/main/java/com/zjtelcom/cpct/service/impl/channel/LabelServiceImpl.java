@@ -80,6 +80,21 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         }
     }
 
+
+    @Override
+    public Map<String, Object> getLabelNameListByParam(Map<String, Object> params) {
+        Map<String,Object> result = new HashMap<>();
+        List<Label> labelList = new ArrayList<>();
+        String labelName = null;
+        if (params.get("labelName")!=null){
+            labelName = params.get("labelName").toString();
+        }
+        labelList = labelMapper.findByParam(labelName);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",labelList);
+        return result;
+    }
+
     @Override
     public Map<String, Object> getLabelListByParam(Long userId, Map<String, Object> params) {
         Map<String,Object> result = new HashMap<>();
