@@ -539,13 +539,10 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
 
         for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfRuleList) {
             //初始化线程池
-            for (int i = 0; i < 1; i++) {
-                final int index = i;
-                try {
-                    Thread.sleep(index * 500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
             ExecutorService executorService = Executors.newCachedThreadPool();
             ruleFuture = executorService.submit(new CopyMktStrategyConfRuleTask(mktStrategyConfRule));
