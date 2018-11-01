@@ -13,7 +13,7 @@ public interface ProductService {
 
     Map<String,Object> addProductRule(Long strategyRuleId,List<Long> productIdList);
 
-    Map<String,Object> editProductRule(Long userId,Long ruleId,String remark);
+    Map<String,Object> editProductRule(Long userId,Long ruleId,String remark,Long priority);
 
     Map<String,Object> delProductRule(Long strategyRuleId,Long ruleId,List<Long> itemRuleIdList);
 
