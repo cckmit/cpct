@@ -71,6 +71,7 @@
     <if test="scriptType != null and scriptType != ''">
       and SCRIPT_TYPE = #{scriptType}
     </if>
+    order by UPDATE_DATE desc
   </select>
 
   <select id="findByScriptName" resultMap="BaseResultMap">

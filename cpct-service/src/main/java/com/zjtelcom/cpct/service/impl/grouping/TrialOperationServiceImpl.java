@@ -359,10 +359,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             if (!response.getResultCode().equals(CODE_SUCCESS)) {
                 trialOperation.setStatusCd("2000");
                 trialOperation.setUpdateDate(new Date());
+                trialOperation.setRemark("ES查询错误");
                 trialOperationMapper.updateByPrimaryKey(trialOperation);
             } else {
                 trialOperation.setStatusCd("3000");
                 trialOperation.setUpdateDate(new Date());
+                trialOperation.setRemark("查询成功");
                 trialOperationMapper.updateByPrimaryKey(trialOperation);
             }
         } catch (Exception e) {
@@ -370,6 +372,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             // 抽样试算失败
             trialOperation.setStatusCd("2000");
             trialOperation.setUpdateDate(new Date());
+            trialOperation.setRemark("ES查询错误");
             trialOperationMapper.updateByPrimaryKey(trialOperation);
         }
         // 抽样试算成功
