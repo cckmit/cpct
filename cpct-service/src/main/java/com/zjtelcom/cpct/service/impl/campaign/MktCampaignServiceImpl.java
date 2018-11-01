@@ -19,6 +19,7 @@ import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
+import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.campaign.*;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.EventDTO;
@@ -30,12 +31,14 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SyncActivityService;
+import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UserUtil;
 import com.zjtelcom.cpct_prd.dao.campaign.MktCampaignPrdMapper;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -123,6 +126,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
     @Autowired
     private SyncActivityService syncActivityService;
+
+    @Autowired
+    private SynchronizeCampaignService synchronizeCampaignService;
 
     /**
      * 添加活动基本信息 并建立关系
@@ -474,9 +480,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 mktCampaignVO.setUpdateDate(mktCampaignCountDO.getUpdateDate());
                 if (mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode()) || mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_PASS.getStatusCode())) {
                     mktCampaignVO.setStatusExamine(StatusCode.STATUS_CODE_PASS.getStatusMsg());
-                } else if (mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_UNPASS.getStatusCode())){
+                } else if (mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_UNPASS.getStatusCode())) {
                     mktCampaignVO.setStatusExamine(StatusCode.STATUS_CODE_UNPASS.getStatusMsg());
-                }else {
+                } else {
                     mktCampaignVO.setStatusExamine(StatusCode.STATUS_CODE_CHECKING.getStatusMsg());
                 }
             } catch (Exception e) {
@@ -511,7 +517,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      * @return
      */
     @Override
-    public Map<String, Object> examineCampaign4Sync(Long campaignId,String statusCd) {
+    public Map<String, Object> examineCampaign4Sync(Long campaignId, String statusCd) {
         Map<String, Object> maps = new HashMap<>();
         MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(campaignId);
         if (campaignDO == null) {
@@ -528,9 +534,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         campaignDO.setUpdateDate(new Date());
         mktCampaignMapper.updateByPrimaryKey(campaignDO);
         maps.put("resultCode", CODE_SUCCESS);
-        if (statusCd.equals(StatusCode.STATUS_CODE_PASS.getStatusCode())){
+        if (statusCd.equals(StatusCode.STATUS_CODE_PASS.getStatusCode())) {
             maps.put("resultMsg", "已通过");
-        }else {
+        } else {
             maps.put("resultMsg", "已拒绝");
         }
         return maps;
@@ -670,7 +676,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      * @throws Exception
      */
     @Override
-    public Map<String, Object> changeMktCampaignStatus(Long mktCampaignId, String statusCd) throws Exception {
+    public Map<String, Object> changeMktCampaignStatus(final Long mktCampaignId, String statusCd) throws Exception {
         Map<String, Object> maps = new HashMap<>();
         mktCampaignMapper.changeMktCampaignStatus(mktCampaignId, statusCd, new Date(), UserUtil.loginId());
         // 判断是否是发布活动, 是该状态生效
@@ -689,6 +695,24 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCamResultRelDO.setUpdateDate(new Date());
             mktCamResultRelDO.setUpdateStaff(UserUtil.loginId());
             mktCamResultRelMapper.changeStatusByMktCampaignId(mktCamResultRelDO);
+        } else if (StatusCode.STATUS_CODE_PASS.getStatusCode().equals(statusCd)) {
+            // 审核通过后异步同步活动到生产环境
+            new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        SysStaff sysStaff = (SysStaff) SecurityUtils.getSubject().getPrincipal();
+                        String roleName = "admin";
+                        if (sysStaff != null) {
+                            roleName = sysStaff.getRoleName();
+                        }
+                        synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
+
         }
         return maps;
     }
