@@ -143,11 +143,15 @@ public class PpmProductController extends BaseController  {
         Long userId = UserUtil.loginId();
         try {
             String remark = null;
+            Long priority = null;
             Long ruleId = Long.valueOf(params.get("ruleId").toString());
             if (params.get("remark")!=null){
                 remark = params.get("remark").toString();
             }
-            result = productService.editProductRule(userId,ruleId,remark);
+            if (params.get("priority")!=null){
+                priority = Long.valueOf(params.get("priority").toString());
+            }
+            result = productService.editProductRule(userId,ruleId,remark,priority);
         }catch (Exception e){
             logger.error("[op:PpmProductController] fail to getProductList",e);
             result.put("resultCode",CODE_FAIL);
