@@ -8,10 +8,9 @@ import com.zjtelcom.cpct.dao.user.UserListMapper;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.filter.FilterRuleAddVO;
 import com.zjtelcom.cpct.dto.user.UserList;
-import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.request.filter.FilterRuleReq;
 import com.zjtelcom.cpct.service.filter.FilterRuleService;
-import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.util.FtpUtils;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -166,13 +165,14 @@ public class FilterRuleController extends BaseController {
         OutputStream ouputStream = null;
         try {
             String fileName = "用户名单.xlsx";
-            File file = new File("d:/用户名单.xlsx");
+            File file = new File("cpct-web/src/main/resources/file/模板.xlsx");
             byte[] buffer = new byte[1024];
             FileInputStream fis = null; //文件输入流
             BufferedInputStream bis = null;
             fis = new FileInputStream(file);
             bis = new BufferedInputStream(fis);
             FileOutputStream fileOutputStream = new FileOutputStream(file);
+
             //处理导出问题
             response.reset();
             response.setContentType(CommonConstant.CONTENTTYPE);
@@ -196,6 +196,7 @@ public class FilterRuleController extends BaseController {
 
         return initSuccRespInfo("导出成功");
     }
+
 
     /**
      * 导入名单
