@@ -26,6 +26,13 @@
     delete from tar_grp_template_condition
     where TAR_GRP_TEMPLATE_ID = #{tarGrpTemplateId,jdbcType=BIGINT}
   </delete>
+  <delete id="deleteBatch" parameterType="java.util.List">
+    delete from tar_grp_template_condition
+    where CONDITION_ID IN
+    <foreach collection="list" item="item" open="(" separator="," close=")" index="index">
+      #{item}
+    </foreach>
+  </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.grouping.TarGrpTemplateConditionDO">
     insert into tar_grp_template_condition (CONDITION_ID, TAR_GRP_TEMPLATE_ID, LEFT_PARAM, 
       LEFT_PARAM_TYPE, OPER_TYPE, RIGHT_PARAM, 

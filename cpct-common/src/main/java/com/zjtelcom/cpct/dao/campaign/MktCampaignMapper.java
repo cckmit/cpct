@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +34,7 @@ public interface MktCampaignMapper {
 
     List<MktCampaignCountDO> qryMktCampaignListPage4Sync(@Param("map") Map<String,Object> map);
 
-    void changeMktCampaignStatus(@Param("mktCampaignId")Long mktCampaignId, @Param("statusCd")String statusCd);
+    void changeMktCampaignStatus(@Param("mktCampaignId")Long mktCampaignId, @Param("statusCd")String statusCd, @Param("updateDate")Date updateDate, @Param("updateStaff")Long updateStaff);
 
     List<MktCampaignDO> qryMktCampaignListByCondition(MktCampaignDO mktCampaignDO);
 

@@ -6,6 +6,9 @@
  */
 package com.zjtelcom.cpct.dubbo.service;
 
+import com.zjtelcom.cpct.dubbo.model.Ret;
+import com.zjtelcom.cpct.dubbo.model.RetCamResult;
+
 import java.util.Map;
 
 /**
@@ -16,6 +19,6 @@ import java.util.Map;
  */
 public interface MktCamChlResultApiService {
 
-    Map<String, Object> selectResultList();
+   RetCamResult selectResultList();
 
 }

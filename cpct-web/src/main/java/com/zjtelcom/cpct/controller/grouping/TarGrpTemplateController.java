@@ -103,9 +103,10 @@ public class TarGrpTemplateController {
     @CrossOrigin
     public String listTarGrpTemplatePage(@RequestBody Map<String, String> params) {
         String tarGrpTemplateName = params.get("tarGrpTemplateName");
+        String tarGrpType = params.get("tarGrpType");
         Integer page = Integer.parseInt(params.get("page"));
         Integer pageSize = Integer.parseInt(params.get("pageSize"));
-        Map<String, Object> map = tarGrpTemplateService.listTarGrpTemplatePage(tarGrpTemplateName, page, pageSize);
+        Map<String, Object> map = tarGrpTemplateService.listTarGrpTemplatePage(tarGrpTemplateName,tarGrpType, page, pageSize);
         return JSON.toJSONString(map);
     }
 }

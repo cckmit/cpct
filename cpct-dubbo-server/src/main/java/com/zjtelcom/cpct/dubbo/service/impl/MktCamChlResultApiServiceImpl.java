@@ -6,7 +6,6 @@
  */
 package com.zjtelcom.cpct.dubbo.service.impl;
 
-import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
@@ -15,9 +14,10 @@ import com.zjtelcom.cpct.domain.campaign.MktCamChlResultConfRelDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlResultDO;
 import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
-import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
-import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
-import com.zjtelcom.cpct.dto.campaign.MktCamResultRelDeatil;
+import com.zjtelcom.cpct.dubbo.model.MktCamChlConfDetail;
+import com.zjtelcom.cpct.dubbo.model.MktCamChlResult;
+import com.zjtelcom.cpct.dubbo.model.MktCamResultRelDeatil;
+import com.zjtelcom.cpct.dubbo.model.RetCamResult;
 import com.zjtelcom.cpct.dubbo.service.MktCamChlResultApiService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 /**
  * @Description:
@@ -64,18 +66,18 @@ public class MktCamChlResultApiServiceImpl implements MktCamChlResultApiService 
      * @return
      */
     @Override
-    public Map<String, Object> selectResultList() {
-        Map<String, Object> resultMap = new HashMap<>();
+    public RetCamResult selectResultList() {
+        RetCamResult ret = new RetCamResult();
         List<Long> mktCampaignIdList = mktCamResultRelMapper.selectAllGroupByMktCampaignId();
-        List<MktCamResultRelDeatil> mktCamResultRelDeatilList = new ArrayList<>();
+        ArrayList<MktCamResultRelDeatil> mktCamResultRelDeatilList = new ArrayList<>();
         for (Long mktCampaignId : mktCampaignIdList) {
             MktCamResultRelDeatil mktCamResultRelDeatil = new MktCamResultRelDeatil();
             List<MktCamChlResultDO> mktCamChlResultDOList = mktCamChlResultMapper.selectResultByMktCampaignId(mktCampaignId);
-            List<MktCamChlResult> mktCamChlResultList = new ArrayList<>();
+            ArrayList<MktCamChlResult> mktCamChlResultList = new ArrayList<>();
             for (MktCamChlResultDO mktCamChlResultDO : mktCamChlResultDOList) {
                 MktCamChlResult mktCamChlResult = BeanUtil.create(mktCamChlResultDO, new MktCamChlResult());
                 List<MktCamChlResultConfRelDO> mktCamChlResultConfRelDOList = mktCamChlResultConfRelMapper.selectByMktCamChlResultId(mktCamChlResultDO.getMktCamChlResultId());
-                List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
+                ArrayList<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
                 for (MktCamChlResultConfRelDO mktCamChlResultConfRelDO : mktCamChlResultConfRelDOList) {
                     MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(mktCamChlResultConfRelDO.getEvtContactConfId());
                     MktCamChlConfDetail mktCamChlConfDetail = BeanUtil.create(mktCamChlConfDO, new MktCamChlConfDetail());
@@ -87,7 +89,7 @@ public class MktCamChlResultApiServiceImpl implements MktCamChlResultApiService 
                     mktCamChlConfDetailList.add(mktCamChlConfDetail);
                     // 获取属性
                     List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(mktCamChlConfDetail.getEvtContactConfId());
-                    List<MktCamChlConfAttr> mktCamChlConfAttrList = new ArrayList<>();
+                    ArrayList<MktCamChlConfAttr> mktCamChlConfAttrList = new ArrayList<>();
                     for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
                         MktCamChlConfAttr mktCamChlConfAttr = BeanUtil.create(mktCamChlConfAttrDO, new MktCamChlConfAttr());
                         mktCamChlConfAttrList.add(mktCamChlConfAttr);
@@ -101,9 +103,9 @@ public class MktCamChlResultApiServiceImpl implements MktCamChlResultApiService 
             mktCamResultRelDeatil.setMktCamChlResultList(mktCamChlResultList);
             mktCamResultRelDeatilList.add(mktCamResultRelDeatil);
         }
-        resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
-        resultMap.put("resultMsg", "success");
-        resultMap.put("mktCamResultRelDeatilList", mktCamResultRelDeatilList);
-        return resultMap;
+        ret.setResultCode(CODE_SUCCESS);
+        ret.setResultMsg("success");
+        ret.setData(mktCamResultRelDeatilList);
+        return ret;
     }
 }

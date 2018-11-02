@@ -19,6 +19,6 @@ public interface CamScriptService {
 
     Map<String,Object> getCamScriptVODetail(Long userId,Long camScriptId);
 
-    Map<String,Object> copyCamScript(Long contactConfId,Long newConfId);
+    Map<String,Object> copyCamScript(Long contactConfId,String scriptDesc, Long newConfId);
 
 }

@@ -57,15 +57,15 @@
 
     <!-- 订阅 -->
     <!-- cpc计算协同中心回调 -->
-    <dubbo:reference interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService" id="eventApiService"
+    <dubbo:reference interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService" id="iContactTaskReceiptService"
                      version="1.0" retries="0" check="false">
-        <dubbo:method name="contactTaskReceipt" servicecode="00.1079.CPCResultFeedback" timeout="5000"/>
+        <dubbo:method name="contactTaskReceipt" servicecode="00.1079.CPCResultFeedback" timeout="20000"/>
     </dubbo:reference>
 
     <!-- 因子实时查询 -->
     <dubbo:reference interface="com.zjpii.biz.serv.YzServ" id="yzServ"
                      version="2.0" retries="0" check="false">
-        <dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="5000"/>
+        <dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="10000"/>
     </dubbo:reference>
 
 

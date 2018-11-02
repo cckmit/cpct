@@ -1,8 +1,10 @@
 package com.zjtelcom.cpct.dao.grouping;
 
+import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 
@@ -24,5 +26,7 @@ public interface TarGrpMapper {
     int modTarGrp(TarGrp record);
 
     int delTarGrp(TarGrp tarGrp);
+
+    List<TarGrp> selectByName(@Param("tarGrpTemplateName") String tarGrpTemplateName,@Param("tarGrpType")String tarGrpType,@Param("remark")String remark);
 
 }

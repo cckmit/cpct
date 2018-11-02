@@ -34,7 +34,9 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
 import com.zjtelcom.cpct.service.channel.CamScriptService;
 import com.zjtelcom.cpct.service.channel.VerbalService;
+import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
+import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -76,6 +78,9 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
     @Autowired
     private MktQuestionnaireMapper mktQuestionnaireMapper;
 
+    @Autowired
+    private RedisUtils redisUtils;
+
     @Override
     public Map<String, Object> saveMktCamChlConf(MktCamChlConfDetail mktCamChlConfDetail) {
         MktCamChlConfDO mktCamChlConfDO = new MktCamChlConfDO();
@@ -83,7 +88,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
         try {
             //添加协同渠道基本信息
             CopyPropertiesUtil.copyBean2Bean(mktCamChlConfDO, mktCamChlConfDetail);
-            mktCamChlConfDO.setStatusCd(StatusCode.STATUS_CODE_NOTACTIVE.getStatusCode());
+            mktCamChlConfDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
             mktCamChlConfDO.setCreateDate(new Date());
             mktCamChlConfDO.setCreateStaff(UserUtil.loginId());
             mktCamChlConfDO.setUpdateDate(new Date());
@@ -93,12 +98,12 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCamChlConfMap.put("resultMsg", ErrorCode.SAVE_CAM_CHL_CONF_SUCCESS.getErrorMsg());
             mktCamChlConfMap.put("evtContactConfId", evtContactConfId);
-
+            MktCamChlConfDetail mktCamChlConfDetailNew = BeanUtil.create(mktCamChlConfDO, new MktCamChlConfDetail());
             // 添加属性
             List<MktCamChlConfAttr> mktCamChlConfAttrList = mktCamChlConfDetail.getMktCamChlConfAttrList();
+            List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = new ArrayList<>();
             for (MktCamChlConfAttr mktCamChlConfAttr : mktCamChlConfAttrList) {
-                MktCamChlConfAttrDO mktCamChlConfAttrDO = new MktCamChlConfAttrDO();
-                CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttrDO, mktCamChlConfAttr);
+                MktCamChlConfAttrDO mktCamChlConfAttrDO = BeanUtil.create(mktCamChlConfAttr, new MktCamChlConfAttrDO());
                 mktCamChlConfAttrDO.setEvtContactConfId(mktCamChlConfDO.getEvtContactConfId());
                 if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
                     mktCamChlConfAttrDO.setAttrValue(evtContactConfId.toString());
@@ -106,8 +111,19 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                     String params = mktCamChlConfAttr.getAttrValue();
                     ruleInsert(evtContactConfId, params);
                 }
-                mktCamChlConfAttrMapper.insert(mktCamChlConfAttrDO);
+                //mktCamChlConfAttrMapper.insert(mktCamChlConfAttrDO);
+                mktCamChlConfAttrDOList.add(mktCamChlConfAttrDO);
             }
+            mktCamChlConfAttrMapper.insertBatch(mktCamChlConfAttrDOList);
+
+            List<MktCamChlConfAttr> mktCamChlConfAttrNewList = new ArrayList<>();
+            for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
+                MktCamChlConfAttr mktCamChlConfAttr = BeanUtil.create(mktCamChlConfAttrDO, new MktCamChlConfAttr());
+                mktCamChlConfAttrNewList.add(mktCamChlConfAttr);
+            }
+            mktCamChlConfDetailNew.setMktCamChlConfAttrList(mktCamChlConfAttrNewList);
+            // 将推送渠道缓存到redis
+            redisUtils.set("MktCamChlConfDetail_" + evtContactConfId, mktCamChlConfDetailNew);
         } catch (Exception e) {
             logger.error("[op:MktCamChlConfServiceImpl] fail to save MktCamChlConf = {}", mktCamChlConfDO, e);
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_FAIL);
@@ -155,6 +171,8 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                 }
                 mktCamChlConfAttrMapper.updateByPrimaryKey(mktCamChlConfAttrDO);
             }
+            // 将推送渠道缓存到redis
+            redisUtils.set("MktCamChlConfDetail_" + evtContactConfId, mktCamChlConfDetail);
         } catch (Exception e) {
             logger.error("[op:MktCamChlConfServiceImpl] fail to save MktCamChlConf = {}", mktCamChlConfDO, e);
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_FAIL);
@@ -187,7 +205,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                     //通过EvtContactConfId获取规则放入属性中
                     String rule = ruleSelect(mktCamChlConfAttr.getEvtContactConfId());
                     mktCamChlConfAttr.setAttrValue(rule);
-                } else if(mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.QUESTION.getArrId())) {
+                } else if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.QUESTION.getArrId())) {
                     // 问卷
                     Questionnaire questionnaire = mktQuestionnaireMapper.selectByPrimaryKey(Long.valueOf(mktCamChlConfAttr.getAttrValue()));
                     mktCamChlConfAttr.setAttrValueName(questionnaire.getNaireName());
@@ -209,7 +227,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             mktCamChlConfMap.put("mktCamChlConfDetail", mktCamChlConfDetail);
         } catch (Exception e) {
             logger.error("[op:MktCamChlConfServiceImpl] fail to getMktCamChlConf by evtContactConfId = {}", evtContactConfId, e);
-            mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            mktCamChlConfMap.put("resultCode", CommonConstant.CODE_FAIL);
             mktCamChlConfMap.put("resultMsg", ErrorCode.GET_CAM_CHL_CONF_FAILURE.getErrorMsg());
             mktCamChlConfMap.put("mktCamChlConfDetail", mktCamChlConfDetail);
         }
@@ -251,7 +269,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             mktCamChlConfMap.put("mktCamChlConfDetailList", mktCamChlConfDetailList);
         } catch (Exception e) {
             logger.error("[op:MktCamChlConfServiceImpl] fail to get mktCamChlConfDetailList evtContactConfId = {}", mktCamChlConfDetailList, e);
-            mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            mktCamChlConfMap.put("resultCode", CommonConstant.CODE_FAIL);
             mktCamChlConfMap.put("resultMsg", ErrorCode.GET_CAM_CHL_CONF_FAILURE.getErrorMsg());
             mktCamChlConfMap.put("mktCamChlConfDetailList", mktCamChlConfDetailList);
         }
@@ -272,7 +290,8 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
         //删除旧的关联规则 todo 静态
         mktVerbalConditionMapper.deleteByVerbalId("1", evtContactConfId);
 
-
+        // 将推送渠道缓存到redis
+        redisUtils.remove("MktCamChlConfDetail_" + evtContactConfId);
         Map<String, Object> mktCamChlConfMap = new HashMap<>();
         mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
         mktCamChlConfMap.put("resultMsg", ErrorCode.DELETE_CAM_CHL_CONF_SUCCESS.getErrorMsg());
@@ -380,7 +399,11 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
     public String ruleSelect(Long evtContactConfId) {
         //唯一ID
         //查询出所有规则
-        List<MktVerbalCondition> mktVerbalConditions = mktVerbalConditionMapper.findConditionListByVerbalId(evtContactConfId);
+        List<MktVerbalCondition> mktVerbalConditions = (List<MktVerbalCondition>) redisUtils.get("RULE_BERBALC_CONDITION_" + evtContactConfId);
+        if (mktVerbalConditions == null) {
+            mktVerbalConditions = mktVerbalConditionMapper.findConditionListByVerbalId(evtContactConfId);
+        }
+
 
         List<MktVerbalCondition> labels = new ArrayList<>(); //标签因子
         List<MktVerbalCondition> expressions = new ArrayList<>(); //表达式
@@ -489,11 +512,12 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(parentEvtContactConfId);
             // 获取原渠道的规则，通过parentEvtContactConfId获取规则放入属性中
             String rule = ruleSelect(parentEvtContactConfId);
-
+            List<MktCamChlConfAttr> mktCamChlConfAttrList = new ArrayList<>();
+            List<MktCamChlConfAttrDO> mktCamChlConfAttrDONewList = new ArrayList<>();
             for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
                 mktCamChlConfAttrDO.setContactChlAttrRstrId(null);
                 mktCamChlConfAttrDO.setEvtContactConfId(childEvtContactConfId);
-
+                mktCamChlConfAttrDONewList.add(mktCamChlConfAttrDO);
                 if (mktCamChlConfAttrDO.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
                     mktCamChlConfAttrDO.setAttrValue(childEvtContactConfId.toString());
                     //协同渠道自策略规则保存
@@ -501,17 +525,98 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                     //  String params = mktCamChlConfAttrDO.getAttrValue();
                     ruleInsert(childEvtContactConfId, rule);
                 }
-                mktCamChlConfAttrMapper.insert(mktCamChlConfAttrDO);
+                MktCamChlConfAttr mktCamChlConfAttr = BeanUtil.create(mktCamChlConfAttrDO, new MktCamChlConfAttr());
+                mktCamChlConfAttr.setEvtContactConfId(childEvtContactConfId);
+                mktCamChlConfAttrList.add(mktCamChlConfAttr);
             }
+            // 批量插入
+            mktCamChlConfAttrMapper.insertBatch(mktCamChlConfAttrDONewList);
+            MktCamChlConfDetail mktCamChlConfDetailNew = BeanUtil.create(mktCamChlConfDO, new MktCamChlConfDetail());
+            mktCamChlConfDetailNew.setMktCamChlConfAttrList(mktCamChlConfAttrList);
+            redisUtils.set("MktCamChlConfDetail_" + mktCamChlConfDetailNew.getEvtContactConfId(), mktCamChlConfDetailNew);
+
             // 查询痛痒点话术列表
             verbalService.copyVerbal(parentEvtContactConfId, childEvtContactConfId);
 
             // 查询脚本
-            camScriptService.copyCamScript(parentEvtContactConfId, childEvtContactConfId);
+            camScriptService.copyCamScript(parentEvtContactConfId, null, childEvtContactConfId);
 
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCamChlConfMap.put("resultMsg", ErrorCode.SAVE_CAM_CHL_CONF_SUCCESS.getErrorMsg());
             mktCamChlConfMap.put("mktCamChlConfDO", mktCamChlConfDO);
+        } catch (Exception e) {
+            logger.error("[op:MktCamChlConfServiceImpl] fail to getMktCamChlConfDO by parentEvtContactConfId = {}", parentEvtContactConfId, e);
+            mktCamChlConfMap.put("resultCode", CommonConstant.CODE_FAIL);
+            mktCamChlConfMap.put("resultMsg", ErrorCode.SAVE_CAM_CHL_CONF_FAILURE.getErrorMsg());
+        }
+        return mktCamChlConfMap;
+    }
+
+
+    /**
+     * 通过父推送渠道Id复制协同渠道
+     *
+     * @param parentEvtContactConfId
+     * @return
+     */
+    @Override
+    public Map<String, Object> copyMktCamChlConfFormRedis(Long parentEvtContactConfId, String scriptDesc) throws Exception {
+        Map<String, Object> mktCamChlConfMap = new HashMap<>();
+        try {
+            // 获取原协同渠道
+            MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) redisUtils.get("MktCamChlConfDetail_" + parentEvtContactConfId);
+            MktCamChlConfDO mktCamChlConfDO = new MktCamChlConfDO();
+            List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = new ArrayList<>();
+            if (mktCamChlConfDetail != null) {
+                CopyPropertiesUtil.copyBean2Bean(mktCamChlConfDO, mktCamChlConfDetail);
+                for (MktCamChlConfAttr mktCamChlConfAttr : mktCamChlConfDetail.getMktCamChlConfAttrList()) {
+                    MktCamChlConfAttrDO mktCamChlConfAttrDO = BeanUtil.create(mktCamChlConfAttr, new MktCamChlConfAttrDO());
+                    mktCamChlConfAttrDOList.add(mktCamChlConfAttrDO);
+                }
+            } else {
+                mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(parentEvtContactConfId);
+                mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(parentEvtContactConfId);
+            }
+            mktCamChlConfDO.setEvtContactConfId(null);
+            mktCamChlConfDO.setCreateStaff(UserUtil.loginId());
+            mktCamChlConfDO.setCreateDate(new Date());
+            mktCamChlConfDO.setUpdateStaff(UserUtil.loginId());
+            mktCamChlConfDO.setUpdateDate(new Date());
+            // 新增协同渠道
+            mktCamChlConfMapper.insert(mktCamChlConfDO);
+            Long childEvtContactConfId = mktCamChlConfDO.getEvtContactConfId();
+            // 获取原渠道的规则，通过parentEvtContactConfId获取规则放入属性中
+            String rule = ruleSelect(parentEvtContactConfId);
+            List<MktCamChlConfAttr> mktCamChlConfAttrList = new ArrayList<>();
+            for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
+                mktCamChlConfAttrDO.setContactChlAttrRstrId(null);
+                mktCamChlConfAttrDO.setEvtContactConfId(childEvtContactConfId);
+
+                if (mktCamChlConfAttrDO.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
+                    //协同渠道自策略规则保存
+                    mktCamChlConfAttrDO.setAttrValue(childEvtContactConfId.toString());
+                    //  String params = mktCamChlConfAttrDO.getAttrValue();
+                    ruleInsert(childEvtContactConfId, rule);
+                }
+            }
+
+            // 批量插入推送渠道属性
+            mktCamChlConfAttrMapper.insertBatch(mktCamChlConfAttrDOList);
+            for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
+                MktCamChlConfAttr mktCamChlConfAttr = BeanUtil.create(mktCamChlConfAttrDO, new MktCamChlConfAttr());
+                mktCamChlConfAttrList.add(mktCamChlConfAttr);
+            }
+            MktCamChlConfDetail mktCamChlConfDetailNew = BeanUtil.create(mktCamChlConfDO, new MktCamChlConfDetail());
+            mktCamChlConfDetailNew.setMktCamChlConfAttrList(mktCamChlConfAttrList);
+            redisUtils.set("MktCamChlConfDetail_" + mktCamChlConfDetailNew.getEvtContactConfId(), mktCamChlConfDetailNew);
+
+            // 查询痛痒点话术列表
+            verbalService.copyVerbal(parentEvtContactConfId, childEvtContactConfId);
+            // 查询脚本
+            camScriptService.copyCamScript(parentEvtContactConfId, scriptDesc, childEvtContactConfId);
+            mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            mktCamChlConfMap.put("resultMsg", ErrorCode.SAVE_CAM_CHL_CONF_SUCCESS.getErrorMsg());
+            mktCamChlConfMap.put("mktCamChlConfDetail", mktCamChlConfDetailNew);
         } catch (Exception e) {
             logger.error("[op:MktCamChlConfServiceImpl] fail to getMktCamChlConfDO by parentEvtContactConfId = {}", parentEvtContactConfId, e);
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_FAIL);

@@ -82,10 +82,11 @@
     where DISPLAY_ID = #{displayId,jdbcType=BIGINT}
   </delete>
 
-
-
-
-
-
+  <select id="listByLabelId" resultMap="BaseResultMap">
+    select DISPLAY_COLUMN_LABEL_ID, INJECTION_LABEL_ID,DISPLAY_ID,MESSAGE_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from display_column_label
+    where  INJECTION_LABEL_ID = #{labelId}
+  </select>
 
 </mapper>

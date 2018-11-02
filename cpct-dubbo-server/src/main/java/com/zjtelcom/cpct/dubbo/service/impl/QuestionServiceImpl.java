@@ -41,18 +41,22 @@ public class QuestionServiceImpl implements QuestionService {
      * @return
      */
     @Override
-    public Map<String, Object> getQuestionnaireDetail(Long questionnaireId) {
+    public RetQuestion getQuestionnaireDetail(Long questionnaireId) {
+        RetQuestion ret = new RetQuestion();
         Map<String,Object> result = new HashMap<>();
         QuestionRep resultRep = new QuestionRep();
         Questionnaire questionnaire = questionnaireMapper.selectByPrimaryKey(questionnaireId);
         if (questionnaire==null){
-            result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg","调研问卷不存在");
-            return result;
+            ret.setData(resultRep);
+            ret.setResultMsg("调研问卷不存在");
+            ret.setResultCode(CODE_FAIL);
+            return ret;
         }
         QuestionnaireVO questionnaireVO = BeanUtil.create(questionnaire,new QuestionnaireVO());
         resultRep.setQuestionnaire(questionnaireVO);
         List<QuestRel> questRelList = questRelMapper.findRelListByQuestionnaireId(questionnaireId);
+
+
         List<QuestionModel> voList = new ArrayList<>();
         for (QuestRel questRel : questRelList){
             Question question = questionMapper.selectByPrimaryKey(questRel.getQuestionId());
@@ -66,13 +70,15 @@ public class QuestionServiceImpl implements QuestionService {
                     QuestionDetailVO detailVO = BeanUtil.create(detail,new QuestionDetailVO());
                     detailVOS.add(detailVO);
                 }
-                vo.setQuestionDetailList(detailVOS);
+                ArrayList<QuestionDetailVO> detailVOArrayList = new ArrayList(detailVOS);
+                vo.setQuestionDetailList(detailVOArrayList);
             }
         }
-        resultRep.setQuestionVOList(voList);
-        result.put("resutlCode",CODE_SUCCESS);
-        result.put("resultMsg",null);
-        result.put("data",resultRep);
-        return result;
+        ArrayList<QuestionModel> detailVOArrayList = new ArrayList(voList);
+        resultRep.setQuestionVOList(detailVOArrayList);
+        ret.setResultCode(CODE_SUCCESS);
+        ret.setData(resultRep);
+        ret.setResultMsg(null);
+        return ret;
     }
 }

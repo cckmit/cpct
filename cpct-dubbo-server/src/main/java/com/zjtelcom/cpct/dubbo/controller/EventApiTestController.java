@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +25,7 @@ public class EventApiTestController {
     @Autowired(required = false)
     private YzServ yzServ;
 
-    @RequestMapping(value = "/cpc",method = RequestMethod.POST)
+    @RequestMapping(value = "/cpc", method = RequestMethod.POST)
     @CrossOrigin
     public String CalculateCPC(@RequestBody Map<String, Object> params) {
         Map result = new HashMap();
@@ -37,9 +39,20 @@ public class EventApiTestController {
     }
 
 
-    @RequestMapping(value = "/cpcSync",method = RequestMethod.POST)
+    @RequestMapping(value = "/cpcSync", method = RequestMethod.POST)
     @CrossOrigin
-    public String CalculateCPCSync(@RequestBody Map<String, Object> params) {
+    public String CalculateCPCSync(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> params) {
+
+        response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET");
+        response.setHeader("Access-Control-Allow-Headers", "Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With,userId,token");
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");//设置日期格式
+        String date = df.format(new Date());
+
+        params.put("reqId","EVT" + date + getRandNum(1,999999));
+
         Map result = new HashMap();
         try {
             result = eventApiService.CalculateCPCSync(params);
@@ -50,8 +63,13 @@ public class EventApiTestController {
         return JSON.toJSONString(result);
     }
 
+    public static int getRandNum(int min, int max) {
+        int randNum = min + (int)(Math.random() * ((max - min) + 1));
+        return randNum;
+    }
 
-    @RequestMapping(value = "/label",method = RequestMethod.POST)
+
+    @RequestMapping(value = "/label", method = RequestMethod.POST)
     @CrossOrigin
     public String label(@RequestBody String params) {
         Map result = new HashMap();
@@ -63,9 +81,6 @@ public class EventApiTestController {
         }
         return JSON.toJSONString(result);
     }
-
-
-
 
 
 }

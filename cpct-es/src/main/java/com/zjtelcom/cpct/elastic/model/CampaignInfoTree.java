@@ -7,11 +7,11 @@ import java.util.Map;
 public class CampaignInfoTree implements Serializable {
     private Long id;
     private String name;
-    private boolean result;
+    private String result;
     private String hitEntity;
     private String reason;
     private List<CampaignInfoTree> children;
-    private List<Map<String,Object>>[] labelList;
+    private List<Map<String,Object>> labelList;
 
 
     public String getReason() {
@@ -54,19 +54,19 @@ public class CampaignInfoTree implements Serializable {
         this.name = name;
     }
 
-    public boolean isResult() {
+    public String getResult() {
         return result;
     }
 
-    public void setResult(boolean result) {
+    public void setResult(String result) {
         this.result = result;
     }
 
-    public List<Map<String, Object>>[] getLabelList() {
+    public List<Map<String, Object>> getLabelList() {
         return labelList;
     }
 
-    public void setLabelList(List<Map<String, Object>>[] labelList) {
+    public void setLabelList(List<Map<String, Object>> labelList) {
         this.labelList = labelList;
     }
 }

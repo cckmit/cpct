@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.service.impl.channel;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.domain.channel.*;
 
+import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.ConditionType;
 import com.zjtelcom.cpct.enums.Operator;
@@ -10,6 +11,7 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.VerbalService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
+import com.zjtelcom.cpct.util.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +34,18 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
     private ContactChannelMapper channelMapper;
     @Autowired
     private InjectionLabelValueMapper labelValueMapper;
+    @Autowired
+    private RedisUtils redisUtils;
+
+    /**
+     * 复制痛痒点Redis获取数据
+     * @param contactConfId
+     * @return
+     */
+    @Override
+    public Map<String, Object> copyVerbalFromRedis(Long contactConfId, Long newConfId) {
+        return null;
+    }
 
     /**
      * 复制痛痒点
@@ -40,23 +54,28 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
      */
     @Override
     public Map<String, Object> copyVerbal(Long contactConfId,Long newConfId) {
-        Map<String,Object> map = getVerbalListByConfId(1L,contactConfId);
-        if (!map.get("resultCode").equals(CODE_SUCCESS)){
+        Map<String,Object> map = new HashMap<>();
+        MktCamChlConfDetail detail = (MktCamChlConfDetail) redisUtils.get("MktCamChlConfDetail_"+contactConfId);
+        if (detail==null){
+            map.put("resultCode", CODE_FAIL);
+            map.put("resultMsg", "推送渠道配置不存在");
             return map;
         }
-        List<VerbalVO> verbalVOList = (List<VerbalVO>)map.get("resultMsg");
-        for (VerbalVO verbalVO : verbalVOList){
-            VerbalAddVO addVO = BeanUtil.create(verbalVO,new VerbalAddVO());
-            addVO.setContactConfId(newConfId);
-            List<VerbalConditionAddVO> conditionAddVOList = new ArrayList<>();
-            for (VerbalConditionVO conditionVO : verbalVO.getConditionList()){
-                VerbalConditionAddVO conditionAddVO = BeanUtil.create(conditionVO,new VerbalConditionAddVO());
-                conditionAddVOList.add(conditionAddVO);
-            }
-            addVO.setAddVOList(conditionAddVOList);
-            Map<String, Object> addMap = addVerbal(1L,addVO);
-            if (!addMap.get("resultCode").equals(CODE_SUCCESS)){
-                return addMap;
+        List<VerbalVO> verbalVOList = detail.getVerbalVOList();
+        if(verbalVOList!=null &&verbalVOList.size()>0){
+            for (VerbalVO verbalVO : verbalVOList){
+                VerbalAddVO addVO = BeanUtil.create(verbalVO,new VerbalAddVO());
+                addVO.setContactConfId(newConfId);
+                List<VerbalConditionAddVO> conditionAddVOList = new ArrayList<>();
+                for (VerbalConditionVO conditionVO : verbalVO.getConditionList()){
+                    VerbalConditionAddVO conditionAddVO = BeanUtil.create(conditionVO,new VerbalConditionAddVO());
+                    conditionAddVOList.add(conditionAddVO);
+                }
+                addVO.setAddVOList(conditionAddVOList);
+                Map<String, Object> addMap = addVerbal(1L,addVO);
+                if (!addMap.get("resultCode").equals(CODE_SUCCESS)){
+                    return addMap;
+                }
             }
         }
         map.put("resultCode", CODE_SUCCESS);
@@ -80,6 +99,7 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
         verbal.setStatusCd("1000");
         verbalMapper.insert(verbal);
         //删除旧的条件
+        List<MktVerbalCondition> conditions = new ArrayList<>();
         for (VerbalConditionAddVO vcAddVO : addVO.getAddVOList()) {
             if (vcAddVO.getOperType()==null){
 
@@ -94,7 +114,26 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
                 mktVerbalCondition.setRightParamType("2000");
             }
             mktVerbalCondition.setConditionType(ConditionType.CHANNEL.getValue().toString());
-            verbalConditionMapper.insert(mktVerbalCondition);
+            conditions.add(mktVerbalCondition);
+        }
+        if (conditions.size()>0){
+            verbalConditionMapper.insertByBatch(conditions);
+        }
+
+        //更新redis分群数据,先查出来再更新
+        MktCamChlConfDetail detail = (MktCamChlConfDetail)redisUtils.get("MktCamChlConfDetail_"+addVO.getContactConfId());
+        if (detail!=null){
+            VerbalVO verbalVO = BeanUtil.create(verbal,new VerbalVO());
+            List<VerbalConditionVO> conditionVOList = new ArrayList<>();
+            for (MktVerbalCondition condition : conditions){
+                VerbalConditionVO vo = BeanUtil.create(condition,new VerbalConditionVO());
+                conditionVOList.add(vo);
+            }
+            verbalVO.setConditionList(conditionVOList);
+            List<VerbalVO> voList = new ArrayList<>();
+            voList.add(verbalVO);
+            detail.setVerbalVOList(voList);
+            redisUtils.set("MktCamChlConfDetail_"+addVO.getContactConfId(),detail);
         }
         result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", "添加成功");

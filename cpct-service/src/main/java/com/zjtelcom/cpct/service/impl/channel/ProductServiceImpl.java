@@ -12,14 +12,12 @@ import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.channel.MktProductRule;
 import com.zjtelcom.cpct.domain.channel.Offer;
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
 import com.zjtelcom.cpct.dto.channel.OfferDetail;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
-import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.DateUtil;
-import com.zjtelcom.cpct.util.MapUtil;
-import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +36,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     private MktCamItemMapper camItemMapper;
     @Autowired
     private MktStrategyConfRuleService strategyConfRuleService;
+    @Autowired
+    private RedisUtils redisUtils;
 
 
     @Override
@@ -88,15 +88,21 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         Map<String,Object> result = new HashMap<>();
         List<Long> ruleIdList = new ArrayList<>();
         if(ItemIdList!=null && ItemIdList.size()>0){
+            List<MktCamItem> mktCamItems = new ArrayList<>();
             for (Long itemId : ItemIdList) {
-                MktCamItem item = camItemMapper.selectByPrimaryKey(itemId);
+                MktCamItem item = (MktCamItem) redisUtils.get("MKT_CAM_ITEM_"+itemId);
                 if (item == null) {
-                    continue;
+                    item = camItemMapper.selectByPrimaryKey(itemId);
+                    redisUtils.set("MKT_CAM_ITEM_"+itemId, item);
                 }
                 MktCamItem newItem = BeanUtil.create(item, new MktCamItem());
                 newItem.setMktCamItemId(null);
-                camItemMapper.insert(newItem);
-                ruleIdList.add(newItem.getMktCamItemId());
+                mktCamItems.add(newItem);
+            }
+            camItemMapper.insertByBatch(mktCamItems);
+            for(MktCamItem item : mktCamItems){
+                redisUtils.set("MKT_CAM_ITEM_" + item.getMktCamItemId(), item);
+                ruleIdList.add(item.getMktCamItemId());
             }
         }
         result.put("resultCode",CODE_SUCCESS);
@@ -109,6 +115,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     public Map<String, Object> addProductRule(Long strategyRuleId, List<Long> productIdList) {
         Map<String,Object> result = new HashMap<>();
         List<Long> ruleIdList = new ArrayList<>();
+        List<MktCamItem> mktCamItems = new ArrayList<>();
         for (Long productId : productIdList){
             Offer product = productMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
             if (product==null){
@@ -128,7 +135,12 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             item.setUpdateStaff(UserUtil.loginId());
             item.setCreateStaff(UserUtil.loginId());
             item.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-            camItemMapper.insert(item);
+            mktCamItems.add(item);
+            //redis添加推荐条目数据
+            redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
+        }
+        camItemMapper.insertByBatch(mktCamItems);
+        for(MktCamItem item : mktCamItems){
             ruleIdList.add(item.getMktCamItemId());
         }
         if (strategyRuleId!=null){
@@ -140,7 +152,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     }
 
     @Override
-    public Map<String, Object> editProductRule(Long userId, Long ruleId, String remark) {
+    public Map<String, Object> editProductRule(Long userId, Long ruleId, String remark,Long priority) {
         Map<String,Object> result = new HashMap<>();
         MktCamItem rule = camItemMapper.selectByPrimaryKey(ruleId);
         if (rule==null){
@@ -149,6 +161,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             return result;
         }
         rule.setRemark(remark);
+        rule.setPriority(priority);
         camItemMapper.updateByPrimaryKey(rule);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","编辑成功");
@@ -175,6 +188,9 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             rule.setProductId(item.getItemId());
             rule.setProductName(product.getOfferName());
             rule.setRemark(item.getRemark());
+            if (item.getPriority()!=null){
+                rule.setPriority(item.getPriority());
+            }
             ruleList.add(rule);
         }
         result.put("resultCode",CODE_SUCCESS);
@@ -187,7 +203,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         Map<String,Object> result = new HashMap<>();
         if (strategyRuleId!=null){
             strategyConfRuleService.updateProductIds(itemRuleIdList,strategyRuleId);
-        }else {
             MktCamItem rule = camItemMapper.selectByPrimaryKey(ruleId);
             if (rule==null){
                 result.put("resultCode",CODE_FAIL);
@@ -195,9 +210,23 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 return result;
             }
             camItemMapper.deleteByPrimaryKey(ruleId);
+            //更新redis数据
+            deleteRedisMktCamItem(strategyRuleId,rule);
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
         return result;
+    }
+
+    private void deleteRedisMktCamItem(Long strategyRuleId, MktCamItem item){
+        List<OfferDetail> nameList =  (List<OfferDetail>)redisUtils.get("MKT_CAM_ITEM_"+strategyRuleId);
+        if (nameList!=null){
+            for (OfferDetail offer : nameList){
+                if (Long.valueOf(offer.getOfferId()).equals(item.getItemId())){
+                    nameList.remove(offer);
+                }
+            }
+            redisUtils.set("MKT_CAM_ITEM_"+strategyRuleId,nameList);
+        }
     }
 }

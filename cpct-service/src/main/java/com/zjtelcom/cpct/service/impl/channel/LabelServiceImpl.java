@@ -5,8 +5,10 @@ import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.bean.RespInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dto.channel.*;
+import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.enums.ConditionType;
 import com.zjtelcom.cpct.enums.LabelCondition;
 import com.zjtelcom.cpct.enums.Operator;
@@ -35,6 +37,14 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     private InjectionLabelGrpMapper labelGrpMapper;
     @Autowired
     private InjectionLabelGrpMbrMapper labelGrpMbrMapper;
+    @Autowired
+    private DisplayColumnLabelMapper displayColumnLabelMapper;
+    @Autowired
+    private MessageLabelMapper messageLabelMapper;
+    @Autowired
+    private MktVerbalConditionMapper verbalConditionMapper;
+    @Autowired
+    private TarGrpConditionMapper tarGrpConditionMapper;
 
     /**
      *共享
@@ -70,6 +80,21 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         }
     }
 
+
+    @Override
+    public Map<String, Object> getLabelNameListByParam(Map<String, Object> params) {
+        Map<String,Object> result = new HashMap<>();
+        List<Label> labelList = new ArrayList<>();
+        String labelName = null;
+        if (params.get("labelName")!=null){
+            labelName = params.get("labelName").toString();
+        }
+        labelList = labelMapper.findByParam(labelName);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",labelList);
+        return result;
+    }
+
     @Override
     public Map<String, Object> getLabelListByParam(Long userId, Map<String, Object> params) {
         Map<String,Object> result = new HashMap<>();
@@ -77,14 +102,10 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         List<Label> labelList = new ArrayList<>();
         try {
             String labelName = null;
-            String fitDomain = null;
             if (params.get("labelName")!=null){
                 labelName = params.get("labelName").toString();
             }
-            if (params.get("fitDomain")!=null){
-                fitDomain = params.get("fitDomain").toString();
-            }
-            labelList = labelMapper.findByParam(labelName,fitDomain);
+            labelList = labelMapper.findByParam(labelName);
             for (Label label : labelList){
                 List<LabelValue> valueList = labelValueMapper.selectByLabelId(label.getInjectionLabelId());
                 LabelVO vo = ChannelUtil.map2LabelVO(label,valueList);
@@ -230,6 +251,36 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         if (label.getScope().equals(1)){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","大数据标签不能删除");
+            return result;
+        }
+        List<DisplayColumnLabel> displayColumnLabels = displayColumnLabelMapper.listByLabelId(labelId);
+        if (displayColumnLabels.size()>0){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","展示列在用标签无法删除");
+            return result;
+        }
+        List<LabelGrpMbr> labelGrpMbrs = labelGrpMbrMapper.findListBylabelId(labelId);
+        if (labelGrpMbrs.size()>0){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","标签组在用标签无法删除");
+            return result;
+        }
+        List<MessageLabel> messageLabels = messageLabelMapper.findListBylabelId(labelId);
+        if (messageLabels.size()>0){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","固定展示列在用标签无法删除");
+            return result;
+        }
+        List<MktVerbalCondition> verbalConditions = verbalConditionMapper.findListBylabelId(labelId);
+        if (verbalConditions.size()>0){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","话术条件在用标签无法删除");
+            return result;
+        }
+        List<TarGrpCondition> tarGrpConditions = tarGrpConditionMapper.findListBylabelId(labelId);
+        if (tarGrpConditions.size()>0){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","分群条件在用标签无法删除");
             return result;
         }
         labelMapper.deleteByPrimaryKey(labelId);
@@ -397,17 +448,18 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             labelGrpMbrMapper.deleteByPrimaryKey(mbr.getGrpMbrId());
         }
 //        labelGrpMbrMapper.deleteBatch(idList);
-
-        List<Label> labels = labelMapper.listLabelByIdList(param.getLabelIdList());
-        for (Label label : labels){
-            if (label!=null){
-                LabelGrpMbr labelGrpMbr = new LabelGrpMbr();
-                labelGrpMbr.setGrpId(param.getLabelGrpId());
-                labelGrpMbr.setInjectionLabelId(label.getInjectionLabelId());
-                labelGrpMbr.setCreateDate(new Date());
-                labelGrpMbr.setCreateStaff(UserUtil.loginId());
-                labelGrpMbr.setStatusCd("1000");
-                labelGrpMbrMapper.insert(labelGrpMbr);
+        if (!param.getLabelIdList().isEmpty()){
+            List<Label> labels = labelMapper.listLabelByIdList(param.getLabelIdList());
+            for (Label label : labels){
+                if (label!=null){
+                    LabelGrpMbr labelGrpMbr = new LabelGrpMbr();
+                    labelGrpMbr.setGrpId(param.getLabelGrpId());
+                    labelGrpMbr.setInjectionLabelId(label.getInjectionLabelId());
+                    labelGrpMbr.setCreateDate(new Date());
+                    labelGrpMbr.setCreateStaff(UserUtil.loginId());
+                    labelGrpMbr.setStatusCd("1000");
+                    labelGrpMbrMapper.insert(labelGrpMbr);
+                }
             }
         }
         result.put("resultCode",CODE_SUCCESS);

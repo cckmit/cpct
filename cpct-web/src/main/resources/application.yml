@@ -40,6 +40,15 @@ spring:
   transaction:
     rollback-on-commit-failure: true
 
+#es接口调用地址
+  esurl:
+   file-to-ftp: http://134.96.252.170:30808/es/cpcMatchFileToFtp
+   search-batch-info: http://134.96.252.170:30808/es/searchBatchInfo
+   batch-hits-list: http://134.96.252.170:30808/es/findBatchHitsList
+   count-info: http://134.96.252.170:30808/es/searchCountInfo
+
+
+
 
 
 

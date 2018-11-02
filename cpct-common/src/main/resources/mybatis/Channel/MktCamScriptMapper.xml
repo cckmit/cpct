@@ -33,18 +33,38 @@
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.CamScript">
     update mkt_cam_script
-    set MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},
+    set
+    <if test="mktCampaignId != null and mktCampaignId != 0">
+        MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},
+    </if>
+    <if test="evtContactConfId != null and evtContactConfId != 0">
       EVT_CONTACT_CONF_ID = #{evtContactConfId,jdbcType=BIGINT},
+    </if>
+    <if test="scriptDesc != null and scriptDesc != ''">
       SCRIPT_DESC = #{scriptDesc,jdbcType=VARCHAR},
+    </if>
+    <if test="statusCd != null and statusCd != ''">
       STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+    </if>
+    <if test="statusDate != null">
       STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+    </if>
+    <if test="createStaff != null and createStaff != ''">
       CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+    </if>
+    <if test="createDate != null">
       CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
-      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
-      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+    </if>
+    <if test="remark != null and remark != ''">
       REMARK = #{remark,jdbcType=VARCHAR},
-      LAN_ID = #{lanId,jdbcType=BIGINT}
+    </if>
+    <if test="lanId != null and lanId != ''">
+      LAN_ID = #{lanId,jdbcType=BIGINT},
+    </if>
+    UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+    UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
     where MKT_CAMPAIGN_SCPT_ID = #{mktCampaignScptId,jdbcType=BIGINT}
+
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select MKT_CAMPAIGN_SCPT_ID, MKT_CAMPAIGN_ID, EVT_CONTACT_CONF_ID, SCRIPT_DESC, STATUS_CD, 

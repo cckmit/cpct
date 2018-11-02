@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -88,7 +90,12 @@ public class MktStrategyConRulController {
     @RequestMapping(value = "/copyMktStrategyConfRule", method = RequestMethod.POST)
     @CrossOrigin
     public String copyMktStrategyConfRule(@RequestBody MktStrategyConfRule mktStrategyConfRule) throws Exception {
-        Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.copyMktStrategyConfRule(mktStrategyConfRule);
-        return JSON.toJSONString(mktStrategyConfRuleMap);
+        List<MktStrategyConfRule> mktStrategyConfRuleList = new ArrayList<>();
+        mktStrategyConfRuleList.add(mktStrategyConfRule);
+        Map<String, Object> ruleListMap = mktStrategyConfRuleService.copyMktStrategyConfRule(mktStrategyConfRuleList);
+        List<MktStrategyConfRule> ruleList = (List<MktStrategyConfRule>) ruleListMap.get("mktStrategyConfRuleList");
+        Map<String, Object> ruleMap = new HashMap<>();
+        ruleMap.put("mktStrategyConfRule", ruleList.get(0));
+        return JSON.toJSONString(ruleMap);
     }
 }

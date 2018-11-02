@@ -12,6 +12,7 @@ import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.dao.system.SystemParamMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamEvtRelDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.domain.event.EventSorceDO;
 import com.zjtelcom.cpct.domain.event.InterfaceCfg;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
@@ -80,6 +81,8 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     private ContactEvtTypeMapper evtTypeMapper;
     @Autowired
     private InterfaceCfgMapper interfaceCfgMapper;
+    @Autowired
+    private EventSorceMapper eventSorceMapper;
 
 
     /**
@@ -203,8 +206,8 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         for (ContactEventDetail evtDetail : evtDetailList) {
             //插入事件主题信息
             ContactEvt contactEvt = evtDetail;
-            //todo 待确认必填字段
-            contactEvt.setInterfaceCfgId(1L);
+//            //todo 待确认必填字段
+//            contactEvt.setInterfaceCfgId();
 
             contactEvt.setUpdateDate(DateUtil.getCurrentTime());
             contactEvt.setCreateDate(DateUtil.getCurrentTime());
@@ -267,6 +270,25 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
 //                    evtSceneCamRelMapper.insert(evtSceneCamRel);
 //                }
 //            }
+
+            //大数据事件同步
+            InterfaceCfg interfaceCfg = interfaceCfgMapper.selectByPrimaryKey(contactEvt.getInterfaceCfgId());
+            EventSorceDO eventSorceDO = eventSorceMapper.selectByPrimaryKey(interfaceCfg.getEvtSrcId());
+            Map<String,Object> map = new HashMap<>();
+            if(eventSorceDO.getEvtSrcName().equals("大数据")) {
+                map.put("isi", DateUtil.getDetailTime());
+                map.put("eventId", contactEvt.getContactEvtId());
+                map.put("eventCode", contactEvt.getContactEvtCode());
+                map.put("eventName", contactEvt.getContactEvtName());
+
+                if(contactEvt.getEvtTrigType().equals("1000")) {
+                    map.put("eventType", "1");
+                }else {
+                    map.put("eventType", "2");
+                }
+                map.put("eventClass", "");
+                map.put("state",contactEvt.getStatusCd());
+            }
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
@@ -299,6 +321,12 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         if (evt==null){
             map.put("resultCode", CODE_FAIL);
             map.put("resultMsg","事件不存在");
+            return map;
+        }
+        List<MktCamEvtRelDO> relDOList = mktCamEvtRelMapper.listActByEventId(contactEvtId);
+        if (relDOList.size()>0){
+            map.put("resultCode", CODE_FAIL);
+            map.put("resultMsg","事件已关联活动无法删除");
             return map;
         }
         contactEvtMapper.delEvent(contactEvtId);

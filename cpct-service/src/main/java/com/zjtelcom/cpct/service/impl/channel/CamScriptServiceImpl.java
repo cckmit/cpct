@@ -3,13 +3,18 @@ package com.zjtelcom.cpct.service.impl.channel;
 import com.zjtelcom.cpct.bean.RespInfo;
 import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
 import com.zjtelcom.cpct.domain.channel.CamScript;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.channel.CamScriptAddVO;
 import com.zjtelcom.cpct.dto.channel.CamScriptEditVO;
 import com.zjtelcom.cpct.dto.channel.CamScriptVO;
+import com.zjtelcom.cpct.dto.channel.VerbalVO;
+import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.CamScriptService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
+import com.zjtelcom.cpct.util.RedisUtils;
+import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +28,8 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
 
     @Autowired
     private MktCamScriptMapper camScriptMapper;
+    @Autowired
+    private RedisUtils redisUtils;
 
 
     /**
@@ -32,18 +39,24 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
      * @return
      */
     @Override
-    public Map<String, Object> copyCamScript(Long contactConfId, Long newConfId) {
+    public Map<String, Object> copyCamScript(Long contactConfId, String scriptDesc, Long newConfId) {
         Map<String,Object> result = new HashMap<>();
-
+/*
         CamScript script = camScriptMapper.selectByConfId(contactConfId);
         if (script==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","活动脚本不存在");
             return result;
-        }
-        CamScript newScript = BeanUtil.create(script,new CamScript());
-        newScript.setMktCampaignScptId(null);
+        }*/
+        CamScript newScript = new CamScript();
+        newScript.setScriptDesc(scriptDesc);
+        newScript.setMktCampaignId(0L);
         newScript.setEvtContactConfId(newConfId);
+        newScript.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+        newScript.setCreateDate(new Date());
+        newScript.setCreateStaff(UserUtil.loginId());
+        newScript.setUpdateDate(new Date());
+        newScript.setUpdateStaff(UserUtil.loginId());
         camScriptMapper.insert(newScript);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",newScript);
@@ -57,14 +70,14 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
         if (script!=null){
             //todo copy结果为null需要处理
             BeanUtil.copy(addVO,script);
-            script.setMktCampaignId(123L);
+            script.setMktCampaignId(addVO.getMktCampaignId());
             script.setUpdateDate(new Date());
             script.setUpdateStaff(userId);
             camScriptMapper.updateByPrimaryKey(script);
         }else {
              script = BeanUtil.create(addVO,new CamScript());
             //todo 添加活动id
-            script.setMktCampaignId(123L);
+            script.setMktCampaignId(addVO.getMktCampaignId());
             script.setCreateDate(new Date());
             script.setUpdateDate(new Date());
             script.setCreateStaff(userId);
@@ -72,10 +85,22 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
             script.setStatusCd("1000");
             camScriptMapper.insert(script);
         }
+        //更新redis推送渠道配置
+        MktCamChlConfDetail detail = (MktCamChlConfDetail)redisUtils.get("MktCamChlConfDetail_"+addVO.getEvtContactConfId());
+        if (detail!=null){
+            Map<String,Object> camScriptList = getCamScriptList(1L,addVO.getEvtContactConfId());
+            if (camScriptList.get("resultCode").equals(CODE_SUCCESS)){
+                CamScriptVO scriptVO = (CamScriptVO)camScriptList.get("resultMsg");
+                CamScript camScript = BeanUtil.create(scriptVO,new CamScript());
+                detail.setCamScript(camScript);
+                redisUtils.set("MktCamChlConfDetail_"+addVO.getEvtContactConfId(),detail);
+            }
+        }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
         return result;
     }
+
 
     @Override
     public Map<String,Object> editCamScript(Long userId, CamScriptEditVO editVO) {
@@ -90,6 +115,17 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
         script.setUpdateDate(new Date());
         script.setUpdateStaff(userId);
         camScriptMapper.updateByPrimaryKey(script);
+        //更新redis推送渠道配置
+        MktCamChlConfDetail detail = (MktCamChlConfDetail)redisUtils.get("MktCamChlConfDetail_"+editVO.getEvtContactConfId());
+        if (detail!=null){
+            Map<String,Object> camScriptList = getCamScriptList(1L,editVO.getEvtContactConfId());
+            if (camScriptList.get("resultCode").equals(CODE_SUCCESS)){
+                CamScriptVO scriptVO = (CamScriptVO)camScriptList.get("resultMsg");
+                CamScript camScript = BeanUtil.create(scriptVO,new CamScript());
+                detail.setCamScript(camScript);
+                redisUtils.set("MktCamChlConfDetail_"+editVO.getEvtContactConfId(),detail);
+            }
+        }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","修改成功");
         return result;

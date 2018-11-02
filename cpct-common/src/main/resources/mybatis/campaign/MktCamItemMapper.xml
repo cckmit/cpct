@@ -67,4 +67,20 @@
     LAN_ID
     from mkt_cam_item
   </select>
+
+  <insert id="insertByBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="mktCamItemId">
+    insert into mkt_cam_item (MKT_CAM_ITEM_ID, MKT_CAMPAIGN_ID, ITEM_TYPE,
+      ITEM_ID, PRIORITY, ITEM_GROUP,OFFER_CODE,OFFER_NAME,
+      STATUS_CD, STATUS_DATE, CREATE_STAFF,
+      CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
+      REMARK, LAN_ID)
+    values
+    <foreach collection="list" item="item" separator="," index="i">
+    (#{item.mktCamItemId,jdbcType=BIGINT}, #{item.mktCampaignId,jdbcType=BIGINT}, #{item.itemType,jdbcType=VARCHAR},
+      #{item.itemId,jdbcType=BIGINT}, #{item.priority,jdbcType=BIGINT}, #{item.itemGroup,jdbcType=BIGINT}, #{item.offerCode,jdbcType=VARCHAR},#{item.offerName,jdbcType=VARCHAR},
+      #{item.statusCd,jdbcType=VARCHAR}, #{item.statusDate,jdbcType=TIMESTAMP}, #{item.createStaff,jdbcType=BIGINT},
+      #{item.createDate,jdbcType=TIMESTAMP}, #{item.updateStaff,jdbcType=BIGINT}, #{item.updateDate,jdbcType=TIMESTAMP},
+      #{item.remark,jdbcType=VARCHAR}, #{item.lanId,jdbcType=BIGINT})
+    </foreach>
+  </insert>
 </mapper>

@@ -165,6 +165,24 @@ public class LabelController extends BaseController {
     }
 
     /**
+     * 获取标签列表（@符标签名查询）
+     */
+    @PostMapping("getLabelNameListByParam")
+    @CrossOrigin
+    public Map<String, Object> getLabelNameListByParam(@RequestBody HashMap<String, Object> params) {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = labelService.getLabelNameListByParam(params);
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to getLabelNameListByParam",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to getLabelNameListByParam");
+            return result;
+        }
+        return result;
+    }
+
+    /**
      * 获取标签列表（标签名和域查询）
      */
     @PostMapping("getLabelListByParam")
