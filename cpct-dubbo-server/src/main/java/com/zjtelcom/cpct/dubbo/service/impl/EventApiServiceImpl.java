@@ -312,12 +312,7 @@ public class EventApiServiceImpl implements EventApiService {
 
             //遍历活动id  查询并匹配活动规则 需要根据事件推荐活动数 取前n个活动
             int max = mktCamEvtRelDOs.size();
-//            if (recCampaignAmount != 0) {
-//                //事件推荐活动数
-//                if (mktCamEvtRelDOs.size() > recCampaignAmount) {
-//                    max = recCampaignAmount;
-//                }
-//            }
+//
             //初始化结果集
             List<Future<Map<String, Object>>> threadList = new ArrayList<>();
             //初始化线程池
