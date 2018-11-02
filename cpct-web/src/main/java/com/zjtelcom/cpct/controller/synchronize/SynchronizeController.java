@@ -885,9 +885,4 @@ public class SynchronizeController extends BaseController {
         }
         return  JSON.toJSONString(map);
     }
-
-
-
-
-
 }

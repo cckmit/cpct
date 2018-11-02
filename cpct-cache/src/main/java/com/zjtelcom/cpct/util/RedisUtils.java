@@ -43,11 +43,11 @@ public class RedisUtils {
         boolean result = false;
         try {
             // 原方法
-           ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-           operations.set(key, value);
+          // ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+          // operations.set(key, value);
 
             // 改造后方法
-            // result = setRedis(key, value);
+            result = setRedis(key, value);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -187,11 +187,11 @@ public class RedisUtils {
         Object result = null;
 
         // 原方法
-        ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-        result = operations.get(key);
+        //ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+        // result = operations.get(key);
 
         // 改造后方法
-        //result = getRedis(key);
+        result = getRedis(key);
         return result;
     }
 
