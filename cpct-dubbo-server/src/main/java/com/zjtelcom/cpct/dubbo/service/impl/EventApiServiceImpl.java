@@ -31,9 +31,15 @@ import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.elastic.service.EsService;
 import com.zjtelcom.cpct.util.HttpUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -503,7 +509,7 @@ public class EventApiServiceImpl implements EventApiService {
 //                return Collections.EMPTY_MAP;
 //            }
 
-            params.put("activityId", mktCampaign.getMktCampaignId().toString()); //活动编码
+//            params.put("activityId", mktCampaign.getMktCampaignId().toString()); //活动编码
 
             privateParams.put("activityId", mktCampaign.getMktCampaignId().toString()); //活动编码
             privateParams.put("activityName", mktCampaign.getMktCampaignName()); //活动名称
@@ -698,7 +704,7 @@ public class EventApiServiceImpl implements EventApiService {
             strategyMap.put("mktStrategyConfName", strategyConfName);
 
             //es log
-            esJson.put("activityId", params.get("activityId"));
+            esJson.put("activityId", privateParams.get("activityId"));
             esJson.put("strategyConfId", strategyConfId);
             esJson.put("strategyConfName", strategyConfName);
             esJson.put("eventId", params.get("eventCode"));
@@ -854,9 +860,6 @@ public class EventApiServiceImpl implements EventApiService {
 
                     //获取销售品
                     String productStr = mktStrategyConfRuleDO.getProductId();
-                    //过滤规则id
-//                    Long ruleConfId = mktStrategyConfRuleDO.getRuleConfId();
-                    Long ruleConfId = 0L;
                     //协同渠道配置id
                     String evtContactConfIdStr = mktStrategyConfRuleDO.getEvtContactConfId();
                     //规则id
@@ -865,7 +868,7 @@ public class EventApiServiceImpl implements EventApiService {
                     String mktStrategyConfRuleName = mktStrategyConfRuleDO.getMktStrategyConfRuleName();
                     //提交线程
                     Future<Map<String, Object>> f = executorService.submit(new RuleTask(params, privateParams, strategyConfId, tarGrpId, productStr,
-                            ruleConfId, evtContactConfIdStr, mktStrategyConfRuleId, mktStrategyConfRuleName, labelItems, itgTriggers, evtTriggers));
+                            evtContactConfIdStr, mktStrategyConfRuleId, mktStrategyConfRuleName, labelItems, itgTriggers, evtTriggers));
                     //将线程处理结果添加到结果集
                     threadList.add(f);
                 }
@@ -912,7 +915,6 @@ public class EventApiServiceImpl implements EventApiService {
         private Long strategyConfId; //策略配置id
         private Long tarGrpId;
         private String productStr;
-        private Long ruleConfId;
         private String evtContactConfIdStr;
         private String reqId;
         private Long ruleId;
@@ -923,14 +925,13 @@ public class EventApiServiceImpl implements EventApiService {
         private List<Map<String, Object>> itgTriggers;
         private List<Map<String, Object>> evtTriggers;
 
-        public RuleTask(Map<String, String> params, Map<String, String> privateParams, Long strategyConfId, Long tarGrpId, String productStr, Long ruleConfId,
+        public RuleTask(Map<String, String> params, Map<String, String> privateParams, Long strategyConfId, Long tarGrpId, String productStr,
                         String evtContactConfIdStr, Long mktStrategyConfRuleId, String mktStrategyConfRuleName,
                         Map<String, String> labelItems, List<Map<String, Object>> itgTriggers, List<Map<String, Object>> evtTriggers) {
             this.strategyConfId = strategyConfId;
             this.tarGrpId = tarGrpId;
             this.reqId = params.get("reqId");
             this.productStr = productStr;
-            this.ruleConfId = ruleConfId;
             this.evtContactConfIdStr = evtContactConfIdStr;
             this.ruleId = mktStrategyConfRuleId;
             this.ruleName = mktStrategyConfRuleName;
@@ -959,7 +960,7 @@ public class EventApiServiceImpl implements EventApiService {
             //  2.判断客户分群规则---------------------------
             //判断匹配结果，如匹配则向下进行，如不匹配则continue结束本次循环
             //拼装redis key
-            String key = "EVENT_RULE_" + params.get("actId") + "_" + strategyConfId + "_" + ruleId;
+            String key = "EVENT_RULE_" + params.get("activityId") + "_" + strategyConfId + "_" + ruleId;
 
             ExpressRunner runner = new ExpressRunner();
             DefaultContext<String, Object> context = new DefaultContext<String, Object>();
@@ -1222,6 +1223,8 @@ public class EventApiServiceImpl implements EventApiService {
 
             esJson.put("labelResultList", JSONArray.toJSON(labelResultList));
 
+            esService.save(esJson, IndexList.Label_MODULE);
+
             try {
                 //规则引擎计算
                 System.out.println(express);
@@ -1252,7 +1255,6 @@ public class EventApiServiceImpl implements EventApiService {
                 jsonObject.put("reqId", reqId);
                 jsonObject.put("eventId", params.get("eventCode"));
                 jsonObject.put("activityId", params.get("activityId"));
-                jsonObject.put("ruleConfId", ruleConfId);
                 jsonObject.put("strategyConfId", strategyConfId);
                 jsonObject.put("productStr", productStr);
                 jsonObject.put("evtContactConfIdStr", evtContactConfIdStr);
@@ -1357,7 +1359,7 @@ public class EventApiServiceImpl implements EventApiService {
 
             }
 
-            esService.save(esJson, IndexList.Label_MODULE);
+
 
             return ruleMap;
         }
@@ -1480,7 +1482,15 @@ public class EventApiServiceImpl implements EventApiService {
                 channel.put("reason", mktVerbals.get(0).getScriptDesc());
             }
 
-            channel.put("itgTriggers", itgTriggers);
+            List<Map<String,Object>> itgTriggersList = new ArrayList<>();
+            for(Map<String,Object> map:itgTriggers ) {
+                Map<String,Object> copyMap = (Map<String, Object>) deepClone(map);
+//                copyMap = (Map<String, Object>) ((HashMap<String, Object>) map).clone();
+
+                itgTriggersList.add(copyMap);
+            }
+//            Collections.copy(itgTriggersList,itgTriggers);
+            channel.put("itgTriggers", itgTriggersList);
 
             return channel;
         }
@@ -1604,6 +1614,21 @@ public class EventApiServiceImpl implements EventApiService {
 
         return result;
     }
+
+    public static Object deepClone(Object obj) {
+        try {// 将对象写到流里
+            ByteArrayOutputStream bo = new ByteArrayOutputStream();
+            ObjectOutputStream oo = new ObjectOutputStream(bo);
+            oo.writeObject(obj);// 从流里读出来
+            ByteArrayInputStream bi = new ByteArrayInputStream(bo.toByteArray());
+            ObjectInputStream oi = new ObjectInputStream(bi);
+            return (oi.readObject());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+
 
 
 }
