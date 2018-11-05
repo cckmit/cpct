@@ -209,7 +209,9 @@ public class RedisUtils {
             ProxyJedis jedis = new ProxyJedis();
             try {
                 jedis = ctgJedisPool.getResource();
-                result = unserizlize(jedis.get(key));
+                if(jedis.exists(key)) {
+                    result = unserizlize(jedis.get(key));
+                }
                 jedis.close();
             } catch (Throwable je) {
                 je.printStackTrace();
