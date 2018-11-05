@@ -15,7 +15,7 @@ public interface EventMatchRulService {
 
     Map<String, Object> delEventMatchRul(EventMatchRulDetail eventMatchRulDetail);
 
-    Map<String, Object> delEventMatchRulCondition(EventMatchRulCondition eventMatchRulCondition);
+    Map<String, Object> delEventMatchRulCondition(Long conditionId);
 
     Map<String, Object> listEventMatchRul(Long eventId);
 }

@@ -79,15 +79,14 @@ public class EventMatchRulController extends BaseController {
      */
     @RequestMapping("/delEventMatchRulCondition")
     @CrossOrigin
-    public String delEventMatchRulCondition(Long conditionId) {
+    public String delEventMatchRulCondition(@RequestBody Map<String, String> param) {
         Map<String, Object> maps = new HashMap<>();
-        EventMatchRulCondition eventMatchRulCondition = new EventMatchRulCondition();
-        eventMatchRulCondition.setConditionId(conditionId);
+        Long conditionId = Long.valueOf(param.get("conditionId"));
         try {
-            maps = eventMatchRulService.delEventMatchRulCondition(eventMatchRulCondition);
+            maps = eventMatchRulService.delEventMatchRulCondition(conditionId);
         } catch (Exception e) {
             logger.error("[op:EventMatchRulController] fail to delEventMatchRul for eventMatchRulDetail = {}!" +
-                    " Exception: ", JSONArray.toJSON(eventMatchRulCondition), e);
+                    " Exception: ", JSONArray.toJSON(param), e);
             return FastJsonUtils.objToJson(maps);
         }
         return FastJsonUtils.objToJson(maps);
