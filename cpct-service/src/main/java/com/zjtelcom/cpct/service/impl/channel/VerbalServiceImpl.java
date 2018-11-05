@@ -116,7 +116,9 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
             mktVerbalCondition.setConditionType(ConditionType.CHANNEL.getValue().toString());
             conditions.add(mktVerbalCondition);
         }
-        verbalConditionMapper.insertByBatch(conditions);
+        if (conditions.size()>0){
+            verbalConditionMapper.insertByBatch(conditions);
+        }
 
         //更新redis分群数据,先查出来再更新
         MktCamChlConfDetail detail = (MktCamChlConfDetail)redisUtils.get("MktCamChlConfDetail_"+addVO.getContactConfId());

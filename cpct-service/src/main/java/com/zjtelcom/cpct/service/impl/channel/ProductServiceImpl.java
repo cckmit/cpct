@@ -152,7 +152,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     }
 
     @Override
-    public Map<String, Object> editProductRule(Long userId, Long ruleId, String remark) {
+    public Map<String, Object> editProductRule(Long userId, Long ruleId, String remark,Long priority) {
         Map<String,Object> result = new HashMap<>();
         MktCamItem rule = camItemMapper.selectByPrimaryKey(ruleId);
         if (rule==null){
@@ -161,6 +161,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             return result;
         }
         rule.setRemark(remark);
+        rule.setPriority(priority);
         camItemMapper.updateByPrimaryKey(rule);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","编辑成功");
@@ -187,6 +188,10 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             rule.setProductId(item.getItemId());
             rule.setProductName(product.getOfferName());
             rule.setRemark(item.getRemark());
+            rule.setPriority(item.getPriority()==null ? 0 : item.getPriority());
+            if (item.getPriority()!=null){
+                rule.setPriority(item.getPriority());
+            }
             ruleList.add(rule);
         }
         result.put("resultCode",CODE_SUCCESS);

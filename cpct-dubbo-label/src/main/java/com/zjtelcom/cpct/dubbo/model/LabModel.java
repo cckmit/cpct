@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.dubbo.model;
 
-public class LabModel {
+import java.io.Serializable;
+
+public class LabModel implements Serializable {
     private Long labRowId;//标签id
     private String labName;//标签名称
     private String labEngName;//英文名称

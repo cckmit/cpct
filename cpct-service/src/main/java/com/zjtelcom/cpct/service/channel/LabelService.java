@@ -28,6 +28,8 @@ public interface LabelService {
 
     Map<String,Object> getLabelListByParam(Long userId, Map<String,Object> params);
 
+    Map<String,Object> getLabelNameListByParam(Map<String,Object> params);
+
 
     //标签组
     Map<String,Object> addLabelGrp(Long userId, LabelGrp addVO);

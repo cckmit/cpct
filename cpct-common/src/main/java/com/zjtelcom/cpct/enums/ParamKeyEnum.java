@@ -18,7 +18,8 @@ public enum ParamKeyEnum {
     MKT_CAMPAIGN_CATEGORY("CAM-C-0037", "mktCampaignCategory"),  //活动类别
     TIGGER_TYPE("CAM-C-0009", "tiggerType"),  // 触发类型
     EXEC_TYPE("CAM-C-0034", "execType"), // 活动周期
-    MKT_CAMPAIGN_TYPE("CAM-C-0033", "mktCampaignType");  //活动分类
+    MKT_CAMPAIGN_TYPE("CAM-C-0033", "mktCampaignType"),  //活动分类
+    TIME_TYPE("CAM-C-0014", "timeType");  // 周期类型
 
     private String paramKey;
     private String paramName;
