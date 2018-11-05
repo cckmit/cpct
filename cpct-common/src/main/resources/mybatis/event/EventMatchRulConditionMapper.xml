@@ -95,6 +95,6 @@
 
     <delete id="delEventMatchRulCondition" parameterType="java.lang.Long">
         DELETE FROM event_match_rul_condition
-        WHERE CONDITION_ID = #{conditionId,jdbcType=BIGINT} or
+        WHERE CONDITION_ID = #{conditionId,jdbcType=BIGINT}
     </delete>
 </mapper>

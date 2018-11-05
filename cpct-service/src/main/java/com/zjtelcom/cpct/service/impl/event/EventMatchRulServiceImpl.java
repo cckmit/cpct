@@ -214,6 +214,7 @@ public class EventMatchRulServiceImpl extends BaseService implements EventMatchR
     /**
      * 删除事件规则条件
      */
+    @Override
     public Map<String, Object> delEventMatchRulCondition(EventMatchRulCondition eventMatchRulCondition) {
         Map<String, Object> maps = new HashMap<>();
         eventMatchRulConditionMapper.delEventMatchRulCondition(eventMatchRulCondition);
