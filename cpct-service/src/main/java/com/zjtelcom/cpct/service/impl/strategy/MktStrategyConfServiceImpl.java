@@ -167,7 +167,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
         //删除策略
         mktStrategyConfMapper.deleteByPrimaryKey(mktStrategyConfId);
         mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
-        mktStrategyConfMap.put("resultMsg", ErrorCode.SAVE_MKT_CAMPAIGN_SUCCESS.getErrorMsg());
+        mktStrategyConfMap.put("resultMsg", ErrorCode.SAVE_MKT_STR_CONF_SUCCESS.getErrorMsg());
         return mktStrategyConfMap;
     }
 
@@ -233,7 +233,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             }
 
             mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
-            mktStrategyConfMap.put("resultMsg", ErrorCode.SAVE_MKT_CAMPAIGN_SUCCESS.getErrorMsg());
+            mktStrategyConfMap.put("resultMsg", ErrorCode.SAVE_MKT_STR_CONF_SUCCESS.getErrorMsg());
             mktStrategyConfMap.put("mktStrategyConfId", mktStrategyConfId);
 
             ExecutorService executorService = Executors.newCachedThreadPool();
@@ -282,7 +282,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
         } catch (Exception e) {
             logger.error("[op:MktStrategyConfServiceImpl] fail to save MktStrategyConfDetail = {}, Exception: ", JSON.toJSON(mktStrategyConfDetail), e);
             mktStrategyConfMap.put("resultCode", CommonConstant.CODE_FAIL);
-            mktStrategyConfMap.put("resultMsg", ErrorCode.SAVE_MKT_CAMPAIGN_FAILURE.getErrorMsg());
+            mktStrategyConfMap.put("resultMsg", ErrorCode.SAVE_MKT_STR_CONF_FAILURE.getErrorMsg());
 
         }
         return mktStrategyConfMap;
@@ -351,7 +351,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             }
 
             mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
-            mktStrategyConfMap.put("resultMsg", ErrorCode.SAVE_MKT_CAMPAIGN_SUCCESS.getErrorMsg());
+            mktStrategyConfMap.put("resultMsg", ErrorCode.SAVE_MKT_STR_CONF_SUCCESS.getErrorMsg());
             mktStrategyConfMap.put("mktStrategyConfId", mktStrategyConfId);
 
             // 遍历策略下的所有规则
@@ -400,7 +400,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
         } catch (Exception e) {
             logger.error("[op:MktStrategyConfServiceImpl] fail to update MktStrategyConfDetail = {}, Exception: ", JSON.toJSON(mktStrategyConfDetail), e);
             mktStrategyConfMap.put("resultCode", CommonConstant.CODE_FAIL);
-            mktStrategyConfMap.put("resultMsg", ErrorCode.UPDATE_MKT_CAMPAIGN_FAILURE.getErrorMsg());
+            mktStrategyConfMap.put("resultMsg", ErrorCode.UPDATE_MKT_STR_CONF_FAILURE.getErrorMsg());
         }
         return mktStrategyConfMap;
     }
@@ -500,12 +500,12 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             }
             mktStrategyConfDetail.setMktStrategyConfRuleList(mktStrategyConfRuleList);
             mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
-            mktStrategyConfMap.put("resultMsg", ErrorCode.GET_MKT_CAMPAIGN_SUCCESS.getErrorMsg());
+            mktStrategyConfMap.put("resultMsg", ErrorCode.GET_MKT_STR_CONF_SUCCESS.getErrorMsg());
             mktStrategyConfMap.put("mktStrategyConfDetail", mktStrategyConfDetail);
         } catch (Exception e) {
             logger.error("[op:MktStrategyConfServiceImpl] fail to get MktStrategyConfDetail = {}, Exception:", JSON.toJSON(mktStrategyConfDetail), e);
             mktStrategyConfMap.put("resultCode", CommonConstant.CODE_FAIL);
-            mktStrategyConfMap.put("resultMsg", ErrorCode.GET_MKT_CAMPAIGN_SUCCESS.getErrorMsg());
+            mktStrategyConfMap.put("resultMsg", ErrorCode.GET_MKT_STR_CONF_FAILURE.getErrorMsg());
             mktStrategyConfMap.put("mktStrategyConfDetail", mktStrategyConfDetail);
             return mktStrategyConfMap;
         }
