@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.controller.event;
 
 import com.alibaba.fastjson.JSONArray;
 import com.zjtelcom.cpct.controller.BaseController;
+import com.zjtelcom.cpct.dto.event.EventMatchRulDTO;
 import com.zjtelcom.cpct.dto.event.EventMatchRulDetail;
 import com.zjtelcom.cpct.service.event.EventMatchRulService;
 import com.zjtelcom.cpct.util.FastJsonUtils;
@@ -77,13 +78,13 @@ public class EventMatchRulController extends BaseController {
      */
     @RequestMapping("/listEventMatchRulCondition")
     @CrossOrigin
-    public String listEventMatchRulCondition(Long evtMatchRulId) {
+    public String listEventMatchRulCondition(@RequestBody EventMatchRulDTO eventMatchRulDTO) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            maps = eventMatchRulService.listEventMatchRulCondition(evtMatchRulId);
+            maps = eventMatchRulService.listEventMatchRulCondition(eventMatchRulDTO.getEvtMatchRulId());
         } catch (Exception e) {
             logger.error("[op:EventMatchRulController] fail to listEventMatchRulCondition for evtMatchRulId = {}!" +
-                    " Exception: ", JSONArray.toJSON(evtMatchRulId), e);
+                    " Exception: ", JSONArray.toJSON(eventMatchRulDTO), e);
             return FastJsonUtils.objToJson(maps);
         }
         return FastJsonUtils.objToJson(maps);

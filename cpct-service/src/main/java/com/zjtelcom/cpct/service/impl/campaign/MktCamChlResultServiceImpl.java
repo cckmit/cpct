@@ -233,7 +233,7 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
             List<MktCamChlResultConfRelDO> mktCamChlResultConfRelDOList = mktCamChlResultConfRelMapper.selectByMktCamChlResultId(mktCamChlResultId);
             for (MktCamChlResultConfRelDO mktCamChlResultConfRelDO : mktCamChlResultConfRelDOList) {
                 // 删除推送渠道以及对应的属性
-                mktCamChlConfService.deleteMktCamChlConf(mktCamChlResultConfRelDO.getEvtContactConfId());
+                mktCamChlConfService.deleteMktCamChlConf(mktCamChlResultConfRelDO.getEvtContactConfId(), null);
             }
             // 删除推送渠道与结果的关联
             mktCamChlResultConfRelMapper.deleteByMktCamChlResultId(mktCamChlResultId);

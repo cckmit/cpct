@@ -92,8 +92,10 @@ public class MktCamChlConfController extends BaseController {
     public String deleteMktCamChlConf(@RequestBody Map<String, String> params){
         Map<String, Object> map = new HashMap<>();
         Long evtContactConfId = Long.valueOf(params.get("evtContactConfId"));
+        Long ruleId = Long.valueOf(params.get("ruleId"));
         try {
-            map = mktCamChlConfService.deleteMktCamChlConf(evtContactConfId);
+            // 删除推送渠道
+            map = mktCamChlConfService.deleteMktCamChlConf(evtContactConfId, ruleId);
         } catch (Exception e) {
             logger.error("[op:MktCamChlConfController] failed to delete mktCamChlConfDetail = {} Exception: ", evtContactConfId, e);
         }

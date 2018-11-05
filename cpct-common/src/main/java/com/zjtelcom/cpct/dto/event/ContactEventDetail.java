@@ -24,5 +24,6 @@ public class ContactEventDetail extends ContactEvt{
     private String mktCampaignTypeName;
     private String eventTypeName;
     private String interfaceName;
+    private EventMatchRulDetail eventMatchRulDetail;
 
 }

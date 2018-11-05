@@ -30,7 +30,7 @@
         INSERT INTO event_match_rul_condition (CONDITION_ID, EVT_MATCH_RUL_ID, LEFT_PARAM, LEFT_PARAM_TYPE, OPER_TYPE,
                       RIGHT_PARAM, RIGHT_PARAM_TYPE,CONDITION_TEXT, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE,
                       STATUS_DATE, UPDATE_DATE, REMARK)
-        VALUES (#{evtMatchRulId,jdbcType=BIGINT}, #{leftParam,jdbcType=VARCHAR}, #{leftParamType,jdbcType=VARCHAR},
+        VALUES (#{conditionId,jdbcType=BIGINT}, #{evtMatchRulId,jdbcType=BIGINT}, #{leftParam,jdbcType=VARCHAR}, #{leftParamType,jdbcType=VARCHAR},
                 #{operType,jdbcType=VARCHAR}, #{rightParam,jdbcType=VARCHAR}, #{rightParamType,jdbcType=VARCHAR},
                 #{conditionText,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT},
                 #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP},
@@ -89,11 +89,12 @@
         <if test="remark != null and remark != ''">
             REMARK = #{remark,jdbcType=VARCHAR},
         </if>
+        CONDITION_ID = #{conditionId,jdbcType=BIGINT}
         where CONDITION_ID = #{conditionId,jdbcType=BIGINT}
     </update>
 
     <delete id="delEventMatchRulCondition" parameterType="java.lang.Long">
         DELETE FROM event_match_rul_condition
-        WHERE CONDITION_ID = #{conditionId,jdbcType=BIGINT}
+        WHERE CONDITION_ID = #{conditionId,jdbcType=BIGINT} or
     </delete>
 </mapper>

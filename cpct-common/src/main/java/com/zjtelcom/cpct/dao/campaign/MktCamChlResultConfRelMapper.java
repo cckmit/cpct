@@ -18,6 +18,8 @@ public interface MktCamChlResultConfRelMapper {
 
     List<MktCamChlResultConfRelDO> selectByMktCamChlResultId(Long mktCamChlResultId);
 
+    MktCamChlResultConfRelDO selectByConfId(Long evtContactConfId);
+
     List<MktCamChlResultConfRelDO> selectAll();
 
     int updateByPrimaryKey(MktCamChlResultConfRelDO mktCamChlResultConfRelDO);
