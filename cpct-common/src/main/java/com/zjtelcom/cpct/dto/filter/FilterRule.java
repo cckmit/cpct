@@ -29,6 +29,15 @@ public class FilterRule extends BaseEntity implements Serializable{
     private String days;
     private String times;
     private String offerInfo;
+    private String operator;
+
+    public String getOperator() {
+        return operator;
+    }
+
+    public void setOperator(String operator) {
+        this.operator = operator;
+    }
 
     public Long getConditionId() {
         return conditionId;
