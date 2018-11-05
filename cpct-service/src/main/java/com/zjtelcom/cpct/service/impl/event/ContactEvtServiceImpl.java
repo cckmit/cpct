@@ -588,7 +588,8 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             if(evtDetail.getEventMatchRulDetail() != null) {
                 EventMatchRulDetail eventMatchRulDetail = evtDetail.getEventMatchRulDetail();
                 eventMatchRulDetail.setEventId(evtDetail.getContactEvtId());
-                List<EventMatchRulCondition> eventMatchRulConditions= eventMatchRulDetail.getEventMatchRulConditions();
+                List<EventMatchRulCondition> eventMatchRulConditions = eventMatchRulDetail.getEventMatchRulConditions();
+                eventMatchRulDetail.setEventMatchRulConditions(eventMatchRulConditions);
 //                List<Long> list = new ArrayList<>();
                 //遍历旧的事件规则条件
 //                Map<String,Object> eventMatchRulMap = eventMatchRulService.listEventMatchRul(evtDetail.getContactEvtId());
