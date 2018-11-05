@@ -440,12 +440,15 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         //获取事件规则
         Map<String, Object> eventMatchRul = eventMatchRulService.listEventMatchRul(contactEvtId);
         EventMatchRulDTO eventMatchRulDTO = (EventMatchRulDTO) eventMatchRul.get("listEventMatchRul");
-        Map<String, Object> eventMatchRulCondition = eventMatchRulService.listEventMatchRulCondition(eventMatchRulDTO.getEvtMatchRulId());
-        List<EventMatchRulConditionVO> eventMatchRulConditionVOS = (List<EventMatchRulConditionVO>) eventMatchRulCondition.get("listEventMatchRulCondition");
+        EventMatchRulDetail eventMatchRulDetail = new EventMatchRulDetail();
+        if(eventMatchRulDTO != null) {
+            Map<String, Object> eventMatchRulCondition = eventMatchRulService.listEventMatchRulCondition(eventMatchRulDTO.getEvtMatchRulId());
+            List<EventMatchRulConditionVO> eventMatchRulConditionVOS = (List<EventMatchRulConditionVO>) eventMatchRulCondition.get("listEventMatchRulCondition");
 
-        EventMatchRulDetail eventMatchRulDetail =BeanUtil.create(eventMatchRulDTO, new EventMatchRulDetail());
+            eventMatchRulDetail = BeanUtil.create(eventMatchRulDTO, new EventMatchRulDetail());
 
-        eventMatchRulDetail.setEventMatchRulConditionVOS(eventMatchRulConditionVOS);
+            eventMatchRulDetail.setEventMatchRulConditionVOS(eventMatchRulConditionVOS);
+        }
         contactEventDetail.setEventMatchRulDetail(eventMatchRulDetail);
 
         viewContactEvtRsp.setContactEvtDetail(contactEventDetail);
