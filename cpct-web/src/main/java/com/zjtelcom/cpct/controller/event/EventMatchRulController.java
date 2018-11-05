@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.controller.event;
 
 import com.alibaba.fastjson.JSONArray;
 import com.zjtelcom.cpct.controller.BaseController;
+import com.zjtelcom.cpct.dto.event.EventMatchRulCondition;
 import com.zjtelcom.cpct.dto.event.EventMatchRulDTO;
 import com.zjtelcom.cpct.dto.event.EventMatchRulDetail;
 import com.zjtelcom.cpct.service.event.EventMatchRulService;
@@ -68,6 +69,25 @@ public class EventMatchRulController extends BaseController {
         } catch (Exception e) {
             logger.error("[op:EventMatchRulController] fail to delEventMatchRul for eventMatchRulDetail = {}!" +
                     " Exception: ", JSONArray.toJSON(eventMatchRulDetail), e);
+            return FastJsonUtils.objToJson(maps);
+        }
+        return FastJsonUtils.objToJson(maps);
+    }
+
+    /**
+     * 删除事件规则条件
+     */
+    @RequestMapping("/delEventMatchRulCondition")
+    @CrossOrigin
+    public String delEventMatchRulCondition(Long conditionId) {
+        Map<String, Object> maps = new HashMap<>();
+        EventMatchRulCondition eventMatchRulCondition = new EventMatchRulCondition();
+        eventMatchRulCondition.setConditionId(conditionId);
+        try {
+            maps = eventMatchRulService.delEventMatchRulCondition(eventMatchRulCondition);
+        } catch (Exception e) {
+            logger.error("[op:EventMatchRulController] fail to delEventMatchRul for eventMatchRulDetail = {}!" +
+                    " Exception: ", JSONArray.toJSON(eventMatchRulCondition), e);
             return FastJsonUtils.objToJson(maps);
         }
         return FastJsonUtils.objToJson(maps);
