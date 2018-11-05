@@ -5,13 +5,22 @@ import java.util.List;
 
 public class EventMatchRulDetail extends EventMatchRulDTO implements Serializable {
 
-    private List<EventMatchRulCondition> EventMatchRulConditions;
+    private List<EventMatchRulCondition> eventMatchRulConditions;
+
+    private List<EventMatchRulConditionVO> eventMatchRulConditionVOS;
 
     public List<EventMatchRulCondition> getEventMatchRulConditions() {
-        return EventMatchRulConditions;
+        return eventMatchRulConditions;
     }
 
     public void setEventMatchRulConditions(List<EventMatchRulCondition> eventMatchRulConditions) {
-        EventMatchRulConditions = eventMatchRulConditions;
+        this.eventMatchRulConditions = eventMatchRulConditions;
+    }
+    public List<EventMatchRulConditionVO> getEventMatchRulConditionVOS() {
+        return eventMatchRulConditionVOS;
+    }
+
+    public void setEventMatchRulConditionVOS(List<EventMatchRulConditionVO> eventMatchRulConditionVOS) {
+        this.eventMatchRulConditionVOS = eventMatchRulConditionVOS;
     }
 }
