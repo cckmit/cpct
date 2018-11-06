@@ -312,8 +312,13 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 mapsT.put("resultMsg", "分群不存在");
                 return mapsT;
             }
-
+            TarGrpDetail detail = (TarGrpDetail)redisUtils.get("TAR_GRP_"+tarGrpId);
             List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
+            if (detail!=null){
+                 detail = BeanUtil.create(tarGrp,new TarGrpDetail());
+                detail.setTarGrpConditions(conditionList);
+                redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),detail);
+            }
             if (conditionList.isEmpty()){
                 tarGrpMapper.deleteByPrimaryKey(tarGrpId);
             }
