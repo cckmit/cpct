@@ -23,7 +23,17 @@ public class FilterRuleAddVO implements Serializable {
     private String days;
     private String times;
     private String offerInfo;
+    private String operator;
 
+
+
+    public String getOperator() {
+        return operator;
+    }
+
+    public void setOperator(String operator) {
+        this.operator = operator;
+    }
 
     public VerbalConditionAddVO getCondition() {
         return condition;

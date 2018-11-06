@@ -7,17 +7,19 @@
     http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 
     <!-- 提供方应用信息，用于计算依赖关系 -->
-    <dubbo:application name="33.1083"/>
+    <dubbo:application name="00.1083"/>
 
+    <!--<dubbo:registry protocol="dubbo" address="134.96.253.86:8033"/>-->
     <dubbo:registry protocol="dubbo" address="134.96.159.11:8033"/>
 
     <!-- 暴露服务 -->
-    <dubbo:protocol name="dubbo" port="30804"/>
+    <!--<dubbo:protocol name="dubbo" port="30323"/>-->
+    <dubbo:protocol name="dubbo" port="30803"/>
     <dubbo:monitor protocol="registry" />
 
     <!-- 注册 -->
     <!-- 标签增量同步 -->
-    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.SyncLabelService" ref="syncLabelServiceImpl" version="1.0" >
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.SyncLabelService" ref="syncLabelService" version="1.0" >
         <dubbo:method name="syncLabelInfo" servicecode="33.1083.syncLabelInfo" timeout="10000"/>
     </dubbo:service>
 

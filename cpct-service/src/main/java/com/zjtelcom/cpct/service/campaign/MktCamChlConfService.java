@@ -26,7 +26,7 @@ public interface MktCamChlConfService {
 
     Map<String,Object> listMktCamChlConf();
 
-    Map<String,Object> deleteMktCamChlConf(Long evtContactConfId);
+    Map<String,Object> deleteMktCamChlConf(Long evtContactConfId, Long ruleId);
 
     Map<String, Object> copyMktCamChlConf(Long parentEvtContactConfId) throws Exception;
 
