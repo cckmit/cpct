@@ -76,6 +76,20 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         return result;
     }
 
+    @Override
+    public Map<String,Object> getProductListByName(Map<String,Object> params) {
+        Map<String,Object> result = new HashMap<>();
+        List<Offer> productList = new ArrayList<>();
+        if (params.get("productName") != null){
+            String productName = params.get("productName").toString();
+            productList = productMapper.findByName(productName);
+        }else {
+            productList = productMapper.selectAll();
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",productList);
+        return result;
+    }
 
     /**
      * 复制营销活动推荐条目

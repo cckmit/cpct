@@ -21,7 +21,7 @@ public interface ProductService {
 
     Map<String,Object> copyProductRule(Long userId,List<Long> ItemIdList);
 
-
+    Map<String,Object> getProductListByName(Map<String,Object> params);
 
 
 }
