@@ -295,6 +295,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     @Override
     public Map<String, Object> delTarGrpCondition(Long conditionId) {
         Map<String, Object> mapsT = new HashMap<>();
+
+
         try {
             TarGrpCondition condition = tarGrpConditionMapper.selectByPrimaryKey(conditionId);
             if (condition==null){
@@ -304,7 +306,19 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             }
             Long tarGrpId = condition.getTarGrpId();
             tarGrpConditionMapper.deleteByPrimaryKey(conditionId);
+            TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpId);
+            if (tarGrp==null){
+                mapsT.put("resultCode", CODE_FAIL);
+                mapsT.put("resultMsg", "分群不存在");
+                return mapsT;
+            }
+            TarGrpDetail detail = (TarGrpDetail)redisUtils.get("TAR_GRP_"+tarGrpId);
             List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
+            if (detail!=null){
+                 detail = BeanUtil.create(tarGrp,new TarGrpDetail());
+                detail.setTarGrpConditions(conditionList);
+                redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),detail);
+            }
             if (conditionList.isEmpty()){
                 tarGrpMapper.deleteByPrimaryKey(tarGrpId);
             }
