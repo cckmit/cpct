@@ -9,6 +9,7 @@ import com.zjtelcom.cpct.dao.org.OrgTreeMapper;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.domain.org.OrgTreeDO;
+import com.zjtelcom.cpct.dto.channel.LabelValueVO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.event.*;
 import com.zjtelcom.cpct.dto.grouping.SysAreaVO;
@@ -63,6 +64,7 @@ public class EventMatchRulServiceImpl extends BaseService implements EventMatchR
         eventMatchRulMapper.createEventMatchRul(eventMatchRulDTO);
 
         List<EventMatchRulCondition> eventMatchRulConditions = eventMatchRulDetail.getEventMatchRulConditions();
+        EventMatchRulDTO eventMatchRulDTO1 = eventMatchRulMapper.listEventMatchRul(eventMatchRulDetail.getEventId());
         for(final EventMatchRulCondition eventMatchRulCondition : eventMatchRulConditions) {
             if (eventMatchRulCondition.getOperType() == null || eventMatchRulCondition.getOperType().equals("")) {
                 maps.put("resultCode", CommonConstant.CODE_FAIL);
@@ -74,7 +76,7 @@ public class EventMatchRulServiceImpl extends BaseService implements EventMatchR
 //            }
             eventMatchRulCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
             eventMatchRulCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
-            eventMatchRulCondition.setEvtMatchRulId(eventMatchRulDTO.getEvtMatchRulId());
+            eventMatchRulCondition.setEvtMatchRulId(eventMatchRulDTO1.getEvtMatchRulId());
             eventMatchRulCondition.setCreateDate(DateUtil.getCurrentTime());
             eventMatchRulCondition.setUpdateDate(DateUtil.getCurrentTime());
             eventMatchRulCondition.setStatusDate(DateUtil.getCurrentTime());
@@ -192,6 +194,38 @@ public class EventMatchRulServiceImpl extends BaseService implements EventMatchR
     }
 
     /**
+     * 获取事件规则
+     */
+    @Override
+    public Map<String, Object> listEventMatchRul(Long eventId) {
+        Map<String, Object> maps = new HashMap<>();
+        if (eventId == null) {
+            maps.put("resultCode", CommonConstant.CODE_FAIL);
+            maps.put("resultMsg", "");
+            return maps;
+        }
+        EventMatchRulDTO eventMatchRulDTO = eventMatchRulMapper.listEventMatchRul(eventId);
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("listEventMatchRul", eventMatchRulDTO);
+        return maps;
+    }
+
+    /**
+     * 删除事件规则条件
+     */
+    @Override
+    public Map<String, Object> delEventMatchRulCondition(Long conditionId) {
+        Map<String, Object> maps = new HashMap<>();
+        EventMatchRulCondition eventMatchRulCondition = new EventMatchRulCondition();
+        eventMatchRulCondition.setConditionId(conditionId);
+        eventMatchRulConditionMapper.delEventMatchRulCondition(eventMatchRulCondition);
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        return maps;
+    }
+
+    /**
      * 获取事件规则条件信息
      */
     @Override
@@ -216,7 +250,7 @@ public class EventMatchRulServiceImpl extends BaseService implements EventMatchR
                 continue;
             }
             List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(label.getInjectionLabelId());
-            List<String> valueList = ChannelUtil.valueList2StList(labelValues);
+            List<LabelValueVO> valueList = ChannelUtil.valueList2VOList(labelValues);
             eventMatchRulConditionVO.setLeftParamName(label.getInjectionLabelName());
             //塞入领域
 //            FitDomain fitDomain = null;

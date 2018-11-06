@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.dto.event;
 
+import com.zjtelcom.cpct.dto.channel.LabelValueVO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.grouping.SysAreaVO;
 
@@ -14,7 +15,7 @@ public class EventMatchRulConditionVO extends EventMatchRulCondition{
 
     private String conditionType;
 
-    private List<String> valueList;
+    private List<LabelValueVO> valueList;
 
     private List<OperatorDetail> operatorList;//运算符
 
@@ -37,11 +38,11 @@ public class EventMatchRulConditionVO extends EventMatchRulCondition{
         this.conditionType = conditionType;
     }
 
-    public List<String> getValueList() {
+    public List<LabelValueVO> getValueList() {
         return valueList;
     }
 
-    public void setValueList(List<String> valueList) {
+    public void setValueList(List<LabelValueVO> valueList) {
         this.valueList = valueList;
     }
 
