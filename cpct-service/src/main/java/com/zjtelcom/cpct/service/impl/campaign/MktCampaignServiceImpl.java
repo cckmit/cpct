@@ -695,17 +695,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCamResultRelDO.setUpdateDate(new Date());
             mktCamResultRelDO.setUpdateStaff(UserUtil.loginId());
             mktCamResultRelMapper.changeStatusByMktCampaignId(mktCamResultRelDO);
-        } else if (StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd) || StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)) {
-            // 暂停或者下线, 该状态为未生效
-            MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();
-            mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_NOTACTIVE.getStatusCode());
-            mktCamResultRelDO.setMktCampaignId(mktCampaignId);
-            mktCamResultRelDO.setUpdateDate(new Date());
-            mktCamResultRelDO.setUpdateStaff(UserUtil.loginId());
-            mktCamResultRelMapper.changeStatusByMktCampaignId(mktCamResultRelDO);
-        } else if (StatusCode.STATUS_CODE_PASS.getStatusCode().equals(statusCd)) {
-            // 审核通过后异步同步活动到生产环境
-            new Thread() {
+            // 发布活动异步同步活动到生产环境
+/*            new Thread() {
                 @Override
                 public void run() {
                     try {
@@ -719,8 +710,15 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         e.printStackTrace();
                     }
                 }
-            }.start();
-
+            }.start();*/
+        } else if (StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd) || StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)) {
+            // 暂停或者下线, 该状态为未生效
+            MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();
+            mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_NOTACTIVE.getStatusCode());
+            mktCamResultRelDO.setMktCampaignId(mktCampaignId);
+            mktCamResultRelDO.setUpdateDate(new Date());
+            mktCamResultRelDO.setUpdateStaff(UserUtil.loginId());
+            mktCamResultRelMapper.changeStatusByMktCampaignId(mktCamResultRelDO);
         }
         return maps;
     }
