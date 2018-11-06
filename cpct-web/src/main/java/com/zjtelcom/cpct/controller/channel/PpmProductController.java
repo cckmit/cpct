@@ -110,6 +110,23 @@ public class PpmProductController extends BaseController  {
         return result;
     }
 
+    /**
+     * 销售品模糊查询
+     */
+    @PostMapping("getProductListByName")
+    @CrossOrigin
+    public Map<String,Object> getProductListByName(@RequestBody HashMap<String,Object> params) {
+        Map<String ,Object> result = new HashMap<>();
+        try {
+            result = productService.getProductListByName(params);
+        }catch (Exception e){
+            logger.error("[op:PpmProductController] fail to getProductListByName",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addCamScript");
+            return result;
+        }
+        return result;
+    }
 
     /**
      * 添加规则下的销售品
