@@ -193,7 +193,6 @@ public class FilterRuleController extends BaseController {
                 e.printStackTrace();
             }
         }
-
         return initSuccRespInfo("导出成功");
     }
 

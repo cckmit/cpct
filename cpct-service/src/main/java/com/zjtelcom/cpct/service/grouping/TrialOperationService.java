@@ -26,6 +26,7 @@ public interface TrialOperationService  {
 
     Map<String,Object> searchCountInfo(Long batchId);
 
+    Map<String,Object> searchCountAllByArea(Long batchId);
 
 
 
