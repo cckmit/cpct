@@ -25,6 +25,7 @@ import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.EventDTO;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
+import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.enums.ParamKeyEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
@@ -113,7 +114,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private SysAreaMapper sysAreaMapper;
 
     /**
-     *
+     * redis
      */
     @Autowired
     private RedisUtils redisUtils;
@@ -139,72 +140,79 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      */
     @Override
     public Map<String, Object> createMktCampaign(MktCampaignVO mktCampaignVO) throws Exception {
-        MktCampaignDO mktCampaignDO = new MktCampaignDO();
-        CopyPropertiesUtil.copyBean2Bean(mktCampaignDO, mktCampaignVO);
-        // 创建活动基本信息
-        mktCampaignDO.setCreateDate(new Date());
-        mktCampaignDO.setCreateStaff(UserUtil.loginId());
-        mktCampaignDO.setUpdateDate(new Date());
-        mktCampaignDO.setUpdateStaff(UserUtil.loginId());
-        mktCampaignDO.setStatusDate(new Date());
-        mktCampaignDO.setCreateChannel("市场部");
-        // TODO 添加所属地市
-        mktCampaignDO.setLanId(8330000L);
-        mktCampaignMapper.insert(mktCampaignDO);
-        Long mktCampaignId = mktCampaignDO.getMktCampaignId();
+        Map<String, Object> maps = null;
+        try {
+            MktCampaignDO mktCampaignDO = new MktCampaignDO();
+            CopyPropertiesUtil.copyBean2Bean(mktCampaignDO, mktCampaignVO);
+            // 创建活动基本信息
+            mktCampaignDO.setCreateDate(new Date());
+            mktCampaignDO.setCreateStaff(UserUtil.loginId());
+            mktCampaignDO.setUpdateDate(new Date());
+            mktCampaignDO.setUpdateStaff(UserUtil.loginId());
+            mktCampaignDO.setStatusDate(new Date());
+            mktCampaignDO.setCreateChannel("市场部");
+            // TODO 添加所属地市
+            mktCampaignDO.setLanId(8330000L);
+            mktCampaignMapper.insert(mktCampaignDO);
+            Long mktCampaignId = mktCampaignDO.getMktCampaignId();
 
-        // 创建二次营销活动
+            // 创建二次营销活动
 
-        if (mktCampaignVO.getPreMktCampaignId() != null && (mktCampaignVO.getPreMktCampaignId() != 0)) {
-            // 创建两个活动为接续关系
-            MktCampaignRelDO mktCampaignRelDO = new MktCampaignRelDO();
-            mktCampaignRelDO.setaMktCampaignId(mktCampaignVO.getPreMktCampaignId());
-            mktCampaignRelDO.setzMktCampaignId(mktCampaignId);
-            mktCampaignRelDO.setRelType("2000");  // 2000 -- 接续关系
-            mktCampaignRelDO.setStatusCd(StatusCode.STATUS_CODE_NOTACTIVE.getStatusCode()); // 1000 -- 有效
-            mktCampaignRelDO.setApplyRegionId(mktCampaignDO.getLanId());
-            mktCampaignRelDO.setStatusDate(new Date());
-            mktCampaignRelDO.setExpDate(mktCampaignVO.getPlanBeginTime());
-            mktCampaignRelDO.setEffDate(mktCampaignVO.getPlanEndTime());
-            mktCampaignRelDO.setCreateDate(new Date());
-            mktCampaignRelDO.setCreateStaff(UserUtil.loginId());
-            mktCampaignRelDO.setUpdateDate(new Date());
-            mktCampaignRelDO.setUpdateStaff(UserUtil.loginId());
-            mktCampaignRelMapper.insert(mktCampaignRelDO);
+            if (mktCampaignVO.getPreMktCampaignId() != null && (mktCampaignVO.getPreMktCampaignId() != 0)) {
+                // 创建两个活动为接续关系
+                MktCampaignRelDO mktCampaignRelDO = new MktCampaignRelDO();
+                mktCampaignRelDO.setaMktCampaignId(mktCampaignVO.getPreMktCampaignId());
+                mktCampaignRelDO.setzMktCampaignId(mktCampaignId);
+                mktCampaignRelDO.setRelType("2000");  // 2000 -- 接续关系
+                mktCampaignRelDO.setStatusCd(StatusCode.STATUS_CODE_NOTACTIVE.getStatusCode()); // 1000 -- 有效
+                mktCampaignRelDO.setApplyRegionId(mktCampaignDO.getLanId());
+                mktCampaignRelDO.setStatusDate(new Date());
+                mktCampaignRelDO.setExpDate(mktCampaignVO.getPlanBeginTime());
+                mktCampaignRelDO.setEffDate(mktCampaignVO.getPlanEndTime());
+                mktCampaignRelDO.setCreateDate(new Date());
+                mktCampaignRelDO.setCreateStaff(UserUtil.loginId());
+                mktCampaignRelDO.setUpdateDate(new Date());
+                mktCampaignRelDO.setUpdateStaff(UserUtil.loginId());
+                mktCampaignRelMapper.insert(mktCampaignRelDO);
+            }
+
+
+            //创建活动与城市之间的关系
+            for (CityProperty cityProperty : mktCampaignVO.getApplyRegionIdList()) {
+                MktCamCityRelDO mktCamCityRelDO = new MktCamCityRelDO();
+                mktCamCityRelDO.setCityId(cityProperty.getCityPropertyId());
+                mktCamCityRelDO.setMktCampaignId(mktCampaignId);
+                mktCamCityRelDO.setCreateDate(new Date());
+                mktCamCityRelDO.setCreateStaff(UserUtil.loginId());
+                mktCamCityRelDO.setUpdateDate(new Date());
+                mktCamCityRelDO.setUpdateStaff(UserUtil.loginId());
+                mktCamCityRelMapper.insert(mktCamCityRelDO);
+            }
+
+            //创建活动与事件的关联
+            for (EventDTO eventDTO : mktCampaignVO.getEventDTOS()) {
+                MktCamEvtRelDO mktCamEvtRelDO = new MktCamEvtRelDO();
+                mktCamEvtRelDO.setMktCampaignId(mktCampaignId);
+                mktCamEvtRelDO.setEventId(eventDTO.getEventId());
+                mktCamEvtRelDO.setCampaignSeq(0); // 默认等级为 0
+                mktCamEvtRelDO.setLevelConfig(0); // 默认为资产级 0
+                mktCamEvtRelDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                mktCamEvtRelDO.setCreateStaff(UserUtil.loginId());
+                mktCamEvtRelDO.setCreateDate(new Date());
+                mktCamEvtRelDO.setUpdateStaff(UserUtil.loginId());
+                mktCamEvtRelDO.setUpdateDate(new Date());
+                mktCamEvtRelMapper.insert(mktCamEvtRelDO);
+            }
+
+            maps = new HashMap<>();
+            maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+            maps.put("resultMsg", ErrorCode.SAVE_MKT_CAMPAIGN_SUCCESS.getErrorMsg());
+            maps.put("mktCampaignId", mktCampaignId);
+        } catch (Exception e) {
+            logger.error("Expersion = ", e);
+            maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+            maps.put("resultMsg", ErrorCode.SAVE_MKT_CAMPAIGN_FAILURE.getErrorMsg());
         }
-
-
-        //创建活动与城市之间的关系
-        for (CityProperty cityProperty : mktCampaignVO.getApplyRegionIdList()) {
-            MktCamCityRelDO mktCamCityRelDO = new MktCamCityRelDO();
-            mktCamCityRelDO.setCityId(cityProperty.getCityPropertyId());
-            mktCamCityRelDO.setMktCampaignId(mktCampaignId);
-            mktCamCityRelDO.setCreateDate(new Date());
-            mktCamCityRelDO.setCreateStaff(UserUtil.loginId());
-            mktCamCityRelDO.setUpdateDate(new Date());
-            mktCamCityRelDO.setUpdateStaff(UserUtil.loginId());
-            mktCamCityRelMapper.insert(mktCamCityRelDO);
-        }
-
-        //创建活动与事件的关联
-        for (EventDTO eventDTO : mktCampaignVO.getEventDTOS()) {
-            MktCamEvtRelDO mktCamEvtRelDO = new MktCamEvtRelDO();
-            mktCamEvtRelDO.setMktCampaignId(mktCampaignId);
-            mktCamEvtRelDO.setEventId(eventDTO.getEventId());
-            mktCamEvtRelDO.setCampaignSeq(0); // 默认等级为 0
-            mktCamEvtRelDO.setLevelConfig(0); // 默认为资产级 0
-            mktCamEvtRelDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
-            mktCamEvtRelDO.setCreateStaff(UserUtil.loginId());
-            mktCamEvtRelDO.setCreateDate(new Date());
-            mktCamEvtRelDO.setUpdateStaff(UserUtil.loginId());
-            mktCamEvtRelDO.setUpdateDate(new Date());
-            mktCamEvtRelMapper.insert(mktCamEvtRelDO);
-        }
-
-        Map<String, Object> maps = new HashMap<>();
-        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
-        maps.put("resultMsg", StringUtils.EMPTY);
-        maps.put("mktCampaignId", mktCampaignId);
         return maps;
     }
 
@@ -687,17 +695,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCamResultRelDO.setUpdateDate(new Date());
             mktCamResultRelDO.setUpdateStaff(UserUtil.loginId());
             mktCamResultRelMapper.changeStatusByMktCampaignId(mktCamResultRelDO);
-        } else if (StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd) || StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)) {
-            // 暂停或者下线, 该状态为未生效
-            MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();
-            mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_NOTACTIVE.getStatusCode());
-            mktCamResultRelDO.setMktCampaignId(mktCampaignId);
-            mktCamResultRelDO.setUpdateDate(new Date());
-            mktCamResultRelDO.setUpdateStaff(UserUtil.loginId());
-            mktCamResultRelMapper.changeStatusByMktCampaignId(mktCamResultRelDO);
-        } else if (StatusCode.STATUS_CODE_PASS.getStatusCode().equals(statusCd)) {
-            // 审核通过后异步同步活动到生产环境
-            new Thread() {
+            // 发布活动异步同步活动到生产环境
+/*            new Thread() {
                 @Override
                 public void run() {
                     try {
@@ -711,8 +710,15 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         e.printStackTrace();
                     }
                 }
-            }.start();
-
+            }.start();*/
+        } else if (StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd) || StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)) {
+            // 暂停或者下线, 该状态为未生效
+            MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();
+            mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_NOTACTIVE.getStatusCode());
+            mktCamResultRelDO.setMktCampaignId(mktCampaignId);
+            mktCamResultRelDO.setUpdateDate(new Date());
+            mktCamResultRelDO.setUpdateStaff(UserUtil.loginId());
+            mktCamResultRelMapper.changeStatusByMktCampaignId(mktCamResultRelDO);
         }
         return maps;
     }
