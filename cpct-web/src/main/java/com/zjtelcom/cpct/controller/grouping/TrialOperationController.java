@@ -93,6 +93,25 @@ public class TrialOperationController extends BaseController {
     }
 
     /**
+     * 策略试运算区域统计查询
+     * @return
+     */
+    @PostMapping("searchCountAllByArea")
+    @CrossOrigin
+    public Map<String, Object> searchCountAllByArea(@RequestBody HashMap<String, Long> param) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = operationService.searchCountAllByArea(param.get("batchId"));
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to searchCountAllByArea", e);
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "fail to searchCountAllByArea");
+            return result;
+        }
+        return result;
+    }
+
+    /**
      * 新增策略试运算
      * @param operationVO
      * @return
