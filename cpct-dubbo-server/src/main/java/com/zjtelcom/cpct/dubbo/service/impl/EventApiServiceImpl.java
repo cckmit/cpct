@@ -1142,15 +1142,15 @@ public class EventApiServiceImpl implements EventApiService {
 
                         String[] strArray = tarGrpConditionDOs.get(i).getRightParam().split(",");
 
-//                        expressSb.append(" >= ").append("\"").append(strArray[0]).append("\"").append(")");
-//                        expressSb.append(" && ").append("((");
-//                        expressSb.append(label.getInjectionLabelCode()).append(")");
-//                        expressSb.append(" <= ").append("\"").append(strArray[1]).append("\"");
-
-                        expressSb.append(" >= ").append(strArray[0]);
-                        expressSb.append(" && ").append("(");
+                        expressSb.append(" >= ").append("\"").append(strArray[0]).append("\"").append(")");
+                        expressSb.append(" && ").append("((");
                         expressSb.append(label.getInjectionLabelCode()).append(")");
-                        expressSb.append(" <= ").append(strArray[1]);
+                        expressSb.append(" <= ").append("\"").append(strArray[1]).append("\"");
+
+//                        expressSb.append(" >= ").append(strArray[0]);
+//                        expressSb.append(" && ").append("(");
+//                        expressSb.append(label.getInjectionLabelCode()).append(")");
+//                        expressSb.append(" <= ").append(strArray[1]);
 
                         express1.append(" >= ").append("\"").append(strArray[0]).append("\"");
                         express1.append(" && ").append("(");
@@ -1277,7 +1277,7 @@ public class EventApiServiceImpl implements EventApiService {
                     ruleMap.put("accNbr", privateParams.get("accNbr")); //业务号码（必填）
                     ruleMap.put("policyId", strategyConfId.toString()); //策略编码
                     ruleMap.put("ruleId", ruleId.toString()); //规则编码
-                    ruleMap.put("triggers", evtTriggers); //规则编码
+                    ruleMap.put("triggers", JSONArray.toJSON(evtTriggers)); //规则编码
 
                     //查询销售品列表
                     if (productStr != null && !"".equals(productStr)) {
@@ -1288,7 +1288,7 @@ public class EventApiServiceImpl implements EventApiService {
                             product.put("productCode", mktCamItem.getOfferCode());
                             product.put("productName", mktCamItem.getOfferName());
                             product.put("productType", mktCamItem.getItemType());
-                            product.put("productFlag", "销售品标签");  //todo 销售品标签
+                            product.put("productFlag", "1000");  //todo 销售品标签
                             //销售品优先级
                             if (mktCamItem.getPriority() != null) {
                                 product.put("productPriority", mktCamItem.getPriority().toString());
@@ -1457,7 +1457,7 @@ public class EventApiServiceImpl implements EventApiService {
             channel.put("pushTime", ""); // 推送时间
 
             //返回结果中添加销售品信息
-            channel.put("productList", productList);
+            channel.put("productList", JSONArray.toJSON(productList));
 
             //查询渠道子策略 这里老系统暂时不返回
 //              List<MktVerbalCondition> mktVerbalConditions = mktVerbalConditionMapper.findConditionListByVerbalId(evtContactConfId);
@@ -1481,16 +1481,7 @@ public class EventApiServiceImpl implements EventApiService {
                 //返回结果中添加话术信息
                 channel.put("reason", mktVerbals.get(0).getScriptDesc());
             }
-
-            List<Map<String,Object>> itgTriggersList = new ArrayList<>();
-            for(Map<String,Object> map:itgTriggers ) {
-                Map<String,Object> copyMap = (Map<String, Object>) deepClone(map);
-//                copyMap = (Map<String, Object>) ((HashMap<String, Object>) map).clone();
-
-                itgTriggersList.add(copyMap);
-            }
-//            Collections.copy(itgTriggersList,itgTriggers);
-            channel.put("itgTriggers", itgTriggersList);
+            channel.put("itgTriggers", JSONArray.toJSON(itgTriggers));
 
             return channel;
         }
