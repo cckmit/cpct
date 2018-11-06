@@ -36,6 +36,4 @@ public class CommonConstant {
 
     public static final String CPC_MATCH_FILE_TO_FTP = "http://localhost:8080/es/cpcMatchFileToFtp";//策略试运算下发上传文件到ftp
 
-
-
 }
