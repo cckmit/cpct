@@ -91,7 +91,6 @@
     <update id="modContactEvtType" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtType">
         update event_type
         set
-            EVT_TYPE_NBR = #{contactEvtTypeCode,jdbcType=VARCHAR},
             EVT_TYPE_NAME = #{contactEvtName,jdbcType=VARCHAR},
         <if test="parEvtTypeId != null and parEvtTypeId != ''">
             PAR_EVT_TYPE_ID = #{parEvtTypeId,jdbcType=BIGINT},

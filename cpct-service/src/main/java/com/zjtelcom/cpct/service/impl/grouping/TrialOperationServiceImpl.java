@@ -24,6 +24,7 @@ import com.zjtelcom.cpct.domain.channel.CamScript;
 import com.zjtelcom.cpct.domain.channel.DisplayColumn;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.MktProductRule;
+import com.zjtelcom.cpct.domain.grouping.GroupingVO;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
@@ -74,6 +75,17 @@ import static com.zjtelcom.cpct.constants.ResponseCode.SUCCESS;
 
 @Service
 public class TrialOperationServiceImpl extends BaseService implements TrialOperationService {
+
+    @Value("${spring.redis.host}")
+    private String host;
+    @Value("${spring.esurl.machfile}")
+    private String machFile;
+    @Value("${spring.esurl.batchinfo}")
+    private String batchInfo;
+    @Value("${spring.esurl.hitslist}")
+    private String hitsList;
+    @Value("${spring.esurl.countinfo}")
+    private String countInfo;
 
     @Autowired
     private TrialOperationMapper trialOperationMapper;
@@ -151,7 +163,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         TrialResponse response = new TrialResponse();
 
         try {
-            response = restTemplate.postForObject("http://134.96.252.170:30808/es/searchBatchInfo", request, TrialResponse.class);
+            response = restTemplate.postForObject(batchInfo, request, TrialResponse.class);
             if (response.getResultCode().equals(CODE_FAIL)){
                 result.put("resultCode", CODE_FAIL);
                 result.put("resultMsg", "抽样校验失败");
@@ -256,8 +268,44 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
 
     /**
+     * 策略试运算区域统计查询
+     * @param batchId
+     * @return
+     */
+    @Override
+    public Map<String, Object> searchCountAllByArea(Long batchId) {
+        Map<String, Object> result = new HashMap<>();
+        TrialOperation operation = trialOperationMapper.selectByPrimaryKey(batchId);
+        if (operation == null) {
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "统计查询记录出错啦！");
+            return result;
+        }
+        Map<String,Object> resultMap =  (Map<String, Object>) redisUtils.get("HITS_COUNT_INFO_"+operation.getBatchNum());
+        if (resultMap==null || resultMap.get("countMap")==null){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "统计查询记录出错啦！");
+            return result;
+        }
+        Map<String,Object> countMap = (Map<String, Object>) resultMap.get("countMap");
+        List<GroupingVO> groupingVOS = new ArrayList<>();
+        Iterator iterator = countMap.entrySet().iterator();
+        while (iterator.hasNext()){
+            Map.Entry<String,Object> entry = (Map.Entry<String, Object>) iterator.next();
+            GroupingVO vo = new GroupingVO();
+            vo.setName(entry.getKey());
+            vo.setValue(entry.getValue().toString());
+            groupingVOS.add(vo);
+        }
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", groupingVOS);
+        return result;
+    }
+
+    /**
      * 策略试运算统计查询
      * @param batchId
+     *
      * @return
      */
     @Override
@@ -270,8 +318,35 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             return result;
         }
         Map<String,Object> resultMap =  (Map<String, Object>) redisUtils.get("HITS_COUNT_INFO_"+operation.getBatchNum());
+        if (resultMap.get("countMap")!=null){
+            resultMap.remove("countMap");
+        }
+        Map<String,Object> map = new HashMap<>();
+        List<String> ruleList = new ArrayList<>();
+        List<GroupingVO> groupingVOS = new ArrayList<>();
+
+        Iterator iterator = resultMap.entrySet().iterator();
+        while (iterator.hasNext()){
+            Map.Entry<String,Object> entry = (Map.Entry<String,Object>)iterator.next();
+            ruleList.add(entry.getKey());
+            Map<String,Object> valueMap = (Map<String, Object>) entry.getValue();
+            List<String> valueList = new ArrayList<>();
+            Iterator iter = valueMap.entrySet().iterator();
+            while (iter.hasNext()){
+                Map.Entry<String,Object> valueEntry = (Map.Entry<String, Object>) iter.next();
+                valueList.add(valueEntry.getValue().toString());
+            }
+            GroupingVO vo = new GroupingVO();
+            vo.setName(entry.getKey());
+            vo.setValueList(valueList);
+            groupingVOS.add(vo);
+        }
+        Collections.reverse(ruleList);
+        Collections.reverse(groupingVOS);
+        map.put("rules",ruleList);
+        map.put("values",groupingVOS);
         result.put("resultCode", CODE_SUCCESS);
-        result.put("resultMsg", resultMap);
+        result.put("resultMsg", map);
         return result;
     }
 
@@ -350,9 +425,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         TrialResponse response = new TrialResponse();
         TrialResponse countResponse = new TrialResponse();
         try {
-            response = restTemplate.postForObject("http://134.96.252.170:30808/es/searchBatchInfo", request, TrialResponse.class);
+            response = restTemplate.postForObject(batchInfo, request, TrialResponse.class);
             //同时调用统计查询的功能
-            countResponse = restTemplate.postForObject("http://134.96.252.170:30808/es/searchCountInfo",request,TrialResponse.class);
+            countResponse = restTemplate.postForObject(countInfo,request,TrialResponse.class);
             if (countResponse.getResultCode().equals(CODE_SUCCESS)){
                 redisUtils.set("HITS_COUNT_INFO_"+request.getBatchNum(),countResponse.getHitsList());
             }
@@ -476,7 +551,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         try {
             Map<String, Long> param = new HashMap<>();
             param.put("batchId", operation.getBatchNum());
-            response = restTemplate.postForObject( "http://134.96.252.170:30808/es/findBatchHitsList", param, TrialResponse.class);
+            response = restTemplate.postForObject( hitsList, param, TrialResponse.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
