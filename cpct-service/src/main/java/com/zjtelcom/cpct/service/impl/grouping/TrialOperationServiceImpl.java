@@ -695,7 +695,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         request.setParamList(paramList);
         try {
             //todo 待验证
-            restTemplate.postForObject(CPC_MATCH_FILE_TO_FTP, request, TrialResponse.class);
+            restTemplate.postForObject(machFile, request, TrialResponse.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
