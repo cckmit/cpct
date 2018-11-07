@@ -63,7 +63,7 @@
     <if test="createStaff != null and createStaff != ''">
       CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
     </if>
-    <if test="createDate != null and createDate != ''">
+    <if test="createDate != null">
       CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
     </if>
       UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
