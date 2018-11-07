@@ -40,6 +40,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -514,7 +515,12 @@ public class EventApiServiceImpl implements EventApiService {
             privateParams.put("activityId", mktCampaign.getMktCampaignId().toString()); //活动编码
             privateParams.put("activityName", mktCampaign.getMktCampaignName()); //活动名称
             privateParams.put("activityType", mktCampaign.getMktCampaignType()); //活动类型
-            privateParams.put("skipCheck", "0"); //是否校验  todo
+            privateParams.put("activityEndTime", mktCampaign.getMktCampaignType()); //活动结束时间
+            privateParams.put("skipCheck", "0"); //是否预校验  todo
+
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            privateParams.put("activityStartTime", simpleDateFormat.format(mktCampaign.getBeginTime())); //活动开始时间
+            privateParams.put("activityEndTime", simpleDateFormat.format(mktCampaign.getEndTime())); //活动结束时间
 
             //es log
             esJson.put("reqId", reqId);
@@ -532,7 +538,6 @@ public class EventApiServiceImpl implements EventApiService {
                 esJson.put("hit", "false");
                 esJson.put("msg", "当前时间不在活动生效时间内");
                 esService.save(esJson, IndexList.ACTIVITY_MODULE);
-
                 return Collections.EMPTY_MAP;
             }
 
@@ -542,23 +547,11 @@ public class EventApiServiceImpl implements EventApiService {
             StringBuilder querySb = new StringBuilder();
 //            int i = 0;
 
-            //查询展示列 （试算）
-//            List<Label> calcDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getCalcDisplay());
-//            //格式化返回参数结构
-//            if (calcDisplay != null) {
-//                for (Label label : calcDisplay) {
-////                    queryFields.put(String.valueOf(i), label.getInjectionLabelCode());
-////                    i++;
-//                    querySb.append(label.getInjectionLabelCode()).append(",");
-//                }
-//            }
             //查询展示列 （iSale）
-            List<Label> iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getIsaleDisplay());
+            List<Map<String,String>> iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getIsaleDisplay());
             if (iSaleDisplay != null && iSaleDisplay.size() > 0) {
-                for (Label label : iSaleDisplay) {
-//                    queryFields.put(String.valueOf(i), label.getInjectionLabelCode());
-//                    i++;
-                    querySb.append(label.getInjectionLabelCode()).append(",");
+                for (Map<String,String> label : iSaleDisplay) {
+                    querySb.append(label.get("labelCode")).append(",");
                 }
 
                 if (querySb.length() > 0) {
@@ -577,43 +570,54 @@ public class EventApiServiceImpl implements EventApiService {
                 System.out.println(resJson.toString());
 
                 Map<String, Object> triggers = new HashMap<>();
-                List<Map<String, Object>> triggerList = new ArrayList<>();
-
-                triggers = new HashMap<>();
-                triggerList = new ArrayList<>();
-
-//            if (calcDisplay != null) {
-//                for (Label label : calcDisplay) {
-//                    if (resJson.containsKey(label.getInjectionLabelCode())) {
-//                        triggers.put("key", label.getInjectionLabelCode());
-//                        triggers.put("value", resJson.get(label.getInjectionLabelCode()));
-//                        triggers.put("display", 0); //todo 确定display字段
-//                        triggers.put("name", label.getInjectionLabelName());
-//                    }
-//
-//                    triggerList.add(triggers);
-//                }
-//                itgTriggers.put("triggerList", triggerList);
-//                itgTriggers.put("type", 1);
-//            }
+                List<Map<String, Object>> triggerList1 = new ArrayList<>();
+                List<Map<String, Object>> triggerList2 = new ArrayList<>();
+                List<Map<String, Object>> triggerList3 = new ArrayList<>();
+                List<Map<String, Object>> triggerList4 = new ArrayList<>();
 
                 if (iSaleDisplay != null) {
-                    for (Label label : iSaleDisplay) {
-                        if (resJson.containsKey(label.getInjectionLabelCode())) {
-                            triggers.put("key", label.getInjectionLabelCode());
-                            triggers.put("value", resJson.get(label.getInjectionLabelCode()));
+                    for (Map<String,String> label : iSaleDisplay) {
+                        if (resJson.containsKey(label.get("labelCode"))) {
+                            triggers.put("key", label.get("labelCode"));
+                            triggers.put("value", resJson.get(label.get("labelCode")));
                             triggers.put("display", 0); //todo 确定display字段
-                            triggers.put("name", label.getInjectionLabelName());
+                            triggers.put("name", label.get("labelName"));
+                            if("1".equals(label.get("typeCode"))) {
+                                triggerList1.add(triggers);
+                            } else if("2".equals(label.get("typeCode"))) {
+                                triggerList2.add(triggers);
+                            } else if("3".equals(label.get("typeCode"))) {
+                                triggerList3.add(triggers);
+                            } else if("4".equals(label.get("typeCode"))) {
+                                triggerList4.add(triggers);
+                            }
                         }
                     }
-
-                    triggerList.add(triggers);
-
-                    itgTrigger.put("triggerList", triggerList);
-                    itgTrigger.put("type", "营销信息");
                 }
-
-                itgTriggers.add(itgTrigger);
+                if(triggerList1.size() > 0) {
+                    itgTriggers = new ArrayList<>();
+                    itgTrigger.put("triggerList", triggerList1);
+                    itgTrigger.put("type", "固定信息");
+                    itgTriggers.add(itgTrigger);
+                }
+                if(triggerList2.size() > 0) {
+                    itgTriggers = new ArrayList<>();
+                    itgTrigger.put("triggerList", triggerList2);
+                    itgTrigger.put("type", "营销信息");
+                    itgTriggers.add(itgTrigger);
+                }
+                if(triggerList3.size() > 0) {
+                    itgTriggers = new ArrayList<>();
+                    itgTrigger.put("triggerList", triggerList3);
+                    itgTrigger.put("type", "费用信息");
+                    itgTriggers.add(itgTrigger);
+                }
+                if(triggerList4.size() > 0) {
+                    itgTriggers = new ArrayList<>();
+                    itgTrigger.put("triggerList", triggerList4);
+                    itgTrigger.put("type", "协议信息");
+                    itgTriggers.add(itgTrigger);
+                }
             }
 
             //根据活动id获取策略列表
