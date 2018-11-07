@@ -37,31 +37,31 @@
     <if test="evtSrcCode != null and evtSrcCode != '' ">
       EVT_SRC_CODE = #{evtSrcCode,jdbcType=VARCHAR},
     </if>
-    <if test="evtSrcName != null and evtSrcName != '' ">
+    <if test="evtSrcName != null ">
       EVT_SRC_NAME = #{evtSrcName,jdbcType=VARCHAR},
     </if>
-    <if test="evtSrcDesc != null and evtSrcDesc != '' ">
+    <if test="evtSrcDesc != null ">
       EVT_SRC_DESC = #{evtSrcDesc,jdbcType=VARCHAR},
     </if>
-    <if test="statusCd != null and statusCd != '' ">
+    <if test="statusCd != null ">
       STATUS_CD = #{statusCd,jdbcType=VARCHAR},
     </if>
     <if test="statusDate != null ">
       STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
     </if>
-    <if test="createStaff != null and createStaff != '' ">
+    <if test="createStaff != null ">
       CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
     </if>
     <if test="createDate != null ">
       CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
     </if>
-    <if test="updateStaff != null and updateStaff != '' ">
+    <if test="updateStaff != null ">
       UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
     </if>
     <if test="updateDate != null ">
       REGION_ID = #{regionId,jdbcType=BIGINT},
     </if>
-    <if test="remark != null and remark != ''  ">
+    <if test="remark != null ">
       REMARK = #{remark,jdbcType=VARCHAR},
     </if>
       UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
