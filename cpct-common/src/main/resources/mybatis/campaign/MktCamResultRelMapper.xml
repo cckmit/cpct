@@ -18,7 +18,7 @@
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamResultRelDO">
     insert into mkt_cam_result_rel (MKT_CAM_RESULT_REL_ID, MKT_CAMPAIGN_ID, MKT_RESULT_ID, 
       STATUS, CREATE_STAFF, CREATE_DATE, 
-      UPDATE_STAFF, UPDATE_DATE)·
+      UPDATE_STAFF, UPDATE_DATE)
     values (#{mktCamResultRelId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{mktResultId,jdbcType=BIGINT}, 
       #{status,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, 
       #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP})

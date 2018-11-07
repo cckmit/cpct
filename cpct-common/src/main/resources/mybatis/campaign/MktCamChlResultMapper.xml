@@ -31,10 +31,10 @@
     update mkt_cam_chl_result
     set
     <if test="resultType != null and resultType != ''">
-      MKT_CAM_CHL_RESULT_NAME = #{resultType,jdbcType=VARCHAR},
+      RESULT_TYPE = #{resultType,jdbcType=VARCHAR},
     </if>
     <if test="mktCamChlResultName != null and mktCamChlResultName != ''">
-      RESULT_TYPE = #{mktCamChlResultName,jdbcType=VARCHAR},
+      MKT_CAM_CHL_RESULT_NAME = #{mktCamChlResultName,jdbcType=VARCHAR},
     </if>
     <if test="result != null and result != ''">
       RESULT = #{result,jdbcType=BIGINT},

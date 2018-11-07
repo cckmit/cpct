@@ -119,7 +119,7 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
                     // 保存话术
                     CamScriptAddVO camScriptAddVO = new CamScriptAddVO();
                     camScriptAddVO.setEvtContactConfId(mktCamChlConfDetail.getEvtContactConfId());
-                    camScriptAddVO.setMktCampaignId(mktCamChlConfDetail.getMktCampaignId());
+                    camScriptAddVO.setMktCampaignId(mktCamChlResult.getMktCampaignId());
                     camScriptAddVO.setScriptDesc(mktCamChlConfDetail.getScriptDesc());
                     camScriptService.addCamScript(UserUtil.loginId(), camScriptAddVO);
                 }
