@@ -58,6 +58,7 @@ import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 
 /**
  * @Description 目标分群serviceImpl
@@ -195,6 +196,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 tarGrpCondition.setStatusDate(DateUtil.getCurrentTime());
                 tarGrpCondition.setUpdateStaff(UserUtil.loginId());
                 tarGrpCondition.setCreateStaff(UserUtil.loginId());
+                tarGrpCondition.setStatusCd("1000");
                 conditionList.add(tarGrpCondition);
             }
             tarGrpConditionMapper.insertByBatch(conditionList);
@@ -364,6 +366,9 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
         List<TarGrpCondition> insertConditions = new ArrayList<>();
         List<TarGrpCondition> allCondition = new ArrayList<>();
+        List<TarGrpCondition> oldConditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrp.getTarGrpId());
+        List<Long> delList = new ArrayList<>();
+
         for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
             TarGrpCondition tarGrpCondition1 = tarGrpConditionMapper.selectByPrimaryKey(tarGrpCondition.getConditionId());
             if (tarGrpCondition1 == null) {
@@ -384,6 +389,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 condition.setStatusDate(DateUtil.getCurrentTime());
                 condition.setUpdateStaff(UserUtil.loginId());
                 condition.setCreateStaff(UserUtil.loginId());
+                condition.setStatusCd(STATUSCD_EFFECTIVE);
                 insertConditions.add(condition);
             } else {
                 tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
@@ -396,6 +402,15 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             tarGrpConditionMapper.insertByBatch(insertConditions);
         }
         allCondition.addAll(insertConditions);
+        for (TarGrpCondition condition : oldConditionList){
+            if (allCondition.contains(condition)){
+                continue;
+            }
+            delList.add(condition.getConditionId());
+        }
+        if (!delList.isEmpty()){
+            tarGrpConditionMapper.deleteBatch(delList);
+        }
         //更新redis分群数据
         TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
         detail.setTarGrpConditions(allCondition);

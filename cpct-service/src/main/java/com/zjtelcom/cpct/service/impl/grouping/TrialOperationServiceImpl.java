@@ -649,8 +649,11 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             TrialOperationParam param = new TrialOperationParam();
             // 获取规则Id
             Long ruleId = ruleRelDO.getMktStrategyConfRuleId();
-            param.setRuleId(ruleId);
-
+            MktStrategyConfRuleDO confRule = ruleMapper.selectByPrimaryKey(ruleId);
+            if (confRule != null) {
+                param.setRuleName(confRule.getMktStrategyConfRuleName());
+                param.setTarGrpId(confRule.getTarGrpId());
+            }
             // 获取规则信息
             Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.getMktStrategyConfRule(ruleId);
             MktStrategyConfRule mktStrategyConfRule = (MktStrategyConfRule) mktStrategyConfRuleMap.get("mktStrategyConfRule");
