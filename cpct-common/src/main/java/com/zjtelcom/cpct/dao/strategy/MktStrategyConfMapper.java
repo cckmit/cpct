@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 @Repository
@@ -22,4 +23,5 @@ public interface MktStrategyConfMapper {
     int updateByPrimaryKey(MktStrategyConfDO mktStrategyConfDO);
 
     List<MktStrategyConfDO> selectByCampaignId(@Param("campaignId")Long campaignId);
+
 }
