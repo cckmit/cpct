@@ -566,11 +566,14 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "未命中任何客户");
             return result;
         }
-        for (String key : hitsList.keySet()) {
-            Map<String, Object> searchMap = (Map<String, Object>) ((Map<String, Object>) hitsList.get(key)).get("searchHitMap");
+
+        List<Map<String,Object>> mapList = (List<Map<String,Object>>) hitsList.get("result");
+
+        for (Map<String,Object> hitMap : mapList){
+            Map<String, Object> searchMap = (Map<String, Object>) hitMap.get("searchHitMap");
             Map<String, Object> ruleInfoMap = new HashMap<>();
-            if (((Map<String, Object>) hitsList.get(key)).get("ruleInfo") != null) {
-                ruleInfoMap = (Map<String, Object>) ((Map<String, Object>) hitsList.get(key)).get("ruleInfo");
+            if ((Map<String, Object>)hitMap.get("ruleInfo") != null) {
+                ruleInfoMap = (Map<String, Object>) hitMap.get("ruleInfo");
             }
             Map<String, Object> map = new HashMap<>();
             for (String set : searchMap.keySet()) {
@@ -588,7 +591,31 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             //todo 工单号
             map.put("orderId", "49736605");
             userList.add(map);
+
         }
+//        for (String key : hitsList.keySet()) {
+//            Map<String, Object> searchMap = (Map<String, Object>) ((Map<String, Object>) hitsList.get(key)).get("searchHitMap");
+//            Map<String, Object> ruleInfoMap = new HashMap<>();
+//            if (((Map<String, Object>) hitsList.get(key)).get("ruleInfo") != null) {
+//                ruleInfoMap = (Map<String, Object>) ((Map<String, Object>) hitsList.get(key)).get("ruleInfo");
+//            }
+//            Map<String, Object> map = new HashMap<>();
+//            for (String set : searchMap.keySet()) {
+//                if (labelCodeList.size() < searchMap.keySet().size()) {
+//                    labelCodeList.add(set);
+//                }
+//                map.put(set, searchMap.get(set));
+//            }
+//            map.put("campaignId", operation.getCampaignId());
+//            map.put("campaignName", operation.getCampaignName());
+//            map.put("strategyId", operation.getStrategyId());
+//            map.put("strategyName", operation.getStrategyName());
+//            map.put("ruleId", ruleInfoMap.get("ruleId"));
+//            map.put("ruleName", ruleInfoMap.get("ruleName").toString());
+//            //todo 工单号
+//            map.put("orderId", "49736605");
+//            userList.add(map);
+//        }
         if (labelCodeList.size() > 0) {
             List<SimpleInfo> titleList = labelMapper.listLabelByCodeList(labelCodeList);
             vo.setTitleList(titleList);
