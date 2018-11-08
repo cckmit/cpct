@@ -72,6 +72,13 @@
             <artifactId>druid</artifactId>
         </dependency>
 
+        <!-- 引入门户模块 -->
+        <dependency>
+            <groupId>com.ctzj.smt.bss</groupId>
+            <artifactId>bss-centralized-service-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>

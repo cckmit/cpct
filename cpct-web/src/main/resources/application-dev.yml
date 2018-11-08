@@ -63,6 +63,15 @@ spring:
       pool: 5
       cluster:
         name: es-cpct
-
+#es接口调用地址
+  esurl:
+#   machfile: http://134.96.252.170:30808/es/cpcMatchFileToFtp
+#   batchinfo: http://134.96.252.170:30808/es/searchBatchInfo
+#   hitslist: http://134.96.252.170:30808/es/findBatchHitsList
+#   countinfo: http://134.96.252.170:30808/es/searchCountInfo
+   machfile: http://localhost:8080/es/cpcMatchFileToFtp
+   batchinfo: http://localhost:8080/es/searchBatchInfo
+   hitslist: http://localhost:8080/es/findBatchHitsList
+   countinfo: http://localhost:8080/es/searchCountInfo
 
 
