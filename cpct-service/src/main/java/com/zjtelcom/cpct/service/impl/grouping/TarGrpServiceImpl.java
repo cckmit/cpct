@@ -403,8 +403,14 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             tarGrpConditionMapper.insertByBatch(insertConditions);
         }
         allCondition.addAll(insertConditions);
+
+        //不存在的删除
+        List<Long> allList = new ArrayList<>();
+        for (TarGrpCondition condition : allCondition){
+            allList.add(condition.getConditionId());
+        }
         for (TarGrpCondition condition : oldConditionList){
-            if (allCondition.contains(condition)){
+            if (allList.contains(condition.getConditionId())){
                 continue;
             }
             delList.add(condition.getConditionId());
