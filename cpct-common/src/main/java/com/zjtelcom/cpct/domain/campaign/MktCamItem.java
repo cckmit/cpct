@@ -58,6 +58,4 @@ public class MktCamItem extends BaseEntity{
     private String offerName;
 
 
-
-
 }
