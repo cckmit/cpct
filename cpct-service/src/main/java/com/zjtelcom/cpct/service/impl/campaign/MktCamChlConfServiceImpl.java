@@ -12,6 +12,7 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfAttrMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlResultConfRelMapper;
+import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
 import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
@@ -24,6 +25,7 @@ import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlResultConfRelDO;
 import com.zjtelcom.cpct.domain.channel.CamScript;
+import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
 import com.zjtelcom.cpct.domain.question.Questionnaire;
@@ -91,6 +93,8 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
 
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired
+    private ContactChannelMapper channelMapper;
 
     @Override
     public Map<String, Object> saveMktCamChlConf(MktCamChlConfDetail mktCamChlConfDetail) {
@@ -222,6 +226,10 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                     mktCamChlConfAttr.setAttrValueName(questionnaire.getNaireName());
                 }
                 mktCamChlConfAttrList.add(mktCamChlConfAttr);
+            }
+            Channel channel = channelMapper.selectByPrimaryKey(mktCamChlConfDO.getContactChlId());
+            if (channel!=null){
+                mktCamChlConfDetail.setContactChlCode(channel.getContactChlCode());
             }
             // 查询痛痒点话术列表
             Map<String, Object> verbalListMap = verbalService.getVerbalListByConfId(UserUtil.loginId(), evtContactConfId);
