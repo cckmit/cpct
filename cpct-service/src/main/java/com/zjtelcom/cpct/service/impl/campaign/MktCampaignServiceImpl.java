@@ -737,7 +737,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCamResultRelDO.setUpdateStaff(UserUtil.loginId());
             mktCamResultRelMapper.changeStatusByMktCampaignId(mktCamResultRelDO);
             // 发布活动异步同步活动到生产环境
-/*            new Thread() {
+            new Thread() {
                 @Override
                 public void run() {
                     try {
@@ -751,7 +751,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         e.printStackTrace();
                     }
                 }
-            }.start();*/
+            }.start();
         } else if (StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd) || StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)) {
             // 暂停或者下线, 该状态为未生效
             MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();
