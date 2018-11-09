@@ -23,4 +23,6 @@ public interface MktStrategyFilterRuleRelMapper {
     List<MktStrategyFilterRuleRelDO> selectAll();
 
     int updateByPrimaryKey(MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO);
+
+    List<MktStrategyFilterRuleRelDO> selectByRuleId(Long ruleId);
 }
