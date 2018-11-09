@@ -38,7 +38,11 @@ public class ScriptController extends BaseController  {
             if (param.get("scriptName")!=null){
                 scriptName = param.get("scriptName").toString();
             }
-            result = scriptService.getScriptList(userId,scriptName);
+            String scriptType = null;
+            if (param.get("scriptType")!=null){
+                scriptType = param.get("scriptType").toString();
+            }
+            result = scriptService.getScriptList(userId,scriptName,scriptType);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to getScriptList",e);
             result.put("resultCode",CODE_FAIL);
