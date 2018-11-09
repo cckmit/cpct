@@ -473,14 +473,17 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         if (!codeList.contains("ACCS_NBR")){
             codeList.add("ACC_NBR");
         }
-        if (!codeList.contains("LAN_NAME")){
-            codeList.add("LAN_NAME");
+        if (!codeList.contains("LATN_NAME")){
+            codeList.add("LATN_NAME");
         }
         if (!codeList.contains("CCUST_NAME")){
             codeList.add("CCUST_NAME");
         } if (!codeList.contains("CCUST_ID")){
             codeList.add("CCUST_ID");
+        } if (!codeList.contains("CCUST_TEL")){
+            codeList.add("CCUST_TEL");
         }
+
         String[] fieldList = new String[codeList.size()];
         for (int i = 0; i < codeList.size(); i++) {
             fieldList[i] = codeList.get(i);
