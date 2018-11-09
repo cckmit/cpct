@@ -43,7 +43,6 @@ public class ProductServiceImpl implements ProductService{
         for(int i = 0; i < split.length; i++) {
             List<Map<String,Object>> policyList = new ArrayList<>();
             Map<String,Object> map = new HashMap<>();
-            map.put("productCode",split[i]);
 
             FilterRule filterRule = new FilterRule();
             filterRule.setChooseProduct(split[i]);
@@ -70,19 +69,21 @@ public class ProductServiceImpl implements ProductService{
                     }
                 }
             }
-            map.put("policyList",policyList);
-
-            productList.add(map);
+            if(policyList.size() > 0) {
+                map.put("productCode",split[i]);
+                map.put("policyList", policyList);
+                productList.add(map);
+            }
 
         }
 
         resultMap.put("reqId", DateUtil.getDetailTime() + EsSearchUtil.getRandomStr(2));
-        if(productList == null) {
-            resultMap.put("resultCode", "1000");
-            resultMap.put("resultMsg", "没有匹配推荐结果");
-        }else{
+        if(productList.size() > 0) {
             resultMap.put("resultCode", "1");
             resultMap.put("resultMsg", "有推荐结果");
+        }else{
+            resultMap.put("resultCode", "1000");
+            resultMap.put("resultMsg", "没有匹配推荐结果");
         }
 
         resultMap.put("productList",productList);
