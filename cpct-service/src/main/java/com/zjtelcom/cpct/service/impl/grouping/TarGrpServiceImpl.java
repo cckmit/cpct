@@ -147,6 +147,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         List<TarGrpCondition> conditionAdd = new ArrayList<>();
         for (TarGrpCondition conditionDO : conditionDOList){
             TarGrpCondition con = BeanUtil.create(conditionDO,new TarGrpCondition());
+            con.setRemark("");
             conditionAdd.add(con);
         }
         addVO.setTarGrpConditions(conditionAdd);
@@ -403,8 +404,14 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             tarGrpConditionMapper.insertByBatch(insertConditions);
         }
         allCondition.addAll(insertConditions);
+
+        //不存在的删除
+        List<Long> allList = new ArrayList<>();
+        for (TarGrpCondition condition : allCondition){
+            allList.add(condition.getConditionId());
+        }
         for (TarGrpCondition condition : oldConditionList){
-            if (allCondition.contains(condition)){
+            if (allList.contains(condition.getConditionId())){
                 continue;
             }
             delList.add(condition.getConditionId());

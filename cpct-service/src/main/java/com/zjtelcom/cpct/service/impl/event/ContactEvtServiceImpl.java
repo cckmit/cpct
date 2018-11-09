@@ -589,31 +589,34 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                 EventMatchRulDetail eventMatchRulDetail = evtDetail.getEventMatchRulDetail();
                 eventMatchRulDetail.setEventId(evtDetail.getContactEvtId());
                 List<EventMatchRulCondition> eventMatchRulConditions = eventMatchRulDetail.getEventMatchRulConditions();
-                eventMatchRulDetail.setEventMatchRulConditions(eventMatchRulConditions);
-//                List<Long> list = new ArrayList<>();
+//                eventMatchRulDetail.setEventMatchRulConditions(eventMatchRulConditions);
+                List<Long> list = new ArrayList<>();
                 //遍历旧的事件规则条件
-//                Map<String,Object> eventMatchRulMap = eventMatchRulService.listEventMatchRul(evtDetail.getContactEvtId());
-//                EventMatchRulDTO eventMatchRulDTO = (EventMatchRulDTO) eventMatchRulMap.get("listEventMatchRul");
-//                Map<String,Object> eventMatchRulConditionMap = eventMatchRulService.listEventMatchRulCondition(eventMatchRulDTO.getEvtMatchRulId());
-//                List<EventMatchRulConditionVO> rulConditionList = (List<EventMatchRulConditionVO>) eventMatchRulConditionMap.get("listEventMatchRulCondition");
-                //更新的事件规则条件的id
-//                for(EventMatchRulCondition eventMatchRulCondition: eventMatchRulConditions){
-//                    list.add(eventMatchRulCondition.getEvtMatchRulId());
-//                }
+                Map<String, Object> eventMatchRulMap = eventMatchRulService.listEventMatchRul(evtDetail.getContactEvtId());
+                EventMatchRulDTO eventMatchRulDTO = (EventMatchRulDTO) eventMatchRulMap.get("listEventMatchRul");
+                Map<String, Object> eventMatchRulConditionMap = eventMatchRulService.listEventMatchRulCondition(eventMatchRulDTO.getEvtMatchRulId());
+                List<EventMatchRulConditionVO> rulConditionList = (List<EventMatchRulConditionVO>) eventMatchRulConditionMap.get("listEventMatchRulCondition");
 
                 //事件规则更新
                 Map<String, Object> eventMatchRul = eventMatchRulService.modEventMatchRul(eventMatchRulDetail);
-                //删除多余的事件规则条件
-//                for(EventMatchRulConditionVO eventMatchRulConditionVO : rulConditionList) {
-//                    if(!list.contains(eventMatchRulConditionVO.getEvtMatchRulId())) {
-//                        EventMatchRulCondition eventMatchRulCondition = BeanUtil.create(eventMatchRulConditionVO,new EventMatchRulCondition());
-//                        eventMatchRulService.delEventMatchRulCondition(eventMatchRulCondition);
-//                    }
-//                }
                 if (!eventMatchRul.get("resultCode").equals(CODE_SUCCESS)) {
                     return eventMatchRul;
                 }
+
+                //更新的事件规则条件的id
+                for (EventMatchRulCondition eventMatchRulCondition : eventMatchRulConditions) {
+                    list.add(eventMatchRulCondition.getConditionId());
+                }
+
+                //删除多余的事件规则条件
+                for (EventMatchRulConditionVO eventMatchRulConditionVO : rulConditionList) {
+                    if (!list.contains(eventMatchRulConditionVO.getConditionId())) {
+                        EventMatchRulCondition eventMatchRulCondition = BeanUtil.create(eventMatchRulConditionVO, new EventMatchRulCondition());
+                        eventMatchRulService.delEventMatchRulCondition(eventMatchRulCondition.getConditionId());
+                    }
+                }
             }
+
         }
         map.put("resultCode", CommonConstant.CODE_SUCCESS);
         map.put("resultMsg", StringUtils.EMPTY);
