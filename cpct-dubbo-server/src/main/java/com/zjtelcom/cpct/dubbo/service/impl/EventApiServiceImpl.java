@@ -520,8 +520,8 @@ public class EventApiServiceImpl implements EventApiService {
             privateParams.put("skipCheck", "0"); //是否预校验  todo
 
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            privateParams.put("activityStartTime", simpleDateFormat.format(mktCampaign.getBeginTime())); //活动开始时间
-            privateParams.put("activityEndTime", simpleDateFormat.format(mktCampaign.getEndTime())); //活动结束时间
+            privateParams.put("activityStartTime", simpleDateFormat.format(mktCampaign.getPlanBeginTime())); //活动开始时间
+            privateParams.put("activityEndTime", simpleDateFormat.format(mktCampaign.getPlanEndTime())); //活动结束时间
 
             //es log
             esJson.put("reqId", reqId);
@@ -549,10 +549,10 @@ public class EventApiServiceImpl implements EventApiService {
 //            int i = 0;
 
             //查询展示列 （iSale）
-            List<Map<String, String>> iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getIsaleDisplay());
+            List<Map<String, Object>> iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getIsaleDisplay());
             if (iSaleDisplay != null && iSaleDisplay.size() > 0) {
-                for (Map<String, String> label : iSaleDisplay) {
-                    querySb.append(label.get("labelCode")).append(",");
+                for (Map<String, Object> label : iSaleDisplay) {
+                    querySb.append((String) label.get("labelCode")).append(",");
                 }
 
                 if (querySb.length() > 0) {
@@ -576,45 +576,45 @@ public class EventApiServiceImpl implements EventApiService {
                 List<Map<String, Object>> triggerList3 = new ArrayList<>();
                 List<Map<String, Object>> triggerList4 = new ArrayList<>();
 
-                if (iSaleDisplay != null) {
-                    for (Map<String, String> label : iSaleDisplay) {
-                        if (resJson.containsKey(label.get("labelCode"))) {
-                            triggers.put("key", label.get("labelCode"));
-                            triggers.put("value", resJson.get(label.get("labelCode")));
-                            triggers.put("display", 0); //todo 确定display字段
-                            triggers.put("name", label.get("labelName"));
-                            if ("1".equals(label.get("typeCode"))) {
-                                triggerList1.add(triggers);
-                            } else if ("2".equals(label.get("typeCode"))) {
-                                triggerList2.add(triggers);
-                            } else if ("3".equals(label.get("typeCode"))) {
-                                triggerList3.add(triggers);
-                            } else if ("4".equals(label.get("typeCode"))) {
-                                triggerList4.add(triggers);
-                            }
+                for (Map<String, Object> label : iSaleDisplay) {
+                    if (resJson.containsKey((String) label.get("labelCode"))) {
+                        triggers = new JSONObject();
+                        triggers.put("key", (String) label.get("labelCode"));
+                        triggers.put("value", resJson.get((String) label.get("labelCode")));
+                        triggers.put("display", 0); //todo 确定display字段
+                        triggers.put("name", (String) label.get("labelName"));
+                        System.out.println(label.get("typeCode"));
+                        if ("1".equals(label.get("typeCode").toString())) {
+                            triggerList1.add(triggers);
+                        } else if ("2".equals(label.get("typeCode").toString())) {
+                            triggerList2.add(triggers);
+                        } else if ("3".equals(label.get("typeCode").toString())) {
+                            triggerList3.add(triggers);
+                        } else if ("4".equals(label.get("typeCode").toString())) {
+                            triggerList4.add(triggers);
                         }
                     }
                 }
                 if (triggerList1.size() > 0) {
-                    itgTriggers = new ArrayList<>();
+                    itgTrigger = new JSONObject();
                     itgTrigger.put("triggerList", triggerList1);
                     itgTrigger.put("type", "固定信息");
                     itgTriggers.add(itgTrigger);
                 }
                 if (triggerList2.size() > 0) {
-                    itgTriggers = new ArrayList<>();
+                    itgTrigger = new JSONObject();
                     itgTrigger.put("triggerList", triggerList2);
                     itgTrigger.put("type", "营销信息");
                     itgTriggers.add(itgTrigger);
                 }
                 if (triggerList3.size() > 0) {
-                    itgTriggers = new ArrayList<>();
+                    itgTrigger = new JSONObject();
                     itgTrigger.put("triggerList", triggerList3);
                     itgTrigger.put("type", "费用信息");
                     itgTriggers.add(itgTrigger);
                 }
                 if (triggerList4.size() > 0) {
-                    itgTriggers = new ArrayList<>();
+                    itgTrigger = new JSONObject();
                     itgTrigger.put("triggerList", triggerList4);
                     itgTrigger.put("type", "协议信息");
                     itgTriggers.add(itgTrigger);
@@ -1555,17 +1555,13 @@ public class EventApiServiceImpl implements EventApiService {
             List<MktVerbal> mktVerbals = mktVerbalMapper.findVerbalListByConfId(evtContactConfId);
             if (mktVerbals != null && mktVerbals.size() > 0) {
                 for (MktVerbal mktVerbal : mktVerbals) {
-                    if(mktVerbal.getChannelId() != null && mktCamChlConf.getContactChlId().equals(mktVerbal.getChannelId())) {
+                    if (mktVerbal.getChannelId() != null && mktCamChlConf.getContactChlId().equals(mktVerbal.getChannelId())) {
                         //查询痛痒点规则
                         List<MktVerbalCondition> channelConditionList = mktVerbalConditionMapper.findChannelConditionListByVerbalId(mktVerbal.getVerbalId());
 
-
+                        channel.put("reason", mktVerbals.get(0).getScriptDesc());
                     }
                 }
-            }
-            if (mktVerbals != null && mktVerbals.size() > 0) {
-                //返回结果中添加痛痒点信息
-                channel.put("reason", mktVerbals.get(0).getScriptDesc());
             }
             channel.put("itgTriggers", JSONArray.toJSON(itgTriggers));
 
