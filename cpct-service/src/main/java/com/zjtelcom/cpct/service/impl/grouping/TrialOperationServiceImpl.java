@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.impl.grouping;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.JsonObject;
 import com.sun.corba.se.spi.ior.ObjectKey;
@@ -20,10 +21,7 @@ import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlResultConfRelDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
-import com.zjtelcom.cpct.domain.channel.CamScript;
-import com.zjtelcom.cpct.domain.channel.DisplayColumn;
-import com.zjtelcom.cpct.domain.channel.Label;
-import com.zjtelcom.cpct.domain.channel.MktProductRule;
+import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.GroupingVO;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
@@ -532,6 +530,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             System.out.println("*************************" + rule);
         }
         param.setRule(rule);
+        List<LabelResult> labelResultList = new ArrayList<>();
+        if (redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId+"_LABEL")!=null){
+            JSONArray objects = JSONArray.parseArray((String) redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId+"_LABEL"));
+            labelResultList = objects.toJavaList(LabelResult.class);
+        }
+        param.setLabelResultList(labelResultList);
         return param;
     }
 

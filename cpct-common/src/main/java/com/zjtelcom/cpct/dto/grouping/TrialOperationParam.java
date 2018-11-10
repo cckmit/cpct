@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.dto.grouping;
 
+import com.zjtelcom.cpct.domain.channel.LabelResult;
 import com.zjtelcom.cpct.domain.channel.MktProductRule;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 
@@ -30,6 +31,8 @@ public class TrialOperationParam implements Serializable {
      */
     private Long tarGrpId;
 
+    private List<LabelResult> labelResultList;
+
     /**
      * 销售品集合
      */
@@ -40,6 +43,14 @@ public class TrialOperationParam implements Serializable {
      */
     private List<MktCamChlConfDetail> mktCamChlConfDetailList;
 
+
+    public List<LabelResult> getLabelResultList() {
+        return labelResultList;
+    }
+
+    public void setLabelResultList(List<LabelResult> labelResultList) {
+        this.labelResultList = labelResultList;
+    }
 
     public Long getTarGrpId() {
         return tarGrpId;
