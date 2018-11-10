@@ -144,6 +144,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         List<TarGrpCondition> conditionDOList = tarGrpConditionMapper.listTarGrpCondition(templateId);
 
         TarGrpDetail addVO = BeanUtil.create(template,new TarGrpDetail());
+        addVO.setRemark(null);
         List<TarGrpCondition> conditionAdd = new ArrayList<>();
         for (TarGrpCondition conditionDO : conditionDOList){
             TarGrpCondition con = BeanUtil.create(conditionDO,new TarGrpCondition());
@@ -323,6 +324,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             }
             if (conditionList.isEmpty()){
                 tarGrpMapper.deleteByPrimaryKey(tarGrpId);
+                redisUtils.remove("TAR_GRP_"+tarGrp.getTarGrpId());
             }
         } catch (Exception e) {
             mapsT.put("resultCode", CODE_FAIL);
@@ -402,8 +404,14 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             tarGrpConditionMapper.insertByBatch(insertConditions);
         }
         allCondition.addAll(insertConditions);
+
+        //不存在的删除
+        List<Long> allList = new ArrayList<>();
+        for (TarGrpCondition condition : allCondition){
+            allList.add(condition.getConditionId());
+        }
         for (TarGrpCondition condition : oldConditionList){
-            if (allCondition.contains(condition)){
+            if (allList.contains(condition.getConditionId())){
                 continue;
             }
             delList.add(condition.getConditionId());

@@ -24,4 +24,6 @@ public interface MktCamItemMapper {
     int updateByPrimaryKey(MktCamItem record);
 
     int insertByBatch(List<MktCamItem> record);
+
+    List<MktCamItem> selectByBatch(List<Long> mktCamItemIdList);
 }

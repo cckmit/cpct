@@ -34,7 +34,7 @@ public class SyncLabelController {
 //        }
 
         //result = syncLabelService.initialization();
-        result = syncLabelService.listLabelCatalog();
+        result = syncLabelService.syncLabelInfo(model);
         return JSON.toJSON(result).toString();
     }
 

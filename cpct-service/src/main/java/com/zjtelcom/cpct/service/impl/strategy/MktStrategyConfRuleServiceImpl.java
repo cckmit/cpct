@@ -9,6 +9,8 @@ package com.zjtelcom.cpct.service.impl.strategy;
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
+import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
+import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.domain.campaign.*;
@@ -20,6 +22,8 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.dto.channel.CamScriptAddVO;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
+import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
+import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.enums.StatusCode;
@@ -35,6 +39,7 @@ import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,6 +97,14 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
     @Autowired
     private RedisUtils redisUtils;
 
+    @Autowired
+    private TarGrpMapper tarGrpMapper;
+    @Autowired
+    private TarGrpConditionMapper tarGrpConditionMapper;
+
+    @Autowired
+    private MktCamItemMapper mktCamItemMapper;
+
     /**
      * 添加策略规则
      *
@@ -137,6 +150,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             if (mktStrategyConfRule.getMktCamChlResultList() != null) {
                 String mktCamChlResultIds = "";
                 for (int i = 0; i < mktStrategyConfRule.getMktCamChlResultList().size(); i++) {
+                    mktStrategyConfRule.getMktCamChlResultList().get(i).setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
                     Map<String, Object> mktCamChlResultMap = mktCamChlResultService.saveMktCamChlResult(mktStrategyConfRule.getMktCamChlResultList().get(i));
                     MktCamChlResultDO mktCamChlResultDO = (MktCamChlResultDO) mktCamChlResultMap.get("mktCamChlResultDO");
                     Long mktCamChlResultId = mktCamChlResultDO.getMktCamChlResultId();
@@ -184,7 +198,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.SAVE_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
             mktStrategyConfRuleMap.put("mktStrategyConfRuleDO", mktStrategyConfRuleDO);
         } catch (Exception e) {
-            logger.error("[op:MktStrategyConfRuleServiceImpl] failed to save MktStrategyConfRule = {}", JSON.toJSON(mktStrategyConfRule));
+            logger.error("[op:MktStrategyConfRuleServiceImpl] failed to save MktStrategyConfRule = {}, Exception:", JSON.toJSON(mktStrategyConfRule), e);
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_FAIL);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.SAVE_MKT_RULE_STR_CONF_RULE_FAILURE.getErrorMsg());
             mktStrategyConfRuleMap.put("mktStrategyConfRuleDO", mktStrategyConfRuleDO);
@@ -321,7 +335,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             if (mktStrategyConfRuleDO.getMktCamChlResultId() != null) {
                 String[] mktCamChlResultIds = mktStrategyConfRuleDO.getMktCamChlResultId().split("/");
                 List<MktCamChlResult> mktCamChlResultList = new ArrayList<>();
-                if(mktCamChlResultIds!=null && !"".equals(mktCamChlResultIds[0])){
+                if (mktCamChlResultIds != null && !"".equals(mktCamChlResultIds[0])) {
                     for (String mktCamChlResultId : mktCamChlResultIds) {
                         Map<String, Object> mktCamChlResultMap = mktCamChlResultService.getMktCamChlResult(Long.valueOf(mktCamChlResultId));
                         mktCamChlResultList.add((MktCamChlResult) mktCamChlResultMap.get("mktCamChlResult"));
@@ -358,7 +372,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
             mktStrategyConfRuleMap.put("mktStrategyConfRuleDOList", mktStrategyConfRuleDOList);
         } catch (Exception e) {
-            logger.error("[op:MktStrategyConfRuleServiceImpl] failed to get the List of mktStrategyConfRuleDOList = {}", JSON.toJSON(mktStrategyConfRuleDOList));
+            logger.error("[op:MktStrategyConfRuleServiceImpl] failed to get the List of mktStrategyConfRuleDOList = {}, Exception", JSON.toJSON(mktStrategyConfRuleDOList), e);
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_FAIL);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_FAILURE.getErrorMsg());
             mktStrategyConfRuleMap.put("mktStrategyConfRuleDOList", mktStrategyConfRuleDOList);
@@ -389,7 +403,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
             mktStrategyConfRuleMap.put("mktStrategyConfRuleList", mktStrategyConfRuleList);
         } catch (Exception e) {
-            logger.error("[op:MktStrategyConfRuleServiceImpl] failed to get the List of mktStrategyConfRuleList = {}", JSON.toJSON(mktStrategyConfRuleList));
+            logger.error("[op:MktStrategyConfRuleServiceImpl] failed to get the List of mktStrategyConfRuleList = {} , Exception = ", JSON.toJSON(mktStrategyConfRuleList), e);
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_FAIL);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_FAILURE.getErrorMsg());
             mktStrategyConfRuleMap.put("mktStrategyConfRuleList", mktStrategyConfRuleList);
@@ -414,7 +428,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
         } catch (Exception e) {
-            logger.error("[op:MktStrategyConfRuleServiceImpl] failed to delete the mktStrategyConfRuleDO by mktStrategyConfRuleId = {}", mktStrategyConfRuleId);
+            logger.error("[op:MktStrategyConfRuleServiceImpl] failed to delete the mktStrategyConfRuleDO by mktStrategyConfRuleId = {},  Exception=", mktStrategyConfRuleId, e);
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_FAIL);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.DELETE_MKT_RULE_STR_CONF_RULE_FAILURE.getErrorMsg());
         }
@@ -757,6 +771,559 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             logger.info("-------------->>>>>>>>>>>>>>>>>>>>>>>>>复制规则结束：" + simpleDateFormat.format(new Date()));
             return mktStrategyConfRuleMap;
         }
+    }
+
+
+    /**
+     * 批量保存客户分群
+     *
+     * @param ruleIdList
+     * @param tarGrpNewId
+     * @return
+     */
+    @Override
+    public Map<String, Object> insertTarGrpBatch(List<Integer> ruleIdList, Long tarGrpNewId) {
+        Map<String, Object> tarGrpMap = new HashMap<>();
+        // 查询新的客户分群
+        try {
+            TarGrpDetail tarGrpDetail = (TarGrpDetail) redisUtils.get("TAR_GRP_" + tarGrpNewId);
+            //初始化结果集
+            List<Future<Map<String, Object>>> threadList = new ArrayList<>();
+            //初始化线程池
+            for (Integer ruleId : ruleIdList) {
+                Future<Map<String, Object>> tarGrpFuture = null;
+                ExecutorService executorService = Executors.newCachedThreadPool();
+                tarGrpFuture = executorService.submit(new insertTarGrpBatchTask(ruleId.longValue(), tarGrpDetail));
+                threadList.add(tarGrpFuture);
+            }
+
+            List<TarGrpDetail> tarGrpDetailList = new ArrayList<>();
+            for (Future<Map<String, Object>> tarGrpFutureNew : threadList) {
+                if (tarGrpFutureNew != null && tarGrpFutureNew.get() != null) {
+                    TarGrpDetail grpDetail = (TarGrpDetail) tarGrpFutureNew.get().get("tarGrpDetail");
+                    tarGrpDetailList.add(grpDetail);
+                }
+                tarGrpMap.put("tarGrpDetailList", tarGrpDetailList);
+            }
+        } catch (Exception e) {
+            logger.error("Exception = ", e);
+        }
+        return tarGrpMap;
+    }
+
+
+    class insertTarGrpBatchTask implements Callable<Map<String, Object>> {
+        private Long ruleId;
+        private TarGrpDetail tarGrpDetail;
+
+        public insertTarGrpBatchTask(Long ruleId, TarGrpDetail tarGrpDetail) {
+            this.ruleId = ruleId;
+            this.tarGrpDetail = tarGrpDetail;
+        }
+
+        @Override
+        public Map<String, Object> call() throws Exception {
+            Map<String, Object> map = new HashMap<>();
+            MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleId);
+
+            if (mktStrategyConfRuleDO.getTarGrpId() != null) {
+                TarGrpDetail detail = (TarGrpDetail) redisUtils.get("TAR_GRP_" + mktStrategyConfRuleDO.getTarGrpId());
+                List<TarGrpCondition> tarGrpConditionList = new ArrayList<>();
+                if (detail == null) {
+                    TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(mktStrategyConfRuleDO.getTarGrpId());
+                    if (tarGrp != null) {
+                        List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(mktStrategyConfRuleDO.getTarGrpId());
+                        detail = BeanUtil.create(tarGrp, new TarGrpDetail());
+                        detail.setTarGrpConditions(conditionList);
+                        redisUtils.set("TAR_GRP_" + tarGrp.getTarGrpId(), detail);
+                    } else {
+                        Map<String, Object> tarGrpMap = tarGrpService.createTarGrp(tarGrpDetail, false);
+                        TarGrp tarGrpNew = (TarGrp) tarGrpMap.get("tarGrp");
+                        MktStrategyConfRuleDO ruleNew = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleId);
+                        ruleNew.setTarGrpId(tarGrpNew.getTarGrpId());
+                        ruleNew.setUpdateDate(new Date());
+                        ruleNew.setUpdateStaff(UserUtil.loginId());
+                        mktStrategyConfRuleMapper.updateByPrimaryKey(ruleNew);
+                    }
+                }
+                List<TarGrpCondition> moreList = new ArrayList<>();
+                for (TarGrpCondition tarGrpCondition : detail.getTarGrpConditions()) {
+                    for (TarGrpCondition tarGrpConditionNew : tarGrpDetail.getTarGrpConditions()) {
+                        tarGrpConditionNew.setConditionId(null);
+                        if (tarGrpCondition.getLeftParam().equals(tarGrpConditionNew.getLeftParam())) {
+                            moreList.add(tarGrpCondition);
+                            continue;
+                        }
+                    }
+                }
+                detail.getTarGrpConditions().removeAll(moreList);
+                List<TarGrpCondition> newList = new ArrayList<>();
+                newList.addAll(detail.getTarGrpConditions());
+                newList.addAll(tarGrpDetail.getTarGrpConditions());
+                detail.setTarGrpConditions(newList);
+                map = tarGrpService.modTarGrp(detail);
+            } else {
+                tarGrpService.createTarGrp(tarGrpDetail, false);
+                Map<String, Object> tarGrpMap = tarGrpService.createTarGrp(tarGrpDetail, false);
+                TarGrp tarGrpNew = (TarGrp) tarGrpMap.get("tarGrp");
+                MktStrategyConfRuleDO ruleNew = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleId);
+                ruleNew.setTarGrpId(tarGrpNew.getTarGrpId());
+                ruleNew.setUpdateDate(new Date());
+                ruleNew.setUpdateStaff(UserUtil.loginId());
+                mktStrategyConfRuleMapper.updateByPrimaryKey(ruleNew);
+            }
+            return map;
+        }
+    }
+
+
+    /**
+     * 批量修改
+     *
+     * @param ruleIdList
+     * @param tarGrpNewId
+     * @return
+     */
+    @Override
+    public Map<String, Object> updateTarGrpBatch(List<Integer> ruleIdList, Long tarGrpNewId) {
+        Map<String, Object> tarGrpMap = new HashMap<>();
+        // 查询新的客户分群
+        try {
+            TarGrpDetail tarGrpDetail = (TarGrpDetail) redisUtils.get("TAR_GRP_" + tarGrpNewId);
+            //初始化结果集
+            List<Future<Map<String, Object>>> threadList = new ArrayList<>();
+            //初始化线程池
+            for (Integer ruleId : ruleIdList) {
+                Future<Map<String, Object>> tarGrpFuture = null;
+                ExecutorService executorService = Executors.newCachedThreadPool();
+                tarGrpFuture = executorService.submit(new updateTarGrpBatchTask(ruleId.longValue(), tarGrpDetail));
+                threadList.add(tarGrpFuture);
+            }
+
+            List<TarGrpDetail> tarGrpDetailList = new ArrayList<>();
+            for (Future<Map<String, Object>> tarGrpFutureNew : threadList) {
+                if (tarGrpFutureNew != null && tarGrpFutureNew.get() != null) {
+                    TarGrpDetail grpDetail = (TarGrpDetail) tarGrpFutureNew.get().get("tarGrpDetail");
+                    tarGrpDetailList.add(grpDetail);
+                }
+                tarGrpMap.put("tarGrpDetailList", tarGrpDetailList);
+            }
+        } catch (Exception e) {
+            logger.error("Exception = ", e);
+        }
+        return tarGrpMap;
+    }
+
+
+    class updateTarGrpBatchTask implements Callable<Map<String, Object>> {
+        private Long ruleId;
+        private TarGrpDetail tarGrpDetail;
+
+        public updateTarGrpBatchTask(Long ruleId, TarGrpDetail tarGrpDetail) {
+            this.ruleId = ruleId;
+            this.tarGrpDetail = tarGrpDetail;
+        }
+
+        @Override
+        public Map<String, Object> call() throws Exception {
+            Map<String, Object> map = new HashMap<>();
+            MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleId);
+            if (mktStrategyConfRuleDO.getTarGrpId() != null) {
+                TarGrpDetail detail = (TarGrpDetail) redisUtils.get("TAR_GRP_" + mktStrategyConfRuleDO.getTarGrpId());
+                List<Long> delId = new ArrayList<>();
+                if (detail != null) {
+                    List<TarGrpCondition> moreList = new ArrayList<>();
+                    for (int i = 0; i < detail.getTarGrpConditions().size(); i++) {
+                        TarGrpCondition tarGrpCondition = detail.getTarGrpConditions().get(i);
+                        for (int j = 0; j < tarGrpDetail.getTarGrpConditions().size(); j++) {
+                            TarGrpCondition tarGrpConditionNew = tarGrpDetail.getTarGrpConditions().get(j);
+                            if (tarGrpCondition.getLeftParam().equals(tarGrpConditionNew.getLeftParam())) {
+                                tarGrpConditionNew.setTarGrpId(mktStrategyConfRuleDO.getTarGrpId());
+                                moreList.add(tarGrpConditionNew);
+                                delId.add(tarGrpCondition.getConditionId());
+                                continue;
+                            } else if (!tarGrpCondition.getLeftParam().equals(tarGrpConditionNew.getLeftParam()) && j == tarGrpDetail.getTarGrpConditions().size() - 1) {
+                                moreList.add(tarGrpCondition);
+                            }
+                        }
+                    }
+                    detail.setTarGrpConditions(moreList);
+                    map = tarGrpService.modTarGrp(detail);
+                    tarGrpConditionMapper.deleteBatch(delId);
+                }
+            }
+            return map;
+        }
+    }
+
+
+    /**
+     * 批量删除
+     *
+     * @param ruleIdList
+     * @param tarGrpNewId
+     * @return
+     */
+    @Override
+    public Map<String, Object> deleteTarGrpBatch(List<Integer> ruleIdList, Long tarGrpNewId) {
+        Map<String, Object> tarGrpMap = new HashMap<>();
+        // 查询新的客户分群
+        try {
+            TarGrpDetail tarGrpDetail = (TarGrpDetail) redisUtils.get("TAR_GRP_" + tarGrpNewId);
+            //初始化结果集
+            List<Future<Map<String, Object>>> threadList = new ArrayList<>();
+            //初始化线程池
+            Future<Map<String, Object>> tarGrpFuture = null;
+            ExecutorService executorService = Executors.newCachedThreadPool();
+            for (Integer ruleId : ruleIdList) {
+                tarGrpFuture = executorService.submit(new deleteTarGrpBatchTask(ruleId.longValue(), tarGrpDetail));
+                threadList.add(tarGrpFuture);
+            }
+
+            List<TarGrpDetail> tarGrpDetailList = new ArrayList<>();
+            for (Future<Map<String, Object>> tarGrpFutureNew : threadList) {
+                if (tarGrpFutureNew != null && tarGrpFutureNew.get() != null) {
+                    TarGrpDetail grpDetail = (TarGrpDetail) tarGrpFutureNew.get().get("tarGrpDetail");
+                    tarGrpDetailList.add(grpDetail);
+                }
+                tarGrpMap.put("tarGrpDetailList", tarGrpDetailList);
+            }
+        } catch (Exception e) {
+            logger.error("Exception = ", e);
+        }
+        return tarGrpMap;
+    }
+
+
+    class deleteTarGrpBatchTask implements Callable<Map<String, Object>> {
+        private Long ruleId;
+        private TarGrpDetail tarGrpDetail;
+
+        public deleteTarGrpBatchTask(Long ruleId, TarGrpDetail tarGrpDetail) {
+            this.ruleId = ruleId;
+            this.tarGrpDetail = tarGrpDetail;
+        }
+
+        @Override
+        public Map<String, Object> call() throws Exception {
+            Map<String, Object> map = new HashMap<>();
+            MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleId);
+            if (mktStrategyConfRuleDO.getTarGrpId() != null) {
+                TarGrpDetail detail = (TarGrpDetail) redisUtils.get("TAR_GRP_" + mktStrategyConfRuleDO.getTarGrpId());
+                List<TarGrpCondition> tarGrpConditionList = new ArrayList<>();
+                if (detail != null) {
+                    List<TarGrpCondition> moreList = new ArrayList<>();
+                    for (TarGrpCondition tarGrpCondition : detail.getTarGrpConditions()) {
+                        for (TarGrpCondition tarGrpConditionNew : tarGrpDetail.getTarGrpConditions()) {
+                            if (tarGrpCondition.getLeftParam().equals(tarGrpConditionNew.getLeftParam())) {
+                                tarGrpService.delTarGrpCondition(tarGrpCondition.getConditionId());
+                            }
+                        }
+                    }
+                }
+            }
+            return map;
+        }
+    }
+
+
+    /**
+     * 批量保存推荐条目
+     *
+     * @param ruleIdList
+     * @param camitemIdList
+     * @return
+     */
+    @Override
+    public Map<String, Object> insertCamItemBatch(List<Integer> ruleIdList, List<Integer> camitemIdList) {
+        List<Long> ruleIdLongList = listInteger2Long(ruleIdList);
+        List<Long> camitemIdLongList = listInteger2Long(camitemIdList);
+        Map tarGrpMap = new HashMap();
+        //初始化结果集
+        List<Future<Map<String, Object>>> threadList = new ArrayList<>();
+        //初始化线程池
+        Future<Map<String, Object>> camItemFuture = null;
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        for (Long ruleId : ruleIdLongList) {
+            camItemFuture = executorService.submit(new insertCamItemBatch(ruleId, camitemIdLongList));
+            threadList.add(camItemFuture);
+        }
+        List<Long> ruleIdListNew = new ArrayList<>();
+        try {
+            for (Future<Map<String, Object>> camItemFutureNew : threadList) {
+                if (camItemFutureNew != null && camItemFutureNew.get() != null) {
+                    Long ruleId = (Long) camItemFutureNew.get().get("ruleId");
+                    ruleIdLongList.add(ruleId);
+                }
+                tarGrpMap.put("ruleIdList", ruleIdListNew);
+                tarGrpMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+                tarGrpMap.put("resultMsg", "批量插入销售品成功!");
+            }
+        } catch (Exception e) {
+            tarGrpMap.put("resultCode", CommonConstant.CODE_FAIL);
+            tarGrpMap.put("resultMsg", "批量插入销售品失败!");
+            logger.error("[op:insertCamItemBatch],批量插入销售品失败! Exception = ", e);
+        }
+        return tarGrpMap;
+    }
+
+
+    class insertCamItemBatch implements Callable<Map<String, Object>> {
+        private Long ruleId;
+        private List<Long> camitemIdList;
+
+        public insertCamItemBatch(Long ruleId, List<Long> camitemIdList) {
+            this.ruleId = ruleId;
+            this.camitemIdList = camitemIdList;
+        }
+
+        @Override
+        public Map<String, Object> call() throws Exception {
+            Map map = new HashMap();
+            MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleId);
+            String productIds = mktStrategyConfRuleDO.getProductId();
+            List<Long> productIdList = new ArrayList<>();
+            List<MktCamItem> mktCamItemList = new ArrayList<>();
+            if (productIds != null && !"".equals(productIds)) {
+                String[] productIdArrary = productIds.split("/");
+                for (String productId : productIdArrary) {
+                    // mktCamItemMapper.selectByPrimaryKey(Long.valueOf(productId))
+                    productIdList.add(Long.valueOf(productId));
+                }
+                // 获取原有的推送条目
+                mktCamItemList = mktCamItemMapper.selectByBatch(productIdList);
+            }
+            // 获取最新的推荐条目
+            List<MktCamItem> mktCamItemListNew = mktCamItemMapper.selectByBatch(camitemIdList);
+            List<Long> moreIdList = new ArrayList<>();
+            for (int i = 0; i < mktCamItemList.size(); i++) {
+                for (int j = 0; j < mktCamItemListNew.size(); j++) {
+                    if (!mktCamItemList.get(i).getItemId().equals(mktCamItemListNew.get(j).getItemId()) && j == mktCamItemListNew.size() - 1) {
+                        moreIdList.add(mktCamItemList.get(i).getMktCamItemId());
+                    } else if (mktCamItemList.get(i).getItemId().equals(mktCamItemListNew.get(j).getItemId())) {
+                        continue;
+                    }
+                }
+            }
+            camitemIdList.addAll(moreIdList);
+            String productIdsNew = "";
+            for (int i = 0; i < camitemIdList.size(); i++) {
+                if (i == 0) {
+                    productIdsNew += camitemIdList.get(i);
+                } else {
+                    productIdsNew += "/" + camitemIdList.get(i);
+                }
+            }
+            mktStrategyConfRuleDO.setProductId(productIdsNew);
+            mktStrategyConfRuleDO.setUpdateStaff(UserUtil.loginId());
+            mktStrategyConfRuleDO.setUpdateDate(new Date());
+            mktStrategyConfRuleMapper.updateByPrimaryKey(mktStrategyConfRuleDO);
+            map.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
+            return map;
+        }
+    }
+
+
+    /**
+     * 批量更新推荐条目
+     *
+     * @param ruleIdList
+     * @param camitemIdList
+     * @return
+     */
+    @Override
+    public Map<String, Object> updateCamItemBatch(List<Integer> ruleIdList, List<Integer> camitemIdList) {
+        List<Long> ruleIdLongList = listInteger2Long(ruleIdList);
+        List<Long> camitemIdLongList = listInteger2Long(camitemIdList);
+        Map tarGrpMap = new HashMap();
+        //初始化结果集
+        List<Future<Map<String, Object>>> threadList = new ArrayList<>();
+        //初始化线程池
+        Future<Map<String, Object>> camItemFuture = null;
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        for (Long ruleId : ruleIdLongList) {
+            camItemFuture = executorService.submit(new updateCamItemBatchTask(ruleId, camitemIdLongList));
+            threadList.add(camItemFuture);
+        }
+        List<Long> ruleIdListNew = new ArrayList<>();
+        try {
+            for (Future<Map<String, Object>> camItemFutureNew : threadList) {
+                if (camItemFutureNew != null && camItemFutureNew.get() != null) {
+                    Long ruleId = (Long) camItemFutureNew.get().get("ruleId");
+                    ruleIdLongList.add(ruleId);
+                }
+                tarGrpMap.put("ruleIdList", ruleIdListNew);
+                tarGrpMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+                tarGrpMap.put("resultMsg", "批量修改销售品成功!");
+            }
+        } catch (Exception e) {
+            tarGrpMap.put("resultCode", CommonConstant.CODE_FAIL);
+            tarGrpMap.put("resultMsg", "批量修改销售品失败!");
+            logger.error("[op:insertCamItemBatch],批量插入销售品失败! Exception = ", e);
+        }
+        return tarGrpMap;
+    }
+
+
+    class updateCamItemBatchTask implements Callable<Map<String, Object>> {
+        private Long ruleId;
+        private List<Long> camitemIdList;
+
+        public updateCamItemBatchTask(Long ruleId, List<Long> camitemIdList) {
+            this.ruleId = ruleId;
+            this.camitemIdList = camitemIdList;
+        }
+
+        @Override
+        public Map<String, Object> call() throws Exception {
+            Map map = new HashMap();
+            MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleId);
+            String productIds = mktStrategyConfRuleDO.getProductId();
+            List<Long> productIdList = new ArrayList<>();
+            List<MktCamItem> mktCamItemList = new ArrayList<>();
+            if (productIds != null && !"".equals(productIds)) {
+                String[] productIdArrary = productIds.split("/");
+                for (String productId : productIdArrary) {
+                    productIdList.add(Long.valueOf(productId));
+                }
+                // 获取原有的推送条目
+                mktCamItemList = mktCamItemMapper.selectByBatch(productIdList);
+            }
+            // 获取最新的推荐条目
+            List<MktCamItem> mktCamItemListNew = mktCamItemMapper.selectByBatch(camitemIdList);
+            // 更新后的集合
+            List<MktCamItem> updateList = new ArrayList<>();
+            List<Long> delList = new ArrayList<>();
+            for (int i = 0; i < mktCamItemList.size(); i++) {
+                for (int j = 0; j < mktCamItemListNew.size(); j++) {
+                    if (!mktCamItemList.get(i).getItemId().equals(mktCamItemListNew.get(j).getItemId()) && j == mktCamItemListNew.size() - 1) {
+                        updateList.add(mktCamItemList.get(i));
+                    } else if (mktCamItemList.get(i).getItemId().equals(mktCamItemListNew.get(j).getItemId())) {
+                        updateList.add(mktCamItemListNew.get(j));
+                        continue;
+                    }
+                }
+            }
+            String productIdsNew = "";
+            for (int i = 0; i < updateList.size(); i++) {
+                if (i == 0) {
+                    productIdsNew += updateList.get(i).getMktCamItemId();
+                } else {
+                    productIdsNew += "/" + updateList.get(i).getMktCamItemId();
+                }
+            }
+            mktStrategyConfRuleDO.setProductId(productIdsNew);
+            mktStrategyConfRuleDO.setUpdateStaff(UserUtil.loginId());
+            mktStrategyConfRuleDO.setUpdateDate(new Date());
+            mktStrategyConfRuleMapper.updateByPrimaryKey(mktStrategyConfRuleDO);
+            map.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
+            return map;
+        }
+
+    }
+
+
+    /**
+     * 批量删除推荐条目
+     *
+     * @param ruleIdList
+     * @param camitemIdList
+     * @return
+     */
+    @Override
+    public Map<String, Object> deleteCamItemBatch(List<Integer> ruleIdList, List<Integer> camitemIdList) {
+        List<Long> ruleIdLongList = listInteger2Long(ruleIdList);
+        List<Long> camitemIdLongList = listInteger2Long(camitemIdList);
+        Map tarGrpMap = new HashMap();
+        //初始化结果集
+        List<Future<Map<String, Object>>> threadList = new ArrayList<>();
+        //初始化线程池
+        Future<Map<String, Object>> camItemFuture = null;
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        for (Long ruleId : ruleIdLongList) {
+            camItemFuture = executorService.submit(new deleteCamItemBatchTask(ruleId, camitemIdLongList));
+            threadList.add(camItemFuture);
+        }
+        List<Long> ruleIdListNew = new ArrayList<>();
+        try {
+            for (Future<Map<String, Object>> camItemFutureNew : threadList) {
+                if (camItemFutureNew != null && camItemFutureNew.get() != null) {
+                    Long ruleId = (Long) camItemFutureNew.get().get("ruleId");
+                    ruleIdLongList.add(ruleId);
+                }
+                tarGrpMap.put("ruleIdList", ruleIdListNew);
+                tarGrpMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+                tarGrpMap.put("resultMsg", "批量修改销售品成功!");
+            }
+        } catch (Exception e) {
+            tarGrpMap.put("resultCode", CommonConstant.CODE_FAIL);
+            tarGrpMap.put("resultMsg", "批量修改销售品失败!");
+            logger.error("[op:insertCamItemBatch],批量插入销售品失败! Exception = ", e);
+        }
+        return tarGrpMap;
+    }
+
+
+    class deleteCamItemBatchTask implements Callable<Map<String, Object>> {
+        private Long ruleId;
+        private List<Long> camitemIdList;
+
+        public deleteCamItemBatchTask(Long ruleId, List<Long> camitemIdList) {
+            this.ruleId = ruleId;
+            this.camitemIdList = camitemIdList;
+        }
+
+        @Override
+        public Map<String, Object> call() throws Exception {
+            Map map = new HashMap();
+            MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleId);
+            String productIds = mktStrategyConfRuleDO.getProductId();
+            List<Long> productIdList = new ArrayList<>();
+            List<MktCamItem> mktCamItemList = new ArrayList<>();
+            if (productIds != null && !"".equals(productIds)) {
+                String[] productIdArrary = productIds.split("/");
+                for (String productId : productIdArrary) {
+                    // mktCamItemMapper.selectByPrimaryKey(Long.valueOf(productId))
+                    productIdList.add(Long.valueOf(productId));
+                }
+                // 获取原有的推送条目
+                mktCamItemList = mktCamItemMapper.selectByBatch(productIdList);
+            }
+            // 获取最新的推荐条目
+            List<MktCamItem> mktCamItemListNew = mktCamItemMapper.selectByBatch(camitemIdList);
+            List<MktCamItem> delIdList = new ArrayList<>();
+            for (int i = 0; i < mktCamItemList.size(); i++) {
+                for (int j = 0; j < mktCamItemListNew.size(); j++) {
+                    if (mktCamItemList.get(i).getItemId().equals(mktCamItemListNew.get(j).getItemId())) {
+                        delIdList.add(mktCamItemList.get(i));
+                        continue;
+                    }
+                }
+            }
+            mktCamItemList.removeAll(delIdList);
+            String productIdsNew = "";
+            for (int i = 0; i < mktCamItemList.size(); i++) {
+                if (i == 0) {
+                    productIdsNew += mktCamItemList.get(i).getMktCamItemId();
+                } else {
+                    productIdsNew += "/" + mktCamItemList.get(i).getMktCamItemId();
+                }
+            }
+            mktStrategyConfRuleDO.setProductId(productIdsNew);
+            mktStrategyConfRuleDO.setUpdateStaff(UserUtil.loginId());
+            mktStrategyConfRuleDO.setUpdateDate(new Date());
+            mktStrategyConfRuleMapper.updateByPrimaryKey(mktStrategyConfRuleDO);
+            map.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
+            return map;
+        }
+    }
+
+    private List<Long> listInteger2Long(List<Integer> integerList) {
+        List<Long> longList = new ArrayList<>();
+        for (Integer integer : integerList) {
+            longList.add(integer.longValue());
+        }
+        return longList;
     }
 
 }

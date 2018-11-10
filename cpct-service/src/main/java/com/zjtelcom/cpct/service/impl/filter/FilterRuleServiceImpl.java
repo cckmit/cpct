@@ -250,7 +250,15 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         filterRule.setUpdateStaff(UserUtil.loginId());
         filterRule.setCreateStaff(UserUtil.loginId());
         filterRule.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-        filterRule.setChooseProduct(ChannelUtil.idList2String(addVO.getChooseProduct()));
+        List<String> codeList = new ArrayList<>();
+        for (Long offerId : addVO.getChooseProduct()){
+            Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
+            if (offer==null){
+                continue;
+            }
+            codeList.add(offer.getOfferNbr());
+        }
+        filterRule.setChooseProduct(ChannelUtil.StringList2String(codeList));
         //销售品互斥过滤 加labelcode
         if (filterRule.getFilterType().equals("3000")){
             filterRule.setLabelCode("PROM_LIST");

@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.impl.grouping;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.JsonObject;
 import com.sun.corba.se.spi.ior.ObjectKey;
@@ -20,10 +21,7 @@ import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlResultConfRelDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
-import com.zjtelcom.cpct.domain.channel.CamScript;
-import com.zjtelcom.cpct.domain.channel.DisplayColumn;
-import com.zjtelcom.cpct.domain.channel.Label;
-import com.zjtelcom.cpct.domain.channel.MktProductRule;
+import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.GroupingVO;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
@@ -76,16 +74,19 @@ import static com.zjtelcom.cpct.constants.ResponseCode.SUCCESS;
 @Service
 public class TrialOperationServiceImpl extends BaseService implements TrialOperationService {
 
-//    @Value("${spring.redis.host}")
-//    private String host;
-//    @Value("${spring.esurl.machfile}")
-//    private String machFile;
-//    @Value("${spring.esurl.batchinfo}")
-//    private String batchInfo;
-//    @Value("${spring.esurl.hitslist}")
-//    private String hitsList;
-//    @Value("${spring.esurl.countinfo}")
-//    private String countInfo;
+    @Value("${spring.esurl.machfile}")
+    private String machFile;
+    @Value("${spring.esurl.batchinfo}")
+    private String batchInfo;
+    @Value("${spring.esurl.hitslist}")
+    private String hitsList;
+    @Value("${spring.esurl.countinfo}")
+    private String countInfo;
+
+//    private static String machFile = CPC_MATCH_FILE_TO_FTP;
+//    private static String batchInfo = SEARCH_INFO_FROM_ES_URL;
+//    private static String hitsList = FIND_BATCH_HITS_LIST_URL;
+//    private static String countInfo = SEARCH_COUNT_INFO_URL;
 
     @Autowired
     private TrialOperationMapper trialOperationMapper;
@@ -163,7 +164,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         TrialResponse response = new TrialResponse();
 
         try {
-            response = restTemplate.postForObject(SEARCH_INFO_FROM_ES_URL, request, TrialResponse.class);
+            response = restTemplate.postForObject(batchInfo, request, TrialResponse.class);
             if (response.getResultCode().equals(CODE_FAIL)){
                 result.put("resultCode", CODE_FAIL);
                 result.put("resultMsg", "抽样校验失败");
@@ -425,9 +426,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         TrialResponse response = new TrialResponse();
         TrialResponse countResponse = new TrialResponse();
         try {
-            response = restTemplate.postForObject(SEARCH_INFO_FROM_ES_URL, request, TrialResponse.class);
+            response = restTemplate.postForObject(batchInfo, request, TrialResponse.class);
             //同时调用统计查询的功能
-            countResponse = restTemplate.postForObject(SEARCH_COUNT_INFO_URL,request,TrialResponse.class);
+            countResponse = restTemplate.postForObject(countInfo,request,TrialResponse.class);
             if (countResponse.getResultCode().equals(CODE_SUCCESS)){
                 redisUtils.set("HITS_COUNT_INFO_"+request.getBatchNum(),countResponse.getHitsList());
             }
@@ -470,14 +471,17 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         if (!codeList.contains("ACCS_NBR")){
             codeList.add("ACC_NBR");
         }
-        if (!codeList.contains("LAN_NAME")){
-            codeList.add("LAN_NAME");
+        if (!codeList.contains("LATN_NAME")){
+            codeList.add("LATN_NAME");
         }
         if (!codeList.contains("CCUST_NAME")){
             codeList.add("CCUST_NAME");
         } if (!codeList.contains("CCUST_ID")){
             codeList.add("CCUST_ID");
+        } if (!codeList.contains("CCUST_TEL")){
+            codeList.add("CCUST_TEL");
         }
+
         String[] fieldList = new String[codeList.size()];
         for (int i = 0; i < codeList.size(); i++) {
             fieldList[i] = codeList.get(i);
@@ -526,6 +530,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             System.out.println("*************************" + rule);
         }
         param.setRule(rule);
+        List<LabelResult> labelResultList = new ArrayList<>();
+        if (redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId+"_LABEL")!=null){
+            JSONArray objects = JSONArray.parseArray((String) redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId+"_LABEL"));
+            labelResultList = objects.toJavaList(LabelResult.class);
+        }
+        param.setLabelResultList(labelResultList);
         return param;
     }
 
@@ -551,7 +561,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         try {
             Map<String, Long> param = new HashMap<>();
             param.put("batchId", operation.getBatchNum());
-            response = restTemplate.postForObject( FIND_BATCH_HITS_LIST_URL, param, TrialResponse.class);
+            response = restTemplate.postForObject(hitsList, param, TrialResponse.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -566,11 +576,14 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "未命中任何客户");
             return result;
         }
-        for (String key : hitsList.keySet()) {
-            Map<String, Object> searchMap = (Map<String, Object>) ((Map<String, Object>) hitsList.get(key)).get("searchHitMap");
+
+        List<Map<String,Object>> mapList = (List<Map<String,Object>>) hitsList.get("result");
+
+        for (Map<String,Object> hitMap : mapList){
+            Map<String, Object> searchMap = (Map<String, Object>) hitMap.get("searchHitMap");
             Map<String, Object> ruleInfoMap = new HashMap<>();
-            if (((Map<String, Object>) hitsList.get(key)).get("ruleInfo") != null) {
-                ruleInfoMap = (Map<String, Object>) ((Map<String, Object>) hitsList.get(key)).get("ruleInfo");
+            if ((Map<String, Object>)hitMap.get("ruleInfo") != null) {
+                ruleInfoMap = (Map<String, Object>) hitMap.get("ruleInfo");
             }
             Map<String, Object> map = new HashMap<>();
             for (String set : searchMap.keySet()) {
@@ -588,7 +601,31 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             //todo 工单号
             map.put("orderId", "49736605");
             userList.add(map);
+
         }
+//        for (String key : hitsList.keySet()) {
+//            Map<String, Object> searchMap = (Map<String, Object>) ((Map<String, Object>) hitsList.get(key)).get("searchHitMap");
+//            Map<String, Object> ruleInfoMap = new HashMap<>();
+//            if (((Map<String, Object>) hitsList.get(key)).get("ruleInfo") != null) {
+//                ruleInfoMap = (Map<String, Object>) ((Map<String, Object>) hitsList.get(key)).get("ruleInfo");
+//            }
+//            Map<String, Object> map = new HashMap<>();
+//            for (String set : searchMap.keySet()) {
+//                if (labelCodeList.size() < searchMap.keySet().size()) {
+//                    labelCodeList.add(set);
+//                }
+//                map.put(set, searchMap.get(set));
+//            }
+//            map.put("campaignId", operation.getCampaignId());
+//            map.put("campaignName", operation.getCampaignName());
+//            map.put("strategyId", operation.getStrategyId());
+//            map.put("strategyName", operation.getStrategyName());
+//            map.put("ruleId", ruleInfoMap.get("ruleId"));
+//            map.put("ruleName", ruleInfoMap.get("ruleName").toString());
+//            //todo 工单号
+//            map.put("orderId", "49736605");
+//            userList.add(map);
+//        }
         if (labelCodeList.size() > 0) {
             List<SimpleInfo> titleList = labelMapper.listLabelByCodeList(labelCodeList);
             vo.setTitleList(titleList);
@@ -649,6 +686,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             TrialOperationParam param = new TrialOperationParam();
             // 获取规则Id
             Long ruleId = ruleRelDO.getMktStrategyConfRuleId();
+            param.setRuleId(ruleId);
             MktStrategyConfRuleDO confRule = ruleMapper.selectByPrimaryKey(ruleId);
             if (confRule != null) {
                 param.setRuleName(confRule.getMktStrategyConfRuleName());
@@ -698,7 +736,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         request.setParamList(paramList);
         try {
             //todo 待验证
-            restTemplate.postForObject(CPC_MATCH_FILE_TO_FTP, request, TrialResponse.class);
+            restTemplate.postForObject(machFile, request, TrialResponse.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
