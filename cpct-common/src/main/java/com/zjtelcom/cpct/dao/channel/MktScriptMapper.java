@@ -19,7 +19,7 @@ public interface MktScriptMapper {
 
     List<Script> selectAll(@Param("scriptName")String scriptName, @Param("createTime")Date createTime,@Param("updateTime")Date updateTime,@Param("scriptType")String scriptType);
 
-    List<Script> findByScriptName(@Param("scriptName")String scriptName);
+    List<Script> findByScriptName(@Param("scriptName")String scriptName, @Param("scriptType")String scriptType);
 
     int updateByPrimaryKey(Script record);
 }

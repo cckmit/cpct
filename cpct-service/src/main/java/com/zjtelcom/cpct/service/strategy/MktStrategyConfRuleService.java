@@ -25,4 +25,16 @@ public interface MktStrategyConfRuleService {
 
     Map<String, Object> updateProductIds(List<Long> productIdList, Long ruleId);
 
+    Map<String, Object> insertTarGrpBatch(List<Integer> ruleIdList, Long tarGrpNewId);
+
+    Map<String, Object> updateTarGrpBatch(List<Integer> ruleIdList, Long tarGrpNewId);
+
+    Map<String, Object> deleteTarGrpBatch(List<Integer> ruleIdList, Long tarGrpNewId);
+
+    public Map<String, Object> insertCamItemBatch(List<Integer> ruleIdList, List<Integer> camitemIdList);
+
+    public Map<String, Object> updateCamItemBatch(List<Integer> ruleIdList, List<Integer> camitemIdList);
+
+    public Map<String, Object> deleteCamItemBatch(List<Integer> ruleIdList, List<Integer> camitemIdList);
+
 }

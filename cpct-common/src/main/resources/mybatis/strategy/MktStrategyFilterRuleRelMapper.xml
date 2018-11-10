@@ -58,5 +58,11 @@
     from mkt_strategy_filter_rule_rel
      where STRATEGY_ID = #{strategyId,jdbcType=BIGINT}
   </select>
+  <select id="selectByRuleId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_STRATEGY_FILTER_RULE_REL_ID, STRATEGY_ID, RULE_ID, CREATE_STAFF, CREATE_DATE,
+    UPDATE_STAFF, UPDATE_DATE
+    from mkt_strategy_filter_rule_rel
+    where RULE_ID = #{ruleId,jdbcType=BIGINT}
+  </select>
 
 </mapper>

@@ -16,7 +16,7 @@ public interface ScriptService {
 
     Map<String,Object> getScriptVODetail(Long userId,Long scriptId);
 
-    Map<String,Object> getScriptList(Long userId,String scriptName);
+    Map<String,Object> getScriptList(Long userId,String scriptName,String scriptType);
 
 
 
