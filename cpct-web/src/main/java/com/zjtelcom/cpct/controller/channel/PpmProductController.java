@@ -138,7 +138,7 @@ public class PpmProductController extends BaseController  {
     public Map<String, Object> addProductRule(@RequestBody ProductParam param) {
         Map<String ,Object> result = new HashMap<>();
         try {
-            result = productService.addProductRule(param.getStrategyRuleId(),param.getIdList());
+            result = productService.addProductRule(param);
         }catch (Exception e){
             logger.error("[op:PpmProductController] fail to addProductRule",e);
             result.put("resultCode",CODE_FAIL);

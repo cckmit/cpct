@@ -14,10 +14,12 @@ import com.zjtelcom.cpct.domain.channel.Offer;
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
 import com.zjtelcom.cpct.dto.channel.OfferDetail;
+import com.zjtelcom.cpct.dto.channel.ProductParam;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.util.*;
+import org.aspectj.apache.bcel.generic.FieldGenOrMethodGen;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -126,11 +128,19 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
     @Override
     @Transactional
-    public Map<String, Object> addProductRule(Long strategyRuleId, List<Long> productIdList) {
+    public Map<String, Object> addProductRule(ProductParam param) {
         Map<String,Object> result = new HashMap<>();
         List<Long> ruleIdList = new ArrayList<>();
         List<MktCamItem> mktCamItems = new ArrayList<>();
-        for (Long productId : productIdList){
+        //销售品id 过滤一遍重复的
+        List<Long> productList = new ArrayList<>();
+        for (Long productId : param.getIdList()){
+            if (productList.contains(productId)){
+                continue;
+            }
+            productList.add(productId);
+        }
+        for (Long productId : productList){
             Offer product = productMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
             if (product==null){
                 result.put("resultCode",CODE_FAIL);
@@ -141,7 +151,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             item.setOfferCode(product.getOfferNbr());
             item.setOfferName(product.getOfferName());
             item.setItemId(productId);
-            item.setItemType(product.getOfferType());
+            item.setItemType(param.getItemType()==null ? "1000" : param.getItemType());
             item.setCreateDate(new Date());
             item.setCreateDate(DateUtil.getCurrentTime());
             item.setUpdateDate(DateUtil.getCurrentTime());
@@ -157,8 +167,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         for(MktCamItem item : mktCamItems){
             ruleIdList.add(item.getMktCamItemId());
         }
-        if (strategyRuleId!=null){
-            strategyConfRuleService.updateProductIds(ruleIdList,strategyRuleId);
+        if (param.getStrategyRuleId()!=null){
+            strategyConfRuleService.updateProductIds(ruleIdList,param.getStrategyRuleId());
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",ruleIdList);
@@ -202,6 +212,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             rule.setProductId(item.getItemId());
             rule.setProductName(product.getOfferName());
             rule.setRemark(item.getRemark());
+            rule.setItemType(item.getItemType()==null ? "" : item.getItemType());
             rule.setPriority(item.getPriority()==null ? 0 : item.getPriority());
             if (item.getPriority()!=null){
                 rule.setPriority(item.getPriority());
