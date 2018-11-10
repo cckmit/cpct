@@ -47,6 +47,7 @@ import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.util.*;
+import com.zjtelcom.es.service.EsService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -116,6 +117,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private SysStaffMapper sysStaffMapper;
     @Autowired
     private SysParamsMapper sysParamsMapper;
+    @Autowired(required = false)
+    private EsService esService;
 
     /**
      * 销售品service
@@ -164,7 +167,11 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         TrialResponse response = new TrialResponse();
 
         try {
+            //todo
+//            com.zjtelcom.es.model.TrialOperationVO requests = BeanUtil.create(request,new com.zjtelcom.es.model.TrialOperationVO());
+//            com.zjtelcom.es.model.TrialResponse response = esService.searchBatchInfo(requests);
             response = restTemplate.postForObject(batchInfo, request, TrialResponse.class);
+
             if (response.getResultCode().equals(CODE_FAIL)){
                 result.put("resultCode", CODE_FAIL);
                 result.put("resultMsg", "抽样校验失败");
@@ -426,9 +433,16 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         TrialResponse response = new TrialResponse();
         TrialResponse countResponse = new TrialResponse();
         try {
+            //todo
+//            com.zjtelcom.es.model.TrialOperationVO request = BeanUtil.create(request,new com.zjtelcom.es.model.TrialOperationVO());
+//            com.zjtelcom.es.model.TrialResponse response = esService.searchBatchInfo(request));
+
             response = restTemplate.postForObject(batchInfo, request, TrialResponse.class);
             //同时调用统计查询的功能
+
+//            com.zjtelcom.es.model.TrialResponse countResponse = esService.searchCountInfo(request));
             countResponse = restTemplate.postForObject(countInfo,request,TrialResponse.class);
+
             if (countResponse.getResultCode().equals(CODE_SUCCESS)){
                 redisUtils.set("HITS_COUNT_INFO_"+request.getBatchNum(),countResponse.getHitsList());
             }
@@ -556,11 +570,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "试运算记录不存在");
             return result;
         }
-
+//        com.zjtelcom.es.model.TrialResponse response = new com.zjtelcom.es.model.TrialResponse();
         TrialResponse response = new TrialResponse();
         try {
             Map<String, Long> param = new HashMap<>();
             param.put("batchId", operation.getBatchNum());
+//            response = esService.findBatchHitsList(operation.getBatchNum().toString());
             response = restTemplate.postForObject(hitsList, param, TrialResponse.class);
         } catch (Exception e) {
             e.printStackTrace();
@@ -735,6 +750,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         }
         request.setParamList(paramList);
         try {
+//            com.zjtelcom.es.model.TrialResponse response = esService.strategyIssure(BeanUtil.create(request,new com.zjtelcom.es.model.TrialOperationVO()));
             //todo 待验证
             restTemplate.postForObject(machFile, request, TrialResponse.class);
         } catch (Exception e) {
@@ -781,6 +797,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         for (TrialOperation trialOperation : trialOperations) {
             TrialOperationDetail detail = BeanUtil.create(trialOperation, new TrialOperationDetail());
             if (trialOperation.getUpdateDate() != null) {
+
                 Double cost = (double) ((trialOperation.getUpdateDate().getTime() - trialOperation.getCreateDate().getTime()) / 1000);
                 detail.setCost(cost + "s");
             }
