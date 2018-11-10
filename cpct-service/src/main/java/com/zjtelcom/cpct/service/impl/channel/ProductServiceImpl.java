@@ -19,7 +19,6 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.util.*;
-import org.aspectj.apache.bcel.generic.FieldGenOrMethodGen;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,22 +78,17 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     }
 
     @Override
-    public Map<String,Object> getProductListByName(Long userId, Map<String,Object> params) {
+    public Map<String,Object> getProductListByName(Map<String,Object> params) {
         Map<String,Object> result = new HashMap<>();
         List<Offer> productList = new ArrayList<>();
-        Integer page = MapUtil.getIntNum(params.get("page"));
-        Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
-        PageHelper.startPage(page,pageSize);
         if (params.get("productName") != null){
             String productName = params.get("productName").toString();
             productList = productMapper.findByName(productName);
         }else {
             productList = productMapper.selectAll();
         }
-        Page pageInfo = new Page(new PageInfo(productList));
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",productList);
-        result.put("page",pageInfo);
         return result;
     }
 
@@ -137,15 +131,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         Map<String,Object> result = new HashMap<>();
         List<Long> ruleIdList = new ArrayList<>();
         List<MktCamItem> mktCamItems = new ArrayList<>();
-        //销售品id 过滤一遍重复的
-        List<Long> productList = new ArrayList<>();
         for (Long productId : param.getIdList()){
-            if (productList.contains(productId)){
-                continue;
-            }
-            productList.add(productId);
-        }
-        for (Long productId : productList){
             Offer product = productMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
             if (product==null){
                 result.put("resultCode",CODE_FAIL);
