@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 策略配置规则Mapper
@@ -28,6 +29,8 @@ public interface MktStrategyConfRuleMapper {
     int updateByPrimaryKey(MktStrategyConfRuleDO mktStrategyConfRuleDO);
 
     List<MktStrategyConfRuleDO> selectByMktStrategyConfId(Long mktStrategyConfId);
+
+    List<Map<String,Object>> selectNameByConfId(Long mktStrategyConfId);
 
     MktStrategyConfRuleDO selectByTarGrpId(@Param("tarGrpId") Long tarGrpId);
 

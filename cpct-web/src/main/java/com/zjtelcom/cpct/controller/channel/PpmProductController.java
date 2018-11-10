@@ -117,8 +117,9 @@ public class PpmProductController extends BaseController  {
     @CrossOrigin
     public Map<String,Object> getProductListByName(@RequestBody HashMap<String,Object> params) {
         Map<String ,Object> result = new HashMap<>();
+        Long userId = UserUtil.loginId();
         try {
-            result = productService.getProductListByName(params);
+            result = productService.getProductListByName(userId, params);
         }catch (Exception e){
             logger.error("[op:PpmProductController] fail to getProductListByName",e);
             result.put("resultCode",CODE_FAIL);

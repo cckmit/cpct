@@ -23,4 +23,6 @@ public interface MktCamStrategyConfRelMapper {
     List<MktCamStrategyConfRelDO> selectAll();
 
     int updateByPrimaryKey(MktCamStrategyConfRelDO mktCamStrategyConfRelDO);
+
+    List<MktCamStrategyConfRelDO> selectByStrategyConfId(Long strategyConfId);
 }
