@@ -129,4 +129,16 @@ public class SynInterfaceCfgServiceImpl extends BaseService implements SynInterf
 
         return maps;
     }
+
+
+
+    @Override
+    public Map<String, Object> deleteSingleEventInterface(Long eventId, String roleName) {
+        Map<String,Object> maps = new HashMap<>();
+        interfaceCfgPrdMapper.deleteByPrimaryKey(eventId);
+        synchronizeRecordService.addRecord(roleName,tableName,eventId, SynchronizeType.delete.getType());
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        return maps;
+    }
 }

@@ -1,10 +1,10 @@
-package com.zjtelcom.cpct.dao.system;
+package com.zjtelcom.cpct_prd.dao.sys;
 
 import com.zjtelcom.cpct.domain.system.SysStaffRole;
 
 import java.util.List;
 
-public interface SysStaffRoleMapper {
+public interface SysStaffRolePrdMapper {
 
     int deleteByPrimaryKey(Long staffRoleId);
 
