@@ -427,11 +427,16 @@
                 <artifactId>fastjson</artifactId>
                 <version>${fastjson.verson}</version>
             </dependency>
+
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>${jackson-databind.verson}</version>
+                <version>2.6.5</version>
             </dependency>
+
+
+
+
 
         </dependencies>
     </dependencyManagement>
