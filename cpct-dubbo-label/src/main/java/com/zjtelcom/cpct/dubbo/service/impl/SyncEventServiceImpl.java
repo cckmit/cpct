@@ -88,6 +88,7 @@ public class SyncEventServiceImpl implements SyncEventService {
                 map.put("evtCollectTime", simpleDateFormat.format(new Date())); //事件触发时间
                 map.put("evtContent", json.toString()); //事件采集项
 
+                System.out.println(map.toString());
                 eventApiService.CalculateCPCSync(map);
 
             } else {
