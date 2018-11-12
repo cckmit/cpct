@@ -33,6 +33,8 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
     private ContactChannelMapper channelMapper;
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired
+
 /*
     @Autowired
     private ClTestRepository testRepository;*/
@@ -314,6 +316,12 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         channel.setChannelType("0");
         channel.setContactChlType("10000");
         channelMapper.insert(channel);
+        new Thread(){
+            public void run(){
+
+
+            }
+        }.start();
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
         return result;
