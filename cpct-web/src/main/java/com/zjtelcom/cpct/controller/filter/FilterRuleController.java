@@ -164,8 +164,8 @@ public class FilterRuleController extends BaseController {
     public String downloadTemplate(HttpServletRequest request, HttpServletResponse response) {
         OutputStream ouputStream = null;
         try {
-            String fileName = "用户名单.xlsx";
-            File file = new File("cpct-web/src/main/resources/file/清单模板.xlsx");
+            String fileName = "用户名单.xls";
+            File file = new File("cpct-web/src/main/resources/file/导入模板.xls");
             byte[] buffer = new byte[1024];
             FileInputStream fis = null; //文件输入流
             BufferedInputStream bis = null;
