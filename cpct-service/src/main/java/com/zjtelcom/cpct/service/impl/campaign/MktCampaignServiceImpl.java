@@ -157,7 +157,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setStatusDate(new Date());
             mktCampaignDO.setCreateChannel("市场部");
             // TODO 添加所属地市
-            mktCampaignDO.setLanId(8330000L);
+            mktCampaignDO.setLanId(1L);
             mktCampaignMapper.insert(mktCampaignDO);
             Long mktCampaignId = mktCampaignDO.getMktCampaignId();
 

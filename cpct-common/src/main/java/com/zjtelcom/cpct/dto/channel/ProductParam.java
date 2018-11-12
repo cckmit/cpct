@@ -6,7 +6,16 @@ import java.util.List;
 public class ProductParam implements Serializable {
     private List<Long> idList;
     private Long strategyRuleId;
+    private String itemType;
 
+
+    public String getItemType() {
+        return itemType;
+    }
+
+    public void setItemType(String itemType) {
+        this.itemType = itemType;
+    }
 
     public Long getStrategyRuleId() {
         return strategyRuleId;

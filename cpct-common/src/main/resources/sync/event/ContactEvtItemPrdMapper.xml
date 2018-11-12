@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct_prd.dao.event.ContactEvtItemPrdMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.dto.event.ContactEvtItem">
+        <id column="EVT_ITEM_ID" jdbcType="BIGINT" property="evtItemId"/>
+        <result column="EVENT_ID" jdbcType="BIGINT" property="contactEvtId"/>
+        <result column="EVT_TYPE_ID" jdbcType="BIGINT" property="evtTypeId"/>
+        <result column="EVT_ITEM_NAME" jdbcType="VARCHAR" property="evtItemName"/>
+        <result column="EVT_ITEM_CODE" jdbcType="VARCHAR" property="evtItemCode"/>
+        <result column="VALUE_DATA_TYPE" jdbcType="VARCHAR" property="valueDataType"/>
+        <result column="EVT_ITEM_FORMAT" jdbcType="VARCHAR" property="evtItemFormat"/>
+        <result column="IS_NULLABLE" jdbcType="VARCHAR" property="isNullable"/>
+        <result column="IS_MAIN_PARAM" jdbcType="VARCHAR" property="isMainParam" />
+        <result column="EVT_ITEM_DESC" jdbcType="VARCHAR" property="evtItemDesc" />
+        <result column="EVT_ITEM_LENGTH" jdbcType="INTEGER" property="evtItemLength"/>
+        <result column="STANDARD_SORT" jdbcType="INTEGER" property="standardSort"/>
+        <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd"/>
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff"/>
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate"/>
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
+        <result column="IS_LABEL" jdbcType="VARCHAR" property="isLabel"/>
+        <result column="REMARK" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from event_item
+    where EVT_ITEM_ID = #{evtItemId,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtItem">
+    insert into event_item (EVT_ITEM_ID, EVENT_ID, EVT_TYPE_ID,
+      EVT_ITEM_NAME, EVT_ITEM_CODE, VALUE_DATA_TYPE,
+      EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, IS_MAIN_PARAM, EVT_ITEM_DESC,
+      STANDARD_SORT, STATUS_CD, CREATE_STAFF,
+      UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+      UPDATE_DATE, REMARK,IS_LABEL)
+    values (#{evtItemId,jdbcType=BIGINT}, #{contactEvtId,jdbcType=BIGINT}, #{evtTypeId,jdbcType=BIGINT},
+      #{evtItemName,jdbcType=VARCHAR}, #{evtItemCode,jdbcType=VARCHAR}, #{valueDataType,jdbcType=VARCHAR},
+      #{evtItemFormat,jdbcType=VARCHAR}, #{isNullable,jdbcType=VARCHAR}, #{evtItemLength,jdbcType=INTEGER},
+      #{isMainParam,jdbcType=VARCHAR}, #{evtItemDesc,jdbcType=VARCHAR},
+      #{standardSort,jdbcType=INTEGER}, #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT},
+      #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP},
+      #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR},#{isLabel,jdbcType=VARCHAR})
+  </insert>
+    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtItem">
+    update event_item
+    set EVENT_ID = #{contactEvtId,jdbcType=BIGINT},
+      EVT_TYPE_ID = #{evtTypeId,jdbcType=BIGINT},
+      EVT_ITEM_NAME = #{evtItemName,jdbcType=VARCHAR},
+      EVT_ITEM_CODE = #{evtItemCode,jdbcType=VARCHAR},
+      VALUE_DATA_TYPE = #{valueDataType,jdbcType=VARCHAR},
+      EVT_ITEM_FORMAT = #{evtItemFormat,jdbcType=VARCHAR},
+      IS_NULLABLE = #{isNullable,jdbcType=VARCHAR},
+      EVT_ITEM_LENGTH = #{evtItemLength,jdbcType=INTEGER},
+       IS_MAIN_PARAM = #{isMainParam,jdbcType=VARCHAR},
+      EVT_ITEM_DESC = #{evtItemDesc,jdbcType=VARCHAR},
+      STANDARD_SORT = #{standardSort,jdbcType=INTEGER},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      IS_LABEL = #{isLabel,jdbcType=VARCHAR}
+    where EVT_ITEM_ID = #{evtItemId,jdbcType=BIGINT}
+  </update>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select EVT_ITEM_ID, EVENT_ID, EVT_TYPE_ID, EVT_ITEM_NAME, EVT_ITEM_CODE, VALUE_DATA_TYPE,
+    EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, STANDARD_SORT, STATUS_CD, CREATE_STAFF, IS_MAIN_PARAM, EVT_ITEM_DESC,
+    UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK,IS_LABEL
+    from event_item
+    where EVT_ITEM_ID = #{evtItemId,jdbcType=BIGINT}
+  </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+    select EVT_ITEM_ID, EVENT_ID, EVT_TYPE_ID, EVT_ITEM_NAME, EVT_ITEM_CODE, VALUE_DATA_TYPE,
+    EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, STANDARD_SORT, STATUS_CD, CREATE_STAFF, IS_MAIN_PARAM, EVT_ITEM_DESC,
+    UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK,IS_LABEL
+    from event_item
+  </select>
+
+    <select id="listEventItem"  resultMap="BaseResultMap">
+        select EVT_ITEM_ID, EVENT_ID, EVT_TYPE_ID, EVT_ITEM_NAME, EVT_ITEM_CODE, VALUE_DATA_TYPE,
+        EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, STANDARD_SORT, STATUS_CD, CREATE_STAFF,IS_MAIN_PARAM, IS_LABEL,EVT_ITEM_DESC,
+        UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+        from event_item
+        where 1 = 1
+        <if test="contactEvtId != null and contactEvtId != 0 ">
+            AND EVENT_ID = #{contactEvtId}
+        </if>
+    </select>
+
+    <select id="listMainItem"  resultMap="BaseResultMap">
+        select EVT_ITEM_ID, EVENT_ID, EVT_TYPE_ID, EVT_ITEM_NAME, EVT_ITEM_CODE, VALUE_DATA_TYPE,
+        EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, STANDARD_SORT, STATUS_CD, CREATE_STAFF,IS_MAIN_PARAM, EVT_ITEM_DESC,
+        UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK,IS_LABEL
+        from event_item
+        where EVENT_ID = 0 or EVENT_ID = -1
+    </select>
+
+
+    <insert id="saveEventItem" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtItem">
+        insert into event_item (
+        EVENT_ID,
+        EVT_TYPE_ID,
+        EVT_ITEM_NAME,
+        EVT_ITEM_CODE,
+        VALUE_DATA_TYPE,
+        EVT_ITEM_FORMAT,
+        IS_NULLABLE,
+        EVT_ITEM_LENGTH,
+        STANDARD_SORT,
+        STATUS_CD,
+        CREATE_STAFF,
+        UPDATE_STAFF,
+        CREATE_DATE,
+        STATUS_DATE,
+        UPDATE_DATE,IS_MAIN_PARAM, EVT_ITEM_DESC,
+        REMARK,
+        IS_LABEL)
+        values (
+        #{contactEvtId,jdbcType=BIGINT},
+        #{evtTypeId,jdbcType=BIGINT},
+        #{evtItemName,jdbcType=VARCHAR},
+        #{evtItemCode,jdbcType=VARCHAR},
+        #{valueDataType,jdbcType=VARCHAR},
+        #{evtItemFormat,jdbcType=VARCHAR},
+        #{isNullable,jdbcType=VARCHAR},
+        #{isMainParam,jdbcType=VARCHAR},
+        #{evtItemDesc,jdbcType=VARCHAR},
+        #{evtItemLength,jdbcType=INTEGER},
+        #{standardSort,jdbcType=INTEGER},
+        #{statusCd,jdbcType=VARCHAR},
+        #{createStaff,jdbcType=BIGINT},
+        #{updateStaff,jdbcType=BIGINT},
+        #{createDate,jdbcType=TIMESTAMP},
+        #{statusDate,jdbcType=TIMESTAMP},
+        #{updateDate,jdbcType=TIMESTAMP},
+        #{remark,jdbcType=VARCHAR},
+        #{isLabel,jdbcType=VARCHAR})
+  </insert>
+
+    <select id="viewEventItem" resultMap="BaseResultMap">
+        select EVT_ITEM_ID, EVENT_ID, EVT_TYPE_ID, EVT_ITEM_NAME, EVT_ITEM_CODE, VALUE_DATA_TYPE,
+        EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, STANDARD_SORT, STATUS_CD, CREATE_STAFF,IS_MAIN_PARAM, EVT_ITEM_DESC,
+        UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK,IS_LABEL
+        from event_item
+        where EVT_ITEM_ID = #{evtItemId}
+    </select>
+
+    <insert id="insertContactEvtItem" keyProperty="evtItemId" useGeneratedKeys="true" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtItem">
+        insert into event_item (
+        EVENT_ID,
+        EVT_TYPE_ID,
+        EVT_ITEM_NAME,
+        EVT_ITEM_CODE,
+        VALUE_DATA_TYPE,
+        EVT_ITEM_FORMAT,
+        IS_NULLABLE,
+        EVT_ITEM_LENGTH,
+        STANDARD_SORT,IS_MAIN_PARAM, EVT_ITEM_DESC,
+        STATUS_CD,
+        CREATE_STAFF,
+        UPDATE_STAFF,
+        CREATE_DATE,
+        STATUS_DATE,
+        UPDATE_DATE,
+        REMARK,IS_LABEL)
+        values (
+        #{contactEvtId,jdbcType=BIGINT},
+        #{evtTypeId,jdbcType=BIGINT},
+        #{evtItemName,jdbcType=VARCHAR},
+        #{evtItemCode,jdbcType=VARCHAR},
+        #{valueDataType,jdbcType=VARCHAR},
+        #{evtItemFormat,jdbcType=VARCHAR},
+        #{isNullable,jdbcType=VARCHAR},
+        #{evtItemLength,jdbcType=INTEGER},
+         #{standardSort,jdbcType=INTEGER},
+         #{isMainParam,jdbcType=VARCHAR},
+          #{evtItemDesc,jdbcType=VARCHAR},
+        #{statusCd,jdbcType=VARCHAR},
+        #{createStaff,jdbcType=BIGINT},
+        #{updateStaff,jdbcType=BIGINT},
+        #{createDate,jdbcType=TIMESTAMP},
+        #{statusDate,jdbcType=TIMESTAMP},
+        #{updateDate,jdbcType=TIMESTAMP},
+        #{remark,jdbcType=VARCHAR},
+        #{isLabel,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="modEventItem" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtItem">
+        update event_item
+        set
+        <if test="contactEvtId != null  and contactEvtId !=0">
+            EVENT_ID = #{contactEvtId,jdbcType=BIGINT},
+        </if>
+        <if test="evtTypeId != null  and evtTypeId !=0">
+            EVT_TYPE_ID = #{evtTypeId,jdbcType=BIGINT},
+        </if>
+        <if test="evtItemName != null  and evtItemName !=''">
+            EVT_ITEM_NAME = #{evtItemName,jdbcType=VARCHAR},
+        </if>
+        <if test="evtItemCode != null  and evtItemCode !=''">
+            EVT_ITEM_CODE = #{evtItemCode,jdbcType=VARCHAR},
+        </if>
+        <if test="valueDataType != null  and valueDataType !=''">
+            VALUE_DATA_TYPE = #{valueDataType,jdbcType=VARCHAR},
+        </if>
+        <if test="evtItemFormat != null  and evtItemFormat !=''">
+            EVT_ITEM_FORMAT = #{evtItemFormat,jdbcType=VARCHAR},
+        </if>
+        <if test="isNullable != null  and isNullable !=''">
+            IS_NULLABLE = #{isNullable,jdbcType=VARCHAR},
+        </if>
+        <if test="evtItemLength != null  and evtItemLength !=''">
+            EVT_ITEM_LENGTH = #{evtItemLength,jdbcType=INTEGER},
+        </if>
+        <if test="standardSort != null  and standardSort !=''">
+            STANDARD_SORT = #{standardSort,jdbcType=INTEGER},
+        </if>
+        <if test="statusCd != null  and statusCd !=''">
+            STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+        </if>
+        <if test="createStaff != null  and createStaff !=0">
+            CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+        </if>
+
+        <if test="isMainParam != null">
+            IS_MAIN_PARAM = #{isMainParam,jdbcType=VARCHAR},
+        </if>
+        <if test="evtItemDesc != null">
+            EVT_ITEM_DESC = #{evtItemDesc,jdbcType=VARCHAR},
+        </if>
+        <if test="updateStaff != null  and updateStaff !=0">
+            UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        </if>
+        <if test="createDate != null">
+            CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="statusDate != null">
+            STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="updateDate != null">
+            UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="remark != null  and remark !=''">
+            REMARK = #{remark,jdbcType=VARCHAR},
+        </if>
+        <if test="isLabel != null  and isLabel !=''">
+            IS_LABEL = #{isLabel,jdbcType=VARCHAR},
+        </if>
+        EVT_ITEM_ID = #{evtItemId}
+        where EVT_ITEM_ID = #{evtItemId,jdbcType=BIGINT}
+    </update>
+
+</mapper>

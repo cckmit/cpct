@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct_prd.dao.label.DisplayColumnPrdMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.DisplayColumn">
+    <id column="DISPLAY_COLUMN_ID" jdbcType="BIGINT" property="displayColumnId" />
+    <result column="DISPLAY_COLUMN_NAME" jdbcType="VARCHAR" property="displayColumnName" />
+    <result column="DISPLAY_COLUMN_CODE" jdbcType="VARCHAR" property="displayColumnCode" />
+    <result column="DISPLAY_COLUMN_TYPE" jdbcType="VARCHAR" property="displayColumnType" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from display_column
+    where DISPLAY_COLUMN_ID = #{displayColumnId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.DisplayColumn">
+    insert into display_column (DISPLAY_COLUMN_ID, DISPLAY_COLUMN_NAME, 
+      DISPLAY_COLUMN_CODE,DISPLAY_COLUMN_TYPE, STATUS_CD, CREATE_STAFF,
+      UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
+      UPDATE_DATE, REMARK)
+    values (#{displayColumnId,jdbcType=BIGINT}, #{displayColumnName,jdbcType=VARCHAR}, 
+      #{displayColumnCode,jdbcType=VARCHAR}, #{displayColumnType,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT},
+      #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.DisplayColumn">
+    update display_column
+    set DISPLAY_COLUMN_NAME = #{displayColumnName,jdbcType=VARCHAR},
+      DISPLAY_COLUMN_CODE = #{displayColumnCode,jdbcType=VARCHAR},
+      DISPLAY_COLUMN_TYPE = #{displayColumnType,jdbcType=VARCHAR},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where DISPLAY_COLUMN_ID = #{displayColumnId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select DISPLAY_COLUMN_ID, DISPLAY_COLUMN_NAME, DISPLAY_COLUMN_CODE,DISPLAY_COLUMN_TYPE, STATUS_CD, CREATE_STAFF,
+    UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from display_column
+    where DISPLAY_COLUMN_ID = #{displayColumnId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select DISPLAY_COLUMN_ID, DISPLAY_COLUMN_NAME, DISPLAY_COLUMN_CODE, DISPLAY_COLUMN_TYPE,STATUS_CD, CREATE_STAFF,
+    UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from display_column
+  </select>
+
+  <select id="findDisplayListByParam" resultMap="BaseResultMap">
+    select DISPLAY_COLUMN_ID, DISPLAY_COLUMN_NAME, DISPLAY_COLUMN_CODE, DISPLAY_COLUMN_TYPE,STATUS_CD, CREATE_STAFF,
+    UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from display_column
+    where 1=1
+    <if test="displayName !=null and displayName != ''">
+      and DISPLAY_COLUMN_NAME LIKE CONCAT(CONCAT('%',#{displayName}),'%')
+    </if>
+    <if test="displayType !=null and displayType != ''">
+      and DISPLAY_COLUMN_TYPE = #{displayType}
+    </if>
+
+  </select>
+
+
+</mapper>

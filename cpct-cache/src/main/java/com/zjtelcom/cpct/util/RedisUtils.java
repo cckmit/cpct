@@ -43,11 +43,11 @@ public class RedisUtils {
         boolean result = false;
         try {
             // 原方法
-          ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-          operations.set(key, value);
+//          ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+//          operations.set(key, value);
 
             // 改造后方法
-           // result = setRedis(key, value);
+            result = setRedis(key, value);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -187,11 +187,11 @@ public class RedisUtils {
         Object result = null;
 
         // 原方法
-        ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-         result = operations.get(key);
+//        ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+//         result = operations.get(key);
 
         // 改造后方法
-        //result = getRedis(key);
+        result = getRedis(key);
         return result;
     }
 
@@ -209,7 +209,9 @@ public class RedisUtils {
             ProxyJedis jedis = new ProxyJedis();
             try {
                 jedis = ctgJedisPool.getResource();
-                result = unserizlize(jedis.get(key));
+                if(jedis.exists(key)) {
+                    result = unserizlize(jedis.get(key));
+                }
                 jedis.close();
             } catch (Throwable je) {
                 je.printStackTrace();
@@ -442,12 +444,14 @@ public class RedisUtils {
     public static Object unserizlize(String serStr) {
         Object newObj = null;
         try {
-            String redStr = java.net.URLDecoder.decode(serStr, "UTF-8");
-            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(redStr.getBytes("ISO-8859-1"));
-            ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
-            newObj = objectInputStream.readObject();
-            objectInputStream.close();
-            byteArrayInputStream.close();
+            if(serStr != null) {
+                String redStr = java.net.URLDecoder.decode(serStr, "UTF-8");
+                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(redStr.getBytes("ISO-8859-1"));
+                ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+                newObj = objectInputStream.readObject();
+                objectInputStream.close();
+                byteArrayInputStream.close();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

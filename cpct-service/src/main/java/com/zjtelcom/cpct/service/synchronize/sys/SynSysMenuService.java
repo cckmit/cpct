@@ -12,4 +12,6 @@ public interface SynSysMenuService {
     Map<String,Object> synchronizeSingleMenu(Long menuId, String roleName);
 
     Map<String,Object> synchronizeBatchMenu(String roleName);
+
+    Map<String,Object> deleteSingleMenu(Long menuId, String roleName);
 }
