@@ -351,11 +351,13 @@
     where CONDITION_TYPE = 2
   </select>
 
-  <select id="listLabelByDisplayId" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select i.INJECTION_LABEL_ID, i.INJECTION_LABEL_CODE, i.INJECTION_LABEL_NAME
+  <select id="listLabelByDisplayId" parameterType="java.lang.Long" resultType="Map">
+    select i.INJECTION_LABEL_CODE as labelCode, i.INJECTION_LABEL_NAME as labelName,dcl.MESSAGE_TYPE as typeCode,m.MESSAGE_NAME as typeName
     from injection_label i
     left join display_column_label dcl
     on i.INJECTION_LABEL_ID = dcl.INJECTION_LABEL_ID
+    left join message m
+    on dcl.MESSAGE_TYPE = m.MESSAGE_ID
     where dcl.DISPLAY_ID = #{grpId,jdbcType=BIGINT}
   </select>
 

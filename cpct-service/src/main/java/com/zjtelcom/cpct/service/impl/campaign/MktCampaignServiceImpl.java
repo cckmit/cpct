@@ -13,11 +13,13 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.campaign.*;
@@ -129,6 +131,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private SyncActivityService syncActivityService;
 
     @Autowired
+    private MktStrategyConfRuleMapper mktStrategyConfRuleMapper;
+
+    @Autowired
     private SynchronizeCampaignService synchronizeCampaignService;
 
     /**
@@ -152,7 +157,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setStatusDate(new Date());
             mktCampaignDO.setCreateChannel("市场部");
             // TODO 添加所属地市
-            mktCampaignDO.setLanId(8330000L);
+            mktCampaignDO.setLanId(1L);
             mktCampaignMapper.insert(mktCampaignDO);
             Long mktCampaignId = mktCampaignDO.getMktCampaignId();
 
@@ -298,7 +303,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         }
         Map<String, Object> maps = new HashMap<>();
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
-        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("resultMsg", ErrorCode.UPDATE_MKT_CAMPAIGN_SUCCESS.getErrorMsg());
         maps.put("mktCampaignId", mktCampaignId);
         return maps;
     }
@@ -388,6 +393,42 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("mktCampaignVO", mktCampaignVO);
+        return maps;
+    }
+
+
+    /**
+     * 根据活动Id查询所有的策略和规则名称集合
+     *
+     * @param mktCampaignId
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public Map<String, Object> getAllConfRuleName(Long mktCampaignId) throws Exception {
+        Map<String, Object> maps = new HashMap<>();
+        List<MktStrategyConfDO> mktStrategyConfDOS = mktStrategyConfMapper.selectByCampaignId(mktCampaignId);
+        List<Map<String, Object>> strConfList = new ArrayList<>();
+        for (MktStrategyConfDO mktStrategyConfDO : mktStrategyConfDOS) {
+            List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(mktStrategyConfDO.getMktStrategyConfId());
+            Map<String, Object> strMap = new HashMap<>();
+            List<Map<String, Object>> ruleMapList = new ArrayList<>();
+            for (MktStrategyConfRuleDO mktStrategyConfRuleDO:mktStrategyConfRuleDOList) {
+                Map<String, Object> ruleMap = new HashMap<>();
+                ruleMap.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
+                ruleMap.put("ruleName", mktStrategyConfRuleDO.getMktStrategyConfRuleName());
+                ruleMapList.add(ruleMap);
+            }
+            List<Long> checkboxGroup = new ArrayList<>();
+            strMap.put("strConfId", mktStrategyConfDO.getMktStrategyConfId());
+            strMap.put("strCofName", mktStrategyConfDO.getMktStrategyConfName());
+            strMap.put("ruleMapList", ruleMapList);
+            strMap.put("checkboxGroup", checkboxGroup);// 该字段为空集合，前端需要
+            strConfList.add(strMap);
+        }
+
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("strConfList", strConfList);
         return maps;
     }
 
@@ -696,7 +737,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCamResultRelDO.setUpdateStaff(UserUtil.loginId());
             mktCamResultRelMapper.changeStatusByMktCampaignId(mktCamResultRelDO);
             // 发布活动异步同步活动到生产环境
-/*            new Thread() {
+            new Thread() {
                 @Override
                 public void run() {
                     try {
@@ -710,7 +751,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         e.printStackTrace();
                     }
                 }
-            }.start();*/
+            }.start();
         } else if (StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd) || StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)) {
             // 暂停或者下线, 该状态为未生效
             MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();

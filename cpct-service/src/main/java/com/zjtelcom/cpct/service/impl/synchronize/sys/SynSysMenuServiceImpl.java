@@ -123,5 +123,14 @@ public class SynSysMenuServiceImpl implements SynSysMenuService {
         return maps;
     }
 
+    @Override
+    public Map<String, Object> deleteSingleMenu(Long menuId, String roleName) {
+        Map<String,Object> maps = new HashMap<>();
+        sysMenuPrdMapper.deleteByPrimaryKey(menuId);
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
+        return maps;
+    }
+
 
 }

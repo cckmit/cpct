@@ -58,6 +58,7 @@ import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 
 /**
  * @Description 目标分群serviceImpl
@@ -143,6 +144,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         List<TarGrpCondition> conditionDOList = tarGrpConditionMapper.listTarGrpCondition(templateId);
 
         TarGrpDetail addVO = BeanUtil.create(template,new TarGrpDetail());
+        addVO.setRemark(null);
         List<TarGrpCondition> conditionAdd = new ArrayList<>();
         for (TarGrpCondition conditionDO : conditionDOList){
             TarGrpCondition con = BeanUtil.create(conditionDO,new TarGrpCondition());
@@ -195,6 +197,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 tarGrpCondition.setStatusDate(DateUtil.getCurrentTime());
                 tarGrpCondition.setUpdateStaff(UserUtil.loginId());
                 tarGrpCondition.setCreateStaff(UserUtil.loginId());
+                tarGrpCondition.setStatusCd("1000");
                 conditionList.add(tarGrpCondition);
             }
             tarGrpConditionMapper.insertByBatch(conditionList);
@@ -321,6 +324,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             }
             if (conditionList.isEmpty()){
                 tarGrpMapper.deleteByPrimaryKey(tarGrpId);
+                redisUtils.remove("TAR_GRP_"+tarGrp.getTarGrpId());
             }
         } catch (Exception e) {
             mapsT.put("resultCode", CODE_FAIL);
@@ -364,6 +368,9 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
         List<TarGrpCondition> insertConditions = new ArrayList<>();
         List<TarGrpCondition> allCondition = new ArrayList<>();
+        List<TarGrpCondition> oldConditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrp.getTarGrpId());
+        List<Long> delList = new ArrayList<>();
+
         for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
             TarGrpCondition tarGrpCondition1 = tarGrpConditionMapper.selectByPrimaryKey(tarGrpCondition.getConditionId());
             if (tarGrpCondition1 == null) {
@@ -384,6 +391,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 condition.setStatusDate(DateUtil.getCurrentTime());
                 condition.setUpdateStaff(UserUtil.loginId());
                 condition.setCreateStaff(UserUtil.loginId());
+                condition.setStatusCd(STATUSCD_EFFECTIVE);
                 insertConditions.add(condition);
             } else {
                 tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
@@ -396,6 +404,21 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             tarGrpConditionMapper.insertByBatch(insertConditions);
         }
         allCondition.addAll(insertConditions);
+
+        //不存在的删除
+        List<Long> allList = new ArrayList<>();
+        for (TarGrpCondition condition : allCondition){
+            allList.add(condition.getConditionId());
+        }
+        for (TarGrpCondition condition : oldConditionList){
+            if (allList.contains(condition.getConditionId())){
+                continue;
+            }
+            delList.add(condition.getConditionId());
+        }
+        if (!delList.isEmpty()){
+            tarGrpConditionMapper.deleteBatch(delList);
+        }
         //更新redis分群数据
         TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
         detail.setTarGrpConditions(allCondition);

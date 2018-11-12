@@ -48,22 +48,22 @@
     <if test="mktStrategyConfRuleName != null and mktStrategyConfRuleName != ''">
       MKT_STRATEGY_CONF_RULE_NAME = #{mktStrategyConfRuleName,jdbcType=VARCHAR},
     </if>
-    <if test="tarGrpId != null and tarGrpId != ''">
+    <if test="tarGrpId != null">
       TAR_GRP_ID = #{tarGrpId,jdbcType=BIGINT},
     </if>
-    <if test="productId != null and productId != ''">
+    <if test="productId != null">
       PRODUCT_ID = #{productId,jdbcType=VARCHAR},
     </if>
-    <if test="evtContactConfId != null and evtContactConfId != ''">
+    <if test="evtContactConfId != null">
       EVT_CONTACT_CONF_ID = #{evtContactConfId,jdbcType=VARCHAR},
     </if>
-    <if test="mktCamChlResultId != null and mktCamChlResultId != ''">
+    <if test="mktCamChlResultId != null">
       MKT_CAM_CHL_RESULT_ID = #{mktCamChlResultId,jdbcType=VARCHAR},
     </if>
-    <if test="createStaff != null and createStaff != ''">
+    <if test="createStaff != null">
       CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
     </if>
-    <if test="createDate != null and createDate != ''">
+    <if test="createDate != null">
       CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
     </if>
       UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},

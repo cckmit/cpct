@@ -124,4 +124,13 @@ public class SynScriptServiceImpl implements SynScriptService{
 
         return maps;
     }
+
+    @Override
+    public Map<String, Object> delelteSynchronizeScript(Long scriptId, String roleName) {
+        Map<String,Object> maps = new HashMap<>();
+        mktScriptPrdMapper.deleteByPrimaryKey(scriptId);
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
+        return maps;
+    }
 }

@@ -32,11 +32,11 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
 
 
     @Override
-    public Map<String, Object> getScriptList(Long userId, String scriptName) {
+    public Map<String, Object> getScriptList(Long userId, String scriptName,String scriptType) {
         Map<String,Object> result = new HashMap<>();
         List<ScriptVO> voList = new ArrayList<>();
         List<Script> scriptList = new ArrayList<>();
-        scriptList = scriptMapper.findByScriptName(scriptName);
+        scriptList = scriptMapper.findByScriptName(scriptName,scriptType);
         for (Script script : scriptList){
             ScriptVO vo = ChannelUtil.map2ScriptVO(script);
             voList.add(vo);

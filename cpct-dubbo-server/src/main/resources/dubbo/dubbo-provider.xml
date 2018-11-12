@@ -9,7 +9,7 @@
     <!-- 提供方应用信息，用于计算依赖关系 -->
     <dubbo:application name="00.1083"/>
 
-    <dubbo:registry protocol="dubbo" address="134.96.159.11:8033"/>
+    <dubbo:registry protocol="dubbo" address="134.96.253.65:8001"/>
 
     <!-- 暴露服务 -->
     <dubbo:protocol name="dubbo" port="30803"/>
@@ -64,7 +64,7 @@
 
     <!-- 因子实时查询 -->
     <dubbo:reference interface="com.zjpii.biz.serv.YzServ" id="yzServ"
-                     version="2.0" retries="0" check="false">
+                     version="1.0" retries="0" check="false">
         <dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="10000"/>
     </dubbo:reference>
 

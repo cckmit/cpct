@@ -18,8 +18,19 @@ public class TarGrpTemplateDetail implements Serializable {
 
     private String tarGrpType;
 
+    private String tarGrpTypeName;
+
     private List<TarGrpTemConditionVO> tarGrpTemConditionVOList;
 
+
+
+    public String getTarGrpTypeName() {
+        return tarGrpTypeName;
+    }
+
+    public void setTarGrpTypeName(String tarGrpTypeName) {
+        this.tarGrpTypeName = tarGrpTypeName;
+    }
 
     public String getTarGrpType() {
         return tarGrpType;

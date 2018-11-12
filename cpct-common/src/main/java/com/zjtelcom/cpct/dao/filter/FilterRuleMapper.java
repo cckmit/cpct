@@ -32,4 +32,6 @@ public interface FilterRuleMapper {
 
     List<FilterRuleModel> selectFilterRuleByStrategyId(@Param("strategyId") Long strategyId);
 
+    List<FilterRule> selectByProduct(@Param("chooseProduct") String chooseProduct);
+
 }

@@ -12,13 +12,13 @@ import java.util.List;
 public interface TarGrpPrdMapper {
     int deleteByPrimaryKey(Long tarGrpId);
 
-    int insert(TarGrpDetail record);
+    int insert(TarGrp record);
 
     TarGrp selectByPrimaryKey(Long tarGrpId);
 
     List<TarGrpDetail> selectAll();
 
-    int updateByPrimaryKey(TarGrpDetail record);
+    int updateByPrimaryKey(TarGrp record);
 
     int createTarGrp(TarGrp tarGrp);
 

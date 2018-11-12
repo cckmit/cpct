@@ -12,9 +12,7 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfAttrMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlResultConfRelMapper;
-import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
-import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
-import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
+import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.question.MktQuestionnaireMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.domain.Rule;
@@ -23,26 +21,24 @@ import com.zjtelcom.cpct.domain.User;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlResultConfRelDO;
-import com.zjtelcom.cpct.domain.channel.CamScript;
-import com.zjtelcom.cpct.domain.channel.Label;
-import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
+import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.question.Questionnaire;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
+import com.zjtelcom.cpct.dto.channel.LabelValueVO;
+import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.enums.ErrorCode;
+import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
 import com.zjtelcom.cpct.service.channel.CamScriptService;
 import com.zjtelcom.cpct.service.channel.VerbalService;
-import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.CopyPropertiesUtil;
-import com.zjtelcom.cpct.util.RedisUtils;
-import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,6 +87,11 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
 
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired
+    private ContactChannelMapper channelMapper;
+
+    @Autowired
+    private InjectionLabelValueMapper injectionLabelValueMapper;
 
     @Override
     public Map<String, Object> saveMktCamChlConf(MktCamChlConfDetail mktCamChlConfDetail) {
@@ -222,6 +223,10 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                     mktCamChlConfAttr.setAttrValueName(questionnaire.getNaireName());
                 }
                 mktCamChlConfAttrList.add(mktCamChlConfAttr);
+            }
+            Channel channel = channelMapper.selectByPrimaryKey(mktCamChlConfDO.getContactChlId());
+            if (channel != null) {
+                mktCamChlConfDetail.setContactChlCode(channel.getContactChlCode());
             }
             // 查询痛痒点话术列表
             Map<String, Object> verbalListMap = verbalService.getVerbalListByConfId(UserUtil.loginId(), evtContactConfId);
@@ -479,12 +484,27 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                             //查询获取标签因子名称
                             Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(condition.getLeftParam()));
                             if (label != null) {
+                                String[] operators = label.getOperator().split(",");
+                                List<OperatorDetail> operatorDetailList = new ArrayList<>();
+                                for (String operator : operators) {
+                                    OperatorDetail operatorDetail = new OperatorDetail();
+                                    operatorDetail.setOperValue(Integer.valueOf(operator));
+                                    operatorDetail.setOperName(Operator.getOperator(Integer.valueOf(operator)).getDescription());
+                                    operatorDetailList.add(operatorDetail);
+                                }
+
+                                List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(label.getInjectionLabelId());
+                                List<LabelValueVO> valueList = ChannelUtil.valueList2VOList(labelValues);
+                                ruleDetail.setValueList(valueList);
+                                ruleDetail.setOperatorList(operatorDetailList);
                                 ruleDetail.setName(label.getInjectionLabelName());
+                                ruleDetail.setConditionType(label.getConditionType());
                             } else {
                                 ruleDetail.setName("");
                             }
                             ruleDetail.setContent(condition.getRightParam());
                             ruleDetail.setOperType(condition.getOperType());
+                            ruleDetail.setOperTypeName(Operator.getOperator(Integer.valueOf(condition.getOperType())).getDescription());
                             ruleDetails.add(ruleDetail);
                         }
                     }

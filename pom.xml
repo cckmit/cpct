@@ -356,6 +356,7 @@
                 <version>${bss-cooperate.version}</version>
             </dependency>
 
+
             <!-- 引入集团redis缓存包 -->
             <dependency>
                 <groupId>com.ctg.itrdc.cache</groupId>

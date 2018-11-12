@@ -82,5 +82,8 @@
     <if test="scriptName != null and scriptName != ''">
       and SCRIPT_NAME LIKE CONCAT(CONCAT('%',#{scriptName}),'%')
     </if>
+    <if test="scriptType != null and scriptType != ''">
+      and SCRIPT_TYPE = #{scriptType}
+    </if>
   </select>
 </mapper>

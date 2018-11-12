@@ -12,4 +12,6 @@ public interface SynSysRoleService {
     Map<String,Object> synchronizeSingleRole(Long roleId, String roleName);
 
     Map<String,Object> synchronizeBatchRole(String roleName);
+
+    Map<String,Object> deleteSingleRole(Long roleId, String roleName);
 }
