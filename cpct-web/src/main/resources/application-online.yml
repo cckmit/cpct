@@ -2,6 +2,8 @@
 server:
   port: 30321
 
+dubboPath: dev
+
 spring:
 # 第一数据源
   datasource:

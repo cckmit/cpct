@@ -251,7 +251,7 @@ public class EventApiServiceImpl implements EventApiService {
         String integrationId = (String) map.get("integrationId");
         //客户编码（必填）
         String custId = (String) map.get("custId");
-        //销售员编码（必填）
+        //流水号（必填）
         String reqId = (String) map.get("reqId");
         //采集时间(yyyy-mm-dd hh24:mm:ss)
         String evtCollectTime = (String) map.get("evtCollectTime");

@@ -2,6 +2,8 @@
 server:
   port: 30801
 
+dubboPath: pst
+
 spring:
 # 第一数据源
   datasource:
