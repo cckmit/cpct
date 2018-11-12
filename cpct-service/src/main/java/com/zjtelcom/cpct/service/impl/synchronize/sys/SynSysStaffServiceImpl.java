@@ -2,12 +2,15 @@ package com.zjtelcom.cpct.service.impl.synchronize.sys;
 
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.system.SysStaffMapper;
+import com.zjtelcom.cpct.dao.system.SysStaffRoleMapper;
 import com.zjtelcom.cpct.domain.system.SysStaff;
+import com.zjtelcom.cpct.domain.system.SysStaffRole;
 import com.zjtelcom.cpct.enums.SynchronizeType;
 import com.zjtelcom.cpct.exception.SystemException;
 import com.zjtelcom.cpct.service.synchronize.SynchronizeRecordService;
 import com.zjtelcom.cpct.service.synchronize.sys.SynSysStaffService;
 import com.zjtelcom.cpct_prd.dao.sys.SysStaffPrdMapper;
+import com.zjtelcom.cpct_prd.dao.sys.SysStaffRolePrdMapper;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +37,10 @@ public class SynSysStaffServiceImpl implements SynSysStaffService{
     private SysStaffPrdMapper sysStaffPrdMapper;
     @Autowired
     private SysStaffMapper sysStaffMapper;
+    @Autowired
+    private SysStaffRoleMapper sysStaffRoleMapper;
+    @Autowired
+    private SysStaffRolePrdMapper sysStaffRolePrdMapper;
 
     //同步表名
     private static final String tableName="sys_staff";
@@ -53,13 +60,21 @@ public class SynSysStaffServiceImpl implements SynSysStaffService{
         if(sysStaff==null){
             throw new SystemException("对应用户信息不存在");
         }
+        SysStaffRole sysStaffRole = sysStaffRoleMapper.selectByStaffId(sysStaff.getStaffId());
+
         //同步时查看是新增还是更新
         SysStaff sysStaff1 = sysStaffPrdMapper.selectByPrimaryKey(staffId);
         if(sysStaff1==null){
             sysStaffPrdMapper.insert(sysStaff);
+            if(sysStaffRole!=null){
+                sysStaffRolePrdMapper.insert(sysStaffRole);
+            }
             synchronizeRecordService.addRecord(roleName,tableName,staffId, SynchronizeType.add.getType());
         }else{
             sysStaffPrdMapper.updateByPrimaryKey(sysStaff);
+            if(sysStaffRole!=null){
+                sysStaffRolePrdMapper.updateByPrimaryKey(sysStaffRole);
+            }
             synchronizeRecordService.addRecord(roleName,tableName,staffId, SynchronizeType.update.getType());
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -106,22 +121,43 @@ public class SynSysStaffServiceImpl implements SynSysStaffService{
         //开始新增
         for(SysStaff c:addList){
             sysStaffPrdMapper.insert(c);
+            SysStaffRole sysStaffRole = sysStaffRoleMapper.selectByStaffId(c.getStaffId());
+            if(sysStaffRole!=null){
+                sysStaffRolePrdMapper.insert(sysStaffRole);
+            }
             synchronizeRecordService.addRecord(roleName,tableName,c.getStaffId(), SynchronizeType.add.getType());
         }
         //开始修改
         for(SysStaff c:updateList){
             sysStaffPrdMapper.updateByPrimaryKey(c);
+            SysStaffRole sysStaffRole = sysStaffRoleMapper.selectByStaffId(c.getStaffId());
+            if(sysStaffRole!=null){
+                sysStaffRolePrdMapper.updateByPrimaryKey(sysStaffRole);
+            }
             synchronizeRecordService.addRecord(roleName,tableName,c.getStaffId(), SynchronizeType.update.getType());
         }
         //开始删除
         for(SysStaff c:deleteList){
             sysStaffPrdMapper.deleteByPrimaryKey(c.getStaffId());
+            SysStaffRole sysStaffRole = sysStaffRoleMapper.selectByStaffId(c.getStaffId());
+            if(sysStaffRole!=null){
+                sysStaffRolePrdMapper.deleteByPrimaryKey(sysStaffRole.getStaffRoleId());
+            }
             synchronizeRecordService.addRecord(roleName,tableName,c.getStaffId(), SynchronizeType.delete.getType());
         }
 
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
 
+        return maps;
+    }
+
+    @Override
+    public Map<String, Object> deleteSingleStaff(Long staffId, String roleName) {
+        Map<String,Object> maps = new HashMap<>();
+        sysStaffPrdMapper.deleteByPrimaryKey(staffId);
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
         return maps;
     }
 

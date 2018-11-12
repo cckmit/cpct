@@ -284,8 +284,7 @@
             CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
             STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
             UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
-            REMARK = #{remark,jdbcType=VARCHAR},
-        EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
+            REMARK = #{remark,jdbcType=VARCHAR}
         where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
     </update>
 

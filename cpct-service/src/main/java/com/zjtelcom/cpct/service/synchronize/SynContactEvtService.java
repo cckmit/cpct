@@ -15,4 +15,6 @@ public interface SynContactEvtService {
 
     Map<String,Object> synchronizeBatchEvent(String roleName);
 
+    Map<String,Object> deleteSingleEvent(Long eventId,String roleName);
+
 }

@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * @Auther: anson
  * @Date: 2018/8/28
- * @Description:事件源同步
+ * @Description:事件源同步  独立的
  */
 @Service
 @Transactional
@@ -40,7 +40,7 @@ public class SynEventSorceServiceImpl extends BaseService implements SynEventSor
     private static final String tableName="event_sorce";
 
     /**
-     * 单个事件源同步
+     * 单个事件源同步  新增和修改
      * @param eventId
      * @param roleName
      * @return
@@ -127,6 +127,21 @@ public class SynEventSorceServiceImpl extends BaseService implements SynEventSor
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
 
+        return maps;
+    }
+
+    /**
+     * 删除
+     * @param eventId
+     * @param roleName
+     * @return
+     */
+    @Override
+    public Map<String, Object> deleteSingleEventSorce(Long eventId, String roleName) {
+        Map<String,Object> maps = new HashMap<>();
+        eventSorcePrdMapper.deleteByPrimaryKey(eventId);
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
         return maps;
     }
 }
