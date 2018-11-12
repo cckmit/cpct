@@ -78,17 +78,22 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     }
 
     @Override
-    public Map<String,Object> getProductListByName(Map<String,Object> params) {
+    public Map<String,Object> getProductListByName( Map<String,Object> params) {
         Map<String,Object> result = new HashMap<>();
         List<Offer> productList = new ArrayList<>();
+        Integer page = MapUtil.getIntNum(params.get("page"));
+        Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
+        PageHelper.startPage(page,pageSize);
         if (params.get("productName") != null){
             String productName = params.get("productName").toString();
             productList = productMapper.findByName(productName);
         }else {
             productList = productMapper.selectAll();
         }
+        Page pageInfo = new Page(new PageInfo(productList));
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",productList);
+        result.put("page",pageInfo);
         return result;
     }
 

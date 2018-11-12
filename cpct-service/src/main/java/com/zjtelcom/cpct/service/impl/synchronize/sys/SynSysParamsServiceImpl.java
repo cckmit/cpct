@@ -124,5 +124,14 @@ public class SynSysParamsServiceImpl implements SynSysParamsService {
         return maps;
     }
 
+    @Override
+    public Map<String, Object> deleteSingleParam(Long paramId, String roleName) {
+        Map<String,Object> maps = new HashMap<>();
+        sysParamsPrdMapper.deleteByPrimaryKey(paramId);
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
+        return maps;
+    }
+
 
 }

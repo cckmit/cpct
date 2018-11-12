@@ -10,9 +10,10 @@ import java.util.Map;
 public interface SynTarGrpTemplateService {
 
 
-    Map<String,Object> synchronizeSingleTemplate(Long templateId, String roleName);
+    Map<String,Object> synchronizeSingleTarGrp(Long templateId, String roleName);
 
-    Map<String,Object> synchronizeBatchTemplate(String roleName);
+    Map<String,Object> synchronizeBatchTarGrp(String roleName);
 
+    Map<String,Object> deleteSingleTarGrp(Long templateId, String roleName);
 
 }
