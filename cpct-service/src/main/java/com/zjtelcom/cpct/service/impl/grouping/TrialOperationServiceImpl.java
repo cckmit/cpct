@@ -484,6 +484,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         //添加固定查询标签
         if (!codeList.contains("ACCS_NBR")){
             codeList.add("ACC_NBR");
+
         }
         if (!codeList.contains("LATN_NAME")){
             codeList.add("LATN_NAME");

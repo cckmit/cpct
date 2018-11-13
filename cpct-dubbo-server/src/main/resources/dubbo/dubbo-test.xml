@@ -31,6 +31,7 @@
     <dubbo:reference interface="com.zjpii.biz.serv.YzServ" id="yzServ"
                      version="2.0" retries="0" check="false">
         <dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="5000"/>
+
     </dubbo:reference>
 
 

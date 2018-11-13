@@ -21,8 +21,8 @@ public class EventApiController extends BaseController {
     @Autowired(required = false)
     private EventApiService eventApiService;
 
-    @Autowired(required = false)
-    private IContactTaskReceiptService iContactTaskReceiptService;
+//    @Autowired(required = false)
+//    private IContactTaskReceiptService iContactTaskReceiptService;
 
     /**
      * 事件触发入口
@@ -74,7 +74,7 @@ public class EventApiController extends BaseController {
     public String iContactTaskReceiptService(@RequestBody Map<String, Object> params) {
         Map result = new HashMap();
         try {
-            result = iContactTaskReceiptService.contactTaskReceipt(params);
+//            result = iContactTaskReceiptService.contactTaskReceipt(params);
         } catch (Exception e) {
             e.printStackTrace();
             return initFailRespInfo(e.getMessage(), "");
