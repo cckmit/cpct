@@ -206,7 +206,7 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
                 vo.setLeftParamName(label.getInjectionLabelName());
                 List<LabelValue> valueList = labelValueMapper.selectByLabelId(label.getInjectionLabelId());
                 if (!valueList.isEmpty()) {
-                    vo.setValueList(ChannelUtil.valueList2StList(valueList));
+                    vo.setValueList(ChannelUtil.valueList2VOList(valueList));
                 }
                 setOperator(vo, label);
             }

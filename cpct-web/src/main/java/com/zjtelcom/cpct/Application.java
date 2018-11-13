@@ -23,8 +23,6 @@ import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 //@EnableAutoConfiguration
-
-
 //@ImportResource({ "classpath:dubbo/*.xml","classpath:task/*.xml" })
 //@ImportResource({ "classpath:dubbo/*.xml"})
 @ComponentScan(value={"com.zjtelcom.cpct"})
