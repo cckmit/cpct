@@ -164,13 +164,13 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             paramList.add(param);
         }
         request.setParamList(paramList);
-        TrialResponse response = new TrialResponse();
+        com.zjtelcom.es.model.TrialResponse response = new com.zjtelcom.es.model.TrialResponse();
 
         try {
             //todo
-//            com.zjtelcom.es.model.TrialOperationVO requests = BeanUtil.create(request,new com.zjtelcom.es.model.TrialOperationVO());
-//            com.zjtelcom.es.model.TrialResponse response = esService.searchBatchInfo(requests);
-            response = restTemplate.postForObject(batchInfo, request, TrialResponse.class);
+            com.zjtelcom.es.model.TrialOperationVO requests = BeanUtil.create(request,new com.zjtelcom.es.model.TrialOperationVO());
+             response = esService.searchBatchInfo(requests);
+//            response = restTemplate.postForObject(batchInfo, request, TrialResponse.class);
 
             if (response.getResultCode().equals(CODE_FAIL)){
                 result.put("resultCode", CODE_FAIL);
@@ -430,18 +430,18 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             paramList.add(param);
         }
         request.setParamList(paramList);
-        TrialResponse response = new TrialResponse();
-        TrialResponse countResponse = new TrialResponse();
+        com.zjtelcom.es.model.TrialResponse response = new com.zjtelcom.es.model.TrialResponse();
+        com.zjtelcom.es.model.TrialResponse countResponse = new com.zjtelcom.es.model.TrialResponse();
         try {
             //todo
-//            com.zjtelcom.es.model.TrialOperationVO request = BeanUtil.create(request,new com.zjtelcom.es.model.TrialOperationVO());
-//            com.zjtelcom.es.model.TrialResponse response = esService.searchBatchInfo(request));
+            com.zjtelcom.es.model.TrialOperationVO requests = BeanUtil.create(request,new com.zjtelcom.es.model.TrialOperationVO());
+             response = esService.searchBatchInfo(requests);
 
-            response = restTemplate.postForObject(batchInfo, request, TrialResponse.class);
+//            response = restTemplate.postForObject(batchInfo, request, TrialResponse.class);
             //同时调用统计查询的功能
 
-//            com.zjtelcom.es.model.TrialResponse countResponse = esService.searchCountInfo(request));
-            countResponse = restTemplate.postForObject(countInfo,request,TrialResponse.class);
+             countResponse = esService.searchCountInfo(requests);
+//            countResponse = restTemplate.postForObject(countInfo,request,TrialResponse.class);
 
             if (countResponse.getResultCode().equals(CODE_SUCCESS)){
                 redisUtils.set("HITS_COUNT_INFO_"+request.getBatchNum(),countResponse.getHitsList());
@@ -571,13 +571,13 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "试运算记录不存在");
             return result;
         }
-//        com.zjtelcom.es.model.TrialResponse response = new com.zjtelcom.es.model.TrialResponse();
-        TrialResponse response = new TrialResponse();
+        com.zjtelcom.es.model.TrialResponse response = new com.zjtelcom.es.model.TrialResponse();
+//        TrialResponse response = new TrialResponse();
         try {
             Map<String, Long> param = new HashMap<>();
             param.put("batchId", operation.getBatchNum());
-//            response = esService.findBatchHitsList(operation.getBatchNum().toString());
-            response = restTemplate.postForObject(hitsList, param, TrialResponse.class);
+            response = esService.findBatchHitsList(operation.getBatchNum().toString());
+//            response = restTemplate.postForObject(hitsList, param, TrialResponse.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
