@@ -74,7 +74,7 @@ spring:
    hitslist: http://localhost:8080/es/findBatchHitsList
    countinfo: http://localhost:8080/es/searchCountInfo
 #是否同步
-  sync:
+sync:
    value: 1
 
 

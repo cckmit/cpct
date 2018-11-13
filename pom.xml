@@ -52,6 +52,12 @@
         <elasticsearch.version>6.3.1</elasticsearch.version>
         <bss-cooperate.version>1.0.8</bss-cooperate.version>
         <ctg-cache.version>2.3.1_P1</ctg-cache.version>
+        <bss-centralized.verson>1.0</bss-centralized.verson>
+        <spring-session.verson>1.1</spring-session.verson>
+        <fastjson.verson>1.2.36</fastjson.verson>
+        <jackson-databind.verson>2.9.5</jackson-databind.verson>
+        <security.verson>1.5.14.RELEASE</security.verson>
+        <session-data-redis.verson>1.3.3.RELEASE</session-data-redis.verson>
 
     </properties>
 
@@ -363,6 +369,69 @@
                 <artifactId>ctg-cache-client</artifactId>
                 <version>${ctg-cache.version}</version>
             </dependency>
+
+
+            <!--&lt;!&ndash; 引入门户模块 &ndash;&gt;-->
+            <!--<dependency>-->
+                <!--<groupId>com.ctzj.smt.bss</groupId>-->
+                <!--<artifactId>bss-centralized-authenticate</artifactId>-->
+                <!--<version>${bss-centralized.verson}</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>com.zjhcsoft.session</groupId>-->
+                <!--<artifactId>spring-session</artifactId>-->
+                <!--<version>${bss-centralized.verson}</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>com.zjhcsoft.session</groupId>-->
+                <!--<artifactId>spring-session-api</artifactId>-->
+                <!--<version>${bss-centralized.verson}</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>org.springframework.boot</groupId>-->
+                <!--<artifactId>spring-boot-starter-security</artifactId>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>com.ctzj.smt.bss</groupId>-->
+                <!--<artifactId>bss-centralized-authenticate</artifactId>-->
+                <!--<version>${bss-centralized.verson}</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>org.springframework.boot</groupId>-->
+                <!--<artifactId>spring-boot-starter-security</artifactId>-->
+                <!--<version>${security.verson}</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>org.springframework.session</groupId>-->
+                <!--<artifactId>spring-session-data-redis</artifactId>-->
+                <!--<version>${session-data-redis.verson}</version>-->
+                <!--<exclusions>-->
+                    <!--<exclusion>-->
+                        <!--<groupId>org.springframework.session</groupId>-->
+                        <!--<artifactId>spring-session</artifactId>-->
+                    <!--</exclusion>-->
+                <!--</exclusions>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>com.zjhcsoft.session</groupId>-->
+                <!--<artifactId>spring-session</artifactId>-->
+                <!--<version>${spring-session.verson}</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>com.zjhcsoft.session</groupId>-->
+                <!--<artifactId>spring-session-api</artifactId>-->
+                <!--<version>${spring-session.verson}</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>com.alibaba</groupId>-->
+                <!--<artifactId>fastjson</artifactId>-->
+                <!--<version>${fastjson.verson}</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>com.fasterxml.jackson.core</groupId>-->
+                <!--<artifactId>jackson-databind</artifactId>-->
+                <!--<version>${jackson-databind.verson}</version>-->
+            <!--</dependency>-->
 
         </dependencies>
     </dependencyManagement>
