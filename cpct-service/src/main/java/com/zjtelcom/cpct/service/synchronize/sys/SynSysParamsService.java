@@ -12,4 +12,6 @@ public interface SynSysParamsService {
     Map<String,Object> synchronizeSingleParam(Long paramId, String roleName);
 
     Map<String,Object> synchronizeBatchParam(String roleName);
+
+    Map<String,Object> deleteSingleParam(Long paramId, String roleName);
 }

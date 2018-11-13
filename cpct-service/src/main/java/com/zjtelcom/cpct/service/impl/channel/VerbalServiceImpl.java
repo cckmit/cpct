@@ -267,14 +267,30 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
     public Map<String, Object> delVerbal(Long userId, Long verbalId) {
         Map<String, Object> result = new HashMap<>();
         //todo 推送渠道对象
-        MktVerbal verbal = verbalMapper.selectByPrimaryKey(verbalId);
-        if (verbal == null) {
-
+        MktVerbal mktVerbal = verbalMapper.selectByPrimaryKey(verbalId);
+        if (mktVerbal == null) {
             result.put("resultCode", CODE_FAIL);
             result.put("resultMsg", "痛痒点话术不存在");
             return result;
         }
+        Long confId = mktVerbal.getContactConfId();
         verbalMapper.deleteByPrimaryKey(verbalId);
+        List<MktVerbal> verbalList = verbalMapper.findVerbalListByConfId(confId);
+        List<VerbalVO> voList = new ArrayList<>();
+        MktCamChlConfDetail detail = (MktCamChlConfDetail) redisUtils.get("MktCamChlConfDetail_"+mktVerbal.getContactConfId());
+        for (MktVerbal verbal : verbalList){
+            List<MktVerbalCondition> conditions = verbalConditionMapper.findChannelConditionListByVerbalId(verbal.getVerbalId());
+            VerbalVO verbalVO = BeanUtil.create(verbal,new VerbalVO());
+            List<VerbalConditionVO> conditionVOList = new ArrayList<>();
+            for (MktVerbalCondition condition : conditions){
+                VerbalConditionVO vo = BeanUtil.create(condition,new VerbalConditionVO());
+                conditionVOList.add(vo);
+            }
+            verbalVO.setConditionList(conditionVOList);
+            voList.add(verbalVO);
+        }
+        detail.setVerbalVOList(voList);
+        redisUtils.set("MktCamChlConfDetail_"+mktVerbal.getContactConfId(),detail);
         result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", "删除成功");
         return result;

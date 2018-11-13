@@ -98,4 +98,99 @@ public class MktStrategyConRulController {
         ruleMap.put("mktStrategyConfRule", ruleList.get(0));
         return JSON.toJSONString(ruleMap);
     }
+
+    /**
+     * 批量插入客户分群
+     * @param params
+     * @return
+     */
+    @RequestMapping(value = "/insertTarGrpBatch", method = RequestMethod.POST)
+    @CrossOrigin
+    public String insertTarGrpBatch(@RequestBody Map<String, Object> params){
+        List<Integer> ruleIdList = (List<Integer>) params.get("ruleIdList");
+        Integer tarGrpNewId = (Integer) params.get("tarGrpId");
+        // 查询新的客户分群
+        Map<String, Object> map = mktStrategyConfRuleService.insertTarGrpBatch(ruleIdList, tarGrpNewId.longValue());
+        return JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 批量修改客户分群
+     * @param params
+     * @return
+     */
+    @RequestMapping(value = "/updateTarGrpBatch", method = RequestMethod.POST)
+    @CrossOrigin
+    public String updateTarGrpBatch(@RequestBody Map<String, Object> params){
+        List<Integer> ruleIdList = (List<Integer>) params.get("ruleIdList");
+        Integer tarGrpNewId = (Integer) params.get("tarGrpId");
+        // 查询新的客户分群
+        Map<String, Object> map = mktStrategyConfRuleService.updateTarGrpBatch(ruleIdList, tarGrpNewId.longValue());
+        return JSON.toJSONString(map);
+    }
+
+    /**
+     * 批量删除客户分群
+     * @param params
+     * @return
+     */
+    @RequestMapping(value = "/deleteTarGrpBatch", method = RequestMethod.POST)
+    @CrossOrigin
+    public String deleteTarGrpBatch(@RequestBody Map<String, Object> params){
+        List<Integer> ruleIdList = (List<Integer>) params.get("ruleIdList");
+        Integer tarGrpNewId = (Integer) params.get("tarGrpId");
+        // 查询新的客户分群
+        Map<String, Object> map = mktStrategyConfRuleService.deleteTarGrpBatch(ruleIdList, tarGrpNewId.longValue());
+        return JSON.toJSONString(map);
+    }
+
+
+
+
+    /**
+     * 批量插入客户分群
+     * @param params
+     * @return
+     */
+    @RequestMapping(value = "/insertCamItemBatch", method = RequestMethod.POST)
+    @CrossOrigin
+    public String insertCamItemBatch(@RequestBody Map<String, Object> params){
+        List<Integer> ruleIdList = (List<Integer>) params.get("ruleIdList");
+        List<Integer> camitemIdList = (List<Integer>) params.get("camitemIdList");
+        // 查询新的客户分群
+        Map<String, Object> map = mktStrategyConfRuleService.insertCamItemBatch(ruleIdList, camitemIdList);
+        return JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 批量修改客户分群
+     * @param params
+     * @return
+     */
+    @RequestMapping(value = "/updateCamItemBatch", method = RequestMethod.POST)
+    @CrossOrigin
+    public String updateCamItemBatch(@RequestBody Map<String, Object> params){
+        List<Integer> ruleIdList = (List<Integer>) params.get("ruleIdList");
+        List<Integer> camitemIdList = (List<Integer>) params.get("camitemIdList");
+        // 查询新的客户分群
+        Map<String, Object> map = mktStrategyConfRuleService.updateCamItemBatch(ruleIdList, camitemIdList);
+        return JSON.toJSONString(map);
+    }
+
+    /**
+     * 批量删除客户分群
+     * @param params
+     * @return
+     */
+    @RequestMapping(value = "/deleteCamItemBatch", method = RequestMethod.POST)
+    @CrossOrigin
+    public String deleteCamItemBatch(@RequestBody Map<String, Object> params){
+        List<Integer> ruleIdList = (List<Integer>) params.get("ruleIdList");
+        List<Integer> camitemIdList = (List<Integer>) params.get("camitemIdList");
+        // 查询新的客户分群
+        Map<String, Object> map = mktStrategyConfRuleService.deleteCamItemBatch(ruleIdList, camitemIdList);
+        return JSON.toJSONString(map);
+    }
 }

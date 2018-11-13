@@ -17,6 +17,14 @@
         <result column="REMARK" jdbcType="VARCHAR" property="remark"/>
     </resultMap>
 
+    <select id="listEventMatchRul" resultMap="BaseResultMap">
+        SELECT EVT_MATCH_RUL_ID, EVENT_ID, EVT_RUL_NAME, EVT_RUL_DESC, EVT_RUL_HANDLE_CLASS,
+                EVT_RUL_EXPRESSION, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+                UPDATE_DATE, REMARK
+        FROM event_match_rul
+        WHERE EVENT_ID = #{eventId,jdbcType=BIGINT}
+    </select>
+
     <insert id="createEventMatchRul" parameterType="com.zjtelcom.cpct.dto.event.EventMatchRulDTO">
         insert into event_match_rul (EVT_MATCH_RUL_ID, EVENT_ID, EVT_RUL_NAME, EVT_RUL_DESC, EVT_RUL_HANDLE_CLASS,
                       EVT_RUL_EXPRESSION, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
@@ -24,15 +32,15 @@
         values (#{evtMatchRulId,jdbcType=BIGINT}, #{eventId,jdbcType=BIGINT}, #{evtRulName,jdbcType=VARCHAR},
                 #{evtRulDesc,jdbcType=VARCHAR}, #{evtRulHandleClass,jdbcType=VARCHAR}, #{evtRulExpression,jdbcType=VARCHAR},
                 #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT},
-                #{CREATE_DATE,jdbcType=TIMESTAMP}, #{STATUS_DATE,jdbcType=TIMESTAMP}, #{UPDATE_DATE,jdbcType=TIMESTAMP},
+                #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP},
                 #{remark,jdbcType=VARCHAR})
     </insert>
 
     <update id="modEventMatchRul" parameterType="com.zjtelcom.cpct.dto.event.EventMatchRulDTO">
         update event_match_rul
         set
-        <if test="eventId != null and eventId != ''">
-            EVENT_ID = #{eventId,jdbcType=BIGINT},
+        <if test="evtMatchRulId != null and evtMatchRulId != ''">
+            EVT_MATCH_RUL_ID = #{evtMatchRulId,jdbcType=BIGINT},
         </if>
         <if test="evtRulName != null and evtRulName != ''">
             EVT_RUL_NAME = #{evtRulName,jdbcType=VARCHAR},
@@ -67,7 +75,8 @@
         <if test="remark != null and remark != ''">
             REMARK = #{remark,jdbcType=VARCHAR},
         </if>
-        where EVT_MATCH_RUL_ID = #{evtMatchRulId,jdbcType=BIGINT}
+        EVENT_ID = #{eventId,jdbcType=BIGINT}
+        where EVENT_ID = #{eventId,jdbcType=BIGINT}
     </update>
 
     <delete id="delEventMatchRul" parameterType="java.lang.Long">

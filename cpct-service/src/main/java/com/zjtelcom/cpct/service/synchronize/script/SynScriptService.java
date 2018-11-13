@@ -12,8 +12,7 @@ public interface SynScriptService {
 
     Map<String,Object> synchronizeBatchScript(String roleName);
 
-
-
+    Map<String,Object> delelteSynchronizeScript(Long scriptId,String roleName);
 
 
 

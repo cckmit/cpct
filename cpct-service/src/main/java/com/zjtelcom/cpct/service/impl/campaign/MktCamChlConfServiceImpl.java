@@ -11,33 +11,34 @@ import com.alibaba.fastjson.JSONObject;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfAttrMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
-import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
-import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
-import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCamChlResultConfRelMapper;
+import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.question.MktQuestionnaireMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.domain.Rule;
 import com.zjtelcom.cpct.domain.RuleDetail;
 import com.zjtelcom.cpct.domain.User;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
-import com.zjtelcom.cpct.domain.channel.CamScript;
-import com.zjtelcom.cpct.domain.channel.Label;
-import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
+import com.zjtelcom.cpct.domain.campaign.MktCamChlResultConfRelDO;
+import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.question.Questionnaire;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
+import com.zjtelcom.cpct.dto.channel.LabelValueVO;
+import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
+import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.enums.ErrorCode;
+import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
 import com.zjtelcom.cpct.service.channel.CamScriptService;
 import com.zjtelcom.cpct.service.channel.VerbalService;
-import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.CopyPropertiesUtil;
-import com.zjtelcom.cpct.util.RedisUtils;
-import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,6 +65,12 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
     private MktVerbalConditionMapper mktVerbalConditionMapper;
 
     @Autowired
+    private MktCamChlResultConfRelMapper mktCamChlResultConfRelMapper;
+
+    @Autowired
+    private MktStrategyConfRuleMapper mktStrategyConfRuleMapper;
+
+    @Autowired
     private InjectionLabelMapper injectionLabelMapper; //标签因子
 
     @Autowired
@@ -80,6 +87,11 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
 
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired
+    private ContactChannelMapper channelMapper;
+
+    @Autowired
+    private InjectionLabelValueMapper injectionLabelValueMapper;
 
     @Override
     public Map<String, Object> saveMktCamChlConf(MktCamChlConfDetail mktCamChlConfDetail) {
@@ -205,12 +217,16 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                     //通过EvtContactConfId获取规则放入属性中
                     String rule = ruleSelect(mktCamChlConfAttr.getEvtContactConfId());
                     mktCamChlConfAttr.setAttrValue(rule);
-                } else if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.QUESTION.getArrId())) {
+                } else if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.QUESTION.getArrId()) && !"".equals(mktCamChlConfAttr.getAttrValue())) {
                     // 问卷
                     Questionnaire questionnaire = mktQuestionnaireMapper.selectByPrimaryKey(Long.valueOf(mktCamChlConfAttr.getAttrValue()));
                     mktCamChlConfAttr.setAttrValueName(questionnaire.getNaireName());
                 }
                 mktCamChlConfAttrList.add(mktCamChlConfAttr);
+            }
+            Channel channel = channelMapper.selectByPrimaryKey(mktCamChlConfDO.getContactChlId());
+            if (channel != null) {
+                mktCamChlConfDetail.setContactChlCode(channel.getContactChlCode());
             }
             // 查询痛痒点话术列表
             Map<String, Object> verbalListMap = verbalService.getVerbalListByConfId(UserUtil.loginId(), evtContactConfId);
@@ -283,9 +299,31 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
      * @return
      */
     @Override
-    public Map<String, Object> deleteMktCamChlConf(Long evtContactConfId) {
+    public Map<String, Object> deleteMktCamChlConf(Long evtContactConfId, Long ruleId) {
         mktCamChlConfMapper.deleteByPrimaryKey(evtContactConfId);
         mktCamChlConfAttrMapper.deleteByEvtContactConfId(evtContactConfId);
+        //判断是否是结果下的
+/*        MktCamChlResultConfRelDO mktCamChlResultConfRelDO = mktCamChlResultConfRelMapper.selectByConfId(evtContactConfId);
+        if (mktCamChlResultConfRelDO != null) {
+            mktCamChlResultConfRelMapper.deleteByPrimaryKey(mktCamChlResultConfRelDO.getMktCamChlResultConfRelId());
+        } else if (mktCamChlResultConfRelDO == null && ruleId != null && ruleId != 0) {
+            MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleId);
+            String confIds = mktStrategyConfRuleDO.getEvtContactConfId();
+            if (confIds != null && "".equals(confIds)) {
+                String[] confIdArray = confIds.split("/");
+                String confIdsNew = null;
+                for (int i = 0; i < confIdArray.length ; i++) {
+                    if(!confIdArray[i].equals(evtContactConfId.toString()) && i == 0 ){
+                        confIdsNew += confIdArray[i] ;
+                    } else if(!confIdArray[i].equals(evtContactConfId.toString()) && i > 0 ) {
+                        confIdsNew += "/" + confIdArray[i] ;
+                    }
+                }
+                mktStrategyConfRuleDO.setEvtContactConfId(confIdsNew);
+            }
+            mktStrategyConfRuleMapper.updateByPrimaryKey(mktStrategyConfRuleDO);
+        }*/
+
 
         //删除旧的关联规则 todo 静态
         mktVerbalConditionMapper.deleteByVerbalId("1", evtContactConfId);
@@ -446,12 +484,27 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                             //查询获取标签因子名称
                             Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(condition.getLeftParam()));
                             if (label != null) {
+                                String[] operators = label.getOperator().split(",");
+                                List<OperatorDetail> operatorDetailList = new ArrayList<>();
+                                for (String operator : operators) {
+                                    OperatorDetail operatorDetail = new OperatorDetail();
+                                    operatorDetail.setOperValue(Integer.valueOf(operator));
+                                    operatorDetail.setOperName(Operator.getOperator(Integer.valueOf(operator)).getDescription());
+                                    operatorDetailList.add(operatorDetail);
+                                }
+
+                                List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(label.getInjectionLabelId());
+                                List<LabelValueVO> valueList = ChannelUtil.valueList2VOList(labelValues);
+                                ruleDetail.setValueList(valueList);
+                                ruleDetail.setOperatorList(operatorDetailList);
                                 ruleDetail.setName(label.getInjectionLabelName());
+                                ruleDetail.setConditionType(label.getConditionType());
                             } else {
                                 ruleDetail.setName("");
                             }
                             ruleDetail.setContent(condition.getRightParam());
                             ruleDetail.setOperType(condition.getOperType());
+                            ruleDetail.setOperTypeName(Operator.getOperator(Integer.valueOf(condition.getOperType())).getDescription());
                             ruleDetails.add(ruleDetail);
                         }
                     }

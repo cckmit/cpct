@@ -68,6 +68,13 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
+        <!-- es试算模块 -->
+        <dependency>
+            <groupId>com.zjtelcom.es</groupId>
+            <artifactId>es-service-batch</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
     </dependencies>
 
 

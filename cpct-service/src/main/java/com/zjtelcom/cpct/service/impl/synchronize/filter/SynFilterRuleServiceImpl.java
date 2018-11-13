@@ -124,5 +124,14 @@ public class SynFilterRuleServiceImpl implements SynFilterRuleService {
         return maps;
     }
 
+    @Override
+    public Map<String, Object> deleteSingleFilterRule(Long ruleId, String roleName) {
+        Map<String,Object> maps = new HashMap<>();
+        filterRulePrdMapper.deleteByPrimaryKey(ruleId);
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
+        return maps;
+    }
+
 
 }

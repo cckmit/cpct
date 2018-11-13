@@ -217,6 +217,22 @@ public class CampaignController extends BaseController {
 
 
     /**
+     * 根据活动Id查询策略和规则
+     *
+     * @param params
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/getAllConfRuleName", method = RequestMethod.POST)
+    @CrossOrigin
+    public String getAllConfRuleName(@RequestBody Map<String, String> params) throws Exception{
+        Long mktCampaignId = Long.valueOf(params.get("mktCampaignId"));
+        Map<String, Object> map = mktCampaignService.getAllConfRuleName(mktCampaignId);
+        return JSON.toJSONString(map);
+    }
+
+
+    /**
      * 删除营销活动
      *
      * @param params

@@ -6,7 +6,7 @@ public interface EventApiService {
 
     Map<String, Object> CalculateCPC(Map<String, Object> map);
 
-    Map<String, Object> SecondChannelSynergy(Map<String, Object> map);
+    Map<String, Object> secondChannelSynergy(Map<String, Object> map);
 
     /**
      * 首次协同cpc同步

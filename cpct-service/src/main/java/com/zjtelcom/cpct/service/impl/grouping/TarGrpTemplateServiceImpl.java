@@ -42,6 +42,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
+
 /**
  * Description:
  * author: linchao
@@ -98,7 +100,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         if (tarGrpTemplateDetail.getTarGrpTemConditionVOList() != null && tarGrpTemplateDetail.getTarGrpTemConditionVOList().size() > 0) {
             for (TarGrpTemConditionVO tarGrpTemConditionVO : tarGrpTemplateDetail.getTarGrpTemConditionVOList()) {
                 if (tarGrpTemConditionVO.getOperType() == null || tarGrpTemConditionVO.getOperType().equals("")) {
-                    tarGrpTemplateMap.put("resultCode", CommonConstant.CODE_FAIL);
+                    tarGrpTemplateMap.put("resultCode", CODE_FAIL);
                     tarGrpTemplateMap.put("resultMsg", "请选择下拉框运算类型");
                     return tarGrpTemplateMap;
                 }
@@ -128,7 +130,13 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
      */
     @Override
     public Map<String, Object> updateTarGrpTemplate(TarGrpTemplateDetail tarGrpTemplateDetail) {
+
         Map<String, Object> tarGrpTemplateMap = new HashMap<>();
+        if (tarGrpTemplateDetail.getTarGrpType()!=null && tarGrpTemplateDetail.getTarGrpType().equals("2000")){
+            tarGrpTemplateMap.put("resultCode", CODE_FAIL);
+            tarGrpTemplateMap.put("resultMsg","销售品模板不支持修改");
+            return tarGrpTemplateMap;
+        }
         TarGrp tarGrpTemplateDO = BeanUtil.create(tarGrpTemplateDetail, new TarGrp());
         // 更新目标分群模板
         tarGrpTemplateDO.setTarGrpId(tarGrpTemplateDetail.getTarGrpTemplateId());
@@ -159,7 +167,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         if (tarGrpTemplateDetail.getTarGrpTemConditionVOList() != null && tarGrpTemplateDetail.getTarGrpTemConditionVOList().size() > 0) {
             for (TarGrpTemConditionVO tarGrpTemConditionVO : tarGrpTemplateDetail.getTarGrpTemConditionVOList()) {
                 if (tarGrpTemConditionVO.getOperType() == null || tarGrpTemConditionVO.getOperType().equals("")) {
-                    tarGrpTemplateMap.put("resultCode", CommonConstant.CODE_FAIL);
+                    tarGrpTemplateMap.put("resultCode", CODE_FAIL);
                     tarGrpTemplateMap.put("resultMsg", "请选择下拉框运算类型");
                     return tarGrpTemplateMap;
                 }
@@ -209,6 +217,9 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             tarGrpTemplateDetail.setTarGrpTemplateId(tarGrpTemplateDO.getTarGrpId());
             tarGrpTemplateDetail.setTarGrpTemplateName(tarGrpTemplateDO.getTarGrpName()==null ? "" : tarGrpTemplateDO.getTarGrpName() );
             tarGrpTemplateDetail.setTarGrpTemplateDesc(tarGrpTemplateDO.getTarGrpDesc()==null ? "" : tarGrpTemplateDO.getTarGrpDesc() );
+            if (tarGrpTemplateDO.getTarGrpType()!=null){
+                tarGrpTemplateDetail.setTarGrpTypeName(tarGrpTemplateDO.getTarGrpType().equals("1000") ? "客户类型" : "销售品类型");
+            }
             tarGrpTemplateDetailList.add(tarGrpTemplateDetail);
         }
         tarGrpTemplateMap.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -320,6 +331,17 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     @Override
     public Map<String, Object> deleteTarGrpTemplate(Long tarGrpTemplateId) {
         Map<String, Object> tarGrpTemplateMap = new HashMap<>();
+        TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpTemplateId);
+        if (tarGrp==null){
+            tarGrpTemplateMap.put("resultCode", CODE_FAIL);
+            tarGrpTemplateMap.put("resultMsg","模板不存在");
+            return tarGrpTemplateMap;
+        }
+        if (tarGrp.getTarGrpType().equals("2000")){
+            tarGrpTemplateMap.put("resultCode", CODE_FAIL);
+            tarGrpTemplateMap.put("resultMsg","销售品模板不支持删除");
+            return tarGrpTemplateMap;
+        }
         tarGrpMapper.deleteByPrimaryKey(tarGrpTemplateId);
         tarGrpConditionMapper.deleteByTarGrpTemplateId(tarGrpTemplateId);
         tarGrpTemplateMap.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -341,7 +363,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             tarGrpTemplateMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             tarGrpTemplateMap.put("conditionId", conditionId);
         } catch (Exception e) {
-            tarGrpTemplateMap.put("resultCode", CommonConstant.CODE_FAIL);
+            tarGrpTemplateMap.put("resultCode", CODE_FAIL);
             tarGrpTemplateMap.put("conditionId", conditionId);
             logger.error("[op:TarGrpTemplateServiceImpl] failed to delete TarGrpTemplateCondition by conditionId = {}, Expection=", conditionId, e);
         }

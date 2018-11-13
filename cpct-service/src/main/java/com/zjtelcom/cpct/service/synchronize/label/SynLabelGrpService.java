@@ -12,4 +12,6 @@ public interface SynLabelGrpService {
     Map<String,Object> synchronizeSingleLabel(Long labelGrpId, String roleName);
 
     Map<String,Object> synchronizeBatchLabel(String roleName);
+
+    Map<String,Object> deleteSingleLabel(Long labelGrpId, String roleName);
 }

@@ -13,4 +13,6 @@ public interface SynSysStaffService {
 
     Map<String,Object> synchronizeBatchStaff(String roleName);
 
+    Map<String,Object> deleteSingleStaff(Long staffId, String roleName);
+
 }

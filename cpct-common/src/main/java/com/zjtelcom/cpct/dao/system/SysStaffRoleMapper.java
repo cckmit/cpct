@@ -17,4 +17,6 @@ public interface SysStaffRoleMapper {
     int updateByPrimaryKey(SysStaffRole record);
 
     int deleteByStaffId(Long staffId);
+
+    SysStaffRole selectByStaffId(Long StaffId);
 }

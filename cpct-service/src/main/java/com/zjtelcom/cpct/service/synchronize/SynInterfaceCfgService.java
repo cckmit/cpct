@@ -13,4 +13,6 @@ public interface SynInterfaceCfgService {
 
     Map<String,Object> synchronizeBatchEventInterface(String roleName);
 
+    Map<String,Object> deleteSingleEventInterface(Long eventId,String roleName);
+
 }

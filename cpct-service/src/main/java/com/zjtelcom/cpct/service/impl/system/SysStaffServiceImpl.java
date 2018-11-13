@@ -11,11 +11,13 @@ import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.domain.system.SysStaffRole;
 import com.zjtelcom.cpct.dto.system.SysStaffDTO;
 import com.zjtelcom.cpct.service.BaseService;
+import com.zjtelcom.cpct.service.synchronize.sys.SynSysStaffService;
 import com.zjtelcom.cpct.service.system.SysStaffService;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +35,12 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
 
     @Autowired
     private SysStaffRoleMapper sysStaffRoleMapper;
+
+    @Autowired
+    private SynSysStaffService synSysStaffService;
+
+    @Value("${sync.value}")
+    private String value;
 
     public Map<String, Object> queryUserByName(String userName) {
         Map<String, Object> resultMap = new HashMap<String, Object>();
@@ -109,7 +117,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         Map<String,Object> result = new HashMap<>();
         //todo 判断字段是否为空
 
-        SysStaff sysStaff = new SysStaff();
+        final SysStaff sysStaff = new SysStaff();
         CopyPropertiesUtil.copyBean2Bean(sysStaff, sysStaffDTO);
         //判断账号是否重复
         int count = sysStaffMapper.checkCodeRepeat(sysStaff.getStaffAccount());
@@ -153,6 +161,19 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
 
         result.put("resultCode",CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","保存成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synSysStaffService.synchronizeSingleStaff(sysStaff.getStaffId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 
@@ -160,7 +181,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
     public Map<String,Object> updateStaff(SysStaffDTO sysStaffDTO) throws Exception {
         Map<String,Object> result = new HashMap<>();
         //todo 判断字段是否为空
-        SysStaff sysStaff = new SysStaff();
+        final SysStaff sysStaff = new SysStaff();
         CopyPropertiesUtil.copyBean2Bean(sysStaff, sysStaffDTO);
 
         //todo 判断账号是否重复
@@ -189,6 +210,18 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
 
         result.put("resultCode",CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","保存成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synSysStaffService.synchronizeSingleStaff(sysStaff.getStaffId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
 
         return result;
     }

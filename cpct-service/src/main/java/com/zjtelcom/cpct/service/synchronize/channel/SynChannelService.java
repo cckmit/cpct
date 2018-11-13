@@ -13,4 +13,6 @@ public interface SynChannelService {
 
     Map<String,Object> synchronizeBatchChannel(String roleName);
 
+    Map<String,Object> deleteSingleChannel(Long channelId, String roleName);
+
 }

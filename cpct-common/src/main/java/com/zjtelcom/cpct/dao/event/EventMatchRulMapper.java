@@ -14,4 +14,6 @@ public interface EventMatchRulMapper {
 
     int delEventMatchRul(EventMatchRulDTO eventMatchRulDTO);
 
+    EventMatchRulDTO listEventMatchRul(Long eventId);
+
 }

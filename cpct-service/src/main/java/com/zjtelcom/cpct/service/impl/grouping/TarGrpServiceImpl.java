@@ -40,6 +40,7 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.EagleDatabaseConfCache;
 import com.zjtelcom.cpct.service.TryCalcService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
+import com.zjtelcom.cpct.service.synchronize.template.SynTarGrpTemplateService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct.validator.ValidateResult;
 import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
@@ -47,6 +48,7 @@ import com.zjtelcom.cpct.vo.grouping.TarGrpVO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -58,6 +60,7 @@ import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 
 /**
  * @Description 目标分群serviceImpl
@@ -96,7 +99,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     private OrgTreeMapper orgTreeMapper;
     @Autowired
     private MktStrategyConfRuleMapper ruleMapper;
+    @Autowired
+    private SynTarGrpTemplateService synTarGrpTemplateService;
 
+    @Value("${sync.value}")
+    private String value;
 
     /**
      * 复制客户分群 返回
@@ -143,6 +150,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         List<TarGrpCondition> conditionDOList = tarGrpConditionMapper.listTarGrpCondition(templateId);
 
         TarGrpDetail addVO = BeanUtil.create(template,new TarGrpDetail());
+        addVO.setRemark(null);
         List<TarGrpCondition> conditionAdd = new ArrayList<>();
         for (TarGrpCondition conditionDO : conditionDOList){
             TarGrpCondition con = BeanUtil.create(conditionDO,new TarGrpCondition());
@@ -158,11 +166,10 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
      */
     @Transactional(readOnly = false)
     @Override
-    public Map<String, Object> createTarGrp(final TarGrpDetail tarGrpDetail, boolean isCopy) {
-         TarGrp tarGrp = new TarGrp();
+    public Map<String, Object> createTarGrp(TarGrpDetail tarGrpDetail, boolean isCopy) {
         Map<String, Object> maps = new HashMap<>();
         //插入客户分群记录
-        tarGrp = tarGrpDetail;
+        final TarGrp tarGrp = tarGrpDetail;
         tarGrp.setCreateDate(DateUtil.getCurrentTime());
         tarGrp.setUpdateDate(DateUtil.getCurrentTime());
         tarGrp.setStatusDate(DateUtil.getCurrentTime());
@@ -195,6 +202,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 tarGrpCondition.setStatusDate(DateUtil.getCurrentTime());
                 tarGrpCondition.setUpdateStaff(UserUtil.loginId());
                 tarGrpCondition.setCreateStaff(UserUtil.loginId());
+                tarGrpCondition.setStatusCd("1000");
                 conditionList.add(tarGrpCondition);
             }
             tarGrpConditionMapper.insertByBatch(conditionList);
@@ -207,6 +215,19 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("tarGrp", tarGrp);
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synTarGrpTemplateService.synchronizeSingleTarGrp(tarGrp.getTarGrpId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return maps;
     }
 
@@ -295,6 +316,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     @Override
     public Map<String, Object> delTarGrpCondition(Long conditionId) {
         Map<String, Object> mapsT = new HashMap<>();
+
+
         try {
             TarGrpCondition condition = tarGrpConditionMapper.selectByPrimaryKey(conditionId);
             if (condition==null){
@@ -304,9 +327,22 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             }
             Long tarGrpId = condition.getTarGrpId();
             tarGrpConditionMapper.deleteByPrimaryKey(conditionId);
+            TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpId);
+            if (tarGrp==null){
+                mapsT.put("resultCode", CODE_FAIL);
+                mapsT.put("resultMsg", "分群不存在");
+                return mapsT;
+            }
+            TarGrpDetail detail = (TarGrpDetail)redisUtils.get("TAR_GRP_"+tarGrpId);
             List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
+            if (detail!=null){
+                 detail = BeanUtil.create(tarGrp,new TarGrpDetail());
+                detail.setTarGrpConditions(conditionList);
+                redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),detail);
+            }
             if (conditionList.isEmpty()){
                 tarGrpMapper.deleteByPrimaryKey(tarGrpId);
+                redisUtils.remove("TAR_GRP_"+tarGrp.getTarGrpId());
             }
         } catch (Exception e) {
             mapsT.put("resultCode", CODE_FAIL);
@@ -342,14 +378,16 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     @Override
     public Map<String, Object> modTarGrp(TarGrpDetail tarGrpDetail) {
         Map<String, Object> maps = new HashMap<>();
-        TarGrp tarGrp = new TarGrp();
-        tarGrp = tarGrpDetail;
+        final TarGrp tarGrp = tarGrpDetail;
         tarGrp.setUpdateDate(DateUtil.getCurrentTime());
         tarGrp.setUpdateStaff(UserUtil.loginId());
         tarGrpMapper.modTarGrp(tarGrp);
         List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
         List<TarGrpCondition> insertConditions = new ArrayList<>();
         List<TarGrpCondition> allCondition = new ArrayList<>();
+        List<TarGrpCondition> oldConditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrp.getTarGrpId());
+        List<Long> delList = new ArrayList<>();
+
         for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
             TarGrpCondition tarGrpCondition1 = tarGrpConditionMapper.selectByPrimaryKey(tarGrpCondition.getConditionId());
             if (tarGrpCondition1 == null) {
@@ -370,6 +408,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 condition.setStatusDate(DateUtil.getCurrentTime());
                 condition.setUpdateStaff(UserUtil.loginId());
                 condition.setCreateStaff(UserUtil.loginId());
+                condition.setStatusCd(STATUSCD_EFFECTIVE);
                 insertConditions.add(condition);
             } else {
                 tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
@@ -382,6 +421,21 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             tarGrpConditionMapper.insertByBatch(insertConditions);
         }
         allCondition.addAll(insertConditions);
+
+        //不存在的删除
+        List<Long> allList = new ArrayList<>();
+        for (TarGrpCondition condition : allCondition){
+            allList.add(condition.getConditionId());
+        }
+        for (TarGrpCondition condition : oldConditionList){
+            if (allList.contains(condition.getConditionId())){
+                continue;
+            }
+            delList.add(condition.getConditionId());
+        }
+        if (!delList.isEmpty()){
+            tarGrpConditionMapper.deleteBatch(delList);
+        }
         //更新redis分群数据
         TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
         detail.setTarGrpConditions(allCondition);
@@ -389,6 +443,19 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
 
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synTarGrpTemplateService.synchronizeSingleTarGrp(tarGrp.getTarGrpId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return maps;
     }
 
@@ -398,7 +465,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     @Override
     public Map<String, Object> delTarGrp(TarGrpDetail tarGrpDetail) {
         Map<String, Object> maps = new HashMap<>();
-        TarGrp tarGrp = tarGrpDetail;
+        final TarGrp tarGrp = tarGrpDetail;
         tarGrpMapper.delTarGrp(tarGrp);
         List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
         for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
@@ -406,6 +473,19 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synTarGrpTemplateService.deleteSingleTarGrp(tarGrp.getTarGrpId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return maps;
     }
 

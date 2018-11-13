@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://code.alibabatech.com/schema/dubbo 
+	http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <!-- 提供方应用信息，用于计算依赖关系 -->
+    <dubbo:application name="00.1083"/>
+
+    <dubbo:registry protocol="dubbo" address="134.96.253.65:8001"/>
+
+    <dubbo:reference interface="com.zjtelcom.cpct.service.api.EventApiService" id="eventApiService"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="CalculateCPC" servicecode="00.1083.CalculateCPC" timeout="20000"/>
+        <dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="20000"/>
+        <!--<dubbo:method name="secondChannelSynergy" servicecode="00.1083.SecondChannelSynergy" timeout="5000"/>-->
+    </dubbo:reference>
+
+    <!-- 订阅 -->
+    <!-- cpc计算协同中心回调 -->
+    <dubbo:reference interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService" id="iContactTaskReceiptService"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="contactTaskReceipt" servicecode="00.1079.CPCResultFeedback" timeout="20000"/>
+    </dubbo:reference>
+
+</beans>

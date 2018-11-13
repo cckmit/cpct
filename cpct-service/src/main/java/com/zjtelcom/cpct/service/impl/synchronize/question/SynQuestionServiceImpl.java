@@ -30,6 +30,10 @@ import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
+/**
+ * 题库关联：       mkt_question  mkt_question_detail
+ * 调研问卷关联：   mkt_questionnaire  mkt_qst_quest_rel(可以关联到题库和题库详情)
+ */
 @Service
 public class SynQuestionServiceImpl  extends BaseService implements SynQuestionService {
     @Autowired
@@ -65,24 +69,28 @@ public class SynQuestionServiceImpl  extends BaseService implements SynQuestionS
      * @return
      */
     @Override
-    public Map<String, Object> synQuestion(Long questionnaireId) {
+    public Map<String, Object> synQuestion(String roleName,Long questionnaireId) {
         Map<String,Object> result = new HashMap<>();
         Questionnaire questionnaire = questionnaireMapper.selectByPrimaryKey(questionnaireId);
         if (questionnaire==null){
             throw new SystemException("对应问卷不存在");
         }
-        questionnairePrdMapper.insert(questionnaire);
-        List<QuestRel> relList = questRelMapper.findRelListByQuestionnaireId(questionnaireId);
-        for (QuestRel rel : relList){
-            Question question = questionMapper.selectByPrimaryKey(rel.getQuestionId());
-            if (question == null){
-                continue;
+        //查出问卷关联题库的关联信息
+        List<QuestRel> relListByQuestionnaireId = questRelMapper.findRelListByQuestionnaireId(questionnaire.getNaireId());
+
+        Questionnaire questionnaire1 = questionnairePrdMapper.selectByPrimaryKey(questionnaireId);
+        if (questionnaire1==null){
+            questionnairePrdMapper.insert(questionnaire);
+            //增加题库关联信息
+            if(!relListByQuestionnaireId.isEmpty()){
+                questRelPrdMapper.insertBatch(relListByQuestionnaireId);
             }
-            questRelPrdMapper.insert(rel);
-            questionPrdMapper.insert(question);
-            List<QuestionDetail> detailList = questionDetailMapper.findDetailListByQuestionId(question.getQuestionId());
-            for (QuestionDetail detail : detailList){
-                questionDetailPrdMapper.insert(detail);
+        }else{
+            questionnairePrdMapper.updateByPrimaryKey(questionnaire);
+            if(!relListByQuestionnaireId.isEmpty()){
+               for (QuestRel questRel:relListByQuestionnaireId){
+                   questRelPrdMapper.updateByPrimaryKey(questRel);
+               }
             }
         }
         result.put("resultCode",CODE_SUCCESS);
@@ -124,6 +132,75 @@ public class SynQuestionServiceImpl  extends BaseService implements SynQuestionS
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         return  maps;
+    }
+
+
+    /**
+     * 同步单个问卷题库
+     * @param roleName
+     * @param questionnaireId
+     * @return
+     */
+    @Override
+    public Map<String, Object> synQuestionBank(String roleName, Long questionnaireId) {
+        Map<String,Object> maps = new HashMap<>();
+        Question question = questionMapper.selectByPrimaryKey(questionnaireId);
+        if(question==null){
+            throw new SystemException("对应题库信息不存在");
+        }
+        //查出题库关联的题库详情
+        List<QuestionDetail> detailListByQuestionId = questionDetailMapper.findDetailListByQuestionId(question.getQuestionId());
+
+        Question question1 = questionPrdMapper.selectByPrimaryKey(questionnaireId);
+        if(question1==null){
+            questionPrdMapper.insert(question);
+            if(!detailListByQuestionId.isEmpty()){
+               for (QuestionDetail questionDetail:detailListByQuestionId){
+                   questionDetailPrdMapper.insert(questionDetail);
+               }
+            }
+        }else{
+            questionPrdMapper.updateByPrimaryKey(question);
+            if(!detailListByQuestionId.isEmpty()){
+                for (QuestionDetail questionDetail:detailListByQuestionId){
+                    questionDetailPrdMapper.updateByPrimaryKey(questionDetail);
+                }
+            }
+        }
+
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
+        return maps;
+    }
+
+    /**
+     * 删除单个问卷题库
+     * @param roleName
+     * @param questionnaireId
+     * @return
+     */
+    @Override
+    public Map<String, Object> deleteQuestionBank(String roleName, Long questionnaireId) {
+        Map<String,Object> maps = new HashMap<>();
+        questionPrdMapper.deleteByPrimaryKey(questionnaireId);
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
+        return maps;
+    }
+
+    /**
+     * 删除单个调研问卷
+     * @param roleName
+     * @param questionnaireId
+     * @return
+     */
+    @Override
+    public Map<String, Object> deleteQuestion(String roleName, Long questionnaireId) {
+        Map<String,Object> maps = new HashMap<>();
+        questionnaireMapper.deleteByPrimaryKey(questionnaireId);
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
+        return maps;
     }
 
 

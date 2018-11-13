@@ -27,13 +27,17 @@ import com.zjtelcom.cpct.response.event.ViewContactEvtRsp;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.ContactEvtItemService;
 import com.zjtelcom.cpct.service.event.ContactEvtService;
+import com.zjtelcom.cpct.service.event.EventMatchRulService;
 import com.zjtelcom.cpct.service.filter.FilterRuleService;
+import com.zjtelcom.cpct.service.synchronize.SynContactEvtService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -83,7 +87,13 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     private InterfaceCfgMapper interfaceCfgMapper;
     @Autowired
     private EventSorceMapper eventSorceMapper;
+    @Autowired
+    private EventMatchRulService eventMatchRulService;
+    @Autowired
+    private SynContactEvtService synContactEvtService;
 
+    @Value("${sync.value}")
+    private String value;
 
     /**
      * 获取事件类型列表
@@ -205,7 +215,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         List<ContactEvtMatchRul> contactEvtMatchRuls = new ArrayList<>();
         for (ContactEventDetail evtDetail : evtDetailList) {
             //插入事件主题信息
-            ContactEvt contactEvt = evtDetail;
+            final ContactEvt contactEvt = evtDetail;
 //            //todo 待确认必填字段
 //            contactEvt.setInterfaceCfgId();
 
@@ -271,25 +281,49 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
 //                }
 //            }
 
+            //插入事件规则
+            if(evtDetail.getEventMatchRulDetail() != null) {
+                evtDetail.getEventMatchRulDetail().setEventId(contactEvt.getContactEvtId());
+                Map<String, Object> eventMatchRul = eventMatchRulService.createEventMatchRul(evtDetail.getEventMatchRulDetail());
+                if (!eventMatchRul.get("resultCode").equals(CODE_SUCCESS)) {
+                    return eventMatchRul;
+                }
+            }
+
             //大数据事件同步
             InterfaceCfg interfaceCfg = interfaceCfgMapper.selectByPrimaryKey(contactEvt.getInterfaceCfgId());
-            EventSorceDO eventSorceDO = eventSorceMapper.selectByPrimaryKey(interfaceCfg.getEvtSrcId());
-            Map<String,Object> map = new HashMap<>();
-            if(eventSorceDO.getEvtSrcName().equals("大数据")) {
-                map.put("isi", DateUtil.getDetailTime());
-                map.put("eventId", contactEvt.getContactEvtId());
-                map.put("eventCode", contactEvt.getContactEvtCode());
-                map.put("eventName", contactEvt.getContactEvtName());
+            if(interfaceCfg != null) {
+                EventSorceDO eventSorceDO = eventSorceMapper.selectByPrimaryKey(interfaceCfg.getEvtSrcId());
+                Map<String, Object> map = new HashMap<>();
+                if (eventSorceDO.getEvtSrcName().equals("大数据")) {
+                    map.put("isi", DateUtil.getDetailTime());
+                    map.put("eventId", contactEvt.getContactEvtId());
+                    map.put("eventCode", contactEvt.getContactEvtCode());
+                    map.put("eventName", contactEvt.getContactEvtName());
 
-                if(contactEvt.getEvtTrigType().equals("1000")) {
-                    map.put("eventType", "1");
-                }else {
-                    map.put("eventType", "2");
+                    if (contactEvt.getEvtTrigType().equals("1000")) {
+                        map.put("eventType", "1");
+                    } else {
+                        map.put("eventType", "2");
+                    }
+                    map.put("eventClass", "");
+                    map.put("state", contactEvt.getStatusCd());
                 }
-                map.put("eventClass", "");
-                map.put("state",contactEvt.getStatusCd());
+            }
+
+            if (value.equals("1")){
+                new Thread(){
+                    public void run(){
+                        try {
+                            synContactEvtService.synchronizeSingleEvent(contactEvt.getContactEvtId(),"");
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                }.run();
             }
         }
+
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         return maps;
@@ -315,7 +349,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
      */
     @Transactional(readOnly = false)
     @Override
-    public Map<String, Object> delEvent(Long contactEvtId) {
+    public Map<String, Object> delEvent(final Long contactEvtId) {
         Map<String, Object> map = new HashMap<>();
         ContactEvt evt = contactEvtMapper.getEventById(contactEvtId);
         if (evt==null){
@@ -329,7 +363,22 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             map.put("resultMsg","事件已关联活动无法删除");
             return map;
         }
+        //EventMatchRulDetail eventMatchRulDetail = ;
+        //删除事件
         contactEvtMapper.delEvent(contactEvtId);
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synContactEvtService.deleteSingleEvent(contactEvtId,"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         map.put("resultCode", CommonConstant.CODE_SUCCESS);
         map.put("resultMsg", StringUtils.EMPTY);
         return map;
@@ -421,6 +470,21 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             }
         }
         contactEventDetail.setMktCamEvtRels(mktCamEvtRels);
+
+        //获取事件规则
+        Map<String, Object> eventMatchRul = eventMatchRulService.listEventMatchRul(contactEvtId);
+        EventMatchRulDTO eventMatchRulDTO = (EventMatchRulDTO) eventMatchRul.get("listEventMatchRul");
+        EventMatchRulDetail eventMatchRulDetail = new EventMatchRulDetail();
+        if(eventMatchRulDTO != null) {
+            Map<String, Object> eventMatchRulCondition = eventMatchRulService.listEventMatchRulCondition(eventMatchRulDTO.getEvtMatchRulId());
+            List<EventMatchRulConditionVO> eventMatchRulConditionVOS = (List<EventMatchRulConditionVO>) eventMatchRulCondition.get("listEventMatchRulCondition");
+
+            eventMatchRulDetail = BeanUtil.create(eventMatchRulDTO, new EventMatchRulDetail());
+
+            eventMatchRulDetail.setEventMatchRulConditionVOS(eventMatchRulConditionVOS);
+        }
+        contactEventDetail.setEventMatchRulDetail(eventMatchRulDetail);
+
         viewContactEvtRsp.setContactEvtDetail(contactEventDetail);
         map.put("resultCode", CommonConstant.CODE_SUCCESS);
         map.put("resultMsg", StringUtils.EMPTY);
@@ -479,7 +543,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         for (ContactEventDetail evtDetail : evtDetailList) {
             //更新事件主题信息
             EventEditVO editVO = BeanUtil.create(evtDetail,new EventEditVO());
-            ContactEvt contactEvt = contactEvtMapper.getEventById(evtDetail.getContactEvtId());
+            final ContactEvt contactEvt = contactEvtMapper.getEventById(evtDetail.getContactEvtId());
             if (contactEvt==null ){
                 map.put("resultCode", CODE_FAIL);
                 map.put("resultMsg", "事件不存在");
@@ -554,6 +618,51 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                     mktCamEvtRelMapper.deleteByPrimaryKey(evtRel.getMktCampEvtRelId());
                 }
             }
+            //更新事件规则
+            if(evtDetail.getEventMatchRulDetail() != null) {
+                EventMatchRulDetail eventMatchRulDetail = evtDetail.getEventMatchRulDetail();
+                eventMatchRulDetail.setEventId(evtDetail.getContactEvtId());
+                List<EventMatchRulCondition> eventMatchRulConditions = eventMatchRulDetail.getEventMatchRulConditions();
+//                eventMatchRulDetail.setEventMatchRulConditions(eventMatchRulConditions);
+                List<Long> list = new ArrayList<>();
+                //遍历旧的事件规则条件
+                Map<String, Object> eventMatchRulMap = eventMatchRulService.listEventMatchRul(evtDetail.getContactEvtId());
+                EventMatchRulDTO eventMatchRulDTO = (EventMatchRulDTO) eventMatchRulMap.get("listEventMatchRul");
+                Map<String, Object> eventMatchRulConditionMap = eventMatchRulService.listEventMatchRulCondition(eventMatchRulDTO.getEvtMatchRulId());
+                List<EventMatchRulConditionVO> rulConditionList = (List<EventMatchRulConditionVO>) eventMatchRulConditionMap.get("listEventMatchRulCondition");
+
+                //事件规则更新
+                Map<String, Object> eventMatchRul = eventMatchRulService.modEventMatchRul(eventMatchRulDetail);
+                if (!eventMatchRul.get("resultCode").equals(CODE_SUCCESS)) {
+                    return eventMatchRul;
+                }
+
+                //更新的事件规则条件的id
+                for (EventMatchRulCondition eventMatchRulCondition : eventMatchRulConditions) {
+                    list.add(eventMatchRulCondition.getConditionId());
+                }
+
+                //删除多余的事件规则条件
+                for (EventMatchRulConditionVO eventMatchRulConditionVO : rulConditionList) {
+                    if (!list.contains(eventMatchRulConditionVO.getConditionId())) {
+                        EventMatchRulCondition eventMatchRulCondition = BeanUtil.create(eventMatchRulConditionVO, new EventMatchRulCondition());
+                        eventMatchRulService.delEventMatchRulCondition(eventMatchRulCondition.getConditionId());
+                    }
+                }
+            }
+
+            if (value.equals("1")){
+                new Thread(){
+                    public void run(){
+                        try {
+                            synContactEvtService.synchronizeSingleEvent(contactEvt.getContactEvtId(),"");
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                }.run();
+            }
+
         }
         map.put("resultCode", CommonConstant.CODE_SUCCESS);
         map.put("resultMsg", StringUtils.EMPTY);
