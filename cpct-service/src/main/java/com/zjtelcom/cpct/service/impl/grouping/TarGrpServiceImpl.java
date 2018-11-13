@@ -40,6 +40,7 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.EagleDatabaseConfCache;
 import com.zjtelcom.cpct.service.TryCalcService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
+import com.zjtelcom.cpct.service.synchronize.template.SynTarGrpTemplateService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct.validator.ValidateResult;
 import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
@@ -47,6 +48,7 @@ import com.zjtelcom.cpct.vo.grouping.TarGrpVO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -97,7 +99,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     private OrgTreeMapper orgTreeMapper;
     @Autowired
     private MktStrategyConfRuleMapper ruleMapper;
+    @Autowired
+    private SynTarGrpTemplateService synTarGrpTemplateService;
 
+    @Value("${sync.value}")
+    private String value;
 
     /**
      * 复制客户分群 返回
@@ -160,11 +166,10 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
      */
     @Transactional(readOnly = false)
     @Override
-    public Map<String, Object> createTarGrp(final TarGrpDetail tarGrpDetail, boolean isCopy) {
-         TarGrp tarGrp = new TarGrp();
+    public Map<String, Object> createTarGrp(TarGrpDetail tarGrpDetail, boolean isCopy) {
         Map<String, Object> maps = new HashMap<>();
         //插入客户分群记录
-        tarGrp = tarGrpDetail;
+        final TarGrp tarGrp = tarGrpDetail;
         tarGrp.setCreateDate(DateUtil.getCurrentTime());
         tarGrp.setUpdateDate(DateUtil.getCurrentTime());
         tarGrp.setStatusDate(DateUtil.getCurrentTime());
@@ -210,6 +215,19 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("tarGrp", tarGrp);
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synTarGrpTemplateService.synchronizeSingleTarGrp(tarGrp.getTarGrpId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return maps;
     }
 
@@ -360,8 +378,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     @Override
     public Map<String, Object> modTarGrp(TarGrpDetail tarGrpDetail) {
         Map<String, Object> maps = new HashMap<>();
-        TarGrp tarGrp = new TarGrp();
-        tarGrp = tarGrpDetail;
+        final TarGrp tarGrp = tarGrpDetail;
         tarGrp.setUpdateDate(DateUtil.getCurrentTime());
         tarGrp.setUpdateStaff(UserUtil.loginId());
         tarGrpMapper.modTarGrp(tarGrp);
@@ -426,6 +443,19 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
 
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synTarGrpTemplateService.synchronizeSingleTarGrp(tarGrp.getTarGrpId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return maps;
     }
 
@@ -435,7 +465,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     @Override
     public Map<String, Object> delTarGrp(TarGrpDetail tarGrpDetail) {
         Map<String, Object> maps = new HashMap<>();
-        TarGrp tarGrp = tarGrpDetail;
+        final TarGrp tarGrp = tarGrpDetail;
         tarGrpMapper.delTarGrp(tarGrp);
         List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
         for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
@@ -443,6 +473,19 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synTarGrpTemplateService.deleteSingleTarGrp(tarGrp.getTarGrpId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return maps;
     }
 

@@ -21,11 +21,13 @@ import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.event.EventSorce;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.EventSorceService;
+import com.zjtelcom.cpct.service.synchronize.SynEventSorceService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +43,9 @@ import java.util.*;
 @Service
 @Transactional
 public class EventSorceServiceImpl extends BaseService implements EventSorceService {
+    @Value("${sync.value}")
+    private String value;
+
 
     @Autowired
     private EventSorceMapper eventSorceMapper;
@@ -49,6 +54,8 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
     private SysStaffMapper sysStaffMapper;
     @Autowired
     private SysParamsMapper sysParamsMapper;
+    @Autowired
+    private SynEventSorceService synEventSorceService;
 
     /**
      * 新增事件源
@@ -59,8 +66,8 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
     @Override
     public Map<String, Object> saveEventSorce(EventSorce eventSorce) {
         Map<String, Object> eventSorceMap = new HashMap<>();
+        final EventSorceDO eventSorceDO = BeanUtil.create(eventSorce, new EventSorceDO());
         try {
-            EventSorceDO eventSorceDO = BeanUtil.create(eventSorce, new EventSorceDO());
             eventSorceDO.setEvtSrcCode("ERC"+DateUtil.date2String(new Date())+ChannelUtil.getRandomStr(4));
             eventSorceDO.setCreateStaff(UserUtil.loginId());
             eventSorceDO.setCreateDate(new Date());
@@ -74,6 +81,17 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
             eventSorceMap.put("resultCode", CommonConstant.CODE_FAIL);
             eventSorceMap.put("resultMsg", "新增事件源失败！");
             logger.error("[op:EventSorceServiceImpl] 新增事件源eventSorce = {}失败！Exception: ", JSON.toJSON(eventSorce), e);
+        }
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synEventSorceService.synchronizeSingleEventSorce(eventSorceDO.getEvtSrcId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
         }
         return eventSorceMap;
     }
@@ -119,8 +137,8 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
     @Override
     public Map<String, Object> updateEventSorce(EventSorce eventSorce) {
         Map<String, Object> eventSorceMap = new HashMap<>();
+        final EventSorceDO eventSorceDO = BeanUtil.create(eventSorce, new EventSorceDO());
         try {
-            EventSorceDO eventSorceDO = BeanUtil.create(eventSorce, new EventSorceDO());
             eventSorceDO.setUpdateStaff(UserUtil.loginId());
             eventSorceDO.setUpdateDate(new Date());
             eventSorceMapper.updateByPrimaryKey(eventSorceDO);
@@ -132,6 +150,17 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
             eventSorceMap.put("resultMsg", "更新事件源失败！");
             logger.error("[op:EventSorceServiceImpl] 更新事件源eventSorce = {}失败！Exception: ", JSON.toJSON(eventSorce), e);
         }
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synEventSorceService.synchronizeSingleEventSorce(eventSorceDO.getEvtSrcId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
         return eventSorceMap;
     }
 
@@ -142,7 +171,7 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
      * @return
      */
     @Override
-    public Map<String, Object> deleteEventSorce(Long evtSrcId) {
+    public Map<String, Object> deleteEventSorce(final Long evtSrcId) {
         Map<String, Object> eventSorceMap = new HashMap<>();
         try {
             eventSorceMapper.deleteByPrimaryKey(evtSrcId);
@@ -153,6 +182,17 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
             eventSorceMap.put("resultCode", CommonConstant.CODE_FAIL);
             eventSorceMap.put("resultMsg", "查询事件源失败！");
             logger.error("[op:EventSorceServiceImpl] 通过evtSrcId = {} 删除事件源失败！Exception: ", evtSrcId, e);
+        }
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synEventSorceService.deleteSingleEventSorce(evtSrcId,"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
         }
         return eventSorceMap;
     }
