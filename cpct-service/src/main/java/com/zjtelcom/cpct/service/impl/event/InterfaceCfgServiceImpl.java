@@ -14,11 +14,13 @@ import com.zjtelcom.cpct.dto.event.EventSorce;
 import com.zjtelcom.cpct.dto.event.InterfaceCfgVO;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.InterfaceCfgService;
+import com.zjtelcom.cpct.service.synchronize.SynInterfaceCfgService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import io.netty.channel.group.ChannelMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -35,10 +37,14 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
     private EventSorceMapper eventSorceMapper;
     @Autowired
     private ContactChannelMapper channelMapper;
+    @Autowired
+    private SynInterfaceCfgService synInterfaceCfgService;
 
+    @Value("${sync.value}")
+    private String value;
 
     @Override
-    public Map<String, Object> createInterfaceCfg(InterfaceCfg interfaceCfg) {
+    public Map<String, Object> createInterfaceCfg(final InterfaceCfg interfaceCfg) {
         Map<String,Object> result = new HashMap<>();
         if (interfaceCfg.getEvtSrcId()==null){
             result.put("resultCode",CODE_FAIL);
@@ -61,11 +67,24 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
         interfaceCfgMapper.insert(ic);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synInterfaceCfgService.synchronizeSingleEventInterface(interfaceCfg.getInterfaceCfgId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 
     @Override
-    public Map<String, Object> modInterfaceCfg(InterfaceCfg interfaceCfg) {
+    public Map<String, Object> modInterfaceCfg(final InterfaceCfg interfaceCfg) {
         Map<String,Object> result = new HashMap<>();
         InterfaceCfg ic = interfaceCfgMapper.selectByPrimaryKey(interfaceCfg.getInterfaceCfgId());
         if (ic==null ){
@@ -79,11 +98,24 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
         interfaceCfgMapper.updateByPrimaryKey(ic);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","编辑成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synInterfaceCfgService.synchronizeSingleEventInterface(interfaceCfg.getInterfaceCfgId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 
     @Override
-    public Map<String, Object> delInterfaceCfg(InterfaceCfg interfaceCfg) {
+    public Map<String, Object> delInterfaceCfg(final InterfaceCfg interfaceCfg) {
         Map<String,Object> result = new HashMap<>();
         InterfaceCfg ic = interfaceCfgMapper.selectByPrimaryKey(interfaceCfg.getInterfaceCfgId());
         if (ic==null ){
@@ -94,6 +126,19 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
         interfaceCfgMapper.deleteByPrimaryKey(ic.getInterfaceCfgId());
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synInterfaceCfgService.deleteSingleEventInterface(interfaceCfg.getInterfaceCfgId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 

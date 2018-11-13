@@ -73,5 +73,8 @@ spring:
    batchinfo: http://localhost:8080/es/searchBatchInfo
    hitslist: http://localhost:8080/es/findBatchHitsList
    countinfo: http://localhost:8080/es/searchCountInfo
+#是否同步
+  sync:
+   value: 1
 
 
