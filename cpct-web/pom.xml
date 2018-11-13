@@ -73,7 +73,7 @@
             <artifactId>bss-cooperate-service-api</artifactId>
         </dependency>
 
-        <!--&lt;!&ndash; 引入门户模块 &ndash;&gt;-->
+        <!-- 引入门户模块 -->
         <!--<dependency>-->
             <!--<groupId>com.ctzj.smt.bss</groupId>-->
             <!--<artifactId>bss-centralized-authenticate</artifactId>-->

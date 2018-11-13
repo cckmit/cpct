@@ -294,7 +294,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         }
         if (parent.getParentId()!=0){
             result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg","已经是最末级节点，请选择上一级节点添加");
+            result.put("resultMsg","该根目录节点下不允许新增子节点");
             return result;
         }
         String channelCode = "CHL"+DateUtil.date2String(new Date())+ChannelUtil.getRandomStr(4);
