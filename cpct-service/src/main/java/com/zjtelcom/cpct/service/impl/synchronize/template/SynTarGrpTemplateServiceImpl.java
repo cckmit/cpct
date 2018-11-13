@@ -1,12 +1,19 @@
 package com.zjtelcom.cpct.service.impl.synchronize.template;
 
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
+import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateMapper;
 import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO;
+import com.zjtelcom.cpct.dto.grouping.TarGrp;
+import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
+import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.enums.SynchronizeType;
 import com.zjtelcom.cpct.exception.SystemException;
 import com.zjtelcom.cpct.service.synchronize.SynchronizeRecordService;
 import com.zjtelcom.cpct.service.synchronize.template.SynTarGrpTemplateService;
+import com.zjtelcom.cpct_prd.dao.grouping.TarGrpConditionPrdMapper;
+import com.zjtelcom.cpct_prd.dao.grouping.TarGrpPrdMapper;
 import com.zjtelcom.cpct_prd.dao.template.TarGrpTemplatePrdMapper;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +28,8 @@ import java.util.Map;
 /**
  * @Auther: anson
  * @Date: 2018/9/17
- * @Description:
+ * @Description: tar_grp   tar_grp_condition  客户分群
+ *     记住 客户分群模板已经没有了
  */
 @Service
 @Transactional
@@ -30,35 +38,51 @@ public class SynTarGrpTemplateServiceImpl implements SynTarGrpTemplateService{
     @Autowired
     private SynchronizeRecordService synchronizeRecordService;
     @Autowired
-    private TarGrpTemplatePrdMapper tarGrpTemplatePrdMapper;
+    private TarGrpConditionMapper tarGrpConditionMapper;
     @Autowired
-    private TarGrpTemplateMapper tarGrpTemplateMapper;
+    private TarGrpConditionPrdMapper tarGrpConditionPrdMapper;
+    @Autowired
+    private TarGrpPrdMapper tarGrpPrdMapper;
+    @Autowired
+    private TarGrpMapper tarGrpMapper;
 
     //同步表名
-    private static final String tableName="tar_grp_template";
+    private static final String tableName="tar_grp";
 
 
     /**
-     * 同步单个分群模板信息
-     * @param templateId    分群模板id
+     * 同步单个客户分群信息
+     * @param templateId    客户分群id
      * @param roleName      操作人身份
      * @return
      */
     @Override
-    public Map<String, Object> synchronizeSingleTemplate(Long templateId, String roleName) {
+    public Map<String, Object> synchronizeSingleTarGrp(Long templateId, String roleName) {
         Map<String,Object> maps = new HashMap<>();
         //查询源数据库
-        TarGrpTemplateDO tarGrpTemplateDO = tarGrpTemplateMapper.selectByPrimaryKey(templateId);
-        if(tarGrpTemplateDO==null){
-            throw new SystemException("对应分群模板信息不存在");
+        TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(templateId);
+        if(tarGrp==null){
+            throw new SystemException("对应分客户分群信息不存在");
         }
+
+        List<TarGrpCondition> tarGrpConditions = tarGrpConditionMapper.listTarGrpCondition(tarGrp.getTarGrpId());
+
         //同步时查看是新增还是更新
-        TarGrpTemplateDO tarGrpTemplateDO1 = tarGrpTemplatePrdMapper.selectByPrimaryKey(templateId);
-        if(tarGrpTemplateDO1==null){
-            tarGrpTemplatePrdMapper.insert(tarGrpTemplateDO);
+        TarGrp tarGrp1 = tarGrpPrdMapper.selectByPrimaryKey(templateId);
+        if(tarGrp1==null){
+            tarGrpPrdMapper.insert(tarGrp);
+            if(!tarGrpConditions.isEmpty()){
+                  tarGrpConditionPrdMapper.insertByBatch(tarGrpConditions);
+            }
             synchronizeRecordService.addRecord(roleName,tableName,templateId, SynchronizeType.add.getType());
         }else{
-            tarGrpTemplatePrdMapper.updateByPrimaryKey(tarGrpTemplateDO);
+            tarGrpPrdMapper.updateByPrimaryKey(tarGrp);
+            if(!tarGrpConditions.isEmpty()){
+                for (TarGrpCondition tarGrpCondition:tarGrpConditions){
+                    tarGrpConditionPrdMapper.updateByPrimaryKey(tarGrpCondition);
+                }
+
+            }
             synchronizeRecordService.addRecord(roleName,tableName,templateId, SynchronizeType.update.getType());
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -67,22 +91,22 @@ public class SynTarGrpTemplateServiceImpl implements SynTarGrpTemplateService{
     }
 
     /**
-     * 批量同步分群模板信息
+     * 批量同步客户分群信息
      * @param roleName
      * @return
      */
     @Override
-    public Map<String, Object> synchronizeBatchTemplate(String roleName) {
+    public Map<String, Object> synchronizeBatchTarGrp(String roleName) {
         Map<String,Object> maps = new HashMap<>();
-        List<TarGrpTemplateDO> prdList = tarGrpTemplateMapper.selectAll();
-        List<TarGrpTemplateDO> realList = tarGrpTemplatePrdMapper.selectAll();
+        List<TarGrpDetail> prdList = tarGrpMapper.selectAll();
+        List<TarGrpDetail> realList = tarGrpPrdMapper.selectAll();
         //三个集合分别表示需要 新增的   修改的    删除的
-        List<TarGrpTemplateDO> addList=new ArrayList<TarGrpTemplateDO>();
-        List<TarGrpTemplateDO> updateList=new ArrayList<TarGrpTemplateDO>();
-        List<TarGrpTemplateDO> deleteList=new ArrayList<TarGrpTemplateDO>();
-        for(TarGrpTemplateDO c:prdList){
+        List<TarGrp> addList=new ArrayList<TarGrp>();
+        List<TarGrp> updateList=new ArrayList<TarGrp>();
+        List<TarGrp> deleteList=new ArrayList<TarGrp>();
+        for(TarGrpDetail c:prdList){
             for (int i = 0; i <realList.size() ; i++) {
-                if(c.getTarGrpTemplateId()-realList.get(i).getTarGrpTemplateId()==0){
+                if(c.getTarGrpId()-realList.get(i).getTarGrpId()==0){
                     //需要修改的
                     updateList.add(c);
                     break;
@@ -92,9 +116,9 @@ public class SynTarGrpTemplateServiceImpl implements SynTarGrpTemplateService{
                 }
             }
         }
-        for(TarGrpTemplateDO c:realList){
+        for(TarGrpDetail c:realList){
             for (int i = 0; i <prdList.size() ; i++) {
-                if(c.getTarGrpTemplateId()-prdList.get(i).getTarGrpTemplateId()==0){
+                if(c.getTarGrpId()-prdList.get(i).getTarGrpId()==0){
                     break;
                 }else if (i==prdList.size()-1){
                     //需要删除的   生产存在,准生产不存在
@@ -103,24 +127,53 @@ public class SynTarGrpTemplateServiceImpl implements SynTarGrpTemplateService{
             }
         }
         //开始新增
-        for(TarGrpTemplateDO c:addList){
-            tarGrpTemplatePrdMapper.insert(c);
-            synchronizeRecordService.addRecord(roleName,tableName,c.getTarGrpTemplateId(), SynchronizeType.add.getType());
+        for(TarGrp c:addList){
+            tarGrpPrdMapper.insert(c);
+            List<TarGrpCondition> tarGrpConditions = tarGrpConditionMapper.listTarGrpCondition(c.getTarGrpId());
+            if(!tarGrpConditions.isEmpty()){
+                tarGrpConditionPrdMapper.insertByBatch(tarGrpConditions);
+            }
+            synchronizeRecordService.addRecord(roleName,tableName,c.getTarGrpId(), SynchronizeType.add.getType());
         }
         //开始修改
-        for(TarGrpTemplateDO c:updateList){
-            tarGrpTemplatePrdMapper.updateByPrimaryKey(c);
-            synchronizeRecordService.addRecord(roleName,tableName,c.getTarGrpTemplateId(), SynchronizeType.update.getType());
+        for(TarGrp c:updateList){
+            tarGrpPrdMapper.updateByPrimaryKey(c);
+            List<TarGrpCondition> tarGrpConditions = tarGrpConditionMapper.listTarGrpCondition(c.getTarGrpId());
+            if(!tarGrpConditions.isEmpty()){
+                for (TarGrpCondition tarGrpCondition:tarGrpConditions){
+                    tarGrpConditionPrdMapper.updateByPrimaryKey(tarGrpCondition);
+                }
+
+            }
+            synchronizeRecordService.addRecord(roleName,tableName,c.getTarGrpId(), SynchronizeType.update.getType());
         }
         //开始删除
-        for(TarGrpTemplateDO c:deleteList){
-            tarGrpTemplatePrdMapper.deleteByPrimaryKey(c.getTarGrpTemplateId());
-            synchronizeRecordService.addRecord(roleName,tableName,c.getTarGrpTemplateId(), SynchronizeType.delete.getType());
+        for(TarGrp c:deleteList){
+            tarGrpPrdMapper.deleteByPrimaryKey(c.getTarGrpId());
+            List<TarGrpCondition> tarGrpConditions = tarGrpConditionMapper.listTarGrpCondition(c.getTarGrpId());
+            if(!tarGrpConditions.isEmpty()){
+                for (TarGrpCondition tarGrpCondition:tarGrpConditions){
+                    tarGrpConditionPrdMapper.deleteByTarGrpId(tarGrpCondition.getTarGrpId());
+                }
+
+            }
+            synchronizeRecordService.addRecord(roleName,tableName,c.getTarGrpId(), SynchronizeType.delete.getType());
         }
 
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
 
+        return maps;
+    }
+
+
+
+    @Override
+    public Map<String, Object> deleteSingleTarGrp(Long templateId, String roleName) {
+        Map<String,Object> maps = new HashMap<>();
+        tarGrpPrdMapper.deleteByPrimaryKey(templateId);
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
         return maps;
     }
 

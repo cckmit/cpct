@@ -8,11 +8,17 @@ import java.util.Map;
 public interface SynQuestionService {
 
 
-    Map<String,Object> synQuestion(Long questionnaireId);
-
+    Map<String,Object> synQuestion(String roleName,Long questionnaireId);
 
     Map<String,Object> synchronizeBatchQuestion(String roleName);
 
+    Map<String,Object> deleteQuestion(String roleName,Long questionnaireId);
+
     Map<String,Object> synchronizeBatchQuestionBank(String roleName);
+
+    Map<String,Object> synQuestionBank(String roleName,Long questionnaireId);
+
+    Map<String,Object> deleteQuestionBank(String roleName,Long questionnaireId);
+
 
 }

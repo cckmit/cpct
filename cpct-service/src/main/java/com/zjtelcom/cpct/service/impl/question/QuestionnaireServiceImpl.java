@@ -15,9 +15,11 @@ import com.zjtelcom.cpct.domain.question.Questionnaire;
 import com.zjtelcom.cpct.dto.question.*;
 import com.zjtelcom.cpct.service.question.QuestionService;
 import com.zjtelcom.cpct.service.question.QuestionnaireService;
+import com.zjtelcom.cpct.service.synchronize.SynQuestionService;
 import com.zjtelcom.cpct.service.system.SysParamsService;
 import com.zjtelcom.cpct.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +48,11 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     private MktQuestionDetailMapper questionDetailMapper;
     @Autowired
     private SysParamsService sysParamsService;
+    @Autowired
+    private SynQuestionService synQuestionService;
+
+    @Value("${sync.value}")
+    private String value;
 
 
     /**
@@ -87,7 +94,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     public Map<String, Object> createQuestionnaire(QuestionnaireParam addVO,boolean isSave) {
         Map<String,Object> result = new HashMap<>();
         //添加调研问卷记录
-        Questionnaire questionnaire = BeanUtil.create(addVO,new Questionnaire());
+        final Questionnaire questionnaire = BeanUtil.create(addVO,new Questionnaire());
         questionnaire.setCreateDate(DateUtil.getCurrentTime());
         questionnaire.setUpdateDate(DateUtil.getCurrentTime());
         questionnaire.setStatusDate(DateUtil.getCurrentTime());
@@ -103,6 +110,19 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
         List<QuestRel> questRelList = getQuestRels(addVO, questionnaire);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","创建成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synQuestionService.synQuestion("",questionnaire.getNaireId());
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 
@@ -114,7 +134,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     @Override
     public Map<String, Object> modQuestionnaire(QuestionnaireParam editvo) {
         Map<String,Object> result = new HashMap<>();
-        Questionnaire questionnaire = questionnaireMapper.selectByPrimaryKey(editvo.getNaireId());
+        final Questionnaire questionnaire = questionnaireMapper.selectByPrimaryKey(editvo.getNaireId());
         if (questionnaire==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","调研问卷不存在");
@@ -129,6 +149,19 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
         List<QuestRel> questRelList = getQuestRels(editvo, questionnaire);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","编辑成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synQuestionService.synQuestion("",questionnaire.getNaireId());
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 
@@ -226,7 +259,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     @Override
     public Map<String, Object> delQuestionnaire(Long questionnaireId) {
         Map<String,Object> result = new HashMap<>();
-        Questionnaire questionnaire = questionnaireMapper.selectByPrimaryKey(questionnaireId);
+        final Questionnaire questionnaire = questionnaireMapper.selectByPrimaryKey(questionnaireId);
         if (questionnaire==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","调研问卷不存在");
@@ -235,6 +268,19 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
         questionnaireMapper.deleteByPrimaryKey(questionnaire.getNaireId());
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synQuestionService.deleteQuestion("",questionnaire.getNaireId());
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 

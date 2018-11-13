@@ -124,4 +124,13 @@ public class SynChannelServiceImpl implements SynChannelService {
 
         return maps;
     }
+
+    @Override
+    public Map<String, Object> deleteSingleChannel(Long channelId, String roleName) {
+        Map<String,Object> maps = new HashMap<>();
+        contactChannelPrdMapper.deleteByPrimaryKey(channelId);
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
+        return maps;
+    }
 }
