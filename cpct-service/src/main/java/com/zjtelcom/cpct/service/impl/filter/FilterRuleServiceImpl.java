@@ -227,12 +227,12 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         FilterRule filterRuleT = filterRuleMapper.getFilterRule(filterRule);
         FilterRuleVO vo = BeanUtil.create(filterRuleT,new FilterRuleVO());
         if (filterRuleT.getChooseProduct()!=null && !filterRuleT.getChooseProduct().equals("")){
-            List<Long> idList = ChannelUtil.StringToidList(filterRuleT.getChooseProduct());
+            List<String> codeList = ChannelUtil.StringToList(filterRuleT.getChooseProduct());
             List<OfferDetail> productList = new ArrayList<>();
-            for (Long id : idList){
-                Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(id.toString()));
-                if (offer!=null){
-                    OfferDetail offerDetail = BeanUtil.create(offer,new OfferDetail());
+            for (String code : codeList){
+                List<Offer> offer = offerMapper.selectByCode(code);
+                if (offer!=null && !offer.isEmpty()){
+                    OfferDetail offerDetail = BeanUtil.create(offer.get(0),new OfferDetail());
                     productList.add(offerDetail);
                 }
             }
@@ -324,7 +324,16 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         BeanUtil.copy(editVO,filterRule);
         filterRule.setUpdateDate(DateUtil.getCurrentTime());
         filterRule.setUpdateStaff(UserUtil.loginId());
-        filterRule.setChooseProduct(ChannelUtil.idList2String(editVO.getChooseProduct()));
+
+        List<String> codeList = new ArrayList<>();
+        for (Long offerId : editVO.getChooseProduct()){
+            Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
+            if (offer==null){
+                continue;
+            }
+            codeList.add(offer.getOfferNbr());
+        }
+        filterRule.setChooseProduct(ChannelUtil.StringList2String(codeList));
         if (filterRule.getFilterType().equals("3000")){
             filterRule.setLabelCode("PROM_LIST");
         }
