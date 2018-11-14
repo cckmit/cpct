@@ -11,8 +11,11 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
+import com.zjtelcom.cpct.dao.strategy.MktCamStrategyRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyMapper;
+import com.zjtelcom.cpct.domain.User;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.CamScript;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
@@ -24,9 +27,11 @@ import com.zjtelcom.cpct.dto.channel.CamScriptAddVO;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
+import com.zjtelcom.cpct.dto.strategy.MktStrategy;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.enums.StatusCode;
+import com.zjtelcom.cpct.pojo.MktCamStrategyRel;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlResultService;
@@ -105,6 +110,15 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
     @Autowired
     private MktCamItemMapper mktCamItemMapper;
 
+    @Autowired
+    private MktCamChlResultConfRelMapper mktCamChlResultConfRelMapper;
+
+    @Autowired
+    private MktStrategyMapper mktStrategyMapper;
+
+    @Autowired
+    private MktCamStrategyRelMapper mktCamStrategyRelMapper;
+
     /**
      * 添加策略规则
      *
@@ -129,12 +143,15 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 }
                 mktStrategyConfRuleDO.setProductId(productIds);
             }
+            String confs = "";
             if (mktStrategyConfRule.getMktCamChlConfDetailList() != null) {
                 for (int i = 0; i < mktStrategyConfRule.getMktCamChlConfDetailList().size(); i++) {
                     if (i == 0) {
                         evtContactConfIds += mktStrategyConfRule.getMktCamChlConfDetailList().get(i).getEvtContactConfId();
+                        confs += mktStrategyConfRule.getMktCamChlConfDetailList().get(i).getEvtContactConfId();
                     } else {
                         evtContactConfIds += "/" + mktStrategyConfRule.getMktCamChlConfDetailList().get(i).getEvtContactConfId();
+                        confs += "||" + mktStrategyConfRule.getMktCamChlConfDetailList().get(i).getEvtContactConfId();
                     }
                     // 保存话术
                     CamScriptAddVO camScriptAddVO = new CamScriptAddVO();
@@ -147,6 +164,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             }
 
             // 新增二次协同结果 并且 将结果id的存到规则中
+            String resultConfs = "";
             if (mktStrategyConfRule.getMktCamChlResultList() != null) {
                 String mktCamChlResultIds = "";
                 for (int i = 0; i < mktStrategyConfRule.getMktCamChlResultList().size(); i++) {
@@ -171,6 +189,15 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                         mktCamResultRelDO.setUpdateStaff(UserUtil.loginId());
                         mktCamResultRelMapper.insert(mktCamResultRelDO);
                     }
+
+                    List<MktCamChlResultConfRelDO> confRelDOList = mktCamChlResultConfRelMapper.selectByMktCamChlResultId(mktCamChlResultId);
+                    for (MktCamChlResultConfRelDO mktCamChlResultConfRelDO : confRelDOList) {
+                        if("".equals(resultConfs)){
+                            resultConfs += mktCamChlResultConfRelDO.getEvtContactConfId();
+                        } else{
+                            resultConfs += "||" + mktCamChlResultConfRelDO.getEvtContactConfId();
+                        }
+                    }
                 }
                 mktStrategyConfRuleDO.setMktCamChlResultId(mktCamChlResultIds);
             }
@@ -179,6 +206,24 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktStrategyConfRuleDO.setUpdateStaff(UserUtil.loginId());
             mktStrategyConfRuleDO.setUpdateDate(new Date());
             mktStrategyConfRuleMapper.insert(mktStrategyConfRuleDO);
+
+
+            // 配置推送渠道关系mkt_strategy表 和 mkt_cam_strategy_rel
+            // 获取与结果关联的推送渠道信息
+            String ruleExpression = "("+ confs + ")&&(" + resultConfs + ")";
+            MktStrategy mktStrategy = new MktStrategy();
+            mktStrategy.setRuleExpression(ruleExpression);
+            mktStrategyMapper.insert(mktStrategy);
+            MktCamStrategyRel mktCamStrategyRel = new MktCamStrategyRel();
+            mktCamStrategyRel.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
+            mktCamStrategyRel.setStrategyId(mktStrategy.getStrategyId());
+            mktCamStrategyRel.setCreateStaff(UserUtil.loginId());
+            mktCamStrategyRel.setCreateDate(new Date());
+            mktCamStrategyRel.setUpdateStaff(UserUtil.loginId());
+            mktCamStrategyRel.setUpdateDate(new Date());
+            mktCamStrategyRel.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+            mktCamStrategyRel.setStatusDate(new Date());
+            mktCamStrategyRelMapper.insert(mktCamStrategyRel);
 
             //添加cpc算法规则
             MktCpcAlgorithmsRulDO mktCpcAlgorithmsRulDO = new MktCpcAlgorithmsRulDO();

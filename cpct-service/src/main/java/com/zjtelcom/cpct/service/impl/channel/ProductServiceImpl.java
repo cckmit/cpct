@@ -14,6 +14,7 @@ import com.zjtelcom.cpct.domain.channel.Offer;
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
 import com.zjtelcom.cpct.dto.channel.OfferDetail;
+import com.zjtelcom.cpct.dto.channel.ProductParam;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
@@ -77,7 +78,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     }
 
     @Override
-    public Map<String,Object> getProductListByName(Long userId, Map<String,Object> params) {
+    public Map<String,Object> getProductListByName( Map<String,Object> params) {
         Map<String,Object> result = new HashMap<>();
         List<Offer> productList = new ArrayList<>();
         Integer page = MapUtil.getIntNum(params.get("page"));
@@ -89,9 +90,20 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         }else {
             productList = productMapper.selectAll();
         }
-        Page pageInfo = new Page(new PageInfo(productList));
+
+        List<Offer> productLists = new ArrayList<>();
+        List<Long> producetIdList = (List<Long>)params.get("productIdList");
+        if(productList !=null && producetIdList != null) {
+            for(Offer offer : productList) {
+                if(!producetIdList.contains(offer.getOfferId())) {
+                    productLists.add(offer);
+                }
+            }
+        }
+
+        Page pageInfo = new Page(new PageInfo(productLists));
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",productList);
+        result.put("resultMsg",productLists);
         result.put("page",pageInfo);
         return result;
     }
@@ -131,11 +143,11 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
     @Override
     @Transactional
-    public Map<String, Object> addProductRule(Long strategyRuleId, List<Long> productIdList) {
+    public Map<String, Object> addProductRule(ProductParam param) {
         Map<String,Object> result = new HashMap<>();
         List<Long> ruleIdList = new ArrayList<>();
         List<MktCamItem> mktCamItems = new ArrayList<>();
-        for (Long productId : productIdList){
+        for (Long productId : param.getIdList()){
             Offer product = productMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
             if (product==null){
                 result.put("resultCode",CODE_FAIL);
@@ -146,7 +158,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             item.setOfferCode(product.getOfferNbr());
             item.setOfferName(product.getOfferName());
             item.setItemId(productId);
-            item.setItemType(product.getOfferType());
+            item.setItemType(param.getItemType()==null ? "1000" : param.getItemType());
             item.setCreateDate(new Date());
             item.setCreateDate(DateUtil.getCurrentTime());
             item.setUpdateDate(DateUtil.getCurrentTime());
@@ -162,8 +174,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         for(MktCamItem item : mktCamItems){
             ruleIdList.add(item.getMktCamItemId());
         }
-        if (strategyRuleId!=null){
-            strategyConfRuleService.updateProductIds(ruleIdList,strategyRuleId);
+        if (param.getStrategyRuleId()!=null){
+            strategyConfRuleService.updateProductIds(ruleIdList,param.getStrategyRuleId());
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",ruleIdList);
@@ -206,7 +218,10 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             rule.setId(item.getMktCamItemId());
             rule.setProductId(item.getItemId());
             rule.setProductName(product.getOfferName());
+            rule.setProductCode(product.getOfferNbr());
+            rule.setProductType(product.getOfferType());
             rule.setRemark(item.getRemark());
+            rule.setItemType(item.getItemType()==null ? "" : item.getItemType());
             rule.setPriority(item.getPriority()==null ? 0 : item.getPriority());
             if (item.getPriority()!=null){
                 rule.setPriority(item.getPriority());

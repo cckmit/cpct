@@ -41,4 +41,12 @@
       select STAFF_ROLE_ID, STAFF_ID, ROLE_ID
       from sys_staff_role
     </select>
+
+
+    <select id="selectByStaffId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select STAFF_ROLE_ID, STAFF_ID, ROLE_ID
+        from sys_staff_role
+        where STAFF_ID = #{staffId,jdbcType=BIGINT}
+    </select>
+
 </mapper>

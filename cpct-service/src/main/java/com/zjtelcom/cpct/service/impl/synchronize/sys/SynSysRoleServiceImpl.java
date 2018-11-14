@@ -124,4 +124,13 @@ public class SynSysRoleServiceImpl implements SynSysRoleService {
         return maps;
     }
 
+    @Override
+    public Map<String, Object> deleteSingleRole(Long roleId, String roleName) {
+        Map<String,Object> maps = new HashMap<>();
+        sysRolePrdMapper.deleteByPrimaryKey(roleId);
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        return maps;
+    }
+
 }

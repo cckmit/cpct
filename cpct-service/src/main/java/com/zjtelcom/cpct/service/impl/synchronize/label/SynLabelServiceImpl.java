@@ -2,12 +2,15 @@ package com.zjtelcom.cpct.service.impl.synchronize.label;
 
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
 import com.zjtelcom.cpct.domain.channel.Label;
+import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.enums.SynchronizeType;
 import com.zjtelcom.cpct.exception.SystemException;
 import com.zjtelcom.cpct.service.synchronize.SynchronizeRecordService;
 import com.zjtelcom.cpct.service.synchronize.label.SynLabelService;
 import com.zjtelcom.cpct_prd.dao.label.InjectionLabelPrdMapper;
+import com.zjtelcom.cpct_prd.dao.label.InjectionLabelValuePrdMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,7 +24,7 @@ import java.util.Map;
 /**
  * @Auther: anson
  * @Date: 2018/9/14
- * @Description:标签同步（准生产-生产）
+ * @Description:标签同步（准生产-生产）   injection_label    injection_label_value
  */
 @Service
 @Transactional
@@ -33,7 +36,10 @@ public class SynLabelServiceImpl implements SynLabelService{
     private InjectionLabelPrdMapper injectionLabelPrdMapper;
     @Autowired
     private SynchronizeRecordService synchronizeRecordService;
-
+    @Autowired
+    private InjectionLabelValueMapper injectionLabelValueMapper;
+    @Autowired
+    private InjectionLabelValuePrdMapper injectionLabelValuePrdMapper;
     //同步表名
     private static final String tableName="injection_label";
 
@@ -50,12 +56,25 @@ public class SynLabelServiceImpl implements SynLabelService{
         if(null==label){
             throw new SystemException("对应标签信息不存在!");
         }
+        List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(label.getInjectionLabelId());
+
         Label label1 = injectionLabelPrdMapper.selectByPrimaryKey(labelId);
         if(null==label1){
             injectionLabelPrdMapper.insert(label);
+            if(!labelValues.isEmpty()){
+                injectionLabelValuePrdMapper.insertBatch(labelValues);
+//                for (LabelValue labelValue:labelValues){
+//                    injectionLabelValuePrdMapper.insert(labelValue);
+//                }
+            }
             synchronizeRecordService.addRecord(roleName,tableName,labelId, SynchronizeType.add.getType());
         }else{
             injectionLabelPrdMapper.updateByPrimaryKey(label);
+            if(!labelValues.isEmpty()){
+                for (LabelValue labelValue:labelValues){
+                    injectionLabelValuePrdMapper.updateByPrimaryKey(labelValue);
+                }
+            }
             synchronizeRecordService.addRecord(roleName,tableName,labelId, SynchronizeType.update.getType());
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -106,16 +125,32 @@ public class SynLabelServiceImpl implements SynLabelService{
         //开始新增
         for(Label c:addList){
             injectionLabelPrdMapper.insert(c);
+            List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(c.getInjectionLabelId());
+            if(!labelValues.isEmpty()){
+                injectionLabelValuePrdMapper.insertBatch(labelValues);
+            }
             synchronizeRecordService.addRecord(roleName,tableName,c.getInjectionLabelId(), SynchronizeType.add.getType());
         }
         //开始修改
         for(Label c:updateList){
             injectionLabelPrdMapper.updateByPrimaryKey(c);
+            List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(c.getInjectionLabelId());
+            if(!labelValues.isEmpty()){
+                for (LabelValue labelValue:labelValues){
+                    injectionLabelValuePrdMapper.updateByPrimaryKey(labelValue);
+                 }
+            }
             synchronizeRecordService.addRecord(roleName,tableName,c.getInjectionLabelId(), SynchronizeType.update.getType());
         }
         //开始删除
         for(Label c:deleteList){
             injectionLabelPrdMapper.deleteByPrimaryKey(c.getInjectionLabelId());
+            List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(c.getInjectionLabelId());
+            if(!labelValues.isEmpty()){
+                for (LabelValue labelValue:labelValues){
+                    injectionLabelValuePrdMapper.deleteByPrimaryKey(labelValue.getLabelValueId());
+                }
+            }
             synchronizeRecordService.addRecord(roleName,tableName,c.getInjectionLabelId(), SynchronizeType.delete.getType());
         }
 
@@ -125,4 +160,22 @@ public class SynLabelServiceImpl implements SynLabelService{
 
         return maps;
     }
+
+    @Override
+    public Map<String, Object> deleteSingleLabel(Long labelId, String roleName) {
+        Map<String,Object> maps = new HashMap<>();
+        injectionLabelPrdMapper.deleteByPrimaryKey(labelId);
+        //相关的标签值
+//        List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(labelId);
+//        for (LabelValue labelValue:labelValues){
+//            injectionLabelValueMapper.deleteByPrimaryKey(labelValue.getLabelValueId());
+//        }
+
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
+        return maps;
+    }
+
+
+   
 }

@@ -18,4 +18,7 @@ public interface SynEventSorceService {
     Map<String,Object> synchronizeSingleEventSorce(Long eventId,String roleName);
 
     Map<String,Object> synchronizeBatchEventSorce(String roleName);
+
+    Map<String,Object> deleteSingleEventSorce(Long eventId,String roleName);
+
 }

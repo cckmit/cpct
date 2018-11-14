@@ -13,11 +13,13 @@ import com.zjtelcom.cpct.enums.ChannelType;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ChannelService;
 /*import com.zjtelcom.cpct.service.impl.api.ClTest;*/
+import com.zjtelcom.cpct.service.synchronize.channel.SynChannelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -33,6 +35,12 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
     private ContactChannelMapper channelMapper;
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired
+    private SynChannelService synChannelService;
+
+    @Value("${sync.value}")
+    private String value;
+
 /*
     @Autowired
     private ClTestRepository testRepository;*/
@@ -292,7 +300,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         }
         if (parent.getParentId()!=0){
             result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg","已经是最末级节点，请选择上一级节点添加");
+            result.put("resultMsg","该根目录节点下不允许新增子节点");
             return result;
         }
         String channelCode = "CHL"+DateUtil.date2String(new Date())+ChannelUtil.getRandomStr(4);
@@ -300,7 +308,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         if (exist!=null){
              channelCode = "CHL"+DateUtil.date2String(new Date())+ChannelUtil.getRandomStr(4);
         }
-        Channel channel = BeanUtil.create(addVO,new Channel());
+        final Channel channel = BeanUtil.create(addVO,new Channel());
         Channel ch = channelMapper.selectChannel4AllChannel(-1L);
         if (addVO.getParentId().equals(ch.getContactChlId())){
             channel.setParentId(0L);
@@ -316,13 +324,26 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         channelMapper.insert(channel);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synChannelService.synchronizeSingleChannel(channel.getContactChlId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 
     @Override
     public  Map<String,Object> modContactChannel(Long userId, ContactChannelDetail editVO) {
         Map<String,Object> result = new HashMap<>();
-        Channel channel = channelMapper.selectByPrimaryKey(editVO.getChannelId());
+        final Channel channel = channelMapper.selectByPrimaryKey(editVO.getChannelId());
         if (channel==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","渠道不存在");
@@ -339,13 +360,26 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         channelMapper.updateByPrimaryKey(channel);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","编辑成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synChannelService.synchronizeSingleChannel(channel.getContactChlId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 
     @Override
     public  Map<String,Object> delContactChannel(Long userId, ContactChannelDetail channelDetail) {
         Map<String,Object> result = new HashMap<>();
-        Channel channel = channelMapper.selectByPrimaryKey(channelDetail.getChannelId());
+        final Channel channel = channelMapper.selectByPrimaryKey(channelDetail.getChannelId());
         if (channel==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","渠道不存在");
@@ -359,6 +393,19 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         channelMapper.deleteByPrimaryKey(channelDetail.getChannelId());
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synChannelService.deleteSingleChannel(channel.getContactChlId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 

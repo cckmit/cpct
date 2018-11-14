@@ -119,7 +119,7 @@ public class PpmProductController extends BaseController  {
         Map<String ,Object> result = new HashMap<>();
         Long userId = UserUtil.loginId();
         try {
-            result = productService.getProductListByName(userId, params);
+            result = productService.getProductListByName(params);
         }catch (Exception e){
             logger.error("[op:PpmProductController] fail to getProductListByName",e);
             result.put("resultCode",CODE_FAIL);
@@ -139,7 +139,7 @@ public class PpmProductController extends BaseController  {
     public Map<String, Object> addProductRule(@RequestBody ProductParam param) {
         Map<String ,Object> result = new HashMap<>();
         try {
-            result = productService.addProductRule(param.getStrategyRuleId(),param.getIdList());
+            result = productService.addProductRule(param);
         }catch (Exception e){
             logger.error("[op:PpmProductController] fail to addProductRule",e);
             result.put("resultCode",CODE_FAIL);

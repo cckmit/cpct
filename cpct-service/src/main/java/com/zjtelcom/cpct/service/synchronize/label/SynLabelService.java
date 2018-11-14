@@ -12,5 +12,5 @@ public interface SynLabelService {
 
     Map<String,Object> synchronizeBatchLabel(String roleName);
 
-
+    Map<String,Object> deleteSingleLabel(Long labelId,String roleName);
 }

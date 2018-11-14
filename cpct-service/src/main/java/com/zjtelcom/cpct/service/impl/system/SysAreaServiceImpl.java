@@ -81,6 +81,12 @@ public class SysAreaServiceImpl implements SysAreaService {
         List<SysArea> provinceAreas = sysAreaMapper.selectByAreaLevel(AreaLeveL.PROVINCE.getAreaLevel());
         for (SysArea provinceArea : provinceAreas) {
             SysArea sysArea = (SysArea) redisUtils.get("CITY_" + provinceArea.getAreaId().toString());
+            if (sysArea == null) {
+                // 将城市数据存入到redis
+                saveCityTORedis();
+                // 重新从redis中获取
+                sysArea = (SysArea) redisUtils.get("CITY_" + provinceArea.getAreaId().toString());
+            }
             sysAreaList.add(sysArea);
         }
         areaMap.put("sysAreaList", sysAreaList);
@@ -160,7 +166,7 @@ public class SysAreaServiceImpl implements SysAreaService {
 
     // 递归获取所有子节点城市
     private List<SysArea> getChildArea(SysArea sysArea, List<SysArea> sysAreaListAll) {
-        if (sysArea.getAreaLevel().equals( AreaLeveL.GRIDDINGS.getAreaLevel()) || sysArea.getChildAreaList() == null) {
+        if (sysArea.getAreaLevel().equals(AreaLeveL.GRIDDINGS.getAreaLevel()) || sysArea.getChildAreaList() == null) {
             if (!isContains(sysAreaListAll, sysArea)) {
                 sysAreaListAll.add(sysArea);
             }
@@ -180,7 +186,7 @@ public class SysAreaServiceImpl implements SysAreaService {
     // 递归获取所有父节点城市
     private List<SysArea> getParentArea(Integer parentArea, List<SysArea> sysAreaListAll) {
         SysArea sysArea = (SysArea) redisUtils.get("CITY_" + parentArea.toString());
-        if(sysArea !=null){
+        if (sysArea != null) {
             if (sysArea.getAreaLevel().equals(AreaLeveL.PROVINCE.getAreaLevel())) {
                 return sysAreaListAll;
             } else {
