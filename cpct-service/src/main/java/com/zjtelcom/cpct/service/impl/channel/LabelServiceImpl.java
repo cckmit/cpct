@@ -167,13 +167,13 @@ public class LabelServiceImpl extends BaseService implements LabelService {
 //                }
 //            }
 //        }
-        final Label labelValodate = labelMapper.selectByLabelCode(addVO.getInjectionLabelCode());
+        Label labelValodate = labelMapper.selectByLabelCode(addVO.getInjectionLabelCode());
         if (labelValodate!=null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","唯一标识符不能重复");
             return result;
         }
-        Label label = BeanUtil.create(addVO,new Label());
+        final Label label = BeanUtil.create(addVO,new Label());
         operatorValodate(label, addVO.getConditionType());
         //
         label.setScope(0);
@@ -197,7 +197,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             new Thread(){
                 public void run(){
                     try {
-                        synLabelService.synchronizeSingleLabel(labelValodate.getInjectionLabelId(),"");
+                        synLabelService.synchronizeSingleLabel(label.getInjectionLabelId(),"");
                     }catch (Exception e){
                         e.printStackTrace();
                     }

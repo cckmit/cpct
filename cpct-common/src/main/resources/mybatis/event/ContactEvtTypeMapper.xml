@@ -74,7 +74,7 @@
         </if>
     </select>
 
-    <insert id="createContactEvtType" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtType">
+    <insert id="createContactEvtType" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtType"  keyProperty="evtTypeId" useGeneratedKeys="true">
     insert into event_type (EVT_TYPE_NBR, EVT_TYPE_NAME,
     PAR_EVT_TYPE_ID, EVT_TYPE_DESC, STATUS_CD,
     CREATE_STAFF, UPDATE_STAFF, CREATE_DATE,

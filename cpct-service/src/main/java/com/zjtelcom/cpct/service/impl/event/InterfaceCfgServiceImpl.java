@@ -44,7 +44,7 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
     private String value;
 
     @Override
-    public Map<String, Object> createInterfaceCfg(final InterfaceCfg interfaceCfg) {
+    public Map<String, Object> createInterfaceCfg(InterfaceCfg interfaceCfg) {
         Map<String,Object> result = new HashMap<>();
         if (interfaceCfg.getEvtSrcId()==null){
             result.put("resultCode",CODE_FAIL);
@@ -57,7 +57,7 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
             result.put("resultMsg","事件源不存在");
             return result;
         }
-        InterfaceCfg ic = BeanUtil.create(interfaceCfg,new InterfaceCfg());
+        final InterfaceCfg ic = BeanUtil.create(interfaceCfg,new InterfaceCfg());
         ic.setCreateDate(DateUtil.getCurrentTime());
         ic.setUpdateDate(DateUtil.getCurrentTime());
         ic.setStatusDate(DateUtil.getCurrentTime());
@@ -72,7 +72,7 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
             new Thread(){
                 public void run(){
                     try {
-                        synInterfaceCfgService.synchronizeSingleEventInterface(interfaceCfg.getInterfaceCfgId(),"");
+                        synInterfaceCfgService.synchronizeSingleEventInterface(ic.getInterfaceCfgId(),"");
                     }catch (Exception e){
                         e.printStackTrace();
                     }
