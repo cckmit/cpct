@@ -57,6 +57,10 @@ public class MktOperatorLogServiceImpl implements MktOperatorLogService{
             String operatorAccount = params.get("operatorAccount");
             mktOperatorLogDO.setOperatorAccount(operatorAccount);
         }
+        if(params.containsKey("operatorType")) {
+            String operatorType = params.get("operatorType");
+            mktOperatorLogDO.setOperatorType(operatorType);
+        }
 
         //分页
         PageHelper.startPage(page, pageSize);
