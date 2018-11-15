@@ -1,9 +1,6 @@
 package com.zjtelcom.cpct.service.impl.grouping;
 
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.google.gson.JsonObject;
-import com.sun.corba.se.spi.ior.ObjectKey;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
@@ -14,12 +11,9 @@ import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
-import com.zjtelcom.cpct.dao.strategy.MktStrategyMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.dao.system.SysStaffMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
-import com.zjtelcom.cpct.domain.campaign.MktCamChlResultConfRelDO;
-import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.GroupingVO;
@@ -27,19 +21,12 @@ import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
-import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.domain.system.SysStaff;
-import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.grouping.*;
-import com.zjtelcom.cpct.dto.strategy.MktStrategy;
-import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
-import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRuleRel;
-import com.zjtelcom.cpct.dto.user.UserList;
-import com.zjtelcom.cpct.pojo.MktCamScript;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
 import com.zjtelcom.cpct.service.channel.MessageLabelService;
@@ -47,13 +34,8 @@ import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.util.*;
-import com.zjtelcom.es.service.EsService;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.poi.hssf.usermodel.HSSFCell;
+//import com.zjtelcom.es.es.service.EsService;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -66,11 +48,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.*;
-import static com.zjtelcom.cpct.constants.ResponseCode.SUCCESS;
 
 @Service
 public class TrialOperationServiceImpl extends BaseService implements TrialOperationService {
@@ -117,8 +97,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private SysStaffMapper sysStaffMapper;
     @Autowired
     private SysParamsMapper sysParamsMapper;
-    @Autowired(required = false)
-    private EsService esService;
+//    @Autowired(required = false)
+//    private EsService esService;
 
     /**
      * 销售品service
@@ -165,11 +145,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         }
         request.setParamList(paramList);
         TrialResponse response = new TrialResponse();
+//        com.zjtelcom.es.es.entity.model.TrialResponse response = new com.zjtelcom.es.es.entity.model.TrialResponse();
 
         try {
             //todo
-//            com.zjtelcom.es.model.TrialOperationVO requests = BeanUtil.create(request,new com.zjtelcom.es.model.TrialOperationVO());
-//            com.zjtelcom.es.model.TrialResponse response = esService.searchBatchInfo(requests);
+//            com.zjtelcom.es.es.entity.TrialOperationVO requests = BeanUtil.create(request,new com.zjtelcom.es.es.entity.TrialOperationVO());
+//             response = esService.searchBatchInfo(requests);
             response = restTemplate.postForObject(batchInfo, request, TrialResponse.class);
 
             if (response.getResultCode().equals(CODE_FAIL)){
@@ -432,15 +413,17 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         request.setParamList(paramList);
         TrialResponse response = new TrialResponse();
         TrialResponse countResponse = new TrialResponse();
+//        com.zjtelcom.es.es.entity.model.TrialResponse response = new com.zjtelcom.es.es.entity.model.TrialResponse();
+//        com.zjtelcom.es.es.entity.model.TrialResponse countResponse = new com.zjtelcom.es.es.entity.model.TrialResponse();
         try {
             //todo
-//            com.zjtelcom.es.model.TrialOperationVO request = BeanUtil.create(request,new com.zjtelcom.es.model.TrialOperationVO());
-//            com.zjtelcom.es.model.TrialResponse response = esService.searchBatchInfo(request));
+//            com.zjtelcom.es.es.entity.TrialOperationVO requests = BeanUtil.create(request,new com.zjtelcom.es.es.entity.TrialOperationVO());
+//             response = esService.searchBatchInfo(requests);
 
             response = restTemplate.postForObject(batchInfo, request, TrialResponse.class);
             //同时调用统计查询的功能
 
-//            com.zjtelcom.es.model.TrialResponse countResponse = esService.searchCountInfo(request));
+//             countResponse = esService.searchCountInfo(requests);
             countResponse = restTemplate.postForObject(countInfo,request,TrialResponse.class);
 
             if (countResponse.getResultCode().equals(CODE_SUCCESS)){
@@ -571,7 +554,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "试运算记录不存在");
             return result;
         }
-//        com.zjtelcom.es.model.TrialResponse response = new com.zjtelcom.es.model.TrialResponse();
+//        com.zjtelcom.es.es.entity.model.TrialResponse response = new com.zjtelcom.es.es.entity.model.TrialResponse();
         TrialResponse response = new TrialResponse();
         try {
             Map<String, Long> param = new HashMap<>();
