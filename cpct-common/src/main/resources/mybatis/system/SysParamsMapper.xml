@@ -20,11 +20,11 @@
     where PARAM_ID = #{paramId,jdbcType=BIGINT}
     </delete>
 
-    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.system.SysParams">
-    insert into sys_params (PARAM_NAME, PARAM_VALUE,
+    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.system.SysParams" useGeneratedKeys="true" keyProperty="paramId">
+    insert into sys_params (PARAM_ID, PARAM_NAME, PARAM_VALUE,
       CONFIG_TYPE, MODIFY_FLAG, DESCRIPTION, 
       PARAM_KEY, CREATE_DATE, CREATE_STAFF)
-    values (#{paramName,jdbcType=VARCHAR}, #{paramValue,jdbcType=VARCHAR},
+    values (#{paramId,jdbcType=BIGINT}, #{paramName,jdbcType=VARCHAR}, #{paramValue,jdbcType=VARCHAR},
       #{configType,jdbcType=BIGINT}, #{modifyFlag,jdbcType=BIGINT}, #{description,jdbcType=VARCHAR}, 
       #{paramKey,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT})
     </insert>
