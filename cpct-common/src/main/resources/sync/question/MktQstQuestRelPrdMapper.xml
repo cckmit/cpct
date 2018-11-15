@@ -73,7 +73,7 @@
 
     <selectKey resultType ="java.lang.Long" keyProperty= "relId" order= "AFTER">
     SELECT REL_ID()
-    </selectKey >
+    </selectKey>
     insert into mkt_qst_quest_rel
     (REL_ID, NAIRE_ID, QUESTION_ID,
       QUESTION_ORDER, QUESTION_WEIGHT, IS_MARK,
@@ -81,12 +81,12 @@
       CREATE_STAFF, CREATE_DATE, UPDATE_STAFF,
       UPDATE_DATE, REMARK)
     values
-    <foreach collection ="list" item="relList" index= "index" separator =",">
-      (#{relId,jdbcType=BIGINT}, #{naireId,jdbcType=BIGINT}, #{questionId,jdbcType=BIGINT},
-      #{questionOrder,jdbcType=BIGINT}, #{questionWeight,jdbcType=BIGINT}, #{isMark,jdbcType=BIGINT},
-      #{isMust,jdbcType=BIGINT}, #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP},
-      #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT},
-      #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR})
+    <foreach collection ="list" item="item" index= "index" separator =",">
+      (#{item.relId,jdbcType=BIGINT}, #{item.naireId,jdbcType=BIGINT}, #{item.questionId,jdbcType=BIGINT},
+      #{item.questionOrder,jdbcType=BIGINT}, #{item.questionWeight,jdbcType=BIGINT}, #{item.isMark,jdbcType=BIGINT},
+      #{item.isMust,jdbcType=BIGINT}, #{item.statusCd,jdbcType=VARCHAR}, #{item.statusDate,jdbcType=TIMESTAMP},
+      #{item.createStaff,jdbcType=BIGINT}, #{item.createDate,jdbcType=TIMESTAMP}, #{item.updateStaff,jdbcType=BIGINT},
+      #{item.updateDate,jdbcType=TIMESTAMP}, #{item.remark,jdbcType=VARCHAR})
     </foreach>
   </insert>
 

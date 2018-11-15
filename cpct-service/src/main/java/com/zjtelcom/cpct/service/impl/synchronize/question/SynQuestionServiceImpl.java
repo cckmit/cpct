@@ -87,10 +87,12 @@ public class SynQuestionServiceImpl  extends BaseService implements SynQuestionS
             }
         }else{
             questionnairePrdMapper.updateByPrimaryKey(questionnaire);
+            questRelPrdMapper.deleteByNaireId(questionnaireId);
             if(!relListByQuestionnaireId.isEmpty()){
-               for (QuestRel questRel:relListByQuestionnaireId){
-                   questRelPrdMapper.updateByPrimaryKey(questRel);
-               }
+                questRelPrdMapper.insertBatch(relListByQuestionnaireId);
+//               for (QuestRel questRel:relListByQuestionnaireId){
+//                   questRelPrdMapper.updateByPrimaryKey(questRel);
+//               }
             }
         }
         result.put("resultCode",CODE_SUCCESS);
@@ -162,8 +164,9 @@ public class SynQuestionServiceImpl  extends BaseService implements SynQuestionS
         }else{
             questionPrdMapper.updateByPrimaryKey(question);
             if(!detailListByQuestionId.isEmpty()){
+                questionDetailPrdMapper.deleteByQuestionId(questionnaireId);
                 for (QuestionDetail questionDetail:detailListByQuestionId){
-                    questionDetailPrdMapper.updateByPrimaryKey(questionDetail);
+                    questionDetailPrdMapper.insert(questionDetail);
                 }
             }
         }
@@ -183,6 +186,7 @@ public class SynQuestionServiceImpl  extends BaseService implements SynQuestionS
     public Map<String, Object> deleteQuestionBank(String roleName, Long questionnaireId) {
         Map<String,Object> maps = new HashMap<>();
         questionPrdMapper.deleteByPrimaryKey(questionnaireId);
+        questionDetailPrdMapper.deleteByQuestionId(questionnaireId);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
         return maps;
@@ -197,7 +201,8 @@ public class SynQuestionServiceImpl  extends BaseService implements SynQuestionS
     @Override
     public Map<String, Object> deleteQuestion(String roleName, Long questionnaireId) {
         Map<String,Object> maps = new HashMap<>();
-        questionnaireMapper.deleteByPrimaryKey(questionnaireId);
+        questionnairePrdMapper.deleteByPrimaryKey(questionnaireId);
+        questRelPrdMapper.deleteByNaireId(questionnaireId);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
         return maps;

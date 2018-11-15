@@ -266,6 +266,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
             return result;
         }
         questionnaireMapper.deleteByPrimaryKey(questionnaire.getNaireId());
+        questRelMapper.deleteByNaireId(questionnaire.getNaireId());
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
 

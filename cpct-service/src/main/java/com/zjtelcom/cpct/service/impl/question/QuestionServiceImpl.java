@@ -125,12 +125,12 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public Map<String, Object> addQuestion(Long userId, QuestionAddVO addVO) {
         Map<String,Object> result = new HashMap<>();
-        final Question question = BeanUtil.create(addVO,new Question());
+        Question question = BeanUtil.create(addVO,new Question());
         Map<String,Object> map = createQuestion(userId,question);
         if (!map.get("resultCode").equals(CODE_SUCCESS)){
             return map;
         }
-        Long questionId = Long.valueOf(map.get("questionId").toString());
+        final Long questionId = Long.valueOf(map.get("questionId").toString());
         if (addVO.getQuestionDetailAddVOList()!=null){
             batchAddQuestionDetail(addVO.getQuestionDetailAddVOList(),questionId);
         }
@@ -142,7 +142,7 @@ public class QuestionServiceImpl implements QuestionService {
             new Thread(){
                 public void run(){
                     try {
-                        synQuestionService.synQuestionBank("",question.getQuestionId());
+                        synQuestionService.synQuestionBank("",questionId);
                     }catch (Exception e){
                         e.printStackTrace();
                     }
@@ -243,6 +243,7 @@ public class QuestionServiceImpl implements QuestionService {
             return result;
         }
         questionMapper.deleteByPrimaryKey(questionId);
+        questionDetailMapper.deleteByQuestionId(questionId);
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","删除成功");
 

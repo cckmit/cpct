@@ -320,6 +320,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             return result;
         }
         labelMapper.deleteByPrimaryKey(labelId);
+        labelValueMapper.deleteByLabelId(labelId);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
 
@@ -442,9 +443,9 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     }
 
     @Override
-    public Map<String,Object> deleteLabelGrp(Long userId, Long labelGrpId) {
+    public Map<String,Object> deleteLabelGrp(Long userId, final Long labelGrpId) {
         Map<String,Object> result = new HashMap<>();
-        final LabelGrp labelGrp = labelGrpMapper.selectByPrimaryKey(labelGrpId);
+        LabelGrp labelGrp = labelGrpMapper.selectByPrimaryKey(labelGrpId);
         if (labelGrp==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","标签组信息不存在");
@@ -459,7 +460,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             new Thread(){
                 public void run(){
                     try {
-                        synLabelGrpService.deleteSingleLabel(labelGrp.getGrpId(),"");
+                        synLabelGrpService.deleteSingleLabel(labelGrpId,"");
                     }catch (Exception e){
                         e.printStackTrace();
                     }
