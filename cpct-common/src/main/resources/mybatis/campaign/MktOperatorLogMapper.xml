@@ -36,5 +36,8 @@
         <if test="operatorAccount != null and operatorAccount != ''">
             AND OPERATOR_ACCOUNT = #{operatorAccount,jdbcType=VARCHAR}
         </if>
+        <if test="operatorType != null and operatorType != ''">
+            AND OPERATION_TYPE = #{operatorType,jdbcType=VARCHAR}
+        </if>
     </select>
 </mapper>
