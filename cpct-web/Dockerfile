@@ -10,4 +10,4 @@ ENV TZ Asia/Shanghai
 
 #VOLUME /app/dubbo/logs
 USER isale 
-ENTRYPOINT ["nohup","java", "-jar","/app/project/cpct-web.jar","--spring.profiles.active=pst","&"]
+ENTRYPOINT ["nohup","java", "-jar","/app/project/cpct-web.jar","--spring.profiles.active=prod","&"]

@@ -615,8 +615,8 @@ public class EventApiServiceImpl implements EventApiService {
                 return Collections.EMPTY_MAP;
             }
 
-            List<Map<String, Object>> itgTriggers = new ArrayList<>();
-            Map<String, Object> itgTrigger = new HashMap<>();
+            List<Map<String,Object>> itgTriggers = new ArrayList<>();
+            Map<String,Object> itgTrigger;
             StringBuilder querySb = new StringBuilder();
 
             //查询展示列 （iSale）
@@ -663,28 +663,28 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 }
                 if (triggerList1.size() > 0) {
-                    itgTrigger = new JSONObject();
+                    itgTrigger = new HashMap<>();
                     itgTrigger.put("triggerList", triggerList1);
                     itgTrigger.put("type", "固定信息");
-                    itgTriggers.add(itgTrigger);
+                    itgTriggers.add(new JSONObject(itgTrigger));
                 }
                 if (triggerList2.size() > 0) {
                     itgTrigger = new JSONObject();
                     itgTrigger.put("triggerList", triggerList2);
                     itgTrigger.put("type", "营销信息");
-                    itgTriggers.add(itgTrigger);
+                    itgTriggers.add(new JSONObject(itgTrigger));
                 }
                 if (triggerList3.size() > 0) {
                     itgTrigger = new JSONObject();
                     itgTrigger.put("triggerList", triggerList3);
                     itgTrigger.put("type", "费用信息");
-                    itgTriggers.add(itgTrigger);
+                    itgTriggers.add(new JSONObject(itgTrigger));
                 }
                 if (triggerList4.size() > 0) {
                     itgTrigger = new JSONObject();
                     itgTrigger.put("triggerList", triggerList4);
                     itgTrigger.put("type", "协议信息");
-                    itgTriggers.add(itgTrigger);
+                    itgTriggers.add(new JSONObject(itgTrigger));
                 }
             }
 
@@ -1173,6 +1173,14 @@ public class EventApiServiceImpl implements EventApiService {
 //                    }
                 }
 
+                //判断参数是否有无值的
+                if (context.size() != paramsSize) {
+                    //有参数没有查询出实例数据
+                    esJson.put("hit", false);
+                    esJson.put("msg", "分群标签取值参数实例不足");
+                    return Collections.EMPTY_MAP;
+                }
+
                 //添加事件采集项的值到上下文
                 context.putAll(labelItems);
                 System.out.println("查询标签成功:" + context.toString());
@@ -1184,14 +1192,6 @@ public class EventApiServiceImpl implements EventApiService {
                 return Collections.EMPTY_MAP;
             }
 
-
-            //判断参数是否有无值的
-            if (context.size() != paramsSize) {
-                //有参数没有查询出实例数据
-                ruleMap.put("hit", true);
-                ruleMap.put("msg", "分群标签取值参数实例不足");
-                return ruleMap;
-            }
 
             //判断redis中是否存在
             String express = "";
@@ -1372,7 +1372,6 @@ public class EventApiServiceImpl implements EventApiService {
                 System.out.println("Tree=" + ruleResult.getRule().toTree());
                 System.out.println("TraceMap=" + ruleResult.getTraceMap());
 
-
                 jsonObject.put("express", express);
                 jsonObject.put("reqId", reqId);
                 jsonObject.put("eventId", params.get("eventCode"));
@@ -1381,7 +1380,6 @@ public class EventApiServiceImpl implements EventApiService {
                 jsonObject.put("productStr", productStr);
                 jsonObject.put("evtContactConfIdStr", evtContactConfIdStr);
                 jsonObject.put("tarGrpId", tarGrpId);
-
 
                 //初始化返回结果中的销售品条目
                 List<Map<String, String>> productList = new ArrayList<>();
@@ -1657,7 +1655,7 @@ public class EventApiServiceImpl implements EventApiService {
             //痛痒点
             channel.put("reason", mktVerbalStr == null?"":mktVerbalStr);
 
-            channel.put("itgTriggers", JSONArray.toJSON(itgTriggers));
+            channel.put("itgTriggers", JSONArray.parse(JSONArray.toJSON(itgTriggers).toString()));
 
             return channel;
         }
@@ -1745,22 +1743,20 @@ public class EventApiServiceImpl implements EventApiService {
 
     private List<String> subScript(String str) {
         List<String> result = new ArrayList<>();
-        Pattern p = Pattern.compile("\\$");
-//        Pattern p = Pattern.compile("(?<=\\$)([^$]+)(?=\\$)");
+//        Pattern p = Pattern.compile("\\$");
+        Pattern p = Pattern.compile("(?<=\\$\\{)([^$]+)(?=\\}\\$)");
         Matcher m = p.matcher(str);
-        List<Integer> list = new ArrayList<>();
+//        List<Integer> list = new ArrayList<>();
 
         while (m.find()) {
-            System.out.println(m.start());
-            list.add(m.start());
+//            list.add(m.start());
+            result.add(m.group(1));
         }
 
-        System.out.println(list.size());
-
-        for (int i = 0; i < list.size(); ) {
-            result.add(str.substring(list.get(i) + 1, list.get(++i)));
-            i++;
-        }
+//        for (int i = 0; i < list.size(); ) {
+//            result.add(str.substring(list.get(i) + 1, list.get(++i)));
+//            i++;
+//        }
         return result;
     }
 

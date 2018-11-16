@@ -9,6 +9,7 @@ import org.springframework.context.annotation.ImportResource;
 @SpringBootApplication
 //@ImportResource("classpath:dubbo/dubbo-provider.xml")  //加载xml文件  pst环境
 @ImportResource("classpath:dubbo/dubbo-test.xml")  //加载xml文件  dev环境
+//@ImportResource("classpath:dubbo/dubbo-prod.xml")  //加载xml文件  dev环境
 public class DubboServerApplication {
 
     public static Logger logger = LoggerFactory.getLogger(DubboServerApplication.class);
