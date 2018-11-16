@@ -2,6 +2,8 @@
 server:
   port: 8080
 
+dubboPath: dev
+
 #数据库相关配置
 #spring:
 #  datasource:
