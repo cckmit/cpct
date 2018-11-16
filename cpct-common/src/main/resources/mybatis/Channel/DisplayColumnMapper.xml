@@ -18,7 +18,7 @@
     delete from display_column
     where DISPLAY_COLUMN_ID = #{displayColumnId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.DisplayColumn">
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.DisplayColumn" useGeneratedKeys="true" keyProperty="displayColumnId">
     insert into display_column (DISPLAY_COLUMN_ID, DISPLAY_COLUMN_NAME, 
       DISPLAY_COLUMN_CODE,DISPLAY_COLUMN_TYPE, STATUS_CD, CREATE_STAFF,
       UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 

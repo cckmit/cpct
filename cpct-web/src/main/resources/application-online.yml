@@ -43,6 +43,9 @@ spring:
     batchinfo: http://134.96.252.170:30808/es/searchBatchInfo
     hitslist: http://134.96.252.170:30808/es/findBatchHitsList
     countinfo: http://134.96.252.170:30808/es/searchCountInfo
+  #是否同步
+  sync:
+    value: 0
 
 
 

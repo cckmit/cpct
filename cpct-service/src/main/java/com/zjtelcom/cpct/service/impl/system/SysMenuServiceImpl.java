@@ -6,8 +6,10 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.system.SysMenuMapper;
 import com.zjtelcom.cpct.domain.system.SysMenu;
 import com.zjtelcom.cpct.service.BaseService;
+import com.zjtelcom.cpct.service.synchronize.sys.SynSysMenuService;
 import com.zjtelcom.cpct.service.system.SysMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,11 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
 
     @Autowired
     private SysMenuMapper sysMenuMapper;  //菜单mapper
+    @Autowired
+    private SynSysMenuService synSysMenuService;
+
+    @Value("${sync.value}")
+    private String value;
 
     @Override
     public Map<String, Object> listMenu() {
@@ -90,7 +97,7 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
         String menuRemark = params.get("menuRemark");
         String syncUrl = params.get("syncUrl");
 
-        SysMenu menu = new SysMenu();
+        final SysMenu menu = new SysMenu();
         menu.setMenuName(menuName);
         menu.setMenuType(menuType);
         menu.setParentMenuId(parentMenuId);
@@ -102,6 +109,19 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
         sysMenuMapper.insert(menu);
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg", "保存成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synSysMenuService.synchronizeSingleMenu(menu.getMenuId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 
@@ -118,7 +138,7 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
         String syncUrl = params.get("syncUrl");
         Integer menuNextId = Integer.parseInt(params.get("menuNextId"));
 
-        SysMenu menu = new SysMenu();
+        final SysMenu menu = new SysMenu();
         menu.setMenuId(menuId);
         menu.setMenuName(menuName);
         menu.setMenuType(menuType);
@@ -131,6 +151,19 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
         sysMenuMapper.updateByPrimaryKey(menu);
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg", "保存成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synSysMenuService.synchronizeSingleMenu(menu.getMenuId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 
@@ -138,11 +171,24 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
     public Map<String, Object> delMenu(Map<String, String> params) {
         Map<String, Object> result = new HashMap<>();
         //获取参数
-        Long menuId = Long.parseLong(params.get("menuId"));
+        final Long menuId = Long.parseLong(params.get("menuId"));
 
         sysMenuMapper.deleteByPrimaryKey(menuId);
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg", "删除成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synSysMenuService.deleteSingleMenu(menuId,"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 
