@@ -56,25 +56,26 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
     private EventMatchRulConditionPrdMapper eventMatchRulConditionPrdMapper;
     @Autowired
     private MktCamEvtRelMapper mktCamEvtRelMapper;
+
     @Autowired
     private CamEvtRelPrdMapper camEvtRelPrdMapper;
     //同步表名
-    private static final String tableName="event";
-
+    private static final String tableName = "event";
 
 
     /**
      * 同步单个事件
-     * @param eventId    事件id
-     * @param roleName   操作人身份
+     *
+     * @param eventId  事件id
+     * @param roleName 操作人身份
      * @return
      */
     @Override
     public Map<String, Object> synchronizeSingleEvent(Long eventId, String roleName) {
-        Map<String,Object> maps = new HashMap<>();
+        Map<String, Object> maps = new HashMap<>();
         //查询源数据库
-        ContactEvt contactEvt=contactEvtMapper.getEventById(eventId);
-        if(contactEvt==null){
+        ContactEvt contactEvt = contactEvtMapper.getEventById(eventId);
+        if (contactEvt == null) {
             throw new SystemException("对应事件不存在");
         }
         //1.1关联的事件采集项
@@ -82,11 +83,11 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
 
         //1.2关联的事件规则
         EventMatchRulDTO eventMatchRulDTO = eventMatchRulMapper.listEventMatchRul(eventId);
-          //1.2.1事件规则条件信息
-          List<EventMatchRulCondition> listEventMatchRulCondition=new ArrayList<>();
-          if(eventMatchRulDTO!=null){
-             listEventMatchRulCondition = eventMatchRulConditionMapper.listEventMatchRulCondition(eventMatchRulDTO.getEvtMatchRulId());
-          }
+        //1.2.1事件规则条件信息
+        List<EventMatchRulCondition> listEventMatchRulCondition = new ArrayList<>();
+        if (eventMatchRulDTO != null) {
+            listEventMatchRulCondition = eventMatchRulConditionMapper.listEventMatchRulCondition(eventMatchRulDTO.getEvtMatchRulId());
+        }
 
         //1.3关联的活动
         List<MktCamEvtRel> mktCamEvtRels = mktCamEvtRelMapper.qryBycontactEvtId(contactEvt.getContactEvtId());
@@ -94,63 +95,209 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
 
         //同步时查看是新增还是更新  查找生产数据库
         ContactEvt eventById = contactEvtPrdMapper.getEventById(eventId);
-        if(eventById==null){
+        if (eventById == null) {
             //2.1新增事件信息
             contactEvtPrdMapper.createContactEvtJt(contactEvt);
-            synchronizeRecordService.addRecord(roleName,tableName,eventId, SynchronizeType.add.getType());
+            synchronizeRecordService.addRecord(roleName, tableName, eventId, SynchronizeType.add.getType());
             //2.2新增关联的事件采集项
-            if(!contactEvtItems.isEmpty()){
-                for (ContactEvtItem c:contactEvtItems){
+            if (!contactEvtItems.isEmpty()) {
+                for (ContactEvtItem c : contactEvtItems) {
                     contactEvtItemPrdMapper.insert(c);
                 }
             }
             //2.3新增关联的事件规则
-            if(eventMatchRulDTO!=null){
+            if (eventMatchRulDTO != null) {
                 eventMatchRulPrdMapper.createEventMatchRul(eventMatchRulDTO);
             }
             //2.4新增关联的事件规则条件信息
-            if(!listEventMatchRulCondition.isEmpty()){
-                 for (EventMatchRulCondition e:listEventMatchRulCondition){
-                     eventMatchRulConditionPrdMapper.insertEventMatchRulCondition(e);
-                 }
-            }
-            //2.5新增关联的活动
-            if(!mktCamEvtRels.isEmpty()){
-                 for (MktCamEvtRel m:mktCamEvtRels){
-                     camEvtRelPrdMapper.insert(m);
-                 }
-            }
-        }else{
-            //3.1修改
-            contactEvtPrdMapper.modContactEvtJt(contactEvt);
-            synchronizeRecordService.addRecord(roleName,tableName,eventId, SynchronizeType.update.getType());
-            //3.2修改关联的事件采集项
-            if(!contactEvtItems.isEmpty()){
-                for (ContactEvtItem c:contactEvtItems){
-                    contactEvtItemPrdMapper.updateByPrimaryKey(c);
+            if (!listEventMatchRulCondition.isEmpty()) {
+                for (EventMatchRulCondition e : listEventMatchRulCondition) {
+                    eventMatchRulConditionPrdMapper.insertEventMatchRulCondition(e);
                 }
             }
+            //2.5新增关联的活动
+            if (!mktCamEvtRels.isEmpty()) {
+                for (MktCamEvtRel m : mktCamEvtRels) {
+                    camEvtRelPrdMapper.insert(m);
+                }
+            }
+        } else {
+            //3.1修改  事件关联的采集项,规则条件,关联活动都有可能新增或者修改或者删除
+            contactEvtPrdMapper.modContactEvtJt(contactEvt);
+            synchronizeRecordService.addRecord(roleName, tableName, eventId, SynchronizeType.update.getType());
+            //3.2修改关联的事件采集项
+            if (!contactEvtItems.isEmpty()) {
+                diffEventItem(contactEvtItems, eventById);
+            }
             //3.3修改关联的事件规则
-            if(eventMatchRulDTO!=null){
+            if (eventMatchRulDTO != null) {
                 eventMatchRulPrdMapper.updateByPrimaryKey(eventMatchRulDTO);
             }
             //3.4修改关联的事件规则条件信息
-            if(!listEventMatchRulCondition.isEmpty()){
-                for (EventMatchRulCondition e:listEventMatchRulCondition){
-                    eventMatchRulConditionPrdMapper.updateByPrimaryKey(e);
-                }
+            if (!listEventMatchRulCondition.isEmpty()) {
+                diffEventMatchRulCondition(listEventMatchRulCondition,eventById);
             }
             //3.5修改关联的活动
-            if(!mktCamEvtRels.isEmpty()){
-                for (MktCamEvtRel m:mktCamEvtRels){
-                    camEvtRelPrdMapper.updateByPrimaryKey(m);
+            if (!mktCamEvtRels.isEmpty()) {
+                diffMktCamEvtRel(mktCamEvtRels,eventById);
+            }
+        }
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        return maps;
+    }
+
+
+    /**
+     * 3.2比较事件关联的事件采集项
+     *
+     * @param prdList
+     * @param contactEvt
+     */
+    public void diffEventItem(List<ContactEvtItem> prdList, ContactEvt contactEvt) {
+        //得到生产环境的事件采集项
+        List<ContactEvtItem> realList = contactEvtItemPrdMapper.listEventItem(contactEvt.getContactEvtId());
+        //判断哪些需要新增  修改  或者删除
+        //三个集合分别表示需要 新增的   修改的    删除的
+        List<ContactEvtItem> addList = new ArrayList<ContactEvtItem>();
+        List<ContactEvtItem> updateList = new ArrayList<ContactEvtItem>();
+        List<ContactEvtItem> deleteList = new ArrayList<ContactEvtItem>();
+        for (ContactEvtItem c : prdList) {
+            for (int i = 0; i < realList.size(); i++) {
+                if (c.getEvtItemId() - realList.get(i).getEvtItemId() == 0) {
+                    //需要修改的
+                    updateList.add(c);
+                    break;
+                } else if (i == realList.size() - 1) {
+                    //需要新增的  准生产存在，生产不存在
+                    addList.add(c);
                 }
             }
         }
-            maps.put("resultCode", CommonConstant.CODE_SUCCESS);
-            maps.put("resultMsg", StringUtils.EMPTY);
-        return maps;
+        for (ContactEvtItem c : realList) {
+            for (int i = 0; i < prdList.size(); i++) {
+                if (c.getEvtItemId() - prdList.get(i).getEvtItemId() == 0) {
+                    break;
+                } else if (i == prdList.size() - 1) {
+                    //需要删除的   生产存在,准生产不存在
+                    deleteList.add(c);
+                }
+            }
+        }
+        //开始新增
+        for (ContactEvtItem c : addList) {
+            contactEvtItemPrdMapper.insert(c);
+        }
+        //开始修改
+        for (ContactEvtItem c : updateList) {
+            contactEvtItemPrdMapper.updateByPrimaryKey(c);
+        }
+        //开始删除
+        for (ContactEvtItem c : deleteList) {
+            contactEvtItemPrdMapper.deleteByPrimaryKey(c.getEvtItemId());
+        }
     }
+
+
+
+    /**
+     * 3.4事件关联的事件规则条件信息比较
+     * @param prdList  准生产事件规则条件集合
+     * @param contactEvt  事件
+     */
+    public void diffEventMatchRulCondition(List<EventMatchRulCondition> prdList,ContactEvt contactEvt){
+        EventMatchRulDTO eventMatchRulDTO = eventMatchRulPrdMapper.listEventMatchRul(contactEvt.getContactEvtId());
+        //1.2.1事件规则条件信息
+        List<EventMatchRulCondition> realList = eventMatchRulConditionPrdMapper.listEventMatchRulCondition(eventMatchRulDTO.getEvtMatchRulId());
+            //开始比较
+            List<EventMatchRulCondition> addList = new ArrayList<EventMatchRulCondition>();
+            List<EventMatchRulCondition> updateList = new ArrayList<EventMatchRulCondition>();
+            List<EventMatchRulCondition> deleteList = new ArrayList<EventMatchRulCondition>();
+            for (EventMatchRulCondition c : prdList) {
+                for (int i = 0; i < realList.size(); i++) {
+                    if (c.getConditionId() - realList.get(i).getConditionId() == 0) {
+                        //需要修改的
+                        updateList.add(c);
+                        break;
+                    } else if (i == realList.size() - 1) {
+                        //需要新增的  准生产存在，生产不存在
+                        addList.add(c);
+                    }
+                }
+            }
+            for (EventMatchRulCondition c : realList) {
+                for (int i = 0; i < prdList.size(); i++) {
+                    if (c.getConditionId() - prdList.get(i).getConditionId() == 0) {
+                        break;
+                    } else if (i == prdList.size() - 1) {
+                        //需要删除的   生产存在,准生产不存在
+                        deleteList.add(c);
+                    }
+                }
+            }
+            //开始新增
+            for (EventMatchRulCondition c : addList) {
+                eventMatchRulConditionPrdMapper.insertEventMatchRulCondition(c);
+            }
+            //开始修改
+            for (EventMatchRulCondition c : updateList) {
+                eventMatchRulConditionPrdMapper.updateByPrimaryKey(c);
+            }
+            //开始删除
+            for (EventMatchRulCondition c : deleteList) {
+                eventMatchRulConditionPrdMapper.delEventMatchRulCondition(c);
+            }
+    }
+
+
+    /**
+     * 事件关联的活动同步
+     * @param prdList
+     * @param contactEvt
+     */
+    public void diffMktCamEvtRel(List<MktCamEvtRel> prdList,ContactEvt contactEvt){
+        List<MktCamEvtRel> realList = camEvtRelPrdMapper.qryBycontactEvtId(contactEvt.getContactEvtId());
+        //开始比较
+        List<MktCamEvtRel> addList = new ArrayList<MktCamEvtRel>();
+        List<MktCamEvtRel> updateList = new ArrayList<MktCamEvtRel>();
+        List<MktCamEvtRel> deleteList = new ArrayList<MktCamEvtRel>();
+        for (MktCamEvtRel c : prdList) {
+            for (int i = 0; i < realList.size(); i++) {
+                if (c.getMktCampaignId() - realList.get(i).getMktCampaignId() == 0) {
+                    //需要修改的
+                    updateList.add(c);
+                    break;
+                } else if (i == realList.size() - 1) {
+                    //需要新增的  准生产存在，生产不存在
+                    addList.add(c);
+                }
+            }
+        }
+        for (MktCamEvtRel c : realList) {
+            for (int i = 0; i < prdList.size(); i++) {
+                if (c.getMktCampaignId() - prdList.get(i).getMktCampaignId() == 0) {
+                    break;
+                } else if (i == prdList.size() - 1) {
+                    //需要删除的   生产存在,准生产不存在
+                    deleteList.add(c);
+                }
+            }
+        }
+        //开始新增
+        for (MktCamEvtRel c : addList) {
+            camEvtRelPrdMapper.insert(c);
+        }
+        //开始修改
+        for (MktCamEvtRel c : updateList) {
+            camEvtRelPrdMapper.updateByPrimaryKey(c);
+        }
+        //开始删除
+        for (MktCamEvtRel c : deleteList) {
+            camEvtRelPrdMapper.deleteByMktCampaignId(c.getMktCampaignId());
+        }
+    }
+
+
 
     /**
      * 批量事件同步 生产环境不存在的就新增，存在的则修改更新
@@ -309,9 +456,7 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
          contactEvtPrdMapper.modContactEvtJt(contactEvt);
          //3.2修改关联的事件采集项
          if(!contactEvtItems.isEmpty()){
-             for (ContactEvtItem c:contactEvtItems){
-                 contactEvtItemPrdMapper.updateByPrimaryKey(c);
-             }
+             diffEventItem(contactEvtItems, contactEvt);
          }
          //3.3修改关联的事件规则
          if(eventMatchRulDTO!=null){
@@ -319,15 +464,11 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
          }
          //3.4修改关联的事件规则条件信息
          if(!listEventMatchRulCondition.isEmpty()){
-             for (EventMatchRulCondition e:listEventMatchRulCondition){
-                 eventMatchRulConditionPrdMapper.updateByPrimaryKey(e);
-             }
+             diffEventMatchRulCondition(listEventMatchRulCondition,contactEvt);
          }
          //3.5修改关联的活动
          if(!mktCamEvtRels.isEmpty()){
-             for (MktCamEvtRel m:mktCamEvtRels){
-                 camEvtRelPrdMapper.updateByPrimaryKey(m);
-             }
+             diffMktCamEvtRel(mktCamEvtRels,contactEvt);
          }
      }
 

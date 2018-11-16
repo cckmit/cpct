@@ -161,7 +161,7 @@ public class SynMessageLabelServiceImpl implements SynMessageLabelService{
     @Override
     public Map<String, Object> deleteSingleMessageLabel(Long messageLabelId, String roleName) {
         Map<String,Object> maps = new HashMap<>();
-        displayColumnMapper.deleteByPrimaryKey(messageLabelId);
+        displayColumnPrdMapper.deleteByPrimaryKey(messageLabelId);
         displayColumnLabelPrdMapper.deleteByDisplayId(messageLabelId);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);

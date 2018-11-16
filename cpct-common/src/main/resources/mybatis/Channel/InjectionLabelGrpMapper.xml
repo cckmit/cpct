@@ -17,7 +17,7 @@
     delete from injection_label_grp
     where GRP_ID = #{grpId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.LabelGrp">
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.LabelGrp" useGeneratedKeys="true" keyProperty="grpId">
     insert into injection_label_grp (GRP_ID, GRP_NAME, GRP_DESC, 
       STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
       CREATE_DATE, STATUS_DATE, UPDATE_DATE, 

@@ -70,10 +70,12 @@ public class SynLabelServiceImpl implements SynLabelService{
             synchronizeRecordService.addRecord(roleName,tableName,labelId, SynchronizeType.add.getType());
         }else{
             injectionLabelPrdMapper.updateByPrimaryKey(label);
+            injectionLabelValuePrdMapper.deleteByLabelId(labelId);
             if(!labelValues.isEmpty()){
-                for (LabelValue labelValue:labelValues){
-                    injectionLabelValuePrdMapper.updateByPrimaryKey(labelValue);
-                }
+                injectionLabelValuePrdMapper.insertBatch(labelValues);
+//                for (LabelValue labelValue:labelValues){
+//                    injectionLabelValuePrdMapper.updateByPrimaryKey(labelValue);
+//                }
             }
             synchronizeRecordService.addRecord(roleName,tableName,labelId, SynchronizeType.update.getType());
         }
@@ -165,6 +167,7 @@ public class SynLabelServiceImpl implements SynLabelService{
     public Map<String, Object> deleteSingleLabel(Long labelId, String roleName) {
         Map<String,Object> maps = new HashMap<>();
         injectionLabelPrdMapper.deleteByPrimaryKey(labelId);
+        injectionLabelValuePrdMapper.deleteByLabelId(labelId);
         //相关的标签值
 //        List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(labelId);
 //        for (LabelValue labelValue:labelValues){
