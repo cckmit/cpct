@@ -26,6 +26,8 @@ public class MktCamChlConfDetail extends MktCamChlConf{
 
     private CamScript camScript;
 
+
+
     public List<MktCamChlConfAttr> getMktCamChlConfAttrList() {
         return mktCamChlConfAttrList;
     }
