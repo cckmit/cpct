@@ -53,23 +53,21 @@ public class SynLabelGrpServiceImpl implements SynLabelGrpService {
         }
         List<LabelGrpMbr> listByGrpId = injectionLabelGrpMbrMapper.findListByGrpId(labelGrp.getGrpId());
         LabelGrp labelGrp1 = injectionLabelGrpPrdMapper.selectByPrimaryKey(labelGrpId);
+
         if(null==labelGrp1){
             injectionLabelGrpPrdMapper.insert(labelGrp);
             //增加对应的关联
-            if(!listByGrpId.isEmpty()){
-                for (LabelGrpMbr grpMbr:listByGrpId){
-                    injectionLabelGrpMbrPrdMapper.insert(grpMbr);
-                }
-            }
+
             synchronizeRecordService.addRecord(roleName,tableName,labelGrpId, SynchronizeType.add.getType());
         }else{
             injectionLabelGrpPrdMapper.updateByPrimaryKey(labelGrp);
-            if(!listByGrpId.isEmpty()){
-                for (LabelGrpMbr grpMbr:listByGrpId){
-                    injectionLabelGrpMbrPrdMapper.updateByPrimaryKey(grpMbr);
-                }
-            }
+            injectionLabelGrpMbrPrdMapper.deleteByLabelGrpId(labelGrpId);
             synchronizeRecordService.addRecord(roleName,tableName,labelGrpId, SynchronizeType.update.getType());
+        }
+        if(!listByGrpId.isEmpty()){
+            for (LabelGrpMbr grpMbr:listByGrpId){
+                injectionLabelGrpMbrPrdMapper.insert(grpMbr);
+            }
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
