@@ -23,7 +23,7 @@
       where MENU_ID = #{menuId,jdbcType=BIGINT}
     </delete>
 
-    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.system.SysMenu">
+    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.system.SysMenu" useGeneratedKeys="true" keyProperty="menuId">
       insert into sys_menu (MENU_ID, MENU_NAME, MENU_IMG,
         MENU_TYPE, PARENT_MENU_ID, MENU_NEXT_ID,SYNC_URL,
         MENU_URL, MENU_REMARK, CREATE_DATE,

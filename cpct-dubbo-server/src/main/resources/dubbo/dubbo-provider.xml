@@ -55,6 +55,11 @@
         <dubbo:method name="getQuestionnaireDetail" servicecode="00.1083.getQuestionnaireDetail" timeout="10000"/>
     </dubbo:service>
 
+    <!-- redis实时查询服务 -->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.TrialRedisService" ref="trialRedisServiceImpl" version="1.0" >
+        <dubbo:method name="searchFromRedis" servicecode="00.1083.searchFromRedis" timeout="10000"/>
+    </dubbo:service>
+
     <!-- 订阅 -->
     <!-- cpc计算协同中心回调 -->
     <dubbo:reference interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService" id="iContactTaskReceiptService"

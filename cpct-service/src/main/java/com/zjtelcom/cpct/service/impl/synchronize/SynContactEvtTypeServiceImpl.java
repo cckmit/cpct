@@ -140,7 +140,7 @@ public class SynContactEvtTypeServiceImpl extends BaseService implements SynCont
     @Override
     public Map<String, Object> deleteSingleEventType(Long eventId, String roleName) {
         Map<String,Object> maps = new HashMap<>();
-        contactEvtTypeMapper.deleteByPrimaryKey(eventId);
+        contactEvtTypePrdMapper.deleteByPrimaryKey(eventId);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
         return maps;

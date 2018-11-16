@@ -1,8 +1,6 @@
 package com.zjtelcom.cpct.service.grouping;
 
-import com.sun.corba.se.spi.ior.ObjectKey;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
-import com.zjtelcom.cpct.dto.grouping.IssueTrialRequest;
 import com.zjtelcom.cpct.dto.grouping.TrialOperationVO;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,7 +18,7 @@ public interface TrialOperationService  {
 
     Map<String,Object> issueTrialResult(TrialOperation trialOperation);
 
-    Map<String,Object> importUserList(MultipartFile multipartFile ,TrialOperationVO operation, Long ruleId ) throws IOException;
+    Map<String,Object> importUserList(MultipartFile multipartFile , TrialOperationVO operation, Long ruleId ) throws IOException;
 
     Map<String,Object> businessCheck(TrialOperationVO operationVO);
 
