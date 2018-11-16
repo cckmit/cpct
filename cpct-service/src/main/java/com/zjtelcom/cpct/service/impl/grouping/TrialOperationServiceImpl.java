@@ -22,9 +22,11 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 import com.zjtelcom.cpct.domain.system.SysStaff;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
+import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.grouping.*;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.service.BaseService;
@@ -34,7 +36,11 @@ import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.util.*;
-//import com.zjtelcom.es.es.service.EsService;
+import com.zjtelcom.es.es.entity.*;
+import com.zjtelcom.es.es.entity.model.LabelResultES;
+import com.zjtelcom.es.es.entity.model.TrialOperationParamES;
+import com.zjtelcom.es.es.entity.model.TrialResponseES;
+import com.zjtelcom.es.es.service.EsService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -97,8 +103,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private SysStaffMapper sysStaffMapper;
     @Autowired
     private SysParamsMapper sysParamsMapper;
-//    @Autowired(required = false)
-//    private EsService esService;
+    @Autowired(required = false)
+    private EsService esService;
 
     /**
      * 销售品service
@@ -137,21 +143,22 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         request.setFieldList(fieldList);
         //抽样业务校验
         request.setSample(false);
-        List<TrialOperationParam> paramList = new ArrayList<>();
+        TrialOperationVOES requests = BeanUtil.create(request,new TrialOperationVOES());
+
+        ArrayList<TrialOperationParamES> paramList = new ArrayList<>();
         List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(operationVO.getStrategyId());
         for (MktStrategyConfRuleRelDO ruleRelDO : ruleRelList) {
-            TrialOperationParam param = getTrialOperationParam(operationVO,null, ruleRelDO.getMktStrategyConfRuleId(),true);
+            TrialOperationParamES param = getTrialOperationParamES(operationVO,null, ruleRelDO.getMktStrategyConfRuleId(),true);
             paramList.add(param);
         }
-        request.setParamList(paramList);
-        TrialResponse response = new TrialResponse();
-//        com.zjtelcom.es.es.entity.model.TrialResponse response = new com.zjtelcom.es.es.entity.model.TrialResponse();
+        requests.setParamList(paramList);
+//        TrialResponse response = new TrialResponse();
+        TrialResponseES response = new TrialResponseES();
 
         try {
             //todo
-//            com.zjtelcom.es.es.entity.TrialOperationVO requests = BeanUtil.create(request,new com.zjtelcom.es.es.entity.TrialOperationVO());
-//             response = esService.searchBatchInfo(requests);
-            response = restTemplate.postForObject(batchInfo, request, TrialResponse.class);
+             response = esService.searchBatchInfo(requests);
+//            response = restTemplate.postForObject(batchInfo, request, TrialResponse.class);
 
             if (response.getResultCode().equals(CODE_FAIL)){
                 result.put("resultCode", CODE_FAIL);
@@ -226,7 +233,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
         String batchNumSt = DateUtil.date2String(new Date()) + ChannelUtil.getRandomStr(2);
         //获取销售品及规则列表
-        TrialOperationParam param = getTrialOperationParam(operation, Long.valueOf(batchNumSt), ruleId,false);
+        TrialOperationParamES param = getTrialOperationParamES(operation, Long.valueOf(batchNumSt), ruleId,false);
 
         InputStream inputStream = multipartFile.getInputStream();
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
@@ -403,28 +410,29 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         request.setFieldList(fieldList);
         //策略试运算
         request.setSample(true);
+        TrialOperationVOES requests = BeanUtil.create(request,new TrialOperationVOES());
         //todo 待测试
-        List<TrialOperationParam> paramList = new ArrayList<>();
+        ArrayList<TrialOperationParamES> paramList = new ArrayList<>();
         List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(operationVO.getStrategyId());
         for (MktStrategyConfRuleRelDO ruleRelDO : ruleRelList) {
-            TrialOperationParam param = getTrialOperationParam(operationVO, trialOperation.getBatchNum(), ruleRelDO.getMktStrategyConfRuleId(),true);
+            TrialOperationParamES param = getTrialOperationParamES(operationVO, trialOperation.getBatchNum(), ruleRelDO.getMktStrategyConfRuleId(),true);
             paramList.add(param);
         }
-        request.setParamList(paramList);
-        TrialResponse response = new TrialResponse();
-        TrialResponse countResponse = new TrialResponse();
-//        com.zjtelcom.es.es.entity.model.TrialResponse response = new com.zjtelcom.es.es.entity.model.TrialResponse();
-//        com.zjtelcom.es.es.entity.model.TrialResponse countResponse = new com.zjtelcom.es.es.entity.model.TrialResponse();
+        requests.setParamList(paramList);
+//        TrialResponse response = new TrialResponse();
+//        TrialResponse countResponse = new TrialResponse();
+        TrialResponseES response = new TrialResponseES();
+        TrialResponseES countResponse = new TrialResponseES();
+
         try {
             //todo
-//            com.zjtelcom.es.es.entity.TrialOperationVO requests = BeanUtil.create(request,new com.zjtelcom.es.es.entity.TrialOperationVO());
-//             response = esService.searchBatchInfo(requests);
+             response = esService.searchBatchInfo(requests);
 
-            response = restTemplate.postForObject(batchInfo, request, TrialResponse.class);
+//            response = restTemplate.postForObject(batchInfo, request, TrialResponse.class);
             //同时调用统计查询的功能
 
-//             countResponse = esService.searchCountInfo(requests);
-            countResponse = restTemplate.postForObject(countInfo,request,TrialResponse.class);
+             countResponse = esService.searchCountInfo(requests);
+//            countResponse = restTemplate.postForObject(countInfo,request,TrialResponse.class);
 
             if (countResponse.getResultCode().equals(CODE_SUCCESS)){
                 redisUtils.set("HITS_COUNT_INFO_"+request.getBatchNum(),countResponse.getHitsList());
@@ -488,54 +496,54 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     }
 
 
-    private TrialOperationParam getTrialOperationParam(TrialOperationVO operationVO, Long batchNum, Long ruleId,boolean isSample) {
-        TrialOperationParam param = new TrialOperationParam();
-        param.setRuleId(ruleId);
-        MktStrategyConfRuleDO confRule = ruleMapper.selectByPrimaryKey(ruleId);
-        if (confRule != null) {
-            param.setRuleName(confRule.getMktStrategyConfRuleName());
-            param.setTarGrpId(confRule.getTarGrpId());
-        }
-        if (!isSample){
-            // 获取规则信息
-            Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.getMktStrategyConfRule(ruleId);
-            MktStrategyConfRule mktStrategyConfRule = (MktStrategyConfRule) mktStrategyConfRuleMap.get("mktStrategyConfRule");
-
-            // 获取销售品集合
-            Map<String, Object> productRuleListMap = productService.getProductRuleList(UserUtil.loginId(), mktStrategyConfRule.getProductIdlist());
-            List<MktProductRule> mktProductRuleList = (List<MktProductRule>) productRuleListMap.get("resultMsg");
-            param.setMktProductRuleList(mktProductRuleList);
-
-            // 获取推送渠道
-            List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
-            List<MktCamChlConfDetail> mktCamChlConfList = mktStrategyConfRule.getMktCamChlConfDetailList();
-            if (mktCamChlConfList != null) {
-                for (MktCamChlConfDetail mktCamChlConf : mktCamChlConfList) {
-                    Map<String, Object> mktCamChlConfDetailMap = mktCamChlConfService.getMktCamChlConf(mktCamChlConf.getEvtContactConfId());
-                    MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConfDetailMap.get("mktCamChlConfDetail");
-                    mktCamChlConfDetailList.add(mktCamChlConfDetail);
-                }
-            }
-            param.setMktCamChlConfDetailList(mktCamChlConfDetailList);
-        }
-        // 设置批次号
-        param.setBatchNum(batchNum);
-        //redis取规则
-        Object ruleOb = redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId);
-        String rule = "";
-        if (ruleOb!=null){
-            rule = ruleOb.toString();
-            System.out.println("*************************" + rule);
-        }
-        param.setRule(rule);
-        List<LabelResult> labelResultList = new ArrayList<>();
-        if (redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId+"_LABEL")!=null){
-            JSONArray objects = JSONArray.parseArray((String) redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId+"_LABEL"));
-            labelResultList = objects.toJavaList(LabelResult.class);
-        }
-        param.setLabelResultList(labelResultList);
-        return param;
-    }
+//    private TrialOperationParam getTrialOperationParam(TrialOperationVO operationVO, Long batchNum, Long ruleId, boolean isSample) {
+//        TrialOperationParam param = new TrialOperationParam();
+//        param.setRuleId(ruleId);
+//        MktStrategyConfRuleDO confRule = ruleMapper.selectByPrimaryKey(ruleId);
+//        if (confRule != null) {
+//            param.setRuleName(confRule.getMktStrategyConfRuleName());
+//            param.setTarGrpId(confRule.getTarGrpId());
+//        }
+//        if (!isSample){
+//            // 获取规则信息
+//            Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.getMktStrategyConfRule(ruleId);
+//            MktStrategyConfRule mktStrategyConfRule = (MktStrategyConfRule) mktStrategyConfRuleMap.get("mktStrategyConfRule");
+//
+//            // 获取销售品集合
+//            Map<String, Object> productRuleListMap = productService.getProductRuleList(UserUtil.loginId(), mktStrategyConfRule.getProductIdlist());
+//            List<MktProductRule> mktProductRuleList = (List<MktProductRule>) productRuleListMap.get("resultMsg");
+//            param.setMktProductRuleList(mktProductRuleList);
+//
+//            // 获取推送渠道
+//            List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
+//            List<MktCamChlConfDetail> mktCamChlConfList = mktStrategyConfRule.getMktCamChlConfDetailList();
+//            if (mktCamChlConfList != null) {
+//                for (MktCamChlConfDetail mktCamChlConf : mktCamChlConfList) {
+//                    Map<String, Object> mktCamChlConfDetailMap = mktCamChlConfService.getMktCamChlConf(mktCamChlConf.getEvtContactConfId());
+//                    MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConfDetailMap.get("mktCamChlConfDetail");
+//                    mktCamChlConfDetailList.add(mktCamChlConfDetail);
+//                }
+//            }
+//            param.setMktCamChlConfDetailList(mktCamChlConfDetailList);
+//        }
+//        // 设置批次号
+//        param.setBatchNum(batchNum);
+//        //redis取规则
+//        Object ruleOb = redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId);
+//        String rule = "";
+//        if (ruleOb!=null){
+//            rule = ruleOb.toString();
+//            System.out.println("*************************" + rule);
+//        }
+//        param.setRule(rule);
+//        List<LabelResult> labelResultList = new ArrayList<>();
+//        if (redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId+"_LABEL")!=null){
+//            JSONArray objects = JSONArray.parseArray((String) redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId+"_LABEL"));
+//            labelResultList = objects.toJavaList(LabelResult.class);
+//        }
+//        param.setLabelResultList(labelResultList);
+//        return param;
+//    }
 
 
     /**
@@ -554,13 +562,13 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "试运算记录不存在");
             return result;
         }
-//        com.zjtelcom.es.es.entity.model.TrialResponse response = new com.zjtelcom.es.es.entity.model.TrialResponse();
-        TrialResponse response = new TrialResponse();
+        TrialResponseES response = new TrialResponseES();
+//        TrialResponse response = new TrialResponse();
         try {
             Map<String, Long> param = new HashMap<>();
             param.put("batchId", operation.getBatchNum());
-//            response = esService.findBatchHitsList(operation.getBatchNum().toString());
-            response = restTemplate.postForObject(hitsList, param, TrialResponse.class);
+            response = esService.findBatchHitsList(operation.getBatchNum().toString());
+//            response = restTemplate.postForObject(hitsList, param, TrialResponse.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -790,6 +798,84 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", operationDetailList);
         return result;
+    }
+
+
+    private TrialOperationParamES getTrialOperationParamES(TrialOperationVO operationVO, Long batchNum, Long ruleId, boolean isSample) {
+        TrialOperationParamES param = new TrialOperationParamES();
+        param.setRuleId(ruleId);
+        MktStrategyConfRuleDO confRule = ruleMapper.selectByPrimaryKey(ruleId);
+        if (confRule != null) {
+            param.setRuleName(confRule.getMktStrategyConfRuleName());
+            param.setTarGrpId(confRule.getTarGrpId());
+        }
+        if (!isSample){
+            // 获取规则信息
+            Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.getMktStrategyConfRule(ruleId);
+            MktStrategyConfRule mktStrategyConfRule = (MktStrategyConfRule) mktStrategyConfRuleMap.get("mktStrategyConfRule");
+
+            // 获取销售品集合
+            Map<String, Object> productRuleListMap = productService.getProductRuleList(UserUtil.loginId(), mktStrategyConfRule.getProductIdlist());
+            List<MktProductRule> mktProductRuleList = (List<MktProductRule>) productRuleListMap.get("resultMsg");
+            ArrayList<MktProductRuleES> mktProductRuleEsList = new ArrayList<>();
+            for (MktProductRule rule : mktProductRuleList){
+                MktProductRuleES es = BeanUtil.create(rule,new MktProductRuleES());
+                mktProductRuleEsList.add(es);
+            }
+            param.setMktProductRuleList(mktProductRuleEsList);
+
+            // 获取推送渠道
+            List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
+            ArrayList<MktCamChlConfDetailES> mktCamChlConfDetaiEslList = new ArrayList<>();
+            List<MktCamChlConfDetail> mktCamChlConfList = mktStrategyConfRule.getMktCamChlConfDetailList();
+            if (mktCamChlConfList != null) {
+                for (MktCamChlConfDetail mktCamChlConf : mktCamChlConfList) {
+                    Map<String, Object> mktCamChlConfDetailMap = mktCamChlConfService.getMktCamChlConf(mktCamChlConf.getEvtContactConfId());
+                    MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConfDetailMap.get("mktCamChlConfDetail");
+                    MktCamChlConfDetailES es = BeanUtil.create(mktCamChlConfDetail,new MktCamChlConfDetailES());
+                    ArrayList<MktCamChlConfAttrES> attrs = new ArrayList<>();
+                    ArrayList<VerbalVOES> verbalES = new ArrayList<>();
+                    if (mktCamChlConfDetail.getMktCamChlConfAttrList()!=null){
+                        for (MktCamChlConfAttr attr : mktCamChlConfDetail.getMktCamChlConfAttrList()){
+                            MktCamChlConfAttrES attrES = BeanUtil.create(attr,new MktCamChlConfAttrES());
+                            attrs.add(attrES);
+                        }
+                    }
+                    if (mktCamChlConfDetail.getVerbalVOList()!=null){
+                        for (VerbalVO verbalVO : mktCamChlConfDetail.getVerbalVOList()){
+                            VerbalVOES verbalVOES = BeanUtil.create(verbalVO,new VerbalVOES());
+                            verbalES.add(verbalVOES);
+                        }
+                    }
+                    es.setVerbalVOList(verbalES);
+                    es.setMktCamChlConfAttrList(attrs);
+                    mktCamChlConfDetaiEslList.add(es);
+                }
+            }
+            param.setMktCamChlConfDetailList(mktCamChlConfDetaiEslList);
+        }
+        // 设置批次号
+        param.setBatchNum(batchNum);
+        //redis取规则
+        Object ruleOb = redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId);
+        String rule = "";
+        if (ruleOb!=null){
+            rule = ruleOb.toString();
+            System.out.println("*************************" + rule);
+        }
+        param.setRule(rule);
+        List<LabelResult> labelResultList = new ArrayList<>();
+        ArrayList<LabelResultES> labelResultES = new ArrayList<>();
+        if (redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId+"_LABEL")!=null){
+            JSONArray objects = JSONArray.parseArray((String) redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId+"_LABEL"));
+            labelResultList = objects.toJavaList(LabelResult.class);
+            for (LabelResult labelResult : labelResultList){
+                LabelResultES labelEs = BeanUtil.create(labelResult,new LabelResultES());
+                labelResultES.add(labelEs);
+            }
+        }
+        param.setLabelResultList(labelResultES);
+        return param;
     }
 
 }
