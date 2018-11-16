@@ -27,5 +27,7 @@ public interface InjectionLabelGrpMbrPrdMapper {
 
     int deleteBatch(@Param("idList") List<Long> idList);
 
+    int deleteByLabelGrpId(@Param("grpId") Long grpId);
+
     List<LabelGrpMbr> findListBylabelId(@Param("labelId") Long labelId);
 }

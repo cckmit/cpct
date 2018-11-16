@@ -29,11 +29,11 @@ import org.springframework.web.client.RestTemplate;
 //@ImportResource({ "classpath:dubbo/*.xml","classpath:task/*.xml" })
 //@ImportResource({ "classpath:dubbo/dubbo-dev.xml"})
 //@ImportResource({ "classpath:dubbo/dubbo-pst.xml"})
-@Import({
-        WebSecurityConfig.class,
-        HttpSessionConfig.class,
-        MyUserDetailsService.class,
-        MyFilterConfig.class})
+//@Import({
+//        WebSecurityConfig.class,
+//        HttpSessionConfig.class,
+//        MyUserDetailsService.class,
+//        MyFilterConfig.class})
 @ComponentScan(value={"com.zjtelcom.cpct"})
 @EnableTransactionManagement
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class,DataSourceTransactionManagerAutoConfiguration.class, MybatisAutoConfiguration.class})
