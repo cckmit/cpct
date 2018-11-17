@@ -1,6 +1,6 @@
 #端口配置
 server:
-  port: 8080
+  port: 8090
 
 dubboPath: dev
 
@@ -17,16 +17,16 @@ spring:
 # 第一数据源
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://47.94.168.117:3306/fpc_system?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
+    url: jdbc:mysql://localhost:3306/cpct_system?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
     username: root
-    password: Yanlei2018
+    password: root
 
 # 第二数据源
   datasource_prd:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://47.94.168.117:3306/fpc_system?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
+    url: jdbc:mysql://134.96.252.170:30304/cpct_system?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
     username: root
-    password: Yanlei2018
+    password: xc.cpct
 
   redis:
       host: 47.94.168.117
@@ -44,3 +44,6 @@ spring:
       batchinfo: http://134.96.252.170:30808/es/searchBatchInfo
       hitslist: http://134.96.252.170:30808/es/findBatchHitsList
       countinfo: http://134.96.252.170:30808/es/searchCountInfo
+#是否同步
+sync:
+ value: 1

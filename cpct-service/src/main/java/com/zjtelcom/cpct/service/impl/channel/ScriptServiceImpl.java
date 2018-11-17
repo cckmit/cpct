@@ -12,9 +12,11 @@ import com.zjtelcom.cpct.dto.channel.QryMktScriptReq;
 import com.zjtelcom.cpct.dto.channel.ScriptVO;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ScriptService;
+import com.zjtelcom.cpct.service.synchronize.script.SynScriptService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -29,7 +31,11 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
     private MktScriptMapper scriptMapper;
     @Autowired
     private ContactChannelMapper channelMapper;
+    @Autowired
+    private SynScriptService synScriptService;
 
+    @Value("${sync.value}")
+    private String value;
 
     @Override
     public Map<String, Object> getScriptList(Long userId, String scriptName,String scriptType) {
@@ -50,7 +56,7 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
     @Override
     public Map<String,Object> createMktScript(Long userId, MktScript addVO) {
         Map<String,Object> result = new HashMap<>();
-        Script script = BeanUtil.create(addVO,new Script());
+        final Script script = BeanUtil.create(addVO,new Script());
         script.setCreateDate(new Date());
         script.setUpdateDate(new Date());
         script.setCreateStaff(userId);
@@ -59,13 +65,26 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
         scriptMapper.insert(script);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synScriptService.synchronizeScript(script.getScriptId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 
     @Override
     public Map<String,Object> modMktScript(Long userId, MktScript editVO) {
         Map<String,Object> result = new HashMap<>();
-        Script script = scriptMapper.selectByPrimaryKey(editVO.getScriptId());
+        final Script script = scriptMapper.selectByPrimaryKey(editVO.getScriptId());
         if (script==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","脚本信息不存在");
@@ -77,13 +96,26 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
         scriptMapper.updateByPrimaryKey(script);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","修改成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synScriptService.synchronizeScript(script.getScriptId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 
     @Override
     public Map<String,Object> delMktScript(Long userId, MktScript mktScript) {
         Map<String,Object> result = new HashMap<>();
-        Script script = scriptMapper.selectByPrimaryKey(mktScript.getScriptId());
+        final Script script = scriptMapper.selectByPrimaryKey(mktScript.getScriptId());
         if (script==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","脚本信息不存在");
@@ -92,6 +124,19 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
         scriptMapper.deleteByPrimaryKey(mktScript.getScriptId());
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synScriptService.delelteSynchronizeScript(script.getScriptId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 

@@ -68,10 +68,10 @@
     CREATE_STAFF,UPDATE_STAFF,CREATE_DATE,STATUS_DATE,UPDATE_DATE,REMARK)
     values
     <foreach collection="record" item="item" index="i" separator=",">
-      (#{labelValueId,jdbcType=BIGINT}, #{injectionLabelId,jdbcType=BIGINT}, #{labelValue,jdbcType=VARCHAR},
-      #{valueName,jdbcType=VARCHAR}, #{valueDesc,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR},
-      #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP},
-      #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+      (#{item.labelValueId,jdbcType=BIGINT}, #{item.injectionLabelId,jdbcType=BIGINT}, #{item.labelValue,jdbcType=VARCHAR},
+      #{item.valueName,jdbcType=VARCHAR}, #{item.valueDesc,jdbcType=VARCHAR}, #{item.statusCd,jdbcType=VARCHAR},
+      #{item.createStaff,jdbcType=BIGINT}, #{item.updateStaff,jdbcType=BIGINT}, #{item.createDate,jdbcType=TIMESTAMP},
+      #{item.statusDate,jdbcType=TIMESTAMP}, #{item.updateDate,jdbcType=TIMESTAMP}, #{item.remark,jdbcType=VARCHAR}
       )
     </foreach>
   </insert>

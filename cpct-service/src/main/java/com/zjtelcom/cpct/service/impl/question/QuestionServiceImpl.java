@@ -15,12 +15,14 @@ import com.zjtelcom.cpct.domain.question.QuestionDetail;
 import com.zjtelcom.cpct.domain.question.Questionnaire;
 import com.zjtelcom.cpct.dto.question.*;
 import com.zjtelcom.cpct.service.question.QuestionService;
+import com.zjtelcom.cpct.service.synchronize.SynQuestionService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,8 +44,11 @@ public class QuestionServiceImpl implements QuestionService {
     private MktQuestionnaireMapper questionnaireMapper;
     @Autowired
     private MktQstQuestRelMapper questRelMapper;
+    @Autowired
+    private SynQuestionService synQuestionService;
 
-
+    @Value("${sync.value}")
+    private String value;
 
     /**
      * 获取题库问题详情
@@ -125,13 +130,26 @@ public class QuestionServiceImpl implements QuestionService {
         if (!map.get("resultCode").equals(CODE_SUCCESS)){
             return map;
         }
-        Long questionId = Long.valueOf(map.get("questionId").toString());
+        final Long questionId = Long.valueOf(map.get("questionId").toString());
         if (addVO.getQuestionDetailAddVOList()!=null){
             batchAddQuestionDetail(addVO.getQuestionDetailAddVOList(),questionId);
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
         result.put("questionId",questionId);
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synQuestionService.synQuestionBank("",questionId);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 
@@ -145,7 +163,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public Map<String, Object> modQuestion(Long userId, QuestionEditVO editVO) {
         Map<String,Object> result = new HashMap<>();
-        Question question = questionMapper.selectByPrimaryKey(editVO.getQuestionId());
+        final Question question = questionMapper.selectByPrimaryKey(editVO.getQuestionId());
         if (question==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","问题不存在");
@@ -162,6 +180,19 @@ public class QuestionServiceImpl implements QuestionService {
 
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","编辑成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synQuestionService.synQuestionBank("",question.getQuestionId());
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 
@@ -205,15 +236,29 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public Map<String, Object> delQuestion(Long userId, Long questionId) {
         Map<String,Object> result = new HashMap<>();
-        Question question = questionMapper.selectByPrimaryKey(questionId);
+        final Question question = questionMapper.selectByPrimaryKey(questionId);
         if (question==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","问题不存在");
             return result;
         }
         questionMapper.deleteByPrimaryKey(questionId);
+        questionDetailMapper.deleteByQuestionId(questionId);
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","删除成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synQuestionService.deleteQuestionBank("",question.getQuestionId());
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 //

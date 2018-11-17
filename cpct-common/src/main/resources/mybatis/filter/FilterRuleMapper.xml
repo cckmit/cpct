@@ -155,7 +155,7 @@
         where RULE_ID = #{ruleId,jdbcType=BIGINT}
     </select>
 
-    <insert id="createFilterRule" parameterType="com.zjtelcom.cpct.dto.filter.FilterRule">
+    <insert id="createFilterRule" parameterType="com.zjtelcom.cpct.dto.filter.FilterRule" useGeneratedKeys="true" keyProperty="ruleId">
         insert into filter_rule (RULE_ID, RULE_NAME, FILTER_TYPE,
         EXECUTION_CHANNEL, CHANNEL_CONTACTS, EFFECTIVE_DATE,
         FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END, STATUS_CD, CREATE_STAFF,

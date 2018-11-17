@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.controller.system;
-
+import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
+import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDetail;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.system.SysMenuMapper;
 import com.zjtelcom.cpct.dao.system.SysRoleMapper;
@@ -22,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+
 @RestController
 @RequestMapping("${adminPath}")
 public class LoginController extends BaseController {
@@ -34,6 +37,16 @@ public class LoginController extends BaseController {
 
     @Autowired
     private SysRoleMapper sysRoleMapper;
+
+    @RequestMapping("/getSysUser")
+    @ResponseBody
+    public Map<String,Object> getSysUser() {
+        Map<String,Object> result = new HashMap<>();
+        SystemUserDetail userDetail = BssSessionHelp.getSystemUserDetail();
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",userDetail);
+        return result;
+    }
 
     /**
      * 登录

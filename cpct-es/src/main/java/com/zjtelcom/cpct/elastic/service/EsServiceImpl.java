@@ -9,6 +9,7 @@ import com.zjtelcom.cpct.elastic.model.TotalModel;
 import com.zjtelcom.cpct.elastic.util.ElasticsearchUtil;
 import com.zjtelcom.cpct.elastic.util.EsSearchUtil;
 import com.zjtelcom.cpct.enums.Operator;
+import org.apache.logging.log4j.util.StringMap;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
@@ -113,6 +114,8 @@ public class EsServiceImpl implements EsService {
             String source = hits.getHits()[j].getSourceAsString();
             System.out.println(source);
             Map<String, Object> stringMap = hits.getHits()[j].getSourceAsMap();
+            //todo 触发时间
+            stringMap.put("triggerTime",new Date());
             System.currentTimeMillis();
             eventList.add(stringMap);
         }

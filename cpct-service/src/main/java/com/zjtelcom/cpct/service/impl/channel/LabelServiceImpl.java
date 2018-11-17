@@ -14,11 +14,14 @@ import com.zjtelcom.cpct.enums.LabelCondition;
 import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.LabelService;
+import com.zjtelcom.cpct.service.synchronize.label.SynLabelGrpService;
+import com.zjtelcom.cpct.service.synchronize.label.SynLabelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -45,6 +48,13 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     private MktVerbalConditionMapper verbalConditionMapper;
     @Autowired
     private TarGrpConditionMapper tarGrpConditionMapper;
+    @Autowired
+    private SynLabelService synLabelService;
+    @Autowired
+    private SynLabelGrpService synLabelGrpService;
+
+    @Value("${sync.value}")
+    private String value;
 
     /**
      *共享
@@ -163,7 +173,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             result.put("resultMsg","唯一标识符不能重复");
             return result;
         }
-        Label label = BeanUtil.create(addVO,new Label());
+        final Label label = BeanUtil.create(addVO,new Label());
         operatorValodate(label, addVO.getConditionType());
         //
         label.setScope(0);
@@ -182,6 +192,19 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         insertLabelValue(label,addVO.getRightOperand());
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synLabelService.synchronizeSingleLabel(label.getInjectionLabelId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 
@@ -205,7 +228,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     @Override
     public Map<String,Object> editLabel(Long userId, LabelEditVO editVO) {
         Map<String,Object> result = new HashMap<>();
-        Label label = labelMapper.selectByPrimaryKey(editVO.getLabelId());
+        final Label label = labelMapper.selectByPrimaryKey(editVO.getLabelId());
         if (label==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","标签信息不存在");
@@ -221,6 +244,19 @@ public class LabelServiceImpl extends BaseService implements LabelService {
 
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","编辑成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synLabelService.synchronizeSingleLabel(label.getInjectionLabelId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 
@@ -240,7 +276,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     }
 
     @Override
-    public Map<String,Object> deleteLabel(Long userId, Long labelId) {
+    public Map<String,Object> deleteLabel(Long userId, final Long labelId) {
         Map<String,Object> result = new HashMap<>();
         Label label = labelMapper.selectByPrimaryKey(labelId);
         if (label==null){
@@ -284,8 +320,22 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             return result;
         }
         labelMapper.deleteByPrimaryKey(labelId);
+        labelValueMapper.deleteByLabelId(labelId);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synLabelService.deleteSingleLabel(labelId,"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 
@@ -336,7 +386,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             result.put("resultMsg","已存在同名标签组");
             return result;
         }
-        LabelGrp labelGrp = BeanUtil.create(addVO,new LabelGrp());
+        final LabelGrp labelGrp = BeanUtil.create(addVO,new LabelGrp());
         labelGrp.setCreateDate(new Date());
         labelGrp.setUpdateDate(new Date());
         labelGrp.setCreateStaff(userId);
@@ -345,13 +395,26 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         labelGrpMapper.insert(labelGrp);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synLabelGrpService.synchronizeSingleLabel(labelGrp.getGrpId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 
     @Override
     public Map<String,Object> editLabelGrp(Long userId, LabelGrp editVO) {
         Map<String,Object> result = new HashMap<>();
-        LabelGrp labelGrp = labelGrpMapper.selectByPrimaryKey(editVO.getGrpId());
+        final LabelGrp labelGrp = labelGrpMapper.selectByPrimaryKey(editVO.getGrpId());
         if (labelGrp==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","标签组信息不存在");
@@ -363,11 +426,24 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         labelGrpMapper.updateByPrimaryKey(labelGrp);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synLabelGrpService.synchronizeSingleLabel(labelGrp.getGrpId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 
     @Override
-    public Map<String,Object> deleteLabelGrp(Long userId, Long labelGrpId) {
+    public Map<String,Object> deleteLabelGrp(Long userId, final Long labelGrpId) {
         Map<String,Object> result = new HashMap<>();
         LabelGrp labelGrp = labelGrpMapper.selectByPrimaryKey(labelGrpId);
         if (labelGrp==null){
@@ -379,6 +455,19 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         labelGrpMapper.deleteByPrimaryKey(labelGrpId);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synLabelGrpService.deleteSingleLabel(labelGrpId,"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 
