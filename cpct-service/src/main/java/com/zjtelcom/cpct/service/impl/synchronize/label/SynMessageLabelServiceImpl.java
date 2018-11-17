@@ -76,8 +76,15 @@ public class SynMessageLabelServiceImpl implements SynMessageLabelService{
         }else{
             displayColumnPrdMapper.updateByPrimaryKey(displayColumn);
             if(!listByDisplayId.isEmpty()){
+                List<DisplayColumnLabel>  displayColumnLabels = displayColumnLabelPrdMapper.findListByDisplayId(displayColumn.getDisplayColumnId());
+                List<Long> list = new ArrayList<>();
+                for(DisplayColumnLabel displayColumnLabel: displayColumnLabels) {
+                    list.add(displayColumnLabel.getInjectionLabelId());
+                }
                 for (DisplayColumnLabel d:listByDisplayId){
-                    displayColumnLabelPrdMapper.updateByPrimaryKey(d);
+                    if(!list.contains(d.getInjectionLabelId())) {
+                        displayColumnLabelPrdMapper.insert(d);
+                    }
                 }
             }
             synchronizeRecordService.addRecord(roleName,tableName,labelId, SynchronizeType.update.getType());
@@ -163,6 +170,18 @@ public class SynMessageLabelServiceImpl implements SynMessageLabelService{
         Map<String,Object> maps = new HashMap<>();
         displayColumnPrdMapper.deleteByPrimaryKey(messageLabelId);
         displayColumnLabelPrdMapper.deleteByDisplayId(messageLabelId);
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
+        return maps;
+    }
+
+    @Override
+    public Map<String, Object> deleteSingleDisplayLabel(Long displayId, Long labelId, String roleName) {
+        Map<String,Object> maps = new HashMap<>();
+        DisplayColumnLabel displayColumnLabel = displayColumnLabelPrdMapper.findByDisplayIdAndLabelId(displayId, labelId);
+        if(displayColumnLabel != null) {
+            displayColumnLabelPrdMapper.deleteByPrimaryKey(displayColumnLabel.getDisplayColumnLabelId());
+        }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
         return maps;
