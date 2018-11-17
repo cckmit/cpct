@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.service.impl.grouping;
 
 import com.alibaba.fastjson.JSONArray;
+import com.sun.corba.se.spi.ior.ObjectKey;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
@@ -229,16 +230,14 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Transactional(readOnly = false)
     @Override
     public Map<String, Object> importUserList(MultipartFile multipartFile, TrialOperationVO operation, Long ruleId) throws IOException {
-        Map<String, Object> maps = new HashMap<>();
-
-        String batchNumSt = DateUtil.date2String(new Date()) + ChannelUtil.getRandomStr(2);
-        //获取销售品及规则列表
-        TrialOperationParamES param = getTrialOperationParamES(operation, Long.valueOf(batchNumSt), ruleId,false);
+        Map<String, Object> result = new HashMap<>();
+        String batchNumSt = DateUtil.date2String(new Date()) + ChannelUtil.getRandomStr(4);
 
         InputStream inputStream = multipartFile.getInputStream();
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
         Sheet sheet = wb.getSheetAt(0);
         Integer rowNums = sheet.getLastRowNum() + 1;
+        List<Map<String,Object>> customerList = new ArrayList<>();
         for (int i = 1; i < rowNums - 1; i++) {
             Map<String, Object> customers = new HashMap<>();
             Row rowFirst = sheet.getRow(0);
@@ -248,18 +247,58 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 Cell cell = row.getCell(j);
                 customers.put(cellTitle.getStringCellValue(), ChannelUtil.getCellValue(cell));
             }
-            Map<String, Object> mktIssueDetailMap = new HashMap<>();
-            mktIssueDetailMap.put("batchNum", batchNumSt);
-            mktIssueDetailMap.put("mktProductRule", param.getRule());
-            mktIssueDetailMap.put("mktCamChlConfDetail", param.getMktCamChlConfDetailList());
-            mktIssueDetailMap.put("mktStrategyConfRuleId", param.getMktProductRuleList());
-            mktIssueDetailMap.put("customerMap", customers);
-            // 将客户信息，销售品，推送渠道存入redis
-            redisUtils.add("ISSUE_" + batchNumSt + "customerId", mktIssueDetailMap);
+            customerList.add(customers);
+//            Map<String, Object> mktIssueDetailMap = new HashMap<>();
+//            mktIssueDetailMap.put("batchNum", batchNumSt);
+//            mktIssueDetailMap.put("mktProductRule", param.getRule());
+//            mktIssueDetailMap.put("mktCamChlConfDetail", param.getMktCamChlConfDetailList());
+//            mktIssueDetailMap.put("mktStrategyConfRuleId", param.getMktProductRuleList());
+//            mktIssueDetailMap.put("customerMap", customers);
+//            // 将客户信息，销售品，推送渠道存入redis
+//
         }
-        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
-        maps.put("resultMsg", "导入成功");
-        return maps;
+        int num = (customerList.size() / 500) + 1;
+        List<List<Map<String,Object>>> smallCustomers = ChannelUtil.averageAssign(customerList,num);
+        //按规则存储客户信息
+        for (int i = 0; i < num; i++) {
+            redisUtils.hset("ISSURE_" + batchNumSt + "_" + ruleId, i + "",smallCustomers.get(i));
+            System.out.println("规则：" + i + redisUtils.hmGet("HITS_" + batchNumSt + "_" + ruleId, i + ""));
+        }
+//        redisUtils.set("ISSURE_" + batchNumSt + "_" + ruleId,customerList);
+        MktCampaignDO campaignDO = campaignMapper.selectByPrimaryKey(operation.getCampaignId());
+        if (campaignDO==null){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "活动不存在");
+            return result;
+        }
+        final TrialOperationVOES request = BeanUtil.create(operation,new TrialOperationVOES());
+        request.setBatchNum(Long.valueOf(batchNumSt));
+        request.setCampaignType(campaignDO.getMktCampaignType());
+        request.setLanId(campaignDO.getLanId());
+        request.setCamLevel(campaignDO.getCamLevel());
+        // 获取创建人员code
+        SysStaff sysStaff = sysStaffMapper.selectByPrimaryKey(campaignDO.getCreateStaff());
+        request.setStaffCode(sysStaff.getStaffCode());
+
+
+        //获取销售品及规则列表
+        TrialOperationParamES param = getTrialOperationParamES(operation, Long.valueOf(batchNumSt), ruleId,false);
+        ArrayList<TrialOperationParamES> paramESList = new ArrayList<>();
+        paramESList.add(param);
+        request.setParamList(paramESList);
+        new Thread(){
+            public void run(){
+                try {
+                   TrialResponseES responseES =  restTemplate.postForObject("http://localhost:8080/es/issueByFile",request,TrialResponseES.class);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }.run();
+
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
+        result.put("resultMsg", "导入成功");
+        return result;
     }
 
 

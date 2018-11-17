@@ -224,6 +224,38 @@ public class RedisUtils {
         return result;
     }
 
+
+
+    /**
+     * hash存储Redis
+     * @param key
+     * @param field
+     * @param value
+     * @return
+     */
+    public boolean hset(final String key, String field, Object value) {
+        boolean result = false;
+        CtgJedisPool ctgJedisPool = initCatch();
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                jedis.hset(key, field, serialize(value));
+                jedis.close();
+                result = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                jedis.close();
+            }
+            ctgJedisPool.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
+
     /**
      * 哈希 添加
      *
