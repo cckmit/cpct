@@ -172,7 +172,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
      * @return
      */
     @Override
-    public Map<String, Object> delColumnLabelRel(Long displayId, Long labelId) {
+    public Map<String, Object> delColumnLabelRel(final Long displayId, final Long labelId) {
         Map<String, Object> maps = new HashMap<>();
         DisplayColumnLabel displayColumnLabel = displayColumnLabelMapper.findByDisplayIdAndLabelId(displayId,labelId);
         if (displayColumnLabel!=null){
@@ -180,6 +180,19 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         }
         maps.put("resultCode", CODE_SUCCESS);
         maps.put("resultMsg", "删除成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synMessageLabelService.deleteSingleDisplayLabel(displayId, labelId, "");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return maps;
     }
 
