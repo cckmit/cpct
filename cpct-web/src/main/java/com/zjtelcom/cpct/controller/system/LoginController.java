@@ -1,6 +1,6 @@
 package com.zjtelcom.cpct.controller.system;
-import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
-import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDetail;
+//import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
+//import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDetail;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.system.SysMenuMapper;
 import com.zjtelcom.cpct.dao.system.SysRoleMapper;
@@ -42,9 +42,9 @@ public class LoginController extends BaseController {
     @ResponseBody
     public Map<String,Object> getSysUser() {
         Map<String,Object> result = new HashMap<>();
-        SystemUserDetail userDetail = BssSessionHelp.getSystemUserDetail();
-        result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",userDetail);
+//        SystemUserDetail userDetail = BssSessionHelp.getSystemUserDetail();
+//        result.put("resultCode",CODE_SUCCESS);
+//        result.put("resultMsg",userDetail);
         return result;
     }
 
