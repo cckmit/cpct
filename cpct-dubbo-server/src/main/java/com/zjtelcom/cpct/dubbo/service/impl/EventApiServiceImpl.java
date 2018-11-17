@@ -313,6 +313,11 @@ public class EventApiServiceImpl implements EventApiService {
             //根据事件code查询事件信息
             ContactEvt event = contactEvtMapper.getEventByEventNbr(map.get("eventCode"));
             if (event == null) {
+                esJson.put("reqId", map.get("reqId"));
+                esJson.put("hit", false);
+                esJson.put("msg", "未找到相关事件");
+                esService.save(esJson, IndexList.EVENT_MODULE);
+
                 result.put("CPCResultMsg", "未找到相关事件");
                 return result;
             }
@@ -328,6 +333,17 @@ public class EventApiServiceImpl implements EventApiService {
             esJson.put("custId", map.get("custId"));
             esJson.put("evtCollectTime", map.get("evtCollectTime"));
 
+            //验证事件状态
+            if (!"1000".equals(event.getStatusCd())) {
+
+                esJson.put("hit", false);
+                esJson.put("msg", "事件已关闭");
+                esService.save(esJson, IndexList.EVENT_MODULE);
+
+                result.put("CPCResultMsg", "事件已关闭");
+                return result;
+            }
+
             //验证事件采集项
             List<ContactEvtItem> contactEvtItems = contactEvtItemMapper.listEventItem(eventId);
             List<Map<String, Object>> evtTriggers = new ArrayList<>();
@@ -337,13 +353,6 @@ public class EventApiServiceImpl implements EventApiService {
 
             StringBuilder stringBuilder = new StringBuilder();
             for (ContactEvtItem contactEvtItem : contactEvtItems) {
-                //排除资产号码  资产集成编码  客户编码
-                if ("ACC_NBR".equals(contactEvtItem.getEvtItemCode())
-                        || "INTEGRATION_ID".equals(contactEvtItem.getEvtItemCode())
-                        || "custId".equals(contactEvtItem.getEvtItemCode())) {
-
-                    continue;
-                }
                 if (evtParams != null && evtParams.containsKey(contactEvtItem.getEvtItemCode())) {
                     //筛选出作为标签使用的事件采集项
                     if ("0".equals(contactEvtItem.getIsLabel())) {
@@ -433,7 +442,7 @@ public class EventApiServiceImpl implements EventApiService {
                     param.put("type", map.get("4"));
                     param.put("queryId", map.get("integrationId"));
                     param.put("queryFields", "ASSET_INTEG_ID");
-
+                    param.put("type", "1");
                     System.out.println("param " + param.toString());
                     Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
                     System.out.println(dubboResult.toString());
@@ -513,11 +522,17 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 });
 
-                if (recCampaignAmount != 0 && recCampaignAmount < activityList.size()) {
-                    //es log
-                    esJson.put("msg", "推荐数：" + recCampaignAmount + ",命中数：" + activityList.size());
-                    //事件推荐活动数
-                    activityList = activityList.subList(0, recCampaignAmount - 1);
+                if (recCampaignAmount > 0 && recCampaignAmount < activityList.size()) {
+                    String orderPriorityLast = (String) activityList.get(recCampaignAmount - 1).get("orderPriority");
+
+                    for (int i = recCampaignAmount; i < activityList.size(); i++) {
+                        if(!orderPriorityLast.equals(activityList.get(i).get("orderPriority"))) {
+                            //es log
+                            esJson.put("msg", "推荐数：" + i + ",命中数：" + activityList.size());
+                            //事件推荐活动数
+                            activityList = activityList.subList(0, i);
+                        }
+                    }
                 }
             }
 
@@ -615,8 +630,8 @@ public class EventApiServiceImpl implements EventApiService {
                 return Collections.EMPTY_MAP;
             }
 
-            List<Map<String,Object>> itgTriggers = new ArrayList<>();
-            Map<String,Object> itgTrigger;
+            List<Map<String, Object>> itgTriggers = new ArrayList<>();
+            Map<String, Object> itgTrigger;
             StringBuilder querySb = new StringBuilder();
 
             //查询展示列 （iSale）
@@ -632,8 +647,10 @@ public class EventApiServiceImpl implements EventApiService {
                 httpParams.put("queryNum", privateParams.get("accNbr"));
                 httpParams.put("c3", params.get("lanId"));
                 httpParams.put("queryId", privateParams.get("integrationId"));
+                httpParams.put("type", "1");
                 //待查询的标签列表
                 httpParams.put("queryFields", querySb.toString());
+
                 //dubbo接口查询标签
                 JSONObject resJson = getLabelByDubbo(httpParams);
                 System.out.println(resJson.toString());
@@ -650,7 +667,7 @@ public class EventApiServiceImpl implements EventApiService {
                         triggers.put("key", label.get("labelCode"));
                         triggers.put("value", resJson.get((String) label.get("labelCode")));
                         triggers.put("display", 0); //todo 确定display字段
-                        triggers.put("name",  label.get("labelName"));
+                        triggers.put("name", label.get("labelName"));
                         if ("1".equals(label.get("typeCode").toString())) {
                             triggerList1.add(triggers);
                         } else if ("2".equals(label.get("typeCode").toString())) {
@@ -893,7 +910,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                         //获取名单
                         String userList = filterRule.getUserList();
-                        if(userList != null) {
+                        if (userList != null) {
                             int index = userList.indexOf(privateParams.get("accNbr"));
                             if (index >= 0) {
                                 System.out.println("红黑名单过滤规则验证被拦截");
@@ -919,6 +936,7 @@ public class EventApiServiceImpl implements EventApiService {
                             labelParam.put("queryId", privateParams.get("integrationId"));
                             //查询标签为销售品标签
                             labelParam.put("queryFields", "PROM_LIST");
+                            labelParam.put("type", "1");
                             Map<String, Object> queryResult = getLabelValue(labelParam);
                             JSONObject body = new JSONObject((HashMap) queryResult.get("msgbody"));
                             if (body.containsKey("PROM_LIST")) {
@@ -1093,6 +1111,7 @@ public class EventApiServiceImpl implements EventApiService {
             param.put("queryNum", privateParams.get("accNbr"));
             param.put("c3", params.get("lanId"));
             param.put("queryId", privateParams.get("integrationId"));
+            param.put("type", "1");
             //查询标签列表
             StringBuilder queryFieldsSb = new StringBuilder();
             //从redis获取规则使用的所有标签
@@ -1471,7 +1490,7 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
                 ruleMap.put("taskChlList", taskChlList);
-                if(taskChlList.size() > 0) {
+                if (taskChlList.size() > 0) {
                     jsonObject.put("hit", true);
                 } else {
                     jsonObject.put("hit", false);
@@ -1611,7 +1630,7 @@ public class EventApiServiceImpl implements EventApiService {
 //                        List<MktVerbalCondition> channelConditionList = mktVerbalConditionMapper.findChannelConditionListByVerbalId(mktVerbal.getVerbalId());
 
                         mktVerbalStr = mktVerbals.get(0).getScriptDesc();
-                        if(mktVerbalStr != null) {
+                        if (mktVerbalStr != null) {
                             scriptLabelList.addAll(subScript(mktVerbalStr));
                         }
                     }
@@ -1624,6 +1643,7 @@ public class EventApiServiceImpl implements EventApiService {
                 labelParam.put("queryNum", privateParams.get("accNbr"));
                 labelParam.put("c3", params.get("lanId"));
                 labelParam.put("queryId", privateParams.get("integrationId"));
+                labelParam.put("type", "1");
                 StringBuilder queryFieldsSb = new StringBuilder();
                 //从redis获取规则使用的所有标签
 
@@ -1641,27 +1661,25 @@ public class EventApiServiceImpl implements EventApiService {
                 //获取查询结果
                 for (Map.Entry<String, Object> entry : body.entrySet()) {
                     //替换标签值内容
-                    if(contactScript != null) {
+                    if (contactScript != null) {
                         contactScript = contactScript.replace("${" + entry.getKey() + "}$", entry.getValue().toString());
                     }
-                    if(mktVerbalStr != null) {
+                    if (mktVerbalStr != null) {
                         mktVerbalStr = mktVerbalStr.replace("${" + entry.getKey() + "}$", entry.getValue().toString());
                     }
                 }
 
             }
             //返回结果中添加脚本信息
-            channel.put("contactScript", contactScript == null?"":contactScript);
+            channel.put("contactScript", contactScript == null ? "" : contactScript);
             //痛痒点
-            channel.put("reason", mktVerbalStr == null?"":mktVerbalStr);
+            channel.put("reason", mktVerbalStr == null ? "" : mktVerbalStr);
 
             channel.put("itgTriggers", JSONArray.parse(JSONArray.toJSON(itgTriggers).toString()));
 
             return channel;
         }
     }
-
-
 
 
     /**

@@ -31,5 +31,14 @@
         <dubbo:method name="exists" servicecode="00.1077.ctgSessionExists"/>
     </dubbo:reference>
 
+    <!-- es提供试算接口 -->
+    <dubbo:reference interface=" com.zjtelcom.es.es.service.EsService" id="esService"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="findBatchHitsList" servicecode="00.1083.findBatchHitsList" timeout="10000"/>
+        <dubbo:method name="searchBatchInfo" servicecode="00.1083.searchBatchInfo" timeout="100000"/>
+        <dubbo:method name="searchCountInfo" servicecode="00.1083.searchCountInfo" timeout="100000"/>
+        <dubbo:method name="strategyIssure" servicecode="00.1083.strategyIssure" timeout="100000"/>
+    </dubbo:reference>
+
 
 </beans>
