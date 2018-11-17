@@ -74,7 +74,7 @@ public class MktOperatorLogServiceImpl implements MktOperatorLogService{
                 operations.add(operation.get(i));
             }
         }
-        Page pageInfo = new Page(new PageInfo(operations));
+        Page pageInfo = new Page(new PageInfo(operation));
 
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("data",operations);
