@@ -25,11 +25,7 @@ import org.springframework.web.client.RestTemplate;
 
 
 @SpringBootApplication
-//@EnableAutoConfiguration
-//@ImportResource({ "classpath:dubbo/*.xml","classpath:task/*.xml" })
-//@ImportResource({ "classpath:dubbo/dubbo-dev.xml"})
-@ImportResource({ "classpath:dubbo/dubbo-pst.xml"})
-//@ImportResource({ "classpath:dubbo/dubbo-prod.xml"})
+@ImportResource("classpath:dubbo/dubbo-${spring.profiles.active}.xml")
 //@Import({
 //        WebSecurityConfig.class,
 //        HttpSessionConfig.class,

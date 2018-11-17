@@ -437,19 +437,16 @@ public class EventApiServiceImpl implements EventApiService {
                     //构造查询参数值
                     JSONObject param = new JSONObject();
                     //查询标识
-                    param.put("queryNum", map.get("accNbr"));
                     param.put("c3", map.get("lanId"));
-                    param.put("type", map.get("4"));
-                    param.put("queryId", map.get("integrationId"));
+                    param.put("queryId", map.get("custId"));
                     param.put("queryFields", "ASSET_INTEG_ID");
-                    param.put("type", "1");
+                    param.put("type", "4");
                     System.out.println("param " + param.toString());
                     Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
                     System.out.println(dubboResult.toString());
 
                     JSONArray accArray = new JSONArray();
                     if ("0".equals(dubboResult.get("result_code").toString())) {
-                        //todo 问黄工客户级怎么查
 //                        accArray = new JSONObject((HashMap) dubboResult.get("msgbody"));
                         return Collections.EMPTY_MAP;
                     } else {
