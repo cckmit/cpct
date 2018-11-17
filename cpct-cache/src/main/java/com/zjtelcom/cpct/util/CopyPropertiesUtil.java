@@ -82,7 +82,7 @@ public class CopyPropertiesUtil extends PropertyUtilsBean {
                         Object value = PropertyUtils.getSimpleProperty(orig, name);
                         getInstance().setSimpleProperty(dest, name, value);
                     }
-                    catch (java.lang.IllegalArgumentException ie) {
+                    catch (IllegalArgumentException ie) {
                         ; // Should not happen
                     }
                     catch (Exception e) {

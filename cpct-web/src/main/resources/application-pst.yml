@@ -13,7 +13,7 @@ spring:
     password: cpc_cpct_user_123
 
 # 第二数据源
-  datasource_prd:
+  datasourceprd:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://134.96.252.170:30304/cpct_system?useUnicode=true&characterEncoding=UTF-8&useSSL=true
     username: root

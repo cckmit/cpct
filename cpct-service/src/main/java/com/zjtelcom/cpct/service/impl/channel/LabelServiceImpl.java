@@ -525,7 +525,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     @Override
     public Map<String, Object> relateLabelGrp(LabelGrpParam param) {
         Map<String,Object> result = new HashMap<>();
-        LabelGrp labelGrp = labelGrpMapper.selectByPrimaryKey(param.getLabelGrpId());
+        final LabelGrp labelGrp = labelGrpMapper.selectByPrimaryKey(param.getLabelGrpId());
         if (labelGrp==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","标签组不存在");
@@ -553,6 +553,19 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synLabelGrpService.synchronizeSingleLabel(labelGrp.getGrpId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return result;
     }
 

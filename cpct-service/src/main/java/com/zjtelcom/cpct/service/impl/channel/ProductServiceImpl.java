@@ -101,7 +101,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             }
         }
 
-        Page pageInfo = new Page(new PageInfo(productLists));
+        Page pageInfo = new Page(new PageInfo(productList));
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",productLists);
         result.put("page",pageInfo);
