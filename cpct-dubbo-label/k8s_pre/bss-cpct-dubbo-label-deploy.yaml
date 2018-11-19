@@ -1,9 +1,9 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: bss-cpct-web #这里修改
+  name: bss-cpct-dubbo-label-pre #这里修改
   labels:
-    name: bss-cpct-web  #这里修改
+    name: bss-cpct-dubbo-label-pre  #这里修改
 spec:
   replicas: 1
   strategy:
@@ -15,19 +15,19 @@ spec:
   template:
     metadata:
       labels:
-        name: bss-cpct-web  #这里修改
+        name: bss-cpct-dubbo-label-pre  #这里修改
     spec:
       containers:
-      - name: bss-cpct-web  #这里修改
-        image: 134.96.180.23:8001/hchc/bss-cpct-web:1.0  #这里修改  地址使用这个么？
+      - name: bss-cpct-dubbo-label-pre  #这里修改
+        image: 134.96.180.23:8001/hchc/bss-cpct-dubbo-label-pre:1.0  #这里修改  地址使用这个么？
         imagePullPolicy: Always
         env:
-#        - name: DUBBO_IP_TO_REGISTRY     # 当项目为对外项目时，此处注解取消
-#          valueFrom:
-#           fieldRef:
-#            fieldPath: status.hostIP
-#        - name: DUBBO_PORT_TO_REGISTRY
-#          value: "30007"
+        - name: DUBBO_IP_TO_REGISTRY     # 当项目为对外项目时，此处注解取消
+          valueFrom:
+           fieldRef:
+            fieldPath: status.hostIP
+        - name: DUBBO_PORT_TO_REGISTRY
+          value: "30824"
         - name: ESB_UNREGISTER_URI
           valueFrom:
             configMapKeyRef:
@@ -41,12 +41,12 @@ spec:
         - name: tz-config
           mountPath: /etc/localtime
         - name: app-log
-          mountPath: /app/cpct/logs
+          mountPath: /app/dubbo/logs
         ports:
-        - containerPort: 30801    #修改端口号
+        - containerPort: 30824    #修改端口号
         readinessProbe:
           tcpSocket:
-            port: 30801   #修改端口号
+            port: 30824   #修改端口号
           initialDelaySeconds: 20
           periodSeconds: 10
           failureThreshold: 3
@@ -57,7 +57,7 @@ spec:
             memory: "4Gi"
             cpu: "2000m"
           limits:
-            memory: "8Gi"
+            memory: "4Gi"
             cpu: "4000m"
       - name: jmx
         image: 134.108.5.132:8000/mgt/jmxtrans:v3.0
@@ -67,17 +67,17 @@ spec:
           mountPath: /etc/localtime
         resources:   #镜镜像环境  不修改就用docker默认
           requests:
-            memory: "2Gi"
-            cpu: "1000m"
-          limits:
-            memory: "2Gi"
+            memory: "4Gi"
             cpu: "2000m"
+          limits:
+            memory: "4Gi"
+            cpu: "4000m"
       nodeSelector:
-        center: crmcontroller   #修改镜像所属中心标签
+        center: bssOther  #修改镜像所属中心标签
       volumes:
       - name: tz-config
         hostPath:
           path: /etc/localtime
       - name: app-log
         hostPath:
-          path: /app/app-log/bss-cpct-web/
+          path: /app/app-log
