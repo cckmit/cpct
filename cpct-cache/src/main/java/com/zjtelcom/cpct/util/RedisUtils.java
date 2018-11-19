@@ -15,6 +15,7 @@ import redis.clients.jedis.JedisPoolConfig;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -32,6 +33,39 @@ public class RedisUtils {
 //    @Autowired
 //    private HashOperations<String,String,Object> hashOperations;
 
+
+    /**
+     *
+     * 通过key获取所有客户信息
+     * @param key
+     * @return List<Map<String, Object>>
+     */
+    public Object hgetAllRedisList(final String key) {
+        CtgJedisPool ctgJedisPool = initCatch();
+        Object result = null;
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                Map<String, String> resultMap = jedis.hgetAll(key);
+                List<Map<String, Object>> mapList = new ArrayList<>();
+                for (Map.Entry<String, String> entry : resultMap.entrySet()) {
+                    mapList.addAll((List<Map<String, Object>>) unserizlize(entry.getValue()));
+                }
+                result = mapList;
+                jedis.close();
+            } catch (Throwable je) {
+                je.printStackTrace();
+                jedis.close();
+            }
+            ctgJedisPool.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
     /**
      * 写入缓存
      *
@@ -42,12 +76,12 @@ public class RedisUtils {
     public boolean set(final String key, Object value) {
         boolean result = false;
         try {
-            // 原方法
-//          ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-//          operations.set(key, value);
+//             原方法
+          ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+          operations.set(key, value);
 
             // 改造后方法
-            result = setRedis(key, value);
+//            result = setRedis(key, value);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -187,11 +221,11 @@ public class RedisUtils {
         Object result = null;
 
         // 原方法
-//        ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-//         result = operations.get(key);
+        ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+         result = operations.get(key);
 
         // 改造后方法
-        result = getRedis(key);
+//        result = getRedis(key);
         return result;
     }
 
@@ -223,6 +257,38 @@ public class RedisUtils {
         }
         return result;
     }
+
+
+
+    /**
+     * hash存储Redis
+     * @param key
+     * @param field
+     * @param value
+     * @return
+     */
+    public boolean hset(final String key, String field, Object value) {
+        boolean result = false;
+        CtgJedisPool ctgJedisPool = initCatch();
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                jedis.hset(key, field, serialize(value));
+                jedis.close();
+                result = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                jedis.close();
+            }
+            ctgJedisPool.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
 
     /**
      * 哈希 添加

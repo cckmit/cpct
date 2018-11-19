@@ -90,9 +90,20 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         }else {
             productList = productMapper.selectAll();
         }
+
+        List<Offer> productLists = new ArrayList<>();
+        List<Long> producetIdList = (List<Long>)params.get("productIdList");
+        if(productList !=null && producetIdList != null) {
+            for(Offer offer : productList) {
+                if(!producetIdList.contains(offer.getOfferId())) {
+                    productLists.add(offer);
+                }
+            }
+        }
+
         Page pageInfo = new Page(new PageInfo(productList));
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",productList);
+        result.put("resultMsg",productLists);
         result.put("page",pageInfo);
         return result;
     }

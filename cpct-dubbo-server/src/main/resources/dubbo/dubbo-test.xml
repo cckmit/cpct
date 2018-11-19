@@ -31,8 +31,13 @@
     <dubbo:reference interface="com.zjpii.biz.serv.YzServ" id="yzServ"
                      version="2.0" retries="0" check="false">
         <dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="5000"/>
+
     </dubbo:reference>
 
+    <!-- redis实时查询服务 -->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.TrialRedisService" ref="trialRedisServiceImpl" version="1.0" >
+        <dubbo:method name="searchFromRedis" servicecode="00.1083.searchFromRedis" timeout="10000"/>
+    </dubbo:service>
 
 
 </beans>

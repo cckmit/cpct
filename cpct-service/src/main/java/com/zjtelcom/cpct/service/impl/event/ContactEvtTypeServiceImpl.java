@@ -11,12 +11,14 @@ import com.zjtelcom.cpct.dto.event.EventTypeVO;
 import com.zjtelcom.cpct.request.event.QryContactEvtTypeReq;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.ContactEvtTypeService;
+import com.zjtelcom.cpct.service.synchronize.SynContactEvtTypeService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +47,11 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
     private ContactEvtTypeMapper contactEvtTypeMapper;
     @Autowired
     private ContactEvtMapper contactEvtMapper;
+    @Autowired
+    SynContactEvtTypeService synContactEvtTypeService;
+
+    @Value("${sync.value}")
+    private String value;
 
     /**
      * 查询事件目录
@@ -88,7 +95,7 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
      * 新增事件目录保存
      */
     @Override
-    public Map<String, Object> createContactEvtType(ContactEvtType contactEvtType) {
+    public Map<String, Object> createContactEvtType(final ContactEvtType contactEvtType) {
         Map<String, Object> maps = new HashMap<>();
         List<EventTypeDO> evtTypes = contactEvtTypeMapper.listByEvtTypeName(contactEvtType.getContactEvtName());
         if (!evtTypes.isEmpty()){
@@ -109,6 +116,19 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("contactEvtType", contactEvtType);
         maps.put("ruleEvents", null);
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synContactEvtTypeService.synchronizeSingleEventType(contactEvtType.getEvtTypeId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return maps;
     }
 
@@ -139,7 +159,7 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
      * 修改事件目录
      */
     @Override
-    public Map<String, Object> modContactEvtType(ContactEvtType contactEvtType) {
+    public Map<String, Object> modContactEvtType(final ContactEvtType contactEvtType) {
         Map<String, Object> maps = new HashMap<>();
         contactEvtType.setUpdateDate(DateUtil.getCurrentTime());
         contactEvtType.setUpdateStaff(UserUtil.loginId());
@@ -148,6 +168,19 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("contactEvtType", contactEvtType);
         maps.put("ruleEvents", null);
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synContactEvtTypeService.synchronizeSingleEventType(contactEvtType.getEvtTypeId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return maps;
     }
 
@@ -155,7 +188,7 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
      * 删除事件目录
      */
     @Override
-    public Map<String, Object> delContactEvtType(ContactEvtType contactEvtType) {
+    public Map<String, Object> delContactEvtType(final ContactEvtType contactEvtType) {
         Map<String, Object> maps = new HashMap<>();
         ContactEvt contactEvt = new ContactEvt();
         QryContactEvtTypeReq qryContactEvtTypeReq = new QryContactEvtTypeReq();
@@ -177,6 +210,19 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
             maps.put("resultMsg", StringUtils.EMPTY);
             maps.put("ruleEvents", null);
         }
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synContactEvtTypeService.deleteSingleEventType(contactEvtType.getEvtTypeId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return maps;
     }
 

@@ -57,6 +57,10 @@ public class MktOperatorLogServiceImpl implements MktOperatorLogService{
             String operatorAccount = params.get("operatorAccount");
             mktOperatorLogDO.setOperatorAccount(operatorAccount);
         }
+        if(params.containsKey("type")) {
+            String operatorType = params.get("type");
+            mktOperatorLogDO.setOperatorType(operatorType);
+        }
 
         //分页
         PageHelper.startPage(page, pageSize);
@@ -70,7 +74,7 @@ public class MktOperatorLogServiceImpl implements MktOperatorLogService{
                 operations.add(operation.get(i));
             }
         }
-        Page pageInfo = new Page(new PageInfo(operations));
+        Page pageInfo = new Page(new PageInfo(operation));
 
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("data",operations);

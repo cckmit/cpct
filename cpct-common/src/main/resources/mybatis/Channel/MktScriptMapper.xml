@@ -20,7 +20,7 @@
     delete from mkt_script
     where SCRIPT_ID = #{scriptId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.Script">
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.Script" useGeneratedKeys="true" keyProperty="scriptId">
     insert into mkt_script (SCRIPT_ID, SCRIPT_NAME, SCRIPT_DESC, 
       SCRIPT_TYPE, SUIT_CHANNEL_TYPE, EXEC_CHANNEL, 
       STATUS_CD, STATUS_DATE, CREATE_STAFF, 

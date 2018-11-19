@@ -25,12 +25,14 @@ import com.zjtelcom.cpct.enums.FilterRuleType;
 import com.zjtelcom.cpct.request.filter.FilterRuleReq;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.filter.FilterRuleService;
+import com.zjtelcom.cpct.service.synchronize.filter.SynFilterRuleService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct.util.DateUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -64,7 +66,11 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
     private MktVerbalConditionMapper verbalConditionMapper;
     @Autowired
     private InjectionLabelMapper labelMapper;
+    @Autowired
+    private SynFilterRuleService synFilterRuleService;
 
+    @Value("${sync.value}")
+    private String value;
 
     /**
      * 过滤规则列表（含分页）
@@ -191,11 +197,24 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
      * 删除过滤规则
      */
     @Override
-    public Map<String, Object> delFilterRule(FilterRule filterRule) {
+    public Map<String, Object> delFilterRule(final FilterRule filterRule) {
         Map<String, Object> maps = new HashMap<>();
         filterRuleMapper.delFilterRule(filterRule);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synFilterRuleService.deleteSingleFilterRule(filterRule.getRuleId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return maps;
     }
 
@@ -208,12 +227,12 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         FilterRule filterRuleT = filterRuleMapper.getFilterRule(filterRule);
         FilterRuleVO vo = BeanUtil.create(filterRuleT,new FilterRuleVO());
         if (filterRuleT.getChooseProduct()!=null && !filterRuleT.getChooseProduct().equals("")){
-            List<Long> idList = ChannelUtil.StringToidList(filterRuleT.getChooseProduct());
+            List<String> codeList = ChannelUtil.StringToList(filterRuleT.getChooseProduct());
             List<OfferDetail> productList = new ArrayList<>();
-            for (Long id : idList){
-                Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(id.toString()));
-                if (offer!=null){
-                    OfferDetail offerDetail = BeanUtil.create(offer,new OfferDetail());
+            for (String code : codeList){
+                List<Offer> offer = offerMapper.selectByCode(code);
+                if (offer!=null && !offer.isEmpty()){
+                    OfferDetail offerDetail = BeanUtil.create(offer.get(0),new OfferDetail());
                     productList.add(offerDetail);
                 }
             }
@@ -243,7 +262,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
     @Override
     public Map<String, Object> createFilterRule(FilterRuleAddVO addVO) {
         Map<String, Object> maps = new HashMap<>();
-        FilterRule filterRule = BeanUtil.create(addVO,new FilterRule());
+        final FilterRule filterRule = BeanUtil.create(addVO,new FilterRule());
         filterRule.setCreateDate(DateUtil.getCurrentTime());
         filterRule.setUpdateDate(DateUtil.getCurrentTime());
         filterRule.setStatusDate(DateUtil.getCurrentTime());
@@ -274,6 +293,19 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("filterRule", filterRule);
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synFilterRuleService.synchronizeSingleFilterRule(filterRule.getRuleId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return maps;
     }
 
@@ -283,7 +315,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
     @Override
     public Map<String, Object> modFilterRule(FilterRuleAddVO editVO) {
         Map<String, Object> maps = new HashMap<>();
-        FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(editVO.getRuleId());
+        final FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(editVO.getRuleId());
         if (filterRule==null){
             maps.put("resultCode", CODE_FAIL);
             maps.put("resultMsg", StringUtils.EMPTY);
@@ -292,7 +324,16 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         BeanUtil.copy(editVO,filterRule);
         filterRule.setUpdateDate(DateUtil.getCurrentTime());
         filterRule.setUpdateStaff(UserUtil.loginId());
-        filterRule.setChooseProduct(ChannelUtil.idList2String(editVO.getChooseProduct()));
+
+        List<String> codeList = new ArrayList<>();
+        for (Long offerId : editVO.getChooseProduct()){
+            Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
+            if (offer==null){
+                continue;
+            }
+            codeList.add(offer.getOfferNbr());
+        }
+        filterRule.setChooseProduct(ChannelUtil.StringList2String(codeList));
         if (filterRule.getFilterType().equals("3000")){
             filterRule.setLabelCode("PROM_LIST");
         }
@@ -315,6 +356,19 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("filterRule", filterRule);
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synFilterRuleService.synchronizeSingleFilterRule(filterRule.getRuleId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return maps;
     }
 

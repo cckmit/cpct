@@ -15,11 +15,13 @@ import com.zjtelcom.cpct.request.channel.DisplayAllMessageReq;
 import com.zjtelcom.cpct.request.channel.MessageReq;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.MessageLabelService;
+import com.zjtelcom.cpct.service.synchronize.label.SynMessageLabelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -48,7 +50,11 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
     private DisplayColumnLabelMapper displayColumnLabelMapper;
     @Autowired
     private SystemParamMapper systemParamMapper;
+    @Autowired
+    private SynMessageLabelService synMessageLabelService;
 
+    @Value("${sync.value}")
+    private String value;
 
     /**
      * 查询标签列表
@@ -134,7 +140,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
     @Override
     public Map<String, Object> delDisplayColumn(DisplayAllMessageReq req) {
         Map<String, Object> maps = new HashMap<>();
-        DisplayColumn displayColumn = displayColumnMapper.selectByPrimaryKey(req.getDisplayColumnId());
+        final DisplayColumn displayColumn = displayColumnMapper.selectByPrimaryKey(req.getDisplayColumnId());
         if (displayColumn==null){
             maps.put("resultCode", CODE_FAIL);
             maps.put("resultMsg", "展示列不存在");
@@ -144,6 +150,19 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         displayColumnLabelMapper.deleteByDisplayId(req.getDisplayColumnId());
         maps.put("resultCode", CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synMessageLabelService.deleteSingleMessageLabel(displayColumn.getDisplayColumnId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return maps;
     }
 
@@ -153,7 +172,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
      * @return
      */
     @Override
-    public Map<String, Object> delColumnLabelRel(Long displayId, Long labelId) {
+    public Map<String, Object> delColumnLabelRel(final Long displayId, final Long labelId) {
         Map<String, Object> maps = new HashMap<>();
         DisplayColumnLabel displayColumnLabel = displayColumnLabelMapper.findByDisplayIdAndLabelId(displayId,labelId);
         if (displayColumnLabel!=null){
@@ -161,6 +180,19 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         }
         maps.put("resultCode", CODE_SUCCESS);
         maps.put("resultMsg", "删除成功");
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synMessageLabelService.deleteSingleDisplayLabel(displayId, labelId, "");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return maps;
     }
 
@@ -249,7 +281,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
      * 新增标签组
      */
     @Override
-    public Map<String, Object> createLabelGroup(DisplayColumn displayColumn) {
+    public Map<String, Object> createLabelGroup(final DisplayColumn displayColumn) {
         Map<String, Object> maps = new HashMap<>();
         displayColumn.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
         displayColumn.setCreateStaff(UserUtil.loginId());
@@ -260,6 +292,19 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         displayColumnMapper.insert(displayColumn);
         maps.put("resultCode", CODE_SUCCESS);
         maps.put("resultMsg", displayColumn.getDisplayColumnId());
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synMessageLabelService.synchronizeSingleMessageLabel(displayColumn.getDisplayColumnId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return maps;
     }
 
@@ -291,7 +336,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
     @Override
     public Map<String, Object> createDisplayAllMessage(DisplayAllMessageReq displayAllMessageReq) {
         Map<String, Object> maps = new HashMap<>();
-        DisplayColumn displayColumn = displayColumnMapper.selectByPrimaryKey(displayAllMessageReq.getDisplayColumnId());
+        final DisplayColumn displayColumn = displayColumnMapper.selectByPrimaryKey(displayAllMessageReq.getDisplayColumnId());
         if (displayColumn==null){
             maps.put("resultCode", CODE_FAIL);
             maps.put("resultMsg", "展示列不存在");
@@ -326,6 +371,19 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         dc.setDisplayColumnId(displayAllMessageReq.getDisplayColumnId());
         displayColumn.setStatusCd("2000");
         displayColumnMapper.updateByPrimaryKey(displayColumn);
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synMessageLabelService.synchronizeSingleMessageLabel(displayColumn.getDisplayColumnId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.run();
+        }
+
         return  queryLabelListByDisplayId(dc);
     }
 
