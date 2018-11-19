@@ -523,7 +523,7 @@ public class EventApiServiceImpl implements EventApiService {
                     String orderPriorityLast = (String) activityList.get(recCampaignAmount - 1).get("orderPriority");
 
                     for (int i = recCampaignAmount; i < activityList.size(); i++) {
-                        if(!orderPriorityLast.equals(activityList.get(i).get("orderPriority"))) {
+                        if (!orderPriorityLast.equals(activityList.get(i).get("orderPriority"))) {
                             //es log
                             esJson.put("msg", "推荐数：" + i + ",命中数：" + activityList.size());
                             //事件推荐活动数
