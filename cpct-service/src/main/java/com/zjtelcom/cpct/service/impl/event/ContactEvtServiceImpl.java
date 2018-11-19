@@ -9,17 +9,13 @@ import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.event.*;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
-import com.zjtelcom.cpct.dao.system.SystemParamMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamEvtRelDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.event.EventSorceDO;
 import com.zjtelcom.cpct.domain.event.InterfaceCfg;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
-import com.zjtelcom.cpct.dto.campaign.MktCampaign;
 import com.zjtelcom.cpct.dto.event.*;
-import com.zjtelcom.cpct.dto.filter.FilterRule;
-import com.zjtelcom.cpct.dto.system.SystemParam;
 import com.zjtelcom.cpct.enums.ParamKeyEnum;
 import com.zjtelcom.cpct.request.event.CreateContactEvtJtReq;
 import com.zjtelcom.cpct.request.event.CreateContactEvtReq;
@@ -28,16 +24,13 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.ContactEvtItemService;
 import com.zjtelcom.cpct.service.event.ContactEvtService;
 import com.zjtelcom.cpct.service.event.EventMatchRulService;
-import com.zjtelcom.cpct.service.filter.FilterRuleService;
 import com.zjtelcom.cpct.service.synchronize.SynContactEvtService;
 import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,15 +57,9 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     @Autowired
     private ContactEvtMapper contactEvtMapper;
     @Autowired
-    private EventSceneMapper eventSceneMapper;
-    @Autowired
-    private EvtSceneCamRelMapper evtSceneCamRelMapper;
-    @Autowired
     private ContactEvtItemMapper contactEvtItemMapper;
     @Autowired
     private ContactEvtMatchRulMapper contactEvtMatchRulMapper;
-    @Autowired
-    private FilterRuleMapper filterRuleMapper;
     @Autowired
     private MktCamEvtRelMapper mktCamEvtRelMapper;
     @Autowired

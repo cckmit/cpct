@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.controller.grouping;
 
 import com.alibaba.fastjson.JSONArray;
-import com.zjhcsoft.eagle.main.dubbo.model.policy.CalcReqModel;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
@@ -223,40 +222,7 @@ public class TarGrpController extends BaseController {
     }
 
 
-    /**
-     * 策略试运算（老系统方法）
-     */
-    @PostMapping("/trycalc")
-    @CrossOrigin
-    public String trycalc(String serialNum, @RequestBody CalcReqModel calcReqModel) {
-        Map<String, String> maps = new HashMap<>();
-        try {
-            //返回前端策略试运算结果
-            maps = tarGrpService.trycalc(calcReqModel, serialNum);
-        } catch (Exception e) {
-            logger.error("[op:TarGrpController] fail to trycalc for req = {}!" +
-                    " Exception: ", JSONArray.toJSON(calcReqModel), e);
-            return FastJsonUtils.objToJson(maps);
-        }
-        return FastJsonUtils.objToJson(maps);
-    }
 
-    /**
-     * 策略试运算（新方法）todo
-     */
-    @RequestMapping("/trycalcNew")
-    @CrossOrigin
-    public String trycalcNew(@RequestBody CalcReqModel calcReqModel, String serialNum) {
-        Map<String, String> maps = new HashMap<>();
-        try {
-            //返回前端策略试运算结果
 
-        } catch (Exception e) {
-            logger.error("[op:TarGrpController] fail to trycalcNew for req = {}!" +
-                    " Exception: ", JSONArray.toJSON(calcReqModel), e);
-            return FastJsonUtils.objToJson(maps);
-        }
-        return FastJsonUtils.objToJson(maps);
-    }
 
 }

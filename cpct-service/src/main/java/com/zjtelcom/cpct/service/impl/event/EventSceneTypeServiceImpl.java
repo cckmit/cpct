@@ -3,7 +3,6 @@ package com.zjtelcom.cpct.service.impl.event;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.event.EventSceneTypeMapper;
 import com.zjtelcom.cpct.domain.event.EventSceneTypeDO;
-import com.zjtelcom.cpct.dto.event.EventScene;
 import com.zjtelcom.cpct.dto.event.EventSceneTypeDTO;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.EventSceneTypeService;

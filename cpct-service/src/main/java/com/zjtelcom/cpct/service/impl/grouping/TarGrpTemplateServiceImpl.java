@@ -19,13 +19,10 @@ import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
-import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateConditionDO;
 import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO;
 import com.zjtelcom.cpct.dto.channel.LabelValueVO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.grouping.*;
-import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
-import com.zjtelcom.cpct.enums.FitDomain;
 import com.zjtelcom.cpct.enums.LeftParamType;
 import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.enums.RightParamType;
@@ -33,9 +30,7 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.grouping.TarGrpTemplateService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
-import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.UserUtil;
-import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,8 +52,6 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     @Autowired
     private TarGrpTemplateMapper tarGrpTemplateMapper;
 
-    @Autowired
-    private TarGrpTemplateConditionMapper tarGrpTemplateConditionMapper;
 
     @Autowired
     private InjectionLabelMapper injectionLabelMapper;
@@ -69,8 +62,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     private TarGrpMapper tarGrpMapper;
     @Autowired
     private TarGrpConditionMapper tarGrpConditionMapper;
-    @Autowired
-    private MktStrategyConfRuleMapper strategyConfRuleMapper;
+
 
     /**
      * 新增目标分群模板

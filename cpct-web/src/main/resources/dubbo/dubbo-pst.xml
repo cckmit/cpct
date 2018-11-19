@@ -8,8 +8,8 @@
     <!-- 提供方应用信息，用于计算依赖关系 -->
     <dubbo:application name="00.1083"/>
 
-    <dubbo:registry id="esb3" protocol="dubbo" address="134.96.253.65:8001" />
-    <dubbo:registry id="esb2" protocol="dubbo" address="134.96.159.11:8033" />
+    <dubbo:registry id="esb3" protocol="dubbo" address="134.96.253.65:8001"/>
+    <dubbo:registry id="esb2" protocol="dubbo" address="134.96.159.11:8033"/>
 
     <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.service.api.EventApiService" id="eventApiService"
                      version="1.0" retries="0" check="false">
