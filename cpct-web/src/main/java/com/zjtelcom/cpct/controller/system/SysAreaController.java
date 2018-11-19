@@ -46,7 +46,7 @@ public class SysAreaController {
         Integer areaId;
         if (landId == null || "".equals(landId) || "null".equals(landId)) {
             //TODO 获取当前用户所在地区
-            areaId = 8330000;
+            areaId = 1;
         } else {
             areaId = Integer.valueOf(landId);
         }
