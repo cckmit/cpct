@@ -8,15 +8,18 @@
     <!-- 提供方应用信息，用于计算依赖关系 -->
     <dubbo:application name="00.1083" />
 
+    <!-- 3.0 -->
     <dubbo:registry protocol="dubbo" address="134.96.253.86:8033"/>
+
+    <!-- PST-2.0 -->
     <!--<dubbo:registry protocol="dubbo" address="134.96.159.11:8033"/>-->
 
-    <dubbo:reference interface="com.zjtelcom.cpct.service.api.EventApiService" id="eventApiService"
-                     version="1.0" retries="0" check="false">
-        <!--<dubbo:method name="CalculateCPC" servicecode="33.1083.CalculateCPC" timeout="5000"/>-->
-        <dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="5000"/>
-        <!--<dubbo:method name="secondChannelSynergy" servicecode="33.1083.SecondChannelSynergy" timeout="5000"/>-->
-    </dubbo:reference>
+    <!--<dubbo:reference interface="com.zjtelcom.cpct.service.api.EventApiService" id="eventApiService"-->
+                     <!--version="1.0" retries="0" check="false">-->
+        <!--&lt;!&ndash;<dubbo:method name="CalculateCPC" servicecode="33.1083.CalculateCPC" timeout="5000"/>&ndash;&gt;-->
+        <!--<dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="5000"/>-->
+        <!--&lt;!&ndash;<dubbo:method name="secondChannelSynergy" servicecode="33.1083.SecondChannelSynergy" timeout="5000"/>&ndash;&gt;-->
+    <!--</dubbo:reference>-->
 
     <!-- es提供试算接口 -->
     <dubbo:reference interface=" com.zjtelcom.es.es.service.EsService" id="esService"
@@ -26,5 +29,12 @@
         <dubbo:method name="searchCountInfo" servicecode="00.1083.searchCountInfo" timeout="100000"/>
         <dubbo:method name="strategyIssure" servicecode="00.1083.strategyIssure" timeout="100000"/>
     </dubbo:reference>
+
+    <!--<dubbo:reference interface="org.springframework.session.data.ctg.IDubboCtgService"-->
+                     <!--id="dubboCtgService" version="1.0" check="false">-->
+        <!--<dubbo:method name="smembers" servicecode="00.1077.ctgSessionSmembers"/>-->
+        <!--<dubbo:method name="hgetAll" servicecode="00.1077.ctgSessionHgetAll"/>-->
+        <!--<dubbo:method name="exists" servicecode="00.1077.ctgSessionExists"/>-->
+    <!--</dubbo:reference>-->
 
 </beans>

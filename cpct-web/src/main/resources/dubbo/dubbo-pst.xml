@@ -24,12 +24,12 @@
         <dubbo:method name="contactTaskReceipt" servicecode="00.1079.CPCResultFeedback" timeout="20000"/>
     </dubbo:reference>
 
-    <dubbo:reference interface="org.springframework.session.data.ctg.IDubboCtgService"
-                     id="dubboCtgService" version="1.0" check="false">
-        <dubbo:method name="smembers" servicecode="00.1077.ctgSessionSmembers"/>
-        <dubbo:method name="hgetAll" servicecode="00.1077.ctgSessionHgetAll"/>
-        <dubbo:method name="exists" servicecode="00.1077.ctgSessionExists"/>
-    </dubbo:reference>
+    <!--<dubbo:reference interface="org.springframework.session.data.ctg.IDubboCtgService"-->
+                     <!--id="dubboCtgService" version="1.0" check="false">-->
+        <!--<dubbo:method name="smembers" servicecode="00.1077.ctgSessionSmembers"/>-->
+        <!--<dubbo:method name="hgetAll" servicecode="00.1077.ctgSessionHgetAll"/>-->
+        <!--<dubbo:method name="exists" servicecode="00.1077.ctgSessionExists"/>-->
+    <!--</dubbo:reference>-->
 
 
 </beans>

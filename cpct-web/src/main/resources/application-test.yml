@@ -20,7 +20,7 @@ spring:
     password: root
 
 # 第二数据源
-  datasource_prd:
+  datasourceprd:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://134.96.252.170:30304/cpct_system?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
     username: root

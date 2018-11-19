@@ -33,13 +33,11 @@ import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
-import com.zjtelcom.cpct.service.synchronize.campaign.SyncActivityService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UserUtil;
-import com.zjtelcom.cpct_prd.dao.campaign.MktCampaignPrdMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -128,7 +126,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private MktCamResultRelMapper mktCamResultRelMapper;
 
     @Autowired
-    private SyncActivityService syncActivityService;
+    private SynchronizeCampaignService syncActivityService;
 
     @Autowired
     private MktStrategyConfRuleMapper mktStrategyConfRuleMapper;
@@ -862,7 +860,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             new Thread() {
                 @Override
                 public void run() {
-                    syncActivityService.syncActivity(mktCampaignId);
+                   try {
+                       syncActivityService.synchronizeCampaign(mktCampaignId,"admin");
+                   }catch (Exception e){
+                       e.printStackTrace();
+                       logger.error("[op:publishMktCampaign] 发布活动 id = {} 时，同步到生产失败！Exception= ", mktCampaignId, e);
+                   }
                 }
             }.start();
         }

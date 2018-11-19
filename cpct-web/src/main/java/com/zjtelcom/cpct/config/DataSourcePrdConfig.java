@@ -5,8 +5,9 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -28,7 +29,7 @@ public class DataSourcePrdConfig {
 
 
     @Bean
-    @ConfigurationProperties(prefix = "spring.datasource_prd")
+    @ConfigurationProperties(prefix = "spring.datasourceprd")
     public DataSource datasourcePrd() {
         return DataSourceBuilder.create().type(DruidDataSource.class).build();
     }
@@ -42,7 +43,7 @@ public class DataSourcePrdConfig {
         return sessionFactoryBean.getObject();
     }
 
-    @Bean(name = "TransactionManager")
+    @Bean(name = "prdTransactionManager")
     public PlatformTransactionManager testTransactionManager(@Qualifier("datasourcePrd") DataSource dataSource) {
         DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dataSource);
         return dataSourceTransactionManager;

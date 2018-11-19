@@ -65,13 +65,13 @@ public class RedisConfig extends CachingConfigurerSupport {
         return factory;
     }
 
-    @Bean
-    public CacheManager cacheManager(RedisTemplate redisTemplate) {
-        RedisCacheManager cacheManager = new RedisCacheManager(redisTemplate);
-        // Number of seconds before expiration. Defaults to unlimited (0)
-        cacheManager.setDefaultExpiration(10); //设置key-value超时时间
-        return cacheManager;
-    }
+//    @Bean
+//    public CacheManager cacheManager(RedisTemplate redisTemplate) {
+//        RedisCacheManager cacheManager = new RedisCacheManager(redisTemplate);
+//        // Number of seconds before expiration. Defaults to unlimited (0)
+//        cacheManager.setDefaultExpiration(10); //设置key-value超时时间
+//        return cacheManager;
+//    }
 
     @Bean
     public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory factory) {

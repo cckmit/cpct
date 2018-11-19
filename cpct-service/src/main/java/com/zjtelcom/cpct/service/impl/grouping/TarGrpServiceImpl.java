@@ -1,57 +1,32 @@
 package com.zjtelcom.cpct.service.impl.grouping;
 
-import com.alibaba.fastjson.JSON;
-import com.zjhcsoft.eagle.main.dubbo.model.policy.CalcReqModel;
-import com.zjhcsoft.eagle.main.dubbo.model.policy.ResponseHeaderModel;
-import com.zjhcsoft.eagle.main.dubbo.service.PolicyCalculateService;
-import com.zjtelcom.cpct.common.CacheConstants;
-import com.zjtelcom.cpct.common.CacheManager;
 import com.zjtelcom.cpct.constants.CommonConstant;
-import com.zjtelcom.cpct.constants.ResponseCode;
 import com.zjtelcom.cpct.dao.campaign.MktCamGrpRulMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
-import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateConditionMapper;
-import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateMapper;
+
 import com.zjtelcom.cpct.dao.org.OrgTreeMapper;
-import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
-import com.zjtelcom.cpct.dao.system.SysAreaMapper;
-import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.domain.grouping.TarGrpConditionDO;
-import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateConditionDO;
-import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO;
-import com.zjtelcom.cpct.domain.org.OrgTree;
 import com.zjtelcom.cpct.domain.org.OrgTreeDO;
-import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.channel.LabelValueVO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.grouping.*;
-import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
-import com.zjtelcom.cpct.dto.system.SystemParam;
 import com.zjtelcom.cpct.enums.*;
-import com.zjtelcom.cpct.model.EagleDatabaseConfig;
-import com.zjtelcom.cpct.pojo.Company;
 import com.zjtelcom.cpct.service.BaseService;
-import com.zjtelcom.cpct.service.EagleDatabaseConfCache;
-import com.zjtelcom.cpct.service.TryCalcService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
-import com.zjtelcom.cpct.service.synchronize.template.SynTarGrpTemplateService;
 import com.zjtelcom.cpct.util.*;
-import com.zjtelcom.cpct.validator.ValidateResult;
 import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
 import com.zjtelcom.cpct.vo.grouping.TarGrpVO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
-import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 
 /**
@@ -72,33 +46,21 @@ import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 public class TarGrpServiceImpl extends BaseService implements TarGrpService {
 
     @Autowired
-    private TarGrpTemplateMapper tarGrpTemplateMapper;
-    @Autowired
-    private TarGrpTemplateConditionMapper tarGrpTemplateConditionMapper;
-    @Autowired
     private TarGrpMapper tarGrpMapper;
     @Autowired
     private TarGrpConditionMapper tarGrpConditionMapper;
     @Autowired
     private MktCamGrpRulMapper mktCamGrpRulMapper;
     @Autowired
-    private RestTemplate restTemplate;
-    @Autowired
-    private TryCalcService tryCalcService;
-    @Autowired(required = false)
-    private PolicyCalculateService policyCalculateService;
-    @Autowired
     private InjectionLabelMapper injectionLabelMapper;
     @Autowired
     private InjectionLabelValueMapper injectionLabelValueMapper;
-    @Autowired
-    private SysAreaMapper areaMapper;
+
     @Autowired
     private RedisUtils redisUtils;
     @Autowired
     private OrgTreeMapper orgTreeMapper;
-    @Autowired
-    private MktStrategyConfRuleMapper ruleMapper;
+
 
     /**
      * 复制客户分群 返回
@@ -569,142 +531,5 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         return null;
     }
 
-    /**
-     * 策略试运算
-     */
-    @Override
-    public Map<String, Object> strategyTrial(CalcReqModel req, String serialNum) {
-        //通过调用大数据返回试算结果返回前台 todo
-        Map result = new HashMap(2);
-        try {
-            Map<String, Object> validateResult = validate(req);
-            if (!validateResult.isEmpty()) {
-                return validateResult;
-            }
-            SystemParam param = (SystemParam) CacheManager.getInstance().getCache(
-                    CacheConstants.SYSTEMPARAM_CACHE_NAME).queryOne("cpc.dubbo.client.url");
-            String url = param.getParamValue() + "/policy/trycalc";
-            if (StringUtils.isNotEmpty(serialNum)) {
-                url = url + "?serialNum=" + serialNum;
-            }
-            result = restTemplate.postForObject(url, req, Map.class);
-        } catch (Exception e) {
-            logger.error("calc error", e);
-            result.put("resultCode", ErrorCode.INTERNAL_ERROR.getErrorCode());
-            result.put("resultMsg", ErrorCode.INTERNAL_ERROR.getErrorMsg());
-        }
-        logger.debug("trycalc result: " + JSON.toJSONString(result));
-        return result;
-    }
-
-    /**
-     * 策略试运算（老系统）
-     */
-    @Override
-    public Map<String, String> trycalc(CalcReqModel calcReqModel, String serialNum) {
-        ResponseHeaderModel resp = null;
-        Map<String, String> result = new HashMap<String, String>(2);
-
-        try {
-            //获取策略列表
-            List<Map<String, Object>> policyList = calcReqModel.getPolicyList();
-            //拼装sql前验证
-            ValidateResult validateResult = tryCalcService.validate(serialNum, calcReqModel);
-//            ValidateResult validateResult = new ValidateResult();
-            validateResult.setResult(true);
-            validateResult.setMessage("111");
-            validateResult.setCode("111");
-
-            //校验通过后进行试运算，否则返回消息给web
-            if (validateResult.getResult()) {
-
-                for (Map<String, Object> policy : policyList) {
-
-                    //页面选择的资产域
-                    String recommendType = policy.get("recommendType").toString();
-                    List<Map<String, String>> tagInfos = new ArrayList<>();
-                    //防止tagInfos添加重复的数据
-                    Map<String, String> tagInfoKeys = new HashMap<>();
-
-                    //规则
-                    List<Map<String, Object>> ruleList = (List<Map<String, Object>>) policy.get("rules");
-                    for (Map<String, Object> rule : ruleList) {
-
-                        List<Map<String, String>> triggers = (List<Map<String, String>>) rule.get("triggers");
-                        List<Company> company = (List<Company>) rule.get("company");
-                        String sql = null;
-                        //tagInfos 获取标签信息
-                        sql = SqlUtil.integrationSql(recommendType, triggers, tagInfos, company,
-                                tagInfoKeys);
-
-                        // 清除不必要的参数
-                        rule.remove("triggers");
-                        rule.remove("company");
-                        rule.remove("xietong");
-
-                        rule.put("sql", sql);
-                    }
-                    //清除不必要的参数
-                    policy.remove("recommendName");
-                    policy.remove("recommendType");
-                    policy.remove("place");
-
-                    policy.put("tagInfos", tagInfos);
-                }
-
-                //目前只支持一个数据源DB2
-//                EagleDatabaseConfig config = (EagleDatabaseConfig)CacheManager.getInstance().getCache(
-//                        CacheConstants.DATABASE_COPNFIG_CACHE_NAME).queryOne(
-//                        EagleDatabaseConfCache.CACHE_DB2_KEY);
-                EagleDatabaseConfig config = new EagleDatabaseConfig();
-                config.setDbConfRowId(21L);
-                calcReqModel.setDbConfRowId(config.getDbConfRowId().toString());
-
-                logger.debug("calcReqModel: " + JSON.toJSONString(calcReqModel));
-                resp = policyCalculateService.tryCalculate(calcReqModel);
-                result.put("resultCode", resp.getResultCode());
-                result.put("resultMessage", resp.getResultMessage());
-                return result;
-            }
-
-            result.put("resultCode", validateResult.getCode());
-            result.put("resultMessage", validateResult.getMessage());
-        } catch (Exception e) {
-            result.put("resultCode", ResponseCode.INTERNAL_ERROR);
-            result.put("resultMessage", ResponseCode.INTERNAL_ERROR_MSG);
-            logger.error("policyCalculateService.tryCalculate", e);
-        }
-
-        return result;
-
-    }
-
-    /**
-     * 参数校验
-     */
-    private Map<String, Object> validate(CalcReqModel req) {
-        Map<String, Object> result = new HashMap<>(2);
-        if (StringUtils.isEmpty(req.getActivityId())) {
-            result.put("resultCode", ErrorCode.VALIDATE_ERROR.getErrorCode());
-            result.put("resultMsg", "activityId不能为空");
-            return result;
-        }
-
-        if (CollectionUtils.isEmpty(req.getPolicyList())) {
-            result.put("resultCode", ErrorCode.VALIDATE_ERROR.getErrorCode());
-            result.put("resultMsg", "policyList不能为空");
-            return result;
-        }
-
-        for (Map<String, Object> policy : req.getPolicyList()) {
-            Object policyId = policy.get("policyId");
-            if (null == policyId || StringUtils.isEmpty(policyId.toString())) {
-                result.put("resultCode", ErrorCode.VALIDATE_ERROR.getErrorCode());
-                result.put("resultMsg", "policyId不能为空");
-                return result;
-            }
-        }
-        return result;
-    }
 
 }
