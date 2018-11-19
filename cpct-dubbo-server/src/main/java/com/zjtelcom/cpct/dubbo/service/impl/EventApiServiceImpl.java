@@ -1281,15 +1281,15 @@ public class EventApiServiceImpl implements EventApiService {
 
                         String[] strArray = tarGrpConditionDOs.get(i).getRightParam().split(",");
 
-                        expressSb.append(" >= ").append("\"").append(strArray[0]).append("\"").append(")");
-                        expressSb.append(" && ").append("((");
-                        expressSb.append(label.getInjectionLabelCode()).append(")");
-                        expressSb.append(" <= ").append("\"").append(strArray[1]).append("\"");
-
-//                        expressSb.append(" >= ").append(strArray[0]);
-//                        expressSb.append(" && ").append("(");
+//                        expressSb.append(" >= ").append("\"").append(strArray[0]).append("\"").append(")");
+//                        expressSb.append(" && ").append("((");
 //                        expressSb.append(label.getInjectionLabelCode()).append(")");
-//                        expressSb.append(" <= ").append(strArray[1]);
+//                        expressSb.append(" <= ").append("\"").append(strArray[1]).append("\"");
+
+                        expressSb.append(" >= ").append(strArray[0]);
+                        expressSb.append(" && ").append("(");
+                        expressSb.append(label.getInjectionLabelCode()).append(")");
+                        expressSb.append(" <= ").append(strArray[1]);
 
                         express1.append(" >= ").append("\"").append(strArray[0]).append("\"");
                         express1.append(" && ").append("(");
@@ -1320,7 +1320,7 @@ public class EventApiServiceImpl implements EventApiService {
                     }
 
                     expressSb.append(")");
-                    express1.append(") {return true} else {return false}");
+                    express1.append(") {return true}");
                     System.out.println(express1.toString());
 
                     try {
