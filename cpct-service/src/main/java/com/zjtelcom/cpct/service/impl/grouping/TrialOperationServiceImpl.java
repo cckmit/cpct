@@ -255,7 +255,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 //            mktIssueDetailMap.put("mktStrategyConfRuleId", param.getMktProductRuleList());
 //            mktIssueDetailMap.put("customerMap", customers);
 //            // 将客户信息，销售品，推送渠道存入redis
-//
         }
         int num = (customerList.size() / 500) + 1;
         List<List<Map<String,Object>>> smallCustomers = ChannelUtil.averageAssign(customerList,num);
@@ -610,6 +609,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 //            response = restTemplate.postForObject(hitsList, param, TrialResponse.class);
         } catch (Exception e) {
             e.printStackTrace();
+            logger.info("试算清单记录查询失败{}",operation.getBatchNum());
         }
 
         TrialOperationListVO vo = new TrialOperationListVO();
@@ -627,9 +627,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
         for (Map<String,Object> hitMap : mapList){
             Map<String, Object> searchMap = (Map<String, Object>) hitMap.get("searchHitMap");
-            Map<String, Object> ruleInfoMap = new HashMap<>();
-            if ((Map<String, Object>)hitMap.get("ruleInfo") != null) {
-                ruleInfoMap = (Map<String, Object>) hitMap.get("ruleInfo");
+            TrialOperationParamES ruleInfoMap = new TrialOperationParamES();
+            if ((TrialOperationParamES)hitMap.get("ruleInfo") != null) {
+                ruleInfoMap = (TrialOperationParamES) hitMap.get("ruleInfo");
             }
             Map<String, Object> map = new HashMap<>();
             for (String set : searchMap.keySet()) {
@@ -642,8 +642,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             map.put("campaignName", operation.getCampaignName());
             map.put("strategyId", operation.getStrategyId());
             map.put("strategyName", operation.getStrategyName());
-            map.put("ruleId", ruleInfoMap.get("ruleId"));
-            map.put("ruleName", ruleInfoMap.get("ruleName").toString());
+            map.put("ruleId", ruleInfoMap.getRuleId());
+            map.put("ruleName", ruleInfoMap.getRuleName());
             //todo 工单号
             map.put("orderId", "49736605");
             userList.add(map);
@@ -840,6 +840,14 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     }
 
 
+    /**
+     * 导入清单下发参数
+     * @param operationVO
+     * @param batchNum
+     * @param ruleId
+     * @param isSample
+     * @return
+     */
     private TrialOperationParamES getTrialOperationParamES(TrialOperationVO operationVO, Long batchNum, Long ruleId, boolean isSample) {
         TrialOperationParamES param = new TrialOperationParamES();
         param.setRuleId(ruleId);

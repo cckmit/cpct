@@ -60,7 +60,7 @@ public class FilterRuleController extends BaseController {
         return JSON.toJSONString(filterRuleListMap);
     }
 
-    /**
+    /**;
      * 查询过滤规则列表(含分页)
      */
     @RequestMapping("/qryFilterRule")
