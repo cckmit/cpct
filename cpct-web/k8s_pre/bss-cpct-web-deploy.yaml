@@ -22,12 +22,12 @@ spec:
         image: 134.96.180.23:8001/hchc/bss-cpct-web-pre:1.0  #这里修改  地址使用这个么？
         imagePullPolicy: Always
         env:
-#        - name: DUBBO_IP_TO_REGISTRY     # 当项目为对外项目时，此处注解取消
-#          valueFrom:
-#           fieldRef:
-#            fieldPath: status.hostIP
-#        - name: DUBBO_PORT_TO_REGISTRY
-#          value: "30007"
+        - name: DUBBO_IP_TO_REGISTRY     # 当项目为对外项目时，此处注解取消
+          valueFrom:
+           fieldRef:
+            fieldPath: status.hostIP
+        - name: DUBBO_PORT_TO_REGISTRY
+          value: "30821"
         - name: ESB_UNREGISTER_URI
           valueFrom:
             configMapKeyRef:

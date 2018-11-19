@@ -10,4 +10,4 @@ spec:
   - port: 30821
     nodePort: 30821
   selector:
-    name: bss-cpct-web
+    name: bss-cpct-web-pre

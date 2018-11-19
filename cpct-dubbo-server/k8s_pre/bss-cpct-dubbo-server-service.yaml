@@ -10,4 +10,4 @@ spec:
   - port: 30823
     nodePort: 30823
   selector:
-    name: bss-cpct-dubbo-server
+    name: bss-cpct-dubbo-server-pre

@@ -10,4 +10,4 @@ spec:
   - port: 30824
     nodePort: 30824
   selector:
-    name: bss-cpct-dubbo-label
+    name: bss-cpct-dubbo-label-pre
