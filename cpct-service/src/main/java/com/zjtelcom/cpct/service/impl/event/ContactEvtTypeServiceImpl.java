@@ -126,7 +126,7 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return maps;
@@ -178,7 +178,7 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return maps;
@@ -220,7 +220,7 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return maps;

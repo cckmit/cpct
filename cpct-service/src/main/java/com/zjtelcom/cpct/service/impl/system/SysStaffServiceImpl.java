@@ -171,7 +171,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;
@@ -220,7 +220,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;

@@ -190,7 +190,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return maps;
@@ -302,7 +302,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return maps;
@@ -381,7 +381,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return  queryLabelListByDisplayId(dc);
