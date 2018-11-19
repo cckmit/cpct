@@ -119,7 +119,7 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;
@@ -161,7 +161,7 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;
@@ -186,7 +186,7 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;

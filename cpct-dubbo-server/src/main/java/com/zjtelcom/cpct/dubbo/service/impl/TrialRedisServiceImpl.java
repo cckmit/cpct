@@ -21,7 +21,11 @@ public class TrialRedisServiceImpl implements TrialRedisService {
         try {
             result.put("resultCode",CODE_SUCCESS);
             result.put("resultMsg","查询成功");
-            result.put("result",redisUtils.get(key));
+            if (key.contains("ISSURE_")){
+                result.put("result",redisUtils.hgetAllRedisList(key));
+            }else {
+                result.put("result",redisUtils.get(key));
+            }
         }catch (Exception e){
             e.printStackTrace();
             result.put("resultCode",CODE_SUCCESS);

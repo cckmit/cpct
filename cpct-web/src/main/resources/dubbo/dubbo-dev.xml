@@ -42,5 +42,4 @@
         <dubbo:method name="strategyIssure" servicecode="00.1083.strategyIssure" timeout="100000"/>
     </dubbo:reference>
 
-
 </beans>

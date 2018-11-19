@@ -262,7 +262,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         //按规则存储客户信息
         for (int i = 0; i < num; i++) {
             redisUtils.hset("ISSURE_" + batchNumSt + "_" + ruleId, i + "",smallCustomers.get(i));
-            System.out.println("规则：" + i + redisUtils.hmGet("HITS_" + batchNumSt + "_" + ruleId, i + ""));
+            System.out.println("规则：" + i + redisUtils.get("ISSURE_" + batchNumSt + "_" + ruleId));
         }
 //        redisUtils.set("ISSURE_" + batchNumSt + "_" + ruleId,customerList);
         MktCampaignDO campaignDO = campaignMapper.selectByPrimaryKey(operation.getCampaignId());
