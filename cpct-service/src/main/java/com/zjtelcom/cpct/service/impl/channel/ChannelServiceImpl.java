@@ -334,7 +334,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;
@@ -370,7 +370,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;
@@ -403,7 +403,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;

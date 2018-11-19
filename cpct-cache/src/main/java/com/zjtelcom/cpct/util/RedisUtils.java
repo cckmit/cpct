@@ -15,6 +15,7 @@ import redis.clients.jedis.JedisPoolConfig;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -31,6 +32,39 @@ public class RedisUtils {
 
 //    @Autowired
 //    private HashOperations<String,String,Object> hashOperations;
+
+
+    /**
+     *
+     * 通过key获取所有客户信息
+     * @param key
+     * @return List<Map<String, Object>>
+     */
+    public Object hgetAllRedisList(final String key) {
+        CtgJedisPool ctgJedisPool = initCatch();
+        Object result = null;
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                Map<String, String> resultMap = jedis.hgetAll(key);
+                List<Map<String, Object>> mapList = new ArrayList<>();
+                for (Map.Entry<String, String> entry : resultMap.entrySet()) {
+                    mapList.addAll((List<Map<String, Object>>) unserizlize(entry.getValue()));
+                }
+                result = mapList;
+                jedis.close();
+            } catch (Throwable je) {
+                je.printStackTrace();
+                jedis.close();
+            }
+            ctgJedisPool.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
 
     /**
      * 写入缓存

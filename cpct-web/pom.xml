@@ -122,6 +122,12 @@
             </activation>
         </profile>
         <profile>
+            <id>online</id>
+            <properties>
+                <spring.profiles.active>online</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
             <id>pst</id>
             <properties>
                 <spring.profiles.active>pst</spring.profiles.active>

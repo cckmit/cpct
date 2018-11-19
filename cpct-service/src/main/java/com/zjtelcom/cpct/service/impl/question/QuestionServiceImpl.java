@@ -147,7 +147,7 @@ public class QuestionServiceImpl implements QuestionService {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;
@@ -190,7 +190,7 @@ public class QuestionServiceImpl implements QuestionService {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;
@@ -256,7 +256,7 @@ public class QuestionServiceImpl implements QuestionService {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;

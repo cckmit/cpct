@@ -439,9 +439,9 @@ public class EventApiServiceImpl implements EventApiService {
                     //查询标识
                     param.put("c3", map.get("lanId"));
                     param.put("queryId", map.get("custId"));
-                    param.put("queryFields", "ASSET_INTEG_ID");
+                    param.put("queryFields", "");
                     param.put("type", "4");
-                    System.out.println("param " + param.toString());
+                    System.out.println("客户级查询param " + param.toString());
                     Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
                     System.out.println(dubboResult.toString());
 
@@ -523,7 +523,7 @@ public class EventApiServiceImpl implements EventApiService {
                     String orderPriorityLast = (String) activityList.get(recCampaignAmount - 1).get("orderPriority");
 
                     for (int i = recCampaignAmount; i < activityList.size(); i++) {
-                        if(!orderPriorityLast.equals(activityList.get(i).get("orderPriority"))) {
+                        if (!orderPriorityLast.equals(activityList.get(i).get("orderPriority"))) {
                             //es log
                             esJson.put("msg", "推荐数：" + i + ",命中数：" + activityList.size());
                             //事件推荐活动数
@@ -1281,15 +1281,15 @@ public class EventApiServiceImpl implements EventApiService {
 
                         String[] strArray = tarGrpConditionDOs.get(i).getRightParam().split(",");
 
-                        expressSb.append(" >= ").append("\"").append(strArray[0]).append("\"").append(")");
-                        expressSb.append(" && ").append("((");
-                        expressSb.append(label.getInjectionLabelCode()).append(")");
-                        expressSb.append(" <= ").append("\"").append(strArray[1]).append("\"");
-
-//                        expressSb.append(" >= ").append(strArray[0]);
-//                        expressSb.append(" && ").append("(");
+//                        expressSb.append(" >= ").append("\"").append(strArray[0]).append("\"").append(")");
+//                        expressSb.append(" && ").append("((");
 //                        expressSb.append(label.getInjectionLabelCode()).append(")");
-//                        expressSb.append(" <= ").append(strArray[1]);
+//                        expressSb.append(" <= ").append("\"").append(strArray[1]).append("\"");
+
+                        expressSb.append(" >= ").append(strArray[0]);
+                        expressSb.append(" && ").append("(");
+                        expressSb.append(label.getInjectionLabelCode()).append(")");
+                        expressSb.append(" <= ").append(strArray[1]);
 
                         express1.append(" >= ").append("\"").append(strArray[0]).append("\"");
                         express1.append(" && ").append("(");
@@ -1320,7 +1320,7 @@ public class EventApiServiceImpl implements EventApiService {
                     }
 
                     expressSb.append(")");
-                    express1.append(") {return true} else {return false}");
+                    express1.append(") {return true}");
                     System.out.println(express1.toString());
 
                     try {
