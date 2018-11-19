@@ -439,9 +439,9 @@ public class EventApiServiceImpl implements EventApiService {
                     //查询标识
                     param.put("c3", map.get("lanId"));
                     param.put("queryId", map.get("custId"));
-                    param.put("queryFields", "ASSET_INTEG_ID");
+                    param.put("queryFields", "");
                     param.put("type", "4");
-                    System.out.println("param " + param.toString());
+                    System.out.println("客户级查询param " + param.toString());
                     Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
                     System.out.println(dubboResult.toString());
 
