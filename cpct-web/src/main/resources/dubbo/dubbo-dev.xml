@@ -2,7 +2,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-	http://code.alibabatech.com/schema/dubbo 
+	http://code.alibabatech.com/schema/dubbo
 	http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 
     <!-- 提供方应用信息，用于计算依赖关系 -->
@@ -36,5 +36,11 @@
         <!--<dubbo:method name="hgetAll" servicecode="00.1077.ctgSessionHgetAll"/>-->
         <!--<dubbo:method name="exists" servicecode="00.1077.ctgSessionExists"/>-->
     <!--</dubbo:reference>-->
+
+    <!-- 佣金政策查询 -->
+    <dubbo:reference interface="com.web.asiainfo.zhejiang.interfaces.PolicyTemplateDataService"
+                     id="policyTemplateDataService" version="1.0">
+        <dubbo:method name="policyTemplateData" servicecode="33.1039.policyTemplateData"/>
+    </dubbo:reference>
 
 </beans>
