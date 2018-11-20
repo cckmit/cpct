@@ -5,7 +5,6 @@ import com.zjtelcom.cpct.dao.channel.InjectionLabelGrpMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelGrpMbrMapper;
 import com.zjtelcom.cpct.domain.channel.LabelGrp;
 import com.zjtelcom.cpct.domain.channel.LabelGrpMbr;
-import com.zjtelcom.cpct.domain.channel.MessageLabel;
 import com.zjtelcom.cpct.enums.SynchronizeType;
 import com.zjtelcom.cpct.exception.SystemException;
 import com.zjtelcom.cpct.service.synchronize.SynchronizeRecordService;
@@ -57,18 +56,16 @@ public class SynLabelGrpServiceImpl implements SynLabelGrpService {
         if(null==labelGrp1){
             injectionLabelGrpPrdMapper.insert(labelGrp);
             //增加对应的关联
-
+            for (LabelGrpMbr labelGrpMbr:listByGrpId){
+                injectionLabelGrpMbrPrdMapper.insert(labelGrpMbr);
+            }
             synchronizeRecordService.addRecord(roleName,tableName,labelGrpId, SynchronizeType.add.getType());
         }else{
             injectionLabelGrpPrdMapper.updateByPrimaryKey(labelGrp);
-            injectionLabelGrpMbrPrdMapper.deleteByLabelGrpId(labelGrpId);
+            diffLabelGroup(listByGrpId,labelGrp1);
             synchronizeRecordService.addRecord(roleName,tableName,labelGrpId, SynchronizeType.update.getType());
         }
-        if(!listByGrpId.isEmpty()){
-            for (LabelGrpMbr grpMbr:listByGrpId){
-                injectionLabelGrpMbrPrdMapper.insert(grpMbr);
-            }
-        }
+
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
         return maps;
@@ -115,33 +112,20 @@ public class SynLabelGrpServiceImpl implements SynLabelGrpService {
         for(LabelGrp c:addList){
             injectionLabelGrpPrdMapper.insert(c);
             List<LabelGrpMbr> listByGrpId = injectionLabelGrpMbrMapper.findListByGrpId(c.getGrpId());
-            if(!listByGrpId.isEmpty()){
-                for (LabelGrpMbr grpMbr:listByGrpId){
-                    injectionLabelGrpMbrPrdMapper.insert(grpMbr);
-                }
-            }
+            diffLabelGroup(listByGrpId,c);
             synchronizeRecordService.addRecord(roleName,tableName,c.getGrpId(), SynchronizeType.add.getType());
         }
         //开始修改
         for(LabelGrp c:updateList){
             injectionLabelGrpPrdMapper.updateByPrimaryKey(c);
             List<LabelGrpMbr> listByGrpId = injectionLabelGrpMbrMapper.findListByGrpId(c.getGrpId());
-            if(!listByGrpId.isEmpty()){
-                for (LabelGrpMbr grpMbr:listByGrpId){
-                    injectionLabelGrpMbrPrdMapper.updateByPrimaryKey(grpMbr);
-                }
-            }
+            diffLabelGroup(listByGrpId,c);
             synchronizeRecordService.addRecord(roleName,tableName,c.getGrpId(), SynchronizeType.update.getType());
         }
         //开始删除
         for(LabelGrp c:deleteList){
             injectionLabelGrpPrdMapper.deleteByPrimaryKey(c.getGrpId());
-            List<LabelGrpMbr> listByGrpId = injectionLabelGrpMbrMapper.findListByGrpId(c.getGrpId());
-            if(!listByGrpId.isEmpty()){
-                for (LabelGrpMbr grpMbr:listByGrpId){
-                    injectionLabelGrpMbrPrdMapper.deleteByPrimaryKey(grpMbr.getGrpMbrId());
-                }
-            }
+            injectionLabelGrpMbrPrdMapper.deleteByLabelGrpId(c.getGrpId());
             synchronizeRecordService.addRecord(roleName,tableName,c.getGrpId(), SynchronizeType.delete.getType());
         }
 
@@ -162,5 +146,88 @@ public class SynLabelGrpServiceImpl implements SynLabelGrpService {
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
         return maps;
+    }
+
+
+    /**
+     * 比较两个环境的标签组的配置信息
+     * @param prdList
+     * @param labelGrp1
+     */
+    public void diffLabelGroup(List<LabelGrpMbr> prdList,LabelGrp labelGrp1){
+        List<LabelGrpMbr> realList = injectionLabelGrpMbrPrdMapper.findListByGrpId(labelGrp1.getGrpId());
+
+        if (prdList.isEmpty() || realList.isEmpty()) {
+            if (prdList.isEmpty() && !realList.isEmpty()) {
+                //清除生产环境数据
+                for (int i = 0; i < realList.size(); i++) {
+                    injectionLabelGrpMbrPrdMapper.deleteByPrimaryKey(realList.get(i).getGrpMbrId());
+                }
+            } else if (!prdList.isEmpty()) {
+                //全量新增准生产的数据到生产环境
+                for (int i = 0; i < prdList.size(); i++) {
+                    injectionLabelGrpMbrPrdMapper.insert(prdList.get(i));
+                }
+            }
+            return;
+        }
+
+
+        List<LabelGrpMbr> addList = new ArrayList<LabelGrpMbr>();
+        List<LabelGrpMbr> updateList = new ArrayList<LabelGrpMbr>();
+        List<LabelGrpMbr> deleteList = new ArrayList<LabelGrpMbr>();
+        //首先判断准生产 或生产是否存在某一方数据修改为0的情况
+        if (prdList.isEmpty() || realList.isEmpty()) {
+            if (prdList.isEmpty() && !realList.isEmpty()) {
+                //清除生产环境数据
+                for (int i = 0; i < realList.size(); i++) {
+                    injectionLabelGrpMbrPrdMapper.deleteByPrimaryKey(realList.get(i).getGrpMbrId());
+                }
+            } else if (!prdList.isEmpty() && realList.isEmpty()) {
+                //全量新增准生产的数据到生产环境
+                for (int i = 0; i < prdList.size(); i++) {
+                    injectionLabelGrpMbrPrdMapper.insert(prdList.get(i));
+                }
+            }
+            return;
+        }
+
+        for (LabelGrpMbr c : prdList) {
+            for (int i = 0; i < realList.size(); i++) {
+                if (c.getGrpMbrId() - realList.get(i).getGrpMbrId() == 0) {
+                    //需要修改的
+                    updateList.add(c);
+                    break;
+                } else if (i == realList.size() - 1) {
+                    //需要新增的  准生产存在，生产不存在
+                    addList.add(c);
+                }
+            }
+        }
+        for (LabelGrpMbr c : realList) {
+            for (int i = 0; i < prdList.size(); i++) {
+                if (c.getGrpMbrId() - prdList.get(i).getGrpMbrId() == 0) {
+                    break;
+                } else if (i == prdList.size() - 1) {
+                    //需要删除的   生产存在,准生产不存在
+                    deleteList.add(c);
+                }
+            }
+        }
+        //开始新增
+        for (LabelGrpMbr c : addList) {
+            injectionLabelGrpMbrPrdMapper.insert(c);
+        }
+        //开始修改
+        for (LabelGrpMbr c : updateList) {
+            injectionLabelGrpMbrPrdMapper.updateByPrimaryKey(c);
+        }
+        //开始删除
+        for (LabelGrpMbr c : deleteList) {
+            injectionLabelGrpMbrPrdMapper.deleteByPrimaryKey(c.getGrpMbrId());
+        }
+
+
+
     }
 }

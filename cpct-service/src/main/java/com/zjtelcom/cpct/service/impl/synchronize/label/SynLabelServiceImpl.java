@@ -70,13 +70,7 @@ public class SynLabelServiceImpl implements SynLabelService{
             synchronizeRecordService.addRecord(roleName,tableName,labelId, SynchronizeType.add.getType());
         }else{
             injectionLabelPrdMapper.updateByPrimaryKey(label);
-            injectionLabelValuePrdMapper.deleteByLabelId(labelId);
-            if(!labelValues.isEmpty()){
-                injectionLabelValuePrdMapper.insertBatch(labelValues);
-//                for (LabelValue labelValue:labelValues){
-//                    injectionLabelValuePrdMapper.updateByPrimaryKey(labelValue);
-//                }
-            }
+            diffLabelValue(labelValues,label1);
             synchronizeRecordService.addRecord(roleName,tableName,labelId, SynchronizeType.update.getType());
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -128,34 +122,23 @@ public class SynLabelServiceImpl implements SynLabelService{
         for(Label c:addList){
             injectionLabelPrdMapper.insert(c);
             List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(c.getInjectionLabelId());
-            if(!labelValues.isEmpty()){
-                injectionLabelValuePrdMapper.insertBatch(labelValues);
-            }
+            diffLabelValue(labelValues,c);
             synchronizeRecordService.addRecord(roleName,tableName,c.getInjectionLabelId(), SynchronizeType.add.getType());
         }
         //开始修改
         for(Label c:updateList){
             injectionLabelPrdMapper.updateByPrimaryKey(c);
             List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(c.getInjectionLabelId());
-            if(!labelValues.isEmpty()){
-                for (LabelValue labelValue:labelValues){
-                    injectionLabelValuePrdMapper.updateByPrimaryKey(labelValue);
-                 }
-            }
+            diffLabelValue(labelValues,c);
             synchronizeRecordService.addRecord(roleName,tableName,c.getInjectionLabelId(), SynchronizeType.update.getType());
         }
         //开始删除
         for(Label c:deleteList){
             injectionLabelPrdMapper.deleteByPrimaryKey(c.getInjectionLabelId());
             List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(c.getInjectionLabelId());
-            if(!labelValues.isEmpty()){
-                for (LabelValue labelValue:labelValues){
-                    injectionLabelValuePrdMapper.deleteByPrimaryKey(labelValue.getLabelValueId());
-                }
-            }
+            diffLabelValue(labelValues,c);
             synchronizeRecordService.addRecord(roleName,tableName,c.getInjectionLabelId(), SynchronizeType.delete.getType());
         }
-
 
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
@@ -177,6 +160,39 @@ public class SynLabelServiceImpl implements SynLabelService{
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
         return maps;
+    }
+
+
+    /**
+     * 比较标签对应的标签值是否对应
+     * !!!准生产代码 每次修改标签都会把他对应的标签值都删除 再新增数据 所以准生产所有的修改我们都对生产环境执行先全删除再新增
+     * @param prdList  准生产标签对应的标签值
+     * @param label1   生产环境的标签
+     */
+    public void diffLabelValue(List<LabelValue> prdList,Label label1){
+        //1.1首先判断准生产 或生产是否存在某一方数据修改为0的情况
+        List<LabelValue> realList = injectionLabelValuePrdMapper.selectByLabelId(label1.getInjectionLabelId());
+        if (prdList.isEmpty() || realList.isEmpty()) {
+            if (prdList.isEmpty() && !realList.isEmpty()) {
+                //清除生产环境数据
+                for (int i = 0; i < realList.size(); i++) {
+                    injectionLabelValuePrdMapper.deleteByPrimaryKey(realList.get(i).getLabelValueId());
+                }
+            } else if (!prdList.isEmpty() && realList.isEmpty()) {
+                //全量新增准生产的数据到生产环境
+                for (int i = 0; i < prdList.size(); i++) {
+                    injectionLabelValuePrdMapper.insert(prdList.get(i));
+                }
+            }
+            return;
+        }
+        //1.2先删除生产环境的对应标签值
+        for(LabelValue c:realList){
+            injectionLabelValuePrdMapper.deleteByPrimaryKey(c.getLabelValueId());
+        }
+        //1.3新增标签值到生产环境
+        injectionLabelValuePrdMapper.insertBatch(prdList);
+
     }
 
 

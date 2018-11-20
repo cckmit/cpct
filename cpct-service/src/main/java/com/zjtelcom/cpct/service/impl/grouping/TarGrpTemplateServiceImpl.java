@@ -28,10 +28,12 @@ import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.enums.RightParamType;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.grouping.TarGrpTemplateService;
+import com.zjtelcom.cpct.service.synchronize.template.SynTarGrpTemplateService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,7 +64,10 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     private TarGrpMapper tarGrpMapper;
     @Autowired
     private TarGrpConditionMapper tarGrpConditionMapper;
-
+    @Autowired
+    private SynTarGrpTemplateService synTarGrpTemplateService;
+    @Value("${sync.value}")
+    private String value;
 
     /**
      * 新增目标分群模板
@@ -71,7 +76,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
      * @return
      */
     @Override
-    public Map<String, Object> saveTarGrpTemplate(TarGrpTemplateDetail tarGrpTemplateDetail) {
+    public Map<String, Object> saveTarGrpTemplate(final TarGrpTemplateDetail tarGrpTemplateDetail) {
         Map<String, Object> tarGrpTemplateMap = new HashMap<>();
         TarGrp tarGrpTemplateDO = BeanUtil.create(tarGrpTemplateDetail, new TarGrp());
         tarGrpTemplateDO.setTarGrpName(tarGrpTemplateDetail.getTarGrpTemplateName()==null ? "" : tarGrpTemplateDetail.getTarGrpTemplateName() );
@@ -109,6 +114,17 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                 tarGrpConditionMapper.insert(tarGrpTemplateConditionDO);
             }
         }
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synTarGrpTemplateService.synchronizeSingleTarGrp(tarGrpTemplateDetail.getTarGrpTemplateId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
+        }
         tarGrpTemplateMap.put("resultCode", CommonConstant.CODE_SUCCESS);
         tarGrpTemplateMap.put("tarGrpTemplateId", tarGrpTemplateId);
         return tarGrpTemplateMap;
@@ -121,7 +137,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
      * @return
      */
     @Override
-    public Map<String, Object> updateTarGrpTemplate(TarGrpTemplateDetail tarGrpTemplateDetail) {
+    public Map<String, Object> updateTarGrpTemplate(final TarGrpTemplateDetail tarGrpTemplateDetail) {
 
         Map<String, Object> tarGrpTemplateMap = new HashMap<>();
         if (tarGrpTemplateDetail.getTarGrpType()!=null && tarGrpTemplateDetail.getTarGrpType().equals("2000")){
@@ -181,6 +197,17 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                     tarGrpConditionMapper.insert(tarGrpTemplateConditionDO);
                 }
             }
+        }
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synTarGrpTemplateService.synchronizeSingleTarGrp(tarGrpTemplateDetail.getTarGrpTemplateId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
         }
         tarGrpTemplateMap.put("resultCode", CommonConstant.CODE_SUCCESS);
         tarGrpTemplateMap.put("tarGrpTemplateId", tarGrpTemplateId);
@@ -321,7 +348,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
      * @return
      */
     @Override
-    public Map<String, Object> deleteTarGrpTemplate(Long tarGrpTemplateId) {
+    public Map<String, Object> deleteTarGrpTemplate(final Long tarGrpTemplateId) {
         Map<String, Object> tarGrpTemplateMap = new HashMap<>();
         TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpTemplateId);
         if (tarGrp==null){
@@ -336,6 +363,18 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         }
         tarGrpMapper.deleteByPrimaryKey(tarGrpTemplateId);
         tarGrpConditionMapper.deleteByTarGrpTemplateId(tarGrpTemplateId);
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synTarGrpTemplateService.deleteSingleTarGrp(tarGrpTemplateId,"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
+        }
         tarGrpTemplateMap.put("resultCode", CommonConstant.CODE_SUCCESS);
         tarGrpTemplateMap.put("tarGrpTemplateId", tarGrpTemplateId);
         return tarGrpTemplateMap;
