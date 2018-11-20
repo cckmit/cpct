@@ -9,7 +9,6 @@ import com.zjtelcom.cpct.domain.question.QuestRel;
 import com.zjtelcom.cpct.domain.question.Question;
 import com.zjtelcom.cpct.domain.question.QuestionDetail;
 import com.zjtelcom.cpct.domain.question.Questionnaire;
-import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.enums.SynchronizeType;
 import com.zjtelcom.cpct.exception.SystemException;
 import com.zjtelcom.cpct.service.BaseService;
@@ -64,7 +63,7 @@ public class SynQuestionServiceImpl  extends BaseService implements SynQuestionS
     private String questionBankDetail="mkt_question_detail";
 
     /**
-     * 同步问卷
+     * 同步问卷 这里的同步每次修改主环境代码都是把问卷相关的问卷关联全删除 再全新增
      * @param questionnaireId
      * @return
      */
@@ -90,9 +89,6 @@ public class SynQuestionServiceImpl  extends BaseService implements SynQuestionS
             questRelPrdMapper.deleteByNaireId(questionnaireId);
             if(!relListByQuestionnaireId.isEmpty()){
                 questRelPrdMapper.insertBatch(relListByQuestionnaireId);
-//               for (QuestRel questRel:relListByQuestionnaireId){
-//                   questRelPrdMapper.updateByPrimaryKey(questRel);
-//               }
             }
         }
         result.put("resultCode",CODE_SUCCESS);
@@ -138,7 +134,7 @@ public class SynQuestionServiceImpl  extends BaseService implements SynQuestionS
 
 
     /**
-     * 同步单个问卷题库
+     * 同步单个问卷题库  这里的同步每次修改主环境代码都是把题库相关的题库详情全删除 再全新增
      * @param roleName
      * @param questionnaireId
      * @return
@@ -416,14 +412,6 @@ public class SynQuestionServiceImpl  extends BaseService implements SynQuestionS
             synchronizeRecordService.addRecord(roleName,tableName,c.getRelId(), SynchronizeType.delete.getType());
         }
     }
-
-
-
-
-
-
-
-
 
 
 

@@ -3,7 +3,7 @@ adminPath: data
 
 #服务器部署相关配置
 logging:
-  path: /app/cpct/logs/bss-cpct.log
+  path: /app/logs/bss-cpct.log
   level:
     com.zjtelcom.cpct.dao: debug
 #    root: error

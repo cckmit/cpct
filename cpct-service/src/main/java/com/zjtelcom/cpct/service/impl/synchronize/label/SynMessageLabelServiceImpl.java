@@ -75,18 +75,7 @@ public class SynMessageLabelServiceImpl implements SynMessageLabelService{
             synchronizeRecordService.addRecord(roleName,tableName,labelId, SynchronizeType.add.getType());
         }else{
             displayColumnPrdMapper.updateByPrimaryKey(displayColumn);
-            if(!listByDisplayId.isEmpty()){
-                List<DisplayColumnLabel>  displayColumnLabels = displayColumnLabelPrdMapper.findListByDisplayId(displayColumn.getDisplayColumnId());
-                List<Long> list = new ArrayList<>();
-                for(DisplayColumnLabel displayColumnLabel: displayColumnLabels) {
-                    list.add(displayColumnLabel.getInjectionLabelId());
-                }
-                for (DisplayColumnLabel d:listByDisplayId){
-                    if(!list.contains(d.getInjectionLabelId())) {
-                        displayColumnLabelPrdMapper.insert(d);
-                    }
-                }
-            }
+            diffMessageLabel(listByDisplayId,displayColumn1);
             synchronizeRecordService.addRecord(roleName,tableName,labelId, SynchronizeType.update.getType());
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -134,22 +123,14 @@ public class SynMessageLabelServiceImpl implements SynMessageLabelService{
         for(DisplayColumn c:addList){
             displayColumnPrdMapper.insert(c);
             List<DisplayColumnLabel> listByDisplayId = displayColumnLabelMapper.findListByDisplayId(c.getDisplayColumnId());
-            if(!listByDisplayId.isEmpty()){
-                for (DisplayColumnLabel d:listByDisplayId){
-                    displayColumnLabelPrdMapper.insert(d);
-                }
-            }
+            diffMessageLabel(listByDisplayId,c);
             synchronizeRecordService.addRecord(roleName,tableName,c.getDisplayColumnId(), SynchronizeType.add.getType());
         }
         //开始修改
         for(DisplayColumn c:updateList){
             displayColumnPrdMapper.updateByPrimaryKey(c);
             List<DisplayColumnLabel> listByDisplayId = displayColumnLabelMapper.findListByDisplayId(c.getDisplayColumnId());
-            if(!listByDisplayId.isEmpty()){
-                for (DisplayColumnLabel d:listByDisplayId){
-                    displayColumnLabelPrdMapper.updateByPrimaryKey(d);
-                }
-            }
+            diffMessageLabel(listByDisplayId,c);
             synchronizeRecordService.addRecord(roleName,tableName,c.getDisplayColumnId(), SynchronizeType.update.getType());
         }
         //开始删除
@@ -185,6 +166,72 @@ public class SynMessageLabelServiceImpl implements SynMessageLabelService{
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
         return maps;
+    }
+
+
+    /**
+     * 判断两个环境展示列信息
+     * @param prdList         准生产对应的展示列信息
+     * @param displayColumn1  生产环境展示列表
+     */
+    public void diffMessageLabel(List<DisplayColumnLabel> prdList,DisplayColumn displayColumn1){
+        List<DisplayColumnLabel> realList = displayColumnLabelPrdMapper.findListByDisplayId(displayColumn1.getDisplayColumnId());
+        if (prdList.isEmpty() || realList.isEmpty()) {
+            if (prdList.isEmpty() && !realList.isEmpty()) {
+                //清除生产环境数据
+                for (int i = 0; i < realList.size(); i++) {
+                    displayColumnLabelPrdMapper.deleteByPrimaryKey(realList.get(i).getDisplayColumnLabelId());
+                }
+            } else if (!prdList.isEmpty()) {
+                //全量新增准生产的数据到生产环境
+                for (int i = 0; i < prdList.size(); i++) {
+                    displayColumnLabelPrdMapper.insert(prdList.get(i));
+                }
+            }
+            return;
+        }
+
+        List<DisplayColumnLabel> addList = new ArrayList<DisplayColumnLabel>();
+        List<DisplayColumnLabel> updateList = new ArrayList<DisplayColumnLabel>();
+        List<DisplayColumnLabel> deleteList = new ArrayList<DisplayColumnLabel>();
+
+
+        for (DisplayColumnLabel c : prdList) {
+            for (int i = 0; i < realList.size(); i++) {
+                if (c.getDisplayColumnLabelId() - realList.get(i).getDisplayColumnLabelId() == 0) {
+                    //需要修改的
+                    updateList.add(c);
+                    break;
+                } else if (i == realList.size() - 1) {
+                    //需要新增的  准生产存在，生产不存在
+                    addList.add(c);
+                }
+            }
+        }
+        for (DisplayColumnLabel c : realList) {
+            for (int i = 0; i < prdList.size(); i++) {
+                if (c.getDisplayColumnLabelId() - prdList.get(i).getDisplayColumnLabelId() == 0) {
+                    break;
+                } else if (i == prdList.size() - 1) {
+                    //需要删除的   生产存在,准生产不存在
+                    deleteList.add(c);
+                }
+            }
+        }
+        //开始新增
+        for (DisplayColumnLabel c : addList) {
+            displayColumnLabelPrdMapper.insert(c);
+        }
+        //开始修改
+        for (DisplayColumnLabel c : updateList) {
+            displayColumnLabelPrdMapper.updateByPrimaryKey(c);
+        }
+        //开始删除
+        for (DisplayColumnLabel c : deleteList) {
+            displayColumnLabelPrdMapper.deleteByPrimaryKey(c.getDisplayColumnLabelId());
+        }
+
+
     }
 
 

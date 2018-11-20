@@ -1,6 +1,5 @@
 package com.zjtelcom.cpct.controller.system;
-import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
-import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDetail;
+
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.system.SysMenuMapper;
 import com.zjtelcom.cpct.dao.system.SysRoleMapper;
@@ -22,8 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 @RestController
 @RequestMapping("${adminPath}")
