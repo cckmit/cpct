@@ -17,6 +17,8 @@ import com.zjtelcom.cpct.dto.event.EventTypeDTO;
 import com.zjtelcom.cpct.request.event.QryContactEvtTypeReq;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.CatalogService;
+import com.zjtelcom.cpct_prod.dao.offer.CatalogItemProdMapper;
+import com.zjtelcom.cpct_prod.dao.offer.OfferProdMapper;
 import net.sf.ehcache.util.ProductInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,13 +33,9 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 @Service
 public class CatalogServiceImpl extends BaseService implements CatalogService {
     @Autowired
-    private CatalogItemMapper catalogItemMapper;
+    private CatalogItemProdMapper catalogItemMapper;
     @Autowired
-    private OfferMapper offerMapper;
-    @Autowired
-    private ObjCatItemRelMapper catItemRelMapper;
-    @Autowired
-    private OfferCatalogLocationMapper offerCatalogLocationMapper;
+    private OfferProdMapper offerMapper;
 
 
     /**
