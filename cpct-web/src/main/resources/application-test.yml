@@ -28,6 +28,13 @@ spring:
     username: root
     password: xc.cpct
 
+# 第三数据源
+  datasourcethird:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://47.94.168.117:3306/fpc_system?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
+    username: root
+    password: Yanlei2018
+
   redis:
       host: 47.94.168.117
       port: 6379
