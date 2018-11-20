@@ -3,10 +3,13 @@ package com.zjtelcom.cpct;
 /**
  * Created by huanghua on 2017/5/23.
  */
+//import com.ctzj.smt.bss.centralized.authenticate.config.HttpSessionConfig;
+//import com.ctzj.smt.bss.centralized.authenticate.config.WebSecurityConfig;
+//import com.ctzj.smt.bss.centralized.authenticate.security.userdetails.service.MyUserDetailsService;
+//import com.ctzj.smt.bss.centralized.web.config.MyFilterConfig;
 import com.ctzj.smt.bss.centralized.authenticate.config.HttpSessionConfig;
 import com.ctzj.smt.bss.centralized.authenticate.config.WebSecurityConfig;
 import com.ctzj.smt.bss.centralized.authenticate.security.userdetails.service.MyUserDetailsService;
-import com.ctzj.smt.bss.centralized.web.config.MyFilterConfig;
 import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

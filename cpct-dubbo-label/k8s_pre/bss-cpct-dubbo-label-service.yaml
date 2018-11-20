@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bss-cpct-dubbo-label-pre
+  labels:
+    name: bss-cpct-dubbo-label-pre
+spec:
+  type: NodePort
+  ports:
+  - port: 30824
+    nodePort: 30824
+  selector:
+    name: bss-cpct-dubbo-label-pre

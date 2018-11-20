@@ -1,9 +1,9 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: bss-cpct-web #这里修改
+  name: bss-cpct-web-pre #这里修改
   labels:
-    name: bss-cpct-web  #这里修改
+    name: bss-cpct-web-pre  #这里修改
 spec:
   replicas: 1
   strategy:
@@ -15,11 +15,11 @@ spec:
   template:
     metadata:
       labels:
-        name: bss-cpct-web  #这里修改
+        name: bss-cpct-web-pre  #这里修改
     spec:
       containers:
-      - name: bss-cpct-web  #这里修改
-        image: 134.96.180.23:8001/hchc/bss-cpct-web:1.0  #这里修改  地址使用这个么？
+      - name: bss-cpct-web-pre  #这里修改
+        image: 134.96.180.23:8001/hchc/bss-cpct-web-pre:1.0  #这里修改  地址使用这个么？
         imagePullPolicy: Always
         env:
         - name: DUBBO_IP_TO_REGISTRY     # 当项目为对外项目时，此处注解取消
@@ -27,7 +27,7 @@ spec:
            fieldRef:
             fieldPath: status.hostIP
         - name: DUBBO_PORT_TO_REGISTRY
-          value: "30801"
+          value: "30821"
         - name: ESB_UNREGISTER_URI
           valueFrom:
             configMapKeyRef:
@@ -41,12 +41,12 @@ spec:
         - name: tz-config
           mountPath: /etc/localtime
         - name: app-log
-          mountPath: /app/cpct/logs
+          mountPath: /app/dubbo/logs
         ports:
-        - containerPort: 30801    #修改端口号
+        - containerPort: 30821    #修改端口号
         readinessProbe:
           tcpSocket:
-            port: 30801   #修改端口号
+            port: 30821   #修改端口号
           initialDelaySeconds: 20
           periodSeconds: 10
           failureThreshold: 3
@@ -80,4 +80,4 @@ spec:
           path: /etc/localtime
       - name: app-log
         hostPath:
-          path: /app/app-log/bss-cpct-web/
+          path: /app/app-log
