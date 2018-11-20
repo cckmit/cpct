@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.controller.system;
 
 import com.alibaba.fastjson.JSON;
+import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
+import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDetail;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.system.SysStaffDTO;
@@ -16,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+
 /**
  * 用户模块控制器
  */
@@ -25,6 +29,19 @@ public class SysStaffController extends BaseController {
 
     @Autowired
     private SysStaffService sysStaffService;
+
+
+
+    @RequestMapping("/getSysUser")
+    @ResponseBody
+    @CrossOrigin
+    public Map<String,Object> getSysUser() {
+        Map<String,Object> result = new HashMap<>();
+        SystemUserDetail userDetail = BssSessionHelp.getSystemUserDetail();
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",userDetail);
+        return result;
+    }
 
     /**
      * 查询员工列表（分页）

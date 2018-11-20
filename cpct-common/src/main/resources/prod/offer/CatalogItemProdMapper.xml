@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct_prod.dao.offer.CatalogItemProdMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.CatalogItem">
+    <id column="CATALOG_ITEM_ID" jdbcType="BIGINT" property="catalogItemId" />
+    <result column="CATALOG_ID" jdbcType="BIGINT" property="catalogId" />
+    <result column="PAR_CATALOG_ITEM_ID" jdbcType="BIGINT" property="parCatalogItemId" />
+    <result column="CATALOG_ITEM_NAME" jdbcType="VARCHAR" property="catalogItemName" />
+    <result column="CATALOG_ITEM_DESC" jdbcType="VARCHAR" property="catalogItemDesc" />
+    <result column="CATALOG_ITEM_TYPE" jdbcType="VARCHAR" property="catalogItemType" />
+    <result column="CATALOG_ITEM_NBR" jdbcType="VARCHAR" property="catalogItemNbr" />
+    <result column="CATALOG_ITEM_SORT" jdbcType="DECIMAL" property="catalogItemSort" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from catalog_item
+    where CATALOG_ITEM_ID = #{catalogItemId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.CatalogItem">
+    insert into catalog_item (CATALOG_ITEM_ID, CATALOG_ID, PAR_CATALOG_ITEM_ID, 
+      CATALOG_ITEM_NAME, CATALOG_ITEM_DESC, CATALOG_ITEM_TYPE, 
+      CATALOG_ITEM_NBR, CATALOG_ITEM_SORT, STATUS_CD, 
+      CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
+      STATUS_DATE, UPDATE_DATE, REMARK
+      )
+    values (#{catalogItemId,jdbcType=BIGINT}, #{catalogId,jdbcType=BIGINT}, #{parCatalogItemId,jdbcType=BIGINT}, 
+      #{catalogItemName,jdbcType=VARCHAR}, #{catalogItemDesc,jdbcType=VARCHAR}, #{catalogItemType,jdbcType=VARCHAR}, 
+      #{catalogItemNbr,jdbcType=VARCHAR}, #{catalogItemSort,jdbcType=DECIMAL}, #{statusCd,jdbcType=VARCHAR}, 
+      #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.CatalogItem">
+    update catalog_item
+    set CATALOG_ID = #{catalogId,jdbcType=BIGINT},
+      PAR_CATALOG_ITEM_ID = #{parCatalogItemId,jdbcType=BIGINT},
+      CATALOG_ITEM_NAME = #{catalogItemName,jdbcType=VARCHAR},
+      CATALOG_ITEM_DESC = #{catalogItemDesc,jdbcType=VARCHAR},
+      CATALOG_ITEM_TYPE = #{catalogItemType,jdbcType=VARCHAR},
+      CATALOG_ITEM_NBR = #{catalogItemNbr,jdbcType=VARCHAR},
+      CATALOG_ITEM_SORT = #{catalogItemSort,jdbcType=DECIMAL},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where CATALOG_ITEM_ID = #{catalogItemId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select CATALOG_ITEM_ID, CATALOG_ID, PAR_CATALOG_ITEM_ID, CATALOG_ITEM_NAME, CATALOG_ITEM_DESC, 
+    CATALOG_ITEM_TYPE, CATALOG_ITEM_NBR, CATALOG_ITEM_SORT, STATUS_CD, CREATE_STAFF, 
+    UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from catalog_item
+    where CATALOG_ITEM_ID = #{catalogItemId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select CATALOG_ITEM_ID, CATALOG_ID, PAR_CATALOG_ITEM_ID, CATALOG_ITEM_NAME, CATALOG_ITEM_DESC, 
+    CATALOG_ITEM_TYPE, CATALOG_ITEM_NBR, CATALOG_ITEM_SORT, STATUS_CD, CREATE_STAFF, 
+    UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from catalog_item
+  </select>
+
+  <select id="selectByCatalog" resultMap="BaseResultMap">
+    select CATALOG_ITEM_ID, CATALOG_ID, PAR_CATALOG_ITEM_ID, CATALOG_ITEM_NAME, CATALOG_ITEM_DESC,
+    CATALOG_ITEM_TYPE, CATALOG_ITEM_NBR, CATALOG_ITEM_SORT, STATUS_CD, CREATE_STAFF,
+    UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from catalog_item
+    where CATALOG_ID = #{catalogId}
+  </select>
+
+
+
+  <select id="selectByParentId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+    select CATALOG_ITEM_ID, CATALOG_ID, PAR_CATALOG_ITEM_ID, CATALOG_ITEM_NAME, CATALOG_ITEM_DESC,
+    CATALOG_ITEM_TYPE, CATALOG_ITEM_NBR, CATALOG_ITEM_SORT, STATUS_CD, CREATE_STAFF,
+    UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from catalog_item
+    where PAR_CATALOG_ITEM_ID = #{parentId}
+  </select>
+
+
+</mapper>
