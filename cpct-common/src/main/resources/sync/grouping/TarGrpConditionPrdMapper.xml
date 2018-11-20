@@ -211,4 +211,9 @@
         </foreach>
     </insert>
 
+    <delete id="deleteByTarGrpTemplateId" parameterType="java.lang.Long">
+        delete from tar_grp_condition
+        where TAR_GRP_ID = #{tarGrpTemplateId,jdbcType=BIGINT}
+    </delete>
+
 </mapper>
