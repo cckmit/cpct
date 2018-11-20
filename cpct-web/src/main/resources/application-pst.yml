@@ -18,35 +18,11 @@ spring:
     password: cpc_cpct_user_123
 
 # 第三数据源
-  datasourcethird:
+  datasourceprd:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://47.94.168.117:3306/fpc_system?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
-    username: root
-    password: Yanlei2018
-
-#spring:
-#  jta:
-#    enabled: true
-#    service: com.atomikos.icatch.standalone.UserTransactionServiceFactory
-#    max-actives: 200
-#    enable-logging: false
-#    atomikos:
-#      datasource:
-#          unique-resource-name: dataSource
-#          xa-data-source-class-name: com.alibaba.druid.pool.xa.DruidXADataSource
-#          xa-properties:
-#            driverClassName: com.mysql.jdbc.Driver
-#            url: jdbc:mysql://134.96.252.170:30304/cpct_system?useUnicode=true&characterEncoding=UTF-8&useSSL=true
-#            username: root
-#            password: xc.cpct
-#      datasource_prd:
-#          unique-resource-name: datasourcePrd
-#          xa-data-source-class-name: com.alibaba.druid.pool.xa.DruidXADataSource
-#          xa-properties:
-#            driverClassName: com.mysql.jdbc.Driver
-#            url: jdbc:mysql://134.96.252.170:30304/cpct_system?useUnicode=true&characterEncoding=UTF-8&useSSL=true
-#            username: root
-#            password: xc.cpct
+    url: jdbc:mysql://134.96.253.29:8801/smt_bss_cpc_cpct?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: cpc_cpct_user
+    password: cpc_cpct_user_123
 
 
 #redis相关配置
