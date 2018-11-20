@@ -74,10 +74,10 @@
         </dependency>
 
         <!-- 引入门户模块 -->
-        <!--<dependency>-->
-            <!--<groupId>com.ctzj.smt.bss</groupId>-->
-            <!--<artifactId>bss-centralized-authenticate</artifactId>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>com.ctzj.smt.bss</groupId>
+            <artifactId>bss-centralized-authenticate</artifactId>
+        </dependency>
         <!--<dependency>-->
             <!--<groupId>com.zjhcsoft.session</groupId>-->
             <!--<artifactId>spring-session</artifactId>-->
