@@ -36,4 +36,5 @@ public interface TarGrpConditionPrdMapper {
 
     int insertByBatch(@Param("list") List<TarGrpCondition> record);
 
+    int deleteByTarGrpTemplateId(Long tarGrpTemplateId);
 }

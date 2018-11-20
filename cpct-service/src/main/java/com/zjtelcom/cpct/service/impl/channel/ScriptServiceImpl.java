@@ -75,7 +75,7 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;
@@ -106,7 +106,7 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;
@@ -134,7 +134,7 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;

@@ -307,7 +307,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                             e.printStackTrace();
                         }
                     }
-                }.run();
+                }.start();
             }
         }
 
@@ -363,7 +363,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         map.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -647,7 +647,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                             e.printStackTrace();
                         }
                     }
-                }.run();
+                }.start();
             }
 
         }

@@ -202,7 +202,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;
@@ -254,7 +254,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;
@@ -333,7 +333,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;
@@ -405,7 +405,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;
@@ -436,7 +436,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;
@@ -465,7 +465,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;
@@ -563,7 +563,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;

@@ -97,7 +97,7 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;
@@ -135,7 +135,7 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;
