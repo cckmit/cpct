@@ -17,6 +17,14 @@ spring:
     username: cpc_cpct_user
     password: cpc_cpct_user_123
 
+# 第三数据源
+  datasourceprd:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://134.96.253.29:8801/smt_bss_cpc_cpct?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: cpc_cpct_user
+    password: cpc_cpct_user_123
+
+
 #redis相关配置
   redis:
     host: 134.96.252.170
@@ -44,5 +52,5 @@ spring:
     countinfo: http://134.96.252.170:30808/es/searchCountInfo
 #是否同步
 sync:
-  value: 0
+  value: 1
 

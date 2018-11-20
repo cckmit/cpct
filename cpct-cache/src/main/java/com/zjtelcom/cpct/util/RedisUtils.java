@@ -422,8 +422,8 @@ public class RedisUtils {
 
         List<HostAndPort> hostAndPortList = new ArrayList();
         // 接入机的ip和端口号
-//        HostAndPort host = new HostAndPort("134.108.0.57", 41701);
-        HostAndPort host = new HostAndPort("134.96.231.228", 40201);
+        HostAndPort host = new HostAndPort("134.108.0.57", 41701);
+//        HostAndPort host = new HostAndPort("134.96.231.228", 40201);
         hostAndPortList.add(host);
 
         GenericObjectPoolConfig poolConfig = new JedisPoolConfig();
@@ -434,8 +434,8 @@ public class RedisUtils {
 
         CtgJedisPoolConfig config = new CtgJedisPoolConfig(hostAndPortList);
 
-//        config.setDatabase(4970).setPassword("bss_cpcp_pocpro_user#bssCpc_ro").setPoolConfig(poolConfig).setPeriod(1000).setMonitorTimeout(100);
-        config.setDatabase(4970).setPassword("bss_cpct_common_user#bss_cpct_common_user123").setPoolConfig(poolConfig).setPeriod(1000).setMonitorTimeout(100);
+        config.setDatabase(4970).setPassword("bss_cpcp_pocpro_user#bssCpc_ro").setPoolConfig(poolConfig).setPeriod(1000).setMonitorTimeout(100);
+//        config.setDatabase(4970).setPassword("bss_cpct_common_user#bss_cpct_common_user123").setPoolConfig(poolConfig).setPeriod(1000).setMonitorTimeout(100);
 
         CtgJedisPool pool = new CtgJedisPool(config);
 
