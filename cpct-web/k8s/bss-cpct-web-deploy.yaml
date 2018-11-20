@@ -41,7 +41,7 @@ spec:
         - name: tz-config
           mountPath: /etc/localtime
         - name: app-log
-          mountPath: /app/cpct/logs
+          mountPath: /app/logs
         ports:
         - containerPort: 30801    #修改端口号
         readinessProbe:
