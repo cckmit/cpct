@@ -69,5 +69,5 @@ spring:
     countinfo: http://134.96.252.170:30808/es/searchCountInfo
 #是否同步
 sync:
-  value: 1
+  value: 0
 
