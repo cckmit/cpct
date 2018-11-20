@@ -33,6 +33,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -337,7 +338,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         if (filterRule.getFilterType().equals("3000")){
             filterRule.setLabelCode("PROM_LIST");
         }
-        if (editVO.getCondition()!=null){
+        if (editVO.getFilterType().equals("6000")){
             if (filterRule.getConditionId()==null){
                 MktVerbalCondition condition = BeanUtil.create(editVO.getCondition(),new MktVerbalCondition());
                 condition.setVerbalId(0L);
