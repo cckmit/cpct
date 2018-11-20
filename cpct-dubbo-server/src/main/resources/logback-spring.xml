@@ -6,9 +6,9 @@ debug：当此属性设置为true时，将打印出logback内部日志信息，�
 -->
 <configuration scan="false" scanPeriod="60 seconds" debug="false">
     <!-- 定义日志的根目录 -->
-    <property name="LOG_HOME" value="/app/logs/dubboserver" />
+    <property name="LOG_HOME" value="/app/logs" />
     <!-- 定义日志文件名称 -->
-    <property name="appName" value="bss-cpct-server.log"></property>
+    <property name="appName" value="bss-cpct-dubbo.log"></property>
     <!-- ch.qos.logback.core.ConsoleAppender 表示控制台输出 -->
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <!--
