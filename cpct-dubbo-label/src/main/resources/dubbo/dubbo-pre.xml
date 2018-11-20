@@ -12,7 +12,7 @@
     <dubbo:registry protocol="dubbo" address="134.96.249.149:8001"/>
 
     <!-- 暴露服务 -->
-    <dubbo:protocol name="dubbo" port="30804"/>
+    <dubbo:protocol name="dubbo" port="30824"/>
     <dubbo:monitor protocol="registry"/>
 
     <!-- 注册 -->
