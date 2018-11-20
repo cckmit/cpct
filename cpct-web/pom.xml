@@ -109,6 +109,12 @@
             <!--<artifactId>jackson-databind</artifactId>-->
         <!--</dependency>-->
 
+        <dependency>
+            <groupId>com.web.asiainfo.zhejiang</groupId>
+            <artifactId>PolicyTemplateDataService</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
     </dependencies>
 
     <profiles>
