@@ -31,6 +31,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.grouping.*;
+import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
@@ -97,6 +98,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Autowired
     private MktStrategyConfMapper strategyMapper;
     @Autowired
+    private MktStrategyConfRuleRelMapper strategyConfRuleRelMapper;
+    @Autowired
     private RestTemplate restTemplate;
     @Autowired
     private MktStrategyConfRuleRelMapper ruleRelMapper;
@@ -148,11 +151,17 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(operationVO.getCampaignId());
         if (campaign == null) {
             result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "活动策略信息有误");
+            result.put("resultMsg", "活动信息有误");
+            return result;
+        }
+        MktStrategyConfDO strategy = strategyMapper.selectByPrimaryKey(operationVO.getStrategyId());
+        if (strategy==null){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "策略信息有误");
             return result;
         }
         // 通过活动id获取关联的标签字段数组
-        String[] fieldList = getStrings(campaign);
+        String[] fieldList = getStrings(campaign,strategy);
 
         TrialOperationVO request = BeanUtil.create(operationVO,new TrialOperationVO());
         request.setFieldList(fieldList);
@@ -454,7 +463,13 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "活动策略信息有误");
             return result;
         }
-        String[] fieldList = getStrings(campaign);
+        MktStrategyConfDO strategy = strategyMapper.selectByPrimaryKey(operationVO.getStrategyId());
+        if (strategy==null){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "策略信息有误");
+            return result;
+        }
+        String[] fieldList = getStrings(campaign,strategy);
 
 
         TrialOperationVO request = BeanUtil.create(operationVO,new TrialOperationVO());
@@ -514,7 +529,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         return result;
     }
 
-    private String[] getStrings(MktCampaignDO campaign) {
+    private String[] getStrings(MktCampaignDO campaign,MktStrategyConfDO strategy) {
         // 通过活动id获取关联的标签字段数组
         DisplayColumn req = new DisplayColumn();
         req.setDisplayColumnId(campaign.getCalcDisplay());
@@ -524,6 +539,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         for (LabelDTO labelDTO : labelDTOList) {
             codeList.add(labelDTO.getLabelCode());
         }
+        List<Long> targrpIdList = strategyConfRuleRelMapper.listTarGrpIdListByStrategyId(strategy.getMktStrategyConfId());
+        List<String> ruleCodeList = new ArrayList<>();
+        for (Long tarGrpId : targrpIdList){
+
+        }
+
         //添加固定查询标签
         if (!codeList.contains("ACCS_NBR")){
             codeList.add("ACC_NBR");
