@@ -23,10 +23,10 @@
     <!--</dubbo:service>-->
 
     <!-- 订阅事件实时计算服务 -->
-    <dubbo:reference interface="com.zjtelcom.cpct.dubbo.service.EventApiService" id="eventApiService"
-                     version="1.0" retries="0" check="false">
-        <dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="10000"/>
-    </dubbo:reference>
+    <!--<dubbo:reference interface="com.zjtelcom.cpct.dubbo.service.EventApiService" id="eventApiService"-->
+                     <!--version="1.0" retries="0" check="false">-->
+        <!--<dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="10000"/>-->
+    <!--</dubbo:reference>-->
 
 
 
