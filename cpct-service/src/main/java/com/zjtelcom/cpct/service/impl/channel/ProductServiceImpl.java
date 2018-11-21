@@ -19,6 +19,7 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.util.*;
+import com.zjtelcom.cpct_prod.dao.offer.OfferProdMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +33,7 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 public class ProductServiceImpl extends BaseService implements ProductService {
 
     @Autowired
-    private OfferMapper productMapper;
+    private OfferProdMapper productMapper;
     @Autowired
     private MktCamItemMapper camItemMapper;
     @Autowired
