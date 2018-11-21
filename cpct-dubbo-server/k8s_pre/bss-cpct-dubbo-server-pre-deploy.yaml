@@ -1,9 +1,9 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: bss-cpct-dubbo-server #这里修改
+  name: bss-cpct-dubbo-server-pre #这里修改
   labels:
-    name: bss-cpct-dubbo-server  #这里修改
+    name: bss-cpct-dubbo-server-pre  #这里修改
 spec:
   replicas: 1
   strategy:
@@ -15,11 +15,11 @@ spec:
   template:
     metadata:
       labels:
-        name: bss-cpct-dubbo-server  #这里修改
+        name: bss-cpct-dubbo-server-pre  #这里修改
     spec:
       containers:
-      - name: bss-cpct-dubbo-server  #这里修改
-        image: 134.96.180.23:8001/hchc/bss-cpct-dubbo-server:1.0  #这里修改  地址使用这个么？
+      - name: bss-cpct-dubbo-server-pre  #这里修改
+        image: 134.96.180.23:8001/hchc/bss-cpct-dubbo-server-pre:1.0  #这里修改  地址使用这个么？
         imagePullPolicy: Always
         env:
 #        - name: DUBBO_IP_TO_REGISTRY     # 当项目为对外项目时，此处注解取消
@@ -27,7 +27,7 @@ spec:
 #           fieldRef:
 #            fieldPath: status.hostIP
 #        - name: DUBBO_PORT_TO_REGISTRY
-#          value: "30803"
+#          value: "30823"
         - name: ESB_UNREGISTER_URI
           valueFrom:
             configMapKeyRef:
@@ -41,12 +41,12 @@ spec:
         - name: tz-config
           mountPath: /etc/localtime
         - name: app-log
-          mountPath: /app/logs
+          mountPath: /app/dubbo/logs
         ports:
-        - containerPort: 30803    #修改端口号
+        - containerPort: 30823    #修改端口号
         readinessProbe:
           tcpSocket:
-            port: 30803   #修改端口号
+            port: 30823   #修改端口号
           initialDelaySeconds: 20
           periodSeconds: 10
           failureThreshold: 3
@@ -67,11 +67,11 @@ spec:
           mountPath: /etc/localtime
         resources:   #镜镜像环境  不修改就用docker默认
           requests:
-            memory: "2Gi"
-            cpu: "1000m"
-          limits:
-            memory: "2Gi"
+            memory: "4Gi"
             cpu: "2000m"
+          limits:
+            memory: "4Gi"
+            cpu: "4000m"
       nodeSelector:
         center: bssOther  #修改镜像所属中心标签
       volumes:
@@ -80,4 +80,4 @@ spec:
           path: /etc/localtime
       - name: app-log
         hostPath:
-          path: /app/app-log/bss-cpct-dubbo
+          path: /app/app-log/bss-cpct-dubbo-pre

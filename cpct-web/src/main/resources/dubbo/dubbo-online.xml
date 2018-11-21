@@ -42,17 +42,5 @@
         <dubbo:method name="strategyIssure" servicecode="00.1083.strategyIssure" timeout="100000"/>
     </dubbo:reference>
 
-    <!--<dubbo:reference interface="org.springframework.session.data.ctg.IDubboCtgService"-->
-                     <!--id="dubboCtgService" version="1.0" check="false">-->
-        <!--<dubbo:method name="smembers" servicecode="00.1077.ctgSessionSmembers"/>-->
-        <!--<dubbo:method name="hgetAll" servicecode="00.1077.ctgSessionHgetAll"/>-->
-        <!--<dubbo:method name="exists" servicecode="00.1077.ctgSessionExists"/>-->
-    <!--</dubbo:reference>-->
-
-    <!-- 佣金政策查询 -->
-    <!--<dubbo:reference interface="com.web.asiainfo.zhejiang.interfaces.PolicyTemplateDataService"-->
-                     <!--id="policyTemplateDataService" version="1.0">-->
-        <!--<dubbo:method name="policyTemplateData" servicecode="33.1039.policyTemplateData"/>-->
-    <!--</dubbo:reference>-->
 
 </beans>
