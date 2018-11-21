@@ -116,6 +116,12 @@
             <version>1.0.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.zjtelcom.es</groupId>
+            <artifactId>es-service-batch</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+
     </dependencies>
 
     <profiles>
@@ -138,6 +144,12 @@
             <id>pst</id>
             <properties>
                 <spring.profiles.active>pst</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>pre</id>
+            <properties>
+                <spring.profiles.active>pre</spring.profiles.active>
             </properties>
         </profile>
         <profile>

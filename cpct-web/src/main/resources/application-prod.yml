@@ -67,10 +67,10 @@ spring:
   #ES
   elasticsearch:
       ip: 134.108.0.88
-      port: 9200
+      port: 9700
       pool: 5
       cluster:
-        name: my-application1
+        name: my-application2
 #es接口调用地址
   esurl:
 #   machfile: http://134.96.252.170:30808/es/cpcMatchFileToFtp
@@ -82,4 +82,6 @@ spring:
    hitslist: http://localhost:8080/es/findBatchHitsList
    countinfo: http://localhost:8080/es/searchCountInfo
 
-
+#是否同步
+sync:
+   value: 0
