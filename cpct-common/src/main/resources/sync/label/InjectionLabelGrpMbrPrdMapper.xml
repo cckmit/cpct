@@ -83,10 +83,10 @@
     where INJECTION_LABEL_ID = #{labelId}
   </select>
 
-  <select id="deleteByLabelGrpId" parameterType="java.lang.Long">
+  <delete id="deleteByLabelGrpId" parameterType="java.lang.Long">
     delete from injection_label_grp_mbr
     where GRP_ID = #{grpId,jdbcType=BIGINT}
-  </select>
+  </delete>
 
 
 </mapper>

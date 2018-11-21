@@ -120,7 +120,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;
@@ -159,7 +159,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;
@@ -279,7 +279,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;

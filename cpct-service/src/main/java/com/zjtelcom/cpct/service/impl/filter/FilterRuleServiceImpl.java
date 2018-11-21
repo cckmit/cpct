@@ -213,7 +213,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return maps;
@@ -304,7 +304,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return maps;
@@ -367,7 +367,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return maps;

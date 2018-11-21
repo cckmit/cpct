@@ -14,4 +14,6 @@ public interface SynMessageLabelService {
     Map<String,Object> synchronizeBatchMessageLabel(String roleName);
 
     Map<String,Object> deleteSingleMessageLabel(Long messageLabelId, String roleName);
+
+    Map<String,Object> deleteSingleDisplayLabel(Long displayId, Long labelId, String roleName);
 }

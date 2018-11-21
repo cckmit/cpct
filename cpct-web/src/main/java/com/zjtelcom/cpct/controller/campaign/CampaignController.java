@@ -290,11 +290,16 @@ public class CampaignController extends BaseController {
     @RequestMapping(value = "/publishMktCampaign", method = RequestMethod.POST)
     @CrossOrigin
     public String publishMktCampaign(@RequestBody Map<String, String> params) throws Exception {
+        Map<String, Object> map = new HashMap<>();
         Long parentMktCampaignId = Long.valueOf(params.get("mktCampaignId"));
         String statusCd = params.get("statusCd");
-        Map<String, Object> mktCampaignMap = mktCampaignService.publishMktCampaign(parentMktCampaignId);
-        mktCampaignService.changeMktCampaignStatus(parentMktCampaignId, statusCd);
-        return JSON.toJSONString(mktCampaignMap);
+        try {
+            Map<String, Object> mktCampaignMap = mktCampaignService.publishMktCampaign(parentMktCampaignId);
+            map = mktCampaignService.changeMktCampaignStatus(parentMktCampaignId, statusCd);
+        } catch (Exception e) {
+            logger.error("[op:publishMktCampaign] 发布活动mktCampaignId = {}, statusCd ={}失败！Exception =  ", parentMktCampaignId, statusCd, e);
+        }
+        return JSON.toJSONString(map);
     }
 
     /**
