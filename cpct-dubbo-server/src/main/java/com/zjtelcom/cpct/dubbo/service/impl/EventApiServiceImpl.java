@@ -14,6 +14,7 @@ import com.zjtelcom.cpct.dao.event.ContactEvtItemMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
+import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
@@ -22,13 +23,21 @@ import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
+import com.zjtelcom.cpct.dto.campaign.MktCampaign;
+import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.ContactEvtItem;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
+import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
+import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.elastic.service.EsService;
+import com.zjtelcom.cpct.util.BeanUtil;
+import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.HttpUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import jdk.nashorn.internal.runtime.regexp.joni.Regex;
@@ -118,6 +127,10 @@ public class EventApiServiceImpl implements EventApiService {
 
     @Autowired(required = false)
     private ContactChannelMapper contactChannelMapper; //渠道信息
+
+    @Autowired
+    private TarGrpMapper tarGrpMapper;
+
 
     @Override
     public Map<String, Object> CalculateCPC(Map<String, Object> map) {
@@ -1130,11 +1143,23 @@ public class EventApiServiceImpl implements EventApiService {
 
             if (labelResultList == null || labelResultList.size() <= 0) {
                 labelResultList = new ArrayList<>();
-                //redis中没有，从数据库查询标签
-                List<TarGrpCondition> tarGrpConditionDOs = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
+                //redis中没有，从数据库查询标签 , 并且set到redis
+                TarGrpDetail detail = (TarGrpDetail) redisUtils.get("TAR_GRP_"+tarGrpId);
+                List<TarGrpCondition> tarGrpConditionDOs = new ArrayList<>();
+                if (detail != null) {
+                    tarGrpConditionDOs = detail.getTarGrpConditions();
+                } else {
+                    TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpId);
+                    TarGrpDetail detailNew = BeanUtil.create(tarGrp, new TarGrpDetail());
+                    tarGrpConditionDOs = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
+                    detailNew.setTarGrpConditions(tarGrpConditionDOs);
+                    redisUtils.set("TAR_GRP_"+tarGrpId, detailNew);
+                }
                 //遍历所有分群规则
                 for (int i = 1; i <= tarGrpConditionDOs.size(); i++) {
                     paramsSize++;
+
+                    //TODO 从redis中获取标签编码
                     Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i - 1).getLeftParam()));
 //                    lr = new LabelResult();
 //                    lr.setLabelCode(label.getInjectionLabelCode());
@@ -1218,8 +1243,18 @@ public class EventApiServiceImpl implements EventApiService {
                 LabelResult lr;
 
                 //若redis中不存在key，则从数据库中查询并拼装表达式
-                //查询分群规则list
-                List<TarGrpCondition> tarGrpConditionDOs = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
+                TarGrpDetail detail = (TarGrpDetail) redisUtils.get("TAR_GRP_"+tarGrpId);
+                List<TarGrpCondition> tarGrpConditionDOs = new ArrayList<>();
+                if (detail != null) {
+                    tarGrpConditionDOs = detail.getTarGrpConditions();
+                } else {
+                    //查询分群规则list
+                    TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpId);
+                    TarGrpDetail detailNew = BeanUtil.create(tarGrp, new TarGrpDetail());
+                    tarGrpConditionDOs = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
+                    detailNew.setTarGrpConditions(tarGrpConditionDOs);
+                    redisUtils.set("TAR_GRP_"+tarGrpId, detailNew);
+                }
                 //将规则拼装为表达式
                 StringBuilder expressSb = new StringBuilder();
                 expressSb.append("if(");
@@ -1229,6 +1264,7 @@ public class EventApiServiceImpl implements EventApiService {
                     String type = tarGrpConditionDOs.get(i).getOperType();
 
                     StringBuilder express1 = new StringBuilder();
+                    //TODO 从redis中获取标签编码
                     Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i).getLeftParam()));
 
                     //保存标签的es log
@@ -1420,7 +1456,16 @@ public class EventApiServiceImpl implements EventApiService {
                         String[] productArray = productStr.split("/");
                         for (String str : productArray) {
                             Map<String, String> product = new HashMap<>();
-                            MktCamItem mktCamItem = mktCamItemMapper.selectByPrimaryKey(Long.parseLong(str));
+
+                            // 从redis中获取推荐条目
+                            MktCamItem mktCamItem = (MktCamItem) redisUtils.get("MKT_CAM_ITEM_" + str);
+                            if (mktCamItem == null) {
+                                mktCamItem = mktCamItemMapper.selectByPrimaryKey(Long.valueOf(str));
+                                if (mktCamItem == null) {
+                                    continue;
+                                }
+                                redisUtils.set("MKT_CAM_ITEM_" + mktCamItem.getMktCamItemId(), mktCamItem);
+                            }
                             product.put("productCode", mktCamItem.getOfferCode());
                             product.put("productName", mktCamItem.getOfferName());
                             product.put("productType", mktCamItem.getItemType());
@@ -1538,9 +1583,30 @@ public class EventApiServiceImpl implements EventApiService {
             Map<String, Object> taskChlAttr;
 
             //查询渠道属性，渠道生失效时间过滤
-            List<MktCamChlConfAttrDO> mktCamChlConfAttrs = mktCamChlConfAttrMapper.selectByEvtContactConfId(evtContactConfId);
+            MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) redisUtils.get("MktCamChlConfDetail_" + evtContactConfId);
+            MktCamChlConfDO mktCamChlConfDO = new MktCamChlConfDO();
+            List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = new ArrayList<>();
+            if (mktCamChlConfDetail != null) {
+                BeanUtil.copy(mktCamChlConfDetail, mktCamChlConfDO);
+                for (MktCamChlConfAttr mktCamChlConfAttr : mktCamChlConfDetail.getMktCamChlConfAttrList()) {
+                    MktCamChlConfAttrDO mktCamChlConfAttrDO = BeanUtil.create(mktCamChlConfAttr, new MktCamChlConfAttrDO());
+                    mktCamChlConfAttrDOList.add(mktCamChlConfAttrDO);
+                }
+            } else {
+                // 从数据库中获取并拼成ktCamChlConfDetail对象存入redis
+                mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(evtContactConfId);
+                mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(evtContactConfId);
+                List<MktCamChlConfAttr> mktCamChlConfAttrList = new ArrayList<>();
+                mktCamChlConfDetail = BeanUtil.create(mktCamChlConfDO, new MktCamChlConfDetail());
+                for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
+                    MktCamChlConfAttr mktCamChlConfAttrNew = BeanUtil.create(mktCamChlConfAttrDO, new MktCamChlConfAttr());
+                    mktCamChlConfAttrList.add(mktCamChlConfAttrNew);
+                }
+                mktCamChlConfDetail.setMktCamChlConfAttrList(mktCamChlConfAttrList);
+                redisUtils.set("MktCamChlConfDetail_" + evtContactConfId, mktCamChlConfDetail);
+            }
             boolean checkTime = true;
-            for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrs) {
+            for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
 
                 //渠道属性数据返回给协同中心
                 if (mktCamChlConfAttrDO.getAttrId() == 500600010001L
@@ -1587,15 +1653,15 @@ public class EventApiServiceImpl implements EventApiService {
             }
 
             //查询渠道信息基本信息
-            MktCamChlConfDO mktCamChlConf = mktCamChlConfMapper.selectByPrimaryKey(evtContactConfId);
+            // MktCamChlConfDO mktCamChlConf = mktCamChlConfMapper.selectByPrimaryKey(evtContactConfId);
 
             //渠道级别信息
-            Channel channelMessage = contactChannelMapper.selectByPrimaryKey(mktCamChlConf.getContactChlId());
+            Channel channelMessage = contactChannelMapper.selectByPrimaryKey(mktCamChlConfDetail.getContactChlId());
             channel.put("channelId", channelMessage.getContactChlCode());
 //            channel.put("channelId", mktCamChlConf.getContactChlId());
             //查询渠道id
-            channel.put("channelConfId", mktCamChlConf.getContactChlId()); //执行渠道推送配置标识(MKT_CAM_CHL_CONF表主键) （必填）
-            channel.put("pushType", mktCamChlConf.getPushType()); //推送类型
+            channel.put("channelConfId", mktCamChlConfDetail.getContactChlId()); //执行渠道推送配置标识(MKT_CAM_CHL_CONF表主键) （必填）
+            channel.put("pushType", mktCamChlConfDetail.getPushType()); //推送类型
             channel.put("pushTime", ""); // 推送时间
 
             //返回结果中添加销售品信息
@@ -1608,25 +1674,45 @@ public class EventApiServiceImpl implements EventApiService {
             List<String> scriptLabelList = new ArrayList<>();
             String contactScript = null;
             String mktVerbalStr = null;
-            CamScript camScript = mktCamScriptMapper.selectByConfId(evtContactConfId);
+            // 从redis获取的mktCamChlConfDetail中获取脚本
+            CamScript camScript = mktCamChlConfDetail.getCamScript();
             if (camScript != null) {
                 //获取脚本信息
                 contactScript = camScript.getScriptDesc();
-//                String contactScript = camScript.getScriptDesc();
+//              String contactScript = camScript.getScriptDesc();
                 if (contactScript != null) {
                     scriptLabelList.addAll(subScript(contactScript));
                 }
+            } else {
+                // 数据库中获取脚本存入redis
+                camScript = mktCamScriptMapper.selectByConfId(evtContactConfId);
+                mktCamChlConfDetail.setCamScript(camScript);
+                redisUtils.set("MktCamChlConfDetail_" + evtContactConfId, mktCamChlConfDetail);
+            }
+
+
+            //查询痛痒点
+            // 从redis获取的mktCamChlConfDetail中获取话术
+            List<VerbalVO> verbalVOList = mktCamChlConfDetail.getVerbalVOList();
+            if (verbalVOList != null) {
+
+            } else {
+                List<MktVerbal> mktVerbals = mktVerbalMapper.findVerbalListByConfId(evtContactConfId);
+                verbalVOList = new ArrayList<>();
+                for (MktVerbal mktVerbal:mktVerbals) {
+                    VerbalVO verbalVO = BeanUtil.create(mktVerbal, new VerbalVO());
+                    verbalVOList.add(verbalVO);
+                }
 
             }
-            //查询痛痒点
-            List<MktVerbal> mktVerbals = mktVerbalMapper.findVerbalListByConfId(evtContactConfId);
-            if (mktVerbals != null && mktVerbals.size() > 0) {
-                for (MktVerbal mktVerbal : mktVerbals) {
-                    if (mktVerbal.getChannelId() != null && mktCamChlConf.getContactChlId().equals(mktVerbal.getChannelId())) {
+
+            if (verbalVOList != null && verbalVOList.size() > 0) {
+                for (VerbalVO verbalVO : verbalVOList) {
+                    if (verbalVO.getChannelId() != null && mktCamChlConfDetail.getContactChlId().equals(verbalVO.getChannelId())) {
                         //查询痛痒点规则 todo
 //                        List<MktVerbalCondition> channelConditionList = mktVerbalConditionMapper.findChannelConditionListByVerbalId(mktVerbal.getVerbalId());
 
-                        mktVerbalStr = mktVerbals.get(0).getScriptDesc();
+                        mktVerbalStr = verbalVOList.get(0).getScriptDesc();
                         if (mktVerbalStr != null) {
                             scriptLabelList.addAll(subScript(mktVerbalStr));
                         }
