@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+    
+  <groupId>com.ctg.dtts</groupId>
+  <artifactId>dtts-tasktracker-multitask</artifactId>
+  <version>1.1.3-SNAPSHOT</version>
+
+<!--  <repositories>
+    <repository>
+      <id>nexus</id>
+      <name>local private nexus</name>
+      <url>http://132.122.232.248:8081/nexus/content/groups/public</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+  </repositories>-->
+
+  <properties>
+    <java.version>1.7</java.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <dtts-tasktracker.version>1.1.3-SNAPSHOT</dtts-tasktracker.version>
+    <dtts-spring.version>1.1.3-SNAPSHOT</dtts-spring.version>
+
+    <springframework.version>4.2.5.RELEASE</springframework.version>
+    <netty.version>4.1.0.Final</netty.version>
+    <fastjson.version>1.2.7</fastjson.version>
+    <mapdb.version>2.0-beta10</mapdb.version>
+
+    <curator.version>2.9.1</curator.version>
+
+    <slf4j.version>1.7.12</slf4j.version>
+    <log4j2.version>2.5</log4j2.version>
+    <disruptor.version>3.3.2</disruptor.version>
+
+    <httpclient.version>4.5</httpclient.version>
+
+    <maven-compiler.version>3.1</maven-compiler.version>
+    <maven-resources.version>2.6</maven-resources.version>
+    <maven-jar-plugin.version>2.4</maven-jar-plugin.version>
+    <maven-assembly-plugin.version>2.6</maven-assembly-plugin.version>
+    <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
+  </properties>
+
+  <dependencies>
+  	<!--<dependency>-->
+        <!--<groupId>com.ctzj.smt.bss</groupId>-->
+        <!--<artifactId>bss-customer-base-service</artifactId>-->
+        <!--<version>1.0-SNAPSHOT</version>-->
+    <!--</dependency>-->
+  	<!--<dependency>-->
+        <!--<groupId>com.ctzj.smt.bss</groupId>-->
+        <!--<artifactId>bss-customer-asset-write-service-api</artifactId>-->
+        <!--<version>1.0-SNAPSHOT</version>-->
+    <!--</dependency>-->
+
+    <dependency>
+      <groupId>com.zjtelcom.cpct</groupId>
+      <artifactId>cpct-service</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.zjtelcom.cpct</groupId>
+      <artifactId>cpct-cache</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.ctg.itrdc.cache</groupId>
+      <artifactId>ctg-cache-client</artifactId>
+      <version>2.3.1_P1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.ctg.dtts</groupId>
+      <artifactId>dtts-tasktracker</artifactId>
+      <version>${dtts-tasktracker.version}</version>
+
+    </dependency>
+    <dependency>
+      <groupId>com.ctg.dtts</groupId>
+      <artifactId>dtts-core</artifactId>
+      <version>${dtts-tasktracker.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.ctg.dtts</groupId>
+      <artifactId>dtts-spring</artifactId>
+      <version>${dtts-spring.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+      <version>${springframework.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-beans</artifactId>
+      <version>${springframework.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <version>${springframework.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context-support</artifactId>
+      <version>${springframework.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-all</artifactId>
+      <version>${netty.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>fastjson</artifactId>
+      <version>${fastjson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mapdb</groupId>
+      <artifactId>mapdb</artifactId>
+      <version>${mapdb.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.curator</groupId>
+      <artifactId>curator-recipes</artifactId>
+      <version>${curator.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>${log4j2.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
+      <version>${log4j2.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.lmax</groupId>
+      <artifactId>disruptor</artifactId>
+      <version>${disruptor.version}</version>
+    </dependency>
+    <!-- 代码直接调用commons-logging会被桥接到slf4j -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <!-- 代码直接调用java.util.logging会被桥接到slf4j -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>${httpclient.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- 设置源文件编码 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven-compiler.version}</version>
+        <configuration>
+          <compilerVersion>${java.version}</compilerVersion>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+          <encoding>${project.build.sourceEncoding}</encoding>
+        </configuration>
+      </plugin>
+      <!-- 设置资源文件的编码-->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>${maven-resources.version}</version>
+        <configuration>
+          <encoding>${project.build.sourceEncoding}</encoding>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>${maven-jar-plugin.version}</version>
+        <configuration>
+          <excludes>
+            <exclude>**/assemble.xml</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin
+        </artifactId><!-- 这里的作用仅仅是拷贝依赖的jar到target的某个目录下，与上面的jar插件没有必然联系，这个可以独立存在执行mvn dependency:copy-dependencies -->
+        <executions>
+          <execution>
+            <id>copy</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>
+                ${project.build.directory}/lib<!-- ${project.build.directory}是maven变量，表示target目录。如果不写的话，将在项目根目录下创建lib目录，与src同级 -->
+              </outputDirectory>
+              <excludeTransitive>false</excludeTransitive> <!-- 表示是否不包含间接依赖的包 -->
+              <stripVersion>false</stripVersion> <!-- 表示复制的jar文件去掉版本信息 -->
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>${maven-assembly-plugin.version}</version>
+        <configuration>
+          <finalName>${project.artifactId}-v${project.version}-t${maven.build.timestamp}
+          </finalName>
+          <appendAssemblyId>false</appendAssemblyId>
+          <encoding>${project.build.sourceEncoding}</encoding>
+          <descriptors>
+            <descriptor>src/main/assembly/assemble.xml</descriptor> <!-- 自定义打包文件的位置，可随意定-->
+          </descriptors>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
