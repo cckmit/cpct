@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+	<Appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36}:%L - %msg%n" />
+		</Console>
+
+		<RollingRandomAccessFile name="RollingFile" fileName="${sys:TASKTRACKER_HOME}/logs/tasktracker.log"
+			filePattern="${sys:TASKTRACKER_HOME}/logs/tasktracker.%d{yyyy-MM-dd}.log">
+			<PatternLayout>
+				<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %p [%t] (%F:%L) %m%n</Pattern>
+			</PatternLayout>
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="10 GB"/>
+			</Policies>
+			<DefaultRolloverStrategy>
+				<Delete basePath="${sys:TASKTRACKER_HOME}/logs/" maxDepth="1">
+					<IfFileName glob="tasktracker.*.log" />
+					<IfLastModified age="7d" />
+				</Delete>
+			</DefaultRolloverStrategy>
+		</RollingRandomAccessFile>
+        
+	</Appenders>
+
+	<Loggers>
+		<logger name="org.apache.*" level="ERROR" additivity="false" />
+		<Logger name="jdbc.resultsettable" level="OFF"></Logger>
+		<Logger name="jdbc.sqlonly" level="INFO"></Logger>
+		<Logger name="jdbc.audit" level="OFF"></Logger>
+		<Logger name="jdbc.resultset" level="OFF"></Logger>
+		<Logger name="jdbc.connection" level="OFF"></Logger>
+		<asyncRoot level="INFO" includeLocation="true">
+			<AppenderRef ref="RollingFile" />
+		</asyncRoot>
+	</Loggers>
+</Configuration>
