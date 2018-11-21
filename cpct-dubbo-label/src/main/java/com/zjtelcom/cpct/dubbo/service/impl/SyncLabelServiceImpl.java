@@ -13,6 +13,7 @@ import com.zjtelcom.cpct.dubbo.model.RecordModel;
 import com.zjtelcom.cpct.dubbo.service.SyncLabelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
+import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,8 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
     private InjectionLabelValueMapper labelValueMapper;
     @Autowired(required = false)
     private InjectionLabelCatalogMapper labelCatalogMapper;
+    @Autowired(required = false)
+    private RedisUtils redisUtils;
 
     /**
      * 标签同步对外接口
@@ -114,6 +117,8 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             //label.setLabelDataType(ChannelUtil.getDataType(tagModel.getSourceTableColumnType()));
 
             labelMapper.updateByPrimaryKey(labelValodate);
+            //redis更新标签库
+            redisUtils.set("LABEL_LIB_"+labelValodate.getInjectionLabelId(),labelValodate);
             syncLabelValue(valueModelList,labelValodate.getInjectionLabelId());
         }else {
 
@@ -155,6 +160,8 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             label.setCreateDate(new Date());
 
             labelMapper.insert(label);
+            //redis更新标签库
+            redisUtils.set("LABEL_LIB_"+label.getInjectionLabelId(),label);
             syncLabelValue(valueModelList,label.getInjectionLabelId());
         }
 
