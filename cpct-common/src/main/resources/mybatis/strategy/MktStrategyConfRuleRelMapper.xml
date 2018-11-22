@@ -63,4 +63,13 @@
     from mkt_strategy_conf_rule_rel
     where MKT_STRATEGY_CONF_RULE_ID = #{mktStrategyConfRuleId,jdbcType=BIGINT}
   </select>
+
+  <select id="listTarGrpIdListByStrategyId" resultType="java.util.List" parameterType="java.lang.Long">
+    select r.TAR_GRP_ID
+    from mkt_strategy_conf_rule_rel as rel left join mkt_strategy_conf as s  on rel.MKT_STRATEGY_CONF_ID = s.MKT_STRATEGY_CONF_ID
+    left join mkt_strategy_conf_rule as r on r.MKT_STRATEGY_CONF_RULE_ID = rel.MKT_STRATEGY_CONF_RULE_ID
+    where s.MKT_STRATEGY_CONF_ID = #{strategyId}
+  </select>
+
+
 </mapper>
