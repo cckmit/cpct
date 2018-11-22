@@ -1159,15 +1159,22 @@ public class EventApiServiceImpl implements EventApiService {
                 for (int i = 1; i <= tarGrpConditionDOs.size(); i++) {
                     paramsSize++;
 
-                    //TODO 从redis中获取标签编码
-                    Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i - 1).getLeftParam()));
+                    //从redis中获取标签编码
+                    Label label = (Label) redisUtils.get("LABEL_LIB_" + tarGrpConditionDOs.get(i - 1).getLeftParam());
+                    if (label == null) {
+                        label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i - 1).getLeftParam()));
+                        redisUtils.set("LABEL_LIB_" + Long.parseLong(tarGrpConditionDOs.get(i - 1).getLeftParam()), label);
+                    }
 //                    lr = new LabelResult();
 //                    lr.setLabelCode(label.getInjectionLabelCode());
 //                    lr.setLabelName(label.getInjectionLabelName());
 //                    lr.setRightOperand(label.getRightOperand());
 //                    lr.setOperType(label.getOperator());
 //                    labelResultList.add(lr);
-                    queryFieldsSb.append(label.getInjectionLabelCode()).append(",");
+                    if (label != null) {
+                        queryFieldsSb.append(label.getInjectionLabelCode()).append(",");
+                    }
+
                 }
             } else {
                 //redis中获取标签
@@ -1265,22 +1272,27 @@ public class EventApiServiceImpl implements EventApiService {
 
                     StringBuilder express1 = new StringBuilder();
                     //TODO 从redis中获取标签编码
-                    Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i).getLeftParam()));
+                    Label label = (Label) redisUtils.get("LABEL_LIB_" + tarGrpConditionDOs.get(i - 1).getLeftParam());
+                    if (label == null) {
+                        label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i).getLeftParam()));
+                        redisUtils.set("LABEL_LIB_" + Long.parseLong(tarGrpConditionDOs.get(i).getLeftParam()), label);
+                    }
 
                     //保存标签的es log
                     lr = new LabelResult();
-                    lr.setOperType(type);
-                    lr.setLabelCode(label.getInjectionLabelCode());
-                    lr.setLabelName(label.getInjectionLabelName());
-                    lr.setRightOperand(tarGrpConditionDOs.get(i).getRightParam());
-                    lr.setClassName(label.getClassName());
-                    if (context.containsKey(label.getInjectionLabelCode())) {
-                        lr.setRightParam(context.get(label.getInjectionLabelCode()).toString());
-                    } else {
-                        lr.setRightParam("无值");
-                        lr.setResult(false);
+                    if (label!=null){
+                        lr.setOperType(type);
+                        lr.setLabelCode(label.getInjectionLabelCode());
+                        lr.setLabelName(label.getInjectionLabelName());
+                        lr.setRightOperand(tarGrpConditionDOs.get(i).getRightParam());
+                        lr.setClassName(label.getClassName());
+                        if (context.containsKey(label.getInjectionLabelCode())) {
+                            lr.setRightParam(context.get(label.getInjectionLabelCode()).toString());
+                        } else {
+                            lr.setRightParam("无值");
+                            lr.setResult(false);
+                        }
                     }
-
                     //拼接表达式
                     if ("7100".equals(type)) {
                         expressSb.append("!");
