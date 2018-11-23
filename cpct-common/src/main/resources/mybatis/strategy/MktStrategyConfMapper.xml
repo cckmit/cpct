@@ -58,4 +58,6 @@
     from mkt_strategy_conf as s left join mkt_cam_strategy_conf_rel as cs  on s.MKT_STRATEGY_CONF_ID = cs.STRATEGY_CONF_ID
     where cs.MKT_CAMPAIGN_ID = #{campaignId}
   </select>
+
+
 </mapper>

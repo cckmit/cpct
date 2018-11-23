@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.dao.strategy;
 
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -22,4 +23,6 @@ public interface  MktStrategyConfRuleRelMapper {
     List<MktStrategyConfRuleRelDO> selectAll();
 
     int updateByPrimaryKey(MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO);
+
+    List<Long> listTarGrpIdListByStrategyId(@Param("strategyId")Long strategyId);
 }

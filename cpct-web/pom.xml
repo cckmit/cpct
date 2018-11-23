@@ -78,7 +78,6 @@
             <groupId>com.ctzj.smt.bss</groupId>
             <artifactId>bss-centralized-authenticate</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.zjhcsoft.session</groupId>
             <artifactId>spring-session</artifactId>
@@ -114,12 +113,6 @@
             <groupId>com.web.asiainfo.zhejiang</groupId>
             <artifactId>PolicyTemplateDataService</artifactId>
             <version>1.0.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.zjtelcom.es</groupId>
-            <artifactId>es-service-batch</artifactId>
-            <version>1.0.1</version>
         </dependency>
 
     </dependencies>

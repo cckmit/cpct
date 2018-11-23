@@ -38,4 +38,5 @@ public interface MktCampaignMapper {
 
     List<MktCampaignDO> qryMktCampaignListByCondition(MktCampaignDO mktCampaignDO);
 
+    List<MktCampaignDO> qryMktCampaignListByTypeAndStatus(@Param("execType") String execType, @Param("statusCd") String statusCd);
 }

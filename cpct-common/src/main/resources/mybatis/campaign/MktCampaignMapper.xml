@@ -339,4 +339,20 @@
         </if>
         order by UPDATE_DATE desc
     </select>
+    
+    <select id="qryMktCampaignListByTypeAndStatus" resultMap="BaseResultMap">
+        select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
+        BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MKT_CAMPAIGN_CATEGORY, MKT_ACTIVITY_NBR, MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC,
+        CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE,
+        UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL
+        from mkt_campaign
+        where 1 = 1
+        <if test="execType != null and execType != ''">
+            AND EXEC_TYPE = #{execType,jdbcType=VARCHAR}
+        </if>
+        <if test="statusCd != null and statusCd != ''">
+            AND STATUS_CD = #{statusCd,jdbcType=VARCHAR}
+        </if>
+        order by UPDATE_DATE desc
+    </select>
 </mapper>

@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.impl.grouping;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.sun.corba.se.spi.ior.ObjectKey;
 import com.zjtelcom.cpct.constants.CommonConstant;
@@ -8,6 +9,7 @@ import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
 import com.zjtelcom.cpct.dao.channel.OfferMapper;
+import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
@@ -29,6 +31,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.grouping.*;
+import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
@@ -36,6 +39,7 @@ import com.zjtelcom.cpct.service.channel.MessageLabelService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
+import com.zjtelcom.cpct.service.thread.TarGrpRule;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.es.es.entity.*;
 import com.zjtelcom.es.es.entity.model.LabelResultES;
@@ -56,6 +60,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.*;
 
@@ -76,12 +84,21 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 //    private static String hitsList = FIND_BATCH_HITS_LIST_URL;
 //    private static String countInfo = SEARCH_COUNT_INFO_URL;
 
+
+    @Autowired
+    private TarGrpConditionMapper tarGrpConditionMapper;
+
+    @Autowired
+    private InjectionLabelMapper injectionLabelMapper;
+
     @Autowired
     private TrialOperationMapper trialOperationMapper;
     @Autowired
     private MktCampaignMapper campaignMapper;
     @Autowired
     private MktStrategyConfMapper strategyMapper;
+    @Autowired
+    private MktStrategyConfRuleRelMapper strategyConfRuleRelMapper;
     @Autowired
     private RestTemplate restTemplate;
     @Autowired
@@ -134,11 +151,17 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(operationVO.getCampaignId());
         if (campaign == null) {
             result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "活动策略信息有误");
+            result.put("resultMsg", "活动信息有误");
+            return result;
+        }
+        MktStrategyConfDO strategy = strategyMapper.selectByPrimaryKey(operationVO.getStrategyId());
+        if (strategy==null){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "策略信息有误");
             return result;
         }
         // 通过活动id获取关联的标签字段数组
-        String[] fieldList = getStrings(campaign);
+        String[] fieldList = getStrings(campaign,strategy);
 
         TrialOperationVO request = BeanUtil.create(operationVO,new TrialOperationVO());
         request.setFieldList(fieldList);
@@ -440,7 +463,13 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "活动策略信息有误");
             return result;
         }
-        String[] fieldList = getStrings(campaign);
+        MktStrategyConfDO strategy = strategyMapper.selectByPrimaryKey(operationVO.getStrategyId());
+        if (strategy==null){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "策略信息有误");
+            return result;
+        }
+        String[] fieldList = getStrings(campaign,strategy);
 
 
         TrialOperationVO request = BeanUtil.create(operationVO,new TrialOperationVO());
@@ -500,7 +529,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         return result;
     }
 
-    private String[] getStrings(MktCampaignDO campaign) {
+    private String[] getStrings(MktCampaignDO campaign,MktStrategyConfDO strategy) {
         // 通过活动id获取关联的标签字段数组
         DisplayColumn req = new DisplayColumn();
         req.setDisplayColumnId(campaign.getCalcDisplay());
@@ -510,6 +539,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         for (LabelDTO labelDTO : labelDTOList) {
             codeList.add(labelDTO.getLabelCode());
         }
+        List<Long> targrpIdList = strategyConfRuleRelMapper.listTarGrpIdListByStrategyId(strategy.getMktStrategyConfId());
+        List<String> ruleCodeList = new ArrayList<>();
+        for (Long tarGrpId : targrpIdList){
+
+        }
+
         //添加固定查询标签
         if (!codeList.contains("ACCS_NBR")){
             codeList.add("ACC_NBR");
@@ -905,8 +940,29 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         param.setBatchNum(batchNum);
         //redis取规则
         Object ruleOb = redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId);
+        logger.info("************************当前规则 ："+ruleId+"*******"+ruleOb);
         String rule = "";
-        if (ruleOb!=null){
+        if(ruleOb==null){
+            ExecutorService executorService = Executors.newCachedThreadPool();
+            try {
+                MktStrategyConfRuleDO ruleDO = ruleMapper.selectByPrimaryKey(ruleId);
+                if (ruleDO!=null){
+                  Future<Map<String, Object>> future = executorService.submit(new TarGrpRuleTask(operationVO.getCampaignId(),operationVO.getStrategyId(), ruleDO, redisUtils, tarGrpConditionMapper, injectionLabelMapper));
+                  rule = future.get().get("express").toString();
+                }
+                     // 关闭线程池
+                if (!executorService.isShutdown()) {
+                    executorService.shutdown();
+                }
+            }catch (Exception e){
+                // 关闭线程池
+                if (!executorService.isShutdown()) {
+                    executorService.shutdown();
+                }
+            }
+
+            logger.info("规则未查询到");
+        }else {
             rule = ruleOb.toString();
             System.out.println("*************************" + rule);
         }
@@ -923,6 +979,99 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         }
         param.setLabelResultList(labelResultES);
         return param;
+
     }
 
+
+    class TarGrpRuleTask implements Callable<Map<String,Object>>{
+        private Long mktCampaignId;
+
+        private Long mktStrategyConfId;
+
+        private MktStrategyConfRuleDO mktStrategyConfRuleDO;
+
+        private RedisUtils redisUtils;
+
+        private TarGrpConditionMapper tarGrpConditionMapper;
+
+        private InjectionLabelMapper injectionLabelMapper;
+
+        public TarGrpRuleTask(Long mktCampaignId, Long mktStrategyConfId, MktStrategyConfRuleDO mktStrategyConfRuleDO, RedisUtils redisUtils, TarGrpConditionMapper tarGrpConditionMapper, InjectionLabelMapper injectionLabelMapper) {
+            this.mktCampaignId = mktCampaignId;
+            this.mktStrategyConfId = mktStrategyConfId;
+            this.mktStrategyConfRuleDO = mktStrategyConfRuleDO;
+            this.redisUtils = redisUtils;
+            this.tarGrpConditionMapper = tarGrpConditionMapper;
+            this.injectionLabelMapper = injectionLabelMapper;
+        }
+
+        @Override
+        public Map<String, Object> call() {
+            Map<String, Object> result = new HashMap<>();
+            // 策略配置规则Id
+            Long mktStrategyConfRuleId = mktStrategyConfRuleDO.getMktStrategyConfRuleId();
+            //  2.判断活动的客户分群规则---------------------------
+            //查询分群规则list
+            Long tarGrpId = mktStrategyConfRuleDO.getTarGrpId();
+            List<TarGrpCondition> tarGrpConditionDOs = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
+            List<LabelResult> labelResultList = new ArrayList<>();
+            StringBuilder express = new StringBuilder();
+            if (tarGrpId != null && tarGrpId != 0) {
+                //将规则拼装为表达式
+                if (tarGrpConditionDOs != null && tarGrpConditionDOs.size() > 0) {
+                    express.append("if(");
+                    //遍历所有规则
+                    for (int i = 0; i < tarGrpConditionDOs.size(); i++) {
+                        LabelResult labelResult = new LabelResult();
+                        String type = tarGrpConditionDOs.get(i).getOperType();
+                        Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i).getLeftParam()));
+
+                        labelResult.setLabelCode(label.getInjectionLabelCode());
+                        labelResult.setLabelName(label.getInjectionLabelName());
+                        labelResult.setRightOperand(label.getRightOperand());
+                        labelResult.setRightParam(tarGrpConditionDOs.get(i).getRightParam());
+                        labelResult.setClassName(label.getClassName());
+                        labelResult.setOperType(type);
+                        labelResultList.add(labelResult);
+                        if ("7100".equals(type)) {
+                            express.append("!");
+                        }
+                        express.append("(");
+                        express.append(label.getInjectionLabelCode());
+                        if ("1000".equals(type)) {
+                            express.append(">");
+                        } else if ("2000".equals(type)) {
+                            express.append("<");
+                        } else if ("3000".equals(type)) {
+                            express.append("==");
+                        } else if ("4000".equals(type)) {
+                            express.append("!=");
+                        } else if ("5000".equals(type)) {
+                            express.append(">=");
+                        } else if ("6000".equals(type)) {
+                            express.append("<=");
+                        } else if ("7000".equals(type) || "7100".equals(type)) {
+                            express.append("in");
+                        }
+                        express.append(tarGrpConditionDOs.get(i).getRightParam());
+                        express.append(")");
+                        if (i + 1 != tarGrpConditionDOs.size()) {
+                            express.append("&&");
+                        }
+                    }
+                }
+                express.append(") {return true} else {return false}");
+                // 将表达式存入Redis
+                String key = "EVENT_RULE_" + mktCampaignId + "_" + mktStrategyConfId + "_" + mktStrategyConfRuleId;
+                System.out.println("key>>>>>>>>>>" + key + ">>>>>>>>express->>>>:" + JSON.toJSONString(express));
+                redisUtils.set(key, express);
+
+                // 将所有的标签集合存入redis
+                redisUtils.set(key + "_LABEL", JSON.toJSONString(labelResultList));
+            }
+            result.put("express",express.toString());
+            return result;
+        }
+
+    }
 }

@@ -16,10 +16,7 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.LabelService;
 import com.zjtelcom.cpct.service.synchronize.label.SynLabelGrpService;
 import com.zjtelcom.cpct.service.synchronize.label.SynLabelService;
-import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.ChannelUtil;
-import com.zjtelcom.cpct.util.MapUtil;
-import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -52,6 +49,8 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     private SynLabelService synLabelService;
     @Autowired
     private SynLabelGrpService synLabelGrpService;
+    @Autowired
+    private RedisUtils redisUtils;
 
     @Value("${sync.value}")
     private String value;
@@ -190,6 +189,18 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         label.setStatusCd("1000");
         labelMapper.insert(label);
         insertLabelValue(label,addVO.getRightOperand());
+
+        //redis更新标签库
+        Object labelInRedis = redisUtils.get("LABEL_DATA_SOURCE");
+        if (labelInRedis==null){
+            redisUtils.set("LABEL_DATA_SOURCE","标签库数据校验");
+            List<Label> labelList = labelMapper.selectAll();
+            for (Label la : labelList){
+                redisUtils.set("LABEL_LIB_"+la.getInjectionLabelId(),la);
+            }
+        }else {
+            redisUtils.set("LABEL_LIB_"+label.getInjectionLabelId(),label);
+        }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
 
@@ -225,6 +236,11 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         }
     }
 
+
+
+
+
+
     @Override
     public Map<String,Object> editLabel(Long userId, LabelEditVO editVO) {
         Map<String,Object> result = new HashMap<>();
@@ -241,6 +257,9 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         labelMapper.updateByPrimaryKey(label);
         labelValueMapper.deleteByLabelId(label.getInjectionLabelId());
         insertLabelValue(label,editVO.getRightOperand());
+
+        //redis更新标签库
+        redisUtils.set("LABEL_LIB_"+label.getInjectionLabelId(),label);
 
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","编辑成功");
@@ -319,6 +338,11 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             result.put("resultMsg","分群条件在用标签无法删除");
             return result;
         }
+        //redis更新标签库
+        if ( redisUtils.get("LABEL_LIB_"+label.getInjectionLabelId())!=null){
+            redisUtils.remove("LABEL_LIB_"+label.getInjectionLabelId());
+        }
+
         labelMapper.deleteByPrimaryKey(labelId);
         labelValueMapper.deleteByLabelId(labelId);
         result.put("resultCode",CODE_SUCCESS);
