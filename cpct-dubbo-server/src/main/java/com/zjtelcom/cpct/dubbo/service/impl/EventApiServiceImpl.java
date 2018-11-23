@@ -601,15 +601,15 @@ public class EventApiServiceImpl implements EventApiService {
             MktCampaignDO mktCampaign = mktCampaignMapper.selectByPrimaryKey(activityId);
 
             //判断活动状态
-            if (!"2002".equals(mktCampaign.getStatusCd())) {
-                esJson.put("hit", "false");
-                esJson.put("msg", "活动状态未发布");
-                esService.save(esJson, IndexList.ACTIVITY_MODULE);
-
-                System.out.println("活动状态未发布");
-
-                return Collections.EMPTY_MAP;
-            }
+//            if (!"2002".equals(mktCampaign.getStatusCd())) {
+//                esJson.put("hit", "false");
+//                esJson.put("msg", "活动状态未发布");
+//                esService.save(esJson, IndexList.ACTIVITY_MODULE);
+//
+//                System.out.println("活动状态未发布");
+//
+//                return Collections.EMPTY_MAP;
+//            }
 
             privateParams.put("activityId", mktCampaign.getMktCampaignId().toString()); //活动编码
             privateParams.put("activityName", mktCampaign.getMktCampaignName()); //活动名称
@@ -1667,7 +1667,7 @@ public class EventApiServiceImpl implements EventApiService {
             //查询渠道信息基本信息
             // MktCamChlConfDO mktCamChlConf = mktCamChlConfMapper.selectByPrimaryKey(evtContactConfId);
 
-            //渠道级别信息
+            //渠道信息
             Channel channelMessage = contactChannelMapper.selectByPrimaryKey(mktCamChlConfDetail.getContactChlId());
             channel.put("channelId", channelMessage.getContactChlCode());
 //            channel.put("channelId", mktCamChlConf.getContactChlId());
@@ -1763,7 +1763,6 @@ public class EventApiServiceImpl implements EventApiService {
                         mktVerbalStr = mktVerbalStr.replace("${" + entry.getKey() + "}$", entry.getValue().toString());
                     }
                 }
-
             }
             //返回结果中添加脚本信息
             channel.put("contactScript", contactScript == null ? "" : contactScript);
