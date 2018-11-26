@@ -834,21 +834,21 @@ public class EventApiServiceImpl implements EventApiService {
                             break;
                         }
                     } else {
-                        //下发地址获取异常 lanId
-                        strategyMap.put("msg", "下发地址获取异常");
+                        //下发地市获取异常 lanId
+                        strategyMap.put("msg", "下发地市获取异常");
 
                         esJson.put("hit", "false");
-                        esJson.put("msg", "下发地址获取异常");
+                        esJson.put("msg", "下发地市获取异常");
                         esService.save(esJson, IndexList.STRATEGY_MODULE);
                         return Collections.EMPTY_MAP;
                     }
                 }
 
                 if (areaCheck) {
-                    strategyMap.put("msg", "下发地址不符");
+                    strategyMap.put("msg", "下发地市不符");
 
                     esJson.put("hit", "false");
-                    esJson.put("msg", "下发地址不符");
+                    esJson.put("msg", "下发地市不符");
                     esService.save(esJson, IndexList.STRATEGY_MODULE);
                     return Collections.EMPTY_MAP;
                 }
@@ -875,7 +875,7 @@ public class EventApiServiceImpl implements EventApiService {
                             break;
                         }
                     } else {
-                        //下发地址获取异常 lanId
+                        //下发地市获取异常 lanId
                         strategyMap.put("msg", "下发渠道获取异常");
                         esJson.put("hit", "false");
                         esJson.put("msg", "下发渠道获取异常");
