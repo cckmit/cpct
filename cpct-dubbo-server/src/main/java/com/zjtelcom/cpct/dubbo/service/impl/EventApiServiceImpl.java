@@ -175,15 +175,15 @@ public class EventApiServiceImpl implements EventApiService {
         params.put("accNbr", accNbr); //资产号码
         params.put("integrationId", integrationId); //资产集成编码
 
-        esJson.put("reqId", reqId);
-        esJson.put("eventCode", eventCode);
-        esJson.put("integrationId", integrationId);
-        esJson.put("accNbr", accNbr);
-        esJson.put("custId", custId);
-        esJson.put("evtCollectTime", evtCollectTime);
-        esJson.put("hit", false);
-        esJson.put("msg", "事件接入，开始异步流程");
-        esService.save(esJson, IndexList.EVENT_MODULE);
+//        esJson.put("reqId", reqId);
+//        esJson.put("eventCode", eventCode);
+//        esJson.put("integrationId", integrationId);
+//        esJson.put("accNbr", accNbr);
+//        esJson.put("custId", custId);
+//        esJson.put("evtCollectTime", evtCollectTime);
+//        esJson.put("hit", false);
+//        esJson.put("msg", "事件接入，开始异步流程");
+//        esService.save(esJson, IndexList.EVENT_MODULE);
 
         //异步
         AsyncCPC asyncCPC = new AsyncCPC(params);
@@ -283,15 +283,15 @@ public class EventApiServiceImpl implements EventApiService {
         params.put("accNbr", accNbr); //资产号码
         params.put("integrationId", integrationId); //资产集成编码
 
-        esJson.put("reqId", reqId);
-        esJson.put("eventCode", eventCode);
-        esJson.put("integrationId", integrationId);
-        esJson.put("accNbr", accNbr);
-        esJson.put("custId", custId);
-        esJson.put("evtCollectTime", evtCollectTime);
-        esJson.put("hit", false);
-        esJson.put("msg", "事件接入，开始同步流程");
-        esService.save(esJson, IndexList.EVENT_MODULE);
+//        esJson.put("reqId", reqId);
+//        esJson.put("eventCode", eventCode);
+//        esJson.put("integrationId", integrationId);
+//        esJson.put("accNbr", accNbr);
+//        esJson.put("custId", custId);
+//        esJson.put("evtCollectTime", evtCollectTime);
+//        esJson.put("hit", false);
+//        esJson.put("msg", "事件接入，开始同步流程");
+//        esService.save(esJson, IndexList.EVENT_MODULE);
 
         //调用计算方法
         result = new EventTask().call(params);
@@ -460,8 +460,8 @@ public class EventApiServiceImpl implements EventApiService {
 
                     JSONArray accArray = new JSONArray();
                     if ("0".equals(dubboResult.get("result_code").toString())) {
-//                        accArray = new JSONObject((HashMap) dubboResult.get("msgbody"));
-                        return Collections.EMPTY_MAP;
+                        accArray = new JSONArray((List<Object>) dubboResult.get("msgbody"));
+
                     } else {
                         esJson.put("hit", "false");
                         esJson.put("msg", "客户级资产查询出错");
@@ -1272,7 +1272,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                     StringBuilder express1 = new StringBuilder();
                     //TODO 从redis中获取标签编码
-                    Label label = (Label) redisUtils.get("LABEL_LIB_" + tarGrpConditionDOs.get(i - 1).getLeftParam());
+                    Label label = (Label) redisUtils.get("LABEL_LIB_" + tarGrpConditionDOs.get(i).getLeftParam());
                     if (label == null) {
                         label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i).getLeftParam()));
                         redisUtils.set("LABEL_LIB_" + Long.parseLong(tarGrpConditionDOs.get(i).getLeftParam()), label);
