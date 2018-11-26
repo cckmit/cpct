@@ -40,6 +40,32 @@ public class TestController extends BaseController {
     @Autowired
     private RedisUtils redisUtils;
 
+    @RequestMapping(value = "/redisTest", method = RequestMethod.POST)
+    @CrossOrigin
+    public String redis()  {
+        List<String> codeList = new ArrayList<>();
+        codeList.add("1234");
+        codeList.add("123456");
+        codeList.add("1gggg");
+        codeList.add("1hjj");
+        codeList.add("1kkk");
+        List<String> code2List = new ArrayList<>();
+        code2List.add("234");
+        code2List.add("23456");
+        code2List.add("2gggg");
+        code2List.add("2hjj");
+        code2List.add("2kkk");
+        redisUtils.hset("LABEL_CODE_"+25,1+"",codeList);
+        redisUtils.hset("LABEL_CODE_"+25,2+"",code2List);
+
+        Object ob = redisUtils.hgetAllRedisList("LABEL_CODE_"+25);
+        List<String> oblist = (List<String>) ob;
+
+        System.out.println(oblist);
+        return "success";
+    }
+
+
 
 
     @RequestMapping(value = "/rule", method = RequestMethod.POST)
