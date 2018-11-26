@@ -30,7 +30,7 @@
         <result column="CREATE_CHANNEL" jdbcType="VARCHAR" property="createChannel" />
         <result column="DIRECTORY_ID" jdbcType="BIGINT" property="directoryId" />
         <result column="CAM_LEVEL" jdbcType="BIGINT" property="camLevel" />
-        <result column="IS_CHECK_RULE" javaType="VARCHAR" property="isChectRule" />
+        <result column="IS_CHECK_RULE" jdbcType="VARCHAR" property="isCheckRule" />
     </resultMap>
 
     <resultMap id="countResultMap" type="com.zjtelcom.cpct.domain.campaign.MktCampaignCountDO">
@@ -76,7 +76,7 @@
       #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT},
       #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP},
       #{remark,jdbcType=VARCHAR}, #{lanId,jdbcType=BIGINT}, #{createChannel,jdbcType=VARCHAR},
-      #{directoryId,jdbcType=BIGINT},#{camLevel,jdbcType=BIGINT}, #{isChectRule,jdbcType=VARCHAR})
+      #{directoryId,jdbcType=BIGINT},#{camLevel,jdbcType=BIGINT}, #{isCheckRule,jdbcType=VARCHAR})
     </insert>
 
 
@@ -108,7 +108,7 @@
         DIRECTORY_ID = #{directoryId,jdbcType=BIGINT},
         LAN_ID = #{lanId,jdbcType=BIGINT},
         CAM_LEVEL = #{camLevel,jdbcType=BIGINT},
-        IS_CHECK_RULE = #{isChectRule,jdbcType=VARCHAR},
+        IS_CHECK_RULE = #{isCheckRule,jdbcType=VARCHAR},
         UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
 
         where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
@@ -339,8 +339,8 @@
         <if test="camLevel != null and camLevel != ''">
             AND CAM_LEVEL = #{camLevel,jdbcType=BIGINT}
         </if>
-        <if test="isChectRule != null and isChectRule != ''">
-            AND IS_CHECK_RULE = #{isChectRule,jdbcType=VARCHAR}
+        <if test="isCheckRule != null and isCheckRule != ''">
+            AND IS_CHECK_RULE = #{isCheckRule,jdbcType=VARCHAR}
         </if>
         order by UPDATE_DATE desc
     </select>
