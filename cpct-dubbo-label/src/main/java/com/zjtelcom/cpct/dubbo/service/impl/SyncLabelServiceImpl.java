@@ -130,15 +130,10 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             //label.setInjectionLabelDesc();
             label.setLabTagCode(labModel.getLabCode());//标签编码
             label.setInjectionLabelDesc(labModel.getLabBusiDesc());
-
-            if (labModel.getLabType() .equals(String.valueOf(1))  || labModel.getLabType() .equals(String.valueOf(2)) ) {
-                label.setConditionType(String.valueOf(4));//标签类型(文本、数值、枚举) 4输入  2多选
-            }else if(labModel.getLabType() .equals(String.valueOf(3)) ) {
-                label.setConditionType(String.valueOf(2));
-            }
-            if(Long.valueOf(label.getConditionType()) == 4){
+            label.setConditionType(labModel.getLabType());
+            if("4".equals(label.getConditionType())){
                 label.setOperator("2000,3000,1000,4000,6000,5000,7000,7200");
-            }else if(Long.valueOf(label.getConditionType()) == 2){
+            }else if("2".equals(label.getConditionType())){
                 label.setOperator("7000");
             }
             label.setScope(1);
