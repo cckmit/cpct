@@ -59,6 +59,7 @@ public class TarGrpRule extends Thread {
         Long tarGrpId = mktStrategyConfRuleDO.getTarGrpId();
         List<TarGrpCondition> tarGrpConditionDOs = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
         List<LabelResult> labelResultList = new ArrayList<>();
+        List<String> codeList = new ArrayList<>();
         if (tarGrpId != null && tarGrpId != 0) {
             //将规则拼装为表达式
             StringBuilder express = new StringBuilder();
@@ -77,6 +78,7 @@ public class TarGrpRule extends Thread {
                     labelResult.setClassName(label.getClassName());
                     labelResult.setOperType(type);
                     labelResultList.add(labelResult);
+                    codeList.add(label.getInjectionLabelCode());
                     if ("7100".equals(type)) {
                         express.append("!");
                     }
@@ -109,6 +111,10 @@ public class TarGrpRule extends Thread {
             String key = "EVENT_RULE_" + mktCampaignId + "_" + mktStrategyConfId + "_" + mktStrategyConfRuleId;
             System.out.println("key>>>>>>>>>>" + key + ">>>>>>>>express->>>>:" + JSON.toJSONString(express));
             redisUtils.set(key, express);
+
+            //标签条件编码集合 试算展示用
+            redisUtils.hset("LABEL_CODE_"+mktStrategyConfId,tarGrpId+"",codeList);
+            System.out.println("TAR_GRP_ID>>>>>>>>>>" + tarGrpId + ">>>>>>>>codeList->>>>:" + JSON.toJSONString(codeList));
 
             // 将所有的标签集合存入redis
             redisUtils.set(key + "_LABEL", JSON.toJSONString(labelResultList));

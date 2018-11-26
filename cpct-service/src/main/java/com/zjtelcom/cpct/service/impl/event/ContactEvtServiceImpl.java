@@ -225,18 +225,6 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                     return maps;
                 }
             }
-            //插入事件匹配规则
-//            contactEvtMatchRuls = evtDetail.getContactEvtMatchRuls();
-//            for (ContactEvtMatchRul contactEvtMatchRul : contactEvtMatchRuls) {
-//                contactEvtMatchRul.setContactEvtId(contactEvt.getContactEvtId());
-//                contactEvtMatchRul.setCreateDate(DateUtil.getCurrentTime());
-//                contactEvtMatchRul.setUpdateDate(DateUtil.getCurrentTime());
-//                contactEvtMatchRul.setStatusDate(DateUtil.getCurrentTime());
-//                contactEvtMatchRul.setUpdateStaff(UserUtil.loginId());
-//                contactEvtMatchRul.setCreateStaff(UserUtil.loginId());
-//                contactEvtMatchRul.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-//                contactEvtMatchRulMapper.createContactEvtMatchRul(contactEvtMatchRul);
-//            }
 
             //插入事件和活动关联
 

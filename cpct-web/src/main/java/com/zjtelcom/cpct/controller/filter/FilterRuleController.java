@@ -165,13 +165,62 @@ public class FilterRuleController extends BaseController {
         OutputStream ouputStream = null;
         try {
             String fileName = "用户名单.xls";
-            File file = new File("cpct-web/src/main/resources/file/导入模板.xls");
+
+            String filePath = getClass().getResource("/file/" + "templete.xlsx").getPath();
+            FileInputStream input = new FileInputStream(filePath);
+
             byte[] buffer = new byte[1024];
             FileInputStream fis = null; //文件输入流
             BufferedInputStream bis = null;
-            fis = new FileInputStream(file);
+            fis = new FileInputStream("cpct-web/src/main/resources/file/templete.xlsx");
             bis = new BufferedInputStream(fis);
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
+
+            //处理导出问题
+            response.reset();
+            response.setContentType(CommonConstant.CONTENTTYPE);
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
+            ouputStream = response.getOutputStream();
+
+            int len = 0;
+            while ((len = bis.read(buffer)) > 0) {
+                ouputStream.write(buffer, 0, len);
+            }
+            int i = bis.read(buffer);
+//            while (i != -1) {
+//                ouputStream.write(buffer);
+//                i = bis.read(buffer);
+//            }
+            ouputStream.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                ouputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return initSuccRespInfo("导出成功");
+    }
+
+    /**
+     * 下载模板
+     */
+    @RequestMapping("downloadTrialOperationTemplate")
+    @CrossOrigin
+    public String downloadTrialOperationTemplate(HttpServletRequest request, HttpServletResponse response) {
+        OutputStream ouputStream = null;
+        try {
+            String fileName = "下发导入模板.xls";
+
+            String filePath = getClass().getResource("/file/" + "trialOperationTemplate.xlsx").getPath();
+            FileInputStream input = new FileInputStream(filePath);
+
+            byte[] buffer = new byte[1024];
+            FileInputStream fis = null; //文件输入流
+            BufferedInputStream bis = null;
+            fis = new FileInputStream("cpct-web/src/main/resources/file/trialOperationTemplate.xlsx");
+            bis = new BufferedInputStream(fis);
 
             //处理导出问题
             response.reset();
