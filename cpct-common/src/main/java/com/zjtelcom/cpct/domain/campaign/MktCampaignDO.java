@@ -26,7 +26,7 @@ public class MktCampaignDO extends BaseEntity{
     private String createChannel;
     private Long directoryId;
     private Long camLevel;
-    private String isChectRule;
+    private String isChecKRule;
 
     public Long getCalcDisplay() {
         return calcDisplay;
@@ -189,11 +189,11 @@ public class MktCampaignDO extends BaseEntity{
         this.camLevel = camLevel;
     }
 
-    public String getIsChectRule() {
-        return isChectRule;
+    public String getIsChecKRule() {
+        return isChecKRule;
     }
 
-    public void setIsChectRule(String isChectRule) {
-        this.isChectRule = isChectRule;
+    public void setIsChecKRule(String isChecKRule) {
+        this.isChecKRule = isChecKRule;
     }
 }
