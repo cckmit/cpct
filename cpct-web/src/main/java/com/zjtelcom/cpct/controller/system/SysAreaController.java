@@ -42,13 +42,13 @@ public class SysAreaController {
     @RequestMapping(value = "/listSysCity", method = RequestMethod.POST)
     @CrossOrigin
     public String listSysCity(@RequestBody  Map<String, Object> params) {
-        String landId = (String) params.get("lanId");
+        String lanId = (String) params.get("lanId");
         Integer areaId;
-        if (landId == null || "".equals(landId) || "null".equals(landId)) {
+        if (lanId == null || "".equals(lanId) || "null".equals(lanId)) {
             //TODO 获取当前用户所在地区
             areaId = 1;
         } else {
-            areaId = Integer.valueOf(landId);
+            areaId = Integer.valueOf(lanId);
         }
         Map<String, Object> map = sysAreaService.listCityByParentId(areaId);
         return JSON.toJSONString(map);

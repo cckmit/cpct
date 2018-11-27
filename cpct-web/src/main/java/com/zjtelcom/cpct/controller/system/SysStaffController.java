@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.controller.system;
 import com.alibaba.fastjson.JSON;
 import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDetail;
+import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.system.SysStaffDTO;
@@ -37,7 +38,7 @@ public class SysStaffController extends BaseController {
     @CrossOrigin
     public Map<String,Object> getSysUser() {
         Map<String,Object> result = new HashMap<>();
-        SystemUserDetail userDetail = BssSessionHelp.getSystemUserDetail();
+        SystemUserDto userDetail = BssSessionHelp.getSystemUserDto();
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",userDetail);
         return result;
