@@ -344,7 +344,9 @@ public class EventApiServiceImpl implements EventApiService {
             esJson.put("integrationId", map.get("integrationId"));
             esJson.put("accNbr", map.get("accNbr"));
             esJson.put("custId", map.get("custId"));
-            esJson.put("evtCollectTime", map.get("evtCollectTime"));
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd mm:HH:ss");
+            esJson.put("evtCollectTime", simpleDateFormat.format(map.get("evtCollectTime")));
+//            esJson.put("evtCollectTime", map.get("evtCollectTime"));
 
             //验证事件状态
             if (!"1000".equals(event.getStatusCd())) {
@@ -1144,7 +1146,7 @@ public class EventApiServiceImpl implements EventApiService {
             if (labelResultList == null || labelResultList.size() <= 0) {
                 labelResultList = new ArrayList<>();
                 //redis中没有，从数据库查询标签 , 并且set到redis
-                TarGrpDetail detail = (TarGrpDetail) redisUtils.get("TAR_GRP_"+tarGrpId);
+                TarGrpDetail detail = (TarGrpDetail) redisUtils.get("TAR_GRP_" + tarGrpId);
                 List<TarGrpCondition> tarGrpConditionDOs = new ArrayList<>();
                 if (detail != null) {
                     tarGrpConditionDOs = detail.getTarGrpConditions();
@@ -1153,7 +1155,7 @@ public class EventApiServiceImpl implements EventApiService {
                     TarGrpDetail detailNew = BeanUtil.create(tarGrp, new TarGrpDetail());
                     tarGrpConditionDOs = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
                     detailNew.setTarGrpConditions(tarGrpConditionDOs);
-                    redisUtils.set("TAR_GRP_"+tarGrpId, detailNew);
+                    redisUtils.set("TAR_GRP_" + tarGrpId, detailNew);
                 }
                 //遍历所有分群规则
                 for (int i = 1; i <= tarGrpConditionDOs.size(); i++) {
@@ -1250,7 +1252,7 @@ public class EventApiServiceImpl implements EventApiService {
                 LabelResult lr;
 
                 //若redis中不存在key，则从数据库中查询并拼装表达式
-                TarGrpDetail detail = (TarGrpDetail) redisUtils.get("TAR_GRP_"+tarGrpId);
+                TarGrpDetail detail = (TarGrpDetail) redisUtils.get("TAR_GRP_" + tarGrpId);
                 List<TarGrpCondition> tarGrpConditionDOs = new ArrayList<>();
                 if (detail != null) {
                     tarGrpConditionDOs = detail.getTarGrpConditions();
@@ -1260,7 +1262,7 @@ public class EventApiServiceImpl implements EventApiService {
                     TarGrpDetail detailNew = BeanUtil.create(tarGrp, new TarGrpDetail());
                     tarGrpConditionDOs = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
                     detailNew.setTarGrpConditions(tarGrpConditionDOs);
-                    redisUtils.set("TAR_GRP_"+tarGrpId, detailNew);
+                    redisUtils.set("TAR_GRP_" + tarGrpId, detailNew);
                 }
                 //将规则拼装为表达式
                 StringBuilder expressSb = new StringBuilder();
@@ -1280,7 +1282,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                     //保存标签的es log
                     lr = new LabelResult();
-                    if (label!=null){
+                    if (label != null) {
                         lr.setOperType(type);
                         lr.setLabelCode(label.getInjectionLabelCode());
                         lr.setLabelName(label.getInjectionLabelName());
@@ -1711,7 +1713,7 @@ public class EventApiServiceImpl implements EventApiService {
             } else {
                 List<MktVerbal> mktVerbals = mktVerbalMapper.findVerbalListByConfId(evtContactConfId);
                 verbalVOList = new ArrayList<>();
-                for (MktVerbal mktVerbal:mktVerbals) {
+                for (MktVerbal mktVerbal : mktVerbals) {
                     VerbalVO verbalVO = BeanUtil.create(mktVerbal, new VerbalVO());
                     verbalVOList.add(verbalVO);
                 }
