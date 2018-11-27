@@ -59,6 +59,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -70,19 +71,6 @@ import static com.zjtelcom.cpct.constants.CommonConstant.*;
 @Service
 public class TrialOperationServiceImpl extends BaseService implements TrialOperationService {
 
-    @Value("${spring.esurl.machfile}")
-    private String machFile;
-    @Value("${spring.esurl.batchinfo}")
-    private String batchInfo;
-    @Value("${spring.esurl.hitslist}")
-    private String hitsList;
-    @Value("${spring.esurl.countinfo}")
-    private String countInfo;
-
-//    private static String machFile = CPC_MATCH_FILE_TO_FTP;
-//    private static String batchInfo = SEARCH_INFO_FROM_ES_URL;
-//    private static String hitsList = FIND_BATCH_HITS_LIST_URL;
-//    private static String countInfo = SEARCH_COUNT_INFO_URL;
 
 
     @Autowired
@@ -860,8 +848,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             TrialOperationDetail detail = BeanUtil.create(trialOperation, new TrialOperationDetail());
             if (trialOperation.getUpdateDate() != null) {
 
-                Double cost = (double) ((trialOperation.getUpdateDate().getTime() - trialOperation.getCreateDate().getTime()) / 1000);
-                detail.setCost(cost + "s");
+                Double cost =  ((double)(trialOperation.getUpdateDate().getTime() - trialOperation.getCreateDate().getTime()) / 1000);
+                DecimalFormat df = new DecimalFormat("#.00");
+                detail.setCost(df.format(cost) + "s");
             }
             operationDetailList.add(detail);
         }
