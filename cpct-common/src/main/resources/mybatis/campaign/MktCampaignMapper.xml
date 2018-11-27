@@ -116,12 +116,12 @@
         LAN_ID = #{lanId,jdbcType=BIGINT},
         CAM_LEVEL = #{camLevel,jdbcType=BIGINT},
         IS_CHECK_RULE = #{isCheckRule,jdbcType=VARCHAR},
-        UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
-        SRC_ID #{srcId,jdbcType=VARCHAR},
-        SRC_TYPE = #{srcType,jdbcType=VARCHAR},
-        SERVICE_CANCLE_FLAG = #{serviceCancleFlag,jdbcType=BIGINT},
-        REGION_ID = #{regionId,jdbcType=BIGINT},
-        LIFE_STAGE =  #{lifeStage,jdbcType=VARCHAR}
+        <if test= "srcId!=null"> SRC_ID #{srcId,jdbcType=VARCHAR},</if>
+        <if test= "srcType!=null">SRC_TYPE = #{srcType,jdbcType=VARCHAR},</if>
+        <if test= "serviceCancleFlag!=null">SERVICE_CANCLE_FLAG = #{serviceCancleFlag,jdbcType=BIGINT},</if>
+        <if test= "regionId!=null">REGION_ID = #{regionId,jdbcType=BIGINT},</if>
+        <if test= "lifeStage!=null">LIFE_STAGE = #{lifeStage,jdbcType=VARCHAR},</if>
+        UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
         where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
     </update>
 
