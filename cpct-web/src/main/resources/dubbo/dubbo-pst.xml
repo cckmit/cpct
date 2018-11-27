@@ -39,6 +39,7 @@
         <dubbo:method name="searchBatchInfo" servicecode="00.1083.searchBatchInfo" timeout="100000"/>
         <dubbo:method name="searchCountInfo" servicecode="00.1083.searchCountInfo" timeout="100000"/>
         <dubbo:method name="strategyIssure" servicecode="00.1083.strategyIssure" timeout="100000"/>
+        <dubbo:method name="issueByFile" servicecode="00.1083.issueByFile" timeout="10000"/>
     </dubbo:reference>
 
 
