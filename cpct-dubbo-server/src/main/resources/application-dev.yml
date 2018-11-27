@@ -10,6 +10,7 @@ spring:
     password: xc.cpct
     driver-class-name: com.mysql.jdbc.Driver
 
+
 #redis相关配置
   redis:
     host: 134.96.252.170

@@ -103,6 +103,11 @@ public class MktCampaign extends BaseEntity {
      */
     private Long camLevel;
 
+    /**
+     * 是否进行规制校验
+     */
+    private String isCheckRule;
+
 
     public Long getDirectoryId() {
         return directoryId;
@@ -246,5 +251,13 @@ public class MktCampaign extends BaseEntity {
 
     public void setCamLevel(Long camLevel) {
         this.camLevel = camLevel;
+    }
+
+    public String getIsCheckRule() {
+        return isCheckRule;
+    }
+
+    public void setIsCheckRule(String isCheckRule) {
+        this.isCheckRule = isCheckRule;
     }
 }

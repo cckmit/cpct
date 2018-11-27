@@ -13,6 +13,7 @@ import com.zjtelcom.cpct.dubbo.model.RecordModel;
 import com.zjtelcom.cpct.dubbo.service.SyncLabelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
+import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,8 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
     private InjectionLabelValueMapper labelValueMapper;
     @Autowired(required = false)
     private InjectionLabelCatalogMapper labelCatalogMapper;
+    @Autowired(required = false)
+    private RedisUtils redisUtils;
 
     /**
      * 标签同步对外接口
@@ -80,51 +83,83 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         Map<String, Object> result = new HashMap<>();
         LabModel labModel = record.getLabel();
         Label labelValodate = labelMapper.selectByTagRowId(record.getLabel().getLabRowId());
-        if (labelValodate != null) {
-            labelValueMapper.deleteByLabelId(labelValodate.getInjectionLabelId());
-            labelMapper.deleteByPrimaryKey(labelValodate.getInjectionLabelId());
-        }
         List<LabValueModel> valueModelList = new ArrayList<>();
         if (record.getLabelValueList() != null && !record.getLabelValueList().isEmpty()) {
             valueModelList = record.getLabelValueList();
         }
-        Label label = BeanUtil.create(labModel, new Label());
-        label.setTagRowId(labModel.getLabRowId());//标签id
-        label.setInjectionLabelName(labModel.getLabName());//标签名称
-        label.setInjectionLabelCode(labModel.getLabEngName());//英文名称
-        //label.setInjectionLabelDesc();
-        label.setLabTagCode(labModel.getLabCode());//标签编码
+        if (labelValodate != null) {
+            BeanUtil.copy(labModel,labelValodate);
+            labelValodate.setTagRowId(labModel.getLabRowId());//标签id
+            labelValodate.setInjectionLabelName(labModel.getLabName());//标签名称
+            labelValodate.setInjectionLabelCode(labModel.getLabEngName());//英文名称
+            //label.setInjectionLabelDesc();
+            labelValodate.setLabTagCode(labModel.getLabCode());//标签编码
+            labelValodate.setInjectionLabelDesc(labModel.getLabBusiDesc());
 
-        if (labModel.getLabType() == String.valueOf(1) || labModel.getLabType() == String.valueOf(2)) {
-            label.setConditionType(String.valueOf(4));//标签类型(文本、数值、枚举) 4输入  2多选
-        }else if(labModel.getLabType() == String.valueOf(3)) {
-            label.setConditionType(String.valueOf(2));
-        }
-        if(Long.valueOf(labModel.getLabType()) == 4){
-            label.setOperator("2000,3000,1000,4000,6000,5000,7000,7200");
-        }else if(Long.valueOf(labModel.getLabType()) == 2){
-            label.setOperator("7000");
-        }
-        label.setScope(1);
-        label.setIsShared(0);
-        label.setCatalogId(labModel.getLabObjectCode() + labModel.getLabLevel1() + labModel.getLabLevel2() + labModel.getLabLevel3());
 
-        //todo 暂无标签类型
-        label.setLabelType("1000");
-        //todo 暂无值类型
-        if (record.getLabelValueList()!=null && !record.getLabelValueList().isEmpty()){
-            label.setLabelValueType("2000");
+            if (labModel.getLabType() .equals(String.valueOf(1))  || labModel.getLabType() .equals(String.valueOf(2)) ) {
+                labelValodate.setConditionType(String.valueOf(4));//标签类型(文本、数值、枚举) 4输入  2多选
+            }else if(labModel.getLabType() .equals(String.valueOf(3)) ) {
+                labelValodate.setConditionType(String.valueOf(2));
+            }
+            if(Long.valueOf(labelValodate.getConditionType()) == 4){
+                labelValodate.setOperator("2000,3000,1000,4000,6000,5000,7000,7200");
+            }else if(Long.valueOf(labelValodate.getConditionType()) == 2){
+                labelValodate.setOperator("7000");
+            }
+            labelValodate.setCatalogId(labModel.getLabObjectCode() + labModel.getLabLevel1() + labModel.getLabLevel2() + labModel.getLabLevel3());
+
+            if (record.getLabelValueList()!=null && !record.getLabelValueList().isEmpty()){
+                labelValodate.setLabelValueType("2000");
+            }else {
+                labelValodate.setLabelValueType("1000");
+            }
+            //label.setLabelDataType(ChannelUtil.getDataType(tagModel.getSourceTableColumnType()));
+
+            labelMapper.updateByPrimaryKey(labelValodate);
+            //redis更新标签库
+            redisUtils.set("LABEL_LIB_"+labelValodate.getInjectionLabelId(),labelValodate);
+            syncLabelValue(valueModelList,labelValodate.getInjectionLabelId());
         }else {
-            label.setLabelValueType("1000");
+
+            Label label = BeanUtil.create(labModel, new Label());
+
+            label.setTagRowId(labModel.getLabRowId());//标签id
+            label.setInjectionLabelName(labModel.getLabName());//标签名称
+            label.setInjectionLabelCode(labModel.getLabEngName());//英文名称
+            //label.setInjectionLabelDesc();
+            label.setLabTagCode(labModel.getLabCode());//标签编码
+            label.setInjectionLabelDesc(labModel.getLabBusiDesc());
+            label.setConditionType(labModel.getLabType());
+            if("4".equals(label.getConditionType())){
+                label.setOperator("2000,3000,1000,4000,6000,5000,7000,7200");
+            }else if("2".equals(label.getConditionType())){
+                label.setOperator("7000");
+            }
+            label.setScope(1);
+            label.setIsShared(0);
+            label.setCatalogId(labModel.getLabObjectCode() + labModel.getLabLevel1() + labModel.getLabLevel2() + labModel.getLabLevel3());
+
+            //todo 暂无标签类型
+            label.setLabelType("1000");
+            //todo 暂无值类型
+            if (record.getLabelValueList()!=null && !record.getLabelValueList().isEmpty()){
+                label.setLabelValueType("2000");
+            }else {
+                label.setLabelValueType("1000");
+            }
+            //label.setLabelDataType(ChannelUtil.getDataType(tagModel.getSourceTableColumnType()));
+
+            label.setStatusCd(STATUSCD_EFFECTIVE);
+            label.setCreateStaff(UserUtil.loginId());
+            label.setCreateDate(new Date());
+
+            labelMapper.insert(label);
+            //redis更新标签库
+            redisUtils.set("LABEL_LIB_"+label.getInjectionLabelId(),label);
+            syncLabelValue(valueModelList,label.getInjectionLabelId());
         }
-        //label.setLabelDataType(ChannelUtil.getDataType(tagModel.getSourceTableColumnType()));
 
-        label.setStatusCd(STATUSCD_EFFECTIVE);
-        label.setCreateStaff(UserUtil.loginId());
-        label.setCreateDate(new Date());
-
-        labelMapper.insert(label);
-        syncLabelValue(valueModelList,label.getInjectionLabelId());
 
 //        //标签目录插入
 //        LabelCatalog labelCatalog =new LabelCatalog();
@@ -286,7 +321,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             labelMapper.insert(labelModel);
         }
 
-//        //标签目录初始化
+        //标签目录初始化
 //        List<Label> labels = labelMapper.selectAll();
 //        for (Label label : labels){
 //            //标签目录插入

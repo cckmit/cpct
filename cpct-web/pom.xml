@@ -74,10 +74,11 @@
         </dependency>
 
         <!-- 引入门户模块 -->
-        <!--<dependency>-->
-            <!--<groupId>com.ctzj.smt.bss</groupId>-->
-            <!--<artifactId>bss-centralized-authenticate</artifactId>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>com.ctzj.smt.bss</groupId>
+            <artifactId>bss-centralized-authenticate</artifactId>
+        </dependency>
+
         <!--<dependency>-->
             <!--<groupId>com.zjhcsoft.session</groupId>-->
             <!--<artifactId>spring-session</artifactId>-->
@@ -109,16 +110,72 @@
             <!--<artifactId>jackson-databind</artifactId>-->
         <!--</dependency>-->
 
+        <!--<dependency>-->
+            <!--<groupId>com.web.asiainfo.zhejiang</groupId>-->
+            <!--<artifactId>PolicyTemplateDataService</artifactId>-->
+            <!--<version>1.0.0</version>-->
+        <!--</dependency>-->
+
         <dependency>
-            <groupId>com.web.asiainfo.zhejiang</groupId>
-            <artifactId>PolicyTemplateDataService</artifactId>
+            <groupId>com.zjtelcom.es</groupId>
+            <artifactId>es-service-batch</artifactId>
             <version>1.0.0</version>
         </dependency>
 
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <spring.profiles.active>dev</spring.profiles.active>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>online</id>
+            <properties>
+                <spring.profiles.active>online</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>pst</id>
+            <properties>
+                <spring.profiles.active>pst</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>pre</id>
+            <properties>
+                <spring.profiles.active>pre</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <spring.profiles.active>prod</spring.profiles.active>
+            </properties>
+        </profile>
+    </profiles>
+
+    <properties>
+        <resource.delimiter>#</resource.delimiter>
+    </properties>
+
     <build>
         <finalName>cpct-web</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources.${spring.profiles.active}</directory>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

@@ -16,11 +16,18 @@
     <dubbo:monitor protocol="registry" />
 
     <!-- 注册 -->
-    <!-- 策略cpct计算服务 -->
-    <!--<dubbo:service interface="com.zjtelcom.cpct.dubbo.service.EventApiService" ref="eventApiServiceImpl" version="1.0" >-->
-        <!--<dubbo:method name="CalculateCPC" servicecode="00.1083.CalculateCPC" timeout="10000"/>-->
-        <!--<dubbo:method name="CalculateCPCSync" servicecode="33.1083.CalculateCPCSync" timeout="5000"/>-->
+    <!-- 事件外部调用测试 -->
+    <!--<dubbo:service interface="com.zjtelcom.cpct.dubbo.service.SyncEventService" ref="syncEventServiceImpl"-->
+                   <!--version="1.0">-->
+        <!--<dubbo:method name="syncEvent" servicecode="33.1083.syncEvent" timeout="10000"/>-->
     <!--</dubbo:service>-->
+
+    <!-- 订阅事件实时计算服务 -->
+    <!--<dubbo:reference interface="com.zjtelcom.cpct.dubbo.service.EventApiService" id="eventApiService"-->
+                     <!--version="1.0" retries="0" check="false">-->
+        <!--<dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="10000"/>-->
+    <!--</dubbo:reference>-->
+
 
 
 

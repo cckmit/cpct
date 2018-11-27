@@ -24,4 +24,6 @@ public interface MktStrategyConfMapper {
 
     List<MktStrategyConfDO> selectByCampaignId(@Param("campaignId")Long campaignId);
 
+
+
 }

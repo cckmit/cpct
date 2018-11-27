@@ -2,6 +2,8 @@
 server:
   port: 30321
 
+dubboPath: dev
+
 spring:
 # 第一数据源
   datasource:
@@ -13,9 +15,23 @@ spring:
 # 第二数据源
   datasourceprd:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://134.96.252.170:30304/cpct_system?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    url: jdbc:mysql://134.96.253.29:8801/smt_bss_cpc_cpct?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: cpc_cpct_user
+    password: cpc_cpct_user_123
+
+# 第三数据源
+  datasourcethird:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://47.94.168.117:3306/fpc_system?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
     username: root
-    password: xc.cpct
+    password: Yanlei2018
+
+# 第三数据源
+  datasourcethird:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://47.94.168.117:3306/fpc_system?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
+    username: root
+    password: Yanlei2018
 
 #redis相关配置
   redis:

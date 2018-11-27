@@ -30,6 +30,7 @@
         <result column="CREATE_CHANNEL" jdbcType="VARCHAR" property="createChannel" />
         <result column="DIRECTORY_ID" jdbcType="BIGINT" property="directoryId" />
         <result column="CAM_LEVEL" jdbcType="BIGINT" property="camLevel" />
+        <result column="IS_CHECK_RULE" jdbcType="VARCHAR" property="isCheckRule" />
     </resultMap>
 
     <resultMap id="countResultMap" type="com.zjtelcom.cpct.domain.campaign.MktCampaignCountDO">
@@ -65,7 +66,7 @@
       EXEC_TYPE, EXEC_INVL, EXEC_NUM,
       STATUS_CD, STATUS_DATE, CREATE_STAFF,
       CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
-      REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL)
+      REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL, IS_CHECK_RULE)
     values (#{mktCampaignId,jdbcType=BIGINT}, #{tiggerType,jdbcType=VARCHAR}, #{mktCampaignName,jdbcType=VARCHAR},
       #{planBeginTime,jdbcType=DATE}, #{planEndTime,jdbcType=DATE}, #{beginTime,jdbcType=DATE},
       #{endTime,jdbcType=DATE}, #{mktCampaignType,jdbcType=VARCHAR}, #{mktCampaignCategory,jdbcType=VARCHAR},
@@ -75,7 +76,7 @@
       #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT},
       #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP},
       #{remark,jdbcType=VARCHAR}, #{lanId,jdbcType=BIGINT}, #{createChannel,jdbcType=VARCHAR},
-      #{directoryId,jdbcType=BIGINT},#{camLevel,jdbcType=BIGINT})
+      #{directoryId,jdbcType=BIGINT},#{camLevel,jdbcType=BIGINT}, #{isCheckRule,jdbcType=VARCHAR})
     </insert>
 
 
@@ -107,6 +108,7 @@
         DIRECTORY_ID = #{directoryId,jdbcType=BIGINT},
         LAN_ID = #{lanId,jdbcType=BIGINT},
         CAM_LEVEL = #{camLevel,jdbcType=BIGINT},
+        IS_CHECK_RULE = #{isCheckRule,jdbcType=VARCHAR},
         UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
 
         where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
@@ -151,7 +153,7 @@
     select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
     BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MKT_CAMPAIGN_CATEGORY, MKT_ACTIVITY_NBR,
     MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD,
-    STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL
+    STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL, IS_CHECK_RULE
     from mkt_campaign
     where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
     </select>
@@ -160,7 +162,7 @@
     select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
     BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MKT_CAMPAIGN_CATEGORY, MKT_ACTIVITY_NBR,
     MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD,
-    STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL
+    STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL, IS_CHECK_RULE
     from mkt_campaign order by UPDATE_DATE desc
     </select>
 
@@ -271,7 +273,7 @@
         select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
         BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MKT_CAMPAIGN_CATEGORY, MKT_ACTIVITY_NBR, MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC,
         CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE,
-        UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL
+        UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL, IS_CHECK_RULE
         from mkt_campaign
         where 1 = 1
         <if test="mktCampaignId != null and mktCampaignId != ''">
@@ -337,6 +339,9 @@
         <if test="camLevel != null and camLevel != ''">
             AND CAM_LEVEL = #{camLevel,jdbcType=BIGINT}
         </if>
+        <if test="isCheckRule != null and isCheckRule != ''">
+            AND IS_CHECK_RULE = #{isCheckRule,jdbcType=VARCHAR}
+        </if>
         order by UPDATE_DATE desc
     </select>
     
@@ -344,7 +349,7 @@
         select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
         BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MKT_CAMPAIGN_CATEGORY, MKT_ACTIVITY_NBR, MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC,
         CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE,
-        UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL
+        UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL, IS_CHECK_RULE
         from mkt_campaign
         where 1 = 1
         <if test="execType != null and execType != ''">

@@ -2,11 +2,14 @@ package com.zjtelcom.cpct.dubbo.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.dubbo.model.RecordModel;
+import com.zjtelcom.cpct.dubbo.service.SyncEventService;
 import com.zjtelcom.cpct.dubbo.service.SyncLabelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -14,6 +17,9 @@ import java.util.Map;
 public class SyncLabelController {
     @Autowired
     private SyncLabelService syncLabelService;
+
+    @Autowired
+    private SyncEventService syncEventService;
 
     @RequestMapping(value = "syncLabel", method = RequestMethod.POST)
     @CrossOrigin
@@ -33,11 +39,17 @@ public class SyncLabelController {
 //            e.printStackTrace();
 //        }
 
-        //result = syncLabelService.initialization();
+//        result = syncLabelService.initialization();
         result = syncLabelService.syncLabelInfo(model);
         return JSON.toJSON(result).toString();
     }
 
+    @RequestMapping(value = "syncEvent", method = RequestMethod.POST)
+    @CrossOrigin
+    public String syncEvent(@RequestBody Map<String,Object> param) {
+        syncEventService.syncEvent(param);
+        return "调用成功";
+    }
 
 
 
