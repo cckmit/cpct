@@ -12,6 +12,7 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
+import com.zjtelcom.cpct.dao.channel.OfferRestrictMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateConditionMapper;
@@ -19,6 +20,7 @@ import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
+import com.zjtelcom.cpct.domain.channel.OfferRestrict;
 import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO;
 import com.zjtelcom.cpct.dto.channel.LabelValueVO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
@@ -27,11 +29,14 @@ import com.zjtelcom.cpct.enums.LeftParamType;
 import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.enums.RightParamType;
 import com.zjtelcom.cpct.service.BaseService;
+import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.service.grouping.TarGrpTemplateService;
 import com.zjtelcom.cpct.service.synchronize.template.SynTarGrpTemplateService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
+import com.zjtelcom.cpct.vo.grouping.TarGrpVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -40,6 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 /**
  * Description:
@@ -53,8 +59,6 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
 
     @Autowired
     private TarGrpTemplateMapper tarGrpTemplateMapper;
-
-
     @Autowired
     private InjectionLabelMapper injectionLabelMapper;
 
@@ -63,11 +67,44 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     @Autowired
     private TarGrpMapper tarGrpMapper;
     @Autowired
+    private OfferRestrictMapper offerRestrictMapper;
+    @Autowired
     private TarGrpConditionMapper tarGrpConditionMapper;
     @Autowired
     private SynTarGrpTemplateService synTarGrpTemplateService;
+    @Autowired
+    private TarGrpService tarGrpService;
     @Value("${sync.value}")
     private String value;
+
+    /**
+     * 销售品id 获取分群集合
+     * @param offerList
+     * @return
+     */
+    @Override
+    public Map<String, Object> getTarGrpTemByOfferId(List<Long> offerList) {
+        Map<String, Object> result = new HashMap<>();
+        List<TarGrpVO> tarGrpVOS = new ArrayList<>();
+        for (Long offerId : offerList){
+            OfferRestrict restrict = offerRestrictMapper.selectByOfferId(offerId,"7000");
+            if (restrict==null){
+                continue;
+            }
+            TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(restrict.getRstrObjId());
+            if (tarGrp==null){
+                continue;
+            }
+            Map<String,Object> targrpMap = tarGrpService.listTarGrpCondition(restrict.getRstrObjId());
+            List<TarGrpConditionVO> voList = ( List<TarGrpConditionVO>)targrpMap.get("listTarGrpCondition");
+            TarGrpVO vo = BeanUtil.create(tarGrp,new TarGrpVO());
+            vo.setTarGrpConditionVOs(voList);
+            tarGrpVOS.add(vo);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",tarGrpVOS);
+        return result;
+    }
 
     /**
      * 新增目标分群模板

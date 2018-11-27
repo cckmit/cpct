@@ -194,10 +194,10 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
 
         // 策略适用渠道
 /*
-        List<Channel> channelsList = new ArrayList<>();
+        List<channel> channelsList = new ArrayList<>();
         String[] channelIds = mktStrategyConfDO.getChannelsId().split("/");
         for (String channelId : channelIds) {
-            Channel channel = contactChannelMapper.selectByPrimaryKey(Long.valueOf(channelId));
+            channel channel = contactChannelMapper.selectByPrimaryKey(Long.valueOf(channelId));
             channelsList.add(channel);
         }
         mktStrategyConfResp.setChannelsList(channelsList);

@@ -8,6 +8,7 @@ package com.zjtelcom.cpct.service.grouping;
 
 import com.zjtelcom.cpct.dto.grouping.TarGrpTemplateDetail;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,4 +32,6 @@ public interface TarGrpTemplateService {
     Map<String, Object> listTarGrpTemplateAll();
 
     Map<String, Object> listTarGrpTemplatePage(String tarGrpTemplateName,String tarGrpType, Integer page, Integer pageSize);
+
+    Map<String, Object> getTarGrpTemByOfferId(List<Long> offerList);
 }
