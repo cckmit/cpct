@@ -993,7 +993,8 @@ public class EventApiServiceImpl implements EventApiService {
                         }
                     } else if ("6000".equals(filterRule.getFilterType())) {  //过扰规则
 //                        itgTriggers
-
+                        //获取过扰标签
+//                        filterRule.get
 
 
                     }
