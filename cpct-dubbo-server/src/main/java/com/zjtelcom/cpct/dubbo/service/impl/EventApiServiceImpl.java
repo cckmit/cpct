@@ -992,6 +992,9 @@ public class EventApiServiceImpl implements EventApiService {
                             return Collections.EMPTY_MAP;
                         }
                     } else if ("6000".equals(filterRule.getFilterType())) {  //过扰规则
+//                        itgTriggers
+
+
 
                     }
                 }
