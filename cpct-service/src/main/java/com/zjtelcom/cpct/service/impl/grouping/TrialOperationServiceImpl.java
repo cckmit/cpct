@@ -15,7 +15,6 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
-import com.zjtelcom.cpct.dao.system.SysStaffMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
@@ -24,14 +23,11 @@ import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
-import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
-import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.grouping.*;
-import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
@@ -39,7 +35,6 @@ import com.zjtelcom.cpct.service.channel.MessageLabelService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
-import com.zjtelcom.cpct.service.thread.TarGrpRule;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.es.es.entity.*;
 import com.zjtelcom.es.es.entity.model.LabelResultES;
@@ -59,6 +54,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -70,19 +66,6 @@ import static com.zjtelcom.cpct.constants.CommonConstant.*;
 @Service
 public class TrialOperationServiceImpl extends BaseService implements TrialOperationService {
 
-    @Value("${spring.esurl.machfile}")
-    private String machFile;
-    @Value("${spring.esurl.batchinfo}")
-    private String batchInfo;
-    @Value("${spring.esurl.hitslist}")
-    private String hitsList;
-    @Value("${spring.esurl.countinfo}")
-    private String countInfo;
-
-//    private static String machFile = CPC_MATCH_FILE_TO_FTP;
-//    private static String batchInfo = SEARCH_INFO_FROM_ES_URL;
-//    private static String hitsList = FIND_BATCH_HITS_LIST_URL;
-//    private static String countInfo = SEARCH_COUNT_INFO_URL;
 
 
     @Autowired
@@ -117,8 +100,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private MktCamChlConfMapper chlConfMapper;
     @Autowired
     private MktCamScriptMapper scriptMapper;
-    @Autowired
-    private SysStaffMapper sysStaffMapper;
     @Autowired
     private SysParamsMapper sysParamsMapper;
     @Autowired(required = false)
@@ -331,8 +312,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         request.setLanId(campaignDO.getLanId());
         request.setCamLevel(campaignDO.getCamLevel());
         // 获取创建人员code
-        SysStaff sysStaff = sysStaffMapper.selectByPrimaryKey(campaignDO.getCreateStaff());
-        request.setStaffCode(sysStaff.getStaffCode());
+        request.setStaffCode("SYS987329864");
 
 
         //获取销售品及规则列表
@@ -796,69 +776,24 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         request.setCampaignType(campaignDO.getMktCampaignType());
         request.setLanId(campaignDO.getLanId());
         request.setCamLevel(campaignDO.getCamLevel());
-
         // 获取创建人员code
-        SysStaff sysStaff = sysStaffMapper.selectByPrimaryKey(campaignDO.getCreateStaff());
-        request.setStaffCode(sysStaff.getStaffCode());
+        request.setStaffCode("SYS827364823");
 
-        List<TrialOperationParam> paramList = new ArrayList<>();
-        List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(trialOperation.getStrategyId());
+
+        TrialOperationVOES requests = BeanUtil.create(request,new TrialOperationVOES());
+        //todo 待测试
+        ArrayList<TrialOperationParamES> paramList = new ArrayList<>();
+        List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(request.getStrategyId());
         for (MktStrategyConfRuleRelDO ruleRelDO : ruleRelList) {
-            TrialOperationParam param = new TrialOperationParam();
-            // 获取规则Id
-            Long ruleId = ruleRelDO.getMktStrategyConfRuleId();
-            param.setRuleId(ruleId);
-            MktStrategyConfRuleDO confRule = ruleMapper.selectByPrimaryKey(ruleId);
-            if (confRule != null) {
-                param.setRuleName(confRule.getMktStrategyConfRuleName());
-                param.setTarGrpId(confRule.getTarGrpId());
-            }
-            // 获取规则信息
-            Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.getMktStrategyConfRule(ruleId);
-            MktStrategyConfRule mktStrategyConfRule = (MktStrategyConfRule) mktStrategyConfRuleMap.get("mktStrategyConfRule");
-
-            // 获取销售品集合
-            Map<String, Object> productRuleListMap = productService.getProductRuleList(UserUtil.loginId(), mktStrategyConfRule.getProductIdlist());
-            List<MktProductRule> mktProductRuleList = (List<MktProductRule>) productRuleListMap.get("resultMsg");
-            param.setMktProductRuleList(mktProductRuleList);
-
-            // 获取推送渠道
-            List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
-            List<MktCamChlConfDetail> mktCamChlConfList = mktStrategyConfRule.getMktCamChlConfDetailList();
-            if(mktCamChlConfList!=null){
-                for (MktCamChlConfDetail mktCamChlConf : mktCamChlConfList) {
-                    Map<String, Object> mktCamChlConfDetailMap = mktCamChlConfService.getMktCamChlConf(mktCamChlConf.getEvtContactConfId());
-                    MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConfDetailMap.get("mktCamChlConfDetail");
-                    mktCamChlConfDetail.setIsSecondCoop("1");   // 设置为首次协同
-                    mktCamChlConfDetailList.add(mktCamChlConfDetail);
-                }
-            }
-
-            List<MktCamChlResult> mktCamChlResultList = mktStrategyConfRule.getMktCamChlResultList();
-            if(mktCamChlResultList!=null){
-                for (MktCamChlResult mktCamChlResult : mktCamChlResultList) {
-                    List<MktCamChlConfDetail> confDetailResultList = mktCamChlResult.getMktCamChlConfDetailList();
-                    for (MktCamChlConfDetail mktCamChlConfDetail : confDetailResultList) {
-                        mktCamChlConfDetail.setIsSecondCoop("0");  // 设置为二次协同
-                        mktCamChlConfDetailList.add(mktCamChlConfDetail);
-                    }
-                }
-            }
-            param.setMktCamChlConfDetailList(mktCamChlConfDetailList);
-
-            // 设置批次号
-            param.setBatchNum(trialOperation.getBatchNum());
-            //redis取规则
-            String rule = redisUtils.get("EVENT_RULE_" + trialOperation.getCampaignId() + "_" + trialOperation.getStrategyId() + "_" + ruleRelDO.getMktStrategyConfRuleId()).toString();
-            System.out.println("*************************" + rule);
-            param.setRule(rule);
+            TrialOperationParamES param = getTrialOperationParamES(request, trialOperation.getBatchNum(), ruleRelDO.getMktStrategyConfRuleId(),false);
             paramList.add(param);
         }
-        request.setParamList(paramList);
+        requests.setParamList(paramList);
+
         try {
-//            com.zjtelcom.es.model.TrialResponse response = esService.strategyIssure(BeanUtil.create(request,new com.zjtelcom.es.model.TrialOperationVO()));
+            TrialResponseES response = esService.strategyIssure(requests);
             //todo 待验证
-            restTemplate.postForObject(machFile, request, TrialResponse.class);
+//            restTemplate.postForObject(machFile, request, TrialResponse.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -904,8 +839,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             TrialOperationDetail detail = BeanUtil.create(trialOperation, new TrialOperationDetail());
             if (trialOperation.getUpdateDate() != null) {
 
-                Double cost = (double) ((trialOperation.getUpdateDate().getTime() - trialOperation.getCreateDate().getTime()) / 1000);
-                detail.setCost(cost + "s");
+                Double cost =  ((double)(trialOperation.getUpdateDate().getTime() - trialOperation.getCreateDate().getTime()) / 1000);
+                DecimalFormat df = new DecimalFormat("#.00");
+                detail.setCost(df.format(cost) + "s");
             }
             operationDetailList.add(detail);
         }

@@ -9,9 +9,8 @@
         <result column="EVT_ITEM_CODE" jdbcType="VARCHAR" property="evtItemCode"/>
         <result column="VALUE_DATA_TYPE" jdbcType="VARCHAR" property="valueDataType"/>
         <result column="EVT_ITEM_FORMAT" jdbcType="VARCHAR" property="evtItemFormat"/>
-        <result column="IS_NULLABLE" jdbcType="VARCHAR" property="isNullable"/>
+        <result column="IS_NULLABLE" jdbcType="BIGINT" property="isNullable"/>
         <result column="IS_MAIN_PARAM" jdbcType="VARCHAR" property="isMainParam" />
-        <result column="EVT_ITEM_DESC" jdbcType="VARCHAR" property="evtItemDesc" />
         <result column="EVT_ITEM_LENGTH" jdbcType="INTEGER" property="evtItemLength"/>
         <result column="STANDARD_SORT" jdbcType="INTEGER" property="standardSort"/>
         <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd"/>
@@ -30,14 +29,14 @@
     <insert id="insert" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtItem">
     insert into event_item (EVT_ITEM_ID, EVENT_ID, EVT_TYPE_ID,
       EVT_ITEM_NAME, EVT_ITEM_CODE, VALUE_DATA_TYPE,
-      EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, IS_MAIN_PARAM, EVT_ITEM_DESC,
+      EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, IS_MAIN_PARAM,
       STANDARD_SORT, STATUS_CD, CREATE_STAFF,
       UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
       UPDATE_DATE, REMARK,IS_LABEL)
     values (#{evtItemId,jdbcType=BIGINT}, #{contactEvtId,jdbcType=BIGINT}, #{evtTypeId,jdbcType=BIGINT},
       #{evtItemName,jdbcType=VARCHAR}, #{evtItemCode,jdbcType=VARCHAR}, #{valueDataType,jdbcType=VARCHAR},
-      #{evtItemFormat,jdbcType=VARCHAR}, #{isNullable,jdbcType=VARCHAR}, #{evtItemLength,jdbcType=INTEGER},
-      #{isMainParam,jdbcType=VARCHAR}, #{evtItemDesc,jdbcType=VARCHAR},
+      #{evtItemFormat,jdbcType=VARCHAR}, #{isNullable,jdbcType=BIGINT}, #{evtItemLength,jdbcType=INTEGER},
+      #{isMainParam,jdbcType=VARCHAR},
       #{standardSort,jdbcType=INTEGER}, #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT},
       #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP},
       #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR},#{isLabel,jdbcType=VARCHAR})
@@ -50,10 +49,9 @@
       EVT_ITEM_CODE = #{evtItemCode,jdbcType=VARCHAR},
       VALUE_DATA_TYPE = #{valueDataType,jdbcType=VARCHAR},
       EVT_ITEM_FORMAT = #{evtItemFormat,jdbcType=VARCHAR},
-      IS_NULLABLE = #{isNullable,jdbcType=VARCHAR},
+      IS_NULLABLE = #{isNullable,jdbcType=BIGINT},
       EVT_ITEM_LENGTH = #{evtItemLength,jdbcType=INTEGER},
        IS_MAIN_PARAM = #{isMainParam,jdbcType=VARCHAR},
-      EVT_ITEM_DESC = #{evtItemDesc,jdbcType=VARCHAR},
       STANDARD_SORT = #{standardSort,jdbcType=INTEGER},
       STATUS_CD = #{statusCd,jdbcType=VARCHAR},
       CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
@@ -67,21 +65,21 @@
   </update>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select EVT_ITEM_ID, EVENT_ID, EVT_TYPE_ID, EVT_ITEM_NAME, EVT_ITEM_CODE, VALUE_DATA_TYPE,
-    EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, STANDARD_SORT, STATUS_CD, CREATE_STAFF, IS_MAIN_PARAM, EVT_ITEM_DESC,
+    EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, STANDARD_SORT, STATUS_CD, CREATE_STAFF, IS_MAIN_PARAM,
     UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK,IS_LABEL
     from event_item
     where EVT_ITEM_ID = #{evtItemId,jdbcType=BIGINT}
   </select>
     <select id="selectAll" resultMap="BaseResultMap">
     select EVT_ITEM_ID, EVENT_ID, EVT_TYPE_ID, EVT_ITEM_NAME, EVT_ITEM_CODE, VALUE_DATA_TYPE,
-    EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, STANDARD_SORT, STATUS_CD, CREATE_STAFF, IS_MAIN_PARAM, EVT_ITEM_DESC,
+    EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, STANDARD_SORT, STATUS_CD, CREATE_STAFF, IS_MAIN_PARAM,
     UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK,IS_LABEL
     from event_item
   </select>
 
     <select id="listEventItem"  resultMap="BaseResultMap">
         select EVT_ITEM_ID, EVENT_ID, EVT_TYPE_ID, EVT_ITEM_NAME, EVT_ITEM_CODE, VALUE_DATA_TYPE,
-        EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, STANDARD_SORT, STATUS_CD, CREATE_STAFF,IS_MAIN_PARAM, IS_LABEL,EVT_ITEM_DESC,
+        EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, STANDARD_SORT, STATUS_CD, CREATE_STAFF,IS_MAIN_PARAM, IS_LABEL,
         UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
         from event_item
         where 1 = 1
@@ -92,7 +90,7 @@
 
     <select id="listMainItem"  resultMap="BaseResultMap">
         select EVT_ITEM_ID, EVENT_ID, EVT_TYPE_ID, EVT_ITEM_NAME, EVT_ITEM_CODE, VALUE_DATA_TYPE,
-        EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, STANDARD_SORT, STATUS_CD, CREATE_STAFF,IS_MAIN_PARAM, EVT_ITEM_DESC,
+        EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, STANDARD_SORT, STATUS_CD, CREATE_STAFF,IS_MAIN_PARAM,
         UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK,IS_LABEL
         from event_item
         where EVENT_ID = 0 or EVENT_ID = -1
@@ -115,7 +113,7 @@
         UPDATE_STAFF,
         CREATE_DATE,
         STATUS_DATE,
-        UPDATE_DATE,IS_MAIN_PARAM, EVT_ITEM_DESC,
+        UPDATE_DATE,IS_MAIN_PARAM,
         REMARK,
         IS_LABEL)
         values (
@@ -125,9 +123,8 @@
         #{evtItemCode,jdbcType=VARCHAR},
         #{valueDataType,jdbcType=VARCHAR},
         #{evtItemFormat,jdbcType=VARCHAR},
-        #{isNullable,jdbcType=VARCHAR},
+        #{isNullable,jdbcType=BIGINT},
         #{isMainParam,jdbcType=VARCHAR},
-        #{evtItemDesc,jdbcType=VARCHAR},
         #{evtItemLength,jdbcType=INTEGER},
         #{standardSort,jdbcType=INTEGER},
         #{statusCd,jdbcType=VARCHAR},
@@ -142,7 +139,7 @@
 
     <select id="viewEventItem" resultMap="BaseResultMap">
         select EVT_ITEM_ID, EVENT_ID, EVT_TYPE_ID, EVT_ITEM_NAME, EVT_ITEM_CODE, VALUE_DATA_TYPE,
-        EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, STANDARD_SORT, STATUS_CD, CREATE_STAFF,IS_MAIN_PARAM, EVT_ITEM_DESC,
+        EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, STANDARD_SORT, STATUS_CD, CREATE_STAFF,IS_MAIN_PARAM,
         UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK,IS_LABEL
         from event_item
         where EVT_ITEM_ID = #{evtItemId}
@@ -158,7 +155,7 @@
         EVT_ITEM_FORMAT,
         IS_NULLABLE,
         EVT_ITEM_LENGTH,
-        STANDARD_SORT,IS_MAIN_PARAM, EVT_ITEM_DESC,
+        STANDARD_SORT,IS_MAIN_PARAM,
         STATUS_CD,
         CREATE_STAFF,
         UPDATE_STAFF,
@@ -173,11 +170,10 @@
         #{evtItemCode,jdbcType=VARCHAR},
         #{valueDataType,jdbcType=VARCHAR},
         #{evtItemFormat,jdbcType=VARCHAR},
-        #{isNullable,jdbcType=VARCHAR},
+        #{isNullable,jdbcType=BIGINT},
         #{evtItemLength,jdbcType=INTEGER},
          #{standardSort,jdbcType=INTEGER},
          #{isMainParam,jdbcType=VARCHAR},
-          #{evtItemDesc,jdbcType=VARCHAR},
         #{statusCd,jdbcType=VARCHAR},
         #{createStaff,jdbcType=BIGINT},
         #{updateStaff,jdbcType=BIGINT},
@@ -210,7 +206,7 @@
             EVT_ITEM_FORMAT = #{evtItemFormat,jdbcType=VARCHAR},
         </if>
         <if test="isNullable != null  and isNullable !=''">
-            IS_NULLABLE = #{isNullable,jdbcType=VARCHAR},
+            IS_NULLABLE = #{isNullable,jdbcType=BIGINT},
         </if>
         <if test="evtItemLength != null  and evtItemLength !=''">
             EVT_ITEM_LENGTH = #{evtItemLength,jdbcType=INTEGER},
@@ -227,9 +223,6 @@
 
         <if test="isMainParam != null">
             IS_MAIN_PARAM = #{isMainParam,jdbcType=VARCHAR},
-        </if>
-        <if test="evtItemDesc != null">
-            EVT_ITEM_DESC = #{evtItemDesc,jdbcType=VARCHAR},
         </if>
         <if test="updateStaff != null  and updateStaff !=0">
             UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},

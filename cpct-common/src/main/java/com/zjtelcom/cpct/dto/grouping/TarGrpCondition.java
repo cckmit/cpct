@@ -15,7 +15,7 @@ public class TarGrpCondition extends BaseEntity implements Serializable{
     private String actType;//  KIP=保持/ADD=新增/MOD=修改/DEL=删除
     private Long conditionId; //目标分群条件标识
     private Long tarGrpId;//目标分群标识
-    private String rootFlag;//是否是根条件，1是 0	否
+    private Long rootFlag;//是否是根条件，1是 0	否
     private String leftParam;//左边参数，类型为注智标签时，对应为注智标签标识；类型为表达式时，为分群条件ID
     private String leftParamType;//参数类型1000	注智标签 2000	表达式 3000	固定值
     private String operType;//运算类型,1000> 2000< 3000==  4000!=   5000>=  6000<=  7000in   8000&   9000||   7100	not in
@@ -60,11 +60,11 @@ public class TarGrpCondition extends BaseEntity implements Serializable{
         this.tarGrpId = tarGrpId;
     }
 
-    public String getRootFlag() {
+    public Long getRootFlag() {
         return rootFlag;
     }
 
-    public void setRootFlag(String rootFlag) {
+    public void setRootFlag(Long rootFlag) {
         this.rootFlag = rootFlag;
     }
 

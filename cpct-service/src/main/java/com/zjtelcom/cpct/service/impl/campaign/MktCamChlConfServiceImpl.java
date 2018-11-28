@@ -126,6 +126,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                 }
                 //mktCamChlConfAttrMapper.insert(mktCamChlConfAttrDO);
                 mktCamChlConfAttrDOList.add(mktCamChlConfAttrDO);
+
             }
             mktCamChlConfAttrMapper.insertBatch(mktCamChlConfAttrDOList);
 

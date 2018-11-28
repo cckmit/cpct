@@ -204,7 +204,7 @@ public class FilterRuleController extends BaseController {
     }
 
     /**
-     * 下载模板
+     * 下发文件导入模板下载
      */
     @RequestMapping("downloadTrialOperationTemplate")
     @CrossOrigin
