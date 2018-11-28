@@ -517,48 +517,55 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
     public Map<String, Object> copyMktStrategyConf(Long parentMktStrategyConfId, Boolean isPublish) throws Exception {
         Map<String, Object> mktStrategyConfMap = new HashMap<>();
         // 通过原策略id 获取原策略基本信息
-        MktStrategyConfDO mktStrategyConfDO = mktStrategyConfMapper.selectByPrimaryKey(parentMktStrategyConfId);
-        // 获取策略下规则信息
-        List<MktStrategyConfRuleRelDO> mktStrategyConfRuleRelDOList = mktStrategyConfRuleRelMapper.selectByMktStrategyConfId(parentMktStrategyConfId);
+        try {
+            MktStrategyConfDO mktStrategyConfDO = mktStrategyConfMapper.selectByPrimaryKey(parentMktStrategyConfId);
+            // 获取策略下规则信息
+            List<MktStrategyConfRuleRelDO> mktStrategyConfRuleRelDOList = mktStrategyConfRuleRelMapper.selectByMktStrategyConfId(parentMktStrategyConfId);
 
-        mktStrategyConfDO.setMktStrategyConfId(null);
-        mktStrategyConfDO.setCreateDate(new Date());
-        mktStrategyConfDO.setCreateStaff(UserUtil.loginId());
-        mktStrategyConfDO.setUpdateDate(new Date());
-        mktStrategyConfDO.setUpdateStaff(UserUtil.loginId());
-        mktStrategyConfMapper.insert(mktStrategyConfDO);
-        Long childMktStrategyConfId = mktStrategyConfDO.getMktStrategyConfId();
+            mktStrategyConfDO.setMktStrategyConfId(null);
+            mktStrategyConfDO.setCreateDate(new Date());
+            mktStrategyConfDO.setCreateStaff(UserUtil.loginId());
+            mktStrategyConfDO.setUpdateDate(new Date());
+            mktStrategyConfDO.setUpdateStaff(UserUtil.loginId());
+            mktStrategyConfMapper.insert(mktStrategyConfDO);
+            Long childMktStrategyConfId = mktStrategyConfDO.getMktStrategyConfId();
 
-        //获取策略对应的过滤规则
-        List<Long> ruleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(parentMktStrategyConfId);
-        // 与新的策略建立关联
-        for (Long ruleId : ruleIdList) {
-            MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO = new MktStrategyFilterRuleRelDO();
-            mktStrategyFilterRuleRelDO.setStrategyId(childMktStrategyConfId);
-            mktStrategyFilterRuleRelDO.setRuleId(ruleId);
-            mktStrategyFilterRuleRelDO.setCreateDate(new Date());
-            mktStrategyFilterRuleRelDO.setCreateStaff(UserUtil.loginId());
-            mktStrategyFilterRuleRelDO.setUpdateDate(new Date());
-            mktStrategyFilterRuleRelDO.setUpdateStaff(UserUtil.loginId());
-            mktStrategyFilterRuleRelMapper.insert(mktStrategyFilterRuleRelDO);
+            //获取策略对应的过滤规则
+            List<Long> ruleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(parentMktStrategyConfId);
+            // 与新的策略建立关联
+            for (Long ruleId : ruleIdList) {
+                MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO = new MktStrategyFilterRuleRelDO();
+                mktStrategyFilterRuleRelDO.setStrategyId(childMktStrategyConfId);
+                mktStrategyFilterRuleRelDO.setRuleId(ruleId);
+                mktStrategyFilterRuleRelDO.setCreateDate(new Date());
+                mktStrategyFilterRuleRelDO.setCreateStaff(UserUtil.loginId());
+                mktStrategyFilterRuleRelDO.setUpdateDate(new Date());
+                mktStrategyFilterRuleRelDO.setUpdateStaff(UserUtil.loginId());
+                mktStrategyFilterRuleRelMapper.insert(mktStrategyFilterRuleRelDO);
+            }
+            // 遍历规则
+            for (MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO : mktStrategyConfRuleRelDOList) {
+                // 复制获取规则
+                Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.copyMktStrategyConfRule(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId(),true);
+                Long mktStrategyConfRuleId = (Long) mktStrategyConfRuleMap.get("mktStrategyConfRuleId");
+                // 简历策略和规则的关系
+                MktStrategyConfRuleRelDO childMktStrategyConfRuleRelDO = new MktStrategyConfRuleRelDO();
+                childMktStrategyConfRuleRelDO.setMktStrategyConfId(childMktStrategyConfId);
+                childMktStrategyConfRuleRelDO.setMktStrategyConfRuleId(mktStrategyConfRuleId);
+                childMktStrategyConfRuleRelDO.setCreateDate(new Date());
+                childMktStrategyConfRuleRelDO.setCreateStaff(UserUtil.loginId());
+                childMktStrategyConfRuleRelDO.setUpdateDate(new Date());
+                childMktStrategyConfRuleRelDO.setUpdateStaff(UserUtil.loginId());
+                mktStrategyConfRuleRelMapper.insert(childMktStrategyConfRuleRelDO);
+            }
+            mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            mktStrategyConfMap.put("resultMsg", "复制策略成功！");
+            mktStrategyConfMap.put("childMktStrategyConfId", childMktStrategyConfId);
+        } catch (Exception e) {
+            logger.error("[op:copyMktStrategyConf] copyMktStrategyConf parentMktStrategyConfId ={} 失败Exception = ", parentMktStrategyConfId, e);
+            mktStrategyConfMap.put("resultCode", CommonConstant.CODE_FAIL);
+            mktStrategyConfMap.put("resultMsg", "复制策略失败！");
         }
-        // 遍历规则
-        for (MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO : mktStrategyConfRuleRelDOList) {
-            // 复制获取规则
-            Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.copyMktStrategyConfRule(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId(),true);
-            Long mktStrategyConfRuleId = (Long) mktStrategyConfRuleMap.get("mktStrategyConfRuleId");
-            // 简历策略和规则的关系
-            MktStrategyConfRuleRelDO childMktStrategyConfRuleRelDO = new MktStrategyConfRuleRelDO();
-            childMktStrategyConfRuleRelDO.setMktStrategyConfId(childMktStrategyConfId);
-            childMktStrategyConfRuleRelDO.setMktStrategyConfRuleId(mktStrategyConfRuleId);
-            childMktStrategyConfRuleRelDO.setCreateDate(new Date());
-            childMktStrategyConfRuleRelDO.setCreateStaff(UserUtil.loginId());
-            childMktStrategyConfRuleRelDO.setUpdateDate(new Date());
-            childMktStrategyConfRuleRelDO.setUpdateStaff(UserUtil.loginId());
-            mktStrategyConfRuleRelMapper.insert(childMktStrategyConfRuleRelDO);
-        }
-        mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
-        mktStrategyConfMap.put("childMktStrategyConfId", childMktStrategyConfId);
         return mktStrategyConfMap;
     }
 
@@ -572,25 +579,35 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
      */
     @Override
     public Map<String, Object> copyMktStrategyConf(MktStrategyConfDetail mktStrategyConfDetail) throws Exception {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
-        logger.info("MktStrategyConfDetail-->>>开始：" + simpleDateFormat.format(new Date()));
-        Map<String, Object> mktStrategyConfDetailMap = new HashMap<>();
-        MktStrategyConfDetail mktStrategyConfDetailCopy = BeanUtil.create(mktStrategyConfDetail, new MktStrategyConfDetail());
-        // 获取规则列表
-        List<MktStrategyConfRule> mktStrategyConfRuleList = mktStrategyConfDetail.getMktStrategyConfRuleList();
-        if (mktStrategyConfRuleList != null && mktStrategyConfRuleList.size() > 0) {
-            List<MktStrategyConfRule> mktStrategyConfRuleCopyList = new ArrayList<>();
-/*            for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfRuleList) {
-                new MktStrategyConfRuleServiceImpl.CopyMktStrategyConfRuleTask(mktStrategyConfRule);
-                MktStrategyConfRule mktStrategyConfRuleCopy = (MktStrategyConfRule) mktStrategyConfRuleMap.get("mktStrategyConfRule");
-                mktStrategyConfRuleCopyList.add(mktStrategyConfRuleCopy);
-            }*/
+        SimpleDateFormat simpleDateFormat = null;
+        Map<String, Object> mktStrategyConfDetailMap = null;
+        try {
+            simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+            logger.info("MktStrategyConfDetail-->>>开始：" + simpleDateFormat.format(new Date()));
+            mktStrategyConfDetailMap = new HashMap<>();
+            MktStrategyConfDetail mktStrategyConfDetailCopy = BeanUtil.create(mktStrategyConfDetail, new MktStrategyConfDetail());
+            // 获取规则列表
+            List<MktStrategyConfRule> mktStrategyConfRuleList = mktStrategyConfDetail.getMktStrategyConfRuleList();
+            if (mktStrategyConfRuleList != null && mktStrategyConfRuleList.size() > 0) {
+                List<MktStrategyConfRule> mktStrategyConfRuleCopyList = new ArrayList<>();
+    /*            for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfRuleList) {
+                    new MktStrategyConfRuleServiceImpl.CopyMktStrategyConfRuleTask(mktStrategyConfRule);
+                    MktStrategyConfRule mktStrategyConfRuleCopy = (MktStrategyConfRule) mktStrategyConfRuleMap.get("mktStrategyConfRule");
+                    mktStrategyConfRuleCopyList.add(mktStrategyConfRuleCopy);
+                }*/
 
-            Map<String, Object> ruleListMap = mktStrategyConfRuleService.copyMktStrategyConfRule(mktStrategyConfRuleList);
-            List<MktStrategyConfRule> ruleList = (List<MktStrategyConfRule>) ruleListMap.get("mktStrategyConfRuleList");
-            mktStrategyConfDetailCopy.setMktStrategyConfRuleList(ruleList);
+                Map<String, Object> ruleListMap = mktStrategyConfRuleService.copyMktStrategyConfRule(mktStrategyConfRuleList);
+                List<MktStrategyConfRule> ruleList = (List<MktStrategyConfRule>) ruleListMap.get("mktStrategyConfRuleList");
+                mktStrategyConfDetailCopy.setMktStrategyConfRuleList(ruleList);
+            }
+            mktStrategyConfDetailMap.put("mktStrategyConfDetail", mktStrategyConfDetailCopy);
+            mktStrategyConfDetailMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            mktStrategyConfDetailMap.put("resultMsg", "复制策略成功！");
+        } catch (Exception e) {
+            logger.error("[op:copyMktStrategyConf] copyMktStrategyConf mktStrategyConfDetail={} 失败Exception = ", JSON.toJSONString(mktStrategyConfDetail), e);
+            mktStrategyConfDetailMap.put("resultCode", CommonConstant.CODE_FAIL);
+            mktStrategyConfDetailMap.put("resultMsg", "复制策略失败！");
         }
-        mktStrategyConfDetailMap.put("mktStrategyConfDetail", mktStrategyConfDetailCopy);
         logger.info("MktStrategyConfDetail-->>>结束：" + simpleDateFormat.format(new Date()));
         return mktStrategyConfDetailMap;
     }

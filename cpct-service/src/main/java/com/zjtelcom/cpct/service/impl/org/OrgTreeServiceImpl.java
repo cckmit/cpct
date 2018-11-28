@@ -7,9 +7,11 @@ import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.org.OrgTreeMapper;
+import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.dao.system.SystemParamMapper;
 import com.zjtelcom.cpct.domain.org.OrgTree;
 import com.zjtelcom.cpct.domain.org.OrgTreeDO;
+import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.system.SystemParam;
 import com.zjtelcom.cpct.exception.SystemException;
 import com.zjtelcom.cpct.service.org.OrgTreeService;
@@ -36,7 +38,7 @@ public class OrgTreeServiceImpl implements OrgTreeService{
     @Autowired
     private OrgTreeMapper orgTreeMapper;
     @Autowired
-    private SystemParamMapper systemParamMapper;
+    private SysParamsMapper systemParamMapper;
 
     /**
      * 批量操作一次插入最多的数据条数
@@ -75,7 +77,7 @@ public class OrgTreeServiceImpl implements OrgTreeService{
     @Override
     public List<OrgTree> getDataByFtp(String path) {
         String code="utf8";
-        List<SystemParam> paramKeyIn = systemParamMapper.findParamKeyIn(path);
+        List<SysParams> paramKeyIn = systemParamMapper.findParamKeyIn(path);
         if(!paramKeyIn.isEmpty()){
             code=paramKeyIn.get(0).getParamValue();
         }
