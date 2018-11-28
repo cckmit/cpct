@@ -15,7 +15,6 @@ import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
-import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.campaign.*;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.EventDTO;
@@ -764,11 +763,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     @Override
                     public void run() {
                         try {
-                            SysStaff sysStaff = (SysStaff) SecurityUtils.getSubject().getPrincipal();
                             String roleName = "admin";
-                            if (sysStaff != null) {
-                                roleName = sysStaff.getRoleName();
-                            }
                             synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
                         } catch (Exception e) {
                             e.printStackTrace();
