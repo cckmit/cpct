@@ -101,4 +101,12 @@
         ORDER BY PARAM_VALUE
     </select>
 
+    <select id="findParamKeyIn" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        PARAM_ID, PARAM_NAME, PARAM_VALUE, CONFIG_TYPE, MODIFY_FLAG, DESCRIPTION,
+        PARAM_KEY, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
+        from sys_params
+        where PARAM_KEY like concat(#{paramKey}, "%");
+    </select>
+
 </mapper>
