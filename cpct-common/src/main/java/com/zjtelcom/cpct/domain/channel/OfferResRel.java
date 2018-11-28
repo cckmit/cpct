@@ -7,7 +7,7 @@ public class OfferResRel {
 
     private Integer offerId;
 
-    private String objType;
+    private String objType;//1000	营销资源;1100	终端组;1200	营销资源类型
 
     private Long objId;
 

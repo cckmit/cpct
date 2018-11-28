@@ -1,6 +1,6 @@
 #端口配置
 server:
-  port: 8090
+  port: 8080
 
 dubboPath: dev
 
@@ -53,4 +53,4 @@ spring:
       countinfo: http://134.96.252.170:30808/es/searchCountInfo
 #是否同步
 sync:
- value: 1
+ value: 0

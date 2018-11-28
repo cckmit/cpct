@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
+
 /**
  * Description:
  * author: linchao
@@ -45,8 +47,13 @@ public class TarGrpTemplateController {
     public String getTarGrpTemByOfferId(@RequestBody HashMap<String,Object> param) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            List<Long> offerIdList = (List<Long>)param.get("idList");
-            maps = tarGrpTemplateService.getTarGrpTemByOfferId(offerIdList);
+            if (param.get("requestid")==null){
+                maps.put("resultCode",CODE_FAIL);
+                maps.put("resultMsg","请求需求涵不存在!");
+                return JSON.toJSONString(maps);
+            }
+            Long requestId = Long.valueOf(param.get("requestId").toString());
+            maps = tarGrpTemplateService.getTarGrpTemByOfferId(requestId);
         } catch (Exception e) {
             return FastJsonUtils.objToJson(maps);
         }

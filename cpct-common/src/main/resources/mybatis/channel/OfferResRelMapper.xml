@@ -59,4 +59,11 @@
     CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, UPDATE_DATE, STATUS_DATE, REMARK
     from offer_res_rel
   </select>
+
+  <select id="selectByOfferId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select OFFER_RES_REL_ID, OFFER_ID, OBJ_TYPE, OBJ_ID, REL_TYPE, APPLY_REGION_ID, STATUS_CD,
+    CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, UPDATE_DATE, STATUS_DATE, REMARK
+    from offer_res_rel
+    where OFFER_ID = #{offerId,jdbcType=DECIMAL} and OBJ_TYPE = #{objType}
+  </select>
 </mapper>

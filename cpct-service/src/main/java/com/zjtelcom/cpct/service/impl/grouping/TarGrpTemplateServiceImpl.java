@@ -10,17 +10,13 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
-import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
-import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
-import com.zjtelcom.cpct.dao.channel.OfferRestrictMapper;
+import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
-import com.zjtelcom.cpct.domain.channel.Label;
-import com.zjtelcom.cpct.domain.channel.LabelValue;
-import com.zjtelcom.cpct.domain.channel.OfferRestrict;
+import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO;
 import com.zjtelcom.cpct.dto.channel.LabelValueVO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
@@ -74,18 +70,31 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     private SynTarGrpTemplateService synTarGrpTemplateService;
     @Autowired
     private TarGrpService tarGrpService;
+    @Autowired
+    private OfferResRelMapper offerResRelMapper;
+    @Autowired
+    private MktResourceMapper resourceMapper;
+    @Autowired
+    private GrpSystemRelMapper grpSystemRelMapper;
+    @Autowired
+    private VrulGrpMapper vrulGrpMapper;
     @Value("${sync.value}")
     private String value;
 
     /**
-     * 销售品id 获取分群集合
-     * @param offerList
+     * 需求涵id 获取分类对象
+     * @param
      * @return
      */
     @Override
-    public Map<String, Object> getTarGrpTemByOfferId(List<Long> offerList) {
+    public Map<String, Object> getTarGrpTemByOfferId(Long requestId) {
         Map<String, Object> result = new HashMap<>();
         List<TarGrpVO> tarGrpVOS = new ArrayList<>();
+        List<Channel> channelList = new ArrayList<>();
+        List<MktResource> resourceList = new ArrayList<>();
+        //todo 通过需求涵id获取销售品idList
+        List<Long> offerList = new ArrayList<>();
+
         for (Long offerId : offerList){
             OfferRestrict restrict = offerRestrictMapper.selectByOfferId(offerId,"7000");
             if (restrict==null){
@@ -101,8 +110,14 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             vo.setTarGrpConditionVOs(voList);
             tarGrpVOS.add(vo);
         }
+//        for (Long offerId : offerList){
+//            OfferResRel offerResRel = offerResRelMapper.
+//
+//        }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",tarGrpVOS);
+        result.put("tarGrpList",tarGrpVOS);
+        result.put("channelList",channelList);
+        result.put("resourceList",resourceList);
         return result;
     }
 
