@@ -562,7 +562,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             mktStrategyConfMap.put("resultMsg", "复制策略成功！");
             mktStrategyConfMap.put("childMktStrategyConfId", childMktStrategyConfId);
         } catch (Exception e) {
-            logger.error("[op:copyMktStrategyConf] copyMktStrategyConf 失败");
+            logger.error("[op:copyMktStrategyConf] copyMktStrategyConf parentMktStrategyConfId ={} 失败Exception = ", parentMktStrategyConfId, e);
             mktStrategyConfMap.put("resultCode", CommonConstant.CODE_FAIL);
             mktStrategyConfMap.put("resultMsg", "复制策略失败！");
         }
@@ -579,25 +579,35 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
      */
     @Override
     public Map<String, Object> copyMktStrategyConf(MktStrategyConfDetail mktStrategyConfDetail) throws Exception {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
-        logger.info("MktStrategyConfDetail-->>>开始：" + simpleDateFormat.format(new Date()));
-        Map<String, Object> mktStrategyConfDetailMap = new HashMap<>();
-        MktStrategyConfDetail mktStrategyConfDetailCopy = BeanUtil.create(mktStrategyConfDetail, new MktStrategyConfDetail());
-        // 获取规则列表
-        List<MktStrategyConfRule> mktStrategyConfRuleList = mktStrategyConfDetail.getMktStrategyConfRuleList();
-        if (mktStrategyConfRuleList != null && mktStrategyConfRuleList.size() > 0) {
-            List<MktStrategyConfRule> mktStrategyConfRuleCopyList = new ArrayList<>();
-/*            for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfRuleList) {
-                new MktStrategyConfRuleServiceImpl.CopyMktStrategyConfRuleTask(mktStrategyConfRule);
-                MktStrategyConfRule mktStrategyConfRuleCopy = (MktStrategyConfRule) mktStrategyConfRuleMap.get("mktStrategyConfRule");
-                mktStrategyConfRuleCopyList.add(mktStrategyConfRuleCopy);
-            }*/
+        SimpleDateFormat simpleDateFormat = null;
+        Map<String, Object> mktStrategyConfDetailMap = null;
+        try {
+            simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+            logger.info("MktStrategyConfDetail-->>>开始：" + simpleDateFormat.format(new Date()));
+            mktStrategyConfDetailMap = new HashMap<>();
+            MktStrategyConfDetail mktStrategyConfDetailCopy = BeanUtil.create(mktStrategyConfDetail, new MktStrategyConfDetail());
+            // 获取规则列表
+            List<MktStrategyConfRule> mktStrategyConfRuleList = mktStrategyConfDetail.getMktStrategyConfRuleList();
+            if (mktStrategyConfRuleList != null && mktStrategyConfRuleList.size() > 0) {
+                List<MktStrategyConfRule> mktStrategyConfRuleCopyList = new ArrayList<>();
+    /*            for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfRuleList) {
+                    new MktStrategyConfRuleServiceImpl.CopyMktStrategyConfRuleTask(mktStrategyConfRule);
+                    MktStrategyConfRule mktStrategyConfRuleCopy = (MktStrategyConfRule) mktStrategyConfRuleMap.get("mktStrategyConfRule");
+                    mktStrategyConfRuleCopyList.add(mktStrategyConfRuleCopy);
+                }*/
 
-            Map<String, Object> ruleListMap = mktStrategyConfRuleService.copyMktStrategyConfRule(mktStrategyConfRuleList);
-            List<MktStrategyConfRule> ruleList = (List<MktStrategyConfRule>) ruleListMap.get("mktStrategyConfRuleList");
-            mktStrategyConfDetailCopy.setMktStrategyConfRuleList(ruleList);
+                Map<String, Object> ruleListMap = mktStrategyConfRuleService.copyMktStrategyConfRule(mktStrategyConfRuleList);
+                List<MktStrategyConfRule> ruleList = (List<MktStrategyConfRule>) ruleListMap.get("mktStrategyConfRuleList");
+                mktStrategyConfDetailCopy.setMktStrategyConfRuleList(ruleList);
+            }
+            mktStrategyConfDetailMap.put("mktStrategyConfDetail", mktStrategyConfDetailCopy);
+            mktStrategyConfDetailMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            mktStrategyConfDetailMap.put("resultMsg", "复制策略成功！");
+        } catch (Exception e) {
+            logger.error("[op:copyMktStrategyConf] copyMktStrategyConf mktStrategyConfDetail={} 失败Exception = ", JSON.toJSONString(mktStrategyConfDetail), e);
+            mktStrategyConfDetailMap.put("resultCode", CommonConstant.CODE_FAIL);
+            mktStrategyConfDetailMap.put("resultMsg", "复制策略失败！");
         }
-        mktStrategyConfDetailMap.put("mktStrategyConfDetail", mktStrategyConfDetailCopy);
         logger.info("MktStrategyConfDetail-->>>结束：" + simpleDateFormat.format(new Date()));
         return mktStrategyConfDetailMap;
     }

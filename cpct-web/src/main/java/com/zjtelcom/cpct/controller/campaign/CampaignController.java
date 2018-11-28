@@ -218,7 +218,13 @@ public class CampaignController extends BaseController {
     @CrossOrigin
     public String getMktCampaign(@RequestBody Map<String, String> params) throws Exception {
         Long mktCampaignId = Long.valueOf(params.get("mktCampaignId"));
-        Map<String, Object> map = mktCampaignService.getMktCampaign(mktCampaignId);
+        Map<String, Object> map = null;
+        try {
+            map = mktCampaignService.getMktCampaign(mktCampaignId);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", "查询活动失败");
+        }
         return JSON.toJSONString(map);
     }
 
@@ -234,7 +240,13 @@ public class CampaignController extends BaseController {
     @CrossOrigin
     public String getAllConfRuleName(@RequestBody Map<String, String> params) throws Exception{
         Long mktCampaignId = Long.valueOf(params.get("mktCampaignId"));
-        Map<String, Object> map = mktCampaignService.getAllConfRuleName(mktCampaignId);
+        Map<String, Object> map = null;
+        try {
+            map = mktCampaignService.getAllConfRuleName(mktCampaignId);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", "查询活动失败");
+        }
         return JSON.toJSONString(map);
     }
 
@@ -250,7 +262,13 @@ public class CampaignController extends BaseController {
     @CrossOrigin
     public String delMktCampaign(@RequestBody Map<String, String> params) throws Exception {
         Long mktCampaignId = Long.valueOf(params.get("mktCampaignId"));
-        Map<String, Object> map = mktCampaignService.delMktCampaign(mktCampaignId);
+        Map<String, Object> map = null;
+        try {
+            map = mktCampaignService.delMktCampaign(mktCampaignId);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", "删除活动失败");
+        }
         return JSON.toJSONString(map);
     }
 
@@ -267,7 +285,6 @@ public class CampaignController extends BaseController {
         Long mktCampaignId = Long.valueOf(params.get("mktCampaignId"));
         String statusCd = params.get("statusCd");
         Map<String, Object> map = mktCampaignService.changeMktCampaignStatus(mktCampaignId, statusCd);
-
         return JSON.toJSONString(map);
     }
 

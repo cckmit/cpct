@@ -126,7 +126,6 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                 }
                 //mktCamChlConfAttrMapper.insert(mktCamChlConfAttrDO);
                 mktCamChlConfAttrDOList.add(mktCamChlConfAttrDO);
-
             }
             mktCamChlConfAttrMapper.insertBatch(mktCamChlConfAttrDOList);
 
@@ -305,9 +304,11 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
      */
     @Override
     public Map<String, Object> deleteMktCamChlConf(Long evtContactConfId, Long ruleId) {
-        mktCamChlConfMapper.deleteByPrimaryKey(evtContactConfId);
-        mktCamChlConfAttrMapper.deleteByEvtContactConfId(evtContactConfId);
-        //判断是否是结果下的
+        Map<String, Object> mktCamChlConfMap = null;
+        try {
+            mktCamChlConfMapper.deleteByPrimaryKey(evtContactConfId);
+            mktCamChlConfAttrMapper.deleteByEvtContactConfId(evtContactConfId);
+            //判断是否是结果下的
 /*        MktCamChlResultConfRelDO mktCamChlResultConfRelDO = mktCamChlResultConfRelMapper.selectByConfId(evtContactConfId);
         if (mktCamChlResultConfRelDO != null) {
             mktCamChlResultConfRelMapper.deleteByPrimaryKey(mktCamChlResultConfRelDO.getMktCamChlResultConfRelId());
@@ -330,14 +331,19 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
         }*/
 
 
-        //删除旧的关联规则 todo 静态
-        mktVerbalConditionMapper.deleteByVerbalId("1", evtContactConfId);
+            //删除旧的关联规则 todo 静态
+            mktVerbalConditionMapper.deleteByVerbalId("1", evtContactConfId);
 
-        // 将推送渠道缓存到redis
-        redisUtils.remove("MktCamChlConfDetail_" + evtContactConfId);
-        Map<String, Object> mktCamChlConfMap = new HashMap<>();
-        mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
-        mktCamChlConfMap.put("resultMsg", ErrorCode.DELETE_CAM_CHL_CONF_SUCCESS.getErrorMsg());
+            // 将推送渠道缓存到redis
+            redisUtils.remove("MktCamChlConfDetail_" + evtContactConfId);
+            mktCamChlConfMap = new HashMap<>();
+            mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            mktCamChlConfMap.put("resultMsg", ErrorCode.DELETE_CAM_CHL_CONF_SUCCESS.getErrorMsg());
+        } catch (Exception e) {
+            logger.error("[op:MktCamChlConfServiceImpl] fail to delete mktCamChlConfDetailList evtContactConfId = {}", evtContactConfId, e);
+            mktCamChlConfMap.put("resultCode", CommonConstant.CODE_FAIL);
+            mktCamChlConfMap.put("resultMsg", ErrorCode.DELETE_CAM_CHL_CONF_FAILURE.getErrorMsg());
+        }
         return mktCamChlConfMap;
     }
 
