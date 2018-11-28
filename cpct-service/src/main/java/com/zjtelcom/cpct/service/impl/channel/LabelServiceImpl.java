@@ -175,6 +175,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         final Label label = BeanUtil.create(addVO,new Label());
         operatorValodate(label, addVO.getConditionType());
         //
+        label.setSystemInfoId(0L);
         label.setScope(0);
         label.setClassName("0");
         label.setLabelType("1000");
