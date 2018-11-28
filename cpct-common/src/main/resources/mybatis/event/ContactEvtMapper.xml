@@ -351,8 +351,6 @@
 
             EVENT_TRIG_TYPE = #{evtTrigType,jdbcType=VARCHAR},
 
-            EXT_EVENT_ID = #{extEventId,jdbcType=BIGINT},
-
             MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR},
 
             STATUS_CD = #{statusCd,jdbcType=VARCHAR},

@@ -9,7 +9,7 @@
         <result column="EVT_ITEM_CODE" jdbcType="VARCHAR" property="evtItemCode"/>
         <result column="VALUE_DATA_TYPE" jdbcType="VARCHAR" property="valueDataType"/>
         <result column="EVT_ITEM_FORMAT" jdbcType="VARCHAR" property="evtItemFormat"/>
-        <result column="IS_NULLABLE" jdbcType="VARCHAR" property="isNullable"/>
+        <result column="IS_NULLABLE" jdbcType="BIGINT" property="isNullable"/>
         <result column="IS_MAIN_PARAM" jdbcType="VARCHAR" property="isMainParam" />
         <result column="EVT_ITEM_LENGTH" jdbcType="INTEGER" property="evtItemLength"/>
         <result column="STANDARD_SORT" jdbcType="INTEGER" property="standardSort"/>
@@ -35,7 +35,7 @@
       UPDATE_DATE, REMARK,IS_LABEL)
     values (#{evtItemId,jdbcType=BIGINT}, #{contactEvtId,jdbcType=BIGINT}, #{evtTypeId,jdbcType=BIGINT},
       #{evtItemName,jdbcType=VARCHAR}, #{evtItemCode,jdbcType=VARCHAR}, #{valueDataType,jdbcType=VARCHAR},
-      #{evtItemFormat,jdbcType=VARCHAR}, #{isNullable,jdbcType=VARCHAR}, #{evtItemLength,jdbcType=INTEGER},
+      #{evtItemFormat,jdbcType=VARCHAR}, #{isNullable,jdbcType=BIGINT}, #{evtItemLength,jdbcType=INTEGER},
       #{isMainParam,jdbcType=VARCHAR},
       #{standardSort,jdbcType=INTEGER}, #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT},
       #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP},
@@ -49,7 +49,7 @@
       EVT_ITEM_CODE = #{evtItemCode,jdbcType=VARCHAR},
       VALUE_DATA_TYPE = #{valueDataType,jdbcType=VARCHAR},
       EVT_ITEM_FORMAT = #{evtItemFormat,jdbcType=VARCHAR},
-      IS_NULLABLE = #{isNullable,jdbcType=VARCHAR},
+      IS_NULLABLE = #{isNullable,jdbcType=BIGINT},
       EVT_ITEM_LENGTH = #{evtItemLength,jdbcType=INTEGER},
        IS_MAIN_PARAM = #{isMainParam,jdbcType=VARCHAR},
       STANDARD_SORT = #{standardSort,jdbcType=INTEGER},
@@ -123,7 +123,7 @@
         #{evtItemCode,jdbcType=VARCHAR},
         #{valueDataType,jdbcType=VARCHAR},
         #{evtItemFormat,jdbcType=VARCHAR},
-        #{isNullable,jdbcType=VARCHAR},
+        #{isNullable,jdbcType=BIGINT},
         #{isMainParam,jdbcType=VARCHAR},
         #{evtItemLength,jdbcType=INTEGER},
         #{standardSort,jdbcType=INTEGER},
@@ -170,7 +170,7 @@
         #{evtItemCode,jdbcType=VARCHAR},
         #{valueDataType,jdbcType=VARCHAR},
         #{evtItemFormat,jdbcType=VARCHAR},
-        #{isNullable,jdbcType=VARCHAR},
+        #{isNullable,jdbcType=BIGINT},
         #{evtItemLength,jdbcType=INTEGER},
          #{standardSort,jdbcType=INTEGER},
          #{isMainParam,jdbcType=VARCHAR},
@@ -206,7 +206,7 @@
             EVT_ITEM_FORMAT = #{evtItemFormat,jdbcType=VARCHAR},
         </if>
         <if test="isNullable != null  and isNullable !=''">
-            IS_NULLABLE = #{isNullable,jdbcType=VARCHAR},
+            IS_NULLABLE = #{isNullable,jdbcType=BIGINT},
         </if>
         <if test="evtItemLength != null  and evtItemLength !=''">
             EVT_ITEM_LENGTH = #{evtItemLength,jdbcType=INTEGER},

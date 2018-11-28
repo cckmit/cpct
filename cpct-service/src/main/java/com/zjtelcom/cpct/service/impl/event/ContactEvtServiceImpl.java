@@ -205,7 +205,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             final ContactEvt contactEvt = evtDetail;
 //            //todo 待确认必填字段
 //            contactEvt.setInterfaceCfgId();
-
+            contactEvt.setExtEventId(1000L);
             contactEvt.setUpdateDate(DateUtil.getCurrentTime());
             contactEvt.setCreateDate(DateUtil.getCurrentTime());
             contactEvt.setStatusDate(DateUtil.getCurrentTime());
