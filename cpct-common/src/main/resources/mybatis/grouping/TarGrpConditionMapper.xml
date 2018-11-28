@@ -4,7 +4,7 @@
     <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.dto.grouping.TarGrpCondition">
         <id column="CONDITION_ID" jdbcType="BIGINT" property="conditionId"/>
         <result column="TAR_GRP_ID" jdbcType="BIGINT" property="tarGrpId"/>
-        <result column="ROOT_FLAG" jdbcType="VARCHAR" property="rootFlag"/>
+        <result column="ROOT_FLAG" jdbcType="BIGINT" property="rootFlag"/>
         <result column="LEFT_PARAM" jdbcType="VARCHAR" property="leftParam"/>
         <result column="LEFT_PARAM_TYPE" jdbcType="VARCHAR" property="leftParamType"/>
         <result column="OPER_TYPE" jdbcType="VARCHAR" property="operType"/>
@@ -30,7 +30,7 @@
       STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
       CREATE_DATE, STATUS_DATE, UPDATE_DATE, 
       REMARK)
-    values ( #{tarGrpId,jdbcType=BIGINT}, #{rootFlag,jdbcType=VARCHAR},
+    values ( #{tarGrpId,jdbcType=BIGINT}, #{rootFlag,jdbcType=BIGINT},
       #{leftParam,jdbcType=VARCHAR}, #{leftParamType,jdbcType=VARCHAR}, #{operType,jdbcType=VARCHAR}, 
       #{rightParam,jdbcType=VARCHAR}, #{rightParamType,jdbcType=VARCHAR}, #{conditionText,jdbcType=VARCHAR}, 
       #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, 
@@ -41,7 +41,7 @@
         update tar_grp_condition
         set
         <if test="rootFlag != null and rootFlag != ''">
-            ROOT_FLAG = #{rootFlag,jdbcType=VARCHAR},
+            ROOT_FLAG = #{rootFlag,jdbcType=BIGINT},
         </if>
         <if test="leftParamType != null and leftParamType != ''">
             LEFT_PARAM_TYPE = #{leftParamType,jdbcType=VARCHAR},
@@ -136,7 +136,7 @@
         update tar_grp_condition
         set
         <if test="rootFlag != null and rootFlag != ''">
-            ROOT_FLAG = #{rootFlag,jdbcType=VARCHAR},
+            ROOT_FLAG = #{rootFlag,jdbcType=BIGINT},
         </if>
         <if test="leftParamType != null and leftParamType != ''">
             LEFT_PARAM_TYPE = #{leftParamType,jdbcType=VARCHAR},
@@ -197,7 +197,7 @@
         CREATE_DATE, STATUS_DATE, UPDATE_DATE,
         REMARK) values
       <foreach collection="list" item="item" separator="," index="i">
-        ( #{item.conditionId,jdbcType=BIGINT},#{item.tarGrpId,jdbcType=BIGINT}, #{item.rootFlag,jdbcType=VARCHAR},
+        ( #{item.conditionId,jdbcType=BIGINT},#{item.tarGrpId,jdbcType=BIGINT}, #{item.rootFlag,jdbcType=BIGINT},
       #{item.leftParam,jdbcType=VARCHAR}, #{item.leftParamType,jdbcType=VARCHAR}, #{item.operType,jdbcType=VARCHAR},
       #{item.rightParam,jdbcType=VARCHAR}, #{item.rightParamType,jdbcType=VARCHAR}, #{item.conditionText,jdbcType=VARCHAR},
       #{item.statusCd,jdbcType=VARCHAR}, #{item.createStaff,jdbcType=BIGINT}, #{item.updateStaff,jdbcType=BIGINT},
