@@ -23,8 +23,6 @@ public class ContactEvtItem extends BaseEntity {
     private Integer standardSort;//记录事件采集项的标准化的顺序
     private String isMainParam;//是否是主参
     private String isLabel;//是否为标签
-    private String evtItemDesc;//采集项描述
-
 
     public String getIsLabel() {
         return isLabel;
@@ -42,13 +40,6 @@ public class ContactEvtItem extends BaseEntity {
         this.isMainParam = isMainParam;
     }
 
-    public String getEvtItemDesc() {
-        return evtItemDesc;
-    }
-
-    public void setEvtItemDesc(String evtItemDesc) {
-        this.evtItemDesc = evtItemDesc;
-    }
 
     public String getActType() {
         return actType;
