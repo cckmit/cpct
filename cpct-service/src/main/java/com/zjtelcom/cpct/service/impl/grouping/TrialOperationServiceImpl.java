@@ -15,7 +15,6 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
-import com.zjtelcom.cpct.dao.system.SysStaffMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
@@ -24,14 +23,11 @@ import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
-import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
-import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.grouping.*;
-import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
@@ -39,7 +35,6 @@ import com.zjtelcom.cpct.service.channel.MessageLabelService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
-import com.zjtelcom.cpct.service.thread.TarGrpRule;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.es.es.entity.*;
 import com.zjtelcom.es.es.entity.model.LabelResultES;
@@ -105,8 +100,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private MktCamChlConfMapper chlConfMapper;
     @Autowired
     private MktCamScriptMapper scriptMapper;
-    @Autowired
-    private SysStaffMapper sysStaffMapper;
     @Autowired
     private SysParamsMapper sysParamsMapper;
     @Autowired(required = false)
@@ -319,8 +312,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         request.setLanId(campaignDO.getLanId());
         request.setCamLevel(campaignDO.getCamLevel());
         // 获取创建人员code
-        SysStaff sysStaff = sysStaffMapper.selectByPrimaryKey(campaignDO.getCreateStaff());
-        request.setStaffCode(sysStaff.getStaffCode());
+        request.setStaffCode("SYS987329864");
 
 
         //获取销售品及规则列表
@@ -785,8 +777,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         request.setLanId(campaignDO.getLanId());
         request.setCamLevel(campaignDO.getCamLevel());
         // 获取创建人员code
-        SysStaff sysStaff = sysStaffMapper.selectByPrimaryKey(campaignDO.getCreateStaff());
-        request.setStaffCode(sysStaff.getStaffCode());
+        request.setStaffCode("SYS827364823");
 
 
         TrialOperationVOES requests = BeanUtil.create(request,new TrialOperationVOES());

@@ -1,6 +1,5 @@
 package com.zjtelcom.cpct.shiro;
 
-import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.service.system.SysStaffService;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.shiro.authc.*;
@@ -65,10 +64,11 @@ public class MyShiroRealm extends AuthorizingRealm {
         UsernamePasswordToken token = (UsernamePasswordToken) authenticationToken;
         logger.info("验证当前登录用户时获取到的token={}", ReflectionToStringBuilder.toString(token));
         Map<String, Object> userMap = sysStaffService.queryUserByName(token.getUsername());
-        SysStaff user = (SysStaff) userMap.get("data");
-        if (user == null) {
-            return null;
-        }
-        return new SimpleAuthenticationInfo(user, user.getPassword(), getName());
+//        SysStaff user = (SysStaff) userMap.get("data");
+//        if (user == null) {
+//            return null;
+//        }
+//        return new SimpleAuthenticationInfo(user, user.getPassword(), getName());
+        return null;
     }
 }
