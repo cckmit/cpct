@@ -116,6 +116,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = new ArrayList<>();
             for (MktCamChlConfAttr mktCamChlConfAttr : mktCamChlConfAttrList) {
                 MktCamChlConfAttrDO mktCamChlConfAttrDO = BeanUtil.create(mktCamChlConfAttr, new MktCamChlConfAttrDO());
+                mktCamChlConfAttrDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
                 mktCamChlConfAttrDO.setEvtContactConfId(mktCamChlConfDO.getEvtContactConfId());
                 if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
                     mktCamChlConfAttrDO.setAttrValue(evtContactConfId.toString());
@@ -136,6 +137,9 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             mktCamChlConfDetailNew.setMktCamChlConfAttrList(mktCamChlConfAttrNewList);
             // 将推送渠道缓存到redis
             redisUtils.set("MktCamChlConfDetail_" + evtContactConfId, mktCamChlConfDetailNew);
+
+//            ruleInsert(1L, "{\"type\":1,\"listData\":[{\"id\":177,\"name\":\"自有标签测试\",\"operatorList\":[{\"operName\":\"小于\",\"operValue\":2000},{\"operName\":\"等于\",\"operValue\":3000},{\"operName\":\"大于\",\"operValue\":1000},{\"operName\":\"不等于\",\"operValue\":4000},{\"operName\":\"小于等于\",\"operValue\":6000},{\"operName\":\"大于等于\",\"operValue\":5000},{\"operName\":\"包含\",\"operValue\":7000},{\"operName\":\"区间于\",\"operValue\":7200}],\"operType\":3000,\"valueList\":[{\"injectionLabelId\":177,\"labelValue\":\"是\",\"valueName\":\"是\"}],\"conditionType\":\"4\",\"conditionFour\":\"nhnh\",\"content\":\"nhnh\"}],\"ruleChildren\":{\"type\":2,\"listData\":[{\"id\":178,\"name\":\"话费余额\",\"operatorList\":[{\"operName\":\"小于\",\"operValue\":2000},{\"operName\":\"等于\",\"operValue\":3000},{\"operName\":\"大于\",\"operValue\":1000},{\"operName\":\"不等于\",\"operValue\":4000},{\"operName\":\"小于等于\",\"operValue\":6000},{\"operName\":\"大于等于\",\"operValue\":5000},{\"operName\":\"包含\",\"operValue\":7000},{\"operName\":\"区间于\",\"operValue\":7200}],\"operType\":3000,\"valueList\":[{\"injectionLabelId\":178,\"labelValue\":\"是\",\"valueName\":\"是\"}],\"conditionType\":\"4\",\"conditionFour\":\"gnghn\",\"content\":\"gnghn\"}]}}");
+
         } catch (Exception e) {
             logger.error("[op:MktCamChlConfServiceImpl] fail to save MktCamChlConf = {}", mktCamChlConfDO, e);
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_FAIL);
@@ -300,9 +304,11 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
      */
     @Override
     public Map<String, Object> deleteMktCamChlConf(Long evtContactConfId, Long ruleId) {
-        mktCamChlConfMapper.deleteByPrimaryKey(evtContactConfId);
-        mktCamChlConfAttrMapper.deleteByEvtContactConfId(evtContactConfId);
-        //判断是否是结果下的
+        Map<String, Object> mktCamChlConfMap = null;
+        try {
+            mktCamChlConfMapper.deleteByPrimaryKey(evtContactConfId);
+            mktCamChlConfAttrMapper.deleteByEvtContactConfId(evtContactConfId);
+            //判断是否是结果下的
 /*        MktCamChlResultConfRelDO mktCamChlResultConfRelDO = mktCamChlResultConfRelMapper.selectByConfId(evtContactConfId);
         if (mktCamChlResultConfRelDO != null) {
             mktCamChlResultConfRelMapper.deleteByPrimaryKey(mktCamChlResultConfRelDO.getMktCamChlResultConfRelId());
@@ -325,14 +331,19 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
         }*/
 
 
-        //删除旧的关联规则 todo 静态
-        mktVerbalConditionMapper.deleteByVerbalId("1", evtContactConfId);
+            //删除旧的关联规则 todo 静态
+            mktVerbalConditionMapper.deleteByVerbalId("1", evtContactConfId);
 
-        // 将推送渠道缓存到redis
-        redisUtils.remove("MktCamChlConfDetail_" + evtContactConfId);
-        Map<String, Object> mktCamChlConfMap = new HashMap<>();
-        mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
-        mktCamChlConfMap.put("resultMsg", ErrorCode.DELETE_CAM_CHL_CONF_SUCCESS.getErrorMsg());
+            // 将推送渠道缓存到redis
+            redisUtils.remove("MktCamChlConfDetail_" + evtContactConfId);
+            mktCamChlConfMap = new HashMap<>();
+            mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            mktCamChlConfMap.put("resultMsg", ErrorCode.DELETE_CAM_CHL_CONF_SUCCESS.getErrorMsg());
+        } catch (Exception e) {
+            logger.error("[op:MktCamChlConfServiceImpl] fail to delete mktCamChlConfDetailList evtContactConfId = {}", evtContactConfId, e);
+            mktCamChlConfMap.put("resultCode", CommonConstant.CODE_FAIL);
+            mktCamChlConfMap.put("resultMsg", ErrorCode.DELETE_CAM_CHL_CONF_FAILURE.getErrorMsg());
+        }
         return mktCamChlConfMap;
     }
 
@@ -446,7 +457,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
         List<MktVerbalCondition> labels = new ArrayList<>(); //标签因子
         List<MktVerbalCondition> expressions = new ArrayList<>(); //表达式
 
-        //分类
+        //将标签和表达式分类
         for (MktVerbalCondition mktVerbalCondition : mktVerbalConditions) {
             if ("1000".equals(mktVerbalCondition.getLeftParamType())) {
                 labels.add(mktVerbalCondition);
@@ -666,7 +677,9 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             // 查询痛痒点话术列表
             verbalService.copyVerbal(parentEvtContactConfId, childEvtContactConfId);
             // 查询脚本
-            camScriptService.copyCamScript(parentEvtContactConfId, scriptDesc, childEvtContactConfId);
+            Map<String, Object> map = camScriptService.copyCamScript(parentEvtContactConfId, scriptDesc, childEvtContactConfId);
+            CamScript newScript = (CamScript) map.get("resultMsg");
+            mktCamChlConfDetailNew.setCamScript(newScript);
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCamChlConfMap.put("resultMsg", ErrorCode.SAVE_CAM_CHL_CONF_SUCCESS.getErrorMsg());
             mktCamChlConfMap.put("mktCamChlConfDetail", mktCamChlConfDetailNew);

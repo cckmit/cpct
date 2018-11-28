@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.controller.system;
 
 
 import com.alibaba.fastjson.JSON;
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.domain.system.SysRole;
@@ -167,9 +168,11 @@ public class SysParamsController extends BaseController {
         Map result = new HashMap();
         try {
             result = sysParamsService.listParamsByKeyForCampaign();
+            result.put("resultCode", CommonConstant.CODE_SUCCESS);
         } catch (Exception e) {
             logger.error("[op:SysParamsController] fail to delParams Exception: ", e);
-            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+            result.put("resultCode", CommonConstant.CODE_FAIL);
+           // return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
         }
 
         return JSON.toJSON(result).toString();
