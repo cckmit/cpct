@@ -51,7 +51,7 @@
         <elasticsearch.version>6.3.1</elasticsearch.version>
         <bss-cooperate.version>1.0.8</bss-cooperate.version>
         <ctg-cache.version>2.3.1_P1</ctg-cache.version>
-        <bss-centralized.verson>1.2</bss-centralized.verson>
+        <bss-centralized.verson>1.0</bss-centralized.verson>
         <spring-session.verson>1.1</spring-session.verson>
         <fastjson.verson>1.2.36</fastjson.verson>
         <jackson-databind.verson>2.9.5</jackson-databind.verson>

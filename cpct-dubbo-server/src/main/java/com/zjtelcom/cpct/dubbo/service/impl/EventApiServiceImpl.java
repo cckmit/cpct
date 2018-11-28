@@ -992,11 +992,16 @@ public class EventApiServiceImpl implements EventApiService {
                             return Collections.EMPTY_MAP;
                         }
                     } else if ("6000".equals(filterRule.getFilterType())) {  //过扰规则
+                        StringBuilder queryLabel = new StringBuilder();
 //                        itgTriggers
                         //获取过扰标签
-//                        filterRule.get
+                        List<MktVerbalCondition> conditionListByVerbalId = mktVerbalConditionMapper.findConditionListByVerbalId(filterRule.getConditionId());
+                        if (conditionListByVerbalId != null) {
+                            for (MktVerbalCondition mktVerbalCondition : conditionListByVerbalId) {
+                                queryLabel.append(mktVerbalCondition.getLeftParam());
 
-
+                            }
+                        }
                     }
                 }
             }
@@ -1654,7 +1659,7 @@ public class EventApiServiceImpl implements EventApiService {
                 //获取调查问卷ID
                 if (mktCamChlConfAttrDO.getAttrId() == 500600010010L) {
                     //调查问卷
-                    channel.put("questionId", mktCamChlConfAttrDO.getAttrValue());
+                    channel.put("naireId", mktCamChlConfAttrDO.getAttrValue());
                 }
 
                 //获取推荐账号(如果有)
@@ -1697,7 +1702,6 @@ public class EventApiServiceImpl implements EventApiService {
             if (camScript != null) {
                 //获取脚本信息
                 contactScript = camScript.getScriptDesc();
-//              String contactScript = camScript.getScriptDesc();
                 if (contactScript != null) {
                     scriptLabelList.addAll(subScript(contactScript));
                 }
@@ -1721,7 +1725,6 @@ public class EventApiServiceImpl implements EventApiService {
                     VerbalVO verbalVO = BeanUtil.create(mktVerbal, new VerbalVO());
                     verbalVOList.add(verbalVO);
                 }
-
             }
 
             if (verbalVOList != null && verbalVOList.size() > 0) {
@@ -1746,9 +1749,13 @@ public class EventApiServiceImpl implements EventApiService {
                 labelParam.put("queryId", privateParams.get("integrationId"));
                 labelParam.put("type", "1");
                 StringBuilder queryFieldsSb = new StringBuilder();
-                //从redis获取规则使用的所有标签
 
+//                int count = 0;
                 for (String labelCode : scriptLabelList) {
+                    if (queryFieldsSb.toString().contains(labelCode)) {
+                        continue;
+                    }
+//                    count++;
                     queryFieldsSb.append(labelCode).append(",");
                 }
                 if (queryFieldsSb.length() > 0) {
@@ -1759,6 +1766,10 @@ public class EventApiServiceImpl implements EventApiService {
                 Map<String, Object> queryResult = getLabelValue(labelParam);
 
                 JSONObject body = new JSONObject((HashMap) queryResult.get("msgbody"));
+//                if (count != body.size()) {
+//                    System.out.println("推荐指引或痛痒点标签替换含有无值的标签");
+//                    return Collections.EMPTY_MAP;
+//                }
                 //获取查询结果
                 for (Map.Entry<String, Object> entry : body.entrySet()) {
                     //替换标签值内容
@@ -1771,10 +1782,18 @@ public class EventApiServiceImpl implements EventApiService {
                 }
             }
             //返回结果中添加脚本信息
+            if (subScript(contactScript).size() > 0) {
+                System.out.println("推荐指引标签替换含有无值的标签");
+                return Collections.EMPTY_MAP;
+            }
             channel.put("contactScript", contactScript == null ? "" : contactScript);
             //痛痒点
+            if (subScript(mktVerbalStr).size() > 0) {
+                System.out.println("痛痒点标签替换含有无值的标签");
+                return Collections.EMPTY_MAP;
+            }
             channel.put("reason", mktVerbalStr == null ? "" : mktVerbalStr);
-
+            //展示列标签
             channel.put("itgTriggers", JSONArray.parse(JSONArray.toJSON(itgTriggers).toString()));
 
             return channel;
