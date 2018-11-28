@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.impl.campaign;
 
+import com.ctzj.smt.bss.cooperate.service.dubbo.IMktCampaignService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
@@ -38,6 +39,7 @@ import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sun.awt.windows.ThemeReader;
 
 import java.util.*;
 
@@ -125,6 +127,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
     @Autowired
     private SynchronizeCampaignService synchronizeCampaignService;
+/*
+    @Autowired
+    private IMktCampaignService iMktCampaignService;*/
+
 
     /**
      * 添加活动基本信息 并建立关系
@@ -731,7 +737,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignVOList.add(mktCampaignVO);
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
-        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("resultMsg", "查询活动列表成功！");
         maps.put("mktCampaigns", mktCampaignVOList);
         maps.put("pageInfo", new Page(new PageInfo(mktCampaignDOList)));
         return maps;
@@ -906,6 +912,16 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     }
                 }
             }.start();
+
+            // 协同中心活动信息同步
+/*            new Thread(){
+                @Override
+                public void run(){
+                    Map<String, Object> map = iMktCampaignService.campaignPublishDetail();
+                }
+            }*/
+
+
         }
         mktCampaignMap.put("childMktCampaignIdList", childMktCampaignIdList);
         return mktCampaignMap;

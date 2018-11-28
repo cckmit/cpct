@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.controller.campaign;
 
 import com.alibaba.fastjson.JSON;
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
@@ -62,7 +63,7 @@ public class CampaignController extends BaseController {
         } catch (Exception e) {
             logger.error("[op:CampaignController] fail to delayCampaign4Sync",e);
             result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg"," fail to delayCampaign4Sync");
+            result.put("resultMsg"," 延期失败！");
             return result;
         }
         return result;
@@ -82,7 +83,7 @@ public class CampaignController extends BaseController {
         } catch (Exception e) {
             logger.error("[op:CampaignController] fail to examineCampaign4Sync",e);
             result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg"," fail to examineCampaign4Sync");
+            result.put("resultMsg","审核失败！");
             return result;
         }
         return result;
@@ -101,7 +102,7 @@ public class CampaignController extends BaseController {
         } catch (Exception e) {
             logger.error("[op:CampaignController] fail to getCampaignEndTime4Sync",e);
             result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg"," fail to getCampaignEndTime4Sync");
+            result.put("resultMsg","获取活动结束时间失败！");
             return result;
         }
         return result;
@@ -129,7 +130,13 @@ public class CampaignController extends BaseController {
     @RequestMapping(value = "/listCampaignPage", method = RequestMethod.POST)
     @CrossOrigin
     public String qryMktCampaignList(@RequestBody Map<String, Object> params) throws Exception {
-        Map<String, Object> map = mktCampaignService.qryMktCampaignListPage(params);
+        Map<String, Object> map = null;
+        try {
+            map = mktCampaignService.qryMktCampaignListPage(params);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", "查询活动列表失败！");
+        }
         return JSON.toJSONString(map);
     }
 

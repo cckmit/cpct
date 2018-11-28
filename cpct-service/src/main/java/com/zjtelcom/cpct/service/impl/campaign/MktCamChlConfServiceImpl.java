@@ -116,6 +116,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = new ArrayList<>();
             for (MktCamChlConfAttr mktCamChlConfAttr : mktCamChlConfAttrList) {
                 MktCamChlConfAttrDO mktCamChlConfAttrDO = BeanUtil.create(mktCamChlConfAttr, new MktCamChlConfAttrDO());
+                mktCamChlConfAttrDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
                 mktCamChlConfAttrDO.setEvtContactConfId(mktCamChlConfDO.getEvtContactConfId());
                 if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
                     mktCamChlConfAttrDO.setAttrValue(evtContactConfId.toString());
