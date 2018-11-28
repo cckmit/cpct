@@ -380,7 +380,12 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
             mktCamChlResultDO.setUpdateStaff(UserUtil.loginId());*/
             // 新增结果 并获取Id
             // mktCamChlResultMapper.insert(mktCamChlResultDO);
-            mktCamChlResultMap.put("mktCamChlResult", mktCamChlResult);
+            try {
+                mktCamChlResultMap.put("mktCamChlResult", mktCamChlResult);
+                mktCamChlResultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            } catch (Exception e) {
+                mktCamChlResultMap.put("resultCode", CommonConstant.CODE_FAIL);
+            }
             return mktCamChlResultMap;
         }
     }
@@ -395,18 +400,23 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
         @Override
         public Map<String, Object> call() throws Exception {
             Map<String, Object> mktCamChlConfDetailMap = new HashMap<>();
-            // 获取原二次协同渠道下结果的推送渠道
-            //List<MktCamChlResultConfRelDO> mktCamChlResultConfRelDOList = mktCamChlResultConfRelMapper.selectByMktCamChlResultId(mktCamChlResultId);
-            List<MktCamChlConfDetail> mktCamChlConfDetailList = mktCamChlResult.getMktCamChlConfDetailList();
-            List<MktCamChlConfDetail> mktCamChlConfDetailListNew = new ArrayList<>();
-            // 遍历获取原二次协同渠道下结果的推送渠道
-            for (MktCamChlConfDetail mktCamChlConfDetail : mktCamChlConfDetailList) {
-                // 复制推送渠道
-                Map<String, Object> mktCamChlConfMap = mktCamChlConfService.copyMktCamChlConfFormRedis(mktCamChlConfDetail.getEvtContactConfId(), mktCamChlConfDetail.getScriptDesc());
-                MktCamChlConfDetail mktCamChlConfDetailNew = (MktCamChlConfDetail) mktCamChlConfMap.get("mktCamChlConfDetail");
-                mktCamChlConfDetailListNew.add(mktCamChlConfDetailNew);
+            try {
+                // 获取原二次协同渠道下结果的推送渠道
+                //List<MktCamChlResultConfRelDO> mktCamChlResultConfRelDOList = mktCamChlResultConfRelMapper.selectByMktCamChlResultId(mktCamChlResultId);
+                List<MktCamChlConfDetail> mktCamChlConfDetailList = mktCamChlResult.getMktCamChlConfDetailList();
+                List<MktCamChlConfDetail> mktCamChlConfDetailListNew = new ArrayList<>();
+                // 遍历获取原二次协同渠道下结果的推送渠道
+                for (MktCamChlConfDetail mktCamChlConfDetail : mktCamChlConfDetailList) {
+                    // 复制推送渠道
+                    Map<String, Object> mktCamChlConfMap = mktCamChlConfService.copyMktCamChlConfFormRedis(mktCamChlConfDetail.getEvtContactConfId(), mktCamChlConfDetail.getScriptDesc());
+                    MktCamChlConfDetail mktCamChlConfDetailNew = (MktCamChlConfDetail) mktCamChlConfMap.get("mktCamChlConfDetail");
+                    mktCamChlConfDetailListNew.add(mktCamChlConfDetailNew);
+                }
+                mktCamChlConfDetailMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+                mktCamChlConfDetailMap.put("mktCamChlConfDetailList", mktCamChlConfDetailListNew);
+            } catch (Exception e) {
+                mktCamChlConfDetailMap.put("resultCode", CommonConstant.CODE_FAIL);
             }
-            mktCamChlConfDetailMap.put("mktCamChlConfDetailList", mktCamChlConfDetailListNew);
             return mktCamChlConfDetailMap;
         }
     }
@@ -420,45 +430,50 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
     @Override
     public Map<String, Object> selectResultList() {
         Map<String, Object> resultMap = new HashMap<>();
-        List<Long> mktCampaignIdList = mktCamResultRelMapper.selectAllGroupByMktCampaignId();
-        List<MktCamResultRelDeatil> mktCamResultRelDeatilList = new ArrayList<>();
-        for (Long mktCampaignId : mktCampaignIdList) {
-            List<MktCamChlResultDO> mktCamChlResultDOList = mktCamChlResultMapper.selectResultByMktCampaignId(mktCampaignId);
-            List<MktCamChlResult> mktCamChlResultList = new ArrayList<>();
-            for (MktCamChlResultDO mktCamChlResultDO : mktCamChlResultDOList) {
-                MktCamChlResult mktCamChlResult = BeanUtil.create(mktCamChlResultDO, new MktCamChlResult());
-                List<MktCamChlResultConfRelDO> mktCamChlResultConfRelDOList = mktCamChlResultConfRelMapper.selectByMktCamChlResultId(mktCamChlResultDO.getMktCamChlResultId());
-                List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
-                for (MktCamChlResultConfRelDO mktCamChlResultConfRelDO : mktCamChlResultConfRelDOList) {
-                    MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(mktCamChlResultConfRelDO.getEvtContactConfId());
-                    MktCamChlConfDetail mktCamChlConfDetail = BeanUtil.create(mktCamChlConfDO, new MktCamChlConfDetail());
-                    // 获取触点渠道编码
-                    Channel channel = contactChannelMapper.selectByPrimaryKey(mktCamChlConfDetail.getContactChlId());
-                    if (channel != null) {
-                        mktCamChlConfDetail.setContactChlCode(channel.getContactChlCode());
+        try {
+            List<Long> mktCampaignIdList = mktCamResultRelMapper.selectAllGroupByMktCampaignId();
+            List<MktCamResultRelDeatil> mktCamResultRelDeatilList = new ArrayList<>();
+            for (Long mktCampaignId : mktCampaignIdList) {
+                List<MktCamChlResultDO> mktCamChlResultDOList = mktCamChlResultMapper.selectResultByMktCampaignId(mktCampaignId);
+                List<MktCamChlResult> mktCamChlResultList = new ArrayList<>();
+                for (MktCamChlResultDO mktCamChlResultDO : mktCamChlResultDOList) {
+                    MktCamChlResult mktCamChlResult = BeanUtil.create(mktCamChlResultDO, new MktCamChlResult());
+                    List<MktCamChlResultConfRelDO> mktCamChlResultConfRelDOList = mktCamChlResultConfRelMapper.selectByMktCamChlResultId(mktCamChlResultDO.getMktCamChlResultId());
+                    List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
+                    for (MktCamChlResultConfRelDO mktCamChlResultConfRelDO : mktCamChlResultConfRelDOList) {
+                        MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(mktCamChlResultConfRelDO.getEvtContactConfId());
+                        MktCamChlConfDetail mktCamChlConfDetail = BeanUtil.create(mktCamChlConfDO, new MktCamChlConfDetail());
+                        // 获取触点渠道编码
+                        Channel channel = contactChannelMapper.selectByPrimaryKey(mktCamChlConfDetail.getContactChlId());
+                        if (channel != null) {
+                            mktCamChlConfDetail.setContactChlCode(channel.getContactChlCode());
+                        }
+                        mktCamChlConfDetailList.add(mktCamChlConfDetail);
+                        // 获取属性
+                        List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(mktCamChlConfDetail.getEvtContactConfId());
+                        List<MktCamChlConfAttr> mktCamChlConfAttrList = new ArrayList<>();
+                        for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
+                            MktCamChlConfAttr mktCamChlConfAttr = BeanUtil.create(mktCamChlConfAttrDO, new MktCamChlConfAttr());
+                            mktCamChlConfAttrList.add(mktCamChlConfAttr);
+                        }
+                        mktCamChlConfDetail.setMktCamChlConfAttrList(mktCamChlConfAttrList);
                     }
-                    mktCamChlConfDetailList.add(mktCamChlConfDetail);
-                    // 获取属性
-                    List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(mktCamChlConfDetail.getEvtContactConfId());
-                    List<MktCamChlConfAttr> mktCamChlConfAttrList = new ArrayList<>();
-                    for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
-                        MktCamChlConfAttr mktCamChlConfAttr = BeanUtil.create(mktCamChlConfAttrDO, new MktCamChlConfAttr());
-                        mktCamChlConfAttrList.add(mktCamChlConfAttr);
-                    }
-                    mktCamChlConfDetail.setMktCamChlConfAttrList(mktCamChlConfAttrList);
+                    mktCamChlResult.setMktCamChlConfDetailList(mktCamChlConfDetailList);
+                    mktCamChlResultList.add(mktCamChlResult);
                 }
-                mktCamChlResult.setMktCamChlConfDetailList(mktCamChlConfDetailList);
-                mktCamChlResultList.add(mktCamChlResult);
-            }
 
-            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
-            MktCamResultRelDeatil mktCamResultRelDeatil = BeanUtil.create(mktCampaignDO, new MktCamResultRelDeatil());
-            mktCamResultRelDeatil.setMktCamChlResultList(mktCamChlResultList);
-            mktCamResultRelDeatilList.add(mktCamResultRelDeatil);
+                MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
+                MktCamResultRelDeatil mktCamResultRelDeatil = BeanUtil.create(mktCampaignDO, new MktCamResultRelDeatil());
+                mktCamResultRelDeatil.setMktCamChlResultList(mktCamChlResultList);
+                mktCamResultRelDeatilList.add(mktCamResultRelDeatil);
+            }
+            resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            resultMap.put("resultMsg", "查询成功！");
+            resultMap.put("mktCamResultRelDeatilList", mktCamResultRelDeatilList);
+        } catch (Exception e) {
+            resultMap.put("resultCode", CommonConstant.CODE_FAIL);
+            resultMap.put("resultMsg", "查询失败！");
         }
-        resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
-        resultMap.put("resultMsg", "success");
-        resultMap.put("mktCamResultRelDeatilList", mktCamResultRelDeatilList);
         return resultMap;
     }
 
