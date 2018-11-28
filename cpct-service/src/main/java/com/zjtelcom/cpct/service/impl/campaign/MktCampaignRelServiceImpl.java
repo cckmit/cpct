@@ -44,30 +44,35 @@ public class MktCampaignRelServiceImpl extends BaseService implements MktCampaig
     @Override
     public Map<String, Object> getMktCampaignRel(Long mktCampaignId) {
         Map<String, Object> map = new HashMap<>();
-        // 获取活动Id查询其有效的子活动
-        List<MktCampaignRelDO> aCampaignRelDOList = mktCampaignRelMapper.selectByAmktCampaignId(mktCampaignId, StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
-        List<Map<String, Object>> childCampaignMapList = new ArrayList<>();
-        for (MktCampaignRelDO mktCampaignRelDO : aCampaignRelDOList) {
-            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignRelDO.getzMktCampaignId());
-            Map<String, Object> mktCampaignMap = new HashMap<>();
-            mktCampaignMap.put("mktCampaignId", mktCampaignDO.getMktCampaignId());
-            mktCampaignMap.put("mktCampaignName", mktCampaignDO.getMktCampaignName());
-            childCampaignMapList.add(mktCampaignMap);
+        try {
+            // 获取活动Id查询其有效的子活动
+            List<MktCampaignRelDO> aCampaignRelDOList = mktCampaignRelMapper.selectByAmktCampaignId(mktCampaignId, StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+            List<Map<String, Object>> childCampaignMapList = new ArrayList<>();
+            for (MktCampaignRelDO mktCampaignRelDO : aCampaignRelDOList) {
+                MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignRelDO.getzMktCampaignId());
+                Map<String, Object> mktCampaignMap = new HashMap<>();
+                mktCampaignMap.put("mktCampaignId", mktCampaignDO.getMktCampaignId());
+                mktCampaignMap.put("mktCampaignName", mktCampaignDO.getMktCampaignName());
+                childCampaignMapList.add(mktCampaignMap);
+            }
+            // 获取父活动
+            List<Map<String, Object>> parentCampaignMapList = new ArrayList<>();
+            List<MktCampaignRelDO> zCampaignRelDOList = mktCampaignRelMapper.selectByZmktCampaignId(mktCampaignId, StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+            for (MktCampaignRelDO mktCampaignRelDO : zCampaignRelDOList) {
+                MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignRelDO.getaMktCampaignId());
+                Map<String, Object> mktCampaignMap = new HashMap<>();
+                mktCampaignMap.put("mktCampaignId", mktCampaignDO.getMktCampaignId());
+                mktCampaignMap.put("mktCampaignName", mktCampaignDO.getMktCampaignName());
+                parentCampaignMapList.add(mktCampaignMap);
+            }
+            map.put("resultCode", CommonConstant.CODE_SUCCESS);
+            map.put("resultMsg", "查询成功！");
+            map.put("childCampaignMapList", childCampaignMapList);
+            map.put("parentCampaignMapList", parentCampaignMapList);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", "查询失败！");
         }
-        // 获取父活动
-        List<Map<String, Object>> parentCampaignMapList = new ArrayList<>();
-        List<MktCampaignRelDO> zCampaignRelDOList = mktCampaignRelMapper.selectByZmktCampaignId(mktCampaignId, StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
-        for (MktCampaignRelDO mktCampaignRelDO : zCampaignRelDOList) {
-            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignRelDO.getaMktCampaignId());
-            Map<String, Object> mktCampaignMap = new HashMap<>();
-            mktCampaignMap.put("mktCampaignId", mktCampaignDO.getMktCampaignId());
-            mktCampaignMap.put("mktCampaignName", mktCampaignDO.getMktCampaignName());
-            parentCampaignMapList.add(mktCampaignMap);
-        }
-        map.put("resultCode", CommonConstant.CODE_SUCCESS);
-        map.put("resultMsg", StringUtils.EMPTY);
-        map.put("childCampaignMapList", childCampaignMapList);
-        map.put("parentCampaignMapList", parentCampaignMapList);
         return map;
     }
 }
