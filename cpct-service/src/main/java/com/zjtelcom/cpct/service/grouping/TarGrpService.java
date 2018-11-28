@@ -26,7 +26,7 @@ public interface TarGrpService {
 
     Map<String, Object> saveBigDataModel(Long mktCamGrpRulId);
 
-    Map<String,Object> listTarGrpCondition(Long tarGrpId) throws Exception;
+    Map<String,Object> listTarGrpCondition(Long tarGrpId) ;
 
     Map<String,Object> listBigDataModel(Long mktCamGrpRulId);
 

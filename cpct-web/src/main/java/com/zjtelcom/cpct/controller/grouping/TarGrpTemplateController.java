@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,6 +31,27 @@ public class TarGrpTemplateController {
 
     @Autowired
     private TarGrpTemplateService tarGrpTemplateService;
+
+
+
+
+    /**
+     * 销售品id 获取分群集合
+     * @param
+     * @return
+     */
+    @RequestMapping(value = "/getTarGrpTemByOfferId", method = RequestMethod.POST)
+    @CrossOrigin
+    public String getTarGrpTemByOfferId(@RequestBody HashMap<String,Object> param) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            List<Long> offerIdList = (List<Long>)param.get("idList");
+            maps = tarGrpTemplateService.getTarGrpTemByOfferId(offerIdList);
+        } catch (Exception e) {
+            return FastJsonUtils.objToJson(maps);
+        }
+        return JSON.toJSONString(maps);
+    }
 
     /**
      * 新增目标分群模板

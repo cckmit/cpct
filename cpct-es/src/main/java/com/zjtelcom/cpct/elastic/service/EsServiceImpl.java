@@ -6,6 +6,7 @@ import com.zjtelcom.cpct.elastic.model.CampaignHitParam;
 import com.zjtelcom.cpct.elastic.model.CampaignHitResponse;
 import com.zjtelcom.cpct.elastic.model.CampaignInfoTree;
 import com.zjtelcom.cpct.elastic.model.TotalModel;
+import com.zjtelcom.cpct.elastic.util.DateUtil;
 import com.zjtelcom.cpct.elastic.util.ElasticsearchUtil;
 import com.zjtelcom.cpct.elastic.util.EsSearchUtil;
 import com.zjtelcom.cpct.enums.Operator;
@@ -21,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.zjtelcom.cpct.elastic.config.IndexList.*;
@@ -50,11 +52,12 @@ public class EsServiceImpl implements EsService {
         jsonObject.put("id",System.currentTimeMillis()+ EsSearchUtil.getRandomStr(15));
         jsonObject.put("age", 25);
         jsonObject.put("name", "j-" + new Random(100).nextInt());
-        jsonObject.put("date", new Date());
-        for (int i = 0;i<850 ;i++){
-            jsonObject.put("TEST"+i,i+1);
-        }
-        String id = ElasticsearchUtil.addData(jsonObject, indexName, esType, jsonObject.getString("id"));
+        jsonObject.put("date",DateUtil.formatDate(new Date()));
+        jsonObject.put("dateSt",new Date());
+        jsonObject.put("dateSt2","2018-04-25T08:33:44.840Z");
+
+
+        String id = ElasticsearchUtil.addData(jsonObject, "test_hyf", esType, jsonObject.getString("id"));
         System.out.println("*********ID**********: "+id);
     }
 
@@ -115,7 +118,8 @@ public class EsServiceImpl implements EsService {
             System.out.println(source);
             Map<String, Object> stringMap = hits.getHits()[j].getSourceAsMap();
             //todo 触发时间
-            stringMap.put("triggerTime",new Date());
+            stringMap.put("triggerTime",stringMap.get("evtCollectTime")==null ? "" : stringMap.get("evtCollectTime"));
+            stringMap.put("timeCost",stringMap.get("timeCost")+"毫秒");
             System.currentTimeMillis();
             eventList.add(stringMap);
         }
@@ -379,7 +383,7 @@ public class EsServiceImpl implements EsService {
                 boolQueryBuilder = getBoolQueryBuilder(param.getIsi());
                 break;
             case "EventCode"://资产集成编码
-                boolQueryBuilder = getBoolQueryBuilderByEventCode(param.getEventCode());
+                boolQueryBuilder = getBoolQueryBuilderByEventCode(param.getEventCode(),param.getStartTime(),param.getEndTime());
                 break;
             case "AssertNumber"://资产号码
                 boolQueryBuilder = getBoolQueryBuilderByAssetNumber(param.getAssetNumber(),param.getStartTime(),param.getEndTime());
@@ -400,7 +404,7 @@ public class EsServiceImpl implements EsService {
                 boolQueryBuilder = getBoolQueryBuilder(param.getIsi());
                 break;
             case "EventCode":
-                boolQueryBuilder = getBoolQueryBuilderByEventCode(param.getEventCode());
+                boolQueryBuilder = getBoolQueryBuilderByEventCode(param.getEventCode(),param.getStartTime(),param.getEndTime());
                 break;
             case "AssertNumber":
                 boolQueryBuilder = getBoolQueryBuilderByAssetNumber(param.getAssetNumber(),param.getStartTime(),param.getEndTime());
@@ -464,10 +468,13 @@ public class EsServiceImpl implements EsService {
     }
 
     //资产集成编码组装查询条件
-    private BoolQueryBuilder getBoolQueryBuilderByEventCode(String eventCode ) {
+    private BoolQueryBuilder getBoolQueryBuilderByEventCode(String eventCode,Date startTime,Date endTime ) {
+//        String start = DateUtil.formatDate(startTime);
+//        String end = DateUtil.formatDate(endTime);
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
                         matchQuery("integrationId",eventCode));
+//                .must(QueryBuilders.rangeQuery("evtCollectTime").from(start).to(end));
         System.out.println(boolQueryBuilder);
 
         return boolQueryBuilder;
@@ -475,11 +482,12 @@ public class EsServiceImpl implements EsService {
 
     //资产号码和时间段组装查询条件
     private BoolQueryBuilder getBoolQueryBuilderByAssetNumber(String assetNumber,Date startTime,Date endTime) {
+//        String start = DateUtil.formatDate(startTime);
+//        String end = DateUtil.formatDate(endTime);
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
                         matchQuery("accNbr",assetNumber));
-//                .must(QueryBuilders.rangeQuery("startTime").gte(startTime))
-//                .must(QueryBuilders.rangeQuery("startTime").lte(endTime));
+//                .must(QueryBuilders.rangeQuery("evtCollectTime").from(start).to(end));
         System.out.println(boolQueryBuilder);
         return boolQueryBuilder;
     }

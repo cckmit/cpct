@@ -27,6 +27,11 @@ public class MktCampaignDO extends BaseEntity{
     private Long directoryId;
     private Long camLevel;
     private String isCheckRule;
+    private String srcId;
+    private String srcType;
+    private Long serviceCancleFlag;
+    private Long regionId;
+    private Long lifeStage;
 
     public Long getCalcDisplay() {
         return calcDisplay;
@@ -195,5 +200,45 @@ public class MktCampaignDO extends BaseEntity{
 
     public void setIsCheckRule(String isCheckRule) {
         this.isCheckRule = isCheckRule;
+    }
+
+    public String getSrcId() {
+        return srcId;
+    }
+
+    public void setSrcId(String srcId) {
+        this.srcId = srcId;
+    }
+
+    public String getSrcType() {
+        return srcType;
+    }
+
+    public void setSrcType(String srcType) {
+        this.srcType = srcType;
+    }
+
+    public Long getServiceCancleFlag() {
+        return serviceCancleFlag;
+    }
+
+    public void setServiceCancleFlag(Long serviceCancleFlag) {
+        this.serviceCancleFlag = serviceCancleFlag;
+    }
+
+    public Long getRegionId() {
+        return regionId;
+    }
+
+    public void setRegionId(Long regionId) {
+        this.regionId = regionId;
+    }
+
+    public Long getLifeStage() {
+        return lifeStage;
+    }
+
+    public void setLifeStage(Long lifeStage) {
+        this.lifeStage = lifeStage;
     }
 }

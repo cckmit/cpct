@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.ObjMktCampaignRelMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.ObjMktCampaignRel">
+    <id column="OFFER_SCENE_REL_ID" jdbcType="BIGINT" property="offerSceneRelId" />
+    <result column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId" />
+    <result column="OBJ_TYPE" jdbcType="VARCHAR" property="objType" />
+    <result column="OBJ_ID" jdbcType="BIGINT" property="objId" />
+    <result column="REL_TYPE" jdbcType="VARCHAR" property="relType" />
+    <result column="EFF_DATE" jdbcType="TIMESTAMP" property="effDate" />
+    <result column="EXP_DATE" jdbcType="TIMESTAMP" property="expDate" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from obj_mkt_campaign_rel
+    where OFFER_SCENE_REL_ID = #{offerSceneRelId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.ObjMktCampaignRel">
+    insert into obj_mkt_campaign_rel (OFFER_SCENE_REL_ID, MKT_CAMPAIGN_ID, OBJ_TYPE, 
+      OBJ_ID, REL_TYPE, EFF_DATE, 
+      EXP_DATE, STATUS_CD, CREATE_STAFF, 
+      UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
+      UPDATE_DATE, REMARK)
+    values (#{offerSceneRelId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{objType,jdbcType=VARCHAR}, 
+      #{objId,jdbcType=BIGINT}, #{relType,jdbcType=VARCHAR}, #{effDate,jdbcType=TIMESTAMP}, 
+      #{expDate,jdbcType=TIMESTAMP}, #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, 
+      #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.ObjMktCampaignRel">
+    update obj_mkt_campaign_rel
+    set MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},
+      OBJ_TYPE = #{objType,jdbcType=VARCHAR},
+      OBJ_ID = #{objId,jdbcType=BIGINT},
+      REL_TYPE = #{relType,jdbcType=VARCHAR},
+      EFF_DATE = #{effDate,jdbcType=TIMESTAMP},
+      EXP_DATE = #{expDate,jdbcType=TIMESTAMP},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where OFFER_SCENE_REL_ID = #{offerSceneRelId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select OFFER_SCENE_REL_ID, MKT_CAMPAIGN_ID, OBJ_TYPE, OBJ_ID, REL_TYPE, EFF_DATE, 
+    EXP_DATE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, 
+    REMARK
+    from obj_mkt_campaign_rel
+    where OFFER_SCENE_REL_ID = #{offerSceneRelId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select OFFER_SCENE_REL_ID, MKT_CAMPAIGN_ID, OBJ_TYPE, OBJ_ID, REL_TYPE, EFF_DATE, 
+    EXP_DATE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, 
+    REMARK
+    from obj_mkt_campaign_rel
+  </select>
+</mapper>

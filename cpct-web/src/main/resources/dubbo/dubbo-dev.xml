@@ -12,34 +12,35 @@
     <dubbo:registry id="esb2" protocol="dubbo" address="134.96.159.11:8033"/>
     <dubbo:registry id="esb3" protocol="dubbo" address="134.96.253.65:8001"/>
 
-    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.service.api.EventApiService" id="eventApiService"
-                     version="1.0" retries="0" check="false">
-        <!--<dubbo:method name="CalculateCPC" servicecode="00.1083.CalculateCPC" timeout="20000"/>-->
-        <dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="20000"/>
-        <!--<dubbo:method name="secondChannelSynergy" servicecode="00.1083.SecondChannelSynergy" timeout="5000"/>-->
-    </dubbo:reference>
-
-    <!-- 订阅 -->
-    <!-- cpc计算协同中心回调 -->
-    <dubbo:reference registry="esb_dev" interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService" id="iContactTaskReceiptService"
-                     version="1.0" retries="0" check="false">
-        <dubbo:method name="contactTaskReceipt" servicecode="00.1079.CPCResultFeedback" timeout="20000"/>
-    </dubbo:reference>
-
-    <!--<dubbo:reference registry="esb2" interface="org.springframework.session.data.ctg.IDubboCtgService"-->
-                     <!--id="dubboCtgService" version="1.0" check="false">-->
-        <!--<dubbo:method name="smembers" servicecode="00.1077.ctgSessionSmembers"/>-->
-        <!--<dubbo:method name="hgetAll" servicecode="00.1077.ctgSessionHgetAll"/>-->
-        <!--<dubbo:method name="exists" servicecode="00.1077.ctgSessionExists"/>-->
+    <!--<dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.service.api.EventApiService" id="eventApiService"-->
+                     <!--version="1.0" retries="0" check="false">-->
+        <!--&lt;!&ndash;<dubbo:method name="CalculateCPC" servicecode="00.1083.CalculateCPC" timeout="20000"/>&ndash;&gt;-->
+        <!--<dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="20000"/>-->
+        <!--&lt;!&ndash;<dubbo:method name="secondChannelSynergy" servicecode="00.1083.SecondChannelSynergy" timeout="5000"/>&ndash;&gt;-->
     <!--</dubbo:reference>-->
+
+    <!--&lt;!&ndash; 订阅 &ndash;&gt;-->
+    <!--&lt;!&ndash; cpc计算协同中心回调 &ndash;&gt;-->
+    <!--<dubbo:reference registry="esb_dev" interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService" id="iContactTaskReceiptService"-->
+                     <!--version="1.0" retries="0" check="false">-->
+        <!--<dubbo:method name="contactTaskReceipt" servicecode="00.1079.CPCResultFeedback" timeout="20000"/>-->
+    <!--</dubbo:reference>-->
+
+    <!--&lt;!&ndash;<dubbo:reference registry="esb2" interface="org.springframework.session.data.ctg.IDubboCtgService"&ndash;&gt;-->
+                     <!--&lt;!&ndash;id="dubboCtgService" version="1.0" check="false">&ndash;&gt;-->
+        <!--&lt;!&ndash;<dubbo:method name="smembers" servicecode="00.1077.ctgSessionSmembers"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;<dubbo:method name="hgetAll" servicecode="00.1077.ctgSessionHgetAll"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;<dubbo:method name="exists" servicecode="00.1077.ctgSessionExists"/>&ndash;&gt;-->
+    <!--&lt;!&ndash;</dubbo:reference>&ndash;&gt;-->
 
     <!-- es提供试算接口 -->
     <dubbo:reference registry="esb_dev" interface=" com.zjtelcom.es.es.service.EsService" id="esService"
                      version="1.0" retries="0" check="false">
         <dubbo:method name="findBatchHitsList" servicecode="00.1083.findBatchHitsList" timeout="10000"/>
-        <dubbo:method name="searchBatchInfo" servicecode="00.1083.searchBatchInfo" timeout="100000"/>
-        <dubbo:method name="searchCountInfo" servicecode="00.1083.searchCountInfo" timeout="100000"/>
-        <dubbo:method name="strategyIssure" servicecode="00.1083.strategyIssure" timeout="100000"/>
+        <dubbo:method name="searchBatchInfo" servicecode="00.1083.searchBatchInfo" timeout="10000"/>
+        <dubbo:method name="searchCountInfo" servicecode="00.1083.searchCountInfo" timeout="10000"/>
+        <dubbo:method name="strategyIssure" servicecode="00.1083.strategyIssure" timeout="10000"/>
+        <dubbo:method name="issueByFile" servicecode="00.1083.issueByFile" timeout="10000"/>
     </dubbo:reference>
 
     <!--<dubbo:reference interface="org.springframework.session.data.ctg.IDubboCtgService"-->

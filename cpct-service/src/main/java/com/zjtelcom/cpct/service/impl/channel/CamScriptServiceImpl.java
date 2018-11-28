@@ -49,7 +49,16 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
             return result;
         }*/
         CamScript newScript = new CamScript();
-        newScript.setScriptDesc(scriptDesc);
+        CamScript camScript = new CamScript();
+        MktCamChlConfDetail detail = (MktCamChlConfDetail) redisUtils.get("MktCamChlConfDetail_" + contactConfId);
+        if (detail == null) {
+            camScript = camScriptMapper.selectByConfId(contactConfId);
+        } else {
+            camScript = detail.getCamScript();
+        }
+        if (camScript != null) {
+            newScript.setScriptDesc(camScript.getScriptDesc());
+        }
         newScript.setMktCampaignId(0L);
         newScript.setEvtContactConfId(newConfId);
         newScript.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
