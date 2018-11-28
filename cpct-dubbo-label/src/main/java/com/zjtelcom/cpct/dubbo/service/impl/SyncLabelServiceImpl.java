@@ -89,6 +89,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         }
         if (labelValodate != null) {
             BeanUtil.copy(labModel,labelValodate);
+            labelValodate.setSystemInfoId(1L);
             labelValodate.setTagRowId(labModel.getLabRowId());//标签id
             labelValodate.setInjectionLabelName(labModel.getLabName());//标签名称
             labelValodate.setInjectionLabelCode(labModel.getLabEngName());//英文名称
@@ -119,7 +120,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         }else {
 
             Label label = BeanUtil.create(labModel, new Label());
-
+            label.setSystemInfoId(1L);
             label.setTagRowId(labModel.getLabRowId());//标签id
             label.setInjectionLabelName(labModel.getLabName());//标签名称
             label.setInjectionLabelCode(labModel.getLabEngName());//英文名称

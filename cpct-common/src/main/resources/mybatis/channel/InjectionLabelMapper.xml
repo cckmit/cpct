@@ -46,6 +46,7 @@
     <result column="LAB_STATE" jdbcType="VARCHAR" property="labState" />
     <result column="LAB_MANAGE_TYPE" jdbcType="VARCHAR" property="labManageType" />
     <result column="LAB_TAG_CODE" jdbcType="VARCHAR" property="labTagCode" />
+    <result column="SYSTEM_INFO_ID" jdbcType="BIGINT" property="systemInfoId" />
   </resultMap>
 
   <resultMap id="BaseResultMapT" type="com.zjtelcom.cpct.domain.channel.Label">
@@ -72,7 +73,7 @@
       LAB_LEVEL5, LAB_LEVEL5_NAME, LAB_LEVEL6,
       LAB_LEVEL6_NAME, LAB_UPDATE_FEQ, LAB_BUSI_DESC,
       LAB_TECH_DESC, LAB_STATE, LAB_MANAGE_TYPE,
-      LAB_TAG_CODE)
+      LAB_TAG_CODE,SYSTEM_INFO_ID)
     values (#{injectionLabelId,jdbcType=BIGINT}, #{injectionLabelCode,jdbcType=VARCHAR},
       #{injectionLabelName,jdbcType=VARCHAR}, #{injectionLabelDesc,jdbcType=VARCHAR},
       #{labelType,jdbcType=VARCHAR}, #{labelValueType,jdbcType=VARCHAR}, #{labelDataType,jdbcType=VARCHAR},
@@ -88,7 +89,7 @@
       #{labLevel5,jdbcType=VARCHAR}, #{labLevel5Name,jdbcType=VARCHAR}, #{labLevel6,jdbcType=VARCHAR},
       #{labLevel6Name,jdbcType=VARCHAR}, #{labUpdateFeq,jdbcType=VARCHAR}, #{labBusiDesc,jdbcType=VARCHAR},
       #{labTechDesc,jdbcType=VARCHAR}, #{labState,jdbcType=VARCHAR}, #{labManageType,jdbcType=VARCHAR},
-      #{labTagCode,jdbcType=VARCHAR})
+      #{labTagCode,jdbcType=VARCHAR},#{systemInfoId,jdbcType=BIGINT})
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.Label">
     update injection_label

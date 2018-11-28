@@ -23,7 +23,6 @@ public class Label extends BaseEntity {
     private String className;
     private String catalogId;
 
-
     private String labRelevantFlag;
 
     private String labMissRate;
@@ -67,6 +66,9 @@ public class Label extends BaseEntity {
     private String labManageType;
 
     private String labTagCode;
+
+    private Long systemInfoId;
+
 
 
 }
