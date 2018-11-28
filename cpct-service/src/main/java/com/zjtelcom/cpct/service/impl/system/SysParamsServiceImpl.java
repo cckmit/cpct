@@ -150,7 +150,7 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
         list = sysParamsMapper.listParamsByKey(key);
 
         result.put("data",list);
-        result.put("code",CommonConstant.CODE_SUCCESS);
+        result.put("resultCode",CommonConstant.CODE_SUCCESS);
 
         return result;
     }
