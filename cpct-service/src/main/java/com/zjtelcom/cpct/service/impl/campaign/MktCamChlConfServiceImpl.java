@@ -209,6 +209,13 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(evtContactConfId);
             List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(evtContactConfId);
             CopyPropertiesUtil.copyBean2Bean(mktCamChlConfDetail, mktCamChlConfDO);
+            // 通过查询结果与推送渠道的关系，判断是否为二次协同
+            MktCamChlResultConfRelDO mktCamChlResultConfRelDO = mktCamChlResultConfRelMapper.selectByConfId(evtContactConfId);
+            if (mktCamChlResultConfRelDO != null) {
+                mktCamChlConfDetail.setIsSecondCoop("1");
+            } else {
+                mktCamChlConfDetail.setIsSecondCoop("0");
+            }
             List<MktCamChlConfAttr> mktCamChlConfAttrList = new ArrayList<>();
             for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
                 MktCamChlConfAttr mktCamChlConfAttr = new MktCamChlConfAttr();

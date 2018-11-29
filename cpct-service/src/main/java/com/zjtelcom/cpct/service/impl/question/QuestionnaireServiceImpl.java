@@ -214,7 +214,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
             }
         }
         resultRep.setQuestionVOList(voList);
-        result.put("resutlCode",CODE_SUCCESS);
+        result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",resultRep);
         return result;
     }
@@ -413,7 +413,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
             }
         }
 //        resultRep.setQuestionVOList(voList);
-        result.put("resutlCode",CODE_SUCCESS);
+        result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",resultRep);
         return result;
     }
