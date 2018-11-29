@@ -96,24 +96,30 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         List<Long> offerList = new ArrayList<>();
 
         for (Long offerId : offerList){
+            //客户分群列表
             OfferRestrict restrict = offerRestrictMapper.selectByOfferId(offerId,"7000");
-            if (restrict==null){
-                continue;
+            if (restrict!=null){
+                TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(restrict.getRstrObjId());
+                if (tarGrp!=null){
+                    Map<String,Object> targrpMap = tarGrpService.listTarGrpCondition(restrict.getRstrObjId());
+                    List<TarGrpConditionVO> voList = ( List<TarGrpConditionVO>)targrpMap.get("listTarGrpCondition");
+                    TarGrpVO vo = BeanUtil.create(tarGrp,new TarGrpVO());
+                    vo.setTarGrpConditionVOs(voList);
+                    tarGrpVOS.add(vo);
+                }
             }
-            TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(restrict.getRstrObjId());
-            if (tarGrp==null){
-                continue;
+            //营销资源列表
+            List<OfferResRel> offerResRel = offerResRelMapper.selectByOfferIdAndObjType(offerId,"1000");
+            for (OfferResRel resRel : offerResRel){
+                MktResource resource = resourceMapper.selectByPrimaryKey(resRel.getObjId());
+                if (resource!=null){
+                    resourceList.add(resource);
+                }
             }
-            Map<String,Object> targrpMap = tarGrpService.listTarGrpCondition(restrict.getRstrObjId());
-            List<TarGrpConditionVO> voList = ( List<TarGrpConditionVO>)targrpMap.get("listTarGrpCondition");
-            TarGrpVO vo = BeanUtil.create(tarGrp,new TarGrpVO());
-            vo.setTarGrpConditionVOs(voList);
-            tarGrpVOS.add(vo);
+            //渠道列表
+
+
         }
-//        for (Long offerId : offerList){
-//            OfferResRel offerResRel = offerResRelMapper.
-//
-//        }
         result.put("resultCode",CODE_SUCCESS);
         result.put("tarGrpList",tarGrpVOS);
         result.put("channelList",channelList);

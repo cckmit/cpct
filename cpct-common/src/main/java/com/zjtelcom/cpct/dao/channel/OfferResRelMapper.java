@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.dao.channel;
 
 
+
 import com.zjtelcom.cpct.domain.channel.OfferResRel;
 import org.apache.ibatis.annotations.Param;
 
@@ -17,6 +18,5 @@ public interface OfferResRelMapper {
 
     int updateByPrimaryKey(OfferResRel record);
 
-    OfferResRel selectByOfferId(@Param("offerId") Long offerResRelId,@Param("objType")String type);
-
+    List<OfferResRel> selectByOfferIdAndObjType(@Param("offerId") Long offerId,@Param("objType")String objType);
 }

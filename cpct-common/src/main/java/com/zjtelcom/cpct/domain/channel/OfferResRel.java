@@ -5,7 +5,7 @@ import java.util.Date;
 public class OfferResRel {
     private Long offerResRelId;
 
-    private Integer offerId;
+    private Long offerId;
 
     private String objType;//1000	营销资源;1100	终端组;1200	营销资源类型
 
@@ -37,11 +37,11 @@ public class OfferResRel {
         this.offerResRelId = offerResRelId;
     }
 
-    public Integer getOfferId() {
+    public Long getOfferId() {
         return offerId;
     }
 
-    public void setOfferId(Integer offerId) {
+    public void setOfferId(Long offerId) {
         this.offerId = offerId;
     }
 
