@@ -234,6 +234,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             try {
                 for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfDetail.getMktStrategyConfRuleList()) {
                     mktStrategyConfRule.setMktCampaignId(mktStrategyConfDetail.getMktCampaignId());
+                    mktStrategyConfRule.setStrategyConfName(mktStrategyConfDetail.getMktStrategyConfName());
                     Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.saveMktStrategyConfRule(mktStrategyConfRule);
                     // 返回策略规则
                     MktStrategyConfRuleDO mktStrategyConfRuleDO = (MktStrategyConfRuleDO) mktStrategyConfRuleMap.get("mktStrategyConfRuleDO");
