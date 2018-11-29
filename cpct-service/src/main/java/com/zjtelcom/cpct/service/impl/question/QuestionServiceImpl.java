@@ -65,7 +65,7 @@ public class QuestionServiceImpl implements QuestionService {
             return result;
         }
         QuestionModel vo = getQuestionModel(question);
-        result.put("resutlCode",CODE_SUCCESS);
+        result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",null);
         result.put("data",vo);
         return result;
@@ -107,7 +107,7 @@ public class QuestionServiceImpl implements QuestionService {
                 voList.add(vo);
             }
         }
-        result.put("resutlCode",CODE_SUCCESS);
+        result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",null);
         result.put("data",voList);
         result.put("page",pageInfo);

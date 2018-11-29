@@ -2,11 +2,13 @@
 server:
   port: 30321
 
+dubboPath: dev
+
 spring:
 # 第一数据源
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://134.96.252.170:30304/SMT_BSS_CPC?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    url: jdbc:mysql://134.96.252.170:30304/cpct_system?useUnicode=true&characterEncoding=UTF-8&useSSL=true
     username: root
     password: xc.cpct
 

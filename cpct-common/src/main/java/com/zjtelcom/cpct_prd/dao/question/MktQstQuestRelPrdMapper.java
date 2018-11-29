@@ -19,7 +19,7 @@ public interface MktQstQuestRelPrdMapper {
 
     int updateByPrimaryKey(QuestRel record);
 
-    int insertBatch(List<QuestRel> questRelList);
+    int insertBatch(@Param("list") List<QuestRel> questRelList);
 
     int deleteByNaireId(@Param("naireId") Long naireId);
 }

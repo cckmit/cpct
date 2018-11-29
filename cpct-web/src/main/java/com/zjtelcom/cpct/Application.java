@@ -28,7 +28,7 @@ import org.springframework.web.client.RestTemplate;
 @Import({WebSecurityConfig.class, HttpSessionConfig.class, MyUserDetailsService.class})
 @ComponentScan(value = {"com.zjtelcom.cpct"})
 @EnableTransactionManagement
-@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class, MybatisAutoConfiguration.class})
+@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class,DataSourceTransactionManagerAutoConfiguration.class, MybatisAutoConfiguration.class})
 @EnableScheduling
 public class Application {
 
