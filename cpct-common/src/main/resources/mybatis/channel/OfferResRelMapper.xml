@@ -2,15 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zjtelcom.cpct.dao.channel.OfferResRelMapper">
   <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.OfferResRel">
-    <id column="OFFER_RES_REL_ID" jdbcType="DECIMAL" property="offerResRelId" />
-    <result column="OFFER_ID" jdbcType="DECIMAL" property="offerId" />
+    <id column="OFFER_RES_REL_ID" jdbcType="BIGINT" property="offerResRelId" />
+    <result column="OFFER_ID" jdbcType="BIGINT" property="offerId" />
     <result column="OBJ_TYPE" jdbcType="VARCHAR" property="objType" />
-    <result column="OBJ_ID" jdbcType="DECIMAL" property="objId" />
+    <result column="OBJ_ID" jdbcType="BIGINT" property="objId" />
     <result column="REL_TYPE" jdbcType="VARCHAR" property="relType" />
-    <result column="APPLY_REGION_ID" jdbcType="DECIMAL" property="applyRegionId" />
+    <result column="APPLY_REGION_ID" jdbcType="BIGINT" property="applyRegionId" />
     <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
-    <result column="CREATE_STAFF" jdbcType="DECIMAL" property="createStaff" />
-    <result column="UPDATE_STAFF" jdbcType="DECIMAL" property="updateStaff" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
     <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
     <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
     <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
@@ -18,7 +18,7 @@
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from offer_res_rel
-    where OFFER_RES_REL_ID = #{offerResRelId,jdbcType=DECIMAL}
+    where OFFER_RES_REL_ID = #{offerResRelId,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.OfferResRel">
     insert into offer_res_rel (OFFER_RES_REL_ID, OFFER_ID, OBJ_TYPE, 
@@ -26,37 +26,43 @@
       STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
       CREATE_DATE, UPDATE_DATE, STATUS_DATE, 
       REMARK)
-    values (#{offerResRelId,jdbcType=DECIMAL}, #{offerId,jdbcType=DECIMAL}, #{objType,jdbcType=VARCHAR}, 
-      #{objId,jdbcType=DECIMAL}, #{relType,jdbcType=VARCHAR}, #{applyRegionId,jdbcType=DECIMAL}, 
-      #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=DECIMAL}, #{updateStaff,jdbcType=DECIMAL}, 
+    values (#{offerResRelId,jdbcType=BIGINT}, #{offerId,jdbcType=BIGINT}, #{objType,jdbcType=VARCHAR}, 
+      #{objId,jdbcType=BIGINT}, #{relType,jdbcType=VARCHAR}, #{applyRegionId,jdbcType=BIGINT}, 
+      #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, 
       #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, 
       #{remark,jdbcType=VARCHAR})
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.OfferResRel">
     update offer_res_rel
-    set OFFER_ID = #{offerId,jdbcType=DECIMAL},
+    set OFFER_ID = #{offerId,jdbcType=BIGINT},
       OBJ_TYPE = #{objType,jdbcType=VARCHAR},
-      OBJ_ID = #{objId,jdbcType=DECIMAL},
+      OBJ_ID = #{objId,jdbcType=BIGINT},
       REL_TYPE = #{relType,jdbcType=VARCHAR},
-      APPLY_REGION_ID = #{applyRegionId,jdbcType=DECIMAL},
+      APPLY_REGION_ID = #{applyRegionId,jdbcType=BIGINT},
       STATUS_CD = #{statusCd,jdbcType=VARCHAR},
-      CREATE_STAFF = #{createStaff,jdbcType=DECIMAL},
-      UPDATE_STAFF = #{updateStaff,jdbcType=DECIMAL},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
       CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
       UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
       STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
       REMARK = #{remark,jdbcType=VARCHAR}
-    where OFFER_RES_REL_ID = #{offerResRelId,jdbcType=DECIMAL}
+    where OFFER_RES_REL_ID = #{offerResRelId,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select OFFER_RES_REL_ID, OFFER_ID, OBJ_TYPE, OBJ_ID, REL_TYPE, APPLY_REGION_ID, STATUS_CD, 
     CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, UPDATE_DATE, STATUS_DATE, REMARK
     from offer_res_rel
-    where OFFER_RES_REL_ID = #{offerResRelId,jdbcType=DECIMAL}
+    where OFFER_RES_REL_ID = #{offerResRelId,jdbcType=BIGINT}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
     select OFFER_RES_REL_ID, OFFER_ID, OBJ_TYPE, OBJ_ID, REL_TYPE, APPLY_REGION_ID, STATUS_CD, 
     CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, UPDATE_DATE, STATUS_DATE, REMARK
     from offer_res_rel
   </select>
+  <select id="selectByOfferIdAndObjType" resultMap="BaseResultMap">
+    select OFFER_RES_REL_ID, OFFER_ID, OBJ_TYPE, OBJ_ID, REL_TYPE, APPLY_REGION_ID, STATUS_CD,
+    CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, UPDATE_DATE, STATUS_DATE, REMARK
+    from offer_res_rel where OFFER_ID = #{offerId} and OBJ_TYPE = #{objType}
+  </select>
+
 </mapper>
