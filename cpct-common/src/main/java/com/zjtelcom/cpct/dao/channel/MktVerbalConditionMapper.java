@@ -32,4 +32,6 @@ public interface MktVerbalConditionMapper {
 
     List<MktVerbalCondition> findListBylabelId(@Param("labelId")Long labelId);
 
+    List<String> getLabelListByConditionId(@Param("conditionId")Long conditionId);
+
 }

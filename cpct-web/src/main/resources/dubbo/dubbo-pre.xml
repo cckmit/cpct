@@ -33,5 +33,10 @@
         <dubbo:method name="exists" servicecode="00.1077.ctgSessionExists"/>
     </dubbo:reference>
 
+    <!-- 因子实时查询 -->
+    <dubbo:reference interface="com.zjpii.biz.serv.YzServ" id="yzServ"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="10000"/>
+    </dubbo:reference>
 
 </beans>

@@ -995,13 +995,41 @@ public class EventApiServiceImpl implements EventApiService {
                         StringBuilder queryLabel = new StringBuilder();
 //                        itgTriggers
                         //获取过扰标签
-                        List<MktVerbalCondition> conditionListByVerbalId = mktVerbalConditionMapper.findConditionListByVerbalId(filterRule.getConditionId());
-                        if (conditionListByVerbalId != null) {
-                            for (MktVerbalCondition mktVerbalCondition : conditionListByVerbalId) {
-                                queryLabel.append(mktVerbalCondition.getLeftParam());
-
+                        List<String> labels = mktVerbalConditionMapper.getLabelListByConditionId(filterRule.getConditionId());
+                        if (labels != null) {
+                            for (String labelCode : labels) {
+                                queryLabel.append(labelCode).append(",");
                             }
                         }
+                        if (queryLabel.length() > 0) {
+                            queryLabel.deleteCharAt(queryLabel.length() - 1);
+                        }
+
+                        //查询标签
+                        JSONObject labelParam = new JSONObject();
+                        labelParam.put("queryNum", privateParams.get("accNbr"));
+                        labelParam.put("c3", params.get("lanId"));
+                        labelParam.put("queryId", privateParams.get("integrationId"));
+                        labelParam.put("type", "1");
+                        labelParam.put("queryFields", queryLabel.toString());
+                        Map<String, Object> queryResult = getLabelValue(labelParam);
+
+                        JSONObject body = new JSONObject((HashMap) queryResult.get("msgbody"));
+                        //获取查询结果
+                        List<Map<String,Object >> triggerList = new ArrayList<>();
+                        for (Map.Entry<String, Object> entry : body.entrySet()) {
+                            Map<String,Object> map = new HashMap<>();
+                            map.put("key",entry.getKey());
+                            map.put("value",entry.getValue().toString());
+                            map.put("display","0");
+                            map.put("name","");
+                            triggerList.add(map);
+                        }
+                        Map<String,Object > disturb = new HashMap<>();
+                        disturb.put("type","disturb");
+                        disturb.put("triggerList",triggerList);
+                        itgTriggers.add(disturb);
+
                     }
                 }
             }

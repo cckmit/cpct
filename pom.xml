@@ -355,6 +355,12 @@
                 <version>${bss-cooperate.version}</version>
             </dependency>
 
+            <!-- 黄懿慧dubbo服务jar包 -->
+            <dependency>
+                <groupId>com.zjpii.biz</groupId>
+                <artifactId>biz</artifactId>
+                <version>1.0.0</version>
+            </dependency>
 
             <!-- 引入集团redis缓存包 -->
             <dependency>
