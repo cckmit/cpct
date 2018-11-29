@@ -316,21 +316,21 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
 
         //获取销售品及规则列表
-//        TrialOperationParamES param = getTrialOperationParamES(operation, Long.valueOf(batchNumSt), ruleId,false);
-//        ArrayList<TrialOperationParamES> paramESList = new ArrayList<>();
-//        paramESList.add(param);
-//        request.setParamList(paramESList);
-//        new Thread(){
-//            public void run(){
-//                try {
-//                    TrialResponseES responseES = esService.issueByFile(request);
-////                   TrialResponseES responseES =  restTemplate.postForObject("http://localhost:8080/es/issueByFile",request,TrialResponseES.class);
-//                }catch (Exception e){
-//                    e.printStackTrace();
-//                    logger.info("导入清单下发失败");
-//                }
-//            }
-//        }.run();
+        TrialOperationParamES param = getTrialOperationParamES(operation, Long.valueOf(batchNumSt), ruleId,false);
+        ArrayList<TrialOperationParamES> paramESList = new ArrayList<>();
+        paramESList.add(param);
+        request.setParamList(paramESList);
+        new Thread(){
+            public void run(){
+                try {
+                    TrialResponseES responseES = esService.issueByFile(request);
+//                   TrialResponseES responseES =  restTemplate.postForObject("http://localhost:8080/es/issueByFile",request,TrialResponseES.class);
+                }catch (Exception e){
+                    e.printStackTrace();
+                    logger.info("导入清单下发失败");
+                }
+            }
+        }.run();
 
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg", "导入成功");

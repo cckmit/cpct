@@ -344,8 +344,8 @@ public class EventApiServiceImpl implements EventApiService {
             esJson.put("integrationId", map.get("integrationId"));
             esJson.put("accNbr", map.get("accNbr"));
             esJson.put("custId", map.get("custId"));
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd mm:HH:ss");
-            esJson.put("evtCollectTime", simpleDateFormat.format((String) map.get("evtCollectTime")));
+//            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd mm:HH:ss");
+//            esJson.put("evtCollectTime", simpleDateFormat.format((String) map.get("evtCollectTime")));
 //            esJson.put("evtCollectTime", map.get("evtCollectTime"));
 
             //验证事件状态
@@ -1756,7 +1756,7 @@ public class EventApiServiceImpl implements EventApiService {
 
             if (verbalVOList != null && verbalVOList.size() > 0) {
                 for (VerbalVO verbalVO : verbalVOList) {
-                    if (verbalVO.getChannelId() != null && mktCamChlConfDetail.getContactChlId().equals(verbalVO.getChannelId())) {
+                    if (verbalVO.getChannelId() != null) {
                         //查询痛痒点规则 todo
 //                        List<MktVerbalCondition> channelConditionList = mktVerbalConditionMapper.findChannelConditionListByVerbalId(mktVerbal.getVerbalId());
 
@@ -1809,15 +1809,19 @@ public class EventApiServiceImpl implements EventApiService {
                 }
             }
             //返回结果中添加脚本信息
-            if (subScript(contactScript).size() > 0) {
-                System.out.println("推荐指引标签替换含有无值的标签");
-                return Collections.EMPTY_MAP;
+            if(contactScript != null) {
+                if (subScript(contactScript).size() > 0) {
+                    System.out.println("推荐指引标签替换含有无值的标签");
+                    return Collections.EMPTY_MAP;
+                }
             }
             channel.put("contactScript", contactScript == null ? "" : contactScript);
             //痛痒点
-            if (subScript(mktVerbalStr).size() > 0) {
-                System.out.println("痛痒点标签替换含有无值的标签");
-                return Collections.EMPTY_MAP;
+            if(mktVerbalStr != null) {
+                if (subScript(mktVerbalStr).size() > 0) {
+                    System.out.println("痛痒点标签替换含有无值的标签");
+                    return Collections.EMPTY_MAP;
+                }
             }
             channel.put("reason", mktVerbalStr == null ? "" : mktVerbalStr);
             //展示列标签
