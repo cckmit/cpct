@@ -3,13 +3,13 @@ package com.zjtelcom.cpct.domain.channel;
 import java.util.Date;
 
 public class MktResource {
-    private Integer mktResId;
+    private Long mktResId;
 
     private String mktResNbr;
 
-    private Integer mktResTypeId;
+    private Long mktResTypeId;
 
-    private Integer mktResExttypeId;
+    private Long mktResExttypeId;
 
     private Long mktMktResId;
 
@@ -17,7 +17,7 @@ public class MktResource {
 
     private String mktResDesc;
 
-    private Integer mktPricingPlanId;
+    private Long mktPricingPlanId;
 
     private String unit;
 
@@ -43,11 +43,11 @@ public class MktResource {
 
     private Date updateDate;
 
-    public Integer getMktResId() {
+    public Long getMktResId() {
         return mktResId;
     }
 
-    public void setMktResId(Integer mktResId) {
+    public void setMktResId(Long mktResId) {
         this.mktResId = mktResId;
     }
 
@@ -59,19 +59,19 @@ public class MktResource {
         this.mktResNbr = mktResNbr;
     }
 
-    public Integer getMktResTypeId() {
+    public Long getMktResTypeId() {
         return mktResTypeId;
     }
 
-    public void setMktResTypeId(Integer mktResTypeId) {
+    public void setMktResTypeId(Long mktResTypeId) {
         this.mktResTypeId = mktResTypeId;
     }
 
-    public Integer getMktResExttypeId() {
+    public Long getMktResExttypeId() {
         return mktResExttypeId;
     }
 
-    public void setMktResExttypeId(Integer mktResExttypeId) {
+    public void setMktResExttypeId(Long mktResExttypeId) {
         this.mktResExttypeId = mktResExttypeId;
     }
 
@@ -99,11 +99,11 @@ public class MktResource {
         this.mktResDesc = mktResDesc;
     }
 
-    public Integer getMktPricingPlanId() {
+    public Long getMktPricingPlanId() {
         return mktPricingPlanId;
     }
 
-    public void setMktPricingPlanId(Integer mktPricingPlanId) {
+    public void setMktPricingPlanId(Long mktPricingPlanId) {
         this.mktPricingPlanId = mktPricingPlanId;
     }
 

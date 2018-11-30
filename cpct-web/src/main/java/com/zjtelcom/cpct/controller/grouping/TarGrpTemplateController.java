@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
+
 /**
  * Description:
  * author: linchao
@@ -32,9 +34,6 @@ public class TarGrpTemplateController {
     @Autowired
     private TarGrpTemplateService tarGrpTemplateService;
 
-
-
-
     /**
      * 销售品id 获取分群集合
      * @param
@@ -42,15 +41,22 @@ public class TarGrpTemplateController {
      */
     @RequestMapping(value = "/getTarGrpTemByOfferId", method = RequestMethod.POST)
     @CrossOrigin
-    public String getTarGrpTemByOfferId(@RequestBody HashMap<String,Object> param) {
+    public Map<String,Object> getTarGrpTemByOfferId(@RequestBody HashMap<String,Object> param) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            List<Long> offerIdList = (List<Long>)param.get("idList");
-            maps = tarGrpTemplateService.getTarGrpTemByOfferId(offerIdList);
+            if (param.get("requestid")==null){
+                maps.put("resultCode",CODE_FAIL);
+                maps.put("resultMsg","请求需求涵不存在!");
+                return maps;
+            }
+            Long requestId = Long.valueOf(param.get("requestId").toString());
+            maps = tarGrpTemplateService.getTarGrpTemByOfferId(requestId);
         } catch (Exception e) {
-            return FastJsonUtils.objToJson(maps);
+            maps.put("resultCode",CODE_FAIL);
+            maps.put("resultMsg","查询失败");
+            return maps;
         }
-        return JSON.toJSONString(maps);
+        return maps;
     }
 
     /**

@@ -209,7 +209,18 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             // 获取与结果关联的推送渠道信息
             String ruleExpression = "("+ confs + ")&&(" + resultConfs + ")";
             MktStrategy mktStrategy = new MktStrategy();
+            mktStrategy.setStrategyId(mktStrategyConfRule.getStrategyConfId());
+            mktStrategy.setStrategyType("1000");
+            mktStrategy.setStrategyName(mktStrategyConfRule.getStrategyConfName());
             mktStrategy.setRuleExpression(ruleExpression);
+            mktStrategy.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+            mktStrategy.setStatusDate(new Date());
+            mktStrategy.setCreateStaff(UserUtil.loginId());
+            mktStrategy.setCreateDate(new Date());
+            mktStrategy.setUpdateStaff(UserUtil.loginId());
+            mktStrategy.setUpdateDate(new Date());
+
+
             mktStrategyMapper.insert(mktStrategy);
             MktCamStrategyRel mktCamStrategyRel = new MktCamStrategyRel();
             mktCamStrategyRel.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());

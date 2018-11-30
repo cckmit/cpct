@@ -113,7 +113,7 @@
         REMARK = #{remark,jdbcType=VARCHAR},
         CREATE_CHANNEL = #{createChannel,jdbcType=VARCHAR},
         DIRECTORY_ID = #{directoryId,jdbcType=BIGINT},
-        LAN_ID = #{lanId,jdbcType=BIGINT},
+        <if test= "lanId!=null">LAN_ID = #{lanId,jdbcType=BIGINT},</if>
         CAM_LEVEL = #{camLevel,jdbcType=BIGINT},
         IS_CHECK_RULE = #{isCheckRule,jdbcType=VARCHAR},
         <if test= "srcId!=null"> SRC_ID #{srcId,jdbcType=VARCHAR},</if>
