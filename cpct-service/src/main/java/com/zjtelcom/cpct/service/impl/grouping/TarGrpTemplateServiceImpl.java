@@ -10,18 +10,15 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
-import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
-import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
-import com.zjtelcom.cpct.dao.channel.OfferRestrictMapper;
+import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
-import com.zjtelcom.cpct.domain.channel.Label;
-import com.zjtelcom.cpct.domain.channel.LabelValue;
-import com.zjtelcom.cpct.domain.channel.OfferRestrict;
+import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO;
+import com.zjtelcom.cpct.dto.channel.CampaignInstVO;
 import com.zjtelcom.cpct.dto.channel.LabelValueVO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.grouping.*;
@@ -37,6 +34,7 @@ import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
 import com.zjtelcom.cpct.vo.grouping.TarGrpVO;
+import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -74,35 +72,80 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     private SynTarGrpTemplateService synTarGrpTemplateService;
     @Autowired
     private TarGrpService tarGrpService;
+    @Autowired
+    private OfferResRelMapper offerResRelMapper;
+    @Autowired
+    private MktResourceMapper resourceMapper;
+    @Autowired
+    private GrpSystemRelMapper grpSystemRelMapper;
+    @Autowired
+    private VrulGrpMapper vrulGrpMapper;
+    @Autowired
+    private RequestInstRelMapper requestInstRelMapper;
+    @Autowired
+    private OfferMapper offerMapper;
+    @Autowired
+    private ContactChannelMapper channelMapper;
+
     @Value("${sync.value}")
     private String value;
 
     /**
-     * 销售品id 获取分群集合
-     * @param offerList
+     * 需求涵id 获取分类对象
+     * @param
      * @return
      */
     @Override
-    public Map<String, Object> getTarGrpTemByOfferId(List<Long> offerList) {
+    public Map<String, Object> getTarGrpTemByOfferId(Long requestId) {
         Map<String, Object> result = new HashMap<>();
-        List<TarGrpVO> tarGrpVOS = new ArrayList<>();
-        for (Long offerId : offerList){
+        List<CampaignInstVO> instVOS = new ArrayList<>();
+        //todo 通过需求涵id获取销售品idList
+        List<RequestInstRel> requestInstRels = requestInstRelMapper.selectByRequestId(requestId);
+        for (RequestInstRel requestInstRel : requestInstRels){
+            Long offerId = requestInstRel.getRequestObjId();
+            Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
+            if (offer==null){
+                continue;
+            }
+            CampaignInstVO instVO = new CampaignInstVO();
+            instVO.setOfferName(offer.getOfferName());
+            //客户分群列表
             OfferRestrict restrict = offerRestrictMapper.selectByOfferId(offerId,"7000");
-            if (restrict==null){
-                continue;
+            if (restrict!=null){
+                TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(restrict.getRstrObjId());
+                if (tarGrp!=null){
+                    instVO.setTarGrpTempleteId(tarGrp.getTarGrpId());
+//                    Map<String,Object> targrpMap = tarGrpService.listTarGrpCondition(restrict.getRstrObjId());
+//                    List<TarGrpConditionVO> voList = ( List<TarGrpConditionVO>)targrpMap.get("listTarGrpCondition");
+//                    TarGrpVO vo = BeanUtil.create(tarGrp,new TarGrpVO());
+//                    vo.setTarGrpConditionVOs(voList);
+//                    tarGrpVOS.add(vo);
+                }
             }
-            TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(restrict.getRstrObjId());
-            if (tarGrp==null){
-                continue;
+            //营销资源列表
+            List<OfferResRel> offerResRel = offerResRelMapper.selectByOfferIdAndObjType(offerId,"1000");
+            List<Long> resourceList = new ArrayList<>();
+            for (OfferResRel resRel : offerResRel){
+                MktResource resource = resourceMapper.selectByPrimaryKey(resRel.getObjId());
+                if (resource!=null){
+                    resourceList.add(resource.getMktResId());
+                }
             }
-            Map<String,Object> targrpMap = tarGrpService.listTarGrpCondition(restrict.getRstrObjId());
-            List<TarGrpConditionVO> voList = ( List<TarGrpConditionVO>)targrpMap.get("listTarGrpCondition");
-            TarGrpVO vo = BeanUtil.create(tarGrp,new TarGrpVO());
-            vo.setTarGrpConditionVOs(voList);
-            tarGrpVOS.add(vo);
+            instVO.setResourceList(resourceList);
+            //渠道列表
+            List<GrpSystemRel> grpSystemRels = grpSystemRelMapper.selectByOfferId(offerId);
+            List<Long> channelList = new ArrayList<>();
+            for (GrpSystemRel systemRel : grpSystemRels){
+                Channel channel = channelMapper.selectByPrimaryKey(systemRel.getOfferVrulGrpId());
+                if (channel!=null){
+                    channelList.add(channel.getContactChlId());
+                }
+            }
+            instVO.setChannelList(channelList);
+            instVOS.add(instVO);
         }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",tarGrpVOS);
+        result.put("resultMsg",instVOS);
         return result;
     }
 
@@ -113,7 +156,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
      * @return
      */
     @Override
-    public Map<String, Object> saveTarGrpTemplate(final TarGrpTemplateDetail tarGrpTemplateDetail) {
+    public Map<String, Object> saveTarGrpTemplate(TarGrpTemplateDetail tarGrpTemplateDetail) {
         Map<String, Object> tarGrpTemplateMap = new HashMap<>();
         TarGrp tarGrpTemplateDO = BeanUtil.create(tarGrpTemplateDetail, new TarGrp());
         tarGrpTemplateDO.setTarGrpName(tarGrpTemplateDetail.getTarGrpTemplateName()==null ? "" : tarGrpTemplateDetail.getTarGrpTemplateName() );
@@ -129,7 +172,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
 
         // 新增目标分群模板
         tarGrpMapper.createTarGrp(tarGrpTemplateDO);
-        Long tarGrpTemplateId = tarGrpTemplateDO.getTarGrpId();
+        final Long tarGrpTemplateId = tarGrpTemplateDO.getTarGrpId();
         // 新增目标分群模板条件
         if (tarGrpTemplateDetail.getTarGrpTemConditionVOList() != null && tarGrpTemplateDetail.getTarGrpTemConditionVOList().size() > 0) {
             for (TarGrpTemConditionVO tarGrpTemConditionVO : tarGrpTemplateDetail.getTarGrpTemConditionVOList()) {
@@ -155,7 +198,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             new Thread(){
                 public void run(){
                     try {
-                        synTarGrpTemplateService.synchronizeSingleTarGrp(tarGrpTemplateDetail.getTarGrpTemplateId(),"");
+                        synTarGrpTemplateService.synchronizeSingleTarGrp(tarGrpTemplateId,"");
                     }catch (Exception e){
                         e.printStackTrace();
                     }
@@ -174,7 +217,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
      * @return
      */
     @Override
-    public Map<String, Object> updateTarGrpTemplate(final TarGrpTemplateDetail tarGrpTemplateDetail) {
+    public Map<String, Object> updateTarGrpTemplate(TarGrpTemplateDetail tarGrpTemplateDetail) {
 
         Map<String, Object> tarGrpTemplateMap = new HashMap<>();
         if (tarGrpTemplateDetail.getTarGrpType()!=null && tarGrpTemplateDetail.getTarGrpType().equals("2000")){
@@ -190,18 +233,21 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         tarGrpTemplateDO.setUpdateDate(new Date());
         tarGrpTemplateDO.setUpdateStaff(UserUtil.loginId());
         tarGrpMapper.modTarGrp(tarGrpTemplateDO);
-        Long tarGrpTemplateId = tarGrpTemplateDetail.getTarGrpTemplateId();
+        final Long tarGrpTemplateId = tarGrpTemplateDetail.getTarGrpTemplateId();
         // 获取原有的标签条件
         List<TarGrpCondition> tarGrpTemplateConditionDOList = tarGrpConditionMapper.listTarGrpCondition(tarGrpTemplateId);
         List<Long> conditionIdList = new ArrayList<>();
         List<TarGrpTemConditionVO> conditionVOList = tarGrpTemplateDetail.getTarGrpTemConditionVOList();
-        for (int i = 0; i < tarGrpTemplateConditionDOList.size(); i++) {
-            for (int j = 0; j < conditionVOList.size(); j++) {
-                if (!tarGrpTemplateConditionDOList.get(i).getConditionId().equals(conditionVOList.get(j).getConditionId()) && (j == conditionVOList.size() - 1)) {
-                    conditionIdList.add(tarGrpTemplateConditionDOList.get(i).getConditionId());
-                } else {
-                    break;
-                }
+        List<Long> newIdList = new ArrayList<>();
+        for (TarGrpTemConditionVO conditionVO : conditionVOList) {
+            if (conditionVO.getConditionId() == 0) {
+                continue;
+            }
+            newIdList.add(conditionVO.getConditionId());
+        }
+        for (TarGrpCondition condition : tarGrpTemplateConditionDOList){
+            if (!newIdList.contains(condition.getConditionId())){
+                conditionIdList.add(condition.getConditionId());
             }
         }
         //批量删除条件
@@ -239,7 +285,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             new Thread(){
                 public void run(){
                     try {
-                        synTarGrpTemplateService.synchronizeSingleTarGrp(tarGrpTemplateDetail.getTarGrpTemplateId(),"");
+                        synTarGrpTemplateService.synchronizeSingleTarGrp(tarGrpTemplateId,"");
                     }catch (Exception e){
                         e.printStackTrace();
                     }

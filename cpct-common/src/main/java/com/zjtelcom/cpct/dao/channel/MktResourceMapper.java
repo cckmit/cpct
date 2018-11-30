@@ -6,11 +6,11 @@ import com.zjtelcom.cpct.domain.channel.MktResource;
 import java.util.List;
 
 public interface MktResourceMapper {
-    int deleteByPrimaryKey(Integer mktResId);
+    int deleteByPrimaryKey(Long mktResId);
 
     int insert(MktResource record);
 
-    MktResource selectByPrimaryKey(Integer mktResId);
+    MktResource selectByPrimaryKey(Long mktResId);
 
     List<MktResource> selectAll();
 

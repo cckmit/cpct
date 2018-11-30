@@ -5,6 +5,7 @@ import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.rule.RuleResult;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
+import com.zjtelcom.cpct.domain.channel.RequestInstRel;
 import com.zjtelcom.cpct.service.EngineTestService;
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.service.MktCampaignResp;
@@ -12,6 +13,7 @@ import com.zjtelcom.cpct.service.campaign.MktCamChlResultApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.util.RedisUtils;
+import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,6 +41,16 @@ public class TestController extends BaseController {
 
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired(required = false)
+    private RequestInstRelMapper requestInstRelMapper;
+
+    @PostMapping("fourthDataSource")
+    @CrossOrigin
+    public Object fourthDataSource() {
+        RequestInstRel requestInstRel = requestInstRelMapper.selectByPrimaryKey(1L);
+        return requestInstRel;
+    }
+
 
     @RequestMapping(value = "/redisTest", method = RequestMethod.POST)
     @CrossOrigin
