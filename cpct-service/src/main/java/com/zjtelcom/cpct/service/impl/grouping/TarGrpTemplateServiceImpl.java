@@ -16,6 +16,7 @@ import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateMapper;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO;
+import com.zjtelcom.cpct.dto.channel.CampaignInstVO;
 import com.zjtelcom.cpct.dto.channel.LabelValueVO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
@@ -34,6 +35,7 @@ import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
 import com.zjtelcom.cpct.vo.grouping.TarGrpVO;
+import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -79,6 +81,13 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     private GrpSystemRelMapper grpSystemRelMapper;
     @Autowired
     private VrulGrpMapper vrulGrpMapper;
+    @Autowired
+    private RequestInstRelMapper requestInstRelMapper;
+    @Autowired
+    private OfferMapper offerMapper;
+    @Autowired
+    private ContactChannelMapper channelMapper;
+
     @Value("${sync.value}")
     private String value;
 
@@ -90,41 +99,54 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     @Override
     public Map<String, Object> getTarGrpTemByOfferId(Long requestId) {
         Map<String, Object> result = new HashMap<>();
-        List<TarGrpVO> tarGrpVOS = new ArrayList<>();
-        List<Channel> channelList = new ArrayList<>();
-        List<MktResource> resourceList = new ArrayList<>();
+        List<CampaignInstVO> instVOS = new ArrayList<>();
         //todo 通过需求涵id获取销售品idList
-        List<Long> offerList = new ArrayList<>();
-
-        for (Long offerId : offerList){
+        List<RequestInstRel> requestInstRels = requestInstRelMapper.selectByRequestId(requestId);
+        for (RequestInstRel requestInstRel : requestInstRels){
+            Long offerId = requestInstRel.getRequestObjId();
+            Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
+            if (offer==null){
+                continue;
+            }
+            CampaignInstVO instVO = new CampaignInstVO();
+            instVO.setOfferName(offer.getOfferName());
             //客户分群列表
             OfferRestrict restrict = offerRestrictMapper.selectByOfferId(offerId,"7000");
             if (restrict!=null){
                 TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(restrict.getRstrObjId());
                 if (tarGrp!=null){
-                    Map<String,Object> targrpMap = tarGrpService.listTarGrpCondition(restrict.getRstrObjId());
-                    List<TarGrpConditionVO> voList = ( List<TarGrpConditionVO>)targrpMap.get("listTarGrpCondition");
-                    TarGrpVO vo = BeanUtil.create(tarGrp,new TarGrpVO());
-                    vo.setTarGrpConditionVOs(voList);
-                    tarGrpVOS.add(vo);
+                    instVO.setTarGrpTempleteId(tarGrp.getTarGrpId());
+//                    Map<String,Object> targrpMap = tarGrpService.listTarGrpCondition(restrict.getRstrObjId());
+//                    List<TarGrpConditionVO> voList = ( List<TarGrpConditionVO>)targrpMap.get("listTarGrpCondition");
+//                    TarGrpVO vo = BeanUtil.create(tarGrp,new TarGrpVO());
+//                    vo.setTarGrpConditionVOs(voList);
+//                    tarGrpVOS.add(vo);
                 }
             }
             //营销资源列表
             List<OfferResRel> offerResRel = offerResRelMapper.selectByOfferIdAndObjType(offerId,"1000");
+            List<Long> resourceList = new ArrayList<>();
             for (OfferResRel resRel : offerResRel){
                 MktResource resource = resourceMapper.selectByPrimaryKey(resRel.getObjId());
                 if (resource!=null){
-                    resourceList.add(resource);
+                    resourceList.add(resource.getMktResId());
                 }
             }
+            instVO.setResourceList(resourceList);
             //渠道列表
-
-
+            List<GrpSystemRel> grpSystemRels = grpSystemRelMapper.selectByOfferId(offerId);
+            List<Long> channelList = new ArrayList<>();
+            for (GrpSystemRel systemRel : grpSystemRels){
+                Channel channel = channelMapper.selectByPrimaryKey(systemRel.getOfferVrulGrpId());
+                if (channel!=null){
+                    channelList.add(channel.getContactChlId());
+                }
+            }
+            instVO.setChannelList(channelList);
+            instVOS.add(instVO);
         }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("tarGrpList",tarGrpVOS);
-        result.put("channelList",channelList);
-        result.put("resourceList",resourceList);
+        result.put("resultMsg",instVOS);
         return result;
     }
 
@@ -217,13 +239,16 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         List<TarGrpCondition> tarGrpTemplateConditionDOList = tarGrpConditionMapper.listTarGrpCondition(tarGrpTemplateId);
         List<Long> conditionIdList = new ArrayList<>();
         List<TarGrpTemConditionVO> conditionVOList = tarGrpTemplateDetail.getTarGrpTemConditionVOList();
-        for (int i = 0; i < tarGrpTemplateConditionDOList.size(); i++) {
-            for (int j = 0; j < conditionVOList.size(); j++) {
-                if (!tarGrpTemplateConditionDOList.get(i).getConditionId().equals(conditionVOList.get(j).getConditionId()) && (j == conditionVOList.size() - 1)) {
-                    conditionIdList.add(tarGrpTemplateConditionDOList.get(i).getConditionId());
-                } else {
-                    break;
-                }
+        List<Long> newIdList = new ArrayList<>();
+        for (TarGrpTemConditionVO conditionVO : conditionVOList) {
+            if (conditionVO.getConditionId() == 0) {
+                continue;
+            }
+            newIdList.add(conditionVO.getConditionId());
+        }
+        for (TarGrpCondition condition : tarGrpTemplateConditionDOList){
+            if (!newIdList.contains(condition.getConditionId())){
+                conditionIdList.add(condition.getConditionId());
             }
         }
         //批量删除条件
