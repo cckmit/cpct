@@ -1,6 +1,6 @@
 #端口配置
 server:
-  port: 8090
+  port: 8080
 
 dubboPath: dev
 
@@ -35,6 +35,13 @@ spring:
     username: root
     password: Yanlei2018
 
+# 第四数据源
+  datasourcefourth:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://47.94.168.117:3306/fpc_system?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
+    username: root
+    password: Yanlei2018
+
   redis:
       host: 47.94.168.117
       port: 6379
@@ -53,4 +60,4 @@ spring:
       countinfo: http://134.96.252.170:30808/es/searchCountInfo
 #是否同步
 sync:
- value: 1
+ value: 0

@@ -33,5 +33,5 @@ public interface TarGrpTemplateService {
 
     Map<String, Object> listTarGrpTemplatePage(String tarGrpTemplateName,String tarGrpType, Integer page, Integer pageSize);
 
-    Map<String, Object> getTarGrpTemByOfferId(List<Long> offerList);
+    Map<String, Object> getTarGrpTemByOfferId(Long requestId);
 }

@@ -815,6 +815,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         Map<String, String> paramBody = new HashMap<>();
         paramBody.put("operationVOList", operationVOList.toString());
         paramBody.put("fieldList", fieldList.toString());
+
         String result = HTTPSClientUtil.doPost(httpClient, url, paramHeader, paramBody);
         //String result = HTTPSClientUtil.doGet(httpsClient, url, null, null);
         System.out.println(result);
@@ -915,48 +916,38 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         // 设置批次号
         param.setBatchNum(batchNum);
         //redis取规则
-        Object ruleOb = redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId);
-        logger.info("************************当前规则 ："+ruleId+"*******"+ruleOb);
         String rule = "";
-        if(ruleOb==null){
-            ExecutorService executorService = Executors.newCachedThreadPool();
-            try {
-                MktStrategyConfRuleDO ruleDO = ruleMapper.selectByPrimaryKey(ruleId);
-                if (ruleDO!=null){
-                  Future<Map<String, Object>> future = executorService.submit(new TarGrpRuleTask(operationVO.getCampaignId(),operationVO.getStrategyId(), ruleDO, redisUtils, tarGrpConditionMapper, injectionLabelMapper));
-                  rule = future.get().get("express").toString();
-                }
-                     // 关闭线程池
-                if (!executorService.isShutdown()) {
-                    executorService.shutdown();
-                }
-            }catch (Exception e){
-                // 关闭线程池
-                if (!executorService.isShutdown()) {
-                    executorService.shutdown();
-                }
-            }
-            logger.info("规则未查询到");
-        }else {
-            rule = ruleOb.toString();
-            System.out.println("*************************" + rule);
-        }
-        param.setRule(rule);
         List<LabelResult> labelResultList = new ArrayList<>();
         ArrayList<LabelResultES> labelResultES = new ArrayList<>();
-        if (redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId+"_LABEL")!=null){
-            JSONArray objects = JSONArray.parseArray((String) redisUtils.get("EVENT_RULE_" + operationVO.getCampaignId() + "_" + operationVO.getStrategyId() + "_" + ruleId+"_LABEL"));
-            labelResultList = objects.toJavaList(LabelResult.class);
-            for (LabelResult labelResult : labelResultList){
-                LabelResultES labelEs = BeanUtil.create(labelResult,new LabelResultES());
-                labelResultES.add(labelEs);
+
+        //获取规则
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        try {
+            MktStrategyConfRuleDO ruleDO = ruleMapper.selectByPrimaryKey(ruleId);
+            if (ruleDO!=null){
+                Future<Map<String, Object>> future = executorService.submit(new TarGrpRuleTask(operationVO.getCampaignId(),operationVO.getStrategyId(), ruleDO, redisUtils, tarGrpConditionMapper, injectionLabelMapper));
+                rule = future.get().get("express").toString();
+                labelResultList = ( List<LabelResult>)future.get().get("labelResultList");
             }
+            // 关闭线程池
+            if (!executorService.isShutdown()) {
+                executorService.shutdown();
+            }
+        }catch (Exception e){
+            // 关闭线程池
+            if (!executorService.isShutdown()) {
+                executorService.shutdown();
+            }
+        }
+        System.out.println("*************************" + rule);
+        param.setRule(rule);
+        for (LabelResult labelResult : labelResultList){
+            LabelResultES labelEs = BeanUtil.create(labelResult,new LabelResultES());
+            labelResultES.add(labelEs);
         }
         param.setLabelResultList(labelResultES);
         return param;
-
     }
-
 
     class TarGrpRuleTask implements Callable<Map<String,Object>>{
         private Long mktCampaignId;
@@ -1051,6 +1042,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 redisUtils.set(key + "_LABEL", JSON.toJSONString(labelResultList));
             }
             result.put("express",express.toString());
+            result.put("labelResultList",labelResultList);
             return result;
         }
 
