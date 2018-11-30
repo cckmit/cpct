@@ -6,6 +6,7 @@
  */
 package com.zjtelcom.cpct.service.impl.campaign;
 
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamDirectoryMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamDirectoryDO;
 import com.zjtelcom.cpct.dto.campaign.MktCamDirectory;
@@ -40,9 +41,17 @@ public class MktCamDirectoryServiceImpl implements MktCamDirectoryService {
      */
     @Override
     public Map<String, Object> listAllDirectoryTree() {
-        Map<String, Object> directoryMap = new HashMap<>();
-        List<MktCamDirectory> mktCamDirectoryList = getChildDirectory(0L);
-        directoryMap.put("mktCamDirectoryList", mktCamDirectoryList);
+        Map<String, Object> directoryMap = null;
+        try {
+            directoryMap = new HashMap<>();
+            List<MktCamDirectory> mktCamDirectoryList = getChildDirectory(0L);
+            directoryMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            directoryMap.put("resultMsg", "查询成功！");
+            directoryMap.put("mktCamDirectoryList", mktCamDirectoryList);
+        } catch (Exception e) {
+            directoryMap.put("resultCode", CommonConstant.CODE_FAIL);
+            directoryMap.put("resultMsg", "查询失败！");
+        }
         return directoryMap;
     }
 
