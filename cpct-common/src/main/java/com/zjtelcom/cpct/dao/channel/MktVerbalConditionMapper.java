@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.dao.channel;
 
 
-import com.zjtelcom.cpct.domain.channel.MessageLabel;
 import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

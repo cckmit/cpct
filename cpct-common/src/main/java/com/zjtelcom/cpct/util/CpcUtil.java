@@ -13,13 +13,11 @@ package com.zjtelcom.cpct.util;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-
 import com.zjtelcom.cpct.constants.ResponseCode;
 import com.zjtelcom.cpct.dto.pojo.*;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.NestedRuntimeException;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

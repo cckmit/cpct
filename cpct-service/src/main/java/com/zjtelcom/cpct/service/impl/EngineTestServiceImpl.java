@@ -2,7 +2,6 @@ package com.zjtelcom.cpct.service.impl;
 
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
-import com.ql.util.express.Operator;
 import com.ql.util.express.rule.RuleResult;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.EngineTestService;

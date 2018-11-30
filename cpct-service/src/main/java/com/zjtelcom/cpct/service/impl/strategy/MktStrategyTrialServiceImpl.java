@@ -7,7 +7,6 @@
 package com.zjtelcom.cpct.service.impl.strategy;
 
 import com.zjtelcom.cpct.domain.channel.MktProductRule;
-import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
@@ -15,12 +14,14 @@ import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyTrialService;
 import com.zjtelcom.cpct.util.RedisUtils;
-
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Description:

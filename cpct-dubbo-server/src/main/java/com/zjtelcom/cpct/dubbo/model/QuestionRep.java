@@ -1,11 +1,7 @@
 package com.zjtelcom.cpct.dubbo.model;
 
-import com.zjtelcom.cpct.domain.question.Questionnaire;
-import com.zjtelcom.cpct.dto.question.QuestionVO;
-
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 public class QuestionRep implements Serializable {
     private QuestionnaireVO questionnaire;

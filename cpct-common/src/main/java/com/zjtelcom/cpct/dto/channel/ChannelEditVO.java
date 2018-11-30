@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.dto.channel;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class ChannelEditVO implements Serializable {
     private Long channelId;

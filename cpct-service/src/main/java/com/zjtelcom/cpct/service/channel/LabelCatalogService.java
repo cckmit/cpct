@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.service.channel;
 
 import com.zjtelcom.cpct.domain.channel.LabelCatalog;
-import com.zjtelcom.cpct.dto.channel.LabelAddVO;
 
 import java.util.List;
 import java.util.Map;

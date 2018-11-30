@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.domain.system;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 /**

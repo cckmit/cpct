@@ -17,15 +17,16 @@ import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
 import com.zjtelcom.cpct.dao.user.UserListMapper;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
-import com.zjtelcom.cpct.dto.campaign.MktCampaign;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.ContactEvtItem;
@@ -36,12 +37,9 @@ import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.elastic.service.EsService;
+import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.CopyPropertiesUtil;
-import com.zjtelcom.cpct.util.HttpUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
-import jdk.nashorn.internal.runtime.regexp.joni.Regex;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +47,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
@@ -128,8 +125,17 @@ public class EventApiServiceImpl implements EventApiService {
     @Autowired(required = false)
     private ContactChannelMapper contactChannelMapper; //渠道信息
 
-    @Autowired
+    @Autowired(required = false)
     private TarGrpMapper tarGrpMapper;
+
+    @Autowired(required = false)
+    private MktCamChlResultMapper mktCamChlResultMapper;
+
+    @Autowired(required = false)
+    private MktCamChlResultConfRelMapper mktCamChlResultConfRelMapper;
+
+    @Autowired(required = false)
+    private MktStrategyConfRuleRelMapper mktStrategyConfRuleRelMapper;
 
 
     @Override
@@ -603,20 +609,23 @@ public class EventApiServiceImpl implements EventApiService {
             MktCampaignDO mktCampaign = mktCampaignMapper.selectByPrimaryKey(activityId);
 
             //判断活动状态
-//            if (!"2002".equals(mktCampaign.getStatusCd())) {
-//                esJson.put("hit", "false");
-//                esJson.put("msg", "活动状态未发布");
-//                esService.save(esJson, IndexList.ACTIVITY_MODULE);
-//
-//                System.out.println("活动状态未发布");
-//
-//                return Collections.EMPTY_MAP;
-//            }
+            if (!"2002".equals(mktCampaign.getStatusCd())) {
+                esJson.put("hit", "false");
+                esJson.put("msg", "活动状态未发布");
+                esService.save(esJson, IndexList.ACTIVITY_MODULE);
+
+                System.out.println("活动状态未发布");
+
+                return Collections.EMPTY_MAP;
+            }
 
             privateParams.put("activityId", mktCampaign.getMktCampaignId().toString()); //活动编码
             privateParams.put("activityName", mktCampaign.getMktCampaignName()); //活动名称
             privateParams.put("activityType", mktCampaign.getMktCampaignType()); //活动类型
             privateParams.put("activityEndTime", mktCampaign.getMktCampaignType()); //活动结束时间
+//            if(mktCampaign.get()) {
+//
+//            }
             privateParams.put("skipCheck", "0"); //是否预校验  todo 预校验
 
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -1832,29 +1841,7 @@ public class EventApiServiceImpl implements EventApiService {
     }
 
 
-    /**
-     * 二次协同
-     *
-     * @param map
-     * @return
-     */
-    @Override
-    public Map<String, Object> secondChannelSynergy(Map<String, Object> map) {
 
-        //初始化返回结果
-        Map<String, Object> result = new HashMap();
-
-        // 解析掺入参数'
-        String activityId = (String) map.get("activityId");
-        String ruleId = (String) map.get("ruleId");
-        String resultNbr = (String) map.get("resultNbr");
-        String accNbr = (String) map.get("accNbr");
-        String integrationId = (String) map.get("integrationId");
-        String custId = (String) map.get("custId");
-
-
-        return result;
-    }
 
     private JSONObject getLabelByDubbo(JSONObject param) {
         //查询标签实例数据
@@ -1936,5 +1923,113 @@ public class EventApiServiceImpl implements EventApiService {
         System.out.println(dubboResult.toString());
         return dubboResult;
     }
+
+
+
+
+    /**
+     * 二次协同
+     *
+     * @param
+     * @return
+     */
+    @Override
+    public Map<String, Object> secondChannelSynergy(Map<String, Object> params) {
+
+        //初始化返回结果
+        Map<String, Object> result = new HashMap();
+
+        Long activityId = Long.valueOf((String) params.get("activityId"));
+        Long ruleId = Long.valueOf((String) params.get("ruleId"));
+        String resultNbr = String.valueOf(params.get("resultNbr"));
+        String accNbr = String.valueOf(params.get("accNbr"));
+        String integrationId = String.valueOf(params.get("integrationId"));
+        String custId = String.valueOf(params.get("custId"));
+        // 通过规则Id获取规则下的结果id
+        List<Map<String, Object>> taskChlList = new ArrayList<>();
+        MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleId);
+        if (mktStrategyConfRuleDO != null) {
+            String[] resultIds = mktStrategyConfRuleDO.getMktCamChlResultId().split(",");
+            if (resultIds != null && !"".equals(resultIds[0])) {
+                for (String resultId : resultIds) {
+                    MktCamChlResultDO mktCamChlResultDO = mktCamChlResultMapper.selectByPrimaryKey(Long.valueOf(resultId));
+                    if (resultNbr.equals(mktCamChlResultDO.getReason().toString())) {
+                        // 查询推送渠道
+                        List<MktCamChlResultConfRelDO> mktCamChlResultConfRelDOS = mktCamChlResultConfRelMapper.selectByMktCamChlResultId(mktCamChlResultDO.getMktCamChlResultId());
+                        if (mktCamChlResultConfRelDOS != null && mktCamChlResultConfRelDOS.size() > 0) {
+                            for (MktCamChlResultConfRelDO mktCamChlResultConfRelDO : mktCamChlResultConfRelDOS) {
+                                Map<String, Object> taskChlMap = new HashMap<>();
+                                MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(mktCamChlResultConfRelDO.getEvtContactConfId());
+//                                taskChlMap.put("channelId", mktCamChlConfDO.getContactChlId());
+                                Channel channel = contactChannelMapper.selectByPrimaryKey(mktCamChlConfDO.getContactChlId());
+                                if (channel != null) {
+                                    taskChlMap.put("channelId", channel.getContactChlCode());
+                                    taskChlMap.put("channelConfId", channel.getContactChlId());
+                                } else {
+                                    System.out.println("渠道查询出错，渠道为空");
+                                    continue;
+                                }
+                                taskChlMap.put("pushType", mktCamChlConfDO.getPushType());
+                                taskChlMap.put("pushTime", "");
+                                // 获取属性
+                                List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(mktCamChlConfDO.getEvtContactConfId());
+                                List<Map<String, Object>> taskChlAttrList = new ArrayList<>();
+                                if (mktCamChlConfAttrDOList != null && mktCamChlConfAttrDOList.size() > 0) {
+                                    for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
+                                        Map<String, Object> taskChlAttrMap = new HashMap<>();
+                                        taskChlAttrMap.put("attrId", mktCamChlConfAttrDO.getAttrId());
+                                        taskChlAttrMap.put("attrKey", mktCamChlConfAttrDO.getAttrValueId());
+                                        taskChlAttrMap.put("attrValue", mktCamChlConfAttrDO.getAttrValue());
+                                        // 接触账号
+                                        if (ConfAttrEnum.ACCOUNT.getArrId().equals(mktCamChlConfAttrDO.getAttrId())) {
+                                            taskChlMap.put("contactAccount", mktCamChlConfAttrDO.getAttrValue());
+                                        } else if (ConfAttrEnum.ACCOUNT.getArrId().equals(mktCamChlConfAttrDO.getAttrId())) {
+                                            taskChlMap.put("naireId", mktCamChlConfAttrDO.getAttrValue());
+                                        }
+                                        taskChlAttrList.add(taskChlAttrMap);
+                                    }
+                                }
+                                taskChlMap.put("taskChlAttrList", taskChlAttrList);
+
+                                // 营销服务话术脚本
+                                CamScript camScript = mktCamScriptMapper.selectByConfId(mktCamChlConfDO.getEvtContactConfId());
+                                if(camScript != null) {
+                                    taskChlMap.put("contactScript", camScript.getScriptDesc());
+                                }
+
+                                // 痛痒点话术
+                                List<MktVerbal> verbalList = mktVerbalMapper.findVerbalListByConfId(mktCamChlConfDO.getEvtContactConfId());
+                                if(verbalList!=null && verbalList.size()>0){
+                                    taskChlMap.put("reason", verbalList.get(0)); // 痛痒点话术有多个
+                                }
+                                taskChlList.add(taskChlMap);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO = mktStrategyConfRuleRelMapper.selectByRuleId(ruleId);
+
+        result.put("activityId", activityId);
+
+        if (mktStrategyConfRuleRelDO != null) {
+            result.put("policyId", mktStrategyConfRuleRelDO.getMktStrategyConfId());
+        }
+        result.put("ruleId", ruleId);
+        result.put("taskChlList", taskChlList);
+        if (taskChlList.size() > 0) {
+            result.put("resultCode", 1);
+        } else {
+            result.put("resultCode", 1000);
+        }
+
+        return result;
+    }
+
+
+
+
+
 
 }

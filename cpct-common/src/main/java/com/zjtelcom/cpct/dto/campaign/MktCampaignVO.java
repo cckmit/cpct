@@ -11,7 +11,6 @@ import com.zjtelcom.cpct.dto.event.EventDTO;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 
-import java.util.Date;
 import java.util.List;
 
 /**

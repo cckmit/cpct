@@ -1,11 +1,7 @@
 
 package com.zjtelcom.cpct.dubbo.service;
 
-import com.zjtelcom.cpct.dubbo.model.QryMktCampaignListReq;
-import com.zjtelcom.cpct.dubbo.model.Ret;
 import com.zjtelcom.cpct.dubbo.model.RetCamResp;
-
-import java.util.Map;
 
 /**
  * Description:

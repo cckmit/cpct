@@ -2,10 +2,10 @@ package com.zjtelcom.cpct.dao.event;
 
 import com.zjtelcom.cpct.domain.event.EventDO;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
-import com.zjtelcom.cpct.dto.event.EventList;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
 /**

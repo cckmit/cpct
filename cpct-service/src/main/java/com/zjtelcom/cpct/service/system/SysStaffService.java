@@ -1,9 +1,7 @@
 package com.zjtelcom.cpct.service.system;
 
-import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.system.SysStaffDTO;
 
-import java.util.List;
 import java.util.Map;
 
 

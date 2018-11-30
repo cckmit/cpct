@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.dto.question;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class QuestionDetailVO implements Serializable {
     private Long qstDetailId;

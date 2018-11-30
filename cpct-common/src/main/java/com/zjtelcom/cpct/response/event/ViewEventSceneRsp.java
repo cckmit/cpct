@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.response.event;
 
 import com.zjtelcom.cpct.dto.event.EventSceneDetail;
+
 import java.io.Serializable;
 
 /**

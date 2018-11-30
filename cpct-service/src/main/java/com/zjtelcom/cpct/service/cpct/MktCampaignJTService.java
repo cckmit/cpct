@@ -10,7 +10,6 @@
 package com.zjtelcom.cpct.service.cpct;
 
 
-import com.zjtelcom.cpct.dto.campaign.MktCampaign;
 import com.zjtelcom.cpct.dto.pojo.Result;
 import com.zjtelcom.cpct.pojo.MktCampaignDetailReq;
 

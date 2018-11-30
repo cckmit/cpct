@@ -8,7 +8,6 @@ package com.zjtelcom.cpct.service.grouping;
 
 import com.zjtelcom.cpct.dto.grouping.TarGrpTemplateDetail;
 
-import java.util.List;
 import java.util.Map;
 
 /**
