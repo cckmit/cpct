@@ -18,12 +18,14 @@ public enum ConfAttrEnum {
     END_TIME_1(500600010002L, "结束时间"),
     START_TIME_2(500600010003L, "开始时间"),
     END_TIME_2(500600010004L, "结束时间"),
-    ACCOUNT(500600010005L, "接触账号"),
+    MESSAGE_CODE(500600010005L, "短信发送码"),
     START_DATE(500600010006L, "生效日期"),
     END_DATE(500600010007L, "失效日期"),
-    QUESTION(500600010010L, "调查问卷"),
-    RULE(500600010011L, "协同规则"),
-    PUSH_TYPE(500600010012L, "推送渠道");
+    QUESTION(500600010008L, "调查问卷"),
+    RULE(500600010009L, "协同规则"),
+    PUSH_TYPE(500600010010L, "推送方式"),
+    IVR_NUMBER(500600010011L, "IVR外显号码"),
+    ACCOUNT(500600010012L, "接触账号");
 
     private Long arrId;
     private String arrName;

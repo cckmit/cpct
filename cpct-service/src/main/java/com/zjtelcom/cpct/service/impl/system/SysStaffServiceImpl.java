@@ -51,11 +51,11 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         } catch(Exception e){
             e.printStackTrace();
             logger.error("根据用户名查询用户信息异常,参数={},异常={}",userName);
-            resultMap.put("code", CommonConstant.CODE_FAIL);
-            resultMap.put("msg", "根据用户名查询用户信息失败!");
+            resultMap.put("resultCode", CommonConstant.CODE_FAIL);
+            resultMap.put("resultMsg", "根据用户名查询用户信息失败!");
             return resultMap;
         }
-        resultMap.put("code", CommonConstant.CODE_SUCCESS);
+        resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
         resultMap.put("data", user);
         logger.info("根据用户名查询用户信息,参数={},返回值={}",userName, JSON.toJSONString(user));
         return resultMap;
@@ -262,6 +262,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         SysStaff sysStaff = sysStaffMapper.selectByPrimaryKey(id);
 
         result.put("resultCode",CommonConstant.CODE_SUCCESS);
+        result.put("resultMsg","获取成功");
         result.put("data",sysStaff);
         return result;
     }

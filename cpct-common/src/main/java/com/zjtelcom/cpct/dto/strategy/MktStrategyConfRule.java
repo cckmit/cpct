@@ -31,6 +31,11 @@ public class MktStrategyConfRule {
     private Long StrategyConfId;
 
     /**
+     * 策略配置名称
+     */
+    private String StrategyConfName;
+
+    /**
      * 客户分群配置Id
      */
     private Long tarGrpId;
@@ -113,5 +118,13 @@ public class MktStrategyConfRule {
 
     public void setStrategyConfId(Long strategyConfId) {
         StrategyConfId = strategyConfId;
+    }
+
+    public String getStrategyConfName() {
+        return StrategyConfName;
+    }
+
+    public void setStrategyConfName(String strategyConfName) {
+        StrategyConfName = strategyConfName;
     }
 }

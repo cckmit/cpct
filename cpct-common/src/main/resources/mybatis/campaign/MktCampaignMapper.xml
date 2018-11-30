@@ -31,6 +31,11 @@
         <result column="DIRECTORY_ID" jdbcType="BIGINT" property="directoryId" />
         <result column="CAM_LEVEL" jdbcType="BIGINT" property="camLevel" />
         <result column="IS_CHECK_RULE" jdbcType="VARCHAR" property="isCheckRule" />
+        <result column="SRC_ID" jdbcType="VARCHAR" property="srcId" />
+        <result column="SRC_TYPE" jdbcType="VARCHAR" property="srcType" />
+        <result column="SERVICE_CANCLE_FLAG" jdbcType="BIGINT" property="serviceCancleFlag" />
+        <result column="REGION_ID" jdbcType="BIGINT" property="regionId" />
+        <result column="LIFE_STAGE" jdbcType="VARCHAR" property="lifeStage" />
     </resultMap>
 
     <resultMap id="countResultMap" type="com.zjtelcom.cpct.domain.campaign.MktCampaignCountDO">
@@ -66,7 +71,7 @@
       EXEC_TYPE, EXEC_INVL, EXEC_NUM,
       STATUS_CD, STATUS_DATE, CREATE_STAFF,
       CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
-      REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL, IS_CHECK_RULE)
+      REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL, IS_CHECK_RULE, SRC_TYPE, SRC_ID, SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE)
     values (#{mktCampaignId,jdbcType=BIGINT}, #{tiggerType,jdbcType=VARCHAR}, #{mktCampaignName,jdbcType=VARCHAR},
       #{planBeginTime,jdbcType=DATE}, #{planEndTime,jdbcType=DATE}, #{beginTime,jdbcType=DATE},
       #{endTime,jdbcType=DATE}, #{mktCampaignType,jdbcType=VARCHAR}, #{mktCampaignCategory,jdbcType=VARCHAR},
@@ -76,7 +81,9 @@
       #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT},
       #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP},
       #{remark,jdbcType=VARCHAR}, #{lanId,jdbcType=BIGINT}, #{createChannel,jdbcType=VARCHAR},
-      #{directoryId,jdbcType=BIGINT},#{camLevel,jdbcType=BIGINT}, #{isCheckRule,jdbcType=VARCHAR})
+      #{directoryId,jdbcType=BIGINT},#{camLevel,jdbcType=BIGINT}, #{isCheckRule,jdbcType=VARCHAR},
+      #{srcId,jdbcType=VARCHAR}, #{srcType,jdbcType=VARCHAR}, #{serviceCancleFlag,jdbcType=BIGINT}, #{regionId,jdbcType=BIGINT},
+      #{lifeStage,jdbcType=VARCHAR} )
     </insert>
 
 
@@ -106,11 +113,15 @@
         REMARK = #{remark,jdbcType=VARCHAR},
         CREATE_CHANNEL = #{createChannel,jdbcType=VARCHAR},
         DIRECTORY_ID = #{directoryId,jdbcType=BIGINT},
-        LAN_ID = #{lanId,jdbcType=BIGINT},
+        <if test= "lanId!=null">LAN_ID = #{lanId,jdbcType=BIGINT},</if>
         CAM_LEVEL = #{camLevel,jdbcType=BIGINT},
         IS_CHECK_RULE = #{isCheckRule,jdbcType=VARCHAR},
+        <if test= "srcId!=null"> SRC_ID #{srcId,jdbcType=VARCHAR},</if>
+        <if test= "srcType!=null">SRC_TYPE = #{srcType,jdbcType=VARCHAR},</if>
+        <if test= "serviceCancleFlag!=null">SERVICE_CANCLE_FLAG = #{serviceCancleFlag,jdbcType=BIGINT},</if>
+        <if test= "regionId!=null">REGION_ID = #{regionId,jdbcType=BIGINT},</if>
+        <if test= "lifeStage!=null">LIFE_STAGE = #{lifeStage,jdbcType=VARCHAR},</if>
         UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
-
         where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
     </update>
 
@@ -153,7 +164,8 @@
     select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
     BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, SERVICE_TYPE, MKT_ACTIVITY_NBR,
     MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD,
-    STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL, IS_CHECK_RULE
+    STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID,
+    CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE, SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE
     from mkt_campaign
     where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
     </select>
@@ -162,7 +174,8 @@
     select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
     BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, SERVICE_TYPE, MKT_ACTIVITY_NBR,
     MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD,
-    STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL, IS_CHECK_RULE
+    STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID,
+    CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE, SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE
     from mkt_campaign order by UPDATE_DATE desc
     </select>
 
@@ -273,7 +286,8 @@
         select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
         BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, SERVICE_TYPE, MKT_ACTIVITY_NBR, MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC,
         CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE,
-        UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL, IS_CHECK_RULE
+        UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE,
+        SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE
         from mkt_campaign
         where 1 = 1
         <if test="mktCampaignId != null and mktCampaignId != ''">
@@ -342,6 +356,21 @@
         <if test="isCheckRule != null and isCheckRule != ''">
             AND IS_CHECK_RULE = #{isCheckRule,jdbcType=VARCHAR}
         </if>
+        <if test="srcId != null and srcId != ''">
+          SRC_ID #{srcId,jdbcType=VARCHAR},
+        </if>
+        <if test="srcType != null and srcType != ''">
+          SRC_TYPE = #{srcType,jdbcType=VARCHAR},
+        </if>
+        <if test="serviceCancleFlag != null and serviceCancleFlag != ''">
+          SERVICE_CANCLE_FLAG = #{serviceCancleFlag,jdbcType=BIGINT},
+        </if>
+        <if test="regionId != null and regionId != ''">
+          REGION_ID = #{regionId,jdbcType=BIGINT},
+        </if>
+        <if test="lifeStage != null and lifeStage != ''">
+          LIFE_STAGE =  #{lifeStage,jdbcType=VARCHAR}
+        </if>
         order by UPDATE_DATE desc
     </select>
     
@@ -349,7 +378,8 @@
         select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
         BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, SERVICE_TYPE, MKT_ACTIVITY_NBR, MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC,
         CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE,
-        UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL, IS_CHECK_RULE
+        UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE,
+        SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE
         from mkt_campaign
         where 1 = 1
         <if test="execType != null and execType != ''">

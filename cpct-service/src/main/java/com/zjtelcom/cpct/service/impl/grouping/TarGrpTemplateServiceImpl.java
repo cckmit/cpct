@@ -156,7 +156,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
      * @return
      */
     @Override
-    public Map<String, Object> saveTarGrpTemplate(final TarGrpTemplateDetail tarGrpTemplateDetail) {
+    public Map<String, Object> saveTarGrpTemplate(TarGrpTemplateDetail tarGrpTemplateDetail) {
         Map<String, Object> tarGrpTemplateMap = new HashMap<>();
         TarGrp tarGrpTemplateDO = BeanUtil.create(tarGrpTemplateDetail, new TarGrp());
         tarGrpTemplateDO.setTarGrpName(tarGrpTemplateDetail.getTarGrpTemplateName()==null ? "" : tarGrpTemplateDetail.getTarGrpTemplateName() );
@@ -172,7 +172,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
 
         // 新增目标分群模板
         tarGrpMapper.createTarGrp(tarGrpTemplateDO);
-        Long tarGrpTemplateId = tarGrpTemplateDO.getTarGrpId();
+        final Long tarGrpTemplateId = tarGrpTemplateDO.getTarGrpId();
         // 新增目标分群模板条件
         if (tarGrpTemplateDetail.getTarGrpTemConditionVOList() != null && tarGrpTemplateDetail.getTarGrpTemConditionVOList().size() > 0) {
             for (TarGrpTemConditionVO tarGrpTemConditionVO : tarGrpTemplateDetail.getTarGrpTemConditionVOList()) {
@@ -198,7 +198,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             new Thread(){
                 public void run(){
                     try {
-                        synTarGrpTemplateService.synchronizeSingleTarGrp(tarGrpTemplateDetail.getTarGrpTemplateId(),"");
+                        synTarGrpTemplateService.synchronizeSingleTarGrp(tarGrpTemplateId,"");
                     }catch (Exception e){
                         e.printStackTrace();
                     }
@@ -217,7 +217,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
      * @return
      */
     @Override
-    public Map<String, Object> updateTarGrpTemplate(final TarGrpTemplateDetail tarGrpTemplateDetail) {
+    public Map<String, Object> updateTarGrpTemplate(TarGrpTemplateDetail tarGrpTemplateDetail) {
 
         Map<String, Object> tarGrpTemplateMap = new HashMap<>();
         if (tarGrpTemplateDetail.getTarGrpType()!=null && tarGrpTemplateDetail.getTarGrpType().equals("2000")){
@@ -233,7 +233,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         tarGrpTemplateDO.setUpdateDate(new Date());
         tarGrpTemplateDO.setUpdateStaff(UserUtil.loginId());
         tarGrpMapper.modTarGrp(tarGrpTemplateDO);
-        Long tarGrpTemplateId = tarGrpTemplateDetail.getTarGrpTemplateId();
+        final Long tarGrpTemplateId = tarGrpTemplateDetail.getTarGrpTemplateId();
         // 获取原有的标签条件
         List<TarGrpCondition> tarGrpTemplateConditionDOList = tarGrpConditionMapper.listTarGrpCondition(tarGrpTemplateId);
         List<Long> conditionIdList = new ArrayList<>();
@@ -285,7 +285,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             new Thread(){
                 public void run(){
                     try {
-                        synTarGrpTemplateService.synchronizeSingleTarGrp(tarGrpTemplateDetail.getTarGrpTemplateId(),"");
+                        synTarGrpTemplateService.synchronizeSingleTarGrp(tarGrpTemplateId,"");
                     }catch (Exception e){
                         e.printStackTrace();
                     }

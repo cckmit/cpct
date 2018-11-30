@@ -7,6 +7,7 @@
 package com.zjtelcom.cpct.controller.strategy;
 
 import com.alibaba.fastjson.JSON;
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,12 +91,18 @@ public class MktStrategyConRulController {
     @RequestMapping(value = "/copyMktStrategyConfRule", method = RequestMethod.POST)
     @CrossOrigin
     public String copyMktStrategyConfRule(@RequestBody MktStrategyConfRule mktStrategyConfRule) throws Exception {
-        List<MktStrategyConfRule> mktStrategyConfRuleList = new ArrayList<>();
-        mktStrategyConfRuleList.add(mktStrategyConfRule);
-        Map<String, Object> ruleListMap = mktStrategyConfRuleService.copyMktStrategyConfRule(mktStrategyConfRuleList);
-        List<MktStrategyConfRule> ruleList = (List<MktStrategyConfRule>) ruleListMap.get("mktStrategyConfRuleList");
         Map<String, Object> ruleMap = new HashMap<>();
-        ruleMap.put("mktStrategyConfRule", ruleList.get(0));
+        try {
+            List<MktStrategyConfRule> mktStrategyConfRuleList = new ArrayList<>();
+            mktStrategyConfRuleList.add(mktStrategyConfRule);
+            Map<String, Object> ruleListMap = mktStrategyConfRuleService.copyMktStrategyConfRule(mktStrategyConfRuleList);
+            List<MktStrategyConfRule> ruleList = (List<MktStrategyConfRule>) ruleListMap.get("mktStrategyConfRuleList");
+            ruleMap.put("mktStrategyConfRule", ruleList.get(0));
+            ruleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+        } catch (Exception e) {
+            ruleMap.put("resultCode", CommonConstant.CODE_FAIL);
+            e.printStackTrace();
+        }
         return JSON.toJSONString(ruleMap);
     }
 
