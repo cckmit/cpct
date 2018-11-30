@@ -568,7 +568,7 @@ public class EventApiServiceImpl implements EventApiService {
 
             //返回结果
             result.put("taskList", activityList); //协同回调结果
-            System.out.println(result.toString());
+            System.out.println("命中结果：" + result.toString());
             return result;
         }
     }
