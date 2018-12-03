@@ -118,6 +118,9 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
     @Autowired
     private MktCamStrategyRelMapper mktCamStrategyRelMapper;
 
+    @Autowired
+    private MktCamGrpRulMapper mktCamGrpRulMapper;
+
     /**
      * 添加策略规则
      *
@@ -129,6 +132,19 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();
         MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
         try {
+            //添加mkt_cam_grp_rul表
+            MktCamGrpRul mktCamGrpRul = new MktCamGrpRul();
+            mktCamGrpRul.setTarGrpId(mktStrategyConfRule.getTarGrpId());
+            mktCamGrpRul.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
+            mktCamGrpRul.setLanId(1L);
+            mktCamGrpRul.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+            mktCamGrpRul.setStatusDate(new Date());
+            mktCamGrpRul.setCreateDate(new Date());
+            mktCamGrpRul.setCreateStaff(UserUtil.loginId());
+            mktCamGrpRul.setUpdateDate(new Date());
+            mktCamGrpRul.setUpdateStaff(UserUtil.loginId());
+            mktCamGrpRulMapper.insert(mktCamGrpRul);
+
             CopyPropertiesUtil.copyBean2Bean(mktStrategyConfRuleDO, mktStrategyConfRule);
             String productIds = "";
             String evtContactConfIds = "";
