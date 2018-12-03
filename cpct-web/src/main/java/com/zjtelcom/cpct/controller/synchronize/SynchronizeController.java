@@ -1062,7 +1062,7 @@ public class SynchronizeController extends BaseController {
     @PostMapping("/synchronizeCampaign")
     @CrossOrigin
     public String synchronizeCampaignServiceImpl(@RequestBody Map<String, Object> params) throws Exception {
-        Long mktCampaignId = Long.valueOf((Integer) params.get("id"));
+        Long mktCampaignId = Long.valueOf((Integer) params.get("mktCampaignId"));
         String roleName = getRole();   //  操作角色
         Map<String, Object> synchronizeCampaignMap = synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
         return JSON.toJSONString(synchronizeCampaignMap);
