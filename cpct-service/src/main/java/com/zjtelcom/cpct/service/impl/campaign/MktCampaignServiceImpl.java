@@ -156,7 +156,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setLanId(1L);
             mktCampaignMapper.insert(mktCampaignDO);
             Long mktCampaignId = mktCampaignDO.getMktCampaignId();
-
+            // 活动编码
+            mktCampaignDO.setMktActivityNbr("MKT" + String.format("%06d", mktCampaignId));
+            mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
             // 创建二次营销活动
 
             if (mktCampaignVO.getPreMktCampaignId() != null && (mktCampaignVO.getPreMktCampaignId() != 0)) {
@@ -477,6 +479,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         // 删除活动基本信息
         try {
             mktCampaignMapper.deleteByPrimaryKey(mktCampaignId);
+            // 删除活动与事件的关系
+            mktCamEvtRelMapper.deleteByMktCampaignId(mktCampaignId);
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
             maps.put("resultMsg", "删除成功！");
             maps.put("mktCampaignId", mktCampaignId);
