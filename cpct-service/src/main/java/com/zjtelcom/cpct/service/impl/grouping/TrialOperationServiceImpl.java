@@ -444,7 +444,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         trialOp.setCampaignName(campaign.getMktCampaignName());
         trialOp.setStrategyName(strategy.getMktStrategyConfName());
         trialOp.setBatchNum(Long.valueOf(batchNumSt));
-        trialOp.setCreateDate(new Date(3));
+        trialOp.setCreateDate(new Date());
         trialOp.setStatusCd("1000");
         trialOperationMapper.insert(trialOp);
         operationVO.setTrialId(trialOp.getId());
@@ -521,12 +521,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             }
             if (!response.getResultCode().equals(CODE_SUCCESS)) {
                 trialOperation.setStatusCd("2000");
-                trialOperation.setUpdateDate(new Date(3));
+                trialOperation.setUpdateDate(new Date());
                 trialOperation.setRemark(response.getResultMsg());
                 trialOperationMapper.updateByPrimaryKey(trialOperation);
             } else {
                 trialOperation.setStatusCd("3000");
-                trialOperation.setUpdateDate(new Date(3));
+                trialOperation.setUpdateDate(new Date());
                 trialOperation.setRemark(response.getResultMsg());
                 trialOperationMapper.updateByPrimaryKey(trialOperation);
             }
@@ -534,7 +534,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             e.printStackTrace();
             // 抽样试算失败
             trialOperation.setStatusCd("2000");
-            trialOperation.setUpdateDate(new Date(3));
+            trialOperation.setUpdateDate(new Date());
             trialOperation.setRemark("ES查询错误");
             trialOperationMapper.updateByPrimaryKey(trialOperation);
         }
