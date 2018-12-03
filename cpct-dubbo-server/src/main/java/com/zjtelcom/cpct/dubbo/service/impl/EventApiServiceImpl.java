@@ -629,7 +629,7 @@ public class EventApiServiceImpl implements EventApiService {
 
             privateParams.put("activityId", mktCampaign.getMktCampaignId().toString()); //活动编码
             privateParams.put("activityName", mktCampaign.getMktCampaignName()); //活动名称
-            if ("2000".equals(mktCampaign.getMktCampaignType())) {
+            if ("1000".equals(mktCampaign.getMktCampaignType())) {
                 privateParams.put("activityType", "0"); //营销
             } else if ("5000".equals(mktCampaign.getMktCampaignType())) {
                 privateParams.put("activityType", "1"); //服务
