@@ -234,7 +234,7 @@ public class EsServiceImpl implements EsService {
         response.setLabelInfo(labelInfo);
         response.setEventInfo(eventList.get(0));
         response.setTotal(totalModels);
-        result.put("resultCode","0");
+        result.put("resultCode","200");
         result.put("resultMsg",response);
         return result;
     }
@@ -264,7 +264,7 @@ public class EsServiceImpl implements EsService {
                 labelInfo.put("labelResultList",labelResults);
             }
         }
-        result.put("rusultCode","0");
+        result.put("rusultCode","200");
         result.put("resultMsg",labelInfo);
         return result;
     }

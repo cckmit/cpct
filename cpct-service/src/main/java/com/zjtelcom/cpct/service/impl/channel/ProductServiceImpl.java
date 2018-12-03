@@ -6,10 +6,12 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
 import com.zjtelcom.cpct.dao.channel.MktProductRuleMapper;
+import com.zjtelcom.cpct.dao.channel.MktResourceMapper;
 import com.zjtelcom.cpct.dao.channel.OfferMapper;
 import com.zjtelcom.cpct.dao.channel.PpmProductMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.channel.MktProductRule;
+import com.zjtelcom.cpct.domain.channel.MktResource;
 import com.zjtelcom.cpct.domain.channel.Offer;
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
@@ -40,6 +42,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     private MktStrategyConfRuleService strategyConfRuleService;
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired
+    private MktResourceMapper resourceMapper;
 
 
     @Override
@@ -213,23 +217,41 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 result.put("resultMsg","推荐条目不存在");
                 return result;
             }
-            Offer product = productMapper.selectByPrimaryKey(Integer.valueOf(item.getItemId().toString()));
-            if (product==null){
-                continue;
+            //销售品
+            if (item.getItemType().equals("1000")){
+                Offer product = productMapper.selectByPrimaryKey(Integer.valueOf(item.getItemId().toString()));
+                if (product==null){
+                    continue;
+                }
+                MktProductRule rule = new MktProductRule();
+                rule.setId(item.getMktCamItemId());
+                rule.setProductId(item.getItemId());
+                rule.setProductName(product.getOfferName());
+                rule.setProductCode(product.getOfferNbr());
+                rule.setProductType(product.getOfferType());
+                rule.setRemark(item.getRemark());
+                rule.setItemType(item.getItemType()==null ? "" : item.getItemType());
+                rule.setPriority(item.getPriority()==null ? 0 : item.getPriority());
+                if (item.getPriority()!=null){
+                    rule.setPriority(item.getPriority());
+                }
+                ruleList.add(rule);
+            }else if (item.getItemType().equals("2000")){
+                //促销券
+                MktResource resource = resourceMapper.selectByPrimaryKey(item.getItemId());
+                if (resource==null){
+                    continue;
+                }
+                MktProductRule rule = new MktProductRule();
+                rule.setId(item.getMktCamItemId());
+                rule.setProductId(item.getItemId());
+                rule.setProductName(resource.getMktResName());
+                rule.setProductCode(resource.getMktResNbr());
+                rule.setRemark(item.getRemark());
+                rule.setItemType(item.getItemType()==null ? "" : item.getItemType());
+                rule.setPriority(item.getPriority()==null ? 0 : item.getPriority());
+                ruleList.add(rule);
             }
-            MktProductRule rule = new MktProductRule();
-            rule.setId(item.getMktCamItemId());
-            rule.setProductId(item.getItemId());
-            rule.setProductName(product.getOfferName());
-            rule.setProductCode(product.getOfferNbr());
-            rule.setProductType(product.getOfferType());
-            rule.setRemark(item.getRemark());
-            rule.setItemType(item.getItemType()==null ? "" : item.getItemType());
-            rule.setPriority(item.getPriority()==null ? 0 : item.getPriority());
-            if (item.getPriority()!=null){
-                rule.setPriority(item.getPriority());
-            }
-            ruleList.add(rule);
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",ruleList);

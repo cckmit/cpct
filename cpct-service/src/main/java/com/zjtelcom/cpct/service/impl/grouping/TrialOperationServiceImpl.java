@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.service.impl.grouping;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.google.gson.JsonObject;
 import com.sun.corba.se.spi.ior.ObjectKey;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
@@ -554,7 +555,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             codeList.add(labelDTO.getLabelCode());
         }
         List<String> ruleCodeList = (List<String>) redisUtils.hgetAllRedisList("LABEL_CODE_"+strategy.getMktStrategyConfId());
-
+        logger.info("*********** 试算获取全部标签条件编码 ："+JSON.toJSONString(ruleCodeList));
         //添加固定查询标签
         if (!codeList.contains("ACCS_NBR")){
             codeList.add("ACC_NBR");
@@ -839,7 +840,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         for (TrialOperation trialOperation : trialOperations) {
             TrialOperationDetail detail = BeanUtil.create(trialOperation, new TrialOperationDetail());
             if (trialOperation.getUpdateDate() != null) {
-
                 Double cost =  ((double)(trialOperation.getUpdateDate().getTime() - trialOperation.getCreateDate().getTime()) / 1000);
                 DecimalFormat df = new DecimalFormat("#.00");
                 detail.setCost(df.format(cost) + "s");
