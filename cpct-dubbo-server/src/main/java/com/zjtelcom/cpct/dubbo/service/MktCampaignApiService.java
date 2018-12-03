@@ -21,4 +21,6 @@ public interface MktCampaignApiService {
     RetCamResp qryMktCampaignDetail(Long mktCampaignId) throws Exception;
 
 
+
+
 }
