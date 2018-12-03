@@ -49,9 +49,10 @@ public class TarGrpTemplateController {
                 maps.put("resultMsg","请求需求涵不存在!");
                 return maps;
             }
-            Long requestId = Long.valueOf(param.get("requestId").toString());
+            Long requestId = Long.valueOf(param.get("requestid").toString());
             maps = tarGrpTemplateService.getTarGrpTemByOfferId(requestId);
         } catch (Exception e) {
+            e.printStackTrace();
             maps.put("resultCode",CODE_FAIL);
             maps.put("resultMsg","查询失败");
             return maps;

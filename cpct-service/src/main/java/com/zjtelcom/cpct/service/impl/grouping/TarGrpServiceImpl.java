@@ -360,13 +360,14 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                     condition.setStatusDate(DateUtil.getCurrentTime());
                     condition.setUpdateStaff(UserUtil.loginId());
                     condition.setCreateStaff(UserUtil.loginId());
-                    condition.setStatusCd(STATUSCD_EFFECTIVE);
+                    condition.setStatusCd(tarGrpCondition.getStatusCd()==null ? STATUSCD_EFFECTIVE : tarGrpCondition.getStatusCd());
                     insertConditions.add(condition);
                 } else {
-                    tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
-                    tarGrpCondition.setUpdateStaff(UserUtil.loginId());
-                    tarGrpConditionMapper.modTarGrpCondition(tarGrpCondition);
-                    allCondition.add(tarGrpCondition);
+                    BeanUtil.copy(tarGrpCondition,tarGrpCondition1);
+                    tarGrpCondition1.setUpdateDate(DateUtil.getCurrentTime());
+                    tarGrpCondition1.setUpdateStaff(UserUtil.loginId());
+                    tarGrpConditionMapper.modTarGrpCondition(tarGrpCondition1);
+                    allCondition.add(tarGrpCondition1);
                 }
             }
             if (!insertConditions.isEmpty()){
@@ -396,6 +397,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
             maps.put("resultMsg", "修改成功！");
         } catch (Exception e) {
+            e.printStackTrace();
             maps.put("resultCode", CommonConstant.CODE_FAIL);
             maps.put("resultMsg", "修改失败！");
         }
@@ -475,13 +477,6 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(label.getInjectionLabelId());
             List<LabelValueVO> valueList = ChannelUtil.valueList2VOList(labelValues);
             tarGrpConditionVO.setLeftParamName(label.getInjectionLabelName());
-            //塞入领域
-//            FitDomain fitDomain = null;
-//            if (label.getFitDomain() != null) {
-//                fitDomain = FitDomain.getFitDomain(Integer.parseInt(label.getFitDomain()));
-//                tarGrpConditionVO.setFitDomainId(Long.valueOf(fitDomain.getValue()));
-//                tarGrpConditionVO.setFitDomainName(fitDomain.getDescription());
-//            }
             //将操作符转为中文
             if (tarGrpConditionVO.getOperType()!=null && !tarGrpConditionVO.getOperType().equals("")){
                 Operator op = Operator.getOperator(Integer.parseInt(tarGrpConditionVO.getOperType()));
