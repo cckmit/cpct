@@ -1782,6 +1782,7 @@ public class EventApiServiceImpl implements EventApiService {
             //查询渠道id
             channel.put("channelConfId", channelMessage.getContactChlId().toString()); //渠道id
             channel.put("pushType", mktCamChlConfDetail.getPushType()); //推送类型
+
             channel.put("pushTime", ""); // 推送时间
 
             //返回结果中添加销售品信息
