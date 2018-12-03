@@ -116,11 +116,6 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                 TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(restrict.getRstrObjId());
                 if (tarGrp!=null){
                     instVO.setTarGrpTempleteId(tarGrp.getTarGrpId());
-//                    Map<String,Object> targrpMap = tarGrpService.listTarGrpCondition(restrict.getRstrObjId());
-//                    List<TarGrpConditionVO> voList = ( List<TarGrpConditionVO>)targrpMap.get("listTarGrpCondition");
-//                    TarGrpVO vo = BeanUtil.create(tarGrp,new TarGrpVO());
-//                    vo.setTarGrpConditionVOs(voList);
-//                    tarGrpVOS.add(vo);
                 }
             }
             //营销资源列表
@@ -140,6 +135,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                 Channel channel = channelMapper.selectByPrimaryKey(systemRel.getOfferVrulGrpId());
                 if (channel!=null){
                     channelList.add(channel.getContactChlId());
+
                 }
             }
             instVO.setChannelList(channelList);

@@ -1,40 +1,62 @@
 package com.zjtelcom.cpct.dubbo.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
-import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
-import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
-import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
+import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
+import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
+import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
+import com.zjtelcom.cpct.dao.org.OrgTreeMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
+import com.zjtelcom.cpct.dao.synchronize.SynchronizeRecordMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.Rule;
 import com.zjtelcom.cpct.domain.RuleDetail;
 import com.zjtelcom.cpct.domain.campaign.*;
-import com.zjtelcom.cpct.domain.channel.Channel;
-import com.zjtelcom.cpct.domain.channel.Label;
-import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
+import com.zjtelcom.cpct.domain.channel.*;
+import com.zjtelcom.cpct.domain.org.OrgTreeDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyFilterRuleRelDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
-import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
+import com.zjtelcom.cpct.dto.campaign.*;
+import com.zjtelcom.cpct.dto.channel.VerbalAddVO;
+import com.zjtelcom.cpct.dto.channel.VerbalConditionAddVO;
+import com.zjtelcom.cpct.dto.channel.VerbalConditionVO;
+import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.filter.FilterRuleModel;
+import com.zjtelcom.cpct.dto.grouping.TarGrp;
+import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
+import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
+import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRuleRel;
+import com.zjtelcom.cpct.dto.synchronize.SynchronizeRecord;
 import com.zjtelcom.cpct.dubbo.model.*;
+import com.zjtelcom.cpct.dubbo.model.MktCamChlConfDetail;
+import com.zjtelcom.cpct.dubbo.model.MktCamChlResult;
 import com.zjtelcom.cpct.dubbo.service.MktCampaignApiService;
-import com.zjtelcom.cpct.enums.ParamKeyEnum;
-import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.CopyPropertiesUtil;
+import com.zjtelcom.cpct.enums.*;
+import com.zjtelcom.cpct.util.*;
+import com.zjtelcom.cpct_prd.dao.campaign.*;
+import com.zjtelcom.cpct_prd.dao.channel.MktCamScriptPrdMapper;
+import com.zjtelcom.cpct_prd.dao.channel.MktVerbalConditionPrdMapper;
+import com.zjtelcom.cpct_prd.dao.channel.MktVerbalPrdMapper;
+import com.zjtelcom.cpct_prd.dao.grouping.TarGrpConditionPrdMapper;
+import com.zjtelcom.cpct_prd.dao.grouping.TarGrpPrdMapper;
+import com.zjtelcom.cpct_prd.dao.strategy.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -84,21 +106,93 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
      */
     @Autowired
     private MktCamChlConfMapper mktCamChlConfMapper;
-
     @Autowired
     private FilterRuleMapper filterRuleMapper;
-
     @Autowired
     private MktCamChlResultMapper mktCamChlResultMapper;
-
     @Autowired
     private MktCamChlResultConfRelMapper mktCamChlResultConfRelMapper;
-
     @Autowired
     private MktVerbalConditionMapper mktVerbalConditionMapper;
-
     @Autowired
     private InjectionLabelMapper injectionLabelMapper;
+    @Autowired
+    private MktCampaignRelMapper mktCampaignRelMapper;
+    @Autowired
+    private MktCamEvtRelMapper mktCamEvtRelMapper;
+    @Autowired
+    private MktCamCityRelMapper mktCamCityRelMapper;
+    @Autowired
+    private MktStrategyConfRuleRelMapper mktStrategyConfRuleRelMapper;
+    @Autowired
+    private MktCampaignPrdMapper mktCampaignPrdMapper;
+    @Autowired
+    private MktCamCityRelPrdMapper mktCamCityRelPrdMapper;
+    @Autowired
+    private MktCamEvtRelPrdMapper mktCamEvtRelPrdMapper;
+    @Autowired
+    private MktCamStrategyConfRelPrdMapper mktCamStrategyConfRelPrdMapper;
+    @Autowired
+    private MktStrategyConfPrdMapper mktStrategyConfPrdMapper;
+    @Autowired
+    private MktStrategyConfRulePrdMapper mktStrategyConfRulePrdMapper;
+    @Autowired
+    private MktStrategyConfRuleRelPrdMapper mktStrategyConfRuleRelPrdMapper;
+    @Autowired
+    private MktStrategyConfRegionRelPrdMapper mktStrategyConfRegionRelPrdMapper;
+    @Autowired
+    private MktStrategyFilterRuleRelMapper mktStrategyFilterRuleRelMapper;
+    @Autowired
+    private MktStrategyFilterRuleRelPrdMapper mktStrategyFilterRuleRelPrdMapper;
+    @Autowired
+    private TarGrpMapper tarGrpMapper;
+    @Autowired
+    private TarGrpPrdMapper tarGrpPrdMapper;
+    @Autowired
+    private TarGrpConditionMapper tarGrpConditionMapper;
+    @Autowired
+    private TarGrpConditionPrdMapper tarGrpConditionPrdMapper;
+    @Autowired
+    private MktCamItemMapper mktCamItemMapper;
+    @Autowired
+    private MktCamItemPrdMapper mktCamItemPrdMapper;
+    @Autowired
+    private MktCamChlConfPrdMapper mktCamChlConfPrdMapper;
+    @Autowired
+    private MktCamChlConfAttrMapper mktCamChlConfAttrMapper;
+    @Autowired
+    private MktCamChlConfAttrPrdMapper mktCamChlConfAttrPrdMapper;
+    @Autowired
+    private MktCamChlResultPrdMapper mktCamChlResultPrdMapper;
+    @Autowired
+    private MktCamChlResultConfRelPrdMapper mktCamChlResultConfRelPrdMapper;
+    @Autowired
+    private MktVerbalPrdMapper mktVerbalPrdMapper;
+    @Autowired
+    private MktVerbalConditionPrdMapper mktVerbalConditionPrdMapper;
+    @Autowired
+    private MktCamScriptPrdMapper mktCamScriptPrdMapper;
+    @Autowired
+    private RedisUtils redisUtils;
+    @Autowired
+    private OrgTreeMapper orgTreeMapper;
+    @Autowired
+    private MktCamItemMapper camItemMapper;
+    @Autowired
+    private MktVerbalMapper verbalMapper;
+    @Autowired
+    private MktVerbalConditionMapper verbalConditionMapper;
+    @Autowired
+    private MktCamScriptMapper camScriptMapper;
+    @Autowired
+    private SynchronizeRecordMapper synchronizeRecordMapper;
+    @Autowired
+    private RedisUtils_prd redisUtils_prd;
+
+    //同步表名
+    private static final String tableName = "mkt_campaign";
+
+
 
     @Override
     public RetCamResp qryMktCampaignDetail(Long mktCampaignId) throws Exception {
@@ -222,98 +316,6 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
         return mktCamChlConfDetail;
     }
 
-    /**
-     * 查询协同子策略规则并拼接格式
-     *
-     * @param evtContactConfId
-     * @return
-     */
 
-    public String ruleSelect(Long evtContactConfId) {
-        //唯一ID
-        //查询出所有规则
-        List<MktVerbalCondition> mktVerbalConditions = mktVerbalConditionMapper.findConditionListByVerbalId(evtContactConfId);
-        List<MktVerbalCondition> labels = new ArrayList<>(); //标签因子
-        List<MktVerbalCondition> expressions = new ArrayList<>(); //表达式
-
-        //分类
-        for (MktVerbalCondition mktVerbalCondition : mktVerbalConditions) {
-            if ("1000".equals(mktVerbalCondition.getLeftParamType())) {
-                labels.add(mktVerbalCondition);
-            } else if ("2000".equals(mktVerbalCondition.getLeftParamType())) {
-                expressions.add(mktVerbalCondition);
-            }
-        }
-        Rule rule = parseRules(labels, expressions, 0);
-        return JSON.toJSONString(rule);
-    }
-
-    /**
-     * 递归查询规则
-     *
-     * @param labels
-     * @param expressions
-     * @param index
-     * @return
-     */
-
-    public Rule parseRules(List<MktVerbalCondition> labels, List<MktVerbalCondition> expressions, int index) {
-        Rule rule = new Rule();
-        List<RuleDetail> ruleDetails = new ArrayList<>();
-        RuleDetail ruleDetail;
-
-        //遍历所有表达式
-        if (expressions.size() > 0) {
-            rule.setType(expressions.get(index).getOperType());
-            for (int i = index; i < expressions.size(); i++) {
-                //判断类型  如果不相同就进入下一级
-                if (rule.getType().equals(expressions.get(i).getOperType())) {
-                    for (MktVerbalCondition condition : labels) {
-                        if (expressions.get(i).getLeftParam().equals(condition.getConditionId().toString()) || expressions.get(i).getRightParam().equals(condition.getConditionId().toString())) {
-                            ruleDetail = new RuleDetail();
-                            ruleDetail.setId(Integer.parseInt(condition.getLeftParam()));
-                            //查询获取标签因子名称
-                            Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(condition.getLeftParam()));
-                            if (label != null) {
-                                ruleDetail.setName(label.getInjectionLabelName());
-                            } else {
-                                ruleDetail.setName("");
-                            }
-                            ruleDetail.setContent(condition.getRightParam());
-                            ruleDetail.setOperType(condition.getOperType());
-                            ruleDetails.add(ruleDetail);
-                        }
-                    }
-                } else {
-                    rule.setRuleChildren(parseRules(labels, expressions, i));
-                    break;
-                }
-            }
-        }
-
-        //判断是否是一个标签的情况
-        if (labels.size() == 1) {
-            rule.setType("1000");
-            ruleDetail = new RuleDetail();
-            ruleDetail.setId(Integer.parseInt(labels.get(0).getLeftParam()));
-            //查询获取标签因子名称
-            Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(labels.get(0).getLeftParam()));
-            if (label != null) {
-                ruleDetail.setName(label.getInjectionLabelName());
-            } else {
-                ruleDetail.setName("");
-            }
-            ruleDetail.setContent(labels.get(0).getRightParam());
-            ruleDetail.setOperType(labels.get(0).getOperType());
-            ruleDetails.add(ruleDetail);
-        }
-
-        if (ruleDetails.size() == 0) {
-            return null;
-        }
-
-        rule.setListData(ruleDetails);
-        return rule;
-    }
 
 }

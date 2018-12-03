@@ -885,9 +885,13 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     tarGrpDetailList.add(grpDetail);
                 }
                 tarGrpMap.put("tarGrpDetailList", tarGrpDetailList);
+                tarGrpMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+                tarGrpMap.put("resultMsg", "批量插入成功！");
             }
         } catch (Exception e) {
-            logger.error("Exception = ", e);
+            logger.error("[op:deleteTarGrpBatch],批量插入客户分群失败! Exception = ", e);
+            tarGrpMap.put("resultCode", CommonConstant.CODE_FAIL);
+            tarGrpMap.put("resultMsg", "批量插入失败！");
         }
         return tarGrpMap;
     }
@@ -988,9 +992,13 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     tarGrpDetailList.add(grpDetail);
                 }
                 tarGrpMap.put("tarGrpDetailList", tarGrpDetailList);
+                tarGrpMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+                tarGrpMap.put("resultMsg", "批量修改成功！");
             }
         } catch (Exception e) {
-            logger.error("Exception = ", e);
+            logger.error("[op:deleteTarGrpBatch],批量修改客户分群失败! Exception = ", e);
+            tarGrpMap.put("resultCode", CommonConstant.CODE_FAIL);
+            tarGrpMap.put("resultMsg", "批量修改失败！");
         }
         return tarGrpMap;
     }
@@ -1068,9 +1076,13 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     tarGrpDetailList.add(grpDetail);
                 }
                 tarGrpMap.put("tarGrpDetailList", tarGrpDetailList);
+                tarGrpMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+                tarGrpMap.put("resultMsg", "批量删除成功！");
             }
         } catch (Exception e) {
-            logger.error("Exception = ", e);
+            logger.error("[op:deleteTarGrpBatch],批量删除客户分群失败! Exception = ", e);
+            tarGrpMap.put("resultCode", CommonConstant.CODE_FAIL);
+            tarGrpMap.put("resultMsg", "批量删除失败！");
         }
         return tarGrpMap;
     }

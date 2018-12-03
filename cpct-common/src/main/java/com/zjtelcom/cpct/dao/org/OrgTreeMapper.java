@@ -2,7 +2,9 @@ package com.zjtelcom.cpct.dao.org;
 
 import com.zjtelcom.cpct.domain.org.OrgTree;
 import com.zjtelcom.cpct.domain.org.OrgTreeDO;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -11,6 +13,8 @@ import java.util.List;
  * @Date: 2018/9/30
  * @Description:
  */
+@Mapper
+@Repository
 public interface OrgTreeMapper {
 
     int deleteByPrimaryKey(Integer areaId);

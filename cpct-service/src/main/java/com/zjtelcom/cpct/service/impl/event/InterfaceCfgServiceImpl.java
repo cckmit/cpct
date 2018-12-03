@@ -15,6 +15,7 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.InterfaceCfgService;
 import com.zjtelcom.cpct.service.synchronize.SynInterfaceCfgService;
 import com.zjtelcom.cpct.util.BeanUtil;
+import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,7 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
             return result;
         }
         final InterfaceCfg ic = BeanUtil.create(interfaceCfg,new InterfaceCfg());
+        ic.setInterfaceNbr("IF"+DateUtil.date2String(new Date())+ChannelUtil.getRandomStr(3));
         ic.setCreateDate(DateUtil.getCurrentTime());
         ic.setUpdateDate(DateUtil.getCurrentTime());
         ic.setStatusDate(DateUtil.getCurrentTime());

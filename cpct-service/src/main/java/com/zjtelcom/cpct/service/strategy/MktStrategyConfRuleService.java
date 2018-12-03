@@ -31,10 +31,10 @@ public interface MktStrategyConfRuleService {
 
     Map<String, Object> deleteTarGrpBatch(List<Integer> ruleIdList, Long tarGrpNewId);
 
-    public Map<String, Object> insertCamItemBatch(List<Integer> ruleIdList, List<Integer> camitemIdList);
+    Map<String, Object> insertCamItemBatch(List<Integer> ruleIdList, List<Integer> camitemIdList);
 
-    public Map<String, Object> updateCamItemBatch(List<Integer> ruleIdList, List<Integer> camitemIdList);
+    Map<String, Object> updateCamItemBatch(List<Integer> ruleIdList, List<Integer> camitemIdList);
 
-    public Map<String, Object> deleteCamItemBatch(List<Integer> ruleIdList, List<Integer> camitemIdList);
+    Map<String, Object> deleteCamItemBatch(List<Integer> ruleIdList, List<Integer> camitemIdList);
 
 }
