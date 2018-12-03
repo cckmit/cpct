@@ -365,7 +365,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
      */
     @Transactional(readOnly = false)
     @Override
-    public Map<String, Object> closeEvent(Long contactEvtId, String statusCd) {
+    public Map<String, Object> closeEvent(final Long contactEvtId, String statusCd) {
         Map<String, Object> map = new HashMap<>();
         ContactEvt evt = contactEvtMapper.getEventById(contactEvtId);
         if (evt==null){
@@ -379,6 +379,18 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             map.put("resultMsg","开启成功");
         }else {
             map.put("resultMsg","关闭成功");
+        }
+        //事件关闭开启 同步状态到生产
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synContactEvtService.synchronizeSingleEvent(contactEvtId,"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
         }
         return map;
     }
