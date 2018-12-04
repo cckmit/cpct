@@ -2,8 +2,8 @@ package com.zjtelcom.cpct.dubbo.service;
 
 import java.util.Map;
 
-public interface MktcampaignSyncApiService {
+public interface MktCampaignSyncApiService {
 
-    Map<String, Object> publishMktCampaign(Long mktCampaignId);
+    Map<String, Object> publishMktCampaign(Long requestId);
 
 }
