@@ -57,7 +57,7 @@ public class EsServiceImpl implements EsService {
         jsonObject.put("dateSt2","2018-04-25T08:33:44.840Z");
 
 
-        String id = ElasticsearchUtil.addData(jsonObject, "test_hyf", esType, jsonObject.getString("id"));
+        String id = ElasticsearchUtil.addData(jsonObject, "params_module", esType, jsonObject.getString("id"));
         System.out.println("*********ID**********: "+id);
     }
 
@@ -85,7 +85,7 @@ public class EsServiceImpl implements EsService {
         for (int i = 0;i<eventList.size();i++){
             isiList.add(eventList.get(i).get("ISI").toString());
         }
-        result.put("resultCode","0");
+        result.put("resultCode","200");
         result.put("resultMsg","命中");
         result.put("total",hits.getTotalHits());
         result.put("ISI",isiList);
@@ -124,7 +124,7 @@ public class EsServiceImpl implements EsService {
             eventList.add(stringMap);
         }
         if (eventList.isEmpty()){
-            result.put("resultCode","1");
+            result.put("resultCode","500");
             result.put("resultMsg","查询结果为空");
             return result;
         }
@@ -172,6 +172,7 @@ public class EsServiceImpl implements EsService {
             //todo 命中结果；命中实例
             activityInfo.setResult(booleanResult);
             activityInfo.setHitEntity("命中得对象");
+            activityInfo.setType("activity");
 
             //查询策略信息
             SearchHits strategyHits = searchStrategyByParam(param,activityInfo.getId().toString());
@@ -191,6 +192,7 @@ public class EsServiceImpl implements EsService {
                 strategyInfo.setName(name);
                 strategyInfo.setResult(booleanResult);
                 strategyInfo.setHitEntity("命中得对象");
+                strategyInfo.setType("strategy");
 
 
                 //查询规则信息
@@ -211,6 +213,7 @@ public class EsServiceImpl implements EsService {
                     ruleInfo.setName(name);
                     ruleInfo.setResult(booleanResult);
                     ruleInfo.setHitEntity("命中得对象");
+                    ruleInfo.setType("rule");
 
                     //查询标签实例信息
                     SearchHits labelInfoHits = searchLabelByRuleId(param,ruleInfo.getId().toString());
@@ -264,7 +267,7 @@ public class EsServiceImpl implements EsService {
                 labelInfo.put("labelResultList",labelResults);
             }
         }
-        result.put("rusultCode","200");
+        result.put("resultCode","200");
         result.put("resultMsg",labelInfo);
         return result;
     }

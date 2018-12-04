@@ -31,6 +31,7 @@ public class SyncEventServiceImpl implements SyncEventService {
     private EventApiService eventApiService;
 
 
+
     /**
      * 标签同步对外接口
      *

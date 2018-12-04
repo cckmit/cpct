@@ -19,6 +19,8 @@ spring:
     password: cpc_cpct_user_123
 
 
+
+
 #redis相关配置
   redis:
     host: 134.96.252.170
