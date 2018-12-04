@@ -130,6 +130,7 @@ public class SynSysParamsServiceImpl implements SynSysParamsService {
         sysParamsPrdMapper.deleteByPrimaryKey(paramId);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
+        synchronizeRecordService.addRecord(roleName,tableName,paramId, SynchronizeType.delete.getType());
         return maps;
     }
 
