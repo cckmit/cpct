@@ -24,8 +24,12 @@
     </resultMap>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from event_item
-    where EVT_ITEM_ID = #{evtItemId,jdbcType=BIGINT}
+    where EVENT_ID = #{evtItemId,jdbcType=BIGINT}
   </delete>
+    <delete id="deleteByEventId" parameterType="java.lang.Long">
+        delete from event_item
+        where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
+    </delete>
     <insert id="insert" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtItem">
     insert into event_item (EVT_ITEM_ID, EVENT_ID, EVT_TYPE_ID,
       EVT_ITEM_NAME, EVT_ITEM_CODE, VALUE_DATA_TYPE,

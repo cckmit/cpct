@@ -153,6 +153,8 @@ public class SynTarGrpTemplateServiceImpl implements SynTarGrpTemplateService {
     public Map<String, Object> deleteSingleTarGrp(Long templateId, String roleName) {
         Map<String, Object> maps = new HashMap<>();
         tarGrpPrdMapper.deleteByPrimaryKey(templateId);
+        tarGrpConditionPrdMapper.deleteByTarGrpTemplateId(templateId);
+        synchronizeRecordService.addRecord(roleName, tableName, templateId, SynchronizeType.delete.getType());
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
         return maps;

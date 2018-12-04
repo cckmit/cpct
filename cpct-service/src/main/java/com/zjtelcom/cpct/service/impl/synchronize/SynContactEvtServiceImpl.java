@@ -420,6 +420,15 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
             if (mktCamEvtRels.isEmpty()) {
                 //没有关联活动 直接删除事件
                 contactEvtPrdMapper.delEvent(eventId);
+                contactEvtItemPrdMapper.deleteByEventId(eventId);
+                EventMatchRulDTO eventMatchRulDTO = eventMatchRulPrdMapper.listEventMatchRul(eventId);
+                if(eventMatchRulDTO != null) {
+                    eventMatchRulPrdMapper.delEventMatchRul(eventMatchRulDTO);
+                    List<EventMatchRulCondition> eventMatchRulConditionList = eventMatchRulConditionPrdMapper.listEventMatchRulCondition(eventMatchRulDTO.getEvtMatchRulId());
+                    for(EventMatchRulCondition eventMatchRulCondition : eventMatchRulConditionList) {
+                        eventMatchRulConditionPrdMapper.delEventMatchRulCondition(eventMatchRulCondition);
+                    }
+                }
             } else {
                 throw new SystemException(contactEvt.getContactEvtCode() + "该事件有关联活动信息，不能删除");
             }
