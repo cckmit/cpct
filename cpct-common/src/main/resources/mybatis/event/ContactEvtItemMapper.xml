@@ -24,7 +24,7 @@
     </resultMap>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from event_item
-    where EVENT_ID = #{evtItemId,jdbcType=BIGINT}
+    where EVT_ITEM_ID = #{evtItemId,jdbcType=BIGINT}
   </delete>
     <delete id="deleteByEventId" parameterType="java.lang.Long">
         delete from event_item
