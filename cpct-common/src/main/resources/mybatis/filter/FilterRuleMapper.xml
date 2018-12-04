@@ -21,6 +21,7 @@
         <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate"/>
         <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
         <result column="REMARK" jdbcType="VARCHAR" property="remark"/>
+        <result column="USER_LIST" jdbcType="VARCHAR" property="userList"/>
         <result column="CONDITION_ID" jdbcType="BIGINT" property="conditionId"/>
         <result column="DAYS" jdbcType="VARCHAR" property="days"/>
         <result column="TIMES" jdbcType="VARCHAR" property="times"/>
@@ -49,16 +50,16 @@
       EXECUTION_CHANNEL, CHANNEL_CONTACTS, EFFECTIVE_DATE, 
       FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF,
       UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
-      UPDATE_DATE, REMARK, CONDITION_ID, DAYS,
+      UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID, DAYS,
       TIMES, OFFER_INFO,OPERATOR)
     values (#{ruleId,jdbcType=BIGINT}, #{ruleName,jdbcType=VARCHAR}, #{filterType,jdbcType=VARCHAR}, 
       #{executionChannel,jdbcType=VARCHAR}, #{channelContacts,jdbcType=VARCHAR}, #{effectiveDate,jdbcType=TIMESTAMP}, 
-      #{failureDate,jdbcType=TIMESTAMP},  #{labelCode,jdbcType=VARCHAR}, #{chooseProduct,jdbcType=VARCHAR}, #{expression,jdbcType=VARCHAR},
-      #{dayStart,jdbcType=TIMESTAMP}, #{dayEnd,jdbcType=TIMESTAMP},
+      #{failureDate,jdbcType=TIMESTAMP},  #{labelCode,jdbcType=VARCHAR}, #{chooseProduct,jdbcType=VARCHAR},
+      #{expression,jdbcType=VARCHAR}, #{dayStart,jdbcType=TIMESTAMP}, #{dayEnd,jdbcType=TIMESTAMP},
       #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT},
       #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, 
-      #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, #{conditionId,jdbcType=BIGINT}, #{days,jdbcType=VARCHAR},
-      #{times,jdbcType=VARCHAR}, #{offerInfo,jdbcType=VARCHAR},#{operator,jdbcType=VARCHAR})
+      #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, #{userList,jdbcType=VARCHAR}, #{conditionId,jdbcType=BIGINT},
+      #{days,jdbcType=VARCHAR},#{times,jdbcType=VARCHAR}, #{offerInfo,jdbcType=VARCHAR},#{operator,jdbcType=VARCHAR})
   </insert>
     <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.dto.filter.FilterRule">
     update filter_rule
@@ -80,6 +81,7 @@
       STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
       UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
       REMARK = #{remark,jdbcType=VARCHAR},
+      USER_LIST = #{userList,jdbcType=VARCHAR},
       CONDITION_ID = #{conditionId,jdbcType=BIGINT},
       DAYS = #{days,jdbcType=VARCHAR},
       TIMES = #{times,jdbcType=VARCHAR},
@@ -92,7 +94,7 @@
       EXECUTION_CHANNEL, CHANNEL_CONTACTS, EFFECTIVE_DATE,
       FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF,
       UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
-      UPDATE_DATE, REMARK,OPERATOR,USER_LIST,CONDITION_ID,DAYS,TIMES,OFFER_INFO,OPERATOR
+      UPDATE_DATE, REMARK,USER_LIST,CONDITION_ID,DAYS,TIMES,OFFER_INFO,OPERATOR
     from filter_rule
     where RULE_ID = #{ruleId,jdbcType=BIGINT}
   </select>
@@ -101,7 +103,7 @@
       EXECUTION_CHANNEL, CHANNEL_CONTACTS, EFFECTIVE_DATE,
       FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF,
       UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
-      UPDATE_DATE, REMARK, CONDITION_ID,
+      UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID,
     DAYS, TIMES, OFFER_INFO,OPERATOR
     from filter_rule
   </select>
@@ -111,7 +113,7 @@
         EXECUTION_CHANNEL, CHANNEL_CONTACTS, EFFECTIVE_DATE,
         FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF,
         UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
-        UPDATE_DATE, REMARK, CONDITION_ID,
+        UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID,
         DAYS, TIMES, OFFER_INFO,OPERATOR
         from filter_rule
         where 1 = 1
@@ -129,7 +131,7 @@
         EXECUTION_CHANNEL, CHANNEL_CONTACTS, EFFECTIVE_DATE,
         FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF,
         UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
-        UPDATE_DATE, REMARK, CONDITION_ID,
+        UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID,
         DAYS, TIMES, OFFER_INFO,OPERATOR
         from filter_rule
         where 1 = 1
@@ -149,7 +151,7 @@
       EXECUTION_CHANNEL, CHANNEL_CONTACTS, EFFECTIVE_DATE,
       FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF,
       UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
-      UPDATE_DATE, REMARK, CONDITION_ID,
+      UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID,
     DAYS, TIMES, OFFER_INFO,OPERATOR
         from filter_rule
         where RULE_ID = #{ruleId,jdbcType=BIGINT}
@@ -160,7 +162,7 @@
         EXECUTION_CHANNEL, CHANNEL_CONTACTS, EFFECTIVE_DATE,
         FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END, STATUS_CD, CREATE_STAFF,
         UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
-        UPDATE_DATE, REMARK, CONDITION_ID,
+        UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID,
     DAYS, TIMES, OFFER_INFO,OPERATOR)
         values (#{ruleId,jdbcType=BIGINT}, #{ruleName,jdbcType=VARCHAR}, #{filterType,jdbcType=VARCHAR},
         #{executionChannel,jdbcType=VARCHAR}, #{channelContacts,jdbcType=VARCHAR}, #{effectiveDate,jdbcType=TIMESTAMP},
@@ -168,7 +170,8 @@
          #{expression,jdbcType=VARCHAR},#{dayStart,jdbcType=TIMESTAMP}, #{dayEnd,jdbcType=TIMESTAMP},
          #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT},
         #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP},
-        #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR},#{conditionId,jdbcType=BIGINT}, #{days,jdbcType=VARCHAR},
+        #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, #{userList,jdbcType=VARCHAR},
+        #{conditionId,jdbcType=BIGINT}, #{days,jdbcType=VARCHAR},
       #{times,jdbcType=VARCHAR}, #{offerInfo,jdbcType=VARCHAR},#{operator,jdbcType=VARCHAR})
     </insert>
 
@@ -216,6 +219,9 @@
         </if>
         <if test="remark != null and remark != ''">
             REMARK = #{remark,jdbcType=VARCHAR},
+        </if>
+        <if test="userList !=null and userList !=''">
+            USER_LIST = #{userList,jdbcType=VARCHAR},
         </if>
         RULE_ID = #{ruleId,jdbcType=BIGINT},
         OPERATOR = #{OPERATOR,jdbcType=VARCHAR},

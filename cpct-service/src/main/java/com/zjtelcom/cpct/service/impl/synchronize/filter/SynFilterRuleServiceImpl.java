@@ -163,7 +163,11 @@ public class SynFilterRuleServiceImpl implements SynFilterRuleService {
     @Override
     public Map<String, Object> deleteSingleFilterRule(Long ruleId, String roleName) {
         Map<String,Object> maps = new HashMap<>();
-        filterRulePrdMapper.deleteByPrimaryKey(ruleId);
+        FilterRule filterRule = filterRulePrdMapper.selectByPrimaryKey(ruleId);
+        if(filterRule != null){
+            filterRulePrdMapper.deleteByPrimaryKey(ruleId);
+            mktVerbalConditionPrdMapper.deleteByPrimaryKey(filterRule.getConditionId());
+        }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
         synchronizeRecordService.addRecord(roleName,tableName,ruleId, SynchronizeType.delete.getType());
