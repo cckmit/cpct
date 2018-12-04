@@ -12,7 +12,16 @@ public class CampaignInfoTree implements Serializable {
     private String reason;
     private List<CampaignInfoTree> children;
     private List<Map<String,Object>> labelList;
+    private String type;
 
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public String getReason() {
         return reason;

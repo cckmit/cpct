@@ -11,7 +11,7 @@ public class ObjMktCampaignRel {
 
     private Long objId;
 
-    private String relType;
+    private String relType;//1000	触发  	触发关系：销售品触发对应的事件场景的关系;2000	推荐	  推荐关系：事件场景推荐对应的销售品的关系
 
     private Date effDate;
 
