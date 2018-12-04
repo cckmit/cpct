@@ -8,7 +8,7 @@ public class CampaignInstVO implements Serializable {
     private String offerName;
     private Long tarGrpTempleteId;
     private List<Long> resourceList;
-    private List<Long> channelList;
+    private List<ChannelDetail> channelList;
 
 
     public String getOfferName() {
@@ -34,11 +34,12 @@ public class CampaignInstVO implements Serializable {
     public void setResourceList(List<Long> resourceList) {
         this.resourceList = resourceList;
     }
-    public List<Long> getChannelList() {
+
+    public List<ChannelDetail> getChannelList() {
         return channelList;
     }
 
-    public void setChannelList(List<Long> channelList) {
+    public void setChannelList(List<ChannelDetail> channelList) {
         this.channelList = channelList;
     }
 }

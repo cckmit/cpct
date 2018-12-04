@@ -6,6 +6,7 @@ import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
+import com.zjtelcom.cpct.dao.channel.ObjMktCampaignRelMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
@@ -13,6 +14,7 @@ import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.*;
+import com.zjtelcom.cpct.domain.channel.ObjMktCampaignRel;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
@@ -45,6 +47,7 @@ import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 
 /**
  * Description:
@@ -127,6 +130,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
     @Autowired
     private SynchronizeCampaignService synchronizeCampaignService;
+    //需求涵id 跟活动关联关系
+    @Autowired
+    private ObjMktCampaignRelMapper objMktCampaignRelMapper;
 /*
     @Autowired
     private IMktCampaignService iMktCampaignService;*/
@@ -205,6 +211,21 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 mktCamEvtRelDO.setUpdateStaff(UserUtil.loginId());
                 mktCamEvtRelDO.setUpdateDate(new Date());
                 mktCamEvtRelMapper.insert(mktCamEvtRelDO);
+            }
+
+            //需求涵id不为空添加与活动的关系
+            if (mktCampaignVO.getRequestId()!=null){
+                ObjMktCampaignRel rel = new ObjMktCampaignRel();
+                rel.setMktCampaignId(mktCampaignId);
+                rel.setObjId(mktCampaignVO.getRequestId());
+                rel.setObjType("2000");
+                rel.setRelType("1000");
+                rel.setStatusCd(STATUSCD_EFFECTIVE);
+                rel.setStatusDate(new Date());
+                rel.setUpdateDate(new Date());
+                rel.setCreateStaff(UserUtil.loginId());
+                rel.setCreateDate(new Date());
+                objMktCampaignRelMapper.insert(rel);
             }
 
             maps = new HashMap<>();

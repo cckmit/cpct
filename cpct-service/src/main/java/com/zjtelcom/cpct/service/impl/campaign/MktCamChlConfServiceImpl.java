@@ -110,6 +110,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCamChlConfMap.put("resultMsg", ErrorCode.SAVE_CAM_CHL_CONF_SUCCESS.getErrorMsg());
             mktCamChlConfMap.put("evtContactConfId", evtContactConfId);
+            mktCamChlConfMap.put("evtContactConfName",mktCamChlConfDO.getEvtContactConfName());
             MktCamChlConfDetail mktCamChlConfDetailNew = BeanUtil.create(mktCamChlConfDO, new MktCamChlConfDetail());
             // 添加属性
             List<MktCamChlConfAttr> mktCamChlConfAttrList = mktCamChlConfDetail.getMktCamChlConfAttrList();
@@ -127,8 +128,9 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                 //mktCamChlConfAttrMapper.insert(mktCamChlConfAttrDO);
                 mktCamChlConfAttrDOList.add(mktCamChlConfAttrDO);
             }
-            mktCamChlConfAttrMapper.insertBatch(mktCamChlConfAttrDOList);
-
+            if (mktCamChlConfAttrDOList.size()>0){
+                mktCamChlConfAttrMapper.insertBatch(mktCamChlConfAttrDOList);
+            }
             List<MktCamChlConfAttr> mktCamChlConfAttrNewList = new ArrayList<>();
             for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
                 MktCamChlConfAttr mktCamChlConfAttr = BeanUtil.create(mktCamChlConfAttrDO, new MktCamChlConfAttr());
@@ -177,11 +179,11 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                 MktCamChlConfAttrDO mktCamChlConfAttrDO = new MktCamChlConfAttrDO();
                 CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttrDO, mktCamChlConfAttr);
                 mktCamChlConfAttrDO.setEvtContactConfId(mktCamChlConfDO.getEvtContactConfId());
-                if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
+                if (mktCamChlConfAttr.getAttrId()!=null && mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
                     mktCamChlConfAttrDO.setAttrValue(evtContactConfId.toString());
                     //删除旧的关联规则 todo 静态
                     mktVerbalConditionMapper.deleteByVerbalId("1", evtContactConfId);
-                    //保存新的规则
+                    //保存新的规则 j
                     String params = mktCamChlConfAttr.getAttrValue();
                     ruleInsert(evtContactConfId, params);
                 }
