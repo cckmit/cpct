@@ -5,6 +5,7 @@ import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.rule.RuleResult;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
+import com.zjtelcom.cpct.domain.channel.RequestInstRel;
 import com.zjtelcom.cpct.service.EngineTestService;
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.service.MktCampaignResp;
@@ -12,6 +13,7 @@ import com.zjtelcom.cpct.service.campaign.MktCamChlResultApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.util.RedisUtils;
+import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,6 +41,42 @@ public class TestController extends BaseController {
 
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired(required = false)
+    private RequestInstRelMapper requestInstRelMapper;
+
+    @PostMapping("fourthDataSource")
+    @CrossOrigin
+    public Object fourthDataSource() {
+        RequestInstRel requestInstRel = requestInstRelMapper.selectByPrimaryKey(1L);
+        return requestInstRel;
+    }
+
+
+    @RequestMapping(value = "/redisTest", method = RequestMethod.POST)
+    @CrossOrigin
+    public String redis()  {
+        List<String> codeList = new ArrayList<>();
+        codeList.add("1234");
+        codeList.add("123456");
+        codeList.add("1gggg");
+        codeList.add("1hjj");
+        codeList.add("1kkk");
+        List<String> code2List = new ArrayList<>();
+        code2List.add("234");
+        code2List.add("23456");
+        code2List.add("2gggg");
+        code2List.add("2hjj");
+        code2List.add("2kkk");
+        redisUtils.hset("LABEL_CODE_"+25,1+"",codeList);
+        redisUtils.hset("LABEL_CODE_"+25,2+"",code2List);
+
+        Object ob = redisUtils.hgetAllRedisList("LABEL_CODE_"+25);
+        List<String> oblist = (List<String>) ob;
+
+        System.out.println(oblist);
+        return "success";
+    }
+
 
 
 

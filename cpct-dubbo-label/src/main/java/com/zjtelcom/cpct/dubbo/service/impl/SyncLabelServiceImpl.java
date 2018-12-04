@@ -89,6 +89,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         }
         if (labelValodate != null) {
             BeanUtil.copy(labModel,labelValodate);
+            labelValodate.setSystemInfoId(1L);
             labelValodate.setTagRowId(labModel.getLabRowId());//标签id
             labelValodate.setInjectionLabelName(labModel.getLabName());//标签名称
             labelValodate.setInjectionLabelCode(labModel.getLabEngName());//英文名称
@@ -97,14 +98,10 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             labelValodate.setInjectionLabelDesc(labModel.getLabBusiDesc());
 
 
-            if (labModel.getLabType() .equals(String.valueOf(1))  || labModel.getLabType() .equals(String.valueOf(2)) ) {
-                labelValodate.setConditionType(String.valueOf(4));//标签类型(文本、数值、枚举) 4输入  2多选
-            }else if(labModel.getLabType() .equals(String.valueOf(3)) ) {
-                labelValodate.setConditionType(String.valueOf(2));
-            }
-            if(Long.valueOf(labelValodate.getConditionType()) == 4){
+            labelValodate.setConditionType(labModel.getLabType());
+            if("4".equals(labelValodate.getConditionType())){
                 labelValodate.setOperator("2000,3000,1000,4000,6000,5000,7000,7200");
-            }else if(Long.valueOf(labelValodate.getConditionType()) == 2){
+            }else if("2".equals(labelValodate.getConditionType())){
                 labelValodate.setOperator("7000");
             }
             labelValodate.setCatalogId(labModel.getLabObjectCode() + labModel.getLabLevel1() + labModel.getLabLevel2() + labModel.getLabLevel3());
@@ -123,22 +120,17 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         }else {
 
             Label label = BeanUtil.create(labModel, new Label());
-
+            label.setSystemInfoId(1L);
             label.setTagRowId(labModel.getLabRowId());//标签id
             label.setInjectionLabelName(labModel.getLabName());//标签名称
             label.setInjectionLabelCode(labModel.getLabEngName());//英文名称
             //label.setInjectionLabelDesc();
             label.setLabTagCode(labModel.getLabCode());//标签编码
             label.setInjectionLabelDesc(labModel.getLabBusiDesc());
-
-            if (labModel.getLabType() .equals(String.valueOf(1))  || labModel.getLabType() .equals(String.valueOf(2)) ) {
-                label.setConditionType(String.valueOf(4));//标签类型(文本、数值、枚举) 4输入  2多选
-            }else if(labModel.getLabType() .equals(String.valueOf(3)) ) {
-                label.setConditionType(String.valueOf(2));
-            }
-            if(Long.valueOf(label.getConditionType()) == 4){
+            label.setConditionType(labModel.getLabType());
+            if("4".equals(label.getConditionType())){
                 label.setOperator("2000,3000,1000,4000,6000,5000,7000,7200");
-            }else if(Long.valueOf(label.getConditionType()) == 2){
+            }else if("2".equals(label.getConditionType())){
                 label.setOperator("7000");
             }
             label.setScope(1);
@@ -296,12 +288,6 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             Label labelModel = BeanUtil.create(label, new Label());
 
             //label.setInjectionLabelDesc();
-
-            if (label.getConditionType() == String.valueOf(1) || label.getConditionType() == String.valueOf(2)) {
-                label.setConditionType(String.valueOf(4));//标签类型(文本、数值、枚举) 4输入  2多选
-            }else if(label.getConditionType() == String.valueOf(3)) {
-                label.setConditionType(String.valueOf(2));
-            }
             if(Long.valueOf(label.getConditionType()) == 4){
                 label.setOperator("2000,3000,1000,4000,6000,5000,7000,7200");
             }else if(Long.valueOf(label.getConditionType()) == 2){
@@ -328,49 +314,49 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
 
         //标签目录初始化
 //        List<Label> labels = labelMapper.selectAll();
-//        for (Label label : labels){
-//            //标签目录插入
-//            LabelCatalog labelCatalog =new LabelCatalog();
-//            labelCatalog.setStatusCd(STATUSCD_EFFECTIVE);
-//            labelCatalog.setCreateStaff(UserUtil.loginId());
-//            labelCatalog.setCreateDate(new Date());
-//            if(labelCatalogMapper.findByCodeAndLevel(label.getLabObjectCode(), Long.valueOf(1)) == null) {
-//                labelCatalog.setCatalogCode(label.getLabObjectCode());
-//                labelCatalog.setCatalogName(label.getLabObject());
-//                labelCatalog.setLevelId(Long.valueOf(1));
-//                labelCatalog.setParentId("0");
-//                labelCatalogMapper.insert(labelCatalog);
-//            }
-//            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1()), Long.valueOf(2)) == null) {
-//                labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getLabLevel1());
-//                labelCatalog.setCatalogName(label.getLabLevel1Name());
-//                labelCatalog.setLevelId(Long.valueOf(2));
-//                labelCatalog.setParentId(label.getLabObjectCode());
-//                labelCatalogMapper.insert(labelCatalog);
-//            }
-//            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2()), Long.valueOf(3)) == null) {
-//                labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2());
-//                labelCatalog.setCatalogName(label.getLabLevel2Name());
-//                labelCatalog.setLevelId(Long.valueOf(3));
-//                labelCatalog.setParentId(label.getLabObjectCode() + label.getLabLevel1());
-//                labelCatalogMapper.insert(labelCatalog);
-//            }
-//            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3()), Long.valueOf(4)) == null) {
-//                labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3());
-//                labelCatalog.setCatalogName(label.getLabLevel3Name());
-//                labelCatalog.setLevelId(Long.valueOf(4));
-//                labelCatalog.setParentId(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2());
-//                labelCatalogMapper.insert(labelCatalog);
-//            }
-//            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3() + label.getLabLevel4()), Long.valueOf(5)) == null) {
-//                labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3() + label.getLabLevel4());
-//                labelCatalog.setCatalogName(label.getLabLevel4Name());
-//                labelCatalog.setLevelId(Long.valueOf(5));
-//                labelCatalog.setParentId(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3());
-//                labelCatalogMapper.insert(labelCatalog);
-//            }
-//
-//        }
+        for (Label label : labels){
+            //标签目录插入
+            LabelCatalog labelCatalog =new LabelCatalog();
+            labelCatalog.setStatusCd(STATUSCD_EFFECTIVE);
+            labelCatalog.setCreateStaff(UserUtil.loginId());
+            labelCatalog.setCreateDate(new Date());
+            if(labelCatalogMapper.findByCodeAndLevel(label.getLabObjectCode(), Long.valueOf(1)) == null) {
+                labelCatalog.setCatalogCode(label.getLabObjectCode());
+                labelCatalog.setCatalogName(label.getLabObject());
+                labelCatalog.setLevelId(Long.valueOf(1));
+                labelCatalog.setParentId("0");
+                labelCatalogMapper.insert(labelCatalog);
+            }
+            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1()), Long.valueOf(2)) == null) {
+                labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getLabLevel1());
+                labelCatalog.setCatalogName(label.getLabLevel1Name());
+                labelCatalog.setLevelId(Long.valueOf(2));
+                labelCatalog.setParentId(label.getLabObjectCode());
+                labelCatalogMapper.insert(labelCatalog);
+            }
+            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2()), Long.valueOf(3)) == null) {
+                labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2());
+                labelCatalog.setCatalogName(label.getLabLevel2Name());
+                labelCatalog.setLevelId(Long.valueOf(3));
+                labelCatalog.setParentId(label.getLabObjectCode() + label.getLabLevel1());
+                labelCatalogMapper.insert(labelCatalog);
+            }
+            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3()), Long.valueOf(4)) == null) {
+                labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3());
+                labelCatalog.setCatalogName(label.getLabLevel3Name());
+                labelCatalog.setLevelId(Long.valueOf(4));
+                labelCatalog.setParentId(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2());
+                labelCatalogMapper.insert(labelCatalog);
+            }
+            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3() + label.getLabLevel4()), Long.valueOf(5)) == null) {
+                labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3() + label.getLabLevel4());
+                labelCatalog.setCatalogName(label.getLabLevel4Name());
+                labelCatalog.setLevelId(Long.valueOf(5));
+                labelCatalog.setParentId(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3());
+                labelCatalogMapper.insert(labelCatalog);
+            }
+
+        }
 
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","新增成功");

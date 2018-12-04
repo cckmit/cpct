@@ -6,6 +6,7 @@ import com.zjtelcom.cpct.elastic.model.CampaignHitParam;
 import com.zjtelcom.cpct.elastic.model.CampaignHitResponse;
 import com.zjtelcom.cpct.elastic.model.CampaignInfoTree;
 import com.zjtelcom.cpct.elastic.model.TotalModel;
+import com.zjtelcom.cpct.elastic.util.DateUtil;
 import com.zjtelcom.cpct.elastic.util.ElasticsearchUtil;
 import com.zjtelcom.cpct.elastic.util.EsSearchUtil;
 import com.zjtelcom.cpct.enums.Operator;
@@ -21,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.zjtelcom.cpct.elastic.config.IndexList.*;
@@ -50,11 +52,12 @@ public class EsServiceImpl implements EsService {
         jsonObject.put("id",System.currentTimeMillis()+ EsSearchUtil.getRandomStr(15));
         jsonObject.put("age", 25);
         jsonObject.put("name", "j-" + new Random(100).nextInt());
-        jsonObject.put("date", new Date());
-        for (int i = 0;i<850 ;i++){
-            jsonObject.put("TEST"+i,i+1);
-        }
-        String id = ElasticsearchUtil.addData(jsonObject, indexName, esType, jsonObject.getString("id"));
+        jsonObject.put("date",DateUtil.formatDate(new Date()));
+        jsonObject.put("dateSt",new Date());
+        jsonObject.put("dateSt2","2018-04-25T08:33:44.840Z");
+
+
+        String id = ElasticsearchUtil.addData(jsonObject, "params_module", esType, jsonObject.getString("id"));
         System.out.println("*********ID**********: "+id);
     }
 
@@ -82,7 +85,7 @@ public class EsServiceImpl implements EsService {
         for (int i = 0;i<eventList.size();i++){
             isiList.add(eventList.get(i).get("ISI").toString());
         }
-        result.put("resultCode","0");
+        result.put("resultCode","200");
         result.put("resultMsg","命中");
         result.put("total",hits.getTotalHits());
         result.put("ISI",isiList);
@@ -115,12 +118,13 @@ public class EsServiceImpl implements EsService {
             System.out.println(source);
             Map<String, Object> stringMap = hits.getHits()[j].getSourceAsMap();
             //todo 触发时间
-            stringMap.put("triggerTime",new Date());
+            stringMap.put("triggerTime",stringMap.get("evtCollectTime")==null ? "" : stringMap.get("evtCollectTime"));
+            stringMap.put("timeCost",stringMap.get("timeCost")+"毫秒");
             System.currentTimeMillis();
             eventList.add(stringMap);
         }
         if (eventList.isEmpty()){
-            result.put("resultCode","1");
+            result.put("resultCode","500");
             result.put("resultMsg","查询结果为空");
             return result;
         }
@@ -168,6 +172,7 @@ public class EsServiceImpl implements EsService {
             //todo 命中结果；命中实例
             activityInfo.setResult(booleanResult);
             activityInfo.setHitEntity("命中得对象");
+            activityInfo.setType("activity");
 
             //查询策略信息
             SearchHits strategyHits = searchStrategyByParam(param,activityInfo.getId().toString());
@@ -187,6 +192,7 @@ public class EsServiceImpl implements EsService {
                 strategyInfo.setName(name);
                 strategyInfo.setResult(booleanResult);
                 strategyInfo.setHitEntity("命中得对象");
+                strategyInfo.setType("strategy");
 
 
                 //查询规则信息
@@ -207,6 +213,7 @@ public class EsServiceImpl implements EsService {
                     ruleInfo.setName(name);
                     ruleInfo.setResult(booleanResult);
                     ruleInfo.setHitEntity("命中得对象");
+                    ruleInfo.setType("rule");
 
                     //查询标签实例信息
                     SearchHits labelInfoHits = searchLabelByRuleId(param,ruleInfo.getId().toString());
@@ -230,7 +237,7 @@ public class EsServiceImpl implements EsService {
         response.setLabelInfo(labelInfo);
         response.setEventInfo(eventList.get(0));
         response.setTotal(totalModels);
-        result.put("resultCode","0");
+        result.put("resultCode","200");
         result.put("resultMsg",response);
         return result;
     }
@@ -260,7 +267,7 @@ public class EsServiceImpl implements EsService {
                 labelInfo.put("labelResultList",labelResults);
             }
         }
-        result.put("rusultCode","0");
+        result.put("resultCode","200");
         result.put("resultMsg",labelInfo);
         return result;
     }
@@ -379,7 +386,7 @@ public class EsServiceImpl implements EsService {
                 boolQueryBuilder = getBoolQueryBuilder(param.getIsi());
                 break;
             case "EventCode"://资产集成编码
-                boolQueryBuilder = getBoolQueryBuilderByEventCode(param.getEventCode());
+                boolQueryBuilder = getBoolQueryBuilderByEventCode(param.getEventCode(),param.getStartTime(),param.getEndTime());
                 break;
             case "AssertNumber"://资产号码
                 boolQueryBuilder = getBoolQueryBuilderByAssetNumber(param.getAssetNumber(),param.getStartTime(),param.getEndTime());
@@ -400,7 +407,7 @@ public class EsServiceImpl implements EsService {
                 boolQueryBuilder = getBoolQueryBuilder(param.getIsi());
                 break;
             case "EventCode":
-                boolQueryBuilder = getBoolQueryBuilderByEventCode(param.getEventCode());
+                boolQueryBuilder = getBoolQueryBuilderByEventCode(param.getEventCode(),param.getStartTime(),param.getEndTime());
                 break;
             case "AssertNumber":
                 boolQueryBuilder = getBoolQueryBuilderByAssetNumber(param.getAssetNumber(),param.getStartTime(),param.getEndTime());
@@ -464,10 +471,13 @@ public class EsServiceImpl implements EsService {
     }
 
     //资产集成编码组装查询条件
-    private BoolQueryBuilder getBoolQueryBuilderByEventCode(String eventCode ) {
+    private BoolQueryBuilder getBoolQueryBuilderByEventCode(String eventCode,Date startTime,Date endTime ) {
+//        String start = DateUtil.formatDate(startTime);
+//        String end = DateUtil.formatDate(endTime);
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
                         matchQuery("integrationId",eventCode));
+//                .must(QueryBuilders.rangeQuery("evtCollectTime").from(start).to(end));
         System.out.println(boolQueryBuilder);
 
         return boolQueryBuilder;
@@ -475,11 +485,12 @@ public class EsServiceImpl implements EsService {
 
     //资产号码和时间段组装查询条件
     private BoolQueryBuilder getBoolQueryBuilderByAssetNumber(String assetNumber,Date startTime,Date endTime) {
+//        String start = DateUtil.formatDate(startTime);
+//        String end = DateUtil.formatDate(endTime);
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
                         matchQuery("accNbr",assetNumber));
-//                .must(QueryBuilders.rangeQuery("startTime").gte(startTime))
-//                .must(QueryBuilders.rangeQuery("startTime").lte(endTime));
+//                .must(QueryBuilders.rangeQuery("evtCollectTime").from(start).to(end));
         System.out.println(boolQueryBuilder);
         return boolQueryBuilder;
     }

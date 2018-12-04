@@ -16,7 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 
 /**
  * Description:
@@ -30,6 +33,32 @@ public class TarGrpTemplateController {
 
     @Autowired
     private TarGrpTemplateService tarGrpTemplateService;
+
+    /**
+     * 销售品id 获取分群集合
+     * @param
+     * @return
+     */
+    @RequestMapping(value = "/getTarGrpTemByOfferId", method = RequestMethod.POST)
+    @CrossOrigin
+    public Map<String,Object> getTarGrpTemByOfferId(@RequestBody HashMap<String,Object> param) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            if (param.get("requestid")==null){
+                maps.put("resultCode",CODE_FAIL);
+                maps.put("resultMsg","请求需求涵不存在!");
+                return maps;
+            }
+            Long requestId = Long.valueOf(param.get("requestid").toString());
+            maps = tarGrpTemplateService.getTarGrpTemByOfferId(requestId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            maps.put("resultCode",CODE_FAIL);
+            maps.put("resultMsg","查询失败");
+            return maps;
+        }
+        return maps;
+    }
 
     /**
      * 新增目标分群模板

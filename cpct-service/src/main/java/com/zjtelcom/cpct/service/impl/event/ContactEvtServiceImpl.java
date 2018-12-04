@@ -205,7 +205,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             final ContactEvt contactEvt = evtDetail;
 //            //todo 待确认必填字段
 //            contactEvt.setInterfaceCfgId();
-
+            contactEvt.setExtEventId(1000L);
             contactEvt.setUpdateDate(DateUtil.getCurrentTime());
             contactEvt.setCreateDate(DateUtil.getCurrentTime());
             contactEvt.setStatusDate(DateUtil.getCurrentTime());
@@ -225,18 +225,6 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                     return maps;
                 }
             }
-            //插入事件匹配规则
-//            contactEvtMatchRuls = evtDetail.getContactEvtMatchRuls();
-//            for (ContactEvtMatchRul contactEvtMatchRul : contactEvtMatchRuls) {
-//                contactEvtMatchRul.setContactEvtId(contactEvt.getContactEvtId());
-//                contactEvtMatchRul.setCreateDate(DateUtil.getCurrentTime());
-//                contactEvtMatchRul.setUpdateDate(DateUtil.getCurrentTime());
-//                contactEvtMatchRul.setStatusDate(DateUtil.getCurrentTime());
-//                contactEvtMatchRul.setUpdateStaff(UserUtil.loginId());
-//                contactEvtMatchRul.setCreateStaff(UserUtil.loginId());
-//                contactEvtMatchRul.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-//                contactEvtMatchRulMapper.createContactEvtMatchRul(contactEvtMatchRul);
-//            }
 
             //插入事件和活动关联
 
@@ -377,7 +365,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
      */
     @Transactional(readOnly = false)
     @Override
-    public Map<String, Object> closeEvent(Long contactEvtId, String statusCd) {
+    public Map<String, Object> closeEvent(final Long contactEvtId, String statusCd) {
         Map<String, Object> map = new HashMap<>();
         ContactEvt evt = contactEvtMapper.getEventById(contactEvtId);
         if (evt==null){
@@ -391,6 +379,18 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             map.put("resultMsg","开启成功");
         }else {
             map.put("resultMsg","关闭成功");
+        }
+        //事件关闭开启 同步状态到生产
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synContactEvtService.synchronizeSingleEvent(contactEvtId,"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
         }
         return map;
     }

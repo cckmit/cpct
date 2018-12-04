@@ -344,7 +344,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("通过主键同步单个事件目录失败！Exception: ",eventSceneId,e);
+            logger.error("通过主键同步单个事件场景失败！Exception: ",eventSceneId,e);
         }
         return JSON.toJSONString(map);
     }
@@ -364,7 +364,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("全量同步事件目录失败！Exception: ", e);
+            logger.error("全量同步事件场景失败！Exception: ", e);
         }
         return  JSON.toJSONString(map);
     }
@@ -1062,7 +1062,7 @@ public class SynchronizeController extends BaseController {
     @PostMapping("/synchronizeCampaign")
     @CrossOrigin
     public String synchronizeCampaignServiceImpl(@RequestBody Map<String, Object> params) throws Exception {
-        Long mktCampaignId = Long.valueOf((Integer) params.get("id"));
+        Long mktCampaignId = Long.valueOf((Integer) params.get("mktCampaignId"));
         String roleName = getRole();   //  操作角色
         Map<String, Object> synchronizeCampaignMap = synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
         return JSON.toJSONString(synchronizeCampaignMap);
@@ -1149,7 +1149,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("[op:SynContactEvtTypeServiceImpl] 通过主键同步单个事件目录失败！Exception: ",eventTypeId,e);
+            logger.error("[op:SynContactEvtTypeServiceImpl] 通过主键同步单个标签组失败！Exception: ",eventTypeId,e);
         }
         return JSON.toJSONString(map);
     }
@@ -1170,7 +1170,7 @@ public class SynchronizeController extends BaseController {
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", e.getMessage());
-            logger.error("[op:SynContactEvtTypeServiceImpl] 通过主键同步单个事件目录失败！Exception: ",eventTypeId,e);
+            logger.error("[op:SynContactEvtTypeServiceImpl] 通过主键同步单个标签组失败！Exception: ",eventTypeId,e);
         }
         return JSON.toJSONString(map);
     }

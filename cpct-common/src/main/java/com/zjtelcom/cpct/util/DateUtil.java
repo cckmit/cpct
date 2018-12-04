@@ -626,6 +626,12 @@ public class DateUtil {
         return result;
     }
 
+    public static String Date2String(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        String result = sdf.format(date);
+        return result;
+    }
+
     /**
      * 获取上个月第一天
      *

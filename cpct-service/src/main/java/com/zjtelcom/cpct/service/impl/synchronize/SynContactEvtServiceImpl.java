@@ -424,6 +424,7 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
                 throw new SystemException(contactEvt.getContactEvtCode() + "该事件有关联活动信息，不能删除");
             }
         }
+        synchronizeRecordService.addRecord(roleName, tableName, eventId, SynchronizeType.delete.getType());
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         return maps;

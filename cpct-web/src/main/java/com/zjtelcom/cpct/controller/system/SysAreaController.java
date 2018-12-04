@@ -7,6 +7,7 @@
 package com.zjtelcom.cpct.controller.system;
 
 import com.alibaba.fastjson.JSON;
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.service.system.SysAreaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +31,13 @@ public class SysAreaController {
     @RequestMapping(value = "/listSysArea", method = RequestMethod.POST)
     @CrossOrigin
     public String listSysArea() {
-        Map<String, Object> map = sysAreaService.listSysArea();
+        Map<String, Object> map = null;
+        try {
+            map = sysAreaService.listSysArea();
+            map.put("resultCode", CommonConstant.CODE_SUCCESS);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+        }
         return JSON.toJSONString(map);
     }
 
@@ -42,15 +49,21 @@ public class SysAreaController {
     @RequestMapping(value = "/listSysCity", method = RequestMethod.POST)
     @CrossOrigin
     public String listSysCity(@RequestBody  Map<String, Object> params) {
-        String landId = (String) params.get("lanId");
+        String lanId = (String) params.get("lanId");
         Integer areaId;
-        if (landId == null || "".equals(landId) || "null".equals(landId)) {
+        if (lanId == null || "".equals(lanId) || "null".equals(lanId)) {
             //TODO 获取当前用户所在地区
             areaId = 1;
         } else {
-            areaId = Integer.valueOf(landId);
+            areaId = Integer.valueOf(lanId);
         }
-        Map<String, Object> map = sysAreaService.listCityByParentId(areaId);
+        Map<String, Object> map = null;
+        try {
+            map = sysAreaService.listCityByParentId(areaId);
+            map.put("resultCode", CommonConstant.CODE_SUCCESS);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+        }
         return JSON.toJSONString(map);
     }
 
@@ -63,7 +76,13 @@ public class SysAreaController {
     @RequestMapping(value = "/listSysAreaTree", method = RequestMethod.POST)
     @CrossOrigin
     public String listSysAreaTree() {
-        Map<String, Object> map = sysAreaService.listAllAreaTrea();
+        Map<String, Object> map = null;
+        try {
+            map = sysAreaService.listAllAreaTrea();
+            map.put("resultCode", CommonConstant.CODE_SUCCESS);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+        }
         return JSON.toJSONString(map);
     }
 
@@ -78,7 +97,13 @@ public class SysAreaController {
     @CrossOrigin
     public String getCityTable(@RequestBody  Map<String, Object> params) {
         List<Integer> areaIds = (List<Integer>) params.get("areaIds");
-        Map<String, Object> cityTableMap = sysAreaService.getCityTable(areaIds);
+        Map<String, Object> cityTableMap = null;
+        try {
+            cityTableMap = sysAreaService.getCityTable(areaIds);
+            cityTableMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+        } catch (Exception e) {
+            cityTableMap.put("resultCode", CommonConstant.CODE_FAIL);
+        }
         return JSON.toJSONString(cityTableMap);
     }
 

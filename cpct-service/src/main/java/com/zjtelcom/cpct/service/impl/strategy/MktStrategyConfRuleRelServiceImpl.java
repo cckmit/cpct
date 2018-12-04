@@ -50,7 +50,7 @@ public class MktStrategyConfRuleRelServiceImpl extends BaseService implements Mk
             mktStryConfRuleRelMap.put("resultMsg", ErrorCode.SAVE_MKT_STR_CONF_RULE_REL_SUCCESS.getErrorMsg());
             mktStryConfRuleRelMap.put("mktStrategyConfRuleRelId", mktStrategyConfRuleRelDO.getMktStrategyConfRuleRelId());
         } catch (Exception e) {
-            logger.error("[op:MktStrategyConfRuleRelServiceImpl] failed to save MktStrategyConfRuleRel = {}", JSON.toJSON(mktStrategyConfRuleRel));
+            logger.error("[op:MktStrategyConfRuleRelServiceImpl] failed to save MktStrategyConfRuleRel = {}, Exception = ", JSON.toJSON(mktStrategyConfRuleRel), e);
             mktStryConfRuleRelMap.put("resultCode", CommonConstant.CODE_FAIL);
             mktStryConfRuleRelMap.put("resultMsg", ErrorCode.SAVE_MKT_STR_CONF_RULE_REL_FAILURE.getErrorMsg());
             mktStryConfRuleRelMap.put("mktStrategyConfRuleRelId", mktStrategyConfRuleRelDO.getMktStrategyConfRuleRelId());
@@ -75,7 +75,8 @@ public class MktStrategyConfRuleRelServiceImpl extends BaseService implements Mk
             mktStryConfRuleRelMap.put("resultMsg", ErrorCode.UPDATE_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
             mktStryConfRuleRelMap.put("mktStrategyConfRuleRelId", mktStrategyConfRuleRelDO.getMktStrategyConfRuleRelId());
         } catch (Exception e) {
-            mktStryConfRuleRelMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            logger.error("[op:MktStrategyConfRuleRelServiceImpl] failed to updateMktStrConfRuleRel = {} , Exception = ", JSON.toJSON(mktStrategyConfRuleRel), e);
+            mktStryConfRuleRelMap.put("resultCode", CommonConstant.CODE_FAIL);
             mktStryConfRuleRelMap.put("resultMsg", ErrorCode.UPDATE_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
         }
         return mktStryConfRuleRelMap;
@@ -99,7 +100,8 @@ public class MktStrategyConfRuleRelServiceImpl extends BaseService implements Mk
             mktStryConfRuleRelMap.put("resultMsg", ErrorCode.UPDATE_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
             mktStryConfRuleRelMap.put("mktStrategyConfRuleRel", mktStrategyConfRuleRel);
         } catch (Exception e) {
-            mktStryConfRuleRelMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            logger.error("[op:MktStrategyConfRuleRelServiceImpl] failed to mktStrategyConfRuleRelId = {}， Exception = ", mktStrategyConfRuleRelId, e);
+            mktStryConfRuleRelMap.put("resultCode", CommonConstant.CODE_FAIL);
             mktStryConfRuleRelMap.put("resultMsg", ErrorCode.UPDATE_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
         }
         return mktStryConfRuleRelMap;
@@ -126,7 +128,9 @@ public class MktStrategyConfRuleRelServiceImpl extends BaseService implements Mk
             mktStryConfRuleRelMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
             mktStryConfRuleRelMap.put("mktStrConfRuleRelList", mktStrConfRuleRelList);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("[op:MktStrategyConfRuleRelServiceImpl] failed to listAllMktStrConfRuleRel， Exception = ", e);
+            mktStryConfRuleRelMap.put("resultCode", CommonConstant.CODE_FAIL);
+            mktStryConfRuleRelMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_FAILURE.getErrorMsg());
         }
         return mktStryConfRuleRelMap;
     }
@@ -152,7 +156,9 @@ public class MktStrategyConfRuleRelServiceImpl extends BaseService implements Mk
             mktStryConfRuleRelMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
             mktStryConfRuleRelMap.put("mktStrConfRuleRelList", mktStrConfRuleRelList);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("[op:MktStrategyConfRuleRelServiceImpl] failed to listMktStrConfRuleRel mktStrategyConfId = {}， Exception = ", mktStrategyConfId, e);
+            mktStryConfRuleRelMap.put("resultCode", CommonConstant.CODE_FAIL);
+            mktStryConfRuleRelMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_FAILURE.getErrorMsg());
         }
         return mktStryConfRuleRelMap;
     }
@@ -165,9 +171,17 @@ public class MktStrategyConfRuleRelServiceImpl extends BaseService implements Mk
      */
     @Override
     public Map<String, Object> deleteMktStrConfRuleRel(Long mktStrategyConfRuleRelId) {
-        Map<String, Object> mktStryConfRuleRelMap = new HashMap<>();
-        mktStrategyConfRuleRelMapper.deleteByPrimaryKey(mktStrategyConfRuleRelId);
-        mktStryConfRuleRelMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+        Map<String, Object> mktStryConfRuleRelMap = null;
+        try {
+            mktStryConfRuleRelMap = new HashMap<>();
+            mktStrategyConfRuleRelMapper.deleteByPrimaryKey(mktStrategyConfRuleRelId);
+            mktStryConfRuleRelMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            mktStryConfRuleRelMap.put("resultMsg", "删除成功！");
+        } catch (Exception e) {
+            logger.error("[op:MktStrategyConfRuleRelServiceImpl] failed to deleteMktStrConfRuleRel mktStrategyConfId = {}， Exception = ", mktStrategyConfRuleRelId, e);
+            mktStryConfRuleRelMap.put("resultCode", CommonConstant.CODE_FAIL);
+            mktStryConfRuleRelMap.put("resultMsg", "删除失败！");
+        }
         return mktStryConfRuleRelMap;
     }
 
@@ -180,8 +194,15 @@ public class MktStrategyConfRuleRelServiceImpl extends BaseService implements Mk
     @Override
     public Map<String, Object> deleteMktStrConfRuleRelByConfId(Long mktStrategyConfId) {
         Map<String, Object> mktStryConfRuleRelMap = new HashMap<>();
-        mktStrategyConfRuleRelMapper.deleteByMktStrategyConfId(mktStrategyConfId);
-        mktStryConfRuleRelMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+        try {
+            mktStrategyConfRuleRelMapper.deleteByMktStrategyConfId(mktStrategyConfId);
+            mktStryConfRuleRelMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            mktStryConfRuleRelMap.put("resultMsg", "删除成功！");
+        } catch (Exception e) {
+            logger.error("[op:MktStrategyConfRuleRelServiceImpl] failed to deleteMktStrConfRuleRelByConfId mktStrategyConfId = {}， Exception = ", mktStrategyConfId, e);
+            mktStryConfRuleRelMap.put("resultCode", CommonConstant.CODE_FAIL);
+            mktStryConfRuleRelMap.put("resultMsg", "删除失败！");
+        }
         return mktStryConfRuleRelMap;
     }
 }

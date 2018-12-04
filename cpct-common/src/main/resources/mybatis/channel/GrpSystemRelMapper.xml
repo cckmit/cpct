@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.GrpSystemRelMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.GrpSystemRel">
+    <id column="GRP_SYSTEM_REL_ID" jdbcType="BIGINT" property="grpSystemRelId" />
+    <result column="SYSTEM_INFO_ID" jdbcType="VARCHAR" property="systemInfoId" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="STATUS_DT" jdbcType="TIMESTAMP" property="statusDt" />
+    <result column="START_DT" jdbcType="TIMESTAMP" property="startDt" />
+    <result column="END_DT" jdbcType="TIMESTAMP" property="endDt" />
+    <result column="VERSION" jdbcType="VARCHAR" property="version" />
+    <result column="OFFER_VRUL_GRP_ID" jdbcType="BIGINT" property="offerVrulGrpId" />
+    <result column="CREATE_DT" jdbcType="TIMESTAMP" property="createDt" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from grp_system_rel
+    where GRP_SYSTEM_REL_ID = #{grpSystemRelId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.GrpSystemRel">
+    insert into grp_system_rel (GRP_SYSTEM_REL_ID, SYSTEM_INFO_ID, STATUS_CD, 
+      STATUS_DT, START_DT, END_DT, 
+      VERSION, OFFER_VRUL_GRP_ID, CREATE_DT, 
+      CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
+      )
+    values (#{grpSystemRelId,jdbcType=BIGINT}, #{systemInfoId,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR}, 
+      #{statusDt,jdbcType=TIMESTAMP}, #{startDt,jdbcType=TIMESTAMP}, #{endDt,jdbcType=TIMESTAMP}, 
+      #{version,jdbcType=VARCHAR}, #{offerVrulGrpId,jdbcType=BIGINT}, #{createDt,jdbcType=TIMESTAMP}, 
+      #{createStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.GrpSystemRel">
+    update grp_system_rel
+    set SYSTEM_INFO_ID = #{systemInfoId,jdbcType=VARCHAR},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      STATUS_DT = #{statusDt,jdbcType=TIMESTAMP},
+      START_DT = #{startDt,jdbcType=TIMESTAMP},
+      END_DT = #{endDt,jdbcType=TIMESTAMP},
+      VERSION = #{version,jdbcType=VARCHAR},
+      OFFER_VRUL_GRP_ID = #{offerVrulGrpId,jdbcType=BIGINT},
+      CREATE_DT = #{createDt,jdbcType=TIMESTAMP},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT}
+    where GRP_SYSTEM_REL_ID = #{grpSystemRelId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select GRP_SYSTEM_REL_ID, SYSTEM_INFO_ID, STATUS_CD, STATUS_DT, START_DT, END_DT, 
+    VERSION, OFFER_VRUL_GRP_ID, CREATE_DT, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
+    from grp_system_rel
+    where GRP_SYSTEM_REL_ID = #{grpSystemRelId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select GRP_SYSTEM_REL_ID, SYSTEM_INFO_ID, STATUS_CD, STATUS_DT, START_DT, END_DT, 
+    VERSION, OFFER_VRUL_GRP_ID, CREATE_DT, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
+    from grp_system_rel
+  </select>
+
+  <select id="selectByOfferId" resultMap="BaseResultMap">
+    select GRP_SYSTEM_REL_ID, SYSTEM_INFO_ID, STATUS_CD, STATUS_DT, START_DT, END_DT,
+    VERSION, OFFER_VRUL_GRP_ID, CREATE_DT, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
+    from grp_system_rel where SYSTEM_INFO_ID = #{offerId}
+  </select>
+
+
+
+
+
+</mapper>
