@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.MktCamRecomCalcRelMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.MktCamRecomCalcRel">
+    <id column="EVT_RECOM_CALC_REL_ID" jdbcType="BIGINT" property="evtRecomCalcRelId" />
+    <result column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId" />
+    <result column="ALGO_ID" jdbcType="BIGINT" property="algoId" />
+    <result column="ALGORITHMS_RUL_ID" jdbcType="BIGINT" property="algorithmsRulId" />
+    <result column="PRIORITY" jdbcType="INTEGER" property="priority" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from mkt_cam_recom_calc_rel
+    where EVT_RECOM_CALC_REL_ID = #{evtRecomCalcRelId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.MktCamRecomCalcRel">
+    insert into mkt_cam_recom_calc_rel (EVT_RECOM_CALC_REL_ID, MKT_CAMPAIGN_ID, ALGO_ID, 
+      ALGORITHMS_RUL_ID, PRIORITY, STATUS_CD, 
+      CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
+      UPDATE_DATE, STATUS_DATE, REMARK
+      )
+    values (#{evtRecomCalcRelId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{algoId,jdbcType=BIGINT}, 
+      #{algorithmsRulId,jdbcType=BIGINT}, #{priority,jdbcType=INTEGER}, #{statusCd,jdbcType=VARCHAR}, 
+      #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.MktCamRecomCalcRel">
+    update mkt_cam_recom_calc_rel
+    set MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},
+      ALGO_ID = #{algoId,jdbcType=BIGINT},
+      ALGORITHMS_RUL_ID = #{algorithmsRulId,jdbcType=BIGINT},
+      PRIORITY = #{priority,jdbcType=INTEGER},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where EVT_RECOM_CALC_REL_ID = #{evtRecomCalcRelId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select EVT_RECOM_CALC_REL_ID, MKT_CAMPAIGN_ID, ALGO_ID, ALGORITHMS_RUL_ID, PRIORITY, 
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, UPDATE_DATE, STATUS_DATE, REMARK
+    from mkt_cam_recom_calc_rel
+    where EVT_RECOM_CALC_REL_ID = #{evtRecomCalcRelId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select EVT_RECOM_CALC_REL_ID, MKT_CAMPAIGN_ID, ALGO_ID, ALGORITHMS_RUL_ID, PRIORITY, 
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, UPDATE_DATE, STATUS_DATE, REMARK
+    from mkt_cam_recom_calc_rel
+  </select>
+</mapper>

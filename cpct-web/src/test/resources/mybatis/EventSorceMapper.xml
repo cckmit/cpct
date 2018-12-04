@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.EventSorceMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.EventSorce">
+    <id column="EVT_SRC_ID" jdbcType="BIGINT" property="evtSrcId" />
+    <result column="EVT_SRC_CODE" jdbcType="VARCHAR" property="evtSrcCode" />
+    <result column="EVT_SRC_NAME" jdbcType="VARCHAR" property="evtSrcName" />
+    <result column="EVT_SRC_DESC" jdbcType="VARCHAR" property="evtSrcDesc" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REGION_ID" jdbcType="BIGINT" property="regionId" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from event_sorce
+    where EVT_SRC_ID = #{evtSrcId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.EventSorce">
+    insert into event_sorce (EVT_SRC_ID, EVT_SRC_CODE, EVT_SRC_NAME, 
+      EVT_SRC_DESC, STATUS_CD, STATUS_DATE, 
+      CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, 
+      UPDATE_DATE, REGION_ID, REMARK
+      )
+    values (#{evtSrcId,jdbcType=BIGINT}, #{evtSrcCode,jdbcType=VARCHAR}, #{evtSrcName,jdbcType=VARCHAR}, 
+      #{evtSrcDesc,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, 
+      #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{regionId,jdbcType=BIGINT}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.EventSorce">
+    update event_sorce
+    set EVT_SRC_CODE = #{evtSrcCode,jdbcType=VARCHAR},
+      EVT_SRC_NAME = #{evtSrcName,jdbcType=VARCHAR},
+      EVT_SRC_DESC = #{evtSrcDesc,jdbcType=VARCHAR},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REGION_ID = #{regionId,jdbcType=BIGINT},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where EVT_SRC_ID = #{evtSrcId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select EVT_SRC_ID, EVT_SRC_CODE, EVT_SRC_NAME, EVT_SRC_DESC, STATUS_CD, STATUS_DATE, 
+    CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REGION_ID, REMARK
+    from event_sorce
+    where EVT_SRC_ID = #{evtSrcId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select EVT_SRC_ID, EVT_SRC_CODE, EVT_SRC_NAME, EVT_SRC_DESC, STATUS_CD, STATUS_DATE, 
+    CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REGION_ID, REMARK
+    from event_sorce
+  </select>
+</mapper>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.SysMenuMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.SysMenu">
+    <id column="MENU_ID" jdbcType="BIGINT" property="menuId" />
+    <result column="MENU_NAME" jdbcType="VARCHAR" property="menuName" />
+    <result column="MENU_IMG" jdbcType="VARCHAR" property="menuImg" />
+    <result column="MENU_TYPE" jdbcType="BIGINT" property="menuType" />
+    <result column="PARENT_MENU_ID" jdbcType="BIGINT" property="parentMenuId" />
+    <result column="MENU_NEXT_ID" jdbcType="INTEGER" property="menuNextId" />
+    <result column="MENU_URL" jdbcType="VARCHAR" property="menuUrl" />
+    <result column="MENU_REMARK" jdbcType="VARCHAR" property="menuRemark" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from sys_menu
+    where MENU_ID = #{menuId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.SysMenu">
+    insert into sys_menu (MENU_ID, MENU_NAME, MENU_IMG, 
+      MENU_TYPE, PARENT_MENU_ID, MENU_NEXT_ID, 
+      MENU_URL, MENU_REMARK, CREATE_DATE, 
+      CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
+      )
+    values (#{menuId,jdbcType=BIGINT}, #{menuName,jdbcType=VARCHAR}, #{menuImg,jdbcType=VARCHAR}, 
+      #{menuType,jdbcType=BIGINT}, #{parentMenuId,jdbcType=BIGINT}, #{menuNextId,jdbcType=INTEGER}, 
+      #{menuUrl,jdbcType=VARCHAR}, #{menuRemark,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{createStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.SysMenu">
+    update sys_menu
+    set MENU_NAME = #{menuName,jdbcType=VARCHAR},
+      MENU_IMG = #{menuImg,jdbcType=VARCHAR},
+      MENU_TYPE = #{menuType,jdbcType=BIGINT},
+      PARENT_MENU_ID = #{parentMenuId,jdbcType=BIGINT},
+      MENU_NEXT_ID = #{menuNextId,jdbcType=INTEGER},
+      MENU_URL = #{menuUrl,jdbcType=VARCHAR},
+      MENU_REMARK = #{menuRemark,jdbcType=VARCHAR},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT}
+    where MENU_ID = #{menuId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MENU_ID, MENU_NAME, MENU_IMG, MENU_TYPE, PARENT_MENU_ID, MENU_NEXT_ID, MENU_URL, 
+    MENU_REMARK, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
+    from sys_menu
+    where MENU_ID = #{menuId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select MENU_ID, MENU_NAME, MENU_IMG, MENU_TYPE, PARENT_MENU_ID, MENU_NEXT_ID, MENU_URL, 
+    MENU_REMARK, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
+    from sys_menu
+  </select>
+</mapper>

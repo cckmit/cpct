@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.EventMatchRulMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.EventMatchRul">
+    <id column="EVT_MATCH_RUL_ID" jdbcType="BIGINT" property="evtMatchRulId" />
+    <result column="EVENT_ID" jdbcType="BIGINT" property="eventId" />
+    <result column="EVT_RUL_NAME" jdbcType="VARCHAR" property="evtRulName" />
+    <result column="EVT_RUL_DESC" jdbcType="VARCHAR" property="evtRulDesc" />
+    <result column="EVT_RUL_HANDLE_CLASS" jdbcType="VARCHAR" property="evtRulHandleClass" />
+    <result column="EVT_RUL_EXPRESSION" jdbcType="VARCHAR" property="evtRulExpression" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from event_match_rul
+    where EVT_MATCH_RUL_ID = #{evtMatchRulId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.EventMatchRul">
+    insert into event_match_rul (EVT_MATCH_RUL_ID, EVENT_ID, EVT_RUL_NAME, 
+      EVT_RUL_DESC, EVT_RUL_HANDLE_CLASS, EVT_RUL_EXPRESSION, 
+      STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+      CREATE_DATE, STATUS_DATE, UPDATE_DATE, 
+      REMARK)
+    values (#{evtMatchRulId,jdbcType=BIGINT}, #{eventId,jdbcType=BIGINT}, #{evtRulName,jdbcType=VARCHAR}, 
+      #{evtRulDesc,jdbcType=VARCHAR}, #{evtRulHandleClass,jdbcType=VARCHAR}, #{evtRulExpression,jdbcType=VARCHAR}, 
+      #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.EventMatchRul">
+    update event_match_rul
+    set EVENT_ID = #{eventId,jdbcType=BIGINT},
+      EVT_RUL_NAME = #{evtRulName,jdbcType=VARCHAR},
+      EVT_RUL_DESC = #{evtRulDesc,jdbcType=VARCHAR},
+      EVT_RUL_HANDLE_CLASS = #{evtRulHandleClass,jdbcType=VARCHAR},
+      EVT_RUL_EXPRESSION = #{evtRulExpression,jdbcType=VARCHAR},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where EVT_MATCH_RUL_ID = #{evtMatchRulId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select EVT_MATCH_RUL_ID, EVENT_ID, EVT_RUL_NAME, EVT_RUL_DESC, EVT_RUL_HANDLE_CLASS, 
+    EVT_RUL_EXPRESSION, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
+    UPDATE_DATE, REMARK
+    from event_match_rul
+    where EVT_MATCH_RUL_ID = #{evtMatchRulId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select EVT_MATCH_RUL_ID, EVENT_ID, EVT_RUL_NAME, EVT_RUL_DESC, EVT_RUL_HANDLE_CLASS, 
+    EVT_RUL_EXPRESSION, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
+    UPDATE_DATE, REMARK
+    from event_match_rul
+  </select>
+</mapper>

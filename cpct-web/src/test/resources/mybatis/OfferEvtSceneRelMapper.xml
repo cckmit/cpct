@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.OfferEvtSceneRelMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.OfferEvtSceneRel">
+    <id column="OFFER_SCENE_REL_ID" jdbcType="BIGINT" property="offerSceneRelId" />
+    <result column="OFFER_ID" jdbcType="BIGINT" property="offerId" />
+    <result column="EVENT_SCENE_ID" jdbcType="BIGINT" property="eventSceneId" />
+    <result column="REL_TYPE" jdbcType="VARCHAR" property="relType" />
+    <result column="EFF_DATE" jdbcType="TIMESTAMP" property="effDate" />
+    <result column="EXP_DATE" jdbcType="TIMESTAMP" property="expDate" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from offer_evt_scene_rel
+    where OFFER_SCENE_REL_ID = #{offerSceneRelId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.OfferEvtSceneRel">
+    insert into offer_evt_scene_rel (OFFER_SCENE_REL_ID, OFFER_ID, EVENT_SCENE_ID, 
+      REL_TYPE, EFF_DATE, EXP_DATE, 
+      STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+      CREATE_DATE, STATUS_DATE, UPDATE_DATE, 
+      REMARK)
+    values (#{offerSceneRelId,jdbcType=BIGINT}, #{offerId,jdbcType=BIGINT}, #{eventSceneId,jdbcType=BIGINT}, 
+      #{relType,jdbcType=VARCHAR}, #{effDate,jdbcType=TIMESTAMP}, #{expDate,jdbcType=TIMESTAMP}, 
+      #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.OfferEvtSceneRel">
+    update offer_evt_scene_rel
+    set OFFER_ID = #{offerId,jdbcType=BIGINT},
+      EVENT_SCENE_ID = #{eventSceneId,jdbcType=BIGINT},
+      REL_TYPE = #{relType,jdbcType=VARCHAR},
+      EFF_DATE = #{effDate,jdbcType=TIMESTAMP},
+      EXP_DATE = #{expDate,jdbcType=TIMESTAMP},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where OFFER_SCENE_REL_ID = #{offerSceneRelId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select OFFER_SCENE_REL_ID, OFFER_ID, EVENT_SCENE_ID, REL_TYPE, EFF_DATE, EXP_DATE, 
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from offer_evt_scene_rel
+    where OFFER_SCENE_REL_ID = #{offerSceneRelId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select OFFER_SCENE_REL_ID, OFFER_ID, EVENT_SCENE_ID, REL_TYPE, EFF_DATE, EXP_DATE, 
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from offer_evt_scene_rel
+  </select>
+</mapper>
