@@ -317,16 +317,16 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
                         mktCamStrategyConfRelMapper.insert(chaildMktCamStrategyConfRelDO);
                     }
                     //  发布活动时异步去同步大数据
-                    new Thread() {
-                        @Override
-                        public void run() {
-                            try {
-                                synchronizeCampaign(mktCampaignId, "admin");
-                            } catch (Exception e) {
-                                logger.error("[op:publishMktCampaign] 发布活动 id = {} 时，同步到生产失败！Exception= ", mktCampaignId, e);
-                            }
-                        }
-                    }.start();
+//                    new Thread() {
+//                        @Override
+//                        public void run() {
+//                            try {
+//                                synchronizeCampaign(mktCampaignId, "admin");
+//                            } catch (Exception e) {
+//                                logger.error("[op:publishMktCampaign] 发布活动 id = {} 时，同步到生产失败！Exception= ", mktCampaignId, e);
+//                            }
+//                        }
+//                    }.start();
 
                     // 协同中心活动信息同步
     /*            new Thread(){

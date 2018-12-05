@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.service.impl.grouping;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.google.gson.JsonObject;
 import com.sun.corba.se.spi.ior.ObjectKey;
 import com.zjtelcom.cpct.constants.CommonConstant;
@@ -768,9 +769,15 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         Map<String,Object> labelMap = messageLabelService.queryLabelListByDisplayId(req);
         List<LabelDTO> labelDTOList = (List<LabelDTO>)labelMap.get("labels");
         String[] fieldList = new String[labelDTOList.size()];
+        List<Map<String,Object>> labelList = new ArrayList<>();
         for (int i = 0 ; i< labelDTOList.size();i++){
             fieldList[i] = labelDTOList.get(i).getLabelCode();
+            Map<String,Object> label = new HashMap<>();
+            label.put("code",labelDTOList.get(i).getLabelCode());
+            label.put("name",labelDTOList.get(i).getInjectionLabelName());
+            labelList.add(label);
         }
+        redisUtils.set("LABEL_DETAIL_"+trialOperation.getBatchNum(),labelList);
 
         TrialOperationVO request = BeanUtil.create(trialOperation,new TrialOperationVO());
         request.setFieldList(fieldList);

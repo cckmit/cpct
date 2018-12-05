@@ -197,7 +197,7 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
         for (MktVerbalCondition condition : conditions) {
             VerbalConditionVO vo = BeanUtil.create(condition, new VerbalConditionVO());
             vo.setOperName(Operator.getOperator(Integer.valueOf(condition.getOperType())).getDescription());
-            if (!condition.getLeftParamType().equals("2000")) {
+            if (condition.getLeftParam()!=null && !condition.getLeftParamType().equals("2000")) {
                 Label label = labelMapper.selectByPrimaryKey(Long.valueOf(condition.getLeftParam()));
                 if (label.getConditionType()!=null && !label.getConditionType().equals("")){
                     vo.setConditionType(label.getConditionType());
