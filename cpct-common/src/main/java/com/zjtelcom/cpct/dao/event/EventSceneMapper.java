@@ -5,6 +5,7 @@ import com.zjtelcom.cpct.dto.event.EventScene;
 import com.zjtelcom.cpct.request.event.QryEventSceneListReq;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
 @Mapper

@@ -86,6 +86,25 @@ public class EventApiTestController {
         return randNum;
     }
 
+    @RequestMapping(value = "/secondChannelSynergy", method = RequestMethod.POST)
+    @CrossOrigin
+    public String secondChannelSynergy(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> params) {
+
+        response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET");
+        response.setHeader("Access-Control-Allow-Headers", "Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With,userId,token");
+
+        Map result = new HashMap();
+        try {
+            result = eventApiService.secondChannelSynergy(params);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
+        return JSON.toJSONString(result);
+    }
+
 
     @RequestMapping(value = "/label", method = RequestMethod.POST)
     @CrossOrigin

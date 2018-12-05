@@ -11,7 +11,6 @@ import com.zjtelcom.cpct.service.channel.LabelCatalogService;
 import com.zjtelcom.cpct.service.channel.LabelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
-import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

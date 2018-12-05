@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.service.impl.grouping;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.google.gson.JsonObject;
 import com.sun.corba.se.spi.ior.ObjectKey;
 import com.zjtelcom.cpct.constants.CommonConstant;
@@ -47,7 +48,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -62,7 +62,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static com.zjtelcom.cpct.constants.CommonConstant.*;
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 @Service
 public class TrialOperationServiceImpl extends BaseService implements TrialOperationService {
@@ -768,9 +769,15 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         Map<String,Object> labelMap = messageLabelService.queryLabelListByDisplayId(req);
         List<LabelDTO> labelDTOList = (List<LabelDTO>)labelMap.get("labels");
         String[] fieldList = new String[labelDTOList.size()];
+        List<Map<String,Object>> labelList = new ArrayList<>();
         for (int i = 0 ; i< labelDTOList.size();i++){
             fieldList[i] = labelDTOList.get(i).getLabelCode();
+            Map<String,Object> label = new HashMap<>();
+            label.put("code",labelDTOList.get(i).getLabelCode());
+            label.put("name",labelDTOList.get(i).getInjectionLabelName());
+            labelList.add(label);
         }
+        redisUtils.set("LABEL_DETAIL_"+trialOperation.getBatchNum(),labelList);
 
         TrialOperationVO request = BeanUtil.create(trialOperation,new TrialOperationVO());
         request.setFieldList(fieldList);

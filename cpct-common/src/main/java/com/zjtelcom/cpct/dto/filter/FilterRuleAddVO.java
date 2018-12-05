@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.dto.filter;
 
 import com.zjtelcom.cpct.dto.channel.VerbalConditionAddVO;
-import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 
 import java.io.Serializable;
 import java.util.Date;

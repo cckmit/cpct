@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.dto.campaign;
 
 import com.zjtelcom.cpct.BaseEntity;
+
 import java.io.Serializable;
 
 public class MktCamEvtRel extends BaseEntity implements Serializable{

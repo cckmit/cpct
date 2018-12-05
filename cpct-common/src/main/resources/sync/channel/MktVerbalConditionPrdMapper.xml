@@ -79,4 +79,12 @@
     from mkt_verbal_condition where CONDITION_TYPE = 0 and VERBAL_ID = #{verbalId}
   </select>
 
+    <select id="getLabelListByConditionId" resultType="String">
+    select label.INJECTION_LABEL_CODE
+    from mkt_verbal_condition m
+    left join injection_label label
+    on label.INJECTION_LABEL_ID = m.LEFT_PARAM
+    where m.CONDITION_TYPE = 3 and m.CONDITION_ID = #{conditionId}
+  </select>
+
 </mapper>

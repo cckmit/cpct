@@ -4,7 +4,6 @@ import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dto.channel.ContactChannelDetail;
 import com.zjtelcom.cpct.service.channel.ChannelService;
 import com.zjtelcom.cpct.util.UserUtil;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

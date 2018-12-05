@@ -3,7 +3,6 @@ package com.zjtelcom.cpct.service.impl.synchronize.template;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
-import com.zjtelcom.cpct.dto.event.ContactEvtItem;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
@@ -153,6 +152,8 @@ public class SynTarGrpTemplateServiceImpl implements SynTarGrpTemplateService {
     public Map<String, Object> deleteSingleTarGrp(Long templateId, String roleName) {
         Map<String, Object> maps = new HashMap<>();
         tarGrpPrdMapper.deleteByPrimaryKey(templateId);
+        tarGrpConditionPrdMapper.deleteByTarGrpTemplateId(templateId);
+        synchronizeRecordService.addRecord(roleName, tableName, templateId, SynchronizeType.delete.getType());
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
         return maps;

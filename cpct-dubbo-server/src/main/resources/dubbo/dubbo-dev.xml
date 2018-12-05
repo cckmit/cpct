@@ -9,35 +9,35 @@
     <!-- 提供方应用信息，用于计算依赖关系 -->
     <dubbo:application name="00.1083"/>
 
-    <dubbo:registry protocol="dubbo" address="134.96.253.86:8033"/>
+    <!--<dubbo:registry protocol="dubbo" address="134.96.253.86:8033"/>-->
+    <dubbo:registry protocol="dubbo" address="134.96.253.65:8001"/>
 
     <!-- 暴露服务 -->
     <dubbo:protocol name="dubbo" port="30311"/>
     <dubbo:monitor protocol="registry" />
 
     <!-- 注册 -->
-    <!--&lt;!&ndash; 策略cpct计算服务 &ndash;&gt;-->
+    <!-- 策略cpct计算服务 -->
     <!--<dubbo:service interface="com.zjtelcom.cpct.dubbo.service.EventApiService" ref="eventApiServiceImpl" version="1.0" >-->
         <!--&lt;!&ndash; 策略cpct计算服务（同步） &ndash;&gt;-->
         <!--<dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="10000"/>-->
     <!--</dubbo:service>-->
 
-    <!--&lt;!&ndash; 编码查询事件详情服务 &ndash;&gt;-->
+    <!-- 编码查询事件详情服务 -->
     <!--<dubbo:service interface="com.zjtelcom.cpct.dubbo.service.ChannelService" ref="channelServiceImpl" version="1.0" >-->
         <!--<dubbo:method name="getEventDetail" servicecode="00.1083.getEventDetail" timeout="10000"/>-->
     <!--</dubbo:service>-->
 
-    <!--&lt;!&ndash; 因子实时查询 &ndash;&gt;-->
-    <!--<dubbo:reference interface="com.zjpii.biz.serv.YzServ" id="yzServ"-->
-                     <!--version="2.0" retries="0" check="false">-->
-        <!--<dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="5000"/>-->
-
-    <!--</dubbo:reference>-->
+    <!-- 因子实时查询 -->
+    <dubbo:reference interface="com.zjpii.biz.serv.YzServ" id="yzServ"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="5000"/>
+    </dubbo:reference>
 
     <!-- redis实时查询服务 -->
-    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.TrialRedisService" ref="trialRedisServiceImpl" version="1.0" >
-        <dubbo:method name="searchFromRedis" servicecode="00.1083.searchFromRedis" timeout="10000"/>
-    </dubbo:service>
+    <!--<dubbo:service interface="com.zjtelcom.cpct.dubbo.service.TrialRedisService" ref="trialRedisServiceImpl" version="1.0" >-->
+        <!--<dubbo:method name="searchFromRedis" servicecode="00.1083.searchFromRedis" timeout="10000"/>-->
+    <!--</dubbo:service>-->
 
 
 </beans>

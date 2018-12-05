@@ -3,7 +3,6 @@ package com.zjtelcom.cpct.controller.event;
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dto.event.ContactEvtMatchRul;
-import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.event.ContactEvtMatchRulService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;

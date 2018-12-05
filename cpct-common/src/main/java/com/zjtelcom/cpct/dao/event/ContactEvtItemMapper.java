@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.dao.event;
 
 import com.zjtelcom.cpct.domain.event.EventItemDO;
-import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.ContactEvtItem;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -14,6 +13,8 @@ import java.util.List;
 public interface ContactEvtItemMapper {
 
     int deleteByPrimaryKey(Long evtItemId);
+
+    int deleteByEventId(Long contactEvtId);
 
     int insert(ContactEvtItem record);
 

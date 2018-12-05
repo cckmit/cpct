@@ -10,7 +10,6 @@ import com.zjtelcom.cpct.dto.filter.FilterRuleAddVO;
 import com.zjtelcom.cpct.dto.user.UserList;
 import com.zjtelcom.cpct.request.filter.FilterRuleReq;
 import com.zjtelcom.cpct.service.filter.FilterRuleService;
-import com.zjtelcom.cpct.util.FtpUtils;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -21,9 +20,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Description 规律规则controller

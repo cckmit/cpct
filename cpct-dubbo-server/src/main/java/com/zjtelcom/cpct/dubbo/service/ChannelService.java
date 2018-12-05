@@ -5,8 +5,6 @@ import com.zjtelcom.cpct.dubbo.model.Ret;
 import com.zjtelcom.cpct.dubbo.model.RetChannel;
 import com.zjtelcom.cpct.dubbo.model.RetEvent;
 
-import java.util.Map;
-
 public interface ChannelService {
 
     RetChannel getChannelDetail(String channelCode);

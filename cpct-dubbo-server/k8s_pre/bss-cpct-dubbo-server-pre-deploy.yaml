@@ -41,7 +41,7 @@ spec:
         - name: tz-config
           mountPath: /etc/localtime
         - name: app-log
-          mountPath: /app/logs
+          mountPath: /app/dubbo/logs
         ports:
         - containerPort: 30823    #修改端口号
         readinessProbe:

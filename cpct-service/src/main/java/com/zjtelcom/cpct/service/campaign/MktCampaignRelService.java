@@ -7,8 +7,6 @@
 package com.zjtelcom.cpct.service.campaign;
 
 
-import com.zjtelcom.cpct.dto.campaign.MktCampaignVO;
-
 import java.util.Map;
 
 /**

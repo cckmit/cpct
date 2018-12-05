@@ -1,8 +1,5 @@
 package com.zjtelcom.cpct.service;
 
-import com.zjtelcom.cpct.domain.SysArea;
-import com.zjtelcom.cpct.domain.channel.Channel;
-import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.filter.FilterRuleModel;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 

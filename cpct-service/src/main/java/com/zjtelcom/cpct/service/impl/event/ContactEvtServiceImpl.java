@@ -7,7 +7,6 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.event.*;
-import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamEvtRelDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
@@ -74,6 +73,10 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     private InterfaceCfgMapper interfaceCfgMapper;
     @Autowired
     private EventSorceMapper eventSorceMapper;
+    @Autowired
+    private EventMatchRulMapper eventMatchRulMapper;
+    @Autowired
+    private EventMatchRulConditionMapper eventMatchRulConditionMapper;
     @Autowired
     private EventMatchRulService eventMatchRulService;
     @Autowired
@@ -341,7 +344,15 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         //EventMatchRulDetail eventMatchRulDetail = ;
         //删除事件
         contactEvtMapper.delEvent(contactEvtId);
-
+        contactEvtItemMapper.deleteByEventId(contactEvtId);
+        EventMatchRulDTO eventMatchRulDTO = eventMatchRulMapper.listEventMatchRul(contactEvtId);
+        if(eventMatchRulDTO != null) {
+            eventMatchRulMapper.delEventMatchRul(eventMatchRulDTO);
+            List<EventMatchRulCondition> eventMatchRulConditionList = eventMatchRulConditionMapper.listEventMatchRulCondition(eventMatchRulDTO.getEvtMatchRulId());
+            for(EventMatchRulCondition eventMatchRulCondition : eventMatchRulConditionList){
+                eventMatchRulConditionMapper.delEventMatchRulCondition(eventMatchRulCondition);
+            }
+        }
         if (value.equals("1")){
             new Thread(){
                 public void run(){

@@ -1,7 +1,5 @@
 package com.zjtelcom.cpct.domain;
 
-import com.zjtelcom.cpct.domain.system.SysAreaTree;
-
 import java.io.Serializable;
 import java.util.List;
 

@@ -80,4 +80,4 @@ spec:
           path: /etc/localtime
       - name: app-log
         hostPath:
-          path: /app/app-log/bss-cpct-web-pre
+          path: /app/app-log

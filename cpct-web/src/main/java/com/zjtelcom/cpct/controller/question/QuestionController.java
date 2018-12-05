@@ -1,15 +1,12 @@
 package com.zjtelcom.cpct.controller.question;
 
-import com.alibaba.fastjson.JSONArray;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.question.Question;
 import com.zjtelcom.cpct.dto.question.QuestionAddVO;
 import com.zjtelcom.cpct.dto.question.QuestionEditVO;
-import com.zjtelcom.cpct.dto.question.QuestionReq;
 import com.zjtelcom.cpct.dto.question.QuestionnaireParam;
 import com.zjtelcom.cpct.service.question.QuestionService;
 import com.zjtelcom.cpct.service.question.QuestionnaireService;
-import com.zjtelcom.cpct.util.FastJsonUtils;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;

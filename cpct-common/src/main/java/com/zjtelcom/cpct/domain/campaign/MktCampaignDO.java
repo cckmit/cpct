@@ -1,7 +1,7 @@
 package com.zjtelcom.cpct.domain.campaign;
 
 import com.zjtelcom.cpct.BaseEntity;
-import lombok.Data;
+
 import java.util.Date;
 
 public class MktCampaignDO extends BaseEntity{

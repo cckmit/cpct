@@ -62,11 +62,6 @@
             <artifactId>zookeeper</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid</artifactId>
-        </dependency>
-
         <!-- 引入协同中心dubbo服务jar包 -->
         <dependency>
             <groupId>com.ctzj.smt.bss</groupId>
@@ -78,6 +73,7 @@
             <groupId>com.ctzj.smt.bss</groupId>
             <artifactId>bss-centralized-authenticate</artifactId>
         </dependency>
+
         <dependency>
             <groupId>com.zjhcsoft.session</groupId>
             <artifactId>spring-session</artifactId>
@@ -114,6 +110,19 @@
             <artifactId>PolicyTemplateDataService</artifactId>
             <version>1.0.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.zjtelcom.es</groupId>
+            <artifactId>es-service-batch</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+
+        <!-- 黄懿慧dubbo服务jar包 -->
+        <dependency>
+            <groupId>com.zjpii.biz</groupId>
+            <artifactId>biz</artifactId>
+        </dependency>
+
 
     </dependencies>
 

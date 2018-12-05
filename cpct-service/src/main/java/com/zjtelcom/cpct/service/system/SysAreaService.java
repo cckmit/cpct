@@ -6,8 +6,6 @@
  */
 package com.zjtelcom.cpct.service.system;
 
-import com.zjtelcom.cpct.domain.SysArea;
-
 import java.util.List;
 import java.util.Map;
 

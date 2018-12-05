@@ -3,10 +3,8 @@ package com.zjtelcom.cpct.dubbo.model;
 import com.zjtelcom.cpct.domain.channel.CamScript;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
-import com.zjtelcom.cpct.dto.channel.VerbalVO;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MktCamChlConfDetail extends MktCamChlConf{
 

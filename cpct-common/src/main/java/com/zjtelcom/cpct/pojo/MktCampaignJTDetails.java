@@ -12,7 +12,9 @@ package com.zjtelcom.cpct.pojo;
 
 import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
-import com.zjtelcom.cpct.dto.campaign.*;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
+import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
+import com.zjtelcom.cpct.dto.campaign.MktCpcAlgorithmsRul;
 import com.zjtelcom.cpct.dto.event.EventScene;
 import com.zjtelcom.cpct.dto.event.EvtSceneCamRel;
 import com.zjtelcom.cpct.dto.strategy.MktStrategy;
