@@ -143,6 +143,7 @@ public class SynLabelGrpServiceImpl implements SynLabelGrpService {
         for (LabelGrpMbr labelGrpMbr:listByGrpId){
             injectionLabelGrpMbrPrdMapper.deleteByPrimaryKey(labelGrpMbr.getGrpMbrId());
         }
+        synchronizeRecordService.addRecord(roleName,tableName,labelGrpId, SynchronizeType.delete.getType());
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
         return maps;

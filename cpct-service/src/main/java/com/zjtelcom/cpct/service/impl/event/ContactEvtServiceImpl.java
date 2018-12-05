@@ -74,6 +74,10 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     @Autowired
     private EventSorceMapper eventSorceMapper;
     @Autowired
+    private EventMatchRulMapper eventMatchRulMapper;
+    @Autowired
+    private EventMatchRulConditionMapper eventMatchRulConditionMapper;
+    @Autowired
     private EventMatchRulService eventMatchRulService;
     @Autowired
     private SynContactEvtService synContactEvtService;
@@ -340,7 +344,15 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         //EventMatchRulDetail eventMatchRulDetail = ;
         //删除事件
         contactEvtMapper.delEvent(contactEvtId);
-
+        contactEvtItemMapper.deleteByEventId(contactEvtId);
+        EventMatchRulDTO eventMatchRulDTO = eventMatchRulMapper.listEventMatchRul(contactEvtId);
+        if(eventMatchRulDTO != null) {
+            eventMatchRulMapper.delEventMatchRul(eventMatchRulDTO);
+            List<EventMatchRulCondition> eventMatchRulConditionList = eventMatchRulConditionMapper.listEventMatchRulCondition(eventMatchRulDTO.getEvtMatchRulId());
+            for(EventMatchRulCondition eventMatchRulCondition : eventMatchRulConditionList){
+                eventMatchRulConditionMapper.delEventMatchRulCondition(eventMatchRulCondition);
+            }
+        }
         if (value.equals("1")){
             new Thread(){
                 public void run(){

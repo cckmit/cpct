@@ -63,4 +63,13 @@
     REMARK
     from obj_mkt_campaign_rel
   </select>
+
+  <select id="selectByRequestIdAndType" resultMap="BaseResultMap">
+    select OFFER_SCENE_REL_ID, MKT_CAMPAIGN_ID, OBJ_TYPE, OBJ_ID, REL_TYPE, EFF_DATE,
+    EXP_DATE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
+    REMARK
+    from obj_mkt_campaign_rel where OBJ_ID = #{requestId} and OBJ_TYPE = #{type}
+  </select>
+
+
 </mapper>

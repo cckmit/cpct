@@ -17,6 +17,7 @@ import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateMapper;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO;
 import com.zjtelcom.cpct.dto.channel.CampaignInstVO;
+import com.zjtelcom.cpct.dto.channel.ChannelDetail;
 import com.zjtelcom.cpct.dto.channel.LabelValueVO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
@@ -130,12 +131,14 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             instVO.setResourceList(resourceList);
             //渠道列表
             List<GrpSystemRel> grpSystemRels = grpSystemRelMapper.selectByOfferId(offerId);
-            List<Long> channelList = new ArrayList<>();
+            List<ChannelDetail> channelList = new ArrayList<>();
             for (GrpSystemRel systemRel : grpSystemRels){
                 Channel channel = channelMapper.selectByPrimaryKey(systemRel.getOfferVrulGrpId());
                 if (channel!=null){
-                    channelList.add(channel.getContactChlId());
-
+                    ChannelDetail detail = new ChannelDetail();
+                    detail.setChannelId(channel.getContactChlId());
+                    detail.setChannelName(channel.getContactChlName());
+                    channelList.add(detail);
                 }
             }
             instVO.setChannelList(channelList);

@@ -14,6 +14,8 @@ public interface ContactEvtItemMapper {
 
     int deleteByPrimaryKey(Long evtItemId);
 
+    int deleteByEventId(Long contactEvtId);
+
     int insert(ContactEvtItem record);
 
     ContactEvtItem selectByPrimaryKey(Long evtItemId);

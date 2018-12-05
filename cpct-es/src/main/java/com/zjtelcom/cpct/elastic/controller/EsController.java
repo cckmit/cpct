@@ -89,12 +89,12 @@ public class EsController {
     @RequestMapping("/createIndex")
     @CrossOrigin
     public String createIndex(HttpServletRequest request, HttpServletResponse response) {
-        if(!ElasticsearchUtil.isIndexExist("test_hyf")) {
-            ElasticsearchUtil.createIndex("test_hyf");
-        }
-        else{
-            return "索引已经存在";
-        }
+//        if(!ElasticsearchUtil.isIndexExist("test_hyf")) {
+//            ElasticsearchUtil.createIndex("test_hyf");
+//        }
+//        else{
+//            return "索引已经存在";
+//        }
         esService.add();
         return "索引创建成功";
     }

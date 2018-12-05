@@ -148,31 +148,62 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         Map<String,Object> result = new HashMap<>();
         List<Long> ruleIdList = new ArrayList<>();
         List<MktCamItem> mktCamItems = new ArrayList<>();
-        for (Long productId : param.getIdList()){
-            Offer product = productMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
-            if (product==null){
-                result.put("resultCode",CODE_FAIL);
-                result.put("resultMsg","产品不存在");
-                return result;
+        //销售品
+        if (param.getItemType().equals("1000")){
+            for (Long productId : param.getIdList()){
+                Offer product = productMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
+                if (product==null){
+                    result.put("resultCode",CODE_FAIL);
+                    result.put("resultMsg","产品不存在");
+                    return result;
+                }
+                MktCamItem item = new MktCamItem();
+                item.setMktCampaignId(1000L);
+                item.setOfferCode(product.getOfferNbr());
+                item.setOfferName(product.getOfferName());
+                item.setItemId(productId);
+                item.setItemType(param.getItemType()==null ? "1000" : param.getItemType());
+                item.setCreateDate(new Date());
+                item.setCreateDate(DateUtil.getCurrentTime());
+                item.setUpdateDate(DateUtil.getCurrentTime());
+                item.setStatusDate(DateUtil.getCurrentTime());
+                item.setUpdateStaff(UserUtil.loginId());
+                item.setCreateStaff(UserUtil.loginId());
+                item.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                mktCamItems.add(item);
+                //redis添加推荐条目数据
+                redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
             }
-            MktCamItem item = new MktCamItem();
-            item.setMktCampaignId(1000L);
-            item.setOfferCode(product.getOfferNbr());
-            item.setOfferName(product.getOfferName());
-            item.setItemId(productId);
-            item.setItemType(param.getItemType()==null ? "1000" : param.getItemType());
-            item.setCreateDate(new Date());
-            item.setCreateDate(DateUtil.getCurrentTime());
-            item.setUpdateDate(DateUtil.getCurrentTime());
-            item.setStatusDate(DateUtil.getCurrentTime());
-            item.setUpdateStaff(UserUtil.loginId());
-            item.setCreateStaff(UserUtil.loginId());
-            item.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-            mktCamItems.add(item);
-            //redis添加推荐条目数据
-            redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
+            //促销券
+        }else if ("3000".equals(param.getItemType())){
+            for (Long resourceId : param.getIdList()){
+                MktResource resource = resourceMapper.selectByPrimaryKey(resourceId);
+                if (resource==null){
+                    result.put("resultCode",CODE_FAIL);
+                    result.put("resultMsg","促销券不存在");
+                    return result;
+                }
+                MktCamItem item = new MktCamItem();
+                item.setMktCampaignId(1000L);
+                item.setOfferCode(resource.getMktResNbr());
+                item.setOfferName(resource.getMktResName());
+                item.setItemId(resourceId);
+                item.setItemType(param.getItemType());
+                item.setCreateDate(new Date());
+                item.setCreateDate(DateUtil.getCurrentTime());
+                item.setUpdateDate(DateUtil.getCurrentTime());
+                item.setStatusDate(DateUtil.getCurrentTime());
+                item.setUpdateStaff(UserUtil.loginId());
+                item.setCreateStaff(UserUtil.loginId());
+                item.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                mktCamItems.add(item);
+                //redis添加推荐条目数据
+                redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
+            }
         }
-        camItemMapper.insertByBatch(mktCamItems);
+        if (!mktCamItems.isEmpty()){
+            camItemMapper.insertByBatch(mktCamItems);
+        }
         for(MktCamItem item : mktCamItems){
             ruleIdList.add(item.getMktCamItemId());
         }
@@ -211,6 +242,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 result.put("resultCode",CODE_FAIL);
                 result.put("resultMsg","推荐条目不存在");
                 return result;
+
             }
             //销售品
             if (item.getItemType().equals("1000")){
@@ -231,7 +263,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                     rule.setPriority(item.getPriority());
                 }
                 ruleList.add(rule);
-            }else if (item.getItemType().equals("2000")){
+            }else if (item.getItemType().equals("3000")){
                 //促销券
                 MktResource resource = resourceMapper.selectByPrimaryKey(item.getItemId());
                 if (resource==null){

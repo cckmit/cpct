@@ -37,8 +37,8 @@ public class SyncLabelController {
 //            e.printStackTrace();
 //        }
 
-//        result = syncLabelService.initialization();
-        result = syncLabelService.syncLabelInfo(model);
+        result = syncLabelService.initialization();
+//        result = syncLabelService.syncLabelInfo(model);
         return JSON.toJSON(result).toString();
     }
 
