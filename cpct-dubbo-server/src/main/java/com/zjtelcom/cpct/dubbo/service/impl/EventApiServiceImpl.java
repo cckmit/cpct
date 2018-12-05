@@ -165,7 +165,14 @@ public class EventApiServiceImpl implements EventApiService {
         //销售员编码（必填）
         String reqId = (String) map.get("reqId");
         //采集时间(yyyy-mm-dd hh24:mm:ss)
-        String evtCollectTime = (String) map.get("evtCollectTime");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String evtCollectTime = simpleDateFormat.format(new Date());
+        if(!map.containsKey("evtCollectTime") || "".equals((String) map.get("evtCollectTime"))) {
+
+        } else {
+            evtCollectTime = (String) map.get("evtCollectTime");
+        }
+
         //自定义参数集合json字符串
         String evtContent = (String) map.get("evtContent");
         //事件传入参数 结束--------------------
@@ -320,6 +327,7 @@ public class EventApiServiceImpl implements EventApiService {
 
             //初始化es log
             JSONObject esJson = new JSONObject();
+            JSONObject paramsJson = new JSONObject();
 
             //构造返回结果
             String custId = map.get("custId");
@@ -350,9 +358,14 @@ public class EventApiServiceImpl implements EventApiService {
             esJson.put("integrationId", map.get("integrationId"));
             esJson.put("accNbr", map.get("accNbr"));
             esJson.put("custId", map.get("custId"));
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd mm:HH:ss");
-//            esJson.put("evtCollectTime", new Date(Long.valueOf(map.get("evtCollectTime"))));
+            esJson.put("channel", map.get("channelCode"));
+            esJson.put("lanId", map.get("lanId"));
+
             esJson.put("evtCollectTime", map.get("evtCollectTime"));
+
+            paramsJson.put("reqId", map.get("reqId"));
+
+//            paramsJson.put("evtCollectTime", map.get("evtCollectTime"));
 
             //验证事件状态
             if (!"1000".equals(event.getStatusCd())) {
@@ -554,12 +567,6 @@ public class EventApiServiceImpl implements EventApiService {
                 }
             }
 
-            //es log
-            long cost = System.currentTimeMillis() - begin;
-            esJson.put("timeCost", cost);
-            esJson.put("hit", true);
-            esService.save(esJson, IndexList.EVENT_MODULE);
-
             //构造返回参数
             result.put("CPCResultCode", "1");
             result.put("CPCResultMsg", "success");
@@ -569,6 +576,16 @@ public class EventApiServiceImpl implements EventApiService {
             //返回结果
             result.put("taskList", activityList); //协同回调结果
             System.out.println("命中结果：" + result.toString());
+
+            //es log
+            long cost = System.currentTimeMillis() - begin;
+            esJson.put("timeCost", cost);
+            esJson.put("hit", true);
+
+            esService.save(esJson, IndexList.EVENT_MODULE);
+
+            paramsJson.put("backParams", result);
+            esService.save(paramsJson, IndexList.PARAMS_MODULE);
             return result;
         }
     }

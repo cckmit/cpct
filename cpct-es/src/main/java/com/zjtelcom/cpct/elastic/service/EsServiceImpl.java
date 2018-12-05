@@ -53,14 +53,13 @@ public class EsServiceImpl implements EsService {
         jsonObject.put("dateSt",new Date());
         jsonObject.put("dateSt2","2018-04-25T08:33:44.840Z");
 
-
         String id = ElasticsearchUtil.addData(jsonObject, "test_hyf", esType, jsonObject.getString("id"));
         System.out.println("*********ID**********: "+id);
     }
 
     @Override
     public void save(JSONObject jsonObject,String indexName) {
-        String id = ElasticsearchUtil.addData(jsonObject, indexName, esType, jsonObject.getString("ISI"));
+        String id = ElasticsearchUtil.addData(jsonObject, indexName, esType);
 //        String id = ElasticsearchUtil.addData(jsonObject, indexName, esType, jsonObject.getString("ISI"));
 
         logger.info("test..."+id);

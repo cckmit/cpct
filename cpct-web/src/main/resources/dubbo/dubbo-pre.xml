@@ -39,4 +39,5 @@
         <dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="10000"/>
     </dubbo:reference>
 
+
 </beans>
