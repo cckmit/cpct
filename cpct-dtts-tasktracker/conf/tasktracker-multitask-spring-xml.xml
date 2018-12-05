@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.0.xsd"
+>
+
+    <context:component-scan base-package="com.ctg.dtts.tasktracker"/>
+
+    <bean id="multiJobRunner" class="com.ctg.dtts.tasktracker.MultiJobRunner"/>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="runCampaignCycleMonth"/>
+        <property name="shardValue" value="campaignCycleMonth"/>
+    </bean>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="runCampaignCycleWeek"/>
+        <property name="shardValue" value="campaignCycleWeek"/>
+    </bean>
+
+    <!--<bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">-->
+        <!--<property name="targetObject" ref="multiJobRunner"/>-->
+        <!--<property name="targetMethod" value="runJob3"/>-->
+        <!--<property name="shardValue" value="simpleTask2"/>-->
+    <!--</bean>-->
+    <!--<bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">-->
+        <!--<property name="targetObject" ref="multiJobRunner"/>-->
+        <!--<property name="targetMethod" value="runJob4"/>-->
+        <!--<property name="shardValue" value="getZkPathChild"/>-->
+    <!--</bean>-->
+
+    <!-- 这个 TaskTrackerAnnotationFactoryBean bean 要放在 MethodInvokingJobRunner的后面  -->
+    <bean id="taskTracker" class="com.ctg.dtts.spring.TaskTrackerAnnotationFactoryBean" init-method="start">
+        <!-- 使用JobRunnerItem注解一定要使用 JobDispatcher -->
+        <property name="jobRunnerClass" value="com.ctg.dtts.spring.tasktracker.JobDispatcher"/>
+        <!-- 如果指定为taskId, 取job.getTaskId() , 否则从 job.getParam("shardField") -->
+        <property name="shardField" value="taskId"/>
+    </bean>
+
+</beans>
