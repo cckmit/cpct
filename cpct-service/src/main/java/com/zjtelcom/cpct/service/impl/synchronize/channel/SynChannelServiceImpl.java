@@ -131,6 +131,7 @@ public class SynChannelServiceImpl implements SynChannelService {
         contactChannelPrdMapper.deleteByPrimaryKey(channelId);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
+        synchronizeRecordService.addRecord(roleName,tableName,channelId, SynchronizeType.delete.getType());
         return maps;
     }
 }

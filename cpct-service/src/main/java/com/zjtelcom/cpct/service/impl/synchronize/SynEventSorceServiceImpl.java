@@ -142,6 +142,8 @@ public class SynEventSorceServiceImpl extends BaseService implements SynEventSor
         eventSorcePrdMapper.deleteByPrimaryKey(eventId);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
+        synchronizeRecordService.addRecord(roleName,tableName,eventId, SynchronizeType.delete.getType());
+
         return maps;
     }
 }

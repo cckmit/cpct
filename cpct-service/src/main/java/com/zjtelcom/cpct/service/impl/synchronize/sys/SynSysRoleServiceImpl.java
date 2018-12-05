@@ -130,6 +130,7 @@ public class SynSysRoleServiceImpl implements SynSysRoleService {
         sysRolePrdMapper.deleteByPrimaryKey(roleId);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
+        synchronizeRecordService.addRecord(roleName,tableName,roleId, SynchronizeType.delete.getType());
         return maps;
     }
 

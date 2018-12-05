@@ -200,7 +200,11 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
     @Override
     public Map<String, Object> delFilterRule(final FilterRule filterRule) {
         Map<String, Object> maps = new HashMap<>();
-        filterRuleMapper.delFilterRule(filterRule);
+        FilterRule rule = filterRuleMapper.selectByPrimaryKey(filterRule.getRuleId());
+        if(rule != null) {
+            filterRuleMapper.delFilterRule(filterRule);
+            verbalConditionMapper.deleteByPrimaryKey(rule.getConditionId());
+        }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
 

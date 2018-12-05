@@ -105,7 +105,17 @@ public class MktCampaignVO extends MktCampaign {
      */
     private List<MktStrategyConfDetail> mktStrategyConfDetailList;
 
+    //需求涵id
+    private Long requestId;
 
+
+    public Long getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(Long requestId) {
+        this.requestId = requestId;
+    }
 
     public String getStatusExamine() {
         return statusExamine;

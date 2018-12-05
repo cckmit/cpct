@@ -6,10 +6,12 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
 import com.zjtelcom.cpct.dao.channel.MktProductRuleMapper;
+import com.zjtelcom.cpct.dao.channel.MktResourceMapper;
 import com.zjtelcom.cpct.dao.channel.OfferMapper;
 import com.zjtelcom.cpct.dao.channel.PpmProductMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.channel.MktProductRule;
+import com.zjtelcom.cpct.domain.channel.MktResource;
 import com.zjtelcom.cpct.domain.channel.Offer;
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
@@ -40,6 +42,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     private MktStrategyConfRuleService strategyConfRuleService;
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired
+    private MktResourceMapper resourceMapper;
 
 
     @Override
@@ -149,31 +153,62 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         Map<String,Object> result = new HashMap<>();
         List<Long> ruleIdList = new ArrayList<>();
         List<MktCamItem> mktCamItems = new ArrayList<>();
-        for (Long productId : param.getIdList()){
-            Offer product = productMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
-            if (product==null){
-                result.put("resultCode",CODE_FAIL);
-                result.put("resultMsg","产品不存在");
-                return result;
+        //销售品
+        if (param.getItemType().equals("1000")){
+            for (Long productId : param.getIdList()){
+                Offer product = productMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
+                if (product==null){
+                    result.put("resultCode",CODE_FAIL);
+                    result.put("resultMsg","产品不存在");
+                    return result;
+                }
+                MktCamItem item = new MktCamItem();
+                item.setMktCampaignId(1000L);
+                item.setOfferCode(product.getOfferNbr());
+                item.setOfferName(product.getOfferName());
+                item.setItemId(productId);
+                item.setItemType(param.getItemType()==null ? "1000" : param.getItemType());
+                item.setCreateDate(new Date());
+                item.setCreateDate(DateUtil.getCurrentTime());
+                item.setUpdateDate(DateUtil.getCurrentTime());
+                item.setStatusDate(DateUtil.getCurrentTime());
+                item.setUpdateStaff(UserUtil.loginId());
+                item.setCreateStaff(UserUtil.loginId());
+                item.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                mktCamItems.add(item);
+                //redis添加推荐条目数据
+                redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
             }
-            MktCamItem item = new MktCamItem();
-            item.setMktCampaignId(1000L);
-            item.setOfferCode(product.getOfferNbr());
-            item.setOfferName(product.getOfferName());
-            item.setItemId(productId);
-            item.setItemType(param.getItemType()==null ? "1000" : param.getItemType());
-            item.setCreateDate(new Date());
-            item.setCreateDate(DateUtil.getCurrentTime());
-            item.setUpdateDate(DateUtil.getCurrentTime());
-            item.setStatusDate(DateUtil.getCurrentTime());
-            item.setUpdateStaff(UserUtil.loginId());
-            item.setCreateStaff(UserUtil.loginId());
-            item.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-            mktCamItems.add(item);
-            //redis添加推荐条目数据
-            redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
+            //促销券
+        }else if ("3000".equals(param.getItemType())){
+            for (Long resourceId : param.getIdList()){
+                MktResource resource = resourceMapper.selectByPrimaryKey(resourceId);
+                if (resource==null){
+                    result.put("resultCode",CODE_FAIL);
+                    result.put("resultMsg","促销券不存在");
+                    return result;
+                }
+                MktCamItem item = new MktCamItem();
+                item.setMktCampaignId(1000L);
+                item.setOfferCode(resource.getMktResNbr());
+                item.setOfferName(resource.getMktResName());
+                item.setItemId(resourceId);
+                item.setItemType(param.getItemType());
+                item.setCreateDate(new Date());
+                item.setCreateDate(DateUtil.getCurrentTime());
+                item.setUpdateDate(DateUtil.getCurrentTime());
+                item.setStatusDate(DateUtil.getCurrentTime());
+                item.setUpdateStaff(UserUtil.loginId());
+                item.setCreateStaff(UserUtil.loginId());
+                item.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                mktCamItems.add(item);
+                //redis添加推荐条目数据
+                redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
+            }
         }
-        camItemMapper.insertByBatch(mktCamItems);
+        if (!mktCamItems.isEmpty()){
+            camItemMapper.insertByBatch(mktCamItems);
+        }
         for(MktCamItem item : mktCamItems){
             ruleIdList.add(item.getMktCamItemId());
         }
@@ -212,24 +247,43 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 result.put("resultCode",CODE_FAIL);
                 result.put("resultMsg","推荐条目不存在");
                 return result;
+
             }
-            Offer product = productMapper.selectByPrimaryKey(Integer.valueOf(item.getItemId().toString()));
-            if (product==null){
-                continue;
+            //销售品
+            if (item.getItemType().equals("1000")){
+                Offer product = productMapper.selectByPrimaryKey(Integer.valueOf(item.getItemId().toString()));
+                if (product==null){
+                    continue;
+                }
+                MktProductRule rule = new MktProductRule();
+                rule.setId(item.getMktCamItemId());
+                rule.setProductId(item.getItemId());
+                rule.setProductName(product.getOfferName());
+                rule.setProductCode(product.getOfferNbr());
+                rule.setProductType(product.getOfferType());
+                rule.setRemark(item.getRemark());
+                rule.setItemType(item.getItemType()==null ? "" : item.getItemType());
+                rule.setPriority(item.getPriority()==null ? 0 : item.getPriority());
+                if (item.getPriority()!=null){
+                    rule.setPriority(item.getPriority());
+                }
+                ruleList.add(rule);
+            }else if (item.getItemType().equals("3000")){
+                //促销券
+                MktResource resource = resourceMapper.selectByPrimaryKey(item.getItemId());
+                if (resource==null){
+                    continue;
+                }
+                MktProductRule rule = new MktProductRule();
+                rule.setId(item.getMktCamItemId());
+                rule.setProductId(item.getItemId());
+                rule.setProductName(resource.getMktResName());
+                rule.setProductCode(resource.getMktResNbr());
+                rule.setRemark(item.getRemark());
+                rule.setItemType(item.getItemType()==null ? "" : item.getItemType());
+                rule.setPriority(item.getPriority()==null ? 0 : item.getPriority());
+                ruleList.add(rule);
             }
-            MktProductRule rule = new MktProductRule();
-            rule.setId(item.getMktCamItemId());
-            rule.setProductId(item.getItemId());
-            rule.setProductName(product.getOfferName());
-            rule.setProductCode(product.getOfferNbr());
-            rule.setProductType(product.getOfferType());
-            rule.setRemark(item.getRemark());
-            rule.setItemType(item.getItemType()==null ? "" : item.getItemType());
-            rule.setPriority(item.getPriority()==null ? 0 : item.getPriority());
-            if (item.getPriority()!=null){
-                rule.setPriority(item.getPriority());
-            }
-            ruleList.add(rule);
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",ruleList);

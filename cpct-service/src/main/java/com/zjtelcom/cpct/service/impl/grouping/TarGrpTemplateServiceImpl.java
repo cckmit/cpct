@@ -19,6 +19,7 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO;
 import com.zjtelcom.cpct.dto.channel.CampaignInstVO;
+import com.zjtelcom.cpct.dto.channel.ChannelDetail;
 import com.zjtelcom.cpct.dto.channel.LabelValueVO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.grouping.*;
@@ -115,11 +116,6 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                 TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(restrict.getRstrObjId());
                 if (tarGrp!=null){
                     instVO.setTarGrpTempleteId(tarGrp.getTarGrpId());
-//                    Map<String,Object> targrpMap = tarGrpService.listTarGrpCondition(restrict.getRstrObjId());
-//                    List<TarGrpConditionVO> voList = ( List<TarGrpConditionVO>)targrpMap.get("listTarGrpCondition");
-//                    TarGrpVO vo = BeanUtil.create(tarGrp,new TarGrpVO());
-//                    vo.setTarGrpConditionVOs(voList);
-//                    tarGrpVOS.add(vo);
                 }
             }
             //营销资源列表
@@ -134,11 +130,14 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             instVO.setResourceList(resourceList);
             //渠道列表
             List<GrpSystemRel> grpSystemRels = grpSystemRelMapper.selectByOfferId(offerId);
-            List<Long> channelList = new ArrayList<>();
+            List<ChannelDetail> channelList = new ArrayList<>();
             for (GrpSystemRel systemRel : grpSystemRels){
                 Channel channel = channelMapper.selectByPrimaryKey(systemRel.getOfferVrulGrpId());
                 if (channel!=null){
-                    channelList.add(channel.getContactChlId());
+                    ChannelDetail detail = new ChannelDetail();
+                    detail.setChannelId(channel.getContactChlId());
+                    detail.setChannelName(channel.getContactChlName());
+                    channelList.add(detail);
                 }
             }
             instVO.setChannelList(channelList);

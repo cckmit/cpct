@@ -84,12 +84,14 @@ public class SynQuestionServiceImpl  extends BaseService implements SynQuestionS
             if(!relListByQuestionnaireId.isEmpty()){
                 questRelPrdMapper.insertBatch(relListByQuestionnaireId);
             }
+            synchronizeRecordService.addRecord(roleName,questionName,questionnaireId, SynchronizeType.add.getType());
         }else{
             questionnairePrdMapper.updateByPrimaryKey(questionnaire);
             questRelPrdMapper.deleteByNaireId(questionnaireId);
             if(!relListByQuestionnaireId.isEmpty()){
                 questRelPrdMapper.insertBatch(relListByQuestionnaireId);
             }
+            synchronizeRecordService.addRecord(roleName,questionName,questionnaireId, SynchronizeType.update.getType());
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","同步成功");
