@@ -37,4 +37,6 @@ public interface MktStrategyConfRuleService {
 
     Map<String, Object> deleteCamItemBatch(List<Integer> ruleIdList, List<Integer> camitemIdList);
 
+    Map<String, Object> getRuleTemplate(Long preStrategyConfId);
+
 }
