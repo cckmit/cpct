@@ -101,6 +101,12 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
             if (mktCamChlResult.getMktCamChlConfDetailList() != null) {
                 for (MktCamChlConfDetail mktCamChlConfDetail : mktCamChlResult.getMktCamChlConfDetailList()) {
                     if (mktCamChlConfDetail.getEvtContactConfId() != null) {
+
+                        //TODO 添加推送渠道添加活动标识
+                        MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(mktCamChlConfDetail.getEvtContactConfId());
+                        mktCamChlConfDO.setMktCampaignId(mktCamChlResult.getMktCampaignId());
+                        mktCamChlConfMapper.updateByPrimaryKey(mktCamChlConfDO);
+
                         // 结果与推送渠道的关联
                         MktCamChlResultConfRelDO mktCamChlResultConfRelDO = new MktCamChlResultConfRelDO();
                         mktCamChlResultConfRelDO.setMktCamChlResultId(mktCamChlResultId);
@@ -265,6 +271,7 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
             // 新增结果 并获取Id
             mktCamChlResultMapper.insert(mktCamChlResultDO);
             Long mktCamChlResultId = mktCamChlResultDO.getMktCamChlResultId();
+            MktCamChlResult mktCamChlResult = BeanUtil.create(mktCamChlResultDO, new MktCamChlResult());
             // 获取原二次协同渠道下结果的推送渠道
             List<MktCamChlResultConfRelDO> mktCamChlResultConfRelDOList = mktCamChlResultConfRelMapper.selectByMktCamChlResultId(parentMktCamChlResultId);
             List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
@@ -272,13 +279,14 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
             for (MktCamChlResultConfRelDO mktCamChlResultConfRelDO : mktCamChlResultConfRelDOList) {
                 // 复制推送渠道
                 Map<String, Object> mktCamChlConfMap = mktCamChlConfService.copyMktCamChlConf(mktCamChlResultConfRelDO.getEvtContactConfId());
-                MktCamChlConfDO mktCamChlConfDO = (MktCamChlConfDO) mktCamChlConfMap.get("mktCamChlConfDO");
+                MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConfMap.get("mktCamChlConfDetail");
                 // 新的推送渠道与新的结果简历关联
-                if (mktCamChlConfDO != null) {
+                if (mktCamChlConfDetail != null) {
+                    mktCamChlConfDetailList.add(mktCamChlConfDetail);
                     // 结果与推送渠道的关联
                     MktCamChlResultConfRelDO childCamChlResultConfRelDO = new MktCamChlResultConfRelDO();
                     childCamChlResultConfRelDO.setMktCamChlResultId(mktCamChlResultId);
-                    childCamChlResultConfRelDO.setEvtContactConfId(mktCamChlConfDO.getEvtContactConfId());
+                    childCamChlResultConfRelDO.setEvtContactConfId(mktCamChlConfDetail.getEvtContactConfId());
                     childCamChlResultConfRelDO.setCreateStaff(UserUtil.loginId());
                     childCamChlResultConfRelDO.setCreateDate(new Date());
                     childCamChlResultConfRelDO.setUpdateStaff(UserUtil.loginId());
@@ -286,12 +294,12 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
                     mktCamChlResultConfRelMapper.insert(childCamChlResultConfRelDO);
                 }
             }
+            mktCamChlResult.setMktCamChlConfDetailList(mktCamChlConfDetailList);
             mktCamChlResultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
-            mktCamChlResultMap.put("mktCamChlResultDO", mktCamChlResultDO);
+            mktCamChlResultMap.put("mktCamChlResult", mktCamChlResult);
         } catch (Exception e) {
             logger.error("[op:MktCamChlResultServiceImpl] failed to get mktCamChlResultDO by mktCamChlResultId = {}", parentMktCamChlResultId);
             mktCamChlResultMap.put("resultCode", CommonConstant.CODE_FAIL);
-            mktCamChlResultMap.put("resultMsg", ErrorCode.GET_MKT_CAM_CHL_CONF_FAILURE.getErrorMsg());
         }
         return mktCamChlResultMap;
     }

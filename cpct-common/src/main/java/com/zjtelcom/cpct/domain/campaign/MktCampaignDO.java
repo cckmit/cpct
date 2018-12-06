@@ -29,9 +29,11 @@ public class MktCampaignDO extends BaseEntity{
     private String isCheckRule;
     private String srcId;
     private String srcType;
+    private String serviceType;
     private Long serviceCancleFlag;
     private Long regionId;
     private Long lifeStage;
+    private String extMktCampaignId;
 
     public Long getCalcDisplay() {
         return calcDisplay;
@@ -240,5 +242,21 @@ public class MktCampaignDO extends BaseEntity{
 
     public void setLifeStage(Long lifeStage) {
         this.lifeStage = lifeStage;
+    }
+
+    public String getServiceType() {
+        return serviceType;
+    }
+
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
+    }
+
+    public String getExtMktCampaignId() {
+        return extMktCampaignId;
+    }
+
+    public void setExtMktCampaignId(String extMktCampaignId) {
+        this.extMktCampaignId = extMktCampaignId;
     }
 }

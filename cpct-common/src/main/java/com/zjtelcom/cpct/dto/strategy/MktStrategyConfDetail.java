@@ -10,7 +10,16 @@ import java.util.List;
  */
 public class MktStrategyConfDetail extends MktStrategyConf {
 
+    /**
+     * 营销活动标识
+     */
     private Long mktCampaignId;
+
+    /**
+     * 营销活动名称
+     */
+    private String mktCampaignName;
+
 
     /**
      * 策略配置下规则列表
@@ -32,5 +41,13 @@ public class MktStrategyConfDetail extends MktStrategyConf {
 
     public void setMktCampaignId(Long mktCampaignId) {
         this.mktCampaignId = mktCampaignId;
+    }
+
+    public String getMktCampaignName() {
+        return mktCampaignName;
+    }
+
+    public void setMktCampaignName(String mktCampaignName) {
+        this.mktCampaignName = mktCampaignName;
     }
 }
