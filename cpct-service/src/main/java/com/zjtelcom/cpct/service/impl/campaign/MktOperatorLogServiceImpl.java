@@ -81,4 +81,15 @@ public class MktOperatorLogServiceImpl implements MktOperatorLogService{
 
         return result;
     }
+
+    @Override
+    public int addMktOperatorLog(String name,Long campaignId, Integer type) {
+        MktOperatorLogDO mktOperatorLogDO = new MktOperatorLogDO();
+        mktOperatorLogDO.setMktCampaignName(name);
+        mktOperatorLogDO.setMktCampaignId(campaignId);
+        mktOperatorLogDO.setOperatorType(String.valueOf(type));
+        mktOperatorLogDO.setOperatorDate(new Date());
+        return mktOperatorLogMapper.insertOperation(mktOperatorLogDO);
+
+    }
 }
