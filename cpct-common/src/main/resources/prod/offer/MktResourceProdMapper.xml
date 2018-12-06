@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct_prod.dao.offer.MktResourceProdMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.MktResource">
+        <id column="MKT_RES_ID" jdbcType="BIGINT" property="mktResId" />
+        <result column="MKT_RES_NBR" jdbcType="VARCHAR" property="mktResNbr" />
+        <result column="MKT_RES_TYPE_ID" jdbcType="BIGINT" property="mktResTypeId" />
+        <result column="MKT_RES_EXTTYPE_ID" jdbcType="BIGINT" property="mktResExttypeId" />
+        <result column="MKT_RES_NAME" jdbcType="VARCHAR" property="mktResName" />
+        <result column="MKT_RES_DESC" jdbcType="VARCHAR" property="mktResDesc" />
+        <result column="MKT_PRICING_PLAN_ID" jdbcType="BIGINT" property="mktPricingPlanId" />
+        <result column="UNIT" jdbcType="VARCHAR" property="unit" />
+        <result column="ORDERED_FLAG" jdbcType="VARCHAR" property="orderedFlag" />
+        <result column="MANAGE_REGION_ID" jdbcType="BIGINT" property="manageRegionId" />
+        <result column="EFF_DATE" jdbcType="TIMESTAMP" property="effDate" />
+        <result column="EXP_DATE" jdbcType="TIMESTAMP" property="expDate" />
+        <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+        <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+        <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from mkt_resource
+        where MKT_RES_ID = #{mktResId,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.MktResource">
+        insert into mkt_resource (MKT_RES_ID, MKT_RES_NBR, MKT_RES_TYPE_ID,
+                                  MKT_RES_EXTTYPE_ID, MKT_RES_NAME,
+                                  MKT_RES_DESC, MKT_PRICING_PLAN_ID, UNIT,
+                                  ORDERED_FLAG, MANAGE_REGION_ID, EFF_DATE,
+                                  EXP_DATE, STATUS_DATE, STATUS_CD,
+                                  REMARK, CREATE_STAFF, CREATE_DATE,
+                                  UPDATE_STAFF, UPDATE_DATE)
+        values (#{mktResId,jdbcType=BIGINT}, #{mktResNbr,jdbcType=VARCHAR}, #{mktResTypeId,jdbcType=BIGINT},
+                #{mktResExttypeId,jdbcType=BIGINT}, #{mktResName,jdbcType=VARCHAR},
+                #{mktResDesc,jdbcType=VARCHAR}, #{mktPricingPlanId,jdbcType=BIGINT}, #{unit,jdbcType=VARCHAR},
+                #{orderedFlag,jdbcType=VARCHAR}, #{manageRegionId,jdbcType=BIGINT}, #{effDate,jdbcType=TIMESTAMP},
+                #{expDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{statusCd,jdbcType=VARCHAR},
+                #{remark,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP},
+                #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP})
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.MktResource">
+        update mkt_resource
+        set MKT_RES_NBR = #{mktResNbr,jdbcType=VARCHAR},
+            MKT_RES_TYPE_ID = #{mktResTypeId,jdbcType=BIGINT},
+            MKT_RES_EXTTYPE_ID = #{mktResExttypeId,jdbcType=BIGINT},
+            MKT_RES_NAME = #{mktResName,jdbcType=VARCHAR},
+            MKT_RES_DESC = #{mktResDesc,jdbcType=VARCHAR},
+            MKT_PRICING_PLAN_ID = #{mktPricingPlanId,jdbcType=BIGINT},
+            UNIT = #{unit,jdbcType=VARCHAR},
+            ORDERED_FLAG = #{orderedFlag,jdbcType=VARCHAR},
+            MANAGE_REGION_ID = #{manageRegionId,jdbcType=BIGINT},
+            EFF_DATE = #{effDate,jdbcType=TIMESTAMP},
+            EXP_DATE = #{expDate,jdbcType=TIMESTAMP},
+            STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+            STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+            REMARK = #{remark,jdbcType=VARCHAR},
+            CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+            CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+            UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+            UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
+        where MKT_RES_ID = #{mktResId,jdbcType=BIGINT}
+    </update>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select MKT_RES_ID, MKT_RES_NBR, MKT_RES_TYPE_ID, MKT_RES_EXTTYPE_ID,
+               MKT_RES_NAME, MKT_RES_DESC, MKT_PRICING_PLAN_ID, UNIT, ORDERED_FLAG, MANAGE_REGION_ID,
+               EFF_DATE, EXP_DATE, STATUS_DATE, STATUS_CD, REMARK, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF,
+               UPDATE_DATE
+        from mkt_resource
+        where MKT_RES_ID = #{mktResId,jdbcType=BIGINT}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select MKT_RES_ID, MKT_RES_NBR, MKT_RES_TYPE_ID, MKT_RES_EXTTYPE_ID,
+               MKT_RES_NAME, MKT_RES_DESC, MKT_PRICING_PLAN_ID, UNIT, ORDERED_FLAG, MANAGE_REGION_ID,
+               EFF_DATE, EXP_DATE, STATUS_DATE, STATUS_CD, REMARK, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF,
+               UPDATE_DATE
+        from mkt_resource
+    </select>
+    <select id="selectByResourceName" resultMap="BaseResultMap">
+        select MKT_RES_ID, MKT_RES_NBR, MKT_RES_TYPE_ID, MKT_RES_EXTTYPE_ID,
+               MKT_RES_NAME, MKT_RES_DESC, MKT_PRICING_PLAN_ID, UNIT, ORDERED_FLAG, MANAGE_REGION_ID,
+               EFF_DATE, EXP_DATE, STATUS_DATE, STATUS_CD, REMARK, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF,
+               UPDATE_DATE
+        from mkt_resource
+        where MKT_RES_NAME LIKE CONCAT(CONCAT('%',#{mktResName}),'%')
+    </select>
+</mapper>
