@@ -106,6 +106,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
                 ChannelDetail childDetail = new ChannelDetail();
                 childDetail.setChannelId(child.getContactChlId());
                 childDetail.setChannelName(child.getContactChlName());
+                childDetail.setChannelCode(child.getContactChlCode());
                 if (child.getRemark()!=null && !child.getRemark().equals("")){
                     childDetail.setRemark(child.getRemark());
                 }
@@ -118,6 +119,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
             }
             parentDetail.setChannelId(parent.getContactChlId());
             parentDetail.setChannelName(parent.getContactChlName());
+            parentDetail.setChannelCode(parent.getContactChlCode());
             parentDetail.setChildren(childDetailList);
             parentDetailList.add(parentDetail);
         }

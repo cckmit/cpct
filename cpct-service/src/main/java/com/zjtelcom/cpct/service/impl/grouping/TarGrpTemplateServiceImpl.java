@@ -101,7 +101,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         Map<String, Object> result = new HashMap<>();
         List<CampaignInstVO> instVOS = new ArrayList<>();
         //todo 通过需求涵id获取销售品idList
-        List<RequestInstRel> requestInstRels = requestInstRelMapper.selectByRequestId(requestId);
+        List<RequestInstRel> requestInstRels = requestInstRelMapper.selectByRequestId(requestId,"offer");
         for (RequestInstRel requestInstRel : requestInstRels){
             Long offerId = requestInstRel.getRequestObjId();
             Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
