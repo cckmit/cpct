@@ -25,6 +25,11 @@ public class MktStrategyConfRule {
     private Long mktCampaignId;
 
     /**
+     * 营销活动名称
+     */
+    private String mktCampaignName;
+
+    /**
      * 策略配置标识
      */
     private Long StrategyConfId;
@@ -125,5 +130,13 @@ public class MktStrategyConfRule {
 
     public void setStrategyConfName(String strategyConfName) {
         StrategyConfName = strategyConfName;
+    }
+
+    public String getMktCampaignName() {
+        return mktCampaignName;
+    }
+
+    public void setMktCampaignName(String mktCampaignName) {
+        this.mktCampaignName = mktCampaignName;
     }
 }

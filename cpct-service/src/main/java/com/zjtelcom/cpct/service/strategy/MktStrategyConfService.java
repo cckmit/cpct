@@ -20,4 +20,6 @@ public interface MktStrategyConfService {
 
     Map<String, Object> copyMktStrategyConf(MktStrategyConfDetail mktStrategyConfDetail) throws Exception;
 
+    Map<String, Object> getStrategyTemplate(Long preMktStrategyConfId) throws Exception;
+
 }

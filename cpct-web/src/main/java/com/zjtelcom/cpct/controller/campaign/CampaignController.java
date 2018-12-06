@@ -180,9 +180,11 @@ public class CampaignController extends BaseController {
         // 存活动
         Map<String, Object> mktCampaignMap = mktCampaignService.createMktCampaign(mktCampaignVO);
         Long mktCampaignId = Long.valueOf(mktCampaignMap.get("mktCampaignId").toString());
+        String mktCampaignName = mktCampaignMap.get("mktCampaignName").toString();
         if (mktCampaignVO.getMktStrategyConfDetailList().size() > 0) {
             for (MktStrategyConfDetail mktStrategyConfDetail : mktCampaignVO.getMktStrategyConfDetailList()) {
                 mktStrategyConfDetail.setMktCampaignId(mktCampaignId);
+                mktStrategyConfDetail.setMktCampaignName(mktCampaignName);
                 mktStrategyConfService.saveMktStrategyConf(mktStrategyConfDetail);
             }
         }
@@ -338,4 +340,28 @@ public class CampaignController extends BaseController {
      //   mktCampaignService.changeMktCampaignStatus(parentMktCampaignId, StatusCode.STATUS_CODE_ROLL.getStatusCode());
         return JSON.toJSONString(mktCampaignMap);
     }
+
+
+    /**
+     * 获取活动模板
+     *
+     * @param params
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/getMktCampaignTemplate", method = RequestMethod.POST)
+    @CrossOrigin
+    public String getMktCampaignTemplate(@RequestBody Map<String, String> params) throws Exception {
+        Long parentMktCampaignId = Long.valueOf(params.get("mktCampaignId"));
+        Map<String, Object> mktCampaignMap = null;
+        try {
+            mktCampaignMap = mktCampaignService.getMktCampaignTemplate(parentMktCampaignId);
+            mktCampaignMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+        } catch (Exception e) {
+            logger.error("[op:CampaignController] failed to getMktCampaignTemplate by parentMktCampaignId = {}, Exception = ", parentMktCampaignId, e);
+            mktCampaignMap.put("resultCode", CommonConstant.CODE_FAIL);
+        }
+        return JSON.toJSONString(mktCampaignMap);
+    }
+
 }

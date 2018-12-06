@@ -56,4 +56,6 @@ public interface MktCampaignService {
 
     Map<String,Object> delayCampaign4Sync (Long campaignId, Date lastTime);
 
+    Map<String, Object> getMktCampaignTemplate(Long preMktCampaignId) throws Exception;
+
 }
