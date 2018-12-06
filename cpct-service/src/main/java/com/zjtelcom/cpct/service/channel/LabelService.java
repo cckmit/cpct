@@ -1,13 +1,12 @@
 package com.zjtelcom.cpct.service.channel;
 
-import com.zjtelcom.cpct.bean.RespInfo;
-import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelGrp;
 import com.zjtelcom.cpct.domain.channel.LabelGrpMbr;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
-import com.zjtelcom.cpct.dto.channel.*;
+import com.zjtelcom.cpct.dto.channel.LabelAddVO;
+import com.zjtelcom.cpct.dto.channel.LabelEditVO;
+import com.zjtelcom.cpct.dto.channel.LabelGrpParam;
 
-import java.util.List;
 import java.util.Map;
 
 public interface LabelService {

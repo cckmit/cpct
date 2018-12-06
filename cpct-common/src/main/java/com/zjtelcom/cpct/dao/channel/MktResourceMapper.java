@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.dao.channel;
 
 
 import com.zjtelcom.cpct.domain.channel.MktResource;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -15,4 +16,6 @@ public interface MktResourceMapper {
     List<MktResource> selectAll();
 
     int updateByPrimaryKey(MktResource record);
+
+    List<MktResource> selectByResourceName(@Param("mktResName") String mktResName);
 }

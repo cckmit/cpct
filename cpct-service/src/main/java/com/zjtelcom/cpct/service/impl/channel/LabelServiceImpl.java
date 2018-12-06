@@ -2,14 +2,12 @@ package com.zjtelcom.cpct.service.impl.channel;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.zjtelcom.cpct.bean.RespInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
-import com.zjtelcom.cpct.enums.ConditionType;
 import com.zjtelcom.cpct.enums.LabelCondition;
 import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.service.BaseService;
@@ -477,20 +475,26 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             return result;
         }
         //todo 存在关联关系的标签组 不能删除
-        labelGrpMapper.deleteByPrimaryKey(labelGrpId);
-        result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","删除成功");
+        List<LabelGrpMbr> labelGrpMbrList = labelGrpMbrMapper.findListByGrpId(labelGrpId);
+        if(labelGrpMbrList.size() == 0) {
+            labelGrpMapper.deleteByPrimaryKey(labelGrpId);
+            result.put("resultCode", CODE_SUCCESS);
+            result.put("resultMsg", "删除成功");
 
-        if (value.equals("1")){
-            new Thread(){
-                public void run(){
-                    try {
-                        synLabelGrpService.deleteSingleLabel(labelGrpId,"");
-                    }catch (Exception e){
-                        e.printStackTrace();
+            if (value.equals("1")){
+                new Thread(){
+                    public void run(){
+                        try {
+                            synLabelGrpService.deleteSingleLabel(labelGrpId,"");
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
                     }
-                }
-            }.start();
+                }.start();
+            }
+        }else{
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "存在关联标签,不能删除");
         }
 
         return result;

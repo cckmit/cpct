@@ -1,9 +1,6 @@
 package com.zjtelcom.cpct.dto.campaign;
 
 import com.zjtelcom.cpct.BaseEntity;
-import com.zjtelcom.cpct.dto.channel.VerbalVO;
-
-import java.util.List;
 
 /**
  * @author:sunpeng

@@ -1,12 +1,15 @@
 package com.zjtelcom.cpct.service.impl.synchronize.filter;
 
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
+import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.enums.SynchronizeType;
 import com.zjtelcom.cpct.exception.SystemException;
 import com.zjtelcom.cpct.service.synchronize.SynchronizeRecordService;
 import com.zjtelcom.cpct.service.synchronize.filter.SynFilterRuleService;
+import com.zjtelcom.cpct_prd.dao.channel.MktVerbalConditionPrdMapper;
 import com.zjtelcom.cpct_prd.dao.filter.FilterRulePrdMapper;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +36,11 @@ public class SynFilterRuleServiceImpl implements SynFilterRuleService {
     private FilterRulePrdMapper filterRulePrdMapper;
     @Autowired
     private FilterRuleMapper filterRuleMapper;
+    @Autowired
+    private MktVerbalConditionMapper mktVerbalConditionMapper;
+    @Autowired
+    private MktVerbalConditionPrdMapper mktVerbalConditionPrdMapper;
+
 
     //同步表名
     private static final String tableName="filter_rule";
@@ -50,15 +58,28 @@ public class SynFilterRuleServiceImpl implements SynFilterRuleService {
         //查询源数据库
         FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(ruleId);
         if(filterRule==null){
-            throw new SystemException("对应事件不存在");
+            throw new SystemException("对应过滤规则不存在");
         }
         //同步时查看是新增还是更新
         FilterRule filterRule1 = filterRulePrdMapper.selectByPrimaryKey(ruleId);
         if(filterRule1==null){
             filterRulePrdMapper.insert(filterRule);
+            //判断是否存在过扰规则    CONDITION_ID
+            if(filterRule.getConditionId()!=null&&filterRule.getConditionId()!=0){
+                MktVerbalCondition mktVerbalCondition = mktVerbalConditionMapper.selectByPrimaryKey(filterRule.getConditionId());
+                if(null!=mktVerbalCondition){
+                    mktVerbalConditionPrdMapper.insert(mktVerbalCondition);
+                }
+            }
             synchronizeRecordService.addRecord(roleName,tableName,ruleId, SynchronizeType.add.getType());
         }else{
             filterRulePrdMapper.updateByPrimaryKey(filterRule);
+            if(filterRule.getConditionId()!=null&&filterRule.getConditionId()!=0){
+                MktVerbalCondition mktVerbalCondition = mktVerbalConditionMapper.selectByPrimaryKey(filterRule.getConditionId());
+                if(null!=mktVerbalCondition){
+                    mktVerbalConditionPrdMapper.updateByPrimaryKey(mktVerbalCondition);
+                }
+            }
             synchronizeRecordService.addRecord(roleName,tableName,ruleId, SynchronizeType.update.getType());
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -105,16 +126,31 @@ public class SynFilterRuleServiceImpl implements SynFilterRuleService {
         //开始新增
         for(FilterRule c:addList){
             filterRulePrdMapper.insert(c);
+            if(c.getConditionId()!=null&&c.getConditionId()!=0){
+                MktVerbalCondition mktVerbalCondition = mktVerbalConditionMapper.selectByPrimaryKey(c.getConditionId());
+                if(null!=mktVerbalCondition){
+                    mktVerbalConditionPrdMapper.insert(mktVerbalCondition);
+                }
+            }
             synchronizeRecordService.addRecord(roleName,tableName,c.getRuleId(), SynchronizeType.add.getType());
         }
         //开始修改
         for(FilterRule c:updateList){
             filterRulePrdMapper.updateByPrimaryKey(c);
+            if(c.getConditionId()!=null&&c.getConditionId()!=0){
+                MktVerbalCondition mktVerbalCondition = mktVerbalConditionMapper.selectByPrimaryKey(c.getConditionId());
+                if(null!=mktVerbalCondition){
+                    mktVerbalConditionPrdMapper.updateByPrimaryKey(mktVerbalCondition);
+                }
+            }
             synchronizeRecordService.addRecord(roleName,tableName,c.getRuleId(), SynchronizeType.update.getType());
         }
         //开始删除
         for(FilterRule c:deleteList){
             filterRulePrdMapper.deleteByPrimaryKey(c.getRuleId());
+            if(c.getConditionId()!=null&&c.getConditionId()!=0){
+                    mktVerbalConditionPrdMapper.deleteByPrimaryKey(c.getConditionId());
+            }
             synchronizeRecordService.addRecord(roleName,tableName,c.getRuleId(), SynchronizeType.delete.getType());
         }
 
@@ -127,9 +163,14 @@ public class SynFilterRuleServiceImpl implements SynFilterRuleService {
     @Override
     public Map<String, Object> deleteSingleFilterRule(Long ruleId, String roleName) {
         Map<String,Object> maps = new HashMap<>();
-        filterRulePrdMapper.deleteByPrimaryKey(ruleId);
+        FilterRule filterRule = filterRulePrdMapper.selectByPrimaryKey(ruleId);
+        if(filterRule != null){
+            filterRulePrdMapper.deleteByPrimaryKey(ruleId);
+            mktVerbalConditionPrdMapper.deleteByPrimaryKey(filterRule.getConditionId());
+        }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
+        synchronizeRecordService.addRecord(roleName,tableName,ruleId, SynchronizeType.delete.getType());
         return maps;
     }
 

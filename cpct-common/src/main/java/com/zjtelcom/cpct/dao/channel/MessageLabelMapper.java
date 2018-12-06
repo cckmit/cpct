@@ -1,9 +1,7 @@
 package com.zjtelcom.cpct.dao.channel;
 
-import com.zjtelcom.cpct.domain.channel.LabelGrpMbr;
 import com.zjtelcom.cpct.domain.channel.Message;
 import com.zjtelcom.cpct.domain.channel.MessageLabel;
-import com.zjtelcom.cpct.dto.channel.MessageLabelDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;

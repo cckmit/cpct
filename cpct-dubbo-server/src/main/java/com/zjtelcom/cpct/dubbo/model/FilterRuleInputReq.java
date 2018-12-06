@@ -1,7 +1,5 @@
 package com.zjtelcom.cpct.dubbo.model;
 
-import com.zjtelcom.cpct.dto.user.UserList;
-
 import java.io.Serializable;
 import java.util.List;
 

@@ -131,6 +131,8 @@ public class SynScriptServiceImpl implements SynScriptService{
         mktScriptPrdMapper.deleteByPrimaryKey(scriptId);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
+        synchronizeRecordService.addRecord(roleName,tableName,scriptId, SynchronizeType.delete.getType());
+
         return maps;
     }
 }

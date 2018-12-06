@@ -4,14 +4,12 @@ import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dto.channel.MktScript;
 import com.zjtelcom.cpct.dto.channel.QryMktScriptReq;
 import com.zjtelcom.cpct.service.channel.ScriptService;
-import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
-
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 

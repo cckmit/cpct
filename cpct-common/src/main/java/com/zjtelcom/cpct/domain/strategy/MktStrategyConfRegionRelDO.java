@@ -1,9 +1,6 @@
 package com.zjtelcom.cpct.domain.strategy;
 
 import com.zjtelcom.cpct.BaseEntity;
-import lombok.Data;
-
-import java.util.Date;
 
 public class MktStrategyConfRegionRelDO extends BaseEntity {
     /**

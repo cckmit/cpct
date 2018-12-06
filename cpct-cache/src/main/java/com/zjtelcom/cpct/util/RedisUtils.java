@@ -1,6 +1,5 @@
 package com.zjtelcom.cpct.util;
 
-import com.alibaba.fastjson.JSONObject;
 import com.ctg.itrdc.cache.pool.CtgJedisPool;
 import com.ctg.itrdc.cache.pool.CtgJedisPoolConfig;
 import com.ctg.itrdc.cache.pool.CtgJedisPoolException;

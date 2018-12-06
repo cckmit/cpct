@@ -37,7 +37,6 @@ import com.zjtelcom.cpct.service.channel.CamScriptService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
-
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
@@ -48,7 +47,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Description:
@@ -116,6 +118,9 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
     @Autowired
     private MktCamStrategyRelMapper mktCamStrategyRelMapper;
 
+    @Autowired
+    private MktCamGrpRulMapper mktCamGrpRulMapper;
+
     /**
      * 添加策略规则
      *
@@ -127,6 +132,19 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();
         MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
         try {
+            //添加mkt_cam_grp_rul表
+            MktCamGrpRul mktCamGrpRul = new MktCamGrpRul();
+            mktCamGrpRul.setTarGrpId(mktStrategyConfRule.getTarGrpId());
+            mktCamGrpRul.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
+            mktCamGrpRul.setLanId(1L);
+            mktCamGrpRul.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+            mktCamGrpRul.setStatusDate(new Date());
+            mktCamGrpRul.setCreateDate(new Date());
+            mktCamGrpRul.setCreateStaff(UserUtil.loginId());
+            mktCamGrpRul.setUpdateDate(new Date());
+            mktCamGrpRul.setUpdateStaff(UserUtil.loginId());
+            mktCamGrpRulMapper.insert(mktCamGrpRul);
+
             CopyPropertiesUtil.copyBean2Bean(mktStrategyConfRuleDO, mktStrategyConfRule);
             String productIds = "";
             String evtContactConfIds = "";
@@ -867,9 +885,13 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     tarGrpDetailList.add(grpDetail);
                 }
                 tarGrpMap.put("tarGrpDetailList", tarGrpDetailList);
+                tarGrpMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+                tarGrpMap.put("resultMsg", "批量插入成功！");
             }
         } catch (Exception e) {
-            logger.error("Exception = ", e);
+            logger.error("[op:deleteTarGrpBatch],批量插入客户分群失败! Exception = ", e);
+            tarGrpMap.put("resultCode", CommonConstant.CODE_FAIL);
+            tarGrpMap.put("resultMsg", "批量插入失败！");
         }
         return tarGrpMap;
     }
@@ -970,9 +992,13 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     tarGrpDetailList.add(grpDetail);
                 }
                 tarGrpMap.put("tarGrpDetailList", tarGrpDetailList);
+                tarGrpMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+                tarGrpMap.put("resultMsg", "批量修改成功！");
             }
         } catch (Exception e) {
-            logger.error("Exception = ", e);
+            logger.error("[op:deleteTarGrpBatch],批量修改客户分群失败! Exception = ", e);
+            tarGrpMap.put("resultCode", CommonConstant.CODE_FAIL);
+            tarGrpMap.put("resultMsg", "批量修改失败！");
         }
         return tarGrpMap;
     }
@@ -1050,9 +1076,13 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     tarGrpDetailList.add(grpDetail);
                 }
                 tarGrpMap.put("tarGrpDetailList", tarGrpDetailList);
+                tarGrpMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+                tarGrpMap.put("resultMsg", "批量删除成功！");
             }
         } catch (Exception e) {
-            logger.error("Exception = ", e);
+            logger.error("[op:deleteTarGrpBatch],批量删除客户分群失败! Exception = ", e);
+            tarGrpMap.put("resultCode", CommonConstant.CODE_FAIL);
+            tarGrpMap.put("resultMsg", "批量删除失败！");
         }
         return tarGrpMap;
     }

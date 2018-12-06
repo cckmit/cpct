@@ -1,6 +1,5 @@
 package com.zjtelcom.cpct.service.channel;
 
-import com.zjtelcom.cpct.domain.channel.PpmProduct;
 import com.zjtelcom.cpct.dto.channel.ProductParam;
 
 import java.util.List;

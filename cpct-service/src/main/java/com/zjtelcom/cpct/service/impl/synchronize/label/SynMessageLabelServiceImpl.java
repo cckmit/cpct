@@ -151,6 +151,7 @@ public class SynMessageLabelServiceImpl implements SynMessageLabelService{
         Map<String,Object> maps = new HashMap<>();
         displayColumnPrdMapper.deleteByPrimaryKey(messageLabelId);
         displayColumnLabelPrdMapper.deleteByDisplayId(messageLabelId);
+        synchronizeRecordService.addRecord(roleName,tableName,messageLabelId, SynchronizeType.delete.getType());
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
         return maps;
@@ -163,6 +164,7 @@ public class SynMessageLabelServiceImpl implements SynMessageLabelService{
         if(displayColumnLabel != null) {
             displayColumnLabelPrdMapper.deleteByPrimaryKey(displayColumnLabel.getDisplayColumnLabelId());
         }
+        synchronizeRecordService.addRecord(roleName,tableName,displayId, SynchronizeType.delete.getType());
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
         return maps;

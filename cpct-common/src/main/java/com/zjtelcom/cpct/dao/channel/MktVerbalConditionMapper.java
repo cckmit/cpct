@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.dao.channel;
 
 
-import com.zjtelcom.cpct.domain.channel.MessageLabel;
 import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -31,5 +30,7 @@ public interface MktVerbalConditionMapper {
     int insertByBatch(@Param("list") List<MktVerbalCondition> record);
 
     List<MktVerbalCondition> findListBylabelId(@Param("labelId")Long labelId);
+
+    List<String> getLabelListByConditionId(@Param("conditionId")Long conditionId);
 
 }

@@ -158,6 +158,7 @@ public class SynSysStaffServiceImpl implements SynSysStaffService{
         sysStaffPrdMapper.deleteByPrimaryKey(staffId);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
+        synchronizeRecordService.addRecord(roleName,tableName,staffId, SynchronizeType.delete.getType());
         return maps;
     }
 

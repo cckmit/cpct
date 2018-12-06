@@ -1,6 +1,4 @@
 package com.zjtelcom.cpct.service.impl.org;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -8,15 +6,12 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.org.OrgTreeMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
-import com.zjtelcom.cpct.dao.system.SystemParamMapper;
 import com.zjtelcom.cpct.domain.org.OrgTree;
 import com.zjtelcom.cpct.domain.org.OrgTreeDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
-import com.zjtelcom.cpct.dto.system.SystemParam;
 import com.zjtelcom.cpct.exception.SystemException;
 import com.zjtelcom.cpct.service.org.OrgTreeService;
 import com.zjtelcom.cpct.util.DateUtil;
-import com.zjtelcom.cpct.util.FileUtil;
 import com.zjtelcom.cpct.util.FtpUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @Auther: anson
