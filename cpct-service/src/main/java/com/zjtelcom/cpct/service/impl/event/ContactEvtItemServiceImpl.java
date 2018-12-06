@@ -76,6 +76,8 @@ public class ContactEvtItemServiceImpl extends BaseService implements ContactEvt
     @Override
     public Map<String, Object> createEventItem(ContactEvtItem contactEvtItem) {
         Map<String, Object> maps = new HashMap<>();
+//        contactEvtItem.setValueDataType();
+        contactEvtItem.setIsNullable(1L);
         contactEvtItem.setCreateDate(DateUtil.getCurrentTime());
         contactEvtItem.setUpdateDate(DateUtil.getCurrentTime());
         contactEvtItem.setStatusDate(DateUtil.getCurrentTime());

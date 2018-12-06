@@ -1,7 +1,9 @@
 package com.zjtelcom.cpct.service.impl.channel;
 
 import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
 import com.zjtelcom.cpct.domain.channel.*;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.ConditionType;
@@ -55,12 +57,12 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
     public Map<String, Object> copyVerbal(Long contactConfId,Long newConfId) {
         Map<String,Object> map = new HashMap<>();
         MktCamChlConfDetail detail = (MktCamChlConfDetail) redisUtils.get("MktCamChlConfDetail_"+contactConfId);
+        List<VerbalVO> verbalVOList = new ArrayList<>();
         if (detail==null){
-            map.put("resultCode", CODE_FAIL);
-            map.put("resultMsg", "推送渠道配置不存在");
-            return map;
+            verbalVOList = ( List<VerbalVO>)getVerbalListByConfId(1L,contactConfId).get("resultMsg");
+        }else {
+            verbalVOList = detail.getVerbalVOList();
         }
-        List<VerbalVO> verbalVOList = detail.getVerbalVOList();
         if(verbalVOList!=null &&verbalVOList.size()>0){
             for (VerbalVO verbalVO : verbalVOList){
                 VerbalAddVO addVO = BeanUtil.create(verbalVO,new VerbalAddVO());

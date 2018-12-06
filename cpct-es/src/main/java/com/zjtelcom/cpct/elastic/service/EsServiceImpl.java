@@ -472,25 +472,28 @@ public class EsServiceImpl implements EsService {
 
     //资产集成编码组装查询条件
     private BoolQueryBuilder getBoolQueryBuilderByEventCode(String eventCode,Date startTime,Date endTime ) {
-//        String start = DateUtil.formatDate(startTime);
-//        String end = DateUtil.formatDate(endTime);
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
                         matchQuery("integrationId",eventCode));
-//                .must(QueryBuilders.rangeQuery("evtCollectTime").from(start).to(end));
+        if (startTime!=null && endTime!=null){
+            String start = DateUtil.formatDate(startTime);
+            String end = DateUtil.formatDate(endTime);
+            boolQueryBuilder .must(QueryBuilders.rangeQuery("evtCollectTime").from(start).to(end));
+        }
         System.out.println(boolQueryBuilder);
-
         return boolQueryBuilder;
     }
 
     //资产号码和时间段组装查询条件
     private BoolQueryBuilder getBoolQueryBuilderByAssetNumber(String assetNumber,Date startTime,Date endTime) {
-//        String start = DateUtil.formatDate(startTime);
-//        String end = DateUtil.formatDate(endTime);
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
                         matchQuery("accNbr",assetNumber));
-//                .must(QueryBuilders.rangeQuery("evtCollectTime").from(start).to(end));
+        if (startTime!=null && endTime!=null){
+            String start = DateUtil.formatDate(startTime);
+            String end = DateUtil.formatDate(endTime);
+            boolQueryBuilder .must(QueryBuilders.rangeQuery("evtCollectTime").from(start).to(end));
+        }
         System.out.println(boolQueryBuilder);
         return boolQueryBuilder;
     }
