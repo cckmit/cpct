@@ -43,8 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 /**
  * Description:
@@ -237,6 +236,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             try {
                 for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfDetail.getMktStrategyConfRuleList()) {
                     mktStrategyConfRule.setMktCampaignId(mktStrategyConfDetail.getMktCampaignId());
+                    mktStrategyConfRule.setMktCampaignName(mktStrategyConfDetail.getMktCampaignName());
                     mktStrategyConfRule.setStrategyConfName(mktStrategyConfDetail.getMktStrategyConfName());
                     Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.saveMktStrategyConfRule(mktStrategyConfRule);
                     // 返回策略规则
@@ -619,6 +619,153 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
     @Override
     public Map<String, Object> listAllMktStrategyConf() {
         return null;
+    }
+
+
+    /**
+     * 从模板获取策略信息(用future实现并发复制策略)
+     *
+     * @param preMktCampaignId
+     * @return
+     */
+    @Override
+    public Map<String, Object> getStrategyTemplate(Long preMktCampaignId) throws Exception {
+        Map<String, Object> strategyTemplateMap = new HashMap<>();
+        try {
+            //初始化结果集
+            List<Future<Map<String, Object>>> threadList = new ArrayList<>();
+            //初始化线程池
+            Future<Map<String, Object>> strategyFuture = null;
+            ExecutorService executorService = Executors.newCachedThreadPool();
+            // 获取活动关联策略集合
+            List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByMktCampaignId(preMktCampaignId);
+            for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {
+                strategyFuture = executorService.submit(new getStrategyTemplateTask(mktCamStrategyConfRelDO.getStrategyConfId()));
+                threadList.add(strategyFuture);
+            }
+            List<MktStrategyConfDetail> mktStrategyConfDetailList = new ArrayList<>();
+            for (Future<Map<String, Object>> strategyFutureNew : threadList) {
+                MktStrategyConfDetail mktStrategyConfDetail = (MktStrategyConfDetail) strategyFutureNew.get().get("mktStrategyConfDetail");
+                mktStrategyConfDetailList.add(mktStrategyConfDetail);
+            }
+            strategyTemplateMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            strategyTemplateMap.put("mktStrategyConfDetailList", mktStrategyConfDetailList);
+        } catch (Exception e) {
+            strategyTemplateMap.put("resultCode", CommonConstant.CODE_FAIL);
+            logger.error("[op:MktStrategyConfServiceImpl] failed to get StrategyTemplate by preMktCampaignId = {} ,Exception = ", preMktCampaignId, e);
+        }
+        return strategyTemplateMap;
+    }
+
+
+    /**
+     * 从模板获取策略信息
+     */
+    class getStrategyTemplateTask implements Callable<Map<String, Object>> {
+
+        private Long preStrategyConfId;
+
+        public getStrategyTemplateTask(Long preStrategyConfId) {
+            this.preStrategyConfId = preStrategyConfId;
+        }
+
+        @Override
+        public Map<String, Object> call() throws Exception {
+            Map<String, Object> mktStrategyConfMap = new HashMap<String, Object>();
+            MktStrategyConfDetail mktStrategyConfDetail = new MktStrategyConfDetail();
+            try {
+                //查出获取所有的城市信息, 设成全局Map
+                Map<Integer, String> cityMap = new HashMap<>();
+                List<SysArea> sysAreaList = sysAreaMapper.selectAll();
+                for (SysArea sysArea : sysAreaList) {
+                    cityMap.put(sysArea.getAreaId(), sysArea.getName());
+                }
+
+                //更具Id查询策略配置信息
+                MktStrategyConfDO mktStrategyConfDO = mktStrategyConfMapper.selectByPrimaryKey(preStrategyConfId);
+                CopyPropertiesUtil.copyBean2Bean(mktStrategyConfDetail, mktStrategyConfDO);
+                List<Integer> areaIdList = new ArrayList<>();
+                String[] areaIds = mktStrategyConfDO.getAreaId().split("/");
+                if (areaIds != null && !"".equals(areaIds[0])) {
+                    for (String areaId : areaIds) {
+                        areaIdList.add(Integer.valueOf(areaId));
+                    }
+                    mktStrategyConfDetail.setAreaIdList(areaIdList);
+
+                }
+                // 策略下发渠道
+                String[] channelIds = mktStrategyConfDO.getChannelsId().split("/");
+                List<Long> channelList = new ArrayList<>();
+                if(channelIds!=null && !"".equals(channelIds[0])){
+                    for (String channelId : channelIds) {
+                        channelList.add(Long.valueOf(channelId));
+                    }
+                    mktStrategyConfDetail.setChannelList(channelList);
+                }
+                // 获取过滤规则集合
+                List<Long> filterRuleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(preStrategyConfId);
+                mktStrategyConfDetail.setFilterRuleIdList(filterRuleIdList);
+
+                //查询与策略匹配的所有规则
+                List<MktStrategyConfRule> mktStrategyConfRuleList = new ArrayList<>();
+                List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(preStrategyConfId);
+                for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleDOList) {
+                    MktStrategyConfRule mktStrategyConfRule = new MktStrategyConfRule();
+                    CopyPropertiesUtil.copyBean2Bean(mktStrategyConfRule, mktStrategyConfRuleDO);
+
+                    if (mktStrategyConfRuleDO.getProductId() != null) {
+                        String[] productIds = mktStrategyConfRuleDO.getProductId().split("/");
+                        List<Long> productIdList = new ArrayList<>();
+                        for (int i = 0; i < productIds.length; i++) {
+                            if (productIds[i] != "" && !"".equals(productIds[i])) {
+                                productIdList.add(Long.valueOf(productIds[i]));
+                            }
+                        }
+                        mktStrategyConfRule.setProductIdlist(productIdList);
+                    }
+                    if (mktStrategyConfRuleDO.getEvtContactConfId() != null) {
+                        String[] evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
+                        List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
+                        for (int i = 0; i < evtContactConfIds.length; i++) {
+                            if (evtContactConfIds[i] != "" && !"".equals(evtContactConfIds[i])) {
+                                MktCamChlConfDetail mktCamChlConfDetail = new MktCamChlConfDetail();
+                                mktCamChlConfDetail.setEvtContactConfId(Long.valueOf(evtContactConfIds[i]));
+                                String evtContactConfName = mktCamChlConfMapper.selectforName(Long.valueOf(evtContactConfIds[i]));
+                                mktCamChlConfDetail.setEvtContactConfName(evtContactConfName);
+                                mktCamChlConfDetailList.add(mktCamChlConfDetail);
+                            }
+                        }
+                        mktStrategyConfRule.setMktCamChlConfDetailList(mktCamChlConfDetailList);
+                    }
+
+                    if (mktStrategyConfRuleDO.getMktCamChlResultId() != null) {
+                        String[] mktCamChlResultIds = mktStrategyConfRuleDO.getMktCamChlResultId().split("/");
+                        List<MktCamChlResult> mktCamChlResultList = new ArrayList<>();
+                        for (int i = 0; i < mktCamChlResultIds.length; i++) {
+                            if (mktCamChlResultIds[i] != null && !"".equals(mktCamChlResultIds[i])) {
+                                MktCamChlResult mktCamChlResult = new MktCamChlResult();
+                                mktCamChlResultMapper.selectByPrimaryKey(Long.valueOf(mktCamChlResultIds[i]));
+
+                                mktCamChlResult.setMktCamChlResultId(Long.valueOf(mktCamChlResultIds[i]));
+                                mktCamChlResultList.add(mktCamChlResult);
+                            }
+                        }
+                        mktStrategyConfRule.setMktCamChlResultList(mktCamChlResultList);
+                    }
+
+                    mktStrategyConfRuleList.add(mktStrategyConfRule);
+                }
+                mktStrategyConfDetail.setMktStrategyConfRuleList(mktStrategyConfRuleList);
+                mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+                mktStrategyConfMap.put("mktStrategyConfDetail", mktStrategyConfDetail);
+            } catch (Exception e) {
+                logger.error("[op:MktStrategyConfServiceImpl] fail to get StrategyTemplateTask preStrategyConfId = {}, Exception:", preStrategyConfId, e);
+                mktStrategyConfMap.put("resultCode", CommonConstant.CODE_FAIL);
+                mktStrategyConfMap.put("mktStrategyConfDetail", mktStrategyConfDetail);
+                return mktStrategyConfMap;
+            }
+            return mktStrategyConfMap;
+        }
     }
 
 }
