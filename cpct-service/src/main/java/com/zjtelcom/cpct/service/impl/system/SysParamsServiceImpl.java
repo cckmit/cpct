@@ -6,7 +6,6 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.system.SysParams;
-import com.zjtelcom.cpct.domain.system.SysRole;
 import com.zjtelcom.cpct.enums.ParamKeyEnum;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.synchronize.sys.SynSysParamsService;

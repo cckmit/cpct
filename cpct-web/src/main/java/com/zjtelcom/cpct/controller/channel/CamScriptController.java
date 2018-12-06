@@ -1,18 +1,15 @@
 package com.zjtelcom.cpct.controller.channel;
 
-import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dto.channel.CamScriptAddVO;
 import com.zjtelcom.cpct.dto.channel.CamScriptEditVO;
 import com.zjtelcom.cpct.dto.channel.CamScriptVO;
 import com.zjtelcom.cpct.service.channel.CamScriptService;
 import com.zjtelcom.cpct.util.UserUtil;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;

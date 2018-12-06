@@ -1,25 +1,14 @@
 package com.zjtelcom.cpct.controller.channel;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
-import com.zjtelcom.cpct.bean.RespInfo;
 import com.zjtelcom.cpct.controller.BaseController;
-import com.zjtelcom.cpct.domain.Rule;
-import com.zjtelcom.cpct.domain.RuleDetail;
-import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
 import com.zjtelcom.cpct.dto.channel.VerbalAddVO;
 import com.zjtelcom.cpct.dto.channel.VerbalEditVO;
-import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.channel.VerbalService;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;

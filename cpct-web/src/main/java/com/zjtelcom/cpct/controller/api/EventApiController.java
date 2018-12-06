@@ -1,7 +1,8 @@
 package com.zjtelcom.cpct.controller.api;
 
 
-import com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService;
+import com.alibaba.fastjson.JSON;
+import com.zjpii.biz.serv.YzServ;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.service.api.EventApiService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ public class EventApiController extends BaseController {
 
     @Autowired(required = false)
     private EventApiService eventApiService;
+
+    @Autowired(required = false)
+    private YzServ yzServ;
 
 //    @Autowired(required = false)
 //    private IContactTaskReceiptService iContactTaskReceiptService;
@@ -85,6 +89,19 @@ public class EventApiController extends BaseController {
             return initFailRespInfo(e.getMessage(), "");
         }
         return initSuccRespInfo(result);
+    }
+
+    @RequestMapping(value = "/label", method = RequestMethod.POST)
+    @CrossOrigin
+    public String label(@RequestBody String params) {
+        Map result = new HashMap();
+        try {
+            result = yzServ.queryYz(params);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
+        return JSON.toJSONString(result);
     }
 
 

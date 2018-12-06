@@ -1,18 +1,14 @@
 package com.zjtelcom.cpct.service.impl.channel;
 
-import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.domain.channel.Channel;
-import com.zjtelcom.cpct.domain.channel.LabelResult;
-import com.zjtelcom.cpct.domain.channel.MktProductRule;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.ChannelType;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ChannelService;
-/*import com.zjtelcom.cpct.service.impl.api.ClTest;*/
 import com.zjtelcom.cpct.service.synchronize.channel.SynChannelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
@@ -21,12 +17,13 @@ import com.zjtelcom.cpct.util.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+
+/*import com.zjtelcom.cpct.service.impl.api.ClTest;*/
 
 @Service
 public class ChannelServiceImpl extends BaseService implements ChannelService {

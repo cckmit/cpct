@@ -1,7 +1,5 @@
 package com.zjtelcom.cpct.dto.pojo;
 
-import com.alibaba.fastjson.annotation.JSONField;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.zjtelcom.cpct.dto.event.Catalog;
 
 import java.util.List;
