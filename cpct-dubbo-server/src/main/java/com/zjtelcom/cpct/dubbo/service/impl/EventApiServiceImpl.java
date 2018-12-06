@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService;
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
+import com.ql.util.express.Operator;
 import com.ql.util.express.rule.RuleResult;
 import com.zjpii.biz.serv.YzServ;
 import com.zjtelcom.cpct.dao.campaign.*;
@@ -40,6 +41,7 @@ import com.zjtelcom.cpct.elastic.service.EsService;
 import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -1371,7 +1373,6 @@ public class EventApiServiceImpl implements EventApiService {
                     String type = tarGrpConditionDOs.get(i).getOperType();
 
                     StringBuilder express1 = new StringBuilder();
-                    //TODO 从redis中获取标签编码
                     Label label = (Label) redisUtils.get("LABEL_LIB_" + tarGrpConditionDOs.get(i).getLeftParam());
                     if (label == null) {
                         label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i).getLeftParam()));
@@ -1397,13 +1398,13 @@ public class EventApiServiceImpl implements EventApiService {
                     if ("7100".equals(type)) {
                         expressSb.append("!");
                     }
-                    expressSb.append("((");
+                    expressSb.append("((toNum(");
 
                     express1.append("if(");
-                    express1.append("(");
+                    express1.append("(toNum(");
 
-                    expressSb.append(label.getInjectionLabelCode()).append(")");
-                    express1.append(label.getInjectionLabelCode()).append(")");
+                    expressSb.append(label.getInjectionLabelCode()).append("))");
+                    express1.append(label.getInjectionLabelCode()).append("))");
                     if ("1000".equals(type)) {
                         expressSb.append(" > ");
                         express1.append(" > ");
@@ -1435,14 +1436,19 @@ public class EventApiServiceImpl implements EventApiService {
 //                        expressSb.append(" <= ").append("\"").append(strArray[1]).append("\"");
 
                         expressSb.append(" >= ").append(strArray[0]);
-                        expressSb.append(" && ").append("(");
-                        expressSb.append(label.getInjectionLabelCode()).append(")");
+                        expressSb.append(" && ").append("(toNum(");
+                        expressSb.append(label.getInjectionLabelCode()).append("))");
                         expressSb.append(" <= ").append(strArray[1]);
 
-                        express1.append(" >= ").append("\"").append(strArray[0]).append("\"");
-                        express1.append(" && ").append("(");
-                        express1.append(label.getInjectionLabelCode()).append(")");
-                        express1.append(" <= ").append("\"").append(strArray[1]).append("\"");
+                        express1.append(" >= ").append(strArray[0]);
+                        express1.append(" && ").append("(toNum(");
+                        express1.append(label.getInjectionLabelCode()).append("))");
+                        express1.append(" <= ").append(strArray[1]);
+
+//                        express1.append(" >= ").append("\"").append(strArray[0]).append("\"");
+//                        express1.append(" && ").append("(");
+//                        express1.append(label.getInjectionLabelCode()).append(")");
+//                        express1.append(" <= ").append("\"").append(strArray[1]).append("\"");
 
                     }
 
@@ -1472,11 +1478,9 @@ public class EventApiServiceImpl implements EventApiService {
                     System.out.println(express1.toString());
 
                     try {
-                        RuleResult ruleResult1 = runner.executeRule(express1.toString(), context, true, true);
 
-                        System.out.println("result222=" + ruleResult1.getResult());
-                        System.out.println("Tree222=" + ruleResult1.getRule().toTree());
-                        System.out.println("TraceMap222=" + ruleResult1.getTraceMap());
+                        runner.addFunction("toNum",new StringToNumOperator("toNum"));
+                        RuleResult ruleResult1 = runner.executeRule(express1.toString(), context, true, true);
 
                         if (null != ruleResult1.getResult()) {
                             lr.setResult((Boolean) ruleResult1.getResult());
@@ -1521,9 +1525,9 @@ public class EventApiServiceImpl implements EventApiService {
                 RuleResult ruleResult = null;
                 System.out.println(context.toString());
                 ExpressRunner runnerQ = new ExpressRunner();
+                runnerQ.addFunction("toNum",new StringToNumOperator("toNum"));
                 try {
                     ruleResult = runnerQ.executeRule(express, context, true, true);
-//                    ruleResult = runnerQ.executeRule("if((\"130\") >= \"99\" && (\"130\") <= \"169\") {return true} else {return false}", context, false, true);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -2412,5 +2416,18 @@ public class EventApiServiceImpl implements EventApiService {
         return result;
     }
 
+    class StringToNumOperator extends Operator {
+        public StringToNumOperator(String name) {
+            this.name = name;
+        }
+        public Object executeInner(Object[] list) throws Exception {
+            String str = (String)list[0];
+            if(NumberUtils.isNumber(str)) {
+                return NumberUtils.toDouble(str);
+            } else {
+                return str;
+            }
+        }
+    }
 
 }
