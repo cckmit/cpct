@@ -1,11 +1,8 @@
 package com.zjtelcom.cpct.dto.event;
 
 import com.zjtelcom.cpct.BaseEntity;
-import com.zjtelcom.cpct.domain.event.EventTypeDO;
-import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
 
 public class ContactEvtType extends BaseEntity implements Serializable{
 

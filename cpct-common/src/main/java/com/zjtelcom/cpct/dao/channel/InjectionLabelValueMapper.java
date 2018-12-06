@@ -1,6 +1,5 @@
 package com.zjtelcom.cpct.dao.channel;
 
-import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

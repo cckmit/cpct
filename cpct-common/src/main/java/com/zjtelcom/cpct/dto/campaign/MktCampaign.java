@@ -1,10 +1,8 @@
 package com.zjtelcom.cpct.dto.campaign;
 
 import com.zjtelcom.cpct.BaseEntity;
-import lombok.Data;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * @Author:sunpeng

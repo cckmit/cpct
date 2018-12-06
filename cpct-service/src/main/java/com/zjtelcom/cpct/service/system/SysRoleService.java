@@ -2,7 +2,6 @@ package com.zjtelcom.cpct.service.system;
 
 import com.zjtelcom.cpct.domain.system.SysRole;
 
-import java.util.List;
 import java.util.Map;
 
 public interface SysRoleService {

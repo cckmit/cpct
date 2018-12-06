@@ -24,8 +24,6 @@ import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.channel.MktVerbal;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
-import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
-import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlResultApiService;
@@ -75,12 +73,12 @@ public class MktCamChlResultApiServiceImpl extends BaseService implements MktCam
 
     @Override
     public Map<String, Object> secondChannelSynergy(Map<String, Object> params) {
-        Long activityId = Long.valueOf((Integer) params.get("activityId"));
-        Long ruleId = Long.valueOf((Integer) params.get("ruleId"));
-        Long resultNbr = Long.valueOf((String) params.get("resultNbr"));
-        Long accNbr = Long.valueOf((String) params.get("accNbr"));
-        Long integrationId = Long.valueOf((Integer) params.get("integrationId"));
-        Long custId = Long.valueOf((Integer) params.get("custId"));
+        Long activityId = Long.valueOf((String) params.get("activityId"));
+        Long ruleId = Long.valueOf((String) params.get("ruleId"));
+        String resultNbr = String.valueOf(params.get("resultNbr"));
+        String accNbr = String.valueOf(params.get("accNbr"));
+        String integrationId = String.valueOf(params.get("integrationId"));
+        String custId = String.valueOf(params.get("custId"));
         Map<String, Object> paramMap = new HashMap<>();
         // 通过规则Id获取规则下的结果id
         List<Map<String, Object>> taskChlList = new ArrayList<>();
@@ -90,7 +88,7 @@ public class MktCamChlResultApiServiceImpl extends BaseService implements MktCam
             if (resultIds != null && !"".equals(resultIds[0])) {
                 for (String resultId : resultIds) {
                     MktCamChlResultDO mktCamChlResultDO = mktCamChlResultMapper.selectByPrimaryKey(Long.valueOf(resultId));
-                    if (resultNbr.equals(mktCamChlResultDO.getReason())) {
+                    if (resultNbr.equals(mktCamChlResultDO.getReason().toString())) {
                         // 查询推送渠道
                         List<MktCamChlResultConfRelDO> mktCamChlResultConfRelDOS = mktCamChlResultConfRelMapper.selectByMktCamChlResultId(mktCamChlResultDO.getMktCamChlResultId());
                         if (mktCamChlResultConfRelDOS != null && mktCamChlResultConfRelDOS.size() > 0) {

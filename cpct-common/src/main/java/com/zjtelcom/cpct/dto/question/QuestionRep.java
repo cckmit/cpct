@@ -1,7 +1,5 @@
 package com.zjtelcom.cpct.dto.question;
 
-import com.zjtelcom.cpct.domain.question.Questionnaire;
-
 import java.io.Serializable;
 import java.util.List;
 

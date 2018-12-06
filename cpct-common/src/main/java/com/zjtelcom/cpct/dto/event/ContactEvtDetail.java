@@ -1,7 +1,7 @@
 package com.zjtelcom.cpct.dto.event;
 
-import com.zjtelcom.cpct.BaseEntity;
 import lombok.Data;
+
 import java.util.List;
 
 /**

@@ -15,7 +15,7 @@
                      version="1.0" retries="0" check="false">
         <!--<dubbo:method name="CalculateCPC" servicecode="00.1083.CalculateCPC" timeout="20000"/>-->
         <dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="20000"/>
-        <!--<dubbo:method name="secondChannelSynergy" servicecode="00.1083.SecondChannelSynergy" timeout="5000"/>-->
+        <dubbo:method name="secondChannelSynergy" servicecode="00.1083.SecondChannelSynergy" timeout="5000"/>
     </dubbo:reference>
 
     <!-- 订阅 -->

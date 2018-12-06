@@ -2,7 +2,6 @@ package com.zjtelcom.cpct.dubbo.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 public class RecordModel implements Serializable {
 

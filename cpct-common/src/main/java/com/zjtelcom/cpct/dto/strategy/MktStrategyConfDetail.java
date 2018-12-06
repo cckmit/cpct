@@ -1,8 +1,5 @@
 package com.zjtelcom.cpct.dto.strategy;
 
-import com.zjtelcom.cpct.domain.campaign.City;
-
-import java.util.Date;
 import java.util.List;
 
 /**

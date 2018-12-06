@@ -11,8 +11,6 @@ public class MktResource {
 
     private Long mktResExttypeId;
 
-    private Long mktMktResId;
-
     private String mktResName;
 
     private String mktResDesc;
@@ -73,14 +71,6 @@ public class MktResource {
 
     public void setMktResExttypeId(Long mktResExttypeId) {
         this.mktResExttypeId = mktResExttypeId;
-    }
-
-    public Long getMktMktResId() {
-        return mktMktResId;
-    }
-
-    public void setMktMktResId(Long mktMktResId) {
-        this.mktMktResId = mktMktResId;
     }
 
     public String getMktResName() {

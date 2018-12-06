@@ -1,10 +1,7 @@
 package com.zjtelcom.cpct.service.system;
 
 import com.zjtelcom.cpct.domain.system.SysParams;
-import com.zjtelcom.cpct.domain.system.SysRole;
-import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
 import java.util.Map;
 
 public interface SysParamsService {

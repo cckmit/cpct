@@ -2,8 +2,6 @@ package com.zjtelcom.cpct.domain.question;
 
 import com.zjtelcom.cpct.BaseEntity;
 
-import java.util.Date;
-
 public class Questionnaire extends BaseEntity{
     private Long naireId;
 

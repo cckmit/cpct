@@ -7,14 +7,9 @@
 package com.zjtelcom.cpct.service.campaign;
 
 
-import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
-import com.zjtelcom.cpct.dto.campaign.MktCampaign;
-import com.zjtelcom.cpct.dto.campaign.MktCampaignDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignVO;
-import com.zjtelcom.cpct.request.campaign.QryMktCampaignListReq;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 /**

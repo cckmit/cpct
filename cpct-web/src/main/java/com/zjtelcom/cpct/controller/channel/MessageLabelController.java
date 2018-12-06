@@ -10,6 +10,7 @@ import com.zjtelcom.cpct.request.channel.MessageReq;
 import com.zjtelcom.cpct.service.channel.MessageLabelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.HashMap;
 import java.util.Map;
 

@@ -1,14 +1,6 @@
 package com.zjtelcom.cpct.dto.campaign;
 
-import com.zjtelcom.cpct.domain.SysArea;
-import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
-import com.zjtelcom.cpct.dto.channel.ChannelDetail;
-import com.zjtelcom.cpct.dto.event.ContactEvt;
-import com.zjtelcom.cpct.dto.event.EventScene;
-import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
-import com.zjtelcom.cpct.dto.strategy.MktStrategyDetail;
-import lombok.Data;
 
 import java.util.List;
 
