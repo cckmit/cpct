@@ -114,7 +114,7 @@ public class MktCampaign extends BaseEntity {
 
     private Long regionId;
 
-    private Long lifeStage;
+    private String lifeStage;
 
     private String serviceType;
 
@@ -305,11 +305,11 @@ public class MktCampaign extends BaseEntity {
         this.regionId = regionId;
     }
 
-    public Long getLifeStage() {
+    public String getLifeStage() {
         return lifeStage;
     }
 
-    public void setLifeStage(Long lifeStage) {
+    public void setLifeStage(String lifeStage) {
         this.lifeStage = lifeStage;
     }
 
