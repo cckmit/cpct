@@ -262,15 +262,17 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             //添加cpc算法规则
             MktCpcAlgorithmsRulDO mktCpcAlgorithmsRulDO = new MktCpcAlgorithmsRulDO();
             mktCpcAlgorithmsRulDO.setAlgorithmsRulName(mktStrategyConfRule.getMktStrategyConfRuleName());
-            mktCpcAlgorithmsRulDO.setRuleDesc("");
-            mktCpcAlgorithmsRulDO.setRuleExpression(mktStrategyConfRule.getTarGrpId() + "");
+            mktCpcAlgorithmsRulDO.setRuleExpression(
+                    "{" + mktStrategyConfRule.getTarGrpId() +"}通过{" + mktStrategyConfRule.getStrategyConfId() +"}推送{" + mktStrategyConfRule.getProductIdlist() + "}");
+            mktCpcAlgorithmsRulDO.setStatusCd("1000");
             mktCpcAlgorithmsRulMapper.insert(mktCpcAlgorithmsRulDO);
             //cpc算法规则关联表
             MktCamRecomCalcRelDO mktCamRecomCalcRelDO = new MktCamRecomCalcRelDO();
             mktCamRecomCalcRelDO.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
             mktCamRecomCalcRelDO.setAlgorithmsRulId(mktCpcAlgorithmsRulDO.getAlgorithmsRulId());
+            mktCamRecomCalcRelDO.setAlgoId(1L);
+            mktCamRecomCalcRelDO.setStatusCd("1000");
             mktCamRecomCalcRelMapper.insert(mktCamRecomCalcRelDO);
-            //cpc算法表
 
 
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
