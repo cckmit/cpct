@@ -787,7 +787,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         // 获取创建人员code
         request.setStaffCode("SYS827364823");
 
-
         TrialOperationVOES requests = BeanUtil.create(request,new TrialOperationVOES());
         //todo 待测试
         ArrayList<TrialOperationParamES> paramList = new ArrayList<>();
