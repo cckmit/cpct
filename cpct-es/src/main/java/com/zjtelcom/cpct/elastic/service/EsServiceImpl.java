@@ -474,7 +474,7 @@ public class EsServiceImpl implements EsService {
     private BoolQueryBuilder getBoolQueryBuilderByEventCode(String eventCode,Date startTime,Date endTime ) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
-                        matchQuery("integrationId",eventCode))
+                        matchQuery("integrationId",eventCode));
         if (startTime!=null && endTime!=null){
             String start = DateUtil.formatDate(startTime);
             String end = DateUtil.formatDate(endTime);

@@ -788,8 +788,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         request.setStaffCode("SYS827364823");
 
         TrialOperationVOES requests = BeanUtil.create(request,new TrialOperationVOES());
-        requests.setStartTime(DateUtil.date2StringDate(campaignDO.getPlanBeginTime()));
-        requests.setEndTime(DateUtil.date2StringDate(campaignDO.getPlanEndTime()));
         //todo 待测试
         ArrayList<TrialOperationParamES> paramList = new ArrayList<>();
         List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(request.getStrategyId());
