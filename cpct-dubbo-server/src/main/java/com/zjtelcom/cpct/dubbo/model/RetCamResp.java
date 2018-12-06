@@ -1,9 +1,6 @@
 package com.zjtelcom.cpct.dubbo.model;
 
-import com.zjtelcom.cpct.dto.campaign.MktCamResultRelDeatil;
-
 import java.io.Serializable;
-import java.util.List;
 
 public class RetCamResp implements Serializable {
     private String resultCode;

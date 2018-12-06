@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.dto.grouping;
 
 import java.io.Serializable;
-import java.util.Date;
 /**
  * @Description:
  * @author: linchao

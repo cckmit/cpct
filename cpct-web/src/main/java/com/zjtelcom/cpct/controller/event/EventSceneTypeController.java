@@ -7,7 +7,6 @@ import com.zjtelcom.cpct.domain.event.EventSceneTypeDO;
 import com.zjtelcom.cpct.dto.event.EventSceneTypeDTO;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.event.EventSceneTypeService;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.dto.event;
 
 import com.zjtelcom.cpct.domain.event.EventTypeDO;
-import lombok.Data;
 
 import java.util.List;
 

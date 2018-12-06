@@ -2,9 +2,6 @@ package com.zjtelcom.cpct.domain.event;
 
 import com.zjtelcom.cpct.BaseEntity;
 import lombok.Data;
-import org.apache.http.protocol.HTTP;
-
-import java.util.Date;
 
 @Data
 public class InterfaceCfg extends BaseEntity {

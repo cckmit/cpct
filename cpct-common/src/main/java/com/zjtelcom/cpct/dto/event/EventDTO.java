@@ -3,8 +3,8 @@ package com.zjtelcom.cpct.dto.event;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.event.EventDO;
 import com.zjtelcom.cpct.domain.event.EventItemDO;
-import com.zjtelcom.cpct.domain.event.EventTypeDO;
 import com.zjtelcom.cpct.domain.event.EventMatchRulDO;
+import com.zjtelcom.cpct.domain.event.EventTypeDO;
 import lombok.Data;
 
 import java.util.List;

@@ -1,12 +1,7 @@
 package com.zjtelcom.cpct.dubbo.model;
 
-import com.zjtelcom.cpct.domain.channel.Offer;
-import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
-
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 策略配置规则DTO

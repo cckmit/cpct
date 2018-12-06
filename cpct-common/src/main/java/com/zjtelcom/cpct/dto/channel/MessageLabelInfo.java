@@ -1,8 +1,5 @@
 package com.zjtelcom.cpct.dto.channel;
 
-import com.zjtelcom.cpct.domain.channel.Message;
-import com.zjtelcom.cpct.domain.channel.MessageLabel;
-
 import java.io.Serializable;
 import java.util.List;
 

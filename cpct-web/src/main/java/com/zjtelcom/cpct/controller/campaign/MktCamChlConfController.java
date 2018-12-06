@@ -8,7 +8,6 @@ package com.zjtelcom.cpct.controller.campaign;
 
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.controller.BaseController;
-import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
 import org.springframework.beans.factory.annotation.Autowired;

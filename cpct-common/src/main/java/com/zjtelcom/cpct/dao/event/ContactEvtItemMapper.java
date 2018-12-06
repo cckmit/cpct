@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.dao.event;
 
 import com.zjtelcom.cpct.domain.event.EventItemDO;
-import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.ContactEvtItem;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

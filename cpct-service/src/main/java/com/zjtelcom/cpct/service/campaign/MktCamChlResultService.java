@@ -6,7 +6,6 @@
  */
 package com.zjtelcom.cpct.service.campaign;
 
-import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 
 import java.util.Map;

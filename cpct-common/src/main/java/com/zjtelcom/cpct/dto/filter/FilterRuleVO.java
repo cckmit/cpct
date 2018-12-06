@@ -1,8 +1,6 @@
 package com.zjtelcom.cpct.dto.filter;
 
-import com.zjtelcom.cpct.domain.channel.PpmProduct;
 import com.zjtelcom.cpct.dto.channel.OfferDetail;
-import com.zjtelcom.cpct.dto.channel.ProductParam;
 
 import java.io.Serializable;
 import java.util.List;

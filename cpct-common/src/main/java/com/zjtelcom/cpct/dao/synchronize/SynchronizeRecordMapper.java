@@ -1,6 +1,5 @@
 package com.zjtelcom.cpct.dao.synchronize;
 
-import com.zjtelcom.cpct.domain.event.EventDO;
 import com.zjtelcom.cpct.dto.synchronize.SynchronizeRecord;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;

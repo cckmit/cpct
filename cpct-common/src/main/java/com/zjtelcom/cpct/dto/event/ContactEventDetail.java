@@ -1,9 +1,9 @@
 package com.zjtelcom.cpct.dto.event;
 
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
-import com.zjtelcom.cpct.dto.campaign.MktCampaign;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import lombok.Data;
+
 import java.util.List;
 
 /**

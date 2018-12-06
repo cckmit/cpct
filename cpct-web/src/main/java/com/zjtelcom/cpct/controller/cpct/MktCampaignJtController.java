@@ -11,15 +11,12 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.zjtelcom.cpct.controller.campaign.CampaignController;
 import com.zjtelcom.cpct.dto.pojo.CpcGroupRequest;
 import com.zjtelcom.cpct.dto.pojo.CpcGroupResponse;
-import com.zjtelcom.cpct.dto.pojo.MktCampaign;
 import com.zjtelcom.cpct.dto.pojo.Result;
 import com.zjtelcom.cpct.pojo.MktCampaignDetailReq;
 import com.zjtelcom.cpct.service.cpct.MktCampaignJTService;
 import com.zjtelcom.cpct.util.CpcUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-
 import org.springframework.web.bind.annotation.*;
 
 /**

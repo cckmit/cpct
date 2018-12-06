@@ -1,6 +1,5 @@
 package com.zjtelcom.cpct.util;
 
-import com.alibaba.fastjson.JSONObject;
 import com.ctg.itrdc.cache.pool.CtgJedisPool;
 import com.ctg.itrdc.cache.pool.CtgJedisPoolConfig;
 import com.ctg.itrdc.cache.pool.CtgJedisPoolException;
@@ -77,11 +76,11 @@ public class RedisUtils {
         boolean result = false;
         try {
 //             原方法
-          ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-          operations.set(key, value);
+//          ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+//          operations.set(key, value);
 
             // 改造后方法
-//            result = setRedis(key, value);
+            result = setRedis(key, value);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -221,11 +220,11 @@ public class RedisUtils {
         Object result = null;
 
         // 原方法
-        ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-         result = operations.get(key);
+//        ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+//         result = operations.get(key);
 
         // 改造后方法
-//        result = getRedis(key);
+        result = getRedis(key);
         return result;
     }
 

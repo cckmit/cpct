@@ -2,8 +2,6 @@ package com.zjtelcom.cpct.domain.strategy;
 
 import com.zjtelcom.cpct.BaseEntity;
 
-import java.util.Date;
-
 public class MktStrategyConfRuleRelDO extends BaseEntity {
     /**
      * 策略配置规则关联Id
