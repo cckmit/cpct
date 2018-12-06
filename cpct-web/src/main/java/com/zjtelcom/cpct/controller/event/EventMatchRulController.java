@@ -2,7 +2,6 @@ package com.zjtelcom.cpct.controller.event;
 
 import com.alibaba.fastjson.JSONArray;
 import com.zjtelcom.cpct.controller.BaseController;
-import com.zjtelcom.cpct.dto.event.EventMatchRulCondition;
 import com.zjtelcom.cpct.dto.event.EventMatchRulDTO;
 import com.zjtelcom.cpct.dto.event.EventMatchRulDetail;
 import com.zjtelcom.cpct.service.event.EventMatchRulService;

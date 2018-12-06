@@ -2,8 +2,6 @@ package com.zjtelcom.cpct.domain.campaign;
 
 import com.zjtelcom.cpct.BaseEntity;
 
-import java.util.Date;
-
 public class MktCamStrategyConfRelDO extends BaseEntity {
     private Long camStrConfRelId;
 

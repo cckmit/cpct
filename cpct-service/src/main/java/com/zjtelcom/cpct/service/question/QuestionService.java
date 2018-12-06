@@ -1,10 +1,8 @@
 package com.zjtelcom.cpct.service.question;
 
 import com.zjtelcom.cpct.domain.question.Question;
-import com.zjtelcom.cpct.domain.question.Questionnaire;
 import com.zjtelcom.cpct.dto.question.QuestionAddVO;
 import com.zjtelcom.cpct.dto.question.QuestionEditVO;
-import com.zjtelcom.cpct.dto.question.QuestionnaireParam;
 
 import java.util.Map;
 

@@ -1,7 +1,5 @@
 package com.zjtelcom.cpct.dubbo.model;
 
-import java.util.Date;
-
 public class QuestionnaireVO {
     private Long naireId;
 

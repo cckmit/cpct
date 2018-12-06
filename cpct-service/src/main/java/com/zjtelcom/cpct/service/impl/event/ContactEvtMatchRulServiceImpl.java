@@ -2,9 +2,7 @@ package com.zjtelcom.cpct.service.impl.event;
 
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.event.ContactEvtMatchRulMapper;
-import com.zjtelcom.cpct.domain.event.EventMatchRulDO;
 import com.zjtelcom.cpct.dto.event.ContactEvtMatchRul;
-import com.zjtelcom.cpct.dto.event.EventMatchRulDTO;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.ContactEvtMatchRulService;
 import org.apache.commons.lang.StringUtils;
@@ -12,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

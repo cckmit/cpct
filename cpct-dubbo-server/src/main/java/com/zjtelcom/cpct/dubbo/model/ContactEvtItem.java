@@ -1,7 +1,5 @@
 package com.zjtelcom.cpct.dubbo.model;
 
-import com.zjtelcom.cpct.BaseEntity;
-
 import java.io.Serializable;
 
 /**

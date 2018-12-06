@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.dto.pojo;
 
 import java.io.Serializable;
-import java.util.List;
 
 public class EventPo implements Serializable {
 	private RequestTemplateInst requestTemplateInst;

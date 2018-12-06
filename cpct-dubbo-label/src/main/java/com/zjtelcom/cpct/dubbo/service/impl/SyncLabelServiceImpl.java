@@ -23,9 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
-import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
-import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
-import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
+import static com.zjtelcom.cpct.constants.CommonConstant.*;
 
 
 /**

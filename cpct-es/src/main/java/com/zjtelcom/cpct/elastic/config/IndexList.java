@@ -33,5 +33,11 @@ public class IndexList {
      */
     public static String  STRATEGY_MODULE="strategy_module";
 
+    /**
+     * 参数模块索引
+     */
+    public static String PARAMS_MODULE="params_module";
+
+
 
 }

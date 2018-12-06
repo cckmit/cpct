@@ -1,9 +1,5 @@
 package com.zjtelcom.cpct.domain.campaign;
 
-import com.zjtelcom.cpct.BaseEntity;
-
-import java.util.Date;
-
 public class MktCampaignCountDO extends MktCampaignDO{
 
     private int relCount;

@@ -37,7 +37,6 @@ import com.zjtelcom.cpct.service.channel.CamScriptService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
-
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
@@ -48,7 +47,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Description:

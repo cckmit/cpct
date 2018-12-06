@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.elastic.model;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
 public class CampaignHitResponse implements Serializable {

@@ -7,8 +7,6 @@ import com.zjtelcom.cpct.dto.pojo.*;
 import com.zjtelcom.cpct.service.cpct.CpctEventSceneService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.CpcUtil;
-import org.bouncycastle.asn1.dvcs.ServiceType;
-import org.omg.CORBA.ServiceDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

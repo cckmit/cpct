@@ -7,7 +7,6 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.event.*;
-import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamEvtRelDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;

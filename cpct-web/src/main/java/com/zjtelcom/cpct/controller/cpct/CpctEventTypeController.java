@@ -6,7 +6,6 @@ import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dto.pojo.CatalogDetailPo;
 import com.zjtelcom.cpct.dto.pojo.CpcGroupRequest;
 import com.zjtelcom.cpct.dto.pojo.CpcGroupResponse;
-import com.zjtelcom.cpct.dto.pojo.EventPo;
 import com.zjtelcom.cpct.service.cpct.CpctEventTypeService;
 import com.zjtelcom.cpct.util.CpcUtil;
 import org.springframework.beans.factory.annotation.Autowired;

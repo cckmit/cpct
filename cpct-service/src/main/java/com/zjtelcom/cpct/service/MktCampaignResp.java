@@ -1,12 +1,8 @@
 package com.zjtelcom.cpct.service;
 
 import com.zjtelcom.cpct.domain.SysArea;
-import com.zjtelcom.cpct.domain.campaign.CityProperty;
 import com.zjtelcom.cpct.dto.campaign.MktCampaign;
-import com.zjtelcom.cpct.dto.channel.MessageLabelInfo;
-import com.zjtelcom.cpct.dto.event.EventDTO;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
