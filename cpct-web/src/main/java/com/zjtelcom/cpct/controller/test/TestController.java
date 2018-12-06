@@ -6,12 +6,15 @@ import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.rule.RuleResult;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
+import com.zjtelcom.cpct.dao.channel.ObjMktCampaignRelMapper;
+import com.zjtelcom.cpct.domain.channel.ObjMktCampaignRel;
 import com.zjtelcom.cpct.domain.channel.RequestInstRel;
 import com.zjtelcom.cpct.service.EngineTestService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlResultApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.util.RedisUtils;
+import com.zjtelcom.cpct.util.UserUtil;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 
 
 @RestController
@@ -44,12 +49,26 @@ public class TestController extends BaseController {
     private RedisUtils redisUtils;
     @Autowired(required = false)
     private RequestInstRelMapper requestInstRelMapper;
+    @Autowired
+    private ObjMktCampaignRelMapper objMktCampaignRelMapper;
 
     @PostMapping("fourthDataSource")
     @CrossOrigin
     public Object fourthDataSource() {
-        RequestInstRel requestInstRel = requestInstRelMapper.selectByPrimaryKey(1L);
-        return requestInstRel;
+//        RequestInstRel requestInstRel = requestInstRelMapper.selectByPrimaryKey(1L);
+
+        ObjMktCampaignRel rel = new ObjMktCampaignRel();
+        rel.setMktCampaignId(333L);
+        rel.setObjId(1666666L);
+        rel.setObjType("2000");
+        rel.setRelType("1000");
+        rel.setStatusCd(STATUSCD_EFFECTIVE);
+        rel.setStatusDate(new Date());
+        rel.setUpdateDate(new Date());
+        rel.setCreateStaff(UserUtil.loginId());
+        rel.setCreateDate(new Date());
+        objMktCampaignRelMapper.insert(rel);
+        return rel;
     }
 
 

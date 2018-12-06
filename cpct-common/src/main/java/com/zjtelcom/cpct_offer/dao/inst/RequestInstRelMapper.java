@@ -17,5 +17,5 @@ public interface RequestInstRelMapper {
 
     int updateByPrimaryKey(RequestInstRel record);
 
-    List<RequestInstRel> selectByRequestId(@Param("requestId") Long requestId);
+    List<RequestInstRel> selectByRequestId(@Param("requestId") Long requestId,@Param("type")String type);
 }

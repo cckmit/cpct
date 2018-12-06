@@ -7,9 +7,18 @@ public class ChannelDetail implements Serializable {
 
     private Long channelId;
     private String channelName;
+    private String channelCode;
     private String remark;
     private List<ChannelDetail> children;
 
+
+    public String getChannelCode() {
+        return channelCode;
+    }
+
+    public void setChannelCode(String channelCode) {
+        this.channelCode = channelCode;
+    }
 
     public String getRemark() {
         return remark;
