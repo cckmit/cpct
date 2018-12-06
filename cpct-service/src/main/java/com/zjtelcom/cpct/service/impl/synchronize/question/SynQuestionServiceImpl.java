@@ -54,13 +54,13 @@ public class SynQuestionServiceImpl  extends BaseService implements SynQuestionS
     @Autowired
     private SynchronizeRecordService synchronizeRecordService;
     //调查问卷题库表
-    private String question="mkt_questionnaire";
+    private static String questionName="mkt_questionnaire";
     //调查问卷关联表
-    private String questionRel="mkt_qst_quest_rel";
+    private static String questionRelName="mkt_qst_quest_rel";
     //题库表
-    private String questionBank="mkt_question";
+    private static String questionBankName="mkt_question";
     //题库详情表
-    private String questionBankDetail="mkt_question_detail";
+    private static String questionBankDetailName="mkt_question_detail";
 
     /**
      * 同步问卷 这里的同步每次修改主环境代码都是把问卷相关的问卷关联全删除 再全新增
@@ -84,12 +84,14 @@ public class SynQuestionServiceImpl  extends BaseService implements SynQuestionS
             if(!relListByQuestionnaireId.isEmpty()){
                 questRelPrdMapper.insertBatch(relListByQuestionnaireId);
             }
+            synchronizeRecordService.addRecord(roleName,questionName,questionnaireId, SynchronizeType.add.getType());
         }else{
             questionnairePrdMapper.updateByPrimaryKey(questionnaire);
             questRelPrdMapper.deleteByNaireId(questionnaireId);
             if(!relListByQuestionnaireId.isEmpty()){
                 questRelPrdMapper.insertBatch(relListByQuestionnaireId);
             }
+            synchronizeRecordService.addRecord(roleName,questionName,questionnaireId, SynchronizeType.update.getType());
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","同步成功");
@@ -106,9 +108,9 @@ public class SynQuestionServiceImpl  extends BaseService implements SynQuestionS
     public Map<String, Object> synchronizeBatchQuestion(String roleName) {
         Map<String,Object> maps = new HashMap<>();
         //问卷
-        batchQuestion(roleName,question);
+        batchQuestion(roleName,questionName);
         //问卷关联
-        batchQuestionRel(roleName,questionRel);
+        batchQuestionRel(roleName,questionRelName);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         return maps;
@@ -124,9 +126,9 @@ public class SynQuestionServiceImpl  extends BaseService implements SynQuestionS
     public Map<String, Object> synchronizeBatchQuestionBank(String roleName) {
         Map<String,Object> maps = new HashMap<>();
         //题库同步
-        batchQuestionBank(roleName,questionBank);
+        batchQuestionBank(roleName,questionBankName);
         //题库详情
-        batchQuestionBankDetail(roleName,questionBankDetail);
+        batchQuestionBankDetail(roleName,questionBankDetailName);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         return  maps;
@@ -157,6 +159,7 @@ public class SynQuestionServiceImpl  extends BaseService implements SynQuestionS
                    questionDetailPrdMapper.insert(questionDetail);
                }
             }
+            synchronizeRecordService.addRecord(roleName,questionName,questionnaireId, SynchronizeType.add.getType());
         }else{
             questionPrdMapper.updateByPrimaryKey(question);
             if(!detailListByQuestionId.isEmpty()){
@@ -165,6 +168,7 @@ public class SynQuestionServiceImpl  extends BaseService implements SynQuestionS
                     questionDetailPrdMapper.insert(questionDetail);
                 }
             }
+            synchronizeRecordService.addRecord(roleName,questionName,questionnaireId, SynchronizeType.update.getType());
         }
 
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -183,6 +187,7 @@ public class SynQuestionServiceImpl  extends BaseService implements SynQuestionS
         Map<String,Object> maps = new HashMap<>();
         questionPrdMapper.deleteByPrimaryKey(questionnaireId);
         questionDetailPrdMapper.deleteByQuestionId(questionnaireId);
+        synchronizeRecordService.addRecord(roleName,questionBankName,questionnaireId, SynchronizeType.delete.getType());
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
         return maps;
@@ -199,6 +204,7 @@ public class SynQuestionServiceImpl  extends BaseService implements SynQuestionS
         Map<String,Object> maps = new HashMap<>();
         questionnairePrdMapper.deleteByPrimaryKey(questionnaireId);
         questRelPrdMapper.deleteByNaireId(questionnaireId);
+        synchronizeRecordService.addRecord(roleName,questionName,questionnaireId, SynchronizeType.delete.getType());
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
         return maps;

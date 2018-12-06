@@ -1,8 +1,6 @@
 package com.zjtelcom.cpct.dto.grouping;
 
 import com.zjtelcom.cpct.BaseEntity;
-import com.zjtelcom.cpct.domain.grouping.TarGrpDetailDO;
-import lombok.Data;
 
 import java.io.Serializable;
 

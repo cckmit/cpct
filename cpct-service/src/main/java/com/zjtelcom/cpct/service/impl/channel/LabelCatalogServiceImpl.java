@@ -4,7 +4,6 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelCatalogMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
-import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelCatalog;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
@@ -18,7 +17,10 @@ import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 

@@ -156,7 +156,7 @@ public class SynLabelServiceImpl implements SynLabelService{
 //        for (LabelValue labelValue:labelValues){
 //            injectionLabelValueMapper.deleteByPrimaryKey(labelValue.getLabelValueId());
 //        }
-
+        synchronizeRecordService.addRecord(roleName,tableName,labelId, SynchronizeType.delete.getType());
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
         return maps;

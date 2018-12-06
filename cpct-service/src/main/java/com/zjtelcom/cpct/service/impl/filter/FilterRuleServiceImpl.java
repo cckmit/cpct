@@ -13,7 +13,6 @@ import com.zjtelcom.cpct.dao.user.UserListMapper;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
 import com.zjtelcom.cpct.domain.channel.Offer;
-import com.zjtelcom.cpct.domain.channel.PpmProduct;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.channel.OfferDetail;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
@@ -27,20 +26,20 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.filter.FilterRuleService;
 import com.zjtelcom.cpct.service.synchronize.filter.SynFilterRuleService;
 import com.zjtelcom.cpct.util.*;
-import com.zjtelcom.cpct.util.DateUtil;
 import org.apache.commons.lang.StringUtils;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
-import java.util.logging.Filter;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 
@@ -200,7 +199,11 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
     @Override
     public Map<String, Object> delFilterRule(final FilterRule filterRule) {
         Map<String, Object> maps = new HashMap<>();
-        filterRuleMapper.delFilterRule(filterRule);
+        FilterRule rule = filterRuleMapper.selectByPrimaryKey(filterRule.getRuleId());
+        if(rule != null) {
+            filterRuleMapper.delFilterRule(filterRule);
+            verbalConditionMapper.deleteByPrimaryKey(rule.getConditionId());
+        }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
 

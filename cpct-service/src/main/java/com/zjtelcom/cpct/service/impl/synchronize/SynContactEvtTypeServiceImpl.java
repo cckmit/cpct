@@ -143,6 +143,7 @@ public class SynContactEvtTypeServiceImpl extends BaseService implements SynCont
         contactEvtTypePrdMapper.deleteByPrimaryKey(eventId);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
+        synchronizeRecordService.addRecord(roleName,tableName,eventId, SynchronizeType.delete.getType());
         return maps;
     }
 }

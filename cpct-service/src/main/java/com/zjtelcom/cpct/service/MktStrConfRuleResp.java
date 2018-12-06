@@ -1,11 +1,7 @@
 package com.zjtelcom.cpct.service;
 
-import com.zjtelcom.cpct.domain.channel.Offer;
-import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
-import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
-import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
 
 import java.io.Serializable;
 import java.util.List;

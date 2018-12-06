@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.dto.event;
 
 import com.zjtelcom.cpct.BaseEntity;
-import lombok.Data;
 
 /**
  * @Description 事件采集项实体类

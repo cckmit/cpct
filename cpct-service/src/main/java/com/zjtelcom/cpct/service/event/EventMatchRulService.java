@@ -1,6 +1,5 @@
 package com.zjtelcom.cpct.service.event;
 
-import com.zjtelcom.cpct.dto.event.EventMatchRulCondition;
 import com.zjtelcom.cpct.dto.event.EventMatchRulDetail;
 
 import java.util.Map;

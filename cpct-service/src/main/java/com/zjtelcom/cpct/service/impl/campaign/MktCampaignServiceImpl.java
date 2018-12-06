@@ -1,6 +1,5 @@
 package com.zjtelcom.cpct.service.impl.campaign;
 
-import com.ctzj.smt.bss.cooperate.service.dubbo.IMktCampaignService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
@@ -19,7 +18,9 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.domain.system.SysStaff;
-import com.zjtelcom.cpct.dto.campaign.*;
+import com.zjtelcom.cpct.dto.campaign.CampaignVO;
+import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
+import com.zjtelcom.cpct.dto.campaign.MktCampaignVO;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.EventDTO;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
@@ -35,13 +36,11 @@ import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UserUtil;
-import com.zjtelcom.cpct_prd.dao.campaign.MktCampaignPrdMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sun.awt.windows.ThemeReader;
 
 import java.util.*;
 
@@ -162,7 +161,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setLanId(1L);
             mktCampaignMapper.insert(mktCampaignDO);
             Long mktCampaignId = mktCampaignDO.getMktCampaignId();
-
+            // 活动编码
+            mktCampaignDO.setMktActivityNbr("MKT" + String.format("%06d", mktCampaignId));
+            mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
             // 创建二次营销活动
 
             if (mktCampaignVO.getPreMktCampaignId() != null && (mktCampaignVO.getPreMktCampaignId() != 0)) {
@@ -498,6 +499,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         // 删除活动基本信息
         try {
             mktCampaignMapper.deleteByPrimaryKey(mktCampaignId);
+            // 删除活动与事件的关系
+            mktCamEvtRelMapper.deleteByMktCampaignId(mktCampaignId);
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
             maps.put("resultMsg", "删除成功！");
             maps.put("mktCampaignId", mktCampaignId);

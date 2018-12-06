@@ -3,8 +3,6 @@ package com.zjtelcom.cpct.domain.event;
 
 import com.zjtelcom.cpct.BaseEntity;
 
-import java.io.Serializable;
-
 public class EventSceneTypeDO extends BaseEntity{
 
     private static final long serialVersionUID = -1161582235420131662L;

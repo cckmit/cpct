@@ -3,18 +3,14 @@ package com.zjtelcom.cpct.controller.org;
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
-import com.zjtelcom.cpct.domain.org.OrgTree;
 import com.zjtelcom.cpct.service.org.OrgTreeService;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

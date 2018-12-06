@@ -1,6 +1,5 @@
 package com.zjtelcom.cpct.service.question;
 
-import com.zjtelcom.cpct.domain.question.Questionnaire;
 import com.zjtelcom.cpct.dto.question.QuestionReq;
 import com.zjtelcom.cpct.dto.question.QuestionnaireParam;
 

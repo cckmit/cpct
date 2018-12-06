@@ -1,8 +1,8 @@
 package com.zjtelcom.cpct.service.event;
 
 import com.zjtelcom.cpct.dto.event.ContactEvtType;
-import com.zjtelcom.cpct.dto.event.EventTypeDTO;
 import com.zjtelcom.cpct.request.event.QryContactEvtTypeReq;
+
 import java.util.Map;
 
 /**

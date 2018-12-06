@@ -13,7 +13,6 @@ import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelResult;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
-import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.springframework.context.annotation.Scope;
 

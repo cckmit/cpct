@@ -129,6 +129,7 @@ public class SynSysMenuServiceImpl implements SynSysMenuService {
         sysMenuPrdMapper.deleteByPrimaryKey(menuId);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
+        synchronizeRecordService.addRecord(roleName,tableName,menuId, SynchronizeType.delete.getType());
         return maps;
     }
 

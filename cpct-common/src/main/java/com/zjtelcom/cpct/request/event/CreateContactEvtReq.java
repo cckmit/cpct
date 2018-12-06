@@ -2,7 +2,6 @@ package com.zjtelcom.cpct.request.event;
 
 import com.zjtelcom.cpct.dto.apply.RequestTemplateInst;
 import com.zjtelcom.cpct.dto.event.ContactEventDetail;
-import com.zjtelcom.cpct.dto.event.ContactEvtDetail;
 
 import java.io.Serializable;
 import java.util.List;

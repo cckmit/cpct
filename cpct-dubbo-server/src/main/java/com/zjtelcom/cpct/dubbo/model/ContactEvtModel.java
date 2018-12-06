@@ -1,11 +1,9 @@
 package com.zjtelcom.cpct.dubbo.model;
 
-import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.ContactEvtItem;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 public class ContactEvtModel  implements Serializable {
 

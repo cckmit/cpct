@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.domain.system;
 
 import com.zjtelcom.cpct.BaseEntity;
-import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
