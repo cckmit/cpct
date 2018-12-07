@@ -162,6 +162,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setCreateChannel("超级管理员");
             // TODO 添加所属地市
             mktCampaignDO.setLanId(1L);
+            mktCampaignDO.setServiceType("1000");
             mktCampaignDO.setRegionId(AreaCodeEnum.getRegionIdByLandId(1L));
             mktCampaignMapper.insert(mktCampaignDO);
             Long mktCampaignId = mktCampaignDO.getMktCampaignId();

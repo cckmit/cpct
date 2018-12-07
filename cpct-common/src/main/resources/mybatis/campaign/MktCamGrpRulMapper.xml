@@ -75,4 +75,10 @@
     CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
     from mkt_cam_grp_rul
   </select>
+
+  <select id="countByTarGrpId">
+    select count(*)
+    from mkt_cam_grp_rul
+    where TAR_GRP_ID = #{tarGrpId,jdbcType=BIGINT},
+  </select>
 </mapper>

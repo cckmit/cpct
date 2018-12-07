@@ -32,7 +32,7 @@ public class MktCampaignDO extends BaseEntity{
     private String serviceType;
     private Long serviceCancleFlag;
     private Long regionId;
-    private Long lifeStage;
+    private String lifeStage;
     private String extMktCampaignId;
 
     public Long getCalcDisplay() {
@@ -236,11 +236,11 @@ public class MktCampaignDO extends BaseEntity{
         this.regionId = regionId;
     }
 
-    public Long getLifeStage() {
+    public String getLifeStage() {
         return lifeStage;
     }
 
-    public void setLifeStage(Long lifeStage) {
+    public void setLifeStage(String lifeStage) {
         this.lifeStage = lifeStage;
     }
 

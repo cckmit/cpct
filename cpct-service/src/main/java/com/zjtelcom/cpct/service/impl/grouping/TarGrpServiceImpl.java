@@ -133,6 +133,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             //插入客户分群记录
             TarGrp tarGrp = new TarGrp();
             tarGrp = tarGrpDetail;
+            tarGrp.setTarGrpType("1000");
             tarGrp.setCreateDate(DateUtil.getCurrentTime());
             tarGrp.setUpdateDate(DateUtil.getCurrentTime());
             tarGrp.setStatusDate(DateUtil.getCurrentTime());

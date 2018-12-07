@@ -679,7 +679,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
 
             // 查询痛痒点话术列表
             verbalService.copyVerbal(parentEvtContactConfId, childEvtContactConfId);
-            // 查询脚本
+            // 查询脚本s
             Map<String, Object> map = camScriptService.copyCamScript(parentEvtContactConfId, scriptDesc, childEvtContactConfId);
             CamScript newScript = (CamScript) map.get("resultMsg");
             mktCamChlConfDetailNew.setCamScript(newScript);

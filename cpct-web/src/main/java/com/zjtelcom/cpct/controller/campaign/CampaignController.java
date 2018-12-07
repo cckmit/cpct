@@ -180,11 +180,10 @@ public class CampaignController extends BaseController {
         // 存活动
         Map<String, Object> mktCampaignMap = mktCampaignService.createMktCampaign(mktCampaignVO);
         Long mktCampaignId = Long.valueOf(mktCampaignMap.get("mktCampaignId").toString());
-        String mktCampaignName = mktCampaignMap.get("mktCampaignName").toString();
         if (mktCampaignVO.getMktStrategyConfDetailList().size() > 0) {
             for (MktStrategyConfDetail mktStrategyConfDetail : mktCampaignVO.getMktStrategyConfDetailList()) {
                 mktStrategyConfDetail.setMktCampaignId(mktCampaignId);
-                mktStrategyConfDetail.setMktCampaignName(mktCampaignName);
+                mktStrategyConfDetail.setMktCampaignName(mktCampaignVO.getMktCampaignName());
                 mktStrategyConfService.saveMktStrategyConf(mktStrategyConfDetail);
             }
         }

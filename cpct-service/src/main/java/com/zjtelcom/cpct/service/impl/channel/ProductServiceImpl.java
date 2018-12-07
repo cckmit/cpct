@@ -43,6 +43,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
     @Override
     public Map<String, Object> getProductNameById(Long userId, List<Long> productIdList) {
+
         Map<String,Object> result = new HashMap<>();
         List<OfferDetail> nameList = new ArrayList<>();
         for (Long productId : productIdList){
