@@ -10,12 +10,12 @@
         <result column="BEGIN_TIME" jdbcType="DATE" property="beginTime"/>
         <result column="END_TIME" jdbcType="DATE" property="endTime"/>
         <result column="MKT_CAMPAIGN_TYPE" jdbcType="VARCHAR" property="mktCampaignType"/>
-        <result column="SERVICE_TYPE" jdbcType="VARCHAR" property="mktCampaignCategory" />
+        <result column="MANAGE_TYPE" jdbcType="VARCHAR" property="mktCampaignCategory" />
         <result column="MKT_ACTIVITY_NBR" jdbcType="VARCHAR" property="mktActivityNbr"/>
         <result column="MKT_ACTIVITY_TARGET" jdbcType="VARCHAR" property="mktActivityTarget"/>
         <result column="MKT_CAMPAIGN_DESC" jdbcType="VARCHAR" property="mktCampaignDesc"/>
-        <result column="CALC_DISPLAY" jdbcType="VARCHAR" property="calcDisplay" />
-        <result column="ISALE_DISPLAY" jdbcType="VARCHAR" property="isaleDisplay" />
+        <result column="CALC_DISPLAY" jdbcType="BIGINT" property="calcDisplay" />
+        <result column="ISALE_DISPLAY" jdbcType="BIGINT" property="isaleDisplay" />
         <result column="EXEC_TYPE" jdbcType="VARCHAR" property="execType"/>
         <result column="EXEC_INVL" jdbcType="VARCHAR" property="execInvl"/>
         <result column="EXEC_NUM" jdbcType="INTEGER" property="execNum"/>
@@ -27,141 +27,274 @@
         <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
         <result column="REMARK" jdbcType="VARCHAR" property="remark"/>
         <result column="LAN_ID" jdbcType="BIGINT" property="lanId"/>
+        <result column="CREATE_CHANNEL" jdbcType="VARCHAR" property="createChannel" />
+        <result column="DIRECTORY_ID" jdbcType="BIGINT" property="directoryId" />
+        <result column="CAM_LEVEL" jdbcType="BIGINT" property="camLevel" />
+        <result column="IS_CHECK_RULE" jdbcType="VARCHAR" property="isCheckRule" />
+        <result column="SRC_ID" jdbcType="VARCHAR" property="srcId" />
+        <result column="SRC_TYPE" jdbcType="VARCHAR" property="srcType" />
+        <result column="SERVICE_TYPE" jdbcType="VARCHAR" property="serviceType" />
+        <result column="SERVICE_CANCLE_FLAG" jdbcType="BIGINT" property="serviceCancleFlag" />
+        <result column="REGION_ID" jdbcType="BIGINT" property="regionId" />
+        <result column="LIFE_STAGE" jdbcType="VARCHAR" property="lifeStage" />
+        <result column="EXT_MKT_CAMPAIGN_ID" jdbcType="VARCHAR" property="extMktCampaignId" />
+
+    </resultMap>
+
+    <resultMap id="countResultMap" type="com.zjtelcom.cpct.domain.campaign.MktCampaignCountDO">
+        <id column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId"/>
+        <result column="TIGGER_TYPE" jdbcType="VARCHAR" property="tiggerType"/>
+        <result column="MKT_CAMPAIGN_NAME" jdbcType="VARCHAR" property="mktCampaignName"/>
+        <result column="PLAN_BEGIN_TIME" jdbcType="DATE" property="planBeginTime"/>
+        <result column="PLAN_END_TIME" jdbcType="DATE" property="planEndTime"/>
+        <result column="MKT_CAMPAIGN_TYPE" jdbcType="VARCHAR" property="mktCampaignType"/>
+        <result column="MANAGE_TYPE" jdbcType="VARCHAR" property="mktCampaignCategory" />
+        <result column="MKT_ACTIVITY_NBR" jdbcType="VARCHAR" property="mktActivityNbr"/>
+        <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd"/>
+        <result column="LAN_ID" jdbcType="BIGINT" property="lanId"/>
+        <result column="CREATE_CHANNEL" jdbcType="VARCHAR" property="createChannel" />
+        <result column="REL_COUNT" javaType="INT" property="relCount" />
+        <result column="A_MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="preMktCampaignId"/>
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
     </resultMap>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-      delete from mkt_campaign
-      where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+        delete from mkt_campaign
+        where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
     </delete>
 
     <insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignDO" useGeneratedKeys="true"
             keyProperty="mktCampaignId">
-    insert into mkt_campaign (MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME,
-      PLAN_BEGIN_TIME, PLAN_END_TIME, BEGIN_TIME,
-      END_TIME, MKT_CAMPAIGN_TYPE, SERVICE_TYPE,
-      MKT_ACTIVITY_NBR, MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC,
-      CALC_DISPLAY,ISALE_DISPLAY,
-      EXEC_TYPE, EXEC_INVL, EXEC_NUM,
-      STATUS_CD, STATUS_DATE, CREATE_STAFF,
-      CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
-      REMARK, LAN_ID)
-    values (#{mktCampaignId,jdbcType=BIGINT}, #{tiggerType,jdbcType=VARCHAR}, #{mktCampaignName,jdbcType=VARCHAR},
-      #{planBeginTime,jdbcType=DATE}, #{planEndTime,jdbcType=DATE}, #{beginTime,jdbcType=DATE},
-      #{endTime,jdbcType=DATE}, #{mktCampaignType,jdbcType=VARCHAR}, #{mktCampaignCategory,jdbcType=VARCHAR},
-      #{mktActivityNbr,jdbcType=VARCHAR}, #{mktActivityTarget,jdbcType=VARCHAR}, #{mktCampaignDesc,jdbcType=VARCHAR},
-      #{calcDisplay,jdbcType=VARCHAR}, #{isaleDisplay,jdbcType=VARCHAR},
-      #{execType,jdbcType=VARCHAR}, #{execInvl,jdbcType=VARCHAR}, #{execNum,jdbcType=INTEGER},
-      #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT},
-      #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP},
-      #{remark,jdbcType=VARCHAR}, #{lanId,jdbcType=BIGINT})
-    </insert>
-
-<!--
-    <insert id="insertBatch" parameterType="java.util.List" useGeneratedKeys="true"
-            keyProperty="mktCampaignId">
         insert into mkt_campaign (MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME,
         PLAN_BEGIN_TIME, PLAN_END_TIME, BEGIN_TIME,
-        END_TIME, MKT_CAMPAIGN_TYPE, MKT_CAMPAIGN_CATEGORY,
+        END_TIME, MKT_CAMPAIGN_TYPE, MANAGE_TYPE,
         MKT_ACTIVITY_NBR, MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC,
         CALC_DISPLAY,ISALE_DISPLAY,
         EXEC_TYPE, EXEC_INVL, EXEC_NUM,
         STATUS_CD, STATUS_DATE, CREATE_STAFF,
         CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
-        REMARK, LAN_ID)
-        values
-        <foreach collection="list" item="campaign" index="index" separator="," >
-            (#{campaign.mktCampaignId,jdbcType=BIGINT}, #{campaign.tiggerType,jdbcType=VARCHAR}, #{campaign.mktCampaignName,jdbcType=VARCHAR},
-            #{campaign.planBeginTime,jdbcType=DATE}, #{campaign.planEndTime,jdbcType=DATE}, #{campaign.beginTime,jdbcType=DATE},
-            #{campaign.endTime,jdbcType=DATE}, #{campaign.mktCampaignType,jdbcType=VARCHAR}, #{campaign.mktCampaignCategory,jdbcType=VARCHAR},
-            #{campaign.mktActivityNbr,jdbcType=VARCHAR}, #{campaign.mktActivityTarget,jdbcType=VARCHAR}, #{campaign.mktCampaignDesc,jdbcType=VARCHAR},
-            #{campaign.calcDisplay,jdbcType=VARCHAR}, #{campaign.isaleDisplay,jdbcType=VARCHAR},
-            #{campaign.execType,jdbcType=VARCHAR}, #{campaign.execInvl,jdbcType=VARCHAR}, #{campaign.execNum,jdbcType=INTEGER},
-            #{campaign.statusCd,jdbcType=VARCHAR}, #{campaign.statusDate,jdbcType=TIMESTAMP}, #{campaign.createStaff,jdbcType=BIGINT},
-            #{campaign.createDate,jdbcType=TIMESTAMP}, #{campaign.updateStaff,jdbcType=BIGINT}, #{campaign.updateDate,jdbcType=TIMESTAMP},
-            #{campaign.remark,jdbcType=VARCHAR}, #{campaign.lanId,jdbcType=BIGINT})
-        </foreach>
+        REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID,
+        CAM_LEVEL,IS_CHECK_RULE, SRC_TYPE, SRC_ID,
+        SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID)
+        values (#{mktCampaignId,jdbcType=BIGINT}, #{tiggerType,jdbcType=VARCHAR}, #{mktCampaignName,jdbcType=VARCHAR},
+        #{planBeginTime,jdbcType=DATE}, #{planEndTime,jdbcType=DATE}, #{beginTime,jdbcType=DATE},
+        #{endTime,jdbcType=DATE}, #{mktCampaignType,jdbcType=VARCHAR}, #{mktCampaignCategory,jdbcType=VARCHAR},
+        #{mktActivityNbr,jdbcType=VARCHAR}, #{mktActivityTarget,jdbcType=VARCHAR}, #{mktCampaignDesc,jdbcType=VARCHAR},
+        #{calcDisplay,jdbcType=BIGINT}, #{isaleDisplay,jdbcType=BIGINT},
+        #{execType,jdbcType=VARCHAR}, #{execInvl,jdbcType=VARCHAR}, #{execNum,jdbcType=INTEGER},
+        #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT},
+        #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP},
+        #{remark,jdbcType=VARCHAR}, #{lanId,jdbcType=BIGINT}, #{createChannel,jdbcType=VARCHAR},
+        #{directoryId,jdbcType=BIGINT},#{camLevel,jdbcType=BIGINT}, #{isCheckRule,jdbcType=VARCHAR},
+        #{srcId,jdbcType=VARCHAR}, #{srcType,jdbcType=VARCHAR}, #{serviceCancleFlag,jdbcType=BIGINT}, #{regionId,jdbcType=BIGINT},
+        #{lifeStage,jdbcType=VARCHAR}, #{serviceType,jdbcType=VARCHAR}, #{extMktCampaignId,jdbcType=VARCHAR} )
     </insert>
--->
+
 
     <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignDO">
-      update mkt_campaign
-   set  <if test= "tiggerType!=null">TIGGER_TYPE = #{tiggerType,jdbcType=VARCHAR},</if>
-        <if test= "mktCampaignName!=null">MKT_CAMPAIGN_NAME = #{mktCampaignName,jdbcType=VARCHAR},</if>
-        <if test= "planBeginTime!=null">PLAN_BEGIN_TIME = #{planBeginTime,jdbcType=DATE},</if>
-        <if test= "planEndTime!=null">PLAN_END_TIME = #{planEndTime,jdbcType=DATE},</if>
-        <if test= "beginTime!=null">BEGIN_TIME = #{beginTime,jdbcType=DATE},</if>
-        <if test= "endTime!=null">END_TIME = #{endTime,jdbcType=DATE},</if>
-        <if test= "mktCampaignType!=null">MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR},</if>
-        <if test= "mktCampaignCategory!=null">SERVICE_TYPE = #{mktCampaignCategory,jdbcType=VARCHAR},</if>
-        <if test= "mktActivityNbr!=null">MKT_ACTIVITY_NBR = #{mktActivityNbr,jdbcType=VARCHAR},</if>
-        <if test= "mktActivityTarget!=null">MKT_ACTIVITY_TARGET = #{mktActivityTarget,jdbcType=VARCHAR},</if>
-        <if test= "mktCampaignDesc!=null">MKT_CAMPAIGN_DESC = #{mktCampaignDesc,jdbcType=VARCHAR},</if>
-        <if test= "calcDisplay!=null">CALC_DISPLAY = #{calcDisplay,jdbcType=VARCHAR},</if>
-        <if test= "isaleDisplay!=null">ISALE_DISPLAY = #{isaleDisplay,jdbcType=VARCHAR},</if>
-        <if test= "execType!=null">EXEC_TYPE = #{execType,jdbcType=VARCHAR},</if>
-        <if test= "execInvl!=null">EXEC_INVL = #{execInvl,jdbcType=VARCHAR},</if>
-        <if test= "execNum!=null">EXEC_NUM = #{execNum,jdbcType=INTEGER},</if>
-        <if test= "statusCd!=null">STATUS_CD = #{statusCd,jdbcType=VARCHAR},</if>
+        update mkt_campaign
+        set  TIGGER_TYPE = #{tiggerType,jdbcType=VARCHAR},
+        MKT_CAMPAIGN_NAME = #{mktCampaignName,jdbcType=VARCHAR},
+        PLAN_BEGIN_TIME = #{planBeginTime,jdbcType=DATE},
+        PLAN_END_TIME = #{planEndTime,jdbcType=DATE},
+        BEGIN_TIME = #{beginTime,jdbcType=DATE},
+        END_TIME = #{endTime,jdbcType=DATE},
+        MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR},
+        MANAGE_TYPE = #{mktCampaignCategory,jdbcType=VARCHAR},
+        MKT_ACTIVITY_NBR = #{mktActivityNbr,jdbcType=VARCHAR},
+        MKT_ACTIVITY_TARGET = #{mktActivityTarget,jdbcType=VARCHAR},
+        MKT_CAMPAIGN_DESC = #{mktCampaignDesc,jdbcType=VARCHAR},
+        CALC_DISPLAY = #{calcDisplay,jdbcType=BIGINT},
+        ISALE_DISPLAY = #{isaleDisplay,jdbcType=BIGINT},
+        EXEC_TYPE = #{execType,jdbcType=VARCHAR},
+        EXEC_INVL = #{execInvl,jdbcType=VARCHAR},
+        EXEC_NUM = #{execNum,jdbcType=INTEGER},
+        STATUS_CD = #{statusCd,jdbcType=VARCHAR},
         <if test= "statusDate!=null">STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},</if>
         <if test= "createStaff!=null">CREATE_STAFF = #{createStaff,jdbcType=BIGINT},</if>
         <if test= "createDate!=null">CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},</if>
         <if test= "updateStaff!=null">UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},</if>
-        <if test= "updateDate!=null">UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},</if>
-        <if test= "remark!=null">REMARK = #{remark,jdbcType=VARCHAR},</if>
-        LAN_ID = #{lanId,jdbcType=BIGINT}
-    where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+        REMARK = #{remark,jdbcType=VARCHAR},
+        CREATE_CHANNEL = #{createChannel,jdbcType=VARCHAR},
+        DIRECTORY_ID = #{directoryId,jdbcType=BIGINT},
+        <if test= "lanId!=null">LAN_ID = #{lanId,jdbcType=BIGINT},</if>
+        CAM_LEVEL = #{camLevel,jdbcType=BIGINT},
+        IS_CHECK_RULE = #{isCheckRule,jdbcType=VARCHAR},
+        <if test= "srcId!=null"> SRC_ID #{srcId,jdbcType=VARCHAR},</if>
+        <if test= "srcType!=null">SRC_TYPE = #{srcType,jdbcType=VARCHAR},</if>
+        <if test= "serviceCancleFlag!=null">SERVICE_CANCLE_FLAG = #{serviceCancleFlag,jdbcType=BIGINT},</if>
+        <if test= "regionId!=null">REGION_ID = #{regionId,jdbcType=BIGINT},</if>
+        <if test= "lifeStage!=null">LIFE_STAGE = #{lifeStage,jdbcType=VARCHAR},</if>
+        <if test= "serviceType!=null">SERVICE_TYPE = #{serviceType,jdbcType=VARCHAR},</if>
+        <if test= "extMktCampaignId!=null">EXT_MKT_CAMPAIGN_ID = #{extMktCampaignId,jdbcType=VARCHAR},</if>
+        UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
+        where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
     </update>
 
+
+
+    <!--    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignDO">
+          update mkt_campaign
+       set  <if test= "tiggerType!=null">TIGGER_TYPE = #{tiggerType,jdbcType=VARCHAR},</if>
+            <if test= "mktCampaignName!=null">MKT_CAMPAIGN_NAME = #{mktCampaignName,jdbcType=VARCHAR},</if>
+            <if test= "planBeginTime!=null">PLAN_BEGIN_TIME = #{planBeginTime,jdbcType=DATE},</if>
+            <if test= "planEndTime!=null">PLAN_END_TIME = #{planEndTime,jdbcType=DATE},</if>
+            <if test= "beginTime!=null">BEGIN_TIME = #{beginTime,jdbcType=DATE},</if>
+            <if test= "endTime!=null">END_TIME = #{endTime,jdbcType=DATE},</if>
+            <if test= "mktCampaignType!=null">MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR},</if>
+            <if test= "mktCampaignCategory!=null">MANAGE_TYPE = #{mktCampaignCategory,jdbcType=VARCHAR},</if>
+            <if test= "mktActivityNbr!=null">MKT_ACTIVITY_NBR = #{mktActivityNbr,jdbcType=VARCHAR},</if>
+            <if test= "mktActivityTarget!=null">MKT_ACTIVITY_TARGET = #{mktActivityTarget,jdbcType=VARCHAR},</if>
+            <if test= "mktCampaignDesc!=null">MKT_CAMPAIGN_DESC = #{mktCampaignDesc,jdbcType=VARCHAR},</if>
+            <if test= "calcDisplay!=null">CALC_DISPLAY = #{calcDisplay,jdbcType=BIGINT},</if>
+            <if test= "isaleDisplay!=null">ISALE_DISPLAY = #{isaleDisplay,jdbcType=BIGINT},</if>
+            <if test= "execType!=null">EXEC_TYPE = #{execType,jdbcType=VARCHAR},</if>
+            <if test= "execInvl!=null">EXEC_INVL = #{execInvl,jdbcType=VARCHAR},</if>
+            <if test= "execNum!=null">EXEC_NUM = #{execNum,jdbcType=INTEGER},</if>
+            <if test= "statusCd!=null">STATUS_CD = #{statusCd,jdbcType=VARCHAR},</if>
+            <if test= "statusDate!=null">STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},</if>
+            <if test= "createStaff!=null">CREATE_STAFF = #{createStaff,jdbcType=BIGINT},</if>
+            <if test= "createDate!=null">CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},</if>
+            <if test= "updateStaff!=null">UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},</if>
+            <if test= "remark!=null">REMARK = #{remark,jdbcType=VARCHAR},</if>
+            <if test= "createChannel!=null">CREATE_CHANNEL = #{createChannel,jdbcType=VARCHAR},</if>
+            <if test= "directoryId!=null">DIRECTORY_ID = #{directoryId,jdbcType=BIGINT},</if>
+            <if test= "lanId!=null">LAN_ID = #{lanId,jdbcType=BIGINT},</if>
+            <if test= "camLevel!=null">CAM_LEVEL = #{camLevel,jdbcType=BIGINT},</if>
+            UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
+
+        where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+        </update>-->
+
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
-    BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, SERVICE_TYPE, MKT_ACTIVITY_NBR,
-    MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD,
-    STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
-    from mkt_campaign
-    where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+        select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
+        BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MANAGE_TYPE, MKT_ACTIVITY_NBR,
+        MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD,
+        STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID,
+        CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE, SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID
+        from mkt_campaign
+        where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
     </select>
 
     <select id="selectAll" resultMap="BaseResultMap">
-    select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
-    BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, SERVICE_TYPE, MKT_ACTIVITY_NBR,
-    MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD,
-    STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
-    from mkt_campaign order by UPDATE_DATE desc
+        select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
+        BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MANAGE_TYPE, MKT_ACTIVITY_NBR,
+        MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD,
+        STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID,
+        CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE, SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID
+        from mkt_campaign order by UPDATE_DATE desc
     </select>
 
-    <select id="qryMktCampaignListPage" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignDO" resultMap="BaseResultMap">
-        select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
-        BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, SERVICE_TYPE, MKT_ACTIVITY_NBR, MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC,
-        CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE,
-        UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
+
+    <select id="qryMktCampaignListPage4Sync" parameterType="map" resultMap="countResultMap">
+        select
+        MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
+        MKT_CAMPAIGN_TYPE,  MANAGE_TYPE, MKT_ACTIVITY_NBR,  STATUS_CD, LAN_ID, CREATE_CHANNEL, CREATE_DATE,UPDATE_DATE
         from mkt_campaign
         where 1 = 1
-        <if test="mktCampaignName != null and mktCampaignName != ''">
-            AND MKT_CAMPAIGN_NAME like CONCAT('%',#{mktCampaignName,jdbcType=VARCHAR},'%')
+        <if test="map.mktCampaignName != null and map.mktCampaignName != ''">
+            AND MKT_CAMPAIGN_NAME like CONCAT('%',#{map.mktCampaignName,jdbcType=VARCHAR},'%')
         </if>
-        <if test="statusCd != null and statusCd != ''">
-            AND STATUS_CD = #{statusCd,jdbcType=VARCHAR}
+        <if test="map.statusCd != null and map.statusCd == 1000">
+            AND (STATUS_CD = 2002 or STATUS_CD = 2003)
         </if>
-        <if test="tiggerType != null and tiggerType != ''">
-            AND TIGGER_TYPE = #{tiggerType,jdbcType=VARCHAR}
+        <if test="map.statusCd != null and map.statusCd == 2000">
+            AND STATUS_CD != 2002 and STATUS_CD != 2003 AND STATUS_CD != 2005
         </if>
-        <if test="mktCampaignType != null and mktCampaignType != ''">
-            AND MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR}
+        <if test="map.statusCd != null and map.statusCd == 3000">
+            AND STATUS_CD = 2005
         </if>
+        <if test="map.tiggerType != null and map.tiggerType != ''">
+            AND TIGGER_TYPE = #{map.tiggerType,jdbcType=VARCHAR}
+        </if>
+        <if test="map.mktCampaignType != null and map.mktCampaignType != ''">
+            AND MKT_CAMPAIGN_TYPE = #{map.mktCampaignType,jdbcType=VARCHAR}
+        </if>
+        <if test="map.mktCampaignCategory != null and map.mktCampaignCategory != ''">
+            AND MANAGE_TYPE = #{map.mktCampaignCategory,jdbcType=VARCHAR}
+        </if>
+        <if test="map.activityNbr != null and map.activityNbr != ''">
+            AND MKT_ACTIVITY_NBR like CONCAT('%',#{map.activityNbr,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="map.channel != null and map.channel != ''">
+            AND CREATE_CHANNEL like CONCAT('%',#{map.channel,jdbcType=VARCHAR},'%')
+        </if>
+        AND STATUS_CD != 2001
         order by UPDATE_DATE desc
     </select>
 
+
+
+    <select id="qryMktCampaignListPage" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignDO" resultMap="countResultMap">
+        select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
+        MKT_CAMPAIGN_TYPE,  MANAGE_TYPE, MKT_ACTIVITY_NBR,  STATUS_CD, LAN_ID, CREATE_CHANNEL, CREATE_DATE,
+        (
+        SELECT
+        count(*)
+        FROM
+        mkt_campaign_rel r
+        WHERE
+        (
+        r.A_MKT_CAMPAIGN_ID = t.MKT_CAMPAIGN_ID
+        AND r.STATUS_CD = 1000
+        AND r.REL_TYPE = 1000
+        )
+        OR (
+        r.Z_MKT_CAMPAIGN_ID = t.MKT_CAMPAIGN_ID
+        AND r.STATUS_CD = 1000
+        AND r.REL_TYPE = 1000
+        )
+        ) AS REL_COUNT,
+        (
+        SELECT
+        r.A_MKT_CAMPAIGN_ID
+        FROM
+        mkt_campaign_rel r
+        WHERE
+        t.MKT_CAMPAIGN_ID = r.Z_MKT_CAMPAIGN_ID
+        ) AS A_MKT_CAMPAIGN_ID
+        from mkt_campaign t
+        where 1 = 1
+        <if test="mktCampaignName != null and mktCampaignName != ''">
+            AND t.MKT_CAMPAIGN_NAME like CONCAT('%',#{mktCampaignName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="statusCd != null and statusCd != ''">
+            AND t.STATUS_CD = #{statusCd,jdbcType=VARCHAR}
+        </if>
+        <if test="tiggerType != null and tiggerType != ''">
+            AND t.TIGGER_TYPE = #{tiggerType,jdbcType=VARCHAR}
+        </if>
+        <if test="mktCampaignCategory != null and mktCampaignCategory != ''">
+            AND t.MANAGE_TYPE = #{mktCampaignCategory,jdbcType=VARCHAR}
+        </if>
+        <if test="mktCampaignType != null and mktCampaignType != ''">
+            AND t.MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR}
+        </if>
+        <if test="lanId != null and lanId != ''">
+            AND t.LAN_ID = #{lanId,jdbcType=BIGINT}
+        </if>
+        <if test="createChannel != null and createChannel != ''">
+            AND t.CREATE_CHANNEL = #{createChannel,jdbcType=VARCHAR}
+        </if>
+        order by t.UPDATE_DATE desc
+    </select>
+
+
     <update id="changeMktCampaignStatus">
         update mkt_campaign
-        set STATUS_CD = #{statusCd,jdbcType=VARCHAR}
+        set STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+        UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
         where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
     </update>
 
     <select id="qryMktCampaignListByCondition" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignDO" resultMap="BaseResultMap">
         select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
-        BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, SERVICE_TYPE, MKT_ACTIVITY_NBR, MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC,
+        BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MANAGE_TYPE, MKT_ACTIVITY_NBR, MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC,
         CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE,
-        UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
+        UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE,
+        SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID
         from mkt_campaign
         where 1 = 1
         <if test="mktCampaignId != null and mktCampaignId != ''">
@@ -186,7 +319,7 @@
             AND PLAN_END_TIME = #{PLAN_END_TIME,jdbcType=DATE}
         </if>
         <if test="mktCampaignCategory != null and mktCampaignCategory != ''">
-            AND SERVICE_TYPE = #{mktCampaignCategory,jdbcType=VARCHAR}
+            AND MANAGE_TYPE = #{mktCampaignCategory,jdbcType=VARCHAR}
         </if>
         <if test="mktActivityNbr != null and mktActivityNbr != ''">
             AND MKT_ACTIVITY_NBR = #{mktActivityNbr,jdbcType=VARCHAR}
@@ -197,26 +330,76 @@
         <if test="mktCampaignDesc != mktCampaignDesc and statusCd != ''">
             AND mktCampaignDesc like CONCAT('%',#{mktCampaignDesc,jdbcType=VARCHAR},'%')
         </if>
-        <if test="calcDisplay != null and calcDisplay != ''">
-            AND CALC_DISPLAY = #{calcDisplay,jdbcType=VARCHAR}
+        <if test="calcDisplay != null and calcDisplay != 0">
+            AND CALC_DISPLAY = #{calcDisplay,jdbcType=BIGINT}
         </if>
-        <if test="isaleDisplay != null and isaleDisplay != ''">
-            AND ISALE_DISPLAY = #{isaleDisplay,jdbcType=VARCHAR}
+        <if test="isaleDisplay != null and isaleDisplay != 0">
+            AND ISALE_DISPLAY = #{isaleDisplay,jdbcType=BIGINT}
         </if>
-        <if test="statusDate != null and statusDate != ''">
+        <if test="statusDate != null">
             AND STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP}
         </if>
         <if test="createStaff != null and createStaff != ''">
             AND CREATE_STAFF = #{createStaff,jdbcType=BIGINT}
         </if>
-        <if test="createDate != null and createDate != ''">
+        <if test="createDate != null">
             AND CREATE_DATE = #{statusCd,jdbcType=TIMESTAMP}
         </if>
         <if test="updateStaff != null and updateStaff != ''">
             AND UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT}
         </if>
-        <if test="updateDate != null and updateDate != ''">
+        <if test="updateDate != null">
             AND UPDATE_DATE = #{statusCd,jdbcType=TIMESTAMP}
+        </if>
+        <if test="createChannel != null and createChannel != ''">
+            AND CREATE_CHANNEL = #{createChannel,jdbcType=VARCHAR}
+        </if>
+        <if test="directoryId != null and directoryId != ''">
+            AND DIRECTORY_ID = #{directoryId,jdbcType=BIGINT}
+        </if>
+        <if test="camLevel != null and camLevel != ''">
+            AND CAM_LEVEL = #{camLevel,jdbcType=BIGINT}
+        </if>
+        <if test="isCheckRule != null and isCheckRule != ''">
+            AND IS_CHECK_RULE = #{isCheckRule,jdbcType=VARCHAR}
+        </if>
+        <if test="srcId != null and srcId != ''">
+            AND SRC_ID #{srcId,jdbcType=VARCHAR},
+        </if>
+        <if test="srcType != null and srcType != ''">
+            AND SRC_TYPE = #{srcType,jdbcType=VARCHAR},
+        </if>
+        <if test="serviceCancleFlag != null and serviceCancleFlag != ''">
+            AND SERVICE_CANCLE_FLAG = #{serviceCancleFlag,jdbcType=BIGINT},
+        </if>
+        <if test="regionId != null and regionId != ''">
+            AND REGION_ID = #{regionId,jdbcType=BIGINT},
+        </if>
+        <if test="lifeStage != null and lifeStage != ''">
+            AND LIFE_STAGE =  #{lifeStage,jdbcType=VARCHAR}
+        </if>
+        <if test="serviceType != null and serviceType != ''">
+            AND SERVICE_TYPE =  #{serviceType,jdbcType=VARCHAR}
+        </if>
+        <if test="extMktCampaignId != null and extMktCampaignId != ''">
+            AND EXT_MKT_CAMPAIGN_ID =  #{extMktCampaignId,jdbcType=VARCHAR}
+        </if>
+        order by UPDATE_DATE desc
+    </select>
+
+    <select id="qryMktCampaignListByTypeAndStatus" resultMap="BaseResultMap">
+        select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
+        BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MANAGE_TYPE, MKT_ACTIVITY_NBR, MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC,
+        CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE,
+        UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE,
+        SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID
+        from mkt_campaign
+        where 1 = 1
+        <if test="execType != null and execType != ''">
+            AND EXEC_TYPE = #{execType,jdbcType=VARCHAR}
+        </if>
+        <if test="statusCd != null and statusCd != ''">
+            AND STATUS_CD = #{statusCd,jdbcType=VARCHAR}
         </if>
         order by UPDATE_DATE desc
     </select>

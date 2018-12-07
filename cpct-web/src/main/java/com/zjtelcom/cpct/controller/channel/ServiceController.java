@@ -127,7 +127,7 @@ public class ServiceController extends BaseController{
         }catch (Exception e){
             logger.error("[op:ServiceController] fail to getServiceDetail",e);
             result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg"," fail to getServiceDetail");
+            result.put("resultMsg"," fail to delService");
             return result;
         }
         return result;
