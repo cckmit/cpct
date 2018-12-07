@@ -1398,13 +1398,17 @@ public class EventApiServiceImpl implements EventApiService {
                     if ("7100".equals(type)) {
                         expressSb.append("!");
                     }
-                    expressSb.append("((toNum(");
+                    expressSb.append("((");
+//                    expressSb.append("((toNum(");
 
                     express1.append("if(");
-                    express1.append("(toNum(");
+                    express1.append("(");
+//                    express1.append("(toNum(");
 
-                    expressSb.append(label.getInjectionLabelCode()).append("))");
-                    express1.append(label.getInjectionLabelCode()).append("))");
+                    expressSb.append(label.getInjectionLabelCode()).append(")");
+//                    expressSb.append(label.getInjectionLabelCode()).append("))");
+                    express1.append(label.getInjectionLabelCode()).append(")");
+//                    express1.append(label.getInjectionLabelCode()).append("))");
                     if ("1000".equals(type)) {
                         expressSb.append(" > ");
                         express1.append(" > ");
@@ -1436,13 +1440,13 @@ public class EventApiServiceImpl implements EventApiService {
 //                        expressSb.append(" <= ").append("\"").append(strArray[1]).append("\"");
 
                         expressSb.append(" >= ").append(strArray[0]);
-                        expressSb.append(" && ").append("(toNum(");
-                        expressSb.append(label.getInjectionLabelCode()).append("))");
+                        expressSb.append(" && ").append("(");
+                        expressSb.append(label.getInjectionLabelCode()).append(")");
                         expressSb.append(" <= ").append(strArray[1]);
 
                         express1.append(" >= ").append(strArray[0]);
-                        express1.append(" && ").append("(toNum(");
-                        express1.append(label.getInjectionLabelCode()).append("))");
+                        express1.append(" && ").append("(");
+                        express1.append(label.getInjectionLabelCode()).append(")");
                         express1.append(" <= ").append(strArray[1]);
 
 //                        express1.append(" >= ").append("\"").append(strArray[0]).append("\"");
