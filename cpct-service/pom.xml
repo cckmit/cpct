@@ -75,6 +75,11 @@
             <artifactId>bss-cooperate-service-api</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.zjhcsoft.eagle</groupId>
+            <artifactId>dubbo-eagle-service</artifactId>
+        </dependency>
+
     </dependencies>
 
 
