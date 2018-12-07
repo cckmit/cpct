@@ -119,7 +119,7 @@ public class RedisConfig extends CachingConfigurerSupport {
         poolConfig.setMaxIdle(5); //最大空闲连接数
         poolConfig.setMaxTotal(10); // 最大连接数（空闲+使用中），不超过应用线程数，建议为应用线程数的一半
         poolConfig.setMinIdle(5); //保持的最小空闲连接数
-        poolConfig.setMaxWaitMillis(3000000);
+        poolConfig.setMaxWaitMillis(3000);
         CtgJedisPoolConfig config = new CtgJedisPoolConfig(hostAndPortList);
         config.setDatabase(redisDataBase).setPassword(redisPassword).setPoolConfig(poolConfig).setPeriod(1000).setMonitorTimeout(100);
 
