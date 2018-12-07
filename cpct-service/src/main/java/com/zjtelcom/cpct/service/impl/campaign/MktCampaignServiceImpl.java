@@ -875,6 +875,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             } else if (StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)) {
                 maps.put("resultMsg", ErrorCode.STATUS_CODE_ROLL_SUCCESS.getErrorMsg());
             }
+            maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         } catch (Exception e) {
             logger.error("[op:changeMktCampaignStatus] 修改活动状态statusCd = {}失败,Exception = ", statusCd, e);
             if (StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)) {
@@ -886,6 +887,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             } else if (StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)) {
                 maps.put("resultMsg", ErrorCode.STATUS_CODE_ROLL_FAILURE.getErrorMsg());
             }
+            maps.put("resultCode", CommonConstant.CODE_FAIL);
         }
 
         return maps;
