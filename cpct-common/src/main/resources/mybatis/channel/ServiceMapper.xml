@@ -97,7 +97,7 @@
         from service
         where SERVICE_NAME LIKE CONCAT(CONCAT('%',#{serviceName}),'%')
     </select>
-    <select id="selectByServiceName" resultMap="BaseResultMap">
+    <select id="selectDetailByServiceEntity" resultMap="BaseResultMap">
         select s.SERVICE_ID, s.SERVICE_NBR, s.SERVICE_NAME,
                s.SERVICE_CONTENT, s.SERVICE_TYPE_ID, s.EXT_SERVICE_ID,
                s.STATUS_CD, s.STATUS_DATE, s.CREATE_STAFF,
