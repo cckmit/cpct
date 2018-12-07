@@ -16,11 +16,11 @@
     <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-    delete from grp_system_rel
+    delete from tmp_grp_system_rel
     where GRP_SYSTEM_REL_ID = #{grpSystemRelId,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.GrpSystemRel">
-    insert into grp_system_rel (GRP_SYSTEM_REL_ID, SYSTEM_INFO_ID, STATUS_CD, 
+    insert into tmp_grp_system_rel (GRP_SYSTEM_REL_ID, SYSTEM_INFO_ID, STATUS_CD,
       STATUS_DT, START_DT, END_DT, 
       VERSION, OFFER_VRUL_GRP_ID, CREATE_DT, 
       CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
@@ -32,7 +32,7 @@
       )
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.GrpSystemRel">
-    update grp_system_rel
+    update tmp_grp_system_rel
     set SYSTEM_INFO_ID = #{systemInfoId,jdbcType=VARCHAR},
       STATUS_CD = #{statusCd,jdbcType=VARCHAR},
       STATUS_DT = #{statusDt,jdbcType=TIMESTAMP},
@@ -49,19 +49,19 @@
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select GRP_SYSTEM_REL_ID, SYSTEM_INFO_ID, STATUS_CD, STATUS_DT, START_DT, END_DT, 
     VERSION, OFFER_VRUL_GRP_ID, CREATE_DT, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
-    from grp_system_rel
+    from tmp_grp_system_rel
     where GRP_SYSTEM_REL_ID = #{grpSystemRelId,jdbcType=BIGINT}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
     select GRP_SYSTEM_REL_ID, SYSTEM_INFO_ID, STATUS_CD, STATUS_DT, START_DT, END_DT, 
     VERSION, OFFER_VRUL_GRP_ID, CREATE_DT, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
-    from grp_system_rel
+    from tmp_grp_system_rel
   </select>
 
   <select id="selectByOfferId" resultMap="BaseResultMap">
     select GRP_SYSTEM_REL_ID, SYSTEM_INFO_ID, STATUS_CD, STATUS_DT, START_DT, END_DT,
     VERSION, OFFER_VRUL_GRP_ID, CREATE_DT, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
-    from grp_system_rel where SYSTEM_INFO_ID = #{offerId}
+    from tmp_grp_system_rel where SYSTEM_INFO_ID = #{offerId}
   </select>
 
 

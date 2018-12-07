@@ -102,7 +102,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         Map<String, Object> result = new HashMap<>();
         List<CampaignInstVO> instVOS = new ArrayList<>();
         //todo 通过需求涵id获取销售品idList
-        List<RequestInstRel> requestInstRels = requestInstRelMapper.selectByRequestId(requestId);
+        List<RequestInstRel> requestInstRels = requestInstRelMapper.selectByRequestId(requestId,"offer");
         for (RequestInstRel requestInstRel : requestInstRels){
             Long offerId = requestInstRel.getRequestObjId();
             Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
@@ -130,18 +130,21 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             }
             instVO.setResourceList(resourceList);
             //渠道列表
-            List<GrpSystemRel> grpSystemRels = grpSystemRelMapper.selectByOfferId(offerId);
-            List<ChannelDetail> channelList = new ArrayList<>();
-            for (GrpSystemRel systemRel : grpSystemRels){
-                Channel channel = channelMapper.selectByPrimaryKey(systemRel.getOfferVrulGrpId());
-                if (channel!=null){
-                    ChannelDetail detail = new ChannelDetail();
-                    detail.setChannelId(channel.getContactChlId());
-                    detail.setChannelName(channel.getContactChlName());
-                    channelList.add(detail);
+            OfferRestrict channelRestrict = offerRestrictMapper.selectByOfferId(offerId,"5000");
+            if (channelRestrict!=null){
+                List<GrpSystemRel> grpSystemRels = grpSystemRelMapper.selectByOfferId(channelRestrict.getRstrObjId());
+                List<ChannelDetail> channelList = new ArrayList<>();
+                for (GrpSystemRel systemRel : grpSystemRels){
+                    Channel channel = channelMapper.selectByPrimaryKey(systemRel.getOfferVrulGrpId());
+                    if (channel!=null){
+                        ChannelDetail detail = new ChannelDetail();
+                        detail.setChannelId(channel.getContactChlId());
+                        detail.setChannelName(channel.getContactChlName());
+                        channelList.add(detail);
+                    }
                 }
+                instVO.setChannelList(channelList);
             }
-            instVO.setChannelList(channelList);
             instVOS.add(instVO);
         }
         result.put("resultCode",CODE_SUCCESS);
