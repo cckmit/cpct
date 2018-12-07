@@ -20,7 +20,7 @@
         delete from service
         where SERVICE_ID = #{serviceId,jdbcType=BIGINT}
     </delete>
-    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.ServiceEntity">
+    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.ServiceEntity" keyProperty="serviceId" useGeneratedKeys="true">
         insert into service (SERVICE_ID, SERVICE_NBR, SERVICE_NAME,
                              SERVICE_CONTENT, SERVICE_TYPE_ID, EXT_SERVICE_ID,
                              STATUS_CD, STATUS_DATE, CREATE_STAFF,
@@ -33,26 +33,53 @@
     </insert>
     <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.ServiceEntity">
         update service
-        set SERVICE_NBR = #{serviceNbr,jdbcType=VARCHAR},
+        set
+        <if test="serviceNbr != null and serviceNbr != ''">
+            SERVICE_NBR = #{serviceNbr,jdbcType=VARCHAR},
+        </if>
+        <if test="serviceName != null and serviceName != ''">
             SERVICE_NAME = #{serviceName,jdbcType=VARCHAR},
+        </if>
+        <if test="serviceContent != null and serviceContent != ''">
             SERVICE_CONTENT = #{serviceContent,jdbcType=VARCHAR},
+        </if>
+        <if test="serviceTypeId != null and serviceTypeId != ''">
             SERVICE_TYPE_ID = #{serviceTypeId,jdbcType=BIGINT},
+        </if>
+        <if test="extServiceId != null and extServiceId != ''">
             EXT_SERVICE_ID = #{extServiceId,jdbcType=BIGINT},
+        </if>
+        <if test="statusCd != null and statusCd != ''">
             STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+        </if>
+        <if test="statusDate != null">
             STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="createStaff != null and createStaff != ''">
             CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+        </if>
+        <if test="createDate != null and">
             CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="updateStaff != null and updateStaff != ''">
             UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        </if>
+        <if test="updateDate != null and">
             UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="remark != null and remark != ''">
             REMARK = #{remark,jdbcType=VARCHAR}
+        </if>
         where SERVICE_ID = #{serviceId,jdbcType=BIGINT}
     </update>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-        select SERVICE_ID, SERVICE_NBR, SERVICE_NAME,
-               SERVICE_CONTENT, SERVICE_TYPE_ID, EXT_SERVICE_ID,
-               STATUS_CD, STATUS_DATE, CREATE_STAFF,
-               CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
-        from service
+        select s.SERVICE_ID, s.SERVICE_NBR, s.SERVICE_NAME,
+               s.SERVICE_CONTENT, s.SERVICE_TYPE_ID, s.EXT_SERVICE_ID,
+               s.STATUS_CD, s.STATUS_DATE, s.CREATE_STAFF,
+               s.CREATE_DATE, s.UPDATE_STAFF, s.UPDATE_DATE, s.REMARK,
+               st.SERVICE_TYPE_NAME, st.SERVICE_TYPE_DESC
+        from service s
+        left join service_type st on s.SERVICE_TYPE_ID = st.SERVICE_TYPE_ID
         where SERVICE_ID = #{serviceId,jdbcType=BIGINT}
     </select>
     <select id="selectAll" resultMap="BaseResultMap">
@@ -69,5 +96,21 @@
                CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
         from service
         where SERVICE_NAME LIKE CONCAT(CONCAT('%',#{serviceName}),'%')
+    </select>
+    <select id="selectByServiceName" resultMap="BaseResultMap">
+        select s.SERVICE_ID, s.SERVICE_NBR, s.SERVICE_NAME,
+               s.SERVICE_CONTENT, s.SERVICE_TYPE_ID, s.EXT_SERVICE_ID,
+               s.STATUS_CD, s.STATUS_DATE, s.CREATE_STAFF,
+               s.CREATE_DATE, s.UPDATE_STAFF, s.UPDATE_DATE, s.REMARK,
+               st.SERVICE_TYPE_NAME, st.SERVICE_TYPE_DESC
+        from service s
+        left join service_type st on s.SERVICE_TYPE_ID = st.SERVICE_TYPE_ID
+        where 1=1
+        <if test="serviceName != null and serviceName != ''">
+            SERVICE_NAME LIKE CONCAT(CONCAT('%',#{serviceName}),'%')
+        </if>
+        <if test="serviceTypeId ！= null and serviceTypeId != ''">
+            SERVICE_TYPE_ID = #{serviceTypeId,jdbcType=BIGINT}
+        </if>
     </select>
 </mapper>

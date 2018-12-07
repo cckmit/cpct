@@ -17,4 +17,6 @@ public interface ServiceMapper {
     int updateByPrimaryKey(ServiceEntity record);
 
     List<ServiceEntity> selectByServiceName(@Param("serviceName") String serviceName);
+
+    List<ServiceEntity> selectDetailByServiceEntity(ServiceEntity record);
 }

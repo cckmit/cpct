@@ -134,17 +134,18 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         try {
             //添加mkt_cam_grp_rul表
             MktCamGrpRul mktCamGrpRul = new MktCamGrpRul();
-            mktCamGrpRul.setTarGrpId(mktStrategyConfRule.getTarGrpId());
-            mktCamGrpRul.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
-            mktCamGrpRul.setLanId(1L);
-            mktCamGrpRul.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
-            mktCamGrpRul.setStatusDate(new Date());
-            mktCamGrpRul.setCreateDate(new Date());
-            mktCamGrpRul.setCreateStaff(UserUtil.loginId());
-            mktCamGrpRul.setUpdateDate(new Date());
-            mktCamGrpRul.setUpdateStaff(UserUtil.loginId());
-            mktCamGrpRulMapper.insert(mktCamGrpRul);
-
+            if(mktStrategyConfRule.getTarGrpId()!=null){
+                mktCamGrpRul.setTarGrpId(mktStrategyConfRule.getTarGrpId());
+                mktCamGrpRul.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
+                mktCamGrpRul.setLanId(1L);
+                mktCamGrpRul.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                mktCamGrpRul.setStatusDate(new Date());
+                mktCamGrpRul.setCreateDate(new Date());
+                mktCamGrpRul.setCreateStaff(UserUtil.loginId());
+                mktCamGrpRul.setUpdateDate(new Date());
+                mktCamGrpRul.setUpdateStaff(UserUtil.loginId());
+                mktCamGrpRulMapper.insert(mktCamGrpRul);
+            }
             CopyPropertiesUtil.copyBean2Bean(mktStrategyConfRuleDO, mktStrategyConfRule);
             String productIds = "";
             String evtContactConfIds = "";
@@ -300,6 +301,23 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         String productIds = "";
         String evtContactConfIds = "";
         try {
+            if(mktStrategyConfRule.getTarGrpId()!=null){
+                int count = mktCamGrpRulMapper.countByTarGrpId(mktStrategyConfRule.getTarGrpId());
+                if(count==0){
+                    //添加mkt_cam_grp_rul表
+                    MktCamGrpRul mktCamGrpRul = new MktCamGrpRul();
+                    mktCamGrpRul.setTarGrpId(mktStrategyConfRule.getTarGrpId());
+                    mktCamGrpRul.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
+                    mktCamGrpRul.setLanId(1L);
+                    mktCamGrpRul.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                    mktCamGrpRul.setStatusDate(new Date());
+                    mktCamGrpRul.setCreateDate(new Date());
+                    mktCamGrpRul.setCreateStaff(UserUtil.loginId());
+                    mktCamGrpRul.setUpdateDate(new Date());
+                    mktCamGrpRul.setUpdateStaff(UserUtil.loginId());
+                    mktCamGrpRulMapper.insert(mktCamGrpRul);
+                }
+            }
             MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
             CopyPropertiesUtil.copyBean2Bean(mktStrategyConfRuleDO, mktStrategyConfRule);
             if (mktStrategyConfRule.getProductIdlist() != null) {
