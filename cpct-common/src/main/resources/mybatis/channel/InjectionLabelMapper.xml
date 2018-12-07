@@ -135,7 +135,8 @@
       LAB_TECH_DESC = #{labTechDesc,jdbcType=VARCHAR},
       LAB_STATE = #{labState,jdbcType=VARCHAR},
       LAB_MANAGE_TYPE = #{labManageType,jdbcType=VARCHAR},
-      LAB_TAG_CODE = #{labTagCode,jdbcType=VARCHAR}
+      LAB_TAG_CODE = #{labTagCode,jdbcType=VARCHAR},
+      SYSTEM_INFO_ID = #{systemInfoId,jdbcType=BIGINT}
     where INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -184,7 +185,7 @@
     insert into injection_label (INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC,
     LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK, RIGHT_OPERAND, CONDITION_TYPE,OPERATOR,SCOPE,TAG_ROW_ID,
-    IS_SHARED,CATALOG_ID, CLASS_NAME)
+    IS_SHARED,CATALOG_ID, CLASS_NAME,SYSTEM_INFO_ID)
     values
     <foreach collection="record" item="item" index="i" separator=",">
       (#{injectionLabelId,jdbcType=BIGINT}, #{injectionLabelCode,jdbcType=VARCHAR},
@@ -194,7 +195,8 @@
       #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP},
       #{remark,jdbcType=VARCHAR}, #{rightOperand,jdbcType=VARCHAR},
       #{conditionType,jdbcType=VARCHAR},#{operator,jdbcType=VARCHAR},#{scope,jdbcType=INTEGER},
-      #{tagRowId,jdbcType=BIGINT}, #{isShared,jdbcType=INTEGER},#{catalogId,jdbcType=VARCHAR}, #{className,jdbcType=VARCHAR})
+      #{tagRowId,jdbcType=BIGINT}, #{isShared,jdbcType=INTEGER},#{catalogId,jdbcType=VARCHAR},
+      #{className,jdbcType=VARCHAR},#{systemInfoId,jdbcType=BIGINT})
     </foreach>
   </insert>
   <!--< 参数查询 >-->
