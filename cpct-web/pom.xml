@@ -114,7 +114,6 @@
         <dependency>
             <groupId>com.zjtelcom.es</groupId>
             <artifactId>es-service-batch</artifactId>
-            <version>1.0.0</version>
         </dependency>
 
         <!-- 黄懿慧dubbo服务jar包 -->

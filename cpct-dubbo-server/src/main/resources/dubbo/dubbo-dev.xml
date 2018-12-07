@@ -9,8 +9,8 @@
     <!-- 提供方应用信息，用于计算依赖关系 -->
     <dubbo:application name="00.1083"/>
 
-    <!--<dubbo:registry protocol="dubbo" address="134.96.253.86:8033"/>-->
-    <dubbo:registry protocol="dubbo" address="134.96.253.65:8001"/>
+    <dubbo:registry protocol="dubbo" address="134.96.253.86:8033"/>
+    <!--<dubbo:registry protocol="dubbo" address="134.96.253.65:8001"/>-->
 
     <!-- 暴露服务 -->
     <dubbo:protocol name="dubbo" port="30311"/>
@@ -35,15 +35,15 @@
     </dubbo:reference>
 
     <!-- redis实时查询服务 -->
-    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.TrialRedisService" ref="trialRedisServiceImpl" version="1.0" >
-        <dubbo:method name="searchFromRedis" servicecode="00.1083.searchFromRedis" timeout="10000"/>
-    </dubbo:service>
+    <!--<dubbo:service interface="com.zjtelcom.cpct.dubbo.service.TrialRedisService" ref="trialRedisServiceImpl" version="1.0" >-->
+        <!--<dubbo:method name="searchFromRedis" servicecode="00.1083.searchFromRedis" timeout="10000"/>-->
+    <!--</dubbo:service>-->
 
 
     <!-- 活动发布接口 -->
-    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.MktCampaignSyncApiService" ref="mktCampaignSyncApiServiceImpl" version="1.0" >
-        <dubbo:method name="publishMktCampaign" servicecode="00.1083.publishMktCampaign" timeout="10000"/>
-    </dubbo:service>
+    <!--<dubbo:service interface="com.zjtelcom.cpct.dubbo.service.MktCampaignSyncApiService" ref="mktCampaignSyncApiServiceImpl" version="1.0" >-->
+        <!--<dubbo:method name="publishMktCampaign" servicecode="00.1083.publishMktCampaign" timeout="10000"/>-->
+    <!--</dubbo:service>-->
 
 
 </beans>
