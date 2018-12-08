@@ -449,16 +449,16 @@ public class EventApiServiceImpl implements EventApiService {
 
 
 
-                //!!!验证事件规则
-//                Map<String, Object> stringObjectMap = matchRulCondition(eventId, labelItems, map);
-//                if (!stringObjectMap.get("code").equals("success")) {
-//                    //判断不符合条件 直接返回不命中
-//                    result.put("CPCResultMsg",stringObjectMap.get("result"));
-//                    esJson.put("hit", false);
-//                    esJson.put("msg",stringObjectMap.get("result"));
-//                    esService.save(esJson, IndexList.EVENT_MODULE);
-//                    return result;
-//                }
+                //!!!验证事件规则命中
+                Map<String, Object> stringObjectMap = matchRulCondition(eventId, labelItems, map);
+                if (!stringObjectMap.get("code").equals("success")) {
+                    //判断不符合条件 直接返回不命中
+                    result.put("CPCResultMsg",stringObjectMap.get("result"));
+                    esJson.put("hit", false);
+                    esJson.put("msg",stringObjectMap.get("result"));
+                    esService.save(esJson, IndexList.EVENT_MODULE);
+                    return result;
+                }
 
                 //获取事件推荐活动数
                 int recCampaignAmount;
@@ -2131,7 +2131,7 @@ public class EventApiServiceImpl implements EventApiService {
             if (resultIds != null && !"".equals(resultIds[0])) {
                 for (String resultId : resultIds) {
                     MktCamChlResultDO mktCamChlResultDO = mktCamChlResultMapper.selectByPrimaryKey(Long.valueOf(resultId));
-                    if (resultNbr.equals(mktCamChlResultDO.getResult().toString())) {
+                    if (resultNbr.equals(mktCamChlResultDO.getReason().toString())) {
                         // 查询推送渠道
                         List<MktCamChlResultConfRelDO> mktCamChlResultConfRelDOS = mktCamChlResultConfRelMapper.selectByMktCamChlResultId(mktCamChlResultDO.getMktCamChlResultId());
                         if (mktCamChlResultConfRelDOS != null && mktCamChlResultConfRelDOS.size() > 0) {
@@ -2611,7 +2611,7 @@ public class EventApiServiceImpl implements EventApiService {
             EventMatchRulCondition condition=null;
             for (EventMatchRulCondition c:eventMatchRulConditions){
                 //得到标签对应的事件规则
-                if(Long.valueOf(c.getLeftParam())==label.getInjectionLabelId()){
+                if(Long.valueOf(c.getLeftParam()).equals(label.getInjectionLabelId())){
                     condition=c;
                     break;
                 }
@@ -2624,9 +2624,7 @@ public class EventApiServiceImpl implements EventApiService {
                 result.put("code","failed");
                 return result;
             }
-
         }
-
 
         //有需要查询ES的标签
         if (!selectByEs.isEmpty()) {
