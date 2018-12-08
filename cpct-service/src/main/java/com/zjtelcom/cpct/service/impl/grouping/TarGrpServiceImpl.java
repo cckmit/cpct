@@ -18,10 +18,7 @@ import com.zjtelcom.cpct.dto.grouping.SysAreaVO;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
-import com.zjtelcom.cpct.enums.ErrorCode;
-import com.zjtelcom.cpct.enums.LeftParamType;
-import com.zjtelcom.cpct.enums.Operator;
-import com.zjtelcom.cpct.enums.RightParamType;
+import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.util.*;
@@ -140,7 +137,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             tarGrp.setUpdateStaff(UserUtil.loginId());
             tarGrp.setCreateStaff(UserUtil.loginId());
             if (isCopy){
-                tarGrp.setStatusCd("2000");
+                tarGrp.setStatusCd(StatusCode.STATUS_CODE_FAILURE.getStatusCode());
             }else {
                 tarGrp.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
             }

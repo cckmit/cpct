@@ -17,5 +17,5 @@ public interface OfferRestrictMapper {
 
     int updateByPrimaryKey(OfferRestrict record);
 
-    OfferRestrict selectByOfferId(@Param("offerId") Long offerId,@Param("type")String type);
+    List<OfferRestrict> selectByOfferId(@Param("offerId") Long offerId,@Param("type")String type);
 }

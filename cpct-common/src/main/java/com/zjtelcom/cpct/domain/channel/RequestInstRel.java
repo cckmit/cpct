@@ -26,7 +26,6 @@ public class RequestInstRel {
     private String remark;
 
 
-
     public Long getRequestInstRelId() {
         return requestInstRelId;
     }
@@ -41,6 +40,14 @@ public class RequestInstRel {
 
     public void setRequestInfoId(Long requestInfoId) {
         this.requestInfoId = requestInfoId;
+    }
+
+    public String getRequestObjType() {
+        return requestObjType;
+    }
+
+    public void setRequestObjType(String requestObjType) {
+        this.requestObjType = requestObjType;
     }
 
     public Long getRequestObjId() {
@@ -105,13 +112,5 @@ public class RequestInstRel {
 
     public void setRemark(String remark) {
         this.remark = remark;
-    }
-
-    public String getRequestObjType() {
-        return requestObjType;
-    }
-
-    public void setRequestObjType(String requestObjType) {
-        this.requestObjType = requestObjType;
     }
 }
