@@ -14,6 +14,7 @@ import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.ObjMktCampaignRel;
+import com.zjtelcom.cpct.domain.channel.RequestInstRel;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
@@ -36,6 +37,7 @@ import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,9 +131,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
     @Autowired
     private SynchronizeCampaignService synchronizeCampaignService;
-    //需求涵id 跟活动关联关系
+
     @Autowired
     private ObjMktCampaignRelMapper objMktCampaignRelMapper;
+    //需求涵id 跟活动关联关系
+    @Autowired
+    private RequestInstRelMapper requestInstRelMapper;
 /*
     @Autowired
     private IMktCampaignService iMktCampaignService;*/
@@ -214,17 +219,16 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
             //需求涵id不为空添加与活动的关系
             if (mktCampaignVO.getRequestId()!=null){
-                ObjMktCampaignRel rel = new ObjMktCampaignRel();
-                rel.setMktCampaignId(mktCampaignId);
-                rel.setObjId(mktCampaignVO.getRequestId());
-                rel.setObjType("2000");
-                rel.setRelType("1000");
-                rel.setStatusCd(STATUSCD_EFFECTIVE);
-                rel.setStatusDate(new Date());
-                rel.setUpdateDate(new Date());
-                rel.setCreateStaff(UserUtil.loginId());
-                rel.setCreateDate(new Date());
-                objMktCampaignRelMapper.insert(rel);
+                RequestInstRel requestInstRel = new RequestInstRel();
+                requestInstRel.setRequestInfoId(mktCampaignVO.getRequestId());
+                requestInstRel.setRequestObjId(mktCampaignId);
+                requestInstRel.setStatusCd(STATUSCD_EFFECTIVE);
+                requestInstRel.setStatusDate(new Date());
+                requestInstRel.setUpdateDate(new Date());
+                requestInstRel.setCreateStaff(UserUtil.loginId());
+                requestInstRel.setCreateDate(new Date());
+                requestInstRel.setRequestObjType("mkt");
+                requestInstRelMapper.insert(requestInstRel);
             }
 
             maps = new HashMap<>();
