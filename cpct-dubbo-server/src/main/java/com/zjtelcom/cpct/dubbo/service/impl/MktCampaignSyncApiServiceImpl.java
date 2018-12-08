@@ -1204,7 +1204,7 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
             tarGrp.setUpdateStaff(UserUtil.loginId());
             tarGrp.setCreateStaff(UserUtil.loginId());
             if (isCopy){
-                tarGrp.setStatusCd("2000");
+                tarGrp.setStatusCd("1100");
             }else {
                 tarGrp.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
             }
