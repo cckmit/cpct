@@ -19,7 +19,7 @@
     where request_inst_rel_id = #{requestInstRelId,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.RequestInstRel">
-    <selectKey keyProperty="request_inst_rel_id" resultType="Long" order="BEFORE">
+    <selectKey keyProperty="requestInstRelId" resultType="Long" order="BEFORE" >
       select smt_bss_cpc_sftt_sequence.nextval
     </selectKey>
     insert into request_inst_rel (request_inst_rel_id, request_info_id, request_obj_id, 
