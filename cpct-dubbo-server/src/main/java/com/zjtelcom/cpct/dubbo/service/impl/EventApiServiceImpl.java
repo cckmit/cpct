@@ -2773,8 +2773,6 @@ public class EventApiServiceImpl implements EventApiService {
             express1.append("\"").append(condition.getRightParam()).append("\"");
         }
 
-
-
         express1.append(") {return true}");
         log.info("事件规则表达式"+express1.toString());
         try {
@@ -2790,8 +2788,5 @@ public class EventApiServiceImpl implements EventApiService {
         }
         return  message;
     }
-
-
-}
 
 }
