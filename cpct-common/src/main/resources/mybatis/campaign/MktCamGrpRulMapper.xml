@@ -81,4 +81,13 @@
     from mkt_cam_grp_rul
     where TAR_GRP_ID = #{tarGrpId,jdbcType=BIGINT},
   </select>
+
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_CAM_GRP_RUL_ID, MKT_CAMPAIGN_ID, TAR_GRP_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF,
+    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
+    from mkt_cam_grp_rul
+     where TAR_GRP_ID = #{tarGrpId,jdbcType=BIGINT},
+  </select>
+
 </mapper>

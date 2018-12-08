@@ -302,8 +302,9 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         String evtContactConfIds = "";
         try {
             if(mktStrategyConfRule.getTarGrpId()!=null){
-                int count = mktCamGrpRulMapper.countByTarGrpId(mktStrategyConfRule.getTarGrpId());
-                if(count==0){
+                //int count = mktCamGrpRulMapper.countByTarGrpId(mktStrategyConfRule.getTarGrpId());
+                MktCamGrpRul camGrpRul = mktCamGrpRulMapper.selectByTarGrpId(mktStrategyConfRule.getTarGrpId());
+                if (camGrpRul == null) {
                     //添加mkt_cam_grp_rul表
                     MktCamGrpRul mktCamGrpRul = new MktCamGrpRul();
                     mktCamGrpRul.setTarGrpId(mktStrategyConfRule.getTarGrpId());
