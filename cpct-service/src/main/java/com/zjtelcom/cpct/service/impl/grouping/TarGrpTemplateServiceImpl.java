@@ -81,8 +81,6 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     @Autowired
     private GrpSystemRelMapper grpSystemRelMapper;
     @Autowired
-    private VrulGrpMapper vrulGrpMapper;
-    @Autowired
     private RequestInstRelMapper requestInstRelMapper;
     @Autowired
     private OfferMapper offerMapper;

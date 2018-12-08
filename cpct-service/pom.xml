@@ -67,13 +67,17 @@
         <dependency>
             <groupId>com.zjtelcom.es</groupId>
             <artifactId>es-service-batch</artifactId>
-            <version>1.0.0</version>
         </dependency>
 
         <!-- 引入协同中心dubbo服务jar包 -->
         <dependency>
             <groupId>com.ctzj.smt.bss</groupId>
             <artifactId>bss-cooperate-service-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zjhcsoft.eagle</groupId>
+            <artifactId>dubbo-eagle-service</artifactId>
         </dependency>
 
     </dependencies>

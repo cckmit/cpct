@@ -32,3 +32,10 @@ spring:
       max-idle: 8
       min-idle: 0
     timeout: 30000
+
+#集团定制的redis配置prod环境
+redisConfig:
+   ip: 134.108.0.57
+   port: 41701
+   database: 4970
+   password: bss_cpcp_pocpro_user#bssCpc_ro
