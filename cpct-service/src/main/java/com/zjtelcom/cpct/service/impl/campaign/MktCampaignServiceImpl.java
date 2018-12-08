@@ -838,12 +838,19 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignMapper.changeMktCampaignStatus(mktCampaignId, statusCd, new Date(), UserUtil.loginId());
             // 判断是否是发布活动, 是该状态生效
             if (StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)) {
-                MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();
+               /* MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();
                 mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
                 mktCamResultRelDO.setMktCampaignId(mktCampaignId);
                 mktCamResultRelDO.setUpdateDate(new Date());
                 mktCamResultRelDO.setUpdateStaff(UserUtil.loginId());
-                mktCamResultRelMapper.changeStatusByMktCampaignId(mktCamResultRelDO);
+                mktCamResultRelMapper.changeStatusByMktCampaignId(mktCamResultRelDO);*/
+
+                List<MktCamResultRelDO> mktCamResultRelDOS = mktCamResultRelMapper.selectResultByMktCampaignId(mktCampaignId);
+                for (MktCamResultRelDO mktCamResultRelDO:mktCamResultRelDOS) {
+                    mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                    mktCamResultRelMapper.updateByPrimaryKey(mktCamResultRelDO);
+                }
+
                 // 发布活动异步同步活动到生产环境
                 new Thread() {
                     @Override
@@ -862,12 +869,18 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }.start();
             } else if (StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd) || StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)) {
                 // 暂停或者下线, 该状态为未生效
-                MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();
+                /*MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();
                 mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_NOTACTIVE.getStatusCode());
+
                 mktCamResultRelDO.setMktCampaignId(mktCampaignId);
                 mktCamResultRelDO.setUpdateDate(new Date());
                 mktCamResultRelDO.setUpdateStaff(UserUtil.loginId());
-                mktCamResultRelMapper.changeStatusByMktCampaignId(mktCamResultRelDO);
+                mktCamResultRelMapper.changeStatusByMktCampaignId(mktCamResultRelDO);*/
+                List<MktCamResultRelDO> mktCamResultRelDOS = mktCamResultRelMapper.selectResultByMktCampaignId(mktCampaignId);
+                for (MktCamResultRelDO mktCamResultRelDO:mktCamResultRelDOS) {
+                    mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_NOTACTIVE.getStatusCode());
+                    mktCamResultRelMapper.updateByPrimaryKey(mktCamResultRelDO);
+                }
             }
 
             if (StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)) {

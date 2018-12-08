@@ -68,5 +68,14 @@
     from mkt_cam_result_rel
     GROUP BY MKT_CAMPAIGN_ID
   </select>
+  <select id="selectResultByMktCampaignId" parameterType="java.lang.Long"  resultMap="BaseResultMap">
+    SELECT t.* FROM
+      mkt_cam_result_rel t,
+      mkt_cam_strategy_conf_rel r
+    WHERE
+      t.MKT_CAMPAIGN_ID = r.STRATEGY_CONF_ID
+    AND r.MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+  </select>
+
 
 </mapper>
