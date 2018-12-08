@@ -28,6 +28,8 @@ public class RedisUtils {
 
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private CtgJedisPool ctgJedisPool;
 
 //    @Autowired
 //    private HashOperations<String,String,Object> hashOperations;
@@ -40,7 +42,6 @@ public class RedisUtils {
      * @return List<Map<String, Object>>
      */
     public Object hgetAllRedisList(final String key) {
-        CtgJedisPool ctgJedisPool = initCatch();
         Object result = null;
         try {
             ProxyJedis jedis = new ProxyJedis();
@@ -57,7 +58,6 @@ public class RedisUtils {
                 je.printStackTrace();
                 jedis.close();
             }
-            ctgJedisPool.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -98,7 +98,6 @@ public class RedisUtils {
     public boolean setRedis(final String key, Object value) {
         boolean result = false;
 
-        CtgJedisPool ctgJedisPool = initCatch();
         try {
             ProxyJedis jedis = new ProxyJedis();
             try {
@@ -112,7 +111,6 @@ public class RedisUtils {
                 je.printStackTrace();
                 jedis.close();
             }
-            ctgJedisPool.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -191,7 +189,6 @@ public class RedisUtils {
      * @return
      */
     public boolean existsRedis(final String key) {
-        CtgJedisPool ctgJedisPool = initCatch();
         boolean result = false;
         try {
             ProxyJedis jedis = new ProxyJedis();
@@ -203,7 +200,6 @@ public class RedisUtils {
                 je.printStackTrace();
                 jedis.close();
             }
-            ctgJedisPool.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -236,7 +232,6 @@ public class RedisUtils {
      * @return
      */
     public Object getRedis(final String key) {
-        CtgJedisPool ctgJedisPool = initCatch();
         Object result = null;
         try {
             ProxyJedis jedis = new ProxyJedis();
@@ -250,7 +245,6 @@ public class RedisUtils {
                 je.printStackTrace();
                 jedis.close();
             }
-            ctgJedisPool.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -268,7 +262,6 @@ public class RedisUtils {
      */
     public boolean hset(final String key, String field, Object value) {
         boolean result = false;
-        CtgJedisPool ctgJedisPool = initCatch();
         try {
             ProxyJedis jedis = new ProxyJedis();
             try {
@@ -280,7 +273,6 @@ public class RedisUtils {
                 e.printStackTrace();
                 jedis.close();
             }
-            ctgJedisPool.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.ServiceMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.ServiceEntity">
+        <id column="SERVICE_ID" jdbcType="BIGINT" property="serviceId" />
+        <result column="SERVICE_NBR" jdbcType="VARCHAR" property="serviceNbr" />
+        <result column="SERVICE_NAME" jdbcType="VARCHAR" property="serviceName" />
+        <result column="SERVICE_CONTENT" jdbcType="VARCHAR" property="serviceContent" />
+        <result column="SERVICE_TYPE_ID" jdbcType="BIGINT" property="serviceTypeId" />
+        <result column="EXT_SERVICE_ID" jdbcType="BIGINT" property="extServiceId" />
+        <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+        <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+        <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from service
+        where SERVICE_ID = #{serviceId,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.ServiceEntity" keyProperty="serviceId" useGeneratedKeys="true">
+        insert into service (SERVICE_ID, SERVICE_NBR, SERVICE_NAME,
+                             SERVICE_CONTENT, SERVICE_TYPE_ID, EXT_SERVICE_ID,
+                             STATUS_CD, STATUS_DATE, CREATE_STAFF,
+                             CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK)
+        values (#{serviceId,jdbcType=BIGINT},#{serviceNbr,jdbcType=VARCHAR},#{serviceName,jdbcType=VARCHAR},
+                #{serviceContent,jdbcType=VARCHAR},#{serviceTypeId,jdbcType=BIGINT},#{extServiceId,jdbcType=BIGINT},
+                #{statusCd,jdbcType=VARCHAR},#{statusDate,jdbcType=TIMESTAMP},#{createStaff,jdbcType=BIGINT},
+                #{createDate,jdbcType=TIMESTAMP},#{updateStaff,jdbcType=BIGINT},#{updateDate,jdbcType=TIMESTAMP},
+                #{remark,jdbcType=VARCHAR})
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.ServiceEntity">
+        update service
+        set
+        <if test="serviceNbr != null and serviceNbr != ''">
+            SERVICE_NBR = #{serviceNbr,jdbcType=VARCHAR},
+        </if>
+        <if test="serviceName != null and serviceName != ''">
+            SERVICE_NAME = #{serviceName,jdbcType=VARCHAR},
+        </if>
+        <if test="serviceContent != null and serviceContent != ''">
+            SERVICE_CONTENT = #{serviceContent,jdbcType=VARCHAR},
+        </if>
+        <if test="serviceTypeId != null and serviceTypeId != ''">
+            SERVICE_TYPE_ID = #{serviceTypeId,jdbcType=BIGINT},
+        </if>
+        <if test="extServiceId != null and extServiceId != ''">
+            EXT_SERVICE_ID = #{extServiceId,jdbcType=BIGINT},
+        </if>
+        <if test="statusCd != null and statusCd != ''">
+            STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+        </if>
+        <if test="statusDate != null">
+            STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="createStaff != null and createStaff != ''">
+            CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+        </if>
+        <if test="createDate != null">
+            CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="updateStaff != null and updateStaff != ''">
+            UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        </if>
+        <if test="updateDate != null">
+            UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="remark != null and remark != ''">
+            REMARK = #{remark,jdbcType=VARCHAR}
+        </if>
+        where SERVICE_ID = #{serviceId,jdbcType=BIGINT}
+    </update>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select s.SERVICE_ID, s.SERVICE_NBR, s.SERVICE_NAME,
+               s.SERVICE_CONTENT, s.SERVICE_TYPE_ID, s.EXT_SERVICE_ID,
+               s.STATUS_CD, s.STATUS_DATE, s.CREATE_STAFF,
+               s.CREATE_DATE, s.UPDATE_STAFF, s.UPDATE_DATE, s.REMARK,
+               st.SERVICE_TYPE_NAME as serviceTypeName,
+               st.SERVICE_TYPE_DESC as serviceTypeDesc
+        from service s
+        left join service_type st on s.SERVICE_TYPE_ID = st.SERVICE_TYPE_ID
+        where s.SERVICE_ID = #{serviceId,jdbcType=BIGINT}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select SERVICE_ID, SERVICE_NBR, SERVICE_NAME,
+               SERVICE_CONTENT, SERVICE_TYPE_ID, EXT_SERVICE_ID,
+               STATUS_CD, STATUS_DATE, CREATE_STAFF,
+               CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
+        from service
+    </select>
+    <select id="selectByServiceName" resultMap="BaseResultMap">
+        select SERVICE_ID, SERVICE_NBR, SERVICE_NAME,
+               SERVICE_CONTENT, SERVICE_TYPE_ID, EXT_SERVICE_ID,
+               STATUS_CD, STATUS_DATE, CREATE_STAFF,
+               CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
+        from service
+        where SERVICE_NAME LIKE CONCAT(CONCAT('%',#{serviceName}),'%')
+    </select>
+    <select id="selectDetailByServiceEntity" resultMap="BaseResultMap">
+        select s.SERVICE_ID, s.SERVICE_NBR, s.SERVICE_NAME,
+               s.SERVICE_CONTENT, s.SERVICE_TYPE_ID, s.EXT_SERVICE_ID,
+               s.STATUS_CD, s.STATUS_DATE, s.CREATE_STAFF,
+               s.CREATE_DATE, s.UPDATE_STAFF, s.UPDATE_DATE, s.REMARK,
+               st.SERVICE_TYPE_NAME as serviceTypeName,
+               st.SERVICE_TYPE_DESC as serviceTypeDesc
+        from service s
+        left join service_type st on s.SERVICE_TYPE_ID = st.SERVICE_TYPE_ID
+        where 1=1
+        <if test="serviceName != null and serviceName != ''">
+            and s.SERVICE_NAME LIKE CONCAT(CONCAT('%',#{serviceName}),'%')
+        </if>
+        <if test="serviceTypeId != null and serviceTypeId != ''">
+            and s.SERVICE_TYPE_ID = #{serviceTypeId,jdbcType=BIGINT}
+        </if>
+    </select>
+</mapper>

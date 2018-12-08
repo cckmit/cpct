@@ -15,7 +15,11 @@ public interface MktCamGrpRulMapper {
 
     MktCamGrpRul selectByPrimaryKey(Long mktCamGrpRulId);
 
+    int countByTarGrpId(Long tarGrpId);
+
     List<MktCamGrpRul> selectAll();
+
+    MktCamGrpRul selectByTarGrpId(Long tarGrpId);
 
     int updateByPrimaryKey(MktCamGrpRul record);
 

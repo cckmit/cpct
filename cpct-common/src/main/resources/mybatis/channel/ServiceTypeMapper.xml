@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.ServiceTypeMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.ServiceType">
+        <id column="SERVICE_TYPE_ID" jdbcType="BIGINT" property="serviceTypeId" />
+        <result column="SERVICE_TYPE_NBR" jdbcType="VARCHAR" property="serviceTypeNbr" />
+        <result column="SERVICE_TYPE_NAME" jdbcType="VARCHAR" property="serviceTypeName" />
+        <result column="PAR_SERVICE_TYPE_ID" jdbcType="BIGINT" property="parServiceTypeId" />
+        <result column="EXT_SERVICE_TYPE_ID" jdbcType="BIGINT" property="extServiceTypeId" />
+        <result column="SERVICE_TYPE_DESC" jdbcType="VARCHAR" property="serviceTypeDesc" />
+        <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+        <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+        <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from service_type
+        where SERVICE_TYPE_ID = #{serviceTypeId,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.ServiceType">
+        insert into service_type (SERVICE_TYPE_ID, SERVICE_TYPE_NBR, SERVICE_TYPE_NAME,
+                                  PAR_SERVICE_TYPE_ID, EXT_SERVICE_TYPE_ID, SERVICE_TYPE_DESC,
+                                  STATUS_CD, STATUS_DATE, CREATE_STAFF,
+                                  CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK)
+        values (#{serviceTypeId,jdbcType=BIGINT}, #{serviceTypeNbr,jdbcType=VARCHAR}, #{serviceTypeName,jdbcType=VARCHAR},
+                #{parServiceTypeId,jdbcType=BIGINT}, #{extServiceTypeId,jdbcType=BIGINT}, #{serviceTypeDesc,jdbcType=VARCHAR},
+                #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT},
+                #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP},
+                #{remark,jdbcType=VARCHAR})
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.ServiceType">
+        update service_type
+        set SERVICE_TYPE_NBR = #{serviceTypeNbr,jdbcType=VARCHAR},
+            SERVICE_TYPE_NAME = #{serviceTypeName,jdbcType=VARCHAR},
+            PAR_SERVICE_TYPE_ID = #{parServiceTypeId,jdbcType=BIGINT},
+            EXT_SERVICE_TYPE_ID = #{extServiceTypeId,jdbcType=BIGINT},
+            SERVICE_TYPE_DESC = #{serviceTypeDesc,jdbcType=VARCHAR},
+            STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+            STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+            CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+            CREATE_DATE= #{createDate,jdbcType=TIMESTAMP},
+            UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+            UPDATE_DATE= #{updateDate,jdbcType=TIMESTAMP},
+            REMARK = #{remark,jdbcType=VARCHAR}
+        where SERVICE_TYPE_ID = #{serviceTypeId,jdbcType=BIGINT}
+    </update>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select SERVICE_TYPE_ID, SERVICE_TYPE_NBR, SERVICE_TYPE_NAME, PAR_SERVICE_TYPE_ID,
+              EXT_SERVICE_TYPE_ID, SERVICE_TYPE_DESC, STATUS_CD, STATUS_DATE, CREATE_STAFF,
+              CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
+        from service_type
+    </select>
+    <select id="findServiceTypeListByPar" resultMap="BaseResultMap">
+        select SERVICE_TYPE_ID, SERVICE_TYPE_NBR, SERVICE_TYPE_NAME, PAR_SERVICE_TYPE_ID,
+              EXT_SERVICE_TYPE_ID, SERVICE_TYPE_DESC, STATUS_CD, STATUS_DATE, CREATE_STAFF,
+              CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
+        from service_type
+        where PAR_SERVICE_TYPE_ID = #{parServiceTypeId}
+    </select>
+</mapper>

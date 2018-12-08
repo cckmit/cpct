@@ -55,6 +55,9 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
             camScript = camScriptMapper.selectByConfId(contactConfId);
         } else {
             camScript = detail.getCamScript();
+            if(camScript ==null){
+                camScript = camScriptMapper.selectByConfId(contactConfId);
+            }
         }
         if (camScript != null) {
             newScript.setScriptDesc(camScript.getScriptDesc());

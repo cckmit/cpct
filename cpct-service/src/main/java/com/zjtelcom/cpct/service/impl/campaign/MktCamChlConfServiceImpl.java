@@ -136,9 +136,6 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             mktCamChlConfDetailNew.setMktCamChlConfAttrList(mktCamChlConfAttrNewList);
             // 将推送渠道缓存到redis
             redisUtils.set("MktCamChlConfDetail_" + evtContactConfId, mktCamChlConfDetailNew);
-
-//            ruleInsert(1L, "{\"type\":1,\"listData\":[{\"id\":177,\"name\":\"自有标签测试\",\"operatorList\":[{\"operName\":\"小于\",\"operValue\":2000},{\"operName\":\"等于\",\"operValue\":3000},{\"operName\":\"大于\",\"operValue\":1000},{\"operName\":\"不等于\",\"operValue\":4000},{\"operName\":\"小于等于\",\"operValue\":6000},{\"operName\":\"大于等于\",\"operValue\":5000},{\"operName\":\"包含\",\"operValue\":7000},{\"operName\":\"区间于\",\"operValue\":7200}],\"operType\":3000,\"valueList\":[{\"injectionLabelId\":177,\"labelValue\":\"是\",\"valueName\":\"是\"}],\"conditionType\":\"4\",\"conditionFour\":\"nhnh\",\"content\":\"nhnh\"}],\"ruleChildren\":{\"type\":2,\"listData\":[{\"id\":178,\"name\":\"话费余额\",\"operatorList\":[{\"operName\":\"小于\",\"operValue\":2000},{\"operName\":\"等于\",\"operValue\":3000},{\"operName\":\"大于\",\"operValue\":1000},{\"operName\":\"不等于\",\"operValue\":4000},{\"operName\":\"小于等于\",\"operValue\":6000},{\"operName\":\"大于等于\",\"operValue\":5000},{\"operName\":\"包含\",\"operValue\":7000},{\"operName\":\"区间于\",\"operValue\":7200}],\"operType\":3000,\"valueList\":[{\"injectionLabelId\":178,\"labelValue\":\"是\",\"valueName\":\"是\"}],\"conditionType\":\"4\",\"conditionFour\":\"gnghn\",\"content\":\"gnghn\"}]}}");
-
         } catch (Exception e) {
             logger.error("[op:MktCamChlConfServiceImpl] fail to save MktCamChlConf = {}", mktCamChlConfDO, e);
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_FAIL);
@@ -613,7 +610,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
 
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCamChlConfMap.put("resultMsg", ErrorCode.SAVE_CAM_CHL_CONF_SUCCESS.getErrorMsg());
-            mktCamChlConfMap.put("mktCamChlConfDO", mktCamChlConfDO);
+            mktCamChlConfMap.put("mktCamChlConfDetail", mktCamChlConfDetailNew);
         } catch (Exception e) {
             logger.error("[op:MktCamChlConfServiceImpl] fail to getMktCamChlConfDO by parentEvtContactConfId = {}", parentEvtContactConfId, e);
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_FAIL);
@@ -682,7 +679,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
 
             // 查询痛痒点话术列表
             verbalService.copyVerbal(parentEvtContactConfId, childEvtContactConfId);
-            // 查询脚本
+            // 查询脚本s
             Map<String, Object> map = camScriptService.copyCamScript(parentEvtContactConfId, scriptDesc, childEvtContactConfId);
             CamScript newScript = (CamScript) map.get("resultMsg");
             mktCamChlConfDetailNew.setCamScript(newScript);
