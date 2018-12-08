@@ -295,6 +295,11 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
                         ArrayList<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
                         for (MktCamChlResultConfRelDO mktCamChlResultConfRelDO : mktCamChlResultConfRelDOList) {
                             MktCamChlConfDetail mktCamChlConfDetail = getMktCamChlConf(mktCamChlResultConfRelDO.getEvtContactConfId());
+                            // 获取触点渠道编码
+                            Channel channel = contactChannelMapper.selectByPrimaryKey(mktCamChlConfDetail.getContactChlId());
+                            if(channel!=null){
+                                mktCamChlConfDetail.setContactChlCode(channel.getContactChlCode());
+                            }
                             mktCamChlConfDetailList.add(mktCamChlConfDetail);
                         }
                         mktCamChlResult.setMktCamChlConfDetailList(mktCamChlConfDetailList);
