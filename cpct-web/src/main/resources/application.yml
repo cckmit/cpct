@@ -57,9 +57,6 @@ redisConfig:
    database: 4970
    password: bss_cpct_common_user#bss_cpct_common_user123
 
-cam:
-  issynchronize: false
-
 
 
 

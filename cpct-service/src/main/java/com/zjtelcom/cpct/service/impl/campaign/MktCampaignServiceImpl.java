@@ -59,8 +59,8 @@ import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 @Service
 @Transactional
 public class MktCampaignServiceImpl extends BaseService implements MktCampaignService {
-    @Value("${cam.issynchronize}")
-    private boolean issynchronize;
+    @Value("${sync.value}")
+    private String value;
 
 
     /**
@@ -989,7 +989,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamStrategyConfRelMapper.insert(chaildMktCamStrategyConfRelDO);
                 }
                 //  发布活动时异步去同步到生产
-                if (issynchronize) {
+                if ("1".equals(value)) {
                     new Thread() {
                         @Override
                         public void run() {
