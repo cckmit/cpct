@@ -1217,6 +1217,7 @@ public class EventApiServiceImpl implements EventApiService {
             String key = "EVENT_RULE_" + params.get("activityId") + "_" + strategyConfId + "_" + ruleId;
 
             ExpressRunner runner = new ExpressRunner();
+            runner.addFunction("toNum",new StringToNumOperator("toNum"));
             DefaultContext<String, Object> context = new DefaultContext<String, Object>();
 
             //查询标签实例数据
@@ -1231,7 +1232,6 @@ public class EventApiServiceImpl implements EventApiService {
             StringBuilder queryFieldsSb = new StringBuilder();
             //从redis获取规则使用的所有标签
             List<LabelResult> labelResultList = (List<LabelResult>) redisUtils.get(key + "_LABEL");
-//            LabelResult lr;
 
             //如果分群id为空
             if (tarGrpId == null) {
@@ -1262,32 +1262,27 @@ public class EventApiServiceImpl implements EventApiService {
                 }
                 //遍历所有分群规则
                 for (int i = 1; i <= tarGrpConditionDOs.size(); i++) {
-                    paramsSize++;
-
                     //从redis中获取标签编码
                     Label label = (Label) redisUtils.get("LABEL_LIB_" + tarGrpConditionDOs.get(i - 1).getLeftParam());
                     if (label == null) {
                         label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i - 1).getLeftParam()));
                         redisUtils.set("LABEL_LIB_" + Long.parseLong(tarGrpConditionDOs.get(i - 1).getLeftParam()), label);
                     }
-//                    lr = new LabelResult();
-//                    lr.setLabelCode(label.getInjectionLabelCode());
-//                    lr.setLabelName(label.getInjectionLabelName());
-//                    lr.setRightOperand(label.getRightOperand());
-//                    lr.setOperType(label.getOperator());
-//                    labelResultList.add(lr);
                     if (label != null) {
+                        if (labelItems.containsKey(label.getInjectionLabelCode())) {
+                            continue;
+                        }
+                        paramsSize++;
                         queryFieldsSb.append(label.getInjectionLabelCode()).append(",");
                     }
-
                 }
             } else {
                 //redis中获取标签
                 for (int i = 1; i <= labelResultList.size(); i++) {
-                    paramsSize++;
-                    if (labelItems.containsKey(String.valueOf(i))) {
+                    if (labelItems.containsKey(labelResultList.get(i - 1).getLabelCode())) {
                         continue;
                     }
+                    paramsSize++;
                     queryFieldsSb.append(labelResultList.get(i - 1).getLabelCode()).append(",");
                 }
             }
@@ -1298,50 +1293,54 @@ public class EventApiServiceImpl implements EventApiService {
 
             param.put("queryFields", queryFieldsSb.toString());
 
-            System.out.println("param " + param.toString());
-            //更换为dubbo因子查询-----------------------------------------------------
-            Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
-            System.out.println(dubboResult.toString());
+            if("".equals(queryFieldsSb.toString())) {
+                System.out.println("无需查询标签");
+                context.putAll(labelItems);
+            } else {
+                System.out.println("param " + param.toString());
+                //更换为dubbo因子查询-----------------------------------------------------
+                Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
+                System.out.println(dubboResult.toString());
 
-            if ("0".equals(dubboResult.get("result_code").toString())) {
-                JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
-                //ES log 标签实例
-                esJson.put("reqId", reqId);
-                esJson.put("eventId", params.get("eventCode"));
-                esJson.put("activityId", params.get("activityId"));
-                esJson.put("ruleId", ruleId);
-                esJson.put("integrationId", params.get("integrationId"));
-                esJson.put("accNbr", params.get("accNbr"));
-                esJson.put("strategyConfId", strategyConfId);
+                if ("0".equals(dubboResult.get("result_code").toString())) {
+                    JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
+                    //ES log 标签实例
+                    esJson.put("reqId", reqId);
+                    esJson.put("eventId", params.get("eventCode"));
+                    esJson.put("activityId", params.get("activityId"));
+                    esJson.put("ruleId", ruleId);
+                    esJson.put("ruleName", ruleName);
+                    esJson.put("integrationId", params.get("integrationId"));
+                    esJson.put("accNbr", params.get("accNbr"));
+                    esJson.put("strategyConfId", strategyConfId);
 
-                //拼接规则引擎上下文
-                for (Map.Entry<String, Object> entry : body.entrySet()) {
-                    //添加到上下文
-                    context.put(entry.getKey(), entry.getValue());
+                    //拼接规则引擎上下文
+                    for (Map.Entry<String, Object> entry : body.entrySet()) {
+                        //添加到上下文
+                        context.put(entry.getKey(), entry.getValue());
+                    }
 
-                }
+                    //判断参数是否有无值的
+                    if (context.size() != paramsSize) {
+                        //有参数没有查询出实例数据
+                        esJson.put("hit", false);
+                        esJson.put("msg", "分群标签取值参数实例不足");
+                        System.out.println("分群标签取值参数实例不足");
+                        esService.save(esJson, IndexList.RULE_MODULE);
+                        return Collections.EMPTY_MAP;
+                    }
 
-                //判断参数是否有无值的
-                if (context.size() != paramsSize) {
-                    //有参数没有查询出实例数据
-                    esJson.put("hit", false);
-                    esJson.put("msg", "分群标签取值参数实例不足");
-                    System.out.println("分群标签取值参数实例不足");
+                    //添加事件采集项的值到上下文
+                    context.putAll(labelItems);
+                    System.out.println("查询标签成功:" + context.toString());
+                } else {
+                    System.out.println("查询标签失败:");
+                    esJson.put("hit", "false");
+                    esJson.put("msg", "查询标签失败");
                     esService.save(esJson, IndexList.RULE_MODULE);
                     return Collections.EMPTY_MAP;
                 }
-
-                //添加事件采集项的值到上下文
-                context.putAll(labelItems);
-                System.out.println("查询标签成功:" + context.toString());
-            } else {
-                System.out.println("查询标签失败:");
-                esJson.put("hit", "false");
-                esJson.put("msg", "查询标签失败");
-                esService.save(esJson, IndexList.RULE_MODULE);
-                return Collections.EMPTY_MAP;
             }
-
 
             //判断redis中是否存在
             String express = "";
@@ -1372,7 +1371,6 @@ public class EventApiServiceImpl implements EventApiService {
 
                     String type = tarGrpConditionDOs.get(i).getOperType();
 
-                    StringBuilder express1 = new StringBuilder();
                     Label label = (Label) redisUtils.get("LABEL_LIB_" + tarGrpConditionDOs.get(i).getLeftParam());
                     if (label == null) {
                         label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i).getLeftParam()));
@@ -1394,120 +1392,122 @@ public class EventApiServiceImpl implements EventApiService {
                             lr.setResult(false);
                         }
                     }
-                    //拼接表达式
-                    if ("7100".equals(type)) {
-                        expressSb.append("!");
-                    }
-                    expressSb.append("((");
-//                    expressSb.append("((toNum(");
 
-                    express1.append("if(");
-                    express1.append("(");
-//                    express1.append("(toNum(");
-
-                    expressSb.append(label.getInjectionLabelCode()).append(")");
-//                    expressSb.append(label.getInjectionLabelCode()).append("))");
-                    express1.append(label.getInjectionLabelCode()).append(")");
-//                    express1.append(label.getInjectionLabelCode()).append("))");
-                    if ("1000".equals(type)) {
-                        expressSb.append(" > ");
-                        express1.append(" > ");
-                    } else if ("2000".equals(type)) {
-                        expressSb.append(" < ");
-                        express1.append(" < ");
-                    } else if ("3000".equals(type)) {
-                        expressSb.append(" == ");
-                        express1.append(" == ");
-                    } else if ("4000".equals(type)) {
-                        expressSb.append(" != ");
-                        express1.append(" != ");
-                    } else if ("5000".equals(type)) {
-                        expressSb.append(" >= ");
-                        express1.append(" >= ");
-                    } else if ("6000".equals(type)) {
-                        expressSb.append(" <= ");
-                        express1.append(" <= ");
-                    } else if ("7000".equals(type) || "7100".equals(type)) {
-                        expressSb.append(" in ");
-                        express1.append(" in ");
-                    } else if ("7200".equals(type)) {
-
-                        String[] strArray = tarGrpConditionDOs.get(i).getRightParam().split(",");
-
-//                        expressSb.append(" >= ").append("\"").append(strArray[0]).append("\"").append(")");
-//                        expressSb.append(" && ").append("((");
-//                        expressSb.append(label.getInjectionLabelCode()).append(")");
-//                        expressSb.append(" <= ").append("\"").append(strArray[1]).append("\"");
-
-                        expressSb.append(" >= ").append(strArray[0]);
-                        expressSb.append(" && ").append("(");
-                        expressSb.append(label.getInjectionLabelCode()).append(")");
-                        expressSb.append(" <= ").append(strArray[1]);
-
-                        express1.append(" >= ").append(strArray[0]);
-                        express1.append(" && ").append("(");
-                        express1.append(label.getInjectionLabelCode()).append(")");
-                        express1.append(" <= ").append(strArray[1]);
-
-//                        express1.append(" >= ").append("\"").append(strArray[0]).append("\"");
-//                        express1.append(" && ").append("(");
-//                        express1.append(label.getInjectionLabelCode()).append(")");
-//                        express1.append(" <= ").append("\"").append(strArray[1]).append("\"");
-
-                    }
-
-                    if ("7000".equals(type) || "7100".equals(type)) {
-                        String[] strArray = tarGrpConditionDOs.get(i).getRightParam().split(",");
-                        expressSb.append("(");
-                        express1.append("(");
-                        for (int j = 0; j < strArray.length; j++) {
-                            expressSb.append("\"").append(strArray[j]).append("\"");
-                            express1.append("\"").append(strArray[j]).append("\"");
-                            if (j != strArray.length - 1) {
-                                expressSb.append(",");
-                                express1.append(",");
-                            }
-                        }
-                        expressSb.append(")");
-                        express1.append(")");
-                    } else if ("7200".equals(type)) {
-                        //do nothing...
-                    } else {
-                        expressSb.append("\"").append(tarGrpConditionDOs.get(i).getRightParam()).append("\"");
-                        express1.append("\"").append(tarGrpConditionDOs.get(i).getRightParam()).append("\"");
-                    }
-
-                    expressSb.append(")");
-                    express1.append(") {return true}");
-                    System.out.println(express1.toString());
+                    expressSb.append(cpcExpression(label,type,tarGrpConditionDOs.get(i).getRightParam()));
+//                    assLabel(label,type,tarGrpConditionDOs.get(i).getRightParam());
 
                     try {
-
-                        runner.addFunction("toNum",new StringToNumOperator("toNum"));
-                        RuleResult ruleResult1 = runner.executeRule(express1.toString(), context, true, true);
-
+                        RuleResult ruleResult1 = runner.executeRule(cpcLabel(label,type,tarGrpConditionDOs.get(i).getRightParam()), context, true, true);
                         if (null != ruleResult1.getResult()) {
                             lr.setResult((Boolean) ruleResult1.getResult());
                         } else {
                             lr.setResult(false);
                         }
 
-//                        for (LabelResult labelResult : labelResultList) {
-//                            if (label.getInjectionLabelCode().equals(labelResult.getLabelCode())) {
-//
-//                                if (null != ruleResult1.getResult()) {
-//                                    labelResult.setResult((Boolean) ruleResult1.getResult());
-//                                } else {
-//                                    labelResult.setResult(false);
-//                                }
-//
-//                            }
-//                        }
-
                     } catch (Exception e) {
                         e.printStackTrace();
                         System.out.println("单个标签判断出错");
                     }
+
+//                    //拼接表达式
+//                    if ("7100".equals(type)) {
+//                        expressSb.append("!");
+//                    }
+//                    expressSb.append("((");
+//
+//                    express1.append("if(");
+//                    express1.append("(");
+//
+//                    expressSb.append(label.getInjectionLabelCode()).append(")");
+//                    express1.append(label.getInjectionLabelCode()).append(")");
+//                    if ("1000".equals(type)) {
+//                        expressSb.append(" > ");
+//                        express1.append(" > ");
+//                    } else if ("2000".equals(type)) {
+//                        expressSb.append(" < ");
+//                        express1.append(" < ");
+//                    } else if ("3000".equals(type)) {
+//                        expressSb.append(" == ");
+//                        express1.append(" == ");
+//                    } else if ("4000".equals(type)) {
+//                        expressSb.append(" != ");
+//                        express1.append(" != ");
+//                    } else if ("5000".equals(type)) {
+//                        expressSb.append(" >= ");
+//                        express1.append(" >= ");
+//                    } else if ("6000".equals(type)) {
+//                        expressSb.append(" <= ");
+//                        express1.append(" <= ");
+//                    } else if ("7000".equals(type) || "7100".equals(type)) {
+//                        expressSb.append(" in ");
+//                        express1.append(" in ");
+//                    } else if ("7200".equals(type)) {
+//
+//                        String[] strArray = tarGrpConditionDOs.get(i).getRightParam().split(",");
+//
+////                        expressSb.append(" >= ").append("\"").append(strArray[0]).append("\"").append(")");
+////                        expressSb.append(" && ").append("((");
+////                        expressSb.append(label.getInjectionLabelCode()).append(")");
+////                        expressSb.append(" <= ").append("\"").append(strArray[1]).append("\"");
+//
+//                        expressSb.append(" >= ").append(strArray[0]);
+//                        expressSb.append(" && ").append("(");
+//                        expressSb.append(label.getInjectionLabelCode()).append(")");
+//                        expressSb.append(" <= ").append(strArray[1]);
+//
+//                        express1.append(" >= ").append(strArray[0]);
+//                        express1.append(" && ").append("(");
+//                        express1.append(label.getInjectionLabelCode()).append(")");
+//                        express1.append(" <= ").append(strArray[1]);
+//
+////                        express1.append(" >= ").append("\"").append(strArray[0]).append("\"");
+////                        express1.append(" && ").append("(");
+////                        express1.append(label.getInjectionLabelCode()).append(")");
+////                        express1.append(" <= ").append("\"").append(strArray[1]).append("\"");
+//
+//                    }
+//
+//                    if ("7000".equals(type) || "7100".equals(type)) {
+//                        String[] strArray = tarGrpConditionDOs.get(i).getRightParam().split(",");
+//                        expressSb.append("(");
+//                        express1.append("(");
+//                        for (int j = 0; j < strArray.length; j++) {
+//                            expressSb.append("\"").append(strArray[j]).append("\"");
+//                            express1.append("\"").append(strArray[j]).append("\"");
+//                            if (j != strArray.length - 1) {
+//                                expressSb.append(",");
+//                                express1.append(",");
+//                            }
+//                        }
+//                        expressSb.append(")");
+//                        express1.append(")");
+//                    } else if ("7200".equals(type)) {
+//                        //do nothing...
+//                    } else {
+//                        expressSb.append("\"").append(tarGrpConditionDOs.get(i).getRightParam()).append("\"");
+//                        express1.append("\"").append(tarGrpConditionDOs.get(i).getRightParam()).append("\"");
+//                    }
+//
+//                    expressSb.append(")");
+//                    express1.append(") {return true}");
+//                    System.out.println(express1.toString());
+
+//                    try {
+//
+//                        runner.addFunction("toNum",new StringToNumOperator("toNum"));
+//
+//                        RuleResult ruleResult1 = runner.executeRule(express1.toString(), context, true, true);
+//
+//                        if (null != ruleResult1.getResult()) {
+//                            lr.setResult((Boolean) ruleResult1.getResult());
+//                        } else {
+//                            lr.setResult(false);
+//                        }
+//
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                        System.out.println("单个标签判断出错");
+//                    }
 
                     if (i + 1 != tarGrpConditionDOs.size()) {
                         expressSb.append("&&");
@@ -1577,7 +1577,7 @@ public class EventApiServiceImpl implements EventApiService {
                     ruleMap.put("policyId", strategyConfId.toString()); //策略编码
                     ruleMap.put("policyName", strategyConfId.toString()); //策略名称
                     ruleMap.put("ruleId", ruleId.toString()); //规则编码
-                    ruleMap.put("ruleName", ruleId.toString()); //规则名称
+                    ruleMap.put("ruleName", ruleName); //规则名称
 //                    ruleMap.put("triggers", JSONArray.toJSON(evtTriggers)); //事件采集项
 
                     //查询销售品列表
@@ -1798,7 +1798,7 @@ public class EventApiServiceImpl implements EventApiService {
                 //获取接触账号/推送账号(如果有)
                 if (mktCamChlConfAttrDO.getAttrId() == 500600010012L) {
 
-                    if (mktCamChlConfAttrDO.getAttrValue() != null) {
+                    if (mktCamChlConfAttrDO.getAttrValue() != null && !"".equals(mktCamChlConfAttrDO.getAttrValue())) {
                         JSONObject httpParams = new JSONObject();
                         httpParams.put("queryNum", privateParams.get("accNbr"));
                         httpParams.put("c3", params.get("lanId"));
@@ -2433,5 +2433,94 @@ public class EventApiServiceImpl implements EventApiService {
             }
         }
     }
+
+
+    public static String cpcExpression (Label label,String type,String rightParam) {
+        StringBuilder express = new StringBuilder();
+
+        if ("7100".equals(type)) {
+            express.append("!");
+        }
+        express.append("((");
+        express.append(assLabel(label,type,rightParam));
+        express.append(")");
+
+        return express.toString();
+    }
+
+
+    public static String cpcLabel (Label label,String type,String rightParam) {
+        StringBuilder express = new StringBuilder();
+        express.append("if(");
+
+        if ("7100".equals(type)) {
+            express.append("!");
+        }
+        express.append("(");
+        express.append(assLabel(label,type,rightParam));
+        express.append(") {return true}");
+
+        return express.toString();
+    }
+
+    public static String assLabel(Label label,String type,String rightParam) {
+        StringBuilder express = new StringBuilder();
+        switch (type) {
+            case "1000":
+                express.append("toNum(").append(label.getInjectionLabelCode()).append("))");
+                express.append(" > ");
+                express.append(rightParam);
+                break;
+            case "2000":
+                express.append("toNum(").append(label.getInjectionLabelCode()).append("))");
+                express.append(" < ");
+                express.append(rightParam);
+                break;
+            case "3000":
+                express.append(label.getInjectionLabelCode()).append(")");
+                express.append(" == ");
+                express.append("\"").append(rightParam).append("\"");
+                break;
+            case "4000":
+                express.append(label.getInjectionLabelCode()).append(")");
+                express.append(" != ");
+                express.append("\"").append(rightParam).append("\"");
+                break;
+            case "5000":
+                express.append("toNum(").append(label.getInjectionLabelCode()).append("))");
+                express.append(" >= ");
+                express.append(rightParam);
+                break;
+            case "6000":
+                express.append("toNum(").append(label.getInjectionLabelCode()).append("))");
+                express.append(" <= ");
+                express.append(rightParam);
+                break;
+            case "7100":
+            case "7000":
+                express.append(label.getInjectionLabelCode()).append(")");
+                express.append(" in ");
+                String[] strArray = rightParam.split(",");
+                express.append("(");
+                for (int j = 0; j < strArray.length; j++) {
+                    express.append("\"").append(strArray[j]).append("\"");
+                    if (j != strArray.length - 1) {
+                        express.append(",");
+                    }
+                }
+                express.append(")");
+                break;
+            case "7200":
+                express.append("toNum(").append(label.getInjectionLabelCode()).append("))");
+                String[] strArray2 = rightParam.split(",");
+                express.append(" >= ").append(strArray2[0]);
+                express.append(" && ").append("(toNum(");
+                express.append(label.getInjectionLabelCode()).append("))");
+                express.append(" <= ").append(strArray2[1]);
+
+        }
+        return express.toString();
+    }
+
 
 }
