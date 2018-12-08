@@ -4,13 +4,18 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
+import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.user.UserListMapper;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.filter.FilterRuleAddVO;
 import com.zjtelcom.cpct.dto.user.UserList;
 import com.zjtelcom.cpct.request.filter.FilterRuleReq;
 import com.zjtelcom.cpct.service.filter.FilterRuleService;
+import com.zjtelcom.cpct.util.ChannelUtil;
 import org.apache.ibatis.annotations.Param;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,6 +47,8 @@ public class FilterRuleController extends BaseController {
     private FilterRuleService filterRuleService;
     @Autowired
     private UserListMapper userListMapper;
+    @Autowired
+    private FilterRuleMapper filterRuleMapper;
 
 
     /**
@@ -174,9 +181,9 @@ public class FilterRuleController extends BaseController {
             FileInputStream input = new FileInputStream(filePath);
 
             byte[] buffer = new byte[1024];
-            FileInputStream fis = null; //文件输入流
+            FileInputStream fis = null; //
             BufferedInputStream bis = null;
-            fis = new FileInputStream("cpct-web/src/main/resources/file/templete.xlsx");
+            fis = new FileInputStream("cpct-web/src/main/resources/file/temp文件输入流lete.xlsx");
             bis = new BufferedInputStream(fis);
 
             //处理导出问题
@@ -206,6 +213,8 @@ public class FilterRuleController extends BaseController {
         }
         return initSuccRespInfo("导出成功");
     }
+
+
 
     /**
      * 下发文件导入模板下载
@@ -253,6 +262,54 @@ public class FilterRuleController extends BaseController {
         }
         return initSuccRespInfo("导出成功");
     }
+
+
+    /**
+     * 导出名单
+     */
+    @RequestMapping("/outPutUserList")
+    public void buildExcelDocument(HSSFWorkbook workBook, HttpServletRequest request, HttpServletResponse response,Long filterRuleId) {
+
+        try {
+            FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId);
+            List<String> phoneList = ChannelUtil.StringToList(filterRule.getUserList());
+            //excel文件名
+            String fileName = "名单.xls";
+            //设置响应的编码格式
+            response.setCharacterEncoding("UTF-8");
+            //设置响应类型
+            response.setContentType("application/ms-excel");
+            //设置响应头
+            response.setHeader("Content-Disposition",
+                    "inline;filename="+
+                            new String(fileName.getBytes(),"iso8859-1"));
+
+
+            //创建一个sheet标签
+            HSSFSheet sheet = workBook.createSheet("学生列表");
+            //创建第一行（头）
+            HSSFRow head = sheet.createRow(0);
+            //创建列
+            head.createCell(0).setCellValue("学生姓名");
+            head.createCell(1).setCellValue("年龄");
+            head.createCell(2).setCellValue("性别");
+            head.createCell(3).setCellValue("地址");
+
+            HSSFRow dataRow = sheet.createRow(0);
+            //根据具体数据集合创建其他的行和列
+            for (int i = 0; i< phoneList.size() ;i++){
+                dataRow.createCell(i).setCellValue(phoneList.get(i));
+            }
+            //通过repsonse获取输出流
+            OutputStream outputStream = response.getOutputStream();
+            workBook.write(outputStream);
+            outputStream.flush();
+            outputStream.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
 
 
     /**

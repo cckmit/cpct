@@ -201,6 +201,31 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 //redis添加推荐条目数据
                 redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
             }
+        }else if ("4000".equals(param.getItemType())){
+//            for (Long serviceId : param.getIdList()){
+//                 resource = resourceMapper.selectByPrimaryKey(resourceId);
+//                if (resource==null){
+//                    result.put("resultCode",CODE_FAIL);
+//                    result.put("resultMsg","促销券不存在");
+//                    return result;
+//                }
+//                MktCamItem item = new MktCamItem();
+//                item.setMktCampaignId(1000L);
+//                item.setOfferCode(resource.getMktResNbr());
+//                item.setOfferName(resource.getMktResName());
+//                item.setItemId(resourceId);
+//                item.setItemType(param.getItemType());
+//                item.setCreateDate(new Date());
+//                item.setCreateDate(DateUtil.getCurrentTime());
+//                item.setUpdateDate(DateUtil.getCurrentTime());
+//                item.setStatusDate(DateUtil.getCurrentTime());
+//                item.setUpdateStaff(UserUtil.loginId());
+//                item.setCreateStaff(UserUtil.loginId());
+//                item.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+//                mktCamItems.add(item);
+//                //redis添加推荐条目数据
+//                redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
+//            }
         }
         if (!mktCamItems.isEmpty()){
             camItemMapper.insertByBatch(mktCamItems);
