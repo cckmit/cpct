@@ -40,6 +40,7 @@ import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +59,9 @@ import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 @Service
 @Transactional
 public class MktCampaignServiceImpl extends BaseService implements MktCampaignService {
+    @Value("${cam.issynchronize}")
+    private boolean issynchronize;
+
 
     /**
      * 营销活动
@@ -984,17 +988,19 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     chaildMktCamStrategyConfRelDO.setUpdateStaff(UserUtil.loginId());
                     mktCamStrategyConfRelMapper.insert(chaildMktCamStrategyConfRelDO);
                 }
-                //  发布活动时异步去同步大数据
-                new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            synchronizeCampaignService.synchronizeCampaign(mktCampaignId, "admin");
-                        } catch (Exception e) {
-                            logger.error("[op:publishMktCampaign] 发布活动 id = {} 时，同步到生产失败！Exception= ", mktCampaignId, e);
+                //  发布活动时异步去同步到生产
+                if (issynchronize) {
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            try {
+                                synchronizeCampaignService.synchronizeCampaign(mktCampaignId, "admin");
+                            } catch (Exception e) {
+                                logger.error("[op:publishMktCampaign] 发布活动 id = {} 时，同步到生产失败！Exception= ", mktCampaignId, e);
+                            }
                         }
-                    }
-                }.start();
+                    }.start();
+                }
 
                 // 协同中心活动信息同步
     /*            new Thread(){

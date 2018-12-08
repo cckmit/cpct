@@ -53,11 +53,11 @@
               CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
         from service_type
     </select>
-    <select id="findServiceTypeListByName" resultMap="BaseResultMap">
+    <select id="findServiceTypeListByPar" resultMap="BaseResultMap">
         select SERVICE_TYPE_ID, SERVICE_TYPE_NBR, SERVICE_TYPE_NAME, PAR_SERVICE_TYPE_ID,
               EXT_SERVICE_TYPE_ID, SERVICE_TYPE_DESC, STATUS_CD, STATUS_DATE, CREATE_STAFF,
               CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
         from service_type
-        where SERVICE_TYPE_NAME LIKE CONCAT(CONCAT('%',#{serviceTypeName}),'%')
+        where PAR_SERVICE_TYPE_ID = #{parServiceTypeId}
     </select>
 </mapper>

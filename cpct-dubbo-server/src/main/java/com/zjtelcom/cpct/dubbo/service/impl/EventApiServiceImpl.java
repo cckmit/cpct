@@ -13,6 +13,8 @@ import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.event.ContactEvtItemMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
+import com.zjtelcom.cpct.dao.event.ContactEvtMatchRulMapper;
+import com.zjtelcom.cpct.dao.event.EventMatchRulConditionMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
@@ -31,6 +33,8 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.ContactEvtItem;
+import com.zjtelcom.cpct.dto.event.ContactEvtMatchRul;
+import com.zjtelcom.cpct.dto.event.EventMatchRulCondition;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
@@ -42,6 +46,8 @@ import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -57,6 +63,8 @@ import java.util.regex.Pattern;
 
 @Service
 public class EventApiServiceImpl implements EventApiService {
+
+    private static final Logger log= LoggerFactory.getLogger(EventApiServiceImpl.class);
 
     @Autowired
     private ContactEvtMapper contactEvtMapper; //事件总表
@@ -138,6 +146,12 @@ public class EventApiServiceImpl implements EventApiService {
 
     @Autowired(required = false)
     private MktStrategyConfRuleRelMapper mktStrategyConfRuleRelMapper;
+
+    @Autowired
+    private ContactEvtMatchRulMapper contactEvtMatchRulMapper; //事件规则
+
+    @Autowired
+    private EventMatchRulConditionMapper eventMatchRulConditionMapper;  //事件规则条件
 
 
     @Override
@@ -432,6 +446,19 @@ public class EventApiServiceImpl implements EventApiService {
                     result.put("CPCResultMsg", "事件采集项验证失败，缺少：" + stringBuilder.toString());
                     return result;
                 }
+
+
+
+                //!!!验证事件规则
+//                Map<String, Object> stringObjectMap = matchRulCondition(eventId, labelItems, map);
+//                if (!stringObjectMap.get("code").equals("success")) {
+//                    //判断不符合条件 直接返回不命中
+//                    result.put("CPCResultMsg",stringObjectMap.get("result"));
+//                    esJson.put("hit", false);
+//                    esJson.put("msg",stringObjectMap.get("result"));
+//                    esService.save(esJson, IndexList.EVENT_MODULE);
+//                    return result;
+//                }
 
                 //获取事件推荐活动数
                 int recCampaignAmount;
@@ -1798,7 +1825,7 @@ public class EventApiServiceImpl implements EventApiService {
                 //获取接触账号/推送账号(如果有)
                 if (mktCamChlConfAttrDO.getAttrId() == 500600010012L) {
 
-                    if (mktCamChlConfAttrDO.getAttrValue() != null && !"".equals(mktCamChlConfAttrDO.getAttrValue())) {
+                    if (mktCamChlConfAttrDO.getAttrValue() != null) {
                         JSONObject httpParams = new JSONObject();
                         httpParams.put("queryNum", privateParams.get("accNbr"));
                         httpParams.put("c3", params.get("lanId"));
@@ -2522,5 +2549,249 @@ public class EventApiServiceImpl implements EventApiService {
         return express.toString();
     }
 
+
+    /**
+     * 判断事件规则条件是否满足  返回map的code值为success则满足条件 否则返回result错误信息
+     * @param eventId    事件id
+     * @param labelItems 需要作为标签值的标签  即不需要去查询ES的标签
+     * @param map        事件接入的信息
+     * @return
+     */
+    public Map<String, Object> matchRulCondition(Long eventId, Map<String, String> labelItems, Map<String, String> map) {
+        log.info("开始验证事件规则条件");
+        Map<String, Object> result = new HashMap<>();
+        result.put("code", "success");
+        //查询事件规则
+        ContactEvtMatchRul evtMatchRul = new ContactEvtMatchRul();
+        evtMatchRul.setContactEvtId(eventId);
+        List<ContactEvtMatchRul> contactEvtMatchRuls = contactEvtMatchRulMapper.listEventMatchRuls(evtMatchRul);
+        //事件规则为空不用判断,直接返回
+        if (contactEvtMatchRuls.isEmpty()) {
+            System.out.println("事件规则为空直接返回");
+            return result;
+        }
+        //查询事件规则条件
+        List<EventMatchRulCondition> eventMatchRulConditions = new ArrayList<>();
+        for (ContactEvtMatchRul c : contactEvtMatchRuls) {
+            List<EventMatchRulCondition> list =  eventMatchRulConditionMapper.listEventMatchRulCondition(c.getEvtMatchRulId());
+            eventMatchRulConditions.addAll(list);
+        }
+        if (eventMatchRulConditions.isEmpty()) {
+            return result;
+        }
+        //查询事件规则条件对应的标签
+        List<Label> labelList = new ArrayList<>();
+        for (EventMatchRulCondition condition : eventMatchRulConditions) {
+            //!!先查redis 没有再查数据库
+            Label label = (Label) redisUtils.get("MATCH_RUL_CONDITION" + condition.getLeftParam());
+            if(label==null){
+                label = injectionLabelMapper.selectByPrimaryKey(Long.valueOf(condition.getLeftParam()));
+                redisUtils.set("MATCH_RUL_CONDITION_" + condition.getLeftParam(),label);
+            }
+            labelList.add(label);
+        }
+        //判断那些标签需要查询ES
+        List<Label> selectByEs = new ArrayList<>();   //需要查询ES获取标签值的标签集合
+        List<Label> myLabelList = new ArrayList<>();  //使用事件接入的数据作为标签值的标签集合
+        for (Label label : labelList) {
+            if (labelItems.containsKey(label.getInjectionLabelCode())) {
+                myLabelList.add(label);
+            } else {
+                selectByEs.add(label);
+            }
+        }
+
+        //判断不需要查ES的标签是否符合规则引擎计算结果
+        JSONObject eventItem = JSONObject.parseObject(map.get("evtContent"));
+        for (Label label : myLabelList) {
+            //添加到上下文
+            DefaultContext<String, Object> context = new DefaultContext<String, Object>();
+            context.put(label.getInjectionLabelCode(), eventItem.get(label.getInjectionLabelCode()));
+            //事件命中规则信息
+            EventMatchRulCondition condition=null;
+            for (EventMatchRulCondition c:eventMatchRulConditions){
+                //得到标签对应的事件规则
+                if(Long.valueOf(c.getLeftParam())==label.getInjectionLabelId()){
+                    condition=c;
+                    break;
+                }
+            }
+            Map<String, String> stringStringMap = decideExpress(condition, label, context);
+            //拼接规则引擎判断  有一个不满足则不满足
+            if(!stringStringMap.get("code").equals("success")) {
+                //判断返回为false直接结束命中
+                result.put("result", stringStringMap.get("result"));
+                result.put("code","failed");
+                return result;
+            }
+
+        }
+
+
+        //有需要查询ES的标签
+        if (!selectByEs.isEmpty()) {
+            Map<String, Object> stringObjectMap = selectLabelByEs(selectByEs, map);
+            if (stringObjectMap.get("result").equals("success")) {
+                //查询成功
+                JSONObject body = (JSONObject) stringObjectMap.get("body");
+                //拼接规则引擎
+                for (Label label:selectByEs){
+                    DefaultContext<String, Object> context = new DefaultContext<String, Object>();
+                    //拼装参数
+                    for (Map.Entry<String, Object> entry : body.entrySet()) {
+                        if(entry.getKey().equals(label.getInjectionLabelCode())){
+                            context.put(entry.getKey(), entry.getValue());
+                            log.info("规则计算标签："+entry.getKey()+"  对应值："+entry.getValue());
+                            break;
+                        }
+                    }
+
+                    //事件命中规则信息
+                    EventMatchRulCondition condition=null;
+                    for (EventMatchRulCondition c:eventMatchRulConditions){
+                        //得到标签对应的事件规则
+                        if(Long.valueOf(c.getLeftParam())==label.getInjectionLabelId()){
+                            condition=c;
+                            break;
+                        }
+                    }
+
+                    Map<String, String> stringStringMap = decideExpress(condition, label, context);
+                    //拼接规则引擎判断  有一个不满足则不满足
+                    if(!stringStringMap.get("code").equals("success")) {
+                        //判断返回为false直接结束命中
+                        result.put("result", stringStringMap.get("result"));
+                        result.put("code","failed");
+                        return result;
+                    }
+                }
+            } else {
+                result.put("result", stringObjectMap.get("result"));
+                result.put("code","failed");
+            }
+        }
+        return result;
+    }
+
+
+    /**
+     * 查询标签因子实例数据
+     *
+     * @param selectByEs 需要ES查询的标签
+     * @param map        事件接入的信息
+     * @return
+     */
+    public Map<String, Object> selectLabelByEs(List<Label> selectByEs, Map<String, String> map) {
+        Map<String, Object> dubboLabel = new HashMap<>();
+        dubboLabel.put("result", "success");
+        JSONObject param = new JSONObject();
+        //查询标识
+        param.put("queryNum", map.get("accNbr"));
+        param.put("c3", map.get("lanId"));
+        param.put("queryId", map.get("integrationId"));
+        param.put("type", "1");
+        StringBuilder queryFields = new StringBuilder();
+        for (Label label : selectByEs) {
+            queryFields.append(label.getInjectionLabelCode()).append(",");
+        }
+        if (queryFields.length() > 0) {
+            queryFields.deleteCharAt(queryFields.length() - 1);
+        }
+        param.put("queryFields", queryFields.toString());
+        //查询标签实例数据
+        log.info("事件规则请求数据："+JSON.toJSONString(param));
+        Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
+        log.info("事件规则请求ES返回："+dubboResult.toString());
+        if ("0".equals(dubboResult.get("result_code").toString())) {
+            //查询成功
+            JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
+            dubboLabel.put("body", body);
+        } else {
+            //查询失败
+            dubboLabel.put("result", "查询标签实例失败");
+        }
+        return dubboLabel;
+    }
+
+
+    /**
+     * @param condition    事件规则条件
+     * @param label        标签
+     * @param context      规则需要比较的上下文内容
+     * @return 规则表达式还需要完善
+     */
+    public Map<String, String> decideExpress(EventMatchRulCondition condition, Label label, DefaultContext<String, Object> context) {
+        String type=condition.getOperType();
+        Map<String, String> message = new HashMap<>();
+        message.put("code", "success");
+        ExpressRunner runner = new ExpressRunner();
+        //拼接表达式
+        StringBuilder express1 = new StringBuilder();
+        express1.append("if(");
+        express1.append("(");
+        express1.append(label.getInjectionLabelCode()).append(")");
+        if ("1000".equals(type)) {
+            express1.append(" > ");
+        } else if ("2000".equals(type)) {
+            express1.append(" < ");
+        } else if ("3000".equals(type)) {
+            express1.append(" == ");
+        } else if ("4000".equals(type)) {
+            express1.append(" != ");
+        } else if ("5000".equals(type)) {
+            express1.append(" >= ");
+        } else if ("6000".equals(type)) {
+            express1.append(" <= ");
+        } else if ("7000".equals(type) || "7100".equals(type)) {
+            express1.append(" in ");
+        } else if ("7200".equals(type)) {
+            String[] strArray =condition.getRightParam().split(",");
+            express1.append(" >= ").append(strArray[0]);
+            express1.append(" && ").append("(");
+            express1.append(label.getInjectionLabelCode()).append(")");
+            express1.append(" <= ").append(strArray[1]);
+        }
+
+        //拼接右测数据
+        if ("7000".equals(type) || "7100".equals(type)) {
+            String[] strArray = condition.getRightParam().split(",");
+            express1.append("(");
+            express1.append("(");
+            for (int j = 0; j < strArray.length; j++) {
+                express1.append("\"").append(strArray[j]).append("\"");
+                express1.append("\"").append(strArray[j]).append("\"");
+                if (j != strArray.length - 1) {
+                    express1.append(",");
+                    express1.append(",");
+                }
+            }
+            express1.append(")");
+            express1.append(")");
+        } else if ("7200".equals(type)) {
+            //do nothing...
+        } else {
+            express1.append("\"").append(condition.getRightParam()).append("\"");
+        }
+
+
+
+        express1.append(") {return true}");
+        log.info("事件规则表达式"+express1.toString());
+        try {
+            RuleResult result = runner.executeRule(express1.toString(), context, true, true);
+            log.info("计算结果："+result.getResult());
+            if (null == result.getResult()) {
+                //计算为false
+                message.put("code", "failed");
+                message.put("result", "事件规则条件" + label.getInjectionLabelCode() + "的标签值"+context.get(label.getInjectionLabelCode())+"不满足条件"+express1.toString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return  message;
+    }
+
+
+}
 
 }
