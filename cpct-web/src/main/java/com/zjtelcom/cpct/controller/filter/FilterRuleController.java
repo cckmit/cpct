@@ -184,7 +184,7 @@ public class FilterRuleController extends BaseController {
             byte[] buffer = new byte[1024];
             FileInputStream fis = null; //
             BufferedInputStream bis = null;
-            fis = new FileInputStream("cpct-web/src/main/resources/file/temp文件输入流lete.xlsx");
+            fis = new FileInputStream("cpct-web/src/main/resources/file/templete.xlsx");
             bis = new BufferedInputStream(fis);
 
             //处理导出问题
@@ -287,19 +287,27 @@ public class FilterRuleController extends BaseController {
             //创建一个sheet标签
             HSSFSheet sheet = workBook.createSheet(filterRule.getRuleName()+"名单");
             //创建第一行（头）
-            HSSFRow head = sheet.createRow(0);
-            //创建列
-            head.createCell(0).setCellValue("");
-            head.createCell(1).setCellValue("年龄");
-            head.createCell(2).setCellValue("性别");
-            head.createCell(3).setCellValue("地址");
-
-            HSSFCell cell = head.createCell(0);
-            HSSFRow dataRow = sheet.createRow(0);
-            //根据具体数据集合创建其他的行和列
+//            HSSFRow head = sheet.createRow(0);
+//            HSSFCell cell = head.createCell(0);
             for (int i = 0; i< phoneList.size() ;i++){
-                dataRow.createCell(0).setCellValue(phoneList.get(i));
+                HSSFRow row = sheet.createRow(i);
+                row.createCell(0).setCellValue(phoneList.get(i));
+//                head.createCell(i).setCellValue(phoneList.get(i));
+//                dataRow.createCell(0).setCellValue(phoneList.get(i));
             }
+
+            //创建列
+//            head.createCell(0).setCellValue("");
+//            head.createCell(1).setCellValue("年龄");
+//            head.createCell(2).setCellValue("性别");
+//            head.createCell(3).setCellValue("地址");
+//
+//            HSSFCell cell = head.createCell(0);
+//            HSSFRow dataRow = sheet.createRow(0);
+//            //根据具体数据集合创建其他的行和列
+//            for (int i = 0; i< phoneList.size() ;i++){
+//                dataRow.createCell(0).setCellValue(phoneList.get(i));
+//            }
             //通过repsonse获取输出流
             OutputStream outputStream = response.getOutputStream();
             workBook.write(outputStream);
