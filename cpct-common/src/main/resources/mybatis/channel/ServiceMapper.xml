@@ -58,13 +58,13 @@
         <if test="createStaff != null and createStaff != ''">
             CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
         </if>
-        <if test="createDate != null and">
+        <if test="createDate != null">
             CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
         </if>
         <if test="updateStaff != null and updateStaff != ''">
             UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
         </if>
-        <if test="updateDate != null and">
+        <if test="updateDate != null">
             UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
         </if>
         <if test="remark != null and remark != ''">
@@ -77,10 +77,11 @@
                s.SERVICE_CONTENT, s.SERVICE_TYPE_ID, s.EXT_SERVICE_ID,
                s.STATUS_CD, s.STATUS_DATE, s.CREATE_STAFF,
                s.CREATE_DATE, s.UPDATE_STAFF, s.UPDATE_DATE, s.REMARK,
-               st.SERVICE_TYPE_NAME, st.SERVICE_TYPE_DESC
+               st.SERVICE_TYPE_NAME as serviceTypeName,
+               st.SERVICE_TYPE_DESC as serviceTypeDesc
         from service s
         left join service_type st on s.SERVICE_TYPE_ID = st.SERVICE_TYPE_ID
-        where SERVICE_ID = #{serviceId,jdbcType=BIGINT}
+        where s.SERVICE_ID = #{serviceId,jdbcType=BIGINT}
     </select>
     <select id="selectAll" resultMap="BaseResultMap">
         select SERVICE_ID, SERVICE_NBR, SERVICE_NAME,
@@ -102,15 +103,16 @@
                s.SERVICE_CONTENT, s.SERVICE_TYPE_ID, s.EXT_SERVICE_ID,
                s.STATUS_CD, s.STATUS_DATE, s.CREATE_STAFF,
                s.CREATE_DATE, s.UPDATE_STAFF, s.UPDATE_DATE, s.REMARK,
-               st.SERVICE_TYPE_NAME, st.SERVICE_TYPE_DESC
+               st.SERVICE_TYPE_NAME as serviceTypeName,
+               st.SERVICE_TYPE_DESC as serviceTypeDesc
         from service s
         left join service_type st on s.SERVICE_TYPE_ID = st.SERVICE_TYPE_ID
         where 1=1
         <if test="serviceName != null and serviceName != ''">
-            SERVICE_NAME LIKE CONCAT(CONCAT('%',#{serviceName}),'%')
+            and s.SERVICE_NAME LIKE CONCAT(CONCAT('%',#{serviceName}),'%')
         </if>
-        <if test="serviceTypeId ！= null and serviceTypeId != ''">
-            SERVICE_TYPE_ID = #{serviceTypeId,jdbcType=BIGINT}
+        <if test="serviceTypeId != null and serviceTypeId != ''">
+            and s.SERVICE_TYPE_ID = #{serviceTypeId,jdbcType=BIGINT}
         </if>
     </select>
 </mapper>
