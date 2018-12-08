@@ -804,9 +804,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 //            restTemplate.postForObject(machFile, request, TrialResponse.class);
         } catch (Exception e) {
             e.printStackTrace();
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "文件下发失败");
+            return result;
         }
         result.put("resultCode", CODE_SUCCESS);
-        result.put("resultMsg", null);
+        result.put("resultMsg", "文件下发成功");
         return result;
     }
 
