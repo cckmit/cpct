@@ -58,12 +58,16 @@ public class SysStaffController extends BaseController {
             Long parentId = parent.getPrivFuncRelDetails().get(0).getFuncMenu().getMenuId();
             Map<String,Object> map = new HashMap<>();
             map.put("parent",parent);
+            List<PrivilegeDetail> childList = new ArrayList<>();
             for (PrivilegeDetail detail : userDetail.getPrivilegeDetails()){
                 Long detailId = detail.getPrivFuncRelDetails().get(0).getFuncMenu().getParMenuId();
                 if (detailId!=null && detailId.equals(parentId) ){
-                    map.put(detail.getPrivName(),detail);
+                    String urlAddr = detail.getPrivFuncRelDetails().get(0).getFuncMenu().getUrlAddr();
+                    String detailName = urlAddr.substring(1,urlAddr.length());
+                    childList.add(detail);
                 }
             }
+            map.put("childList",childList);
             resultList.add(map);
         }
         result.put("resultCode",CODE_SUCCESS);

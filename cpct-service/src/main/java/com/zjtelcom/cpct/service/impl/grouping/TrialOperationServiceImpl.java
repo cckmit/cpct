@@ -27,6 +27,7 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.grouping.*;
@@ -894,6 +895,15 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
             ArrayList<MktCamChlConfDetailES> mktCamChlConfDetaiEslList = new ArrayList<>();
             List<MktCamChlConfDetail> mktCamChlConfList = mktStrategyConfRule.getMktCamChlConfDetailList();
+            if(mktStrategyConfRule.getMktCamChlResultList()!=null){
+                for (MktCamChlResult mktCamChlResult:mktStrategyConfRule.getMktCamChlResultList()) {
+                    if(mktCamChlResult.getMktCamChlConfDetailList()!=null){
+                        for (MktCamChlConfDetail mktCamChlConfDetail : mktCamChlResult.getMktCamChlConfDetailList()) {
+                            mktCamChlConfList.add(mktCamChlConfDetail);
+                        }
+                    }
+                }
+            }
             if (mktCamChlConfList != null) {
                 for (MktCamChlConfDetail mktCamChlConf : mktCamChlConfList) {
                     Map<String, Object> mktCamChlConfDetailMap = mktCamChlConfService.getMktCamChlConf(mktCamChlConf.getEvtContactConfId());
