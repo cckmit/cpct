@@ -20,5 +20,5 @@ public interface ServiceTypeMapper {
 
     int updateByPrimaryKey(ServiceType record);
 
-    List<ServiceType> findServiceTypeListByName(@Param("serviceTypeName") String serviceTypeName);
+    List<ServiceType> findServiceTypeListByPar(@Param("parServiceTypeId") Long parServiceTypeId);
 }

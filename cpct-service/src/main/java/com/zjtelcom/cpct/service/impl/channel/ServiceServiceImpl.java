@@ -45,6 +45,7 @@ public class ServiceServiceImpl extends BaseService implements ServiceService {
         Page pageInfo = new Page(new PageInfo(serviceEntityList));
         result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", serviceEntityList);
+        result.put("page",pageInfo);
         return result;
     }
 
