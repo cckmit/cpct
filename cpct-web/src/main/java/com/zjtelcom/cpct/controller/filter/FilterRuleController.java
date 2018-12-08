@@ -13,6 +13,7 @@ import com.zjtelcom.cpct.request.filter.FilterRuleReq;
 import com.zjtelcom.cpct.service.filter.FilterRuleService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import org.apache.ibatis.annotations.Param;
+import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -274,7 +275,7 @@ public class FilterRuleController extends BaseController {
             FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId);
             List<String> phoneList = ChannelUtil.StringToList(filterRule.getUserList());
             //excel文件名
-            String fileName = "名单.xls";
+            String fileName = filterRule.getRuleName()+"名单.xls";
             //设置响应的编码格式
             response.setCharacterEncoding("UTF-8");
             //设置响应类型
@@ -283,22 +284,21 @@ public class FilterRuleController extends BaseController {
             response.setHeader("Content-Disposition",
                     "inline;filename="+
                             new String(fileName.getBytes(),"iso8859-1"));
-
-
             //创建一个sheet标签
-            HSSFSheet sheet = workBook.createSheet("学生列表");
+            HSSFSheet sheet = workBook.createSheet(filterRule.getRuleName()+"名单");
             //创建第一行（头）
             HSSFRow head = sheet.createRow(0);
             //创建列
-            head.createCell(0).setCellValue("学生姓名");
+            head.createCell(0).setCellValue("");
             head.createCell(1).setCellValue("年龄");
             head.createCell(2).setCellValue("性别");
             head.createCell(3).setCellValue("地址");
 
+            HSSFCell cell = head.createCell(0);
             HSSFRow dataRow = sheet.createRow(0);
             //根据具体数据集合创建其他的行和列
             for (int i = 0; i< phoneList.size() ;i++){
-                dataRow.createCell(i).setCellValue(phoneList.get(i));
+                dataRow.createCell(0).setCellValue(phoneList.get(i));
             }
             //通过repsonse获取输出流
             OutputStream outputStream = response.getOutputStream();
