@@ -61,6 +61,8 @@ import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.Calendar.MONTH;
+
 @Service
 public class EventApiServiceImpl implements EventApiService {
 
@@ -454,6 +456,7 @@ public class EventApiServiceImpl implements EventApiService {
                 if (!stringObjectMap.get("code").equals("success")) {
                     //判断不符合条件 直接返回不命中
                     result.put("CPCResultMsg",stringObjectMap.get("result"));
+                    result.put("CPCResultCode", "1000");
                     esJson.put("hit", false);
                     esJson.put("msg",stringObjectMap.get("result"));
                     esService.save(esJson, IndexList.EVENT_MODULE);
@@ -609,9 +612,14 @@ public class EventApiServiceImpl implements EventApiService {
                 result.put("taskList", activityList); //协同回调结果
                 System.out.println("命中结果：" + result.toString());
 
-                //构造返回参数
-                result.put("CPCResultCode", "1");
-                result.put("CPCResultMsg", "success");
+                if(activityList.size() > 0) {
+                    //构造返回参数
+                    result.put("CPCResultCode", "1");
+                    result.put("CPCResultMsg", "success");
+                } else {
+                    result.put("CPCResultCode", "1000");
+                    result.put("CPCResultMsg", "success");
+                }
                 result.put("reqId", map.get("reqId"));
                 result.put("custId", custId);
 
@@ -1825,7 +1833,7 @@ public class EventApiServiceImpl implements EventApiService {
                 //获取接触账号/推送账号(如果有)
                 if (mktCamChlConfAttrDO.getAttrId() == 500600010012L) {
 
-                    if (mktCamChlConfAttrDO.getAttrValue() != null) {
+                    if (mktCamChlConfAttrDO.getAttrValue() != null && !"".equals(mktCamChlConfAttrDO.getAttrValue())) {
                         JSONObject httpParams = new JSONObject();
                         httpParams.put("queryNum", privateParams.get("accNbr"));
                         httpParams.put("c3", params.get("lanId"));
@@ -2000,20 +2008,18 @@ public class EventApiServiceImpl implements EventApiService {
 
 
     private boolean compareHourAndMinute(FilterRule filterRule) {
-        Boolean result = true;
-
+        Boolean result = false;
+        Calendar cal = Calendar.getInstance();
         Calendar start = Calendar.getInstance();
         start.setTime(filterRule.getDayStart());
+        start.set(cal.get(Calendar.YEAR),cal.get(MONTH),cal.get(Calendar.DAY_OF_MONTH));
         Calendar end = Calendar.getInstance();
         end.setTime(filterRule.getDayEnd());
-        Calendar cal = Calendar.getInstance();
-        int nowHour = cal.get(Calendar.HOUR_OF_DAY);
-        if (nowHour > start.get(Calendar.HOUR_OF_DAY) && nowHour < end.get(Calendar.HOUR_OF_DAY)) {
-            if (nowHour > start.get(Calendar.MINUTE) && nowHour < end.get(Calendar.MINUTE)) {
-                if (nowHour > start.get(Calendar.SECOND) && nowHour < end.get(Calendar.SECOND)) {
-                    result = false;
-                }
-            }
+        end.set(cal.get(Calendar.YEAR),cal.get(MONTH),cal.get(Calendar.DAY_OF_MONTH));
+
+        if((cal.getTimeInMillis() - start.getTimeInMillis()) > 0
+                && (cal.getTimeInMillis() - end.getTimeInMillis()) < 0) {
+            result = true;
         }
 
         return result;
