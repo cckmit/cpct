@@ -1006,18 +1006,18 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamStrategyConfRelMapper.insert(chaildMktCamStrategyConfRelDO);
                 }
                 //  发布活动时异步去同步到生产
-//                if ("1".equals(value)) {
-//                    new Thread() {
-//                        @Override
-//                        public void run() {
-//                            try {
-//                                synchronizeCampaignService.synchronizeCampaign(mktCampaignId, "admin");
-//                            } catch (Exception e) {
-//                                logger.error("[op:publishMktCampaign] 发布活动 id = {} 时，同步到生产失败！Exception= ", mktCampaignId, e);
-//                            }
-//                        }
-//                    }.start();
-//                }
+/*                if ("1".equals(value)) {
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            try {
+                                synchronizeCampaignService.synchronizeCampaign(mktCampaignId, "admin");
+                            } catch (Exception e) {
+                                logger.error("[op:publishMktCampaign] 发布活动 id = {} 时，同步到生产失败！Exception= ", mktCampaignId, e);
+                            }
+                        }
+                    }.start();
+                }*/
 
                 // 协同中心活动信息同步
     /*            new Thread(){
