@@ -1006,7 +1006,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamStrategyConfRelMapper.insert(chaildMktCamStrategyConfRelDO);
                 }
                 //  发布活动时异步去同步到生产
-                if ("1".equals(value)) {
+/*                if ("1".equals(value)) {
                     new Thread() {
                         @Override
                         public void run() {
@@ -1017,7 +1017,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                             }
                         }
                     }.start();
-                }
+                }*/
 
                 // 协同中心活动信息同步
     /*            new Thread(){
