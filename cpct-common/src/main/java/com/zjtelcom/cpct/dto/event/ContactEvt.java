@@ -22,7 +22,6 @@ public class ContactEvt extends BaseEntity implements Serializable {
     private String evtProcotolType;//记录接口协议类型,1000	HTTP 2000FTP
     private String evtMappedFunName;//事件匹配映射的方法名，用于事件识别
     private String contactEvtDesc;//记录事件的描述说明
-    private String mktCampaignType;//事件分类
     private String recCampaignAmount;//推荐活动数量
     private Long contactChlId;//记录触发事件的触点渠道标识
     private Long contactEvtTypeId;//记录事件的所属事件类型标识
@@ -37,13 +36,6 @@ public class ContactEvt extends BaseEntity implements Serializable {
 
     public void setRecCampaignAmount(String recCampaignAmount) {
         this.recCampaignAmount = recCampaignAmount;
-    }
-
-    public String getMktCampaignType() {
-        return mktCampaignType;
-    }
-    public void setMktCampaignType(String mktCampaignType) {
-        this.mktCampaignType = mktCampaignType;
     }
 
     public String getActType() {

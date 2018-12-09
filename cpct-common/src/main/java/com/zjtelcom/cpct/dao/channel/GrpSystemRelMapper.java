@@ -18,5 +18,5 @@ public interface GrpSystemRelMapper {
 
     int updateByPrimaryKey(GrpSystemRel record);
 
-    List<GrpSystemRel> selectByOfferId(@Param("offerId") Long offerId);
+    GrpSystemRel selectByOfferId(@Param("offerId") Long offerId);
 }

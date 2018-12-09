@@ -203,7 +203,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     // 判断类型是否为工单类型 , 保存二次营销结果和活动的关联
                     if ("1".equals(mktCamChlResultDO.getResultType())) {
                         MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();
-                        mktCamResultRelDO.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
+                        mktCamResultRelDO.setMktCampaignId(mktStrategyConfRule.getStrategyConfId());
                         mktCamResultRelDO.setMktResultId(mktCamChlResultDO.getMktCamChlResultId());
                         mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode()); //1000-有效
                         mktCamResultRelDO.setCreateDate(new Date());

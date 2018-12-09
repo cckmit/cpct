@@ -6,10 +6,12 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
 import com.zjtelcom.cpct.dao.channel.MktResourceMapper;
+import com.zjtelcom.cpct.dao.channel.ServiceMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.channel.MktProductRule;
 import com.zjtelcom.cpct.domain.channel.MktResource;
 import com.zjtelcom.cpct.domain.channel.Offer;
+import com.zjtelcom.cpct.domain.channel.ServiceEntity;
 import com.zjtelcom.cpct.dto.channel.OfferDetail;
 import com.zjtelcom.cpct.dto.channel.ProductParam;
 import com.zjtelcom.cpct.service.BaseService;
@@ -39,6 +41,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     private RedisUtils redisUtils;
     @Autowired
     private MktResourceMapper resourceMapper;
+    @Autowired
+    private ServiceMapper serviceMapper;
 
 
     @Override
@@ -201,6 +205,31 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 //redis添加推荐条目数据
                 redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
             }
+        }else if ("4000".equals(param.getItemType())){
+            for (Long serviceId : param.getIdList()){
+                 ServiceEntity serviceEntity = serviceMapper.selectByPrimaryKey(serviceId);
+                if (serviceEntity==null){
+                    result.put("resultCode",CODE_FAIL);
+                    result.put("resultMsg","服务不存在");
+                    return result;
+                }
+                MktCamItem item = new MktCamItem();
+                item.setMktCampaignId(1000L);
+                item.setOfferCode(serviceEntity.getServiceNbr());
+                item.setOfferName(serviceEntity.getServiceName());
+                item.setItemId(serviceId);
+                item.setItemType(param.getItemType());
+                item.setCreateDate(new Date());
+                item.setCreateDate(DateUtil.getCurrentTime());
+                item.setUpdateDate(DateUtil.getCurrentTime());
+                item.setStatusDate(DateUtil.getCurrentTime());
+                item.setUpdateStaff(UserUtil.loginId());
+                item.setCreateStaff(UserUtil.loginId());
+                item.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                mktCamItems.add(item);
+                //redis添加推荐条目数据
+                redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
+            }
         }
         if (!mktCamItems.isEmpty()){
             camItemMapper.insertByBatch(mktCamItems);
@@ -279,6 +308,21 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 rule.setItemType(item.getItemType()==null ? "" : item.getItemType());
                 rule.setPriority(item.getPriority()==null ? 0 : item.getPriority());
                 ruleList.add(rule);
+            } else if (item.getItemType().equals("4000")){
+            //促销券
+            ServiceEntity serviceEntity = serviceMapper.selectByPrimaryKey(item.getItemId());
+            if (serviceEntity==null){
+                continue;
+            }
+            MktProductRule rule = new MktProductRule();
+            rule.setId(item.getMktCamItemId());
+            rule.setProductId(item.getItemId());
+            rule.setProductName(serviceEntity.getServiceName());
+            rule.setProductCode(serviceEntity.getServiceNbr());
+            rule.setRemark(item.getRemark());
+            rule.setItemType(item.getItemType()==null ? "" : item.getItemType());
+            rule.setPriority(item.getPriority()==null ? 0 : item.getPriority());
+            ruleList.add(rule);
             }
         }
         result.put("resultCode",CODE_SUCCESS);

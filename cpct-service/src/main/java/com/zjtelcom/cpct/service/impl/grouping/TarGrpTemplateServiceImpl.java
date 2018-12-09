@@ -107,12 +107,15 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             if (offer==null){
                 continue;
             }
+            List<Long> offerList = new ArrayList<>();
+            offerList.add(offerId);
             CampaignInstVO instVO = new CampaignInstVO();
             instVO.setOfferName(offer.getOfferName());
+            instVO.setOfferList(offerList);
             //客户分群列表
-            OfferRestrict restrict = offerRestrictMapper.selectByOfferId(offerId,"7000");
-            if (restrict!=null){
-                TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(restrict.getRstrObjId());
+            List<OfferRestrict> restrict = offerRestrictMapper.selectByOfferId(offerId,"7000");
+            if (restrict!=null && restrict.size()>0){
+                TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(restrict.get(0).getRstrObjId());
                 if (tarGrp!=null){
                     instVO.setTarGrpTempleteId(tarGrp.getTarGrpId());
                 }
@@ -128,21 +131,22 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             }
             instVO.setResourceList(resourceList);
             //渠道列表
-            OfferRestrict channelRestrict = offerRestrictMapper.selectByOfferId(offerId,"5000");
-            if (channelRestrict!=null){
-                List<GrpSystemRel> grpSystemRels = grpSystemRelMapper.selectByOfferId(channelRestrict.getRstrObjId());
-                List<ChannelDetail> channelList = new ArrayList<>();
-                for (GrpSystemRel systemRel : grpSystemRels){
-                    Channel channel = channelMapper.selectByPrimaryKey(systemRel.getOfferVrulGrpId());
-                    if (channel!=null){
-                        ChannelDetail detail = new ChannelDetail();
-                        detail.setChannelId(channel.getContactChlId());
-                        detail.setChannelName(channel.getContactChlName());
-                        channelList.add(detail);
-                    }
+            List<OfferRestrict> channelRestrictList = offerRestrictMapper.selectByOfferId(offerId,"5000");
+            List<ChannelDetail> channelList = new ArrayList<>();
+            List<Long> channelIdList = new ArrayList<>();
+            for (OfferRestrict channelRestrict : channelRestrictList ){
+                GrpSystemRel grpSystemRel = grpSystemRelMapper.selectByOfferId(channelRestrict.getRstrObjId());
+                Channel channel = channelMapper.selectByPrimaryKey(grpSystemRel.getOfferVrulGrpId());
+                if (channel!=null && !channelIdList.contains(channel.getContactChlId())){
+                    ChannelDetail detail = new ChannelDetail();
+                    detail.setChannelId(channel.getContactChlId());
+                    detail.setChannelName(channel.getContactChlName());
+                    detail.setChannelCode(channel.getContactChlCode());
+                    channelList.add(detail);
+                    channelIdList.add(channel.getContactChlId());
                 }
-                instVO.setChannelList(channelList);
             }
+            instVO.setChannelList(channelList);
             instVOS.add(instVO);
         }
         result.put("resultCode",CODE_SUCCESS);
