@@ -352,6 +352,11 @@ public class EventApiServiceImpl implements EventApiService {
 
             JSONObject paramsJson = new JSONObject();
             paramsJson.put("reqId", map.get("reqId"));
+            try {
+                paramsJson.put("intoParams", map);  //保存入参
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             //es log
             esJson.put("reqId", map.get("reqId"));

@@ -57,7 +57,7 @@
         <security.verson>1.5.14.RELEASE</security.verson>
         <session-data-redis.verson>1.3.3.RELEASE</session-data-redis.verson>
 
-        <service-batch.version>1.0.1</service-batch.version>
+        <service-batch.version>1.0.0</service-batch.version>
         <bss-centralized.verson>1.3</bss-centralized.verson>
 
     </properties>
