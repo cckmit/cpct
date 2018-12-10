@@ -40,14 +40,17 @@ public class UserUtil {
      */
     public static String getUserRole() {
         SystemUserDto userDetail = BssSessionHelp.getSystemUserDto();
-        String roleName = "默认管理员";
+        String roleCode = " ";
         for (SystemPostDto role : userDetail.getSystemPostDtoList()) {
-            if (0 != role.getDefaultFlag()) {
-                continue;
+            if (role.getSysPostCode().contains("cpcp")){
+                roleCode = role.getSysPostName();
             }
-            roleName = role.getSysPostName();
+//            if (0 != role.getDefaultFlag()) {
+//                continue;
+//            }
+//            roleName = role.getSysPostName();
         }
-        return roleName;
+        return roleCode;
     }
 
     /**
