@@ -4,8 +4,11 @@ import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.filter.FilterRuleAddVO;
 import com.zjtelcom.cpct.dto.user.UserList;
 import com.zjtelcom.cpct.request.filter.FilterRuleReq;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -34,5 +37,6 @@ public interface FilterRuleService {
     Map<String,Object> listUserList(UserList userList) throws IOException;
 
     Map<String, Object> getFilterRule(List<Integer> filterRuleIdList);
+
 
 }

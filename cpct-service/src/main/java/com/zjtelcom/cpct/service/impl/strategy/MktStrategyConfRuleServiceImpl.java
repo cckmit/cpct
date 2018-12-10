@@ -203,7 +203,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     // 判断类型是否为工单类型 , 保存二次营销结果和活动的关联
                     if ("1".equals(mktCamChlResultDO.getResultType())) {
                         MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();
-                        mktCamResultRelDO.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
+                        mktCamResultRelDO.setMktCampaignId(mktStrategyConfRule.getStrategyConfId());
                         mktCamResultRelDO.setMktResultId(mktCamChlResultDO.getMktCamChlResultId());
                         mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode()); //1000-有效
                         mktCamResultRelDO.setCreateDate(new Date());
@@ -302,8 +302,8 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         String evtContactConfIds = "";
         try {
             if(mktStrategyConfRule.getTarGrpId()!=null){
-                int count = mktCamGrpRulMapper.countByTarGrpId(mktStrategyConfRule.getTarGrpId());
-                if(count==0){
+                MktCamGrpRul camGrpRul = mktCamGrpRulMapper.selectByTarGrpId(mktStrategyConfRule.getTarGrpId());
+                if (camGrpRul == null) {
                     //添加mkt_cam_grp_rul表
                     MktCamGrpRul mktCamGrpRul = new MktCamGrpRul();
                     mktCamGrpRul.setTarGrpId(mktStrategyConfRule.getTarGrpId());

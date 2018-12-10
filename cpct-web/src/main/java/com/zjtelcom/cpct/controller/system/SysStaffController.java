@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.controller.system;
 
 import com.alibaba.fastjson.JSON;
 import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
+import com.ctzj.smt.bss.sysmgr.model.dto.PrivilegeDetail;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dto.system.SysStaffDTO;
@@ -11,7 +12,9 @@ import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -37,6 +40,41 @@ public class SysStaffController extends BaseController {
         result.put("resultMsg",userDetail);
         return result;
     }
+
+    @RequestMapping("/getSysMenuList")
+    @ResponseBody
+    @CrossOrigin
+    public Map<String,Object> getSysMenuList() {
+        Map<String,Object> result = new HashMap<>();
+        SystemUserDto userDetail = BssSessionHelp.getSystemUserDto();
+        List<Map<String,Object>> resultList = new ArrayList<>();
+        List<PrivilegeDetail> parentList = new ArrayList<>();
+        for (PrivilegeDetail detail : userDetail.getPrivilegeDetails()){
+            if (detail.getPrivCode().contains("CPCP") && detail.getPrivFuncRelDetails().get(0).getFuncMenu().getParMenuId()==null){
+                parentList.add(detail);
+            }
+        }
+        for (PrivilegeDetail parent  : parentList){
+            Long parentId = parent.getPrivFuncRelDetails().get(0).getFuncMenu().getMenuId();
+            Map<String,Object> map = new HashMap<>();
+            map.put("parent",parent);
+            List<PrivilegeDetail> childList = new ArrayList<>();
+            for (PrivilegeDetail detail : userDetail.getPrivilegeDetails()){
+                Long detailId = detail.getPrivFuncRelDetails().get(0).getFuncMenu().getParMenuId();
+                if (detailId!=null && detailId.equals(parentId) ){
+                    String urlAddr = detail.getPrivFuncRelDetails().get(0).getFuncMenu().getUrlAddr();
+                    String detailName = urlAddr.substring(1,urlAddr.length());
+                    childList.add(detail);
+                }
+            }
+            map.put("childList",childList);
+            resultList.add(map);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",resultList);
+        return result;
+    }
+
 
     /**
      * 查询员工列表（分页）

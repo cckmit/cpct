@@ -8,8 +8,17 @@ public class CampaignInstVO implements Serializable {
     private String offerName;
     private Long tarGrpTempleteId;
     private List<Long> resourceList;
+    private List<Long> offerList;
     private List<ChannelDetail> channelList;
 
+
+    public List<Long> getOfferList() {
+        return offerList;
+    }
+
+    public void setOfferList(List<Long> offerList) {
+        this.offerList = offerList;
+    }
 
     public String getOfferName() {
         return offerName;
