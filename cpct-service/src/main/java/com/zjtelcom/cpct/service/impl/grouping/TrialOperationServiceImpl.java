@@ -890,6 +890,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             ArrayList<MktProductRuleES> mktProductRuleEsList = new ArrayList<>();
             for (MktProductRule rule : mktProductRuleList){
                 MktProductRuleES es = BeanUtil.create(rule,new MktProductRuleES());
+                es.setPriority(es.getPriority()==null ? 0L : es.getPriority());
                 mktProductRuleEsList.add(es);
             }
             param.setMktProductRuleList(mktProductRuleEsList);
@@ -912,6 +913,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     Map<String, Object> mktCamChlConfDetailMap = mktCamChlConfService.getMktCamChlConf(mktCamChlConf.getEvtContactConfId());
                     MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConfDetailMap.get("mktCamChlConfDetail");
                     MktCamChlConfDetailES es = BeanUtil.create(mktCamChlConfDetail,new MktCamChlConfDetailES());
+                    CamScriptES camScriptES = BeanUtil.create(mktCamChlConfDetail.getCamScript(),new CamScriptES());
+                    es.setCamScript(camScriptES);
                     ArrayList<MktCamChlConfAttrES> attrs = new ArrayList<>();
                     ArrayList<VerbalVOES> verbalES = new ArrayList<>();
                     if (mktCamChlConfDetail.getMktCamChlConfAttrList()!=null){
