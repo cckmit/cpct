@@ -20,19 +20,16 @@
     where EVT_RECOM_CALC_REL_ID = #{evtRecomCalcRelId,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamRecomCalcRelDO">
-    <foreach collection="sktCamRecomCalcRelDOs" index="index" separator="," open="(" close=")" item="item">
-      insert into mkt_cam_recom_calc_rel (EVT_RECOM_CALC_REL_ID, MKT_CAMPAIGN_ID, ALGO_ID,
-      ALGORITHMS_RUL_ID, PRIORITY, STATUS_CD,
-      CREATE_STAFF, UPDATE_STAFF, CREATE_DATE,
-      UPDATE_DATE, STATUS_DATE, REMARK
-      )
-      values (#{item.evtRecomCalcRelId,jdbcType=BIGINT}, #{item.mktCampaignId,jdbcType=BIGINT}, #{item.algoId,jdbcType=BIGINT},
-      #{item.algorithmsRulId,jdbcType=BIGINT}, #{item.priority,jdbcType=INTEGER}, #{item.statusCd,jdbcType=VARCHAR},
-      #{item.createStaff,jdbcType=BIGINT}, #{item.updateStaff,jdbcType=BIGINT}, #{item.createDate,jdbcType=TIMESTAMP},
-      #{item.updateDate,jdbcType=TIMESTAMP}, #{item.statusDate,jdbcType=TIMESTAMP}, #{item.remark,jdbcType=VARCHAR}
-      )
-    </foreach>
-
+    insert into mkt_cam_recom_calc_rel (EVT_RECOM_CALC_REL_ID, MKT_CAMPAIGN_ID, ALGO_ID,
+    ALGORITHMS_RUL_ID, PRIORITY, STATUS_CD,
+    CREATE_STAFF, UPDATE_STAFF, CREATE_DATE,
+    UPDATE_DATE, STATUS_DATE, REMARK
+    )
+    values (#{evtRecomCalcRelId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{algoId,jdbcType=BIGINT},
+    #{algorithmsRulId,jdbcType=BIGINT}, #{priority,jdbcType=INTEGER}, #{statusCd,jdbcType=VARCHAR},
+    #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP},
+    #{updateDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+    )
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamRecomCalcRelDO">
     update mkt_cam_recom_calc_rel
