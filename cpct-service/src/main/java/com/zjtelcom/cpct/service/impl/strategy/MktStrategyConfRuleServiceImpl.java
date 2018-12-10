@@ -135,7 +135,12 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             if(mktStrategyConfRule.getTarGrpId()!=null){
                 mktCamGrpRul.setTarGrpId(mktStrategyConfRule.getTarGrpId());
                 mktCamGrpRul.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
-                mktCamGrpRul.setLanId(1L);
+                //添加所属地市
+                if(UserUtil.getUser()!=null){
+                    mktCamGrpRul.setLanId(UserUtil.getUser().getLanId());
+                } else{
+                    mktCamGrpRul.setLanId(UserUtil.loginId());
+                }
                 mktCamGrpRul.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
                 mktCamGrpRul.setStatusDate(new Date());
                 mktCamGrpRul.setCreateDate(new Date());
@@ -234,7 +239,12 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             String ruleExpression = "("+ confs + ")&&(" + resultConfs + ")";
             MktStrategy mktStrategy = new MktStrategy();
             mktStrategy.setStrategyId(mktStrategyConfRule.getStrategyConfId());
-            mktStrategy.setStrategyType("1000");
+            // 活动分类为服务活动时,为关怀策略 ; 活动分类为营销活动，维系活动等其它活动时,为销售策略
+            if(StatusCode.SERVICE_CAMPAIGN.getStatusCode().equals( mktStrategyConfRule.getMktCampaignType())){
+                mktStrategy.setStrategyType(StatusCode.CARE_STRATEGY.getStatusCode());
+            } else{
+                mktStrategy.setStrategyType(StatusCode.SALES_STRATEGY.getStatusCode());
+            }
             mktStrategy.setStrategyName(mktStrategyConfRule.getMktStrategyConfRuleName());
             mktStrategy.setStrategyDesc(mktStrategyConfRule.getMktStrategyConfRuleName());
             mktStrategy.setRuleExpression(ruleExpression);
