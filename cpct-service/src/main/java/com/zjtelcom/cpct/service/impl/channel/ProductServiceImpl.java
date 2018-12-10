@@ -285,7 +285,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 rule.setProductId(item.getItemId());
                 rule.setProductName(product.getOfferName());
                 rule.setProductCode(product.getOfferNbr());
-                rule.setProductType(product.getOfferType());
+                rule.setProductType(item.getItemType()==null ? "" : item.getItemType());
                 rule.setRemark(item.getRemark());
                 rule.setItemType(item.getItemType()==null ? "" : item.getItemType());
                 rule.setPriority(item.getPriority()==null ? 0 : item.getPriority());
@@ -304,6 +304,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 rule.setProductId(item.getItemId());
                 rule.setProductName(resource.getMktResName());
                 rule.setProductCode(resource.getMktResNbr());
+                rule.setProductType(item.getItemType()==null ? "" : item.getItemType());
                 rule.setRemark(item.getRemark());
                 rule.setItemType(item.getItemType()==null ? "" : item.getItemType());
                 rule.setPriority(item.getPriority()==null ? 0 : item.getPriority());
@@ -319,6 +320,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             rule.setProductId(item.getItemId());
             rule.setProductName(serviceEntity.getServiceName());
             rule.setProductCode(serviceEntity.getServiceNbr());
+            rule.setProductType(item.getItemType()==null ? "" : item.getItemType());
             rule.setRemark(item.getRemark());
             rule.setItemType(item.getItemType()==null ? "" : item.getItemType());
             rule.setPriority(item.getPriority()==null ? 0 : item.getPriority());
