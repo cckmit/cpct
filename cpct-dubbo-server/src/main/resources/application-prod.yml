@@ -18,6 +18,13 @@ spring:
     username: cpc_cpct_user
     password: cpc_cpct_user_123
 
+# 第四数据源
+  datasourcefourth:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://134.96.253.29:8801/smt_bss_cpc_evo2?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: cpc_user
+    password: cpc_user_123
+
 
 
 
