@@ -66,7 +66,7 @@ import static java.util.Calendar.MONTH;
 @Service
 public class EventApiServiceImpl implements EventApiService {
 
-    private static final Logger log= LoggerFactory.getLogger(EventApiServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(EventApiServiceImpl.class);
 
     @Autowired
     private ContactEvtMapper contactEvtMapper; //事件总表
@@ -352,6 +352,11 @@ public class EventApiServiceImpl implements EventApiService {
 
             JSONObject paramsJson = new JSONObject();
             paramsJson.put("reqId", map.get("reqId"));
+            try {
+                paramsJson.put("intoParams", map);  //保存入参
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             //es log
             esJson.put("reqId", map.get("reqId"));
@@ -450,15 +455,14 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
 
-
                 //!!!验证事件规则命中
                 Map<String, Object> stringObjectMap = matchRulCondition(eventId, labelItems, map);
                 if (!stringObjectMap.get("code").equals("success")) {
                     //判断不符合条件 直接返回不命中
-                    result.put("CPCResultMsg",stringObjectMap.get("result"));
+                    result.put("CPCResultMsg", stringObjectMap.get("result"));
                     result.put("CPCResultCode", "1000");
                     esJson.put("hit", false);
-                    esJson.put("msg",stringObjectMap.get("result"));
+                    esJson.put("msg", stringObjectMap.get("result"));
                     esService.save(esJson, IndexList.EVENT_MODULE);
                     return result;
                 }
@@ -612,7 +616,7 @@ public class EventApiServiceImpl implements EventApiService {
                 result.put("taskList", activityList); //协同回调结果
                 System.out.println("命中结果：" + result.toString());
 
-                if(activityList.size() > 0) {
+                if (activityList.size() > 0) {
                     //构造返回参数
                     result.put("CPCResultCode", "1");
                     result.put("CPCResultMsg", "success");
@@ -715,7 +719,7 @@ public class EventApiServiceImpl implements EventApiService {
             } else {
                 privateParams.put("activityType", "0"); //活动类型
             }
-            if("0".equals(mktCampaign.getIsCheckRule()) || "校验".equals(mktCampaign.getIsCheckRule())) {
+            if ("0".equals(mktCampaign.getIsCheckRule()) || "校验".equals(mktCampaign.getIsCheckRule())) {
                 privateParams.put("skipCheck", "0"); //是否预校验
             } else {
                 privateParams.put("skipCheck", "1"); //是否预校验
@@ -1252,7 +1256,7 @@ public class EventApiServiceImpl implements EventApiService {
             String key = "EVENT_RULE_" + params.get("activityId") + "_" + strategyConfId + "_" + ruleId;
 
             ExpressRunner runner = new ExpressRunner();
-            runner.addFunction("toNum",new StringToNumOperator("toNum"));
+            runner.addFunction("toNum", new StringToNumOperator("toNum"));
             DefaultContext<String, Object> context = new DefaultContext<String, Object>();
 
             //查询标签实例数据
@@ -1328,7 +1332,7 @@ public class EventApiServiceImpl implements EventApiService {
 
             param.put("queryFields", queryFieldsSb.toString());
 
-            if("".equals(queryFieldsSb.toString())) {
+            if ("".equals(queryFieldsSb.toString())) {
                 System.out.println("无需查询标签");
                 context.putAll(labelItems);
             } else {
@@ -1428,11 +1432,11 @@ public class EventApiServiceImpl implements EventApiService {
                         }
                     }
 
-                    expressSb.append(cpcExpression(label,type,tarGrpConditionDOs.get(i).getRightParam()));
+                    expressSb.append(cpcExpression(label, type, tarGrpConditionDOs.get(i).getRightParam()));
 //                    assLabel(label,type,tarGrpConditionDOs.get(i).getRightParam());
 
                     try {
-                        RuleResult ruleResult1 = runner.executeRule(cpcLabel(label,type,tarGrpConditionDOs.get(i).getRightParam()), context, true, true);
+                        RuleResult ruleResult1 = runner.executeRule(cpcLabel(label, type, tarGrpConditionDOs.get(i).getRightParam()), context, true, true);
                         if (null != ruleResult1.getResult()) {
                             lr.setResult((Boolean) ruleResult1.getResult());
                         } else {
@@ -1564,7 +1568,7 @@ public class EventApiServiceImpl implements EventApiService {
                 RuleResult ruleResult = null;
                 System.out.println(context.toString());
                 ExpressRunner runnerQ = new ExpressRunner();
-                runnerQ.addFunction("toNum",new StringToNumOperator("toNum"));
+                runnerQ.addFunction("toNum", new StringToNumOperator("toNum"));
                 try {
                     ruleResult = runnerQ.executeRule(express, context, true, true);
 
@@ -1630,6 +1634,8 @@ public class EventApiServiceImpl implements EventApiService {
                                 }
                                 redisUtils.set("MKT_CAM_ITEM_" + mktCamItem.getMktCamItemId(), mktCamItem);
                             }
+
+                            product.put("productId", mktCamItem.getItemId().toString());
                             product.put("productCode", mktCamItem.getOfferCode());
                             product.put("productName", mktCamItem.getOfferName());
                             product.put("productType", mktCamItem.getItemType());
@@ -1662,7 +1668,7 @@ public class EventApiServiceImpl implements EventApiService {
                         //协同渠道规则表id（自建表）
                         Long evtContactConfId = Long.parseLong(str);
                         //提交线程
-                        Future<Map<String, Object>> f = executorService.submit(new ChannelTask(params, evtContactConfId, productList, privateParams, itgTriggers, evtTriggers));
+                        Future<Map<String, Object>> f = executorService.submit(new ChannelTask(params, evtContactConfId, productList, privateParams, itgTriggers, evtTriggers, labelItems));
                         //将线程处理结果添加到结果集
                         threadList.add(f);
                     }
@@ -1727,15 +1733,17 @@ public class EventApiServiceImpl implements EventApiService {
         private Map<String, String> privateParams;
         private List<Map<String, Object>> itgTriggers;
         private List<Map<String, Object>> evtTriggers;
+        private Map<String, String> labelItems;
 
         public ChannelTask(Map<String, String> params, Long evtContactConfId, List<Map<String, String>> productList,
-                           Map<String, String> privateParams, List<Map<String, Object>> itgTriggers, List<Map<String, Object>> evtTriggers) {
+                           Map<String, String> privateParams, List<Map<String, Object>> itgTriggers, List<Map<String, Object>> evtTriggers, Map<String, String> labelItems) {
             this.evtContactConfId = evtContactConfId;
             this.productList = productList;
             this.params = params;
             this.privateParams = privateParams;
             this.itgTriggers = itgTriggers;
             this.evtTriggers = evtTriggers;
+            this.labelItems = labelItems;
         }
 
         @Override
@@ -1932,12 +1940,10 @@ public class EventApiServiceImpl implements EventApiService {
                 labelParam.put("type", "1");
                 StringBuilder queryFieldsSb = new StringBuilder();
 
-//                int count = 0;
                 for (String labelCode : scriptLabelList) {
                     if (queryFieldsSb.toString().contains(labelCode)) {
                         continue;
                     }
-//                    count++;
                     queryFieldsSb.append(labelCode).append(",");
                 }
                 if (queryFieldsSb.length() > 0) {
@@ -1948,10 +1954,7 @@ public class EventApiServiceImpl implements EventApiService {
                 Map<String, Object> queryResult = getLabelValue(labelParam);
 
                 JSONObject body = new JSONObject((HashMap) queryResult.get("msgbody"));
-//                if (count != body.size()) {
-//                    System.out.println("推荐指引或痛痒点标签替换含有无值的标签");
-//                    return Collections.EMPTY_MAP;
-//                }
+                body.putAll(labelItems);
                 //获取查询结果
                 for (Map.Entry<String, Object> entry : body.entrySet()) {
                     //替换标签值内容
@@ -2012,12 +2015,12 @@ public class EventApiServiceImpl implements EventApiService {
         Calendar cal = Calendar.getInstance();
         Calendar start = Calendar.getInstance();
         start.setTime(filterRule.getDayStart());
-        start.set(cal.get(Calendar.YEAR),cal.get(MONTH),cal.get(Calendar.DAY_OF_MONTH));
+        start.set(cal.get(Calendar.YEAR), cal.get(MONTH), cal.get(Calendar.DAY_OF_MONTH));
         Calendar end = Calendar.getInstance();
         end.setTime(filterRule.getDayEnd());
-        end.set(cal.get(Calendar.YEAR),cal.get(MONTH),cal.get(Calendar.DAY_OF_MONTH));
+        end.set(cal.get(Calendar.YEAR), cal.get(MONTH), cal.get(Calendar.DAY_OF_MONTH));
 
-        if((cal.getTimeInMillis() - start.getTimeInMillis()) > 0
+        if ((cal.getTimeInMillis() - start.getTimeInMillis()) > 0
                 && (cal.getTimeInMillis() - end.getTimeInMillis()) < 0) {
             result = true;
         }
@@ -2041,20 +2044,11 @@ public class EventApiServiceImpl implements EventApiService {
 
     private List<String> subScript(String str) {
         List<String> result = new ArrayList<>();
-//        Pattern p = Pattern.compile("\\$");
         Pattern p = Pattern.compile("(?<=\\$\\{)([^$]+)(?=\\}\\$)");
         Matcher m = p.matcher(str);
-//        List<Integer> list = new ArrayList<>();
-
         while (m.find()) {
-//            list.add(m.start());
             result.add(m.group(1));
         }
-
-//        for (int i = 0; i < list.size(); ) {
-//            result.add(str.substring(list.get(i) + 1, list.get(++i)));
-//            i++;
-//        }
         return result;
     }
 
@@ -2457,9 +2451,10 @@ public class EventApiServiceImpl implements EventApiService {
         public StringToNumOperator(String name) {
             this.name = name;
         }
+
         public Object executeInner(Object[] list) throws Exception {
-            String str = (String)list[0];
-            if(NumberUtils.isNumber(str)) {
+            String str = (String) list[0];
+            if (NumberUtils.isNumber(str)) {
                 return NumberUtils.toDouble(str);
             } else {
                 return str;
@@ -2468,21 +2463,21 @@ public class EventApiServiceImpl implements EventApiService {
     }
 
 
-    public static String cpcExpression (Label label,String type,String rightParam) {
+    public static String cpcExpression(Label label, String type, String rightParam) {
         StringBuilder express = new StringBuilder();
 
         if ("7100".equals(type)) {
             express.append("!");
         }
         express.append("((");
-        express.append(assLabel(label,type,rightParam));
+        express.append(assLabel(label, type, rightParam));
         express.append(")");
 
         return express.toString();
     }
 
 
-    public static String cpcLabel (Label label,String type,String rightParam) {
+    public static String cpcLabel(Label label, String type, String rightParam) {
         StringBuilder express = new StringBuilder();
         express.append("if(");
 
@@ -2490,13 +2485,13 @@ public class EventApiServiceImpl implements EventApiService {
             express.append("!");
         }
         express.append("(");
-        express.append(assLabel(label,type,rightParam));
+        express.append(assLabel(label, type, rightParam));
         express.append(") {return true}");
 
         return express.toString();
     }
 
-    public static String assLabel(Label label,String type,String rightParam) {
+    public static String assLabel(Label label, String type, String rightParam) {
         StringBuilder express = new StringBuilder();
         switch (type) {
             case "1000":
@@ -2558,6 +2553,7 @@ public class EventApiServiceImpl implements EventApiService {
 
     /**
      * 判断事件规则条件是否满足  返回map的code值为success则满足条件 否则返回result错误信息
+     *
      * @param eventId    事件id
      * @param labelItems 需要作为标签值的标签  即不需要去查询ES的标签
      * @param map        事件接入的信息
@@ -2573,13 +2569,13 @@ public class EventApiServiceImpl implements EventApiService {
         List<ContactEvtMatchRul> contactEvtMatchRuls = contactEvtMatchRulMapper.listEventMatchRuls(evtMatchRul);
         //事件规则为空不用判断,直接返回
         if (contactEvtMatchRuls.isEmpty()) {
-            System.out.println("事件规则为空直接返回");
+            log.info("事件规则为空直接返回");
             return result;
         }
         //查询事件规则条件
         List<EventMatchRulCondition> eventMatchRulConditions = new ArrayList<>();
         for (ContactEvtMatchRul c : contactEvtMatchRuls) {
-            List<EventMatchRulCondition> list =  eventMatchRulConditionMapper.listEventMatchRulCondition(c.getEvtMatchRulId());
+            List<EventMatchRulCondition> list = eventMatchRulConditionMapper.listEventMatchRulCondition(c.getEvtMatchRulId());
             eventMatchRulConditions.addAll(list);
         }
         if (eventMatchRulConditions.isEmpty()) {
@@ -2590,9 +2586,9 @@ public class EventApiServiceImpl implements EventApiService {
         for (EventMatchRulCondition condition : eventMatchRulConditions) {
             //!!先查redis 没有再查数据库
             Label label = (Label) redisUtils.get("MATCH_RUL_CONDITION" + condition.getLeftParam());
-            if(label==null){
+            if (label == null) {
                 label = injectionLabelMapper.selectByPrimaryKey(Long.valueOf(condition.getLeftParam()));
-                redisUtils.set("MATCH_RUL_CONDITION_" + condition.getLeftParam(),label);
+                redisUtils.set("MATCH_RUL_CONDITION_" + condition.getLeftParam(), label);
             }
             labelList.add(label);
         }
@@ -2614,20 +2610,20 @@ public class EventApiServiceImpl implements EventApiService {
             DefaultContext<String, Object> context = new DefaultContext<String, Object>();
             context.put(label.getInjectionLabelCode(), eventItem.get(label.getInjectionLabelCode()));
             //事件命中规则信息
-            EventMatchRulCondition condition=null;
-            for (EventMatchRulCondition c:eventMatchRulConditions){
+            EventMatchRulCondition condition = null;
+            for (EventMatchRulCondition c : eventMatchRulConditions) {
                 //得到标签对应的事件规则
-                if(Long.valueOf(c.getLeftParam()).equals(label.getInjectionLabelId())){
-                    condition=c;
+                if (Long.valueOf(c.getLeftParam()).equals(label.getInjectionLabelId())) {
+                    condition = c;
                     break;
                 }
             }
             Map<String, String> stringStringMap = decideExpress(condition, label, context);
             //拼接规则引擎判断  有一个不满足则不满足
-            if(!stringStringMap.get("code").equals("success")) {
+            if (!stringStringMap.get("code").equals("success")) {
                 //判断返回为false直接结束命中
                 result.put("result", stringStringMap.get("result"));
-                result.put("code","failed");
+                result.put("code", "failed");
                 return result;
             }
         }
@@ -2639,39 +2635,39 @@ public class EventApiServiceImpl implements EventApiService {
                 //查询成功
                 JSONObject body = (JSONObject) stringObjectMap.get("body");
                 //拼接规则引擎
-                for (Label label:selectByEs){
+                for (Label label : selectByEs) {
                     DefaultContext<String, Object> context = new DefaultContext<String, Object>();
                     //拼装参数
                     for (Map.Entry<String, Object> entry : body.entrySet()) {
-                        if(entry.getKey().equals(label.getInjectionLabelCode())){
+                        if (entry.getKey().equals(label.getInjectionLabelCode())) {
                             context.put(entry.getKey(), entry.getValue());
-                            log.info("规则计算标签："+entry.getKey()+"  对应值："+entry.getValue());
+                            log.info("规则计算标签：" + entry.getKey() + "  对应值：" + entry.getValue());
                             break;
                         }
                     }
 
                     //事件命中规则信息
-                    EventMatchRulCondition condition=null;
-                    for (EventMatchRulCondition c:eventMatchRulConditions){
+                    EventMatchRulCondition condition = null;
+                    for (EventMatchRulCondition c : eventMatchRulConditions) {
                         //得到标签对应的事件规则
-                        if(Long.valueOf(c.getLeftParam())==label.getInjectionLabelId()){
-                            condition=c;
+                        if (Long.valueOf(c.getLeftParam()) == label.getInjectionLabelId()) {
+                            condition = c;
                             break;
                         }
                     }
 
                     Map<String, String> stringStringMap = decideExpress(condition, label, context);
                     //拼接规则引擎判断  有一个不满足则不满足
-                    if(!stringStringMap.get("code").equals("success")) {
+                    if (!stringStringMap.get("code").equals("success")) {
                         //判断返回为false直接结束命中
                         result.put("result", stringStringMap.get("result"));
-                        result.put("code","failed");
+                        result.put("code", "failed");
                         return result;
                     }
                 }
             } else {
                 result.put("result", stringObjectMap.get("result"));
-                result.put("code","failed");
+                result.put("code", "failed");
             }
         }
         return result;
@@ -2703,9 +2699,9 @@ public class EventApiServiceImpl implements EventApiService {
         }
         param.put("queryFields", queryFields.toString());
         //查询标签实例数据
-        log.info("事件规则请求数据："+JSON.toJSONString(param));
+        log.info("事件规则请求数据：" + JSON.toJSONString(param));
         Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
-        log.info("事件规则请求ES返回："+dubboResult.toString());
+        log.info("事件规则请求ES返回：" + dubboResult.toString());
         if ("0".equals(dubboResult.get("result_code").toString())) {
             //查询成功
             JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
@@ -2719,78 +2715,30 @@ public class EventApiServiceImpl implements EventApiService {
 
 
     /**
-     * @param condition    事件规则条件
-     * @param label        标签
-     * @param context      规则需要比较的上下文内容
-     * @return 规则表达式还需要完善
+     * @param condition 事件规则条件
+     * @param label     标签
+     * @param context   规则需要比较的上下文内容
      */
     public Map<String, String> decideExpress(EventMatchRulCondition condition, Label label, DefaultContext<String, Object> context) {
-        String type=condition.getOperType();
+        String type = condition.getOperType();
         Map<String, String> message = new HashMap<>();
         message.put("code", "success");
         ExpressRunner runner = new ExpressRunner();
-        //拼接表达式
-        StringBuilder express1 = new StringBuilder();
-        express1.append("if(");
-        express1.append("(");
-        express1.append(label.getInjectionLabelCode()).append(")");
-        if ("1000".equals(type)) {
-            express1.append(" > ");
-        } else if ("2000".equals(type)) {
-            express1.append(" < ");
-        } else if ("3000".equals(type)) {
-            express1.append(" == ");
-        } else if ("4000".equals(type)) {
-            express1.append(" != ");
-        } else if ("5000".equals(type)) {
-            express1.append(" >= ");
-        } else if ("6000".equals(type)) {
-            express1.append(" <= ");
-        } else if ("7000".equals(type) || "7100".equals(type)) {
-            express1.append(" in ");
-        } else if ("7200".equals(type)) {
-            String[] strArray =condition.getRightParam().split(",");
-            express1.append(" >= ").append(strArray[0]);
-            express1.append(" && ").append("(");
-            express1.append(label.getInjectionLabelCode()).append(")");
-            express1.append(" <= ").append(strArray[1]);
-        }
+        runner.addFunction("toNum", new StringToNumOperator("toNum"));
 
-        //拼接右测数据
-        if ("7000".equals(type) || "7100".equals(type)) {
-            String[] strArray = condition.getRightParam().split(",");
-            express1.append("(");
-            express1.append("(");
-            for (int j = 0; j < strArray.length; j++) {
-                express1.append("\"").append(strArray[j]).append("\"");
-                express1.append("\"").append(strArray[j]).append("\"");
-                if (j != strArray.length - 1) {
-                    express1.append(",");
-                    express1.append(",");
-                }
-            }
-            express1.append(")");
-            express1.append(")");
-        } else if ("7200".equals(type)) {
-            //do nothing...
-        } else {
-            express1.append("\"").append(condition.getRightParam()).append("\"");
-        }
-
-        express1.append(") {return true}");
-        log.info("事件规则表达式"+express1.toString());
         try {
-            RuleResult result = runner.executeRule(express1.toString(), context, true, true);
-            log.info("计算结果："+result.getResult());
+            String str = cpcLabel(label, type, condition.getRightParam());
+            log.info("事件规则表达式" + str);
+            RuleResult result = runner.executeRule(str, context, true, true);
             if (null == result.getResult()) {
                 //计算为false
                 message.put("code", "failed");
-                message.put("result", "事件规则条件" + label.getInjectionLabelCode() + "的标签值"+context.get(label.getInjectionLabelCode())+"不满足条件"+express1.toString());
+                message.put("result", "事件规则条件" + label.getInjectionLabelCode() + "的标签值" + context.get(label.getInjectionLabelCode()) + "不满足条件" + str.toString());
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return  message;
+        return message;
     }
 
 }

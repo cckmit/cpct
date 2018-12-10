@@ -5,6 +5,7 @@ import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.request.event.CreateContactEvtJtReq;
 import com.zjtelcom.cpct.request.event.CreateContactEvtReq;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,5 +37,7 @@ public interface ContactEvtService {
     Map<String,Object> modContactEvt(CreateContactEvtReq createContactEvtReq) throws Exception;
 
     Map<String,Object> evtDetails(ContactEvt contactEvt);
+
+    Map<String,Object> evtDetailsByIdList(List<Long> idList );
 
 }

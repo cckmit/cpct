@@ -29,7 +29,7 @@
     values (#{id,jdbcType=BIGINT}, #{campaignId,jdbcType=BIGINT}, #{campaignName,jdbcType=VARCHAR}, 
       #{strategyId,jdbcType=BIGINT}, #{strategyName,jdbcType=VARCHAR}, #{batchNum,jdbcType=BIGINT}, 
       #{statusCd,jdbcType=VARCHAR},
-      #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, now(3),
       #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
       )
   </insert>
@@ -45,7 +45,7 @@
       UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
       CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
       STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
-      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE =  now(3),
       REMARK = #{remark,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=BIGINT}
   </update>
