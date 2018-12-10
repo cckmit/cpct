@@ -119,15 +119,16 @@ public class ServiceController extends BaseController{
      */
     @PostMapping("getServiceDetail")
     @CrossOrigin
-    public Map<String, Object> getServiceDetail(Long serviceId) {
+    public Map<String, Object> getServiceDetail(@RequestBody HashMap<String,Long> param) {
         Map<String ,Object> result = new HashMap<>();
         Long userId = UserUtil.loginId();
         try {
+            Long serviceId = param.get("serviceId");
             result = serviceService.getServiceDetail(userId, serviceId);
         }catch (Exception e){
             logger.error("[op:ServiceController] fail to getServiceDetail",e);
             result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg"," fail to getServiceDetail");
+            result.put("resultMsg"," fail to delService");
             return result;
         }
         return result;

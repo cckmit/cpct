@@ -30,6 +30,10 @@ public class ServiceEntity implements Serializable{
 
     private String remark;
 
+    private String serviceTypeName;
+
+    private String serviceTypeDesc;
+
     public Long getServiceId() {
         return serviceId;
     }
@@ -132,5 +136,21 @@ public class ServiceEntity implements Serializable{
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getServiceTypeName() {
+        return serviceTypeName;
+    }
+
+    public void setServiceTypeName(String serviceTypeName) {
+        this.serviceTypeName = serviceTypeName;
+    }
+
+    public String getServiceTypeDesc() {
+        return serviceTypeDesc;
+    }
+
+    public void setServiceTypeDesc(String serviceTypeDesc) {
+        this.serviceTypeDesc = serviceTypeDesc;
     }
 }

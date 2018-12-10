@@ -14,6 +14,7 @@ import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.ObjMktCampaignRel;
+import com.zjtelcom.cpct.domain.channel.RequestInstRel;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
@@ -37,9 +38,11 @@ import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +61,9 @@ import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 @Service
 @Transactional
 public class MktCampaignServiceImpl extends BaseService implements MktCampaignService {
+    @Value("${sync.value}")
+    private String value;
+
 
     /**
      * 营销活动
@@ -130,9 +136,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
     @Autowired
     private SynchronizeCampaignService synchronizeCampaignService;
-    //需求涵id 跟活动关联关系
+
     @Autowired
     private ObjMktCampaignRelMapper objMktCampaignRelMapper;
+    //需求涵id 跟活动关联关系
+    @Autowired
+    private RequestInstRelMapper requestInstRelMapper;
 /*
     @Autowired
     private IMktCampaignService iMktCampaignService;*/
@@ -218,18 +227,17 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
 
             //需求涵id不为空添加与活动的关系
-            if (mktCampaignVO.getRequestId() != null) {
-                ObjMktCampaignRel rel = new ObjMktCampaignRel();
-                rel.setMktCampaignId(mktCampaignId);
-                rel.setObjId(mktCampaignVO.getRequestId());
-                rel.setObjType("2000");
-                rel.setRelType("1000");
-                rel.setStatusCd(STATUSCD_EFFECTIVE);
-                rel.setStatusDate(new Date());
-                rel.setUpdateDate(new Date());
-                rel.setCreateStaff(UserUtil.loginId());
-                rel.setCreateDate(new Date());
-                objMktCampaignRelMapper.insert(rel);
+            if (mktCampaignVO.getRequestId()!=null){
+                RequestInstRel requestInstRel = new RequestInstRel();
+                requestInstRel.setRequestInfoId(mktCampaignVO.getRequestId());
+                requestInstRel.setRequestObjId(mktCampaignId);
+                requestInstRel.setStatusCd(STATUSCD_EFFECTIVE);
+                requestInstRel.setStatusDate(new Date());
+                requestInstRel.setUpdateDate(new Date());
+                requestInstRel.setCreateStaff(UserUtil.loginId());
+                requestInstRel.setCreateDate(new Date());
+                requestInstRel.setRequestObjType("mkt");
+                requestInstRelMapper.insert(requestInstRel);
             }
 
             maps = new HashMap<>();
@@ -834,12 +842,19 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignMapper.changeMktCampaignStatus(mktCampaignId, statusCd, new Date(), UserUtil.loginId());
             // 判断是否是发布活动, 是该状态生效
             if (StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)) {
-                MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();
+               /* MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();
                 mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
                 mktCamResultRelDO.setMktCampaignId(mktCampaignId);
                 mktCamResultRelDO.setUpdateDate(new Date());
                 mktCamResultRelDO.setUpdateStaff(UserUtil.loginId());
-                mktCamResultRelMapper.changeStatusByMktCampaignId(mktCamResultRelDO);
+                mktCamResultRelMapper.changeStatusByMktCampaignId(mktCamResultRelDO);*/
+
+                List<MktCamResultRelDO> mktCamResultRelDOS = mktCamResultRelMapper.selectResultByMktCampaignId(mktCampaignId);
+                for (MktCamResultRelDO mktCamResultRelDO:mktCamResultRelDOS) {
+                    mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                    mktCamResultRelMapper.updateByPrimaryKey(mktCamResultRelDO);
+                }
+
                 // 发布活动异步同步活动到生产环境
                 new Thread() {
                     @Override
@@ -858,12 +873,18 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }.start();
             } else if (StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd) || StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)) {
                 // 暂停或者下线, 该状态为未生效
-                MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();
+                /*MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();
                 mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_NOTACTIVE.getStatusCode());
+
                 mktCamResultRelDO.setMktCampaignId(mktCampaignId);
                 mktCamResultRelDO.setUpdateDate(new Date());
                 mktCamResultRelDO.setUpdateStaff(UserUtil.loginId());
-                mktCamResultRelMapper.changeStatusByMktCampaignId(mktCamResultRelDO);
+                mktCamResultRelMapper.changeStatusByMktCampaignId(mktCamResultRelDO);*/
+                List<MktCamResultRelDO> mktCamResultRelDOS = mktCamResultRelMapper.selectResultByMktCampaignId(mktCampaignId);
+                for (MktCamResultRelDO mktCamResultRelDO:mktCamResultRelDOS) {
+                    mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_NOTACTIVE.getStatusCode());
+                    mktCamResultRelMapper.updateByPrimaryKey(mktCamResultRelDO);
+                }
             }
 
             if (StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)) {
@@ -875,6 +896,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             } else if (StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)) {
                 maps.put("resultMsg", ErrorCode.STATUS_CODE_ROLL_SUCCESS.getErrorMsg());
             }
+            maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         } catch (Exception e) {
             logger.error("[op:changeMktCampaignStatus] 修改活动状态statusCd = {}失败,Exception = ", statusCd, e);
             if (StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)) {
@@ -886,6 +908,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             } else if (StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)) {
                 maps.put("resultMsg", ErrorCode.STATUS_CODE_ROLL_FAILURE.getErrorMsg());
             }
+            maps.put("resultCode", CommonConstant.CODE_FAIL);
         }
 
         return maps;
@@ -982,17 +1005,19 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     chaildMktCamStrategyConfRelDO.setUpdateStaff(UserUtil.loginId());
                     mktCamStrategyConfRelMapper.insert(chaildMktCamStrategyConfRelDO);
                 }
-                //  发布活动时异步去同步大数据
-                new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            synchronizeCampaignService.synchronizeCampaign(mktCampaignId, "admin");
-                        } catch (Exception e) {
-                            logger.error("[op:publishMktCampaign] 发布活动 id = {} 时，同步到生产失败！Exception= ", mktCampaignId, e);
+                //  发布活动时异步去同步到生产
+/*                if ("1".equals(value)) {
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            try {
+                                synchronizeCampaignService.synchronizeCampaign(mktCampaignId, "admin");
+                            } catch (Exception e) {
+                                logger.error("[op:publishMktCampaign] 发布活动 id = {} 时，同步到生产失败！Exception= ", mktCampaignId, e);
+                            }
                         }
-                    }
-                }.start();
+                    }.start();
+                }*/
 
                 // 协同中心活动信息同步
     /*            new Thread(){
