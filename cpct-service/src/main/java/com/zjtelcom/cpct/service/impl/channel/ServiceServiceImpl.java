@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.ServiceMapper;
 import com.zjtelcom.cpct.domain.channel.ServiceEntity;
+import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ServiceService;
 import com.zjtelcom.cpct.util.BeanUtil;
@@ -89,7 +90,7 @@ public class ServiceServiceImpl extends BaseService implements ServiceService {
         serviceEntity.setCreateDate(new Date());
         serviceEntity.setUpdateStaff(UserUtil.loginId());
         serviceEntity.setUpdateDate(new Date());
-        serviceEntity.setStatusCd("1000");
+        serviceEntity.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
         serviceEntity.setStatusDate(new Date());
         serviceMapper.insert(serviceEntity);
         result.put("resultCode",CODE_SUCCESS);
