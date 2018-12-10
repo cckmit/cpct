@@ -22,9 +22,6 @@
     where OFFER_SCENE_REL_ID = #{offerSceneRelId,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.ObjMktCampaignRel">
-    <selectKey keyProperty="offerSceneRelId" resultType="Long" order="BEFORE">
-      select smt_bss_cpc_sftt_sequence.nextval
-    </selectKey>
     insert into obj_mkt_campaign_rel (OFFER_SCENE_REL_ID, MKT_CAMPAIGN_ID, OBJ_TYPE, 
       OBJ_ID, REL_TYPE, EFF_DATE, 
       EXP_DATE, STATUS_CD, CREATE_STAFF, 
@@ -36,18 +33,6 @@
       #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, 
       #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR})
   </insert>
-
-
-  <!--<insert id="saveRequestInstRel" parameterType="com.ctzj.smt.bss.cpc.model.request.atomic.RequestInstRel" useGeneratedKeys="true" keyProperty="requestInstRelId">-->
-    <!--<selectKey keyProperty="requestInstRelId" resultType="Long" order="BEFORE">-->
-      <!--select smt_bss_cpc_sftt_sequence.nextval-->
-    <!--</selectKey>-->
-    <!--insert into request_inst_rel (<include refid="columns" />)-->
-    <!--values (<include refid="vals" />)-->
-  <!--</insert>-->
-
-
-
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.ObjMktCampaignRel">
     update obj_mkt_campaign_rel
     set MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},
