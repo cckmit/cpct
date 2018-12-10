@@ -1634,6 +1634,8 @@ public class EventApiServiceImpl implements EventApiService {
                                 }
                                 redisUtils.set("MKT_CAM_ITEM_" + mktCamItem.getMktCamItemId(), mktCamItem);
                             }
+
+                            product.put("productId", mktCamItem.getItemId().toString());
                             product.put("productCode", mktCamItem.getOfferCode());
                             product.put("productName", mktCamItem.getOfferName());
                             product.put("productType", mktCamItem.getItemType());
