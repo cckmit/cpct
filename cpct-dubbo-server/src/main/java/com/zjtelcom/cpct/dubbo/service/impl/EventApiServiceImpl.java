@@ -2578,7 +2578,7 @@ public class EventApiServiceImpl implements EventApiService {
         List<ContactEvtMatchRul> contactEvtMatchRuls = contactEvtMatchRulMapper.listEventMatchRuls(evtMatchRul);
         //事件规则为空不用判断,直接返回
         if (contactEvtMatchRuls.isEmpty()) {
-            System.out.println("事件规则为空直接返回");
+            log.info("事件规则为空直接返回");
             return result;
         }
         //查询事件规则条件
@@ -2727,70 +2727,22 @@ public class EventApiServiceImpl implements EventApiService {
      * @param condition    事件规则条件
      * @param label        标签
      * @param context      规则需要比较的上下文内容
-     * @return 规则表达式还需要完善
      */
     public Map<String, String> decideExpress(EventMatchRulCondition condition, Label label, DefaultContext<String, Object> context) {
         String type=condition.getOperType();
         Map<String, String> message = new HashMap<>();
         message.put("code", "success");
         ExpressRunner runner = new ExpressRunner();
-        //拼接表达式
-        StringBuilder express1 = new StringBuilder();
-        express1.append("if(");
-        express1.append("(");
-        express1.append(label.getInjectionLabelCode()).append(")");
-        if ("1000".equals(type)) {
-            express1.append(" > ");
-        } else if ("2000".equals(type)) {
-            express1.append(" < ");
-        } else if ("3000".equals(type)) {
-            express1.append(" == ");
-        } else if ("4000".equals(type)) {
-            express1.append(" != ");
-        } else if ("5000".equals(type)) {
-            express1.append(" >= ");
-        } else if ("6000".equals(type)) {
-            express1.append(" <= ");
-        } else if ("7000".equals(type) || "7100".equals(type)) {
-            express1.append(" in ");
-        } else if ("7200".equals(type)) {
-            String[] strArray =condition.getRightParam().split(",");
-            express1.append(" >= ").append(strArray[0]);
-            express1.append(" && ").append("(");
-            express1.append(label.getInjectionLabelCode()).append(")");
-            express1.append(" <= ").append(strArray[1]);
-        }
+        runner.addFunction("toNum",new StringToNumOperator("toNum"));
 
-        //拼接右测数据
-        if ("7000".equals(type) || "7100".equals(type)) {
-            String[] strArray = condition.getRightParam().split(",");
-            express1.append("(");
-            express1.append("(");
-            for (int j = 0; j < strArray.length; j++) {
-                express1.append("\"").append(strArray[j]).append("\"");
-                express1.append("\"").append(strArray[j]).append("\"");
-                if (j != strArray.length - 1) {
-                    express1.append(",");
-                    express1.append(",");
-                }
-            }
-            express1.append(")");
-            express1.append(")");
-        } else if ("7200".equals(type)) {
-            //do nothing...
-        } else {
-            express1.append("\"").append(condition.getRightParam()).append("\"");
-        }
-
-        express1.append(") {return true}");
-        log.info("事件规则表达式"+express1.toString());
         try {
-            RuleResult result = runner.executeRule(express1.toString(), context, true, true);
-            log.info("计算结果："+result.getResult());
+            String str = cpcLabel(label, type, condition.getRightParam());
+            log.info("事件规则表达式"+str);
+            RuleResult result = runner.executeRule(str, context, true, true);
             if (null == result.getResult()) {
                 //计算为false
                 message.put("code", "failed");
-                message.put("result", "事件规则条件" + label.getInjectionLabelCode() + "的标签值"+context.get(label.getInjectionLabelCode())+"不满足条件"+express1.toString());
+                message.put("result", "事件规则条件" + label.getInjectionLabelCode() + "的标签值"+context.get(label.getInjectionLabelCode())+"不满足条件"+str.toString());
             }
         } catch (Exception e) {
             e.printStackTrace();
