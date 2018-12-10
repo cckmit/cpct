@@ -105,7 +105,8 @@ public class ContactEvtController extends BaseController {
     public String evtDetailsByIdList(@RequestBody HashMap<String,Object> param) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            List<Long> idList = (List<Long>) param.get("idList");
+            List<Integer> idList = (List<Integer>) param.get("idList");
+
             maps = contactEvtService.evtDetailsByIdList(idList);
         } catch (Exception e) {
             logger.error("[op:EventController] fail to evtDetailsByIdList for contactEvt = {}! Exception: ", JSONArray.toJSON(maps), e);
