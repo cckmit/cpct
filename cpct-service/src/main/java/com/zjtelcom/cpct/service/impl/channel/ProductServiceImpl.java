@@ -345,7 +345,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             }
             camItemMapper.deleteByPrimaryKey(ruleId);
             //更新redis数据
-            deleteRedisMktCamItem(strategyRuleId,rule);
+            redisUtils.remove("MKT_CAM_ITEM_"+ruleId);
+
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
