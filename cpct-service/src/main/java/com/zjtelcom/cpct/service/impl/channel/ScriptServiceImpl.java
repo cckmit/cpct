@@ -5,8 +5,10 @@ import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.channel.MktScriptMapper;
+import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.channel.Script;
+import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.channel.MktScript;
 import com.zjtelcom.cpct.dto.channel.QryMktScriptReq;
 import com.zjtelcom.cpct.dto.channel.ScriptVO;
@@ -33,6 +35,8 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
     private ContactChannelMapper channelMapper;
     @Autowired
     private SynScriptService synScriptService;
+    @Autowired
+    private SysParamsMapper sysParamsMapper;
 
     @Value("${sync.value}")
     private String value;
@@ -166,6 +170,8 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
             Page info = new Page(new PageInfo(scriptList));
             for (Script script : scriptList){
                 ScriptVO vo = ChannelUtil.map2ScriptVO(script);
+                SysParams sysParams = sysParamsMapper.findParamsByValue("CAM-0002",script.getScriptType());
+                vo.setScriptTypeName(sysParams==null ? "" : sysParams.getParamName());
                 if (script.getExecChannel()!=null){
                     Channel channel = channelMapper.selectByPrimaryKey(Long.valueOf(script.getExecChannel()));
                     if (channel!=null){
