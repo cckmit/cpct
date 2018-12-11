@@ -30,7 +30,13 @@ public class UserUtil {
      * @return
      */
     public static SystemUserDto getUser(){
-        SystemUserDto userDetail = BssSessionHelp.getSystemUserDto();
+        SystemUserDto userDetail = null;
+        try {
+             userDetail = BssSessionHelp.getSystemUserDto();
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
         return userDetail;
     }
 
