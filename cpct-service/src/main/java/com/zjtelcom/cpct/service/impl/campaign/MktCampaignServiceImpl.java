@@ -163,13 +163,13 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setUpdateStaff(UserUtil.loginId());
             mktCampaignDO.setStatusDate(new Date());
             //添加所属地市
-            if(UserUtil.getUser()!=null){
+            if (UserUtil.getUser() != null) {
                 // 获取当前用户
                 mktCampaignDO.setRegionId(UserUtil.getUser().getLanId());
                 // 获取当前用户的岗位编码
                 mktCampaignDO.setCreateChannel(UserUtil.getRoleCode());
             } else{
-                mktCampaignDO.setLanId(UserUtil.loginId());
+                mktCampaignDO.setRegionId(AreaCodeEnum.ZHEJIAGN.getRegionId());
                 mktCampaignDO.setCreateChannel(PostEnum.ADMIN.getPostCode());
             }
 
