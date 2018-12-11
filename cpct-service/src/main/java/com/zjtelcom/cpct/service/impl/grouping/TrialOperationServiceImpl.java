@@ -183,7 +183,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
 
         TrialOperationVO request = BeanUtil.create(operationVO,new TrialOperationVO());
-        request.setFieldList(fieldList);
         //抽样业务校验
         request.setSample(false);
         TrialOperationVOES requests = BeanUtil.create(request,new TrialOperationVOES());
@@ -193,11 +192,11 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         for (MktStrategyConfRuleRelDO ruleRelDO : ruleRelList) {
             TrialOperationParamES param = getTrialOperationParamES(operationVO,null, ruleRelDO.getMktStrategyConfRuleId(),true);
             paramList.add(param);
-
           Map<String,Object> stringObjectMap =  getProductAndChannelByRuleId(ruleRelDO.getMktStrategyConfRuleId());
           List<String> stringList = (List<String>) stringObjectMap.get("scriptLabel");
           fieldList = ChannelUtil.arrayInput(fieldList,stringList);
         }
+        request.setFieldList(fieldList);
         requests.setParamList(paramList);
 //        TrialResponse response = new TrialResponse();
         TrialResponseES response = new TrialResponseES();
@@ -240,6 +239,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         channelScript = channelScript.replace("${" + code + "}$", customer.get(code)==null ? "" : customer.get(code).toString());
                     }
                     map.put("channel", channelScript);
+                }
+                //todo 目前只查杭州数据 后续加映射关系
+                if(customer.get("LATN_NAME")==null){
+                    customer.put("LATN_NAME","杭州");
                 }
                 customer.putAll(map);
                 customers.add(customer);
@@ -611,6 +614,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             codeList.add("CCUST_ID");
         } if (!codeList.contains("CCUST_TEL")){
             codeList.add("CCUST_TEL");
+        } if (!codeList.contains("LATN_ID")){
+            codeList.add("LATN_ID");
         }
         //策略下所有分群条件加入
         if (ruleCodeList!=null){

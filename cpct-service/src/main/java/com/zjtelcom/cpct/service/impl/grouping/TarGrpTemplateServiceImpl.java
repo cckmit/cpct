@@ -136,6 +136,9 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             List<Long> channelIdList = new ArrayList<>();
             for (OfferRestrict channelRestrict : channelRestrictList ){
                 GrpSystemRel grpSystemRel = grpSystemRelMapper.selectByOfferId(channelRestrict.getRstrObjId());
+                if (grpSystemRel==null){
+                    continue;
+                }
                 Channel channel = channelMapper.selectByPrimaryKey(grpSystemRel.getOfferVrulGrpId());
                 if (channel!=null && !channelIdList.contains(channel.getContactChlId())){
                     ChannelDetail detail = new ChannelDetail();
@@ -187,6 +190,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                     return tarGrpTemplateMap;
                 }
                 TarGrpCondition tarGrpTemplateConditionDO = BeanUtil.create(tarGrpTemConditionVO, new TarGrpCondition());
+                tarGrpTemplateConditionDO.setRootFlag(0L);
                 tarGrpTemplateConditionDO.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
                 tarGrpTemplateConditionDO.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
                 tarGrpTemplateConditionDO.setTarGrpId(tarGrpTemplateId);
