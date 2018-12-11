@@ -1501,6 +1501,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             }
             for (Future<Map<String, Object>> ruleFutureNew : threadList) {
                 MktStrategyConfRule mktStrategyConfRule = (MktStrategyConfRule) ruleFutureNew.get().get("mktStrategyConfRule");
+                mktStrategyConfRule.setMktStrategyConfRuleId(null);
                 mktStrategyConfRuleList.add(mktStrategyConfRule);
             }
             ruleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
