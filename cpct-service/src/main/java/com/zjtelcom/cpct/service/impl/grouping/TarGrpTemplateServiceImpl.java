@@ -187,6 +187,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                     return tarGrpTemplateMap;
                 }
                 TarGrpCondition tarGrpTemplateConditionDO = BeanUtil.create(tarGrpTemConditionVO, new TarGrpCondition());
+                tarGrpTemplateConditionDO.setRootFlag(0L);
                 tarGrpTemplateConditionDO.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
                 tarGrpTemplateConditionDO.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
                 tarGrpTemplateConditionDO.setTarGrpId(tarGrpTemplateId);
