@@ -697,15 +697,6 @@ public class EventApiServiceImpl implements EventApiService {
                 return Collections.EMPTY_MAP;
             }
 
-            //判断活动状态
-            if (!"2002".equals(mktCampaign.getStatusCd())) {
-                esJson.put("hit", "false");
-                esJson.put("msg", "活动状态未发布");
-                esService.save(esJson, IndexList.ACTIVITY_MODULE);
-                System.out.println("活动状态未发布");
-                return Collections.EMPTY_MAP;
-            }
-
             privateParams.put("activityId", mktCampaign.getMktCampaignId().toString()); //活动编码
             privateParams.put("activityName", mktCampaign.getMktCampaignName()); //活动名称
             if ("1000".equals(mktCampaign.getMktCampaignType())) {
@@ -734,6 +725,15 @@ public class EventApiServiceImpl implements EventApiService {
             esJson.put("activityId", mktCampaign.getMktCampaignId().toString());
             esJson.put("activityName", mktCampaign.getMktCampaignName());
             esJson.put("activityCode", mktCampaign.getMktCampaignId().toString());
+
+            //判断活动状态
+            if (!"2002".equals(mktCampaign.getStatusCd())) {
+                esJson.put("hit", "false");
+                esJson.put("msg", "活动状态未发布");
+                esService.save(esJson, IndexList.ACTIVITY_MODULE);
+                System.out.println("活动状态未发布");
+                return Collections.EMPTY_MAP;
+            }
 
             //验证活动生效时间
             Date beginTime = mktCampaign.getPlanBeginTime();
