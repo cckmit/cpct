@@ -66,6 +66,7 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
         script.setCreateStaff(userId);
         script.setUpdateStaff(userId);
         script.setStatusCd("1000");
+        script.setSuitChannelType("100000");
         scriptMapper.insert(script);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
