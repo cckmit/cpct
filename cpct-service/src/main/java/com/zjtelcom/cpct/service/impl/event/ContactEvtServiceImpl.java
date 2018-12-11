@@ -680,4 +680,19 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         return maps;
     }
 
+
+    @Override
+    public Map<String, Object> evtDetailsByIdList(List<Integer> idList) {
+        Map<String,Object> maps = new HashMap<>();
+        List<ContactEvt> evts = new ArrayList<>();
+        for (Integer id: idList){
+           ContactEvt contactEvt = contactEvtMapper.getEventById(Long.valueOf(id.toString()));
+           if (contactEvt!=null){
+               evts.add(contactEvt);
+           }
+        }
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", evts);
+        return maps;
+    }
 }

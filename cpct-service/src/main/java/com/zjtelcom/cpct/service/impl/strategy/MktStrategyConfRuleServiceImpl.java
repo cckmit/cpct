@@ -15,6 +15,7 @@ import com.zjtelcom.cpct.dao.strategy.MktCamStrategyRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyMapper;
+import com.zjtelcom.cpct.domain.User;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.CamScript;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
@@ -69,9 +70,6 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
     private MktStrategyConfRuleRelMapper mktStrategyConfRuleRelMapper;
 
     @Autowired
-    private MktCamStrategyConfRelMapper mktCamStrategyConfRelMapper; //cpc算法与活动关联表
-
-    @Autowired
     private MktCpcAlgorithmsRulMapper mktCpcAlgorithmsRulMapper; //cpc算法规则表
 
     @Autowired
@@ -96,7 +94,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
     private CamScriptService camScriptService;
 
     @Autowired
-    private MktCamRecomCalcRelMapper mktCamRecomCalcRelMapper;
+    private MktCamRecomCalcRelMapper mktCamRecomCalcRelMapper;  //cpc算法与活动关联表
 
     @Autowired
     private RedisUtils redisUtils;
@@ -137,7 +135,12 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             if(mktStrategyConfRule.getTarGrpId()!=null){
                 mktCamGrpRul.setTarGrpId(mktStrategyConfRule.getTarGrpId());
                 mktCamGrpRul.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
-                mktCamGrpRul.setLanId(1L);
+                //添加所属地市
+                if(UserUtil.getUser()!=null){
+                    mktCamGrpRul.setLanId(UserUtil.getUser().getLanId());
+                } else{
+                    mktCamGrpRul.setLanId(UserUtil.loginId());
+                }
                 mktCamGrpRul.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
                 mktCamGrpRul.setStatusDate(new Date());
                 mktCamGrpRul.setCreateDate(new Date());
@@ -236,7 +239,12 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             String ruleExpression = "("+ confs + ")&&(" + resultConfs + ")";
             MktStrategy mktStrategy = new MktStrategy();
             mktStrategy.setStrategyId(mktStrategyConfRule.getStrategyConfId());
-            mktStrategy.setStrategyType("1000");
+            // 活动分类为服务活动时,为关怀策略 ; 活动分类为营销活动，维系活动等其它活动时,为销售策略
+            if(StatusCode.SERVICE_CAMPAIGN.getStatusCode().equals( mktStrategyConfRule.getMktCampaignType())){
+                mktStrategy.setStrategyType(StatusCode.CARE_STRATEGY.getStatusCode());
+            } else{
+                mktStrategy.setStrategyType(StatusCode.SALES_STRATEGY.getStatusCode());
+            }
             mktStrategy.setStrategyName(mktStrategyConfRule.getMktStrategyConfRuleName());
             mktStrategy.setStrategyDesc(mktStrategyConfRule.getMktStrategyConfRuleName());
             mktStrategy.setRuleExpression(ruleExpression);
@@ -265,14 +273,24 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktCpcAlgorithmsRulDO.setAlgorithmsRulName(mktStrategyConfRule.getMktStrategyConfRuleName());
             mktCpcAlgorithmsRulDO.setRuleExpression(
                     "{" + mktStrategyConfRule.getTarGrpId() +"}通过{" + mktStrategyConfRule.getStrategyConfId() +"}推送{" + mktStrategyConfRule.getProductIdlist() + "}");
-            mktCpcAlgorithmsRulDO.setStatusCd("1000");
+            mktCpcAlgorithmsRulDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+            mktCpcAlgorithmsRulDO.setStatusDate(new Date());
+            mktCpcAlgorithmsRulDO.setCreateDate(new Date());
+            mktCpcAlgorithmsRulDO.setCreateStaff(UserUtil.loginId());
+            mktCpcAlgorithmsRulDO.setUpdateStaff(UserUtil.loginId());
+            mktCpcAlgorithmsRulDO.setUpdateDate(new Date());
             mktCpcAlgorithmsRulMapper.insert(mktCpcAlgorithmsRulDO);
             //cpc算法规则关联表
             MktCamRecomCalcRelDO mktCamRecomCalcRelDO = new MktCamRecomCalcRelDO();
             mktCamRecomCalcRelDO.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
             mktCamRecomCalcRelDO.setAlgorithmsRulId(mktCpcAlgorithmsRulDO.getAlgorithmsRulId());
             mktCamRecomCalcRelDO.setAlgoId(1L);
-            mktCamRecomCalcRelDO.setStatusCd("1000");
+            mktCamRecomCalcRelDO.setStatusDate(new Date());
+            mktCamRecomCalcRelDO.setCreateDate(new Date());
+            mktCamRecomCalcRelDO.setCreateStaff(UserUtil.loginId());
+            mktCamRecomCalcRelDO.setUpdateStaff(UserUtil.loginId());
+            mktCamRecomCalcRelDO.setUpdateDate(new Date());
+            mktCamRecomCalcRelDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
             mktCamRecomCalcRelMapper.insert(mktCamRecomCalcRelDO);
 
 

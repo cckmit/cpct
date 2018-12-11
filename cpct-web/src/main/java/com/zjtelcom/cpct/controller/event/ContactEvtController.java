@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -90,6 +91,25 @@ public class ContactEvtController extends BaseController {
             maps = contactEvtService.delEvent(contactEvtReq.getContactEvt().getContactEvtId());
         } catch (Exception e) {
             logger.error("[op:EventController] fail to delEvent for contactEvtReq = {}! Exception: ", JSONArray.toJSON(contactEvtReq), e);
+            return JSON.toJSONString(maps);
+        }
+        return JSON.toJSONString(maps);
+    }
+
+
+    /**
+     * 事件详情
+     */
+    @RequestMapping("/evtDetailsByIdList")
+    @CrossOrigin
+    public String evtDetailsByIdList(@RequestBody HashMap<String,Object> param) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            List<Integer> idList = (List<Integer>) param.get("idList");
+
+            maps = contactEvtService.evtDetailsByIdList(idList);
+        } catch (Exception e) {
+            logger.error("[op:EventController] fail to evtDetailsByIdList for contactEvt = {}! Exception: ", JSONArray.toJSON(maps), e);
             return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);

@@ -184,6 +184,7 @@ public class CampaignController extends BaseController {
             for (MktStrategyConfDetail mktStrategyConfDetail : mktCampaignVO.getMktStrategyConfDetailList()) {
                 mktStrategyConfDetail.setMktCampaignId(mktCampaignId);
                 mktStrategyConfDetail.setMktCampaignName(mktCampaignVO.getMktCampaignName());
+                mktStrategyConfDetail.setMktCampaignType(mktCampaignVO.getMktCampaignType());
                 mktStrategyConfService.saveMktStrategyConf(mktStrategyConfDetail);
             }
         }
