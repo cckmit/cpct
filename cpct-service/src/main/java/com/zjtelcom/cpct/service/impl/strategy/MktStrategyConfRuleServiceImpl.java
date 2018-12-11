@@ -1533,7 +1533,10 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 Map<String, Object> tarGrpMap = new HashMap<>();
                 tarGrpMap = tarGrpService.copyTarGrp(mktStrategyConfRuleDO.getTarGrpId(), false);
                 TarGrp tarGrp = (TarGrp) tarGrpMap.get("tarGrp");
-                mktStrategyConfRule.setTarGrpId(tarGrp.getTarGrpId());
+                if (tarGrp != null) {
+                    mktStrategyConfRule.setTarGrpId(tarGrp.getTarGrpId());
+                }
+
                 /**
                  * 销售品配置
                  */
