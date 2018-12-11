@@ -165,6 +165,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             contactEvtItems = evtDetail.getContactEvtItems();
             for (ContactEvtItem contactEvtItem : contactEvtItems) {
                 contactEvtItem.setContactEvtId(contactEvt.getContactEvtId());
+                contactEvtItem.setValueDataType("1200");
                 contactEvtItem.setEvtTypeId(contactEvt.getContactEvtTypeId());
                 contactEvtItem.setCreateDate(DateUtil.getCurrentTime());
                 contactEvtItem.setUpdateDate(DateUtil.getCurrentTime());
