@@ -162,7 +162,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setUpdateDate(new Date());
             mktCampaignDO.setUpdateStaff(UserUtil.loginId());
             mktCampaignDO.setStatusDate(new Date());
-            mktCampaignDO.setCreateChannel("超级管理员");
             //添加所属地市
             if(UserUtil.getUser()!=null){
                 // 获取当前用户
@@ -175,7 +174,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
 
             mktCampaignDO.setServiceType(StatusCode.CUST_TYPE.getStatusCode()); // 1000 - 客账户类
-            mktCampaignDO.setLanId(AreaCodeEnum.getLandIdByRegionId(mktCampaignDO.getLanId()));
+            mktCampaignDO.setLanId(AreaCodeEnum.getLandIdByRegionId(mktCampaignDO.getRegionId()));
             mktCampaignMapper.insert(mktCampaignDO);
             Long mktCampaignId = mktCampaignDO.getMktCampaignId();
             // 活动编码
@@ -766,6 +765,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setTiggerType(params.get("tiggerType").toString());             // 活动触发类型 - 实时，批量
             mktCampaignDO.setMktCampaignCategory(params.get("mktCampaignCategory").toString());  // 活动分类 - 框架，强制，自主
             mktCampaignDO.setMktCampaignType(params.get("mktCampaignType").toString());   // 活动类别 - 服务，营销，服务+营销
+
             List<Integer> landIdList = (List) params.get("landIds");
             if (landIdList.size() > 0 && !"".equals(landIdList.get(0))) {
                 Long landId = Long.valueOf(landIdList.get(landIdList.size() - 1));
@@ -791,7 +791,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCampaignVO.setMktActivityNbr(mktCampaignCountDO.getMktActivityNbr());
                     mktCampaignVO.setPlanBeginTime(mktCampaignCountDO.getPlanBeginTime());
                     mktCampaignVO.setPlanEndTime(mktCampaignCountDO.getPlanEndTime());
-                    mktCampaignVO.setCreateChannel(mktCampaignCountDO.getCreateChannel());
+                    mktCampaignVO.setCreateChannel(PostEnum.getNameByCode(mktCampaignCountDO.getCreateChannel()));
                     mktCampaignVO.setCreateDate(mktCampaignCountDO.getCreateDate());
                     mktCampaignVO.setPreMktCampaignId(mktCampaignCountDO.getPreMktCampaignId());
                 } catch (Exception e) {
