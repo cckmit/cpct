@@ -62,6 +62,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -179,8 +181,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         // 通过活动id获取关联的标签字段数组
         String[] fieldList = getStrings(campaign,strategy);
 
+
         TrialOperationVO request = BeanUtil.create(operationVO,new TrialOperationVO());
-        request.setFieldList(fieldList);
         //抽样业务校验
         request.setSample(false);
         TrialOperationVOES requests = BeanUtil.create(request,new TrialOperationVOES());
@@ -190,7 +192,11 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         for (MktStrategyConfRuleRelDO ruleRelDO : ruleRelList) {
             TrialOperationParamES param = getTrialOperationParamES(operationVO,null, ruleRelDO.getMktStrategyConfRuleId(),true);
             paramList.add(param);
+          Map<String,Object> stringObjectMap =  getProductAndChannelByRuleId(ruleRelDO.getMktStrategyConfRuleId());
+          List<String> stringList = (List<String>) stringObjectMap.get("scriptLabel");
+          fieldList = ChannelUtil.arrayInput(fieldList,stringList);
         }
+        request.setFieldList(fieldList);
         requests.setParamList(paramList);
 //        TrialResponse response = new TrialResponse();
         TrialResponseES response = new TrialResponseES();
@@ -224,8 +230,21 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         for (String ruleIdSt : response.getHitsList().keySet()){
             Long ruleId = Long.valueOf(ruleIdSt);
             List<Map<String,Object>> customerList = (List<Map<String,Object>>) response.getHitsList().get(ruleIdSt);
+            Map<String,Object> map = getProductAndChannelByRuleId(ruleId);
             for (Map<String,Object> customer : customerList) {
-                customer.putAll(getProductAndChannelByRuleId(ruleId));
+                String channelScript = map.get("channelTemp")==null? "" : map.get("channelTemp").toString();
+                List<String> camList = subScript(channelScript);
+                if (!camList.isEmpty()){
+                    for (String code : camList){
+                        channelScript = channelScript.replace("${" + code + "}$", customer.get(code)==null ? "" : customer.get(code).toString());
+                    }
+                    map.put("channel", channelScript);
+                }
+                //todo 目前只查杭州数据 后续加映射关系
+                if(customer.get("LATN_NAME")==null){
+                    customer.put("LATN_NAME","杭州");
+                }
+                customer.putAll(map);
                 customers.add(customer);
             }
         }
@@ -238,6 +257,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
     public Map<String,Object> getProductAndChannelByRuleId(Long ruleId){
         Map<String,Object> result = new HashMap<>();
+        List<String> scriptList = new ArrayList<>();
         //添加规则下的销售品
         MktStrategyConfRuleDO rule = ruleMapper.selectByPrimaryKey(ruleId);
         if (rule.getProductId()!=null && !rule.getProductId().equals("")){
@@ -251,13 +271,39 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             List<MktCamChlConfDO> chlConfList = chlConfMapper.listByIdList(channelIdList);
             for (MktCamChlConfDO chlConf : chlConfList){
                 CamScript script = scriptMapper.selectByConfId(chlConf.getEvtContactConfId());
+                if (script.getScriptDesc()!=null){
+                    List<String> camList = subScript(script.getScriptDesc());
+                    scriptList.addAll(camList);
+                }
                 st.append(chlConf.getEvtContactConfName()).append("(")
                         .append(script.getScriptDesc()==null? "" : script.getScriptDesc())
                         .append(")；");
             }
-            result.put("channel",st);
+            result.put("channel",st.toString());
+            result.put("channelTemp",st.toString());
         }
+        result.put("scriptLabel",scriptList);
         //todo 渠道及推荐指引
+        return result;
+    }
+
+    //截取脚本内的标签
+    private List<String> subScript(String str) {
+        List<String> result = new ArrayList<>();
+//        Pattern p = Pattern.compile("\\$");
+        Pattern p = Pattern.compile("(?<=\\$\\{)([^$]+)(?=\\}\\$)");
+        Matcher m = p.matcher(str);
+//        List<Integer> list = new ArrayList<>();
+
+        while (m.find()) {
+//            list.add(m.start());
+            result.add(m.group(1));
+        }
+
+//        for (int i = 0; i < list.size(); ) {
+//            result.add(str.substring(list.get(i) + 1, list.get(++i)));
+//            i++;
+//        }
         return result;
     }
 
@@ -446,7 +492,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         trialOp.setCampaignName(campaign.getMktCampaignName());
         trialOp.setStrategyName(strategy.getMktStrategyConfName());
         trialOp.setBatchNum(Long.valueOf(batchNumSt));
-        trialOp.setCreateDate(new Date());
         trialOp.setStatusCd("1000");
         trialOperationMapper.insert(trialOp);
         operationVO.setTrialId(trialOp.getId());
@@ -569,6 +614,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             codeList.add("CCUST_ID");
         } if (!codeList.contains("CCUST_TEL")){
             codeList.add("CCUST_TEL");
+        } if (!codeList.contains("LATN_ID")){
+            codeList.add("LATN_ID");
         }
         //策略下所有分群条件加入
         if (ruleCodeList!=null){

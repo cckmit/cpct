@@ -38,6 +38,6 @@ public interface ContactEvtService {
 
     Map<String,Object> evtDetails(ContactEvt contactEvt);
 
-    Map<String,Object> evtDetailsByIdList(List<Long> idList );
+    Map<String,Object> evtDetailsByIdList(List<Integer> idList );
 
 }

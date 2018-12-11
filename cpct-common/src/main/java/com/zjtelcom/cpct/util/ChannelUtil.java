@@ -19,6 +19,25 @@ import java.util.UUID;
 @Component
 public class ChannelUtil  {
 
+
+    public static String[] arrayInput(String[] fildList,List<String> codeList){
+        List<String> resultList = new ArrayList<>();
+        for (String code : fildList){
+            resultList.add(code);
+        }
+        for (String code : codeList){
+            if (resultList.contains(code)){
+                continue;
+            }
+            resultList.add(code);
+        }
+        String[] fieldList = new String[resultList.size()];
+        for (int i = 0; i < resultList.size(); i++) {
+            fieldList[i] = resultList.get(i);
+        }
+        return fieldList;
+    }
+
     /**
      * 将一个list均分成n个list,主要通过偏移量来实现的
      * @param source
