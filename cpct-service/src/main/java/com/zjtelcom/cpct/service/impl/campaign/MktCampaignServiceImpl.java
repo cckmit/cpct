@@ -169,7 +169,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 // 获取当前用户的岗位编码
                 mktCampaignDO.setCreateChannel(UserUtil.getRoleCode());
             } else{
-                mktCampaignDO.setLanId(UserUtil.loginId());
+                mktCampaignDO.setRegionId(AreaCodeEnum.ZHEJIAGN.getRegionId());
                 mktCampaignDO.setCreateChannel(PostEnum.ADMIN.getPostCode());
             }
 
