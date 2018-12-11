@@ -44,7 +44,7 @@ public class UserUtil {
             SystemUserDto userDetail = BssSessionHelp.getSystemUserDto();
             for (SystemPostDto role : userDetail.getSystemPostDtoList()) {
                 if (role.getSysPostCode().contains("cpcp")){
-                    roleCode = role.getSysPostName();
+                    roleCode = role.getSysPostCode();
                     break;
                 }
 //            if (0 != role.getDefaultFlag()) {

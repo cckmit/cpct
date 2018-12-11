@@ -142,6 +142,10 @@
     o.UPDATE_DATE
     from offer o ,offer_catalog_location ocl
 	where ocl.CATALOG_ITEM_ID = #{catalogId} and ocl.OFFER_ID = o.OFFER_ID
+    <if test="offerName != null and offerName != ''">
+      and o.OFFER_NAME  LIKE CONCAT(CONCAT('%',#{offerName}),'%')
+    </if>
+
   </select>
 
   <select id="listByOfferIdList" resultType="java.lang.String">

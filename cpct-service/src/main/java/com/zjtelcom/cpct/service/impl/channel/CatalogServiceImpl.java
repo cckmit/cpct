@@ -50,7 +50,7 @@ public class CatalogServiceImpl extends BaseService implements CatalogService {
 //               offerList.add(product);
 //            }
 //        }
-        List<Offer> productList = offerMapper.listByCatalogItemId(catalogId);
+        List<Offer> productList = offerMapper.listByCatalogItemId(catalogId,productName);
         Page pa = new Page(new PageInfo(productList));
         for (Offer offer : productList){
             PpmProduct product = new PpmProduct();
