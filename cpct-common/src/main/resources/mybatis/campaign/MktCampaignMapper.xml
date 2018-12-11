@@ -102,7 +102,7 @@
         END_TIME = #{endTime,jdbcType=DATE},
         MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR},
         MANAGE_TYPE = #{mktCampaignCategory,jdbcType=VARCHAR},
-        MKT_ACTIVITY_NBR = #{mktActivityNbr,jdbcType=VARCHAR},
+        <if test= "mktActivityNbr!=null">MKT_ACTIVITY_NBR = #{mktActivityNbr,jdbcType=VARCHAR},</if>
         MKT_ACTIVITY_TARGET = #{mktActivityTarget,jdbcType=VARCHAR},
         MKT_CAMPAIGN_DESC = #{mktCampaignDesc,jdbcType=VARCHAR},
         CALC_DISPLAY = #{calcDisplay,jdbcType=BIGINT},

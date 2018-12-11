@@ -237,7 +237,9 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                 for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfDetail.getMktStrategyConfRuleList()) {
                     mktStrategyConfRule.setMktCampaignId(mktStrategyConfDetail.getMktCampaignId());
                     mktStrategyConfRule.setMktCampaignName(mktStrategyConfDetail.getMktCampaignName());
+                    mktStrategyConfRule.setStrategyConfId(mktStrategyConfId);
                     mktStrategyConfRule.setStrategyConfName(mktStrategyConfDetail.getMktStrategyConfName());
+                    mktStrategyConfRule.setMktCampaignType(mktStrategyConfDetail.getMktCampaignType());
                     Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.saveMktStrategyConfRule(mktStrategyConfRule);
                     // 返回策略规则
                     MktStrategyConfRuleDO mktStrategyConfRuleDO = (MktStrategyConfRuleDO) mktStrategyConfRuleMap.get("mktStrategyConfRuleDO");
@@ -358,6 +360,10 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                     for (MktStrategyConfRule mktStrategyConfRule : mktStrategyConfDetail.getMktStrategyConfRuleList()) {
                         Map<String, Object> mktStrategyConfRuleMap;
                         mktStrategyConfRule.setMktCampaignId(mktStrategyConfDetail.getMktCampaignId());
+                        mktStrategyConfRule.setMktCampaignName(mktStrategyConfDetail.getMktCampaignName());
+                        mktStrategyConfRule.setStrategyConfId(mktStrategyConfId);
+                        mktStrategyConfRule.setStrategyConfName(mktStrategyConfDetail.getMktStrategyConfName());
+                        mktStrategyConfRule.setMktCampaignType(mktStrategyConfDetail.getMktCampaignType());
                         //判断规则是否是修改还是新增
                         if (mktStrategyConfRule.getMktStrategyConfRuleId() != null && mktStrategyConfRule.getMktStrategyConfRuleId() != 0) {
                             // 修改规则的信息 并返回

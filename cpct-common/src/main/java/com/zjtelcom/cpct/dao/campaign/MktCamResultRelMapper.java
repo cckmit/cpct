@@ -22,4 +22,6 @@ public interface MktCamResultRelMapper {
     int changeStatusByMktCampaignId(MktCamResultRelDO mktCamResultRelDO);
 
     List<Long> selectAllGroupByMktCampaignId();
+
+    List<MktCamResultRelDO> selectResultByMktCampaignId(Long mktCampaignId);
 }

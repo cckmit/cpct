@@ -17,6 +17,11 @@ public class MktStrategyConfDetail extends MktStrategyConf {
      */
     private String mktCampaignName;
 
+    /**
+     * 营销活动分类
+     */
+    private String mktCampaignType;
+
 
     /**
      * 策略配置下规则列表
@@ -46,5 +51,13 @@ public class MktStrategyConfDetail extends MktStrategyConf {
 
     public void setMktCampaignName(String mktCampaignName) {
         this.mktCampaignName = mktCampaignName;
+    }
+
+    public String getMktCampaignType() {
+        return mktCampaignType;
+    }
+
+    public void setMktCampaignType(String mktCampaignType) {
+        this.mktCampaignType = mktCampaignType;
     }
 }
