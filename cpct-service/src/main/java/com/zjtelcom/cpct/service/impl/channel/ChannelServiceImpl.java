@@ -47,8 +47,17 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
     public Map<String, Object> listAllChildChannelList() {
         Map<String,Object> result = new HashMap<>();
         List<Channel> channelList = channelMapper.findChildList();
+        List<String> resultList = new ArrayList<>();
+        List<Channel> resultChannelList = new ArrayList<>();
+        for (Channel channel : channelList){
+            if (resultList.contains(channel.getContactChlCode())){
+                continue;
+            }
+            resultList.add(channel.getContactChlCode());
+            resultChannelList.add(channel);
+        }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",channelList);
+        result.put("resultMsg",resultChannelList);
         return result;
     }
 

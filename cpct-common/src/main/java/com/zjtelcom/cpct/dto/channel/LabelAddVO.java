@@ -9,7 +9,7 @@ public class LabelAddVO implements Serializable {
     private String injectionLabelDesc;
     private String fitDomain;//适用域
     private String rightOperand;//右操作符（标签值）
-    private String conditionType;//单选多选框
+    private String conditionType;//输入-枚举
     private List<String> operatorList;//运算符
     private Integer scope;
     private Integer isShared;
