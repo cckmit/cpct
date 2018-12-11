@@ -39,7 +39,7 @@ public class UserUtil {
      * @return
      */
     public static String getRoleCode() {
-        String roleCode = " ";
+        String roleCode = "";
         try {
             SystemUserDto userDetail = BssSessionHelp.getSystemUserDto();
             for (SystemPostDto role : userDetail.getSystemPostDtoList()) {

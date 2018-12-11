@@ -148,7 +148,14 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 mktCamGrpRul.setUpdateDate(new Date());
                 mktCamGrpRul.setUpdateStaff(UserUtil.loginId());
                 mktCamGrpRulMapper.insert(mktCamGrpRul);
+
+                // 更新客户分群名字为规则名称
+                TarGrp tarGrp = new TarGrp();
+                tarGrp.setTarGrpId(mktStrategyConfRule.getTarGrpId());
+                tarGrp.setTarGrpName(mktStrategyConfRule.getMktStrategyConfRuleName());
+                tarGrp.setTarGrpDesc(mktStrategyConfRule.getMktStrategyConfRuleName());
             }
+
             CopyPropertiesUtil.copyBean2Bean(mktStrategyConfRuleDO, mktStrategyConfRule);
             String productIds = "";
             String evtContactConfIds = "";
@@ -335,6 +342,11 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     mktCamGrpRul.setUpdateStaff(UserUtil.loginId());
                     mktCamGrpRulMapper.insert(mktCamGrpRul);
                 }
+                // 更新客户分群名字为规则名称
+                TarGrp tarGrp = new TarGrp();
+                tarGrp.setTarGrpId(mktStrategyConfRule.getTarGrpId());
+                tarGrp.setTarGrpName(mktStrategyConfRule.getMktStrategyConfRuleName());
+                tarGrp.setTarGrpDesc(mktStrategyConfRule.getMktStrategyConfRuleName());
             }
             MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
             CopyPropertiesUtil.copyBean2Bean(mktStrategyConfRuleDO, mktStrategyConfRule);
