@@ -166,6 +166,10 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     } else {
                         productIds += "/" + mktStrategyConfRule.getProductIdlist().get(i);
                     }
+                    // 给mkt_cam_item表添加活动id
+                    MktCamItem mktCamItem = mktCamItemMapper.selectByPrimaryKey(mktStrategyConfRule.getProductIdlist().get(i));
+                    mktCamItem.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
+                    mktCamItemMapper.updateByPrimaryKey(mktCamItem);
                 }
                 mktStrategyConfRuleDO.setProductId(productIds);
             }
@@ -357,6 +361,10 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     } else {
                         productIds += "/" + mktStrategyConfRule.getProductIdlist().get(i);
                     }
+                    // 给mkt_cam_item表添加活动id
+                    MktCamItem mktCamItem = mktCamItemMapper.selectByPrimaryKey(mktStrategyConfRule.getProductIdlist().get(i));
+                    mktCamItem.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
+                    mktCamItemMapper.updateByPrimaryKey(mktCamItem);
                 }
                 mktStrategyConfRuleDO.setProductId(productIds);
             }
@@ -1493,6 +1501,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             }
             for (Future<Map<String, Object>> ruleFutureNew : threadList) {
                 MktStrategyConfRule mktStrategyConfRule = (MktStrategyConfRule) ruleFutureNew.get().get("mktStrategyConfRule");
+                mktStrategyConfRule.setMktStrategyConfRuleId(null);
                 mktStrategyConfRuleList.add(mktStrategyConfRule);
             }
             ruleMap.put("resultCode", CommonConstant.CODE_SUCCESS);

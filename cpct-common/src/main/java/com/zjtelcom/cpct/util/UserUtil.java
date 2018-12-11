@@ -30,7 +30,13 @@ public class UserUtil {
      * @return
      */
     public static SystemUserDto getUser(){
-        SystemUserDto userDetail = BssSessionHelp.getSystemUserDto();
+        SystemUserDto userDetail = null;
+        try {
+             userDetail = BssSessionHelp.getSystemUserDto();
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
         return userDetail;
     }
 
@@ -44,7 +50,7 @@ public class UserUtil {
             SystemUserDto userDetail = BssSessionHelp.getSystemUserDto();
             for (SystemPostDto role : userDetail.getSystemPostDtoList()) {
                 if (role.getSysPostCode().contains("cpcp")){
-                    roleCode = role.getSysPostName();
+                    roleCode = role.getSysPostCode();
                     break;
                 }
 //            if (0 != role.getDefaultFlag()) {
