@@ -173,13 +173,8 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                 MktCamChlConfAttrDO mktCamChlConfAttrDO1 = mktCamChlConfAttrMapper.selectByPrimaryKey(mktCamChlConfAttr.getContactChlAttrRstrId());
                 MktCamChlConfAttrDO mktCamChlConfAttrDO = new MktCamChlConfAttrDO();
                 CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttrDO, mktCamChlConfAttr);
-                mktCamChlConfAttrDO.setEvtContactConfId(mktCamChlConfDO.getEvtContactConfId());
-                if (mktCamChlConfAttrDO1 != null) {
-                    mktCamChlConfAttrMapper.updateByPrimaryKey(mktCamChlConfAttrDO);
-                } else {
-                    mktCamChlConfAttrMapper.insert(mktCamChlConfAttrDO);
-                }
                 if (mktCamChlConfAttr.getAttrId()!=null && mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
+                    mktCamChlConfAttrDO.setEvtContactConfId(mktCamChlConfDO.getEvtContactConfId());
                     mktCamChlConfAttrDO.setAttrValue(evtContactConfId.toString());
                     //删除旧的关联规则 todo 静态
                     mktVerbalConditionMapper.deleteByVerbalId("1", evtContactConfId);
@@ -187,6 +182,16 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                     String params = mktCamChlConfAttr.getAttrValue();
                     ruleInsert(evtContactConfId, params);
                 }
+                if (mktCamChlConfAttrDO1 != null) {
+                    mktCamChlConfAttrMapper.updateByPrimaryKey(mktCamChlConfAttrDO);
+                } else {
+                    mktCamChlConfAttrDO.setEvtContactConfId(evtContactConfId);
+                    mktCamChlConfAttrDO.setCreateDate(new Date());
+                    mktCamChlConfAttrDO.setUpdateDate(new Date());
+                    mktCamChlConfAttrDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                    mktCamChlConfAttrMapper.insert(mktCamChlConfAttrDO);
+                }
+
             }
             // 将推送渠道缓存到redis
             redisUtils.set("MktCamChlConfDetail_" + evtContactConfId, mktCamChlConfDetail);
