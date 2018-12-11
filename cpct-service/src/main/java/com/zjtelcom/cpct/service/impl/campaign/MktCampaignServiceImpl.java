@@ -26,10 +26,7 @@ import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.EventDTO;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
-import com.zjtelcom.cpct.enums.AreaCodeEnum;
-import com.zjtelcom.cpct.enums.ErrorCode;
-import com.zjtelcom.cpct.enums.ParamKeyEnum;
-import com.zjtelcom.cpct.enums.StatusCode;
+import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
@@ -142,9 +139,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     //需求涵id 跟活动关联关系
     @Autowired
     private RequestInstRelMapper requestInstRelMapper;
-/*
-    @Autowired
-    private IMktCampaignService iMktCampaignService;*/
 
     private final static String createChannel = "cpcp0005";
 
@@ -168,16 +162,19 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setUpdateDate(new Date());
             mktCampaignDO.setUpdateStaff(UserUtil.loginId());
             mktCampaignDO.setStatusDate(new Date());
-            mktCampaignDO.setCreateChannel("超级管理员");
             //添加所属地市
-            if(UserUtil.getUser()!=null){
-                mktCampaignDO.setLanId(UserUtil.getUser().getLanId());
+            if (UserUtil.getUser() != null) {
+                // 获取当前用户
+                mktCampaignDO.setRegionId(UserUtil.getUser().getLanId());
+                // 获取当前用户的岗位编码
+                mktCampaignDO.setCreateChannel(UserUtil.getRoleCode());
             } else{
-                mktCampaignDO.setLanId(UserUtil.loginId());
+                mktCampaignDO.setRegionId(AreaCodeEnum.ZHEJIAGN.getRegionId());
+                mktCampaignDO.setCreateChannel(PostEnum.ADMIN.getPostCode());
             }
 
             mktCampaignDO.setServiceType(StatusCode.CUST_TYPE.getStatusCode()); // 1000 - 客账户类
-            mktCampaignDO.setRegionId(AreaCodeEnum.getRegionIdByLandId(mktCampaignDO.getLanId()));
+            mktCampaignDO.setLanId(AreaCodeEnum.getLandIdByRegionId(mktCampaignDO.getRegionId()));
             mktCampaignMapper.insert(mktCampaignDO);
             Long mktCampaignId = mktCampaignDO.getMktCampaignId();
             // 活动编码
@@ -768,6 +765,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setTiggerType(params.get("tiggerType").toString());             // 活动触发类型 - 实时，批量
             mktCampaignDO.setMktCampaignCategory(params.get("mktCampaignCategory").toString());  // 活动分类 - 框架，强制，自主
             mktCampaignDO.setMktCampaignType(params.get("mktCampaignType").toString());   // 活动类别 - 服务，营销，服务+营销
+
             List<Integer> landIdList = (List) params.get("landIds");
             if (landIdList.size() > 0 && !"".equals(landIdList.get(0))) {
                 Long landId = Long.valueOf(landIdList.get(landIdList.size() - 1));
@@ -793,7 +791,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCampaignVO.setMktActivityNbr(mktCampaignCountDO.getMktActivityNbr());
                     mktCampaignVO.setPlanBeginTime(mktCampaignCountDO.getPlanBeginTime());
                     mktCampaignVO.setPlanEndTime(mktCampaignCountDO.getPlanEndTime());
-                    mktCampaignVO.setCreateChannel(mktCampaignCountDO.getCreateChannel());
+                    mktCampaignVO.setCreateChannel(PostEnum.getNameByCode(mktCampaignCountDO.getCreateChannel()));
                     mktCampaignVO.setCreateDate(mktCampaignCountDO.getCreateDate());
                     mktCampaignVO.setPreMktCampaignId(mktCampaignCountDO.getPreMktCampaignId());
                 } catch (Exception e) {
