@@ -616,6 +616,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             codeList.add("CCUST_TEL");
         } if (!codeList.contains("LATN_ID")){
             codeList.add("LATN_ID");
+        }if (!codeList.contains("CCUST_ROW_ID")){
+            codeList.add("CCUST_ROW_ID");
+        }if (!codeList.contains("ASSET_NUMBER")){
+            codeList.add("ASSET_NUMBER");
         }
         //策略下所有分群条件加入
         if (ruleCodeList!=null){
