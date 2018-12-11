@@ -7,9 +7,11 @@ import com.google.gson.JsonObject;
 import com.sun.corba.se.spi.ior.ObjectKey;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
+import com.zjtelcom.cpct.dao.channel.MktResourceMapper;
 import com.zjtelcom.cpct.dao.channel.OfferMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
@@ -18,6 +20,7 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
+import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.GroupingVO;
@@ -109,6 +112,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private SysParamsMapper sysParamsMapper;
     @Autowired(required = false)
     private EsService esService;
+    @Autowired
+    private MktResourceMapper resourceMapper;
 
     /**
      * 销售品service
@@ -125,6 +130,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
      */
     @Autowired
     private MktCamChlConfService mktCamChlConfService;
+
+    @Autowired
+    private MktCamItemMapper itemMapper;
 
 
     /**
@@ -262,8 +270,25 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         MktStrategyConfRuleDO rule = ruleMapper.selectByPrimaryKey(ruleId);
         if (rule.getProductId()!=null && !rule.getProductId().equals("")){
             List<Long> itemIdList = ChannelUtil.StringToIdList(rule.getProductId());
+            List<Long> productList = new ArrayList<>();
+            List<String> resourceList = new ArrayList<>();
+            for (Long itemId : itemIdList){
+                MktCamItem item = itemMapper.selectByPrimaryKey(itemId);
+                if (item==null){
+                    continue;
+                }
+                if (item.getItemType().equals("1000")){
+                    productList.add(itemId);
+                }else if (item.getItemType().equals("3000")){
+                    MktResource resource = resourceMapper.selectByPrimaryKey(item.getItemId());
+                    if (resource!=null){
+                        resourceList.add(resource.getMktResName());
+                    }
+                }
+            }
             List<String> itemList = offerMapper.listByOfferIdList(itemIdList);
             result.put("product",ChannelUtil.StringList2String(itemList));
+            result.put("resource",ChannelUtil.StringList2String(resourceList));
         }
         StringBuffer st = new StringBuffer();
         if (rule.getEvtContactConfId()!=null && !rule.getEvtContactConfId().equals("")){
