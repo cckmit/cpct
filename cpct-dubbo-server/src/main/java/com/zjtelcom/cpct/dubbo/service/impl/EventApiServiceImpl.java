@@ -698,15 +698,13 @@ public class EventApiServiceImpl implements EventApiService {
             }
 
             //判断活动状态
-//            if (!"2002".equals(mktCampaign.getStatusCd())) {
-//                esJson.put("hit", "false");
-//                esJson.put("msg", "活动状态未发布");
-//                esService.save(esJson, IndexList.ACTIVITY_MODULE);
-//
-//                System.out.println("活动状态未发布");
-//
-//                return Collections.EMPTY_MAP;
-//            }
+            if (!"2002".equals(mktCampaign.getStatusCd())) {
+                esJson.put("hit", "false");
+                esJson.put("msg", "活动状态未发布");
+                esService.save(esJson, IndexList.ACTIVITY_MODULE);
+                System.out.println("活动状态未发布");
+                return Collections.EMPTY_MAP;
+            }
 
             privateParams.put("activityId", mktCampaign.getMktCampaignId().toString()); //活动编码
             privateParams.put("activityName", mktCampaign.getMktCampaignName()); //活动名称
@@ -969,7 +967,7 @@ public class EventApiServiceImpl implements EventApiService {
                 esService.save(esJson, IndexList.STRATEGY_MODULE);
                 return Collections.EMPTY_MAP;
             }
-            //判断下发渠道
+            //判断适用渠道
             if (mktStrategyConf.getChannelsId() != null && !"".equals(mktStrategyConf.getChannelsId())) {
                 String[] strArrayChannelsId = mktStrategyConf.getChannelsId().split("/");
                 boolean channelCheck = true;
@@ -984,26 +982,26 @@ public class EventApiServiceImpl implements EventApiService {
                         }
                     } else {
                         //下发地市获取异常 lanId
-                        strategyMap.put("msg", "下发渠道获取异常");
+                        strategyMap.put("msg", "适用渠道获取异常");
                         esJson.put("hit", "false");
-                        esJson.put("msg", "下发渠道获取异常");
+                        esJson.put("msg", "适用渠道获取异常");
                         esService.save(esJson, IndexList.STRATEGY_MODULE);
                         return Collections.EMPTY_MAP;
                     }
                 }
 
                 if (channelCheck) {
-                    strategyMap.put("msg", "下发渠道不符");
+                    strategyMap.put("msg", "适用渠道不符");
                     esJson.put("hit", "false");
-                    esJson.put("msg", "下发渠道不符");
+                    esJson.put("msg", "适用渠道不符");
                     esService.save(esJson, IndexList.STRATEGY_MODULE);
                     return Collections.EMPTY_MAP;
                 }
             } else {
                 //下发地市数据异常
-                strategyMap.put("msg", "下发渠道数据异常");
+                strategyMap.put("msg", "适用渠道数据异常");
                 esJson.put("hit", "false");
-                esJson.put("msg", "下发渠道数据异常");
+                esJson.put("msg", "适用渠道数据异常");
                 esService.save(esJson, IndexList.STRATEGY_MODULE);
                 return Collections.EMPTY_MAP;
             }
@@ -1969,7 +1967,7 @@ public class EventApiServiceImpl implements EventApiService {
             //返回结果中添加脚本信息
             if (contactScript != null) {
                 if (subScript(contactScript).size() > 0) {
-                    System.out.println("推荐指引标签替换含有无值的标签");
+                    System.out.println("推荐话术标签替换含有无值的标签");
                     return Collections.EMPTY_MAP;
                 }
             }
@@ -1977,7 +1975,7 @@ public class EventApiServiceImpl implements EventApiService {
             //痛痒点
             if (mktVerbalStr != null) {
                 if (subScript(mktVerbalStr).size() > 0) {
-                    System.out.println("痛痒点标签替换含有无值的标签");
+                    System.out.println("推荐指引标签替换含有无值的标签");
                     return Collections.EMPTY_MAP;
                 }
             }
