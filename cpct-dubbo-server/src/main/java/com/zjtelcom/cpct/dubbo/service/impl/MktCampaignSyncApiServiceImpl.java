@@ -1218,6 +1218,7 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
                         area2RedisThread(tarGrp, tarGrpCondition);
                     }
                     tarGrpCondition.setConditionId(null);
+                    tarGrpCondition.setRootFlag(0L);
                     tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
                     tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
                     tarGrpCondition.setTarGrpId(tarGrp.getTarGrpId());

@@ -26,10 +26,7 @@ import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.EventDTO;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
-import com.zjtelcom.cpct.enums.AreaCodeEnum;
-import com.zjtelcom.cpct.enums.ErrorCode;
-import com.zjtelcom.cpct.enums.ParamKeyEnum;
-import com.zjtelcom.cpct.enums.StatusCode;
+import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
@@ -142,9 +139,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     //需求涵id 跟活动关联关系
     @Autowired
     private RequestInstRelMapper requestInstRelMapper;
-/*
-    @Autowired
-    private IMktCampaignService iMktCampaignService;*/
 
     private final static String createChannel = "cpcp0005";
 
@@ -171,13 +165,17 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setCreateChannel("超级管理员");
             //添加所属地市
             if(UserUtil.getUser()!=null){
-                mktCampaignDO.setLanId(UserUtil.getUser().getLanId());
+                // 获取当前用户
+                mktCampaignDO.setRegionId(UserUtil.getUser().getLanId());
+                // 获取当前用户的岗位编码
+                mktCampaignDO.setCreateChannel(UserUtil.getRoleCode());
             } else{
                 mktCampaignDO.setLanId(UserUtil.loginId());
+                mktCampaignDO.setCreateChannel(PostEnum.ADMIN.getPostCode());
             }
 
             mktCampaignDO.setServiceType(StatusCode.CUST_TYPE.getStatusCode()); // 1000 - 客账户类
-            mktCampaignDO.setRegionId(AreaCodeEnum.getRegionIdByLandId(mktCampaignDO.getLanId()));
+            mktCampaignDO.setLanId(AreaCodeEnum.getLandIdByRegionId(mktCampaignDO.getLanId()));
             mktCampaignMapper.insert(mktCampaignDO);
             Long mktCampaignId = mktCampaignDO.getMktCampaignId();
             // 活动编码

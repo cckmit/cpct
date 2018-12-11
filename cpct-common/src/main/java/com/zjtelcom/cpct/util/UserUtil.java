@@ -38,17 +38,23 @@ public class UserUtil {
      * 获取用户权限名称
      * @return
      */
-    public static String getUserRole() {
-        SystemUserDto userDetail = BssSessionHelp.getSystemUserDto();
-        String roleCode = " ";
-        for (SystemPostDto role : userDetail.getSystemPostDtoList()) {
-            if (role.getSysPostCode().contains("cpcp")){
-                roleCode = role.getSysPostName();
-            }
+    public static String getRoleCode() {
+        String roleCode = "";
+        try {
+            SystemUserDto userDetail = BssSessionHelp.getSystemUserDto();
+            for (SystemPostDto role : userDetail.getSystemPostDtoList()) {
+                if (role.getSysPostCode().contains("cpcp")){
+                    roleCode = role.getSysPostName();
+                    break;
+                }
 //            if (0 != role.getDefaultFlag()) {
 //                continue;
 //            }
 //            roleName = role.getSysPostName();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return roleCode;
         }
         return roleCode;
     }
