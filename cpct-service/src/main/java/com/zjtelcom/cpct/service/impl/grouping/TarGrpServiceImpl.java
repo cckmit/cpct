@@ -130,7 +130,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                     }
                     MktCamGrpRul rul = grpRulMapper.selectByTarGrpId(oldTarGrpId);
                     if (rul!=null){
-//                        grpRulMapper.deleteByPrimaryKey()
+                        grpRulMapper.deleteByTarGrpId(oldTarGrpId);
                     }
                 }
             }
