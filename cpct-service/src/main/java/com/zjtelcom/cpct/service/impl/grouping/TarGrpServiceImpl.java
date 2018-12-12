@@ -315,6 +315,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             }
             if (conditionList.isEmpty()){
                 tarGrpMapper.deleteByPrimaryKey(tarGrpId);
+                mktCamGrpRulMapper.deleteByTarGrpId(tarGrpId);
                 redisUtils.remove("TAR_GRP_"+tarGrp.getTarGrpId());
             }
         } catch (Exception e) {

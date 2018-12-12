@@ -61,6 +61,8 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
         }
         if (camScript != null) {
             newScript.setScriptDesc(camScript.getScriptDesc());
+        } else {
+            newScript.setScriptDesc(scriptDesc);
         }
         newScript.setMktCampaignId(0L);
         newScript.setEvtContactConfId(newConfId);

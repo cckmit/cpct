@@ -28,7 +28,9 @@ import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.dto.strategy.MktStrategy;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
+import com.zjtelcom.cpct.enums.AreaCodeEnum;
 import com.zjtelcom.cpct.enums.ErrorCode;
+import com.zjtelcom.cpct.enums.PostEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.pojo.MktCamStrategyRel;
 import com.zjtelcom.cpct.service.BaseService;
@@ -139,7 +141,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 if(UserUtil.getUser()!=null){
                     mktCamGrpRul.setLanId(UserUtil.getUser().getLanId());
                 } else{
-                    mktCamGrpRul.setLanId(UserUtil.loginId());
+                    mktCamGrpRul.setLanId((AreaCodeEnum.ZHEJIAGN.getRegionId()));
                 }
                 mktCamGrpRul.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
                 mktCamGrpRul.setStatusDate(new Date());
@@ -337,7 +339,12 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     MktCamGrpRul mktCamGrpRul = new MktCamGrpRul();
                     mktCamGrpRul.setTarGrpId(mktStrategyConfRule.getTarGrpId());
                     mktCamGrpRul.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
-                    mktCamGrpRul.setLanId(1L);
+                    if (UserUtil.getUser() != null) {
+                        // 获取当前用户
+                        mktCamGrpRul.setLanId(UserUtil.getUser().getLanId());
+                    } else{
+                        mktCamGrpRul.setLanId((AreaCodeEnum.ZHEJIAGN.getRegionId()));
+                    }
                     mktCamGrpRul.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
                     mktCamGrpRul.setStatusDate(new Date());
                     mktCamGrpRul.setCreateDate(new Date());
@@ -1501,6 +1508,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             }
             for (Future<Map<String, Object>> ruleFutureNew : threadList) {
                 MktStrategyConfRule mktStrategyConfRule = (MktStrategyConfRule) ruleFutureNew.get().get("mktStrategyConfRule");
+                mktStrategyConfRule.setMktStrategyConfRuleId(null);
                 mktStrategyConfRuleList.add(mktStrategyConfRule);
             }
             ruleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -1532,7 +1540,10 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 Map<String, Object> tarGrpMap = new HashMap<>();
                 tarGrpMap = tarGrpService.copyTarGrp(mktStrategyConfRuleDO.getTarGrpId(), false);
                 TarGrp tarGrp = (TarGrp) tarGrpMap.get("tarGrp");
-                mktStrategyConfRule.setTarGrpId(tarGrp.getTarGrpId());
+                if (tarGrp != null) {
+                    mktStrategyConfRule.setTarGrpId(tarGrp.getTarGrpId());
+                }
+
                 /**
                  * 销售品配置
                  */

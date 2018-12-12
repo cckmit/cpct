@@ -18,6 +18,10 @@
     delete from mkt_cam_grp_rul
     where MKT_CAM_GRP_RUL_ID = #{mktCamGrpRulId,jdbcType=BIGINT}
   </delete>
+  <delete id="deleteByTarGrpId" parameterType="java.lang.Long">
+    delete from mkt_cam_grp_rul
+    where TAR_GRP_ID = #{tarGrpId,jdbcType=BIGINT}
+  </delete>
   <insert id="insert" useGeneratedKeys="true" keyProperty="mktCamGrpRulId" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamGrpRul">
     insert into mkt_cam_grp_rul (MKT_CAM_GRP_RUL_ID, MKT_CAMPAIGN_ID, TAR_GRP_ID, 
       STATUS_CD, STATUS_DATE, CREATE_STAFF, 
