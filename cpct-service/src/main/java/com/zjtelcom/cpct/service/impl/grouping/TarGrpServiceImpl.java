@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 
 /**
@@ -61,6 +62,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     private RedisUtils redisUtils;
     @Autowired
     private OrgTreeMapper orgTreeMapper;
+    @Autowired
+    private MktCamGrpRulMapper grpRulMapper;
 
 
     /**
@@ -97,7 +100,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
      * @return‘
      */
     @Override
-    public Map<String, Object> createTarGrpByTemplateId(Long templateId) {
+    public Map<String, Object> createTarGrpByTemplateId(Long templateId,Long oldTarGrpId) {
         Map<String, Object> result = new HashMap<>();
         TarGrp template = tarGrpMapper.selectByPrimaryKey(templateId);
         if (template==null){
@@ -115,7 +118,28 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             conditionAdd.add(con);
         }
         addVO.setTarGrpConditions(conditionAdd);
-        return createTarGrp(addVO,false);
+        Map<String,Object> crMap = createTarGrp(addVO,false);
+        if (crMap.get("resultCode").equals(CODE_SUCCESS)){
+            if (oldTarGrpId!=0){
+                TarGrp grp = tarGrpMapper.selectByPrimaryKey(oldTarGrpId);
+                if (grp!=null){
+                    tarGrpMapper.deleteByPrimaryKey(oldTarGrpId);
+                    List<TarGrpCondition> conditions = tarGrpConditionMapper.listTarGrpCondition(oldTarGrpId);
+                    for (TarGrpCondition condition : conditions){
+                        tarGrpConditionMapper.deleteByPrimaryKey(condition.getConditionId());
+                    }
+                    MktCamGrpRul rul = grpRulMapper.selectByTarGrpId(oldTarGrpId);
+                    if (rul!=null){
+                        grpRulMapper.deleteByTarGrpId(oldTarGrpId);
+                    }
+                }
+            }
+            result = crMap;
+            return result;
+        }else {
+            result = crMap;
+        }
+        return result;
     }
 
 
