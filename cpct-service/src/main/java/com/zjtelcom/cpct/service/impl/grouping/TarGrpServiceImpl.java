@@ -291,6 +291,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     @Override
     public Map<String, Object> delTarGrpCondition(Long conditionId) {
         Map<String, Object> mapsT = new HashMap<>();
+        Long tarGrpId = null;
+        boolean isDeleted = false;
         try {
             TarGrpCondition condition = tarGrpConditionMapper.selectByPrimaryKey(conditionId);
             if (condition==null){
@@ -298,7 +300,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 mapsT.put("resultMsg", ErrorCode.DEL_TAR_GRP_CONDITION_FAILURE.getErrorMsg());
                 return mapsT;
             }
-            Long tarGrpId = condition.getTarGrpId();
+            tarGrpId = condition.getTarGrpId();
             tarGrpConditionMapper.deleteByPrimaryKey(conditionId);
             TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpId);
             if (tarGrp==null){
@@ -317,6 +319,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 tarGrpMapper.deleteByPrimaryKey(tarGrpId);
                 mktCamGrpRulMapper.deleteByTarGrpId(tarGrpId);
                 redisUtils.remove("TAR_GRP_"+tarGrp.getTarGrpId());
+                isDeleted = true;
             }
         } catch (Exception e) {
             mapsT.put("resultCode", CODE_FAIL);
@@ -327,7 +330,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         }
         mapsT.put("resultCode", CommonConstant.CODE_SUCCESS);
         mapsT.put("resultMsg", StringUtils.EMPTY);
-        mapsT.put("resultObject", StringUtils.EMPTY);
+        if (isDeleted){
+            mapsT.put("resultObject", null);
+        }else {
+            mapsT.put("resultObject", tarGrpId);
+        }
         return mapsT;
     }
 
