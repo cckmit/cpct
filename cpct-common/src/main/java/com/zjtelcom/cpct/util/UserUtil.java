@@ -1,9 +1,13 @@
 package com.zjtelcom.cpct.util;
 
 import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
+import com.ctzj.smt.bss.sysmgr.model.dataobject.SystemRoles;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemPostDto;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * 用户工具类
@@ -26,7 +30,13 @@ public class UserUtil {
      * @return
      */
     public static SystemUserDto getUser(){
-        SystemUserDto userDetail = BssSessionHelp.getSystemUserDto();
+        SystemUserDto userDetail = null;
+        try {
+             userDetail = BssSessionHelp.getSystemUserDto();
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
         return userDetail;
     }
 
@@ -40,7 +50,7 @@ public class UserUtil {
             SystemUserDto userDetail = BssSessionHelp.getSystemUserDto();
             for (SystemPostDto role : userDetail.getSystemPostDtoList()) {
                 if (role.getSysPostCode().contains("cpcp")){
-                    roleCode = role.getSysPostName();
+                    roleCode = role.getSysPostCode();
                     break;
                 }
 //            if (0 != role.getDefaultFlag()) {

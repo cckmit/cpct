@@ -178,9 +178,12 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         label.setClassName("0");
         label.setLabelType("1000");
         //todo 系统添加待确认
-        label.setLabelDataType("1000");
-        label.setLabelValueType("1000");
-
+        if (label.getConditionType().equals("4")){
+            label.setLabelValueType("1000");
+        }else {
+            label.setLabelValueType("2000");
+        }
+        label.setLabelDataType("1200");
         label.setCreateDate(new Date());
         label.setUpdateDate(new Date());
         label.setCreateStaff(userId);
