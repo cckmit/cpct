@@ -11,6 +11,8 @@ import java.util.List;
 public interface MktCamGrpRulMapper {
     int deleteByPrimaryKey(Long mktCamGrpRulId);
 
+    int deleteByTarGrpId(Long tarGrpId);
+
     int insert(MktCamGrpRul record);
 
     MktCamGrpRul selectByPrimaryKey(Long mktCamGrpRulId);

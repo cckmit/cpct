@@ -10,6 +10,7 @@ import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlResultMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCamGrpRulMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamStrategyConfRelMapper;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
@@ -97,6 +98,12 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
     @Autowired
     private ContactChannelMapper contactChannelMapper;
 
+    /**
+     * 分群与活动关系
+     */
+    @Autowired
+    private MktCamGrpRulMapper mktCamGrpRulMapper;
+
     /*
      * 协同渠道
      */
@@ -154,7 +161,10 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
         //删除策略下的规则，以及关联的表
         List<MktStrategyConfRuleRelDO> mktStrategyConfRuleRelDOList = mktStrategyConfRuleRelMapper.selectByMktStrategyConfId(mktStrategyConfId);
         for (MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO : mktStrategyConfRuleRelDOList) {
+            // 删除规则
             mktStrategyConfRuleMapper.deleteByPrimaryKey(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId());
+            // 删除活动与分群的关系
+            mktCamGrpRulMapper.deleteByTarGrpId(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId());
             mktStrategyConfRuleRelMapper.deleteByPrimaryKey(mktStrategyConfRuleRelDO.getMktStrategyConfRuleRelId());
         }
         //删除策略与活动的关联
