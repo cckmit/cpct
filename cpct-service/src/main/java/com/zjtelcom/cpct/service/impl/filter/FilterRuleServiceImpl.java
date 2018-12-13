@@ -232,9 +232,9 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
      * 查询单个过滤规则
      */
     @Override
-    public Map<String, Object> getFilterRule(FilterRule filterRule) {
+    public Map<String, Object> getFilterRule(Long ruleId) {
         Map<String, Object> map = new HashMap<>();
-        FilterRule filterRuleT = filterRuleMapper.getFilterRule(filterRule);
+        FilterRule filterRuleT = filterRuleMapper.selectByPrimaryKey(ruleId);
         FilterRuleVO vo = BeanUtil.create(filterRuleT,new FilterRuleVO());
         if (filterRuleT.getChooseProduct()!=null && !filterRuleT.getChooseProduct().equals("")){
             List<String> codeList = ChannelUtil.StringToList(filterRuleT.getChooseProduct());

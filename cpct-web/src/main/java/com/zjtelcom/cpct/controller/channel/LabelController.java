@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.controller.channel;
 
 import com.zjtelcom.cpct.controller.BaseController;
-import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dto.channel.LabelAddVO;
 import com.zjtelcom.cpct.dto.channel.LabelEditVO;
@@ -28,8 +27,6 @@ public class LabelController extends BaseController {
     private LabelService labelService;
     @Autowired
     private LabelCatalogService labelCatalogService;
-    @Autowired
-    private InjectionLabelMapper labelMapper;
 
 
     @PostMapping("batchAdd")
@@ -131,15 +128,6 @@ public class LabelController extends BaseController {
         return result;
     }
 
-
-    @PostMapping("queryTriggerByleftOperand")
-    @CrossOrigin
-    public Map<String, Object> queryTriggerByleftOperand(@RequestBody List<Map<String ,String>> leftOperans) {
-        List<Label> labelList = labelMapper.queryTriggerByLeftOpers(leftOperans);
-        Map ma = new HashMap();
-        ma.put("result",labelList);
-        return ma;
-    }
 
     /**
      * 通过标签组获取标签列表
