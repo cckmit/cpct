@@ -1,0 +1,170 @@
+#set ($mapper = $!mapperName.substring(0,1).toLowerCase()+$!mapperName.substring(1))
+#set ($bean = $!javabean.substring(0,1).toLowerCase()+$!javabean.substring(1))
+package $!{packageName}.serviceImpl.$!{catalogName};
+
+import com.zjtelcom.cpct.$!{mapperCatalogName};
+import com.zjtelcom.cpct.$!{beanCatalogName};
+import com.zjtelcom.cpct.exception.SystemException;
+import com.zjtelcom.cpct.open.base.common.CommonUtil;
+import com.zjtelcom.cpct.open.base.service.BaseService;
+import com.zjtelcom.cpct.open.service.$!{catalogName}.Open$!{entityName}Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.zjtelcom.cpct.util.BeanUtil;
+import com.zjtelcom.cpct.util.DateUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageInfo;
+import com.zjtelcom.cpct.common.Page;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+* @author: anson
+* @CreateDate: $!{date}
+* @version: V 1.0
+* $!{annotation}openapi相关服务
+*/
+@Service
+@Transactional
+public class Open$!{entityName}ServiceImpl extends BaseService implements Open$!{entityName}Service{
+
+@Autowired
+private $!{mapperName} $!{mapper};
+
+
+/**
+* 查询$!{annotation}信息
+* @param id
+* @return
+*/
+@Override
+public Map<String, Object> queryById(String id) {
+Map<String, Object> resultMap = new HashMap<>();
+long queryId= CommonUtil.stringToLong(id);
+$!{javabean} $!{bean} = $!{mapper}.selectByPrimaryKey(queryId);
+if(null==$!{bean}){
+throw new SystemException("对应$!{annotation}信息不存在!");
+}
+        //转换为openapi返回规范
+Open$!{entityName} open$!{entityName}=BeanUtil.create($!{bean},new Open$!{entityName}());
+        //设置id  和href  转换时间为对应格式
+open$!{entityName}.setId(id);
+open$!{entityName}.setHref("/$!{path}/" + id);
+if(null!=$!{bean}.getStatusDate()){
+open$!{entityName}.setStatusDate(DateUtil.getDatetime($!{bean}.getStatusDate()));
+}
+resultMap.put("params",open$!{entityName});
+return resultMap;
+}
+
+
+/**
+* 新增$!{annotation}
+* @param object
+* @return
+*/
+@Override
+public Map<String, Object> addByObject(Object object) {
+Map<String, Object> resultMap = new HashMap<>();
+$!{javabean} $!{bean}= ($!{javabean}) object;
+$!{mapper}.insert($!{bean});
+$!{javabean} result = $!{mapper}.selectByPrimaryKey($!{bean}.getId());
+Open$!{entityName} open$!{entityName}=BeanUtil.create(result,new Open$!{entityName}());
+        //设置id  和href  转换时间为对应格式
+open$!{entityName}.setId(result.getStrategyId().toString());
+open$!{entityName}.setHref("/$!{path}/" + result.getStrategyId().toString());
+if(null!=result.getStatusDate()){
+open$!{entityName}.setStatusDate(DateUtil.getDatetime(result.getStatusDate()));
+}
+resultMap.put("params",open$!{entityName});
+return resultMap;
+}
+
+
+/**
+* 修改$!{annotation}信息
+* @param id
+* @param object
+* @return
+*/
+@Override
+public Map<String, Object> updateByParams(String id, Object object) {
+Map<String, Object> resultMap = new HashMap<>();
+Long queryId = CommonUtil.stringToLong(id);
+$!{javabean} $!{bean} = $!{mapper}.selectByPrimaryKey(queryId);
+if(null==$!{bean}){
+throw new SystemException("对应$!{annotation}信息不存在!");
+}
+JSONObject json = JSONObject.parseObject(JSONObject.toJSONString($!{bean}));
+JSONArray array = (JSONArray) JSONArray.parse((String)object);
+for (int i = 0; i <array.size() ; i++) {
+        //目前只考虑修改值的情况  replace   只对"path":"/injectionLabelName"  格式操作
+JSONObject jsonObject = (JSONObject) array.get(i);
+String path = ((String) jsonObject.get("path")).substring(1);
+json.put(path,jsonObject.getString("value"));
+}
+        //赋值以后转为对象 再去更新
+$!{javabean} change=JSONObject.parseObject(json.toJSONString(),$!{javabean}.class);
+$!{mapper}.updateByPrimaryKey(change);
+json.put("id",change.getStrategyId().toString());
+json.put("href","/$!{path}/" + change.getStrategyId().toString());
+if(change.getStatusDate()!=null){
+json.put("statusDate",DateUtil.getDatetime(change.getStatusDate()));
+}
+        //转为集团返回规范
+Open$!{entityName} open$!{entityName}=JSONObject.parseObject(json.toJSONString(),Open$!{entityName}.class);
+resultMap.put("params",open$!{entityName});
+return resultMap;
+}
+
+/**
+* 删除$!{annotation}信息
+* @param id
+* @return
+*/
+@Override
+public Map<String, Object> deleteById(String id) {
+Map<String, Object> resultMap = new HashMap<>();
+long queryId= CommonUtil.stringToLong(id);
+$!{mapper}.deleteByPrimaryKey(queryId);
+return resultMap;
+}
+
+
+/**
+* 查询$!{annotation}信息列表
+* @param map
+* @return
+*/
+@Override
+public Map<String, Object> queryListByMap(Map<String, Object> map) {
+Map<String, Object> resultMap = new HashMap<>();
+$!{javabean} $!{bean}=new $!{javabean}();
+CommonUtil.setPage(map);
+List<$!{javabean}> list = $!{mapper}.queryList($!{bean});
+if(list.isEmpty()){
+throw new SystemException("对应$!{annotation}信息不存在！");
+}
+        //转化为集团返回规范 设置id  href  转换时间格式
+List<Open$!{entityName}> returnList=new ArrayList<>();
+    for($!{javabean} m:list){
+    Open$!{entityName} open$!{entityName}=BeanUtil.create(m,new Open$!{entityName}());
+    open$!{entityName}.setId(m.getStrategyId().toString());
+    open$!{entityName}.setHref("/$!{path}/" + m.getStrategyId().toString());
+    if(null!=$!{bean}.getStatusDate()){
+    open$!{entityName}.setStatusDate(DateUtil.getDatetime($!{bean}.getStatusDate()));
+    }
+    returnList.add(open$!{entityName});
+    }
+    Page pageInfo = new Page(new PageInfo(list));
+    resultMap.put("params", returnList);
+    resultMap.put("size",String.valueOf(pageInfo.getTotal()));
+    return resultMap;
+    }
+    }

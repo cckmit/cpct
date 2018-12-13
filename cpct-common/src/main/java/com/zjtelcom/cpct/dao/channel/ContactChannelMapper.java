@@ -33,4 +33,6 @@ public interface ContactChannelMapper {
 
     Channel selectByCode(@Param("code")String code);
 
+    List<Channel> queryList(Channel record);
+
 }

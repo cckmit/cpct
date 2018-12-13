@@ -715,4 +715,32 @@ public class DateUtil {
         return v;
     }
 
+
+    /**
+     * date转数字格式时间
+     * @param time
+     * @return
+     */
+    public static String getDatetime(Date time){
+        SimpleDateFormat sf=new SimpleDateFormat("yyyyMMddHHmmss");
+        return  sf.format(time);
+    }
+
+
+    /**
+     * 时间戳转数字格式时间
+     * @param time
+     * @return
+     */
+    public static String TimeStampToNum(Long time){
+        SimpleDateFormat sf=new SimpleDateFormat("yyyyMMddHHmmss");
+        return  sf.format(time);
+    }
+
+
+
+
+
+
+
 }

@@ -364,4 +364,40 @@
         where EVENT_NBR = #{eventNbr,jdbcType=VARCHAR}
     </select>
 
+    <!--多条件查询-->
+    <select id="findEventsByKey" resultType="com.zjtelcom.cpct.dto.event.ContactEvt">
+        select
+        e.EVENT_ID contactEvtId,
+        e.EVENT_NBR contactEvtCode,
+        e.EVENT_NAME contactEvtName,
+        e.EVENT_DESC contactEvtDesc,
+        e.EVT_MAPPED_ADDR evtMappedAddr,
+        e.EVT_MAPPED_IP evtMappedIp,
+        e.EVT_PROCOTOL_TYPE evtProcotolType,
+        e.EVT_MAPPED_FUN_NAME evtMappedFunName,
+        e.MKT_CAMPAIGN_TYPE mktCampaignType,
+        t.EVT_TYPE_NAME contactEvtTypeName,
+        e.EVENT_TRIG_TYPE evtTrigType,
+        e.STATUS_CD statusCd
+        from event e
+        <include refid="eventJoin"/>
+        where 1=1
+        <if test="contactEvtId != null and contactEvtId != ''">
+            and e.EVENT_ID = #{contactEvtId}
+        </if>
+        <if test="contactEvtCode != null and contactEvtCode != ''">
+            and e.EVENT_NBR = #{contactEvtCode}
+        </if>
+        <if test="contactEvtName != null and contactEvtName != ''">
+            and e.EVENT_NAME LIKE CONCAT(CONCAT('%',#{contactEvtName}),'%')
+        </if>
+        <if test="contactEvtTypeId != null and contactEvtTypeId != 0">
+            and e.EVT_TYPE_ID = #{contactEvtTypeId}
+        </if>
+        <if test="statusCd != null and statusCd != ''">
+            and e.STATUS_CD = #{statusCd}
+        </if>
+        ORDER BY e.CREATE_DATE DESC
+    </select>
+
 </mapper>

@@ -15,4 +15,6 @@ public interface MktStrategyMapper {
     List<MktStrategy> selectAll();
 
     int updateByPrimaryKey(MktStrategy mktStrategy);
+
+    List<MktStrategy> queryList(MktStrategy mktStrategy);
 }

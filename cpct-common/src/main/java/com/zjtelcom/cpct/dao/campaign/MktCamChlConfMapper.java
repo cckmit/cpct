@@ -23,4 +23,6 @@ public interface MktCamChlConfMapper {
     int updateByPrimaryKey(MktCamChlConfDO mktCamChlConfDO);
 
     List<MktCamChlConfDO> listByIdList(@Param("list")List<Long> idList);
+
+    List<MktCamChlConfDO> selectByMktCamChlConf(MktCamChlConfDO mktCamChlConfDO);
 }

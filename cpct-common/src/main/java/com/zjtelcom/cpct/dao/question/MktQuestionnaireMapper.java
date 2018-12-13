@@ -22,4 +22,6 @@ public interface MktQuestionnaireMapper {
 
 
     int updateByPrimaryKey(Questionnaire record);
+
+    List<Questionnaire> queryList(Questionnaire questionnaire);
 }

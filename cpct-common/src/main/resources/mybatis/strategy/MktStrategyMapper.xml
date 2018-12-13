@@ -61,4 +61,24 @@
     LAN_ID
     from mkt_strategy
   </select>
+
+
+
+
+  <select id="queryList" parameterType="com.zjtelcom.cpct.dto.strategy.MktStrategy" resultMap="BaseResultMap">
+    select STRATEGY_ID, STRATEGY_NAME, STRATEGY_TYPE, STRATEGY_DESC, RULE_EXPRESSION,
+    STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK,
+    LAN_ID
+    from mkt_strategy
+    WHERE 1 = 1
+    <if test="strategyId != null and strategyId != ''">
+      AND STRATEGY_ID = #{strategyId,jdbcType=VARCHAR}
+    </if>
+    <if test="strategyName != null and strategyName != '' ">
+      AND STRATEGY_NAME = #{strategyName,jdbcType=VARCHAR}
+    </if>
+
+  </select>
+
+
 </mapper>
