@@ -36,10 +36,12 @@ public class TarGrpController extends BaseController {
 
     @RequestMapping("/createTarGrpByTemplateId")
     @CrossOrigin
-    public String createTarGrpByTemplateId(@RequestBody HashMap<String,Long> param) {
+    public String createTarGrpByTemplateId(@RequestBody HashMap<String,Object> param) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            maps = tarGrpService.createTarGrpByTemplateId(param.get("templateId"));
+            Long templateId = Long.valueOf(param.get("templateId").toString());
+            Long oldTarGrpId = Long.valueOf(param.get("oldTarGrpId").toString());
+            maps = tarGrpService.createTarGrpByTemplateId(templateId,oldTarGrpId);
         } catch (Exception e) {
             logger.error("[op:TarGrpController] fail to saveTagNumFetch for tarGrpDTO = {}!" +
                     " Exception: ", JSONArray.toJSON(maps), e);

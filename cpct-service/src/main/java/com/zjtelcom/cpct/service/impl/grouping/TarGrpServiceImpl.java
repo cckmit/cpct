@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 
 /**
@@ -61,6 +62,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     private RedisUtils redisUtils;
     @Autowired
     private OrgTreeMapper orgTreeMapper;
+    @Autowired
+    private MktCamGrpRulMapper grpRulMapper;
 
 
     /**
@@ -97,7 +100,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
      * @return‘
      */
     @Override
-    public Map<String, Object> createTarGrpByTemplateId(Long templateId) {
+    public Map<String, Object> createTarGrpByTemplateId(Long templateId,Long oldTarGrpId) {
         Map<String, Object> result = new HashMap<>();
         TarGrp template = tarGrpMapper.selectByPrimaryKey(templateId);
         if (template==null){
@@ -115,7 +118,28 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             conditionAdd.add(con);
         }
         addVO.setTarGrpConditions(conditionAdd);
-        return createTarGrp(addVO,false);
+        Map<String,Object> crMap = createTarGrp(addVO,false);
+        if (crMap.get("resultCode").equals(CODE_SUCCESS)){
+            if (oldTarGrpId!=0){
+                TarGrp grp = tarGrpMapper.selectByPrimaryKey(oldTarGrpId);
+                if (grp!=null){
+                    tarGrpMapper.deleteByPrimaryKey(oldTarGrpId);
+                    List<TarGrpCondition> conditions = tarGrpConditionMapper.listTarGrpCondition(oldTarGrpId);
+                    for (TarGrpCondition condition : conditions){
+                        tarGrpConditionMapper.deleteByPrimaryKey(condition.getConditionId());
+                    }
+                    MktCamGrpRul rul = grpRulMapper.selectByTarGrpId(oldTarGrpId);
+                    if (rul!=null){
+                        grpRulMapper.deleteByTarGrpId(oldTarGrpId);
+                    }
+                }
+            }
+            result = crMap;
+            return result;
+        }else {
+            result = crMap;
+        }
+        return result;
     }
 
 
@@ -267,6 +291,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     @Override
     public Map<String, Object> delTarGrpCondition(Long conditionId) {
         Map<String, Object> mapsT = new HashMap<>();
+        Long tarGrpId = null;
+        boolean isDeleted = false;
         try {
             TarGrpCondition condition = tarGrpConditionMapper.selectByPrimaryKey(conditionId);
             if (condition==null){
@@ -274,7 +300,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 mapsT.put("resultMsg", ErrorCode.DEL_TAR_GRP_CONDITION_FAILURE.getErrorMsg());
                 return mapsT;
             }
-            Long tarGrpId = condition.getTarGrpId();
+            tarGrpId = condition.getTarGrpId();
             tarGrpConditionMapper.deleteByPrimaryKey(conditionId);
             TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpId);
             if (tarGrp==null){
@@ -291,7 +317,9 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             }
             if (conditionList.isEmpty()){
                 tarGrpMapper.deleteByPrimaryKey(tarGrpId);
+                mktCamGrpRulMapper.deleteByTarGrpId(tarGrpId);
                 redisUtils.remove("TAR_GRP_"+tarGrp.getTarGrpId());
+                isDeleted = true;
             }
         } catch (Exception e) {
             mapsT.put("resultCode", CODE_FAIL);
@@ -302,7 +330,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         }
         mapsT.put("resultCode", CommonConstant.CODE_SUCCESS);
         mapsT.put("resultMsg", StringUtils.EMPTY);
-        mapsT.put("resultObject", StringUtils.EMPTY);
+        if (isDeleted){
+            mapsT.put("resultObject", null);
+        }else {
+            mapsT.put("resultObject", tarGrpId);
+        }
         return mapsT;
     }
 
@@ -357,6 +389,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                     }
                     condition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
                     condition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
+                    condition.setRootFlag(0L);
                     condition.setTarGrpId(tarGrp.getTarGrpId());
                     condition.setUpdateDate(DateUtil.getCurrentTime());
                     condition.setCreateDate(DateUtil.getCurrentTime());
