@@ -940,7 +940,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
 
     /**
-     * 导入清单下发参数
+     * 下发参数
      * @param operationVO
      * @param batchNum
      * @param ruleId
