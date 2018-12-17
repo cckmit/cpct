@@ -727,13 +727,13 @@ public class EventApiServiceImpl implements EventApiService {
             esJson.put("activityCode", mktCampaign.getMktCampaignId().toString());
 
             //判断活动状态
-            if (!"2002".equals(mktCampaign.getStatusCd())) {
-                esJson.put("hit", "false");
-                esJson.put("msg", "活动状态未发布");
-                esService.save(esJson, IndexList.ACTIVITY_MODULE);
-                System.out.println("活动状态未发布");
-                return Collections.EMPTY_MAP;
-            }
+//            if (!"2002".equals(mktCampaign.getStatusCd())) {
+//                esJson.put("hit", "false");
+//                esJson.put("msg", "活动状态未发布");
+//                esService.save(esJson, IndexList.ACTIVITY_MODULE);
+//                System.out.println("活动状态未发布");
+//                return Collections.EMPTY_MAP;
+//            }
 
             //验证活动生效时间
             Date beginTime = mktCampaign.getPlanBeginTime();
@@ -1100,7 +1100,7 @@ public class EventApiServiceImpl implements EventApiService {
                         StringBuilder queryLabel = new StringBuilder();
                         //获取过扰标签
                         List<String> labels = mktVerbalConditionMapper.getLabelListByConditionId(filterRule.getConditionId());
-                        if (labels != null) {
+                        if (labels != null && labels.size() > 0) {
                             for (String labelCode : labels) {
                                 queryLabel.append(labelCode).append(",");
                             }
