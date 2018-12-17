@@ -1,0 +1,29 @@
+package com.zjtelcom.cpct.open.entity.$!{catalogName};
+
+import com.zjtelcom.cpct.open.base.entity.BaseEntity;
+
+
+
+/**
+* @Auther: anson
+* @Date: $!{date}
+* @Description:$!{annotation}  实体类 匹配集团openapi规范返回
+*/
+public class Open$!{entityName} extends BaseEntity{
+
+private String statusDate;//状态时间
+
+
+public String getStatusDate() {
+return statusDate;
+}
+
+public void setStatusDate(String statusDate) {
+this.statusDate = statusDate;
+}
+
+
+
+
+
+}

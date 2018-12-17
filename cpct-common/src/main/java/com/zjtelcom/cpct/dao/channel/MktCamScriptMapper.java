@@ -21,4 +21,6 @@ public interface MktCamScriptMapper {
     List<CamScript> selectAll();
 
     int updateByPrimaryKey(CamScript record);
+
+    List<CamScript> selectByCampaignId(Long mktCampaignId);
 }

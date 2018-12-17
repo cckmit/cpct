@@ -1,0 +1,134 @@
+#set ($bean = $!javabean.substring(0,1).toLowerCase()+$!javabean.substring(1))
+package com.zjtelcom.cpct.open.controller.$!{catalogName};
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.zjtelcom.cpct.$!{beanCatalogName};
+import com.zjtelcom.cpct.exception.SystemException;
+import com.zjtelcom.cpct.open.base.common.HttpUtil;
+import com.zjtelcom.cpct.open.base.controller.BaseController;
+import com.zjtelcom.cpct.open.service.$!{catalogName}.Open$!{entityName}Service;
+import org.apache.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
+
+/**
+* @author: anson
+* @CreateDate: $!{date}
+* @version: V 1.0
+* @Description:$!{annotation}
+*/
+@RestController
+@RequestMapping("${openPath}")
+public class Open$!{entityName}Controller extends BaseController{
+
+
+
+@Autowired
+private Open$!{entityName}Service open$!{entityName}Service;
+
+
+/**
+* 查询$!{annotation}
+* @param $!{id}
+* @return
+*/
+@CrossOrigin
+@RequestMapping(value = "/$!{path}/{$!{id}}", method = RequestMethod.GET)
+public String getContactChannel(@PathVariable String id, HttpServletResponse response) {
+try {
+Map<String, Object> map = open$!{entityName}Service.queryById(id);
+return JSON.toJSONString(map.get("params"),SerializerFeature.WriteMapNullValue);
+} catch (SystemException e) {
+e.printStackTrace();
+response.setStatus(HttpStatus.SC_NOT_FOUND);
+return "";
+}
+}
+
+
+/**
+* 新增$!{annotation}
+* @param  $!{bean}
+* @return
+*/
+@CrossOrigin
+@RequestMapping(value = "/$!{path}", method = RequestMethod.POST)
+public String saveContactChannel(@RequestBody $!{javabean} $!{bean}, HttpServletResponse response) {
+Map<String, Object> map = open$!{entityName}Service.addByObject($!{bean});
+             //成功返回http状态201
+response.setStatus(HttpStatus.SC_CREATED);
+return JSON.toJSONString(map.get("params"),SerializerFeature.WriteMapNullValue);
+}
+
+
+/**
+* 更新$!{annotation}
+* @param $!{id}
+* @return application/json-patch+json
+*/
+@CrossOrigin
+@RequestMapping(value = "/$!{path}/{$!{id}}", method = RequestMethod.PATCH)
+public String updateContactChannel(@PathVariable String id, @RequestBody String params, HttpServletResponse response) {
+try {
+Map<String, Object> map = open$!{entityName}Service.updateByParams(id, params);
+return JSON.toJSONString(map.get("params"),SerializerFeature.WriteMapNullValue);
+} catch (SystemException e) {
+e.printStackTrace();
+response.setStatus(HttpStatus.SC_NOT_FOUND);
+return "";
+} catch (Exception e) {
+e.printStackTrace();
+             //参数错误
+response.setStatus(HttpStatus.SC_CONFLICT);
+return "";
+}
+}
+
+/**
+* 删除$!{annotation}
+* @param $!{id}
+* @return
+*/
+@CrossOrigin
+@RequestMapping(value = "/$!{path}/{$!{id}}", method = RequestMethod.DELETE)
+public void deleteContactChannel(@PathVariable String id, HttpServletResponse response) {
+try {
+open$!{entityName}Service.deleteById(id);
+            //删除成功返回http状态码 204
+response.setStatus(HttpStatus.SC_NO_CONTENT);
+} catch (SystemException e) {
+e.printStackTrace();
+response.setStatus(HttpStatus.SC_NOT_FOUND);
+}
+
+}
+
+
+/**
+* 分页查询$!{annotation}列表
+* @return
+*/
+@CrossOrigin
+@RequestMapping(value = "/$!{path}", method = RequestMethod.GET)
+public String listContactChannelPage(HttpServletRequest request, HttpServletResponse response) {
+try {
+Map<String, Object> parameterMap = HttpUtil.getRequestMap(request);
+Map<String, Object> map = open$!{entityName}Service.queryListByMap(parameterMap);
+             //  X-Total-Count  符合条件的总数
+response.setHeader("X-Total-Count", (String) map.get("size"));
+return JSON.toJSONString(map.get("params"), SerializerFeature.WriteMapNullValue);
+} catch (Exception e) {
+e.printStackTrace();
+return "";
+}
+
+}
+
+
+
+}

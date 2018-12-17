@@ -55,4 +55,23 @@
     CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, UPDATE_DATE, STATUS_DATE, REMARK
     from mkt_cpc_algorithms_rul
   </select>
+
+
+  <select id="queryList" parameterType="com.zjtelcom.cpct.domain.campaign.MktCpcAlgorithmsRulDO" resultMap="BaseResultMap">
+    select ALGORITHMS_RUL_ID, ALGORITHMS_RUL_NAME, RULE_DESC, RULE_EXPRESSION, STATUS_CD,
+    CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, UPDATE_DATE, STATUS_DATE, REMARK
+    from mkt_cpc_algorithms_rul
+    WHERE 1 = 1
+    <if test="algorithmsRulId != null and algorithmsRulId != ''">
+      AND ALGORITHMS_RUL_ID = #{algorithmsRulId}
+    </if>
+    <if test="algorithmsRulName != null and algorithmsRulName != '' ">
+      AND ALGORITHMS_RUL_NAME = #{algorithmsRulName}
+    </if>
+    <if test="ruleExpression != null and ruleExpression != '' ">
+      AND RULE_EXPRESSION = #{ruleExpression}
+    </if>
+  </select>
+
+
 </mapper>
