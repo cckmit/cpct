@@ -1266,7 +1266,8 @@ public class EventApiServiceImpl implements EventApiService {
             param.put("queryId", privateParams.get("integrationId"));
             param.put("type", "1");
             //查询标签列表
-            StringBuilder queryFieldsSb = new StringBuilder();
+            StringBuilder queryFieldsAss = new StringBuilder();
+            StringBuilder queryFieldsCust = new StringBuilder();
             //从redis获取规则使用的所有标签
             List<LabelResult> labelResultList = (List<LabelResult>) redisUtils.get(key + "_LABEL");
 
@@ -1310,7 +1311,13 @@ public class EventApiServiceImpl implements EventApiService {
                             continue;
                         }
                         paramsSize++;
-                        queryFieldsSb.append(label.getInjectionLabelCode()).append(",");
+                        // todo 标签类型常量
+                        if("1000".equals(label.getLabelType())) {
+                            queryFieldsAss.append(label.getInjectionLabelCode()).append(",");
+                        } else if("2000".equals(label.getLabelType())) {
+                            queryFieldsCust.append(label.getInjectionLabelCode()).append(",");
+                        }
+
                     }
                 }
             } else {
@@ -1320,17 +1327,17 @@ public class EventApiServiceImpl implements EventApiService {
                         continue;
                     }
                     paramsSize++;
-                    queryFieldsSb.append(labelResultList.get(i - 1).getLabelCode()).append(",");
+                    queryFieldsAss.append(labelResultList.get(i - 1).getLabelCode()).append(",");
                 }
             }
 
-            if (queryFieldsSb.length() > 0) {
-                queryFieldsSb.deleteCharAt(queryFieldsSb.length() - 1);
+            if (queryFieldsAss.length() > 0) {
+                queryFieldsAss.deleteCharAt(queryFieldsAss.length() - 1);
             }
 
-            param.put("queryFields", queryFieldsSb.toString());
+            param.put("queryFields", queryFieldsAss.toString());
 
-            if ("".equals(queryFieldsSb.toString())) {
+            if ("".equals(queryFieldsAss.toString())) {
                 System.out.println("无需查询标签");
                 context.putAll(labelItems);
             } else {
@@ -1445,106 +1452,6 @@ public class EventApiServiceImpl implements EventApiService {
                         e.printStackTrace();
                         System.out.println("单个标签判断出错");
                     }
-
-//                    //拼接表达式
-//                    if ("7100".equals(type)) {
-//                        expressSb.append("!");
-//                    }
-//                    expressSb.append("((");
-//
-//                    express1.append("if(");
-//                    express1.append("(");
-//
-//                    expressSb.append(label.getInjectionLabelCode()).append(")");
-//                    express1.append(label.getInjectionLabelCode()).append(")");
-//                    if ("1000".equals(type)) {
-//                        expressSb.append(" > ");
-//                        express1.append(" > ");
-//                    } else if ("2000".equals(type)) {
-//                        expressSb.append(" < ");
-//                        express1.append(" < ");
-//                    } else if ("3000".equals(type)) {
-//                        expressSb.append(" == ");
-//                        express1.append(" == ");
-//                    } else if ("4000".equals(type)) {
-//                        expressSb.append(" != ");
-//                        express1.append(" != ");
-//                    } else if ("5000".equals(type)) {
-//                        expressSb.append(" >= ");
-//                        express1.append(" >= ");
-//                    } else if ("6000".equals(type)) {
-//                        expressSb.append(" <= ");
-//                        express1.append(" <= ");
-//                    } else if ("7000".equals(type) || "7100".equals(type)) {
-//                        expressSb.append(" in ");
-//                        express1.append(" in ");
-//                    } else if ("7200".equals(type)) {
-//
-//                        String[] strArray = tarGrpConditionDOs.get(i).getRightParam().split(",");
-//
-////                        expressSb.append(" >= ").append("\"").append(strArray[0]).append("\"").append(")");
-////                        expressSb.append(" && ").append("((");
-////                        expressSb.append(label.getInjectionLabelCode()).append(")");
-////                        expressSb.append(" <= ").append("\"").append(strArray[1]).append("\"");
-//
-//                        expressSb.append(" >= ").append(strArray[0]);
-//                        expressSb.append(" && ").append("(");
-//                        expressSb.append(label.getInjectionLabelCode()).append(")");
-//                        expressSb.append(" <= ").append(strArray[1]);
-//
-//                        express1.append(" >= ").append(strArray[0]);
-//                        express1.append(" && ").append("(");
-//                        express1.append(label.getInjectionLabelCode()).append(")");
-//                        express1.append(" <= ").append(strArray[1]);
-//
-////                        express1.append(" >= ").append("\"").append(strArray[0]).append("\"");
-////                        express1.append(" && ").append("(");
-////                        express1.append(label.getInjectionLabelCode()).append(")");
-////                        express1.append(" <= ").append("\"").append(strArray[1]).append("\"");
-//
-//                    }
-//
-//                    if ("7000".equals(type) || "7100".equals(type)) {
-//                        String[] strArray = tarGrpConditionDOs.get(i).getRightParam().split(",");
-//                        expressSb.append("(");
-//                        express1.append("(");
-//                        for (int j = 0; j < strArray.length; j++) {
-//                            expressSb.append("\"").append(strArray[j]).append("\"");
-//                            express1.append("\"").append(strArray[j]).append("\"");
-//                            if (j != strArray.length - 1) {
-//                                expressSb.append(",");
-//                                express1.append(",");
-//                            }
-//                        }
-//                        expressSb.append(")");
-//                        express1.append(")");
-//                    } else if ("7200".equals(type)) {
-//                        //do nothing...
-//                    } else {
-//                        expressSb.append("\"").append(tarGrpConditionDOs.get(i).getRightParam()).append("\"");
-//                        express1.append("\"").append(tarGrpConditionDOs.get(i).getRightParam()).append("\"");
-//                    }
-//
-//                    expressSb.append(")");
-//                    express1.append(") {return true}");
-//                    System.out.println(express1.toString());
-
-//                    try {
-//
-//                        runner.addFunction("toNum",new StringToNumOperator("toNum"));
-//
-//                        RuleResult ruleResult1 = runner.executeRule(express1.toString(), context, true, true);
-//
-//                        if (null != ruleResult1.getResult()) {
-//                            lr.setResult((Boolean) ruleResult1.getResult());
-//                        } else {
-//                            lr.setResult(false);
-//                        }
-//
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                        System.out.println("单个标签判断出错");
-//                    }
 
                     if (i + 1 != tarGrpConditionDOs.size()) {
                         expressSb.append("&&");
@@ -1715,7 +1622,6 @@ public class EventApiServiceImpl implements EventApiService {
                 esService.save(jsonObject, IndexList.RULE_MODULE);
             }
 
-
             return ruleMap;
         }
 
@@ -1840,20 +1746,25 @@ public class EventApiServiceImpl implements EventApiService {
                 if (mktCamChlConfAttrDO.getAttrId() == 500600010012L) {
 
                     if (mktCamChlConfAttrDO.getAttrValue() != null && !"".equals(mktCamChlConfAttrDO.getAttrValue())) {
-                        JSONObject httpParams = new JSONObject();
-                        httpParams.put("queryNum", privateParams.get("accNbr"));
-                        httpParams.put("c3", params.get("lanId"));
-                        httpParams.put("queryId", privateParams.get("integrationId"));
-                        httpParams.put("type", "1");
-                        //待查询的标签列表
-                        httpParams.put("queryFields", mktCamChlConfAttrDO.getAttrValue());
-                        //dubbo接口查询标签
-                        JSONObject resJson = getLabelByDubbo(httpParams);
-                        if (resJson.containsKey(mktCamChlConfAttrDO.getAttrValue())) {
-                            channel.put("contactAccount", resJson.get(mktCamChlConfAttrDO.getAttrValue()));
+
+                        if(labelItems.containsKey(mktCamChlConfAttrDO.getAttrValue())) {
+                            channel.put("contactAccount", labelItems.get(mktCamChlConfAttrDO.getAttrValue()));
                         } else {
-                            //todo 不命中
-                            channel.put("contactAccount", mktCamChlConfAttrDO.getAttrValue());
+                            JSONObject httpParams = new JSONObject();
+                            httpParams.put("queryNum", privateParams.get("accNbr"));
+                            httpParams.put("c3", params.get("lanId"));
+                            httpParams.put("queryId", privateParams.get("integrationId"));
+                            httpParams.put("type", "1");
+                            //待查询的标签列表
+                            httpParams.put("queryFields", mktCamChlConfAttrDO.getAttrValue());
+                            //dubbo接口查询标签
+                            JSONObject resJson = getLabelByDubbo(httpParams);
+                            if (resJson.containsKey(mktCamChlConfAttrDO.getAttrValue())) {
+                                channel.put("contactAccount", resJson.get(mktCamChlConfAttrDO.getAttrValue()));
+                            } else {
+                                //todo 不命中
+                                channel.put("contactAccount", mktCamChlConfAttrDO.getAttrValue());
+                            }
                         }
                     }
                 }
