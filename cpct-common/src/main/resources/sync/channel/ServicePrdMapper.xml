@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zjtelcom.cpct.dao.channel.ServiceMapper">
+<mapper namespace="com.zjtelcom.cpct_prd.dao.channel.ServicePrdMapper">
     <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.ServiceEntity">
         <id column="SERVICE_ID" jdbcType="BIGINT" property="serviceId" />
         <result column="SERVICE_NBR" jdbcType="VARCHAR" property="serviceNbr" />
@@ -101,11 +101,11 @@
     </select>
     <select id="selectDetailByServiceEntity" resultMap="BaseResultMap">
         select s.SERVICE_ID, s.SERVICE_NBR, s.SERVICE_NAME,
-               s.SERVICE_CONTENT, s.SERVICE_TYPE_ID, s.EXT_SERVICE_ID,
-               s.STATUS_CD, s.STATUS_DATE, s.CREATE_STAFF,
-               s.CREATE_DATE, s.UPDATE_STAFF, s.UPDATE_DATE, s.REMARK,
-               st.SERVICE_TYPE_NAME as serviceTypeName,
-               st.SERVICE_TYPE_DESC as serviceTypeDesc
+        s.SERVICE_CONTENT, s.SERVICE_TYPE_ID, s.EXT_SERVICE_ID,
+        s.STATUS_CD, s.STATUS_DATE, s.CREATE_STAFF,
+        s.CREATE_DATE, s.UPDATE_STAFF, s.UPDATE_DATE, s.REMARK,
+        st.SERVICE_TYPE_NAME as serviceTypeName,
+        st.SERVICE_TYPE_DESC as serviceTypeDesc
         from service s
         left join service_type st on s.SERVICE_TYPE_ID = st.SERVICE_TYPE_ID
         where 1=1
