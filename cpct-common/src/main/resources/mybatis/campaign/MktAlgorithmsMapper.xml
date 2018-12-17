@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.campaign.MktAlgorithmsMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.campaign.MktAlgorithms">
+        <id column="ALGO_ID" jdbcType="BIGINT" property="algoId" />
+        <result column="ALGO_CODE" jdbcType="VARCHAR" property="algoCode" />
+        <result column="ALGO_NAME" jdbcType="VARCHAR" property="algoName" />
+        <result column="HANDLE_CLASS" jdbcType="VARCHAR" property="handleClass" />
+        <result column="ALGO_DESC" jdbcType="VARCHAR" property="algoDesc" />
+        <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+        <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+        <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+
+    <select id="selcetAll" resultMap="BaseResultMap">
+        SELECT ALGO_ID, ALGO_CODE, ALGO_NAME, HANDLE_CLASS, ALGO_DESC, STATUS_CD, STATUS_DATE, CREATE_STAFF,
+                CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
+        FROM mkt_algorithms
+    </select>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT ALGO_ID, ALGO_CODE, ALGO_NAME, HANDLE_CLASS, ALGO_DESC, STATUS_CD, STATUS_DATE, CREATE_STAFF,
+        CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
+        FROM mkt_algorithms
+        WHERE ALGO_ID = #{algoId,jdbcType=BIGINT}
+    </select>
+
+    <insert id="saveMktAlgorithms" keyProperty="algoId" useGeneratedKeys="true" parameterType="com.zjtelcom.cpct.domain.campaign.MktAlgorithms">
+        INSERT mkt_algorithms (ALGO_ID, ALGO_CODE, ALGO_NAME, HANDLE_CLASS, ALGO_DESC, STATUS_CD, STATUS_DATE,
+        CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
+        )
+        VALUES (#{algoId,jdbcType=BIGINT},#{algoCode,jdbcType=VARCHAR},#{algoName,jdbcType=VARCHAR},
+        #{handleClass,jdbcType=VARCHAR}, #{algoDesc,jdbcType=VARCHAR},#{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP},
+        #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT},
+        #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <update id="updateMktAlgorithms" parameterType="com.zjtelcom.cpct.domain.campaign.MktAlgorithms">
+        UPDATE mkt_algorithms
+        SET ALGO_ID = #{algoId,jdbcType=BIGINT},
+        <if test="algoCode != null and algoCode != ''">
+            ALGO_CODE = #{algoCode,jdbcType=VARCHAR},
+        </if>
+        <if test="algoName != null and algoName != ''">
+            ALGO_NAME = #{algoName,jdbcType=VARCHAR},
+        </if>
+        <if test="handleClass != null and handleClass != ''">
+            HANDLE_CLASS = #{handleClass,jdbcType=VARCHAR},
+        </if>
+        <if test="algoDesc != null and algoDesc != ''">
+            ALGO_DESC = #{algoDesc,jdbcType=VARCHAR},
+        </if>
+        <if test="statusCd != null and statusCd != ''">
+            STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+        </if>
+        <if test="statusDate != null">
+            STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="createStaff != null and createStaff != ''">
+            CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+        </if>
+        <if test="createDate != null">
+            CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="updateStaff != null and updateStaff != ''">
+            UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        </if>
+        <if test="updateDate != null">
+            UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="remark != null and remark != ''">
+            REMARK = #{remark,jdbcType=VARCHAR}
+        </if>
+        WHERE ALGO_ID = #{algoId,jdbcType=BIGINT}
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        DELETE FROM mkt_algorithms
+        WHERE ALGO_ID = #{algoId,jdbcType=BIGINT}
+    </delete>
+
+    <select id="selectByMktAlgorithms" resultMap="BaseResultMap">
+        SELECT ALGO_ID, ALGO_CODE, ALGO_NAME, HANDLE_CLASS, ALGO_DESC, STATUS_CD, STATUS_DATE, CREATE_STAFF,
+                CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
+        FROM mkt_algorithms
+        WHERE 1=1
+        <if test="algoId != null and algoId != ''">
+            and ALGO_ID = #{algoId,jdbcType=BIGINT}
+        </if>
+        <if test="algoName != null and algoName != ''">
+            and ALGO_NAME LIKE CONCAT(CONCAT('%',#{algoName}),'%')
+        </if>
+    </select>
+</mapper>

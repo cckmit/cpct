@@ -25,6 +25,8 @@ public interface MktCamEvtRelMapper {
 
     List<MktCamEvtRelDO> findRelListByEvtId(@Param("contactEvtId") Long contactEvtId);
 
+    List<MktCamEvtRelDO> selectByMktCamEvtRel(MktCamEvtRelDO mktCamEvtRelDO);
+
     List<MktCamEvtRelDO> selectAll();
 
     int updateByPrimaryKey(MktCamEvtRelDO mktCamEvtRelDO);

@@ -23,5 +23,10 @@ public interface ProductService {
 
     Map<String,Object> getProductListByName( Map<String,Object> params);
 
+    Map<String,Object> getProductRuleListByCampaign(ProductParam param);
+
+
+
+
 
 }

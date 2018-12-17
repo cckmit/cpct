@@ -1,0 +1,41 @@
+#端口配置
+server:
+  port: 30321
+
+spring:
+# 第一数据源
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://134.96.252.170:30304/cpct_system?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: root
+    password: xc.cpct
+
+# 第二数据源
+  datasource_prd:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://134.96.252.170:30304/cpct_system?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: root
+    password: xc.cpct
+
+#redis相关配置
+  redis:
+    host: 134.96.252.170
+    port: 30305
+    password: xc.cpct
+    pool:
+      max-active: 8
+      max-wait: -1
+      max-idle: 8
+      min-idle: 0
+    timeout: 30000
+  #ES
+  elasticsearch:
+      ip: 134.108.3.30
+      port: 9300
+      pool: 5
+      cluster:
+        name: es-cpct
+
+
+
+

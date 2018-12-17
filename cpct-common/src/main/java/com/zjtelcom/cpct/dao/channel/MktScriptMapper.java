@@ -22,4 +22,9 @@ public interface MktScriptMapper {
     List<Script> findByScriptName(@Param("scriptName")String scriptName, @Param("scriptType")String scriptType);
 
     int updateByPrimaryKey(Script record);
+
+    List<Script> selectScriptList(Script script);
+
+
+
 }
