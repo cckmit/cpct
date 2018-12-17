@@ -940,7 +940,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
 
     /**
-     * 导入清单下发参数
+     * 下发参数
      * @param operationVO
      * @param batchNum
      * @param ruleId
@@ -1081,6 +1081,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             List<TarGrpCondition> tarGrpConditionDOs = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
             List<LabelResult> labelResultList = new ArrayList<>();
             List<String> codeList = new ArrayList<>();
+
             StringBuilder express = new StringBuilder();
             if (tarGrpId != null && tarGrpId != 0) {
                 //将规则拼装为表达式
