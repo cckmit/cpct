@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.MktResourceMapper;
 import com.zjtelcom.cpct.dao.channel.ServiceMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
@@ -12,6 +13,7 @@ import com.zjtelcom.cpct.domain.channel.MktProductRule;
 import com.zjtelcom.cpct.domain.channel.MktResource;
 import com.zjtelcom.cpct.domain.channel.Offer;
 import com.zjtelcom.cpct.domain.channel.ServiceEntity;
+import com.zjtelcom.cpct.dto.campaign.MktCampaign;
 import com.zjtelcom.cpct.dto.channel.OfferDetail;
 import com.zjtelcom.cpct.dto.channel.ProductParam;
 import com.zjtelcom.cpct.service.BaseService;
@@ -43,6 +45,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     private MktResourceMapper resourceMapper;
     @Autowired
     private ServiceMapper serviceMapper;
+    @Autowired
+    private MktCampaignMapper campaignMapper;
 
 
     @Override
@@ -153,6 +157,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         Map<String,Object> result = new HashMap<>();
         List<Long> ruleIdList = new ArrayList<>();
         List<MktCamItem> mktCamItems = new ArrayList<>();
+
         //销售品
         if (param.getItemType().equals("1000")){
             for (Long productId : param.getIdList()){
@@ -163,13 +168,13 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                     return result;
                 }
                 MktCamItem item = new MktCamItem();
-                item.setMktCampaignId(1000L);
+                item.setMktCampaignId(param.getCampaignId()==null ? -1L : param.getCampaignId());
                 item.setOfferCode(product.getOfferNbr());
-                item.setOfferName(product.getOfferName());
-                item.setItemId(productId);
                 item.setItemType(param.getItemType()==null ? "1000" : param.getItemType());
                 item.setCreateDate(new Date());
                 item.setCreateDate(DateUtil.getCurrentTime());
+                item.setOfferName(product.getOfferName());
+                item.setItemId(productId);
                 item.setUpdateDate(DateUtil.getCurrentTime());
                 item.setStatusDate(DateUtil.getCurrentTime());
                 item.setUpdateStaff(UserUtil.loginId());
@@ -189,7 +194,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                     return result;
                 }
                 MktCamItem item = new MktCamItem();
-                item.setMktCampaignId(1000L);
+                item.setMktCampaignId(param.getCampaignId()==null ? -1L : param.getCampaignId());
                 item.setOfferCode(resource.getMktResNbr());
                 item.setOfferName(resource.getMktResName());
                 item.setItemId(resourceId);
@@ -214,7 +219,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                     return result;
                 }
                 MktCamItem item = new MktCamItem();
-                item.setMktCampaignId(1000L);
+                item.setMktCampaignId(param.getCampaignId()==null ? -1L : param.getCampaignId());
                 item.setOfferCode(serviceEntity.getServiceNbr());
                 item.setOfferName(serviceEntity.getServiceName());
                 item.setItemId(serviceId);
@@ -259,6 +264,18 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         camItemMapper.updateByPrimaryKey(rule);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","编辑成功");
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getProductRuleListByCampaign(ProductParam param) {
+        Map<String,Object> result = new HashMap<>();
+        List<MktProductRule> ruleList = new ArrayList<>();
+        List<MktCamItem> itemList = camItemMapper.selectByCampaignAndType(param.getCampaignId(),param.getItemType());
+        for (MktCamItem item : itemList) {
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",itemList);
         return result;
     }
 
