@@ -76,7 +76,7 @@ public class SysRoleServiceImpl extends BaseService implements SysRoleService {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;
