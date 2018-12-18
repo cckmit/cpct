@@ -31,6 +31,8 @@ public class MktCpcAlgorithmsRulDO extends BaseEntity {
      */
     private String ruleExpression;
 
+
+
     public String getActType() {
         return actType;
     }

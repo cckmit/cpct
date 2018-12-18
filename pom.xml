@@ -17,6 +17,7 @@
         <module>cpct-dubbo-server</module>
         <module>cpct-cache</module>
         <module>cpct-dubbo-label</module>
+        <module>cpct-open-api</module>
     </modules>
 
     <properties>
@@ -60,6 +61,7 @@
         <bss-centralized.verson>1.4</bss-centralized.verson>
 
         <service-batch.version>1.0.2</service-batch.version>
+
     </properties>
 
     <parent>

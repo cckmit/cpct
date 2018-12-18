@@ -178,6 +178,28 @@ public class PpmProductController extends BaseController  {
         return result;
     }
 
+
+
+    /**
+     * 关联活动的推荐条目列表
+     * @return
+     */
+    @PostMapping("getProductRuleListByCampaign")
+    @CrossOrigin
+    public Map<String, Object> getProductRuleListByCampaign(@RequestBody ProductParam ruleParam) {
+        Map<String ,Object> result = new HashMap<>();
+        Long userId = UserUtil.loginId();
+        try {
+            result = productService.getProductRuleListByCampaign(ruleParam);
+        }catch (Exception e){
+            logger.error("[op:PpmProductController] fail to getProductRuleListByCampaign",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to getProductRuleListByCampaign");
+            return result;
+        }
+        return result;
+    }
+
     /**
      * 获取规则下的销售品列表
      * @return

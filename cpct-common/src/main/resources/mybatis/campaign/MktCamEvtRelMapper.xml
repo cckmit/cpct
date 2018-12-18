@@ -112,4 +112,18 @@
     where MKT_CAMPAIGN_ID = #{campaignId,jdbcType=BIGINT} and EVENT_ID = #{evtId}
   </select>
 
+    <select id="selectByMktCamEvtRel" resultMap="BaseResultMap">
+        select MKT_CAMP_EVT_REL_ID, MKT_CAMPAIGN_ID, EVENT_ID, LEVEL_CONFIG,
+        STATUS_CD, STATUS_DATE, CREATE_STAFF,
+        CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+        from mkt_cam_evt_rel
+        where 1=1
+        <if test="mktCampEvtRelId != null and mktCampEvtRelId !=''">
+            and MKT_CAMP_EVT_REL_ID = #{mktCampEvtRelId,jdbcType=BIGINT}
+        </if>
+        <if test="mktCampaignId != null and mktCampaignId !=''">
+            and MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+        </if>
+    </select>
+
 </mapper>

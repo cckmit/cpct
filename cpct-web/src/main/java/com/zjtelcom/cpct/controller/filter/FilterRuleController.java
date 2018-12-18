@@ -5,15 +5,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
-import com.zjtelcom.cpct.dao.user.UserListMapper;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.filter.FilterRuleAddVO;
+import com.zjtelcom.cpct.dto.filter.FilterRuleVO;
 import com.zjtelcom.cpct.dto.user.UserList;
 import com.zjtelcom.cpct.request.filter.FilterRuleReq;
 import com.zjtelcom.cpct.service.filter.FilterRuleService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import org.apache.ibatis.annotations.Param;
-import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -46,10 +45,6 @@ public class FilterRuleController extends BaseController {
 
     @Autowired
     private FilterRuleService filterRuleService;
-    @Autowired
-    private UserListMapper userListMapper;
-    @Autowired
-    private FilterRuleMapper filterRuleMapper;
 
 
     /**
@@ -128,7 +123,7 @@ public class FilterRuleController extends BaseController {
     public String getFilterRule(@RequestBody FilterRule filterRule) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            maps = filterRuleService.getFilterRule(filterRule);
+            maps = filterRuleService.getFilterRule(filterRule.getRuleId());
         } catch (Exception e) {
             logger.error("[op:FilterRuleController] fail to listEvents for filterRule = {}! Exception: ", JSONArray.toJSON(filterRule), e);
             return JSON.toJSONString(maps);
@@ -272,7 +267,11 @@ public class FilterRuleController extends BaseController {
     public void buildExcelDocument(HSSFWorkbook workBook, HttpServletRequest request, HttpServletResponse response,Long filterRuleId) {
 
         try {
-            FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId);
+            Map<String,Object> filterRuleMap = filterRuleService.getFilterRule(filterRuleId);
+            if (!filterRuleMap.get("resultCode").equals("200")){
+                logger.info("过滤规则不存在");
+            }
+            FilterRuleVO filterRule = (FilterRuleVO)filterRuleMap.get("filterRule");
             List<String> phoneList = ChannelUtil.StringToList(filterRule.getUserList());
             //excel文件名
             String fileName = filterRule.getRuleName()+"名单.xls";
@@ -287,27 +286,10 @@ public class FilterRuleController extends BaseController {
             //创建一个sheet标签
             HSSFSheet sheet = workBook.createSheet(filterRule.getRuleName()+"名单");
             //创建第一行（头）
-//            HSSFRow head = sheet.createRow(0);
-//            HSSFCell cell = head.createCell(0);
             for (int i = 0; i< phoneList.size() ;i++){
                 HSSFRow row = sheet.createRow(i);
                 row.createCell(0).setCellValue(phoneList.get(i));
-//                head.createCell(i).setCellValue(phoneList.get(i));
-//                dataRow.createCell(0).setCellValue(phoneList.get(i));
             }
-
-            //创建列
-//            head.createCell(0).setCellValue("");
-//            head.createCell(1).setCellValue("年龄");
-//            head.createCell(2).setCellValue("性别");
-//            head.createCell(3).setCellValue("地址");
-//
-//            HSSFCell cell = head.createCell(0);
-//            HSSFRow dataRow = sheet.createRow(0);
-//            //根据具体数据集合创建其他的行和列
-//            for (int i = 0; i< phoneList.size() ;i++){
-//                dataRow.createCell(0).setCellValue(phoneList.get(i));
-//            }
             //通过repsonse获取输出流
             OutputStream outputStream = response.getOutputStream();
             workBook.write(outputStream);

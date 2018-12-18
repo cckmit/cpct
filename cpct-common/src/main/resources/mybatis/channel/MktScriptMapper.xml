@@ -86,4 +86,33 @@
       and SCRIPT_TYPE = #{scriptType}
     </if>
   </select>
+
+
+  <select id="selectScriptList" resultMap="BaseResultMap">
+    select SCRIPT_ID, SCRIPT_NAME, SCRIPT_DESC, SCRIPT_TYPE, SUIT_CHANNEL_TYPE, EXEC_CHANNEL,
+    STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
+    from mkt_script
+    where 1=1
+    <if test="scriptId != null and scriptId != ''">
+      and SCRIPT_ID = #{scriptId}
+    </if>
+    <if test="scriptName != null and scriptName != ''">
+      and SCRIPT_NAME =#{scriptName}
+    </if>
+    <if test="scriptType != null and scriptType != ''">
+      and SCRIPT_TYPE =#{scriptType}
+    </if>
+    <if test="suitChannelType != null and suitChannelType != ''">
+      and SUIT_CHANNEL_TYPE =#{suitChannelType}
+    </if>
+    <if test="execChannel != null and execChannel != ''">
+      and EXEC_CHANNEL =#{execChannel}
+    </if>
+    <if test="statusCd != null and statusCd != ''">
+      and STATUS_CD = #{statusCd}
+    </if>
+    <if test="createStaff != null and createStaff != ''">
+      and CREATE_STAFF = #{createStaff}
+    </if>
+  </select>
 </mapper>

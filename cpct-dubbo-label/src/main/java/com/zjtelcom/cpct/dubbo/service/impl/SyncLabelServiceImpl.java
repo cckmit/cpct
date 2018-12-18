@@ -293,6 +293,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             }
             labelModel.setScope(1);
             labelModel.setIsShared(0);
+            labelModel.setSystemInfoId(0L);
             labelModel.setCatalogId(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3());
 
 //            //todo 暂无值类型

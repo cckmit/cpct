@@ -4,10 +4,19 @@ import java.io.Serializable;
 import java.util.List;
 
 public class ProductParam implements Serializable {
+    private Long campaignId;
     private List<Long> idList;
     private Long strategyRuleId;
     private String itemType;
 
+
+    public Long getCampaignId() {
+        return campaignId;
+    }
+
+    public void setCampaignId(Long campaignId) {
+        this.campaignId = campaignId;
+    }
 
     public String getItemType() {
         return itemType;

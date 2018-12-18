@@ -15,4 +15,6 @@ public interface MktCamStrategyRelMapper {
     List<MktCamStrategyRel> selectAll();
 
     int updateByPrimaryKey(MktCamStrategyRel record);
+
+    List<MktCamStrategyRel> selectByMktCampaignId(Long mktCampaignId);
 }
