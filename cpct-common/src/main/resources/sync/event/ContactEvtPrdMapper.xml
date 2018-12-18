@@ -11,7 +11,6 @@
         <result column="EVT_MAPPED_IP" jdbcType="VARCHAR" property="evtMappedIp" />
         <result column="EVT_PROCOTOL_TYPE" jdbcType="VARCHAR" property="evtProcotolType" />
         <result column="EVT_MAPPED_FUN_NAME" jdbcType="VARCHAR" property="evtMappedFunName" />
-        <result column="MKT_CAMPAIGN_TYPE" jdbcType="VARCHAR" property="mktCampaignType" />
         <result column="REC_CAMPAIGN_AMOUNT" jdbcType="VARCHAR" property="recCampaignAmount" />
         <result column="EVENT_DESC" jdbcType="VARCHAR" property="contactEvtDesc" />
         <result column="EVT_TYPE_ID" jdbcType="BIGINT" property="contactEvtTypeId" />
@@ -86,7 +85,6 @@
         CREATE_DATE,
         STATUS_DATE,
         UPDATE_DATE,
-        MKT_CAMPAIGN_TYPE,
         REC_CAMPAIGN_AMOUNT,
         REMARK)
         values (
@@ -108,7 +106,6 @@
         #{createDate,jdbcType=TIMESTAMP},
         #{statusDate,jdbcType=TIMESTAMP},
         #{updateDate,jdbcType=TIMESTAMP},
-        #{mktCampaignType,jdbcType=VARCHAR},
         #{recCampaignAmount,jdbcType=VARCHAR},
         #{remark,jdbcType=VARCHAR})
     </insert>
@@ -135,7 +132,6 @@
         CREATE_DATE,
         STATUS_DATE,
         UPDATE_DATE,
-        MKT_CAMPAIGN_TYPE,
         REC_CAMPAIGN_AMOUNT,
         REMARK)
         values (
@@ -156,7 +152,6 @@
         #{createDate,jdbcType=TIMESTAMP},
         #{statusDate,jdbcType=TIMESTAMP},
         #{updateDate,jdbcType=TIMESTAMP},
-        #{mktCampaignType,jdbcType=VARCHAR},
         #{recCampaignAmount,jdbcType=VARCHAR},
         #{remark,jdbcType=VARCHAR})
     </insert>
@@ -237,9 +232,6 @@
         <if test="statusCd != null and statusCd != ''">
             STATUS_CD = #{statusCd,jdbcType=VARCHAR},
         </if>
-        <if test="mktCampaignType != null and mktCampaignType != ''">
-            MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR},
-        </if>
         <if test="recCampaignAmount != null and recCampaignAmount != ''">
             REC_CAMPAIGN_AMOUNT = #{recCampaignAmount,jdbcType=VARCHAR},
         </if>
@@ -275,7 +267,6 @@
             EVT_MAPPED_IP = #{evtMappedIp,jdbcType=VARCHAR},
             EVT_PROCOTOL_TYPE = #{evtProcotolType,jdbcType=VARCHAR},
             EVT_MAPPED_FUN_NAME = #{evtMappedFunName,jdbcType=VARCHAR},
-            MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR},
             REC_CAMPAIGN_AMOUNT = #{recCampaignAmount,jdbcType=VARCHAR},
             EVENT_DESC = #{contactEvtDesc,jdbcType=VARCHAR},
             EVT_TYPE_ID = #{contactEvtTypeId,jdbcType=BIGINT},
@@ -326,9 +317,6 @@
         </if>
         <if test="extEventId != null and extEventId != 0">
             EXT_EVENT_ID = #{extEventId,jdbcType=BIGINT},
-        </if>
-        <if test="mktCampaignType != null and mktCampaignType != ''">
-            MKT_CAMPAIGN_TYPE = #{mktCampaignType,jdbcType=VARCHAR},
         </if>
         <if test="statusCd != null and statusCd != ''">
             STATUS_CD = #{statusCd,jdbcType=VARCHAR},
