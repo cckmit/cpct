@@ -1317,7 +1317,6 @@ public class EventApiServiceImpl implements EventApiService {
                         } else if("2000".equals(label.getLabelType())) {
                             queryFieldsCust.append(label.getInjectionLabelCode()).append(",");
                         }
-
                     }
                 }
             } else {
