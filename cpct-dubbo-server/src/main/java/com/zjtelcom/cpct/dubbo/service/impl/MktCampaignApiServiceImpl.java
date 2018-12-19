@@ -251,10 +251,9 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
         CopyPropertiesUtil.copyBean2Bean(mktStrategyConfResp, mktStrategyConfDO);
 
         // 获取过滤规则集合
-        List<FilterRuleModel> filterRuleModels = filterRuleMapper.selectFilterRuleByStrategyId(mktStrategyConfId);
-        ArrayList<FilterRuleModel> filterRuleModelArrayList = new ArrayList<>();
-        filterRuleModelArrayList.addAll(filterRuleModels);
-        mktStrategyConfResp.setFilterRuleModelList(filterRuleModelArrayList);
+        ArrayList<FilterRuleModel> filterRuleModels = filterRuleMapper.selectFilterRuleByStrategyIdArrayList(mktStrategyConfId);
+//        ArrayList<FilterRuleModel> filterRuleModelArrayList = new ArrayList<>(filterRuleModels);
+        mktStrategyConfResp.setFilterRuleModelList(filterRuleModels);
 
         //查询与策略匹配的所有规则
         ArrayList<MktStrConfRuleResp> mktStrConfRuleRespList = new ArrayList<>();

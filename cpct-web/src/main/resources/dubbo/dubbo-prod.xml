@@ -11,13 +11,13 @@
     <dubbo:registry id="esb3" protocol="dubbo" address="134.96.249.149:8001" />
     <dubbo:registry id="esb2" protocol="dubbo" address="134.96.161.20:8001" />
 
-    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.service.api.EventApiService" id="eventApiService"
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.EventApiService" id="eventApiService"
                      version="1.0" retries="0" check="false">
         <dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="5000"/>
     </dubbo:reference>
 
     <!-- es提供试算接口 -->
-    <dubbo:reference registry="esb3" interface=" com.zjtelcom.es.es.service.EsService" id="esService"
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.es.es.service.EsService" id="esService"
                      version="1.0" retries="0" check="false">
         <dubbo:method name="findBatchHitsList" servicecode="00.1083.findBatchHitsList" timeout="10000"/>
         <dubbo:method name="searchBatchInfo" servicecode="00.1083.searchBatchInfo" timeout="100000"/>

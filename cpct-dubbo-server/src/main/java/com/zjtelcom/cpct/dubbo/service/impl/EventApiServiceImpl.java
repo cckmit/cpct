@@ -518,6 +518,7 @@ public class EventApiServiceImpl implements EventApiService {
                         //查询标识
                         param.put("c3", map.get("lanId"));
                         param.put("queryId", map.get("custId"));
+                        param.put("queryNum", "");
                         param.put("queryFields", "");
                         param.put("type", "4");
                         System.out.println("客户级查询param " + param.toString());
@@ -539,8 +540,9 @@ public class EventApiServiceImpl implements EventApiService {
                             //客户级下，循环资产级
                             Map<String, String> privateParams = new HashMap<>();
                             privateParams.put("isCust", "0");
-                            privateParams.put("accNbr", ((JSONObject) o).getString("ACC_NBR"));
-                            privateParams.put("integrationId", ((JSONObject) o).getString("ASSET_INTEG_ID"));
+                            privateParams.put("accNbr", ((Map) o).get("ACC_NBR").toString());
+                            privateParams.put("integrationId",  ((Map) o).get("ASSET_INTEG_ID").toString());
+                            privateParams.put("custId", map.get("custId"));
                             //活动优先级为空的时候默认0
                             privateParams.put("orderPriority", camEvtRelDO.getCampaignSeq() == null ? "0" : camEvtRelDO.getCampaignSeq().toString());
                             Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, camEvtRelDO.getMktCampaignId(), privateParams, labelItems, evtTriggers));
@@ -554,6 +556,7 @@ public class EventApiServiceImpl implements EventApiService {
                         privateParams.put("isCust", "1"); //是否是客户级
                         privateParams.put("accNbr", map.get("accNbr"));
                         privateParams.put("integrationId", map.get("integrationId"));
+                        privateParams.put("custId", map.get("custId"));
                         if (camEvtRelDO.getCampaignSeq() == null) {
                             camEvtRelDO.setCampaignSeq(0);
                         }
@@ -706,7 +709,7 @@ public class EventApiServiceImpl implements EventApiService {
             } else if ("6000".equals(mktCampaign.getMktCampaignType())) {
                 privateParams.put("activityType", "2"); //随销
             } else {
-                privateParams.put("activityType", "0"); //活动类型
+                privateParams.put("activityType", "0"); //活动类型 默认营销
             }
             if ("0".equals(mktCampaign.getIsCheckRule()) || "校验".equals(mktCampaign.getIsCheckRule())) {
                 privateParams.put("skipCheck", "0"); //是否预校验
@@ -727,13 +730,13 @@ public class EventApiServiceImpl implements EventApiService {
             esJson.put("activityCode", mktCampaign.getMktCampaignId().toString());
 
             //判断活动状态
-            if (!"2002".equals(mktCampaign.getStatusCd())) {
-                esJson.put("hit", "false");
-                esJson.put("msg", "活动状态未发布");
-                esService.save(esJson, IndexList.ACTIVITY_MODULE);
-                System.out.println("活动状态未发布");
-                return Collections.EMPTY_MAP;
-            }
+//            if (!"2002".equals(mktCampaign.getStatusCd())) {
+//                esJson.put("hit", "false");
+//                esJson.put("msg", "活动状态未发布");
+//                esService.save(esJson, IndexList.ACTIVITY_MODULE);
+//                System.out.println("活动状态未发布");
+//                return Collections.EMPTY_MAP;
+//            }
 
             //验证活动生效时间
             Date beginTime = mktCampaign.getPlanBeginTime();
@@ -1014,16 +1017,6 @@ public class EventApiServiceImpl implements EventApiService {
                     FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId);
                     //判断过滤类型(红名单，黑名单)
                     if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
-                        //查询红名单黑名单列表  （userList验证方式）
-//                        int count = userListMapper.checkRule(privateParams.get("accNbr"), filterRule.getRuleId(), filterRule.getFilterType());
-//                        if (count > 0) {
-//                            System.out.println("红黑名单过滤规则验证被拦截");
-//                            esJson.put("hit", "false");
-//                            esJson.put("msg", "红黑名单过滤规则验证被拦截");
-//                            esService.save(esJson, IndexList.STRATEGY_MODULE);
-//                            return Collections.EMPTY_MAP;
-//                        }
-
                         //获取名单
                         String userList = filterRule.getUserList();
                         if (userList != null) {
@@ -1100,7 +1093,7 @@ public class EventApiServiceImpl implements EventApiService {
                         StringBuilder queryLabel = new StringBuilder();
                         //获取过扰标签
                         List<String> labels = mktVerbalConditionMapper.getLabelListByConditionId(filterRule.getConditionId());
-                        if (labels != null) {
+                        if (labels != null && labels.size() > 0) {
                             for (String labelCode : labels) {
                                 queryLabel.append(labelCode).append(",");
                             }
@@ -1261,12 +1254,13 @@ public class EventApiServiceImpl implements EventApiService {
             //构造查询参数值
             JSONObject param = new JSONObject();
             //查询标识
-            param.put("queryNum", privateParams.get("accNbr"));
-            param.put("c3", params.get("lanId"));
-            param.put("queryId", privateParams.get("integrationId"));
-            param.put("type", "1");
+//            param.put("queryNum", privateParams.get("accNbr"));
+//            param.put("c3", params.get("lanId"));
+//            param.put("queryId", privateParams.get("integrationId"));
+//            param.put("type", "1");
             //查询标签列表
-            StringBuilder queryFieldsSb = new StringBuilder();
+            StringBuilder queryFieldsAss = new StringBuilder();
+            StringBuilder queryFieldsCust = new StringBuilder();
             //从redis获取规则使用的所有标签
             List<LabelResult> labelResultList = (List<LabelResult>) redisUtils.get(key + "_LABEL");
 
@@ -1281,7 +1275,9 @@ public class EventApiServiceImpl implements EventApiService {
             }
 
             //记录参数个数
-            int paramsSize = 0;
+//            int paramsSize = 0;
+            int paramsAss = 0;
+            int paramsCust = 0;
 
             if (labelResultList == null || labelResultList.size() <= 0) {
                 labelResultList = new ArrayList<>();
@@ -1309,8 +1305,16 @@ public class EventApiServiceImpl implements EventApiService {
                         if (labelItems.containsKey(label.getInjectionLabelCode())) {
                             continue;
                         }
-                        paramsSize++;
-                        queryFieldsSb.append(label.getInjectionLabelCode()).append(",");
+//                        paramsSize++;
+                        // todo 标签类型常量
+                        //判断是客户级标签还是资产及标签
+                        if ("1000".equals(label.getLabelType())) {
+                            paramsCust++;
+                            queryFieldsCust.append(label.getInjectionLabelCode()).append(",");
+                        } else {
+                            paramsAss++;
+                            queryFieldsAss.append(label.getInjectionLabelCode()).append(",");
+                        }
                     }
                 }
             } else {
@@ -1319,65 +1323,183 @@ public class EventApiServiceImpl implements EventApiService {
                     if (labelItems.containsKey(labelResultList.get(i - 1).getLabelCode())) {
                         continue;
                     }
-                    paramsSize++;
-                    queryFieldsSb.append(labelResultList.get(i - 1).getLabelCode()).append(",");
+                    paramsAss++;
+                    queryFieldsAss.append(labelResultList.get(i - 1).getLabelCode()).append(",");
                 }
             }
 
-            if (queryFieldsSb.length() > 0) {
-                queryFieldsSb.deleteCharAt(queryFieldsSb.length() - 1);
-            }
+            //资产级标签
+            if (queryFieldsAss.length() > 0) {
+                queryFieldsAss.deleteCharAt(queryFieldsAss.length() - 1);
 
-            param.put("queryFields", queryFieldsSb.toString());
+                param.put("queryNum", privateParams.get("accNbr"));
+                param.put("c3", params.get("lanId"));
+                param.put("queryId", privateParams.get("integrationId"));
+                param.put("type", "1");
+                param.put("queryFields", queryFieldsAss.toString());
 
-            if ("".equals(queryFieldsSb.toString())) {
-                System.out.println("无需查询标签");
-                context.putAll(labelItems);
-            } else {
-                System.out.println("param " + param.toString());
-                //更换为dubbo因子查询-----------------------------------------------------
-                Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
-                System.out.println(dubboResult.toString());
+                if (!"".equals(queryFieldsAss.toString())) {
+                    System.out.println("param " + param.toString());
+                    //更换为dubbo因子查询-----------------------------------------------------
+                    Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
+                    System.out.println(dubboResult.toString());
 
-                if ("0".equals(dubboResult.get("result_code").toString())) {
-                    JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
-                    //ES log 标签实例
-                    esJson.put("reqId", reqId);
-                    esJson.put("eventId", params.get("eventCode"));
-                    esJson.put("activityId", params.get("activityId"));
-                    esJson.put("ruleId", ruleId);
-                    esJson.put("ruleName", ruleName);
-                    esJson.put("integrationId", params.get("integrationId"));
-                    esJson.put("accNbr", params.get("accNbr"));
-                    esJson.put("strategyConfId", strategyConfId);
+                    if ("0".equals(dubboResult.get("result_code").toString())) {
+                        JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
+                        //ES log 标签实例
+                        esJson.put("reqId", reqId);
+                        esJson.put("eventId", params.get("eventCode"));
+                        esJson.put("activityId", params.get("activityId"));
+                        esJson.put("ruleId", ruleId);
+                        esJson.put("ruleName", ruleName);
+                        esJson.put("integrationId", params.get("integrationId"));
+                        esJson.put("accNbr", params.get("accNbr"));
+                        esJson.put("strategyConfId", strategyConfId);
 
-                    //拼接规则引擎上下文
-                    for (Map.Entry<String, Object> entry : body.entrySet()) {
-                        //添加到上下文
-                        context.put(entry.getKey(), entry.getValue());
-                    }
+                        //拼接规则引擎上下文
+                        for (Map.Entry<String, Object> entry : body.entrySet()) {
+                            paramsAss--;
+                            //添加到上下文
+                            context.put(entry.getKey(), entry.getValue());
+                        }
 
-                    //判断参数是否有无值的
-                    if (context.size() != paramsSize) {
-                        //有参数没有查询出实例数据
-                        esJson.put("hit", false);
-                        esJson.put("msg", "分群标签取值参数实例不足");
-                        System.out.println("分群标签取值参数实例不足");
+                        //判断参数是否有无值的
+//                        if (context.size() != paramsAss) {
+                        if (paramsAss != 0) {
+                            //有参数没有查询出实例数据
+                            esJson.put("hit", false);
+                            esJson.put("msg", "资产分群标签取值参数实例不足");
+                            System.out.println("资产分群标签取值参数实例不足");
+                            esService.save(esJson, IndexList.RULE_MODULE);
+                            return Collections.EMPTY_MAP;
+                        }
+
+                        System.out.println("查询资产标签成功:" + context.toString());
+                    } else {
+                        System.out.println("查询资产标签失败:");
+                        esJson.put("hit", "false");
+                        esJson.put("msg", "查询资产标签失败");
                         esService.save(esJson, IndexList.RULE_MODULE);
                         return Collections.EMPTY_MAP;
                     }
+                }
 
-                    //添加事件采集项的值到上下文
-                    context.putAll(labelItems);
-                    System.out.println("查询标签成功:" + context.toString());
-                } else {
-                    System.out.println("查询标签失败:");
-                    esJson.put("hit", "false");
-                    esJson.put("msg", "查询标签失败");
-                    esService.save(esJson, IndexList.RULE_MODULE);
-                    return Collections.EMPTY_MAP;
+            }
+
+            //客户级标签
+            if (queryFieldsCust.length() > 0) {
+                queryFieldsCust.deleteCharAt(queryFieldsCust.length() - 1);
+
+                JSONObject paramCust = new JSONObject();
+                paramCust.put("queryNum", "");
+                paramCust.put("c3", params.get("lanId"));
+                paramCust.put("queryId", privateParams.get("custId"));
+                paramCust.put("type", "2");
+                paramCust.put("queryFields", queryFieldsCust.toString());
+
+                if (!"".equals(queryFieldsCust.toString())) {
+                    System.out.println("param " + paramCust.toString());
+                    //更换为dubbo因子查询-----------------------------------------------------
+                    Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(paramCust));
+                    System.out.println(dubboResult.toString());
+
+                    if ("0".equals(dubboResult.get("result_code").toString())) {
+                        JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
+                        //ES log 标签实例
+                        esJson.put("reqId", reqId);
+                        esJson.put("eventId", params.get("eventCode"));
+                        esJson.put("activityId", params.get("activityId"));
+                        esJson.put("ruleId", ruleId);
+                        esJson.put("ruleName", ruleName);
+                        esJson.put("integrationId", params.get("integrationId"));
+                        esJson.put("accNbr", params.get("accNbr"));
+                        esJson.put("strategyConfId", strategyConfId);
+
+                        //拼接规则引擎上下文
+                        for (Map.Entry<String, Object> entry : body.entrySet()) {
+                            paramsCust--;
+                            //添加到上下文
+                            context.put(entry.getKey(), entry.getValue());
+                        }
+
+                        //判断参数是否有无值的
+//                        if (context.size() != paramsSize) {
+                        if (paramsCust != 0) {
+                            //有参数没有查询出实例数据
+                            esJson.put("hit", false);
+                            esJson.put("msg", "客户分群标签取值参数实例不足");
+                            System.out.println("客户分群标签取值参数实例不足");
+                            esService.save(esJson, IndexList.RULE_MODULE);
+                            return Collections.EMPTY_MAP;
+                        }
+                        System.out.println("查询客户标签成功:" + context.toString());
+                    } else {
+                        System.out.println("查询客户标签失败:");
+                        esJson.put("hit", "false");
+                        esJson.put("msg", "查询客户标签失败");
+                        esService.save(esJson, IndexList.RULE_MODULE);
+                        return Collections.EMPTY_MAP;
+                    }
                 }
             }
+
+            //添加事件采集项的值到上下文
+            context.putAll(labelItems);
+
+//            param.put("queryNum", privateParams.get("accNbr"));
+//            param.put("c3", params.get("lanId"));
+//            param.put("queryId", privateParams.get("integrationId"));
+//            param.put("type", "1");
+//            param.put("queryFields", queryFieldsAss.toString());
+
+//            if ("".equals(queryFieldsAss.toString())) {
+//                System.out.println("无需查询标签");
+//                context.putAll(labelItems);
+//            } else {
+//                System.out.println("param " + param.toString());
+//                //更换为dubbo因子查询-----------------------------------------------------
+//                Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
+//                System.out.println(dubboResult.toString());
+//
+//                if ("0".equals(dubboResult.get("result_code").toString())) {
+//                    JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
+//                    //ES log 标签实例
+//                    esJson.put("reqId", reqId);
+//                    esJson.put("eventId", params.get("eventCode"));
+//                    esJson.put("activityId", params.get("activityId"));
+//                    esJson.put("ruleId", ruleId);
+//                    esJson.put("ruleName", ruleName);
+//                    esJson.put("integrationId", params.get("integrationId"));
+//                    esJson.put("accNbr", params.get("accNbr"));
+//                    esJson.put("strategyConfId", strategyConfId);
+//
+//                    //拼接规则引擎上下文
+//                    for (Map.Entry<String, Object> entry : body.entrySet()) {
+//                        //添加到上下文
+//                        context.put(entry.getKey(), entry.getValue());
+//                    }
+//
+//                    //判断参数是否有无值的
+//                    if (context.size() != paramsSize) {
+//                        //有参数没有查询出实例数据
+//                        esJson.put("hit", false);
+//                        esJson.put("msg", "分群标签取值参数实例不足");
+//                        System.out.println("分群标签取值参数实例不足");
+//                        esService.save(esJson, IndexList.RULE_MODULE);
+//                        return Collections.EMPTY_MAP;
+//                    }
+//
+//                    //添加事件采集项的值到上下文
+//                    context.putAll(labelItems);
+//                    System.out.println("查询标签成功:" + context.toString());
+//                } else {
+//                    System.out.println("查询标签失败:");
+//                    esJson.put("hit", "false");
+//                    esJson.put("msg", "查询标签失败");
+//                    esService.save(esJson, IndexList.RULE_MODULE);
+//                    return Collections.EMPTY_MAP;
+//                }
+//            }
 
             //判断redis中是否存在
             String express = "";
@@ -1445,106 +1567,6 @@ public class EventApiServiceImpl implements EventApiService {
                         e.printStackTrace();
                         System.out.println("单个标签判断出错");
                     }
-
-//                    //拼接表达式
-//                    if ("7100".equals(type)) {
-//                        expressSb.append("!");
-//                    }
-//                    expressSb.append("((");
-//
-//                    express1.append("if(");
-//                    express1.append("(");
-//
-//                    expressSb.append(label.getInjectionLabelCode()).append(")");
-//                    express1.append(label.getInjectionLabelCode()).append(")");
-//                    if ("1000".equals(type)) {
-//                        expressSb.append(" > ");
-//                        express1.append(" > ");
-//                    } else if ("2000".equals(type)) {
-//                        expressSb.append(" < ");
-//                        express1.append(" < ");
-//                    } else if ("3000".equals(type)) {
-//                        expressSb.append(" == ");
-//                        express1.append(" == ");
-//                    } else if ("4000".equals(type)) {
-//                        expressSb.append(" != ");
-//                        express1.append(" != ");
-//                    } else if ("5000".equals(type)) {
-//                        expressSb.append(" >= ");
-//                        express1.append(" >= ");
-//                    } else if ("6000".equals(type)) {
-//                        expressSb.append(" <= ");
-//                        express1.append(" <= ");
-//                    } else if ("7000".equals(type) || "7100".equals(type)) {
-//                        expressSb.append(" in ");
-//                        express1.append(" in ");
-//                    } else if ("7200".equals(type)) {
-//
-//                        String[] strArray = tarGrpConditionDOs.get(i).getRightParam().split(",");
-//
-////                        expressSb.append(" >= ").append("\"").append(strArray[0]).append("\"").append(")");
-////                        expressSb.append(" && ").append("((");
-////                        expressSb.append(label.getInjectionLabelCode()).append(")");
-////                        expressSb.append(" <= ").append("\"").append(strArray[1]).append("\"");
-//
-//                        expressSb.append(" >= ").append(strArray[0]);
-//                        expressSb.append(" && ").append("(");
-//                        expressSb.append(label.getInjectionLabelCode()).append(")");
-//                        expressSb.append(" <= ").append(strArray[1]);
-//
-//                        express1.append(" >= ").append(strArray[0]);
-//                        express1.append(" && ").append("(");
-//                        express1.append(label.getInjectionLabelCode()).append(")");
-//                        express1.append(" <= ").append(strArray[1]);
-//
-////                        express1.append(" >= ").append("\"").append(strArray[0]).append("\"");
-////                        express1.append(" && ").append("(");
-////                        express1.append(label.getInjectionLabelCode()).append(")");
-////                        express1.append(" <= ").append("\"").append(strArray[1]).append("\"");
-//
-//                    }
-//
-//                    if ("7000".equals(type) || "7100".equals(type)) {
-//                        String[] strArray = tarGrpConditionDOs.get(i).getRightParam().split(",");
-//                        expressSb.append("(");
-//                        express1.append("(");
-//                        for (int j = 0; j < strArray.length; j++) {
-//                            expressSb.append("\"").append(strArray[j]).append("\"");
-//                            express1.append("\"").append(strArray[j]).append("\"");
-//                            if (j != strArray.length - 1) {
-//                                expressSb.append(",");
-//                                express1.append(",");
-//                            }
-//                        }
-//                        expressSb.append(")");
-//                        express1.append(")");
-//                    } else if ("7200".equals(type)) {
-//                        //do nothing...
-//                    } else {
-//                        expressSb.append("\"").append(tarGrpConditionDOs.get(i).getRightParam()).append("\"");
-//                        express1.append("\"").append(tarGrpConditionDOs.get(i).getRightParam()).append("\"");
-//                    }
-//
-//                    expressSb.append(")");
-//                    express1.append(") {return true}");
-//                    System.out.println(express1.toString());
-
-//                    try {
-//
-//                        runner.addFunction("toNum",new StringToNumOperator("toNum"));
-//
-//                        RuleResult ruleResult1 = runner.executeRule(express1.toString(), context, true, true);
-//
-//                        if (null != ruleResult1.getResult()) {
-//                            lr.setResult((Boolean) ruleResult1.getResult());
-//                        } else {
-//                            lr.setResult(false);
-//                        }
-//
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                        System.out.println("单个标签判断出错");
-//                    }
 
                     if (i + 1 != tarGrpConditionDOs.size()) {
                         expressSb.append("&&");
@@ -1715,7 +1737,6 @@ public class EventApiServiceImpl implements EventApiService {
                 esService.save(jsonObject, IndexList.RULE_MODULE);
             }
 
-
             return ruleMap;
         }
 
@@ -1840,20 +1861,25 @@ public class EventApiServiceImpl implements EventApiService {
                 if (mktCamChlConfAttrDO.getAttrId() == 500600010012L) {
 
                     if (mktCamChlConfAttrDO.getAttrValue() != null && !"".equals(mktCamChlConfAttrDO.getAttrValue())) {
-                        JSONObject httpParams = new JSONObject();
-                        httpParams.put("queryNum", privateParams.get("accNbr"));
-                        httpParams.put("c3", params.get("lanId"));
-                        httpParams.put("queryId", privateParams.get("integrationId"));
-                        httpParams.put("type", "1");
-                        //待查询的标签列表
-                        httpParams.put("queryFields", mktCamChlConfAttrDO.getAttrValue());
-                        //dubbo接口查询标签
-                        JSONObject resJson = getLabelByDubbo(httpParams);
-                        if (resJson.containsKey(mktCamChlConfAttrDO.getAttrValue())) {
-                            channel.put("contactAccount", resJson.get(mktCamChlConfAttrDO.getAttrValue()));
+
+                        if (labelItems.containsKey(mktCamChlConfAttrDO.getAttrValue())) {
+                            channel.put("contactAccount", labelItems.get(mktCamChlConfAttrDO.getAttrValue()));
                         } else {
-                            //todo 不命中
-                            channel.put("contactAccount", mktCamChlConfAttrDO.getAttrValue());
+                            JSONObject httpParams = new JSONObject();
+                            httpParams.put("queryNum", privateParams.get("accNbr"));
+                            httpParams.put("c3", params.get("lanId"));
+                            httpParams.put("queryId", privateParams.get("integrationId"));
+                            httpParams.put("type", "1");
+                            //待查询的标签列表
+                            httpParams.put("queryFields", mktCamChlConfAttrDO.getAttrValue());
+                            //dubbo接口查询标签
+                            JSONObject resJson = getLabelByDubbo(httpParams);
+                            if (resJson.containsKey(mktCamChlConfAttrDO.getAttrValue())) {
+                                channel.put("contactAccount", resJson.get(mktCamChlConfAttrDO.getAttrValue()));
+                            } else {
+                                //todo 不命中
+                                channel.put("contactAccount", mktCamChlConfAttrDO.getAttrValue());
+                            }
                         }
                     }
                 }
@@ -2100,16 +2126,16 @@ public class EventApiServiceImpl implements EventApiService {
             result.put("resultMsg", "结果id为空");
             return result;
         }
-        if (accNbr == null || "".equals(accNbr)) {
-            result.put("resultCode", "1000");
-            result.put("resultMsg", "资产号码为空");
-            return result;
-        }
-        if (integrationId == null || "".equals(integrationId)) {
-            result.put("resultCode", "1000");
-            result.put("resultMsg", "资产集成编码为空");
-            return result;
-        }
+//        if (accNbr == null || "".equals(accNbr)) {
+//            result.put("resultCode", "1000");
+//            result.put("resultMsg", "资产号码为空");
+//            return result;
+//        }
+//        if (integrationId == null || "".equals(integrationId)) {
+//            result.put("resultCode", "1000");
+//            result.put("resultMsg", "资产集成编码为空");
+//            return result;
+//        }
         if (custId == null || "".equals(custId)) {
             result.put("resultCode", "1000");
             result.put("resultMsg", "客户编码为空");

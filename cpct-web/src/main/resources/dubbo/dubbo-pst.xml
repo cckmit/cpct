@@ -34,7 +34,7 @@
     </dubbo:reference>
 
     <!-- es提供试算接口 -->
-    <dubbo:reference registry="esb3" interface=" com.zjtelcom.es.es.service.EsService" id="esService"
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.es.es.service.EsService" id="esService"
                      version="1.0" retries="0" check="false">
         <dubbo:method name="findBatchHitsList" servicecode="00.1083.findBatchHitsList" timeout="10000"/>
         <dubbo:method name="searchBatchInfo" servicecode="00.1083.searchBatchInfo" timeout="100000"/>

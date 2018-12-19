@@ -252,4 +252,28 @@
         AND c.LEFT_PARAM = l.INJECTION_LABEL_ID
     </select>
 
+    <select id="selectFilterRuleByStrategyIdArrayList" parameterType="java.lang.Long" resultMap="FilterRuleModelMap">
+    SELECT
+        f.RULE_ID,
+        f.RULE_NAME,
+        f.FILTER_TYPE,
+        f.DAYS,
+        f.TIMES,
+        c.OPER_TYPE,
+        c.RIGHT_PARAM,
+        l.INJECTION_LABEL_CODE,
+        l.INJECTION_LABEL_NAME
+    FROM
+        filter_rule f,
+        mkt_verbal_condition c,
+        injection_label l,
+        mkt_strategy_filter_rule_rel r
+    WHERE
+        r.STRATEGY_ID = #{strategyId, jdbcType=VARCHAR}
+        AND f.RULE_ID = r.RULE_ID
+        AND f.FILTER_TYPE = 6000
+        AND c.CONDITION_ID = f.CONDITION_ID
+        AND c.LEFT_PARAM = l.INJECTION_LABEL_ID
+    </select>
+
 </mapper>
