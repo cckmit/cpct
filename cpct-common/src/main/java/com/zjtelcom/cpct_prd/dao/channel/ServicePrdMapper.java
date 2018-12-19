@@ -1,4 +1,4 @@
-package com.zjtelcom.cpct.dao.channel;
+package com.zjtelcom.cpct_prd.dao.channel;
 
 import com.zjtelcom.cpct.domain.channel.ServiceEntity;
 import org.apache.ibatis.annotations.Mapper;
@@ -9,7 +9,7 @@ import java.util.List;
 
 @Mapper
 @Repository
-public interface ServiceMapper {
+public interface ServicePrdMapper {
     int deleteByPrimaryKey(Long serviceId);
 
     int insert(ServiceEntity record);

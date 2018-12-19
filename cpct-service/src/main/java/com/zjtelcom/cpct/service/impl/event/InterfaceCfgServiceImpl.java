@@ -77,7 +77,7 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         return result;

@@ -81,21 +81,24 @@
 
     <insert id="insertByBatch" parameterType="java.util.List" useGeneratedKeys="true"
             keyProperty="conditionId">
-    insert into mkt_verbal_condition (CONDITION_ID, VERBAL_ID, LEFT_PARAM,
-      LEFT_PARAM_TYPE, OPER_TYPE, RIGHT_PARAM,
-      RIGHT_PARAM_TYPE, STATUS_CD, CREATE_STAFF,
-      CREATE_DATE, STATUS_DATE, REMARK, CONDITION_TYPE
-      )
-      values
-      <foreach collection="list" item="item" separator="," index="i">
-       (#{item.conditionId,jdbcType=BIGINT}, #{item.verbalId,jdbcType=BIGINT}, #{item.leftParam,jdbcType=VARCHAR},
-      #{item.leftParamType,jdbcType=VARCHAR}, #{item.operType,jdbcType=VARCHAR}, #{item.rightParam,jdbcType=VARCHAR},
-      #{item.rightParamType,jdbcType=VARCHAR}, #{item.statusCd,jdbcType=VARCHAR}, #{item.createStaff,jdbcType=BIGINT},
-      #{item.createDate,jdbcType=TIMESTAMP}, #{item.statusDate,jdbcType=TIMESTAMP}, #{item.remark,jdbcType=VARCHAR},
-      #{item.conditionType,jdbcType=VARCHAR}
-      )
-      </foreach>
-  </insert>
+        insert into mkt_verbal_condition (CONDITION_ID, VERBAL_ID, LEFT_PARAM,
+        LEFT_PARAM_TYPE, OPER_TYPE, RIGHT_PARAM,
+        RIGHT_PARAM_TYPE, STATUS_CD, CREATE_STAFF,
+        CREATE_DATE, STATUS_DATE, REMARK, CONDITION_TYPE
+        )
+        values
+        <foreach collection="list" item="item" separator="," index="i">
+            (#{item.conditionId,jdbcType=BIGINT}, #{item.verbalId,jdbcType=BIGINT}, #{item.leftParam,jdbcType=VARCHAR},
+            #{item.leftParamType,jdbcType=VARCHAR}, #{item.operType,jdbcType=VARCHAR},
+            #{item.rightParam,jdbcType=VARCHAR},
+            #{item.rightParamType,jdbcType=VARCHAR}, #{item.statusCd,jdbcType=VARCHAR},
+            #{item.createStaff,jdbcType=BIGINT},
+            #{item.createDate,jdbcType=TIMESTAMP}, #{item.statusDate,jdbcType=TIMESTAMP},
+            #{item.remark,jdbcType=VARCHAR},
+            #{item.conditionType,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
 
     <select id="findListBylabelId" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select CONDITION_ID, VERBAL_ID, LEFT_PARAM, LEFT_PARAM_TYPE, OPER_TYPE, RIGHT_PARAM,
@@ -104,6 +107,13 @@
     where LEFT_PARAM = #{labelId,jdbcType=BIGINT}
   </select>
 
+    <select id="getLabelListByConditionId" resultType="String" parameterType="java.lang.Long">
+    select label.INJECTION_LABEL_CODE
+    from mkt_verbal_condition mvc
+    left join injection_label label
+    on mvc.LEFT_PARAM = label.INJECTION_LABEL_ID
+    where mvc.CONDITION_TYPE = 3 and mvc.CONDITION_ID = #{conditionId}
+  </select>
 
 
 </mapper>
