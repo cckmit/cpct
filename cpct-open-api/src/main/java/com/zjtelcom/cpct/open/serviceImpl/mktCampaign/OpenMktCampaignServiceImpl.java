@@ -19,7 +19,10 @@ import com.zjtelcom.cpct.dto.strategy.MktStrategy;
 import com.zjtelcom.cpct.exception.SystemException;
 import com.zjtelcom.cpct.open.base.common.CommonUtil;
 import com.zjtelcom.cpct.open.base.service.BaseService;
+import com.zjtelcom.cpct.open.entity.mktCamItem.OpenMktCamItem;
 import com.zjtelcom.cpct.open.entity.mktCampaign.OpenMktCampaign;
+import com.zjtelcom.cpct.open.entity.mktStrategy.OpenMktStrategy;
+import com.zjtelcom.cpct.open.entity.script.OpenScript;
 import com.zjtelcom.cpct.open.service.mktCampaign.OpenMktCampaignService;
 import com.zjtelcom.cpct.pojo.MktCamStrategyRel;
 import com.zjtelcom.cpct_prd.dao.campaign.MktCamStrategyConfRelPrdMapper;
@@ -82,14 +85,15 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
         long queryId = CommonUtil.stringToLong(id);
         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(queryId);
         if (null == mktCampaignDO) {
-            throw new SystemException("对应营销活动信息不存在!");
+            resultMap.put("params", "对应营销活动信息不存在!");
+            return resultMap;
         }
         //将活动信息转换为openapi返回格式
         OpenMktCampaign campaign=getOpenCampaign(mktCampaignDO);
         //活动推荐条目列表  活动脚本列表  维挽策略列表
-        List<MktCamItem> mktCamItemList=new ArrayList<>();
-        List<CamScript> mktScriptList=new ArrayList<>();
-        List<MktStrategy> mktStrategyList=new ArrayList<>();
+        List<OpenMktCamItem> mktCamItemList=new ArrayList<>();
+        List<OpenScript> mktScriptList=new ArrayList<>();
+        List<OpenMktStrategy> mktStrategyList=new ArrayList<>();
 
         //1.查询营销推荐维挽策略
         List<MktCamStrategyRel> mktCamStrategyRels = mktCamStrategyRelMapper.selectByMktCampaignId(queryId);
@@ -97,7 +101,11 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
             for (MktCamStrategyRel rel:mktCamStrategyRels){
                 MktStrategy mktStrategy = mktStrategyMapper.selectByPrimaryKey(rel.getStrategyId());
                 if(null!=mktStrategy){
-                    mktStrategyList.add(mktStrategy);
+                    OpenMktStrategy openMktStrategy = BeanUtil.create(mktStrategy, new OpenMktStrategy());
+                    if(null!=mktStrategy.getStatusDate()){
+                        openMktStrategy.setStatusDate(DateUtil.getDatetime(mktStrategy.getStatusDate()));
+                    }
+                    mktStrategyList.add(openMktStrategy);
                 }
             }
             campaign.setMktStrategy(mktStrategyList);
@@ -108,7 +116,11 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
         if(!camScripts.isEmpty()){
             for (CamScript script:camScripts){
                 if(null!=script){
-                    mktScriptList.add(script);
+                    OpenScript openScript = BeanUtil.create(script, new OpenScript());
+                    openScript.setId(script.getMktCampaignScptId());
+                    openScript.setHref("/mktScript/"+script.getMktCampaignScptId().toString());
+                    openScript.setMktActivityNbr(mktCampaignDO.getMktActivityNbr());
+                    mktScriptList.add(openScript);
                 }
             }
             campaign.setMktCamScript(mktScriptList);
@@ -143,7 +155,11 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                             //得到活动推荐条目
                             MktCamItem mktCamItem = mktCamItemMapper.selectByPrimaryKey(Long.valueOf(split[i]));
                             if(null!=mktCamItem){
-                                mktCamItemList.add(mktCamItem);
+                                OpenMktCamItem openMktCamItem = BeanUtil.create(mktCamItem, new OpenMktCamItem());
+                                openMktCamItem.setId(mktCamItem.getItemId());
+                                openMktCamItem.setHref("/mktCamItem/"+mktCamItem.getItemId().toString());
+                                openMktCamItem.setMktActivityNbr(mktCampaignDO.getMktActivityNbr());
+                                mktCamItemList.add(openMktCamItem);
                             }
                         }
 
@@ -156,7 +172,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
         }
 
         //设置id  和href  转换时间为对应格式
-        campaign.setId(id);
+        campaign.setId(Long.valueOf(id));
         campaign.setHref("/mktCampaign/" + id);
 
         resultMap.put("params", campaign);
@@ -250,9 +266,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
         if(null!=mktCampaignDO.getPlanEndTime()){
             campaign.setPlanEndTime(DateUtil.getDatetime(mktCampaignDO.getPlanEndTime()));
         }
-        if(null!=mktCampaignDO.getStatusDate()){
-            campaign.setStatusDate(DateUtil.getDatetime(mktCampaignDO.getStatusDate()));
-        }
+
         return campaign;
     }
 
