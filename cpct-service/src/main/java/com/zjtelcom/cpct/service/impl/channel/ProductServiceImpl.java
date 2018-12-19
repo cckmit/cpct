@@ -242,9 +242,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         for(MktCamItem item : mktCamItems){
             ruleIdList.add(item.getMktCamItemId());
         }
-        if (param.getStrategyRuleId()!=null){
-            strategyConfRuleService.updateProductIds(ruleIdList,param.getStrategyRuleId());
-        }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",ruleIdList);
         return result;
@@ -362,7 +359,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             }
             camItemMapper.deleteByPrimaryKey(ruleId);
             //更新redis数据
-            redisUtils.removeKey("MKT_CAM_ITEM_"+ruleId);
+            redisUtils.remove("MKT_CAM_ITEM_"+ruleId);
 
         }
         result.put("resultCode",CODE_SUCCESS);

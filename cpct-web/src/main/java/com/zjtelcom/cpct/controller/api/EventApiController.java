@@ -4,7 +4,8 @@ package com.zjtelcom.cpct.controller.api;
 import com.alibaba.fastjson.JSON;
 import com.zjpii.biz.serv.YzServ;
 import com.zjtelcom.cpct.controller.BaseController;
-import com.zjtelcom.cpct.dubbo.service.EventApiService;
+
+import com.zjtelcom.cpct.service.api.EventApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
