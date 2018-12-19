@@ -81,16 +81,16 @@
 			<artifactId>biz</artifactId>
 		</dependency>
 
-		<!--客户中心-CRM标识查询-->
+		<!--客户中心-CRM标识查询1.0版本-->
 		<dependency>
 			<groupId>com.ctzj.smt.bss</groupId>
 			<artifactId>smt-bss-custview-model</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.ctzj.smt.bss</groupId>
 			<artifactId>smt-bss-custview-query-service-api</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>1.0</version>
 		</dependency>
 
 
