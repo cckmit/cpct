@@ -207,6 +207,30 @@ public class RedisUtils {
     }
 
     /**
+     * 更换集团redis方法
+     *
+     * @param key
+     * @return
+     */
+    public void removeKey(final String key) {
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                if (jedis.exists(key)){
+                    jedis.del(key);
+                }
+                jedis.close();
+            } catch (Throwable je) {
+                je.printStackTrace();
+                jedis.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * 读取缓存
      *
      * @param key
