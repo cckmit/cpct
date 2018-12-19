@@ -2,7 +2,7 @@ package com.zjtelcom.cpct.enums;
 
 public enum LabelType {
     CCUST_LEVEL(1000,"客户级"),
-    ASSET_LEVEL(2000,"资产级"),
+    ASSET_LEVEL(2000,"用户级"),
     PRODUCT_LEVEL(3000,"销售品级"),
     ZONE_LEVEL(4000,"区域级");
 

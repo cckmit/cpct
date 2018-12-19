@@ -56,7 +56,13 @@ public enum StatusCode {
     /*服务类型*/
     CUST_TYPE("客账户类", "1000"),
     PRODUCT_TYPE("产品类", "1000"),
-    PROM_TYPE("销售品类", "1000");
+    PROM_TYPE("销售品类", "1000"),
+
+    /*标签类型*/
+    CCUST_LEVEL("1000","客户级"),
+    ASSET_LEVEL("2000","用户级"),
+    PRODUCT_LEVEL("3000","销售品级"),
+    ZONE_LEVEL("4000","区域级");
 
 
     private String statusMsg;
