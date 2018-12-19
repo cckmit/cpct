@@ -29,7 +29,7 @@
 
     <!--用户信息查询-->
     <dubbo:reference registry="esb1" interface="com.ctzj.smt.bss.custview.query.service.api.IUserDubboService"
-                     id="iUserDubboService" version="1.0">
+                     id="iUserDubboService" version="1.0" retries="0" check="false">
         <dubbo:method name="qryCustProdInst" servicecode="33.1074.qryCustProdInst"/>
     </dubbo:reference>
 
