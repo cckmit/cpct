@@ -260,6 +260,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         operatorValodate(label, editVO.getConditionType());
         label.setUpdateDate(new Date());
         label.setUpdateStaff(userId);
+        label.setSystemInfoId(0L);
         labelMapper.updateByPrimaryKey(label);
         labelValueMapper.deleteByLabelId(label.getInjectionLabelId());
         insertLabelValue(label,editVO.getRightOperand());

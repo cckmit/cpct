@@ -348,24 +348,38 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         Sheet sheet = wb.getSheetAt(0);
         Integer rowNums = sheet.getLastRowNum() + 1;
         List<Map<String,Object>> customerList = new ArrayList<>();
-        for (int i = 1; i < rowNums - 1; i++) {
+
+        List<Map<String,Object>> labelList = new ArrayList<>();
+
+        List<LabelDTO>  labelDTOList = new ArrayList<>();
+        Row labelRowFirst = sheet.getRow(0);
+        Row labelRow = sheet.getRow(1);
+        for (int j = 0; j < labelRow.getLastCellNum(); j++) {
+            Cell cellTitle = labelRowFirst.getCell(j);
+            Cell cell = labelRow.getCell(j);
+            LabelDTO  labelDTO = new LabelDTO();
+            labelDTO.setLabelCode((String) ChannelUtil.getCellValue(cell));
+            labelDTO.setInjectionLabelName(cellTitle.getStringCellValue());
+            labelDTOList.add(labelDTO);
+        }
+        for (int i = 2; i < rowNums ; i++) {
             Map<String, Object> customers = new HashMap<>();
-            Row rowFirst = sheet.getRow(0);
+            Row rowCode = sheet.getRow(1);
             Row row = sheet.getRow(i);
             for (int j = 0; j < row.getLastCellNum(); j++) {
-                Cell cellTitle = rowFirst.getCell(j);
+                Cell cellTitle = rowCode.getCell(j);
                 Cell cell = row.getCell(j);
                 customers.put(cellTitle.getStringCellValue(), ChannelUtil.getCellValue(cell));
             }
             customerList.add(customers);
-//            Map<String, Object> mktIssueDetailMap = new HashMap<>();
-//            mktIssueDetailMap.put("batchNum", batchNumSt);
-//            mktIssueDetailMap.put("mktProductRule", param.getRule());
-//            mktIssueDetailMap.put("mktCamChlConfDetail", param.getMktCamChlConfDetailList());
-//            mktIssueDetailMap.put("mktStrategyConfRuleId", param.getMktProductRuleList());
-//            mktIssueDetailMap.put("customerMap", customers);
-//            // 将客户信息，销售品，推送渠道存入redis
         }
+        for (int i = 0 ; i< labelDTOList.size();i++){
+            Map<String,Object> label = new HashMap<>();
+            label.put("code",labelDTOList.get(i).getLabelCode());
+            label.put("name",labelDTOList.get(i).getInjectionLabelName());
+            labelList.add(label);
+        }
+        redisUtils.set("LABEL_DETAIL_"+batchNumSt,labelList);
         int num = (customerList.size() / 500) + 1;
         List<List<Map<String,Object>>> smallCustomers = ChannelUtil.averageAssign(customerList,num);
         //按规则存储客户信息
@@ -405,7 +419,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 }
             }
         }.run();
-
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg", "导入成功");
         return result;

@@ -165,7 +165,7 @@ public class RedisUtils {
      *
      * @param key
      */
-    public void remove(final String key) {
+    public void removeKey(final String key) {
         if (exists(key)) {
             redisTemplate.delete(key);
         }
@@ -212,7 +212,7 @@ public class RedisUtils {
      * @param key
      * @return
      */
-    public void removeKey(final String key) {
+    public void remove(final String key) {
         try {
             ProxyJedis jedis = new ProxyJedis();
             try {
