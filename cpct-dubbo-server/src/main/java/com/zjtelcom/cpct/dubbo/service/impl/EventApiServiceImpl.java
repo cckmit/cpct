@@ -540,8 +540,9 @@ public class EventApiServiceImpl implements EventApiService {
                             //客户级下，循环资产级
                             Map<String, String> privateParams = new HashMap<>();
                             privateParams.put("isCust", "0");
-                            privateParams.put("accNbr", ((JSONObject) o).getString("ACC_NBR"));
-                            privateParams.put("integrationId", ((JSONObject) o).getString("ASSET_INTEG_ID"));
+                            privateParams.put("accNbr", ((Map) o).get("ACC_NBR").toString());
+                            privateParams.put("integrationId",  ((Map) o).get("ASSET_INTEG_ID").toString());
+                            privateParams.put("custId", map.get("custId"));
                             //活动优先级为空的时候默认0
                             privateParams.put("orderPriority", camEvtRelDO.getCampaignSeq() == null ? "0" : camEvtRelDO.getCampaignSeq().toString());
                             Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, camEvtRelDO.getMktCampaignId(), privateParams, labelItems, evtTriggers));
@@ -555,6 +556,7 @@ public class EventApiServiceImpl implements EventApiService {
                         privateParams.put("isCust", "1"); //是否是客户级
                         privateParams.put("accNbr", map.get("accNbr"));
                         privateParams.put("integrationId", map.get("integrationId"));
+                        privateParams.put("custId", map.get("custId"));
                         if (camEvtRelDO.getCampaignSeq() == null) {
                             camEvtRelDO.setCampaignSeq(0);
                         }
@@ -707,7 +709,7 @@ public class EventApiServiceImpl implements EventApiService {
             } else if ("6000".equals(mktCampaign.getMktCampaignType())) {
                 privateParams.put("activityType", "2"); //随销
             } else {
-                privateParams.put("activityType", "0"); //活动类型
+                privateParams.put("activityType", "0"); //活动类型 默认营销
             }
             if ("0".equals(mktCampaign.getIsCheckRule()) || "校验".equals(mktCampaign.getIsCheckRule())) {
                 privateParams.put("skipCheck", "0"); //是否预校验
@@ -1015,16 +1017,6 @@ public class EventApiServiceImpl implements EventApiService {
                     FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId);
                     //判断过滤类型(红名单，黑名单)
                     if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
-                        //查询红名单黑名单列表  （userList验证方式）
-//                        int count = userListMapper.checkRule(privateParams.get("accNbr"), filterRule.getRuleId(), filterRule.getFilterType());
-//                        if (count > 0) {
-//                            System.out.println("红黑名单过滤规则验证被拦截");
-//                            esJson.put("hit", "false");
-//                            esJson.put("msg", "红黑名单过滤规则验证被拦截");
-//                            esService.save(esJson, IndexList.STRATEGY_MODULE);
-//                            return Collections.EMPTY_MAP;
-//                        }
-
                         //获取名单
                         String userList = filterRule.getUserList();
                         if (userList != null) {
@@ -1283,7 +1275,9 @@ public class EventApiServiceImpl implements EventApiService {
             }
 
             //记录参数个数
-            int paramsSize = 0;
+//            int paramsSize = 0;
+            int paramsAss = 0;
+            int paramsCust = 0;
 
             if (labelResultList == null || labelResultList.size() <= 0) {
                 labelResultList = new ArrayList<>();
@@ -1311,13 +1305,15 @@ public class EventApiServiceImpl implements EventApiService {
                         if (labelItems.containsKey(label.getInjectionLabelCode())) {
                             continue;
                         }
-                        paramsSize++;
+//                        paramsSize++;
                         // todo 标签类型常量
                         //判断是客户级标签还是资产及标签
-                        if("1000".equals(label.getLabelType())) {
-                            queryFieldsAss.append(label.getInjectionLabelCode()).append(",");
-                        } else if("2000".equals(label.getLabelType())) {
+                        if ("1000".equals(label.getLabelType())) {
+                            paramsCust++;
                             queryFieldsCust.append(label.getInjectionLabelCode()).append(",");
+                        } else {
+                            paramsAss++;
+                            queryFieldsAss.append(label.getInjectionLabelCode()).append(",");
                         }
                     }
                 }
@@ -1327,7 +1323,7 @@ public class EventApiServiceImpl implements EventApiService {
                     if (labelItems.containsKey(labelResultList.get(i - 1).getLabelCode())) {
                         continue;
                     }
-                    paramsSize++;
+                    paramsAss++;
                     queryFieldsAss.append(labelResultList.get(i - 1).getLabelCode()).append(",");
                 }
             }
@@ -1362,12 +1358,14 @@ public class EventApiServiceImpl implements EventApiService {
 
                         //拼接规则引擎上下文
                         for (Map.Entry<String, Object> entry : body.entrySet()) {
+                            paramsAss--;
                             //添加到上下文
                             context.put(entry.getKey(), entry.getValue());
                         }
 
                         //判断参数是否有无值的
-                        if (context.size() != paramsSize) {
+//                        if (context.size() != paramsAss) {
+                        if (paramsAss != 0) {
                             //有参数没有查询出实例数据
                             esJson.put("hit", false);
                             esJson.put("msg", "资产分群标签取值参数实例不足");
@@ -1419,12 +1417,14 @@ public class EventApiServiceImpl implements EventApiService {
 
                         //拼接规则引擎上下文
                         for (Map.Entry<String, Object> entry : body.entrySet()) {
+                            paramsCust--;
                             //添加到上下文
                             context.put(entry.getKey(), entry.getValue());
                         }
 
                         //判断参数是否有无值的
-                        if (context.size() != paramsSize) {
+//                        if (context.size() != paramsSize) {
+                        if (paramsCust != 0) {
                             //有参数没有查询出实例数据
                             esJson.put("hit", false);
                             esJson.put("msg", "客户分群标签取值参数实例不足");
@@ -1862,7 +1862,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                     if (mktCamChlConfAttrDO.getAttrValue() != null && !"".equals(mktCamChlConfAttrDO.getAttrValue())) {
 
-                        if(labelItems.containsKey(mktCamChlConfAttrDO.getAttrValue())) {
+                        if (labelItems.containsKey(mktCamChlConfAttrDO.getAttrValue())) {
                             channel.put("contactAccount", labelItems.get(mktCamChlConfAttrDO.getAttrValue()));
                         } else {
                             JSONObject httpParams = new JSONObject();

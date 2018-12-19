@@ -252,8 +252,8 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
 
         // 获取过滤规则集合
         ArrayList<FilterRuleModel> filterRuleModels = filterRuleMapper.selectFilterRuleByStrategyIdArrayList(mktStrategyConfId);
-        ArrayList<FilterRuleModel> filterRuleModelArrayList = new ArrayList<>(filterRuleModels);
-        mktStrategyConfResp.setFilterRuleModelList(filterRuleModelArrayList);
+//        ArrayList<FilterRuleModel> filterRuleModelArrayList = new ArrayList<>(filterRuleModels);
+        mktStrategyConfResp.setFilterRuleModelList(filterRuleModels);
 
         //查询与策略匹配的所有规则
         ArrayList<MktStrConfRuleResp> mktStrConfRuleRespList = new ArrayList<>();
