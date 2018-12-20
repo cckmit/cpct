@@ -85,13 +85,16 @@ public class OpenLabelServiceImpl implements OpenLabelService {
         //首先判断是客户级查询还是资产级查询
         String custId = (String) map.get("custId");   //客户级
         String accNum = (String) map.get("accNum");   //资产级
+        JSONObject json=new JSONObject();
         if (StringUtils.isBlank(custId) && StringUtils.isBlank(accNum)) {
-            resultMap.put("params", "custId和accNum不能全部为空!");
+            json.put("message","custId和accNum不能全部为空!");
+            resultMap.put("params", json);
             return resultMap;
         }
         //客户级和资产级只能二选一
         if (!StringUtils.isBlank(custId) && !StringUtils.isBlank(accNum)) {
-            resultMap.put("params", "请选择custId或accNum其中一个查询");
+            json.put("message","请选择custId或accNum其中一个查询");
+            resultMap.put("params", json);
             return resultMap;
         }
         //contactTaskId  接触任务标示  目前没用到
@@ -145,7 +148,7 @@ public class OpenLabelServiceImpl implements OpenLabelService {
         } else {
             //资产级查询  CustviewResultObject
             if(isOpen){
-                System.out.println("资产级查询："+accNum);
+                log.info("资产级查询："+accNum);
                 crmPrivil = iCustomerDubboService.getCrmPrivil(2L, Long.valueOf(accNum));
                 log.info(crmPrivil.getResultCode()+" "+crmPrivil.getResultMsg()+" object"+crmPrivil.getResultObject());
             }else{
@@ -263,7 +266,7 @@ public class OpenLabelServiceImpl implements OpenLabelService {
         for (String str:map.keySet()){
            if (str.equals(code)){
                result=map.get(str);
-               System.out.println("有符合的返回："+result);
+               log.info("有符合的返回："+result);
                return  result;
            }
         }
@@ -272,7 +275,6 @@ public class OpenLabelServiceImpl implements OpenLabelService {
         int i=0;
         for (String str:map.keySet()){
             if(i==ram){
-                System.out.println("没有符合的则随机返回："+map.get(str));
                 return  map.get(str);
             }
             i++;

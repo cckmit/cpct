@@ -53,9 +53,10 @@ public class MyInterceptor extends HandlerInterceptorAdapter {
         }
 
 
-        Map<String, String> stringStringMap = requestHeaderIsTrue(request);
+
 //        请求头是否符合规范
         if(flag){
+            Map<String, String> stringStringMap = requestHeaderIsTrue(request);
             if(!stringStringMap.get("resultCode").equals("0")){
                 //返回请求头验证失败信息
                 String news=stringStringMap.get("message");
@@ -156,7 +157,7 @@ public class MyInterceptor extends HandlerInterceptorAdapter {
         result.put("resultCode","0");
         Map<String, String> stringObjectMap = headNews();
         for (String str:head.keySet()){
-            if(!head.get(str).equals(stringObjectMap.get(str))){
+            if(!stringObjectMap.get(str).equals(head.get(str))){
                   result.put("resultCode","1");
                   result.put("message",str+"信息验证失败");
             }
