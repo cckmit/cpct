@@ -100,4 +100,28 @@
     </select>
 
 
+  <select id="queryList" parameterType="com.zjtelcom.cpct.domain.question.Questionnaire" resultMap="BaseResultMap">
+    select NAIRE_ID, NAIRE_NAME, NAIRE_TYPE, MARK_TYPE, NAIRE_POINTS, NAIRE_DESC, START_TIP,
+    END_TIP, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
+    REMARK
+    from mkt_questionnaire
+    where 1=1
+    <if test="naireId !=null and naireId != ''">
+      and NAIRE_ID = #{naireId}
+    </if>
+    <if test="naireName !=null and naireName != ''">
+      and NAIRE_NAME LIKE CONCAT(CONCAT('%',#{naireName}),'%')
+    </if>
+    <if test="naireType !=null and naireType != ''">
+      and NAIRE_TYPE = #{naireType}
+    </if>
+    <if test="markType !=null and markType != ''">
+      and MARK_TYPE = #{markType}
+    </if>
+    <if test="statusCd !=null and statusCd != ''">
+      and STATUS_CD = #{statusCd}
+    </if>
+  </select>
+
+
 </mapper>

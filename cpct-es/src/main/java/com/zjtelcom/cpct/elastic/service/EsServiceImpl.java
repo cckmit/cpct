@@ -17,6 +17,7 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,9 +64,13 @@ public class EsServiceImpl implements EsService {
 
     @Override
     public void save(JSONObject jsonObject,String indexName) {
-        String id = ElasticsearchUtil.addData(jsonObject, indexName, esType, jsonObject.getString("ISI"));
-//        String id = ElasticsearchUtil.addData(jsonObject, indexName, esType, jsonObject.getString("ISI"));
+        String id = ElasticsearchUtil.addData(jsonObject, indexName, esType);
+        logger.info("test..."+id);
+    }
 
+    @Override
+    public void save(JSONObject jsonObject,String indexName,String _id) {
+        String id = ElasticsearchUtil.addData(jsonObject, indexName, esType, _id);
         logger.info("test..."+id);
     }
 
@@ -158,11 +163,12 @@ public class EsServiceImpl implements EsService {
             Long id = null;
             String name = null;
             String booleanResult = null;
-            String reason = null;
+            String hitEntity = null;
 
             id = Long.valueOf(activity.get("activityId").toString());
             name = activity.get("activityName").toString();
             booleanResult = activity.get("hit")==null ? "false" : activity.get("hit").toString();
+            hitEntity = activity.get("hitEntity")==null ? "未知对象" : activity.get("hitEntity").toString();
             if (booleanResult.equals("false")){
                 booleanResult = booleanResult+(activity.get("msg")==null ? "(未知原因)" : "("+activity.get("msg")+")");
             }
@@ -171,7 +177,7 @@ public class EsServiceImpl implements EsService {
             activityInfo.setName(name);
             //todo 命中结果；命中实例
             activityInfo.setResult(booleanResult);
-            activityInfo.setHitEntity("命中得对象");
+            activityInfo.setHitEntity(hitEntity);
             activityInfo.setType("activity");
 
             //查询策略信息
@@ -185,13 +191,14 @@ public class EsServiceImpl implements EsService {
                 id = Long.valueOf(strategy.get("strategyConfId").toString());
                 name = strategy.get("strategyConfName")==null ? "" : strategy.get("strategyConfName").toString();
                 booleanResult = strategy.get("hit")==null ? "false" : strategy.get("hit").toString();
+                hitEntity = strategy.get("hitEntity")==null ? "未知对象" : strategy.get("hitEntity").toString();
                 if (booleanResult.equals("false")){
                     booleanResult = booleanResult+(strategy.get("msg")==null ? "(未知原因)" : "("+strategy.get("msg")+")");
                 }
                 strategyInfo.setId(id);
                 strategyInfo.setName(name);
                 strategyInfo.setResult(booleanResult);
-                strategyInfo.setHitEntity("命中得对象");
+                strategyInfo.setHitEntity(hitEntity);
                 strategyInfo.setType("strategy");
 
 
@@ -206,13 +213,14 @@ public class EsServiceImpl implements EsService {
                     id = Long.valueOf(rule.get("ruleId").toString());
                     name = rule.get("ruleName")==null ? "" : rule.get("ruleName").toString();
                     booleanResult = rule.get("hit")==null ? "false" : rule.get("hit").toString();
+                    hitEntity = rule.get("hitEntity")==null ? "未知对象" : rule.get("hitEntity").toString();
                     if (booleanResult.equals("false")){
                         booleanResult = booleanResult+(rule.get("msg")==null ? "(未知原因)" : "("+rule.get("msg")+")");
                     }
                     ruleInfo.setId(id);
                     ruleInfo.setName(name);
                     ruleInfo.setResult(booleanResult);
-                    ruleInfo.setHitEntity("命中得对象");
+                    ruleInfo.setHitEntity(hitEntity);
                     ruleInfo.setType("rule");
 
                     //查询标签实例信息
@@ -305,7 +313,7 @@ public class EsServiceImpl implements EsService {
      * @return
      */
     private SearchHits getSearchHits(BoolQueryBuilder boolQueryBuilder, SearchRequestBuilder builder,int from) {
-        SearchResponse myresponse = builder.setQuery(boolQueryBuilder)
+        SearchResponse myresponse = builder.setQuery(boolQueryBuilder).addSort("evtCollectTime", SortOrder.DESC)
 //                .setFrom(from).setSize(1)
 //                .setFetchSource(fields,null)
                 .setExplain(true).execute().actionGet();
@@ -318,8 +326,7 @@ public class EsServiceImpl implements EsService {
      */
     private SearchHits getSearchHits4Event(BoolQueryBuilder boolQueryBuilder, SearchRequestBuilder builder,int from) {
         SearchResponse myresponse = builder.setQuery(boolQueryBuilder)
-                .setFrom(from).setSize(1)
-//                .setFetchSource(fields,null)
+                .setFrom(from).setSize(1).addSort("evtCollectTime", SortOrder.DESC)
                 .setExplain(true).execute().actionGet();
         return myresponse.getHits();
     }

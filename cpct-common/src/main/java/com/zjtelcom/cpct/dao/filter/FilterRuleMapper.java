@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Mapper
@@ -32,6 +33,8 @@ public interface FilterRuleMapper {
     int modFilterRule(FilterRule filterRule);
 
     List<FilterRuleModel> selectFilterRuleByStrategyId(@Param("strategyId") Long strategyId);
+
+    ArrayList<FilterRuleModel> selectFilterRuleByStrategyIdArrayList(@Param("strategyId") Long strategyId);
 
     List<FilterRule> selectByProduct(@Param("chooseProduct") String chooseProduct);
 

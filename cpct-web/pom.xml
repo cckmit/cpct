@@ -122,6 +122,18 @@
             <artifactId>biz</artifactId>
         </dependency>
 
+        <!-- 自己的dubbo-server对内jar  测试用 -->
+        <dependency>
+            <groupId>com.zjtelcom.cpct.dubbo</groupId>
+            <artifactId>cpct-dubbo</artifactId>
+        </dependency>
+
+        <!--活动同步大数据-->
+        <dependency>
+            <groupId>com.zjhcsoft.eagle</groupId>
+            <artifactId>dubbo-eagle-service</artifactId>
+        </dependency>
+
 
     </dependencies>
 

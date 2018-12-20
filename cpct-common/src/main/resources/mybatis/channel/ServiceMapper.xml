@@ -68,8 +68,9 @@
             UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
         </if>
         <if test="remark != null and remark != ''">
-            REMARK = #{remark,jdbcType=VARCHAR}
+            REMARK = #{remark,jdbcType=VARCHAR},
         </if>
+        SERVICE_ID = #{serviceId,jdbcType=BIGINT}
         where SERVICE_ID = #{serviceId,jdbcType=BIGINT}
     </update>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">

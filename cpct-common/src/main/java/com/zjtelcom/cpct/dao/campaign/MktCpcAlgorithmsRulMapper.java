@@ -14,4 +14,6 @@ public interface MktCpcAlgorithmsRulMapper {
     List<MktCpcAlgorithmsRulDO> selectAll();
 
     int updateByPrimaryKey(MktCpcAlgorithmsRulDO record);
+
+    List<MktCpcAlgorithmsRulDO> queryList(MktCpcAlgorithmsRulDO mktCpcAlgorithmsRulDO);
 }

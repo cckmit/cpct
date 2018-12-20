@@ -2,8 +2,6 @@
 server:
   port: 30821
 
-dubboPath: prod
-
 #数据库相关配置
 spring:
 # 第一数据源   cpc数据库
@@ -27,6 +25,13 @@ spring:
     username: cpc_user_cpct
     password: cpc_user_cpct_prod
 
+# 第四数据源
+  datasourcefourth:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://134.108.1.12:8803/smt_bss_cpc?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: cpc_user_cpct
+    password: cpc_user_cpct_prod
+
 
   #redis相关配置
   redis:
@@ -42,20 +47,10 @@ spring:
   #ES
   elasticsearch:
       ip: 134.108.0.88
-      port: 9700
+      port: 9300
       pool: 5
       cluster:
-        name: my-application2
-#es接口调用地址
-  esurl:
-#   machfile: http://134.96.252.170:30808/es/cpcMatchFileToFtp
-#   batchinfo: http://134.96.252.170:30808/es/searchBatchInfo
-#   hitslist: http://134.96.252.170:30808/es/findBatchHitsList
-#   countinfo: http://134.96.252.170:30808/es/searchCountInfo
-   machfile: http://localhost:8080/es/cpcMatchFileToFtp
-   batchinfo: http://localhost:8080/es/searchBatchInfo
-   hitslist: http://localhost:8080/es/findBatchHitsList
-   countinfo: http://localhost:8080/es/searchCountInfo
+        name: my-application1
 
 #是否同步
 sync:
@@ -64,6 +59,6 @@ sync:
 #集团定制的redis配置prod环境
 redisConfig:
    ip: 134.108.0.57
-   port: 41701
+   port: 41601
    database: 4970
-   password: bss_cpcp_pocpro_user#bssCpc_ro
+   password: bss_cpcp_poczsc_user#Bsscpc!z3

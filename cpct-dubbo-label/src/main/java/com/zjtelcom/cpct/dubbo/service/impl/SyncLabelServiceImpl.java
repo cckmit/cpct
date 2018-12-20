@@ -110,7 +110,15 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
                 labelValodate.setLabelValueType("1000");
             }
             //label.setLabelDataType(ChannelUtil.getDataType(tagModel.getSourceTableColumnType()));
-
+            if (labelValodate.getLabObject().equals("客户级")){
+                labelValodate.setLabelType("1000");
+            }else if (labelValodate.getLabObject().equals("用户级")) {
+                labelValodate.setLabelType("2000");
+            }else if (labelValodate.getLabObject().equals("销售品级")) {
+                labelValodate.setLabelType("3000");
+            }else if (labelValodate.getLabObject().equals("区域级")) {
+                labelValodate.setLabelType("4000");
+            }
             labelMapper.updateByPrimaryKey(labelValodate);
             //redis更新标签库
             redisUtils.set("LABEL_LIB_"+labelValodate.getInjectionLabelId(),labelValodate);
@@ -148,7 +156,15 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             label.setStatusCd(STATUSCD_EFFECTIVE);
             label.setCreateStaff(UserUtil.loginId());
             label.setCreateDate(new Date());
-
+            if (label.getLabObject().equals("客户级")){
+                label.setLabelType("1000");
+            }else if (label.getLabObject().equals("用户级")) {
+                label.setLabelType("2000");
+            }else if (label.getLabObject().equals("销售品级")) {
+                label.setLabelType("3000");
+            }else if (label.getLabObject().equals("区域级")) {
+                label.setLabelType("4000");
+            }
             labelMapper.insert(label);
             //redis更新标签库
             redisUtils.set("LABEL_LIB_"+label.getInjectionLabelId(),label);
@@ -286,13 +302,17 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             Label labelModel = BeanUtil.create(label, new Label());
 
             //label.setInjectionLabelDesc();
-            if(Long.valueOf(label.getConditionType()) == 4){
-                label.setOperator("2000,3000,1000,4000,6000,5000,7000,7200");
-            }else if(Long.valueOf(label.getConditionType()) == 2){
-                label.setOperator("7000");
+            if(label.getConditionType().equals("4")){
+                labelModel.setOperator("2000,3000,1000,4000,6000,5000,7000,7200");
+                labelModel.setLabelValueType("1000");
+            }else{
+                labelModel.setOperator("7000");
+                labelModel.setLabelValueType("2000");
             }
+            labelModel.setLabelDataType("1000");
             labelModel.setScope(1);
             labelModel.setIsShared(0);
+            labelModel.setSystemInfoId(0L);
             labelModel.setCatalogId(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3());
 
 //            //todo 暂无值类型

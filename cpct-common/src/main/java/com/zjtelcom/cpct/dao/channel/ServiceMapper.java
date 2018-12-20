@@ -14,7 +14,7 @@ public interface ServiceMapper {
 
     int insert(ServiceEntity record);
 
-    ServiceEntity selectByPrimaryKey(Long mktResId);
+    ServiceEntity selectByPrimaryKey(Long serviceId);
 
     List<ServiceEntity> selectAll();
 

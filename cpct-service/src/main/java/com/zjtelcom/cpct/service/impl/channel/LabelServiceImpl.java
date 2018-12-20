@@ -190,6 +190,10 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         label.setUpdateStaff(userId);
         label.setStatusCd("1000");
         labelMapper.insert(label);
+        Long labelId = label.getInjectionLabelId();
+        label.setInjectionLabelId(100000+label.getInjectionLabelId());
+        labelMapper.insert(label);
+        labelMapper.deleteByPrimaryKey(labelId);
         insertLabelValue(label,addVO.getRightOperand());
 
         //redis更新标签库
@@ -256,6 +260,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         operatorValodate(label, editVO.getConditionType());
         label.setUpdateDate(new Date());
         label.setUpdateStaff(userId);
+        label.setSystemInfoId(0L);
         labelMapper.updateByPrimaryKey(label);
         labelValueMapper.deleteByLabelId(label.getInjectionLabelId());
         insertLabelValue(label,editVO.getRightOperand());

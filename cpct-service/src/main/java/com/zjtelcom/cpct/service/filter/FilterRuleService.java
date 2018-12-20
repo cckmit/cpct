@@ -24,7 +24,7 @@ public interface FilterRuleService {
 
     Map<String,Object> delFilterRule(FilterRule filterRule);
 
-    Map<String,Object> getFilterRule(FilterRule filterRule);
+    Map<String,Object> getFilterRule(Long ruleId);
 
     Map<String,Object> createFilterRule(FilterRuleAddVO addVO);
 

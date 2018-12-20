@@ -51,7 +51,7 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 public class ContactEvtServiceImpl extends BaseService implements ContactEvtService {
 
     public static final int EVTCODE_MAX_LENGTH = 9;//事件编码最大长度
-    public static final String EVTD_INDEX = "EVTD";//事件编码前缀
+    public static final String EVTD_INDEX = "EVT";//事件编码前缀
 
     @Autowired
     private ContactEvtMapper contactEvtMapper;
@@ -287,6 +287,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                     }
                     map.put("eventClass", "");
                     map.put("state", contactEvt.getStatusCd());
+
                 }
             }
 
@@ -432,7 +433,6 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         }
 
         //查询出事件采集项
-
         List<ContactEvtItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId());
         contactEventDetail.setContactEvtItems(contactEvtItems);
 

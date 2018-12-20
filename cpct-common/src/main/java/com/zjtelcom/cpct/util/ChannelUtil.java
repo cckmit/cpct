@@ -327,7 +327,6 @@ public class ChannelUtil  {
             case ERROR: // 故障
                 cellValue = "非法字符";
                 break;
-
             default:
                 cellValue = "未知类型";
                 break;

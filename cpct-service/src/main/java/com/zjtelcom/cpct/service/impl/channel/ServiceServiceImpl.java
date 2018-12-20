@@ -8,11 +8,13 @@ import com.zjtelcom.cpct.domain.channel.ServiceEntity;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ServiceService;
+import com.zjtelcom.cpct.service.synchronize.channel.SynServiceService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.xml.ws.Action;
@@ -26,6 +28,11 @@ public class ServiceServiceImpl extends BaseService implements ServiceService {
 
     @Autowired
     private ServiceMapper serviceMapper;
+    @Autowired
+    private SynServiceService synServiceService;
+
+    @Value("${sync.value}")
+    private String value;
 
     @Override
     public Map<String, Object> getServiceList(Long userId, Map<String,Object> params) {
@@ -85,7 +92,7 @@ public class ServiceServiceImpl extends BaseService implements ServiceService {
     @Override
     public Map<String, Object> createService(Long userId, ServiceEntity addVO) {
         Map<String, Object> result = new HashMap<>();
-        ServiceEntity serviceEntity = BeanUtil.create(addVO, new ServiceEntity());
+        final ServiceEntity serviceEntity = BeanUtil.create(addVO, new ServiceEntity());
         serviceEntity.setCreateStaff(UserUtil.loginId());
         serviceEntity.setCreateDate(new Date());
         serviceEntity.setUpdateStaff(UserUtil.loginId());
@@ -93,6 +100,19 @@ public class ServiceServiceImpl extends BaseService implements ServiceService {
         serviceEntity.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
         serviceEntity.setStatusDate(new Date());
         serviceMapper.insert(serviceEntity);
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synServiceService.synchronizeSingleService(serviceEntity.getServiceId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
+        }
+
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
         return result;
@@ -101,7 +121,7 @@ public class ServiceServiceImpl extends BaseService implements ServiceService {
     @Override
     public Map<String, Object> modService(Long userId, ServiceEntity editVO) {
         Map<String, Object> result = new HashMap<>();
-        ServiceEntity serviceEntity = serviceMapper.selectByPrimaryKey(editVO.getServiceId());
+        final ServiceEntity serviceEntity = serviceMapper.selectByPrimaryKey(editVO.getServiceId());
         if(serviceEntity == null) {
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","服务信息不存在");
@@ -111,6 +131,19 @@ public class ServiceServiceImpl extends BaseService implements ServiceService {
         serviceEntity.setUpdateDate(new Date());
         serviceEntity.setUpdateStaff(UserUtil.loginId());
         serviceMapper.updateByPrimaryKey(serviceEntity);
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synServiceService.synchronizeSingleService(serviceEntity.getServiceId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
+        }
+
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","修改成功");
         return result;
@@ -119,13 +152,26 @@ public class ServiceServiceImpl extends BaseService implements ServiceService {
     @Override
     public Map<String, Object> delService(Long userId, ServiceEntity delVO) {
         Map<String, Object> result = new HashMap<>();
-        ServiceEntity serviceEntity = serviceMapper.selectByPrimaryKey(delVO.getServiceId());
+        final ServiceEntity serviceEntity = serviceMapper.selectByPrimaryKey(delVO.getServiceId());
         if(serviceEntity == null) {
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","服务信息不存在");
             return result;
         }
         serviceMapper.deleteByPrimaryKey(delVO.getServiceId());
+
+        if (value.equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synServiceService.deleteSingleService(serviceEntity.getServiceId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
+        }
+
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
         return result;

@@ -112,6 +112,7 @@ public class RedisUtils {
                 jedis.close();
             }
         } catch (Exception e) {
+            System.out.println("redis报错set");
             e.printStackTrace();
         }
         return result;
@@ -165,7 +166,7 @@ public class RedisUtils {
      *
      * @param key
      */
-    public void remove(final String key) {
+    public void removeKey(final String key) {
         if (exists(key)) {
             redisTemplate.delete(key);
         }
@@ -178,7 +179,14 @@ public class RedisUtils {
      * @return
      */
     public boolean exists(final String key) {
-        return redisTemplate.hasKey(key);
+        boolean result = false;
+        try {
+            result = redisTemplate.hasKey(key);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return result;
     }
 
 
@@ -204,6 +212,30 @@ public class RedisUtils {
             e.printStackTrace();
         }
         return result;
+    }
+
+    /**
+     * 更换集团redis方法
+     *
+     * @param key
+     * @return
+     */
+    public void remove(final String key) {
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                if (jedis.exists(key)){
+                    jedis.del(key);
+                }
+                jedis.close();
+            } catch (Throwable je) {
+                je.printStackTrace();
+                jedis.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -246,6 +278,7 @@ public class RedisUtils {
                 jedis.close();
             }
         } catch (Exception e) {
+            System.out.println("redis报错get");
             e.printStackTrace();
         }
         return result;

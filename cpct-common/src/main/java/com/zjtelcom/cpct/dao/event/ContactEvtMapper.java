@@ -43,4 +43,6 @@ public interface ContactEvtMapper {
 
     List<ContactEvt> query();
 
+    List<ContactEvt> findEventsByKey(ContactEvt contactEvt);
+
 }
