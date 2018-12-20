@@ -83,7 +83,7 @@
     where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
   </select>
     <select id="selectByMktCampaignId" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select MKT_CAMP_EVT_REL_ID, MKT_CAMPAIGN_ID, EVENT_ID, LEVEL_CONFIG,
+    select MKT_CAMP_EVT_REL_ID, MKT_CAMPAIGN_ID, CAMPAIGN_SEQ, EVENT_ID, LEVEL_CONFIG,
     STATUS_CD, STATUS_DATE, CREATE_STAFF,
     CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
     from mkt_cam_evt_rel
@@ -91,29 +91,29 @@
   </select>
 
     <select id="listActivityByEventId" parameterType="java.lang.Long" resultType="java.lang.Long">
-      select MKT_CAMPAIGN_ID
-      from mkt_cam_evt_rel
-      where EVENT_ID = #{eventId,jdbcType=BIGINT}
-      order by CAMPAIGN_SEQ asc
+        select MKT_CAMPAIGN_ID
+        from mkt_cam_evt_rel
+        where EVENT_ID = #{eventId,jdbcType=BIGINT}
+        order by CAMPAIGN_SEQ asc
     </select>
 
     <select id="listActByEventId" parameterType="java.lang.Long" resultMap="BaseResultMap">
-      select MKT_CAMP_EVT_REL_ID, MKT_CAMPAIGN_ID, CAMPAIGN_SEQ, EVENT_ID,LEVEL_CONFIG
-      from mkt_cam_evt_rel
-      where EVENT_ID = #{eventId,jdbcType=BIGINT}
-      order by CAMPAIGN_SEQ asc
+        select MKT_CAMP_EVT_REL_ID, MKT_CAMPAIGN_ID, CAMPAIGN_SEQ, EVENT_ID,LEVEL_CONFIG
+        from mkt_cam_evt_rel
+        where EVENT_ID = #{eventId,jdbcType=BIGINT}
+        order by CAMPAIGN_SEQ asc
     </select>
 
     <select id="findByCampaignIdAndEvtId" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select MKT_CAMP_EVT_REL_ID, MKT_CAMPAIGN_ID, CAMPAIGN_SEQ, EVENT_ID,LEVEL_CONFIG,
-     STATUS_CD, STATUS_DATE,
-    CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
-    from mkt_cam_evt_rel
-    where MKT_CAMPAIGN_ID = #{campaignId,jdbcType=BIGINT} and EVENT_ID = #{evtId}
-  </select>
+        select MKT_CAMP_EVT_REL_ID, MKT_CAMPAIGN_ID, CAMPAIGN_SEQ, EVENT_ID,LEVEL_CONFIG,
+        STATUS_CD, STATUS_DATE,
+        CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+        from mkt_cam_evt_rel
+        where MKT_CAMPAIGN_ID = #{campaignId,jdbcType=BIGINT} and EVENT_ID = #{evtId}
+    </select>
 
     <select id="selectByMktCamEvtRel" resultMap="BaseResultMap">
-        select MKT_CAMP_EVT_REL_ID, MKT_CAMPAIGN_ID, EVENT_ID, LEVEL_CONFIG,
+        select MKT_CAMP_EVT_REL_ID, MKT_CAMPAIGN_ID, CAMPAIGN_SEQ, EVENT_ID, LEVEL_CONFIG,
         STATUS_CD, STATUS_DATE, CREATE_STAFF,
         CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
         from mkt_cam_evt_rel
