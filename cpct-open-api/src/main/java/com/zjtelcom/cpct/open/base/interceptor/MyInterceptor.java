@@ -46,7 +46,7 @@ public class MyInterceptor extends HandlerInterceptorAdapter {
             sysParamsMapper = (SysParamsMapper) factory.getBean("sysParamsMapper");
         }
         List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign("IS_OPEN_HEAD");
-        if (!sysParams.isEmpty()) {
+            if (!sysParams.isEmpty()) {
             if ("2".equals(sysParams.get(0).getParamValue())) {
                 flag = true;
             }

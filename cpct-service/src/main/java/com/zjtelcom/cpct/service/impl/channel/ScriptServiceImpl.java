@@ -17,6 +17,7 @@ import com.zjtelcom.cpct.service.channel.ScriptService;
 import com.zjtelcom.cpct.service.synchronize.script.SynScriptService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
+import com.zjtelcom.cpct.util.SystemParamsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -71,7 +72,7 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -102,7 +103,7 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","修改成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -130,7 +131,7 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {

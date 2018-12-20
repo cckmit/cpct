@@ -6,10 +6,12 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.system.SysParams;
+import com.zjtelcom.cpct.dto.system.SystemParam;
 import com.zjtelcom.cpct.enums.ParamKeyEnum;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.synchronize.sys.SynSysParamsService;
 import com.zjtelcom.cpct.service.system.SysParamsService;
+import com.zjtelcom.cpct.util.SystemParamsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -58,7 +60,7 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
         int flag = sysParamsMapper.insert(sysParams);
         result.put("resultCode",CommonConstant.CODE_SUCCESS);
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -86,8 +88,12 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
         sysParams.setUpdateDate(new Date());
         int flag = sysParamsMapper.updateByPrimaryKey(sysParams);
         result.put("resultCode",CommonConstant.CODE_SUCCESS);
-
-        if (value.equals("1")){
+        //修改静态参数  如果是同步开关的修改则重新初始化同步值
+        if((SystemParamsUtil.SYNC_VALUE).equals(sysParams.getParamKey())){
+            //初始化同步值
+            SystemParamsUtil.initValue();
+        }
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -125,7 +131,7 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","保存成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {

@@ -210,7 +210,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -271,7 +271,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","编辑成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -355,7 +355,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -427,7 +427,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -458,7 +458,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -489,7 +489,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             result.put("resultCode", CODE_SUCCESS);
             result.put("resultMsg", "删除成功");
 
-            if (value.equals("1")){
+            if (SystemParamsUtil.getSyncValue().equals("1")){
                 new Thread(){
                     public void run(){
                         try {
@@ -591,7 +591,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
