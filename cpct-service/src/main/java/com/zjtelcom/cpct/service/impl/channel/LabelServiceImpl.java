@@ -191,9 +191,11 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         label.setStatusCd("1000");
         labelMapper.insert(label);
         Long labelId = label.getInjectionLabelId();
-        label.setInjectionLabelId(100000+label.getInjectionLabelId());
-        labelMapper.insert(label);
-        labelMapper.deleteByPrimaryKey(labelId);
+        if (labelId<10000){
+            label.setInjectionLabelId(100000+label.getInjectionLabelId());
+            labelMapper.insert(label);
+            labelMapper.deleteByPrimaryKey(labelId);
+        }
         insertLabelValue(label,addVO.getRightOperand());
 
         //redis更新标签库

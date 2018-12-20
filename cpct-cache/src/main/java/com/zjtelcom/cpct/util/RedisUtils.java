@@ -75,10 +75,6 @@ public class RedisUtils {
     public boolean set(final String key, Object value) {
         boolean result = false;
         try {
-//             原方法
-//          ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-//          operations.set(key, value);
-
             // 改造后方法
             result = setRedis(key, value);
         } catch (Exception e) {

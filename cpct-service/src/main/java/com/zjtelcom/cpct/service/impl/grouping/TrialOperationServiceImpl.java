@@ -1133,6 +1133,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             express.append("<=");
                         } else if ("7000".equals(type) || "7100".equals(type)) {
                             express.append("in");
+                        }else if ("7200".equals(type)) {
+                            express.append("@@@@");//区间于
+                        } else if ("7100".equals(type)) {
+                            express.append("notIn");
                         }
                         express.append(tarGrpConditionDOs.get(i).getRightParam());
                         express.append(")");
