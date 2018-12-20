@@ -182,12 +182,11 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
 
     private void getVOList(List<InterfaceCfg> cfgList, List<InterfaceCfgVO> voList) {
         for (InterfaceCfg interfaceCfg1 : cfgList){
-            EventSorceDO eventSorce = eventSorceMapper.selectByPrimaryKey(interfaceCfg1.getEvtSrcId());
-            if (eventSorce==null){
-                continue;
-            }
             InterfaceCfgVO vo = BeanUtil.create(interfaceCfg1,new InterfaceCfgVO());
-            vo.setEvtSrcName(eventSorce.getEvtSrcName());
+            EventSorceDO eventSorce = eventSorceMapper.selectByPrimaryKey(interfaceCfg1.getEvtSrcId());
+            if (eventSorce!=null){
+                vo.setEvtSrcName(eventSorce.getEvtSrcName());
+            }
             Channel caller = channelMapper.selectByPrimaryKey(Long.valueOf(interfaceCfg1.getCaller()));
             if (caller!=null){
                 vo.setCallerName(caller.getContactChlName());

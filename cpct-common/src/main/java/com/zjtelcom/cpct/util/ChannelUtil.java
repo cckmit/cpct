@@ -156,6 +156,17 @@ public class ChannelUtil  {
         return StringUtils.join(sts,",");
     }
 
+    public static String list2String(List<String> stringList,String separator){
+        if (stringList == null || stringList.isEmpty()){
+            return "";
+        }
+        String[] sts = new String[stringList.size()];
+        for (int i = 0;i<sts.length;i++){
+            sts[i] = stringList.get(i);
+        }
+        return StringUtils.join(sts,separator);
+    }
+
     public static String valueVOList2String(List<LabelValueVO> valueVOList){
         if (valueVOList == null || valueVOList.isEmpty()){
             return "";
