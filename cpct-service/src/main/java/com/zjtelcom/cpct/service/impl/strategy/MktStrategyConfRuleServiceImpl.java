@@ -608,7 +608,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             /**
              * 销售品配置
              */
-            List<Long> productIdList = new ArrayList<>();
+/*            List<Long> productIdList = new ArrayList<>();
             if (mktStrategyConfRuleDO.getProductId() != null) {
                 String[] productIds = mktStrategyConfRuleDO.getProductId().split("/");
                 for (int i = 0; i < productIds.length; i++) {
@@ -626,7 +626,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 } else {
                     childProductIds += "/" + ruleIdList.get(i);
                 }
-            }
+            }*/
             /**
              * 协同渠道配置
              */
@@ -668,7 +668,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             if (tarGrp != null) {
                 chiledMktStrategyConfRuleDO.setTarGrpId(tarGrp.getTarGrpId());
             }
-            chiledMktStrategyConfRuleDO.setProductId(childProductIds);
+            chiledMktStrategyConfRuleDO.setProductId(mktStrategyConfRuleDO.getProductId());
             chiledMktStrategyConfRuleDO.setEvtContactConfId(childEvtContactConfIds);
             chiledMktStrategyConfRuleDO.setMktCamChlResultId(childMktCamChlResultIds);
             chiledMktStrategyConfRuleDO.setCreateDate(new Date());
@@ -875,11 +875,13 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             /**
              * 销售品配置
              */
-            Future<Map<String, Object>> productFuture = null;
+   /*         Future<Map<String, Object>> productFuture = null;
             if (parentMktStrategyConfRule.getProductIdlist() != null && parentMktStrategyConfRule.getProductIdlist().size() > 0) {
                 productFuture = executorService.submit(new CopyProductRuleTask(parentMktStrategyConfRule.getProductIdlist()));
                 threadList.add(productFuture);
-            }
+            }*/
+
+
             /**
              * 协同渠道配置
              */
@@ -905,10 +907,12 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 mktStrategyConfRule.setTarGrpId(tarGrp.getTarGrpId());
             }
 
-            if (productFuture != null) {
+         /*   if (productFuture != null) {
                 List<Long> ruleIdList = (List<Long>) productFuture.get().get("ruleIdList");
                 mktStrategyConfRule.setProductIdlist(ruleIdList);
-            }
+            }*/
+
+            mktStrategyConfRule.setProductIdlist(parentMktStrategyConfRule.getProductIdlist());
 
             if (mktCamChlConfFuture != null) {
                 List<MktCamChlConfDetail> mktCamChlConfDetailList = (List<MktCamChlConfDetail>) mktCamChlConfFuture.get().get("mktCamChlConfDetailList");
@@ -1547,6 +1551,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 /**
                  * 销售品配置
                  */
+/*
                 List<Long> productIdList = new ArrayList<>();
                 if (mktStrategyConfRuleDO.getProductId() != null) {
                     String[] productIds = mktStrategyConfRuleDO.getProductId().split("/");
@@ -1559,6 +1564,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 Map<String, Object> productRuleMap = productService.copyProductRule(UserUtil.loginId(), productIdList);
                 List<Long> ruleIdList = (List<Long>) productRuleMap.get("ruleIdList");
                 mktStrategyConfRule.setProductIdlist(ruleIdList);
+*/
 
                 /**
                  * 协同渠道配置
