@@ -14,6 +14,8 @@ public interface MktStrategyFilterRuleRelMapper {
 
     int insert(MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO);
 
+    int insertBatch(List<MktStrategyFilterRuleRelDO> mktStrategyFilterRuleRelDOList);
+
     MktStrategyFilterRuleRelDO selectByPrimaryKey(Long mktStrategyFilterRuleRelId);
 
     List<Long> selectByStrategyId(Long strategyId);

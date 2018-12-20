@@ -9,6 +9,7 @@ import com.zjtelcom.cpct.dao.channel.ObjMktCampaignRelMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
 import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.SysArea;
@@ -17,6 +18,7 @@ import com.zjtelcom.cpct.domain.channel.ObjMktCampaignRel;
 import com.zjtelcom.cpct.domain.channel.RequestInstRel;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyFilterRuleRelDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.campaign.CampaignVO;
@@ -140,6 +142,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Autowired
     private RequestInstRelMapper requestInstRelMapper;
 
+    /**
+     * 过滤规则与策略关联 Mapper
+     */
+    @Autowired
+    private MktStrategyFilterRuleRelMapper mktStrategyFilterRuleRelMapper;
+
     private final static String createChannel = "cpcp0005";
 
 
@@ -240,6 +248,20 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 requestInstRel.setCreateDate(new Date());
                 requestInstRel.setRequestObjType("mkt");
                 requestInstRelMapper.insert(requestInstRel);
+            }
+
+            //保存策略与过滤规则关系
+            if (mktCampaignVO.getFilterRuleIdList() != null && mktCampaignVO.getFilterRuleIdList().size() > 0) {
+                for (Long FilterRuleId : mktCampaignVO.getFilterRuleIdList()) {
+                    MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO = new MktStrategyFilterRuleRelDO();
+                    mktStrategyFilterRuleRelDO.setRuleId(FilterRuleId);
+                    mktStrategyFilterRuleRelDO.setStrategyId(mktCampaignId); //表结构不能变更, 逻辑变更, 策略字段放活动Id
+                    mktStrategyFilterRuleRelDO.setCreateStaff(UserUtil.loginId());
+                    mktStrategyFilterRuleRelDO.setCreateDate(new Date());
+                    mktStrategyFilterRuleRelDO.setUpdateStaff(UserUtil.loginId());
+                    mktStrategyFilterRuleRelDO.setUpdateDate(new Date());
+                    mktStrategyFilterRuleRelMapper.insert(mktStrategyFilterRuleRelDO);
+                }
             }
 
             maps = new HashMap<>();
@@ -353,6 +375,23 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     }
                 }
             }
+
+            //重建策略与过滤规则关系
+            mktStrategyFilterRuleRelMapper.deleteByStrategyId(mktCampaignId);
+            if (mktCampaignVO.getFilterRuleIdList() != null && mktCampaignVO.getFilterRuleIdList().size() > 0) {
+                for (Long FilterRuleId : mktCampaignVO.getFilterRuleIdList()) {
+                    MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO = new MktStrategyFilterRuleRelDO();
+                    mktStrategyFilterRuleRelDO.setRuleId(FilterRuleId);
+                    mktStrategyFilterRuleRelDO.setStrategyId(mktCampaignId);
+                    mktStrategyFilterRuleRelDO.setCreateStaff(UserUtil.loginId());
+                    mktStrategyFilterRuleRelDO.setCreateDate(new Date());
+                    mktStrategyFilterRuleRelDO.setUpdateStaff(UserUtil.loginId());
+                    mktStrategyFilterRuleRelDO.setUpdateDate(new Date());
+                    mktStrategyFilterRuleRelMapper.insert(mktStrategyFilterRuleRelDO);
+                }
+            }
+
+
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
             if (StatusCode.STATUS_CODE_DRAFT.getStatusCode().equals(mktCampaignVO.getStatusCd())) {
                 maps.put("resultMsg", ErrorCode.UPDATE_MKT_CAMPAIGN_SUCCESS.getErrorMsg());
@@ -439,6 +478,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignVO.setEventDTOS(eventDTOList);
         }
 
+        // 获取过滤规则集合
+        List<Long> filterRuleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(mktCampaignId);
+        mktCampaignVO.setFilterRuleIdList(filterRuleIdList);
+
 
         // 获取活动关联策略集合
         List<MktStrategyConfDetail> mktStrategyConfDetailList = new ArrayList<>();
@@ -516,8 +559,13 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         // 删除活动基本信息
         try {
             mktCampaignMapper.deleteByPrimaryKey(mktCampaignId);
+            // 删除活动策略关系
+            mktCamStrategyConfRelMapper.deleteByMktCampaignId(mktCampaignId);
             // 删除活动与事件的关系
             mktCamEvtRelMapper.deleteByMktCampaignId(mktCampaignId);
+            // 删除策略与规则集合
+            mktStrategyFilterRuleRelMapper.deleteByStrategyId(mktCampaignId);
+
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
             maps.put("resultMsg", "删除成功！");
             maps.put("mktCampaignId", mktCampaignId);
@@ -1010,29 +1058,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     chaildMktCamStrategyConfRelDO.setUpdateStaff(UserUtil.loginId());
                     mktCamStrategyConfRelMapper.insert(chaildMktCamStrategyConfRelDO);
                 }
-                //  发布活动时异步去同步到生产
-/*                if ("1".equals(value)) {
-                    new Thread() {
-                        @Override
-                        public void run() {
-                            try {
-                                synchronizeCampaignService.synchronizeCampaign(mktCampaignId, "admin");
-                            } catch (Exception e) {
-                                logger.error("[op:publishMktCampaign] 发布活动 id = {} 时，同步到生产失败！Exception= ", mktCampaignId, e);
-                            }
-                        }
-                    }.start();
-                }*/
-
-                // 协同中心活动信息同步
-    /*            new Thread(){
-                    @Override
-                    public void run(){
-                        Map<String, Object> map = iMktCampaignService.campaignPublishDetail();
-                    }
-                }*/
-
-
             }
             mktCampaignMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCampaignMap.put("resultMsg", "发布活动成功！");
@@ -1192,6 +1217,11 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
                 mktCampaignVO.setEventDTOS(eventDTOList);
             }
+
+            // 获取过滤规则集合
+            List<Long> filterRuleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(preMktCampaignId);
+            mktCampaignVO.setFilterRuleIdList(filterRuleIdList);
+
 
             Map<String, Object> strategyTemplateMap = mktStrategyConfService.getStrategyTemplate(preMktCampaignId);
             List<MktStrategyConfDetail> mktStrategyConfDetailList = (List<MktStrategyConfDetail>) strategyTemplateMap.get("mktStrategyConfDetailList");

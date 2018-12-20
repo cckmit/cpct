@@ -35,10 +35,6 @@ public class MktStrategyConf implements Serializable {
      */
     private List<Integer> areaIdList;
 
-    /**
-     * 过滤规则id集合
-     */
-    private List<Long>  filterRuleIdList;
 
     public Long getMktStrategyConfId() {
         return mktStrategyConfId;
@@ -86,13 +82,5 @@ public class MktStrategyConf implements Serializable {
 
     public void setAreaIdList(List<Integer> areaIdList) {
         this.areaIdList = areaIdList;
-    }
-
-    public List<Long> getFilterRuleIdList() {
-        return filterRuleIdList;
-    }
-
-    public void setFilterRuleIdList(List<Long> filterRuleIdList) {
-        this.filterRuleIdList = filterRuleIdList;
     }
 }

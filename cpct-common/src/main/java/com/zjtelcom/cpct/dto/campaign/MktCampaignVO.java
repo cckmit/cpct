@@ -107,6 +107,18 @@ public class MktCampaignVO extends MktCampaign {
     //需求涵id
     private Long requestId;
 
+    /**
+     * 过滤规则id集合
+     */
+    private List<Long>  filterRuleIdList;
+
+    public List<Long> getFilterRuleIdList() {
+        return filterRuleIdList;
+    }
+
+    public void setFilterRuleIdList(List<Long> filterRuleIdList) {
+        this.filterRuleIdList = filterRuleIdList;
+    }
 
     public Long getRequestId() {
         return requestId;
