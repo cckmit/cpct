@@ -52,7 +52,7 @@ spring:
     cluster:
       name: my-application2
 
-#是否同步
+#是否同步  0不开启  1开启
 sync:
    value: 0
 
