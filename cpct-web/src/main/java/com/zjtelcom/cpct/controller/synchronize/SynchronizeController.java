@@ -1040,7 +1040,7 @@ public class SynchronizeController extends BaseController {
         try {
             responseHeaderModel = syncActivityService.syncActivity(mktCampaignId);
         } catch (Exception e) {
-            responseHeaderModel.setResultMessage("1");
+            responseHeaderModel.setResultCode("1");
             responseHeaderModel.setResultMessage("同步失败！");
             logger.error("同步活动到大数据失败！Exception: ", mktCampaignId, e);
         }

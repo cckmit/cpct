@@ -1,20 +1,35 @@
 package com.zjtelcom.cpct.open.base.interceptor;
 
+import com.alibaba.fastjson.JSONObject;
+import com.zjtelcom.cpct.constants.ResponseCode;
+import com.zjtelcom.cpct.dao.system.SysParamsMapper;
+import com.zjtelcom.cpct.domain.system.SysParams;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Auther: anson
  * @Date: 2018/10/29
- * @Description:自定义拦截器
+ * @Description:自定义拦截器   目前只提供标签api 和 营销活动详情
  */
+@Component
 public class MyInterceptor extends HandlerInterceptorAdapter {
 
 
+    @Autowired
+    private SysParamsMapper sysParamsMapper;
     /**
 
      * @param request
@@ -25,17 +40,39 @@ public class MyInterceptor extends HandlerInterceptorAdapter {
      */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-       // System.out.println("在控制器执行前调用 ");
-        Boolean flag = true;
-        requestHeaderIsTrue(request);
-        setResponseHeader(response);
-        if(flag){
-            System.out.println(request.getRequestURI());
-            return true;
-        }else{
-            System.out.println(request.getRequestURI());
-            return false;
+        Boolean flag = false;  //是否开启请求头验证 true开启
+        if(sysParamsMapper==null) {   //如果注入失败则手动获取
+            BeanFactory factory = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getServletContext());
+            sysParamsMapper = (SysParamsMapper) factory.getBean("sysParamsMapper");
         }
+        List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign("IS_OPEN_HEAD");
+            if (!sysParams.isEmpty()) {
+            if ("2".equals(sysParams.get(0).getParamValue())) {
+                flag = true;
+            }
+        }
+
+
+
+//        请求头是否符合规范
+        if(flag){
+            Map<String, String> stringStringMap = requestHeaderIsTrue(request);
+            if(!stringStringMap.get("resultCode").equals("0")){
+                //返回请求头验证失败信息
+                String news=stringStringMap.get("message");
+                JSONObject json=new JSONObject();
+                json.put("message",news);
+                response.setContentType("application/json;charset=UTF-8");
+                PrintWriter pw = response.getWriter();
+                pw.write(json.toJSONString());
+                pw.flush();
+                pw.close();
+                return false;
+            }
+
+        }
+        setResponseHeader(response);
+        return  true;
     }
 
 
@@ -46,22 +83,25 @@ public class MyInterceptor extends HandlerInterceptorAdapter {
      * X-APP-KEY          中国电信分配的APP-KEY
      * X-CTG-Request-Id   请求ID，唯⼀标示一次业务请求
      */
-    public static void requestHeaderIsTrue(HttpServletRequest request){
+    public static  Map<String, String>requestHeaderIsTrue(HttpServletRequest request) {
         //获取所有的消息头名称
-        //Enumeration<String> headerNames = request.getHeaderNames();
+        Enumeration<String> headerNames = request.getHeaderNames();
         //获取获取的消息头名称，获取对应的值，并输出
-//        while(headerNames.hasMoreElements()){
+//        while (headerNames.hasMoreElements()) {
 //            String nextElement = headerNames.nextElement();
-//            System.out.println(nextElement+":"+request.getHeader(nextElement));
+//            System.out.println(nextElement + ":" + request.getHeader(nextElement));
 //        }
         //判断对应的请求头信息是否正常
-        String contentType = request.getHeader("Content-Type");
-        String appId = request.getHeader("X-APP-ID");
-        String appKey = request.getHeader("X-APP-KEY");
-        String requestId = request.getHeader("X-CTG-Request-Id");
-
-
-
+        Map<String, String> headMap = new HashMap<>();
+        headMap.put("Content-Type", request.getHeader("Content-Type"));
+        headMap.put("X-APP-ID", request.getHeader("X-APP-ID"));
+        headMap.put("X-APP-KEY", request.getHeader("X-APP-KEY"));
+        headMap.put("X-CTG-Request-Id", request.getHeader("X-CTG-Request-Id"));
+        headMap.put("X-CTG-Region-ID", request.getHeader("X-CTG-Region-ID"));
+        //判断请求头是否符合规范
+//        System.out.println("请求头的信息："+headMap);
+        Map<String, String> stringStringMap = diffHead(headMap);
+        return  stringStringMap;
     }
 
 
@@ -71,13 +111,12 @@ public class MyInterceptor extends HandlerInterceptorAdapter {
      * 集团openapi指定返回
      */
     public static void setResponseHeader(HttpServletResponse response){
-        response.setHeader("Content-Type","application/json;charset=utf-8");   //这个目前设置不起作用 debug会发现他在后面改成了text/plain
-        response.setHeader("Location","/openapi/capability/1");
-        response.setHeader("Cache-Control","private");
-        response.setHeader("X-CTG-Request-Id","22222");
-        response.setHeader("X-RateLimit-Limit","11");
-        response.setHeader("X-RateLimit-Reset","999");
-        response.setHeader("X-RateLimit-Remaining","123456");
+        response.setHeader("Content-Type","application/json");   //这个目前设置不起作用 debug会发现他在后面改成了text/plain
+
+        response.setHeader("X-CTG-Request-Id","92598bee-7d30-4086-afc9-a7be6bd2cda0");
+        response.setHeader("X-RateLimit-Limit","60");
+        response.setHeader("X-RateLimit-Reset","48");
+        response.setHeader("X-RateLimit-Remaining","14");
     }
 
 
@@ -99,6 +138,32 @@ public class MyInterceptor extends HandlerInterceptorAdapter {
     }
 
 
+    /**
+     * 集团文档规定的请求头信息
+     * @return
+     */
+    public static Map<String, String> headNews(){
+        Map<String, String> head = new HashMap<>();
+        head.put("Content-Type","application/json");
+        head.put("X-APP-ID","FFnN2hso42Wego3pWq4X5qlu");
+        head.put("X-APP-KEY","UtOCzqb67d3sN12Kts4URwy8");
+        head.put("X-CTG-Request-Id","92598bee-7d30-4086-afc9-a7be6bd2cda0");
+        head.put("X-CTG-Region-ID","8110100");
+        return head;
+    }
+
+    public static Map<String, String> diffHead( Map<String, String> head){
+        Map<String, String> result=new HashMap<>();
+        result.put("resultCode","0");
+        Map<String, String> stringObjectMap = headNews();
+        for (String str:head.keySet()){
+            if(!stringObjectMap.get(str).equals(head.get(str))){
+                  result.put("resultCode","1");
+                  result.put("message",str+"信息验证失败");
+            }
+        }
+        return  result;
+    }
 
 
 }

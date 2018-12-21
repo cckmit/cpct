@@ -8,9 +8,13 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+@ImportResource("classpath:dubbo/dubbo-${spring.profiles.active}.xml")
+//@EnableSwagger2
 @ComponentScan(value={"com.zjtelcom.cpct"})
 @SpringBootApplication
 @EnableTransactionManagement

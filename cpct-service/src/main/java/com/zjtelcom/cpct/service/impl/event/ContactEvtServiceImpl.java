@@ -26,6 +26,7 @@ import com.zjtelcom.cpct.service.event.EventMatchRulService;
 import com.zjtelcom.cpct.service.synchronize.SynContactEvtService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.DateUtil;
+import com.zjtelcom.cpct.util.SystemParamsUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -291,7 +292,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                 }
             }
 
-            if (value.equals("1")){
+            if (SystemParamsUtil.getSyncValue().equals("1")){
                 new Thread(){
                     public void run(){
                         try {
@@ -355,7 +356,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                 eventMatchRulConditionMapper.delEventMatchRulCondition(eventMatchRulCondition);
             }
         }
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -394,7 +395,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             map.put("resultMsg","关闭成功");
         }
         //事件关闭开启 同步状态到生产
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -650,7 +651,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                 }
             }
 
-            if (value.equals("1")){
+            if (SystemParamsUtil.getSyncValue().equals("1")){
                 new Thread(){
                     public void run(){
                         try {

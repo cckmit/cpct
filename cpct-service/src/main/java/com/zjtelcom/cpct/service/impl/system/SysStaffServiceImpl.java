@@ -14,6 +14,7 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.synchronize.sys.SynSysStaffService;
 import com.zjtelcom.cpct.service.system.SysStaffService;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
+import com.zjtelcom.cpct.util.SystemParamsUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -162,7 +163,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         result.put("resultCode",CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","保存成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -211,7 +212,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         result.put("resultCode",CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","保存成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {

@@ -13,7 +13,7 @@ import java.util.Date;
  * //如果设计到时间字段  请设置为String类型
 */
 //@Data
-public class OpenMktStrategy extends BaseEntity{
+public class OpenMktStrategy{
 
 
     /**

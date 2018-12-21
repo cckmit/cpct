@@ -128,6 +128,12 @@
             <artifactId>cpct-dubbo</artifactId>
         </dependency>
 
+        <!--活动同步大数据-->
+        <dependency>
+            <groupId>com.zjhcsoft.eagle</groupId>
+            <artifactId>dubbo-eagle-service</artifactId>
+        </dependency>
+
 
     </dependencies>
 
