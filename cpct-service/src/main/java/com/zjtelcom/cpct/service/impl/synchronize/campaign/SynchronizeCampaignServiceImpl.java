@@ -761,6 +761,10 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
                 detail.setCamScript(script);
             } else if (detail.getCamScript() != null) {
                 script = detail.getCamScript();
+                if(script.getMktCampaignScptId()==null){
+                    script = mktCamScriptMapper.selectByConfId(script.getEvtContactConfId());
+                    detail.setCamScript(script);
+                }
                 mktCamScriptPrdMapper.insert(script);
             }
             redisUtils.set("MktCamChlConfDetail_" + detail.getEvtContactConfId(), detail);
