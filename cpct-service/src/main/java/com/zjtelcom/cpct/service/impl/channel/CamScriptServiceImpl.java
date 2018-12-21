@@ -72,6 +72,12 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
         newScript.setUpdateDate(new Date());
         newScript.setUpdateStaff(UserUtil.loginId());
         camScriptMapper.insert(newScript);
+        //更新redis推送渠道配置
+        MktCamChlConfDetail de = (MktCamChlConfDetail)redisUtils.get("MktCamChlConfDetail_"+newConfId);
+        if (detail!=null){
+            detail.setCamScript(newScript);
+            redisUtils.set("MktCamChlConfDetail_"+newConfId,detail);
+        }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",newScript);
         return result;
@@ -102,13 +108,8 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
         //更新redis推送渠道配置
         MktCamChlConfDetail detail = (MktCamChlConfDetail)redisUtils.get("MktCamChlConfDetail_"+addVO.getEvtContactConfId());
         if (detail!=null){
-            Map<String,Object> camScriptList = getCamScriptList(1L,addVO.getEvtContactConfId());
-            if (camScriptList.get("resultCode").equals(CODE_SUCCESS)){
-                CamScriptVO scriptVO = (CamScriptVO)camScriptList.get("resultMsg");
-                CamScript camScript = BeanUtil.create(scriptVO,new CamScript());
-                detail.setCamScript(camScript);
-                redisUtils.set("MktCamChlConfDetail_"+addVO.getEvtContactConfId(),detail);
-            }
+            detail.setCamScript(script);
+            redisUtils.set("MktCamChlConfDetail_"+addVO.getEvtContactConfId(),detail);
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
@@ -132,13 +133,8 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
         //更新redis推送渠道配置
         MktCamChlConfDetail detail = (MktCamChlConfDetail)redisUtils.get("MktCamChlConfDetail_"+editVO.getEvtContactConfId());
         if (detail!=null){
-            Map<String,Object> camScriptList = getCamScriptList(1L,editVO.getEvtContactConfId());
-            if (camScriptList.get("resultCode").equals(CODE_SUCCESS)){
-                CamScriptVO scriptVO = (CamScriptVO)camScriptList.get("resultMsg");
-                CamScript camScript = BeanUtil.create(scriptVO,new CamScript());
-                detail.setCamScript(camScript);
-                redisUtils.set("MktCamChlConfDetail_"+editVO.getEvtContactConfId(),detail);
-            }
+            detail.setCamScript(script);
+            redisUtils.set("MktCamChlConfDetail_"+editVO.getEvtContactConfId(),detail);
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","修改成功");

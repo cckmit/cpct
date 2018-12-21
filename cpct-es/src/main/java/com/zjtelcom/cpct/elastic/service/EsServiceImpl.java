@@ -17,6 +17,8 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.sort.SortBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -309,9 +311,7 @@ public class EsServiceImpl implements EsService {
      * @return
      */
     private SearchHits getSearchHits(BoolQueryBuilder boolQueryBuilder, SearchRequestBuilder builder,int from) {
-        SearchResponse myresponse = builder.setQuery(boolQueryBuilder).addSort("evtCollectTime", SortOrder.DESC)
-//                .setFrom(from).setSize(1)
-//                .setFetchSource(fields,null)
+        SearchResponse myresponse = builder.setQuery(boolQueryBuilder)
                 .setExplain(true).execute().actionGet();
         return myresponse.getHits();
     }
@@ -321,8 +321,10 @@ public class EsServiceImpl implements EsService {
      * @return
      */
     private SearchHits getSearchHits4Event(BoolQueryBuilder boolQueryBuilder, SearchRequestBuilder builder,int from) {
+        SortBuilder sortBuilder = SortBuilders.fieldSort("evtCollectTime")
+                .order(SortOrder.DESC).unmappedType("date");
         SearchResponse myresponse = builder.setQuery(boolQueryBuilder)
-                .setFrom(from).setSize(1).addSort("evtCollectTime", SortOrder.DESC)
+                .setFrom(from).setSize(1).addSort(sortBuilder)
                 .setExplain(true).execute().actionGet();
         return myresponse.getHits();
     }
