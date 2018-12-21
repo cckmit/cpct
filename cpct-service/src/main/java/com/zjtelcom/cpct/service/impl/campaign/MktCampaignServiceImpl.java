@@ -859,23 +859,24 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
                     mktCamResultRelMapper.updateByPrimaryKey(mktCamResultRelDO);
                 }
-
-                // 发布活动异步同步活动到生产环境
-                new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            SysStaff sysStaff = (SysStaff) SecurityUtils.getSubject().getPrincipal();
-                            String roleName = "admin";
-                            if (sysStaff != null) {
-                                roleName = sysStaff.getRoleName();
+                if ("1".equals(value)) {
+                    // 发布活动异步同步活动到生产环境
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            try {
+                                SysStaff sysStaff = (SysStaff) SecurityUtils.getSubject().getPrincipal();
+                                String roleName = "admin";
+                                if (sysStaff != null) {
+                                    roleName = sysStaff.getRoleName();
+                                }
+                                synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
-                            synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
-                        } catch (Exception e) {
-                            e.printStackTrace();
                         }
-                    }
-                }.start();
+                    }.start();
+                }
             } else if (StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd) || StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)) {
                 // 暂停或者下线, 该状态为未生效
                 /*MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();
@@ -1010,29 +1011,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     chaildMktCamStrategyConfRelDO.setUpdateStaff(UserUtil.loginId());
                     mktCamStrategyConfRelMapper.insert(chaildMktCamStrategyConfRelDO);
                 }
-                //  发布活动时异步去同步到生产
-/*                if ("1".equals(value)) {
-                    new Thread() {
-                        @Override
-                        public void run() {
-                            try {
-                                synchronizeCampaignService.synchronizeCampaign(mktCampaignId, "admin");
-                            } catch (Exception e) {
-                                logger.error("[op:publishMktCampaign] 发布活动 id = {} 时，同步到生产失败！Exception= ", mktCampaignId, e);
-                            }
-                        }
-                    }.start();
-                }*/
-
-                // 协同中心活动信息同步
-    /*            new Thread(){
-                    @Override
-                    public void run(){
-                        Map<String, Object> map = iMktCampaignService.campaignPublishDetail();
-                    }
-                }*/
-
-
             }
             mktCampaignMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCampaignMap.put("resultMsg", "发布活动成功！");
