@@ -85,7 +85,9 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
         long queryId = CommonUtil.stringToLong(id);
         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(queryId);
         if (null == mktCampaignDO) {
-            resultMap.put("params", "对应营销活动信息不存在!");
+            JSONObject json=new JSONObject();
+            json.put("message","对应营销活动信息不存在!");
+            resultMap.put("params", json);
             return resultMap;
         }
         //将活动信息转换为openapi返回格式

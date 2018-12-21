@@ -313,7 +313,7 @@ public class EsServiceImpl implements EsService {
      * @return
      */
     private SearchHits getSearchHits(BoolQueryBuilder boolQueryBuilder, SearchRequestBuilder builder,int from) {
-        SearchResponse myresponse = builder.setQuery(boolQueryBuilder).addSort("evtCollectTime", SortOrder.DESC)
+        SearchResponse myresponse = builder.setQuery(boolQueryBuilder)
 //                .setFrom(from).setSize(1)
 //                .setFetchSource(fields,null)
                 .setExplain(true).execute().actionGet();
@@ -326,7 +326,7 @@ public class EsServiceImpl implements EsService {
      */
     private SearchHits getSearchHits4Event(BoolQueryBuilder boolQueryBuilder, SearchRequestBuilder builder,int from) {
         SearchResponse myresponse = builder.setQuery(boolQueryBuilder)
-                .setFrom(from).setSize(1).addSort("evtCollectTime", SortOrder.DESC)
+                .setFrom(from).setSize(1)
                 .setExplain(true).execute().actionGet();
         return myresponse.getHits();
     }

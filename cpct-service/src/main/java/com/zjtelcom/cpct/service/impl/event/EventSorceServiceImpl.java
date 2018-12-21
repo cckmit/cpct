@@ -19,10 +19,7 @@ import com.zjtelcom.cpct.dto.event.EventSorce;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.EventSorceService;
 import com.zjtelcom.cpct.service.synchronize.SynEventSorceService;
-import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.ChannelUtil;
-import com.zjtelcom.cpct.util.DateUtil;
-import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -76,7 +73,7 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
             eventSorceMap.put("resultMsg", "新增事件源失败！");
             logger.error("[op:EventSorceServiceImpl] 新增事件源eventSorce = {}失败！Exception: ", JSON.toJSON(eventSorce), e);
         }
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -140,7 +137,7 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
             eventSorceMap.put("resultMsg", "更新事件源失败！");
             logger.error("[op:EventSorceServiceImpl] 更新事件源eventSorce = {}失败！Exception: ", JSON.toJSON(eventSorce), e);
         }
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -173,7 +170,7 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
             eventSorceMap.put("resultMsg", "查询事件源失败！");
             logger.error("[op:EventSorceServiceImpl] 通过evtSrcId = {} 删除事件源失败！Exception: ", evtSrcId, e);
         }
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {

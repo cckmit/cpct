@@ -45,7 +45,7 @@ public class MyInterceptor extends HandlerInterceptorAdapter {
             sysParamsMapper = (SysParamsMapper) factory.getBean("sysParamsMapper");
         }
         List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign("IS_OPEN_HEAD");
-        if (!sysParams.isEmpty()) {
+            if (!sysParams.isEmpty()) {
             if ("2".equals(sysParams.get(0).getParamValue())) {
                 flag = true;
             }
@@ -156,7 +156,7 @@ public class MyInterceptor extends HandlerInterceptorAdapter {
         result.put("resultCode","0");
         Map<String, String> stringObjectMap = headNews();
         for (String str:head.keySet()){
-            if(!head.get(str).equals(stringObjectMap.get(str))){
+            if(!stringObjectMap.get(str).equals(head.get(str))){
                   result.put("resultCode","1");
                   result.put("message",str+"信息验证失败");
             }

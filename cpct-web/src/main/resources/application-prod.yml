@@ -47,12 +47,12 @@ spring:
   #ES
   elasticsearch:
     ip: 134.108.0.88
-    port: 9700
+    port: 9300
     pool: 5
     cluster:
-      name: my-application2
+      name: my-application1
 
-#是否同步
+#是否同步  0不开启  1开启
 sync:
    value: 0
 

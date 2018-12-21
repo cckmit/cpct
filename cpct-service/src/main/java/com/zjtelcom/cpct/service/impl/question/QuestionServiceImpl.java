@@ -13,10 +13,7 @@ import com.zjtelcom.cpct.domain.question.QuestionDetail;
 import com.zjtelcom.cpct.dto.question.*;
 import com.zjtelcom.cpct.service.question.QuestionService;
 import com.zjtelcom.cpct.service.synchronize.SynQuestionService;
-import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.ChannelUtil;
-import com.zjtelcom.cpct.util.DateUtil;
-import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -134,7 +131,7 @@ public class QuestionServiceImpl implements QuestionService {
         result.put("resultMsg","添加成功");
         result.put("questionId",questionId);
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -177,7 +174,7 @@ public class QuestionServiceImpl implements QuestionService {
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","编辑成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -243,7 +240,7 @@ public class QuestionServiceImpl implements QuestionService {
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","删除成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {

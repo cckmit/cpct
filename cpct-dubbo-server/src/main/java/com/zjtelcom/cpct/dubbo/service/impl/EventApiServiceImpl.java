@@ -1525,6 +1525,7 @@ public class EventApiServiceImpl implements EventApiService {
                     TarGrpDetail detail = (TarGrpDetail) redisUtils.get("TAR_GRP_" + tarGrpId);
                     List<TarGrpCondition> tarGrpConditionDOs = new ArrayList<>();
                     if (detail != null) {
+                        System.out.println("埋点88888 redis");
                         tarGrpConditionDOs = detail.getTarGrpConditions();
                     } else {
                         //查询分群规则list
