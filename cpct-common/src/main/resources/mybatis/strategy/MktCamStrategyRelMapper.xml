@@ -53,4 +53,11 @@
     CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
     from mkt_cam_strategy_rel
   </select>
+
+  <select id="selectByMktCampaignId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select CAMP_STR_REL_ID, MKT_CAMPAIGN_ID, STRATEGY_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF,
+    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
+    from mkt_cam_strategy_rel
+    where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+  </select>
 </mapper>

@@ -12,10 +12,7 @@ import com.zjtelcom.cpct.request.event.QryContactEvtTypeReq;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.ContactEvtTypeService;
 import com.zjtelcom.cpct.service.synchronize.SynContactEvtTypeService;
-import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.ChannelUtil;
-import com.zjtelcom.cpct.util.DateUtil;
-import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.util.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -117,7 +114,7 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
         maps.put("contactEvtType", contactEvtType);
         maps.put("ruleEvents", null);
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -169,7 +166,7 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
         maps.put("contactEvtType", contactEvtType);
         maps.put("ruleEvents", null);
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -211,7 +208,7 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
             maps.put("ruleEvents", null);
         }
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {

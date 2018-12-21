@@ -7,27 +7,78 @@ import com.zjtelcom.cpct.open.base.entity.BaseEntity;
  * @Date: 2018/11/7
  * @Description:营销活动脚本
  */
-public class OpenScript extends BaseEntity {
+public class OpenScript{
 
-    private Long evtContactConfId;//'事件推送策略标识',
-    private String execChannel;   //执行渠道
+    private String href;
+    private Long id;
+    private String mktActivityNbr;
+    private Long mktCampaignId;
     private String remark;
-    private String scriptDesc;//'记录营销活动该渠道执行环节的具体脚本内容
-    private String scriptName;
-    private String scriptType;
+    private String scriptDesc;
     private String statusCd;
-    private Long mktCampaignScptId;//'营销活动脚本标识，主键',
-    private Long mktCampaignId;//'营销活动标识',
+    private Long evtContactConfId;
 
+    public String getHref() {
+        return href;
+    }
 
+    public void setHref(String href) {
+        this.href = href;
+    }
 
-    private Long lanId;//'记录本地网标识，数据来源于公共管理区域。'
+    public Long getId() {
+        return id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
 
+    public String getMktActivityNbr() {
+        return mktActivityNbr;
+    }
 
+    public void setMktActivityNbr(String mktActivityNbr) {
+        this.mktActivityNbr = mktActivityNbr;
+    }
 
+    public Long getMktCampaignId() {
+        return mktCampaignId;
+    }
 
+    public void setMktCampaignId(Long mktCampaignId) {
+        this.mktCampaignId = mktCampaignId;
+    }
 
+    public String getRemark() {
+        return remark;
+    }
 
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
 
+    public String getScriptDesc() {
+        return scriptDesc;
+    }
+
+    public void setScriptDesc(String scriptDesc) {
+        this.scriptDesc = scriptDesc;
+    }
+
+    public String getStatusCd() {
+        return statusCd;
+    }
+
+    public void setStatusCd(String statusCd) {
+        this.statusCd = statusCd;
+    }
+
+    public Long getEvtContactConfId() {
+        return evtContactConfId;
+    }
+
+    public void setEvtContactConfId(Long evtContactConfId) {
+        this.evtContactConfId = evtContactConfId;
+    }
 }

@@ -36,5 +36,7 @@ public interface MktStrategyConfRuleMapper {
 
     List<Long> listTarGrpIdList();
 
+    List<MktStrategyConfRuleDO> selectByCampaignId(@Param("campaignId")Long campaignId);
+
 
 }

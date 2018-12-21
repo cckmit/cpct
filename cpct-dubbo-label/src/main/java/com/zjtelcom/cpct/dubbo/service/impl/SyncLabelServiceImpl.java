@@ -309,6 +309,15 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
                 labelModel.setOperator("7000");
                 labelModel.setLabelValueType("2000");
             }
+            if (labelModel.getLabObject().equals("客户级")){
+                labelModel.setLabelType("1000");
+            }else if (labelModel.getLabObject().equals("用户级")) {
+                labelModel.setLabelType("2000");
+            }else if (labelModel.getLabObject().equals("销售品级")) {
+                labelModel.setLabelType("3000");
+            }else if (labelModel.getLabObject().equals("区域级")) {
+                labelModel.setLabelType("4000");
+            }
             labelModel.setLabelDataType("1000");
             labelModel.setScope(1);
             labelModel.setIsShared(0);

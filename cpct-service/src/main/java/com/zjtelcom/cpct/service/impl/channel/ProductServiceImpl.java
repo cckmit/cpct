@@ -242,9 +242,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         for(MktCamItem item : mktCamItems){
             ruleIdList.add(item.getMktCamItemId());
         }
-        if (param.getStrategyRuleId()!=null){
-            strategyConfRuleService.updateProductIds(ruleIdList,param.getStrategyRuleId());
-        }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",ruleIdList);
         return result;

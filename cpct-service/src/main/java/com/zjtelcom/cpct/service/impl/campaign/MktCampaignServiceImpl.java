@@ -907,23 +907,24 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
                     mktCamResultRelMapper.updateByPrimaryKey(mktCamResultRelDO);
                 }
-
-                // 发布活动异步同步活动到生产环境
-                new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            SysStaff sysStaff = (SysStaff) SecurityUtils.getSubject().getPrincipal();
-                            String roleName = "admin";
-                            if (sysStaff != null) {
-                                roleName = sysStaff.getRoleName();
+                if ("1".equals(value)) {
+                    // 发布活动异步同步活动到生产环境
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            try {
+                                SysStaff sysStaff = (SysStaff) SecurityUtils.getSubject().getPrincipal();
+                                String roleName = "admin";
+                                if (sysStaff != null) {
+                                    roleName = sysStaff.getRoleName();
+                                }
+                                synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
-                            synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
-                        } catch (Exception e) {
-                            e.printStackTrace();
                         }
-                    }
-                }.start();
+                    }.start();
+                }
             } else if (StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd) || StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)) {
                 // 暂停或者下线, 该状态为未生效
                 /*MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();
