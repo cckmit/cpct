@@ -28,4 +28,8 @@ public interface MktCamItemMapper {
     List<MktCamItem> selectByBatch(List<Long> mktCamItemIdList);
 
     List<MktCamItem> selectByCampaignAndType(@Param("campaignId")Long campaignId,@Param("type")String itemType);
+
+    List<MktCamItem> selectByCampaignId(@Param("campaignId")Long campaignId);
+
+    MktCamItem selectByItemIdAndCampaignId(@Param("itemId")Long itemId,@Param("campaignId")Long campaignId);
 }

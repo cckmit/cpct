@@ -157,6 +157,29 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         return result;
     }
 
+    /**
+     * 活动发布复制推荐条目
+     * @param oldCampaignId
+     * @param newCampaignId
+     * @return
+     */
+    @Override
+    public Map<String, Object> copyItemByCampaignPublish(Long oldCampaignId, Long newCampaignId) {
+        Map<String,Object> result = new HashMap<>();
+        List<Long> idList = new ArrayList<>();
+        List<MktCamItem> oldItemList = camItemMapper.selectByCampaignId(oldCampaignId);
+        for (MktCamItem item : oldItemList){
+            MktCamItem newItem = BeanUtil.create(item,new MktCamItem());
+            newItem.setMktCamItemId(null);
+            newItem.setMktCampaignId(newCampaignId);
+            camItemMapper.insert(newItem);
+            idList.add(newItem.getMktCamItemId());
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",idList);
+        return result;
+    }
+
     @Override
     @Transactional
     public Map<String, Object> addProductRule(ProductParam param) {
