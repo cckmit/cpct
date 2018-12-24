@@ -594,16 +594,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         try {
             //todo
              response = esService.searchBatchInfo(requests);
-
-//            response = restTemplate.postForObject(batchInfo, request, TrialResponse.class);
-            //同时调用统计查询的功能
-
-             countResponse = esService.searchCountInfo(requests);
-//            countResponse = restTemplate.postForObject(countInfo,request,TrialResponse.class);
-
-            if (countResponse.getResultCode().equals(CODE_SUCCESS)){
-                redisUtils.set("HITS_COUNT_INFO_"+request.getBatchNum(),countResponse.getHitsList());
-            }
             if (!response.getResultCode().equals(CODE_SUCCESS)) {
                 trialOperation.setStatusCd("2000");
                 trialOperation.setUpdateDate(new Date());
@@ -622,6 +612,16 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             trialOperation.setUpdateDate(new Date());
             trialOperation.setRemark("ES查询错误");
             trialOperationMapper.updateByPrimaryKey(trialOperation);
+        }
+        //同时调用统计查询的功能
+        try {
+            countResponse = esService.searchCountInfo(requests);
+//            countResponse = restTemplate.postForObject(countInfo,request,TrialResponse.class);
+            if (countResponse.getResultCode().equals(CODE_SUCCESS)){
+                redisUtils.set("HITS_COUNT_INFO_"+request.getBatchNum(),countResponse.getHitsList());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
         // 抽样试算成功
         result.put("resultCode", CODE_SUCCESS);

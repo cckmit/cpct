@@ -179,7 +179,8 @@ public class RedisUtils {
         try {
             result = redisTemplate.hasKey(key);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("redis判断存在异常");
+//            e.printStackTrace();
             return false;
         }
         return result;

@@ -268,11 +268,12 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         Map<String,Object> result = new HashMap<>();
         List<LabelValue> valueList = new ArrayList<>();
         List<String> stringList = new ArrayList<>();
+        labelValueMapper.deleteByLabelId(labelId);
         for (LabValueModel info : valueModelList){
             LabelValue value = BeanUtil.create(info,new LabelValue());
             value.setInjectionLabelId(labelId);
             value.setValueDesc(info.getValueName());
-            value.setValueName(info.getValueName());
+            value.setValueName(info.getLabValue());
             value.setLabelValue(info.getLabValue());
             value.setCreateDate(new Date());
             value.setStatusCd("1000");

@@ -197,6 +197,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
             detail.setTarGrpConditions(conditionList);
             redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),detail);
+
+            System.out.println(((TarGrpDetail)redisUtils.get("TAR_GRP_"+tarGrp.getTarGrpId())).getStatusCd());
             //插入客户分群条件
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
             maps.put("tarGrp", tarGrp);
@@ -363,9 +365,13 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     @Override
     public Map<String, Object> modTarGrp(TarGrpDetail tarGrpDetail) {
         Map<String, Object> maps = new HashMap<>();
+        TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpDetail.getTarGrpId());
+        if (tarGrp==null){
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg", "分群不存在");
+            return maps;
+        }
         try {
-            TarGrp tarGrp = new TarGrp();
-            tarGrp = tarGrpDetail;
             tarGrp.setUpdateDate(DateUtil.getCurrentTime());
             tarGrp.setUpdateStaff(UserUtil.loginId());
             tarGrpMapper.modTarGrp(tarGrp);

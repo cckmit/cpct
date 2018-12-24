@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.open.base.interceptor;
 
 import com.alibaba.fastjson.JSONObject;
+import com.zjtelcom.cpct.constants.ResponseCode;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import org.springframework.beans.factory.BeanFactory;

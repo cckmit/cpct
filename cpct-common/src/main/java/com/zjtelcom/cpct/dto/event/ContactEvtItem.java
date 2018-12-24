@@ -23,23 +23,6 @@ public class ContactEvtItem extends BaseEntity {
     private String isMainParam;//是否是主参
     private String isLabel;//是否为标签
 
-    public String getIsLabel() {
-        return isLabel;
-    }
-
-    public void setIsLabel(String isLabel) {
-        this.isLabel = isLabel;
-    }
-
-    public String getIsMainParam() {
-        return isMainParam;
-    }
-
-    public void setIsMainParam(String isMainParam) {
-        this.isMainParam = isMainParam;
-    }
-
-
     public String getActType() {
         return actType;
     }
@@ -126,5 +109,21 @@ public class ContactEvtItem extends BaseEntity {
 
     public void setStandardSort(Integer standardSort) {
         this.standardSort = standardSort;
+    }
+
+    public String getIsMainParam() {
+        return isMainParam;
+    }
+
+    public void setIsMainParam(String isMainParam) {
+        this.isMainParam = isMainParam;
+    }
+
+    public String getIsLabel() {
+        return isLabel;
+    }
+
+    public void setIsLabel(String isLabel) {
+        this.isLabel = isLabel;
     }
 }

@@ -209,7 +209,7 @@ public class EventApiServiceImpl implements EventApiService {
         esJson.put("evtCollectTime", evtCollectTime);
         esJson.put("hit", false);
         esJson.put("msg", "事件接入，开始异步流程");
-        esService.save(esJson, IndexList.EVENT_MODULE,reqId);
+        esService.save(esJson, IndexList.EVENT_MODULE, reqId);
 
         //异步
         AsyncCPC asyncCPC = new AsyncCPC(params);
@@ -317,7 +317,7 @@ public class EventApiServiceImpl implements EventApiService {
         esJson.put("evtCollectTime", evtCollectTime);
         esJson.put("hit", false);
         esJson.put("msg", "事件接入，开始异步流程");
-        esService.save(esJson, IndexList.EVENT_MODULE,reqId);
+        esService.save(esJson, IndexList.EVENT_MODULE, reqId);
 
         //调用计算方法
         result = new EventTask().call(params);
@@ -388,7 +388,7 @@ public class EventApiServiceImpl implements EventApiService {
                 if (event == null) {
                     esJson.put("hit", false);
                     esJson.put("msg", "未找到相关事件");
-                    esService.save(esJson, IndexList.EVENT_MODULE,map.get("reqId"));
+                    esService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
 
                     result.put("CPCResultMsg", "未找到相关事件");
                     return result;
@@ -402,7 +402,7 @@ public class EventApiServiceImpl implements EventApiService {
                 if (!"1000".equals(event.getStatusCd())) {
                     esJson.put("hit", false);
                     esJson.put("msg", "事件已关闭");
-                    esService.save(esJson, IndexList.EVENT_MODULE,map.get("reqId"));
+                    esService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
                     result.put("CPCResultMsg", "事件已关闭");
                     return result;
                 }
@@ -444,7 +444,7 @@ public class EventApiServiceImpl implements EventApiService {
                     esJson.put("timeCost", cost);
                     esJson.put("hit", false);
                     esJson.put("msg", "事件采集项验证失败，缺少：" + stringBuilder.toString());
-                    esService.save(esJson, IndexList.EVENT_MODULE,map.get("reqId"));
+                    esService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
 
                     result.put("CPCResultCode", "1000");
                     result.put("CPCResultMsg", "事件采集项验证失败，缺少：" + stringBuilder.toString());
@@ -460,7 +460,7 @@ public class EventApiServiceImpl implements EventApiService {
                     result.put("CPCResultCode", "1000");
                     esJson.put("hit", false);
                     esJson.put("msg", stringObjectMap.get("result"));
-                    esService.save(esJson, IndexList.EVENT_MODULE,map.get("reqId"));
+                    esService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
                     return result;
                 }
 
@@ -501,7 +501,7 @@ public class EventApiServiceImpl implements EventApiService {
                             esJson.put("hit", false);
                             esJson.put("activityId", camEvtRelDO.getMktCampaignId());
                             esJson.put("msg", "客户级活动，事件采集项未包含客户编码");
-                            esService.save(esJson, IndexList.EVENT_MODULE,map.get("reqId"));
+                            esService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
 
                             //事件采集项没有客户编码
                             result.put("CPCResultCode", "1000");
@@ -539,7 +539,7 @@ public class EventApiServiceImpl implements EventApiService {
                             Map<String, String> privateParams = new HashMap<>();
                             privateParams.put("isCust", "0");
                             privateParams.put("accNbr", ((Map) o).get("ACC_NBR").toString());
-                            privateParams.put("integrationId",  ((Map) o).get("ASSET_INTEG_ID").toString());
+                            privateParams.put("integrationId", ((Map) o).get("ASSET_INTEG_ID").toString());
                             privateParams.put("custId", map.get("custId"));
                             //活动优先级为空的时候默认0
                             privateParams.put("orderPriority", camEvtRelDO.getCampaignSeq() == null ? "0" : camEvtRelDO.getCampaignSeq().toString());
@@ -635,7 +635,7 @@ public class EventApiServiceImpl implements EventApiService {
                 long cost = System.currentTimeMillis() - begin;
                 esJson.put("timeCost", cost);
                 esJson.put("hit", true);
-                esService.save(esJson, IndexList.EVENT_MODULE,map.get("reqId"));
+                esService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
 
             } catch (Exception e) {
 
@@ -743,7 +743,7 @@ public class EventApiServiceImpl implements EventApiService {
                 //当前时间不在活动生效时间内
                 esJson.put("hit", false);
                 esJson.put("msg", "当前时间不在活动生效时间内");
-                esService.save(esJson, IndexList.ACTIVITY_MODULE,esJson.getString("activityId"));
+                esService.save(esJson, IndexList.ACTIVITY_MODULE, esJson.getString("activityId"));
                 return Collections.EMPTY_MAP;
             }
 
@@ -854,14 +854,14 @@ public class EventApiServiceImpl implements EventApiService {
                     esJson.put("hit", false);
                     esJson.put("msg", "策略均未命中");
                 }
-                esService.save(esJson, IndexList.ACTIVITY_MODULE,esJson.getString("activityId"));
+                esService.save(esJson, IndexList.ACTIVITY_MODULE, esJson.getString("activityId"));
 
             } catch (Exception e) {
                 e.printStackTrace();
 
                 esJson.put("hit", false);
                 esJson.put("msg", "获取计算结果异常");
-                esService.save(esJson, IndexList.ACTIVITY_MODULE,esJson.getString("activityId"));
+                esService.save(esJson, IndexList.ACTIVITY_MODULE, esJson.getString("activityId"));
                 //发生异常关闭线程池
                 executorService.shutdown();
             }
@@ -942,30 +942,30 @@ public class EventApiServiceImpl implements EventApiService {
                             break;
                         }
                     } else {
-                        //下发地市获取异常 lanId
-                        strategyMap.put("msg", "下发地市获取异常");
+                        //适用地市获取异常 lanId
+                        strategyMap.put("msg", "适用地市获取异常");
 
                         esJson.put("hit", "false");
-                        esJson.put("msg", "下发地市获取异常");
+                        esJson.put("msg", "适用地市获取异常");
                         esService.save(esJson, IndexList.STRATEGY_MODULE);
                         return Collections.EMPTY_MAP;
                     }
                 }
 
                 if (areaCheck) {
-                    strategyMap.put("msg", "下发地市不符");
+                    strategyMap.put("msg", "适用地市不符");
 
                     esJson.put("hit", "false");
-                    esJson.put("msg", "下发地市不符");
+                    esJson.put("msg", "适用地市不符");
                     esService.save(esJson, IndexList.STRATEGY_MODULE);
                     return Collections.EMPTY_MAP;
                 }
             } else {
-                //下发地市数据异常
-                strategyMap.put("msg", "下发地市数据异常");
+                //适用地市数据异常
+                strategyMap.put("msg", "适用地市数据异常");
 
                 esJson.put("hit", "false");
-                esJson.put("msg", "下发地市数据异常");
+                esJson.put("msg", "适用地市数据异常");
                 esService.save(esJson, IndexList.STRATEGY_MODULE);
                 return Collections.EMPTY_MAP;
             }
@@ -983,7 +983,7 @@ public class EventApiServiceImpl implements EventApiService {
                             break;
                         }
                     } else {
-                        //下发地市获取异常 lanId
+                        //适用地市获取异常 lanId
                         strategyMap.put("msg", "适用渠道获取异常");
                         esJson.put("hit", "false");
                         esJson.put("msg", "适用渠道获取异常");
@@ -1000,7 +1000,7 @@ public class EventApiServiceImpl implements EventApiService {
                     return Collections.EMPTY_MAP;
                 }
             } else {
-                //下发地市数据异常
+                //适用地市数据异常
                 strategyMap.put("msg", "适用渠道数据异常");
                 esJson.put("hit", "false");
                 esJson.put("msg", "适用渠道数据异常");
@@ -1514,82 +1514,82 @@ public class EventApiServiceImpl implements EventApiService {
             //判断redis中是否存在
             String express = "";
             try {
-                if (redisUtils.exists(key)) {
-                    System.out.println("埋点22222");
-                    express = (String) redisUtils.get(key);
+//                if (redisUtils.exists(key)) {
+//                    System.out.println("埋点22222");
+//                    express = (String) redisUtils.get(key);
+//                } else {
+
+                LabelResult lr;
+
+                //若redis中不存在key，则从数据库中查询并拼装表达式
+                TarGrpDetail detail = (TarGrpDetail) redisUtils.get("TAR_GRP_" + tarGrpId);
+                List<TarGrpCondition> tarGrpConditionDOs = new ArrayList<>();
+                if (detail != null) {
+                    System.out.println("埋点88888 redis");
+                    tarGrpConditionDOs = detail.getTarGrpConditions();
                 } else {
+                    //查询分群规则list
+                    TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpId);
+                    TarGrpDetail detailNew = BeanUtil.create(tarGrp, new TarGrpDetail());
+                    tarGrpConditionDOs = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
+                    detailNew.setTarGrpConditions(tarGrpConditionDOs);
+                    redisUtils.set("TAR_GRP_" + tarGrpId, detailNew);
+                }
+                //将规则拼装为表达式
+                StringBuilder expressSb = new StringBuilder();
+                expressSb.append("if(");
+                //遍历所有规则
+                for (int i = 0; i < tarGrpConditionDOs.size(); i++) {
 
-                    LabelResult lr;
+                    String type = tarGrpConditionDOs.get(i).getOperType();
 
-                    //若redis中不存在key，则从数据库中查询并拼装表达式
-                    TarGrpDetail detail = (TarGrpDetail) redisUtils.get("TAR_GRP_" + tarGrpId);
-                    List<TarGrpCondition> tarGrpConditionDOs = new ArrayList<>();
-                    if (detail != null) {
-                        System.out.println("埋点88888 redis");
-                        tarGrpConditionDOs = detail.getTarGrpConditions();
-                    } else {
-                        //查询分群规则list
-                        TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpId);
-                        TarGrpDetail detailNew = BeanUtil.create(tarGrp, new TarGrpDetail());
-                        tarGrpConditionDOs = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
-                        detailNew.setTarGrpConditions(tarGrpConditionDOs);
-                        redisUtils.set("TAR_GRP_" + tarGrpId, detailNew);
+                    Label label = (Label) redisUtils.get("LABEL_LIB_" + tarGrpConditionDOs.get(i).getLeftParam());
+                    if (label == null) {
+                        label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i).getLeftParam()));
+                        redisUtils.set("LABEL_LIB_" + Long.parseLong(tarGrpConditionDOs.get(i).getLeftParam()), label);
                     }
-                    //将规则拼装为表达式
-                    StringBuilder expressSb = new StringBuilder();
-                    expressSb.append("if(");
-                    //遍历所有规则
-                    for (int i = 0; i < tarGrpConditionDOs.size(); i++) {
 
-                        String type = tarGrpConditionDOs.get(i).getOperType();
-
-                        Label label = (Label) redisUtils.get("LABEL_LIB_" + tarGrpConditionDOs.get(i).getLeftParam());
-                        if (label == null) {
-                            label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i).getLeftParam()));
-                            redisUtils.set("LABEL_LIB_" + Long.parseLong(tarGrpConditionDOs.get(i).getLeftParam()), label);
+                    //保存标签的es log
+                    lr = new LabelResult();
+                    if (label != null) {
+                        lr.setOperType(type);
+                        lr.setLabelCode(label.getInjectionLabelCode());
+                        lr.setLabelName(label.getInjectionLabelName());
+                        lr.setRightOperand(tarGrpConditionDOs.get(i).getRightParam());
+                        lr.setClassName(label.getClassName());
+                        if (context.containsKey(label.getInjectionLabelCode())) {
+                            lr.setRightParam(context.get(label.getInjectionLabelCode()).toString());
+                        } else {
+                            lr.setRightParam("无值");
+                            lr.setResult(false);
                         }
+                    }
 
-                        //保存标签的es log
-                        lr = new LabelResult();
-                        if (label != null) {
-                            lr.setOperType(type);
-                            lr.setLabelCode(label.getInjectionLabelCode());
-                            lr.setLabelName(label.getInjectionLabelName());
-                            lr.setRightOperand(tarGrpConditionDOs.get(i).getRightParam());
-                            lr.setClassName(label.getClassName());
-                            if (context.containsKey(label.getInjectionLabelCode())) {
-                                lr.setRightParam(context.get(label.getInjectionLabelCode()).toString());
-                            } else {
-                                lr.setRightParam("无值");
-                                lr.setResult(false);
-                            }
-                        }
-
-                        expressSb.append(cpcExpression(label, type, tarGrpConditionDOs.get(i).getRightParam()));
+                    expressSb.append(cpcExpression(label, type, tarGrpConditionDOs.get(i).getRightParam()));
 //                    assLabel(label,type,tarGrpConditionDOs.get(i).getRightParam());
 
-                        try {
-                            RuleResult ruleResult1 = runner.executeRule(cpcLabel(label, type, tarGrpConditionDOs.get(i).getRightParam()), context, true, true);
-                            if (null != ruleResult1.getResult()) {
-                                lr.setResult((Boolean) ruleResult1.getResult());
-                            } else {
-                                lr.setResult(false);
-                            }
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            System.out.println("单个标签判断出错");
+                    try {
+                        RuleResult ruleResult1 = runner.executeRule(cpcLabel(label, type, tarGrpConditionDOs.get(i).getRightParam()), context, true, true);
+                        if (null != ruleResult1.getResult()) {
+                            lr.setResult((Boolean) ruleResult1.getResult());
+                        } else {
+                            lr.setResult(false);
                         }
 
-                        if (i + 1 != tarGrpConditionDOs.size()) {
-                            expressSb.append("&&");
-                        }
-
-                        labelResultList.add(lr);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.out.println("单个标签判断出错");
                     }
-                    expressSb.append(") {return true} else {return false}");
-                    express = expressSb.toString();
+
+                    if (i + 1 != tarGrpConditionDOs.size()) {
+                        expressSb.append("&&");
+                    }
+
+                    labelResultList.add(lr);
                 }
+                expressSb.append(") {return true} else {return false}");
+                express = expressSb.toString();
+//                }
             } catch (Exception e) {
                 e.printStackTrace();
                 System.out.println("埋点3333");

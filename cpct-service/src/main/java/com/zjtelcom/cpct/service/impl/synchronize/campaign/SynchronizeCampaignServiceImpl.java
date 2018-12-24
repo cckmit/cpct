@@ -290,47 +290,55 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
 
                 // 删除销售品
                 String[] productIds = mktStrategyConfRuleDO.getProductId().split("/");
-                for (String productId : productIds) {
-                    mktCamItemPrdMapper.deleteByPrimaryKey(Long.valueOf(productId));
+                if(productIds!=null && !"".equals(productIds)){
+                    for (String productId : productIds) {
+                        mktCamItemPrdMapper.deleteByPrimaryKey(Long.valueOf(productId));
+                    }
                 }
+
 
                 // 删除首次协同
                 String[] evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
-                for (String evtContactConfId : evtContactConfIds) {
-                    Long confId = Long.valueOf(evtContactConfId);
-                    mktCamChlConfPrdMapper.deleteByPrimaryKey(confId);
-                    mktCamChlConfAttrPrdMapper.deleteByEvtContactConfId(confId);
-                    // 删除话术
-                    List<MktVerbal> verbalList = mktVerbalPrdMapper.findVerbalListByConfId(confId);
-                    for (MktVerbal mktVerbal : verbalList) {
-                        mktVerbalConditionPrdMapper.deleteByVerbalId("0", mktVerbal.getVerbalId());
+                if(evtContactConfIds!=null && !"".equals(evtContactConfIds)){
+                    for (String evtContactConfId : evtContactConfIds) {
+                        Long confId = Long.valueOf(evtContactConfId);
+                        mktCamChlConfPrdMapper.deleteByPrimaryKey(confId);
+                        mktCamChlConfAttrPrdMapper.deleteByEvtContactConfId(confId);
+                        // 删除话术
+                        List<MktVerbal> verbalList = mktVerbalPrdMapper.findVerbalListByConfId(confId);
+                        for (MktVerbal mktVerbal : verbalList) {
+                            mktVerbalConditionPrdMapper.deleteByVerbalId("0", mktVerbal.getVerbalId());
+                        }
+                        mktVerbalPrdMapper.deleteByConfId(confId);
+                        // 删除脚本
+                        mktCamScriptPrdMapper.deleteByConfId(confId);
                     }
-                    mktVerbalPrdMapper.deleteByConfId(confId);
-                    // 删除脚本
-                    mktCamScriptPrdMapper.deleteByConfId(confId);
                 }
+
 
                 // 删除二次协同结果
                 String[] mktCamChlResultIds = mktStrategyConfRuleDO.getMktCamChlResultId().split("/");
-                if(mktCamChlResultIds !=null && !"".equals(mktCamChlResultIds[0])){
-                    for (String mktCamChlResultId : mktCamChlResultIds) {
-                        // 删除结果下的推动渠道以及属性
-                        List<MktCamChlResultConfRelDO> mktCamChlResultConfRelDOList = mktCamChlResultConfRelPrdMapper.selectByMktCamChlResultId(Long.valueOf(mktCamChlResultId));
-                        for (MktCamChlResultConfRelDO mktCamChlResultConfRelDO : mktCamChlResultConfRelDOList) {
-                            Long confId = Long.valueOf(mktCamChlResultConfRelDO.getEvtContactConfId());
-                            mktCamChlConfPrdMapper.deleteByPrimaryKey(confId);
-                            mktCamChlConfAttrPrdMapper.deleteByEvtContactConfId(confId);
-                            // 删除话术
-                            List<MktVerbal> verbalList = mktVerbalPrdMapper.findVerbalListByConfId(confId);
-                            for (MktVerbal mktVerbal : verbalList) {
-                                mktVerbalConditionPrdMapper.deleteByVerbalId("0", mktVerbal.getVerbalId());
+                if(mktCamChlResultIds!=null && !"".equals(mktCamChlResultIds)){
+                    if(mktCamChlResultIds !=null && !"".equals(mktCamChlResultIds[0])){
+                        for (String mktCamChlResultId : mktCamChlResultIds) {
+                            // 删除结果下的推动渠道以及属性
+                            List<MktCamChlResultConfRelDO> mktCamChlResultConfRelDOList = mktCamChlResultConfRelPrdMapper.selectByMktCamChlResultId(Long.valueOf(mktCamChlResultId));
+                            for (MktCamChlResultConfRelDO mktCamChlResultConfRelDO : mktCamChlResultConfRelDOList) {
+                                Long confId = Long.valueOf(mktCamChlResultConfRelDO.getEvtContactConfId());
+                                mktCamChlConfPrdMapper.deleteByPrimaryKey(confId);
+                                mktCamChlConfAttrPrdMapper.deleteByEvtContactConfId(confId);
+                                // 删除话术
+                                List<MktVerbal> verbalList = mktVerbalPrdMapper.findVerbalListByConfId(confId);
+                                for (MktVerbal mktVerbal : verbalList) {
+                                    mktVerbalConditionPrdMapper.deleteByVerbalId("0", mktVerbal.getVerbalId());
+                                }
+                                mktVerbalPrdMapper.deleteByConfId(confId);
+                                // 删除脚本
+                                mktCamScriptPrdMapper.deleteByConfId(confId);
                             }
-                            mktVerbalPrdMapper.deleteByConfId(confId);
-                            // 删除脚本
-                            mktCamScriptPrdMapper.deleteByConfId(confId);
+                            mktCamChlResultConfRelPrdMapper.deleteByMktCamChlResultId(Long.valueOf(mktCamChlResultId));
+                            mktCamChlResultPrdMapper.deleteByPrimaryKey(Long.valueOf(mktCamChlResultId));
                         }
-                        mktCamChlResultConfRelPrdMapper.deleteByMktCamChlResultId(Long.valueOf(mktCamChlResultId));
-                        mktCamChlResultPrdMapper.deleteByPrimaryKey(Long.valueOf(mktCamChlResultId));
                     }
                 }
                 mktStrategyConfRulePrdMapper.deleteByPrimaryKey(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId());
@@ -449,23 +457,21 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
     public Map<String, Object> copyTarGrp(Long tarGrpId, boolean isCopy) throws Exception {
         Map<String, Object> result = new HashMap<>();
         //从redis获取
-        TarGrpDetail detail = (TarGrpDetail) redisUtils.get("TAR_GRP_" + tarGrpId);
-        if (detail == null) {
-            TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpId);
-            if (tarGrp == null) {
-                result.put("resultCode", CODE_FAIL);
-                result.put("resultMsg", "请选择下拉框运算类型");
-                return result;
-            }
-            List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
-            detail = BeanUtil.create(tarGrp, new TarGrpDetail());
-            detail.setTarGrpConditions(conditionList);
-            redisUtils.set("TAR_GRP_" + tarGrpId, detail);
+//        TarGrpDetail detail = (TarGrpDetail) redisUtils.get("TAR_GRP_" + tarGrpId);
+//        if (detail == null) {
+        TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpId);
+        if (tarGrp == null) {
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "请选择下拉框运算类型");
+            return result;
         }
-
+        List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
+        TarGrpDetail detail = BeanUtil.create(tarGrp, new TarGrpDetail());
+        detail.setTarGrpConditions(conditionList);
+//        redisUtils.set("TAR_GRP_" + tarGrpId, detail);
         result = createTarGrp(detail, isCopy);
         // 将客户分群数据同步到生产环境redis
-        redisUtils_prd.set_prd("TAR_GRP_" + tarGrpId, detail);
+//        redisUtils_prd.set_prd("TAR_GRP_" + tarGrpId, detail);
         return result;
     }
 
@@ -499,7 +505,8 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
         Map<String, Object> mktCamChlConfMap = new HashMap<>();
         try {
             // 获取原协同渠道
-            MktCamChlConfDetail detail = (MktCamChlConfDetail) redisUtils.get("MktCamChlConfDetail_" + parentEvtContactConfId);
+//            MktCamChlConfDetail detail = (MktCamChlConfDetail) redisUtils.get("MktCamChlConfDetail_" + parentEvtContactConfId);
+            MktCamChlConfDetail detail = null;
             MktCamChlConfDO mktCamChlConfDO = new MktCamChlConfDO();
             List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = new ArrayList<>();
             if (detail == null) {
@@ -511,7 +518,7 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
                 List<MktCamChlConfAttr> mktCamChlConfAttrList = new ArrayList<>();
                 CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttrList, mktCamChlConfAttrDOList);
                 detail.setMktCamChlConfAttrList(mktCamChlConfAttrList);
-                redisUtils.set("MktCamChlConfDetail_" + detail.getEvtContactConfId(), detail);
+//                redisUtils.set("MktCamChlConfDetail_" + detail.getEvtContactConfId(), detail);
             } else {
                 CopyPropertiesUtil.copyBean2Bean(mktCamChlConfDO, detail);
                 CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttrDOList, detail.getMktCamChlConfAttrList());
@@ -533,7 +540,7 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
             // 查询脚本
             copyCamScriptToPrd(parentEvtContactConfId, parentEvtContactConfId);
 
-            redisUtils.set("MktCamChlConfDetail_" + detail.getEvtContactConfId(), detail);
+//            redisUtils.set("MktCamChlConfDetail_" + detail.getEvtContactConfId(), detail);
 
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCamChlConfMap.put("resultMsg", ErrorCode.SAVE_CAM_CHL_CONF_SUCCESS.getErrorMsg());
@@ -673,7 +680,8 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
     public Map<String, Object> copyVerbalToPrd(Long contactConfId) {
         Map<String, Object> map = new HashMap<>();
         try {
-            MktCamChlConfDetail detail = (MktCamChlConfDetail) redisUtils.get("MktCamChlConfDetail_" + contactConfId);
+            //MktCamChlConfDetail detail = (MktCamChlConfDetail) redisUtils.get("MktCamChlConfDetail_" + contactConfId);
+            MktCamChlConfDetail detail = null;
             MktCamChlConfDO mktCamChlConfDO = new MktCamChlConfDO();
             List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = new ArrayList<>();
             if (detail == null) {
@@ -681,11 +689,12 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
                 mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(contactConfId);
                 // 获取原渠道的属性
                 mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(contactConfId);
-                detail = BeanUtil.create(mktCamChlConfDO, detail);
+                detail = BeanUtil.create(mktCamChlConfDO, new MktCamChlConfDetail());
                 List<MktCamChlConfAttr> mktCamChlConfAttrList = new ArrayList<>();
                 CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttrList, mktCamChlConfAttrDOList);
                 detail.setMktCamChlConfAttrList(mktCamChlConfAttrList);
-            } else if (detail.getVerbalVOList() == null) {
+            }
+            if (detail.getVerbalVOList() == null) {
                 List<MktVerbal> verbalList = mktVerbalMapper.findVerbalListByConfId(contactConfId);
                 List<VerbalVO> voList = new ArrayList<>();
                 for (MktVerbal verbal : verbalList) {
@@ -716,8 +725,8 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
                     }
                 }
             }
-            redisUtils.set("MktCamChlConfDetail_" + contactConfId, detail);
-            redisUtils_prd.set_prd("MktCamChlConfDetail_" + contactConfId, detail);
+//            redisUtils.set("MktCamChlConfDetail_" + contactConfId, detail);
+//            redisUtils_prd.set_prd("MktCamChlConfDetail_" + contactConfId, detail);
             map.put("resultCode", CODE_SUCCESS);
             map.put("resultMsg", "添加成功");
         } catch (Exception e) {
@@ -735,9 +744,9 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
      */
     public Map<String, Object> copyCamScriptToPrd(Long contactConfId, Long newConfId) {
         Map<String, Object> result = new HashMap<>();
-
         try {
-            MktCamChlConfDetail detail = (MktCamChlConfDetail) redisUtils.get("MktCamChlConfDetail_" + contactConfId);
+ //           MktCamChlConfDetail detail = (MktCamChlConfDetail) redisUtils.get("MktCamChlConfDetail_" + contactConfId);
+            MktCamChlConfDetail detail = null;
             MktCamChlConfDO mktCamChlConfDO = new MktCamChlConfDO();
             List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = new ArrayList<>();
             CamScript script = new CamScript();
@@ -746,11 +755,12 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
                 mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(contactConfId);
                 // 获取原渠道的属性
                 mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(contactConfId);
-                detail = BeanUtil.create(mktCamChlConfDO, detail);
+                detail = BeanUtil.create(mktCamChlConfDO, new MktCamChlConfDetail());
                 List<MktCamChlConfAttr> mktCamChlConfAttrList = new ArrayList<>();
                 CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttrList, mktCamChlConfAttrDOList);
                 detail.setMktCamChlConfAttrList(mktCamChlConfAttrList);
-            } else if (detail.getCamScript() == null) {
+            }
+            if (detail.getCamScript() == null) {
                 script = mktCamScriptMapper.selectByConfId(contactConfId);
                 if (script == null) {
                     result.put("resultCode", CODE_FAIL);
@@ -761,10 +771,14 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
                 detail.setCamScript(script);
             } else if (detail.getCamScript() != null) {
                 script = detail.getCamScript();
+                if(script.getMktCampaignScptId()==null){
+                    script = mktCamScriptMapper.selectByConfId(script.getEvtContactConfId());
+                    detail.setCamScript(script);
+                }
                 mktCamScriptPrdMapper.insert(script);
             }
-            redisUtils.set("MktCamChlConfDetail_" + detail.getEvtContactConfId(), detail);
-            redisUtils_prd.set_prd("MktCamChlConfDetail_" + detail.getEvtContactConfId(), detail);
+//            redisUtils.set("MktCamChlConfDetail_" + detail.getEvtContactConfId(), detail);
+//            redisUtils_prd.set_prd("MktCamChlConfDetail_" + detail.getEvtContactConfId(), detail);
             result.put("resultCode", CODE_SUCCESS);
             result.put("resultMsg", script);
         } catch (Exception e) {
@@ -785,17 +799,18 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
         Map<String, Object> result = new HashMap<>();
         List<Long> ruleIdList = new ArrayList<>();
         for (Long itemId : ItemIdList) {
-            MktCamItem item = (MktCamItem) redisUtils.get("MKT_CAM_ITEM_" + itemId);
+//            MktCamItem item = (MktCamItem) redisUtils.get("MKT_CAM_ITEM_" + itemId);
+            MktCamItem item = null;
             if (item == null || item.getMktCampaignId() == null) {
                 item = mktCamItemMapper.selectByPrimaryKey(itemId);
                 if (item == null) {
                     continue;
                 }
-                redisUtils.set("MKT_CAM_ITEM_" + item.getMktCamItemId(), item);
+//                redisUtils.set("MKT_CAM_ITEM_" + item.getMktCamItemId(), item);
             }
             mktCamItemPrdMapper.insert(item);
             // 同步推进条目数据到生产环境redis
-            redisUtils_prd.set_prd("MKT_CAM_ITEM_" + item.getMktCamItemId(), item);
+//            redisUtils_prd.set_prd("MKT_CAM_ITEM_" + item.getMktCamItemId(), item);
             ruleIdList.add(item.getMktCamItemId());
         }
         result.put("resultCode", CODE_SUCCESS);
@@ -812,7 +827,8 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
     public Map<String, Object> copyMktCamChlResult(Long parentMktCamChlResultId) {
         Map<String, Object> mktCamChlResultMap = new HashMap<>();
         try {
-            MktCamChlResult mktCamChlResult = (MktCamChlResult) redisUtils.get("MktCamChlResult_" + parentMktCamChlResultId);
+//            MktCamChlResult mktCamChlResult = (MktCamChlResult) redisUtils.get("MktCamChlResult_" + parentMktCamChlResultId);
+            MktCamChlResult mktCamChlResult = null;
             MktCamChlResultDO mktCamChlResultDO = new MktCamChlResultDO();
             if (mktCamChlResult == null) {
                 mktCamChlResultDO = mktCamChlResultMapper.selectByPrimaryKey(parentMktCamChlResultId);
@@ -820,8 +836,8 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
             } else {
                 BeanUtil.copy(mktCamChlResult, mktCamChlResultDO);
             }
-            redisUtils.set("MktCamChlResult_" + parentMktCamChlResultId, mktCamChlResult);
-            redisUtils_prd.set_prd("MktCamChlResult_" + parentMktCamChlResultId, mktCamChlResult);
+//            redisUtils.set("MktCamChlResult_" + parentMktCamChlResultId, mktCamChlResult);
+//            redisUtils_prd.set_prd("MktCamChlResult_" + parentMktCamChlResultId, mktCamChlResult);
             // 新增结果 并获取Id
             mktCamChlResultPrdMapper.insert(mktCamChlResultDO);
             // 获取原二次协同渠道下结果的推送渠道
