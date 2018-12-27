@@ -12,10 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Description 事件采集项实现类
@@ -77,10 +74,10 @@ public class ContactEvtItemServiceImpl extends BaseService implements ContactEvt
     public Map<String, Object> createEventItem(ContactEvtItem contactEvtItem) {
         Map<String, Object> maps = new HashMap<>();
 //        contactEvtItem.setValueDataType();
-        contactEvtItem.setIsNullable(1L);
-        contactEvtItem.setCreateDate(DateUtil.getCurrentTime());
-        contactEvtItem.setUpdateDate(DateUtil.getCurrentTime());
-        contactEvtItem.setStatusDate(DateUtil.getCurrentTime());
+//        contactEvtItem.setIsNullable(1L);
+        contactEvtItem.setCreateDate(new Date());
+        contactEvtItem.setUpdateDate(new Date());
+        contactEvtItem.setStatusDate(new Date());
         contactEvtItem.setUpdateStaff(UserUtil.loginId());
         contactEvtItem.setCreateStaff(UserUtil.loginId());
         contactEvtItem.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);

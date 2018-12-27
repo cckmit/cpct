@@ -4,6 +4,9 @@ import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.channel.CamScript;
 import com.zjtelcom.cpct.dto.strategy.MktStrategy;
 import com.zjtelcom.cpct.open.base.entity.BaseEntity;
+import com.zjtelcom.cpct.open.entity.mktCamItem.OpenMktCamItem;
+import com.zjtelcom.cpct.open.entity.mktStrategy.OpenMktStrategy;
+import com.zjtelcom.cpct.open.entity.script.OpenScript;
 
 import java.util.List;
 
@@ -13,32 +16,36 @@ import java.util.List;
  * @Date: 2018-11-05 17:32:51
  * @Description:营销活动 实体类 匹配集团openapi规范返回
  */
-public class OpenMktCampaign extends BaseEntity {
+public class OpenMktCampaign{
 
-    private String statusDate;//状态时间
+
+    private Long id;
+    private String href;
     private String beginTime;
     private String endTime;
 
     private String execInvl;
     private Integer execNum;
     private String execType;
+    private String extMktCampaignId;
 
     private Long lanId;//本地网标识
 
+    private String manageType;
     private String mktActivityNbr;
     private String mktActivityTarget;
 
     //营销活动推荐条目列表
-    private List<MktCamItem> mktCamItem;
+    private List<OpenMktCamItem> mktCamItem;
     //营销活动脚本
-    private List<CamScript> mktCamScript;
+    private List<OpenScript> mktCamScript;
 
     private String mktCampaignDesc;
     private String mktCampaignName;
     private String mktCampaignType;
 
     //营销维挽策略列表
-    private List<MktStrategy> mktStrategy;
+    private List<OpenMktStrategy> mktStrategy;
 
     private String planBeginTime;
     private String planEndTime;
@@ -48,18 +55,21 @@ public class OpenMktCampaign extends BaseEntity {
     private Long updateStaff;//更新人
 
 
-
-
-
-
-    public String getStatusDate() {
-        return statusDate;
+    public Long getId() {
+        return id;
     }
 
-    public void setStatusDate(String statusDate) {
-        this.statusDate = statusDate;
+    public void setId(Long id) {
+        this.id = id;
     }
 
+    public String getHref() {
+        return href;
+    }
+
+    public void setHref(String href) {
+        this.href = href;
+    }
 
     public String getBeginTime() {
         return beginTime;
@@ -125,6 +135,22 @@ public class OpenMktCampaign extends BaseEntity {
         this.mktActivityTarget = mktActivityTarget;
     }
 
+    public List<OpenMktCamItem> getMktCamItem() {
+        return mktCamItem;
+    }
+
+    public void setMktCamItem(List<OpenMktCamItem> mktCamItem) {
+        this.mktCamItem = mktCamItem;
+    }
+
+    public List<OpenScript> getMktCamScript() {
+        return mktCamScript;
+    }
+
+    public void setMktCamScript(List<OpenScript> mktCamScript) {
+        this.mktCamScript = mktCamScript;
+    }
+
     public String getMktCampaignDesc() {
         return mktCampaignDesc;
     }
@@ -147,6 +173,14 @@ public class OpenMktCampaign extends BaseEntity {
 
     public void setMktCampaignType(String mktCampaignType) {
         this.mktCampaignType = mktCampaignType;
+    }
+
+    public List<OpenMktStrategy> getMktStrategy() {
+        return mktStrategy;
+    }
+
+    public void setMktStrategy(List<OpenMktStrategy> mktStrategy) {
+        this.mktStrategy = mktStrategy;
     }
 
     public String getPlanBeginTime() {
@@ -197,27 +231,19 @@ public class OpenMktCampaign extends BaseEntity {
         this.updateStaff = updateStaff;
     }
 
-    public List<MktCamItem> getMktCamItem() {
-        return mktCamItem;
+    public String getExtMktCampaignId() {
+        return extMktCampaignId;
     }
 
-    public void setMktCamItem(List<MktCamItem> mktCamItem) {
-        this.mktCamItem = mktCamItem;
+    public void setExtMktCampaignId(String extMktCampaignId) {
+        this.extMktCampaignId = extMktCampaignId;
     }
 
-    public List<CamScript> getMktCamScript() {
-        return mktCamScript;
+    public String getManageType() {
+        return manageType;
     }
 
-    public void setMktCamScript(List<CamScript> mktCamScript) {
-        this.mktCamScript = mktCamScript;
-    }
-
-    public List<MktStrategy> getMktStrategy() {
-        return mktStrategy;
-    }
-
-    public void setMktStrategy(List<MktStrategy> mktStrategy) {
-        this.mktStrategy = mktStrategy;
+    public void setManageType(String manageType) {
+        this.manageType = manageType;
     }
 }

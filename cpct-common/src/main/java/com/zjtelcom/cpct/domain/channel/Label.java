@@ -3,9 +3,11 @@ package com.zjtelcom.cpct.domain.channel;
 import com.zjtelcom.cpct.BaseEntity;
 import lombok.Data;
 
+import java.io.Serializable;
+
 
 @Data
-public class Label extends BaseEntity {
+public class Label extends BaseEntity implements Serializable {
     private Long injectionLabelId;
     private Long tagRowId;
     private String injectionLabelCode;//标签的编码

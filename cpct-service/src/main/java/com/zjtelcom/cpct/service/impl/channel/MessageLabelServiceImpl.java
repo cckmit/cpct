@@ -16,6 +16,7 @@ import com.zjtelcom.cpct.service.channel.MessageLabelService;
 import com.zjtelcom.cpct.service.synchronize.label.SynMessageLabelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.DateUtil;
+import com.zjtelcom.cpct.util.SystemParamsUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -149,7 +150,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         maps.put("resultCode", CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -179,7 +180,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         maps.put("resultCode", CODE_SUCCESS);
         maps.put("resultMsg", "删除成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -291,7 +292,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         maps.put("resultCode", CODE_SUCCESS);
         maps.put("resultMsg", displayColumn.getDisplayColumnId());
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -370,7 +371,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         displayColumn.setStatusCd("2000");
         displayColumnMapper.updateByPrimaryKey(displayColumn);
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {

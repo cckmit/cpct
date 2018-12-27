@@ -26,6 +26,7 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SyncActivityService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,9 +78,9 @@ public class SyncActivityServiceImpl implements SyncActivityService {
         activityModel.setActivityName(mktCampaignDO.getMktCampaignName());
         activityModel.setStartDate(mktCampaignDO.getPlanBeginTime());
         activityModel.setEndDate(mktCampaignDO.getPlanEndTime());
-        if (mktCampaignDO.getTiggerType() == "1000") {
+        if ("1000".equals(mktCampaignDO.getTiggerType())) {
             activityModel.setHandoutType("1");
-        } else if (mktCampaignDO.getTiggerType() == "2000") {
+        } else if ("2000".equals(mktCampaignDO.getTiggerType())) {
             activityModel.setHandoutType("0");
         }
         List<PolicyModel> policyList = new ArrayList<>();
@@ -113,11 +114,13 @@ public class SyncActivityServiceImpl implements SyncActivityService {
                     for (String productId : productIds) {
                         ProductModel productModel = new ProductModel();
                         Offer offer = offerMapper.selectByCamItemId(Long.valueOf(productId));
-                        productModel.setProductId(offer.getOfferId().toString());
-                        productModel.setProductCode(offer.getOfferNbr());
-                        productModel.setProductName(offer.getOfferName());
-                        productModel.setProductDesc(offer.getOfferDesc());
-                        productModelList.add(productModel);
+                        if(offer!=null) {
+                            productModel.setProductId(offer.getOfferId().toString());
+                            productModel.setProductCode(offer.getOfferNbr());
+                            productModel.setProductName(offer.getOfferName());
+                            productModel.setProductDesc(offer.getOfferDesc());
+                            productModelList.add(productModel);
+                        }
                     }
                 }
                 ProductDmsModel productDmsModel = new ProductDmsModel();
@@ -137,13 +140,16 @@ public class SyncActivityServiceImpl implements SyncActivityService {
                 List<VerbalDmsModel> verbalDmsModelList = new ArrayList<>();
                 String[] evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
                 for (String evtContactConfId : evtContactConfIds) {
-                    List<MktVerbal> mktVerbalList = mktVerbalMapper.findVerbalListByConfId(Long.valueOf(evtContactConfId));
-                    for (MktVerbal mktVerbal : mktVerbalList) {
-                        VerbalDmsModel verbalDmsModel = new VerbalDmsModel();
-                        verbalDmsModel.setVerbalId(mktVerbal.getVerbalId().toString());
-                        verbalDmsModel.setVerbalContext(mktVerbal.getScriptDesc());
-                        verbalDmsModelList.add(verbalDmsModel);
+                    if(!StringUtils.isBlank(evtContactConfId)){
+                        List<MktVerbal> mktVerbalList = mktVerbalMapper.findVerbalListByConfId(Long.valueOf(evtContactConfId));
+                        for (MktVerbal mktVerbal : mktVerbalList) {
+                            VerbalDmsModel verbalDmsModel = new VerbalDmsModel();
+                            verbalDmsModel.setVerbalId(mktVerbal.getVerbalId().toString());
+                            verbalDmsModel.setVerbalContext(mktVerbal.getScriptDesc());
+                            verbalDmsModelList.add(verbalDmsModel);
+                        }
                     }
+
                 }
                 ruleModel.setVerbalDms(verbalDmsModelList);
                 ruleList.add(ruleModel);

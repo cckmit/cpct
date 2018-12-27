@@ -230,19 +230,16 @@ public class PpmProductController extends BaseController  {
         Map<String, Object> result = new HashMap<>();
         Long userId = UserUtil.loginId();
         try {
-            Long strategyRuleId = null;
+            Long campaignId = null;
             Long ruleId = null;
             List<Long> itemRuleIdList = null;
-            if (params.get("strategyRuleId")!=null && !params.get("strategyRuleId").equals("")){
-                 strategyRuleId = Long.valueOf(params.get("strategyRuleId").toString());
+            if (params.get("campaignId")!=null && !params.get("campaignId").equals("")){
+                campaignId = Long.valueOf(params.get("campaignId").toString());
             }
             if (params.get("ruleId")!=null && !params.get("ruleId").equals("")){
                 ruleId = Long.valueOf(params.get("ruleId").toString());
             }
-            if (params.get("itemRuleIdList")!=null){
-                itemRuleIdList = (List<java.lang.Long>) params.get("itemRuleIdList");
-            }
-            result = productService.delProductRule(strategyRuleId, ruleId,itemRuleIdList);
+            result = productService.delProductRule(campaignId, ruleId);
         } catch (Exception e) {
             logger.error("[op:PpmProductController] fail to delProductRule", e);
             result.put("resultCode", CODE_FAIL);

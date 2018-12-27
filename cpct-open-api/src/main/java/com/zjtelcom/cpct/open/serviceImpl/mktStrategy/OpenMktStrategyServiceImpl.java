@@ -53,8 +53,7 @@ public class OpenMktStrategyServiceImpl extends BaseService implements OpenMktSt
         //转换为openapi返回规范
         OpenMktStrategy openMktStrategy=BeanUtil.create(mktStrategy,new OpenMktStrategy());
         //设置id  和href  转换时间为对应格式
-        openMktStrategy.setId(id);
-        openMktStrategy.setHref("/mktStrategy/" + id);
+
         if(null!=mktStrategy.getStatusDate()){
             openMktStrategy.setStatusDate(DateUtil.getDatetime(mktStrategy.getStatusDate()));
         }
@@ -77,8 +76,7 @@ public class OpenMktStrategyServiceImpl extends BaseService implements OpenMktSt
         MktStrategy result = mktStrategyMapper.selectByPrimaryKey(mktStrategy.getStrategyId());
         OpenMktStrategy openMktStrategy=BeanUtil.create(result,new OpenMktStrategy());
         //设置id  和href  转换时间为对应格式
-        openMktStrategy.setId(result.getStrategyId().toString());
-        openMktStrategy.setHref("/mktStrategy/" + result.getStrategyId().toString());
+
         if(null!=result.getStatusDate()){
             openMktStrategy.setStatusDate(DateUtil.getDatetime(result.getStatusDate()));
         }
@@ -156,8 +154,6 @@ public class OpenMktStrategyServiceImpl extends BaseService implements OpenMktSt
         List<OpenMktStrategy> returnList=new ArrayList<>();
         for(MktStrategy m:list){
             OpenMktStrategy openMktStrategy=BeanUtil.create(m,new OpenMktStrategy());
-            openMktStrategy.setId(m.getStrategyId().toString());
-            openMktStrategy.setHref("/mktStrategy/" + m.getStrategyId().toString());
             if(null!=mktStrategy.getStatusDate()){
                 openMktStrategy.setStatusDate(DateUtil.getDatetime(mktStrategy.getStatusDate()));
             }
