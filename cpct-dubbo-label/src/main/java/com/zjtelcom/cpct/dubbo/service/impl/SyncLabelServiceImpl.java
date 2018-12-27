@@ -268,11 +268,12 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         Map<String,Object> result = new HashMap<>();
         List<LabelValue> valueList = new ArrayList<>();
         List<String> stringList = new ArrayList<>();
+        labelValueMapper.deleteByLabelId(labelId);
         for (LabValueModel info : valueModelList){
             LabelValue value = BeanUtil.create(info,new LabelValue());
             value.setInjectionLabelId(labelId);
             value.setValueDesc(info.getValueName());
-            value.setValueName(info.getValueName());
+            value.setValueName(info.getLabValue());
             value.setLabelValue(info.getLabValue());
             value.setCreateDate(new Date());
             value.setStatusCd("1000");
@@ -308,6 +309,15 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             }else{
                 labelModel.setOperator("7000");
                 labelModel.setLabelValueType("2000");
+            }
+            if (labelModel.getLabObject().equals("客户级")){
+                labelModel.setLabelType("1000");
+            }else if (labelModel.getLabObject().equals("用户级")) {
+                labelModel.setLabelType("2000");
+            }else if (labelModel.getLabObject().equals("销售品级")) {
+                labelModel.setLabelType("3000");
+            }else if (labelModel.getLabObject().equals("区域级")) {
+                labelModel.setLabelType("4000");
             }
             labelModel.setLabelDataType("1000");
             labelModel.setScope(1);

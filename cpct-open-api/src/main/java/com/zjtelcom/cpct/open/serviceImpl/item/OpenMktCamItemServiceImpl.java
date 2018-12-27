@@ -61,11 +61,9 @@ public class OpenMktCamItemServiceImpl extends BaseService implements OpenMktCam
             throw new SystemException("对应营销活动推荐条目信息不存在!");
         }
         OpenMktCamItem openMktCamItem = BeanUtil.create(mktCamItem,new OpenMktCamItem());
-        openMktCamItem.setId(id);
+        openMktCamItem.setId(Long.valueOf(id));
         openMktCamItem.setHref("/mktCamItem/" + id);
-        if(mktCamItem.getStatusDate() != null){
-            openMktCamItem.setStatusDate(DateUtil.getDatetime(mktCamItem.getStatusDate()));
-        }
+
         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCamItem.getMktCampaignId());
         if(mktCampaignDO != null) {
             openMktCamItem.setMktActivityNbr(mktCampaignDO.getMktActivityNbr());
@@ -127,7 +125,7 @@ public class OpenMktCamItemServiceImpl extends BaseService implements OpenMktCam
         mktCamItemMapper.updateByPrimaryKey(mktCamItems);
 
         OpenMktCamItem openMktCamItem = BeanUtil.create(mktCamItems,new OpenMktCamItem());
-        openMktCamItem.setId(id);
+        openMktCamItem.setId(Long.valueOf(id));
         openMktCamItem.setHref("/mktCamItem/" + id);
         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCamItem.getMktCampaignId());
         if(mktCampaignDO != null) {
@@ -178,7 +176,7 @@ public class OpenMktCamItemServiceImpl extends BaseService implements OpenMktCam
 
         for(MktCamItem camItem : mktCamItemList) {
             OpenMktCamItem openMktCamItem = BeanUtil.create(camItem,new OpenMktCamItem());
-            openMktCamItem.setId(String.valueOf(mktCamItem.getMktCamItemId()));
+            openMktCamItem.setId(mktCamItem.getMktCamItemId());
             openMktCamItem.setHref("/mktCamItem/" + mktCamItem.getMktCamItemId());
             //活动编码
             MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCamItem.getMktCampaignId());

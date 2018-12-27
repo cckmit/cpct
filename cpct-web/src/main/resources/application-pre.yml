@@ -52,9 +52,9 @@ spring:
       cluster:
         name: my-application2
 
-#是否同步
+#是否同步  0不开启  1开启
 sync:
-   value: 0
+   value: 1
 
 #集团定制的redis配置prod环境
 redisConfig:

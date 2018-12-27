@@ -213,7 +213,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -308,7 +308,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("filterRule", filterRule);
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -371,7 +371,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("filterRule", filterRule);
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {

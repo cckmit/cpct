@@ -75,10 +75,6 @@ public class RedisUtils {
     public boolean set(final String key, Object value) {
         boolean result = false;
         try {
-//             原方法
-//          ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-//          operations.set(key, value);
-
             // 改造后方法
             result = setRedis(key, value);
         } catch (Exception e) {
@@ -165,7 +161,7 @@ public class RedisUtils {
      *
      * @param key
      */
-    public void remove(final String key) {
+    public void removeKey(final String key) {
         if (exists(key)) {
             redisTemplate.delete(key);
         }
@@ -204,6 +200,30 @@ public class RedisUtils {
             e.printStackTrace();
         }
         return result;
+    }
+
+    /**
+     * 更换集团redis方法
+     *
+     * @param key
+     * @return
+     */
+    public void remove(final String key) {
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                if (jedis.exists(key)){
+                    jedis.del(key);
+                }
+                jedis.close();
+            } catch (Throwable je) {
+                je.printStackTrace();
+                jedis.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**

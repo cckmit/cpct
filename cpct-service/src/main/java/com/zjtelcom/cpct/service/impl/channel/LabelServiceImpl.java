@@ -191,9 +191,11 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         label.setStatusCd("1000");
         labelMapper.insert(label);
         Long labelId = label.getInjectionLabelId();
-        label.setInjectionLabelId(100000+label.getInjectionLabelId());
-        labelMapper.insert(label);
-        labelMapper.deleteByPrimaryKey(labelId);
+        if (labelId<10000){
+            label.setInjectionLabelId(100000+label.getInjectionLabelId());
+            labelMapper.insert(label);
+            labelMapper.deleteByPrimaryKey(labelId);
+        }
         insertLabelValue(label,addVO.getRightOperand());
 
         //redis更新标签库
@@ -210,7 +212,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -260,6 +262,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         operatorValodate(label, editVO.getConditionType());
         label.setUpdateDate(new Date());
         label.setUpdateStaff(userId);
+        label.setSystemInfoId(0L);
         labelMapper.updateByPrimaryKey(label);
         labelValueMapper.deleteByLabelId(label.getInjectionLabelId());
         insertLabelValue(label,editVO.getRightOperand());
@@ -270,7 +273,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","编辑成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -354,7 +357,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -426,7 +429,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -457,7 +460,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -488,7 +491,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             result.put("resultCode", CODE_SUCCESS);
             result.put("resultMsg", "删除成功");
 
-            if (value.equals("1")){
+            if (SystemParamsUtil.getSyncValue().equals("1")){
                 new Thread(){
                     public void run(){
                         try {
@@ -590,7 +593,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {

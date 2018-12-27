@@ -8,14 +8,18 @@ import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.MktResourceMapper;
 import com.zjtelcom.cpct.dao.channel.ServiceMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
+import com.zjtelcom.cpct.domain.campaign.MktCamStrategyConfRelDO;
 import com.zjtelcom.cpct.domain.channel.MktProductRule;
 import com.zjtelcom.cpct.domain.channel.MktResource;
 import com.zjtelcom.cpct.domain.channel.Offer;
 import com.zjtelcom.cpct.domain.channel.ServiceEntity;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.campaign.MktCampaign;
 import com.zjtelcom.cpct.dto.channel.OfferDetail;
 import com.zjtelcom.cpct.dto.channel.ProductParam;
+import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
@@ -47,6 +51,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     private ServiceMapper serviceMapper;
     @Autowired
     private MktCampaignMapper campaignMapper;
+    @Autowired
+    private MktStrategyConfRuleMapper ruleMapper;
 
 
     @Override
@@ -71,15 +77,15 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     public Map<String,Object> getProductList(Long userId,Map<String,Object> params){
         Map<String,Object> result = new HashMap<>();
         List<Offer> productList = new ArrayList<>();
-            Integer page = MapUtil.getIntNum(params.get("page"));
-            Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
-            String productName = null;
-            if (params.get("productName")!=null){
-                productName = params.get("productName").toString();
-            }
-            PageHelper.startPage(page,pageSize);
-            productList = productMapper.findByName(productName);
-            Page pageInfo = new Page(new PageInfo(productList));
+        Integer page = MapUtil.getIntNum(params.get("page"));
+        Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
+        String productName = null;
+        if (params.get("productName")!=null){
+            productName = params.get("productName").toString();
+        }
+        PageHelper.startPage(page,pageSize);
+        productList = productMapper.findByName(productName);
+        Page pageInfo = new Page(new PageInfo(productList));
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",productList);
         result.put("page",pageInfo);
@@ -151,6 +157,29 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         return result;
     }
 
+    /**
+     * 活动发布复制推荐条目
+     * @param oldCampaignId
+     * @param newCampaignId
+     * @return
+     */
+    @Override
+    public Map<String, Object> copyItemByCampaignPublish(Long oldCampaignId, Long newCampaignId) {
+        Map<String,Object> result = new HashMap<>();
+        List<Long> idList = new ArrayList<>();
+        List<MktCamItem> oldItemList = camItemMapper.selectByCampaignId(oldCampaignId);
+        for (MktCamItem item : oldItemList){
+            MktCamItem newItem = BeanUtil.create(item,new MktCamItem());
+            newItem.setMktCamItemId(null);
+            newItem.setMktCampaignId(newCampaignId);
+            camItemMapper.insert(newItem);
+            idList.add(newItem.getMktCamItemId());
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",idList);
+        return result;
+    }
+
     @Override
     @Transactional
     public Map<String, Object> addProductRule(ProductParam param) {
@@ -212,7 +241,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             }
         }else if ("4000".equals(param.getItemType())){
             for (Long serviceId : param.getIdList()){
-                 ServiceEntity serviceEntity = serviceMapper.selectByPrimaryKey(serviceId);
+                ServiceEntity serviceEntity = serviceMapper.selectByPrimaryKey(serviceId);
                 if (serviceEntity==null){
                     result.put("resultCode",CODE_FAIL);
                     result.put("resultMsg","服务不存在");
@@ -241,9 +270,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         }
         for(MktCamItem item : mktCamItems){
             ruleIdList.add(item.getMktCamItemId());
-        }
-        if (param.getStrategyRuleId()!=null){
-            strategyConfRuleService.updateProductIds(ruleIdList,param.getStrategyRuleId());
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",ruleIdList);
@@ -327,21 +353,21 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 rule.setPriority(item.getPriority()==null ? 0 : item.getPriority());
                 ruleList.add(rule);
             } else if (item.getItemType().equals("4000")){
-            //促销券
-            ServiceEntity serviceEntity = serviceMapper.selectByPrimaryKey(item.getItemId());
-            if (serviceEntity==null){
-                continue;
-            }
-            MktProductRule rule = new MktProductRule();
-            rule.setId(item.getMktCamItemId());
-            rule.setProductId(item.getItemId());
-            rule.setProductName(serviceEntity.getServiceName());
-            rule.setProductCode(serviceEntity.getServiceNbr());
-            rule.setProductType(item.getItemType()==null ? "" : item.getItemType());
-            rule.setRemark(item.getRemark());
-            rule.setItemType(item.getItemType()==null ? "" : item.getItemType());
-            rule.setPriority(item.getPriority()==null ? 0 : item.getPriority());
-            ruleList.add(rule);
+                //促销券
+                ServiceEntity serviceEntity = serviceMapper.selectByPrimaryKey(item.getItemId());
+                if (serviceEntity==null){
+                    continue;
+                }
+                MktProductRule rule = new MktProductRule();
+                rule.setId(item.getMktCamItemId());
+                rule.setProductId(item.getItemId());
+                rule.setProductName(serviceEntity.getServiceName());
+                rule.setProductCode(serviceEntity.getServiceNbr());
+                rule.setProductType(item.getItemType()==null ? "" : item.getItemType());
+                rule.setRemark(item.getRemark());
+                rule.setItemType(item.getItemType()==null ? "" : item.getItemType());
+                rule.setPriority(item.getPriority()==null ? 0 : item.getPriority());
+                ruleList.add(rule);
             }
         }
         result.put("resultCode",CODE_SUCCESS);
@@ -350,20 +376,30 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     }
 
     @Override
-    public Map<String, Object> delProductRule(Long strategyRuleId, Long ruleId,List<Long> itemRuleIdList) {
+    public Map<String, Object> delProductRule(Long campaignId, Long ruleId) {
         Map<String,Object> result = new HashMap<>();
-        if (strategyRuleId!=null){
-            strategyConfRuleService.updateProductIds(itemRuleIdList,strategyRuleId);
-            MktCamItem rule = camItemMapper.selectByPrimaryKey(ruleId);
-            if (rule==null){
-                result.put("resultCode",CODE_FAIL);
-                result.put("resultMsg","推荐条目不存在");
-                return result;
+        MktCamItem item = camItemMapper.selectByPrimaryKey(ruleId);
+        if (item==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","推荐条目不存在");
+            return result;
+        }
+        camItemMapper.deleteByPrimaryKey(ruleId);
+        //更新redis数据
+        redisUtils.remove("MKT_CAM_ITEM_"+ruleId);
+        if (campaignId!=null){
+            List<MktStrategyConfRuleDO> ruleList = ruleMapper.selectByCampaignId(campaignId);
+            for (MktStrategyConfRuleDO rule : ruleList){
+                if (rule.getProductId()!=null && !rule.getProductId().equals("")){
+                    String[] idList = rule.getProductId().split("/");
+                    List<String> ids = Arrays.asList(idList);
+                    if (ids.contains(ruleId.toString())){
+                        ids.remove(ruleId.toString());
+                    }
+                    rule.setProductId(ChannelUtil.list2String(ids,"/"));
+                    ruleMapper.updateByPrimaryKey(rule);
+                }
             }
-            camItemMapper.deleteByPrimaryKey(ruleId);
-            //更新redis数据
-            redisUtils.remove("MKT_CAM_ITEM_"+ruleId);
-
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");

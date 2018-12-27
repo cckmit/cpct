@@ -110,7 +110,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","创建成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -149,7 +149,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","编辑成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -269,7 +269,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {

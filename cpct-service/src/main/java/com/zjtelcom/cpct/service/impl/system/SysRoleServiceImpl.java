@@ -11,6 +11,7 @@ import com.zjtelcom.cpct.domain.system.SysRoleMenu;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.synchronize.sys.SynSysRoleService;
 import com.zjtelcom.cpct.service.system.SysRoleService;
+import com.zjtelcom.cpct.util.SystemParamsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -67,7 +68,7 @@ public class SysRoleServiceImpl extends BaseService implements SysRoleService {
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","保存成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -97,7 +98,7 @@ public class SysRoleServiceImpl extends BaseService implements SysRoleService {
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","保存成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -136,7 +137,7 @@ public class SysRoleServiceImpl extends BaseService implements SysRoleService {
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg", "删除成功");
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {

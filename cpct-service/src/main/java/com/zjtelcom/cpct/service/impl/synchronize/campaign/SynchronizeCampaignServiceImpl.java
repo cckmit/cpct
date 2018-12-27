@@ -768,6 +768,10 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
                 detail.setCamScript(script);
             } else if (detail.getCamScript() != null) {
                 script = detail.getCamScript();
+                if(script.getMktCampaignScptId()==null){
+                    script = mktCamScriptMapper.selectByConfId(script.getEvtContactConfId());
+                    detail.setCamScript(script);
+                }
                 mktCamScriptPrdMapper.insert(script);
             }
             redisUtils.set("MktCamChlConfDetail_" + detail.getEvtContactConfId(), detail);
@@ -822,7 +826,7 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
             MktCamChlResult mktCamChlResult = (MktCamChlResult) redisUtils.get("MktCamChlResult_" + parentMktCamChlResultId);
             MktCamChlResultDO mktCamChlResultDO = new MktCamChlResultDO();
             if (mktCamChlResult == null) {
-               mktCamChlResultDO = mktCamChlResultMapper.selectByPrimaryKey(parentMktCamChlResultId);
+                mktCamChlResultDO = mktCamChlResultMapper.selectByPrimaryKey(parentMktCamChlResultId);
                 BeanUtil.copy(mktCamChlResultDO, mktCamChlResult);
             } else {
                 BeanUtil.copy(mktCamChlResult, mktCamChlResultDO);

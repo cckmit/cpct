@@ -11,6 +11,7 @@ import com.zjtelcom.cpct.service.channel.ServiceService;
 import com.zjtelcom.cpct.service.synchronize.channel.SynServiceService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.MapUtil;
+import com.zjtelcom.cpct.util.SystemParamsUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,7 +102,7 @@ public class ServiceServiceImpl extends BaseService implements ServiceService {
         serviceEntity.setStatusDate(new Date());
         serviceMapper.insert(serviceEntity);
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -132,7 +133,7 @@ public class ServiceServiceImpl extends BaseService implements ServiceService {
         serviceEntity.setUpdateStaff(UserUtil.loginId());
         serviceMapper.updateByPrimaryKey(serviceEntity);
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
@@ -160,7 +161,7 @@ public class ServiceServiceImpl extends BaseService implements ServiceService {
         }
         serviceMapper.deleteByPrimaryKey(delVO.getServiceId());
 
-        if (value.equals("1")){
+        if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {

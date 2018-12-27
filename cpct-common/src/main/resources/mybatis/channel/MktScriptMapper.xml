@@ -37,8 +37,12 @@
     set SCRIPT_NAME = #{scriptName,jdbcType=VARCHAR},
       SCRIPT_DESC = #{scriptDesc,jdbcType=VARCHAR},
       SCRIPT_TYPE = #{scriptType,jdbcType=VARCHAR},
-      SUIT_CHANNEL_TYPE = #{suitChannelType,jdbcType=VARCHAR},
-      EXEC_CHANNEL = #{execChannel,jdbcType=VARCHAR},
+    <if test="suitChannelType != null and suitChannelType != ''">
+      and SUIT_CHANNEL_TYPE = #{suitChannelType,jdbcType=VARCHAR},
+    </if>
+    <if test="execChannel != null and execChannel != ''">
+      and  EXEC_CHANNEL = #{execChannel,jdbcType=VARCHAR},
+    </if>
       STATUS_CD = #{statusCd,jdbcType=VARCHAR},
       STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
       CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
