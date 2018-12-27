@@ -909,7 +909,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
 
                 // 发布活动异步同步活动到生产环境
-                new Thread() {
+/*                new Thread() {
                     @Override
                     public void run() {
                         try {
@@ -923,7 +923,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                             e.printStackTrace();
                         }
                     }
-                }.start();
+                }.start();*/
             } else if (StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd) || StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)) {
                 // 暂停或者下线, 该状态为未生效
                 /*MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();
@@ -976,7 +976,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      * @throws Exception
      */
     @Override
-    public Map<String, Object> publishMktCampaign(final Long mktCampaignId) throws Exception {
+    public Map<String, Object> publishMktCampaign(Long mktCampaignId) throws Exception {
         Map<String, Object> mktCampaignMap = new HashMap<>();
         try {
             // 获取当前活动信息
@@ -1008,7 +1008,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 // 获取新的活动的Id
                 Long childMktCampaignId = mktCampaignDO.getMktCampaignId();
                 // 活动编码
-                mktCampaignDO.setMktActivityNbr("MKT" + String.format("%06d", mktCampaignId));
+                mktCampaignDO.setMktActivityNbr("MKT" + String.format("%06d", childMktCampaignId));
                 mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
 
                 childMktCampaignIdList.add(childMktCampaignId);
@@ -1032,7 +1032,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 for (MktCamEvtRelDO mktCamEvtRelDO : MktCamEvtRelDOList) {
                     MktCamEvtRelDO childMktCamEvtRelDO = new MktCamEvtRelDO();
                     childMktCamEvtRelDO.setMktCampaignId(childMktCampaignId);
-                    childMktCamEvtRelDO.setEventId(childMktCamEvtRelDO.getEventId());
+                    childMktCamEvtRelDO.setEventId(mktCamEvtRelDO.getEventId());
                     childMktCamEvtRelDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
                     childMktCamEvtRelDO.setStatusDate(new Date());
                     childMktCamEvtRelDO.setCreateDate(new Date());
@@ -1041,6 +1041,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     childMktCamEvtRelDO.setCreateStaff(UserUtil.loginId());
                     mktCamEvtRelMapper.insert(childMktCamEvtRelDO);
                 }
+
+                //
 
                 // 遍历活动下策略的集合
                 for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {
@@ -1058,11 +1060,20 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     chaildMktCamStrategyConfRelDO.setUpdateStaff(UserUtil.loginId());
                     mktCamStrategyConfRelMapper.insert(chaildMktCamStrategyConfRelDO);
                 }
+
+                // 活动下过滤规则
+                List<MktStrategyFilterRuleRelDO> mktStrategyFilterRuleRelDOS = mktStrategyFilterRuleRelMapper.selectRuleByStrategyId(mktCampaignId);
+                for (MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO : mktStrategyFilterRuleRelDOS) {
+                    mktStrategyFilterRuleRelDO.setMktStrategyFilterRuleRelId(null);
+                    mktStrategyFilterRuleRelDO.setStrategyId(childMktCampaignId);
+                    mktStrategyFilterRuleRelMapper.insert(mktStrategyFilterRuleRelDO);
+                }
             }
             mktCampaignMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCampaignMap.put("resultMsg", "发布活动成功！");
             mktCampaignMap.put("childMktCampaignIdList", childMktCampaignIdList);
         } catch (Exception e) {
+            logger.error("[op:MktCampaignServiceImpl] failed to publishMktCampaign by mktCampaignId = {}, Exception = ", mktCampaignId, e);
             mktCampaignMap.put("resultCode", CommonConstant.CODE_FAIL);
             mktCampaignMap.put("resultMsg", "发布活动失败！");
         }
