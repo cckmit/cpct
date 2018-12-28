@@ -315,7 +315,7 @@ public class EsServiceImpl implements EsService {
      * @return
      */
     private SearchHits getSearchHits(BoolQueryBuilder boolQueryBuilder, SearchRequestBuilder builder,int from) {
-        SearchResponse myresponse = builder.setQuery(boolQueryBuilder)
+        SearchResponse myresponse = builder.setQuery(boolQueryBuilder).setSize(1000)
                 .setExplain(true).execute().actionGet();
         return myresponse.getHits();
     }

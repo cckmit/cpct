@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.event;
 
+import com.zjtelcom.cpct.domain.channel.EventItem;
 import com.zjtelcom.cpct.dto.event.ContactEvtItem;
 import com.zjtelcom.cpct.request.event.ContactEvtReq;
 
@@ -18,8 +19,8 @@ public interface ContactEvtItemService {
 
     Map<String,Object> viewEventItem(ContactEvtItem contactEvtItem);
 
-    Map<String,Object> createEventItem(ContactEvtItem contactEvtItem);
+    Map<String,Object> createEventItem(EventItem contactEvtItem);
 
-    Map<String,Object> modEventItem(ContactEvtItem contactEvtItem);
+    Map<String,Object> modEventItem(EventItem contactEvtItem);
 
 }

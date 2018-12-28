@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.controller.event;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.zjtelcom.cpct.controller.BaseController;
+import com.zjtelcom.cpct.domain.channel.EventItem;
 import com.zjtelcom.cpct.dto.event.ContactEvtItem;
 import com.zjtelcom.cpct.request.event.ContactEvtReq;
 import com.zjtelcom.cpct.service.event.ContactEvtItemService;
@@ -80,7 +81,7 @@ public class ContactEvtItemController extends BaseController {
      */
     @RequestMapping("/createEventItem")
     @CrossOrigin
-    public String createEventItem(@RequestBody ContactEvtItem contactEvtItem) {
+    public String createEventItem(@RequestBody EventItem contactEvtItem) {
         Map<String, Object> maps = new HashMap<>();
         try {
             maps = contactEvtItemService.createEventItem(contactEvtItem);
@@ -96,7 +97,7 @@ public class ContactEvtItemController extends BaseController {
      */
     @RequestMapping("/modEventItem")
     @CrossOrigin
-    public String modEventItem(@RequestBody ContactEvtItem contactEvtItem) {
+    public String modEventItem(@RequestBody EventItem contactEvtItem) {
         Map<String, Object> maps = new HashMap<>();
         try {
             maps = contactEvtItemService.modEventItem(contactEvtItem);

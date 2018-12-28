@@ -41,7 +41,7 @@ spec:
         - name: tz-config
           mountPath: /etc/localtime
         - name: app-log
-          mountPath: /app/cpct/
+          mountPath: /app/logs
         ports:
         - containerPort: 30803    #修改端口号
         readinessProbe:
@@ -57,7 +57,7 @@ spec:
             memory: "4Gi"
             cpu: "2000m"
           limits:
-            memory: "4Gi"
+            memory: "8Gi"
             cpu: "4000m"
       - name: jmx
         image: 134.108.5.132:8000/mgt/jmxtrans:v3.0
@@ -67,11 +67,11 @@ spec:
           mountPath: /etc/localtime
         resources:   #镜镜像环境  不修改就用docker默认
           requests:
-            memory: "2Gi"
-            cpu: "1000m"
+            memory: "1Gi"
+            cpu: "500m"
           limits:
-            memory: "2Gi"
-            cpu: "2000m"
+            memory: "1Gi"
+            cpu: "1000m"
       nodeSelector:
         center: bssOther  #修改镜像所属中心标签
       volumes:

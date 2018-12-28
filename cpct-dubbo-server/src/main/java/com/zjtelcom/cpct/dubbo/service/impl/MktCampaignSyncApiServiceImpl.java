@@ -518,7 +518,7 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
             }
             mktCamItemPrdMapper.insert(item);
             // 同步推进条目数据到生产环境redis
-            redisUtils_prd.set_prd("MKT_CAM_ITEM_" + item.getMktCamItemId(), item);
+            redisUtils_prd.set("MKT_CAM_ITEM_" + item.getMktCamItemId(), item);
             ruleIdList.add(item.getMktCamItemId());
         }
         result.put("resultCode", CODE_SUCCESS);

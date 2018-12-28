@@ -7,6 +7,7 @@ import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.user.UserListMapper;
 import com.zjtelcom.cpct.domain.channel.Channel;
+import com.zjtelcom.cpct.domain.channel.EventItem;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.ContactEvtItem;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
@@ -69,8 +70,12 @@ public class ChannelServiceImpl implements ChannelService {
         }
         ContactEvtModel evtModel = BeanUtil.create(contactEvt,new ContactEvtModel());
         //查询出事件采集项
-        List<ContactEvtItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId());
-        ArrayList<ContactEvtItem> detailVOArrayList = new ArrayList(contactEvtItems);
+        List<EventItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId());
+        ArrayList<ContactEvtItem> detailVOArrayList = new ArrayList<>();
+        for (EventItem eventItem : contactEvtItems){
+            ContactEvtItem evtItem = BeanUtil.create(eventItem,new ContactEvtItem());
+            detailVOArrayList.add(evtItem);
+        }
         evtModel.setContactEvtItems(detailVOArrayList);
         ret.setResultCode("0");
         ret.setData(evtModel);

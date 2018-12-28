@@ -23,6 +23,10 @@ public class ContactEvtItem extends BaseEntity {
     private String isMainParam;//是否是主参
     private String isLabel;//是否为标签
 
+
+
+
+
     public String getActType() {
         return actType;
     }

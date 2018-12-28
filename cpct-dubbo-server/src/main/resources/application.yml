@@ -37,8 +37,12 @@ redisConfig:
    database: 4970
    password: bss_cpct_common_user#bss_cpct_common_user123
 
-
-
+#集团定制的redis配置生产环境
+redisConfig_Prd:
+   ip: 134.108.0.59
+   port: 41701
+   database: 4970
+   password: bss_cpcp_pocpro_user#bssCpc_ro
 
 
 

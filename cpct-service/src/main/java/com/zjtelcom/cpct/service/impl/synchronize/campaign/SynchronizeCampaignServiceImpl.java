@@ -23,10 +23,7 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
 import com.zjtelcom.cpct.domain.Rule;
 import com.zjtelcom.cpct.domain.RuleDetail;
 import com.zjtelcom.cpct.domain.campaign.*;
-import com.zjtelcom.cpct.domain.channel.CamScript;
-import com.zjtelcom.cpct.domain.channel.Label;
-import com.zjtelcom.cpct.domain.channel.MktVerbal;
-import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
+import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
@@ -34,23 +31,28 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyFilterRuleRelDO;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
+import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.channel.VerbalConditionVO;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.enums.ErrorCode;
+import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.enums.SynchronizeType;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.synchronize.SynchronizeRecordService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_prd.dao.campaign.*;
+import com.zjtelcom.cpct_prd.dao.channel.ContactChannelPrdMapper;
 import com.zjtelcom.cpct_prd.dao.channel.MktCamScriptPrdMapper;
 import com.zjtelcom.cpct_prd.dao.channel.MktVerbalConditionPrdMapper;
 import com.zjtelcom.cpct_prd.dao.channel.MktVerbalPrdMapper;
 import com.zjtelcom.cpct_prd.dao.grouping.TarGrpConditionPrdMapper;
 import com.zjtelcom.cpct_prd.dao.grouping.TarGrpPrdMapper;
+import com.zjtelcom.cpct_prd.dao.label.InjectionLabelPrdMapper;
+import com.zjtelcom.cpct_prd.dao.label.InjectionLabelValuePrdMapper;
 import com.zjtelcom.cpct_prd.dao.strategy.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -181,6 +183,13 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
     private MktVerbalConditionPrdMapper mktVerbalConditionPrdMapper;
 
     @Autowired
+    private InjectionLabelPrdMapper injectionLabelPrdMapper;
+    @Autowired
+    private ContactChannelPrdMapper contactChannelPrdMapper;
+    @Autowired
+    private InjectionLabelValuePrdMapper injectionLabelValuePrdMapper;
+
+    @Autowired
     private MktCamScriptMapper mktCamScriptMapper;
 
     @Autowired
@@ -265,6 +274,83 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
         return synchronizeCampaignMap;
     }
 
+    /**
+     * 更新活动下的所有redis
+     * @param mktCampaignId
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public Map<String, Object> updateCampaignRedis(Long mktCampaignId) throws Exception {
+        Map<String, Object> resultMap = new HashMap<>();
+        // 查询活动下的所有规则
+        try {
+            List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList = mktStrategyConfRulePrdMapper.selectByCampaignId(mktCampaignId);
+            for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleDOList) {
+                // 更新客户分群redis
+                Long tarGrpId = mktStrategyConfRuleDO.getTarGrpId();
+                if (tarGrpId != null) {
+                    TarGrp tarGrp = tarGrpPrdMapper.selectByPrimaryKey(tarGrpId);
+                    TarGrpDetail tarGrpDetail = BeanUtil.create(tarGrp, new TarGrpDetail());
+                    List<TarGrpCondition> conditionDOList = tarGrpConditionPrdMapper.listTarGrpCondition(tarGrpId);
+                    tarGrpDetail.setTarGrpConditions(conditionDOList);
+                    redisUtils_prd.set("TAR_GRP_" + tarGrpId, tarGrpDetail);
+                }
+
+                // 更新推荐条目redis
+                String productIds = mktStrategyConfRuleDO.getProductId();
+                if (productIds != null) {
+                    String[] itemIds = productIds.split("/");
+                    if (itemIds != null && !"".equals(itemIds[0])) {
+                        for (int i = 0; i < itemIds.length; i++) {
+                            MktCamItem mktCamItem = mktCamItemPrdMapper.selectByPrimaryKey(Long.valueOf(itemIds[i]));
+                            redisUtils_prd.set("MKT_CAM_ITEM_" + mktCamItem.getMktCamItemId(), mktCamItem);
+                        }
+                    }
+                }
+
+                // 更新首次协同
+                String evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId();
+                if (evtContactConfIds != null) {
+                    // 分割推动渠道id
+                    String[] evtContactConfIdArray = evtContactConfIds.split("/");
+                    if (evtContactConfIdArray != null && !"".equals(evtContactConfIdArray[0])) {
+                        List<Long> evtContactConfIdList = new ArrayList<>();
+                        for (String evtContactConfId : evtContactConfIdArray) {
+                            evtContactConfIdList.add(Long.valueOf(evtContactConfId));
+                        }
+                        List<MktCamChlConfDetail> mktCamChlConfDetailList = getMktCamChlConfDetailList(evtContactConfIdList);
+                        for (MktCamChlConfDetail mktCamChlConfDetail : mktCamChlConfDetailList) {
+                            redisUtils_prd.set("MktCamChlConfDetail_" + mktCamChlConfDetail.getEvtContactConfId(), mktCamChlConfDetail);
+                        }
+                    }
+                }
+
+                //更新二次协同
+                String mktCamChlResultId = mktStrategyConfRuleDO.getMktCamChlResultId();
+                if (mktCamChlResultId!=null && !"".equals(mktCamChlResultId)){
+                    String[] mktCamChlResultIds = mktCamChlResultId.split("/");
+                    for (int i = 0; i <mktCamChlResultIds.length ; i++) {
+                        MktCamChlResultDO mktCamChlResultDO = mktCamChlResultPrdMapper.selectByPrimaryKey(Long.valueOf(mktCamChlResultIds[i]));
+                        MktCamChlResult mktCamChlResult = BeanUtil.create(mktCamChlResultDO, new MktCamChlResult());
+                        List<Long> evtContactConfIdList = mktCamChlResultConfRelPrdMapper.selectConfIdByResultId(mktCamChlResult.getMktCamChlResultId());
+                        List<MktCamChlConfDetail> mktCamChlConfDetailList = getMktCamChlConfDetailList(evtContactConfIdList);
+                        mktCamChlResult.setMktCamChlConfDetailList(mktCamChlConfDetailList);
+                        redisUtils_prd.set("MktCamChlResult_" + mktCamChlResult.getMktCamChlResultId(), mktCamChlResult);
+                    }
+                }
+            }
+            resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            resultMap.put("resultMsg", "更新生产环境redis成功！");
+        } catch (Exception e) {
+            resultMap.put("resultCode", CommonConstant.CODE_FAIL);
+            resultMap.put("resultMsg", "更新生产环境redis失败！");
+           logger.error("[op:SynchronizeCampaignServiceImpl] failed to updateCampaignRedis by mktCampaignId = {} , Exception = ", mktCampaignId, e);
+        }
+        return resultMap;
+    }
+
+
 
     /**
      * 删除活动下策略的所有信息
@@ -288,9 +374,9 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
                 tarGrpConditionPrdMapper.deleteByTarGrpId(mktStrategyConfRuleDO.getTarGrpId());
                 tarGrpPrdMapper.deleteByPrimaryKey(mktStrategyConfRuleDO.getTarGrpId());
 
+                if(mktStrategyConfRuleDO.getProductId()!=null && !"".equals(mktStrategyConfRuleDO.getProductId())){
                 // 删除销售品
                 String[] productIds = mktStrategyConfRuleDO.getProductId().split("/");
-                if(productIds!=null && !"".equals(productIds)){
                     for (String productId : productIds) {
                         mktCamItemPrdMapper.deleteByPrimaryKey(Long.valueOf(productId));
                     }
@@ -298,48 +384,51 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
 
 
                 // 删除首次协同
-                String[] evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
-                if(evtContactConfIds!=null && !"".equals(evtContactConfIds)){
-                    for (String evtContactConfId : evtContactConfIds) {
-                        Long confId = Long.valueOf(evtContactConfId);
-                        mktCamChlConfPrdMapper.deleteByPrimaryKey(confId);
-                        mktCamChlConfAttrPrdMapper.deleteByEvtContactConfId(confId);
-                        // 删除话术
-                        List<MktVerbal> verbalList = mktVerbalPrdMapper.findVerbalListByConfId(confId);
-                        for (MktVerbal mktVerbal : verbalList) {
-                            mktVerbalConditionPrdMapper.deleteByVerbalId("0", mktVerbal.getVerbalId());
+                if (mktStrategyConfRuleDO.getEvtContactConfId()!=null){
+                    String[] evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
+                    if(!"".equals(evtContactConfIds[0])){
+                        for (String evtContactConfId : evtContactConfIds) {
+                            Long confId = Long.valueOf(evtContactConfId);
+                            mktCamChlConfPrdMapper.deleteByPrimaryKey(confId);
+                            mktCamChlConfAttrPrdMapper.deleteByEvtContactConfId(confId);
+                            // 删除话术
+                            List<MktVerbal> verbalList = mktVerbalPrdMapper.findVerbalListByConfId(confId);
+                            for (MktVerbal mktVerbal : verbalList) {
+                                mktVerbalConditionPrdMapper.deleteByVerbalId("0", mktVerbal.getVerbalId());
+                            }
+                            mktVerbalPrdMapper.deleteByConfId(confId);
+                            // 删除脚本
+                            mktCamScriptPrdMapper.deleteByConfId(confId);
                         }
-                        mktVerbalPrdMapper.deleteByConfId(confId);
-                        // 删除脚本
-                        mktCamScriptPrdMapper.deleteByConfId(confId);
                     }
                 }
 
 
-                // 删除二次协同结果
-                String[] mktCamChlResultIds = mktStrategyConfRuleDO.getMktCamChlResultId().split("/");
-                if(mktCamChlResultIds!=null && !"".equals(mktCamChlResultIds)){
-                    if(mktCamChlResultIds !=null && !"".equals(mktCamChlResultIds[0])){
-                        for (String mktCamChlResultId : mktCamChlResultIds) {
-                            // 删除结果下的推动渠道以及属性
-                            List<MktCamChlResultConfRelDO> mktCamChlResultConfRelDOList = mktCamChlResultConfRelPrdMapper.selectByMktCamChlResultId(Long.valueOf(mktCamChlResultId));
-                            for (MktCamChlResultConfRelDO mktCamChlResultConfRelDO : mktCamChlResultConfRelDOList) {
-                                Long confId = Long.valueOf(mktCamChlResultConfRelDO.getEvtContactConfId());
-                                mktCamChlConfPrdMapper.deleteByPrimaryKey(confId);
-                                mktCamChlConfAttrPrdMapper.deleteByEvtContactConfId(confId);
-                                // 删除话术
-                                List<MktVerbal> verbalList = mktVerbalPrdMapper.findVerbalListByConfId(confId);
-                                for (MktVerbal mktVerbal : verbalList) {
-                                    mktVerbalConditionPrdMapper.deleteByVerbalId("0", mktVerbal.getVerbalId());
+
+                if (mktStrategyConfRuleDO.getMktCamChlResultId()!=null){
+                    // 删除二次协同结果
+                    String[] mktCamChlResultIds = mktStrategyConfRuleDO.getMktCamChlResultId().split("/");
+                        if(mktCamChlResultIds !=null && !"".equals(mktCamChlResultIds[0])){
+                            for (String mktCamChlResultId : mktCamChlResultIds) {
+                                // 删除结果下的推动渠道以及属性
+                                List<MktCamChlResultConfRelDO> mktCamChlResultConfRelDOList = mktCamChlResultConfRelPrdMapper.selectByMktCamChlResultId(Long.valueOf(mktCamChlResultId));
+                                for (MktCamChlResultConfRelDO mktCamChlResultConfRelDO : mktCamChlResultConfRelDOList) {
+                                    Long confId = Long.valueOf(mktCamChlResultConfRelDO.getEvtContactConfId());
+                                    mktCamChlConfPrdMapper.deleteByPrimaryKey(confId);
+                                    mktCamChlConfAttrPrdMapper.deleteByEvtContactConfId(confId);
+                                    // 删除话术
+                                    List<MktVerbal> verbalList = mktVerbalPrdMapper.findVerbalListByConfId(confId);
+                                    for (MktVerbal mktVerbal : verbalList) {
+                                        mktVerbalConditionPrdMapper.deleteByVerbalId("0", mktVerbal.getVerbalId());
+                                    }
+                                    mktVerbalPrdMapper.deleteByConfId(confId);
+                                    // 删除脚本
+                                    mktCamScriptPrdMapper.deleteByConfId(confId);
                                 }
-                                mktVerbalPrdMapper.deleteByConfId(confId);
-                                // 删除脚本
-                                mktCamScriptPrdMapper.deleteByConfId(confId);
+                                mktCamChlResultConfRelPrdMapper.deleteByMktCamChlResultId(Long.valueOf(mktCamChlResultId));
+                                mktCamChlResultPrdMapper.deleteByPrimaryKey(Long.valueOf(mktCamChlResultId));
                             }
-                            mktCamChlResultConfRelPrdMapper.deleteByMktCamChlResultId(Long.valueOf(mktCamChlResultId));
-                            mktCamChlResultPrdMapper.deleteByPrimaryKey(Long.valueOf(mktCamChlResultId));
                         }
-                    }
                 }
                 mktStrategyConfRulePrdMapper.deleteByPrimaryKey(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId());
                 mktStrategyConfRuleRelPrdMapper.deleteByMktStrategyConfId(mktStrategyConfRuleRelDO.getMktStrategyConfId());
@@ -424,11 +513,13 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
         /**
          * 协同渠道配置
          */
-        String[] evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
-        if (evtContactConfIds != null && !"".equals(evtContactConfIds[0])) {
-            for (int i = 0; i < evtContactConfIds.length; i++) {
-                if (evtContactConfIds[i] != "" && !"".equals(evtContactConfIds[i])) {
-                    copyMktCamChlConf(Long.valueOf(evtContactConfIds[i]));
+        if (mktStrategyConfRuleDO.getEvtContactConfId()!=null){
+            String[] evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
+            if (evtContactConfIds != null && !"".equals(evtContactConfIds[0])) {
+                for (int i = 0; i < evtContactConfIds.length; i++) {
+                    if (evtContactConfIds[i] != "" && !"".equals(evtContactConfIds[i])) {
+                        copyMktCamChlConf(Long.valueOf(evtContactConfIds[i]));
+                    }
                 }
             }
         }
@@ -436,11 +527,14 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
         /**
          * 二次协同结果
          */
-        String[] mktCamChlResultIds = mktStrategyConfRuleDO.getMktCamChlResultId().split("/");
-        if (mktCamChlResultIds != null && !"".equals(mktCamChlResultIds[0])) {
-            for (int i = 0; i < mktCamChlResultIds.length; i++) {
-                copyMktCamChlResult(Long.valueOf(mktCamChlResultIds[i]));
+        if (mktStrategyConfRuleDO.getMktCamChlResultId()!=null){
+            String[] mktCamChlResultIds = mktStrategyConfRuleDO.getMktCamChlResultId().split("/");
+            if (mktCamChlResultIds != null && !"".equals(mktCamChlResultIds[0])) {
+                for (int i = 0; i < mktCamChlResultIds.length; i++) {
+                    copyMktCamChlResult(Long.valueOf(mktCamChlResultIds[i]));
+                }
             }
+
         }
         mktStrategyConfRuleMap.put("mktStrategyConfRuleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
         return mktStrategyConfRuleMap;
@@ -856,5 +950,46 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
             mktCamChlResultMap.put("resultMsg", ErrorCode.GET_MKT_CAM_CHL_CONF_FAILURE.getErrorMsg());
         }
         return mktCamChlResultMap;
+    }
+
+    /**
+     * 获取推动渠道
+     * @param evtContactConfIdList 所有推送渠道拼接结果
+     * @return
+     */
+    private List<MktCamChlConfDetail> getMktCamChlConfDetailList(List evtContactConfIdList){
+        List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
+        // 更新首次协同推送渠道redis
+        for (int i = 0; i < evtContactConfIdList.size(); i++) {
+            // 查询推送渠道属性
+            MktCamChlConfDO mktCamChlConfDO = mktCamChlConfPrdMapper.selectByPrimaryKey((Long) evtContactConfIdList.get(i));
+            MktCamChlConfDetail mktCamChlConfDetail = BeanUtil.create(mktCamChlConfDO, new MktCamChlConfDetail());
+            // 查询推送渠道属性集合
+            List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = mktCamChlConfAttrPrdMapper.selectByEvtContactConfId((Long) evtContactConfIdList.get(i));
+            List<MktCamChlConfAttr> mktCamChlConfAttrList = new ArrayList<>();
+            for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
+                MktCamChlConfAttr mktCamChlConfAttr = BeanUtil.create(mktCamChlConfAttrDO, new MktCamChlConfAttr());
+                mktCamChlConfAttrList.add(mktCamChlConfAttr);
+            }
+            mktCamChlConfDetail.setMktCamChlConfAttrList(mktCamChlConfAttrList);
+
+            // 查询话术
+            List<MktVerbal> verbalList = mktVerbalPrdMapper.findVerbalListByConfId((Long) evtContactConfIdList.get(i));
+            List<VerbalVO> verbalVOS = new ArrayList<>();
+            for (MktVerbal mktVerbal:verbalList) {
+                VerbalVO verbalVO = BeanUtil.create(mktVerbal, new VerbalVO());
+                List<MktVerbalCondition> conditionList = mktVerbalConditionPrdMapper.findConditionListByVerbalId(verbalVO.getVerbalId());
+                List<VerbalConditionVO> conditionVOList = new ArrayList<>();
+                for (MktVerbalCondition mktVerbalCondition:conditionList) {
+                    VerbalConditionVO verbalConditionVO = BeanUtil.create(mktVerbalCondition, new VerbalConditionVO());
+                    conditionVOList.add(verbalConditionVO);
+                }
+                verbalVO.setConditionList(conditionVOList);
+                verbalVOS.add(verbalVO);
+            }
+            mktCamChlConfDetail.setVerbalVOList(verbalVOS);
+            mktCamChlConfDetailList.add(mktCamChlConfDetail);
+        }
+        return mktCamChlConfDetailList;
     }
 }

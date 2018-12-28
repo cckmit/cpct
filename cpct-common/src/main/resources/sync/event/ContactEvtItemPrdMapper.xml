@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zjtelcom.cpct_prd.dao.event.ContactEvtItemPrdMapper">
-    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.dto.event.ContactEvtItem">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.EventItem">
         <id column="EVT_ITEM_ID" jdbcType="BIGINT" property="evtItemId"/>
         <result column="EVENT_ID" jdbcType="BIGINT" property="contactEvtId"/>
         <result column="EVT_TYPE_ID" jdbcType="BIGINT" property="evtTypeId"/>
@@ -9,7 +9,7 @@
         <result column="EVT_ITEM_CODE" jdbcType="VARCHAR" property="evtItemCode"/>
         <result column="VALUE_DATA_TYPE" jdbcType="VARCHAR" property="valueDataType"/>
         <result column="EVT_ITEM_FORMAT" jdbcType="VARCHAR" property="evtItemFormat"/>
-        <result column="IS_NULLABLE" jdbcType="VARCHAR" property="isNullable"/>
+        <result column="IS_NULLABLE" jdbcType="BIGINT" property="isNullable"/>
         <result column="IS_MAIN_PARAM" jdbcType="VARCHAR" property="isMainParam" />
         <result column="EVT_ITEM_LENGTH" jdbcType="INTEGER" property="evtItemLength"/>
         <result column="STANDARD_SORT" jdbcType="INTEGER" property="standardSort"/>
@@ -30,7 +30,7 @@
         delete from event_item
         where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
     </delete>
-    <insert id="insert" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtItem">
+    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.EventItem">
     insert into event_item (EVT_ITEM_ID, EVENT_ID, EVT_TYPE_ID,
       EVT_ITEM_NAME, EVT_ITEM_CODE, VALUE_DATA_TYPE,
       EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, IS_MAIN_PARAM,
@@ -39,13 +39,13 @@
       UPDATE_DATE, REMARK,IS_LABEL)
     values (#{evtItemId,jdbcType=BIGINT}, #{contactEvtId,jdbcType=BIGINT}, #{evtTypeId,jdbcType=BIGINT},
       #{evtItemName,jdbcType=VARCHAR}, #{evtItemCode,jdbcType=VARCHAR}, #{valueDataType,jdbcType=VARCHAR},
-      #{evtItemFormat,jdbcType=VARCHAR}, #{isNullable,jdbcType=VARCHAR}, #{evtItemLength,jdbcType=INTEGER},
-      #{isMainParam,jdbcType=VARCHAR}, #{standardSort,jdbcType=INTEGER}, #{statusCd,jdbcType=VARCHAR},
-      #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP},
-      #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR},
-      #{isLabel,jdbcType=VARCHAR})
+      #{evtItemFormat,jdbcType=VARCHAR}, #{isNullable,jdbcType=BIGINT}, #{evtItemLength,jdbcType=INTEGER},
+      #{isMainParam,jdbcType=VARCHAR},
+      #{standardSort,jdbcType=INTEGER}, #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT},
+      #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP},
+      #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR},#{isLabel,jdbcType=VARCHAR})
   </insert>
-    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtItem">
+    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.EventItem">
     update event_item
     set EVENT_ID = #{contactEvtId,jdbcType=BIGINT},
       EVT_TYPE_ID = #{evtTypeId,jdbcType=BIGINT},
@@ -53,9 +53,9 @@
       EVT_ITEM_CODE = #{evtItemCode,jdbcType=VARCHAR},
       VALUE_DATA_TYPE = #{valueDataType,jdbcType=VARCHAR},
       EVT_ITEM_FORMAT = #{evtItemFormat,jdbcType=VARCHAR},
-      IS_NULLABLE = #{isNullable,jdbcType=VARCHAR},
+      IS_NULLABLE = #{isNullable,jdbcType=BIGINT},
       EVT_ITEM_LENGTH = #{evtItemLength,jdbcType=INTEGER},
-      IS_MAIN_PARAM = #{isMainParam,jdbcType=VARCHAR},
+       IS_MAIN_PARAM = #{isMainParam,jdbcType=VARCHAR},
       STANDARD_SORT = #{standardSort,jdbcType=INTEGER},
       STATUS_CD = #{statusCd,jdbcType=VARCHAR},
       CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
@@ -101,7 +101,7 @@
     </select>
 
 
-    <insert id="saveEventItem" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtItem">
+    <insert id="saveEventItem" parameterType="com.zjtelcom.cpct.domain.channel.EventItem">
         insert into event_item (
         EVENT_ID,
         EVT_TYPE_ID,
@@ -127,7 +127,7 @@
         #{evtItemCode,jdbcType=VARCHAR},
         #{valueDataType,jdbcType=VARCHAR},
         #{evtItemFormat,jdbcType=VARCHAR},
-        #{isNullable,jdbcType=VARCHAR},
+        #{isNullable,jdbcType=BIGINT},
         #{isMainParam,jdbcType=VARCHAR},
         #{evtItemLength,jdbcType=INTEGER},
         #{standardSort,jdbcType=INTEGER},
@@ -149,7 +149,7 @@
         where EVT_ITEM_ID = #{evtItemId}
     </select>
 
-    <insert id="insertContactEvtItem" keyProperty="evtItemId" useGeneratedKeys="true" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtItem">
+    <insert id="insertContactEvtItem" keyProperty="evtItemId" useGeneratedKeys="true" parameterType="com.zjtelcom.cpct.domain.channel.EventItem">
         insert into event_item (
         EVENT_ID,
         EVT_TYPE_ID,
@@ -166,7 +166,8 @@
         CREATE_DATE,
         STATUS_DATE,
         UPDATE_DATE,
-        REMARK,IS_LABEL)
+        REMARK,
+        IS_LABEL)
         values (
         #{contactEvtId,jdbcType=BIGINT},
         #{evtTypeId,jdbcType=BIGINT},
@@ -174,7 +175,7 @@
         #{evtItemCode,jdbcType=VARCHAR},
         #{valueDataType,jdbcType=VARCHAR},
         #{evtItemFormat,jdbcType=VARCHAR},
-        #{isNullable,jdbcType=VARCHAR},
+        #{isNullable,jdbcType=BIGINT},
         #{evtItemLength,jdbcType=INTEGER},
          #{standardSort,jdbcType=INTEGER},
          #{isMainParam,jdbcType=VARCHAR},
@@ -188,7 +189,7 @@
         #{isLabel,jdbcType=VARCHAR})
     </insert>
 
-    <update id="modEventItem" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtItem">
+    <update id="modEventItem" parameterType="com.zjtelcom.cpct.domain.channel.EventItem">
         update event_item
         set
         <if test="contactEvtId != null  and contactEvtId !=0">
@@ -210,7 +211,7 @@
             EVT_ITEM_FORMAT = #{evtItemFormat,jdbcType=VARCHAR},
         </if>
         <if test="isNullable != null  and isNullable !=''">
-            IS_NULLABLE = #{isNullable,jdbcType=VARCHAR},
+            IS_NULLABLE = #{isNullable,jdbcType=BIGINT},
         </if>
         <if test="evtItemLength != null  and evtItemLength !=''">
             EVT_ITEM_LENGTH = #{evtItemLength,jdbcType=INTEGER},

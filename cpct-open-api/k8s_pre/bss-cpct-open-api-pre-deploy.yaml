@@ -54,11 +54,11 @@ spec:
           timeoutSeconds: 5
         resources:   #镜像环境  不修改就用docker默认
           requests:
-            memory: "2Gi"
-            cpu: "1000m"
-          limits:
-            memory: "2Gi"
+            memory: "4Gi"
             cpu: "2000m"
+          limits:
+            memory: "8Gi"
+            cpu: "4000m"
       - name: jmx
         image: 134.108.5.132:8000/mgt/jmxtrans:v3.0
         imagePullPolicy: Always
@@ -67,11 +67,11 @@ spec:
           mountPath: /etc/localtime
         resources:   #镜镜像环境  不修改就用docker默认
           requests:
-            memory: "2Gi"
-            cpu: "1000m"
+            memory: "1Gi"
+            cpu: "500m"
           limits:
-            memory: "2Gi"
-            cpu: "2000m"
+            memory: "1Gi"
+            cpu: "1000m"
       nodeSelector:
         center: crmcontroller   #修改镜像所属中心标签
       volumes:

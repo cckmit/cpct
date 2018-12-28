@@ -25,10 +25,10 @@ spring:
     username: cpc_user_cpct
     password: cpc_user_cpct_prod
 
-# 第四数据源
+# 第四数据源   cpc的EVO库查询需求函
   datasourcefourth:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://134.108.1.12:8803/smt_bss_cpc?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    url: jdbc:mysql://134.108.1.12:8803/smt_bss_cpc_evo?useUnicode=true&characterEncoding=UTF-8&useSSL=true
     username: cpc_user_cpct
     password: cpc_user_cpct_prod
 
@@ -46,7 +46,7 @@ spring:
     timeout: 30000
   #ES
   elasticsearch:
-      ip: 134.108.0.88
+      ip: 134.108.6.161
       port: 9300
       pool: 5
       cluster:

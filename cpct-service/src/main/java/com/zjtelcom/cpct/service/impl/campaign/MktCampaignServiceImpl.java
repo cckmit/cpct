@@ -871,6 +871,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                                     roleName = sysStaff.getRoleName();
                                 }
                                 synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
+                                //同步redis
+                                synchronizeCampaignService.updateCampaignRedis(mktCampaignId);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -961,7 +963,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 // 获取新的活动的Id
                 Long childMktCampaignId = mktCampaignDO.getMktCampaignId();
                 // 活动编码
-                mktCampaignDO.setMktActivityNbr("MKT" + String.format("%06d", mktCampaignId));
+                mktCampaignDO.setMktActivityNbr("MKT" + String.format("%06d", childMktCampaignId));
                 mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
 
                 childMktCampaignIdList.add(childMktCampaignId);
@@ -985,7 +987,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 for (MktCamEvtRelDO mktCamEvtRelDO : MktCamEvtRelDOList) {
                     MktCamEvtRelDO childMktCamEvtRelDO = new MktCamEvtRelDO();
                     childMktCamEvtRelDO.setMktCampaignId(childMktCampaignId);
-                    childMktCamEvtRelDO.setEventId(childMktCamEvtRelDO.getEventId());
+                    childMktCamEvtRelDO.setEventId(mktCamEvtRelDO.getEventId());
                     childMktCamEvtRelDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
                     childMktCamEvtRelDO.setStatusDate(new Date());
                     childMktCamEvtRelDO.setCreateDate(new Date());
@@ -1184,5 +1186,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         }
         return maps;
     }
+/*
+    @Override
+    public Object getRedisResult(String str){
+        return redisUtils.unserizlizeString(str);
+    }*/
 
 }

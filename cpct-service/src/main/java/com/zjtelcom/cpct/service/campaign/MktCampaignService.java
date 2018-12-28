@@ -58,4 +58,6 @@ public interface MktCampaignService {
 
     Map<String, Object> getMktCampaignTemplate(Long preMktCampaignId) throws Exception;
 
+//    Object getRedisResult(String str);
+
 }

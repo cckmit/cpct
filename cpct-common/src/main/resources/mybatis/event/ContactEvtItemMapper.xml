@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zjtelcom.cpct.dao.event.ContactEvtItemMapper">
-    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.dto.event.ContactEvtItem">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.EventItem">
         <id column="EVT_ITEM_ID" jdbcType="BIGINT" property="evtItemId"/>
         <result column="EVENT_ID" jdbcType="BIGINT" property="contactEvtId"/>
         <result column="EVT_TYPE_ID" jdbcType="BIGINT" property="evtTypeId"/>
@@ -30,7 +30,7 @@
         delete from event_item
         where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
     </delete>
-    <insert id="insert" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtItem">
+    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.EventItem">
     insert into event_item (EVT_ITEM_ID, EVENT_ID, EVT_TYPE_ID,
       EVT_ITEM_NAME, EVT_ITEM_CODE, VALUE_DATA_TYPE,
       EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, IS_MAIN_PARAM,
@@ -45,7 +45,7 @@
       #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP},
       #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR},#{isLabel,jdbcType=VARCHAR})
   </insert>
-    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtItem">
+    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.EventItem">
     update event_item
     set EVENT_ID = #{contactEvtId,jdbcType=BIGINT},
       EVT_TYPE_ID = #{evtTypeId,jdbcType=BIGINT},
@@ -101,7 +101,7 @@
     </select>
 
 
-    <insert id="saveEventItem" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtItem">
+    <insert id="saveEventItem" parameterType="com.zjtelcom.cpct.domain.channel.EventItem">
         insert into event_item (
         EVENT_ID,
         EVT_TYPE_ID,
@@ -149,7 +149,7 @@
         where EVT_ITEM_ID = #{evtItemId}
     </select>
 
-    <insert id="insertContactEvtItem" keyProperty="evtItemId" useGeneratedKeys="true" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtItem">
+    <insert id="insertContactEvtItem" keyProperty="evtItemId" useGeneratedKeys="true" parameterType="com.zjtelcom.cpct.domain.channel.EventItem">
         insert into event_item (
         EVENT_ID,
         EVT_TYPE_ID,
@@ -166,7 +166,8 @@
         CREATE_DATE,
         STATUS_DATE,
         UPDATE_DATE,
-        REMARK,IS_LABEL)
+        REMARK,
+        IS_LABEL)
         values (
         #{contactEvtId,jdbcType=BIGINT},
         #{evtTypeId,jdbcType=BIGINT},
@@ -188,7 +189,7 @@
         #{isLabel,jdbcType=VARCHAR})
     </insert>
 
-    <update id="modEventItem" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtItem">
+    <update id="modEventItem" parameterType="com.zjtelcom.cpct.domain.channel.EventItem">
         update event_item
         set
         <if test="contactEvtId != null  and contactEvtId !=0">

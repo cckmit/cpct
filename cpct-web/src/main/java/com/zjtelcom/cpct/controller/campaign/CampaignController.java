@@ -127,6 +127,7 @@ public class CampaignController extends BaseController {
     @RequestMapping(value = "/listCampaignPage", method = RequestMethod.POST)
     @CrossOrigin
     public String qryMktCampaignList(@RequestBody Map<String, Object> params) throws Exception {
+        logger.info("查询活动列表接口listCampaignPage已触发！");
         Map<String, Object> map = null;
         try {
             map = mktCampaignService.qryMktCampaignListPage(params);
@@ -363,5 +364,13 @@ public class CampaignController extends BaseController {
         }
         return JSON.toJSONString(mktCampaignMap);
     }
+
+
+/*    @RequestMapping(value = "/getRedisResult", method = RequestMethod.POST)
+    @CrossOrigin
+    public String getRedisResult(String str){
+        Object redisResult = mktCampaignService.getRedisResult(str);
+        return JSON.toJSONString(redisResult);
+    }*/
 
 }

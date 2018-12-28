@@ -38,4 +38,6 @@ public interface TarGrpService {
 
     Map<String,Object> copyTarGrp(Long tarGrpId,boolean isCopy);
 
+    Map<String,Object> test(List<Integer> campaignId);
+
 }

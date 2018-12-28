@@ -151,6 +151,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         return result;
     }
 
+
+
     @Override
     @Transactional
     public Map<String, Object> addProductRule(ProductParam param) {

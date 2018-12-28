@@ -67,11 +67,11 @@ spec:
           mountPath: /etc/localtime
         resources:   #镜镜像环境  不修改就用docker默认
           requests:
-            memory: "4Gi"
-            cpu: "2000m"
+            memory: "1Gi"
+            cpu: "500m"
           limits:
-            memory: "4Gi"
-            cpu: "4000m"
+            memory: "1Gi"
+            cpu: "1000m"
       nodeSelector:
         center: crmcontroller   #修改镜像所属中心标签
       volumes:

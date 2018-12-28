@@ -86,15 +86,18 @@
 			<artifactId>biz</artifactId>
 		</dependency>
 
-		<!--客户中心-CRM标识查询1.0版本-->
+
+		<!--统一平台crm接口-->
 		<dependency>
-			<groupId>com.ctzj.smt.bss</groupId>
-			<artifactId>smt-bss-custview-model</artifactId>
-			<version>1.0</version>
+			<groupId>com.zjpii.biz</groupId>
+			<artifactId>UnifiedBiz</artifactId>
+			<version>1.0.0</version>
 		</dependency>
+
+		<!--渠道协同接触任务id-->
 		<dependency>
 			<groupId>com.ctzj.smt.bss</groupId>
-			<artifactId>smt-bss-custview-query-service-api</artifactId>
+			<artifactId>bss-cooperate-realtime-mkt-service-api</artifactId>
 			<version>1.0</version>
 		</dependency>
 

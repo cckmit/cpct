@@ -10,6 +10,7 @@ import com.zjtelcom.cpct.dao.event.*;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamEvtRelDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.domain.channel.EventItem;
 import com.zjtelcom.cpct.domain.event.EventSorceDO;
 import com.zjtelcom.cpct.domain.event.InterfaceCfg;
 import com.zjtelcom.cpct.domain.system.SysParams;
@@ -146,7 +147,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         Map<String, Object> maps = new HashMap<>();
         //获取到所有事件明细
         List<ContactEvtDetail> evtDetailList = createContactEvtJtReq.getContactEvtDetails();
-        List<ContactEvtItem> contactEvtItems = new ArrayList<>();
+        List<EventItem> contactEvtItems = new ArrayList<>();
         List<ContactEvtMatchRul> contactEvtMatchRuls = new ArrayList<>();
         for (ContactEvtDetail evtDetail : evtDetailList) {
             //插入事件主题信息
@@ -164,7 +165,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             contactEvtMapper.modContactEvtCode(contactEvt.getContactEvtId(), contactEvt.getContactEvtCode());
             //插入事件采集项
             contactEvtItems = evtDetail.getContactEvtItems();
-            for (ContactEvtItem contactEvtItem : contactEvtItems) {
+            for (EventItem contactEvtItem : contactEvtItems) {
                 contactEvtItem.setContactEvtId(contactEvt.getContactEvtId());
                 contactEvtItem.setValueDataType("1200");
                 contactEvtItem.setEvtTypeId(contactEvt.getContactEvtTypeId());
@@ -203,8 +204,9 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         Map<String, Object> maps = new HashMap<>();
         //获取到所有事件明细
         List<ContactEventDetail> evtDetailList = createContactEvtReq.getContactEvtDetails();
-        List<ContactEvtItem> contactEvtItems = new ArrayList<>();
+        List<EventItem> contactEvtItems = new ArrayList<>();
         List<ContactEvtMatchRul> contactEvtMatchRuls = new ArrayList<>();
+        Long eventId = null;
         for (ContactEventDetail evtDetail : evtDetailList) {
             //插入事件主题信息
             final ContactEvt contactEvt = evtDetail;
@@ -223,7 +225,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             contactEvtMapper.modContactEvtCode(contactEvt.getContactEvtId(), contactEvt.getContactEvtCode());
             //插入事件采集项
             contactEvtItems = evtDetail.getContactEvtItems();
-            for (ContactEvtItem contactEvtItem : contactEvtItems) {
+            for (EventItem contactEvtItem : contactEvtItems) {
                 contactEvtItem.setContactEvtId(contactEvt.getContactEvtId());
                 maps = evtItemService.createEventItem(contactEvtItem);
                 if (!maps.get("resultCode").equals(CODE_SUCCESS)){
@@ -270,6 +272,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                 }
             }
 
+            eventId = contactEvt.getContactEvtId();
             //大数据事件同步
             InterfaceCfg interfaceCfg = interfaceCfgMapper.selectByPrimaryKey(contactEvt.getInterfaceCfgId());
             if(interfaceCfg != null) {
@@ -292,21 +295,21 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                 }
             }
 
-            if (SystemParamsUtil.getSyncValue().equals("1")){
-                new Thread(){
-                    public void run(){
-                        try {
-                            synContactEvtService.synchronizeSingleEvent(contactEvt.getContactEvtId(),"");
-                        }catch (Exception e){
-                            e.printStackTrace();
-                        }
-                    }
-                }.start();
-            }
+//            if (SystemParamsUtil.getSyncValue().equals("1")){
+//                new Thread(){
+//                    public void run(){
+//                        try {
+//                            synContactEvtService.synchronizeSingleEvent(contactEvt.getContactEvtId(),"");
+//                        }catch (Exception e){
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }.start();
+//            }
         }
-
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("eventId",eventId);
         return maps;
     }
 
@@ -332,6 +335,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     @Override
     public Map<String, Object> delEvent(final Long contactEvtId) {
         Map<String, Object> map = new HashMap<>();
+        Long eventId = null;
         ContactEvt evt = contactEvtMapper.getEventById(contactEvtId);
         if (evt==null){
             map.put("resultCode", CODE_FAIL);
@@ -356,20 +360,22 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                 eventMatchRulConditionMapper.delEventMatchRulCondition(eventMatchRulCondition);
             }
         }
-        if (SystemParamsUtil.getSyncValue().equals("1")){
-            new Thread(){
-                public void run(){
-                    try {
-                        synContactEvtService.deleteSingleEvent(contactEvtId,"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
+//        if (SystemParamsUtil.getSyncValue().equals("1")){
+//            new Thread(){
+//                public void run(){
+//                    try {
+//                        synContactEvtService.deleteSingleEvent(contactEvtId,"");
+//                    }catch (Exception e){
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }.start();
+//        }
+        eventId = contactEvtId;
         map.put("resultCode", CommonConstant.CODE_SUCCESS);
         map.put("resultMsg", StringUtils.EMPTY);
+        map.put("eventId",eventId);
         return map;
     }
 
@@ -389,23 +395,24 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         }
         contactEvtMapper.updateEventStatusCd(contactEvtId, statusCd);
         map.put("resultCode",CODE_SUCCESS);
+        map.put("eventId",contactEvtId);
         if (statusCd.equals("1000")){
             map.put("resultMsg","开启成功");
         }else {
             map.put("resultMsg","关闭成功");
         }
         //事件关闭开启 同步状态到生产
-        if (SystemParamsUtil.getSyncValue().equals("1")){
-            new Thread(){
-                public void run(){
-                    try {
-                        synContactEvtService.synchronizeSingleEvent(contactEvtId,"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
+//        if (SystemParamsUtil.getSyncValue().equals("1")){
+//            new Thread(){
+//                public void run(){
+//                    try {
+//                        synContactEvtService.synchronizeSingleEvent(contactEvtId,"");
+//                    }catch (Exception e){
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }.start();
+//        }
         return map;
     }
 
@@ -434,7 +441,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         }
 
         //查询出事件采集项
-        List<ContactEvtItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId());
+        List<EventItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId());
         contactEventDetail.setContactEvtItems(contactEvtItems);
 
         //查询出事件匹配规则
@@ -501,7 +508,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         Map<String, Object> map = new HashMap<>();
         //获取到所有事件明细
         List<ContactEvtDetail> evtDetailList = createContactEvtJtReq.getContactEvtDetails();
-        List<ContactEvtItem> contactEvtItems = new ArrayList<>();
+        List<EventItem> contactEvtItems = new ArrayList<>();
         List<ContactEvtMatchRul> contactEvtMatchRuls = new ArrayList<>();
         for (ContactEvtDetail evtDetail : evtDetailList) {
             //插入事件主题信息
@@ -511,7 +518,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             contactEvtMapper.modContactEvtJt(contactEvt);
             //插入事件采集项
             contactEvtItems = evtDetail.getContactEvtItems();
-            for (ContactEvtItem contactEvtItem : contactEvtItems) {
+            for (EventItem contactEvtItem : contactEvtItems) {
                 contactEvtItem.setUpdateDate(DateUtil.getCurrentTime());
                 contactEvtItem.setUpdateStaff(UserUtil.loginId());
                 contactEvtItemMapper.modEventItem(contactEvtItem);
@@ -538,8 +545,9 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         Map<String, Object> map = new HashMap<>();
         //获取到所有事件明细
         List<ContactEventDetail> evtDetailList = createContactEvtReq.getContactEvtDetails();
-        List<ContactEvtItem> contactEvtItems = new ArrayList<>();
+        List<EventItem> contactEvtItems = new ArrayList<>();
         List<MktCamEvtRel> mktCamEvtRels = new ArrayList<>();
+        Long eventId = null;
         for (ContactEventDetail evtDetail : evtDetailList) {
             //更新事件主题信息
             EventEditVO editVO = BeanUtil.create(evtDetail,new EventEditVO());
@@ -554,10 +562,10 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             contactEvt.setUpdateStaff(UserUtil.loginId());
             contactEvtMapper.modContactEvt(contactEvt);
             //更新事件采集项
-            List<ContactEvtItem> oldItems = contactEvtItemMapper.listEventItem(evtDetail.getContactEvtId());
+            List<EventItem> oldItems = contactEvtItemMapper.listEventItem(evtDetail.getContactEvtId());
             contactEvtItems = evtDetail.getContactEvtItems();
             List<Long> contactIdList = new ArrayList<>();
-            for (ContactEvtItem contactEvtItem : contactEvtItems) {
+            for (EventItem contactEvtItem : contactEvtItems) {
                 contactIdList.add(contactEvtItem.getEvtItemId());
                 //判断传值id 是否为0 为0新增 不为0更新
                 if (contactEvtItem.getEvtItemId().equals(0L)){
@@ -568,7 +576,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                         return map;
                     }
                 }else {
-                    ContactEvtItem item = contactEvtItemMapper.selectByPrimaryKey(contactEvtItem.getEvtItemId());
+                    EventItem item = contactEvtItemMapper.selectByPrimaryKey(contactEvtItem.getEvtItemId());
                     ItemEditVO itemEditVO = BeanUtil.create(contactEvtItem,new ItemEditVO());
                     BeanUtil.copy(itemEditVO,item);
                     item.setUpdateDate(DateUtil.getCurrentTime());
@@ -577,7 +585,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                 }
             }
             //遍历旧的采集项 不在的删除
-            for (ContactEvtItem oldItem : oldItems){
+            for (EventItem oldItem : oldItems){
                 if (!contactIdList.contains(oldItem.getEvtItemId())){
 
                     contactEvtItemMapper.deleteByPrimaryKey(oldItem.getEvtItemId());
@@ -650,22 +658,23 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                     }
                 }
             }
-
-            if (SystemParamsUtil.getSyncValue().equals("1")){
-                new Thread(){
-                    public void run(){
-                        try {
-                            synContactEvtService.synchronizeSingleEvent(contactEvt.getContactEvtId(),"");
-                        }catch (Exception e){
-                            e.printStackTrace();
-                        }
-                    }
-                }.start();
-            }
+            eventId = evtDetail.getContactEvtId();
+//            if (SystemParamsUtil.getSyncValue().equals("1")){
+//                new Thread(){
+//                    public void run(){
+//                        try {
+//                            synContactEvtService.synchronizeSingleEvent(contactEvt.getContactEvtId(),"");
+//                        }catch (Exception e){
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }.start();
+//            }
 
         }
         map.put("resultCode", CommonConstant.CODE_SUCCESS);
         map.put("resultMsg", StringUtils.EMPTY);
+        map.put("eventId",eventId);
         return map;
     }
 

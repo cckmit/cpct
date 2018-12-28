@@ -341,7 +341,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Override
     public Map<String, Object> importUserList(MultipartFile multipartFile, TrialOperationVO operation, Long ruleId) throws IOException {
         Map<String, Object> result = new HashMap<>();
-        String batchNumSt = DateUtil.date2String(new Date()) + ChannelUtil.getRandomStr(4);
+        String batchNumSt = DateUtil.date2String(new Date()) + ChannelUtil.getRandomStr(8);
 
         InputStream inputStream = multipartFile.getInputStream();
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
@@ -518,7 +518,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     public Map<String, Object> createTrialOperation(TrialOperationVO operationVO) {
         Map<String, Object> result = new HashMap<>();
         //生成批次号
-        String batchNumSt = DateUtil.date2String(new Date()) + ChannelUtil.getRandomStr(2);
+        String batchNumSt = DateUtil.date2String(new Date()) + ChannelUtil.getRandomStr(8);
         MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(operationVO.getCampaignId());
         MktStrategyConfDO strategy = strategyMapper.selectByPrimaryKey(operationVO.getStrategyId());
         if (campaign == null || strategy == null) {
@@ -592,6 +592,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         TrialResponseES countResponse = new TrialResponseES();
 
         try {
+            System.out.println(JSON.toJSONString(requests));
             //todo
              response = esService.searchBatchInfo(requests);
             if (!response.getResultCode().equals(CODE_SUCCESS)) {
@@ -775,7 +776,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             }
             Map<String, Object> map = new HashMap<>();
             for (String set : searchMap.keySet()) {
-                if (labelCodeList.size() < searchMap.keySet().size()) {
+                if (!labelCodeList.contains(set)) {
                     labelCodeList.add(set);
                 }
                 map.put(set, searchMap.get(set));
@@ -787,7 +788,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             map.put("ruleId", ruleInfoMap.getRuleId());
             map.put("ruleName", ruleInfoMap.getRuleName());
             //todo 工单号
-            map.put("orderId", "49736605");
+            map.put("orderId", operation.getBatchNum());
             userList.add(map);
 
         }
@@ -816,6 +817,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 //        }
         if (labelCodeList.size() > 0) {
             List<SimpleInfo> titleList = labelMapper.listLabelByCodeList(labelCodeList);
+            SimpleInfo id = new SimpleInfo();
+            id.setName("记录ID");
+            id.setValue("id");
+            titleList.add(id);
             vo.setTitleList(titleList);
         }
         vo.setHitsList(userList);
@@ -888,6 +893,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         requests.setParamList(paramList);
 
         try {
+            System.out.println(JSON.toJSONString(requests));
             TrialResponseES response = esService.strategyIssure(requests);
             //todo 待验证
 //            restTemplate.postForObject(machFile, request, TrialResponse.class);
@@ -1105,7 +1111,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         LabelResult labelResult = new LabelResult();
                         String type = tarGrpConditionDOs.get(i).getOperType();
                         Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i).getLeftParam()));
-
+                        if (label==null){
+                            continue;
+                        }
                         labelResult.setLabelCode(label.getInjectionLabelCode());
                         labelResult.setLabelName(label.getInjectionLabelName());
                         labelResult.setRightOperand(label.getRightOperand());

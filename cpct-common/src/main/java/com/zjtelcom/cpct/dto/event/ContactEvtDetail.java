@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.dto.event;
 
+import com.zjtelcom.cpct.domain.channel.EventItem;
 import lombok.Data;
 
 import java.util.List;
@@ -12,16 +13,16 @@ import java.util.List;
 @Data
 public class ContactEvtDetail extends ContactEvt{
 
-    private List<ContactEvtItem> contactEvtItems;
+    private List<EventItem> contactEvtItems;
     private List<ContactEvtMatchRul> contactEvtMatchRuls;
     private List<ContactEvtTrigRul> contactEvtTrigRuls;
     private InterfaceCfgDetail interfaceCfgDetail;
 
-    public List<ContactEvtItem> getContactEvtItems() {
+    public List<EventItem> getContactEvtItems() {
         return contactEvtItems;
     }
 
-    public void setContactEvtItems(List<ContactEvtItem> contactEvtItems) {
+    public void setContactEvtItems(List<EventItem> contactEvtItems) {
         this.contactEvtItems = contactEvtItems;
     }
 

@@ -7,17 +7,20 @@ import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.org.OrgTreeMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.domain.grouping.TarGrpConditionDO;
 import com.zjtelcom.cpct.domain.org.OrgTreeDO;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.channel.LabelValueVO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.grouping.SysAreaVO;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
+import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
@@ -64,7 +67,42 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     private OrgTreeMapper orgTreeMapper;
     @Autowired
     private MktCamGrpRulMapper grpRulMapper;
+    @Autowired
+    private MktStrategyConfRuleMapper ruleMapper;
 
+
+    @Override
+    public Map<String, Object> test(List<Integer> campaignId) {
+        Map<String,Object> re = new HashMap<>();
+        List<Map<String,Object>> codeList = new ArrayList<>();
+        List<Long> idlIst = new ArrayList<>();
+        for (Integer id : campaignId){
+            List<MktStrategyConfRuleDO> ruleList =ruleMapper.selectByCampaignId(Long.valueOf(id.toString()));
+            for (MktStrategyConfRuleDO rule : ruleList) {
+                if (rule.getTarGrpId() == null) {
+                    continue;
+                }
+                List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(rule.getTarGrpId());
+                for (TarGrpCondition condition : conditionList) {
+                    Label label = injectionLabelMapper.selectByPrimaryKey(Long.valueOf(condition.getLeftParam()));
+                    if (idlIst.contains(label.getInjectionLabelId())){
+                        continue;
+                    }
+                    idlIst.add(label.getInjectionLabelId());
+                    if (label != null ) {
+                        Map<String, Object> result = new HashMap<>();
+                        result.put("code", label.getInjectionLabelCode());
+                        result.put("name", label.getInjectionLabelName());
+                        codeList.add(result);
+                    }
+                }
+            }
+
+        }
+        re.put("code","200");
+        re.put("data",codeList);
+        return re;
+    }
 
     /**
      * 复制客户分群 返回
