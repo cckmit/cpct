@@ -31,6 +31,7 @@ import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
+import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.util.ChannelUtil;
@@ -147,6 +148,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      */
     @Autowired
     private MktStrategyFilterRuleRelMapper mktStrategyFilterRuleRelMapper;
+
+    @Autowired
+    private ProductService productService;
 
     private final static String createChannel = "cpcp0005";
 
@@ -1043,6 +1047,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamEvtRelMapper.insert(childMktCamEvtRelDO);
                 }
 
+                // 推荐条目下发
+                productService.copyItemByCampaignPublish(parentMktCampaignId, childMktCampaignId);
+
                 // 遍历活动下策略的集合
                 for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {
                     Map<String, Object> mktStrategyConfMap = mktStrategyConfService.copyMktStrategyConf(mktCamStrategyConfRelDO.getStrategyConfId(), true);
@@ -1051,8 +1058,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     MktCamStrategyConfRelDO chaildMktCamStrategyConfRelDO = new MktCamStrategyConfRelDO();
                     chaildMktCamStrategyConfRelDO.setMktCampaignId(childMktCampaignId);
                     chaildMktCamStrategyConfRelDO.setStrategyConfId(childMktStrategyConfId);
-                    //                chaildMktCamStrategyConfRelDO.setStatusCd("1000"); // 1000-有效
-                    //                chaildMktCamStrategyConfRelDO.setStatusDate(new Date());
+                    chaildMktCamStrategyConfRelDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode()); // 1000-有效
+                    chaildMktCamStrategyConfRelDO.setStatusDate(new Date());
                     chaildMktCamStrategyConfRelDO.setCreateDate(new Date());
                     chaildMktCamStrategyConfRelDO.setCreateStaff(UserUtil.loginId());
                     chaildMktCamStrategyConfRelDO.setUpdateDate(new Date());
