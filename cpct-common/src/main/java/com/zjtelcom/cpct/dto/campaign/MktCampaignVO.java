@@ -1,9 +1,3 @@
-/**
- * @(#)MktCampaignVO.java, 2018/7/7.
- * <p/>
- * Copyright 2018 Netease, Inc. All rights reserved.
- * NETEASE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
 package com.zjtelcom.cpct.dto.campaign;
 
 import com.zjtelcom.cpct.domain.campaign.CityProperty;
