@@ -106,12 +106,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.web.asiainfo.zhejiang</groupId>
-            <artifactId>PolicyTemplateDataService</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.zjtelcom.es</groupId>
             <artifactId>es-service-batch</artifactId>
         </dependency>
