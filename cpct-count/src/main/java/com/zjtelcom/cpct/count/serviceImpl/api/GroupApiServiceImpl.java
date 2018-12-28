@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.count.serviceImpl.api;
 
+import com.zjtelcom.cpct.count.base.ResultEnum;
 import com.zjtelcom.cpct.count.controller.GroupApiController;
 import com.zjtelcom.cpct.count.service.api.GroupApiService;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
@@ -35,11 +36,12 @@ public class GroupApiServiceImpl implements GroupApiService {
     @Override
     public Map<String, Object> groupTrial(Map<String, Object> paramMap) {
         Map<String, Object> map=new HashMap<>();
-        map.put("resultCode","1");
+        map.put("resultCode",ResultEnum.SUCCESS.getStatus());
+        map.put("resultMsg",ResultEnum.SUCCESS);
         log.info("分群请求参数："+map);
         String groupId = (String) map.get("groupId");
         if(StringUtils.isBlank(groupId)){
-            map.put("resultCode","1000");
+            map.put("resultCode",ResultEnum.FAILED.getStatus());
             map.put("resultMsg","分群id信息不能为空");
             return  map;
         }
@@ -49,7 +51,7 @@ public class GroupApiServiceImpl implements GroupApiService {
         for (String str:groupList){
             TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(Long.valueOf(str));
             if(tarGrp==null){
-                map.put("resultCode","1000");
+                map.put("resultCode",ResultEnum.FAILED.getStatus());
                 map.put("resultMsg","分群id "+str+" 信息不存在");
                 return  map;
             }
@@ -111,6 +113,10 @@ public class GroupApiServiceImpl implements GroupApiService {
 
     }
 
+
+    public static void main(String[] args) {
+        System.out.println(ResultEnum.SUCCESS);
+    }
 
 
 
