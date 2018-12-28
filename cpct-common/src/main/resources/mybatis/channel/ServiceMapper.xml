@@ -83,6 +83,7 @@
         from service s
         left join service_type st on s.SERVICE_TYPE_ID = st.SERVICE_TYPE_ID
         where s.SERVICE_ID = #{serviceId,jdbcType=BIGINT}
+        order by s.UPDATE_DATE desc
     </select>
     <select id="selectAll" resultMap="BaseResultMap">
         select SERVICE_ID, SERVICE_NBR, SERVICE_NAME,
@@ -90,6 +91,7 @@
                STATUS_CD, STATUS_DATE, CREATE_STAFF,
                CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
         from service
+        order by UPDATE_DATE desc
     </select>
     <select id="selectByServiceName" resultMap="BaseResultMap">
         select SERVICE_ID, SERVICE_NBR, SERVICE_NAME,
@@ -98,6 +100,7 @@
                CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
         from service
         where SERVICE_NAME LIKE CONCAT(CONCAT('%',#{serviceName}),'%')
+        order by UPDATE_DATE desc
     </select>
     <select id="selectDetailByServiceEntity" resultMap="BaseResultMap">
         select s.SERVICE_ID, s.SERVICE_NBR, s.SERVICE_NAME,
@@ -115,5 +118,6 @@
         <if test="serviceTypeId != null and serviceTypeId != ''">
             and s.SERVICE_TYPE_ID = #{serviceTypeId,jdbcType=BIGINT}
         </if>
+        order by s.UPDATE_DATE desc
     </select>
 </mapper>
