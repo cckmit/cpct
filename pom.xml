@@ -18,6 +18,7 @@
         <module>cpct-cache</module>
         <module>cpct-dubbo-label</module>
         <module>cpct-open-api</module>
+        <module>cpct-count</module>
     </modules>
 
     <properties>
