@@ -126,10 +126,10 @@
     where ITEM_ID = #{itemId,jdbcType=BIGINT} and  MKT_CAMPAIGN_ID = {campaignId}
   </select>
 
-  <select id="selectCamItemIdByCampaignId" parameterType="java.lang.Long" resultMap="java.lang.Long">
+  <select id="selectCamItemIdByCampaignId" parameterType="java.lang.Long" resultType="java.lang.Long">
     select MKT_CAM_ITEM_ID
     from mkt_cam_item
-    where ITEM_ID = #{itemId,jdbcType=BIGINT} and  MKT_CAMPAIGN_ID = {campaignId}
+    WHERE MKT_CAMPAIGN_ID = #{item.mktCampaignId,jdbcType=BIGINT}
   </select>
 
 </mapper>
