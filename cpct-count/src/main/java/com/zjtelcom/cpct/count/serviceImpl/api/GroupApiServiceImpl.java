@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.count.serviceImpl.api;
 
+import com.zjtelcom.cpct.count.base.ResultEnum;
 import com.zjtelcom.cpct.count.controller.GroupApiController;
 import com.zjtelcom.cpct.count.service.api.GroupApiService;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
@@ -8,6 +9,8 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,6 +22,9 @@ import java.util.Map;
  * @Date: 2018/12/28
  * @Description:分群id试算标签
  */
+
+@Service
+@Transactional
 public class GroupApiServiceImpl implements GroupApiService {
 
     private Logger log = LoggerFactory.getLogger(GroupApiServiceImpl.class);
@@ -35,11 +41,12 @@ public class GroupApiServiceImpl implements GroupApiService {
     @Override
     public Map<String, Object> groupTrial(Map<String, Object> paramMap) {
         Map<String, Object> map=new HashMap<>();
-        map.put("resultCode","1");
-        log.info("分群请求参数："+map);
-        String groupId = (String) map.get("groupId");
+        map.put("resultCode",ResultEnum.SUCCESS.getStatus());
+        map.put("resultMsg",ResultEnum.SUCCESS);
+        log.info("分群请求参数："+paramMap);
+        String groupId = (String) paramMap.get("groupId");
         if(StringUtils.isBlank(groupId)){
-            map.put("resultCode","1000");
+            map.put("resultCode",ResultEnum.FAILED.getStatus());
             map.put("resultMsg","分群id信息不能为空");
             return  map;
         }
@@ -49,7 +56,7 @@ public class GroupApiServiceImpl implements GroupApiService {
         for (String str:groupList){
             TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(Long.valueOf(str));
             if(tarGrp==null){
-                map.put("resultCode","1000");
+                map.put("resultCode",ResultEnum.FAILED.getStatus());
                 map.put("resultMsg","分群id "+str+" 信息不存在");
                 return  map;
             }
@@ -111,6 +118,10 @@ public class GroupApiServiceImpl implements GroupApiService {
 
     }
 
+
+    public static void main(String[] args) {
+        System.out.println(ResultEnum.SUCCESS);
+    }
 
 
 
