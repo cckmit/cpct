@@ -143,6 +143,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Autowired
     private RequestInstRelMapper requestInstRelMapper;
 
+    @Autowired
+    private MktCamItemMapper mktCamItemMapper;
+
     /**
      * 过滤规则与策略关联 Mapper
      */
@@ -240,6 +243,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 mktCamEvtRelMapper.insert(mktCamEvtRelDO);
             }
 
+            //更新推荐条目
+            List<MktCamItem> mktCamItemList = mktCamItemMapper.selectByBatch(mktCampaignVO.getMktCamItemIdList());
+            for (MktCamItem mktCamItem : mktCamItemList) {
+                mktCamItemMapper.updateByPrimaryKey(mktCamItem);
+            }
+
             //需求涵id不为空添加与活动的关系
             if (mktCampaignVO.getRequestId()!=null){
                 RequestInstRel requestInstRel = new RequestInstRel();
@@ -332,6 +341,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 } else {
                     mktStrategyConfService.saveMktStrategyConf(mktStrategyConfDetail);
                 }
+            }
+
+            //更新推荐条目
+            List<MktCamItem> mktCamItemList = mktCamItemMapper.selectByBatch(mktCampaignVO.getMktCamItemIdList());
+            for (MktCamItem mktCamItem : mktCamItemList) {
+                mktCamItemMapper.updateByPrimaryKey(mktCamItem);
             }
 
             List<MktCamEvtRelDO> mktCamEvtRelDOList = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignId);
