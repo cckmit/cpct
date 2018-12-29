@@ -27,9 +27,11 @@ public interface MktCamItemMapper {
 
     List<MktCamItem> selectByBatch(List<Long> mktCamItemIdList);
 
-    List<MktCamItem> selectByCampaignAndType(@Param("campaignId")Long campaignId,@Param("type")String itemType);
+    List<MktCamItem> selectByCampaignAndType(@Param("campaignId")Long campaignId,@Param("type")String itemType,@Param("name")String name);
 
     List<MktCamItem> selectByCampaignId(@Param("campaignId")Long campaignId);
+
+    List<Long> selectCamItemIdByCampaignId (Long campaignId);
 
     MktCamItem selectByItemIdAndCampaignId(@Param("itemId")Long itemId,@Param("campaignId")Long campaignId);
 }

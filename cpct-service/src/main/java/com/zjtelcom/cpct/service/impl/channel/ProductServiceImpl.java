@@ -33,6 +33,7 @@ import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 
 @Service
 public class ProductServiceImpl extends BaseService implements ProductService {
@@ -143,7 +144,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 }
                 MktCamItem newItem = BeanUtil.create(item, new MktCamItem());
                 newItem.setMktCamItemId(null);
-                newItem.setMktCampaignId(1000L);
+                newItem.setMktCampaignId(-1L);
                 mktCamItems.add(newItem);
             }
             camItemMapper.insertByBatch(mktCamItems);
@@ -208,7 +209,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 item.setStatusDate(DateUtil.getCurrentTime());
                 item.setUpdateStaff(UserUtil.loginId());
                 item.setCreateStaff(UserUtil.loginId());
-                item.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                item.setStatusCd(param.getStatusCd()==null? STATUSCD_EFFECTIVE : param.getStatusCd());
                 mktCamItems.add(item);
                 //redis添加推荐条目数据
                 redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
@@ -234,7 +235,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 item.setStatusDate(DateUtil.getCurrentTime());
                 item.setUpdateStaff(UserUtil.loginId());
                 item.setCreateStaff(UserUtil.loginId());
-                item.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                item.setStatusCd(param.getStatusCd()==null? STATUSCD_EFFECTIVE : param.getStatusCd());
                 mktCamItems.add(item);
                 //redis添加推荐条目数据
                 redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
@@ -259,7 +260,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 item.setStatusDate(DateUtil.getCurrentTime());
                 item.setUpdateStaff(UserUtil.loginId());
                 item.setCreateStaff(UserUtil.loginId());
-                item.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                item.setStatusCd(param.getStatusCd()==null? STATUSCD_EFFECTIVE : param.getStatusCd());
                 mktCamItems.add(item);
                 //redis添加推荐条目数据
                 redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
@@ -297,7 +298,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     public Map<String, Object> getProductRuleListByCampaign(ProductParam param) {
         Map<String,Object> result = new HashMap<>();
         List<MktProductRule> ruleList = new ArrayList<>();
-        List<MktCamItem> itemList = camItemMapper.selectByCampaignAndType(param.getCampaignId(),param.getItemType());
+        List<MktCamItem> itemList = camItemMapper.selectByCampaignAndType(param.getCampaignId(),param.getItemType(),param.getName());
         for (MktCamItem item : itemList) {
         }
         result.put("resultCode",CODE_SUCCESS);

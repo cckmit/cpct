@@ -143,6 +143,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Autowired
     private RequestInstRelMapper requestInstRelMapper;
 
+    @Autowired
+    private MktCamItemMapper mktCamItemMapper;
+
     /**
      * 过滤规则与策略关联 Mapper
      */
@@ -240,6 +243,13 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 mktCamEvtRelMapper.insert(mktCamEvtRelDO);
             }
 
+            //更新推荐条目
+            List<MktCamItem> mktCamItemList = mktCamItemMapper.selectByBatch(mktCampaignVO.getMktCamItemIdList());
+            for (MktCamItem mktCamItem : mktCamItemList) {
+                mktCamItem.setMktCampaignId(mktCampaignId);
+                mktCamItemMapper.updateByPrimaryKey(mktCamItem);
+            }
+
             //需求涵id不为空添加与活动的关系
             if (mktCampaignVO.getRequestId()!=null){
                 RequestInstRel requestInstRel = new RequestInstRel();
@@ -332,6 +342,13 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 } else {
                     mktStrategyConfService.saveMktStrategyConf(mktStrategyConfDetail);
                 }
+            }
+
+            //更新推荐条目
+            List<MktCamItem> mktCamItemList = mktCamItemMapper.selectByBatch(mktCampaignVO.getMktCamItemIdList());
+            for (MktCamItem mktCamItem : mktCamItemList) {
+                mktCamItem.setMktCampaignId(mktCampaignId);
+                mktCamItemMapper.updateByPrimaryKey(mktCamItem);
             }
 
             List<MktCamEvtRelDO> mktCamEvtRelDOList = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignId);
@@ -1234,6 +1251,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
                 mktCampaignVO.setEventDTOS(eventDTOList);
             }
+
+            List<Long> camItemIdList = mktCamItemMapper.selectCamItemIdByCampaignId(preMktCampaignId);
+
+            Map<String, Object> stringObjectMap = productService.copyProductRule(UserUtil.loginId(), camItemIdList);
+            List<Long> ruleIdList = (List<Long>) stringObjectMap.get("ruleIdList");
+            mktCampaignVO.setMktCamItemIdList(ruleIdList);
 
             // 获取过滤规则集合
             List<Long> filterRuleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(preMktCampaignId);

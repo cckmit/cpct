@@ -100,7 +100,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
      * @return‘
      */
     @Override
-    public Map<String, Object> createTarGrpByTemplateId(Long templateId,Long oldTarGrpId) {
+    public Map<String, Object> createTarGrpByTemplateId(Long templateId,Long oldTarGrpId,String needDeleted) {
         Map<String, Object> result = new HashMap<>();
         TarGrp template = tarGrpMapper.selectByPrimaryKey(templateId);
         if (template==null){
@@ -119,6 +119,10 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         }
         addVO.setTarGrpConditions(conditionAdd);
         Map<String,Object> crMap = createTarGrp(addVO,false);
+        if (needDeleted .equals("0")){
+            tarGrpConditionMapper.deleteByTarGrpTemplateId(templateId);
+            tarGrpMapper.deleteByPrimaryKey(templateId);
+        }
         if (crMap.get("resultCode").equals(CODE_SUCCESS)){
             if (oldTarGrpId!=0){
                 TarGrp grp = tarGrpMapper.selectByPrimaryKey(oldTarGrpId);
