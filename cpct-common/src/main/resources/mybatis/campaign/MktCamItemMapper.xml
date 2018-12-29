@@ -105,6 +105,9 @@
     <if test="type != null and type != '' ">
       and ITEM_TYPE = #{type}
     </if>
+    <if test="name != null and name != '' ">
+      and OFFER_NAME like CONCAT('%',#{name,jdbcType=VARCHAR},'%')
+    </if>
   </select>
 
   <select id="selectByCampaignId" resultMap="BaseResultMap">
