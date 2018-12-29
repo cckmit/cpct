@@ -1,4 +1,4 @@
-package com.zjtelcom.cpct.count.base;
+package com.zjtelcom.cpct.count.base.enums;
 
 /**
  * @Auther: anson

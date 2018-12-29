@@ -1,10 +1,17 @@
 package com.zjtelcom.cpct.count.serviceImpl.api;
 
-import com.zjtelcom.cpct.count.base.ResultEnum;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.zjtelcom.cpct.count.base.enums.ResultEnum;
+import com.zjtelcom.cpct.count.base.util.FormatUtil;
 import com.zjtelcom.cpct.count.controller.GroupApiController;
 import com.zjtelcom.cpct.count.service.api.GroupApiService;
+import com.zjtelcom.cpct.count.service.api.TrialService;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
+import com.zjtelcom.es.es.entity.model.TrialResponseES;
+import com.zjtelcom.es.es.service.EsService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +39,9 @@ public class GroupApiServiceImpl implements GroupApiService {
     @Autowired
     private TarGrpMapper tarGrpMapper;
 
+    @Autowired
+    private TrialService trialService;
+
 
     /**
      * 通过分群id
@@ -42,7 +52,7 @@ public class GroupApiServiceImpl implements GroupApiService {
     public Map<String, Object> groupTrial(Map<String, Object> paramMap) {
         Map<String, Object> map=new HashMap<>();
         map.put("resultCode",ResultEnum.SUCCESS.getStatus());
-        map.put("resultMsg",ResultEnum.SUCCESS);
+        map.put("resultMsg", ResultEnum.SUCCESS);
         log.info("分群请求参数："+paramMap);
         String groupId = (String) paramMap.get("groupId");
         if(StringUtils.isBlank(groupId)){
@@ -62,12 +72,12 @@ public class GroupApiServiceImpl implements GroupApiService {
             }
         }
         //调用es的试算服务
+        TrialResponseES trialResponseES = trialService.trialTarGrp(paramMap);
+        log.info("试算返回信息"+ JSONObject.parseObject(JSON.toJSONString(trialResponseES)));
+        //
+        Map<String, Object> stringObjectMap = FormatUtil.objectToMap(trialResponseES);
+        log.info("转化map后："+stringObjectMap);
 
-
-
-
-
-        log.info("试算返回信息");
         return map;
     }
 
@@ -119,8 +129,14 @@ public class GroupApiServiceImpl implements GroupApiService {
     }
 
 
+
+
+
+
+
     public static void main(String[] args) {
         System.out.println(ResultEnum.SUCCESS);
+
     }
 
 

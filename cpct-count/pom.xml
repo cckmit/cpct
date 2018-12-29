@@ -74,9 +74,6 @@
 			<properties>
 				<spring.profiles.active>dev</spring.profiles.active>
 			</properties>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
 		</profile>
 		<profile>
 			<id>online</id>
@@ -89,6 +86,9 @@
 			<properties>
 				<spring.profiles.active>pst</spring.profiles.active>
 			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 		</profile>
 		<profile>
 			<id>pre</id>

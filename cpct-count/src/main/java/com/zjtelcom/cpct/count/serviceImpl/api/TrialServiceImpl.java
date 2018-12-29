@@ -41,7 +41,7 @@ public class TrialServiceImpl implements TrialService {
     private TarGrpConditionMapper tarGrpConditionMapper;
     @Autowired
     private InjectionLabelMapper injectionLabelMapper;
-    @Autowired
+    @Autowired(required = false)
     private EsService esService;
 
     /**

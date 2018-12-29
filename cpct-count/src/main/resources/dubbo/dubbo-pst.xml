@@ -17,9 +17,15 @@
 
 
     <!--客户分群id标签试算-->
-    <!--<dubbo:service registry="esb2" interface="com.zjtelcom.cpct.count.service.api.GroupApiService" ref="groupApiServiceImpl" version="1.0" >-->
-        <!--<dubbo:method name="groupTrial" servicecode="00.1083.groupTrial"/>-->
-    <!--</dubbo:service>-->
+    <dubbo:service registry="esb2" interface="com.zjtelcom.cpct.count.service.api.GroupApiService" ref="groupApiServiceImpl" version="1.0" >
+        <dubbo:method name="groupTrial" servicecode="00.1083.groupTrial"/>
+    </dubbo:service>
+
+    <!-- es提供试算接口 -->
+    <dubbo:reference registry="esb2" interface="com.zjtelcom.es.es.service.EsService" id="esService"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="searchByTarGrp" servicecode="00.1083.searchByTarGrp" timeout="10000"/>
+    </dubbo:reference>
 
 
 
