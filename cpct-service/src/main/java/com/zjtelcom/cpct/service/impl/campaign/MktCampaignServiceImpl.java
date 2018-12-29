@@ -246,7 +246,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             //更新推荐条目
             List<MktCamItem> mktCamItemList = mktCamItemMapper.selectByBatch(mktCampaignVO.getMktCamItemIdList());
             for (MktCamItem mktCamItem : mktCamItemList) {
-                mktCamItem.setMktCamItemId(mktCampaignId);
+                mktCamItem.setMktCampaignId(mktCampaignId);
                 mktCamItemMapper.updateByPrimaryKey(mktCamItem);
             }
 
@@ -347,7 +347,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             //更新推荐条目
             List<MktCamItem> mktCamItemList = mktCamItemMapper.selectByBatch(mktCampaignVO.getMktCamItemIdList());
             for (MktCamItem mktCamItem : mktCamItemList) {
-                mktCamItem.setMktCamItemId(mktCampaignId);
+                mktCamItem.setMktCampaignId(mktCampaignId);
                 mktCamItemMapper.updateByPrimaryKey(mktCamItem);
             }
 
@@ -1251,6 +1251,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
                 mktCampaignVO.setEventDTOS(eventDTOList);
             }
+
+            List<Long> camItemIdList = mktCamItemMapper.selectCamItemIdByCampaignId(preMktCampaignId);
+
+            Map<String, Object> stringObjectMap = productService.copyProductRule(UserUtil.loginId(), camItemIdList);
+            List<Long> ruleIdList = (List<Long>) stringObjectMap.get("ruleIdList");
+            mktCampaignVO.setMktCamItemIdList(ruleIdList);
 
             // 获取过滤规则集合
             List<Long> filterRuleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(preMktCampaignId);
