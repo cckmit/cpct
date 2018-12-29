@@ -9,6 +9,8 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +22,9 @@ import java.util.Map;
  * @Date: 2018/12/28
  * @Description:分群id试算标签
  */
+
+@Service
+@Transactional
 public class GroupApiServiceImpl implements GroupApiService {
 
     private Logger log = LoggerFactory.getLogger(GroupApiServiceImpl.class);
@@ -38,8 +43,8 @@ public class GroupApiServiceImpl implements GroupApiService {
         Map<String, Object> map=new HashMap<>();
         map.put("resultCode",ResultEnum.SUCCESS.getStatus());
         map.put("resultMsg",ResultEnum.SUCCESS);
-        log.info("分群请求参数："+map);
-        String groupId = (String) map.get("groupId");
+        log.info("分群请求参数："+paramMap);
+        String groupId = (String) paramMap.get("groupId");
         if(StringUtils.isBlank(groupId)){
             map.put("resultCode",ResultEnum.FAILED.getStatus());
             map.put("resultMsg","分群id信息不能为空");
