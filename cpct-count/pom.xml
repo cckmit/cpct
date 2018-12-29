@@ -86,9 +86,6 @@
 			<properties>
 				<spring.profiles.active>pst</spring.profiles.active>
 			</properties>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
 		</profile>
 		<profile>
 			<id>pre</id>

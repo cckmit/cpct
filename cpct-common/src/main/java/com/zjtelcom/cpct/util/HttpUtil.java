@@ -28,10 +28,9 @@ public class HttpUtil {
         try{
             httpClient = HttpClients.createDefault();
             httpPost = new HttpPost(url);
-            httpPost.addHeader("Content-Type", "application/json");
+            httpPost.addHeader("Content-Type", "application/json;utf-8");
             StringEntity se = new StringEntity(params);
-            se.setContentType("text/json");
-            se.setContentEncoding(new BasicHeader("Content-Type", "application/json"));
+            se.setContentEncoding(new BasicHeader("Content-Type", "application/json;utf-8"));
             httpPost.setEntity(se);
             HttpResponse response = httpClient.execute(httpPost);
             if(response != null){

@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.count.serviceImpl.api;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.zjtelcom.cpct.count.service.api.TrialService;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
@@ -10,6 +11,7 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
+import com.zjtelcom.cpct.util.HttpUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.es.es.entity.TrialTarGrp;
 import com.zjtelcom.es.es.entity.TrilTarGrpParam;
@@ -20,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
@@ -43,6 +46,9 @@ public class TrialServiceImpl implements TrialService {
     private InjectionLabelMapper injectionLabelMapper;
     @Autowired(required = false)
     private EsService esService;
+    @Autowired
+    private RestTemplate restTemplate;
+
 
     /**
      * 分群试算
@@ -56,7 +62,6 @@ public class TrialServiceImpl implements TrialService {
         String groupId = (String)tarMap.get("groupId");
         List<String> groupList = new ArrayList<>();
         TrialTarGrp trialTarGrp = new TrialTarGrp();
-        trialTarGrp.setSize(size);
         if(groupId.contains(";")){
             String[] split = groupId.split(";");
             for (String s:split){
@@ -70,8 +75,13 @@ public class TrialServiceImpl implements TrialService {
             }
             trialTarGrp = getParam(groupList,"1000");
         }
+        trialTarGrp.setSize(size);
         try {
+//            String url="http://192.168.137.1:8080/es/searchByTarGrp";
+//            responseES = restTemplate.postForObject(url, trialTarGrp, TrialResponseES.class);
             responseES = esService.searchByTarGrp(trialTarGrp);
+            System.out.println("返回信息："+ JSONObject.parseObject(JSON.toJSONString(responseES)));
+
         }catch (Exception e){
             e.printStackTrace();
             log.error("分群试算失败：es接口调用错误");
@@ -208,7 +218,7 @@ public class TrialServiceImpl implements TrialService {
 
                         labelResult.setLabelCode(label.getInjectionLabelCode());
                         labelResult.setLabelName(label.getInjectionLabelName());
-                        labelResult.setRightOperand(label.getRightOperand());
+                        labelResult.setRightOperand(label.getLabelType());
                         labelResult.setRightParam(conditionList.get(i).getRightParam());
                         labelResult.setClassName(label.getClassName());
                         labelResult.setOperType(type);
