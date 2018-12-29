@@ -34,11 +34,9 @@ import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
-import com.zjtelcom.cpct.util.ChannelUtil;
-import com.zjtelcom.cpct.util.CopyPropertiesUtil;
-import com.zjtelcom.cpct.util.RedisUtils;
-import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
+import net.sf.json.JSON;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -169,8 +167,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     public Map<String, Object> createMktCampaign(MktCampaignVO mktCampaignVO) throws Exception {
         Map<String, Object> maps = null;
         try {
-            MktCampaignDO mktCampaignDO = new MktCampaignDO();
-            CopyPropertiesUtil.copyBean2Bean(mktCampaignDO, mktCampaignVO);
+            MktCampaignDO mktCampaignDO = BeanUtil.create(mktCampaignVO, new MktCampaignDO());
+            logger.info("mktCampaignDO = " + com.alibaba.fastjson.JSON.toJSONString(mktCampaignDO));
             // 创建活动基本信息
             mktCampaignDO.setCreateDate(new Date());
             mktCampaignDO.setCreateStaff(UserUtil.loginId());
