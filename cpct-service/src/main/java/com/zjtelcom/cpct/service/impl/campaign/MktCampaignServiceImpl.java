@@ -246,6 +246,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             //更新推荐条目
             List<MktCamItem> mktCamItemList = mktCamItemMapper.selectByBatch(mktCampaignVO.getMktCamItemIdList());
             for (MktCamItem mktCamItem : mktCamItemList) {
+                mktCamItem.setMktCamItemId(mktCampaignId);
                 mktCamItemMapper.updateByPrimaryKey(mktCamItem);
             }
 
@@ -346,6 +347,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             //更新推荐条目
             List<MktCamItem> mktCamItemList = mktCamItemMapper.selectByBatch(mktCampaignVO.getMktCamItemIdList());
             for (MktCamItem mktCamItem : mktCamItemList) {
+                mktCamItem.setMktCamItemId(mktCampaignId);
                 mktCamItemMapper.updateByPrimaryKey(mktCamItem);
             }
 
