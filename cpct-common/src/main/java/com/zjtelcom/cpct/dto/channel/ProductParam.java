@@ -8,7 +8,16 @@ public class ProductParam implements Serializable {
     private List<Long> idList;
     private Long strategyRuleId;
     private String itemType;
+    private String statusCd;
 
+
+    public String getStatusCd() {
+        return statusCd;
+    }
+
+    public void setStatusCd(String statusCd) {
+        this.statusCd = statusCd;
+    }
 
     public Long getCampaignId() {
         return campaignId;

@@ -33,6 +33,7 @@ import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 
 @Service
 public class ProductServiceImpl extends BaseService implements ProductService {
@@ -208,7 +209,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 item.setStatusDate(DateUtil.getCurrentTime());
                 item.setUpdateStaff(UserUtil.loginId());
                 item.setCreateStaff(UserUtil.loginId());
-                item.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                item.setStatusCd(param.getStatusCd()==null? STATUSCD_EFFECTIVE : param.getStatusCd());
                 mktCamItems.add(item);
                 //redis添加推荐条目数据
                 redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
@@ -234,7 +235,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 item.setStatusDate(DateUtil.getCurrentTime());
                 item.setUpdateStaff(UserUtil.loginId());
                 item.setCreateStaff(UserUtil.loginId());
-                item.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                item.setStatusCd(param.getStatusCd()==null? STATUSCD_EFFECTIVE : param.getStatusCd());
                 mktCamItems.add(item);
                 //redis添加推荐条目数据
                 redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
@@ -259,7 +260,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 item.setStatusDate(DateUtil.getCurrentTime());
                 item.setUpdateStaff(UserUtil.loginId());
                 item.setCreateStaff(UserUtil.loginId());
-                item.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                item.setStatusCd(param.getStatusCd()==null? STATUSCD_EFFECTIVE : param.getStatusCd());
                 mktCamItems.add(item);
                 //redis添加推荐条目数据
                 redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
