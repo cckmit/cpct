@@ -144,7 +144,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 }
                 MktCamItem newItem = BeanUtil.create(item, new MktCamItem());
                 newItem.setMktCamItemId(null);
-                newItem.setMktCampaignId(1000L);
+                newItem.setMktCampaignId(-1L);
                 mktCamItems.add(newItem);
             }
             camItemMapper.insertByBatch(mktCamItems);
