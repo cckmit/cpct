@@ -113,7 +113,7 @@ public class GroupApiServiceImpl implements GroupApiService {
 //        //
 //        Map<String, Object> stringObjectMap = FormatUtil.objectToMap(trialResponseES);
 //        log.info("转化map后："+stringObjectMap);
-
+        log.info("试算返回信息: "+ jsonObject);
         return jsonObject;
     }
 
