@@ -298,7 +298,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     public Map<String, Object> getProductRuleListByCampaign(ProductParam param) {
         Map<String,Object> result = new HashMap<>();
         List<MktProductRule> ruleList = new ArrayList<>();
-        List<MktCamItem> itemList = camItemMapper.selectByCampaignAndType(param.getCampaignId(),param.getItemType());
+        List<MktCamItem> itemList = camItemMapper.selectByCampaignAndType(param.getCampaignId(),param.getItemType(),param.getName());
         for (MktCamItem item : itemList) {
         }
         result.put("resultCode",CODE_SUCCESS);

@@ -9,7 +9,16 @@ public class ProductParam implements Serializable {
     private Long strategyRuleId;
     private String itemType;
     private String statusCd;
+    private String name;
 
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public String getStatusCd() {
         return statusCd;
