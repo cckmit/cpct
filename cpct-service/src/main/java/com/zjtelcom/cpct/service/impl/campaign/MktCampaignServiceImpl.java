@@ -243,7 +243,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
 
             //更新推荐条目
-            if (mktCampaignVO.getMktCamItemIdList()!=null){
+            if (mktCampaignVO.getMktCamItemIdList()!=null && !mktCampaignVO.getMktCamItemIdList().isEmpty()){
                 List<MktCamItem> mktCamItemList = mktCamItemMapper.selectByBatch(mktCampaignVO.getMktCamItemIdList());
                 for (MktCamItem mktCamItem : mktCamItemList) {
                     mktCamItem.setMktCampaignId(mktCampaignId);
@@ -346,7 +346,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
 
             //更新推荐条目
-            if (mktCampaignVO.getMktCamItemIdList() !=null){
+            if (mktCampaignVO.getMktCamItemIdList() !=null && !mktCampaignVO.getMktCamItemIdList().isEmpty()){
                 List<MktCamItem> mktCamItemList = mktCamItemMapper.selectByBatch(mktCampaignVO.getMktCamItemIdList());
                 for (MktCamItem mktCamItem : mktCamItemList) {
                     mktCamItem.setMktCampaignId(mktCampaignId);
