@@ -113,7 +113,6 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             }
             offerIds.add(offerId);
             offerParam.setIdList(offerIds);
-
             List<Long> offerList = new ArrayList<>();
             offerList.add(offerId);
             CampaignInstVO instVO = new CampaignInstVO();
@@ -186,14 +185,18 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             instVO.setChannelList(channelList);
             instVOS.add(instVO);
         }
-        Map<String,Object> offerMap = productService.addProductRule(offerParam);
-        Map<String,Object> resMap = productService.addProductRule(resourceParam);
         List<Long> itemList = new ArrayList<>();
-        if (offerMap.get("resultCode").equals(CODE_SUCCESS)){
-            itemList.addAll((List<Long>)offerMap.get("resultMsg"));
+        if (offerParam.getIdList()!=null && !offerParam.getIdList().isEmpty()){
+            Map<String,Object> offerMap = productService.addProductRule(offerParam);
+            if (offerMap.get("resultCode").equals(CODE_SUCCESS)){
+                itemList.addAll((List<Long>)offerMap.get("resultMsg"));
+            }
         }
-        if (resMap.get("resultCode").equals(CODE_SUCCESS)){
-            itemList.addAll((List<Long>)resMap.get("resultMsg"));
+        if (resourceParam.getIdList()!=null && !resourceParam.getIdList().isEmpty()){
+            Map<String,Object> resMap = productService.addProductRule(resourceParam);
+            if (resMap.get("resultCode").equals(CODE_SUCCESS)){
+                itemList.addAll((List<Long>)resMap.get("resultMsg"));
+            }
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",instVOS);
