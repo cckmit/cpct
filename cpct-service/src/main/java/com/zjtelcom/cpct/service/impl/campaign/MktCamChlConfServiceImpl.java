@@ -184,7 +184,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                 }
                 if (mktCamChlConfAttrDO1 != null) {
                     mktCamChlConfAttrMapper.updateByPrimaryKey(mktCamChlConfAttrDO);
-                } else {
+                } else if (!mktCamChlConfAttrDO.getAttrValue().contains("ruleChildren")){
                     mktCamChlConfAttrDO.setEvtContactConfId(evtContactConfId);
                     mktCamChlConfAttrDO.setCreateDate(new Date());
                     mktCamChlConfAttrDO.setUpdateDate(new Date());
