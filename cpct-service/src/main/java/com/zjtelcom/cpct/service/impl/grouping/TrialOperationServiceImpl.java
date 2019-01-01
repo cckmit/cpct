@@ -1108,7 +1108,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
                         labelResult.setLabelCode(label.getInjectionLabelCode());
                         labelResult.setLabelName(label.getInjectionLabelName());
-                        labelResult.setRightOperand(label.getRightOperand());
+                        labelResult.setRightOperand(label.getLabelType());
                         labelResult.setRightParam(tarGrpConditionDOs.get(i).getRightParam());
                         labelResult.setClassName(label.getClassName());
                         labelResult.setOperType(type);
@@ -1131,7 +1131,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             express.append(">=");
                         } else if ("6000".equals(type)) {
                             express.append("<=");
-                        } else if ("7000".equals(type) || "7100".equals(type)) {
+                        } else if ("7000".equals(type)) {
                             express.append("in");
                         }else if ("7200".equals(type)) {
                             express.append("@@@@");//区间于
