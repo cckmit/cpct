@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct_prd.dao.event;
 
+import com.zjtelcom.cpct.domain.channel.EventItem;
 import com.zjtelcom.cpct.domain.event.EventItemDO;
 import com.zjtelcom.cpct.dto.event.ContactEvtItem;
 import org.apache.ibatis.annotations.Mapper;
@@ -16,24 +17,24 @@ public interface ContactEvtItemPrdMapper {
 
     int deleteByEventId(Long contactEvtId);
 
-    int insert(ContactEvtItem record);
+    int insert(EventItem record);
 
-    ContactEvtItem selectByPrimaryKey(Long evtItemId);
+    EventItem selectByPrimaryKey(Long evtItemId);
 
     List<EventItemDO> selectAll();
 
-    int updateByPrimaryKey(ContactEvtItem record);
+    int updateByPrimaryKey(EventItem record);
 
-    int saveEventItem(EventItemDO record);
+    int saveEventItem(EventItem record);
 
-    List<ContactEvtItem> listEventItem(@Param("contactEvtId") Long contactEvtId);
+    List<EventItem> listEventItem(@Param("contactEvtId") Long contactEvtId);
 
-    List<ContactEvtItem> listMainItem();
+    List<EventItem> listMainItem();
 
-    ContactEvtItem viewEventItem(Long evtItemId);
+    EventItem viewEventItem(Long evtItemId);
 
-    int insertContactEvtItem(ContactEvtItem record);
+    int insertContactEvtItem(EventItem record);
 
-    int modEventItem(ContactEvtItem record);
+    int modEventItem(EventItem record);
 
 }
