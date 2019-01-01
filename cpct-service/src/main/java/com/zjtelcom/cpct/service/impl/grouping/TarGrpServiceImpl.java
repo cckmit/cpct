@@ -115,6 +115,9 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         List<TarGrpCondition> conditionAdd = new ArrayList<>();
         for (TarGrpCondition conditionDO : conditionDOList){
             TarGrpCondition con = BeanUtil.create(conditionDO,new TarGrpCondition());
+            if (needDeleted.equals("0")){
+                con.setStatusCd("1100");
+            }
             conditionAdd.add(con);
         }
         addVO.setTarGrpConditions(conditionAdd);
@@ -192,7 +195,9 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                     tarGrpCondition.setStatusDate(DateUtil.getCurrentTime());
                     tarGrpCondition.setUpdateStaff(UserUtil.loginId());
                     tarGrpCondition.setCreateStaff(UserUtil.loginId());
-                    tarGrpCondition.setStatusCd("1000");
+                    if (tarGrpCondition.getStatusCd()==null){
+                        tarGrpCondition.setStatusCd(STATUSCD_EFFECTIVE);
+                    }
                     conditionList.add(tarGrpCondition);
                 }
                 tarGrpConditionMapper.insertByBatch(conditionList);

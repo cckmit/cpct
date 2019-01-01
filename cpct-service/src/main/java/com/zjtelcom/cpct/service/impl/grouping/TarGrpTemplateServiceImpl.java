@@ -123,7 +123,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                     tarGrpConditions.addAll(conditionDOList);
                 }
                 TarGrpDetail addVO = new TarGrpDetail();
-                addVO.setTarGrpName("增存量模板导入转换模板-可删除");
+                addVO.setTarGrpName("增存量模板导入转换模板");
                 addVO.setTarGrpType("1000");
                 addVO.setCreateDate(DateUtil.getCurrentTime());
                 addVO.setUpdateDate(DateUtil.getCurrentTime());

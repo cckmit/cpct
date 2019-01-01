@@ -888,17 +888,18 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         requests.setParamList(paramList);
 
         try {
+            System.out.println(JSON.toJSONString(requests));
             TrialResponseES response = esService.strategyIssure(requests);
             //todo 待验证
 //            restTemplate.postForObject(machFile, request, TrialResponse.class);
         } catch (Exception e) {
             e.printStackTrace();
             result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "文件下发失败");
+            result.put("resultMsg", "文件下发成功，稍后请联系相关业务人员校验结果");
             return result;
         }
         result.put("resultCode", CODE_SUCCESS);
-        result.put("resultMsg", "文件下发成功");
+        result.put("resultMsg", "文件下发成功，稍后请联系相关业务人员校验结果");
         return result;
     }
 
@@ -1108,7 +1109,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
                         labelResult.setLabelCode(label.getInjectionLabelCode());
                         labelResult.setLabelName(label.getInjectionLabelName());
-                        labelResult.setRightOperand(label.getRightOperand());
+                        labelResult.setRightOperand(label.getLabelType());
                         labelResult.setRightParam(tarGrpConditionDOs.get(i).getRightParam());
                         labelResult.setClassName(label.getClassName());
                         labelResult.setOperType(type);
@@ -1131,7 +1132,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             express.append(">=");
                         } else if ("6000".equals(type)) {
                             express.append("<=");
-                        } else if ("7000".equals(type) || "7100".equals(type)) {
+                        } else if ("7000".equals(type)) {
                             express.append("in");
                         }else if ("7200".equals(type)) {
                             express.append("@@@@");//区间于
