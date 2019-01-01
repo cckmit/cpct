@@ -1147,8 +1147,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             express.append("&&");
                         }
                     }
+                    express.append(") {return true} else {return false}");
+                }else {
+                    express.append("");
                 }
-                express.append(") {return true} else {return false}");
                 // 将表达式存入Redis
                 String key = "EVENT_RULE_" + mktCampaignId + "_" + mktStrategyConfId + "_" + mktStrategyConfRuleId;
                 System.out.println("key>>>>>>>>>>" + key + ">>>>>>>>express->>>>:" + JSON.toJSONString(express));

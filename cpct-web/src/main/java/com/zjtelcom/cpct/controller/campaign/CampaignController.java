@@ -6,7 +6,7 @@ import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
-import com.zjtelcom.cpct.dto.campaign.MktCampaignVO;
+import com.zjtelcom.cpct.dto.campaign.MktCamVO;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
@@ -176,7 +176,7 @@ public class CampaignController extends BaseController {
      */
     @RequestMapping(value = "/createMktCampaign", method = RequestMethod.POST)
     @CrossOrigin
-    public String createMktCampaign(@RequestBody MktCampaignVO mktCampaignVO) throws Exception {
+    public String createMktCampaign(@RequestBody MktCamVO mktCampaignVO) throws Exception {
         logger.info("[op:createMktCampaign] mktCampaignVO = ", JSON.toJSONString(mktCampaignVO));
         // 存活动
         Map<String, Object> mktCampaignMap = mktCampaignService.createMktCampaign(mktCampaignVO);
@@ -201,7 +201,7 @@ public class CampaignController extends BaseController {
      */
     @RequestMapping(value = "/modMktCampaign", method = RequestMethod.POST)
     @CrossOrigin
-    public String modMktCampaign(@RequestBody MktCampaignVO mktCampaignVO) throws Exception {
+    public String modMktCampaign(@RequestBody MktCamVO mktCampaignVO) throws Exception {
         Map<String, Object> mktCampaignMap = mktCampaignService.modMktCampaign(mktCampaignVO);
         return JSON.toJSONString(mktCampaignMap);
     }

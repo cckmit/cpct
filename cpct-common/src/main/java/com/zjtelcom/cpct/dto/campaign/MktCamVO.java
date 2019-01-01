@@ -13,7 +13,7 @@ import java.util.List;
  * date: 2018/07/07 15:25
  * version: V1.0
  */
-public class MktCampaignVO extends MktCampaign {
+public class MktCamVO extends MktCampaign {
 
     /**
      * 活动关联的事件
