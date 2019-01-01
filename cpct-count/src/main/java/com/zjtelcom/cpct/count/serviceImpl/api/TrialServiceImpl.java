@@ -254,8 +254,11 @@ public class TrialServiceImpl implements TrialService {
                             express.append("&&");
                         }
                     }
+                    express.append(") {return true} else {return false}");
+                }else {
+                    express.append("");
                 }
-                express.append(") {return true} else {return false}");
+
                 // 将表达式存入Redis
                 System.out.println(">>express->>>>:" + JSON.toJSONString(express));
 
