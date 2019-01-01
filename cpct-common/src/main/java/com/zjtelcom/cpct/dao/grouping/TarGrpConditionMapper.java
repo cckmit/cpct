@@ -38,6 +38,6 @@ public interface TarGrpConditionMapper {
 
     int deleteBatch(List<Long> conditionIds);
 
-    int deleteByTarGrpTemplateId(Long tarGrpTemplateId);
+    int deleteByTarGrpTemplateId(@Param("tarGrpTemplateId") Long tarGrpTemplateId);
 
 }

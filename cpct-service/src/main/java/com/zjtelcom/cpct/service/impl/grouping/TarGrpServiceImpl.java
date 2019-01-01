@@ -123,7 +123,6 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         addVO.setTarGrpConditions(conditionAdd);
         Map<String,Object> crMap = createTarGrp(addVO,false);
         if (needDeleted .equals("0")){
-
             tarGrpConditionMapper.deleteByTarGrpTemplateId(templateId);
             tarGrpMapper.deleteByPrimaryKey(templateId);
         }
