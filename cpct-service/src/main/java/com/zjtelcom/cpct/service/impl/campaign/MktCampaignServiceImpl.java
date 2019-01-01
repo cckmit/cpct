@@ -243,10 +243,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
 
             //更新推荐条目
-            List<MktCamItem> mktCamItemList = mktCamItemMapper.selectByBatch(mktCampaignVO.getMktCamItemIdList());
-            for (MktCamItem mktCamItem : mktCamItemList) {
-                mktCamItem.setMktCampaignId(mktCampaignId);
-                mktCamItemMapper.updateByPrimaryKey(mktCamItem);
+            if (mktCampaignVO.getMktCamItemIdList()!=null){
+                List<MktCamItem> mktCamItemList = mktCamItemMapper.selectByBatch(mktCampaignVO.getMktCamItemIdList());
+                for (MktCamItem mktCamItem : mktCamItemList) {
+                    mktCamItem.setMktCampaignId(mktCampaignId);
+                    mktCamItemMapper.updateByPrimaryKey(mktCamItem);
+                }
             }
 
             //需求涵id不为空添加与活动的关系
@@ -344,10 +346,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
 
             //更新推荐条目
-            List<MktCamItem> mktCamItemList = mktCamItemMapper.selectByBatch(mktCampaignVO.getMktCamItemIdList());
-            for (MktCamItem mktCamItem : mktCamItemList) {
-                mktCamItem.setMktCampaignId(mktCampaignId);
-                mktCamItemMapper.updateByPrimaryKey(mktCamItem);
+            if (mktCampaignVO.getMktCamItemIdList() !=null){
+                List<MktCamItem> mktCamItemList = mktCamItemMapper.selectByBatch(mktCampaignVO.getMktCamItemIdList());
+                for (MktCamItem mktCamItem : mktCamItemList) {
+                    mktCamItem.setMktCampaignId(mktCampaignId);
+                    mktCamItemMapper.updateByPrimaryKey(mktCamItem);
+                }
             }
 
             List<MktCamEvtRelDO> mktCamEvtRelDOList = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignId);
