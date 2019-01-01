@@ -333,6 +333,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 rule.setRemark(item.getRemark());
                 rule.setItemType(item.getItemType()==null ? "" : item.getItemType());
                 rule.setPriority(item.getPriority()==null ? 0 : item.getPriority());
+                rule.setStatusCd(item.getStatusCd());
                 if (item.getPriority()!=null){
                     rule.setPriority(item.getPriority());
                 }
@@ -352,6 +353,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 rule.setRemark(item.getRemark());
                 rule.setItemType(item.getItemType()==null ? "" : item.getItemType());
                 rule.setPriority(item.getPriority()==null ? 0 : item.getPriority());
+                rule.setStatusCd(item.getStatusCd());
                 ruleList.add(rule);
             } else if (item.getItemType().equals("4000")){
                 //促销券
@@ -368,6 +370,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 rule.setRemark(item.getRemark());
                 rule.setItemType(item.getItemType()==null ? "" : item.getItemType());
                 rule.setPriority(item.getPriority()==null ? 0 : item.getPriority());
+                rule.setStatusCd(item.getStatusCd());
                 ruleList.add(rule);
             }
         }
