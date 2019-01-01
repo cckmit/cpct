@@ -66,11 +66,16 @@ public class EsServiceImpl implements EsService {
 
     @Override
     public void save(JSONObject jsonObject,String indexName) {
-        String id = ElasticsearchUtil.addData(jsonObject, indexName, esType, jsonObject.getString("ISI"));
-//        String id = ElasticsearchUtil.addData(jsonObject, indexName, esType, jsonObject.getString("ISI"));
-
+        String id = ElasticsearchUtil.addData(jsonObject, indexName, esType);
         logger.info("test..."+id);
     }
+
+    @Override
+    public void save(JSONObject jsonObject,String indexName,String _id) {
+        String id = ElasticsearchUtil.addData(jsonObject, indexName, esType, _id);
+        logger.info("test..."+id);
+    }
+
 
 
     /**
