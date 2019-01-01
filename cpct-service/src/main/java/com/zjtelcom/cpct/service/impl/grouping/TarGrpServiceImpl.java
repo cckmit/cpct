@@ -111,6 +111,12 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         List<TarGrpCondition> conditionDOList = tarGrpConditionMapper.listTarGrpCondition(templateId);
 
         TarGrpDetail addVO = BeanUtil.create(template,new TarGrpDetail());
+
+        if (needDeleted .equals("0")){
+            tarGrpConditionMapper.deleteByTarGrpTemplateId(templateId);
+            tarGrpMapper.deleteByPrimaryKey(templateId);
+        }
+        addVO.setTarGrpId(null);
         addVO.setRemark(null);
         List<TarGrpCondition> conditionAdd = new ArrayList<>();
         for (TarGrpCondition conditionDO : conditionDOList){
@@ -122,10 +128,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         }
         addVO.setTarGrpConditions(conditionAdd);
         Map<String,Object> crMap = createTarGrp(addVO,false);
-        if (needDeleted .equals("0")){
-            tarGrpConditionMapper.deleteByTarGrpTemplateId(templateId);
-            tarGrpMapper.deleteByPrimaryKey(templateId);
-        }
+
         if (crMap.get("resultCode").equals(CODE_SUCCESS)){
             if (oldTarGrpId!=0){
                 TarGrp grp = tarGrpMapper.selectByPrimaryKey(oldTarGrpId);
