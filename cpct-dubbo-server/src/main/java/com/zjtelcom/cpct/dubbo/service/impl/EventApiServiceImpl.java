@@ -415,61 +415,61 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
                 //验证事件采集项
-//                List<EventItem> contactEvtItems = contactEvtItemMapper.listEventItem(eventId);
+                List<EventItem> contactEvtItems = contactEvtItemMapper.listEventItem(eventId);
                 List<Map<String, Object>> evtTriggers = new ArrayList<>();
-//                Map<String, Object> trigger;
-//                //事件采集项标签集合(事件采集项标签优先规则)
+                Map<String, Object> trigger;
+                //事件采集项标签集合(事件采集项标签优先规则)
                 Map<String, String> labelItems = new HashMap<>();
-//
-//                StringBuilder stringBuilder = new StringBuilder();
-//                for (EventItem contactEvtItem : contactEvtItems) {
-//                    if (evtParams != null && evtParams.containsKey(contactEvtItem.getEvtItemCode())) {
-//                        //筛选出作为标签使用的事件采集项
-//                        if ("0".equals(contactEvtItem.getIsLabel())) {
-//                            labelItems.put(contactEvtItem.getEvtItemCode(), evtParams.getString(contactEvtItem.getEvtItemCode()));
-//                        }
-//
-//                        trigger = new HashMap<>();
-//                        trigger.put("key", contactEvtItem.getEvtItemCode());
-//                        trigger.put("value", evtParams.get(contactEvtItem.getEvtItemCode()));
-//                        evtTriggers.add(trigger);
-//                    } else {
-//                        //记录缺少的事件采集项
-//                        stringBuilder.append(contactEvtItem.getEvtItemCode()).append("、");
-//                    }
-//                }
 
-//                if (stringBuilder.length() > 0) {
-//                    stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-//                }
-//
-//                //事件采集项返回参数
-//                if (stringBuilder.length() > 0) {
-//
-//                    //保存es log
-//                    long cost = System.currentTimeMillis() - begin;
-//                    esJson.put("timeCost", cost);
-//                    esJson.put("hit", false);
-//                    esJson.put("msg", "事件采集项验证失败，缺少：" + stringBuilder.toString());
-//                    esService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
-//
-//                    result.put("CPCResultCode", "1000");
-//                    result.put("CPCResultMsg", "事件采集项验证失败，缺少：" + stringBuilder.toString());
-//                    return result;
-//                }
+                StringBuilder stringBuilder = new StringBuilder();
+                for (EventItem contactEvtItem : contactEvtItems) {
+                    if (evtParams != null && evtParams.containsKey(contactEvtItem.getEvtItemCode())) {
+                        //筛选出作为标签使用的事件采集项
+                        if ("0".equals(contactEvtItem.getIsLabel())) {
+                            labelItems.put(contactEvtItem.getEvtItemCode(), evtParams.getString(contactEvtItem.getEvtItemCode()));
+                        }
+
+                        trigger = new HashMap<>();
+                        trigger.put("key", contactEvtItem.getEvtItemCode());
+                        trigger.put("value", evtParams.get(contactEvtItem.getEvtItemCode()));
+                        evtTriggers.add(trigger);
+                    } else {
+                        //记录缺少的事件采集项
+                        stringBuilder.append(contactEvtItem.getEvtItemCode()).append("、");
+                    }
+                }
+
+                if (stringBuilder.length() > 0) {
+                    stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+                }
+
+                //事件采集项返回参数
+                if (stringBuilder.length() > 0) {
+
+                    //保存es log
+                    long cost = System.currentTimeMillis() - begin;
+                    esJson.put("timeCost", cost);
+                    esJson.put("hit", false);
+                    esJson.put("msg", "事件采集项验证失败，缺少：" + stringBuilder.toString());
+                    esService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
+
+                    result.put("CPCResultCode", "1000");
+                    result.put("CPCResultMsg", "事件采集项验证失败，缺少：" + stringBuilder.toString());
+                    return result;
+                }
 
 
                 //!!!验证事件规则命中
-//                Map<String, Object> stringObjectMap = matchRulCondition(eventId, labelItems, map);
-////                if (!stringObjectMap.get("code").equals("success")) {
-////                    //判断不符合条件 直接返回不命中
-////                    result.put("CPCResultMsg", stringObjectMap.get("result"));
-////                    result.put("CPCResultCode", "1000");
-////                    esJson.put("hit", false);
-////                    esJson.put("msg", stringObjectMap.get("result"));
-////                    esService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
-////                    return result;
-////                }
+                Map<String, Object> stringObjectMap = matchRulCondition(eventId, labelItems, map);
+                if (!stringObjectMap.get("code").equals("success")) {
+                    //判断不符合条件 直接返回不命中
+                    result.put("CPCResultMsg", stringObjectMap.get("result"));
+                    result.put("CPCResultCode", "1000");
+                    esJson.put("hit", false);
+                    esJson.put("msg", stringObjectMap.get("result"));
+                    esService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
+                    return result;
+                }
 
                 //获取事件推荐活动数
                 int recCampaignAmount;
