@@ -1262,13 +1262,13 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     productIdList.add(Long.valueOf(productId));
                 }
                 // 获取原有的推送条目
-                if (productIdList!=null){
+                if (productIdList!=null && !productIdList.isEmpty()){
                     mktCamItemList = mktCamItemMapper.selectByBatch(productIdList);
                 }
             }
             // 获取最新的推荐条目
             List<MktCamItem> mktCamItemListNew = new ArrayList<>();
-            if (camitemIdList!=null){
+            if (camitemIdList!=null && !camitemIdList.isEmpty()){
                 mktCamItemListNew = mktCamItemMapper.selectByBatch(camitemIdList);
             }
             List<Long> moreIdList = new ArrayList<>();
