@@ -6,9 +6,9 @@ import com.zjtelcom.cpct.dao.event.ContactEvtItemMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.event.EventMatchRulConditionMapper;
 import com.zjtelcom.cpct.dao.event.EventMatchRulMapper;
+import com.zjtelcom.cpct.domain.channel.EventItem;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
-import com.zjtelcom.cpct.dto.event.ContactEvtItem;
 import com.zjtelcom.cpct.dto.event.EventMatchRulCondition;
 import com.zjtelcom.cpct.dto.event.EventMatchRulDTO;
 import com.zjtelcom.cpct.enums.SynchronizeType;
@@ -79,7 +79,7 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
             throw new SystemException("对应事件不存在");
         }
         //1.1关联的事件采集项
-        List<ContactEvtItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId());
+        List<EventItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId());
 
         //1.2关联的事件规则
         EventMatchRulDTO eventMatchRulDTO = eventMatchRulMapper.listEventMatchRul(eventId);
@@ -101,7 +101,7 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
             synchronizeRecordService.addRecord(roleName, tableName, eventId, SynchronizeType.add.getType());
             //2.2新增关联的事件采集项
             if (!contactEvtItems.isEmpty()) {
-                for (ContactEvtItem c : contactEvtItems) {
+                for (EventItem c : contactEvtItems) {
                     contactEvtItemPrdMapper.insert(c);
                 }
             }
@@ -126,15 +126,15 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
             contactEvtPrdMapper.modContactEvtJt(contactEvt);
             synchronizeRecordService.addRecord(roleName, tableName, eventId, SynchronizeType.update.getType());
             //3.2修改关联的事件采集项
-                diffEventItem(contactEvtItems, eventById);
+            diffEventItem(contactEvtItems, eventById);
             //3.3修改关联的事件规则
             if (eventMatchRulDTO != null) {
                 eventMatchRulPrdMapper.updateByPrimaryKey(eventMatchRulDTO);
             }
             //3.4修改关联的事件规则条件信息
-                diffEventMatchRulCondition(listEventMatchRulCondition, eventById);
+            diffEventMatchRulCondition(listEventMatchRulCondition, eventById);
             //3.5修改关联的活动
-                diffMktCamEvtRel(mktCamEvtRels, eventById);
+            diffMktCamEvtRel(mktCamEvtRels, eventById);
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
@@ -148,14 +148,14 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
      * @param prdList
      * @param contactEvt
      */
-    public void diffEventItem(List<ContactEvtItem> prdList, ContactEvt contactEvt) {
+    public void diffEventItem(List<EventItem> prdList, ContactEvt contactEvt) {
         //得到生产环境的事件采集项
-        List<ContactEvtItem> realList = contactEvtItemPrdMapper.listEventItem(contactEvt.getContactEvtId());
+        List<EventItem> realList = contactEvtItemPrdMapper.listEventItem(contactEvt.getContactEvtId());
         //判断哪些需要新增  修改  或者删除
         //三个集合分别表示需要 新增的   修改的    删除的
-        List<ContactEvtItem> addList = new ArrayList<ContactEvtItem>();
-        List<ContactEvtItem> updateList = new ArrayList<ContactEvtItem>();
-        List<ContactEvtItem> deleteList = new ArrayList<ContactEvtItem>();
+        List<EventItem> addList = new ArrayList<EventItem>();
+        List<EventItem> updateList = new ArrayList<EventItem>();
+        List<EventItem> deleteList = new ArrayList<EventItem>();
         //首先判断准生产 或生产是否存在某一方数据修改为0的情况
         if (prdList.isEmpty() || realList.isEmpty()) {
             if (prdList.isEmpty() && !realList.isEmpty()) {
@@ -172,7 +172,7 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
             return;
         }
 
-        for (ContactEvtItem c : prdList) {
+        for (EventItem c : prdList) {
             for (int i = 0; i < realList.size(); i++) {
                 if (c.getEvtItemId() - realList.get(i).getEvtItemId() == 0) {
                     //需要修改的
@@ -184,7 +184,7 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
                 }
             }
         }
-        for (ContactEvtItem c : realList) {
+        for (EventItem c : realList) {
             for (int i = 0; i < prdList.size(); i++) {
                 if (c.getEvtItemId() - prdList.get(i).getEvtItemId() == 0) {
                     break;
@@ -195,15 +195,15 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
             }
         }
         //开始新增
-        for (ContactEvtItem c : addList) {
+        for (EventItem c : addList) {
             contactEvtItemPrdMapper.insert(c);
         }
         //开始修改
-        for (ContactEvtItem c : updateList) {
+        for (EventItem c : updateList) {
             contactEvtItemPrdMapper.updateByPrimaryKey(c);
         }
         //开始删除
-        for (ContactEvtItem c : deleteList) {
+        for (EventItem c : deleteList) {
             contactEvtItemPrdMapper.deleteByPrimaryKey(c.getEvtItemId());
         }
     }
@@ -447,7 +447,7 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
      */
     public void addEvent(ContactEvt contactEvt) {
         //1.1关联的事件采集项
-        List<ContactEvtItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId());
+        List<EventItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId());
 
         //1.2关联的事件规则
         EventMatchRulDTO eventMatchRulDTO = eventMatchRulMapper.listEventMatchRul(contactEvt.getExtEventId());
@@ -463,7 +463,7 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
         contactEvtPrdMapper.createContactEvtJt(contactEvt);
         //2.2新增关联的事件采集项
         if (!contactEvtItems.isEmpty()) {
-            for (ContactEvtItem c : contactEvtItems) {
+            for (EventItem c : contactEvtItems) {
                 contactEvtItemPrdMapper.insert(c);
             }
         }
@@ -494,7 +494,7 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
      */
     public void updateEvent(ContactEvt contactEvt) {
         //1.1关联的事件采集项
-        List<ContactEvtItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId());
+        List<EventItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId());
 
         //1.2关联的事件规则
         EventMatchRulDTO eventMatchRulDTO = eventMatchRulMapper.listEventMatchRul(contactEvt.getExtEventId());

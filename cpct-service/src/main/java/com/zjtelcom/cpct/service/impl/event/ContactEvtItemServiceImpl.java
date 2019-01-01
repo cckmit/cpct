@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.service.impl.event;
 
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.event.ContactEvtItemMapper;
+import com.zjtelcom.cpct.domain.channel.EventItem;
 import com.zjtelcom.cpct.dto.event.ContactEvtItem;
 import com.zjtelcom.cpct.request.event.ContactEvtReq;
 import com.zjtelcom.cpct.service.BaseService;
@@ -31,7 +32,7 @@ public class ContactEvtItemServiceImpl extends BaseService implements ContactEvt
     @Override
     public Map<String, Object> listEventItem(ContactEvtReq ContactEvtReq) {
         Map<String, Object> maps = new HashMap<>();
-        List<ContactEvtItem> contactEvtItems = new ArrayList<>();
+        List<EventItem> contactEvtItems = new ArrayList<>();
 //        Page pageInfo = ContactEvtReq.getPage();
 //        PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
         contactEvtItems = contactEvtItemMapper.listMainItem();
@@ -60,7 +61,7 @@ public class ContactEvtItemServiceImpl extends BaseService implements ContactEvt
     @Override
     public Map<String, Object> viewEventItem(ContactEvtItem contactEvtItem) {
         Map<String, Object> maps = new HashMap<>();
-        ContactEvtItem contactEvtItemR = contactEvtItemMapper.viewEventItem(contactEvtItem.getEvtItemId());
+        EventItem contactEvtItemR = contactEvtItemMapper.viewEventItem(contactEvtItem.getEvtItemId());
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("contactEvtItem", contactEvtItemR);
@@ -71,10 +72,13 @@ public class ContactEvtItemServiceImpl extends BaseService implements ContactEvt
      * 新增事件采集项
      */
     @Override
-    public Map<String, Object> createEventItem(ContactEvtItem contactEvtItem) {
+    public Map<String, Object> createEventItem(EventItem contactEvtItem) {
         Map<String, Object> maps = new HashMap<>();
-//        contactEvtItem.setValueDataType();
-//        contactEvtItem.setIsNullable(1L);
+
+        System.out.println("0000000000000000000000000000000000");
+        System.out.println(ContactEvtItem.class.getName());
+        System.out.println(ContactEvtItem.class.getMethods()[0].getName());
+        contactEvtItem.setIsNullable(1L);
         contactEvtItem.setCreateDate(new Date());
         contactEvtItem.setUpdateDate(new Date());
         contactEvtItem.setStatusDate(new Date());
@@ -91,7 +95,7 @@ public class ContactEvtItemServiceImpl extends BaseService implements ContactEvt
      * 修改事件采集项
      */
     @Override
-    public Map<String, Object> modEventItem(ContactEvtItem contactEvtItem) {
+    public Map<String, Object> modEventItem(EventItem contactEvtItem) {
         Map<String, Object> maps = new HashMap<>();
         contactEvtItem.setUpdateDate(DateUtil.getCurrentTime());
         contactEvtItem.setUpdateStaff(UserUtil.loginId());
