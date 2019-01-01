@@ -14,7 +14,6 @@ import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.*;
-import com.zjtelcom.cpct.domain.channel.ObjMktCampaignRel;
 import com.zjtelcom.cpct.domain.channel.RequestInstRel;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
@@ -23,7 +22,7 @@ import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.campaign.CampaignVO;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
-import com.zjtelcom.cpct.dto.campaign.MktCampaignVO;
+import com.zjtelcom.cpct.dto.campaign.MktCamVO;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.EventDTO;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
@@ -36,7 +35,6 @@ import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
-import net.sf.json.JSON;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -164,7 +162,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      * @throws Exception
      */
     @Override
-    public Map<String, Object> createMktCampaign(MktCampaignVO mktCampaignVO) throws Exception {
+    public Map<String, Object> createMktCampaign(MktCamVO mktCampaignVO) throws Exception {
         Map<String, Object> maps = null;
         try {
             logger.info("[op:MktCampaignServiceImpl createMktCampaign] mktCampaignVO = ", com.alibaba.fastjson.JSON.toJSONString(mktCampaignVO));
@@ -308,7 +306,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      * @throws Exception
      */
     @Override
-    public Map<String, Object> modMktCampaign(MktCampaignVO mktCampaignVO) throws Exception {
+    public Map<String, Object> modMktCampaign(MktCamVO mktCampaignVO) throws Exception {
         Map<String, Object> maps = new HashMap<>();
         try {
             MktCampaignDO mktCampaignDO = new MktCampaignDO();
@@ -451,7 +449,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         // 获取活动基本信息
         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
 
-        MktCampaignVO mktCampaignVO = new MktCampaignVO();
+        MktCamVO mktCampaignVO = new MktCamVO();
         CopyPropertiesUtil.copyBean2Bean(mktCampaignVO, mktCampaignDO);
         // 获取下发城市集合
         List<MktCamCityRelDO> mktCamCityRelDOList = mktCamCityRelMapper.selectByMktCampaignId(mktCampaignVO.getMktCampaignId());
@@ -677,9 +675,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 paramMap.put(sysParams.getParamKey() + sysParams.getParamValue(), sysParams.getParamName());
             }
 
-            List<MktCampaignVO> mktCampaignVOList = new ArrayList<>();
+            List<MktCamVO> mktCampaignVOList = new ArrayList<>();
             for (MktCampaignCountDO mktCampaignCountDO : mktCampaignDOList) {
-                MktCampaignVO mktCampaignVO = new MktCampaignVO();
+                MktCamVO mktCampaignVO = new MktCamVO();
                 try {
                     mktCampaignVO.setMktCampaignId(mktCampaignCountDO.getMktCampaignId());
                     mktCampaignVO.setMktCampaignName(mktCampaignCountDO.getMktCampaignName());
@@ -854,9 +852,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 paramMap.put(sysParams.getParamKey() + sysParams.getParamValue(), sysParams.getParamName());
             }
 
-            List<MktCampaignVO> mktCampaignVOList = new ArrayList<>();
+            List<MktCamVO> mktCampaignVOList = new ArrayList<>();
             for (MktCampaignCountDO mktCampaignCountDO : mktCampaignDOList) {
-                MktCampaignVO mktCampaignVO = new MktCampaignVO();
+                MktCamVO mktCampaignVO = new MktCamVO();
                 try {
                     mktCampaignVO.setMktCampaignId(mktCampaignCountDO.getMktCampaignId());
                     mktCampaignVO.setMktCampaignName(mktCampaignCountDO.getMktCampaignName());
@@ -1204,7 +1202,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             // 获取活动基本信息
             MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(preMktCampaignId);
 
-            MktCampaignVO mktCampaignVO = new MktCampaignVO();
+            MktCamVO mktCampaignVO = new MktCamVO();
             CopyPropertiesUtil.copyBean2Bean(mktCampaignVO, mktCampaignDO);
             // 获取下发城市集合
             List<MktCamCityRelDO> mktCamCityRelDOList = mktCamCityRelMapper.selectByMktCampaignId(mktCampaignVO.getMktCampaignId());

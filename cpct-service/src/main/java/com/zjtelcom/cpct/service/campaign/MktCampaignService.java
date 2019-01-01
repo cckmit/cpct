@@ -7,7 +7,7 @@
 package com.zjtelcom.cpct.service.campaign;
 
 
-import com.zjtelcom.cpct.dto.campaign.MktCampaignVO;
+import com.zjtelcom.cpct.dto.campaign.MktCamVO;
 
 import java.util.Date;
 import java.util.Map;
@@ -30,7 +30,7 @@ public interface MktCampaignService {
 
     Map<String,Object> getCampaignList4EventScene (String mktCampaignName);
 
-    Map<String,Object> createMktCampaign(MktCampaignVO mktCampaignVO) throws Exception;
+    Map<String,Object> createMktCampaign(MktCamVO mktCampaignVO) throws Exception;
 
     Map<String,Object> delMktCampaign(Long mktCampaignId) throws Exception;
 
@@ -38,11 +38,11 @@ public interface MktCampaignService {
 
     Map<String,Object> getAllConfRuleName (Long mktCampaignId) throws Exception;
 
-    Map<String,Object> modMktCampaign(MktCampaignVO mktCampaignVO) throws Exception;
+    Map<String,Object> modMktCampaign(MktCamVO mktCampaignVO) throws Exception;
 
     Map<String,Object> changeMktCampaignStatus(Long mktCampaignId, String statusCd) throws Exception;
 
-//    Map<String,Object> qryMktCampaignList (MktCampaignVO mktCampaignVO);
+//    Map<String,Object> qryMktCampaignList (MktCamVO mktCampaignVO);
 
     Map<String, Object> publishMktCampaign(Long mktCampaignId) throws Exception;
 
