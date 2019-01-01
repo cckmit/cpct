@@ -34,11 +34,9 @@ import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
-import com.zjtelcom.cpct.util.ChannelUtil;
-import com.zjtelcom.cpct.util.CopyPropertiesUtil;
-import com.zjtelcom.cpct.util.RedisUtils;
-import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
+import net.sf.json.JSON;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,6 +141,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Autowired
     private RequestInstRelMapper requestInstRelMapper;
 
+    @Autowired
+    private MktCamItemMapper mktCamItemMapper;
+
     /**
      * 过滤规则与策略关联 Mapper
      */
@@ -166,8 +167,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     public Map<String, Object> createMktCampaign(MktCampaignVO mktCampaignVO) throws Exception {
         Map<String, Object> maps = null;
         try {
-            MktCampaignDO mktCampaignDO = new MktCampaignDO();
-            CopyPropertiesUtil.copyBean2Bean(mktCampaignDO, mktCampaignVO);
+            logger.info("[op:MktCampaignServiceImpl createMktCampaign] mktCampaignVO = ", com.alibaba.fastjson.JSON.toJSONString(mktCampaignVO));
+            MktCampaignDO mktCampaignDO = BeanUtil.create(mktCampaignVO, new MktCampaignDO());
+            logger.info("[op:MktCampaignServiceImpl createMktCampaign] mktCampaignDO = " + com.alibaba.fastjson.JSON.toJSONString(mktCampaignDO));
             // 创建活动基本信息
             mktCampaignDO.setCreateDate(new Date());
             mktCampaignDO.setCreateStaff(UserUtil.loginId());
@@ -238,6 +240,13 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 mktCamEvtRelDO.setUpdateStaff(UserUtil.loginId());
                 mktCamEvtRelDO.setUpdateDate(new Date());
                 mktCamEvtRelMapper.insert(mktCamEvtRelDO);
+            }
+
+            //更新推荐条目
+            List<MktCamItem> mktCamItemList = mktCamItemMapper.selectByBatch(mktCampaignVO.getMktCamItemIdList());
+            for (MktCamItem mktCamItem : mktCamItemList) {
+                mktCamItem.setMktCampaignId(mktCampaignId);
+                mktCamItemMapper.updateByPrimaryKey(mktCamItem);
             }
 
             //需求涵id不为空添加与活动的关系
@@ -332,6 +341,13 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 } else {
                     mktStrategyConfService.saveMktStrategyConf(mktStrategyConfDetail);
                 }
+            }
+
+            //更新推荐条目
+            List<MktCamItem> mktCamItemList = mktCamItemMapper.selectByBatch(mktCampaignVO.getMktCamItemIdList());
+            for (MktCamItem mktCamItem : mktCamItemList) {
+                mktCamItem.setMktCampaignId(mktCampaignId);
+                mktCamItemMapper.updateByPrimaryKey(mktCamItem);
             }
 
             List<MktCamEvtRelDO> mktCamEvtRelDOList = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignId);
@@ -1234,6 +1250,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
                 mktCampaignVO.setEventDTOS(eventDTOList);
             }
+
+            List<Long> camItemIdList = mktCamItemMapper.selectCamItemIdByCampaignId(preMktCampaignId);
+
+            Map<String, Object> stringObjectMap = productService.copyProductRule(UserUtil.loginId(), camItemIdList);
+            List<Long> ruleIdList = (List<Long>) stringObjectMap.get("ruleIdList");
+            mktCampaignVO.setMktCamItemIdList(ruleIdList);
 
             // 获取过滤规则集合
             List<Long> filterRuleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(preMktCampaignId);

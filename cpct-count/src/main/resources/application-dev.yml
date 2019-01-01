@@ -1,0 +1,62 @@
+#端口配置
+server:
+  port: 30810
+
+#数据库相关配置
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/cpct?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
+    username: root
+    password: root
+
+
+
+
+
+#spring:
+#  jta:
+#    enabled: true
+#    service: com.atomikos.icatch.standalone.UserTransactionServiceFactory
+#    max-actives: 200
+#    enable-logging: false
+#    atomikos:
+#      datasource:
+#          unique-resource-name: dataSource
+#          xa-data-source-class-name: com.alibaba.druid.pool.xa.DruidXADataSource
+#          xa-properties:
+#            driverClassName: com.mysql.jdbc.Driver
+#            url: jdbc:mysql://47.94.168.117:3306/fpc_system?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
+#            username: root
+#            password: Yanlei2018
+#      datasource_prd:
+#          unique-resource-name: datasourcePrd
+#          xa-data-source-class-name: com.alibaba.druid.pool.xa.DruidXADataSource
+#          xa-properties:
+#            driverClassName: com.mysql.jdbc.Driver
+#            url: jdbc:mysql://47.94.168.117:3306/cpct?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
+#            username: root
+#            password: root
+#
+
+  #redis相关配置
+  redis:
+    host: 47.94.168.117
+    port: 6379
+    password: 9bOCHtdJkNZ1hb2e35OmgIrLvGEaBXuT2udRBQNt5VQ
+    pool:
+      max-active: 8
+      max-wait: -1
+      max-idle: 8
+      min-idle: 0
+    timeout: 30000
+  #ES
+#  elasticsearch:
+#      ip: 134.108.3.30
+#      port: 9300
+#      pool: 5
+#      cluster:
+#        name: es-cpct
+
+
+

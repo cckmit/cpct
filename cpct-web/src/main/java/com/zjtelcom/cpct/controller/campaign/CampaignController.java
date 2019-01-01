@@ -177,6 +177,7 @@ public class CampaignController extends BaseController {
     @RequestMapping(value = "/createMktCampaign", method = RequestMethod.POST)
     @CrossOrigin
     public String createMktCampaign(@RequestBody MktCampaignVO mktCampaignVO) throws Exception {
+        logger.info("[op:createMktCampaign] mktCampaignVO = ", JSON.toJSONString(mktCampaignVO));
         // 存活动
         Map<String, Object> mktCampaignMap = mktCampaignService.createMktCampaign(mktCampaignVO);
         Long mktCampaignId = Long.valueOf(mktCampaignMap.get("mktCampaignId").toString());

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<artifactId>cpct</artifactId>
+		<groupId>com.zjtelcom.cpct</groupId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>cpct-count</artifactId>
+	<name>cpct-count</name>
+	<packaging>jar</packaging>
+
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+
+		<dependency>
+			<groupId>com.zjtelcom.cpct</groupId>
+			<artifactId>cpct-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.zjtelcom.cpct</groupId>
+			<artifactId>cpct-cache</artifactId>
+		</dependency>
+
+
+		<dependency>
+			<groupId>com.zjhcsoft</groupId>
+			<artifactId>dubbo</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.20.0-GA</version>
+		</dependency>
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.45</version>
+		</dependency>
+
+		<!--es分群试算-->
+		<dependency>
+			<groupId>com.zjtelcom.es</groupId>
+			<artifactId>es-service-targrp</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+		<!-- 阿里 连接池 -->
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid</artifactId>
+		</dependency>
+	</dependencies>
+
+
+	<profiles>
+		<profile>
+			<id>dev</id>
+			<properties>
+				<spring.profiles.active>dev</spring.profiles.active>
+			</properties>
+		</profile>
+		<profile>
+			<id>online</id>
+			<properties>
+				<spring.profiles.active>online</spring.profiles.active>
+			</properties>
+		</profile>
+		<profile>
+			<id>pst</id>
+			<properties>
+				<spring.profiles.active>pst</spring.profiles.active>
+			</properties>
+		</profile>
+		<profile>
+			<id>pre</id>
+			<properties>
+				<spring.profiles.active>pre</spring.profiles.active>
+			</properties>
+		</profile>
+		<profile>
+			<id>prod</id>
+			<properties>
+				<spring.profiles.active>prod</spring.profiles.active>
+			</properties>
+		</profile>
+	</profiles>
+
+	<properties>
+		<resource.delimiter>#</resource.delimiter>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<build>
+		<finalName>cpct-count</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>1.4.3.RELEASE</version>
+				<configuration>
+					<mainClass>com.zjtelcom.cpct.CpctCountApplication</mainClass>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

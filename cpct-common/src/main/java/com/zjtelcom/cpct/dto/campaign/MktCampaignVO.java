@@ -98,6 +98,12 @@ public class MktCampaignVO extends MktCampaign {
      */
     private List<MktStrategyConfDetail> mktStrategyConfDetailList;
 
+    /**
+     * 推荐条目id集合
+     */
+    private List<Long> mktCamItemIdList;
+
+
     //需求涵id
     private Long requestId;
 
@@ -257,5 +263,13 @@ public class MktCampaignVO extends MktCampaign {
 
     public void setDirectoryName(String directoryName) {
         this.directoryName = directoryName;
+    }
+
+    public List<Long> getMktCamItemIdList() {
+        return mktCamItemIdList;
+    }
+
+    public void setMktCamItemIdList(List<Long> mktCamItemIdList) {
+        this.mktCamItemIdList = mktCamItemIdList;
     }
 }
