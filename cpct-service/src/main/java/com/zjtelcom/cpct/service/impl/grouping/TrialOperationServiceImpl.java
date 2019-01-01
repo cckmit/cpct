@@ -204,7 +204,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
           List<String> stringList = (List<String>) stringObjectMap.get("scriptLabel");
           fieldList = ChannelUtil.arrayInput(fieldList,stringList);
         }
-        request.setFieldList(fieldList);
+        requests.setFieldList(fieldList);
         requests.setParamList(paramList);
 //        TrialResponse response = new TrialResponse();
         TrialResponseES response = new TrialResponseES();
@@ -877,7 +877,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         // 获取创建人员code
         request.setStaffCode("SYS827364823");
 
-        TrialOperationVOES requests = BeanUtil.create(request,new TrialOperationVOES());
+         TrialOperationVOES requests = BeanUtil.create(request,new TrialOperationVOES());
         //todo 待测试
         ArrayList<TrialOperationParamES> paramList = new ArrayList<>();
         List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(request.getStrategyId());
@@ -886,12 +886,14 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             paramList.add(param);
         }
         requests.setParamList(paramList);
-
+        final  TrialOperationVOES  issureRequest = requests;
+        System.out.println(JSON.toJSONString(requests));
         try {
-            System.out.println(JSON.toJSONString(requests));
-            TrialResponseES response = esService.strategyIssure(requests);
-            //todo 待验证
-//            restTemplate.postForObject(machFile, request, TrialResponse.class);
+            new Thread(){
+                public void run(){
+                   esService.strategyIssure(issureRequest);
+                }
+            }.start();
         } catch (Exception e) {
             e.printStackTrace();
             result.put("resultCode", CODE_FAIL);

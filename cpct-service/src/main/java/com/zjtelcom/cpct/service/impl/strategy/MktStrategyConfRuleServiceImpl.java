@@ -1262,10 +1262,15 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     productIdList.add(Long.valueOf(productId));
                 }
                 // 获取原有的推送条目
-                mktCamItemList = mktCamItemMapper.selectByBatch(productIdList);
+                if (productIdList!=null){
+                    mktCamItemList = mktCamItemMapper.selectByBatch(productIdList);
+                }
             }
             // 获取最新的推荐条目
-            List<MktCamItem> mktCamItemListNew = mktCamItemMapper.selectByBatch(camitemIdList);
+            List<MktCamItem> mktCamItemListNew = new ArrayList<>();
+            if (camitemIdList!=null){
+                mktCamItemListNew = mktCamItemMapper.selectByBatch(camitemIdList);
+            }
             List<Long> moreIdList = new ArrayList<>();
             for (int i = 0; i < mktCamItemList.size(); i++) {
                 for (int j = 0; j < mktCamItemListNew.size(); j++) {
@@ -1358,10 +1363,15 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     productIdList.add(Long.valueOf(productId));
                 }
                 // 获取原有的推送条目
-                mktCamItemList = mktCamItemMapper.selectByBatch(productIdList);
+                if (productIdList!=null && !productIdList.isEmpty()){
+                    mktCamItemList = mktCamItemMapper.selectByBatch(productIdList);
+                }
             }
             // 获取最新的推荐条目
-            List<MktCamItem> mktCamItemListNew = mktCamItemMapper.selectByBatch(camitemIdList);
+            List<MktCamItem> mktCamItemListNew = new ArrayList<>();
+            if (camitemIdList!=null && !camitemIdList.isEmpty()){
+                mktCamItemListNew = mktCamItemMapper.selectByBatch(camitemIdList);
+            }
             // 更新后的集合
             List<MktCamItem> updateList = new ArrayList<>();
             List<Long> delList = new ArrayList<>();
@@ -1458,10 +1468,15 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     productIdList.add(Long.valueOf(productId));
                 }
                 // 获取原有的推送条目
-                mktCamItemList = mktCamItemMapper.selectByBatch(productIdList);
+                if (productIdList!=null && !productIdList.isEmpty()){
+                    mktCamItemList = mktCamItemMapper.selectByBatch(productIdList);
+                }
             }
             // 获取最新的推荐条目
-            List<MktCamItem> mktCamItemListNew = mktCamItemMapper.selectByBatch(camitemIdList);
+            List<MktCamItem> mktCamItemListNew = new ArrayList<MktCamItem>();
+            if (camitemIdList!=null && !camitemIdList.isEmpty()){
+                mktCamItemListNew  = mktCamItemMapper.selectByBatch(camitemIdList);
+            }
             List<MktCamItem> delIdList = new ArrayList<>();
             for (int i = 0; i < mktCamItemList.size(); i++) {
                 for (int j = 0; j < mktCamItemListNew.size(); j++) {
