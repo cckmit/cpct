@@ -167,13 +167,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     public Map<String, Object> createMktCampaign(MktCampaignVO mktCampaignVO) throws Exception {
         Map<String, Object> maps = null;
         try {
+            logger.info("[op:MktCampaignServiceImpl createMktCampaign] mktCampaignVO = ", com.alibaba.fastjson.JSON.toJSONString(mktCampaignVO));
             MktCampaignDO mktCampaignDO = BeanUtil.create(mktCampaignVO, new MktCampaignDO());
-            logger.info("mktCampaignDO = " + com.alibaba.fastjson.JSON.toJSONString(mktCampaignDO));
+            logger.info("[op:MktCampaignServiceImpl createMktCampaign] mktCampaignDO = " + com.alibaba.fastjson.JSON.toJSONString(mktCampaignDO));
             // 创建活动基本信息
-            mktCampaignDO.setCamLevel(mktCampaignVO.getCamLevel());
-            mktCampaignDO.setServiceCancleFlag(mktCampaignVO.getServiceCancleFlag());
-            mktCampaignDO.setLifeStage(mktCampaignVO.getLifeStage());
-            mktCampaignDO.setIsCheckRule(mktCampaignVO.getIsCheckRule());
             mktCampaignDO.setCreateDate(new Date());
             mktCampaignDO.setCreateStaff(UserUtil.loginId());
             mktCampaignDO.setUpdateDate(new Date());
