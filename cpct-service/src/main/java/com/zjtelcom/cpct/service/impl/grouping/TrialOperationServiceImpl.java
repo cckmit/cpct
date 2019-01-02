@@ -643,7 +643,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         logger.info("*********** 试算获取全部标签条件编码 ："+JSON.toJSONString(ruleCodeList));
         //添加固定查询标签
         if (!codeList.contains("ACCS_NBR")){
-            codeList.add("ACC_NBR");
+            codeList.add("ACCS_NBR");
         }if (!codeList.contains("LATN_NAME")){
             codeList.add("LATN_NAME");
         }if (!codeList.contains("CCUST_NAME")){
