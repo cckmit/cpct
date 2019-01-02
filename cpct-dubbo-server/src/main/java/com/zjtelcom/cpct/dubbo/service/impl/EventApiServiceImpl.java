@@ -697,11 +697,11 @@ public class EventApiServiceImpl implements EventApiService {
 
             List<Map<String, Object>> strageyList = new ArrayList<>();
             //查询活动基本信息
-            MktCampaignDO mktCampaign = (MktCampaignDO) redisUtils.get("MKT_" + activityId);
-            if (mktCampaign == null) {
-                mktCampaign = mktCampaignMapper.selectByPrimaryKey(activityId);
-                redisUtils.set("MKT_" + activityId, mktCampaign);
-            }
+//            MktCampaignDO mktCampaign = (MktCampaignDO) redisUtils.get("MKT_" + activityId);
+//            if (mktCampaign == null) {
+            MktCampaignDO mktCampaign = mktCampaignMapper.selectByPrimaryKey(activityId);
+//                redisUtils.set("MKT_" + activityId, mktCampaign);
+//            }
 
 //            MktCampaignDO mktCampaign = mktCampaignMapper.selectByPrimaryKey(activityId);
 
@@ -743,13 +743,13 @@ public class EventApiServiceImpl implements EventApiService {
             esJson.put("activityCode", mktCampaign.getMktCampaignId().toString());
 
             //判断活动状态
-            if (!"2002".equals(mktCampaign.getStatusCd())) {
-                esJson.put("hit", "false");
-                esJson.put("msg", "活动状态未发布");
-                esService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + "_" + esJson.getString("activityId"));
-//                System.out.println("活动状态未发布");
-                return Collections.EMPTY_MAP;
-            }
+//            if (!"2002".equals(mktCampaign.getStatusCd())) {
+//                esJson.put("hit", "false");
+//                esJson.put("msg", "活动状态未发布");
+//                esService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + "_" + esJson.getString("activityId"));
+////                System.out.println("活动状态未发布");
+//                return Collections.EMPTY_MAP;
+//            }
 
             //验证活动生效时间
             Date beginTime = mktCampaign.getPlanBeginTime();
@@ -1523,11 +1523,11 @@ public class EventApiServiceImpl implements EventApiService {
             String saleId = "";
             for (int i = 1; i <= tarGrpConditionDOs.size(); i++) {
                 //从redis中获取标签编码
-                Label label = (Label) redisUtils.get("LABEL_LIB_" + tarGrpConditionDOs.get(i - 1).getLeftParam());
-                if (label == null) {
-                    label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i - 1).getLeftParam()));
-                    redisUtils.set("LABEL_LIB_" + Long.parseLong(tarGrpConditionDOs.get(i - 1).getLeftParam()), label);
-                }
+//                Label label = (Label) redisUtils.get("LABEL_LIB_" + tarGrpConditionDOs.get(i - 1).getLeftParam());
+//                if (label == null) {
+                Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i - 1).getLeftParam()));
+//                    redisUtils.set("LABEL_LIB_" + Long.parseLong(tarGrpConditionDOs.get(i - 1).getLeftParam()), label);
+//                }
                 if (label != null) {
                     if (labelItems.containsKey(label.getInjectionLabelCode())) {
                         continue;

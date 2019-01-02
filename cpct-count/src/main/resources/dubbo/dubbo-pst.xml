@@ -12,12 +12,12 @@
     <dubbo:registry id="esb3" protocol="dubbo" address="134.96.253.65:8001"/>
     <dubbo:registry id="esb2" protocol="dubbo" address="134.96.159.11:8033"/>
 
-    <dubbo:protocol name="dubbo" port="30803"/>
+    <dubbo:protocol name="dubbo" port="30810"/>
     <dubbo:monitor protocol="registry" />
 
 
     <!--客户分群id标签试算-->
-    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.count.service.api.GroupApiService" ref="groupApiServiceImpl" version="1.0" >
+    <dubbo:service registry="esb2" interface="com.zjtelcom.cpct.count.service.api.GroupApiService" ref="groupApiServiceImpl" version="1.0" >
         <dubbo:method name="groupTrial" servicecode="00.1083.groupTrial"/>
     </dubbo:service>
 

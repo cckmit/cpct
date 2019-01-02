@@ -89,22 +89,22 @@ public class GroupApiServiceImpl implements GroupApiService {
         JSONObject hitsList = (JSONObject) jsonObject.get("hitsList");
         JSONObject array=new JSONObject();
         for(String str: hitsList.keySet()){
-             if(!str.equals("total")){
-                 System.out.println("当前str:"+str);
-                 JSONArray jsonArray= (JSONArray) hitsList.get(str);
+            if(!str.equals("total")&&!str.equals("cloumn")){
+                System.out.println("当前str:"+str);
+                JSONArray jsonArray= (JSONArray) hitsList.get(str);
 //                 System.out.println("文件："+o);
 //                 JSONArray jsonArray = (JSONArray) JSONArray.parse(JSON.toJSONString(o));
-                 System.out.println("解析后："+jsonArray);
-                 JSONObject json= (JSONObject) jsonArray.get(0);
-                 JSONObject news=new JSONObject();
-                 for (String s:json.keySet()){
-                     Label label = injectionLabelMapper.selectByLabelCode(s);
-                     if(label!=null){
-                         news.put(s,label.getInjectionLabelName());
-                     }
-                 }
-                 array.put(str,news);
-             }
+                System.out.println("解析后："+jsonArray);
+                JSONObject json= (JSONObject) jsonArray.get(0);
+                JSONObject news=new JSONObject();
+                for (String s:json.keySet()){
+                    Label label = injectionLabelMapper.selectByLabelCode(s);
+                    if(label!=null){
+                        news.put(s,label.getInjectionLabelName());
+                    }
+                }
+                array.put(str,news);
+            }
         }
         jsonObject.put("column",array);
         jsonObject.put("resultCode",ResultEnum.SUCCESS.getStatus());
