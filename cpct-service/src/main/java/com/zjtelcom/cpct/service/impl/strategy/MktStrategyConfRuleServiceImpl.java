@@ -1289,36 +1289,6 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         public Map<String, Object> call() throws Exception {
             Map map = new HashMap();
             MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleId);
-            String productIds = mktStrategyConfRuleDO.getProductId();
-            List<Long> productIdList = new ArrayList<>();
-            List<MktCamItem> mktCamItemList = new ArrayList<>();
-            if (productIds != null && !"".equals(productIds)) {
-                String[] productIdArrary = productIds.split("/");
-                for (String productId : productIdArrary) {
-                    // mktCamItemMapper.selectByPrimaryKey(Long.valueOf(productId))
-                    productIdList.add(Long.valueOf(productId));
-                }
-                // 获取原有的推送条目
-                if (productIdList!=null && !productIdList.isEmpty()){
-                    mktCamItemList = mktCamItemMapper.selectByBatch(productIdList);
-                }
-            }
-            // 获取最新的推荐条目
-            List<MktCamItem> mktCamItemListNew = new ArrayList<>();
-            if (camitemIdList!=null && !camitemIdList.isEmpty()){
-                mktCamItemListNew = mktCamItemMapper.selectByBatch(camitemIdList);
-            }
-            List<Long> moreIdList = new ArrayList<>();
-            for (int i = 0; i < mktCamItemList.size(); i++) {
-                for (int j = 0; j < mktCamItemListNew.size(); j++) {
-                    if (!mktCamItemList.get(i).getItemId().equals(mktCamItemListNew.get(j).getItemId()) && j == mktCamItemListNew.size() - 1) {
-                        moreIdList.add(mktCamItemList.get(i).getMktCamItemId());
-                    } else if (mktCamItemList.get(i).getItemId().equals(mktCamItemListNew.get(j).getItemId())) {
-                        continue;
-                    }
-                }
-            }
-            camitemIdList.addAll(moreIdList);
             String productIdsNew = "";
             for (int i = 0; i < camitemIdList.size(); i++) {
                 if (i == 0) {
@@ -1327,6 +1297,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     productIdsNew += "/" + camitemIdList.get(i);
                 }
             }
+            logger.info("productIdsNew = " + productIdsNew);
             mktStrategyConfRuleDO.setProductId(productIdsNew);
             mktStrategyConfRuleDO.setUpdateStaff(UserUtil.loginId());
             mktStrategyConfRuleDO.setUpdateDate(new Date());

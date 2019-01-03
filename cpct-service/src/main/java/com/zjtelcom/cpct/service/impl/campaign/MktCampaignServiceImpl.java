@@ -22,7 +22,7 @@ import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.campaign.CampaignVO;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
-import com.zjtelcom.cpct.dto.campaign.MktCamVO;
+import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.EventDTO;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
@@ -162,10 +162,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      * @throws Exception
      */
     @Override
-    public Map<String, Object> createMktCampaign(MktCamVO mktCampaignVO) throws Exception {
+    public Map<String, Object> createMktCampaign(MktCampaignDetailVO mktCampaignVO) throws Exception {
         Map<String, Object> maps = null;
         try {
-            logger.info("[op:MktCampaignServiceImpl createMktCampaign] mktCampaignVO = ", com.alibaba.fastjson.JSON.toJSONString(mktCampaignVO));
+            logger.info("[op:MktCampaignServiceImpl createMktCampaign] mktCampaignVO = " + com.alibaba.fastjson.JSON.toJSONString(mktCampaignVO));
             MktCampaignDO mktCampaignDO = BeanUtil.create(mktCampaignVO, new MktCampaignDO());
             logger.info("[op:MktCampaignServiceImpl createMktCampaign] mktCampaignDO = " + com.alibaba.fastjson.JSON.toJSONString(mktCampaignDO));
             // 创建活动基本信息
@@ -306,7 +306,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      * @throws Exception
      */
     @Override
-    public Map<String, Object> modMktCampaign(MktCamVO mktCampaignVO) throws Exception {
+    public Map<String, Object> modMktCampaign(MktCampaignDetailVO mktCampaignVO) throws Exception {
         Map<String, Object> maps = new HashMap<>();
         try {
             MktCampaignDO mktCampaignDO = new MktCampaignDO();
@@ -449,7 +449,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         // 获取活动基本信息
         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
 
-        MktCamVO mktCampaignVO = new MktCamVO();
+        MktCampaignDetailVO mktCampaignVO = new MktCampaignDetailVO();
         CopyPropertiesUtil.copyBean2Bean(mktCampaignVO, mktCampaignDO);
         // 获取下发城市集合
         List<MktCamCityRelDO> mktCamCityRelDOList = mktCamCityRelMapper.selectByMktCampaignId(mktCampaignVO.getMktCampaignId());
@@ -675,9 +675,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 paramMap.put(sysParams.getParamKey() + sysParams.getParamValue(), sysParams.getParamName());
             }
 
-            List<MktCamVO> mktCampaignVOList = new ArrayList<>();
+            List<MktCampaignDetailVO> mktCampaignVOList = new ArrayList<>();
             for (MktCampaignCountDO mktCampaignCountDO : mktCampaignDOList) {
-                MktCamVO mktCampaignVO = new MktCamVO();
+                MktCampaignDetailVO mktCampaignVO = new MktCampaignDetailVO();
                 try {
                     mktCampaignVO.setMktCampaignId(mktCampaignCountDO.getMktCampaignId());
                     mktCampaignVO.setMktCampaignName(mktCampaignCountDO.getMktCampaignName());
@@ -852,9 +852,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 paramMap.put(sysParams.getParamKey() + sysParams.getParamValue(), sysParams.getParamName());
             }
 
-            List<MktCamVO> mktCampaignVOList = new ArrayList<>();
+            List<MktCampaignDetailVO> mktCampaignVOList = new ArrayList<>();
             for (MktCampaignCountDO mktCampaignCountDO : mktCampaignDOList) {
-                MktCamVO mktCampaignVO = new MktCamVO();
+                MktCampaignDetailVO mktCampaignVO = new MktCampaignDetailVO();
                 try {
                     mktCampaignVO.setMktCampaignId(mktCampaignCountDO.getMktCampaignId());
                     mktCampaignVO.setMktCampaignName(mktCampaignCountDO.getMktCampaignName());
@@ -1202,7 +1202,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             // 获取活动基本信息
             MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(preMktCampaignId);
 
-            MktCamVO mktCampaignVO = new MktCamVO();
+            MktCampaignDetailVO mktCampaignVO = new MktCampaignDetailVO();
             CopyPropertiesUtil.copyBean2Bean(mktCampaignVO, mktCampaignDO);
             // 获取下发城市集合
             List<MktCamCityRelDO> mktCamCityRelDOList = mktCamCityRelMapper.selectByMktCampaignId(mktCampaignVO.getMktCampaignId());

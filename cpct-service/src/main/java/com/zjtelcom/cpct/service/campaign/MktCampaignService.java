@@ -1,13 +1,6 @@
-/**
- * @(#)MktCampaignService.java, 2018/6/22.
- * <p/>
- * Copyright 2018 Netease, Inc. All rights reserved.
- * NETEASE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
 package com.zjtelcom.cpct.service.campaign;
 
-
-import com.zjtelcom.cpct.dto.campaign.MktCamVO;
+import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
 
 import java.util.Date;
 import java.util.Map;
@@ -30,7 +23,7 @@ public interface MktCampaignService {
 
     Map<String,Object> getCampaignList4EventScene (String mktCampaignName);
 
-    Map<String,Object> createMktCampaign(MktCamVO mktCampaignVO) throws Exception;
+    Map<String,Object> createMktCampaign(MktCampaignDetailVO mktCampaignVO) throws Exception;
 
     Map<String,Object> delMktCampaign(Long mktCampaignId) throws Exception;
 
@@ -38,7 +31,7 @@ public interface MktCampaignService {
 
     Map<String,Object> getAllConfRuleName (Long mktCampaignId) throws Exception;
 
-    Map<String,Object> modMktCampaign(MktCamVO mktCampaignVO) throws Exception;
+    Map<String,Object> modMktCampaign(MktCampaignDetailVO mktCampaignVO) throws Exception;
 
     Map<String,Object> changeMktCampaignStatus(Long mktCampaignId, String statusCd) throws Exception;
 
