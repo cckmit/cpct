@@ -77,6 +77,7 @@ public class EsServiceImpl implements EsService {
     }
 
 
+
     /**
      * 命中查询条数
      * @param param
@@ -315,7 +316,7 @@ public class EsServiceImpl implements EsService {
      * @return
      */
     private SearchHits getSearchHits(BoolQueryBuilder boolQueryBuilder, SearchRequestBuilder builder,int from) {
-        SearchResponse myresponse = builder.setQuery(boolQueryBuilder).setSize(1000)
+        SearchResponse myresponse = builder.setQuery(boolQueryBuilder)
                 .setExplain(true).execute().actionGet();
         return myresponse.getHits();
     }

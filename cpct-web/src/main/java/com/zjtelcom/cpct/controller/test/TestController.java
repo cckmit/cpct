@@ -19,7 +19,10 @@ import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 
@@ -49,13 +52,6 @@ public class TestController extends BaseController {
     private RequestInstRelMapper requestInstRelMapper;
     @Autowired
     private ObjMktCampaignRelMapper objMktCampaignRelMapper;
-
-    @PostMapping("testTarGrp")
-    @CrossOrigin
-    public Object testTarGrp(@RequestBody HashMap<String,Object> param) {
-        return tarGrpService.test((List<Integer>)param.get("idList"));
-    }
-
 
     @PostMapping("fourthDataSource")
     @CrossOrigin

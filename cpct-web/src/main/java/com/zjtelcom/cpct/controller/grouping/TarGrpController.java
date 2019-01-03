@@ -41,7 +41,8 @@ public class TarGrpController extends BaseController {
         try {
             Long templateId = Long.valueOf(param.get("templateId").toString());
             Long oldTarGrpId = Long.valueOf(param.get("oldTarGrpId").toString());
-            maps = tarGrpService.createTarGrpByTemplateId(templateId,oldTarGrpId);
+            String  needDeleted = param.get("needDeleted")==null ? "1" : param.get("needDeleted").toString();
+            maps = tarGrpService.createTarGrpByTemplateId(templateId,oldTarGrpId,needDeleted);
         } catch (Exception e) {
             logger.error("[op:TarGrpController] fail to saveTagNumFetch for tarGrpDTO = {}!" +
                     " Exception: ", JSONArray.toJSON(maps), e);

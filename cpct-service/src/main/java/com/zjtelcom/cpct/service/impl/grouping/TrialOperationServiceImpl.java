@@ -204,7 +204,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
           List<String> stringList = (List<String>) stringObjectMap.get("scriptLabel");
           fieldList = ChannelUtil.arrayInput(fieldList,stringList);
         }
-        request.setFieldList(fieldList);
+        requests.setFieldList(fieldList);
         requests.setParamList(paramList);
 //        TrialResponse response = new TrialResponse();
         TrialResponseES response = new TrialResponseES();
@@ -341,7 +341,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Override
     public Map<String, Object> importUserList(MultipartFile multipartFile, TrialOperationVO operation, Long ruleId) throws IOException {
         Map<String, Object> result = new HashMap<>();
-        String batchNumSt = DateUtil.date2String(new Date()) + ChannelUtil.getRandomStr(8);
+        String batchNumSt = DateUtil.date2String(new Date()) + ChannelUtil.getRandomStr(4);
 
         InputStream inputStream = multipartFile.getInputStream();
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
@@ -518,7 +518,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     public Map<String, Object> createTrialOperation(TrialOperationVO operationVO) {
         Map<String, Object> result = new HashMap<>();
         //生成批次号
-        String batchNumSt = DateUtil.date2String(new Date()) + ChannelUtil.getRandomStr(8);
+        String batchNumSt = DateUtil.date2String(new Date()) + ChannelUtil.getRandomStr(2);
         MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(operationVO.getCampaignId());
         MktStrategyConfDO strategy = strategyMapper.selectByPrimaryKey(operationVO.getStrategyId());
         if (campaign == null || strategy == null) {
@@ -592,9 +592,18 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         TrialResponseES countResponse = new TrialResponseES();
 
         try {
-            System.out.println(JSON.toJSONString(requests));
             //todo
              response = esService.searchBatchInfo(requests);
+
+//            response = restTemplate.postForObject(batchInfo, request, TrialResponse.class);
+            //同时调用统计查询的功能
+
+             countResponse = esService.searchCountInfo(requests);
+//            countResponse = restTemplate.postForObject(countInfo,request,TrialResponse.class);
+
+            if (countResponse.getResultCode().equals(CODE_SUCCESS)){
+                redisUtils.set("HITS_COUNT_INFO_"+request.getBatchNum(),countResponse.getHitsList());
+            }
             if (!response.getResultCode().equals(CODE_SUCCESS)) {
                 trialOperation.setStatusCd("2000");
                 trialOperation.setUpdateDate(new Date());
@@ -613,16 +622,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             trialOperation.setUpdateDate(new Date());
             trialOperation.setRemark("ES查询错误");
             trialOperationMapper.updateByPrimaryKey(trialOperation);
-        }
-        //同时调用统计查询的功能
-        try {
-            countResponse = esService.searchCountInfo(requests);
-//            countResponse = restTemplate.postForObject(countInfo,request,TrialResponse.class);
-            if (countResponse.getResultCode().equals(CODE_SUCCESS)){
-                redisUtils.set("HITS_COUNT_INFO_"+request.getBatchNum(),countResponse.getHitsList());
-            }
-        }catch (Exception e){
-            e.printStackTrace();
         }
         // 抽样试算成功
         result.put("resultCode", CODE_SUCCESS);
@@ -776,7 +775,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             }
             Map<String, Object> map = new HashMap<>();
             for (String set : searchMap.keySet()) {
-                if (!labelCodeList.contains(set)) {
+                if (labelCodeList.size() < searchMap.keySet().size()) {
                     labelCodeList.add(set);
                 }
                 map.put(set, searchMap.get(set));
@@ -788,7 +787,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             map.put("ruleId", ruleInfoMap.getRuleId());
             map.put("ruleName", ruleInfoMap.getRuleName());
             //todo 工单号
-            map.put("orderId", operation.getBatchNum());
+            map.put("orderId", "49736605");
             userList.add(map);
 
         }
@@ -817,10 +816,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 //        }
         if (labelCodeList.size() > 0) {
             List<SimpleInfo> titleList = labelMapper.listLabelByCodeList(labelCodeList);
-            SimpleInfo id = new SimpleInfo();
-            id.setName("记录ID");
-            id.setValue("id");
-            titleList.add(id);
             vo.setTitleList(titleList);
         }
         vo.setHitsList(userList);
@@ -882,7 +877,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         // 获取创建人员code
         request.setStaffCode("SYS827364823");
 
-        TrialOperationVOES requests = BeanUtil.create(request,new TrialOperationVOES());
+         TrialOperationVOES requests = BeanUtil.create(request,new TrialOperationVOES());
         //todo 待测试
         ArrayList<TrialOperationParamES> paramList = new ArrayList<>();
         List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(request.getStrategyId());
@@ -891,20 +886,22 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             paramList.add(param);
         }
         requests.setParamList(paramList);
-
+        final  TrialOperationVOES  issureRequest = requests;
+        System.out.println(JSON.toJSONString(requests));
         try {
-            System.out.println(JSON.toJSONString(requests));
-            TrialResponseES response = esService.strategyIssure(requests);
-            //todo 待验证
-//            restTemplate.postForObject(machFile, request, TrialResponse.class);
+            new Thread(){
+                public void run(){
+                   esService.strategyIssure(issureRequest);
+                }
+            }.start();
         } catch (Exception e) {
             e.printStackTrace();
             result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "文件下发失败");
+            result.put("resultMsg", "文件下发成功，稍后请联系相关业务人员校验结果");
             return result;
         }
         result.put("resultCode", CODE_SUCCESS);
-        result.put("resultMsg", "文件下发成功");
+        result.put("resultMsg", "文件下发成功，稍后请联系相关业务人员校验结果");
         return result;
     }
 
@@ -1111,12 +1108,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         LabelResult labelResult = new LabelResult();
                         String type = tarGrpConditionDOs.get(i).getOperType();
                         Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i).getLeftParam()));
-                        if (label==null){
-                            continue;
-                        }
+
                         labelResult.setLabelCode(label.getInjectionLabelCode());
                         labelResult.setLabelName(label.getInjectionLabelName());
-                        labelResult.setRightOperand(label.getRightOperand());
+                        labelResult.setRightOperand(label.getLabelType());
                         labelResult.setRightParam(tarGrpConditionDOs.get(i).getRightParam());
                         labelResult.setClassName(label.getClassName());
                         labelResult.setOperType(type);
@@ -1139,7 +1134,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             express.append(">=");
                         } else if ("6000".equals(type)) {
                             express.append("<=");
-                        } else if ("7000".equals(type) || "7100".equals(type)) {
+                        } else if ("7000".equals(type)) {
                             express.append("in");
                         }else if ("7200".equals(type)) {
                             express.append("@@@@");//区间于
@@ -1152,8 +1147,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             express.append("&&");
                         }
                     }
+                    express.append(") {return true} else {return false}");
+                }else {
+                    express.append("");
                 }
-                express.append(") {return true} else {return false}");
                 // 将表达式存入Redis
                 String key = "EVENT_RULE_" + mktCampaignId + "_" + mktStrategyConfId + "_" + mktStrategyConfRuleId;
                 System.out.println("key>>>>>>>>>>" + key + ">>>>>>>>express->>>>:" + JSON.toJSONString(express));

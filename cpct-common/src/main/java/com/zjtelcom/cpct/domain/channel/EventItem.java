@@ -2,9 +2,9 @@ package com.zjtelcom.cpct.domain.channel;
 
 import com.zjtelcom.cpct.BaseEntity;
 
-import java.util.Date;
+import java.io.Serializable;
 
-public class EventItem extends BaseEntity {
+public class EventItem extends BaseEntity implements Serializable {
     private Long evtItemId;
 
     private Long contactEvtId;

@@ -19,7 +19,7 @@ import java.util.Map;
 @RequestMapping("${openPath}")
 public class OpenEventController extends BaseController{
 
-    @Autowired(required = false)
+    @Autowired
     private OpenEventService openEventService;
 
     /*

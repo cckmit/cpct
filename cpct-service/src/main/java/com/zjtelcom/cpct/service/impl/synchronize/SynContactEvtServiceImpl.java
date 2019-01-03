@@ -126,15 +126,15 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
             contactEvtPrdMapper.modContactEvtJt(contactEvt);
             synchronizeRecordService.addRecord(roleName, tableName, eventId, SynchronizeType.update.getType());
             //3.2修改关联的事件采集项
-                diffEventItem(contactEvtItems, eventById);
+            diffEventItem(contactEvtItems, eventById);
             //3.3修改关联的事件规则
             if (eventMatchRulDTO != null) {
                 eventMatchRulPrdMapper.updateByPrimaryKey(eventMatchRulDTO);
             }
             //3.4修改关联的事件规则条件信息
-                diffEventMatchRulCondition(listEventMatchRulCondition, eventById);
+            diffEventMatchRulCondition(listEventMatchRulCondition, eventById);
             //3.5修改关联的活动
-                diffMktCamEvtRel(mktCamEvtRels, eventById);
+            diffMktCamEvtRel(mktCamEvtRels, eventById);
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);

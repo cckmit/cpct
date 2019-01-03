@@ -8,7 +8,6 @@ package com.zjtelcom.cpct.controller.system;
 
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.constants.CommonConstant;
-import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.service.system.SysAreaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +23,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("${adminPath}/SysArea")
-public class SysAreaController extends BaseController {
+public class SysAreaController {
 
     @Autowired
     private SysAreaService sysAreaService;
@@ -77,7 +76,6 @@ public class SysAreaController extends BaseController {
     @RequestMapping(value = "/listSysAreaTree", method = RequestMethod.POST)
     @CrossOrigin
     public String listSysAreaTree() {
-        logger.info("获取下发城市树接口listSysAreaTree已触发！");
         Map<String, Object> map = null;
         try {
             map = sysAreaService.listAllAreaTrea();

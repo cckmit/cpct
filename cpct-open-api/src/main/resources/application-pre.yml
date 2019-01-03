@@ -32,18 +32,5 @@ spring:
         name: es-cpct
 
 
-#调用统一平台的参数  生产环境
-platformConfig:
-   channel: CLZX
-   channel_token: rAx5T2pIvvw5W9vQ
-   bis_module: 内容策略中心
-   bis_detail: 内容策略中心
-   version: v1.0
 
 
-#集团定制的redis配置prod环境
-redisConfig:
-   ip: 134.108.0.59
-   port: 41701
-   database: 4970
-   password: bss_cpcp_pocpro_user#bssCpc_ro

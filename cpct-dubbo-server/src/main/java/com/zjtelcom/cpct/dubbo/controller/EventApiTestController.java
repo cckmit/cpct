@@ -5,8 +5,6 @@ import com.alibaba.fastjson.JSON;
 import com.zjpii.biz.serv.YzServ;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.dto.pojo.MktCampaign;
-import com.zjtelcom.cpct.dubbo.model.RetEvent;
-import com.zjtelcom.cpct.dubbo.service.ChannelService;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.dubbo.service.MktCampaignSyncApiService;
 import com.zjtelcom.cpct_prd.dao.campaign.MktCampaignPrdMapper;
@@ -32,21 +30,6 @@ public class EventApiTestController {
     private MktCampaignPrdMapper mktCampaignPrdMapper;
     @Autowired
     private MktCampaignSyncApiService syncApiService;
-    @Autowired
-    private ChannelService channelService;
-
-
-    @PostMapping("testEvent")
-    public  RetEvent testEvent(String code) {
-        RetEvent result = new RetEvent();
-        List<MktCampaignDO> campaigns = new ArrayList<>();
-        try {
-            result = channelService.getEventDetail(code);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
 
     @PostMapping("test")
     public  Map<String,Object> test(@RequestBody Map<String, Long> params) {

@@ -68,9 +68,9 @@
 //            event.setEventTrigType(contactEvt.getEvtTrigType());
 //
 //            //事件采集项
-//            List<EventItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvtId);
+//            List<ContactEvtItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvtId);
 //            List<EventItem> eventItems = new ArrayList<>();
-//            for(EventItem contactEvtItem : contactEvtItems) {
+//            for(ContactEvtItem contactEvtItem : contactEvtItems) {
 //                EventItem eventItem = BeanUtil.create(contactEvtItem, new EventItem());
 //                eventItems.add(eventItem);
 //            }

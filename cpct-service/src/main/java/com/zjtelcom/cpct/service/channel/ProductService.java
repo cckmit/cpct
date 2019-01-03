@@ -15,7 +15,7 @@ public interface ProductService {
 
     Map<String,Object> editProductRule(Long userId,Long ruleId,String remark,Long priority);
 
-    Map<String,Object> delProductRule(Long strategyRuleId,Long ruleId,List<Long> itemRuleIdList);
+    Map<String,Object> delProductRule(Long campaignId,Long ruleId);
 
     Map<String,Object> getProductRuleList(Long userId,List<Long> ruleIdList);
 
@@ -25,9 +25,7 @@ public interface ProductService {
 
     Map<String,Object> getProductRuleListByCampaign(ProductParam param);
 
-
-
-
+    Map<String,Object> copyItemByCampaignPublish(Long oldCampaignId,Long newCampaignId);
 
 
 

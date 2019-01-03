@@ -63,11 +63,6 @@
     from mkt_cam_chl_result_conf_rel
     where MKT_CAM_CHL_RESULT_ID = #{mktCamChlResultId,jdbcType=BIGINT}
   </select>
-    <select id="selectConfIdByResultId" parameterType="java.lang.Long" resultType="java.lang.Long">
-        select EVT_CONTACT_CONF_ID
-        from mkt_cam_chl_result_conf_rel
-        where MKT_CAM_CHL_RESULT_ID = #{mktCamChlResultId,jdbcType=BIGINT}
-    </select>
 
 
 </mapper>

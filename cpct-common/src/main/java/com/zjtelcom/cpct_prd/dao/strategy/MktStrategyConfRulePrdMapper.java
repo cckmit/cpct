@@ -2,7 +2,6 @@ package com.zjtelcom.cpct_prd.dao.strategy;
 
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -29,5 +28,5 @@ public interface MktStrategyConfRulePrdMapper {
 
     List<MktStrategyConfRuleDO> selectByMktStrategyConfId(Long mktStrategyConfId);
 
-    List<MktStrategyConfRuleDO> selectByCampaignId(@Param("campaignId")Long campaignId);
+
 }

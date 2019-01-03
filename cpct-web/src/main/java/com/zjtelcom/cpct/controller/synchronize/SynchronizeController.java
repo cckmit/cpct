@@ -1072,17 +1072,6 @@ public class SynchronizeController extends BaseController {
     }
 
 
-    @PostMapping("/updateCampaignRedis")
-    @CrossOrigin
-    public String updateCampaignRedis(@RequestBody Map<String, Object> params) throws Exception {
-        Long mktCampaignId = Long.valueOf((Integer) params.get("mktCampaignId"));
-        Map<String, Object> resultMap = synchronizeCampaignService.updateCampaignRedis(mktCampaignId);
-        return JSON.toJSONString(resultMap);
-    }
-
-
-
-
 
     /**
      * 单个标签同步

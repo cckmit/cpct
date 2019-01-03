@@ -16,25 +16,17 @@ import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateMapper;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO;
-import com.zjtelcom.cpct.dto.channel.CampaignInstVO;
-import com.zjtelcom.cpct.dto.channel.ChannelDetail;
-import com.zjtelcom.cpct.dto.channel.LabelValueVO;
-import com.zjtelcom.cpct.dto.channel.OperatorDetail;
-import com.zjtelcom.cpct.dto.grouping.TarGrp;
-import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
-import com.zjtelcom.cpct.dto.grouping.TarGrpTemConditionVO;
-import com.zjtelcom.cpct.dto.grouping.TarGrpTemplateDetail;
+import com.zjtelcom.cpct.dto.channel.*;
+import com.zjtelcom.cpct.dto.grouping.*;
 import com.zjtelcom.cpct.enums.LeftParamType;
 import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.enums.RightParamType;
 import com.zjtelcom.cpct.service.BaseService;
+import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.service.grouping.TarGrpTemplateService;
 import com.zjtelcom.cpct.service.synchronize.template.SynTarGrpTemplateService;
-import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.ChannelUtil;
-import com.zjtelcom.cpct.util.SystemParamsUtil;
-import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
 import com.zjtelcom.cpct.vo.grouping.TarGrpVO;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
@@ -87,7 +79,8 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     private OfferMapper offerMapper;
     @Autowired
     private ContactChannelMapper channelMapper;
-
+    @Autowired
+    private ProductService productService;
     @Value("${sync.value}")
     private String value;
 
@@ -100,14 +93,26 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     public Map<String, Object> getTarGrpTemByOfferId(Long requestId) {
         Map<String, Object> result = new HashMap<>();
         List<CampaignInstVO> instVOS = new ArrayList<>();
+        List<ProductParam> paramList = new ArrayList<>();
         //todo 通过需求涵id获取销售品idList
         List<RequestInstRel> requestInstRels = requestInstRelMapper.selectByRequestId(requestId,"offer");
+        ProductParam offerParam = new ProductParam();
+        List<Long> offerIds = new ArrayList<>();
+        offerParam.setItemType("1000");
+        offerParam.setStatusCd("2000");
+
+        ProductParam resourceParam = new ProductParam();
+        List<Long> resList = new ArrayList<>();
+        resourceParam.setItemType("3000");
+        resourceParam.setStatusCd("2000");
         for (RequestInstRel requestInstRel : requestInstRels){
             Long offerId = requestInstRel.getRequestObjId();
             Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
             if (offer==null){
                 continue;
             }
+            offerIds.add(offerId);
+            offerParam.setIdList(offerIds);
             List<Long> offerList = new ArrayList<>();
             offerList.add(offerId);
             CampaignInstVO instVO = new CampaignInstVO();
@@ -116,8 +121,33 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             //客户分群列表
             List<OfferRestrict> restrict = offerRestrictMapper.selectByOfferId(offerId,"7000");
             if (restrict!=null && restrict.size()>0){
-                TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(restrict.get(0).getRstrObjId());
-                if (tarGrp!=null){
+                List<TarGrpCondition> tarGrpConditions = new ArrayList<>();
+                for (OfferRestrict offerRestrict : restrict){
+                    if (offerRestrict.getRstrObjId()==null){
+                        continue;
+                    }
+                    Long targrpId = offerRestrict.getRstrObjId();
+                    TarGrp tarGrpTem = tarGrpMapper.selectByPrimaryKey(targrpId);
+                    if (tarGrpTem==null){
+                        continue;
+                    }
+                    List<TarGrpCondition> conditionDOList = tarGrpConditionMapper.listTarGrpCondition(targrpId);
+                    tarGrpConditions.addAll(conditionDOList);
+                }
+                TarGrpDetail addVO = new TarGrpDetail();
+                addVO.setTarGrpName("增存量模板导入转换模板");
+                addVO.setTarGrpType("1000");
+                addVO.setCreateDate(DateUtil.getCurrentTime());
+                addVO.setUpdateDate(DateUtil.getCurrentTime());
+                addVO.setStatusDate(DateUtil.getCurrentTime());
+                addVO.setUpdateStaff(UserUtil.loginId());
+                addVO.setCreateStaff(UserUtil.loginId());
+                addVO.setRemark(null);
+                addVO.setTarGrpConditions(tarGrpConditions);
+
+                Map<String,Object> createTarGrp = tarGrpService.createTarGrp(addVO,false);
+                if (createTarGrp.get("resultCode").equals(CODE_SUCCESS)){
+                    TarGrp tarGrp = (TarGrp) createTarGrp.get("tarGrp");
                     instVO.setTarGrpTempleteId(tarGrp.getTarGrpId());
                 }
             }
@@ -128,6 +158,8 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                 MktResource resource = resourceMapper.selectByPrimaryKey(resRel.getObjId());
                 if (resource!=null){
                     resourceList.add(resource.getMktResId());
+                    resList.add(resource.getMktResId());
+                    resourceParam.setIdList(resList);
                 }
             }
             instVO.setResourceList(resourceList);
@@ -153,8 +185,22 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             instVO.setChannelList(channelList);
             instVOS.add(instVO);
         }
+        List<Long> itemList = new ArrayList<>();
+        if (offerParam.getIdList()!=null && !offerParam.getIdList().isEmpty()){
+            Map<String,Object> offerMap = productService.addProductRule(offerParam);
+            if (offerMap.get("resultCode").equals(CODE_SUCCESS)){
+                itemList.addAll((List<Long>)offerMap.get("resultMsg"));
+            }
+        }
+        if (resourceParam.getIdList()!=null && !resourceParam.getIdList().isEmpty()){
+            Map<String,Object> resMap = productService.addProductRule(resourceParam);
+            if (resMap.get("resultCode").equals(CODE_SUCCESS)){
+                itemList.addAll((List<Long>)resMap.get("resultMsg"));
+            }
+        }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",instVOS);
+        result.put("itemList",itemList);
         return result;
     }
 

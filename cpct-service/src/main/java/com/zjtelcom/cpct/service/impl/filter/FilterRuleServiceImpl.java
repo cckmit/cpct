@@ -26,7 +26,6 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.filter.FilterRuleService;
 import com.zjtelcom.cpct.service.synchronize.filter.SynFilterRuleService;
 import com.zjtelcom.cpct.util.*;
-import com.zjtelcom.cpct_prod.dao.offer.OfferProdMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -68,7 +67,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
     @Autowired
     private SysParamsMapper sysParamsMapper;
     @Autowired
-    private OfferProdMapper offerMapper;
+    private OfferMapper offerMapper;
     @Autowired
     private MktVerbalConditionMapper verbalConditionMapper;
     @Autowired

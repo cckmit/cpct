@@ -108,7 +108,6 @@ public class RedisUtils {
                 jedis.close();
             }
         } catch (Exception e) {
-            System.out.println("redis报错set");
             e.printStackTrace();
         }
         return result;
@@ -175,15 +174,7 @@ public class RedisUtils {
      * @return
      */
     public boolean exists(final String key) {
-        boolean result = false;
-        try {
-            result = redisTemplate.hasKey(key);
-        } catch (Exception e) {
-            System.out.println("redis判断存在异常");
-//            e.printStackTrace();
-            return false;
-        }
-        return result;
+        return redisTemplate.hasKey(key);
     }
 
 
@@ -275,7 +266,6 @@ public class RedisUtils {
                 jedis.close();
             }
         } catch (Exception e) {
-            System.out.println("redis报错get");
             e.printStackTrace();
         }
         return result;

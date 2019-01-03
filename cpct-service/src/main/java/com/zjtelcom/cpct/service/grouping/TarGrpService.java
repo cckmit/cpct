@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public interface TarGrpService {
 
-    Map<String, Object> createTarGrpByTemplateId(Long templateId,Long  oldTarGrpId);
+    Map<String, Object> createTarGrpByTemplateId(Long templateId,Long  oldTarGrpId,String needDelete);
 
     Map<String, Object> createTarGrp(TarGrpDetail tarGrpDetail,boolean isCopy);
 
@@ -37,7 +37,5 @@ public interface TarGrpService {
     Map<String,Object> delTarGrp(TarGrpDetail tarGrpDetail);
 
     Map<String,Object> copyTarGrp(Long tarGrpId,boolean isCopy);
-
-    Map<String,Object> test(List<Integer> campaignId);
 
 }

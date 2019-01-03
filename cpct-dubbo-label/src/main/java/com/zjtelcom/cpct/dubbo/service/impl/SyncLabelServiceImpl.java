@@ -124,6 +124,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             redisUtils.set("LABEL_LIB_"+labelValodate.getInjectionLabelId(),labelValodate);
             syncLabelValue(valueModelList,labelValodate.getInjectionLabelId());
         }else {
+
             Label label = BeanUtil.create(labModel, new Label());
             label.setSystemInfoId(1L);
             label.setTagRowId(labModel.getLabRowId());//标签id
@@ -217,6 +218,28 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         return result;
     }
 
+    /**
+     * 更新标签
+     * @param record
+     * @return
+     */
+    private Map<String,Object> updateLabel(RecordModel record){
+        Map<String,Object> result = new HashMap<>();
+        //todo 先删除再添加
+        LabModel tagModel = record.getLabel();
+        Label label = labelMapper.selectByTagRowId(tagModel.getLabRowId());
+//        if (label==null){
+//            result.put("resultCode",CODE_FAIL);
+//            result.put("resultMsg","未找到对应标签");
+//            return result;
+//        }
+        labelValueMapper.deleteByLabelId(label.getInjectionLabelId());
+        labelMapper.deleteByPrimaryKey(label.getInjectionLabelId());
+        addLabel(record);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","更新成功");
+        return result;
+    }
 
     /**
      * 删除标签

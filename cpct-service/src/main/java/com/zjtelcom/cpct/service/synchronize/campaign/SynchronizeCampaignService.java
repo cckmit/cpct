@@ -18,6 +18,4 @@ public interface SynchronizeCampaignService {
 
     Map<String, Object> synchronizeCampaign(Long mktCampaignId, String roleName) throws Exception;
 
-    Map<String, Object> updateCampaignRedis(Long mktCampaignId) throws Exception;
-
 }

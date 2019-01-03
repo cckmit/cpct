@@ -12,6 +12,7 @@ public class CampaignInstVO implements Serializable {
     private List<ChannelDetail> channelList;
 
 
+
     public List<Long> getOfferList() {
         return offerList;
     }

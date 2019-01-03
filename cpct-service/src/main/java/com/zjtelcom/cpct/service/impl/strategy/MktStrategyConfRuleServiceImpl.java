@@ -609,7 +609,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             /**
              * 销售品配置
              */
-            List<Long> productIdList = new ArrayList<>();
+/*            List<Long> productIdList = new ArrayList<>();
             if (mktStrategyConfRuleDO.getProductId() != null) {
                 String[] productIds = mktStrategyConfRuleDO.getProductId().split("/");
                 for (int i = 0; i < productIds.length; i++) {
@@ -627,7 +627,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 } else {
                     childProductIds += "/" + ruleIdList.get(i);
                 }
-            }
+            }*/
             /**
              * 协同渠道配置
              */
@@ -669,7 +669,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             if (tarGrp != null) {
                 chiledMktStrategyConfRuleDO.setTarGrpId(tarGrp.getTarGrpId());
             }
-            chiledMktStrategyConfRuleDO.setProductId(childProductIds);
+            chiledMktStrategyConfRuleDO.setProductId(mktStrategyConfRuleDO.getProductId());
             chiledMktStrategyConfRuleDO.setEvtContactConfId(childEvtContactConfIds);
             chiledMktStrategyConfRuleDO.setMktCamChlResultId(childMktCamChlResultIds);
             chiledMktStrategyConfRuleDO.setCreateDate(new Date());
@@ -876,11 +876,13 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             /**
              * 销售品配置
              */
-            Future<Map<String, Object>> productFuture = null;
+   /*         Future<Map<String, Object>> productFuture = null;
             if (parentMktStrategyConfRule.getProductIdlist() != null && parentMktStrategyConfRule.getProductIdlist().size() > 0) {
                 productFuture = executorService.submit(new CopyProductRuleTask(parentMktStrategyConfRule.getProductIdlist()));
                 threadList.add(productFuture);
-            }
+            }*/
+
+
             /**
              * 协同渠道配置
              */
@@ -906,10 +908,12 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 mktStrategyConfRule.setTarGrpId(tarGrp.getTarGrpId());
             }
 
-            if (productFuture != null) {
+         /*   if (productFuture != null) {
                 List<Long> ruleIdList = (List<Long>) productFuture.get().get("ruleIdList");
                 mktStrategyConfRule.setProductIdlist(ruleIdList);
-            }
+            }*/
+
+            mktStrategyConfRule.setProductIdlist(parentMktStrategyConfRule.getProductIdlist());
 
             if (mktCamChlConfFuture != null) {
                 List<MktCamChlConfDetail> mktCamChlConfDetailList = (List<MktCamChlConfDetail>) mktCamChlConfFuture.get().get("mktCamChlConfDetailList");
@@ -1258,10 +1262,15 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     productIdList.add(Long.valueOf(productId));
                 }
                 // 获取原有的推送条目
-                mktCamItemList = mktCamItemMapper.selectByBatch(productIdList);
+                if (productIdList!=null && !productIdList.isEmpty()){
+                    mktCamItemList = mktCamItemMapper.selectByBatch(productIdList);
+                }
             }
             // 获取最新的推荐条目
-            List<MktCamItem> mktCamItemListNew = mktCamItemMapper.selectByBatch(camitemIdList);
+            List<MktCamItem> mktCamItemListNew = new ArrayList<>();
+            if (camitemIdList!=null && !camitemIdList.isEmpty()){
+                mktCamItemListNew = mktCamItemMapper.selectByBatch(camitemIdList);
+            }
             List<Long> moreIdList = new ArrayList<>();
             for (int i = 0; i < mktCamItemList.size(); i++) {
                 for (int j = 0; j < mktCamItemListNew.size(); j++) {
@@ -1354,10 +1363,15 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     productIdList.add(Long.valueOf(productId));
                 }
                 // 获取原有的推送条目
-                mktCamItemList = mktCamItemMapper.selectByBatch(productIdList);
+                if (productIdList!=null && !productIdList.isEmpty()){
+                    mktCamItemList = mktCamItemMapper.selectByBatch(productIdList);
+                }
             }
             // 获取最新的推荐条目
-            List<MktCamItem> mktCamItemListNew = mktCamItemMapper.selectByBatch(camitemIdList);
+            List<MktCamItem> mktCamItemListNew = new ArrayList<>();
+            if (camitemIdList!=null && !camitemIdList.isEmpty()){
+                mktCamItemListNew = mktCamItemMapper.selectByBatch(camitemIdList);
+            }
             // 更新后的集合
             List<MktCamItem> updateList = new ArrayList<>();
             List<Long> delList = new ArrayList<>();
@@ -1454,10 +1468,15 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     productIdList.add(Long.valueOf(productId));
                 }
                 // 获取原有的推送条目
-                mktCamItemList = mktCamItemMapper.selectByBatch(productIdList);
+                if (productIdList!=null && !productIdList.isEmpty()){
+                    mktCamItemList = mktCamItemMapper.selectByBatch(productIdList);
+                }
             }
             // 获取最新的推荐条目
-            List<MktCamItem> mktCamItemListNew = mktCamItemMapper.selectByBatch(camitemIdList);
+            List<MktCamItem> mktCamItemListNew = new ArrayList<MktCamItem>();
+            if (camitemIdList!=null && !camitemIdList.isEmpty()){
+                mktCamItemListNew  = mktCamItemMapper.selectByBatch(camitemIdList);
+            }
             List<MktCamItem> delIdList = new ArrayList<>();
             for (int i = 0; i < mktCamItemList.size(); i++) {
                 for (int j = 0; j < mktCamItemListNew.size(); j++) {
@@ -1548,6 +1567,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 /**
                  * 销售品配置
                  */
+/*
                 List<Long> productIdList = new ArrayList<>();
                 if (mktStrategyConfRuleDO.getProductId() != null) {
                     String[] productIds = mktStrategyConfRuleDO.getProductId().split("/");
@@ -1560,6 +1580,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 Map<String, Object> productRuleMap = productService.copyProductRule(UserUtil.loginId(), productIdList);
                 List<Long> ruleIdList = (List<Long>) productRuleMap.get("ruleIdList");
                 mktStrategyConfRule.setProductIdlist(ruleIdList);
+*/
 
                 /**
                  * 协同渠道配置

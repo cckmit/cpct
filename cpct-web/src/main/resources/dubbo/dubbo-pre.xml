@@ -13,7 +13,7 @@
 
     <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.EventApiService" id="eventApiService"
                      version="1.0" retries="0" check="false">
-        <dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync_zsc" timeout="10000"/>
+        <dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync_zsc" timeout="5000"/>
     </dubbo:reference>
 
     <!-- es提供试算接口 -->
