@@ -237,6 +237,8 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                 } else if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.QUESTION.getArrId()) && !"".equals(mktCamChlConfAttr.getAttrValue())) {
                     // 问卷
                     Questionnaire questionnaire = mktQuestionnaireMapper.selectByPrimaryKey(Long.valueOf(mktCamChlConfAttr.getAttrValue()));
+                    logger.info("*************************************:mktCamChlConfAttr"+JSON.toJSONString(mktCamChlConfAttr.getClass().getMethods()));
+                    logger.info("*************************************:mktCamChlConfAttr"+JSON.toJSONString(mktCamChlConfAttr.getClass().getPackage()));
                     mktCamChlConfAttr.setAttrValueName(questionnaire.getNaireName());
                 }
                 mktCamChlConfAttrList.add(mktCamChlConfAttr);

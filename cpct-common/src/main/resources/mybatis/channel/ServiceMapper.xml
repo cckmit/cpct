@@ -90,6 +90,7 @@
                STATUS_CD, STATUS_DATE, CREATE_STAFF,
                CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
         from service
+        order by UPDATE_DATE desc
     </select>
     <select id="selectByServiceName" resultMap="BaseResultMap">
         select SERVICE_ID, SERVICE_NBR, SERVICE_NAME,
@@ -115,5 +116,6 @@
         <if test="serviceTypeId != null and serviceTypeId != ''">
             and s.SERVICE_TYPE_ID = #{serviceTypeId,jdbcType=BIGINT}
         </if>
+        order by UPDATE_DATE desc
     </select>
 </mapper>
