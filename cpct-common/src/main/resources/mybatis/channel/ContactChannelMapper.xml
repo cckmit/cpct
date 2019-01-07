@@ -122,6 +122,14 @@
     where CONTACT_CHL_CODE = #{code}
   </select>
 
+  <select id="selectChannelCodeByPrimaryKey" resultType="java.lang.String" parameterType="list">
+    select t.CONTACT_CHL_CODE
+    from contact_channel t
+    where CONTACT_CHL_ID IN
+    <foreach collection="list" item="item" index="i" open="(" close=")" separator=",">
+      #{item}
+    </foreach>
+  </select>
 
 
 </mapper>

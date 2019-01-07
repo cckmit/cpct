@@ -35,4 +35,6 @@ public interface ContactChannelMapper {
 
     List<Channel> queryList(Channel record);
 
+    List<String> selectChannelCodeByPrimaryKey(List<Long> contactChlIdList);
+
 }
