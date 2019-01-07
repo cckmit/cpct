@@ -775,6 +775,137 @@ public class EventApiServiceImpl implements EventApiService {
             //初始化iSale展示列参数
             List<Map<String, Object>> itgTriggers = new ArrayList<>();
 
+            //验证过滤规则
+            List<FilterRule> filterRuleList = new ArrayList<>();
+            filterRuleList = (List<FilterRule>) redisUtils.get("FILTER_RULE_MODEL_" + activityId);
+            if (filterRuleList == null) {
+                filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(activityId);
+                redisUtils.set("FILTER_RULE_MODEL_" + activityId, filterRuleList);
+            }
+
+            if (filterRuleList != null && filterRuleList.size() > 0) {
+                //循环并判断过滤规则
+                for (FilterRule filterRule : filterRuleList) {
+                    //判断过滤类型(红名单，黑名单)
+                    if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
+                        //获取名单
+                        String userList = filterRule.getUserList();
+                        if (userList != null) {
+                            int index = userList.indexOf(privateParams.get("accNbr"));
+                            if (index >= 0) {
+//                                System.out.println("红黑名单过滤规则验证被拦截");
+                                esJson.put("hit", "false");
+                                esJson.put("msg", "红黑名单过滤规则验证被拦截");
+                                esService.save(esJson, IndexList.STRATEGY_MODULE);
+                                return Collections.EMPTY_MAP;
+                            }
+                        }
+                    } else if ("3000".equals(filterRule.getFilterType())) {  //销售品过滤
+                        boolean productCheck = true;
+                        //获取需要过滤的销售品
+                        String checkProduct = filterRule.getChooseProduct();
+                        if (checkProduct != null) {
+                            String[] checkProductArr = checkProduct.split(",");
+
+                            String productStr = null;
+                            //获取用户已办理销售品
+                            JSONObject labelParam = new JSONObject();
+                            labelParam.put("queryNum", privateParams.get("accNbr"));
+                            labelParam.put("c3", params.get("lanId"));
+                            labelParam.put("queryId", privateParams.get("integrationId"));
+                            //查询标签为销售品标签
+                            labelParam.put("queryFields", "PROM_LIST");
+                            labelParam.put("type", "1");
+                            Map<String, Object> queryResult = getLabelValue(labelParam);
+                            JSONObject body = new JSONObject((HashMap) queryResult.get("msgbody"));
+                            if (body.containsKey("PROM_LIST")) {
+                                productStr = body.getString("PROM_LIST");
+                            }
+                            if (productStr != null && !"".equals(productStr)) {
+                                for (String product : checkProductArr) {
+                                    int index = productStr.indexOf(product);
+                                    if (index >= 0) {
+                                        //不存在于校验
+                                        if ("2000".equals(filterRule.getOperator())) {
+                                            productCheck = true;
+                                        } else if ("1000".equals(filterRule.getOperator())) {
+                                            productCheck = false;
+                                        }
+                                    }
+                                }
+                            } else {
+                                //存在于校验
+                                if ("2000".equals(filterRule.getOperator())) {
+                                    productCheck = false;
+                                }
+                            }
+
+                            if (productCheck) {
+                                esJson.put("hit", "false");
+                                esJson.put("msg", "销售品过滤验证未通过");
+                                esService.save(esJson, IndexList.STRATEGY_MODULE);
+                                return Collections.EMPTY_MAP;
+                            }
+                        }
+                    } else if ("4000".equals(filterRule.getFilterType())) {  //表达式过滤
+                        //暂不处理
+                        //do something
+                    } else if ("5000".equals(filterRule.getFilterType())) {  //时间段过滤
+                        //时间段的格式
+                        if (compareHourAndMinute(filterRule)) {
+//                            System.out.println("过滤时间段验证被拦截");
+                            esJson.put("hit", "false");
+                            esJson.put("msg", "过滤时间段验证被拦截");
+                            esService.save(esJson, IndexList.STRATEGY_MODULE);
+                            return Collections.EMPTY_MAP;
+                        }
+                    } else if ("6000".equals(filterRule.getFilterType())) {  //过扰规则
+                        //将过扰规则的标签放到iSale展示列
+                        StringBuilder queryLabel = new StringBuilder();
+                        //获取过扰标签   todo 缓存
+                        List<String> labels = new ArrayList<>();
+                        labels = (List<String>) redisUtils.get("FILTER_RULE_CONDITION_" + filterRule);
+                        if (labels == null) {
+                            labels = mktVerbalConditionMapper.getLabelListByConditionId(filterRule.getConditionId());
+                            redisUtils.set("FILTER_RULE_CONDITION_" + filterRule, labels);
+                        }
+                        if (labels != null && labels.size() > 0) {
+                            for (String labelCode : labels) {
+                                queryLabel.append(labelCode).append(",");
+                            }
+                        }
+                        if (queryLabel.length() > 0) {
+                            queryLabel.deleteCharAt(queryLabel.length() - 1);
+                        }
+
+                        //查询标签
+                        JSONObject labelParam = new JSONObject();
+                        labelParam.put("queryNum", privateParams.get("accNbr"));
+                        labelParam.put("c3", params.get("lanId"));
+                        labelParam.put("queryId", privateParams.get("integrationId"));
+                        labelParam.put("type", "1");
+                        labelParam.put("queryFields", queryLabel.toString());
+                        Map<String, Object> queryResult = getLabelValue(labelParam);
+
+                        JSONObject body = new JSONObject((HashMap) queryResult.get("msgbody"));
+                        //获取查询结果
+                        List<Map<String, Object>> triggerList = new ArrayList<>();
+                        for (Map.Entry<String, Object> entry : body.entrySet()) {
+                            Map<String, Object> map = new HashMap<>();
+                            map.put("key", entry.getKey());
+                            map.put("value", entry.getValue().toString());
+                            map.put("display", "0");
+                            map.put("name", "");
+                            triggerList.add(map);
+                        }
+                        Map<String, Object> disturb = new HashMap<>();
+                        disturb.put("type", "disturb");
+                        disturb.put("triggerList", triggerList);
+                        itgTriggers.add(disturb);
+                    }
+                }
+            }
+
             //根据活动id获取策略列表  todo 缓存
             List<MktStrategyConfDO> strategyConfDOList = mktStrategyConfMapper.selectByCampaignId(activityId);
             //初始化结果集
@@ -1113,136 +1244,136 @@ public class EventApiServiceImpl implements EventApiService {
                 return Collections.EMPTY_MAP;
             }
 
-            //验证过滤规则
-            List<FilterRule> filterRuleList = new ArrayList<>();
-            filterRuleList = (List<FilterRule>) redisUtils.get("FILTER_RULE_MODEL_" + strategyConfId);
-            if (filterRuleList == null) {
-                filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(strategyConfId);
-                redisUtils.set("FILTER_RULE_MODEL_" + strategyConfId, filterRuleList);
-            }
-
-            if (filterRuleList != null && filterRuleList.size() > 0) {
-                //循环并判断过滤规则
-                for (FilterRule filterRule : filterRuleList) {
-                    //判断过滤类型(红名单，黑名单)
-                    if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
-                        //获取名单
-                        String userList = filterRule.getUserList();
-                        if (userList != null) {
-                            int index = userList.indexOf(privateParams.get("accNbr"));
-                            if (index >= 0) {
-//                                System.out.println("红黑名单过滤规则验证被拦截");
-                                esJson.put("hit", "false");
-                                esJson.put("msg", "红黑名单过滤规则验证被拦截");
-                                esService.save(esJson, IndexList.STRATEGY_MODULE);
-                                return Collections.EMPTY_MAP;
-                            }
-                        }
-                    } else if ("3000".equals(filterRule.getFilterType())) {  //销售品过滤
-                        boolean productCheck = true;
-                        //获取需要过滤的销售品
-                        String checkProduct = filterRule.getChooseProduct();
-                        if (checkProduct != null) {
-                            String[] checkProductArr = checkProduct.split(",");
-
-                            String productStr = null;
-                            //获取用户已办理销售品
-                            JSONObject labelParam = new JSONObject();
-                            labelParam.put("queryNum", privateParams.get("accNbr"));
-                            labelParam.put("c3", params.get("lanId"));
-                            labelParam.put("queryId", privateParams.get("integrationId"));
-                            //查询标签为销售品标签
-                            labelParam.put("queryFields", "PROM_LIST");
-                            labelParam.put("type", "1");
-                            Map<String, Object> queryResult = getLabelValue(labelParam);
-                            JSONObject body = new JSONObject((HashMap) queryResult.get("msgbody"));
-                            if (body.containsKey("PROM_LIST")) {
-                                productStr = body.getString("PROM_LIST");
-                            }
-                            if (productStr != null && !"".equals(productStr)) {
-                                for (String product : checkProductArr) {
-                                    int index = productStr.indexOf(product);
-                                    if (index >= 0) {
-                                        //不存在于校验
-                                        if ("2000".equals(filterRule.getOperator())) {
-                                            productCheck = true;
-                                        } else if ("1000".equals(filterRule.getOperator())) {
-                                            productCheck = false;
-                                        }
-                                    }
-                                }
-                            } else {
-                                //存在于校验
-                                if ("2000".equals(filterRule.getOperator())) {
-                                    productCheck = false;
-                                }
-                            }
-
-                            if (productCheck) {
-                                esJson.put("hit", "false");
-                                esJson.put("msg", "销售品过滤验证未通过");
-                                esService.save(esJson, IndexList.STRATEGY_MODULE);
-                                return Collections.EMPTY_MAP;
-                            }
-                        }
-                    } else if ("4000".equals(filterRule.getFilterType())) {  //表达式过滤
-                        //暂不处理
-                        //do something
-                    } else if ("5000".equals(filterRule.getFilterType())) {  //时间段过滤
-                        //时间段的格式
-                        if (compareHourAndMinute(filterRule)) {
-//                            System.out.println("过滤时间段验证被拦截");
-                            esJson.put("hit", "false");
-                            esJson.put("msg", "过滤时间段验证被拦截");
-                            esService.save(esJson, IndexList.STRATEGY_MODULE);
-                            return Collections.EMPTY_MAP;
-                        }
-                    } else if ("6000".equals(filterRule.getFilterType())) {  //过扰规则
-                        //将过扰规则的标签放到iSale展示列
-                        StringBuilder queryLabel = new StringBuilder();
-                        //获取过扰标签   todo 缓存
-                        List<String> labels = new ArrayList<>();
-                        labels = (List<String>) redisUtils.get("FILTER_RULE_CONDITION_" + filterRule);
-                        if (labels == null) {
-                            labels = mktVerbalConditionMapper.getLabelListByConditionId(filterRule.getConditionId());
-                            redisUtils.set("FILTER_RULE_CONDITION_" + filterRule, labels);
-                        }
-                        if (labels != null && labels.size() > 0) {
-                            for (String labelCode : labels) {
-                                queryLabel.append(labelCode).append(",");
-                            }
-                        }
-                        if (queryLabel.length() > 0) {
-                            queryLabel.deleteCharAt(queryLabel.length() - 1);
-                        }
-
-                        //查询标签
-                        JSONObject labelParam = new JSONObject();
-                        labelParam.put("queryNum", privateParams.get("accNbr"));
-                        labelParam.put("c3", params.get("lanId"));
-                        labelParam.put("queryId", privateParams.get("integrationId"));
-                        labelParam.put("type", "1");
-                        labelParam.put("queryFields", queryLabel.toString());
-                        Map<String, Object> queryResult = getLabelValue(labelParam);
-
-                        JSONObject body = new JSONObject((HashMap) queryResult.get("msgbody"));
-                        //获取查询结果
-                        List<Map<String, Object>> triggerList = new ArrayList<>();
-                        for (Map.Entry<String, Object> entry : body.entrySet()) {
-                            Map<String, Object> map = new HashMap<>();
-                            map.put("key", entry.getKey());
-                            map.put("value", entry.getValue().toString());
-                            map.put("display", "0");
-                            map.put("name", "");
-                            triggerList.add(map);
-                        }
-                        Map<String, Object> disturb = new HashMap<>();
-                        disturb.put("type", "disturb");
-                        disturb.put("triggerList", triggerList);
-                        itgTriggers.add(disturb);
-                    }
-                }
-            }
+//            //验证过滤规则
+//            List<FilterRule> filterRuleList = new ArrayList<>();
+//            filterRuleList = (List<FilterRule>) redisUtils.get("FILTER_RULE_MODEL_" + strategyConfId);
+//            if (filterRuleList == null) {
+//                filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(strategyConfId);
+//                redisUtils.set("FILTER_RULE_MODEL_" + strategyConfId, filterRuleList);
+//            }
+//
+//            if (filterRuleList != null && filterRuleList.size() > 0) {
+//                //循环并判断过滤规则
+//                for (FilterRule filterRule : filterRuleList) {
+//                    //判断过滤类型(红名单，黑名单)
+//                    if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
+//                        //获取名单
+//                        String userList = filterRule.getUserList();
+//                        if (userList != null) {
+//                            int index = userList.indexOf(privateParams.get("accNbr"));
+//                            if (index >= 0) {
+////                                System.out.println("红黑名单过滤规则验证被拦截");
+//                                esJson.put("hit", "false");
+//                                esJson.put("msg", "红黑名单过滤规则验证被拦截");
+//                                esService.save(esJson, IndexList.STRATEGY_MODULE);
+//                                return Collections.EMPTY_MAP;
+//                            }
+//                        }
+//                    } else if ("3000".equals(filterRule.getFilterType())) {  //销售品过滤
+//                        boolean productCheck = true;
+//                        //获取需要过滤的销售品
+//                        String checkProduct = filterRule.getChooseProduct();
+//                        if (checkProduct != null) {
+//                            String[] checkProductArr = checkProduct.split(",");
+//
+//                            String productStr = null;
+//                            //获取用户已办理销售品
+//                            JSONObject labelParam = new JSONObject();
+//                            labelParam.put("queryNum", privateParams.get("accNbr"));
+//                            labelParam.put("c3", params.get("lanId"));
+//                            labelParam.put("queryId", privateParams.get("integrationId"));
+//                            //查询标签为销售品标签
+//                            labelParam.put("queryFields", "PROM_LIST");
+//                            labelParam.put("type", "1");
+//                            Map<String, Object> queryResult = getLabelValue(labelParam);
+//                            JSONObject body = new JSONObject((HashMap) queryResult.get("msgbody"));
+//                            if (body.containsKey("PROM_LIST")) {
+//                                productStr = body.getString("PROM_LIST");
+//                            }
+//                            if (productStr != null && !"".equals(productStr)) {
+//                                for (String product : checkProductArr) {
+//                                    int index = productStr.indexOf(product);
+//                                    if (index >= 0) {
+//                                        //不存在于校验
+//                                        if ("2000".equals(filterRule.getOperator())) {
+//                                            productCheck = true;
+//                                        } else if ("1000".equals(filterRule.getOperator())) {
+//                                            productCheck = false;
+//                                        }
+//                                    }
+//                                }
+//                            } else {
+//                                //存在于校验
+//                                if ("2000".equals(filterRule.getOperator())) {
+//                                    productCheck = false;
+//                                }
+//                            }
+//
+//                            if (productCheck) {
+//                                esJson.put("hit", "false");
+//                                esJson.put("msg", "销售品过滤验证未通过");
+//                                esService.save(esJson, IndexList.STRATEGY_MODULE);
+//                                return Collections.EMPTY_MAP;
+//                            }
+//                        }
+//                    } else if ("4000".equals(filterRule.getFilterType())) {  //表达式过滤
+//                        //暂不处理
+//                        //do something
+//                    } else if ("5000".equals(filterRule.getFilterType())) {  //时间段过滤
+//                        //时间段的格式
+//                        if (compareHourAndMinute(filterRule)) {
+////                            System.out.println("过滤时间段验证被拦截");
+//                            esJson.put("hit", "false");
+//                            esJson.put("msg", "过滤时间段验证被拦截");
+//                            esService.save(esJson, IndexList.STRATEGY_MODULE);
+//                            return Collections.EMPTY_MAP;
+//                        }
+//                    } else if ("6000".equals(filterRule.getFilterType())) {  //过扰规则
+//                        //将过扰规则的标签放到iSale展示列
+//                        StringBuilder queryLabel = new StringBuilder();
+//                        //获取过扰标签   todo 缓存
+//                        List<String> labels = new ArrayList<>();
+//                        labels = (List<String>) redisUtils.get("FILTER_RULE_CONDITION_" + filterRule);
+//                        if (labels == null) {
+//                            labels = mktVerbalConditionMapper.getLabelListByConditionId(filterRule.getConditionId());
+//                            redisUtils.set("FILTER_RULE_CONDITION_" + filterRule, labels);
+//                        }
+//                        if (labels != null && labels.size() > 0) {
+//                            for (String labelCode : labels) {
+//                                queryLabel.append(labelCode).append(",");
+//                            }
+//                        }
+//                        if (queryLabel.length() > 0) {
+//                            queryLabel.deleteCharAt(queryLabel.length() - 1);
+//                        }
+//
+//                        //查询标签
+//                        JSONObject labelParam = new JSONObject();
+//                        labelParam.put("queryNum", privateParams.get("accNbr"));
+//                        labelParam.put("c3", params.get("lanId"));
+//                        labelParam.put("queryId", privateParams.get("integrationId"));
+//                        labelParam.put("type", "1");
+//                        labelParam.put("queryFields", queryLabel.toString());
+//                        Map<String, Object> queryResult = getLabelValue(labelParam);
+//
+//                        JSONObject body = new JSONObject((HashMap) queryResult.get("msgbody"));
+//                        //获取查询结果
+//                        List<Map<String, Object>> triggerList = new ArrayList<>();
+//                        for (Map.Entry<String, Object> entry : body.entrySet()) {
+//                            Map<String, Object> map = new HashMap<>();
+//                            map.put("key", entry.getKey());
+//                            map.put("value", entry.getValue().toString());
+//                            map.put("display", "0");
+//                            map.put("name", "");
+//                            triggerList.add(map);
+//                        }
+//                        Map<String, Object> disturb = new HashMap<>();
+//                        disturb.put("type", "disturb");
+//                        disturb.put("triggerList", triggerList);
+//                        itgTriggers.add(disturb);
+//                    }
+//                }
+//            }
 
             //获取策略下所有标签
             List<Map<String, String>> allLabel = (List<Map<String, String>>) redisUtils.get("STRATEGY_ALL_LABEL_" + strategyConfId);
