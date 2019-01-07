@@ -118,4 +118,30 @@
     where camrel.MKT_CAMPAIGN_ID = #{campaignId,jdbcType=BIGINT}
   </select>
 
+  <select id="selectAllLabelByStrategyConfId" resultType="Map" parameterType="Long">
+  SELECT
+	INJECTION_LABEL_CODE AS code,
+	LABEL_TYPE AS type
+FROM
+	injection_label
+WHERE
+	INJECTION_LABEL_ID IN (
+		SELECT DISTINCT
+			LEFT_PARAM
+		FROM
+			tar_grp_condition
+		WHERE
+			TAR_GRP_ID IN (
+				SELECT
+					cr.TAR_GRP_ID
+				FROM
+					mkt_strategy_conf_rule cr
+				LEFT JOIN mkt_strategy_conf_rule_rel crr ON cr.MKT_STRATEGY_CONF_RULE_ID = crr.MKT_STRATEGY_CONF_RULE_ID
+				WHERE
+					crr.MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=BIGINT}
+			)
+	)
+  </select>
+
+
 </mapper>

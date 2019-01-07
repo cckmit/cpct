@@ -1,7 +1,5 @@
 package com.zjtelcom.cpct.dto.event;
 
-import com.zjtelcom.cpct.BaseEntity;
-
 import java.io.Serializable;
 import java.util.Date;
 
@@ -10,7 +8,7 @@ import java.util.Date;
  * @Author pengy
  * @Date 2018/6/26 13:54
  */
-public class ContactEvtItem  implements Serializable {
+public class ContactEvtItem implements Serializable {
 
     private String actType;//  KIP=保持/ADD=新增/MOD=修改/DEL=删除
     private Long evtItemId;//事件采集项主键
