@@ -40,6 +40,8 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
     @Autowired
     private SynSysStaffService synSysStaffService;
 
+
+
     @Value("${sync.value}")
     private String value;
 

@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 @Repository
@@ -39,5 +40,7 @@ public interface TarGrpConditionMapper {
     int deleteBatch(List<Long> conditionIds);
 
     int deleteByTarGrpTemplateId(@Param("tarGrpTemplateId") Long tarGrpTemplateId);
+
+    List<Map<String,String>> selectAllLabelByTarId(Long tarGrpTemplateId);
 
 }
