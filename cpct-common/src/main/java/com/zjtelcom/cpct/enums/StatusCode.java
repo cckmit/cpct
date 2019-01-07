@@ -59,10 +59,10 @@ public enum StatusCode {
     PROM_TYPE("销售品类", "1000"),
 
     /*标签类型*/
-    CCUST_LEVEL("1000","客户级"),
-    ASSET_LEVEL("2000","用户级"),
-    PRODUCT_LEVEL("3000","销售品级"),
-    ZONE_LEVEL("4000","区域级");
+    CCUST_LEVEL("客户级","1000"),
+    ASSET_LEVEL("用户级","2000"),
+    PRODUCT_LEVEL("销售品级","3000"),
+    ZONE_LEVEL("区域级","4000");
 
 
     private String statusMsg;

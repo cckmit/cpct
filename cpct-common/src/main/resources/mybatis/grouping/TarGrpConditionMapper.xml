@@ -196,15 +196,18 @@
         STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
         CREATE_DATE, STATUS_DATE, UPDATE_DATE,
         REMARK) values
-      <foreach collection="list" item="item" separator="," index="i">
-        ( #{item.conditionId,jdbcType=BIGINT},#{item.tarGrpId,jdbcType=BIGINT}, #{item.rootFlag,jdbcType=BIGINT},
-      #{item.leftParam,jdbcType=VARCHAR}, #{item.leftParamType,jdbcType=VARCHAR}, #{item.operType,jdbcType=VARCHAR},
-      #{item.rightParam,jdbcType=VARCHAR}, #{item.rightParamType,jdbcType=VARCHAR}, #{item.conditionText,jdbcType=VARCHAR},
-      #{item.statusCd,jdbcType=VARCHAR}, #{item.createStaff,jdbcType=BIGINT}, #{item.updateStaff,jdbcType=BIGINT},
-      #{item.createDate,jdbcType=TIMESTAMP}, #{item.statusDate,jdbcType=TIMESTAMP}, #{item.updateDate,jdbcType=TIMESTAMP},
-      #{item.remark,jdbcType=VARCHAR})
-      </foreach>
-  </insert>
+        <foreach collection="list" item="item" separator="," index="i">
+            ( #{item.conditionId,jdbcType=BIGINT},#{item.tarGrpId,jdbcType=BIGINT}, #{item.rootFlag,jdbcType=BIGINT},
+            #{item.leftParam,jdbcType=VARCHAR}, #{item.leftParamType,jdbcType=VARCHAR},
+            #{item.operType,jdbcType=VARCHAR},
+            #{item.rightParam,jdbcType=VARCHAR}, #{item.rightParamType,jdbcType=VARCHAR},
+            #{item.conditionText,jdbcType=VARCHAR},
+            #{item.statusCd,jdbcType=VARCHAR}, #{item.createStaff,jdbcType=BIGINT}, #{item.updateStaff,jdbcType=BIGINT},
+            #{item.createDate,jdbcType=TIMESTAMP}, #{item.statusDate,jdbcType=TIMESTAMP},
+            #{item.updateDate,jdbcType=TIMESTAMP},
+            #{item.remark,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
 
     <select id="findListBylabelId" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select CONDITION_ID, TAR_GRP_ID, ROOT_FLAG, LEFT_PARAM, LEFT_PARAM_TYPE, OPER_TYPE,
@@ -225,7 +228,7 @@
     <delete id="deleteByTarGrpTemplateId" parameterType="java.lang.Long">
     delete from tar_grp_condition
     where TAR_GRP_ID = #{tarGrpTemplateId,jdbcType=BIGINT}
-  </delete>
+    </delete>
 
     <select id="selectAllLabelByTarId" parameterType="java.lang.Long" resultType="Map">
     SELECT DISTINCT
