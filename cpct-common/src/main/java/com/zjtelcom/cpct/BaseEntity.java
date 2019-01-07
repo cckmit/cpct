@@ -13,7 +13,9 @@ public abstract class BaseEntity implements Serializable {
 
     private String statusCd;//记录状态。1000有效 1100无效  1200	未生效 1300已归档  1001将生效  1002待恢复  1101将失效  1102待失效 1301	待撤消
     private Long createStaff;//创建人
+    private String createStaffName;//创建人名称
     private Long updateStaff;//更新人
+    private String updateStaffName;//更新人名称
     private Date createDate;//创建时间
     private Date statusDate;//状态时间
     private Date updateDate;//更新时间
@@ -82,5 +84,21 @@ public abstract class BaseEntity implements Serializable {
 
     public void setLanId(Long lanId) {
         this.lanId = lanId;
+    }
+
+    public String getCreateStaffName() {
+        return createStaffName;
+    }
+
+    public void setCreateStaffName(String createStaffName) {
+        this.createStaffName = createStaffName;
+    }
+
+    public String getUpdateStaffName() {
+        return updateStaffName;
+    }
+
+    public void setUpdateStaffName(String updateStaffName) {
+        this.updateStaffName = updateStaffName;
     }
 }
