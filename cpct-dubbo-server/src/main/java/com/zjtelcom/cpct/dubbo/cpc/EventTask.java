@@ -603,33 +603,48 @@ public class EventTask {
                                 productStr = body.getString("PROM_LIST");
                             }
 
-                            productCheck = checkFilerProm(checkProduct,productStr);
-
+//                            productCheck = checkFilerProm(checkProduct,productStr);
 
                             String[] checkProductArr = checkProduct.split(",");
-
+                            String esMsg = "";
                             if (productStr != null && !"".equals(productStr)) {
-                                for (String product : checkProductArr) {
-                                    int index = productStr.indexOf(product);
-                                    if (index >= 0) {
-                                        //不存在于校验
-                                        if ("2000".equals(filterRule.getOperator())) {
-                                            productCheck = true;
-                                        } else if ("1000".equals(filterRule.getOperator())) {
+
+                                if ("1000".equals(filterRule.getOperator())) {  //存在于
+                                    for (String product : checkProductArr) {
+                                        int index = productStr.indexOf(product);
+                                        if (index >= 0) {
                                             productCheck = false;
+                                            break;
                                         }
+                                    }
+                                } else if ("2000".equals(filterRule.getOperator())) { //不存在于
+
+                                    boolean noExistCheck = true;
+                                    for (String product : checkProductArr) {
+                                        int index = productStr.indexOf(product);
+                                        if (index >= 0) {
+                                            productCheck = true;
+                                            noExistCheck = false;
+                                            //被过滤的销售品
+                                            esMsg = product;
+                                            break;
+                                        }
+                                    }
+                                    if(noExistCheck) {
+                                        productCheck = false;
                                     }
                                 }
                             } else {
                                 //存在于校验
                                 if ("2000".equals(filterRule.getOperator())) {
                                     productCheck = false;
+                                } else if("1000".equals(filterRule.getOperator())) {
+                                    productCheck = true;
                                 }
                             }
-
                             if (productCheck) {
                                 esJson.put("hit", "false");
-                                esJson.put("msg", "销售品过滤验证未通过");
+                                esJson.put("msg", "销售品过滤验证未通过:" + esMsg);
                                 esService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + "_" + esJson.getString("activityId"));
                                 return Collections.EMPTY_MAP;
                             }
@@ -2502,11 +2517,46 @@ public class EventTask {
         return body;
     }
 
-    public boolean checkFilerProm(String filterStr,String promList) {
-
-
-
-        return true;
-    }
+//    public boolean checkFilerProm(String checkProductArr,String productStr,String type) {
+//
+//        if (productStr != null && !"".equals(productStr)) {
+//
+//            if ("1000".equals(type)) {  //存在于
+//                for (String product : checkProductArr) {
+//                    int index = productStr.indexOf(product);
+//                    if (index >= 0) {
+//                        productCheck = false;
+//                        break;
+//                    }
+//                }
+//            } else if ("2000".equals(type)) { //不存在于
+//
+//                boolean noExistCheck = true;
+//                for (String product : checkProductArr) {
+//                    int index = productStr.indexOf(product);
+//                    if (index >= 0) {
+//                        productCheck = true;
+//                        noExistCheck = false;
+//                        //被过滤的销售品
+//                        esMsg = product;
+//                        break;
+//                    }
+//                }
+//                if(noExistCheck) {
+//                    productCheck = false;
+//                }
+//            }
+//        } else {
+//            //存在于校验
+//            if ("2000".equals(type)) {
+//                productCheck = false;
+//            } else if("1000".equals(type)) {
+//                productCheck = true;
+//            }
+//        }
+//
+//
+//        return true;
+//    }
 
 }
