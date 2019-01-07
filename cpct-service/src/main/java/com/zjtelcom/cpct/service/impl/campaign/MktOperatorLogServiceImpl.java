@@ -82,14 +82,22 @@ public class MktOperatorLogServiceImpl implements MktOperatorLogService{
         return result;
     }
 
+
     @Override
-    public int addMktOperatorLog(String name,Long campaignId, Integer type) {
+    public int addMktOperatorLog(String name,Long campaignId, String mktActivityNbr, String mktCampaignStateBefore, String mktCampaignStateAfter, Long operatorAccount,  String type) {
         MktOperatorLogDO mktOperatorLogDO = new MktOperatorLogDO();
         mktOperatorLogDO.setMktCampaignName(name);
         mktOperatorLogDO.setMktCampaignId(campaignId);
-        mktOperatorLogDO.setOperatorType(String.valueOf(type));
+        mktOperatorLogDO.setMktActivityNbr(mktActivityNbr);
+        mktOperatorLogDO.setOperatorType(type);
+        if(mktCampaignStateBefore!=null && !"".equals(mktCampaignStateBefore)){
+            mktOperatorLogDO.setMktCampaignStateBefore(mktCampaignStateBefore);
+        }
+        if(mktCampaignStateAfter!=null && !"".equals(mktCampaignStateAfter)){
+            mktOperatorLogDO.setMktCampaignStateAfter(mktCampaignStateAfter);
+        }
+        mktOperatorLogDO.setOperatorAccount(String.valueOf(operatorAccount));
         mktOperatorLogDO.setOperatorDate(new Date());
         return mktOperatorLogMapper.insertOperation(mktOperatorLogDO);
-
     }
 }
