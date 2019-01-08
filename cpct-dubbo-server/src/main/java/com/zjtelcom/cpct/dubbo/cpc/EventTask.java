@@ -703,132 +703,7 @@ public class EventTask {
                 }
             }
 
-            Map<String, Object> itgTrigger;
-            StringBuilder queryFieldsCust = new StringBuilder();
-            StringBuilder queryFieldsAss = new StringBuilder();
-            StringBuilder queryFieldsSale = new StringBuilder();
 
-            //查询展示列 （iSale）
-            List<Map<String, String>> iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getIsaleDisplay());
-            if (iSaleDisplay != null && iSaleDisplay.size() > 0) {
-                for (Map<String, String> labelMap : iSaleDisplay) {
-                    switch (labelMap.get("labelCode")) {
-                        case "1000":
-                            queryFieldsCust.append(labelMap.get("labelCode")).append(",");
-                            break;
-                        case "2000":
-                            queryFieldsAss.append(labelMap.get("labelCode")).append(",");
-                            break;
-                        case "3000":
-                            queryFieldsSale.append(labelMap.get("labelCode")).append(",");
-                            break;
-                    }
-                }
-
-                JSONObject resJsonAll = new JSONObject();
-
-                //如果有销售品级标签，就加上销售品主id的查询
-                if (queryFieldsSale.length() > 0) {
-                    queryFieldsAss.append("PROM_INTEG_ID");
-                }
-
-                if (queryFieldsAss.length() > 0) {
-                    queryFieldsAss.deleteCharAt(queryFieldsAss.length() - 1);
-
-                    JSONObject httpParams = new JSONObject();
-                    httpParams.put("queryNum", privateParams.get("accNbr"));
-                    httpParams.put("c3", params.get("lanId"));
-                    httpParams.put("queryId", privateParams.get("integrationId"));
-                    httpParams.put("type", "1");
-                    //待查询的标签列
-                    httpParams.put("queryFields", queryFieldsAss.toString());
-                    //dubbo接口查询标签
-                    JSONObject resJson = getLabelByDubbo(httpParams);
-//                    System.out.println(resJson.toString());
-                    resJsonAll.putAll(resJson);
-                }
-                if (queryFieldsCust.length() > 0) {
-                    queryFieldsCust.deleteCharAt(queryFieldsCust.length() - 1);
-
-                    JSONObject httpParams = new JSONObject();
-                    httpParams.put("queryNum", "");
-                    httpParams.put("c3", params.get("lanId"));
-                    httpParams.put("queryId", privateParams.get("custId"));
-                    httpParams.put("type", "2");
-                    //待查询的标签列
-                    httpParams.put("queryFields", queryFieldsCust.toString());
-                    //dubbo接口查询标签
-                    JSONObject resJson = getLabelByDubbo(httpParams);
-//                    System.out.println(resJson.toString());
-                    resJsonAll.putAll(resJson);
-                }
-                if (queryFieldsSale.length() > 0) {
-                    if ((resJsonAll.getString("PROM_INTEG_ID") != null) && !"".equals(resJsonAll.getString("PROM_INTEG_ID"))) {
-                        queryFieldsSale.deleteCharAt(queryFieldsSale.length() - 1);
-
-                        JSONObject httpParams = new JSONObject();
-                        httpParams.put("queryNum", privateParams.get("accNbr"));
-                        httpParams.put("c3", params.get("lanId"));
-                        httpParams.put("queryId", resJsonAll.getString("PROM_INTEG_ID"));
-                        httpParams.put("type", "3");
-                        //待查询的标签列
-                        httpParams.put("queryFields", queryFieldsSale.toString());
-                        //dubbo接口查询标签
-                        JSONObject resJson = getLabelByDubbo(httpParams);
-//                        System.out.println(resJson.toString());
-                        resJsonAll.putAll(resJson);
-                    }
-                }
-
-                Map<String, Object> triggers;
-                List<Map<String, Object>> triggerList1 = new ArrayList<>();
-                List<Map<String, Object>> triggerList2 = new ArrayList<>();
-                List<Map<String, Object>> triggerList3 = new ArrayList<>();
-                List<Map<String, Object>> triggerList4 = new ArrayList<>();
-
-                for (Map<String, String> label : iSaleDisplay) {
-                    if (resJsonAll.containsKey((String) label.get("labelCode"))) {
-                        triggers = new JSONObject();
-                        triggers.put("key", label.get("labelCode"));
-                        triggers.put("value", resJsonAll.get((String) label.get("labelCode")));
-                        triggers.put("display", 0); //todo 确定display字段
-                        triggers.put("name", label.get("labelName"));
-                        if ("1".equals(label.get("typeCode").toString())) {
-                            triggerList1.add(triggers);
-                        } else if ("2".equals(label.get("typeCode").toString())) {
-                            triggerList2.add(triggers);
-                        } else if ("3".equals(label.get("typeCode").toString())) {
-                            triggerList3.add(triggers);
-                        } else if ("4".equals(label.get("typeCode").toString())) {
-                            triggerList4.add(triggers);
-                        }
-                    }
-                }
-                if (triggerList1.size() > 0) {
-                    itgTrigger = new HashMap<>();
-                    itgTrigger.put("triggerList", triggerList1);
-                    itgTrigger.put("type", "固定信息");
-                    itgTriggers.add(new JSONObject(itgTrigger));
-                }
-                if (triggerList2.size() > 0) {
-                    itgTrigger = new JSONObject();
-                    itgTrigger.put("triggerList", triggerList2);
-                    itgTrigger.put("type", "营销信息");
-                    itgTriggers.add(new JSONObject(itgTrigger));
-                }
-                if (triggerList3.size() > 0) {
-                    itgTrigger = new JSONObject();
-                    itgTrigger.put("triggerList", triggerList3);
-                    itgTrigger.put("type", "费用信息");
-                    itgTriggers.add(new JSONObject(itgTrigger));
-                }
-                if (triggerList4.size() > 0) {
-                    itgTrigger = new JSONObject();
-                    itgTrigger.put("triggerList", triggerList4);
-                    itgTrigger.put("type", "协议信息");
-                    itgTriggers.add(new JSONObject(itgTrigger));
-                }
-            }
 
             //根据活动id获取策略列表  todo 缓存
             List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOs = mktCamStrategyConfRelMapper.selectByMktCampaignId(activityId);
@@ -857,6 +732,135 @@ public class EventTask {
                 //判断是否有策略命中
                 if (strageyList.size() > 0) {
                     esJson.put("hit", true);
+
+                    Map<String, Object> itgTrigger;
+                    StringBuilder queryFieldsCust = new StringBuilder();
+                    StringBuilder queryFieldsAss = new StringBuilder();
+                    StringBuilder queryFieldsSale = new StringBuilder();
+
+                    //查询展示列 （iSale）
+                    List<Map<String, String>> iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getIsaleDisplay());
+                    if (iSaleDisplay != null && iSaleDisplay.size() > 0) {
+                        for (Map<String, String> labelMap : iSaleDisplay) {
+                            switch (labelMap.get("labelCode")) {
+                                case "1000":
+                                    queryFieldsCust.append(labelMap.get("labelCode")).append(",");
+                                    break;
+                                case "2000":
+                                    queryFieldsAss.append(labelMap.get("labelCode")).append(",");
+                                    break;
+                                case "3000":
+                                    queryFieldsSale.append(labelMap.get("labelCode")).append(",");
+                                    break;
+                            }
+                        }
+
+                        JSONObject resJsonAll = new JSONObject();
+
+                        //如果有销售品级标签，就加上销售品主id的查询
+                        if (queryFieldsSale.length() > 0) {
+                            queryFieldsAss.append("PROM_INTEG_ID");
+                        }
+
+                        if (queryFieldsAss.length() > 0) {
+                            queryFieldsAss.deleteCharAt(queryFieldsAss.length() - 1);
+
+                            JSONObject httpParams = new JSONObject();
+                            httpParams.put("queryNum", privateParams.get("accNbr"));
+                            httpParams.put("c3", params.get("lanId"));
+                            httpParams.put("queryId", privateParams.get("integrationId"));
+                            httpParams.put("type", "1");
+                            //待查询的标签列
+                            httpParams.put("queryFields", queryFieldsAss.toString());
+                            //dubbo接口查询标签
+                            JSONObject resJson = getLabelByDubbo(httpParams);
+//                    System.out.println(resJson.toString());
+                            resJsonAll.putAll(resJson);
+                        }
+                        if (queryFieldsCust.length() > 0) {
+                            queryFieldsCust.deleteCharAt(queryFieldsCust.length() - 1);
+
+                            JSONObject httpParams = new JSONObject();
+                            httpParams.put("queryNum", "");
+                            httpParams.put("c3", params.get("lanId"));
+                            httpParams.put("queryId", privateParams.get("custId"));
+                            httpParams.put("type", "2");
+                            //待查询的标签列
+                            httpParams.put("queryFields", queryFieldsCust.toString());
+                            //dubbo接口查询标签
+                            JSONObject resJson = getLabelByDubbo(httpParams);
+//                    System.out.println(resJson.toString());
+                            resJsonAll.putAll(resJson);
+                        }
+                        if (queryFieldsSale.length() > 0) {
+                            if ((resJsonAll.getString("PROM_INTEG_ID") != null) && !"".equals(resJsonAll.getString("PROM_INTEG_ID"))) {
+                                queryFieldsSale.deleteCharAt(queryFieldsSale.length() - 1);
+
+                                JSONObject httpParams = new JSONObject();
+                                httpParams.put("queryNum", privateParams.get("accNbr"));
+                                httpParams.put("c3", params.get("lanId"));
+                                httpParams.put("queryId", resJsonAll.getString("PROM_INTEG_ID"));
+                                httpParams.put("type", "3");
+                                //待查询的标签列
+                                httpParams.put("queryFields", queryFieldsSale.toString());
+                                //dubbo接口查询标签
+                                JSONObject resJson = getLabelByDubbo(httpParams);
+//                        System.out.println(resJson.toString());
+                                resJsonAll.putAll(resJson);
+                            }
+                        }
+
+                        Map<String, Object> triggers;
+                        List<Map<String, Object>> triggerList1 = new ArrayList<>();
+                        List<Map<String, Object>> triggerList2 = new ArrayList<>();
+                        List<Map<String, Object>> triggerList3 = new ArrayList<>();
+                        List<Map<String, Object>> triggerList4 = new ArrayList<>();
+
+                        for (Map<String, String> label : iSaleDisplay) {
+                            if (resJsonAll.containsKey((String) label.get("labelCode"))) {
+                                triggers = new JSONObject();
+                                triggers.put("key", label.get("labelCode"));
+                                triggers.put("value", resJsonAll.get((String) label.get("labelCode")));
+                                triggers.put("display", 0); //todo 确定display字段
+                                triggers.put("name", label.get("labelName"));
+                                if ("1".equals(label.get("typeCode").toString())) {
+                                    triggerList1.add(triggers);
+                                } else if ("2".equals(label.get("typeCode").toString())) {
+                                    triggerList2.add(triggers);
+                                } else if ("3".equals(label.get("typeCode").toString())) {
+                                    triggerList3.add(triggers);
+                                } else if ("4".equals(label.get("typeCode").toString())) {
+                                    triggerList4.add(triggers);
+                                }
+                            }
+                        }
+                        if (triggerList1.size() > 0) {
+                            itgTrigger = new HashMap<>();
+                            itgTrigger.put("triggerList", triggerList1);
+                            itgTrigger.put("type", "固定信息");
+                            itgTriggers.add(new JSONObject(itgTrigger));
+                        }
+                        if (triggerList2.size() > 0) {
+                            itgTrigger = new JSONObject();
+                            itgTrigger.put("triggerList", triggerList2);
+                            itgTrigger.put("type", "营销信息");
+                            itgTriggers.add(new JSONObject(itgTrigger));
+                        }
+                        if (triggerList3.size() > 0) {
+                            itgTrigger = new JSONObject();
+                            itgTrigger.put("triggerList", triggerList3);
+                            itgTrigger.put("type", "费用信息");
+                            itgTriggers.add(new JSONObject(itgTrigger));
+                        }
+                        if (triggerList4.size() > 0) {
+                            itgTrigger = new JSONObject();
+                            itgTrigger.put("triggerList", triggerList4);
+                            itgTrigger.put("type", "协议信息");
+                            itgTriggers.add(new JSONObject(itgTrigger));
+                        }
+                    }
+
+
                 } else {
                     esJson.put("hit", false);
                     esJson.put("msg", "策略均未命中");
