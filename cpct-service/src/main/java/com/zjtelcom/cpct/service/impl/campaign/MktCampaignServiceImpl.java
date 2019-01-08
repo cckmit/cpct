@@ -899,14 +899,14 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCampaignVO.setPreMktCampaignId(mktCampaignCountDO.getPreMktCampaignId());
 
                     // 获取创建人信息
-/*
+
                     SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(mktCampaignCountDO.getCreateStaff(), new ArrayList<Long>());
                     if (systemUserDtoSysmgrResultObject != null) {
                         if (systemUserDtoSysmgrResultObject.getResultObject() != null) {
                             mktCampaignVO.setCreateStaffName(systemUserDtoSysmgrResultObject.getResultObject().getStaffName());
                         }
                     }
-*/
+
 
                 } catch (Exception e) {
                     logger.error("Excetion:", e);

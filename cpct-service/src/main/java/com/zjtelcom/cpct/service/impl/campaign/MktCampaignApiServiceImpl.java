@@ -449,10 +449,10 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
         PageHelper.startPage(page, pageSize);
         List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListByCondition(mktCampaignDOReq);
         Page pageInfo = new Page(new PageInfo(mktCampaignDOList));
-        List<MktCampaign> mktCampaignList = new ArrayList<>();
+        List<MktCampaignPO> mktCampaignList = new ArrayList<>();
         try {
             for (MktCampaignDO mktCampaignDOResp : mktCampaignDOList) {
-                MktCampaign mktCampaign = new MktCampaign();
+                MktCampaignPO mktCampaign = new MktCampaignPO();
                 CopyPropertiesUtil.copyBean2Bean(mktCampaign, mktCampaignDOResp);
                 mktCampaignList.add(mktCampaign);
             }
