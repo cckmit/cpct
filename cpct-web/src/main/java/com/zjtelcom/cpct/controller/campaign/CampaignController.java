@@ -131,6 +131,7 @@ public class CampaignController extends BaseController {
         try {
             map = mktCampaignService.qryMktCampaignListPage(params);
         } catch (Exception e) {
+            logger.info("[op:CampaignController] failed to listCampaignPage , Expection = ", e);
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", "查询活动列表失败！");
         }
