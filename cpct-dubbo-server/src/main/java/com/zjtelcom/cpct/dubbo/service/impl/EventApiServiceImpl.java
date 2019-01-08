@@ -2676,14 +2676,14 @@ public class EventApiServiceImpl implements EventApiService {
         try {
             //查询展示列标签
             MktCampaignDO mktCampaign = mktCampaignMapper.selectByPrimaryKey(activityId);
-            List<Map<String, Object>> iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getIsaleDisplay());
+            List<Map<String, String>> iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getIsaleDisplay());
             List<Map<String, Object>> itgTriggers = new ArrayList<>();
             Map<String, Object> itgTrigger;
 
             StringBuilder querySb = new StringBuilder();
 
             if (iSaleDisplay != null && iSaleDisplay.size() > 0) {
-                for (Map<String, Object> label : iSaleDisplay) {
+                for (Map<String, String> label : iSaleDisplay) {
                     querySb.append((String) label.get("labelCode")).append(",");
                 }
                 if (querySb.length() > 0) {
@@ -2706,7 +2706,7 @@ public class EventApiServiceImpl implements EventApiService {
                 List<Map<String, Object>> triggerList3 = new ArrayList<>();
                 List<Map<String, Object>> triggerList4 = new ArrayList<>();
 
-                for (Map<String, Object> label : iSaleDisplay) {
+                for (Map<String, String> label : iSaleDisplay) {
                     if (resJson.containsKey((String) label.get("labelCode"))) {
                         triggers = new JSONObject();
                         triggers.put("key", label.get("labelCode"));
