@@ -48,6 +48,11 @@ public enum StatusCode {
     ONE_TIME("一次性", "1000"),
     PERIODICITY("周期性", "2000"),
 
+    /*营销活动触发类型*/
+    BATCH_CAMPAIGN("批量营销活动", "1000"),
+    REAL_TIME_CAMPAIGN("实时营销活动", "2000"),
+    MIXTURE_CAMPAIGN("混合营销活动", "3000"),
+
     /*活动类型*/
     FRAMEWORK_CAMPAIGN("框架活动", "1000"),
     ENFORCEMENT_CAMPAIGN("强制活动", "2000"),

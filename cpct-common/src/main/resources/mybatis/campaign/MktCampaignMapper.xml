@@ -229,7 +229,7 @@
 
     <select id="qryMktCampaignListPage" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignDO" resultMap="countResultMap">
         select MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
-        MKT_CAMPAIGN_TYPE,  MANAGE_TYPE, MKT_ACTIVITY_NBR,  STATUS_CD, LAN_ID, CREATE_CHANNEL, CREATE_DATE,CREATE_STAFF
+        MKT_CAMPAIGN_TYPE,  MANAGE_TYPE, MKT_ACTIVITY_NBR,  STATUS_CD, LAN_ID, CREATE_CHANNEL, CREATE_DATE,CREATE_STAFF,
         (
             SELECT
               count(*)
