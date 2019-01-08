@@ -900,7 +900,6 @@ public class EventApiServiceImpl implements EventApiService {
                 }
             }
 
-
             //根据活动id获取策略列表  todo 缓存
             List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOs = mktCamStrategyConfRelMapper.selectByMktCampaignId(activityId);
 
