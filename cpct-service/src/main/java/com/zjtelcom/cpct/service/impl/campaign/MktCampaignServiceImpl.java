@@ -160,11 +160,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Autowired
     private MktOperatorLogService mktOperatorLogService;
 
-    @Autowired
+    @Autowired(required = false)
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
-
-    @Autowired
-    private ISystemPostDubboService iSystemPostDubboService;
 
     private final static String createChannel = "cpcpcj0001";
 
@@ -181,9 +178,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     public Map<String, Object> createMktCampaign(MktCampaignDetailVO mktCampaignVO) throws Exception {
         Map<String, Object> maps = null;
         try {
-            logger.info("[op:MktCampaignServiceImpl createMktCampaign] mktCampaignVO = " + com.alibaba.fastjson.JSON.toJSONString(mktCampaignVO));
             MktCampaignDO mktCampaignDO = BeanUtil.create(mktCampaignVO, new MktCampaignDO());
-            logger.info("[op:MktCampaignServiceImpl createMktCampaign] mktCampaignDO = " + com.alibaba.fastjson.JSON.toJSONString(mktCampaignDO));
             // 创建活动基本信息
             mktCampaignDO.setCreateDate(new Date());
             mktCampaignDO.setCreateStaff(UserUtil.loginId());
@@ -342,7 +337,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             Long mktCampaignId = mktCampaignDO.getMktCampaignId();
             MktCampaignDO campaign = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
             // 记录活动操作
-            mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), campaign.getStatusCd(), mktCampaignDO.getStatusCd(), UserUtil.getUserId(), OperatorLogEnum.UPDATE.getOperatorValue());
+           // mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), campaign.getStatusCd(), mktCampaignDO.getStatusCd(), UserUtil.getUserId(), OperatorLogEnum.UPDATE.getOperatorValue());
 
             //删除原来的活动与城市之间的关系
             mktCamCityRelMapper.deleteByMktCampaignId(mktCampaignId);
@@ -511,8 +506,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 get(ParamKeyEnum.EXEC_TYPE.getParamKey() + mktCampaignDO.getExecType()));
 
         // 获取渠道信息
+/*
         String postName = PostUtil.getPostNameByCode(mktCampaignDO.getCreateChannel());
         mktCampaignVO.setCreateChannelName(postName);
+*/
 
         // 获取活动关联的事件
         List<MktCamEvtRelDO> mktCamEvtRelDOList = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignDO.getMktCampaignId());
@@ -613,7 +610,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         try {
             MktCampaignDO mktCampaignDO =mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
             // 记录活动操作
-            mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), mktCampaignDO.getStatusCd(), OperatorLogEnum.DELETE.getOperatorValue(), UserUtil.getUserId(), OperatorLogEnum.DELETE.getOperatorValue());
+          //  mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), mktCampaignDO.getStatusCd(), OperatorLogEnum.DELETE.getOperatorValue(), UserUtil.getUserId(), OperatorLogEnum.DELETE.getOperatorValue());
 
             mktCampaignMapper.deleteByPrimaryKey(mktCampaignId);
 
@@ -902,12 +899,14 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCampaignVO.setPreMktCampaignId(mktCampaignCountDO.getPreMktCampaignId());
 
                     // 获取创建人信息
+
                     SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(mktCampaignCountDO.getCreateStaff(), new ArrayList<Long>());
                     if (systemUserDtoSysmgrResultObject != null) {
                         if (systemUserDtoSysmgrResultObject.getResultObject() != null) {
                             mktCampaignVO.setCreateStaffName(systemUserDtoSysmgrResultObject.getResultObject().getStaffName());
                         }
                     }
+
 
                 } catch (Exception e) {
                     logger.error("Excetion:", e);
@@ -963,7 +962,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         try {
             MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
             // 记录活动操作
-            mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), mktCampaignDO.getStatusCd(), statusCd, UserUtil.getUserId(), statusCd);
+           // mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), mktCampaignDO.getStatusCd(), statusCd, UserUtil.getUserId(), statusCd);
 
             mktCampaignMapper.changeMktCampaignStatus(mktCampaignId, statusCd, new Date(), UserUtil.loginId());
             // 判断是否是发布活动, 是该状态生效
