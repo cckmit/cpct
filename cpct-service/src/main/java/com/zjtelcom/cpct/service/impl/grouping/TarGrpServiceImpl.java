@@ -85,9 +85,14 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
 //        detail.setTarGrpConditions(conditionList);
         TarGrpDetail detail = (TarGrpDetail)redisUtils.get("TAR_GRP_"+tarGrpId);
         if (detail==null){
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "客户分群不存在");
-            return result;
+            TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpId);
+            if (tarGrp!=null){
+                detail = BeanUtil.create(tarGrp,new TarGrpDetail());
+                List<TarGrpCondition> conditions = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
+                detail.setTarGrpConditions(conditions);
+            }else {
+                return null;
+            }
         }
         result = createTarGrp(detail,isCopy);
         return result;
