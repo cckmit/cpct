@@ -210,7 +210,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setMktActivityNbr("MKT" + String.format("%06d", mktCampaignId));
             mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
             // 记录活动操作
-            mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), null, mktCampaignDO.getStatusCd(), UserUtil.getUserId(), OperatorLogEnum.ADD.getOperatorValue());
+//            mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), null, mktCampaignDO.getStatusCd(), UserUtil.getUserId(), OperatorLogEnum.ADD.getOperatorValue());
 
             // 创建二次营销活动
             if (mktCampaignVO.getPreMktCampaignId() != null && (mktCampaignVO.getPreMktCampaignId() != 0)) {
@@ -899,14 +899,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCampaignVO.setPreMktCampaignId(mktCampaignCountDO.getPreMktCampaignId());
 
                     // 获取创建人信息
-
                     SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(mktCampaignCountDO.getCreateStaff(), new ArrayList<Long>());
                     if (systemUserDtoSysmgrResultObject != null) {
                         if (systemUserDtoSysmgrResultObject.getResultObject() != null) {
                             mktCampaignVO.setCreateStaffName(systemUserDtoSysmgrResultObject.getResultObject().getStaffName());
                         }
                     }
-
 
                 } catch (Exception e) {
                     logger.error("Excetion:", e);
