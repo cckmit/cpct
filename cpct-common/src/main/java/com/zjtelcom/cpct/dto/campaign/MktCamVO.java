@@ -13,7 +13,7 @@
 // * date: 2018/07/07 15:25
 // * version: V1.0
 // */
-//public class MktCamVO extends MktCampaign {
+//public class MktCamVO extends MktCampaignPO {
 //
 //    /**
 //     * 活动关联的事件
