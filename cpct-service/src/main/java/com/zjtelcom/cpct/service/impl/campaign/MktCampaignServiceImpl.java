@@ -977,7 +977,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
                     mktCamResultRelMapper.updateByPrimaryKey(mktCamResultRelDO);
                 }
-                if ("1".equals(value)) {
+                if (SystemParamsUtil.getSyncValue().equals("1")) {
                     // 发布活动异步同步活动到生产环境
                     new Thread() {
                         @Override
