@@ -26,7 +26,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCpcAlgorithmsRul;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.EventScene;
 import com.zjtelcom.cpct.dto.event.EvtSceneCamRel;
-import com.zjtelcom.cpct.dto.pojo.MktCampaign;
+import com.zjtelcom.cpct.dto.pojo.MktCampaignPO;
 import com.zjtelcom.cpct.dto.pojo.Result;
 import com.zjtelcom.cpct.dto.strategy.MktStrategy;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRuleRel;
@@ -160,8 +160,8 @@ public class MktCampaignJTServiceImpl implements MktCampaignJTService {
         logger.debug(String.format("req.getTransactionId(): %s, data: %s", req.getTransactionId(), JSON.toJSONString(req.getMktCampaignDetails())));
         Map<String, Object> campaignResult = new HashMap<>();
         try {
-            List<MktCampaign> mktCampaignList = req.getMktCampaignDetails();
-            for (MktCampaign mktCampaign : mktCampaignList) {
+            List<MktCampaignPO> mktCampaignList = req.getMktCampaignDetails();
+            for (MktCampaignPO mktCampaign : mktCampaignList) {
                 // 保存活动基本信息
                 MktCampaignDO mktCampaignDO = new MktCampaignDO();
                 CopyPropertiesUtil.copyBean2Bean(mktCampaignDO, mktCampaign);
@@ -346,8 +346,8 @@ public class MktCampaignJTServiceImpl implements MktCampaignJTService {
         logger.debug(String.format("req.getTransactionId(): %s, data: %s", req.getTransactionId(), JSON.toJSONString(req.getMktCampaignDetails())));
         Map<String, Object> campaignResult = new HashMap<>();
         try {
-            List<MktCampaign> mktCampaignList = req.getMktCampaignDetails();
-            for (MktCampaign mktCampaign : mktCampaignList) {
+            List<MktCampaignPO> mktCampaignList = req.getMktCampaignDetails();
+            for (MktCampaignPO mktCampaign : mktCampaignList) {
                 // 保存活动基本信息
                 MktCampaignDO mktCampaignDO = new MktCampaignDO();
                 CopyPropertiesUtil.copyBean2Bean(mktCampaignDO, mktCampaign);
