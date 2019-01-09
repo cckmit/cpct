@@ -60,9 +60,11 @@ public class UserUtil {
      * @return
      */
     public static Long getUserId(){
+        Long userId = 1L;
         SystemUserDto userDetail = BssSessionHelp.getSystemUserDto();
-        return userDetail.getSysUserId();
+        if (userDetail != null) {
+            userId = userDetail.getSysUserId();
+        }
+        return userId;
     }
-
-
 }
