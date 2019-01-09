@@ -150,6 +150,10 @@ public class EsServiceImpl implements EsService {
         Map<String,Object> labelInfo = new HashMap<>();
         for (Map<String,Object> label : labelList){
             if (label.get("labelResultList")!=null){
+                List<Map<String,Object>> labelResults = (List<Map<String, Object>>) label.get("labelResultList");
+                for (Map<String,Object> map : labelResults){
+                    map.put("operType",Operator.getOperator(Integer.valueOf(map.get("operType").toString())).getDescription());
+                }
                 labelInfo.put("labelResultList",label.get("labelResultList"));
             }
         }
