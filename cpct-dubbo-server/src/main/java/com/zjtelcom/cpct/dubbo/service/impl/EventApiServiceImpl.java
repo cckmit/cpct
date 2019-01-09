@@ -588,7 +588,7 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
                 //判断事件推荐活动数，按照优先级排序
-                if (activityList.size() > 0) {
+                if (activityList.size() > 0 && recCampaignAmount > 0 && recCampaignAmount < activityList.size()) {
                     Collections.sort(activityList, new Comparator<Map<String, Object>>() {
                         public int compare(Map o1, Map o2) {
                             if (!o1.containsKey("orderPriority")) {
@@ -601,16 +601,14 @@ public class EventApiServiceImpl implements EventApiService {
                         }
                     });
 
-                    if (recCampaignAmount > 0 && recCampaignAmount < activityList.size()) {
-                        String orderPriorityLast = (String) activityList.get(recCampaignAmount - 1).get("orderPriority");
+                    String orderPriorityLast = (String) activityList.get(recCampaignAmount - 1).get("orderPriority");
 
-                        for (int i = recCampaignAmount; i < activityList.size(); i++) {
-                            if (!orderPriorityLast.equals(activityList.get(i).get("orderPriority"))) {
-                                //es log
-                                esJson.put("msg", "推荐数：" + i + ",命中数：" + activityList.size());
-                                //事件推荐活动数
-                                activityList = activityList.subList(0, i);
-                            }
+                    for (int i = recCampaignAmount; i < activityList.size(); i++) {
+                        if (!orderPriorityLast.equals(activityList.get(i).get("orderPriority"))) {
+                            //es log
+                            esJson.put("msg", "推荐数：" + i + ",命中数：" + activityList.size());
+                            //事件推荐活动数
+                            activityList = activityList.subList(0, i);
                         }
                     }
                 }
@@ -803,8 +801,6 @@ public class EventApiServiceImpl implements EventApiService {
                                 productStr = body.getString("PROM_LIST");
                             }
 
-//                            productCheck = checkFilerProm(checkProduct,productStr);
-
                             String[] checkProductArr = checkProduct.split(",");
                             String esMsg = "";
                             if (productStr != null && !"".equals(productStr)) {
@@ -853,15 +849,6 @@ public class EventApiServiceImpl implements EventApiService {
                         //暂不处理
                         //do something
                     }
-//                    else if ("5000".equals(filterRule.getFilterType())) {  //时间段过滤
-//                        //时间段的格式
-//                        if (compareHourAndMinute(filterRule)) {
-//                            esJson.put("hit", "false");
-//                            esJson.put("msg", "过滤时间段验证被拦截");
-//                            esService.save(esJson, IndexList.ACTIVITY_MODULE);
-//                            return Collections.EMPTY_MAP;
-//                        }
-//                    }
                     else if ("6000".equals(filterRule.getFilterType())) {  //过扰规则
                         //将过扰规则的标签放到iSale展示列
                         StringBuilder queryLabel = new StringBuilder();
@@ -1555,7 +1542,6 @@ public class EventApiServiceImpl implements EventApiService {
                         labelMapList = tarGrpConditionMapper.selectAllLabelByTarId(tarGrpId);
                     }
 
-
                     //将规则拼装为表达式
                     StringBuilder expressSb = new StringBuilder();
                     expressSb.append("if(");
@@ -1683,6 +1669,7 @@ public class EventApiServiceImpl implements EventApiService {
                 esService.save(esJson, IndexList.RULE_MODULE);
                 return Collections.EMPTY_MAP;
             }
+
             try {
                 //规则引擎计算
 //                System.out.println(express);
@@ -1830,7 +1817,8 @@ public class EventApiServiceImpl implements EventApiService {
                 } else {
                     jsonObject.put("hit", false);
                     jsonObject.put("msg", "渠道均未命中");
-
+                    esService.save(jsonObject, IndexList.RULE_MODULE);
+                    return Collections.EMPTY_MAP;
                 }
                 esService.save(jsonObject, IndexList.RULE_MODULE);
             } catch (Exception e) {
