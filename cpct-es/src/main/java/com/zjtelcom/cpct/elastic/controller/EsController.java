@@ -2,7 +2,7 @@ package com.zjtelcom.cpct.elastic.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.zjtelcom.cpct.elastic.model.CampaignHitParam;
-import com.zjtelcom.cpct.elastic.service.EsService;
+import com.zjtelcom.cpct.elastic.service.EsHitService;
 import com.zjtelcom.cpct.elastic.util.ElasticsearchUtil;
 import com.zjtelcom.cpct.elastic.util.EsPage;
 import org.apache.commons.lang3.StringUtils;
@@ -40,7 +40,7 @@ public class EsController {
     private String esType="external";
 
     @Autowired
-    private EsService esService;
+    private EsHitService esService;
 
 
     /**
