@@ -1,8 +1,10 @@
 package com.zjtelcom.cpct.service.impl.campaign;
 
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
+import com.ctzj.smt.bss.sysmgr.model.dataobject.SystemPost;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemPostDto;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
+import com.ctzj.smt.bss.sysmgr.model.query.QrySystemPostReq;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemPostDubboService;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
 import com.github.pagehelper.PageHelper;
@@ -162,6 +164,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
     @Autowired(required = false)
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
+
+
+    @Autowired(required = false)
+    private ISystemPostDubboService iSystemPostDubboService;
 
     private final static String createChannel = "cpcpcj0001";
 
@@ -505,8 +511,26 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         mktCampaignVO.setExecTypeValue(paramMap.
                 get(ParamKeyEnum.EXEC_TYPE.getParamKey() + mktCampaignDO.getExecType()));
 
-        // 获取渠道信息
-        String postName = PostUtil.getPostNameByCode(mktCampaignDO.getCreateChannel());
+        String postName = "";
+        try {
+            SystemPost systemPost = new SystemPost();
+            systemPost.setSysPostCode(mktCampaignDO.getCreateChannel());
+            QrySystemPostReq qrySystemPostReq = new QrySystemPostReq();
+            qrySystemPostReq.setSystemPost(systemPost);
+            SysmgrResultObject<com.ctzj.smt.bss.sysmgr.model.common.Page> pageSysmgrResultObject = iSystemPostDubboService.qrySystemPostPage(new com.ctzj.smt.bss.sysmgr.model.common.Page(), qrySystemPostReq);
+            if(pageSysmgrResultObject!=null){
+                if( pageSysmgrResultObject.getResultObject()!=null){
+                    List<SystemPost> dataList = (List<SystemPost>) pageSysmgrResultObject.getResultObject().getDataList();
+                    if(dataList!=null){
+                        if(dataList.get(0)!=null){
+                            postName = dataList.get(0).getSysPostName();
+                        }
+                    }
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         mktCampaignVO.setCreateChannelName(postName);
 
 
