@@ -770,9 +770,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         for (Map<String,Object> hitMap : mapList){
             Map<String, Object> searchMap = (Map<String, Object>) hitMap.get("searchHitMap");
             Map<String, Object> map = new HashMap<>();
-            Map<String,Object> ruleInfoMap = new HashMap<>();
+            TrialOperationParamES ruleInfoMap = new TrialOperationParamES();
             if (hitMap.get("ruleInfo") != null) {
-                ruleInfoMap = (Map<String, Object>) hitMap.get("ruleInfo");
+                ruleInfoMap = (TrialOperationParamES) hitMap.get("ruleInfo");
             }
 
             for (String set : searchMap.keySet()) {
@@ -785,8 +785,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             map.put("campaignName", operation.getCampaignName());
             map.put("strategyId", operation.getStrategyId());
             map.put("strategyName", operation.getStrategyName());
-            map.put("ruleId", ruleInfoMap.get("ruleId"));
-            map.put("ruleName", ruleInfoMap.get("ruleName"));
+            map.put("ruleId", ruleInfoMap.getRuleId());
+            map.put("ruleName", ruleInfoMap.getRuleName());
             //todo 工单号
             map.put("orderId", "49736605");
             userList.add(map);
@@ -903,6 +903,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             new Thread(){
                 public void run(){
                    esService.strategyIssure(issureRequest);
+//                    TrialResponseES res  =  restTemplate.postForObject("http://localhost:8080/es/cpcMatchFileToFtp", issureRequest, TrialResponseES.class);
                 }
             }.start();
         } catch (Exception e) {
