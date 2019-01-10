@@ -59,6 +59,7 @@ import java.util.concurrent.Future;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 
 @Service
 @Transactional
@@ -251,6 +252,11 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
                 if (mktCampaignDO == null) {
                     mktCampaignMap.put("resultCode", CommonConstant.CODE_FAIL);
                     mktCampaignMap.put("resultMsg", "活动不存在！");
+                    return mktCampaignMap;
+                }
+                if (!StatusCode.STATUS_CODE_PASS.getStatusCode().equals(mktCampaignDO.getStatusCd())){
+                    mktCampaignMap.put("resultCode", CommonConstant.CODE_FAIL);
+                    mktCampaignMap.put("resultMsg", "非已通过活动，无法发布！");
                     return mktCampaignMap;
                 }
                 mktCampaignMapper.changeMktCampaignStatus(mktCampaignId, "2002", new Date(), UserUtil.loginId());
