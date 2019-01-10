@@ -22,7 +22,6 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
-import com.zjtelcom.cpct.dao.user.UserListMapper;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
@@ -39,12 +38,14 @@ import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.elastic.service.EsService;
 import com.zjtelcom.cpct.enums.ConfAttrEnum;
+import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -57,6 +58,9 @@ import static java.util.Calendar.MONTH;
 
 @Service
 public class EventApiServiceImpl implements EventApiService {
+
+    @Value("${thread.maxPoolSize}")
+    private int maxPoolSize;
 
     private static final int THREAD_COUNT_ACTIVE = 50;
     private static final int THREAD_COUNT_STRATEGY = 20;
@@ -584,7 +588,7 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
                 //判断事件推荐活动数，按照优先级排序
-                if (activityList.size() > 0) {
+                if (activityList.size() > 0 && recCampaignAmount > 0 && recCampaignAmount < activityList.size()) {
                     Collections.sort(activityList, new Comparator<Map<String, Object>>() {
                         public int compare(Map o1, Map o2) {
                             if (!o1.containsKey("orderPriority")) {
@@ -597,16 +601,14 @@ public class EventApiServiceImpl implements EventApiService {
                         }
                     });
 
-                    if (recCampaignAmount > 0 && recCampaignAmount < activityList.size()) {
-                        String orderPriorityLast = (String) activityList.get(recCampaignAmount - 1).get("orderPriority");
+                    String orderPriorityLast = (String) activityList.get(recCampaignAmount - 1).get("orderPriority");
 
-                        for (int i = recCampaignAmount; i < activityList.size(); i++) {
-                            if (!orderPriorityLast.equals(activityList.get(i).get("orderPriority"))) {
-                                //es log
-                                esJson.put("msg", "推荐数：" + i + ",命中数：" + activityList.size());
-                                //事件推荐活动数
-                                activityList = activityList.subList(0, i);
-                            }
+                    for (int i = recCampaignAmount; i < activityList.size(); i++) {
+                        if (!orderPriorityLast.equals(activityList.get(i).get("orderPriority"))) {
+                            //es log
+                            esJson.put("msg", "推荐数：" + i + ",命中数：" + activityList.size());
+                            //事件推荐活动数
+                            activityList = activityList.subList(0, i);
                         }
                     }
                 }
@@ -799,8 +801,6 @@ public class EventApiServiceImpl implements EventApiService {
                                 productStr = body.getString("PROM_LIST");
                             }
 
-//                            productCheck = checkFilerProm(checkProduct,productStr);
-
                             String[] checkProductArr = checkProduct.split(",");
                             String esMsg = "";
                             if (productStr != null && !"".equals(productStr)) {
@@ -849,15 +849,6 @@ public class EventApiServiceImpl implements EventApiService {
                         //暂不处理
                         //do something
                     }
-//                    else if ("5000".equals(filterRule.getFilterType())) {  //时间段过滤
-//                        //时间段的格式
-//                        if (compareHourAndMinute(filterRule)) {
-//                            esJson.put("hit", "false");
-//                            esJson.put("msg", "过滤时间段验证被拦截");
-//                            esService.save(esJson, IndexList.ACTIVITY_MODULE);
-//                            return Collections.EMPTY_MAP;
-//                        }
-//                    }
                     else if ("6000".equals(filterRule.getFilterType())) {  //过扰规则
                         //将过扰规则的标签放到iSale展示列
                         StringBuilder queryLabel = new StringBuilder();
@@ -934,25 +925,32 @@ public class EventApiServiceImpl implements EventApiService {
                     StringBuilder queryFieldsSale = new StringBuilder();
 
                     //查询展示列 （iSale）
-                    List<Map<String, String>> iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getIsaleDisplay());
+                    List<Map<String, Object>> iSaleDisplay = new ArrayList<>();
+                    iSaleDisplay = (List<Map<String, Object>>) redisUtils.get("EVT_ISALE_LABEL_" + mktCampaign.getIsaleDisplay());
+                    if (iSaleDisplay == null) {
+                        iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getIsaleDisplay());
+                        redisUtils.set("EVT_ISALE_LABEL_" + mktCampaign.getIsaleDisplay(), iSaleDisplay);
+                    }
+
                     if (iSaleDisplay != null && iSaleDisplay.size() > 0) {
-                        for (Map<String, String> labelMap : iSaleDisplay) {
-                            switch (labelMap.get("labelCode")) {
-                                case "1000":
-                                    queryFieldsCust.append(labelMap.get("labelCode")).append(",");
-                                    break;
-                                case "2000":
-                                    queryFieldsAss.append(labelMap.get("labelCode")).append(",");
-                                    break;
-                                case "3000":
-                                    queryFieldsSale.append(labelMap.get("labelCode")).append(",");
-                                    break;
+                        for (Map<String, Object> labelMap : iSaleDisplay) {
+                            //标签类型
+                            String labelType = (String) labelMap.get("labelType");
+                            //标签编码
+                            String labelCode = (String) labelMap.get("labelCode");
+                            if (StatusCode.CCUST_LEVEL.getStatusCode().equals(labelType)) {
+                                queryFieldsCust.append(labelCode).append(",");
+                            } else if (StatusCode.ASSET_LEVEL.getStatusCode().equals(labelType)) {
+                                queryFieldsAss.append(labelCode).append(",");
+                            } else if (StatusCode.PRODUCT_LEVEL.getStatusCode().equals(labelType)) {
+                                queryFieldsSale.append(labelCode).append(",");
+                            } else {
+                                //如果标签类型不属于任何一种  不处理
                             }
                         }
 
                         JSONObject resJsonAll = new JSONObject();
 
-                        //如果有销售品级标签，就加上销售品主id的查询
                         if (queryFieldsSale.length() > 0) {
                             queryFieldsAss.append("PROM_INTEG_ID");
                         }
@@ -969,7 +967,6 @@ public class EventApiServiceImpl implements EventApiService {
                             httpParams.put("queryFields", queryFieldsAss.toString());
                             //dubbo接口查询标签
                             JSONObject resJson = getLabelByDubbo(httpParams);
-//                    System.out.println(resJson.toString());
                             resJsonAll.putAll(resJson);
                         }
                         if (queryFieldsCust.length() > 0) {
@@ -984,7 +981,6 @@ public class EventApiServiceImpl implements EventApiService {
                             httpParams.put("queryFields", queryFieldsCust.toString());
                             //dubbo接口查询标签
                             JSONObject resJson = getLabelByDubbo(httpParams);
-//                    System.out.println(resJson.toString());
                             resJsonAll.putAll(resJson);
                         }
                         if (queryFieldsSale.length() > 0) {
@@ -1000,7 +996,6 @@ public class EventApiServiceImpl implements EventApiService {
                                 httpParams.put("queryFields", queryFieldsSale.toString());
                                 //dubbo接口查询标签
                                 JSONObject resJson = getLabelByDubbo(httpParams);
-//                        System.out.println(resJson.toString());
                                 resJsonAll.putAll(resJson);
                             }
                         }
@@ -1011,7 +1006,7 @@ public class EventApiServiceImpl implements EventApiService {
                         List<Map<String, Object>> triggerList3 = new ArrayList<>();
                         List<Map<String, Object>> triggerList4 = new ArrayList<>();
 
-                        for (Map<String, String> label : iSaleDisplay) {
+                        for (Map<String, Object> label : iSaleDisplay) {
                             if (resJsonAll.containsKey((String) label.get("labelCode"))) {
                                 triggers = new JSONObject();
                                 triggers.put("key", label.get("labelCode"));
@@ -1059,7 +1054,7 @@ public class EventApiServiceImpl implements EventApiService {
                     for (Map<String, Object> strategyMap : strategyList) {
                         List<Map<String, Object>> ChlMap = (List<Map<String, Object>>) strategyMap.get("taskChlList");
                         for (Map<String, Object> map : ChlMap) {
-                            map.put("itgTriggers", itgTriggers);
+                            map.put("itgTriggers", JSONArray.parse(JSONArray.toJSON(itgTriggers).toString()));
                             map.put("triggers", JSONArray.parse(JSONArray.toJSON(evtTriggers).toString()));
 
 //                            List<Map<String, Object>> itgMap = (List<Map<String, Object>>) map.get("itgTriggers");
@@ -1547,7 +1542,6 @@ public class EventApiServiceImpl implements EventApiService {
                         labelMapList = tarGrpConditionMapper.selectAllLabelByTarId(tarGrpId);
                     }
 
-
                     //将规则拼装为表达式
                     StringBuilder expressSb = new StringBuilder();
                     expressSb.append("if(");
@@ -1675,6 +1669,7 @@ public class EventApiServiceImpl implements EventApiService {
                 esService.save(esJson, IndexList.RULE_MODULE);
                 return Collections.EMPTY_MAP;
             }
+
             try {
                 //规则引擎计算
 //                System.out.println(express);
@@ -1822,7 +1817,8 @@ public class EventApiServiceImpl implements EventApiService {
                 } else {
                     jsonObject.put("hit", false);
                     jsonObject.put("msg", "渠道均未命中");
-
+                    esService.save(jsonObject, IndexList.RULE_MODULE);
+                    return Collections.EMPTY_MAP;
                 }
                 esService.save(jsonObject, IndexList.RULE_MODULE);
             } catch (Exception e) {
@@ -2689,15 +2685,20 @@ public class EventApiServiceImpl implements EventApiService {
         try {
             //查询展示列标签
             MktCampaignDO mktCampaign = mktCampaignMapper.selectByPrimaryKey(activityId);
-            List<Map<String, String>> iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getIsaleDisplay());
+            List<Map<String, Object>> iSaleDisplay = new ArrayList<>();
+            iSaleDisplay = (List<Map<String, Object>>) redisUtils.get("EVT_ISALE_LABEL_" + mktCampaign.getIsaleDisplay());
+            if (iSaleDisplay == null) {
+                iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getIsaleDisplay());
+                redisUtils.set("EVT_ISALE_LABEL_" + mktCampaign.getIsaleDisplay(), iSaleDisplay);
+            }
             List<Map<String, Object>> itgTriggers = new ArrayList<>();
             Map<String, Object> itgTrigger;
 
             StringBuilder querySb = new StringBuilder();
 
             if (iSaleDisplay != null && iSaleDisplay.size() > 0) {
-                for (Map<String, String> label : iSaleDisplay) {
-                    querySb.append((String) label.get("labelCode")).append(",");
+                for (Map<String, Object> labelMap : iSaleDisplay) {
+                    querySb.append((String) labelMap.get("labelCode")).append(",");
                 }
                 if (querySb.length() > 0) {
                     querySb.deleteCharAt(querySb.length() - 1);
@@ -2719,7 +2720,7 @@ public class EventApiServiceImpl implements EventApiService {
                 List<Map<String, Object>> triggerList3 = new ArrayList<>();
                 List<Map<String, Object>> triggerList4 = new ArrayList<>();
 
-                for (Map<String, String> label : iSaleDisplay) {
+                for (Map<String, Object> label : iSaleDisplay) {
                     if (resJson.containsKey((String) label.get("labelCode"))) {
                         triggers = new JSONObject();
                         triggers.put("key", label.get("labelCode"));

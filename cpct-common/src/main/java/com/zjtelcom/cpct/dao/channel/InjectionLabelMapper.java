@@ -55,6 +55,6 @@ public interface InjectionLabelMapper{
 
     List<Label> listLabelByGrpId(@Param("grpId")Long grpId);
 
-    List<Map<String,String>> listLabelByDisplayId(@Param("grpId")Long grpId);
+    List<Map<String,Object>> listLabelByDisplayId(@Param("grpId")Long grpId);
 
 }
