@@ -10,7 +10,7 @@
 package com.zjtelcom.cpct.pojo;
 
 
-import com.zjtelcom.cpct.dto.pojo.MktCampaign;
+import com.zjtelcom.cpct.dto.pojo.MktCampaignPO;
 
 import java.io.Serializable;
 import java.util.List;
@@ -24,15 +24,15 @@ import java.util.List;
  * @since JDK1.7
  */
 public class MktCampaignDetailReq implements Serializable {
-    private List<MktCampaign> mktCampaignDetails;
+    private List<MktCampaignPO> mktCampaignDetails;
 
     private String transactionId;
 
-    public List<MktCampaign> getMktCampaignDetails() {
+    public List<MktCampaignPO> getMktCampaignDetails() {
         return mktCampaignDetails;
     }
 
-    public void setMktCampaignDetails(List<MktCampaign> mktCampaignDetails) {
+    public void setMktCampaignDetails(List<MktCampaignPO> mktCampaignDetails) {
         this.mktCampaignDetails = mktCampaignDetails;
     }
 

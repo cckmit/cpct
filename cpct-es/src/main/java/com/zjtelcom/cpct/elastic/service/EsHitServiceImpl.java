@@ -56,21 +56,26 @@ public class EsHitServiceImpl implements EsHitService {
         jsonObject.put("dateSt",new Date());
         jsonObject.put("dateSt2","2018-04-25T08:33:44.840Z");
 
-
         String id = ElasticsearchUtil.addData(jsonObject, "params_module", esType, jsonObject.getString("id"));
         System.out.println("*********ID**********: "+id);
     }
 
     @Override
     public void save(JSONObject jsonObject,String indexName) {
-        String id = ElasticsearchUtil.addData(jsonObject, indexName, esType);
-        logger.info("test..."+id);
+        try {
+            ElasticsearchUtil.addData(jsonObject, indexName, esType);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void save(JSONObject jsonObject,String indexName,String _id) {
-        String id = ElasticsearchUtil.addData(jsonObject, indexName, esType, _id);
-        logger.info("test..."+id);
+        try {
+            ElasticsearchUtil.addData(jsonObject, indexName, esType, _id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

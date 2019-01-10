@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 
-public class MktCampaign implements Serializable {
+public class MktCampaignPO implements Serializable {
     private Long mktCampaignId;
 
     private String tiggerType;
@@ -345,24 +345,24 @@ public class MktCampaign implements Serializable {
         this.actType = actType;
     }
 
-	public MktCampaign() {
+	public MktCampaignPO() {
 		super();
 	}
 
-	public MktCampaign(Long mktCampaignId, String tiggerType,
-                       String mktCampaignName, Date planBeginTime, Date planEndTime,
-                       Date beginTime, Date endTime, String mktCampaignType,
-                       String mktActivityNbr, String mktActivityTarget,
-                       String mktCampaignDesc, Long calcDisplay, Long isaleDisplay, String execType, String execInvl,
-                       Integer execNum, String statusCd, Date statusDate,
-                       Long createStaff, Date createDate, Long updateStaff,
-                       Date updateDate, String remark, Long lanId, Long strategyId,
-                       List<MktCamGrpRul> mktCamGrpRuls, List<MktCamItem> mktCamItems,
-                       List<MktCamChlConf> mktCamChlConfDetails,
-                       List<MktCpcAlgorithmsRul> mktCpcAlgorithmsRulDetails,
-                       List<MktContactEvt> mktCampaignEvts,
-                       List<MktStrategy> mktCampaignStrategyDetails,
-                       List<EventScene> eventScenes, String actType) {
+	public MktCampaignPO(Long mktCampaignId, String tiggerType,
+                         String mktCampaignName, Date planBeginTime, Date planEndTime,
+                         Date beginTime, Date endTime, String mktCampaignType,
+                         String mktActivityNbr, String mktActivityTarget,
+                         String mktCampaignDesc, Long calcDisplay, Long isaleDisplay, String execType, String execInvl,
+                         Integer execNum, String statusCd, Date statusDate,
+                         Long createStaff, Date createDate, Long updateStaff,
+                         Date updateDate, String remark, Long lanId, Long strategyId,
+                         List<MktCamGrpRul> mktCamGrpRuls, List<MktCamItem> mktCamItems,
+                         List<MktCamChlConf> mktCamChlConfDetails,
+                         List<MktCpcAlgorithmsRul> mktCpcAlgorithmsRulDetails,
+                         List<MktContactEvt> mktCampaignEvts,
+                         List<MktStrategy> mktCampaignStrategyDetails,
+                         List<EventScene> eventScenes, String actType) {
 		super();
 		this.mktCampaignId = mktCampaignId;
 		this.tiggerType = tiggerType;
