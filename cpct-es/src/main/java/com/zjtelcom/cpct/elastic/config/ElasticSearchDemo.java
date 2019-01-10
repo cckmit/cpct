@@ -1,15 +1,15 @@
 package com.zjtelcom.cpct.elastic.config;
 
 
-import com.zjtelcom.cpct.elastic.service.EsService;
+import com.zjtelcom.cpct.elastic.service.EsHitService;
 
 import java.util.Date;
 
 public class ElasticSearchDemo implements Runnable {
 
-    private EsService esService;
+    private EsHitService esService;
 
-    public ElasticSearchDemo(EsService esService) {
+    public ElasticSearchDemo(EsHitService esService) {
         this.esService = esService;
     }
 

@@ -1128,8 +1128,8 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                             TarGrpCondition tarGrpConditionNew = tarGrpDetail.getTarGrpConditions().get(j);
                             if (tarGrpCondition.getLeftParam().equals(tarGrpConditionNew.getLeftParam())) {
                                 tarGrpCondition.setRightParam(tarGrpConditionNew.getRightParam());
+                                tarGrpCondition.setOperType(tarGrpConditionNew.getOperType());
                                 moreList.add(tarGrpCondition);
-                                //delId.add(tarGrpCondition.getConditionId());
                                 continue;
                             } else if (!tarGrpCondition.getLeftParam().equals(tarGrpConditionNew.getLeftParam()) && j == tarGrpDetail.getTarGrpConditions().size() - 1) {
                                 moreList.add(tarGrpCondition);
