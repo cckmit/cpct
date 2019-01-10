@@ -123,7 +123,7 @@
         <if test="filterType != null and filterType != ''">
             AND FILTER_TYPE = #{filterType}
         </if>
-        ORDER BY RULE_ID DESC
+        ORDER BY UPDATE_DATE DESC
     </select>
 
     <select id="selectByProduct" resultMap="BaseResultMap">
@@ -138,7 +138,7 @@
         <if test="chooseProduct != null and chooseProduct != ''">
             AND CHOOSE_PRODUCT like concat('%',concat(#{chooseProduct},'%'))
         </if>
-        ORDER BY RULE_ID DESC
+        ORDER BY UPDATE_DATE DESC
     </select>
 
     <delete id="delFilterRule" parameterType="com.zjtelcom.cpct.dto.filter.FilterRule">

@@ -337,7 +337,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             Long mktCampaignId = mktCampaignDO.getMktCampaignId();
             MktCampaignDO campaign = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
             // 记录活动操作
-           // mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), campaign.getStatusCd(), mktCampaignDO.getStatusCd(), UserUtil.getUserId(), OperatorLogEnum.UPDATE.getOperatorValue());
+            mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), campaign.getStatusCd(), mktCampaignDO.getStatusCd(), UserUtil.getUserId(), OperatorLogEnum.UPDATE.getOperatorValue());
 
             //删除原来的活动与城市之间的关系
             mktCamCityRelMapper.deleteByMktCampaignId(mktCampaignId);
@@ -506,10 +506,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 get(ParamKeyEnum.EXEC_TYPE.getParamKey() + mktCampaignDO.getExecType()));
 
         // 获取渠道信息
-/*
         String postName = PostUtil.getPostNameByCode(mktCampaignDO.getCreateChannel());
         mktCampaignVO.setCreateChannelName(postName);
-*/
+
 
         // 获取活动关联的事件
         List<MktCamEvtRelDO> mktCamEvtRelDOList = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignDO.getMktCampaignId());

@@ -105,8 +105,6 @@ public class QuestionServiceImpl implements QuestionService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",null);
         result.put("data",vo);
-        result.put("post",fourthDataSource());
-        result.put("sysUser",userTest());
         return result;
 
 
