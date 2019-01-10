@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.elastic.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.zjtelcom.cpct.domain.channel.LabelResult;
 import com.zjtelcom.cpct.elastic.model.CampaignHitParam;
 import com.zjtelcom.cpct.elastic.model.CampaignHitResponse;
 import com.zjtelcom.cpct.elastic.model.CampaignInfoTree;
@@ -10,7 +9,6 @@ import com.zjtelcom.cpct.elastic.util.DateUtil;
 import com.zjtelcom.cpct.elastic.util.ElasticsearchUtil;
 import com.zjtelcom.cpct.elastic.util.EsSearchUtil;
 import com.zjtelcom.cpct.enums.Operator;
-import org.apache.logging.log4j.util.StringMap;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
@@ -25,15 +23,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.zjtelcom.cpct.elastic.config.IndexList.*;
 
 @Service
-public class EsServiceImpl implements EsService {
+public class EsHitServiceImpl implements EsHitService {
 
-    protected Logger logger = LoggerFactory.getLogger(EsServiceImpl.class);
+    protected Logger logger = LoggerFactory.getLogger(EsHitServiceImpl.class);
 
     @Autowired
     private TransportClient client;

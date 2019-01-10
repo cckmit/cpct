@@ -110,7 +110,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private MktCamScriptMapper scriptMapper;
     @Autowired
     private SysParamsMapper sysParamsMapper;
-    @Autowired(required = false)
+    @Autowired
     private EsService esService;
     @Autowired
     private MktResourceMapper resourceMapper;
@@ -385,7 +385,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         //按规则存储客户信息
         for (int i = 0; i < num; i++) {
             redisUtils.hset("ISSURE_" + batchNumSt + "_" + ruleId, i + "",smallCustomers.get(i));
-            System.out.println("规则：" + i + redisUtils.get("ISSURE_" + batchNumSt + "_" + ruleId));
         }
 //        redisUtils.set("ISSURE_" + batchNumSt + "_" + ruleId,customerList);
         MktCampaignDO campaignDO = campaignMapper.selectByPrimaryKey(operation.getCampaignId());
@@ -593,17 +592,18 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
         try {
             //todo
-             response = esService.searchBatchInfo(requests);
+            System.out.println(JSON.toJSONString(requests));
+            response = esService.searchBatchInfo(requests);
 
-//            response = restTemplate.postForObject(batchInfo, request, TrialResponse.class);
+//            response = restTemplate.postForObject("http://localhost:8080/es/searchBatchInfo", requests, TrialResponseES.class);
             //同时调用统计查询的功能
 
-             countResponse = esService.searchCountInfo(requests);
+//             countResponse = esService.searchCountInfo(requests);
 //            countResponse = restTemplate.postForObject(countInfo,request,TrialResponse.class);
 
-            if (countResponse.getResultCode().equals(CODE_SUCCESS)){
-                redisUtils.set("HITS_COUNT_INFO_"+request.getBatchNum(),countResponse.getHitsList());
-            }
+//            if (countResponse.getResultCode().equals(CODE_SUCCESS)){
+//                redisUtils.set("HITS_COUNT_INFO_"+request.getBatchNum(),countResponse.getHitsList());
+//            }
             if (!response.getResultCode().equals(CODE_SUCCESS)) {
                 trialOperation.setStatusCd("2000");
                 trialOperation.setUpdateDate(new Date());
@@ -748,7 +748,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             Map<String, Long> param = new HashMap<>();
             param.put("batchId", operation.getBatchNum());
             response = esService.findBatchHitsList(operation.getBatchNum().toString());
-//            response = restTemplate.postForObject(hitsList, param, TrialResponse.class);
+//            response = restTemplate.postForObject("http://localhost:8080/es/findBatchHitsList",param, TrialResponseES.class);
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("试算清单记录查询失败{}",operation.getBatchNum());
@@ -769,11 +769,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
         for (Map<String,Object> hitMap : mapList){
             Map<String, Object> searchMap = (Map<String, Object>) hitMap.get("searchHitMap");
-            TrialOperationParamES ruleInfoMap = new TrialOperationParamES();
-            if ((TrialOperationParamES)hitMap.get("ruleInfo") != null) {
-                ruleInfoMap = (TrialOperationParamES) hitMap.get("ruleInfo");
-            }
             Map<String, Object> map = new HashMap<>();
+            Map<String,Object> ruleInfoMap = new HashMap<>();
+            if (hitMap.get("ruleInfo") != null) {
+                ruleInfoMap = (Map<String, Object>) hitMap.get("ruleInfo");
+            }
+
             for (String set : searchMap.keySet()) {
                 if (labelCodeList.size() < searchMap.keySet().size()) {
                     labelCodeList.add(set);
@@ -784,8 +785,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             map.put("campaignName", operation.getCampaignName());
             map.put("strategyId", operation.getStrategyId());
             map.put("strategyName", operation.getStrategyName());
-            map.put("ruleId", ruleInfoMap.getRuleId());
-            map.put("ruleName", ruleInfoMap.getRuleName());
+            map.put("ruleId", ruleInfoMap.get("ruleId"));
+            map.put("ruleName", ruleInfoMap.get("ruleName"));
             //todo 工单号
             map.put("orderId", "49736605");
             userList.add(map);

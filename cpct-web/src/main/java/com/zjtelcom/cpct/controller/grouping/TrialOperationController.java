@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.controller.grouping;
 
 
+import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.dto.grouping.TrialOperationVO;
@@ -62,6 +63,7 @@ public class TrialOperationController extends BaseController {
     public Map<String, Object> importUserList(MultipartFile file, TrialOperationVO operation,@Param("ruleId") Long ruleId)throws IOException{
         Map<String, Object> result = new HashMap<>();
         try {
+
             result = operationService.importUserList(file,operation,ruleId);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to importUserList", e);
