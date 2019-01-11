@@ -3,12 +3,13 @@
 scan：当此属性设置为true时，配置文件如果发生改变，将会被重新加载，默认值为true。
 scanPeriod：设置监测配置文件是否有修改的时间间隔，如果没有给出时间单位，默认单位是毫秒当scan为true时，此属性生效。默认的时间间隔为1分钟。
 debug：当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false。
+/app/logs是容器挂载日志的目录  cpct-dubbo则为生产的日志文件上一层目录  cpct-dubbo-server.log为生产的日志文件名称
 -->
 <configuration scan="false" scanPeriod="60 seconds" debug="false">
     <!-- 定义日志的根目录 -->
-    <property name="LOG_HOME" value="/app/logs/cpct-dubbo" />
+    <property name="LOG_HOME" value="/app/logs/cpct/cpct-count" />
     <!-- 定义日志文件名称 -->
-    <property name="appName" value="cpct-dubbo-server"/>
+    <property name="appName" value="cpct-count"/>
     <!-- ch.qos.logback.core.ConsoleAppender 表示控制台输出 -->
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <!--
@@ -21,7 +22,7 @@ debug：当此属性设置为true时，将打印出logback内部日志信息，�
 			%n是换行符
         -->
         <layout class="ch.qos.logback.classic.PatternLayout">
-                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS}----------> [%thread] %-5level %logger{50} - %msg%n</pattern>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS}----> [%thread] %-5level %logger{50} - %msg%n</pattern>
         </layout>
     </appender>
 
@@ -55,7 +56,7 @@ debug：当此属性设置为true时，将打印出logback内部日志信息，�
         <!-- 日志输出格式： -->
         <layout class="ch.qos.logback.classic.PatternLayout">
 
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [ %thread ] ------------------ [ %-5level ] [ %logger{50} : %line ] - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [ %thread ] ----[ %-5level ] [ %logger{50} : %line ] - %msg%n</pattern>
 
         </layout>
     </appender>
