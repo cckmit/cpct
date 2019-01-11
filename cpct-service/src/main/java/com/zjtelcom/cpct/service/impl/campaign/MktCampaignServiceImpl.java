@@ -216,7 +216,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setMktActivityNbr("MKT" + String.format("%06d", mktCampaignId));
             mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
             // 记录活动操作
-//            mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), null, mktCampaignDO.getStatusCd(), UserUtil.getUserId(), OperatorLogEnum.ADD.getOperatorValue());
+//          mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), null, mktCampaignDO.getStatusCd(), UserUtil.getUserId(), OperatorLogEnum.ADD.getOperatorValue());
 
             // 创建二次营销活动
             if (mktCampaignVO.getPreMktCampaignId() != null && (mktCampaignVO.getPreMktCampaignId() != 0)) {
@@ -510,28 +510,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 get(ParamKeyEnum.STATUS_CD.getParamKey() + mktCampaignDO.getStatusCd()));
         mktCampaignVO.setExecTypeValue(paramMap.
                 get(ParamKeyEnum.EXEC_TYPE.getParamKey() + mktCampaignDO.getExecType()));
-
-        String postName = "";
-        try {
-            SystemPost systemPost = new SystemPost();
-            systemPost.setSysPostCode(mktCampaignDO.getCreateChannel());
-            QrySystemPostReq qrySystemPostReq = new QrySystemPostReq();
-            qrySystemPostReq.setSystemPost(systemPost);
-            SysmgrResultObject<com.ctzj.smt.bss.sysmgr.model.common.Page> pageSysmgrResultObject = iSystemPostDubboService.qrySystemPostPage(new com.ctzj.smt.bss.sysmgr.model.common.Page(), qrySystemPostReq);
-            if(pageSysmgrResultObject!=null){
-                if( pageSysmgrResultObject.getResultObject()!=null){
-                    List<SystemPost> dataList = (List<SystemPost>) pageSysmgrResultObject.getResultObject().getDataList();
-                    if(dataList!=null){
-                        if(dataList.get(0)!=null){
-                            postName = dataList.get(0).getSysPostName();
-                        }
-                    }
-                }
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        mktCampaignVO.setCreateChannelName(postName);
 
 
         // 获取活动关联的事件
@@ -879,7 +857,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     }
 
     /**
-     * 查询活动列表（分页）
+     * 查询活动列表（分页） -- 活动总览
      */
     @Override
     public Map<String, Object> qryMktCampaignListPage(Map<String, Object> params) {
@@ -917,7 +895,28 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCampaignVO.setMktActivityNbr(mktCampaignCountDO.getMktActivityNbr());
                     mktCampaignVO.setPlanBeginTime(mktCampaignCountDO.getPlanBeginTime());
                     mktCampaignVO.setPlanEndTime(mktCampaignCountDO.getPlanEndTime());
-                    mktCampaignVO.setCreateChannel(PostEnum.getNameByCode(mktCampaignCountDO.getCreateChannel()));
+
+                    String postName = "";
+                    try {
+                        SystemPost systemPost = new SystemPost();
+                        systemPost.setSysPostCode(mktCampaignDO.getCreateChannel());
+                        QrySystemPostReq qrySystemPostReq = new QrySystemPostReq();
+                        qrySystemPostReq.setSystemPost(systemPost);
+                        SysmgrResultObject<com.ctzj.smt.bss.sysmgr.model.common.Page> pageSysmgrResultObject = iSystemPostDubboService.qrySystemPostPage(new com.ctzj.smt.bss.sysmgr.model.common.Page(), qrySystemPostReq);
+                        if(pageSysmgrResultObject!=null){
+                            if( pageSysmgrResultObject.getResultObject()!=null){
+                                List<SystemPost> dataList = (List<SystemPost>) pageSysmgrResultObject.getResultObject().getDataList();
+                                if(dataList!=null){
+                                    if(dataList.get(0)!=null){
+                                        postName = dataList.get(0).getSysPostName();
+                                    }
+                                }
+                            }
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    mktCampaignVO.setCreateChannelName(postName);
                     mktCampaignVO.setCreateDate(mktCampaignCountDO.getCreateDate());
                     mktCampaignVO.setPreMktCampaignId(mktCampaignCountDO.getPreMktCampaignId());
 

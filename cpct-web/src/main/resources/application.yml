@@ -7,6 +7,7 @@ logging:
   level:
     com.zjtelcom.cpct.dao: debug
     com.ctg.itrdc.cache.pool.CtgJedisPool: warn
+    com.alibaba.dubbo: error
 #    root: error
 
 eureka:
