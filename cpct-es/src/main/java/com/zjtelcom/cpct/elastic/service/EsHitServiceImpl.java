@@ -65,7 +65,8 @@ public class EsHitServiceImpl implements EsHitService {
         try {
             ElasticsearchUtil.addData(jsonObject, indexName, esType);
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            logger.error("es日志存储失败");
         }
     }
 
@@ -74,7 +75,8 @@ public class EsHitServiceImpl implements EsHitService {
         try {
             ElasticsearchUtil.addData(jsonObject, indexName, esType, _id);
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            logger.error("es日志存储失败");
         }
     }
 
