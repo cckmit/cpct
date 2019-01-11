@@ -162,12 +162,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Autowired
     private MktOperatorLogService mktOperatorLogService;
 
-    @Autowired(required = false)
-    private ISystemUserDtoDubboService iSystemUserDtoDubboService;
-
-
-    @Autowired(required = false)
-    private ISystemPostDubboService iSystemPostDubboService;
+//    @Autowired(required = false)
+//    private ISystemUserDtoDubboService iSystemUserDtoDubboService;
+//
+//
+//    @Autowired(required = false)
+//    private ISystemPostDubboService iSystemPostDubboService;
 
     private final static String createChannel = "cpcpcj0001";
 
@@ -512,25 +512,25 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 get(ParamKeyEnum.EXEC_TYPE.getParamKey() + mktCampaignDO.getExecType()));
 
         String postName = "";
-        try {
-            SystemPost systemPost = new SystemPost();
-            systemPost.setSysPostCode(mktCampaignDO.getCreateChannel());
-            QrySystemPostReq qrySystemPostReq = new QrySystemPostReq();
-            qrySystemPostReq.setSystemPost(systemPost);
-            SysmgrResultObject<com.ctzj.smt.bss.sysmgr.model.common.Page> pageSysmgrResultObject = iSystemPostDubboService.qrySystemPostPage(new com.ctzj.smt.bss.sysmgr.model.common.Page(), qrySystemPostReq);
-            if(pageSysmgrResultObject!=null){
-                if( pageSysmgrResultObject.getResultObject()!=null){
-                    List<SystemPost> dataList = (List<SystemPost>) pageSysmgrResultObject.getResultObject().getDataList();
-                    if(dataList!=null){
-                        if(dataList.get(0)!=null){
-                            postName = dataList.get(0).getSysPostName();
-                        }
-                    }
-                }
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+//        try {
+//            SystemPost systemPost = new SystemPost();
+//            systemPost.setSysPostCode(mktCampaignDO.getCreateChannel());
+//            QrySystemPostReq qrySystemPostReq = new QrySystemPostReq();
+//            qrySystemPostReq.setSystemPost(systemPost);
+//            SysmgrResultObject<com.ctzj.smt.bss.sysmgr.model.common.Page> pageSysmgrResultObject = iSystemPostDubboService.qrySystemPostPage(new com.ctzj.smt.bss.sysmgr.model.common.Page(), qrySystemPostReq);
+//            if(pageSysmgrResultObject!=null){
+//                if( pageSysmgrResultObject.getResultObject()!=null){
+//                    List<SystemPost> dataList = (List<SystemPost>) pageSysmgrResultObject.getResultObject().getDataList();
+//                    if(dataList!=null){
+//                        if(dataList.get(0)!=null){
+//                            postName = dataList.get(0).getSysPostName();
+//                        }
+//                    }
+//                }
+//            }
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
         mktCampaignVO.setCreateChannelName(postName);
 
 
@@ -922,12 +922,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCampaignVO.setPreMktCampaignId(mktCampaignCountDO.getPreMktCampaignId());
 
                     // 获取创建人信息
-                    SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(mktCampaignCountDO.getCreateStaff(), new ArrayList<Long>());
-                    if (systemUserDtoSysmgrResultObject != null) {
-                        if (systemUserDtoSysmgrResultObject.getResultObject() != null) {
-                            mktCampaignVO.setCreateStaffName(systemUserDtoSysmgrResultObject.getResultObject().getStaffName());
-                        }
-                    }
+//                    SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(mktCampaignCountDO.getCreateStaff(), new ArrayList<Long>());
+//                    if (systemUserDtoSysmgrResultObject != null) {
+//                        if (systemUserDtoSysmgrResultObject.getResultObject() != null) {
+//                            mktCampaignVO.setCreateStaffName(systemUserDtoSysmgrResultObject.getResultObject().getStaffName());
+//                        }
+//                    }
 
                 } catch (Exception e) {
                     logger.error("Excetion:", e);

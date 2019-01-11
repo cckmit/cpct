@@ -313,10 +313,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         for (Long ruleId : ruleIdList){
             MktCamItem item = camItemMapper.selectByPrimaryKey(ruleId);
             if (item==null){
-                result.put("resultCode",CODE_FAIL);
-                result.put("resultMsg","推荐条目不存在");
-                return result;
-
+               continue;
             }
             //销售品
             if (item.getItemType().equals("1000")){
