@@ -21,5 +21,7 @@ public interface MktCamChlResultConfRelPrdMapper {
 
     List<MktCamChlResultConfRelDO> selectAll();
 
+    List<Long> selectConfIdByResultId(Long mktCamChlResultId);
+
     int updateByPrimaryKey(MktCamChlResultConfRelDO mktCamChlResultConfRelDO);
 }

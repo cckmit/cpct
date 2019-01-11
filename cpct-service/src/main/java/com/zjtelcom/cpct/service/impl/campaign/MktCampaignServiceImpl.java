@@ -131,7 +131,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Autowired
     private MktStrategyConfRuleMapper mktStrategyConfRuleMapper;
 
-    @Autowired
+    @Autowired(required = false)
     private SynchronizeCampaignService synchronizeCampaignService;
 
     @Autowired

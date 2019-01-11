@@ -72,7 +72,7 @@ public class SynchronizeController extends BaseController {
     private SynTarGrpTemplateService synTarGrpTemplateService;
     @Autowired
     private SynMktCampaignRelService synMktCampaignRelService;
-    @Autowired
+    @Autowired(required = false)
     private SynchronizeCampaignService synchronizeCampaignService;
     @Autowired
     private SynLabelGrpService synLabelGrpService;
