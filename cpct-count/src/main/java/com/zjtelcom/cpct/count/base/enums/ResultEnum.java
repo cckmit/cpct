@@ -8,7 +8,8 @@ package com.zjtelcom.cpct.count.base.enums;
 public enum ResultEnum {
 
     SUCCESS("1"),         //成功
-    FAILED("1000");       //失败
+    FAILED("1000"),       //失败
+    ES_SUCCESS("200");    //es返回成功
 
 
     private String status;

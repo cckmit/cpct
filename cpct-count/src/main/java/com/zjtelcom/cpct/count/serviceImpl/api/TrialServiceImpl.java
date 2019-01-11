@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.count.serviceImpl.api;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.zjtelcom.cpct.count.base.enums.ResultEnum;
 import com.zjtelcom.cpct.count.service.api.TrialService;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
@@ -80,11 +81,14 @@ public class TrialServiceImpl implements TrialService {
 //            String url="http://192.168.137.1:8080/es/searchByTarGrp";
 //            responseES = restTemplate.postForObject(url, trialTarGrp, TrialResponseES.class);
             responseES = esService.searchByTarGrp(trialTarGrp);
-            System.out.println("返回信息："+ JSONObject.parseObject(JSON.toJSONString(responseES)));
+            log.info("es返回信息："+ JSONObject.parseObject(JSON.toJSONString(responseES)));
 
         }catch (Exception e){
             e.printStackTrace();
             log.error("分群试算失败：es接口调用错误");
+            //es返回200成功
+            responseES.setResultCode(ResultEnum.FAILED.getStatus());
+            responseES.setResultMsg("分群试算失败：es接口调用错误");
         }
         return responseES;
     }
