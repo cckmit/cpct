@@ -23,7 +23,10 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
 import com.zjtelcom.cpct.domain.Rule;
 import com.zjtelcom.cpct.domain.RuleDetail;
 import com.zjtelcom.cpct.domain.campaign.*;
-import com.zjtelcom.cpct.domain.channel.*;
+import com.zjtelcom.cpct.domain.channel.CamScript;
+import com.zjtelcom.cpct.domain.channel.Label;
+import com.zjtelcom.cpct.domain.channel.MktVerbal;
+import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
@@ -31,14 +34,12 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyFilterRuleRelDO;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
-import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.channel.VerbalConditionVO;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.enums.ErrorCode;
-import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.enums.SynchronizeType;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.synchronize.SynchronizeRecordService;
@@ -898,6 +899,10 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
             if (item == null || item.getMktCampaignId() == null) {
                 item = mktCamItemMapper.selectByPrimaryKey(itemId);
                 if (item == null) {
+                    continue;
+                }
+                MktCamItem prdItem = mktCamItemPrdMapper.selectByPrimaryKey(itemId);
+                if (prdItem!=null){
                     continue;
                 }
 //                redisUtils.set("MKT_CAM_ITEM_" + item.getMktCamItemId(), item);
