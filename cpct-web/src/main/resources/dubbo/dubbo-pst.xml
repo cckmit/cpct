@@ -12,7 +12,7 @@
     <dubbo:registry id="esb2" protocol="dubbo" address="134.96.159.11:8033"/>
     <dubbo:registry id="esb1" protocol="dubbo" address="134.96.159.11:8033"/>
 
-    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.service.api.EventApiService" id="eventApiService"
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.EventApiService" id="eventApiService"
                      version="1.0" retries="0" check="false">
         <!--<dubbo:method name="CalculateCPC" servicecode="00.1083.CalculateCPC" timeout="20000"/>-->
         <dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="20000"/>
@@ -26,7 +26,7 @@
         <dubbo:method name="contactTaskReceipt" servicecode="00.1079.CPCResultFeedback" timeout="20000"/>
     </dubbo:reference>
 
-    <dubbo:reference registry="esb2" interface="org.springframework.session.data.ctg.IDubboCtgService"
+    <dubbo:reference registry="esb3" interface="org.springframework.session.data.ctg.IDubboCtgService"
                      id="dubboCtgService" version="1.0" check="false">
         <dubbo:method name="smembers" servicecode="00.1077.ctgSessionSmembers"/>
         <dubbo:method name="hgetAll" servicecode="00.1077.ctgSessionHgetAll"/>
@@ -48,6 +48,16 @@
         <dubbo:method name="syncActivity" servicecode="33.1307.syncActivity" timeout="30000"/>
     </dubbo:reference>
 
+    <!-- 门户-获取用户岗位信息 -->
+    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemPostDubboService"
+                     id="iSystemPostDubboService" version="1.0" retries="0" check="false">
+        <dubbo:method name="qrySystemPostPage" servicecode="00.1077.qrySystemPostPage" timeout="10000"/>
+    </dubbo:reference>
 
+    <!-- 门户-获取用户角色信息 -->
+    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService"
+                     id="iSystemUserDtoDubboService" version="1.0" retries="0" check="false">
+        <dubbo:method name="qrySystemUserDto" servicecode="00.1077.qrySystemUserDto" timeout="10000"/>
+    </dubbo:reference>
 
 </beans>

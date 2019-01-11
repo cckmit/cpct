@@ -1,9 +1,3 @@
-/**
- * @(#)MktCamChlConfAttrServiceImpl.java, 2018/7/2.
- * <p/>
- * Copyright 2018 Netease, Inc. All rights reserved.
- * NETEASE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
 package com.zjtelcom.cpct.service.impl.campaign;
 
 import com.alibaba.fastjson.JSON;
@@ -237,7 +231,9 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                 } else if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.QUESTION.getArrId()) && !"".equals(mktCamChlConfAttr.getAttrValue())) {
                     // 问卷
                     Questionnaire questionnaire = mktQuestionnaireMapper.selectByPrimaryKey(Long.valueOf(mktCamChlConfAttr.getAttrValue()));
-                    mktCamChlConfAttr.setAttrValueName(questionnaire.getNaireName());
+                    logger.info("*************************************:mktCamChlConfAttr"+JSON.toJSONString(mktCamChlConfAttr.getClass().getMethods()));
+                    logger.info("*************************************:mktCamChlConfAttr"+JSON.toJSONString(mktCamChlConfAttr.getClass().getPackage()));
+                    mktCamChlConfAttr.setAttrValName(questionnaire.getNaireName());
                 }
                 mktCamChlConfAttrList.add(mktCamChlConfAttr);
             }

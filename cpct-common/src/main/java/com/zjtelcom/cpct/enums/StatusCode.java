@@ -48,6 +48,11 @@ public enum StatusCode {
     ONE_TIME("一次性", "1000"),
     PERIODICITY("周期性", "2000"),
 
+    /*营销活动触发类型*/
+    BATCH_CAMPAIGN("批量营销活动", "1000"),
+    REAL_TIME_CAMPAIGN("实时营销活动", "2000"),
+    MIXTURE_CAMPAIGN("混合营销活动", "3000"),
+
     /*活动类型*/
     FRAMEWORK_CAMPAIGN("框架活动", "1000"),
     ENFORCEMENT_CAMPAIGN("强制活动", "2000"),
@@ -59,10 +64,10 @@ public enum StatusCode {
     PROM_TYPE("销售品类", "1000"),
 
     /*标签类型*/
-    CCUST_LEVEL("1000","客户级"),
-    ASSET_LEVEL("2000","用户级"),
-    PRODUCT_LEVEL("3000","销售品级"),
-    ZONE_LEVEL("4000","区域级");
+    CCUST_LEVEL("客户级","1000"),
+    ASSET_LEVEL("用户级","2000"),
+    PRODUCT_LEVEL("销售品级","3000"),
+    ZONE_LEVEL("区域级","4000");
 
 
     private String statusMsg;

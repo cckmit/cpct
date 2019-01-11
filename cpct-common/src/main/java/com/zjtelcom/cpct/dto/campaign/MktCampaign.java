@@ -82,6 +82,11 @@ public class MktCampaign extends BaseEntity {
     private String createChannel;
 
     /**
+     * 创建渠道名称
+     */
+    private String createChannelName;
+
+    /**
      * 活动目录标识
      */
     private Long directoryId;
@@ -327,5 +332,13 @@ public class MktCampaign extends BaseEntity {
 
     public void setExtMktCampaignId(String extMktCampaignId) {
         this.extMktCampaignId = extMktCampaignId;
+    }
+
+    public String getCreateChannelName() {
+        return createChannelName;
+    }
+
+    public void setCreateChannelName(String createChannelName) {
+        this.createChannelName = createChannelName;
     }
 }

@@ -946,6 +946,13 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         // 查询新的客户分群
         try {
             TarGrpDetail tarGrpDetail = (TarGrpDetail) redisUtils.get("TAR_GRP_" + tarGrpNewId);
+            if (tarGrpDetail == null) {
+                TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpNewId);
+                tarGrpDetail = BeanUtil.create(tarGrp, new TarGrpDetail());
+                List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrpNewId);
+                tarGrpDetail.setTarGrpConditions(conditionList);
+                redisUtils.set("TAR_GRP_" + tarGrp.getTarGrpId(), tarGrpDetail);
+            }
             //初始化结果集
             List<Future<Map<String, Object>>> threadList = new ArrayList<>();
                     //初始化线程池
@@ -1041,7 +1048,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
 
 
     /**
-     * 批量修改
+     * 批量修改客户分群
      *
      * @param ruleIdList
      * @param tarGrpNewId
@@ -1053,6 +1060,13 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         // 查询新的客户分群
         try {
             TarGrpDetail tarGrpDetail = (TarGrpDetail) redisUtils.get("TAR_GRP_" + tarGrpNewId);
+            if (tarGrpDetail == null) {
+                TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpNewId);
+                tarGrpDetail = BeanUtil.create(tarGrp, new TarGrpDetail());
+                List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrpNewId);
+                tarGrpDetail.setTarGrpConditions(conditionList);
+                redisUtils.set("TAR_GRP_" + tarGrp.getTarGrpId(), tarGrpDetail);
+            }
             //初始化结果集
             List<Future<Map<String, Object>>> threadList = new ArrayList<>();
             //初始化线程池
@@ -1096,18 +1110,26 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             Map<String, Object> map = new HashMap<>();
             MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleId);
             if (mktStrategyConfRuleDO.getTarGrpId() != null) {
+                // 获取原来的额客户分群信息
                 TarGrpDetail detail = (TarGrpDetail) redisUtils.get("TAR_GRP_" + mktStrategyConfRuleDO.getTarGrpId());
-                List<Long> delId = new ArrayList<>();
+                if (detail == null) {
+                    TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(mktStrategyConfRuleDO.getTarGrpId());
+                    detail = BeanUtil.create(tarGrp, new TarGrpDetail());
+                    List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(mktStrategyConfRuleDO.getTarGrpId());
+                    detail.setTarGrpConditions(conditionList);
+                    redisUtils.set("TAR_GRP_" + tarGrp.getTarGrpId(), tarGrpDetail);
+                }
                 if (detail != null) {
                     List<TarGrpCondition> moreList = new ArrayList<>();
+                    // 遍历对比新的客户分群条件和原客户分群条件的不同
                     for (int i = 0; i < detail.getTarGrpConditions().size(); i++) {
                         TarGrpCondition tarGrpCondition = detail.getTarGrpConditions().get(i);
                         for (int j = 0; j < tarGrpDetail.getTarGrpConditions().size(); j++) {
                             TarGrpCondition tarGrpConditionNew = tarGrpDetail.getTarGrpConditions().get(j);
                             if (tarGrpCondition.getLeftParam().equals(tarGrpConditionNew.getLeftParam())) {
-                                tarGrpConditionNew.setTarGrpId(mktStrategyConfRuleDO.getTarGrpId());
-                                moreList.add(tarGrpConditionNew);
-                                delId.add(tarGrpCondition.getConditionId());
+                                tarGrpCondition.setRightParam(tarGrpConditionNew.getRightParam());
+                                tarGrpCondition.setOperType(tarGrpConditionNew.getOperType());
+                                moreList.add(tarGrpCondition);
                                 continue;
                             } else if (!tarGrpCondition.getLeftParam().equals(tarGrpConditionNew.getLeftParam()) && j == tarGrpDetail.getTarGrpConditions().size() - 1) {
                                 moreList.add(tarGrpCondition);
@@ -1115,8 +1137,9 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                         }
                     }
                     detail.setTarGrpConditions(moreList);
+                    logger.info("detail = " + JSON.toJSONString(detail));
                     map = tarGrpService.modTarGrp(detail);
-                    tarGrpConditionMapper.deleteBatch(delId);
+                   // tarGrpConditionMapper.deleteBatch(delId);
                 }
             }
             return map;
@@ -1137,6 +1160,13 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         // 查询新的客户分群
         try {
             TarGrpDetail tarGrpDetail = (TarGrpDetail) redisUtils.get("TAR_GRP_" + tarGrpNewId);
+            if (tarGrpDetail == null) {
+                TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpNewId);
+                tarGrpDetail = BeanUtil.create(tarGrp, new TarGrpDetail());
+                List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrpNewId);
+                tarGrpDetail.setTarGrpConditions(conditionList);
+                redisUtils.set("TAR_GRP_" + tarGrp.getTarGrpId(), tarGrpDetail);
+            }
             //初始化结果集
             List<Future<Map<String, Object>>> threadList = new ArrayList<>();
             //初始化线程池
@@ -1181,6 +1211,13 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleId);
             if (mktStrategyConfRuleDO.getTarGrpId() != null) {
                 TarGrpDetail detail = (TarGrpDetail) redisUtils.get("TAR_GRP_" + mktStrategyConfRuleDO.getTarGrpId());
+                if (detail == null) {
+                    TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(mktStrategyConfRuleDO.getTarGrpId());
+                    detail = BeanUtil.create(tarGrp, new TarGrpDetail());
+                    List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(mktStrategyConfRuleDO.getTarGrpId());
+                    detail.setTarGrpConditions(conditionList);
+                    redisUtils.set("TAR_GRP_" + tarGrp.getTarGrpId(), detail);
+                }
                 List<TarGrpCondition> tarGrpConditionList = new ArrayList<>();
                 if (detail != null) {
                     List<TarGrpCondition> moreList = new ArrayList<>();
@@ -1252,36 +1289,6 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         public Map<String, Object> call() throws Exception {
             Map map = new HashMap();
             MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleId);
-            String productIds = mktStrategyConfRuleDO.getProductId();
-            List<Long> productIdList = new ArrayList<>();
-            List<MktCamItem> mktCamItemList = new ArrayList<>();
-            if (productIds != null && !"".equals(productIds)) {
-                String[] productIdArrary = productIds.split("/");
-                for (String productId : productIdArrary) {
-                    // mktCamItemMapper.selectByPrimaryKey(Long.valueOf(productId))
-                    productIdList.add(Long.valueOf(productId));
-                }
-                // 获取原有的推送条目
-                if (productIdList!=null && !productIdList.isEmpty()){
-                    mktCamItemList = mktCamItemMapper.selectByBatch(productIdList);
-                }
-            }
-            // 获取最新的推荐条目
-            List<MktCamItem> mktCamItemListNew = new ArrayList<>();
-            if (camitemIdList!=null && !camitemIdList.isEmpty()){
-                mktCamItemListNew = mktCamItemMapper.selectByBatch(camitemIdList);
-            }
-            List<Long> moreIdList = new ArrayList<>();
-            for (int i = 0; i < mktCamItemList.size(); i++) {
-                for (int j = 0; j < mktCamItemListNew.size(); j++) {
-                    if (!mktCamItemList.get(i).getItemId().equals(mktCamItemListNew.get(j).getItemId()) && j == mktCamItemListNew.size() - 1) {
-                        moreIdList.add(mktCamItemList.get(i).getMktCamItemId());
-                    } else if (mktCamItemList.get(i).getItemId().equals(mktCamItemListNew.get(j).getItemId())) {
-                        continue;
-                    }
-                }
-            }
-            camitemIdList.addAll(moreIdList);
             String productIdsNew = "";
             for (int i = 0; i < camitemIdList.size(); i++) {
                 if (i == 0) {
@@ -1290,6 +1297,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     productIdsNew += "/" + camitemIdList.get(i);
                 }
             }
+            logger.info("productIdsNew = " + productIdsNew);
             mktStrategyConfRuleDO.setProductId(productIdsNew);
             mktStrategyConfRuleDO.setUpdateStaff(UserUtil.loginId());
             mktStrategyConfRuleDO.setUpdateDate(new Date());

@@ -110,7 +110,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private MktCamScriptMapper scriptMapper;
     @Autowired
     private SysParamsMapper sysParamsMapper;
-    @Autowired(required = false)
+    @Autowired
     private EsService esService;
     @Autowired
     private MktResourceMapper resourceMapper;
@@ -385,7 +385,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         //按规则存储客户信息
         for (int i = 0; i < num; i++) {
             redisUtils.hset("ISSURE_" + batchNumSt + "_" + ruleId, i + "",smallCustomers.get(i));
-            System.out.println("规则：" + i + redisUtils.get("ISSURE_" + batchNumSt + "_" + ruleId));
         }
 //        redisUtils.set("ISSURE_" + batchNumSt + "_" + ruleId,customerList);
         MktCampaignDO campaignDO = campaignMapper.selectByPrimaryKey(operation.getCampaignId());
@@ -593,17 +592,18 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
         try {
             //todo
-             response = esService.searchBatchInfo(requests);
+            System.out.println(JSON.toJSONString(requests));
+            response = esService.searchBatchInfo(requests);
 
-//            response = restTemplate.postForObject(batchInfo, request, TrialResponse.class);
+//            response = restTemplate.postForObject("http://localhost:8080/es/searchBatchInfo", requests, TrialResponseES.class);
             //同时调用统计查询的功能
 
-             countResponse = esService.searchCountInfo(requests);
+//             countResponse = esService.searchCountInfo(requests);
 //            countResponse = restTemplate.postForObject(countInfo,request,TrialResponse.class);
 
-            if (countResponse.getResultCode().equals(CODE_SUCCESS)){
-                redisUtils.set("HITS_COUNT_INFO_"+request.getBatchNum(),countResponse.getHitsList());
-            }
+//            if (countResponse.getResultCode().equals(CODE_SUCCESS)){
+//                redisUtils.set("HITS_COUNT_INFO_"+request.getBatchNum(),countResponse.getHitsList());
+//            }
             if (!response.getResultCode().equals(CODE_SUCCESS)) {
                 trialOperation.setStatusCd("2000");
                 trialOperation.setUpdateDate(new Date());
@@ -643,7 +643,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         logger.info("*********** 试算获取全部标签条件编码 ："+JSON.toJSONString(ruleCodeList));
         //添加固定查询标签
         if (!codeList.contains("ACCS_NBR")){
-            codeList.add("ACC_NBR");
+            codeList.add("ACCS_NBR");
         }if (!codeList.contains("LATN_NAME")){
             codeList.add("LATN_NAME");
         }if (!codeList.contains("CCUST_NAME")){
@@ -748,7 +748,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             Map<String, Long> param = new HashMap<>();
             param.put("batchId", operation.getBatchNum());
             response = esService.findBatchHitsList(operation.getBatchNum().toString());
-//            response = restTemplate.postForObject(hitsList, param, TrialResponse.class);
+//            response = restTemplate.postForObject("http://localhost:8080/es/findBatchHitsList",param, TrialResponseES.class);
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("试算清单记录查询失败{}",operation.getBatchNum());
@@ -769,11 +769,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
         for (Map<String,Object> hitMap : mapList){
             Map<String, Object> searchMap = (Map<String, Object>) hitMap.get("searchHitMap");
+            Map<String, Object> map = new HashMap<>();
             TrialOperationParamES ruleInfoMap = new TrialOperationParamES();
-            if ((TrialOperationParamES)hitMap.get("ruleInfo") != null) {
+            if (hitMap.get("ruleInfo") != null) {
                 ruleInfoMap = (TrialOperationParamES) hitMap.get("ruleInfo");
             }
-            Map<String, Object> map = new HashMap<>();
+
             for (String set : searchMap.keySet()) {
                 if (labelCodeList.size() < searchMap.keySet().size()) {
                     labelCodeList.add(set);
@@ -883,6 +884,16 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(request.getStrategyId());
         for (MktStrategyConfRuleRelDO ruleRelDO : ruleRelList) {
             TrialOperationParamES param = getTrialOperationParamES(request, trialOperation.getBatchNum(), ruleRelDO.getMktStrategyConfRuleId(),false);
+            List<LabelResultES> labelResultList = param.getLabelResultList();
+            List<String> labelTypeList = new ArrayList<>();
+            for (LabelResultES la : labelResultList){
+                labelTypeList.add(la.getRightOperand());
+            }
+            if (!labelTypeList.contains("2000")){
+                result.put("resultCode", CODE_FAIL);
+                result.put("resultMsg", "规则："+param.getRuleName()+"不满足查询条件，请至少配置一条用户级标签查询条件！");
+                return result;
+            }
             paramList.add(param);
         }
         requests.setParamList(paramList);
@@ -892,6 +903,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             new Thread(){
                 public void run(){
                    esService.strategyIssure(issureRequest);
+//                    TrialResponseES res  =  restTemplate.postForObject("http://localhost:8080/es/cpcMatchFileToFtp", issureRequest, TrialResponseES.class);
                 }
             }.start();
         } catch (Exception e) {

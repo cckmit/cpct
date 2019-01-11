@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.elastic.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.zjtelcom.cpct.domain.channel.LabelResult;
 import com.zjtelcom.cpct.elastic.model.CampaignHitParam;
 import com.zjtelcom.cpct.elastic.model.CampaignHitResponse;
 import com.zjtelcom.cpct.elastic.model.CampaignInfoTree;
@@ -10,7 +9,6 @@ import com.zjtelcom.cpct.elastic.util.DateUtil;
 import com.zjtelcom.cpct.elastic.util.ElasticsearchUtil;
 import com.zjtelcom.cpct.elastic.util.EsSearchUtil;
 import com.zjtelcom.cpct.enums.Operator;
-import org.apache.logging.log4j.util.StringMap;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
@@ -25,15 +23,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.zjtelcom.cpct.elastic.config.IndexList.*;
 
 @Service
-public class EsServiceImpl implements EsService {
+public class EsHitServiceImpl implements EsHitService {
 
-    protected Logger logger = LoggerFactory.getLogger(EsServiceImpl.class);
+    protected Logger logger = LoggerFactory.getLogger(EsHitServiceImpl.class);
 
     @Autowired
     private TransportClient client;
@@ -59,21 +56,26 @@ public class EsServiceImpl implements EsService {
         jsonObject.put("dateSt",new Date());
         jsonObject.put("dateSt2","2018-04-25T08:33:44.840Z");
 
-
         String id = ElasticsearchUtil.addData(jsonObject, "params_module", esType, jsonObject.getString("id"));
         System.out.println("*********ID**********: "+id);
     }
 
     @Override
     public void save(JSONObject jsonObject,String indexName) {
-        String id = ElasticsearchUtil.addData(jsonObject, indexName, esType);
-        logger.info("test..."+id);
+        try {
+            ElasticsearchUtil.addData(jsonObject, indexName, esType);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void save(JSONObject jsonObject,String indexName,String _id) {
-        String id = ElasticsearchUtil.addData(jsonObject, indexName, esType, _id);
-        logger.info("test..."+id);
+        try {
+            ElasticsearchUtil.addData(jsonObject, indexName, esType, _id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -150,6 +152,10 @@ public class EsServiceImpl implements EsService {
         Map<String,Object> labelInfo = new HashMap<>();
         for (Map<String,Object> label : labelList){
             if (label.get("labelResultList")!=null){
+                List<Map<String,Object>> labelResults = (List<Map<String, Object>>) label.get("labelResultList");
+                for (Map<String,Object> map : labelResults){
+                    map.put("operType",Operator.getOperator(Integer.valueOf(map.get("operType").toString())).getDescription());
+                }
                 labelInfo.put("labelResultList",label.get("labelResultList"));
             }
         }
@@ -184,7 +190,7 @@ public class EsServiceImpl implements EsService {
             activityInfo.setType("activity");
 
             //查询策略信息
-            SearchHits strategyHits = searchStrategyByParam(param,activityInfo.getId().toString());
+            SearchHits strategyHits = searchStrategyByParam(param,activityInfo.getId().toString(),hitEntity);
             List<Map<String,Object>> strategyList = hitsToMapList4More(strategyHits);
 
             List<CampaignInfoTree> stratygyResult = new ArrayList<>();
@@ -206,7 +212,7 @@ public class EsServiceImpl implements EsService {
 
 
                 //查询规则信息
-                SearchHits ruleHits = searchRuleByParam(param,strategyInfo.getId().toString());
+                SearchHits ruleHits = searchRuleByParam(param,strategyInfo.getId().toString(),hitEntity);
                 List<Map<String,Object>> ruleList = hitsToMapList4More( ruleHits);
 
                 List<CampaignInfoTree> ruleResult = new ArrayList<>();
@@ -227,7 +233,7 @@ public class EsServiceImpl implements EsService {
                     ruleInfo.setType("rule");
 
                     //查询标签实例信息
-                    SearchHits labelInfoHits = searchLabelByRuleId(param,ruleInfo.getId().toString());
+                    SearchHits labelInfoHits = searchLabelByRuleId(param,ruleInfo.getId().toString(),hitEntity);
                     List<Map<String,Object>> labelInfoList = hitsToMapList4More(labelInfoHits);
 
                     ruleInfo.setLabelList(labelInfoList);
@@ -266,7 +272,7 @@ public class EsServiceImpl implements EsService {
         param.setIsi(isi);
         param.setFrom(0);
         List<Map<String,Object>> labelList = new ArrayList<>();
-        SearchHits labelHits = searchLabelByRuleId(param,ruleId);
+        SearchHits labelHits = searchLabelByRuleId(param,ruleId,"");
         labelList = hitsToMapList(labelList, labelHits);
         Map<String,Object> labelInfo = new HashMap<>();
         for (Map<String,Object> label : labelList){
@@ -316,7 +322,7 @@ public class EsServiceImpl implements EsService {
      * @return
      */
     private SearchHits getSearchHits(BoolQueryBuilder boolQueryBuilder, SearchRequestBuilder builder,int from) {
-        SearchResponse myresponse = builder.setQuery(boolQueryBuilder)
+        SearchResponse myresponse = builder.setQuery(boolQueryBuilder).setSize(1000)
                 .setExplain(true).execute().actionGet();
         return myresponse.getHits();
     }
@@ -349,8 +355,8 @@ public class EsServiceImpl implements EsService {
     /**
      *标签索引查询--RuleId
      */
-    private SearchHits searchLabelByRuleId(CampaignHitParam param,String ruleId) {
-        BoolQueryBuilder boolQueryBuilder = getBoolQueryBuilderByRuleId(param.getIsi(),ruleId);
+    private SearchHits searchLabelByRuleId(CampaignHitParam param,String ruleId,String hitEntity) {
+        BoolQueryBuilder boolQueryBuilder = getBoolQueryBuilderByRuleId(param.getIsi(),ruleId,hitEntity);
         SearchRequestBuilder builder = client.prepareSearch(Label_MODULE).setTypes(esType);
         SearchHits hits = getSearchHits(boolQueryBuilder, builder,param.getFrom());
         return hits;
@@ -369,8 +375,8 @@ public class EsServiceImpl implements EsService {
     /**
      *策略索引查询
      */
-    private SearchHits searchStrategyByParam(CampaignHitParam param,String activityId) {
-        BoolQueryBuilder boolQueryBuilder = getBoolQueryBuilderByActivityId(param.getIsi(),activityId);
+    private SearchHits searchStrategyByParam(CampaignHitParam param,String activityId,String hitEntity) {
+        BoolQueryBuilder boolQueryBuilder = getBoolQueryBuilderByActivityId(param.getIsi(),activityId,hitEntity);
         SearchRequestBuilder builder = client.prepareSearch(STRATEGY_MODULE).setTypes(esType);
         SearchHits hits = getSearchHits(boolQueryBuilder, builder,param.getFrom());
         return hits;
@@ -378,8 +384,8 @@ public class EsServiceImpl implements EsService {
     /**
      *规则索引查询
      */
-    private SearchHits searchRuleByParam(CampaignHitParam param,String strategyId) {
-        BoolQueryBuilder boolQueryBuilder = getBoolQueryBuilderByStrategyId(param.getIsi(),strategyId);
+    private SearchHits searchRuleByParam(CampaignHitParam param,String strategyId,String hitEntity) {
+        BoolQueryBuilder boolQueryBuilder = getBoolQueryBuilderByStrategyId(param.getIsi(),strategyId,hitEntity);
         SearchRequestBuilder builder = client.prepareSearch(RULE_MODULE).setTypes(esType);
         SearchHits hits = getSearchHits(boolQueryBuilder, builder,param.getFrom());
         return hits;
@@ -430,34 +436,43 @@ public class EsServiceImpl implements EsService {
 
 
     //活动id isi 组装查询条件
-    private BoolQueryBuilder getBoolQueryBuilderByActivityId(String isi,String activityId) {
+    private BoolQueryBuilder getBoolQueryBuilderByActivityId(String isi,String activityId,String hitEntity) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
                         matchQuery("activityId",activityId))
                 .must(QueryBuilders.
                         matchQuery("reqId",isi));
+        if (!"".equals(hitEntity) && !"未知对象".equals(hitEntity)){
+            boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("hitEntity.keyword",hitEntity));
+        }
         System.out.println(boolQueryBuilder);
         return boolQueryBuilder;
     }
 
     //策略id isi 组装查询条件
-    private BoolQueryBuilder getBoolQueryBuilderByStrategyId(String isi,String strategyId) {
+    private BoolQueryBuilder getBoolQueryBuilderByStrategyId(String isi,String strategyId,String hitEntity) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
                         termQuery("strategyConfId",Long.valueOf(strategyId)))
                 .must(QueryBuilders.
                         matchQuery("reqId",isi));
+        if (!"".equals(hitEntity) && !"未知对象".equals(hitEntity)){
+            boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("hitEntity.keyword",hitEntity));
+        }
         System.out.println(boolQueryBuilder);
         return boolQueryBuilder;
     }
 
     //规则id isi 组装查询条件
-    private BoolQueryBuilder getBoolQueryBuilderByRuleId(String isi,String ruleId) {
+    private BoolQueryBuilder getBoolQueryBuilderByRuleId(String isi,String ruleId,String hitEntity) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
                         termQuery("ruleId",(Long.valueOf(ruleId))))
                 .must(QueryBuilders.
                         matchQuery("reqId",isi));
+        if (!"".equals(hitEntity) && !"未知对象".equals(hitEntity)){
+            boolQueryBuilder.must(QueryBuilders.matchPhraseQuery("hitEntity.keyword",hitEntity));
+        }
         System.out.println(boolQueryBuilder);
         return boolQueryBuilder;
     }

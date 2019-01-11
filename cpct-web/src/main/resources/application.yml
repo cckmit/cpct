@@ -3,10 +3,10 @@ adminPath: data
 
 #服务器部署相关配置
 logging:
-  path: /app/logs/bss-cpct.log
   level:
     com.zjtelcom.cpct.dao: debug
     com.ctg.itrdc.cache.pool.CtgJedisPool: warn
+    com.alibaba.dubbo: error
 #    root: error
 
 eureka:
@@ -58,12 +58,12 @@ redisConfig:
    password: bss_cpct_common_user#bss_cpct_common_user123
 
 
-#集团定制的redis配置生产环境
+#集团定制的redis配置pst环境
 redisConfig_Prd:
-   ip: 134.108.0.59
-   port: 41701
-   database: 4970
-   password: bss_cpcp_pocpro_user#bssCpc_ro
+      ip: 134.96.231.228
+      port: 40201
+      database: 4970
+      password: bss_cpct_common_user#bss_cpct_common_user123
 
 
 

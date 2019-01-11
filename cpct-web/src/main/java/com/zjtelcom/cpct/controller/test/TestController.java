@@ -1,6 +1,13 @@
 package com.zjtelcom.cpct.controller.test;
 
 import com.alibaba.fastjson.JSON;
+import com.ctzj.smt.bss.sysmgr.model.common.Page;
+import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
+import com.ctzj.smt.bss.sysmgr.model.dataobject.SystemPost;
+import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
+import com.ctzj.smt.bss.sysmgr.model.query.QrySystemPostReq;
+import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemPostDubboService;
+import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.rule.RuleResult;
@@ -19,10 +26,7 @@ import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 
@@ -48,28 +52,47 @@ public class TestController extends BaseController {
 
     @Autowired
     private RedisUtils redisUtils;
+
     @Autowired(required = false)
-    private RequestInstRelMapper requestInstRelMapper;
-    @Autowired
-    private ObjMktCampaignRelMapper objMktCampaignRelMapper;
+    private ISystemPostDubboService iSystemPostDubboService;
+
+    @Autowired(required = false)
+    private ISystemUserDtoDubboService iSystemUserDtoDubboService;
+
 
     @PostMapping("fourthDataSource")
     @CrossOrigin
     public Object fourthDataSource() {
 //        RequestInstRel requestInstRel = requestInstRelMapper.selectByPrimaryKey(1L);
+        String postName = "";
+        SystemPost systemPost = new SystemPost();
+        systemPost.setSysPostCode("cpcp0001");
+        QrySystemPostReq qrySystemPostReq = new QrySystemPostReq();
+        qrySystemPostReq.setSystemPost(systemPost);
+        SysmgrResultObject<Page> pageSysmgrResultObject = iSystemPostDubboService.qrySystemPostPage(new Page(), qrySystemPostReq);
+        if(pageSysmgrResultObject!=null){
+            if( pageSysmgrResultObject.getResultObject()!=null){
+                List<SystemPost> dataList = (List<SystemPost>) pageSysmgrResultObject.getResultObject().getDataList();
+                if(dataList!=null){
+                    if(dataList.get(0)!=null){
+                        postName = dataList.get(0).getSysPostName();
+                    }
+                }
+            }
+        }
+        return postName;
+    }
 
-        ObjMktCampaignRel rel = new ObjMktCampaignRel();
-        rel.setMktCampaignId(333L);
-        rel.setObjId(1666666L);
-        rel.setObjType("2000");
-        rel.setRelType("1000");
-        rel.setStatusCd(STATUSCD_EFFECTIVE);
-        rel.setStatusDate(new Date());
-        rel.setUpdateDate(new Date());
-        rel.setCreateStaff(UserUtil.loginId());
-        rel.setCreateDate(new Date());
-        objMktCampaignRelMapper.insert(rel);
-        return rel;
+    @PostMapping("userTest")
+    @CrossOrigin
+    public Object userTest() {
+        Map<String,Object> resutl = new HashMap<>();
+        SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(121119809L, new ArrayList<Long>());
+        resutl.put("staffId",systemUserDtoSysmgrResultObject);
+        SysmgrResultObject<SystemUserDto> sysUser = iSystemUserDtoDubboService.qrySystemUserDto(100010L, new ArrayList<Long>());
+        resutl.put("sysUser",sysUser);
+
+        return resutl;
     }
 
 

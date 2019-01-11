@@ -44,25 +44,15 @@ public class UserUtil {
      * 获取用户权限名称
      * @return
      */
-    public static String getRoleCode() {
-        String roleCode = "";
+    public static SystemUserDto getRoleCode() {
+        SystemUserDto userDetail = new SystemUserDto();
         try {
-            SystemUserDto userDetail = BssSessionHelp.getSystemUserDto();
-            for (SystemPostDto role : userDetail.getSystemPostDtoList()) {
-                if (role.getSysPostCode().contains("cpcp")){
-                    roleCode = role.getSysPostCode();
-                    break;
-                }
-//            if (0 != role.getDefaultFlag()) {
-//                continue;
-//            }
-//            roleName = role.getSysPostName();
-            }
+            userDetail = BssSessionHelp.getSystemUserDto();
         }catch (Exception e){
             e.printStackTrace();
-            return roleCode;
+            return userDetail;
         }
-        return roleCode;
+        return userDetail;
     }
 
     /**
@@ -70,9 +60,11 @@ public class UserUtil {
      * @return
      */
     public static Long getUserId(){
+        Long userId = 1L;
         SystemUserDto userDetail = BssSessionHelp.getSystemUserDto();
-        return userDetail.getSysUserId();
+        if (userDetail != null) {
+            userId = userDetail.getSysUserId();
+        }
+        return userId;
     }
-
-
 }

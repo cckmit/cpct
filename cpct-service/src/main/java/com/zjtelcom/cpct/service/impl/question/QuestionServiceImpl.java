@@ -1,5 +1,11 @@
 package com.zjtelcom.cpct.service.impl.question;
 
+import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
+import com.ctzj.smt.bss.sysmgr.model.dataobject.SystemPost;
+import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
+import com.ctzj.smt.bss.sysmgr.model.query.QrySystemPostReq;
+import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemPostDubboService;
+import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
@@ -18,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.*;
 
@@ -42,6 +50,42 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Value("${sync.value}")
     private String value;
+    @Autowired(required = false)
+    private ISystemPostDubboService iSystemPostDubboService;
+
+    @Autowired(required = false)
+    private ISystemUserDtoDubboService iSystemUserDtoDubboService;
+
+
+    public String fourthDataSource() {
+//        RequestInstRel requestInstRel = requestInstRelMapper.selectByPrimaryKey(1L);
+        String postName = "";
+        SystemPost systemPost = new SystemPost();
+        systemPost.setSysPostCode("cpcp0001");
+        QrySystemPostReq qrySystemPostReq = new QrySystemPostReq();
+        qrySystemPostReq.setSystemPost(systemPost);
+        SysmgrResultObject<com.ctzj.smt.bss.sysmgr.model.common.Page> pageSysmgrResultObject = iSystemPostDubboService.qrySystemPostPage(new com.ctzj.smt.bss.sysmgr.model.common.Page(), qrySystemPostReq);
+        if(pageSysmgrResultObject!=null){
+            if( pageSysmgrResultObject.getResultObject()!=null){
+                List<SystemPost> dataList = (List<SystemPost>) pageSysmgrResultObject.getResultObject().getDataList();
+                if(dataList!=null){
+                    if(dataList.get(0)!=null){
+                        postName = dataList.get(0).getSysPostName();
+                    }
+                }
+            }
+        }
+        return postName;
+    }
+
+    public Map<String, Object> userTest() {
+        Map<String,Object> resutl = new HashMap<>();
+        SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(121119809L, new ArrayList<Long>());
+        resutl.put("staffId",systemUserDtoSysmgrResultObject);
+        SysmgrResultObject<SystemUserDto> sysUser = iSystemUserDtoDubboService.qrySystemUserDto(100010L, new ArrayList<Long>());
+        resutl.put("sysUser",sysUser);
+        return resutl;
+    }
 
     /**
      * 获取题库问题详情

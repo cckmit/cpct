@@ -1,10 +1,12 @@
 package com.zjtelcom.cpct.controller.grouping;
 
 
+import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.dto.grouping.TrialOperationVO;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,7 +52,7 @@ public class TrialOperationController extends BaseController {
 
     /**
      * 客户清单导入试运算
-     * @param multipartFile
+     * @param file
      * @param operation
      * @param ruleId
      * @return
@@ -58,10 +60,11 @@ public class TrialOperationController extends BaseController {
      */
     @PostMapping("importUserList")
     @CrossOrigin
-    public Map<String, Object> importUserList(MultipartFile multipartFile, TrialOperationVO operation, Long ruleId)throws IOException{
+    public Map<String, Object> importUserList(MultipartFile file, TrialOperationVO operation,@Param("ruleId") Long ruleId)throws IOException{
         Map<String, Object> result = new HashMap<>();
         try {
-            result = operationService.importUserList(multipartFile,operation,ruleId);
+
+            result = operationService.importUserList(file,operation,ruleId);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to importUserList", e);
             result.put("resultCode", CODE_FAIL);

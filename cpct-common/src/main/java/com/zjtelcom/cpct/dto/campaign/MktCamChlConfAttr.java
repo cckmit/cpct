@@ -1,7 +1,9 @@
 package com.zjtelcom.cpct.dto.campaign;
 
 import com.zjtelcom.cpct.BaseEntity;
+import lombok.Data;
 
+@Data
 public class MktCamChlConfAttr extends BaseEntity {
     private Long contactChlAttrRstrId;
 
@@ -11,9 +13,9 @@ public class MktCamChlConfAttr extends BaseEntity {
 
     private Long attrValueId;
 
-    private String attrValue;
+    private String attrValName;
 
-    private String attrValueName;
+    public String attrValue;
 
     public Long getContactChlAttrRstrId() {
         return contactChlAttrRstrId;
@@ -55,11 +57,11 @@ public class MktCamChlConfAttr extends BaseEntity {
         this.attrValue = attrValue;
     }
 
-    public String getAttrValueName() {
-        return attrValueName;
+    public String getAttrValName() {
+        return attrValName;
     }
 
-    public void setAttrValueName(String attrValueName) {
-        this.attrValueName = attrValueName;
+    public void setAttrValName(String attrValName) {
+        this.attrValName = attrValName;
     }
 }
