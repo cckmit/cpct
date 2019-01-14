@@ -1,9 +1,9 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: bss-cpct-dubbo-server #这里修改
+  name: bss-cpct-open-api-pre #这里修改
   labels:
-    name: bss-cpct-dubbo-server  #这里修改
+    name: bss-cpct-open-api-pre  #这里修改
 spec:
   replicas: 1
   strategy:
@@ -15,19 +15,19 @@ spec:
   template:
     metadata:
       labels:
-        name: bss-cpct-dubbo-server  #这里修改
+        name: bss-cpct-open-api-pre  #这里修改
     spec:
       containers:
-      - name: bss-cpct-dubbo-server  #这里修改
-        image: 134.96.180.23:8001/hchc/bss-cpct-dubbo-server:1.0  #这里修改  地址使用这个么？
+      - name: bss-cpct-open-api-pre  #这里修改
+        image: 134.96.180.23:8001/hchc/bss-cpct-open-api-pre:1.0  #这里修改  地址使用这个么？
         imagePullPolicy: Always
         env:
-#        - name: DUBBO_IP_TO_REGISTRY     # 当项目为对外项目时，此处注解取消
-#          valueFrom:
-#           fieldRef:
-#            fieldPath: status.hostIP
-#        - name: DUBBO_PORT_TO_REGISTRY
-#          value: "30803"
+        - name: DUBBO_IP_TO_REGISTRY     # 当项目为对外项目时，此处注解取消
+          valueFrom:
+           fieldRef:
+            fieldPath: status.hostIP
+        - name: DUBBO_PORT_TO_REGISTRY
+          value: "30821"
         - name: ESB_UNREGISTER_URI
           valueFrom:
             configMapKeyRef:
@@ -43,10 +43,10 @@ spec:
         - name: app-log
           mountPath: /app/logs
         ports:
-        - containerPort: 30803    #修改端口号
+        - containerPort: 30821    #修改端口号
         readinessProbe:
           tcpSocket:
-            port: 30803   #修改端口号
+            port: 30821   #修改端口号
           initialDelaySeconds: 20
           periodSeconds: 10
           failureThreshold: 3
@@ -54,11 +54,11 @@ spec:
           timeoutSeconds: 5
         resources:   #镜像环境  不修改就用docker默认
           requests:
-            memory: "4Gi"
-            cpu: "2000m"
+            memory: "2Gi"
+            cpu: "1000m"
           limits:
-            memory: "8Gi"
-            cpu: "4000m"
+            memory: "2Gi"
+            cpu: "2000m"
       - name: jmx
         image: 134.108.5.132:8000/mgt/jmxtrans:v3.0
         imagePullPolicy: Always
@@ -67,13 +67,13 @@ spec:
           mountPath: /etc/localtime
         resources:   #镜镜像环境  不修改就用docker默认
           requests:
-            memory: "1Gi"
-            cpu: "500m"
-          limits:
-            memory: "1Gi"
+            memory: "2Gi"
             cpu: "1000m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
       nodeSelector:
-        center: bssOther  #修改镜像所属中心标签
+        center: crmcontroller   #修改镜像所属中心标签
       volumes:
       - name: tz-config
         hostPath:

@@ -1,14 +1,6 @@
 package com.zjtelcom.cpct.util;
 
-import com.ctzj.smt.bss.sysmgr.model.common.Page;
-import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
-import com.ctzj.smt.bss.sysmgr.model.dataobject.SystemPost;
-import com.ctzj.smt.bss.sysmgr.model.query.QrySystemPostReq;
-import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemPostDubboService;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import java.util.List;
 
 /**
  * @Description:

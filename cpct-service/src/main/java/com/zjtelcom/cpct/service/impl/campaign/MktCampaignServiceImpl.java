@@ -1,12 +1,7 @@
 package com.zjtelcom.cpct.service.impl.campaign;
 
-import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
-import com.ctzj.smt.bss.sysmgr.model.dataobject.SystemPost;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemPostDto;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
-import com.ctzj.smt.bss.sysmgr.model.query.QrySystemPostReq;
-import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemPostDubboService;
-import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
@@ -14,6 +9,7 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.ObjMktCampaignRelMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
+import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
@@ -32,6 +28,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.EventDTO;
+import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 import com.zjtelcom.cpct.enums.*;
@@ -52,9 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
-import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
-import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
-import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
+import static com.zjtelcom.cpct.constants.CommonConstant.*;
 
 /**
  * Description:
@@ -138,7 +133,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Autowired
     private MktStrategyConfRuleMapper mktStrategyConfRuleMapper;
 
-    @Autowired
+    @Autowired(required = false)
     private SynchronizeCampaignService synchronizeCampaignService;
 
     @Autowired
@@ -162,16 +157,46 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Autowired
     private MktOperatorLogService mktOperatorLogService;
 
-    @Autowired(required = false)
-    private ISystemUserDtoDubboService iSystemUserDtoDubboService;
+    @Autowired
+    private TarGrpMapper tarGrpMapper;
 
-
-    @Autowired(required = false)
-    private ISystemPostDubboService iSystemPostDubboService;
+//    @Autowired(required = false)
+//    private ISystemUserDtoDubboService iSystemUserDtoDubboService;
+//
+//
+//    @Autowired(required = false)
+//    private ISystemPostDubboService iSystemPostDubboService;
 
     private final static String createChannel = "cpcpcj0001";
 
 
+
+    @Override
+    public Map<String, Object> searchByCampaignId(Long campaignId) {
+        Map<String,Object> result = new HashMap<>();
+        Map<String,Object> strategyMap = new HashMap<>();
+        List<MktStrategyConfDO> strategyConfList = mktStrategyConfMapper.selectByCampaignId(campaignId);
+        for (MktStrategyConfDO strategyConfDO : strategyConfList){
+            strategyMap.put("strategyId",strategyConfDO.getMktStrategyConfId());
+            strategyMap.put("strategyName",strategyConfDO.getMktStrategyConfName());
+            Map<String,Object> ruleMap = new HashMap<>();
+            List<MktStrategyConfRuleDO> ruleDOList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(strategyConfDO.getMktStrategyConfId());
+            for (MktStrategyConfRuleDO ruleDO : ruleDOList){
+                ruleMap.put("ruleId",ruleDO.getMktStrategyConfRuleId());
+                ruleMap.put("ruleName",ruleDO.getMktStrategyConfRuleName());
+                TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(ruleDO.getTarGrpId());
+                Map<String,Object> tarMap = new HashMap<>();
+                if (tarGrp!=null){
+                    tarMap.put("tarGrpId",tarGrp.getTarGrpId());
+                    ruleMap.put("tarGrp",tarMap);
+                }
+            }
+            strategyMap.put("rule",ruleMap);
+        }
+        result.put("campaignId",campaignId);
+        result.put("strategy",strategyMap);
+        return result;
+    }
 
     /**
      * 添加活动基本信息 并建立关系
@@ -897,36 +922,36 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCampaignVO.setPlanEndTime(mktCampaignCountDO.getPlanEndTime());
 
                     String postName = "";
-                    try {
-                        SystemPost systemPost = new SystemPost();
-                        systemPost.setSysPostCode(mktCampaignDO.getCreateChannel());
-                        QrySystemPostReq qrySystemPostReq = new QrySystemPostReq();
-                        qrySystemPostReq.setSystemPost(systemPost);
-                        SysmgrResultObject<com.ctzj.smt.bss.sysmgr.model.common.Page> pageSysmgrResultObject = iSystemPostDubboService.qrySystemPostPage(new com.ctzj.smt.bss.sysmgr.model.common.Page(), qrySystemPostReq);
-                        if(pageSysmgrResultObject!=null){
-                            if( pageSysmgrResultObject.getResultObject()!=null){
-                                List<SystemPost> dataList = (List<SystemPost>) pageSysmgrResultObject.getResultObject().getDataList();
-                                if(dataList!=null){
-                                    if(dataList.get(0)!=null){
-                                        postName = dataList.get(0).getSysPostName();
-                                    }
-                                }
-                            }
-                        }
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
+//                    try {
+//                        SystemPost systemPost = new SystemPost();
+//                        systemPost.setSysPostCode(mktCampaignDO.getCreateChannel());
+//                        QrySystemPostReq qrySystemPostReq = new QrySystemPostReq();
+//                        qrySystemPostReq.setSystemPost(systemPost);
+//                        SysmgrResultObject<com.ctzj.smt.bss.sysmgr.model.common.Page> pageSysmgrResultObject = iSystemPostDubboService.qrySystemPostPage(new com.ctzj.smt.bss.sysmgr.model.common.Page(), qrySystemPostReq);
+//                        if(pageSysmgrResultObject!=null){
+//                            if( pageSysmgrResultObject.getResultObject()!=null){
+//                                List<SystemPost> dataList = (List<SystemPost>) pageSysmgrResultObject.getResultObject().getDataList();
+//                                if(dataList!=null){
+//                                    if(dataList.get(0)!=null){
+//                                        postName = dataList.get(0).getSysPostName();
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }catch (Exception e){
+//                        e.printStackTrace();
+//                    }
                     mktCampaignVO.setCreateChannelName(postName);
                     mktCampaignVO.setCreateDate(mktCampaignCountDO.getCreateDate());
                     mktCampaignVO.setPreMktCampaignId(mktCampaignCountDO.getPreMktCampaignId());
 
                     // 获取创建人信息
-                    SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(mktCampaignCountDO.getCreateStaff(), new ArrayList<Long>());
-                    if (systemUserDtoSysmgrResultObject != null) {
-                        if (systemUserDtoSysmgrResultObject.getResultObject() != null) {
-                            mktCampaignVO.setCreateStaffName(systemUserDtoSysmgrResultObject.getResultObject().getStaffName());
-                        }
-                    }
+//                    SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(mktCampaignCountDO.getCreateStaff(), new ArrayList<Long>());
+//                    if (systemUserDtoSysmgrResultObject != null) {
+//                        if (systemUserDtoSysmgrResultObject.getResultObject() != null) {
+//                            mktCampaignVO.setCreateStaffName(systemUserDtoSysmgrResultObject.getResultObject().getStaffName());
+//                        }
+//                    }
 
                 } catch (Exception e) {
                     logger.error("Excetion:", e);
