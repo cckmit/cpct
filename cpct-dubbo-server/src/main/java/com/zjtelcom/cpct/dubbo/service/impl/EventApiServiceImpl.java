@@ -793,7 +793,7 @@ public class EventApiServiceImpl implements EventApiService {
                         boolean productCheck = true;
                         //获取需要过滤的销售品
                         String checkProduct = filterRule.getChooseProduct();
-                        if (checkProduct != null) {
+                        if (checkProduct != null && !"".equals(checkProduct)) {
                             String productStr = null;
                             //获取用户已办理销售品
                             JSONObject body = getLabelsByDubbo(privateParams.get("integrationId"), privateParams.get("accNbr"), params.get("lanId"), "1", "PROM_LIST");
