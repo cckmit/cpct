@@ -60,7 +60,7 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
         int flag = sysParamsMapper.insert(sysParams);
         result.put("resultCode",CommonConstant.CODE_SUCCESS);
 
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {
@@ -93,7 +93,7 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
             //初始化同步值
             SystemParamsUtil.initValue();
         }
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {
@@ -131,7 +131,7 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","保存成功");
 
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {

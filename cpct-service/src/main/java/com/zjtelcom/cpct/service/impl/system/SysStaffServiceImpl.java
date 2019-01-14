@@ -165,7 +165,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         result.put("resultCode",CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","保存成功");
 
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {
@@ -214,7 +214,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         result.put("resultCode",CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","保存成功");
 
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {

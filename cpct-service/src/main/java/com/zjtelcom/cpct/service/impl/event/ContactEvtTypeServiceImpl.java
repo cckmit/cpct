@@ -114,7 +114,7 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
         maps.put("contactEvtType", contactEvtType);
         maps.put("ruleEvents", null);
 
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {
@@ -166,7 +166,7 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
         maps.put("contactEvtType", contactEvtType);
         maps.put("ruleEvents", null);
 
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {
@@ -208,7 +208,7 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
             maps.put("ruleEvents", null);
         }
 
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {

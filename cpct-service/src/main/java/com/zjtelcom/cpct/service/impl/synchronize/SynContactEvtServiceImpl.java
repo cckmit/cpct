@@ -6,6 +6,7 @@ import com.zjtelcom.cpct.dao.event.ContactEvtItemMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.event.EventMatchRulConditionMapper;
 import com.zjtelcom.cpct.dao.event.EventMatchRulMapper;
+import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.EventItem;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
@@ -16,6 +17,8 @@ import com.zjtelcom.cpct.exception.SystemException;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.synchronize.SynContactEvtService;
 import com.zjtelcom.cpct.service.synchronize.SynchronizeRecordService;
+import com.zjtelcom.cpct_prd.dao.campaign.MktCamEvtRelPrdMapper;
+import com.zjtelcom.cpct_prd.dao.campaign.MktCampaignPrdMapper;
 import com.zjtelcom.cpct_prd.dao.event.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +59,10 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
     private EventMatchRulConditionPrdMapper eventMatchRulConditionPrdMapper;
     @Autowired
     private MktCamEvtRelMapper mktCamEvtRelMapper;
+    @Autowired
+    private MktCamEvtRelPrdMapper mktCamEvtRelPrdMapper;
+    @Autowired
+    private MktCampaignPrdMapper mktCampaignPrdMapper;
 
     @Autowired
     private CamEvtRelPrdMapper camEvtRelPrdMapper;
@@ -72,6 +79,7 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
      */
     @Override
     public Map<String, Object> synchronizeSingleEvent(Long eventId, String roleName) {
+        System.out.println("同步单个事件： ");
         Map<String, Object> maps = new HashMap<>();
         //查询源数据库
         ContactEvt contactEvt = contactEvtMapper.getEventById(eventId);
@@ -89,7 +97,7 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
             listEventMatchRulCondition = eventMatchRulConditionMapper.listEventMatchRulCondition(eventMatchRulDTO.getEvtMatchRulId());
         }
 
-        //1.3关联的活动
+        //1.3关联的活动  关联活动的时候要判断一下该活动在生产环境是否存在 如果不存在就不要同步  如果存在就更新
         List<MktCamEvtRel> mktCamEvtRels = mktCamEvtRelMapper.qryBycontactEvtId(contactEvt.getContactEvtId());
 
 
@@ -115,10 +123,19 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
                     eventMatchRulConditionPrdMapper.insertEventMatchRulCondition(e);
                 }
             }
-            //2.5新增关联的活动
+            //2.5新增关联的活动   只能新增生产环境存在的活动
             if (!mktCamEvtRels.isEmpty()) {
-                for (MktCamEvtRel m : mktCamEvtRels) {
-                    camEvtRelPrdMapper.insert(m);
+                List<MktCampaignDO> mktCampaignDOS = mktCampaignPrdMapper.selectAll();
+                if(!mktCampaignDOS.isEmpty()){
+                    for (MktCamEvtRel mktCamEvtRel:mktCamEvtRels){
+                        for (MktCampaignDO m : mktCampaignDOS) {
+                            if(m.getMktCampaignId()-mktCamEvtRel.getMktCampaignId()==0){
+                                camEvtRelPrdMapper.insert(mktCamEvtRel);
+                                break;
+                            }
+
+                        }
+                    }
                 }
             }
         } else {
@@ -279,10 +296,11 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
     /**
      * 事件关联的活动同步
      *
-     * @param prdList
+     * @param prdList   准生产事件关联的活动
      * @param contactEvt
      */
     public void diffMktCamEvtRel(List<MktCamEvtRel> prdList, ContactEvt contactEvt) {
+
         List<MktCamEvtRel> realList = camEvtRelPrdMapper.qryBycontactEvtId(contactEvt.getContactEvtId());
         //开始比较
         List<MktCamEvtRel> addList = new ArrayList<MktCamEvtRel>();
@@ -296,10 +314,20 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
                     camEvtRelPrdMapper.deleteByMktCampaignId(realList.get(i).getMktCampaignId());
                 }
             } else if (!prdList.isEmpty() && realList.isEmpty()) {
-                //全量新增准生产的数据到生产环境
-                for (int i = 0; i < prdList.size(); i++) {
-                    camEvtRelPrdMapper.insert(prdList.get(i));
+                //新增准生产的数据到生产环境  只能同步准生产和生产都存在的活动
+                List<MktCampaignDO> mktCampaignDOS = mktCampaignPrdMapper.selectAll();
+                if(!mktCampaignDOS.isEmpty()){
+                    for (MktCamEvtRel mktCamEvtRel:prdList){
+                        for (MktCampaignDO m : mktCampaignDOS) {
+                            if(m.getMktCampaignId()-mktCamEvtRel.getMktCampaignId()==0){
+                                camEvtRelPrdMapper.insert(mktCamEvtRel);
+                                break;
+                            }
+
+                        }
+                    }
                 }
+
             }
             return;
         }
@@ -312,10 +340,20 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
                     break;
                 } else if (i == realList.size() - 1) {
                     //需要新增的  准生产存在，生产不存在
-                    addList.add(c);
+                    List<MktCampaignDO> mktCampaignDOS = mktCampaignPrdMapper.selectAll();
+                    if(!mktCampaignDOS.isEmpty()){
+                            for (MktCampaignDO m : mktCampaignDOS) {
+                                if(m.getMktCampaignId()-c.getMktCampaignId()==0){
+                                    addList.add(c);
+                                    break;
+                                }
+                            }
+                    }
+
                 }
             }
         }
+
         for (MktCamEvtRel c : realList) {
             for (int i = 0; i < prdList.size(); i++) {
                 if (c.getMktCampaignId() - prdList.get(i).getMktCampaignId() == 0) {
@@ -326,6 +364,7 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
                 }
             }
         }
+
         //开始新增
         for (MktCamEvtRel c : addList) {
             camEvtRelPrdMapper.insert(c);
@@ -413,6 +452,7 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
      */
     @Override
     public Map<String, Object> deleteSingleEvent(Long eventId, String roleName) {
+        System.out.println("同步删除事件");
         Map<String, Object> maps = new HashMap<>();
         ContactEvt contactEvt = contactEvtPrdMapper.getEventById(eventId);
         if (contactEvt != null) {
@@ -479,8 +519,17 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
         }
         //2.5新增关联的活动
         if (!mktCamEvtRels.isEmpty()) {
-            for (MktCamEvtRel m : mktCamEvtRels) {
-                camEvtRelPrdMapper.insert(m);
+            List<MktCampaignDO> mktCampaignDOS = mktCampaignPrdMapper.selectAll();
+            if(!mktCampaignDOS.isEmpty()){
+                for (MktCamEvtRel mktCamEvtRel:mktCamEvtRels){
+                    for (MktCampaignDO m : mktCampaignDOS) {
+                        if(m.getMktCampaignId()-mktCamEvtRel.getMktCampaignId()==0){
+                            camEvtRelPrdMapper.insert(mktCamEvtRel);
+                            break;
+                        }
+
+                    }
+                }
             }
         }
 
