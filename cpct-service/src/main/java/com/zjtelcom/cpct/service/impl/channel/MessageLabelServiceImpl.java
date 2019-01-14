@@ -150,7 +150,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         maps.put("resultCode", CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
 
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {
@@ -180,7 +180,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         maps.put("resultCode", CODE_SUCCESS);
         maps.put("resultMsg", "删除成功");
 
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {
@@ -292,7 +292,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         maps.put("resultCode", CODE_SUCCESS);
         maps.put("resultMsg", displayColumn.getDisplayColumnId());
 
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {
@@ -371,7 +371,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         displayColumn.setStatusCd("2000");
         displayColumnMapper.updateByPrimaryKey(displayColumn);
 
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {

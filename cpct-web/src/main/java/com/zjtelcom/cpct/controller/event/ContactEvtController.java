@@ -94,7 +94,7 @@ public class ContactEvtController extends BaseController {
         try {
             maps = contactEvtService.delEvent(contactEvtReq.getContactEvt().getContactEvtId());
             final Long eventId = (Long) maps.get("eventId");
-            if (SystemParamsUtil.getSyncValue().equals("1")&& eventId!=null){
+            if (SystemParamsUtil.isCampaignSync()&& eventId!=null){
                 new Thread(){
                     public void run(){
                         try {
@@ -173,7 +173,7 @@ public class ContactEvtController extends BaseController {
         try {
             maps = contactEvtService.createContactEvt(createContactEvtReq);
             final Long eventId = (Long) maps.get("eventId");
-            if (SystemParamsUtil.getSyncValue().equals("1")&& eventId != null){
+            if (SystemParamsUtil.isCampaignSync()&& eventId != null){
                 new Thread(){
                     public void run(){
                         try {
@@ -201,7 +201,7 @@ public class ContactEvtController extends BaseController {
         try {
             maps = contactEvtService.closeEvent(contactEvtReq.getContactEvt().getContactEvtId(), contactEvtReq.getContactEvt().getStatusCd());
             final Long eventId = (Long) maps.get("eventId");
-            if (SystemParamsUtil.getSyncValue().equals("1")&&eventId !=null){
+            if (SystemParamsUtil.isCampaignSync()&&eventId !=null){
                 new Thread(){
                     public void run(){
                         try {
@@ -261,7 +261,8 @@ public class ContactEvtController extends BaseController {
         try {
             maps = contactEvtService.modContactEvt(createContactEvtReq);
             final Long eventId = (Long) maps.get("eventId");
-            if (SystemParamsUtil.getSyncValue().equals("1")&& eventId!=null){
+            if (SystemParamsUtil.isCampaignSync()&& eventId!=null){
+                System.out.println("开始同步修改事件");
                 new Thread(){
                     public void run(){
                         try {
