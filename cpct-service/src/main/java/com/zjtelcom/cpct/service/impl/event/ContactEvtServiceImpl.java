@@ -295,7 +295,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                 }
             }
 
-//            if (SystemParamsUtil.getSyncValue().equals("1")){
+//            if (SystemParamsUtil.isSync()){
 //                new Thread(){
 //                    public void run(){
 //                        try {
@@ -361,7 +361,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             }
         }
 
-//        if (SystemParamsUtil.getSyncValue().equals("1")){
+//        if (SystemParamsUtil.isSync()){
 //            new Thread(){
 //                public void run(){
 //                    try {
@@ -402,7 +402,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             map.put("resultMsg","关闭成功");
         }
         //事件关闭开启 同步状态到生产
-//        if (SystemParamsUtil.getSyncValue().equals("1")){
+//        if (SystemParamsUtil.isSync()){
 //            new Thread(){
 //                public void run(){
 //                    try {
@@ -659,7 +659,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                 }
             }
             eventId = evtDetail.getContactEvtId();
-//            if (SystemParamsUtil.getSyncValue().equals("1")){
+//            if (SystemParamsUtil.isSync()){
 //                new Thread(){
 //                    public void run(){
 //                        try {
