@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.dubbo.service.impl;
 
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelCatalogMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
@@ -11,13 +12,17 @@ import com.zjtelcom.cpct.dubbo.model.LabModel;
 import com.zjtelcom.cpct.dubbo.model.LabValueModel;
 import com.zjtelcom.cpct.dubbo.model.RecordModel;
 import com.zjtelcom.cpct.dubbo.service.SyncLabelService;
-import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.ChannelUtil;
-import com.zjtelcom.cpct.util.RedisUtils;
-import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.dubbo.service.SynchronizeRecordService;
+import com.zjtelcom.cpct.enums.SynchronizeType;
+import com.zjtelcom.cpct.exception.SystemException;
+import com.zjtelcom.cpct.util.*;
+import com.zjtelcom.cpct_prd.dao.label.InjectionLabelPrdMapper;
+import com.zjtelcom.cpct_prd.dao.label.InjectionLabelValuePrdMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +49,100 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
     @Autowired(required = false)
     private RedisUtils redisUtils;
 
+    @Autowired
+    private InjectionLabelMapper injectionLabelMapper;
+    @Autowired(required = false)
+    private InjectionLabelPrdMapper injectionLabelPrdMapper;
+    @Autowired
+    private SynchronizeRecordService synchronizeRecordService;
+    @Autowired
+    private InjectionLabelValueMapper injectionLabelValueMapper;
+    @Autowired(required = false)
+    private InjectionLabelValuePrdMapper injectionLabelValuePrdMapper;
+    //同步表名
+    private static final String tableName="injection_label";
+
+    /**
+     * 单个标签信息同步
+     * @param labelId
+     * @param roleName
+     * @return
+     */
+    public Map<String, Object> synchronizeSingleLabel(Long labelId, String roleName) {
+        Map<String,Object> maps = new HashMap<>();
+        Label label = injectionLabelMapper.selectByPrimaryKey(labelId);
+        if(null==label){
+            throw new SystemException("对应标签信息不存在!");
+        }
+        List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(label.getInjectionLabelId());
+
+        Label label1 = injectionLabelPrdMapper.selectByPrimaryKey(labelId);
+        if(null==label1){
+            injectionLabelPrdMapper.insert(label);
+            if(!labelValues.isEmpty()){
+                injectionLabelValuePrdMapper.insertBatch(labelValues);
+//                for (LabelValue labelValue:labelValues){
+//                    injectionLabelValuePrdMapper.insert(labelValue);
+//                }
+            }
+            synchronizeRecordService.addRecord(roleName,tableName,labelId, SynchronizeType.add.getType());
+        }else{
+            injectionLabelPrdMapper.updateByPrimaryKey(label);
+            diffLabelValue(labelValues,label1);
+            synchronizeRecordService.addRecord(roleName,tableName,labelId, SynchronizeType.update.getType());
+        }
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        return maps;
+    }
+
+    /**
+     * 比较标签对应的标签值是否对应
+     * !!!准生产代码 每次修改标签都会把他对应的标签值都删除 再新增数据 所以准生产所有的修改我们都对生产环境执行先全删除再新增
+     * @param prdList  准生产标签对应的标签值
+     * @param label1   生产环境的标签
+     */
+    public void diffLabelValue(List<LabelValue> prdList,Label label1){
+        //1.1首先判断准生产 或生产是否存在某一方数据修改为0的情况
+        List<LabelValue> realList = injectionLabelValuePrdMapper.selectByLabelId(label1.getInjectionLabelId());
+        if (prdList.isEmpty() || realList.isEmpty()) {
+            if (prdList.isEmpty() && !realList.isEmpty()) {
+                //清除生产环境数据
+                for (int i = 0; i < realList.size(); i++) {
+                    injectionLabelValuePrdMapper.deleteByPrimaryKey(realList.get(i).getLabelValueId());
+                }
+            } else if (!prdList.isEmpty() && realList.isEmpty()) {
+                //全量新增准生产的数据到生产环境
+                for (int i = 0; i < prdList.size(); i++) {
+                    injectionLabelValuePrdMapper.insert(prdList.get(i));
+                }
+            }
+            return;
+        }
+        //1.2先删除生产环境的对应标签值
+        for(LabelValue c:realList){
+            injectionLabelValuePrdMapper.deleteByPrimaryKey(c.getLabelValueId());
+        }
+        //1.3新增标签值到生产环境
+        injectionLabelValuePrdMapper.insertBatch(prdList);
+
+    }
+
+    public Map<String, Object> deleteSingleLabel(Long labelId, String roleName) {
+        Map<String,Object> maps = new HashMap<>();
+        injectionLabelPrdMapper.deleteByPrimaryKey(labelId);
+        injectionLabelValuePrdMapper.deleteByLabelId(labelId);
+        //相关的标签值
+//        List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(labelId);
+//        for (LabelValue labelValue:labelValues){
+//            injectionLabelValueMapper.deleteByPrimaryKey(labelValue.getLabelValueId());
+//        }
+        synchronizeRecordService.addRecord(roleName,tableName,labelId, SynchronizeType.delete.getType());
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
+        return maps;
+    }
+
     /**
      * 标签同步对外接口
      * @param record
@@ -51,17 +150,40 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
      */
     @Override
     @Transactional
-    public Map<String, Object> syncLabelInfo(RecordModel record) {
+    public Map<String, Object> syncLabelInfo(final RecordModel record) {
         Map<String,Object> result = new HashMap<>();
         try {
             switch (record.getLabel().getLabState()){
                 case "3":
                     result = addLabel(record);
+//                    if (result.get("resultCode").equals(CODE_SUCCESS)){
+//                        new Thread(){
+//                            public void run(){
+//                                try {
+//                                    synchronizeSingleLabel(record.getLabel().getLabRowId(),"");
+//                                }catch (Exception e){
+//                                    e.printStackTrace();
+//                                }
+//                            }
+//                        }.start();
+//                    }
                     break;
                 case "5":
                     result = deleteLabel(record);
+//                    if (result.get("resultCode").equals(CODE_SUCCESS)){
+//                        new Thread(){
+//                            public void run(){
+//                                try {
+//                                    deleteSingleLabel(record.getLabel().getLabRowId(),"");
+//                                }catch (Exception e){
+//                                    e.printStackTrace();
+//                                }
+//                            }
+//                        }.start();
+//                    }
                     break;
             }
+
         }catch (Exception e){
             logger.error("[op:SyncLabelServiceImpl] fail to syncLabelInfo",e);
             result.put("resultCode",CODE_FAIL);
@@ -82,9 +204,11 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         LabModel labModel = record.getLabel();
         Label labelValodate = labelMapper.selectByTagRowId(record.getLabel().getLabRowId());
         List<LabValueModel> valueModelList = new ArrayList<>();
+        final List<Label> labelList = new ArrayList<>();
         if (record.getLabelValueList() != null && !record.getLabelValueList().isEmpty()) {
             valueModelList = record.getLabelValueList();
         }
+        Long labelId = null;
         if (labelValodate != null) {
             BeanUtil.copy(labModel,labelValodate);
             labelValodate.setSystemInfoId(1L);
@@ -120,11 +244,12 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
                 labelValodate.setLabelType("4000");
             }
             labelMapper.updateByPrimaryKey(labelValodate);
+            labelId = labelValodate.getInjectionLabelId();
             //redis更新标签库
             redisUtils.set("LABEL_LIB_"+labelValodate.getInjectionLabelId(),labelValodate);
             syncLabelValue(valueModelList,labelValodate.getInjectionLabelId());
+            labelList.add(labelValodate);
         }else {
-
             Label label = BeanUtil.create(labModel, new Label());
             label.setSystemInfoId(1L);
             label.setTagRowId(labModel.getLabRowId());//标签id
@@ -166,80 +291,27 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
                 label.setLabelType("4000");
             }
             labelMapper.insert(label);
+            labelId = label.getInjectionLabelId();
             //redis更新标签库
             redisUtils.set("LABEL_LIB_"+label.getInjectionLabelId(),label);
             syncLabelValue(valueModelList,label.getInjectionLabelId());
+            labelList.add(label);
         }
-
-
-//        //标签目录插入
-//        LabelCatalog labelCatalog =new LabelCatalog();
-//        labelCatalog.setStatusCd(STATUSCD_EFFECTIVE);
-//        labelCatalog.setCreateStaff(UserUtil.loginId());
-//        labelCatalog.setCreateDate(new Date());
-//        if(labelCatalogMapper.findByCodeAndLevel(record.getLabel().getLabObjectCode(), Long.valueOf(1)) == null) {
-//            labelCatalog.setCatalogCode(record.getLabel().getLabObjectCode());
-//            labelCatalog.setCatalogName(record.getLabel().getLabObject());
-//            labelCatalog.setLevelId(Long.valueOf(1));
-//            labelCatalog.setParentId("0");
-//            labelCatalogMapper.insert(labelCatalog);
-//        }
-//        if(labelCatalogMapper.findByCodeAndLevel((record.getLabel().getLabObjectCode() + record.getLabel().getLabLevel1()), Long.valueOf(2)) == null) {
-//            labelCatalog.setCatalogCode(record.getLabel().getLabObjectCode() + record.getLabel().getLabLevel1());
-//            labelCatalog.setCatalogName(record.getLabel().getLabLevel1Name());
-//            labelCatalog.setLevelId(Long.valueOf(2));
-//            labelCatalog.setParentId(record.getLabel().getLabObjectCode());
-//            labelCatalogMapper.insert(labelCatalog);
-//        }
-//        if(labelCatalogMapper.findByCodeAndLevel((record.getLabel().getLabObjectCode() + record.getLabel().getLabLevel1() + record.getLabel().getLabLevel2()), Long.valueOf(3)) == null) {
-//            labelCatalog.setCatalogCode(record.getLabel().getLabObjectCode() + record.getLabel().getLabLevel1() + record.getLabel().getLabLevel2());
-//            labelCatalog.setCatalogName(record.getLabel().getLabLevel2Name());
-//            labelCatalog.setLevelId(Long.valueOf(3));
-//            labelCatalog.setParentId(record.getLabel().getLabObjectCode() + record.getLabel().getLabLevel1());
-//            labelCatalogMapper.insert(labelCatalog);
-//        }
-//        if(labelCatalogMapper.findByCodeAndLevel((record.getLabel().getLabObjectCode() + record.getLabel().getLabLevel1() + record.getLabel().getLabLevel2() + record.getLabel().getLabLevel3()), Long.valueOf(4)) == null) {
-//            labelCatalog.setCatalogCode(record.getLabel().getLabObjectCode() + record.getLabel().getLabLevel1() + record.getLabel().getLabLevel2() + record.getLabel().getLabLevel3());
-//            labelCatalog.setCatalogName(record.getLabel().getLabLevel3Name());
-//            labelCatalog.setLevelId(Long.valueOf(4));
-//            labelCatalog.setParentId(record.getLabel().getLabObjectCode() + record.getLabel().getLabLevel1() + record.getLabel().getLabLevel2());
-//            labelCatalogMapper.insert(labelCatalog);
-//        }
-//        if(labelCatalogMapper.findByCodeAndLevel((record.getLabel().getLabObjectCode() + record.getLabel().getLabLevel1() + record.getLabel().getLabLevel2() + record.getLabel().getLabLevel3() + record.getLabel().getLabLevel4()), Long.valueOf(5)) == null) {
-//            labelCatalog.setCatalogCode(record.getLabel().getLabObjectCode() + record.getLabel().getLabLevel1() + record.getLabel().getLabLevel2() + record.getLabel().getLabLevel3() + record.getLabel().getLabLevel4());
-//            labelCatalog.setCatalogName(record.getLabel().getLabLevel4Name());
-//            labelCatalog.setLevelId(Long.valueOf(5));
-//            labelCatalog.setParentId(record.getLabel().getLabObjectCode() + record.getLabel().getLabLevel1() + record.getLabel().getLabLevel2() + record.getLabel().getLabLevel3());
-//            labelCatalogMapper.insert(labelCatalog);
-//        }
-
+        new Thread(){
+            public void run(){
+                try {
+                    initLabelCatalog(labelList);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }.start();
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","新增成功");
+        result.put("labelId",labelId);
         return result;
     }
 
-    /**
-     * 更新标签
-     * @param record
-     * @return
-     */
-    private Map<String,Object> updateLabel(RecordModel record){
-        Map<String,Object> result = new HashMap<>();
-        //todo 先删除再添加
-        LabModel tagModel = record.getLabel();
-        Label label = labelMapper.selectByTagRowId(tagModel.getLabRowId());
-//        if (label==null){
-//            result.put("resultCode",CODE_FAIL);
-//            result.put("resultMsg","未找到对应标签");
-//            return result;
-//        }
-        labelValueMapper.deleteByLabelId(label.getInjectionLabelId());
-        labelMapper.deleteByPrimaryKey(label.getInjectionLabelId());
-        addLabel(record);
-        result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","更新成功");
-        return result;
-    }
 
     /**
      * 删除标签
@@ -342,53 +414,56 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
 
         //标签目录初始化
 //        List<Label> labels = labelMapper.selectAll();
+        initLabelCatalog(labels);
+
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","新增成功");
+        return result;
+    }
+
+    private void initLabelCatalog(List<Label> labels) {
         for (Label label : labels){
             //标签目录插入
             LabelCatalog labelCatalog =new LabelCatalog();
             labelCatalog.setStatusCd(STATUSCD_EFFECTIVE);
             labelCatalog.setCreateStaff(UserUtil.loginId());
             labelCatalog.setCreateDate(new Date());
-            if(labelCatalogMapper.findByCodeAndLevel(label.getLabObjectCode(), Long.valueOf(1)) == null) {
+            if(labelCatalogMapper.findByCodeAndLevel(label.getLabObjectCode(),1L) == null) {
                 labelCatalog.setCatalogCode(label.getLabObjectCode());
                 labelCatalog.setCatalogName(label.getLabObject());
-                labelCatalog.setLevelId(Long.valueOf(1));
+                labelCatalog.setLevelId(1L);
                 labelCatalog.setParentId("0");
                 labelCatalogMapper.insert(labelCatalog);
             }
-            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1()), Long.valueOf(2)) == null) {
+            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1()),2L) == null) {
                 labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getLabLevel1());
                 labelCatalog.setCatalogName(label.getLabLevel1Name());
-                labelCatalog.setLevelId(Long.valueOf(2));
+                labelCatalog.setLevelId(2L);
                 labelCatalog.setParentId(label.getLabObjectCode());
                 labelCatalogMapper.insert(labelCatalog);
             }
-            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2()), Long.valueOf(3)) == null) {
+            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2()), 3L) == null) {
                 labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2());
                 labelCatalog.setCatalogName(label.getLabLevel2Name());
-                labelCatalog.setLevelId(Long.valueOf(3));
+                labelCatalog.setLevelId(3L);
                 labelCatalog.setParentId(label.getLabObjectCode() + label.getLabLevel1());
                 labelCatalogMapper.insert(labelCatalog);
             }
-            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3()), Long.valueOf(4)) == null) {
+            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3()),4L) == null) {
                 labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3());
                 labelCatalog.setCatalogName(label.getLabLevel3Name());
-                labelCatalog.setLevelId(Long.valueOf(4));
+                labelCatalog.setLevelId(4L);
                 labelCatalog.setParentId(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2());
                 labelCatalogMapper.insert(labelCatalog);
             }
-            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3() + label.getLabLevel4()), Long.valueOf(5)) == null) {
+            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3() + label.getLabLevel4()), 5L) == null) {
                 labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3() + label.getLabLevel4());
                 labelCatalog.setCatalogName(label.getLabLevel4Name());
-                labelCatalog.setLevelId(Long.valueOf(5));
+                labelCatalog.setLevelId(5L);
                 labelCatalog.setParentId(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3());
                 labelCatalogMapper.insert(labelCatalog);
             }
-
         }
-
-        result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg","新增成功");
-        return result;
     }
 
     /**
