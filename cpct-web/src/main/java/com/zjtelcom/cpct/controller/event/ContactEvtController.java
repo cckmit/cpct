@@ -8,6 +8,8 @@ import com.zjtelcom.cpct.request.event.ContactEvtReq;
 import com.zjtelcom.cpct.request.event.CreateContactEvtJtReq;
 import com.zjtelcom.cpct.request.event.CreateContactEvtReq;
 import com.zjtelcom.cpct.service.event.ContactEvtService;
+import com.zjtelcom.cpct.service.synchronize.SynContactEvtService;
+import com.zjtelcom.cpct.util.SystemParamsUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -30,6 +32,8 @@ public class ContactEvtController extends BaseController {
 
     @Autowired
     private ContactEvtService contactEvtService;
+    @Autowired
+    private SynContactEvtService synContactEvtService;
 
 
     /**
@@ -89,6 +93,18 @@ public class ContactEvtController extends BaseController {
         Map<String, Object> maps = new HashMap<>();
         try {
             maps = contactEvtService.delEvent(contactEvtReq.getContactEvt().getContactEvtId());
+            final Long eventId = (Long) maps.get("eventId");
+            if (SystemParamsUtil.getSyncValue().equals("1")&& eventId!=null){
+                new Thread(){
+                    public void run(){
+                        try {
+                            synContactEvtService.deleteSingleEvent(eventId,"");
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                }.start();
+            }
         } catch (Exception e) {
             logger.error("[op:EventController] fail to delEvent for contactEvtReq = {}! Exception: ", JSONArray.toJSON(contactEvtReq), e);
             return JSON.toJSONString(maps);
@@ -156,6 +172,18 @@ public class ContactEvtController extends BaseController {
         Map<String, Object> maps = new HashMap<>();
         try {
             maps = contactEvtService.createContactEvt(createContactEvtReq);
+            final Long eventId = (Long) maps.get("eventId");
+            if (SystemParamsUtil.getSyncValue().equals("1")&& eventId != null){
+                new Thread(){
+                    public void run(){
+                        try {
+                            synContactEvtService.synchronizeSingleEvent(eventId,"");
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                }.start();
+            }
         } catch (Exception e) {
             logger.error("[op:EventController] fail to createContactEvt for CreateContactEvtReq = {}! Exception: ", JSONArray.toJSON(createContactEvtReq), e);
             return JSON.toJSONString(maps);
@@ -172,6 +200,18 @@ public class ContactEvtController extends BaseController {
         Map<String, Object> maps = new HashMap<>();
         try {
             maps = contactEvtService.closeEvent(contactEvtReq.getContactEvt().getContactEvtId(), contactEvtReq.getContactEvt().getStatusCd());
+            final Long eventId = (Long) maps.get("eventId");
+            if (SystemParamsUtil.getSyncValue().equals("1")&&eventId !=null){
+                new Thread(){
+                    public void run(){
+                        try {
+                            synContactEvtService.synchronizeSingleEvent(eventId,"");
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                }.start();
+            }
         } catch (Exception e) {
             logger.error("[op:EventController] fail to closeEvent for contactEvtReq = {}! Exception: ", JSONArray.toJSON(contactEvtReq), e);
             return JSON.toJSONString(maps);
@@ -220,6 +260,18 @@ public class ContactEvtController extends BaseController {
         Map<String, Object> maps = new HashMap<>();
         try {
             maps = contactEvtService.modContactEvt(createContactEvtReq);
+            final Long eventId = (Long) maps.get("eventId");
+            if (SystemParamsUtil.getSyncValue().equals("1")&& eventId!=null){
+                new Thread(){
+                    public void run(){
+                        try {
+                            synContactEvtService.synchronizeSingleEvent(eventId,"");
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                }.start();
+            }
         } catch (Exception e) {
             logger.error("[op:EventController] fail to modContactEvt for CreateContactEvtReq = {}! Exception: ", JSONArray.toJSON(createContactEvtReq), e);
             return JSON.toJSONString(maps);
