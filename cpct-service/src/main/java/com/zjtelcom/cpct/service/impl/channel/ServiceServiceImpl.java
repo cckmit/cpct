@@ -102,7 +102,7 @@ public class ServiceServiceImpl extends BaseService implements ServiceService {
         serviceEntity.setStatusDate(new Date());
         serviceMapper.insert(serviceEntity);
 
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {
@@ -133,7 +133,7 @@ public class ServiceServiceImpl extends BaseService implements ServiceService {
         serviceEntity.setUpdateStaff(UserUtil.loginId());
         serviceMapper.updateByPrimaryKey(serviceEntity);
 
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {
@@ -161,7 +161,7 @@ public class ServiceServiceImpl extends BaseService implements ServiceService {
         }
         serviceMapper.deleteByPrimaryKey(delVO.getServiceId());
 
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {
