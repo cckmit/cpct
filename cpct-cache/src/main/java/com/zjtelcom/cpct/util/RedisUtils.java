@@ -28,7 +28,7 @@ public class RedisUtils {
 
     @Autowired
     private RedisTemplate redisTemplate;
-    @Autowired
+    @Autowired(required = false)
     private CtgJedisPool ctgJedisPool;
 
 //    @Autowired

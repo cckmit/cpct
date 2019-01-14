@@ -110,7 +110,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private MktCamScriptMapper scriptMapper;
     @Autowired
     private SysParamsMapper sysParamsMapper;
-    @Autowired
+    @Autowired(required = false)
     private EsService esService;
     @Autowired
     private MktResourceMapper resourceMapper;

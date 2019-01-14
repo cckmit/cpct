@@ -6,6 +6,7 @@ import com.ctg.itrdc.cache.pool.CtgJedisPoolException;
 import com.ctg.itrdc.cache.pool.ProxyJedis;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.HostAndPort;
@@ -25,6 +26,18 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class RedisUtils_prd {
 
+    @Value("${redisConfig_Prd.ip}")
+    private String redisIp;
+
+    @Value("${redisConfig_Prd.port}")
+    private Integer redisPort;
+
+    @Value("${redisConfig_Prd.database}")
+    private Integer redisDatabase;
+
+    @Value("${redisConfig_Prd.password}")
+    private String redisPassword;
+
     @Autowired
     private RedisTemplate redisTemplate;
 
@@ -38,7 +51,7 @@ public class RedisUtils_prd {
      * @param value
      * @return
      */
-    public boolean set_prd(final String key, Object value) {
+    public boolean set(final String key, Object value) {
         boolean result = false;
         try {
             // 原方法
@@ -186,11 +199,11 @@ public class RedisUtils_prd {
         Object result = null;
 
         // 原方法
-        ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-         result = operations.get(key);
+        // ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+        //   result = operations.get(key);
 
         // 改造后方法
-      //  result = getRedis(key);
+        result = getRedis(key);
         return result;
     }
 
@@ -351,11 +364,9 @@ public class RedisUtils_prd {
 
 
     private CtgJedisPool initCatch() {
-
-
         List<HostAndPort> hostAndPortList = new ArrayList();
         // 接入机的ip和端口号
-        HostAndPort host = new HostAndPort("134.96.231.228", 40201);
+        HostAndPort host = new HostAndPort(redisIp, redisPort);
         hostAndPortList.add(host);
 
         GenericObjectPoolConfig poolConfig = new JedisPoolConfig();
@@ -366,7 +377,7 @@ public class RedisUtils_prd {
 
         CtgJedisPoolConfig config = new CtgJedisPoolConfig(hostAndPortList);
 
-        config.setDatabase(4970).setPassword("bss_cpct_common_user#bss_cpct_common_user123").setPoolConfig(poolConfig).setPeriod(1000).setMonitorTimeout(100);
+        config.setDatabase(redisDatabase).setPassword(redisPassword).setPoolConfig(poolConfig).setPeriod(1000).setMonitorTimeout(100);
 
         CtgJedisPool pool = new CtgJedisPool(config);
 
