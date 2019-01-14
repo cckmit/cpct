@@ -57,7 +57,7 @@ spec:
             memory: "4Gi"
             cpu: "2000m"
           limits:
-            memory: "4Gi"
+            memory: "8Gi"
             cpu: "4000m"
       - name: jmx
         image: 134.108.5.132:8000/mgt/jmxtrans:v3.0

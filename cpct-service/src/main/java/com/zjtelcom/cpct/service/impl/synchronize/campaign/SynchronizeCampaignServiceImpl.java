@@ -243,6 +243,12 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
             mktCamCityRelPrdMapper.insert(mktCamCityRelDO);
         }
 
+
+        mktCamItemPrdMapper.deleteByCampaignId(mktCampaignDO.getMktCampaignId());
+        List<MktCamItem> itemList = mktCamItemMapper.selectByCampaignId(mktCampaignDO.getMktCampaignId());
+        for (MktCamItem item : itemList){
+            mktCamItemPrdMapper.insert(item);
+        }
         // 删除关联事件
         mktCamEvtRelPrdMapper.deleteByMktCampaignId(mktCampaignDO.getMktCampaignId());
         // 关联事件
@@ -259,6 +265,17 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
         }
         // 删除该活动下的所有策略
         mktCamStrategyConfRelPrdMapper.deleteByMktCampaignId(mktCampaignDO.getMktCampaignId());
+
+        // 删除与策略关联的过滤规则
+        mktStrategyFilterRuleRelPrdMapper.deleteByStrategyId(mktCampaignDO.getMktCampaignId());
+
+        //获取策略对应的过滤规则
+        List<Long> ruleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(mktCampaignDO.getMktCampaignId());
+        List<MktStrategyFilterRuleRelDO> mktStrategyFilterRuleRelDOList = mktStrategyFilterRuleRelMapper.selectRuleByStrategyId(mktCampaignDO.getMktCampaignId());
+        // 与新的策略建立关联
+        for (MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO : mktStrategyFilterRuleRelDOList) {
+            mktStrategyFilterRuleRelPrdMapper.insert(mktStrategyFilterRuleRelDO);
+        }
 
         /*复制活动下的策略到生产环境*/
         // 查询活动策略关系
@@ -364,8 +381,6 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
         Map<String, Object> mktStrategyConfMap = new HashMap<>();
         // 删除与策略关联的下发城市
         mktStrategyConfRegionRelPrdMapper.deleteByMktStrategyConfId(mktStrategyConfId);
-        // 删除与策略关联的过滤规则
-        mktStrategyFilterRuleRelPrdMapper.deleteByStrategyId(mktStrategyConfId);
         //删除策略下的规则，以及关联的表
         List<MktStrategyConfRuleRelDO> mktStrategyConfRuleRelDOList = mktStrategyConfRuleRelPrdMapper.selectByMktStrategyConfId(mktStrategyConfId);
         for (MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO : mktStrategyConfRuleRelDOList) {
@@ -375,13 +390,13 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
                 tarGrpConditionPrdMapper.deleteByTarGrpId(mktStrategyConfRuleDO.getTarGrpId());
                 tarGrpPrdMapper.deleteByPrimaryKey(mktStrategyConfRuleDO.getTarGrpId());
 
-                if(mktStrategyConfRuleDO.getProductId()!=null && !"".equals(mktStrategyConfRuleDO.getProductId())){
-                // 删除销售品
-                String[] productIds = mktStrategyConfRuleDO.getProductId().split("/");
-                    for (String productId : productIds) {
-                        mktCamItemPrdMapper.deleteByPrimaryKey(Long.valueOf(productId));
-                    }
-                }
+//                if(mktStrategyConfRuleDO.getProductId()!=null && !"".equals(mktStrategyConfRuleDO.getProductId())){
+//                // 删除销售品
+//                String[] productIds = mktStrategyConfRuleDO.getProductId().split("/");
+//                    for (String productId : productIds) {
+//                        mktCamItemPrdMapper.deleteByPrimaryKey(Long.valueOf(productId));
+//                    }
+//                }
 
 
                 // 删除首次协同
@@ -460,14 +475,6 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
         List<MktStrategyConfRuleRelDO> mktStrategyConfRuleRelDOList = mktStrategyConfRuleRelMapper.selectByMktStrategyConfId(parentMktStrategyConfId);
         mktStrategyConfPrdMapper.insert(mktStrategyConfDO);
         Long childMktStrategyConfId = mktStrategyConfDO.getMktStrategyConfId();
-
-        //获取策略对应的过滤规则
-        List<Long> ruleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(parentMktStrategyConfId);
-        List<MktStrategyFilterRuleRelDO> mktStrategyFilterRuleRelDOList = mktStrategyFilterRuleRelMapper.selectRuleByStrategyId(parentMktStrategyConfId);
-        // 与新的策略建立关联
-        for (MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO : mktStrategyFilterRuleRelDOList) {
-            mktStrategyFilterRuleRelPrdMapper.insert(mktStrategyFilterRuleRelDO);
-        }
         // 遍历规则
         for (MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO : mktStrategyConfRuleRelDOList) {
             // 建立策略和规则的关系
@@ -500,16 +507,16 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
         /**
          * 销售品配置
          */
-        List<Long> productIdList = new ArrayList<>();
-        if (mktStrategyConfRuleDO.getProductId() != null) {
-            String[] productIds = mktStrategyConfRuleDO.getProductId().split("/");
-            for (int i = 0; i < productIds.length; i++) {
-                if (productIds[i] != "" && !"".equals(productIds[i])) {
-                    productIdList.add(Long.valueOf(productIds[i]));
-                }
-            }
-        }
-        copyProductRuleToPrd(UserUtil.loginId(), productIdList);
+//        List<Long> productIdList = new ArrayList<>();
+//        if (mktStrategyConfRuleDO.getProductId() != null) {
+//            String[] productIds = mktStrategyConfRuleDO.getProductId().split("/");
+//            for (int i = 0; i < productIds.length; i++) {
+//                if (productIds[i] != "" && !"".equals(productIds[i])) {
+//                    productIdList.add(Long.valueOf(productIds[i]));
+//                }
+//            }
+//        }
+//        copyProductRuleToPrd(UserUtil.loginId(), productIdList);
 
         /**
          * 协同渠道配置
