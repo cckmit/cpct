@@ -21,8 +21,17 @@ public class UserUtil {
      * @return
      */
     public static Long loginId() {
-
-        return 1L;
+        Long userId = 1L;
+        SystemUserDto userDetail = null;
+        try {
+            userDetail = BssSessionHelp.getSystemUserDto();
+        } catch (Exception e) {
+            return userId;
+        }
+        if (userDetail != null) {
+            userId = userDetail.getSysUserId();
+        }
+        return userId;
     }
 
     /**
@@ -53,18 +62,5 @@ public class UserUtil {
             return userDetail;
         }
         return userDetail;
-    }
-
-    /**
-     * 获取登陆用户id
-     * @return
-     */
-    public static Long getUserId(){
-        Long userId = 1L;
-        SystemUserDto userDetail = BssSessionHelp.getSystemUserDto();
-        if (userDetail != null) {
-            userId = userDetail.getSysUserId();
-        }
-        return userId;
     }
 }

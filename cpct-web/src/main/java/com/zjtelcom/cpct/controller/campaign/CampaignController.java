@@ -127,6 +127,7 @@ public class CampaignController extends BaseController {
     @RequestMapping(value = "/listCampaignPage", method = RequestMethod.POST)
     @CrossOrigin
     public String qryMktCampaignList(@RequestBody Map<String, Object> params) throws Exception {
+        logger.info("进入活动总览-qryMktCampaignList");
         Map<String, Object> map = null;
         try {
             map = mktCampaignService.qryMktCampaignListPage(params);

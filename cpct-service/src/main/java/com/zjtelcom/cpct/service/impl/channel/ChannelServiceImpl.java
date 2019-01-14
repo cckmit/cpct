@@ -330,7 +330,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
 
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {
@@ -366,7 +366,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","编辑成功");
 
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {
@@ -399,7 +399,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
 
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {

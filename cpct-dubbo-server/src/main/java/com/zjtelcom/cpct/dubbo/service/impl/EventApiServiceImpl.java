@@ -793,7 +793,7 @@ public class EventApiServiceImpl implements EventApiService {
                         boolean productCheck = true;
                         //获取需要过滤的销售品
                         String checkProduct = filterRule.getChooseProduct();
-                        if (checkProduct != null) {
+                        if (checkProduct != null && !"".equals(checkProduct)) {
                             String productStr = null;
                             //获取用户已办理销售品
                             JSONObject body = getLabelsByDubbo(privateParams.get("integrationId"), privateParams.get("accNbr"), params.get("lanId"), "1", "PROM_LIST");
@@ -1636,10 +1636,6 @@ public class EventApiServiceImpl implements EventApiService {
                     //遍历所有规则
                     for (Map<String, String> labelMap : labelMapList) {
                         //判断标签实例是否足够
-//                        if (!context.containsKey(labelMap.get("code"))) {
-//                            notEnoughLabel.append(labelMap.get("code")).append(",");
-//                            continue;
-//                        }
 
                         String type = labelMap.get("operType");
                         //保存标签的es log
@@ -1649,12 +1645,6 @@ public class EventApiServiceImpl implements EventApiService {
                         lr.setLabelName(labelMap.get("name"));
                         lr.setRightOperand(labelMap.get("rightParam"));
                         lr.setClassName(labelMap.get("className"));
-//                        if (context.containsKey(labelMap.get("code"))) {
-//                            lr.setRightParam(context.get(labelMap.get("code")).toString());
-//                        } else {
-//                            lr.setRightParam("无值");
-//                            lr.setResult(false);
-//                        }
 
                         //判断标签实例是否足够
                         if (context.containsKey(labelMap.get("code"))) {
@@ -2227,7 +2217,7 @@ public class EventApiServiceImpl implements EventApiService {
 //                    return Collections.EMPTY_MAP;
 //                }
 //            }
-//            channel.put("contactScript", contactScript == null ? "" : contactScript);
+            channel.put("contactScript", contactScript == null ? "" : contactScript);
 //            //痛痒点
 //            if (mktVerbalStr != null) {
 //                if (subScript(mktVerbalStr).size() > 0) {
