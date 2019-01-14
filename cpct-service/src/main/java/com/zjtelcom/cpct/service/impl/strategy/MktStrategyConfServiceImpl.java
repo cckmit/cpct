@@ -649,12 +649,13 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
     @Override
     public Map<String, Object> getStrategyTemplate(Long preMktCampaignId) throws Exception {
         Map<String, Object> strategyTemplateMap = new HashMap<>();
+        ExecutorService executorService = Executors.newCachedThreadPool();
         try {
             //初始化结果集
             List<Future<Map<String, Object>>> threadList = new ArrayList<>();
             //初始化线程池
             Future<Map<String, Object>> strategyFuture = null;
-            ExecutorService executorService = Executors.newCachedThreadPool();
+
             // 获取活动关联策略集合
             List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByMktCampaignId(preMktCampaignId);
             for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {
@@ -669,8 +670,13 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             strategyTemplateMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             strategyTemplateMap.put("mktStrategyConfDetailList", mktStrategyConfDetailList);
         } catch (Exception e) {
+            //关闭线程池
+            executorService.shutdown();
             strategyTemplateMap.put("resultCode", CommonConstant.CODE_FAIL);
             logger.error("[op:MktStrategyConfServiceImpl] failed to get StrategyTemplate by preMktCampaignId = {} ,Exception = ", preMktCampaignId, e);
+        } finally {
+            //关闭线程池
+            executorService.shutdown();
         }
         return strategyTemplateMap;
     }

@@ -250,7 +250,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                 tarGrpConditionMapper.insert(tarGrpTemplateConditionDO);
             }
         }
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {
@@ -337,7 +337,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                 }
             }
         }
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {
@@ -503,7 +503,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         tarGrpMapper.deleteByPrimaryKey(tarGrpTemplateId);
         tarGrpConditionMapper.deleteByTarGrpTemplateId(tarGrpTemplateId);
 
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {

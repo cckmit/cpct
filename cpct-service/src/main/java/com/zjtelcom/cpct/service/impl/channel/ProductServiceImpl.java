@@ -31,9 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
-import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
-import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
-import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
+import static com.zjtelcom.cpct.constants.CommonConstant.*;
 
 @Service
 public class ProductServiceImpl extends BaseService implements ProductService {
@@ -313,10 +311,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         for (Long ruleId : ruleIdList){
             MktCamItem item = camItemMapper.selectByPrimaryKey(ruleId);
             if (item==null){
-                result.put("resultCode",CODE_FAIL);
-                result.put("resultMsg","推荐条目不存在");
-                return result;
-
+                continue;
             }
             //销售品
             if (item.getItemType().equals("1000")){

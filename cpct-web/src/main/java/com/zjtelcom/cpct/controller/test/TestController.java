@@ -19,6 +19,7 @@ import com.zjtelcom.cpct.domain.channel.RequestInstRel;
 import com.zjtelcom.cpct.service.EngineTestService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlResultApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
+import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UserUtil;
@@ -58,29 +59,15 @@ public class TestController extends BaseController {
 
     @Autowired(required = false)
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
+    @Autowired
+    private MktCampaignService campaignService;
 
 
-    @PostMapping("fourthDataSource")
+    @PostMapping("searchByCampaignId")
     @CrossOrigin
-    public Object fourthDataSource() {
-//        RequestInstRel requestInstRel = requestInstRelMapper.selectByPrimaryKey(1L);
-        String postName = "";
-        SystemPost systemPost = new SystemPost();
-        systemPost.setSysPostCode("cpcp0001");
-        QrySystemPostReq qrySystemPostReq = new QrySystemPostReq();
-        qrySystemPostReq.setSystemPost(systemPost);
-        SysmgrResultObject<Page> pageSysmgrResultObject = iSystemPostDubboService.qrySystemPostPage(new Page(), qrySystemPostReq);
-        if(pageSysmgrResultObject!=null){
-            if( pageSysmgrResultObject.getResultObject()!=null){
-                List<SystemPost> dataList = (List<SystemPost>) pageSysmgrResultObject.getResultObject().getDataList();
-                if(dataList!=null){
-                    if(dataList.get(0)!=null){
-                        postName = dataList.get(0).getSysPostName();
-                    }
-                }
-            }
-        }
-        return postName;
+    public Object searchByCampaignId(Long campaignId) {
+        Map<String,Object> result = campaignService.searchByCampaignId(campaignId);
+        return result;
     }
 
     @PostMapping("userTest")

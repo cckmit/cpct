@@ -61,22 +61,40 @@ public class EsHitServiceImpl implements EsHitService {
     }
 
     @Override
-    public void save(JSONObject jsonObject,String indexName) {
+    public void save(final JSONObject jsonObject,final String indexName) {
         try {
-            ElasticsearchUtil.addData(jsonObject, indexName, esType);
+            new Thread() {
+                public void run() {
+//                    logger.info("异步存储");
+                    //在匿名内部类中使用count、future、c。
+                    ElasticsearchUtil.addData(jsonObject, indexName, esType);
+                }
+            }.start();
+
+//            ElasticsearchUtil.addData(jsonObject, indexName, esType);
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            logger.error("es日志存储失败");
         }
     }
 
     @Override
-    public void save(JSONObject jsonObject,String indexName,String _id) {
+    public void save(final JSONObject jsonObject,final String indexName,final String _id) {
         try {
-            ElasticsearchUtil.addData(jsonObject, indexName, esType, _id);
+//            ElasticsearchUtil.addData(jsonObject, indexName, esType, _id);
+            new Thread() {
+                public void run() {
+//                    logger.info("异步存储");
+                    //在匿名内部类中使用count、future、c。
+                    ElasticsearchUtil.addData(jsonObject, indexName, esType, _id);
+                }
+            }.start();
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            logger.error("es日志存储失败");
         }
     }
+
 
 
 

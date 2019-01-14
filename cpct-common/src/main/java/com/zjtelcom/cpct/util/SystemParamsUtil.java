@@ -15,7 +15,7 @@ import java.util.List;
 @Component
 public class SystemParamsUtil {
 
-    private static String IS_OPEN_SYNC="";          //是否开启同步 0不开启  1开启
+    private static String IS_OPEN_SYNC="";          //是否开启同步  0不开启同步  1开启同步(所有模块的同步)   2开启同步(事件和活动模块同步功能关闭)
 
     public static String SYNC_VALUE="IS_OPEN_SYNC"; //数据库中系统参数表同步开关的key
 
@@ -37,6 +37,9 @@ public class SystemParamsUtil {
             }else{
                 if ("1".equals(sysParams.get(0).getParamValue())) {
                     IS_OPEN_SYNC = "1";
+                }else if("2".equals(sysParams.get(0).getParamValue())){
+                    //除了事件和活动  其他的模块都开启同步功能
+                    IS_OPEN_SYNC="2";
                 }else{
                     //不开启同步
                     IS_OPEN_SYNC="0";
@@ -47,11 +50,38 @@ public class SystemParamsUtil {
         return IS_OPEN_SYNC;
     }
 
+    /**
+     * 针对除活动和事件外的同步的判断方法  目前值为  1和2 都可以同步
+     * @return
+     */
+    public synchronized static boolean isSync(){
+        boolean tip=false;
+        if (SystemParamsUtil.getSyncValue().equals("1")||SystemParamsUtil.getSyncValue().equals("2")){
+            tip=true;
+        }
+        return  tip;
+    }
+
+    /**
+     * 针对活动和事件的同步的判断方法     目前只有  值为1才能同步
+     * @return
+     */
+    public synchronized static boolean isCampaignSync(){
+        boolean tip=false;
+        if (SystemParamsUtil.getSyncValue().equals("1")){
+            tip=true;
+        }
+        return  tip;
+    }
+
+
+
 
     /**
      * 初始化同步值
      */
     public static void initValue(){
+        System.out.println("初始化同步值");
         IS_OPEN_SYNC="";
     }
 

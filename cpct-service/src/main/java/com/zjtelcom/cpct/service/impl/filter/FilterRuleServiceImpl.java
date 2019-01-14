@@ -26,6 +26,7 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.filter.FilterRuleService;
 import com.zjtelcom.cpct.service.synchronize.filter.SynFilterRuleService;
 import com.zjtelcom.cpct.util.*;
+import com.zjtelcom.cpct_prod.dao.offer.OfferProdMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -67,7 +68,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
     @Autowired
     private SysParamsMapper sysParamsMapper;
     @Autowired
-    private OfferMapper offerMapper;
+    private OfferProdMapper offerMapper;
     @Autowired
     private MktVerbalConditionMapper verbalConditionMapper;
     @Autowired
@@ -213,7 +214,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
 
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {
@@ -308,7 +309,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("filterRule", filterRule);
 
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {
@@ -371,7 +372,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("filterRule", filterRule);
 
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {
