@@ -9,6 +9,7 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.ObjMktCampaignRelMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
+import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
@@ -27,6 +28,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.EventDTO;
+import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 import com.zjtelcom.cpct.enums.*;
@@ -155,6 +157,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Autowired
     private MktOperatorLogService mktOperatorLogService;
 
+    @Autowired
+    private TarGrpMapper tarGrpMapper;
+
 //    @Autowired(required = false)
 //    private ISystemUserDtoDubboService iSystemUserDtoDubboService;
 //
@@ -165,6 +170,33 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private final static String createChannel = "cpcpcj0001";
 
 
+
+    @Override
+    public Map<String, Object> searchByCampaignId(Long campaignId) {
+        Map<String,Object> result = new HashMap<>();
+        Map<String,Object> strategyMap = new HashMap<>();
+        List<MktStrategyConfDO> strategyConfList = mktStrategyConfMapper.selectByCampaignId(campaignId);
+        for (MktStrategyConfDO strategyConfDO : strategyConfList){
+            strategyMap.put("strategyId",strategyConfDO.getMktStrategyConfId());
+            strategyMap.put("strategyName",strategyConfDO.getMktStrategyConfName());
+            Map<String,Object> ruleMap = new HashMap<>();
+            List<MktStrategyConfRuleDO> ruleDOList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(strategyConfDO.getMktStrategyConfId());
+            for (MktStrategyConfRuleDO ruleDO : ruleDOList){
+                ruleMap.put("ruleId",ruleDO.getMktStrategyConfRuleId());
+                ruleMap.put("ruleName",ruleDO.getMktStrategyConfRuleName());
+                TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(ruleDO.getTarGrpId());
+                Map<String,Object> tarMap = new HashMap<>();
+                if (tarGrp!=null){
+                    tarMap.put("tarGrpId",tarGrp.getTarGrpId());
+                    ruleMap.put("tarGrp",tarMap);
+                }
+            }
+            strategyMap.put("rule",ruleMap);
+        }
+        result.put("campaignId",campaignId);
+        result.put("strategy",strategyMap);
+        return result;
+    }
 
     /**
      * 添加活动基本信息 并建立关系
@@ -992,7 +1024,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
                     mktCamResultRelMapper.updateByPrimaryKey(mktCamResultRelDO);
                 }
-                if (SystemParamsUtil.getSyncValue().equals("1")) {
+                if (SystemParamsUtil.isCampaignSync()) {
                     // 发布活动异步同步活动到生产环境
                     new Thread() {
                         @Override

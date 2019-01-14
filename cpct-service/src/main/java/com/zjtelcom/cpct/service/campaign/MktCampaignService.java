@@ -13,6 +13,8 @@ import java.util.Map;
  */
 public interface MktCampaignService {
 
+    Map<String,Object> searchByCampaignId(Long campaignId);
+
 /*    int createMktCampaign(MktCampaignDetail mktCampaignDetail) throws Exception;
 
     int modMktCampaign(MktCampaignDetail mktCampaignDetail) throws Exception;*/

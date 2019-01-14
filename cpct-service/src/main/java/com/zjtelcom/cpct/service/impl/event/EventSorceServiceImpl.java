@@ -73,7 +73,7 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
             eventSorceMap.put("resultMsg", "新增事件源失败！");
             logger.error("[op:EventSorceServiceImpl] 新增事件源eventSorce = {}失败！Exception: ", JSON.toJSON(eventSorce), e);
         }
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {
@@ -137,7 +137,7 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
             eventSorceMap.put("resultMsg", "更新事件源失败！");
             logger.error("[op:EventSorceServiceImpl] 更新事件源eventSorce = {}失败！Exception: ", JSON.toJSON(eventSorce), e);
         }
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {
@@ -170,7 +170,7 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
             eventSorceMap.put("resultMsg", "查询事件源失败！");
             logger.error("[op:EventSorceServiceImpl] 通过evtSrcId = {} 删除事件源失败！Exception: ", evtSrcId, e);
         }
-        if (SystemParamsUtil.getSyncValue().equals("1")){
+        if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
                     try {
