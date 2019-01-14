@@ -99,12 +99,12 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         ProductParam offerParam = new ProductParam();
         List<Long> offerIds = new ArrayList<>();
         offerParam.setItemType("1000");
-        offerParam.setStatusCd("2000");
+        offerParam.setStatusCd("1100");
 
         ProductParam resourceParam = new ProductParam();
         List<Long> resList = new ArrayList<>();
         resourceParam.setItemType("3000");
-        resourceParam.setStatusCd("2000");
+        resourceParam.setStatusCd("1100");
         for (RequestInstRel requestInstRel : requestInstRels){
             Long offerId = requestInstRel.getRequestObjId();
             Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));

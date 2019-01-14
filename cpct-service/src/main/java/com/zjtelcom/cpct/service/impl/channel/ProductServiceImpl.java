@@ -20,6 +20,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCampaign;
 import com.zjtelcom.cpct.dto.channel.OfferDetail;
 import com.zjtelcom.cpct.dto.channel.ProductParam;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
+import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
@@ -169,6 +170,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         List<MktCamItem> oldItemList = camItemMapper.selectByCampaignId(oldCampaignId);
         for (MktCamItem item : oldItemList){
             MktCamItem newItem = BeanUtil.create(item,new MktCamItem());
+            newItem.setStatusCd(StatusCode.STATUS_CODE_FAILURE.getStatusCode());
             newItem.setMktCamItemId(null);
             newItem.setMktCampaignId(newCampaignId);
             camItemMapper.insert(newItem);

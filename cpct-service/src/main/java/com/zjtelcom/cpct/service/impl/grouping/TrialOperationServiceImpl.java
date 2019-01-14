@@ -341,7 +341,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Override
     public Map<String, Object> importUserList(MultipartFile multipartFile, TrialOperationVO operation, Long ruleId) throws IOException {
         Map<String, Object> result = new HashMap<>();
-        String batchNumSt = DateUtil.date2String(new Date()) + ChannelUtil.getRandomStr(4);
+        String batchNumSt = DateUtil.date2String(new Date()) + ChannelUtil.getRandomStr(8);
 
         InputStream inputStream = multipartFile.getInputStream();
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
@@ -517,7 +517,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     public Map<String, Object> createTrialOperation(TrialOperationVO operationVO) {
         Map<String, Object> result = new HashMap<>();
         //生成批次号
-        String batchNumSt = DateUtil.date2String(new Date()) + ChannelUtil.getRandomStr(2);
+        String batchNumSt = DateUtil.date2String(new Date()) + ChannelUtil.getRandomStr(8);
         MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(operationVO.getCampaignId());
         MktStrategyConfDO strategy = strategyMapper.selectByPrimaryKey(operationVO.getStrategyId());
         if (campaign == null || strategy == null) {
