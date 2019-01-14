@@ -15,7 +15,7 @@ import java.util.List;
 @Component
 public class SystemParamsUtil {
 
-    private static String IS_OPEN_SYNC="";          //是否开启同步  0不开启同步  1开启同步(所有模块的同步)   2开启同步(事件和活动模块同步功能关闭)
+    private static String IS_OPEN_SYNC="";          //是否开启同步  0不开启同步  1开启同步(所有模块的同步)   2开启同步(但是事件和活动模块同步功能关闭)
 
     public static String SYNC_VALUE="IS_OPEN_SYNC"; //数据库中系统参数表同步开关的key
 
@@ -81,7 +81,6 @@ public class SystemParamsUtil {
      * 初始化同步值
      */
     public static void initValue(){
-        System.out.println("初始化同步值");
         IS_OPEN_SYNC="";
     }
 
