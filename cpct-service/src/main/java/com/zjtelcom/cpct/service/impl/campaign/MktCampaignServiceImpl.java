@@ -216,7 +216,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setMktActivityNbr("MKT" + String.format("%06d", mktCampaignId));
             mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
             // 记录活动操作
-//          mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), null, mktCampaignDO.getStatusCd(), UserUtil.getUserId(), OperatorLogEnum.ADD.getOperatorValue());
+          mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), null, mktCampaignDO.getStatusCd(), UserUtil.loginId(), OperatorLogEnum.ADD.getOperatorValue());
 
             // 创建二次营销活动
             if (mktCampaignVO.getPreMktCampaignId() != null && (mktCampaignVO.getPreMktCampaignId() != 0)) {
@@ -343,7 +343,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             Long mktCampaignId = mktCampaignDO.getMktCampaignId();
             MktCampaignDO campaign = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
             // 记录活动操作
-            mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), campaign.getStatusCd(), mktCampaignDO.getStatusCd(), UserUtil.getUserId(), OperatorLogEnum.UPDATE.getOperatorValue());
+            mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), campaign.getStatusCd(), mktCampaignDO.getStatusCd(), UserUtil.loginId(), OperatorLogEnum.UPDATE.getOperatorValue());
 
             //删除原来的活动与城市之间的关系
             mktCamCityRelMapper.deleteByMktCampaignId(mktCampaignId);
@@ -611,7 +611,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         try {
             MktCampaignDO mktCampaignDO =mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
             // 记录活动操作
-          //  mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), mktCampaignDO.getStatusCd(), OperatorLogEnum.DELETE.getOperatorValue(), UserUtil.getUserId(), OperatorLogEnum.DELETE.getOperatorValue());
+            mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), mktCampaignDO.getStatusCd(), OperatorLogEnum.DELETE.getOperatorValue(), UserUtil.loginId(), OperatorLogEnum.DELETE.getOperatorValue());
 
             mktCampaignMapper.deleteByPrimaryKey(mktCampaignId);
 
@@ -982,7 +982,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         try {
             MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
             // 记录活动操作
-           // mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), mktCampaignDO.getStatusCd(), statusCd, UserUtil.getUserId(), statusCd);
+            mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), mktCampaignDO.getStatusCd(), statusCd, UserUtil.loginId(), statusCd);
 
             mktCampaignMapper.changeMktCampaignStatus(mktCampaignId, statusCd, new Date(), UserUtil.loginId());
             // 判断是否是发布活动, 是该状态生效
