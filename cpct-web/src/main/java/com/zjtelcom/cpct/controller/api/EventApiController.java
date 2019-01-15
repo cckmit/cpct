@@ -13,6 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+
 
 @RestController
 @RequestMapping("${adminPath}/api")
@@ -50,14 +53,20 @@ public class EventApiController extends BaseController {
 //        response.setHeader("Access-Control-Allow-Methods", "POST, GET");
 //        response.setHeader("Access-Control-Allow-Headers", "Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With,userId,token");
 
-        Map result = new HashMap();
+
+        Map<String,Object> result = new HashMap<>();
+        Map<String,Object> resultMap = new HashMap<>();
         try {
             result = eventApiService.CalculateCPCSync(params);
         } catch (Exception e) {
             e.printStackTrace();
-            return initFailRespInfo(e.getMessage(), "");
+            resultMap.put("resultCode",CODE_FAIL);
+            resultMap.put("resultMsg","失败！");
+            return JSON.toJSONString(resultMap);
         }
-        return initSuccRespInfo(result);
+        resultMap.put("resultCode",CODE_SUCCESS);
+        resultMap.put("resultMsg",result);
+        return JSON.toJSONString(resultMap);
     }
 
 

@@ -399,9 +399,9 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 for (int i = 0; i < mktStrategyConfRule.getMktCamChlResultList().size(); i++) {
                     Long mktCamChlResultId = 0L;
                     MktCamChlResult mktCamChlResult = mktStrategyConfRule.getMktCamChlResultList().get(i);
+                    mktCamChlResult.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
                     if (mktCamChlResult.getMktCamChlResultId() != null && mktCamChlResult.getMktCamChlResultId() != 0) {
                         // 修改已有的结果信息
-                        mktCamChlResult.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
                         mktCamChlResultService.updateMktCamChlResult(mktCamChlResult);
                         mktCamChlResultId = mktCamChlResult.getMktCamChlResultId();
                     } else {
@@ -1525,11 +1525,11 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
     public Map<String, Object> getRuleTemplate(Long preStrategyConfId){
         Map<String, Object> ruleMap = new HashMap();
         List<MktStrategyConfRule> mktStrategyConfRuleList = new ArrayList<>();
+        ExecutorService executorService = Executors.newCachedThreadPool();
         try {
             List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(preStrategyConfId);
             List<Future<Map<String, Object>>> threadList = new ArrayList<>();
             Future<Map<String, Object>> ruleFuture = null;
-            ExecutorService executorService = Executors.newCachedThreadPool();
             for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleDOList) {
                 ruleFuture = executorService.submit(new getRuleTemplateTask(mktStrategyConfRuleDO.getMktStrategyConfRuleId()));
                 threadList.add(ruleFuture);
@@ -1542,8 +1542,11 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             ruleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             ruleMap.put("mktStrategyConfRuleList", mktStrategyConfRuleList);
         } catch (Exception e) {
+            executorService.shutdown();
             logger.error("[op:MktStrategyConfRuleServiceImpl] failed to getRuleTemplate by preStrategyConfId = {}, Exception = ", preStrategyConfId, e);
             ruleMap.put("resultCode", CommonConstant.CODE_FAIL);
+        } finally {
+            executorService.shutdown();
         }
         return ruleMap;
     }

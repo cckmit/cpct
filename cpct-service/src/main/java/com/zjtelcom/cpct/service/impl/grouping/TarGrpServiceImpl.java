@@ -203,8 +203,10 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                     tarGrpCondition.setStatusDate(DateUtil.getCurrentTime());
                     tarGrpCondition.setUpdateStaff(UserUtil.loginId());
                     tarGrpCondition.setCreateStaff(UserUtil.loginId());
-                    if (tarGrpCondition.getStatusCd()==null){
-                        tarGrpCondition.setStatusCd(STATUSCD_EFFECTIVE);
+                    if (isCopy){
+                        tarGrpCondition.setStatusCd(StatusCode.STATUS_CODE_FAILURE.getStatusCode());
+                    }else if (tarGrpCondition.getStatusCd()==null){
+                        tarGrpCondition.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
                     }
                     conditionList.add(tarGrpCondition);
                 }

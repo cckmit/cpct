@@ -90,8 +90,8 @@
     where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
   </select>
 
-    <select id="listActivityByEventId" parameterType="java.lang.Long" resultType="java.lang.Long">
-        select MKT_CAMPAIGN_ID
+    <select id="listActivityByEventId" parameterType="java.lang.Long" resultType="Map">
+        select MKT_CAMPAIGN_ID as mktCampaginId,LEVEL_CONFIG as levelConfig,CAMPAIGN_SEQ as campaignSeq
         from mkt_cam_evt_rel
         where EVENT_ID = #{eventId,jdbcType=BIGINT}
         order by CAMPAIGN_SEQ asc
