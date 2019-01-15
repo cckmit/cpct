@@ -5,6 +5,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
@@ -27,11 +28,28 @@ import javax.sql.DataSource;
 @MapperScan(basePackages = "com.zjtelcom.cpct.dao", sqlSessionFactoryRef = "masterSqlSessionFactory")
 public class DataSourceConfig {
 
+    @Value("${spring.datasource.url}")
+    private String url;
+    @Value("${spring.datasource.username}")
+    private String username;
+    @Value("${spring.datasource.password}")
+    private String password;
+
+
     @Bean
     @Primary
     @ConfigurationProperties(prefix = "spring.datasource")
     public DataSource dataSource() {
-        return DataSourceBuilder.create().type(DruidDataSource.class).build();
+        DruidDataSource datasource = new DruidDataSource();
+        datasource.setUrl(url);
+        datasource.setUsername(username);
+        datasource.setPassword(password);
+        datasource.setDriverClassName("com.mysql.jdbc.Driver");
+        datasource.setInitialSize(20);
+        datasource.setMinIdle(20);
+        datasource.setMaxActive(50);
+        datasource.setMaxWait(60000);
+        return datasource;
     }
 
     @Primary
