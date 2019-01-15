@@ -33,5 +33,5 @@ public interface MktCamItemMapper {
 
     List<Long> selectCamItemIdByCampaignId (Long campaignId);
 
-    MktCamItem selectByCampaignIdAndItemIdAndType(@Param("itemId")Long itemId,@Param("campaignId")Long campaignId,@Param("itemType")String itemType);
+    MktCamItem selectByCampaignIdAndItemIdAndType(@Param("itemId")Long itemId,@Param("mktCampaignId")Long campaignId,@Param("itemType")String itemType);
 }

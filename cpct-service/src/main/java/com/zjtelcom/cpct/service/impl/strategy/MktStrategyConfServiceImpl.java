@@ -527,7 +527,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
      * @throws Exception
      */
     @Override
-    public Map<String, Object> copyMktStrategyConf(Long parentMktStrategyConfId, Boolean isPublish) throws Exception {
+    public Map<String, Object> copyMktStrategyConf(Long parentMktStrategyConfId, Long childMktCampaignId, Boolean isPublish) throws Exception {
         Map<String, Object> mktStrategyConfMap = new HashMap<>();
         // 通过原策略id 获取原策略基本信息
         try {
@@ -559,7 +559,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             // 遍历规则
             for (MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO : mktStrategyConfRuleRelDOList) {
                 // 复制获取规则
-                Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.copyMktStrategyConfRule(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId(),true);
+                Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.copyMktStrategyConfRule(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId(), childMktCampaignId,true);
                 Long mktStrategyConfRuleId = (Long) mktStrategyConfRuleMap.get("mktStrategyConfRuleId");
                 // 简历策略和规则的关系
                 MktStrategyConfRuleRelDO childMktStrategyConfRuleRelDO = new MktStrategyConfRuleRelDO();
