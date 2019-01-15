@@ -626,6 +626,12 @@ public class DateUtil {
         return result;
     }
 
+    public static String date2St4Trial(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+        String result = sdf.format(date);
+        return result;
+    }
+
     public static String date2StringDate(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String result = sdf.format(date);
