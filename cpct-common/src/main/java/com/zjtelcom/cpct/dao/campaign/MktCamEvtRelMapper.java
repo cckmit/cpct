@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 @Repository
@@ -33,7 +34,7 @@ public interface MktCamEvtRelMapper {
 
     List<MktCamEvtRel> qryBycontactEvtId(@Param("contactEvtId") Long contactEvtId);
 
-    List<Long> listActivityByEventId(@Param("eventId") Long eventId);
+    List<Map<String,Object>> listActivityByEventId(@Param("eventId") Long eventId);
 
     List<MktCamEvtRelDO> listActByEventId(@Param("eventId") Long eventId);
 
