@@ -118,12 +118,14 @@
   </select>
 
 
-  <select id="selectByCampaignIdAndItemIdAndType" parameterType="java.lang.Long" resultMap="BaseResultMap">
+  <select id="selectByCampaignIdAndItemIdAndType" resultMap="BaseResultMap">
     select MKT_CAM_ITEM_ID, MKT_CAMPAIGN_ID, ITEM_TYPE, ITEM_ID, PRIORITY, ITEM_GROUP, OFFER_CODE,OFFER_NAME,
     STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK,
     LAN_ID
     from mkt_cam_item
-    where ITEM_ID = #{itemId,jdbcType=BIGINT} and  MKT_CAMPAIGN_ID = {campaignId} and ITEM_TYPE = #{itemType}
+    WHERE MKT_CAMPAIGN_ID = #{mktCampaignId, jdbcType=BIGINT}
+    AND ITEM_TYPE = #{itemType, jdbcType=VARCHAR}
+    AND ITEM_ID = #{itemId, jdbcType=BIGINT}
   </select>
 
   <select id="selectCamItemIdByCampaignId" parameterType="java.lang.Long" resultType="java.lang.Long">

@@ -1165,7 +1165,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
                 // 遍历活动下策略的集合
                 for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {
-                    Map<String, Object> mktStrategyConfMap = mktStrategyConfService.copyMktStrategyConf(mktCamStrategyConfRelDO.getStrategyConfId(), true);
+                    Map<String, Object> mktStrategyConfMap = mktStrategyConfService.copyMktStrategyConf(mktCamStrategyConfRelDO.getStrategyConfId(), childMktCampaignId, true);
                     Long childMktStrategyConfId = (Long) mktStrategyConfMap.get("childMktStrategyConfId");
                     // 建立活动和策略的关系
                     MktCamStrategyConfRelDO chaildMktCamStrategyConfRelDO = new MktCamStrategyConfRelDO();
@@ -1258,7 +1258,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
             List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByMktCampaignId(parentsMktCampaignId);
             for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {
-                Map<String, Object> map = mktStrategyConfService.copyMktStrategyConf(mktCamStrategyConfRelDO.getStrategyConfId(), false);
+                Map<String, Object> map = mktStrategyConfService.copyMktStrategyConf(mktCamStrategyConfRelDO.getStrategyConfId(), childMktCampaignId, false);
                 Long childMktStrategyConfId = (Long) map.get("childMktStrategyConfId");
                 MktCamStrategyConfRelDO childtCamStrRelDO = new MktCamStrategyConfRelDO();
                 childtCamStrRelDO.setMktCampaignId(childMktCampaignId);
