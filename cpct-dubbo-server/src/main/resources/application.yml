@@ -38,12 +38,23 @@ redisConfig:
    password: bss_cpct_common_user#bss_cpct_common_user123
 
 
+redisConfig_Prd:
+   ip: 134.96.231.228
+   port: 40201
+   database: 4970
+   password: bss_cpct_common_user#bss_cpct_common_user123
+
 #事件接入线程（活动校验部分）
 thread:
   maxPoolSize: 20
 
 
-
+#集团定制的redis配置pst环境
+redisConfig_Prd:
+      ip: 134.96.231.228
+      port: 40201
+      database: 4970
+      password: bss_cpct_common_user#bss_cpct_common_user123
 
 
 

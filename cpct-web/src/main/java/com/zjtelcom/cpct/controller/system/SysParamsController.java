@@ -160,6 +160,7 @@ public class SysParamsController extends BaseController {
     @RequestMapping(value = "/listParamsByKeyForCampaign", method = RequestMethod.POST)
     @CrossOrigin
     public String listParamsByKeyForCampaign() {
+        logger.info("获取活动总览页面的筛选条件列表-listParamsByKeyForCampaign");
         Map result = new HashMap();
         try {
             result = sysParamsService.listParamsByKeyForCampaign();

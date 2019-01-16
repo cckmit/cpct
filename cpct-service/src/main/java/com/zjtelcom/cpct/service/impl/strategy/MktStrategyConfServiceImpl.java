@@ -18,6 +18,7 @@ import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.strategy.*;
 import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.domain.SysArea;
+import com.zjtelcom.cpct.domain.campaign.MktCamChlResultDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamStrategyConfRelDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
@@ -134,12 +135,6 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
     @Autowired
     private MktStrategyConfRuleService mktStrategyConfRuleService;
 
-    /**
-     * 过滤规则与策略关联 Mapper
-     */
-    @Autowired
-    private MktStrategyFilterRuleRelMapper mktStrategyFilterRuleRelMapper;
-
     @Autowired
     private MktCamChlResultMapper mktCamChlResultMapper;
 
@@ -156,8 +151,6 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
         Map<String, Object> mktStrategyConfMap = new HashMap<>();
         // 删除与策略关联的下发城市
         mktStrategyConfRegionRelMapper.deleteByMktStrategyConfId(mktStrategyConfId);
-        // 删除与策略关联的过滤规则
-        mktStrategyFilterRuleRelMapper.deleteByStrategyId(mktStrategyConfId);
         //删除策略下的规则，以及关联的表
         List<MktStrategyConfRuleRelDO> mktStrategyConfRuleRelDOList = mktStrategyConfRuleRelMapper.selectByMktStrategyConfId(mktStrategyConfId);
         for (MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO : mktStrategyConfRuleRelDOList) {
@@ -501,10 +494,8 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                     List<MktCamChlResult> mktCamChlResultList = new ArrayList<>();
                     for (int i = 0; i < mktCamChlResultIds.length; i++) {
                         if (mktCamChlResultIds[i] != null && !"".equals(mktCamChlResultIds[i])) {
-                            MktCamChlResult mktCamChlResult = new MktCamChlResult();
-                            mktCamChlResultMapper.selectByPrimaryKey(Long.valueOf(mktCamChlResultIds[i]));
-
-                            mktCamChlResult.setMktCamChlResultId(Long.valueOf(mktCamChlResultIds[i]));
+                            MktCamChlResultDO mktCamChlResultDO = mktCamChlResultMapper.selectByPrimaryKey(Long.valueOf(mktCamChlResultIds[i]));
+                            MktCamChlResult mktCamChlResult = BeanUtil.create(mktCamChlResultDO, new MktCamChlResult());
                             mktCamChlResultList.add(mktCamChlResult);
                         }
                     }
@@ -536,7 +527,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
      * @throws Exception
      */
     @Override
-    public Map<String, Object> copyMktStrategyConf(Long parentMktStrategyConfId, Boolean isPublish) throws Exception {
+    public Map<String, Object> copyMktStrategyConf(Long parentMktStrategyConfId, Long childMktCampaignId, Boolean isPublish) throws Exception {
         Map<String, Object> mktStrategyConfMap = new HashMap<>();
         // 通过原策略id 获取原策略基本信息
         try {
@@ -553,7 +544,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             Long childMktStrategyConfId = mktStrategyConfDO.getMktStrategyConfId();
 
             //获取策略对应的过滤规则
-            List<Long> ruleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(parentMktStrategyConfId);
+/*            List<Long> ruleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(parentMktStrategyConfId);
             // 与新的策略建立关联
             for (Long ruleId : ruleIdList) {
                 MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO = new MktStrategyFilterRuleRelDO();
@@ -564,11 +555,11 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                 mktStrategyFilterRuleRelDO.setUpdateDate(new Date());
                 mktStrategyFilterRuleRelDO.setUpdateStaff(UserUtil.loginId());
                 mktStrategyFilterRuleRelMapper.insert(mktStrategyFilterRuleRelDO);
-            }
+            }*/
             // 遍历规则
             for (MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO : mktStrategyConfRuleRelDOList) {
                 // 复制获取规则
-                Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.copyMktStrategyConfRule(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId(),true);
+                Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.copyMktStrategyConfRule(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId(), childMktCampaignId,true);
                 Long mktStrategyConfRuleId = (Long) mktStrategyConfRuleMap.get("mktStrategyConfRuleId");
                 // 简历策略和规则的关系
                 MktStrategyConfRuleRelDO childMktStrategyConfRuleRelDO = new MktStrategyConfRuleRelDO();

@@ -19,7 +19,7 @@ public interface MktStrategyConfRuleService {
 
     Map<String, Object> deleteMktStrategyConfRule(Long mktStrategyConfRuleId);
 
-    Map<String, Object> copyMktStrategyConfRule(Long parentMktStrategyConfRuleId, Boolean isPublish)throws Exception;
+    Map<String, Object> copyMktStrategyConfRule(Long parentMktStrategyConfRuleId, Long childMktCampaignId, Boolean isPublish)throws Exception;
 
     Map<String, Object> copyMktStrategyConfRule(List<MktStrategyConfRule> mktStrategyConfRuleList) throws Exception;
 
