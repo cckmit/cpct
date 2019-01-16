@@ -223,9 +223,13 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 // 获取当前用户的岗位编码包含“cpcpch”
                 SystemUserDto userDetail = UserUtil.getRoleCode();
                 for (SystemPostDto role : userDetail.getSystemPostDtoList()) {
-                    if (role.getSysPostCode().contains("cpcpch")) {
+                    // 判断是否为超级管理员
+                    if(role.getSysPostCode().contains(PostEnum.ADMIN.getPostCode())){
                         mktCampaignDO.setCreateChannel(role.getSysPostCode());
                         break;
+                    } else if (role.getSysPostCode().contains("cpcpch")) {
+                        mktCampaignDO.setCreateChannel(role.getSysPostCode());
+                        continue;
                     }
                 }
             } else{
