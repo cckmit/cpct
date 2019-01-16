@@ -91,8 +91,11 @@
   </select>
 
     <select id="listActivityByEventId" parameterType="java.lang.Long" resultType="Map">
-        select MKT_CAMPAIGN_ID as mktCampaginId,LEVEL_CONFIG as levelConfig,CAMPAIGN_SEQ as campaignSeq
-        from mkt_cam_evt_rel
+        select mr.MKT_CAMPAIGN_ID as mktCampaginId,mr.LEVEL_CONFIG as levelConfig,mr.CAMPAIGN_SEQ as campaignSeq,
+        cam.MKT_CAMPAIGN_NAME as mktCampaginName,cam.MKT_ACTIVITY_NBR as mktCampaginNbr
+        from mkt_cam_evt_rel mr
+        left join mkt_campaign cam
+        on cam.MKT_CAMPAIGN_ID = mr.MKT_CAMPAIGN_ID
         where EVENT_ID = #{eventId,jdbcType=BIGINT}
         order by CAMPAIGN_SEQ asc
     </select>
