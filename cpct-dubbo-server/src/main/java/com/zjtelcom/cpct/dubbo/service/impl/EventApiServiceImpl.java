@@ -336,6 +336,7 @@ public class EventApiServiceImpl implements EventApiService {
         public Map<String, Object> cpc(Map<String, String> map) {
             //记录开始时间
             long begin = System.currentTimeMillis();
+            System.out.println("事件开始**************************" + (System.currentTimeMillis() - begin));
 
             //初始化返回结果
             Map<String, Object> result = new HashMap();
@@ -376,12 +377,16 @@ public class EventApiServiceImpl implements EventApiService {
                 esJson.put("evtCollectTime", simpleDateFormat.format(new Date()));
             }
 
+            System.out.println("参数构造完成，开始验证**************************" + (System.currentTimeMillis() - begin));
+
             try {
                 //事件验证开始↓↓↓↓↓↓↓↓↓↓↓↓↓
                 //解析事件采集项
                 JSONObject evtParams = JSONObject.parseObject(map.get("evtContent"));
                 //根据事件code查询事件信息
+                System.out.println("事件查询开始，redis获取开始**************************" + (System.currentTimeMillis() - begin));
                 ContactEvt event = (ContactEvt) redisUtils.get("EVENT_" + map.get("eventCode"));
+                System.out.println("事件查询开始，redis获取结束**************************" + (System.currentTimeMillis() - begin));
                 if (event == null) {
                     event = contactEvtMapper.getEventByEventNbr(map.get("eventCode"));
                     redisUtils.set("EVENT_" + map.get("eventCode"), event);
@@ -410,12 +415,14 @@ public class EventApiServiceImpl implements EventApiService {
                     esJson.put("msg", "事件已关闭");
                     esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
 
-                    log.error("事件已关闭:" + map.get("reqId"));
+                    log.info("事件已关闭:" + map.get("reqId"));
 
                     result.put("CPCResultCode", "1000");
                     result.put("CPCResultMsg", "事件已关闭");
                     return result;
                 }
+
+                System.out.println("事件验证完成**************************" + (System.currentTimeMillis() - begin));
 
                 //验证事件采集项
                 List<EventItem> contactEvtItems = contactEvtItemMapper.listEventItem(eventId);
@@ -464,6 +471,8 @@ public class EventApiServiceImpl implements EventApiService {
                     return result;
                 }
 
+                System.out.println("采集项验证完成**************************" + (System.currentTimeMillis() - begin));
+
                 //!!!验证事件规则命中
                 Map<String, Object> stringObjectMap = matchRulCondition(eventId, labelItems, map);
                 if (!stringObjectMap.get("code").equals("success")) {
@@ -489,12 +498,12 @@ public class EventApiServiceImpl implements EventApiService {
                     recCampaignAmount = Integer.parseInt(recCampaignAmountStr);
                 }
 
-                System.out.println("2222*********************************" + (System.currentTimeMillis() - begin));
+                System.out.println("事件规则验证完成**************************" + (System.currentTimeMillis() - begin));
 
                 //事件下所有活动的规则预校验，返回初步可命中活动
                 List<Map<String, Object>> resultByEvent = getResultByEvent(eventId, map.get("lanId"), map.get("channelCode"), map.get("reqId"), map.get("accNbr"));
 
-                System.out.println("3333*********************************" + (System.currentTimeMillis() - begin));
+                System.out.println("活动预校验完成**************************" + (System.currentTimeMillis() - begin));
 
                 if (resultByEvent == null || resultByEvent.size() <= 0) {
                     log.info("预校验均为空");
@@ -513,8 +522,6 @@ public class EventApiServiceImpl implements EventApiService {
 
                 //初始化返回结果中的工单信息
                 List<Map<String, Object>> activityList = new ArrayList<>();
-
-                System.out.println("44444*********************************" + (System.currentTimeMillis() - begin));
 
                 //初始化结果集
                 List<Future<Map<String, Object>>> threadList = new ArrayList<>();
@@ -602,7 +609,7 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 }
 
-                System.out.println("555555*********************************" + (System.currentTimeMillis() - begin));
+                System.out.println("活动线程开启完成**************************" + (System.currentTimeMillis() - begin));
 
                 //获取结果
                 try {
@@ -625,7 +632,7 @@ public class EventApiServiceImpl implements EventApiService {
                     executorService.shutdown();
                 }
 
-                System.out.println("66666*********************************" + (System.currentTimeMillis() - begin));
+                System.out.println("活动线程结果获取完成**************************" + (System.currentTimeMillis() - begin));
 
                 //判断事件推荐活动数，按照优先级排序
                 if (activityList.size() > 0 && recCampaignAmount > 0 && recCampaignAmount < activityList.size()) {
@@ -653,8 +660,6 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 }
 
-                System.out.println("77777*********************************" + (System.currentTimeMillis() - begin));
-
                 //返回结果
                 result.put("taskList", activityList); //协同回调结果
 
@@ -664,7 +669,7 @@ public class EventApiServiceImpl implements EventApiService {
                     result.put("CPCResultMsg", "success");
 
                     StringBuilder actStr = new StringBuilder();
-                    for(Map<String, Object> actMap : activityList) {
+                    for (Map<String, Object> actMap : activityList) {
                         actStr.append(actMap.get("activityId")).append(",");
                     }
                     esJson.put("hit", true);
@@ -681,14 +686,17 @@ public class EventApiServiceImpl implements EventApiService {
                 result.put("custId", custId);
 
                 paramsJson.put("backParams", result);
+                System.out.println("参数日志存储开始**************************" + (System.currentTimeMillis() - begin));
                 esHitService.save(paramsJson, IndexList.PARAMS_MODULE);
+                System.out.println("参数日志存储完成**************************" + (System.currentTimeMillis() - begin));
 
                 //es log
                 long cost = System.currentTimeMillis() - begin;
-                System.out.println("*********************************" + cost);
                 esJson.put("timeCost", cost);
                 esJson.put("success", true);
                 esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
+
+                System.out.println("活动结果解析完成**************************" + (System.currentTimeMillis() - begin));
 
             } catch (Exception e) {
                 log.info("策略中心计算异常");
@@ -941,7 +949,7 @@ public class EventApiServiceImpl implements EventApiService {
             for (Map<String, Object> strategyMap : strategyMapList) {
                 //提交线程
                 Future<Map<String, Object>> f = executorService.submit(
-                        new StrategyTask(params, (Long) strategyMap.get("strategyConfId"),(String) strategyMap.get("strategyConfName"),
+                        new StrategyTask(params, (Long) strategyMap.get("strategyConfId"), (String) strategyMap.get("strategyConfName"),
                                 privateParams, labelItems));
                 //将线程处理结果添加到结果集
                 threadList.add(f);
@@ -1130,7 +1138,7 @@ public class EventApiServiceImpl implements EventApiService {
         private Map<String, String> privateParams;  //私有参数
         private Map<String, String> labelItems;  //事件采集项标签
 
-        public StrategyTask(Map<String, String> params, Long strategyConfId,String strategyConfName, Map<String, String> privateParams,
+        public StrategyTask(Map<String, String> params, Long strategyConfId, String strategyConfName, Map<String, String> privateParams,
                             Map<String, String> labelItems) {
             this.strategyConfId = strategyConfId;
             this.strategyConfName = strategyConfName;
@@ -1339,7 +1347,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                     String mktStrategyConfRuleName = mktStrategyConfRuleDO.getMktStrategyConfRuleName();
                     //提交线程
-                    Future<Map<String, Object>> f = executorService.submit(new RuleTask(params, privateParams, strategyConfId, strategyConfName,tarGrpId, productStr,
+                    Future<Map<String, Object>> f = executorService.submit(new RuleTask(params, privateParams, strategyConfId, strategyConfName, tarGrpId, productStr,
                             evtContactConfIdStr, mktStrategyConfRuleId, mktStrategyConfRuleName, labelItems, context));
                     //将线程处理结果添加到结果集
                     threadList.add(f);
@@ -1397,7 +1405,7 @@ public class EventApiServiceImpl implements EventApiService {
         private Map<String, String> labelItems;
         private DefaultContext<String, Object> context;
 
-        public RuleTask(Map<String, String> params, Map<String, String> privateParams, Long strategyConfId,String strategyConfName, Long tarGrpId, String productStr,
+        public RuleTask(Map<String, String> params, Map<String, String> privateParams, Long strategyConfId, String strategyConfName, Long tarGrpId, String productStr,
                         String evtContactConfIdStr, Long mktStrategyConfRuleId, String mktStrategyConfRuleName, Map<String, String> labelItems,
                         DefaultContext<String, Object> context) {
             this.strategyConfId = strategyConfId;
@@ -2129,12 +2137,7 @@ public class EventApiServiceImpl implements EventApiService {
 
     private JSONObject getLabelByDubbo(JSONObject param) {
         //查询标签实例数据
-//        System.out.println("param " + param.toString());
-
         Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
-
-//        System.out.println(dubboResult.toString());
-
         if ("0".equals(dubboResult.get("result_code").toString())) {
             JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
             //解析返回结果
@@ -3028,19 +3031,19 @@ public class EventApiServiceImpl implements EventApiService {
             esJson.put("activityCode", act.get("mktCampaginNbr"));
             esJson.put("hitEntity", accNbr); //命中对象
 
-            //验证过滤规则时间   todo 这里可以仅查询出 5000 的过滤规则
-            List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(mktCampaginId);
+            //验证过滤规则时间,默认只查询5000类型的时间段过滤
+            List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(mktCampaginId, "5000");
             for (FilterRule filterRule : filterRuleList) {
-                if ("5000".equals(filterRule.getFilterType())) {  //时间段过滤
-                    //时间段的格式
-                    if (compareHourAndMinute(filterRule)) {
-                        log.info("过滤时间段验证被拦截");
-                        esJson.put("hit", false);
-                        esJson.put("msg", "过滤时间段验证被拦截");
-                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                        return Collections.EMPTY_MAP;
-                    }
+//                if ("5000".equals(filterRule.getFilterType())) {  //时间段过滤
+                //时间段的格式
+                if (compareHourAndMinute(filterRule)) {
+                    log.info("过滤时间段验证被拦截");
+                    esJson.put("hit", false);
+                    esJson.put("msg", "过滤时间段验证被拦截");
+                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                    return Collections.EMPTY_MAP;
                 }
+//                }
             }
 
             Map<String, Object> mktCampaignMap = new HashMap<>();
