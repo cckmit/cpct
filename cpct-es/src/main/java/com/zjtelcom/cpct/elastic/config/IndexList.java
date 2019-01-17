@@ -38,6 +38,16 @@ public class IndexList {
      */
     public static String PARAMS_MODULE="params_module";
 
+    /**
+     * 耗时模块索引
+     */
+    public static String TIME_MODULE="time_module";
+
+    /**
+     * 规则模块索引
+     */
+    public static String RULE_TIME_MODULE="rule_time_module";
+
 
 
 }
