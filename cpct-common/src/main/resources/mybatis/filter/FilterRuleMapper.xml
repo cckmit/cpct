@@ -276,7 +276,7 @@
         AND c.LEFT_PARAM = l.INJECTION_LABEL_ID
     </select>
 
-    <select id="selectFilterRuleListByStrategyId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    <select id="selectFilterRuleListByStrategyId" resultMap="BaseResultMap">
         SELECT
             t.RULE_ID, t.RULE_NAME, t.FILTER_TYPE,
             t.EXECUTION_CHANNEL, t.CHANNEL_CONTACTS, t.EFFECTIVE_DATE,
@@ -289,6 +289,7 @@
         WHERE
           r.STRATEGY_ID = #{strategyId, jdbcType=VARCHAR}
         AND t.RULE_ID = r.RULE_ID
+        and t.FILTER_TYPE = #{strategyType, jdbcType=VARCHAR}
     </select>
 
 

@@ -1,6 +1,6 @@
 #服务器部署相关配置
 logging:
-  path: /app/cpct/user_service/logs/stdout.log
+  path: /app/logs/cpct-dubbo-pre/stdout.log
   level:
 #    com.zjtelcom.cpct.dao: debug
     com.ctg.itrdc.cache.pool.CtgJedisPool: warn
