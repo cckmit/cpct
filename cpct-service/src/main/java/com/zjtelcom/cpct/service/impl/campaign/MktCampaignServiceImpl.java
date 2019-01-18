@@ -933,10 +933,11 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     String postName = "";
                     try {
                         SystemPost systemPost = new SystemPost();
-                        systemPost.setSysPostCode(mktCampaignDO.getCreateChannel());
+                        systemPost.setSysPostCode(mktCampaignCountDO.getCreateChannel());
                         QrySystemPostReq qrySystemPostReq = new QrySystemPostReq();
                         qrySystemPostReq.setSystemPost(systemPost);
-                        SysmgrResultObject<com.ctzj.smt.bss.sysmgr.model.common.Page> pageSysmgrResultObject = iSystemPostDubboService.qrySystemPostPage(new com.ctzj.smt.bss.sysmgr.model.common.Page(), qrySystemPostReq);
+                        SysmgrResultObject<com.ctzj.smt.bss.sysmgr.model.common.Page> pageSysmgrResultObject =
+                                iSystemPostDubboService.qrySystemPostPage(new com.ctzj.smt.bss.sysmgr.model.common.Page(), qrySystemPostReq);
                         if(pageSysmgrResultObject!=null){
                             if( pageSysmgrResultObject.getResultObject()!=null){
                                 List<SystemPost> dataList = (List<SystemPost>) pageSysmgrResultObject.getResultObject().getDataList();
