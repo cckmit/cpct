@@ -165,6 +165,18 @@
                 <spring.profiles.active>prod</spring.profiles.active>
             </properties>
         </profile>
+        <profile>
+            <id>grey</id>
+            <properties>
+                <spring.profiles.active>grey</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>grey-pre</id>
+            <properties>
+                <spring.profiles.active>grey-pre</spring.profiles.active>
+            </properties>
+        </profile>
     </profiles>
 
     <properties>

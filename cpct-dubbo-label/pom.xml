@@ -87,6 +87,24 @@
                 <spring.profiles.active>prod</spring.profiles.active>
             </properties>
         </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <spring.profiles.active>prod</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>grep</id>
+            <properties>
+                <spring.profiles.active>grep</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>grep-pre</id>
+            <properties>
+                <spring.profiles.active>grep-pre</spring.profiles.active>
+            </properties>
+        </profile>
     </profiles>
 
     <properties>

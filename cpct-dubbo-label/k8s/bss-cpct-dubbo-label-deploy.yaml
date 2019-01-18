@@ -22,6 +22,13 @@ spec:
         image: 134.96.180.23:8001/hchc/bss-cpct-dubbo-label:1.0  #这里修改  地址使用这个么？
         imagePullPolicy: Always
         env:
+        lifecycle:     #处理dubbo没有取消注册问题
+          preStop:
+            exec:
+              command:
+                - "/bin/sh"
+                - "/app/project/unregister.sh"
+                - "30007"
         - name: DUBBO_IP_TO_REGISTRY     # 当项目为对外项目时，此处注解取消
           valueFrom:
            fieldRef:
@@ -67,11 +74,11 @@ spec:
           mountPath: /etc/localtime
         resources:   #镜镜像环境  不修改就用docker默认
           requests:
-            memory: "4Gi"
-            cpu: "2000m"
+            memory: "1Gi"
+            cpu: "500m"
           limits:
-            memory: "4Gi"
-            cpu: "4000m"
+            memory: "1Gi"
+            cpu: "1000m"
       nodeSelector:
         center: bssOther  #修改镜像所属中心标签
       volumes:
