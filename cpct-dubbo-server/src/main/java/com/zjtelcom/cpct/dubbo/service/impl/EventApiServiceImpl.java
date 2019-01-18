@@ -336,7 +336,7 @@ public class EventApiServiceImpl implements EventApiService {
         public Map<String, Object> cpc(Map<String, String> map) {
             //记录开始时间
             long begin = System.currentTimeMillis();
-            System.out.println(map.get("reqId") + "事件开始**************************" + (System.currentTimeMillis() - begin));
+            System.out.println(map.get("reqId") + "***事件开始**************************" + (System.currentTimeMillis() - begin));
 
             //初始化返回结果
             Map<String, Object> result = new HashMap();
@@ -381,7 +381,6 @@ public class EventApiServiceImpl implements EventApiService {
                 esJson.put("evtCollectTime", simpleDateFormat.format(new Date()));
             }
 
-            System.out.println("参数构造完成，开始验证**************************" + (System.currentTimeMillis() - begin));
             timeJson.put("time2", System.currentTimeMillis() - begin);
 
             try {
@@ -390,9 +389,7 @@ public class EventApiServiceImpl implements EventApiService {
                 JSONObject evtParams = JSONObject.parseObject(map.get("evtContent"));
                 //根据事件code查询事件信息
                 timeJson.put("time3", System.currentTimeMillis() - begin);
-                System.out.println(map.get("reqId") + "事件查询开始，redis获取开始**************************" + (System.currentTimeMillis() - begin));
                 ContactEvt event = (ContactEvt) redisUtils.get("EVENT_" + map.get("eventCode"));
-                System.out.println(map.get("reqId") + "事件查询开始，redis获取结束**************************" + (System.currentTimeMillis() - begin));
                 timeJson.put("time4", System.currentTimeMillis() - begin);
                 if (event == null) {
                     event = contactEvtMapper.getEventByEventNbr(map.get("eventCode"));
@@ -429,7 +426,6 @@ public class EventApiServiceImpl implements EventApiService {
                     return result;
                 }
 
-                System.out.println(map.get("reqId") + "事件验证完成**************************" + (System.currentTimeMillis() - begin));
                 timeJson.put("time4", System.currentTimeMillis() - begin);
                 //验证事件采集项
                 List<EventItem> contactEvtItems = contactEvtItemMapper.listEventItem(eventId);
@@ -477,8 +473,6 @@ public class EventApiServiceImpl implements EventApiService {
                     result.put("CPCResultMsg", "事件采集项验证失败，缺少：" + stringBuilder.toString());
                     return result;
                 }
-
-                System.out.println(map.get("reqId") + "采集项验证完成**************************" + (System.currentTimeMillis() - begin));
                 timeJson.put("time5", System.currentTimeMillis() - begin);
 
                 //!!!验证事件规则命中
@@ -506,12 +500,12 @@ public class EventApiServiceImpl implements EventApiService {
                     recCampaignAmount = Integer.parseInt(recCampaignAmountStr);
                 }
 
-                System.out.println(map.get("reqId") + "事件规则验证完成**************************" + (System.currentTimeMillis() - begin));
+                System.out.println(map.get("reqId") + "**事件规则验证完成**************************" + (System.currentTimeMillis() - begin));
                 timeJson.put("time6", System.currentTimeMillis() - begin);
                 //事件下所有活动的规则预校验，返回初步可命中活动
                 List<Map<String, Object>> resultByEvent = getResultByEvent(eventId, map.get("lanId"), map.get("channelCode"), map.get("reqId"), map.get("accNbr"));
 
-                System.out.println(map.get("reqId") + "活动预校验完成**************************" + (System.currentTimeMillis() - begin));
+                System.out.println(map.get("reqId") + "**活动预校验完成**************************" + (System.currentTimeMillis() - begin));
                 timeJson.put("time7", System.currentTimeMillis() - begin);
 
                 if (resultByEvent == null || resultByEvent.size() <= 0) {
@@ -618,49 +612,6 @@ public class EventApiServiceImpl implements EventApiService {
                             esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
                         }
 
-//                        if (custId == null || "".equals(custId)) {
-//
-//                            //保存es log
-//                            long cost = System.currentTimeMillis() - begin;
-//                            esJson.put("timeCost", cost);
-//                            esJson.put("hit", false);
-//                            esJson.put("success", true);
-//                            esJson.put("activityId", (Long) activeMap.get("mktCampaginId"));
-//                            esJson.put("msg", "客户级活动，事件采集项未包含客户编码");
-//                            esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
-//
-//                            log.error("采集项未包含客户编码:" + map.get("reqId"));
-//
-//                            //事件采集项没有客户编码
-//                            result.put("CPCResultCode", "1000");
-//                            result.put("CPCResultMsg", "采集项未包含客户编码");
-//                            return result;
-//                        }
-
-                        //根据客户编码查询所有资产
-                        //构造查询参数值
-//                        JSONObject param = new JSONObject();
-//                        //查询标识
-//                        param.put("c3", map.get("lanId"));
-//                        param.put("queryId", map.get("custId"));
-//                        param.put("queryNum", "");
-//                        param.put("queryFields", "");
-//                        param.put("type", "4");
-//                        Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
-//
-//                        JSONArray accArray = new JSONArray();
-//                        if ("0".equals(dubboResult.get("result_code").toString())) {
-//                            accArray = new JSONArray((List<Object>) dubboResult.get("msgbody"));
-//
-//                        } else {
-//                            log.error("客户级资产查询出错:" + map.get("reqId"));
-//
-//                            esJson.put("hit", "false");
-//                            esJson.put("msg", "客户级资产查询出错");
-//                            esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-//                            continue;
-//                        }
-
                     } else {
                         //资产级
                         Map<String, String> privateParams = new HashMap<>();
@@ -677,7 +628,7 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 }
 
-                System.out.println(map.get("reqId") + "活动线程开启完成**************************" + (System.currentTimeMillis() - begin));
+                System.out.println(map.get("reqId") + "**活动线程开启完成**************************" + (System.currentTimeMillis() - begin));
                 timeJson.put("time8", System.currentTimeMillis() - begin);
 
                 //获取结果
@@ -701,7 +652,7 @@ public class EventApiServiceImpl implements EventApiService {
                     executorService.shutdown();
                 }
 
-                System.out.println(map.get("reqId") + "活动线程结果获取完成**************************" + (System.currentTimeMillis() - begin));
+                System.out.println(map.get("reqId") + "**活动线程结果获取完成**************************" + (System.currentTimeMillis() - begin));
                 timeJson.put("time9", System.currentTimeMillis() - begin);
 
                 //判断事件推荐活动数，按照优先级排序
@@ -2371,7 +2322,7 @@ public class EventApiServiceImpl implements EventApiService {
             if (checkProduct != null && !"".equals(checkProduct)) {
                 String[] checkProductArr = checkProduct.split(",");
                 if (productStr != null && !"".equals(productStr)) {
-                    if ("1000".equals(type)) {  //存在于
+                    if ("7000".equals(type)) {  //存在于
                         for (String product : checkProductArr) {
                             int index = productStr.indexOf(product);
                             if (index >= 0) {
@@ -2379,7 +2330,7 @@ public class EventApiServiceImpl implements EventApiService {
                                 break;
                             }
                         }
-                    } else if ("2000".equals(type)) { //不存在于
+                    } else if ("7100".equals(type)) { //不存在于
                         boolean noExistCheck = true;
                         for (String product : checkProductArr) {
                             int index = productStr.indexOf(product);
@@ -2396,9 +2347,9 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 } else {
                     //存在于校验
-                    if ("2000".equals(type)) {
+                    if ("7100".equals(type)) {
                         productCheck = false;
-                    } else if ("1000".equals(type)) {
+                    } else if ("7000".equals(type)) {
                         productCheck = true;
                     }
                 }
@@ -2490,8 +2441,8 @@ public class EventApiServiceImpl implements EventApiService {
                 express.append(" <= ");
                 express.append(rightParam);
                 break;
-            case "7100":
-            case "7000":
+            case "7100":    //不包含于
+            case "7000":    //包含于
                 express.append(code).append(")");
                 express.append(" in ");
                 String[] strArray = rightParam.split(",");
@@ -2504,7 +2455,7 @@ public class EventApiServiceImpl implements EventApiService {
                 }
                 express.append(")");
                 break;
-            case "7200":
+            case "7200":  //区间于
                 express.append("toNum(").append(code).append("))");
                 String[] strArray2 = rightParam.split(",");
                 express.append(" >= ").append(strArray2[0]);
