@@ -59,10 +59,13 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
                 camScript = camScriptMapper.selectByConfId(contactConfId);
             }
         }
-        if (camScript != null) {
+        if (camScript.getScriptDesc() != null) {
             newScript.setScriptDesc(camScript.getScriptDesc());
-        } else {
+        } else if(camScript.getScriptDesc() == null && scriptDesc != null) {
             newScript.setScriptDesc(scriptDesc);
+        } else {
+            camScript = camScriptMapper.selectByConfId(contactConfId);
+            newScript.setScriptDesc(camScript.getScriptDesc());
         }
         newScript.setMktCampaignId(0L);
         newScript.setEvtContactConfId(newConfId);
@@ -89,7 +92,13 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
         CamScript script = camScriptMapper.selectByConfId(addVO.getEvtContactConfId());
         if (script!=null){
             //todo copy结果为null需要处理
-            BeanUtil.copy(addVO,script);
+            //BeanUtil.copy(addVO,script);
+            if(addVO.getScriptDesc() != null){
+                script.setScriptDesc(addVO.getScriptDesc());
+            }
+            if(addVO.getLanId() != null){
+                script.setLanId(addVO.getLanId());
+            }
             script.setMktCampaignId(addVO.getMktCampaignId());
             script.setUpdateDate(new Date());
             script.setUpdateStaff(userId);
