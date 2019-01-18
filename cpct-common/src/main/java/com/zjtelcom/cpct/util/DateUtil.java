@@ -744,7 +744,17 @@ public class DateUtil {
     }
 
 
-
+    /**
+     *以yyyyMMdd格式获取当前时间
+     * <p>
+     *
+     * @return
+     */
+    public static String getNowTime(){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        String timeStamp = sdf.format(new Date());
+        return timeStamp;
+    }
 
 
 
