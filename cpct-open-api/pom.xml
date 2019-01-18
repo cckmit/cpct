@@ -149,6 +149,12 @@
 				<spring.profiles.active>prod</spring.profiles.active>
 			</properties>
 		</profile>
+		<profile>
+			<id>grep</id>
+			<properties>
+				<spring.profiles.active>grep</spring.profiles.active>
+			</properties>
+		</profile>
 	</profiles>
 
 	<properties>
