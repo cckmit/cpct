@@ -570,7 +570,7 @@ public class EventApiServiceImpl implements EventApiService {
                                 successCust = true;
                             }
                         } catch (Exception e) {
-
+                            // todo
                         }
                     }
                 }
@@ -851,7 +851,7 @@ public class EventApiServiceImpl implements EventApiService {
 
             System.out.println(activityId + "活动2222**************************" + (System.currentTimeMillis() - begin));
             //验证过滤规则 活动级
-            mktCampaign = (MktCampaignDO) redisUtils.get("MKT_" + activityId);
+            mktCampaign = (MktCampaignDO) redisUtils.get("MKT_" + activityId);  //todo
             List<Long> filterRuleIds = (List<Long>) redisUtils.get("MKT_FILTER_RULE_IDS" + activityId);
             if (filterRuleIds == null) {
                 filterRuleIds = mktStrategyFilterRuleRelMapper.selectByStrategyId(activityId);
@@ -1398,7 +1398,7 @@ public class EventApiServiceImpl implements EventApiService {
 
             context.putAll(labelItems);
 
-            //根据策略id获取策略下发规则列表 todo
+            //根据策略id获取策略下发规则列表 todo 缓存
             List<MktStrategyConfRuleDO> mktStrategyConfRuleDOS = mktStrategyConfRuleMapper.selectByMktStrategyConfId(strategyConfId);
             //遍历规则↓↓↓↓↓↓↓↓↓↓
             //初始化结果集
@@ -2214,7 +2214,7 @@ public class EventApiServiceImpl implements EventApiService {
 //            }
             //返回结果中添加脚本信息
             channel.put("contactScript", contactScript == null ? "" : contactScript);
-//            //痛痒点
+            //痛痒点
 //            if (mktVerbalStr != null) {
 //                if (subScript(mktVerbalStr).size() > 0) {
 ////                    System.out.println("推荐指引标签替换含有无值的标签");
