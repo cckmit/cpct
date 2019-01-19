@@ -3,7 +3,7 @@ openPath: api
 
 #服务器部署相关配置
 logging:
-  path: /app/cpct/user_service/logs/open_api.log
+  path: /app/logs/cpct/cpct-open-api
   level:
     com.zjtelcom.cpct.dao: debug
     com.ctg.itrdc.cache.pool.CtgJedisPool: warn
@@ -36,6 +36,17 @@ spring:
   transaction:
     rollback-on-commit-failure: true
 
+#redis相关配置
+  redis:
+    host: 134.96.252.170
+    port: 30305
+    password: xc.cpct
+    pool:
+      max-active: 8
+      max-wait: -1
+      max-idle: 8
+      min-idle: 0
+    timeout: 30000
 
 
 #集团定制的redis配置pst环境
@@ -46,3 +57,18 @@ redisConfig:
    password: bss_cpct_common_user#bss_cpct_common_user123
 
 
+#调用统一平台的参数  测试环境
+platformConfig:
+   channel: CLZX
+   channel_token: ZZ2hhmTCbnBAl3XS
+   bis_module: 内容策略中心
+   bis_detail: 内容策略中心
+   version: v1.0
+
+
+#集团定制的redis配置pst环境
+redisConfig_Prd:
+   ip: 134.96.231.228
+   port: 40201
+   database: 4970
+   password: bss_cpct_common_user#bss_cpct_common_user123

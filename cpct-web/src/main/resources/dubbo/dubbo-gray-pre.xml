@@ -40,7 +40,7 @@
     </dubbo:reference>
 
     <!--活动信息同步大数据-->
-    <dubbo:reference registry="esb2" id="activitySyncService" interface="com.zjhcsoft.eagle.main.dubbo.service.ActivitySyncService" version="2.0">
+    <dubbo:reference registry="esb2" id="activitySyncService" interface="com.zjhcsoft.eagle.main.dubbo.service.ActivitySyncService" version="1.0">
         <dubbo:method name="syncActivity" servicecode="33.1307.syncActivity" timeout="30000"/>
     </dubbo:reference>
 
