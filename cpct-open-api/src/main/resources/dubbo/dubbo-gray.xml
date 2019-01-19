@@ -15,7 +15,7 @@
 
     <!-- 因子实时查询 -->
     <dubbo:reference registry="esb4" interface="com.zjpii.biz.serv.YzServ" id="yzServ"
-                     version="1.0" retries="0" check="false">
+                     version="2.0" retries="0" check="false">
         <dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="10000"/>
     </dubbo:reference>
 
@@ -28,7 +28,7 @@
 
     <!--协同渠道接触任务-->
     <dubbo:reference registry="esb4" interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskService" id="iContactTaskService"
-                     version="1.0" retries="0" check="false">
+                     version="2.0" retries="0" check="false">
         <dubbo:method name="queryTaskDetail4openApi" servicecode="00.1079.queryTaskDetail4openApi"/>
     </dubbo:reference>
 

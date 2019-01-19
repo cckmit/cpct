@@ -13,7 +13,7 @@
 
     <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.EventApiService" id="eventApiService"
                      version="2.0" retries="0" check="false">
-        <dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync_zsc" timeout="20000"/>
+        <dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="20000"/>
     </dubbo:reference>
 
     <!-- es提供试算接口 -->
@@ -26,24 +26,17 @@
         <dubbo:method name="issueByFile" servicecode="00.1083.issueByFile" timeout="10000"/>
     </dubbo:reference>
 
-    <dubbo:reference registry="esb2" interface="org.springframework.session.data.ctg.IDubboCtgService"
+    <dubbo:reference registry="esb3" interface="org.springframework.session.data.ctg.IDubboCtgService"
                      id="dubboCtgService" version="2.0" check="false">
         <dubbo:method name="smembers" servicecode="00.1077.ctgSessionSmembers"/>
         <dubbo:method name="hgetAll" servicecode="00.1077.ctgSessionHgetAll"/>
         <dubbo:method name="exists" servicecode="00.1077.ctgSessionExists"/>
     </dubbo:reference>
 
-    <!-- 因子实时查询 -->
-    <dubbo:reference registry="esb3" interface="com.zjpii.biz.serv.YzServ" id="yzServ"
-                     version="2.0" retries="0" check="false">
-        <dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="10000"/>
-    </dubbo:reference>
-
     <!--活动信息同步大数据-->
-    <dubbo:reference registry="esb2" id="activitySyncService" interface="com.zjhcsoft.eagle.main.dubbo.service.ActivitySyncService" version="2.0">
+    <dubbo:reference registry="esb2" id="activitySyncService" interface="com.zjhcsoft.eagle.main.dubbo.service.ActivitySyncService" version="1.0">
         <dubbo:method name="syncActivity" servicecode="33.1307.syncActivity" timeout="30000"/>
     </dubbo:reference>
-
 
 
 </beans>
