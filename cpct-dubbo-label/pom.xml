@@ -88,15 +88,15 @@
             </properties>
         </profile>
         <profile>
-            <id>grep</id>
+            <id>gray</id>
             <properties>
-                <spring.profiles.active>grep</spring.profiles.active>
+                <spring.profiles.active>gray</spring.profiles.active>
             </properties>
         </profile>
         <profile>
-            <id>grep-pre</id>
+            <id>gray-pre</id>
             <properties>
-                <spring.profiles.active>grep-pre</spring.profiles.active>
+                <spring.profiles.active>gray-pre</spring.profiles.active>
             </properties>
         </profile>
     </profiles>
