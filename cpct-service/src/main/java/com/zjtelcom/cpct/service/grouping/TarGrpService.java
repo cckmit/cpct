@@ -31,11 +31,12 @@ public interface TarGrpService {
 
     Map<String,Object> listBigDataModel(Long mktCamGrpRulId);
 
-
     Map<String,Object> modTarGrp(TarGrpDetail tarGrpDetail);
 
     Map<String,Object> delTarGrp(TarGrpDetail tarGrpDetail);
 
     Map<String,Object> copyTarGrp(Long tarGrpId,boolean isCopy);
+
+    Map<String,Object> labelListByCampaignId(List<Integer> campaignId);
 
 }
