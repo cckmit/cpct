@@ -10,12 +10,10 @@ import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.util.FastJsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -32,6 +30,15 @@ public class TarGrpController extends BaseController {
     private TarGrpService tarGrpService;
     @Autowired
     private TrialOperationService operationService;
+
+
+    @PostMapping("labelListByCampaignId")
+    @CrossOrigin
+    public Map<String, Object> labelListByCampaignId(@RequestBody HashMap<String,Object> param) {
+        Map<String,Object> resutlt = new HashMap<>();
+        resutlt = tarGrpService.labelListByCampaignId((List<Integer>)param.get("idList"));
+        return resutlt;
+    }
 
 
     @RequestMapping("/createTarGrpByTemplateId")
