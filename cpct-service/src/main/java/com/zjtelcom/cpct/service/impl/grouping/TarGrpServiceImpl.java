@@ -118,7 +118,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 }
             }
             //过滤规则标签
-            List<FilterRule> filterRules = filterRuleMapper.selectFilterRuleListByStrategyId(Long.valueOf(id.toString()));
+            List<FilterRule> filterRules = filterRuleMapper.selectFilterRuleList(Long.valueOf(id.toString()));
             for (FilterRule filterRule : filterRules){
                 if ("6000".equals(filterRule.getFilterType()) && filterRule.getConditionId()!=null){
                     Label label = injectionLabelMapper.selectByPrimaryKey(filterRule.getConditionId());
