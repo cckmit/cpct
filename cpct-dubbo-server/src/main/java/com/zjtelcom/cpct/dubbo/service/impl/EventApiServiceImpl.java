@@ -1238,7 +1238,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                     System.out.println(activityId + "活动7777" + params.get("accNbr") + "**************************" + (System.currentTimeMillis() - begin));
                     timeJson.put("time6", System.currentTimeMillis() - begin);
-                    esHitService.save(timeJson, IndexList.TIME_MODULE,reqId + "0_" + activityId + "_" + params.get("accNbr"));
+                    esHitService.save(timeJson, IndexList.TIME_MODULE, reqId + "0_" + activityId + "_" + params.get("accNbr"));
 
                 } else {
                     esJson.put("hit", false);
@@ -1359,7 +1359,7 @@ public class EventApiServiceImpl implements EventApiService {
                 strategyMap.put("ruleList", ruleList);
 
                 timeJson.put("time3", System.currentTimeMillis() - begin);
-                esHitService.save(timeJson, IndexList.TIME_MODULE,reqId + "0_" + strategyConfId + "_" + params.get("accNbr"));
+                esHitService.save(timeJson, IndexList.TIME_MODULE, reqId + "0_" + strategyConfId + "_" + params.get("accNbr"));
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -1383,7 +1383,6 @@ public class EventApiServiceImpl implements EventApiService {
                 esHitService.save(esJson, IndexList.STRATEGY_MODULE);
                 return Collections.EMPTY_MAP;
             }
-
 
 
             return strategyMap;
@@ -1749,7 +1748,7 @@ public class EventApiServiceImpl implements EventApiService {
                             //协同渠道规则表id（自建表）
                             Long evtContactConfId = Long.parseLong(str);
                             //提交线程
-                            Future<Map<String, Object>> f = executorService.submit(new ChannelTask(params, evtContactConfId, productList, privateParams, context));
+                            Future<Map<String, Object>> f = executorService.submit(new ChannelTask(evtContactConfId, productList, context));
                             //将线程处理结果添加到结果集
                             threadList.add(f);
                         }
@@ -1786,7 +1785,7 @@ public class EventApiServiceImpl implements EventApiService {
                 ruleMap.put("taskChlList", taskChlList);
 
                 timeJson.put("time8", System.currentTimeMillis() - begin);
-                esHitService.save(timeJson, IndexList.TIME_MODULE,reqId + "0_" + ruleId + "_" + params.get("accNbr"));
+                esHitService.save(timeJson, IndexList.TIME_MODULE, reqId + "0_" + ruleId + "_" + params.get("accNbr"));
 
                 if (taskChlList.size() > 0) {
                     jsonObject.put("hit", true);
@@ -1814,24 +1813,18 @@ public class EventApiServiceImpl implements EventApiService {
         private Long evtContactConfId;
 
         private List<Map<String, String>> productList;
-        private Map<String, String> params;
-        private Map<String, String> privateParams;
         private DefaultContext<String, Object> context;
 
-        public ChannelTask(Map<String, String> params, Long evtContactConfId, List<Map<String, String>> productList,
-                           Map<String, String> privateParams, DefaultContext<String, Object> context) {
+        public ChannelTask(Long evtContactConfId, List<Map<String, String>> productList,
+                           DefaultContext<String, Object> context) {
             this.evtContactConfId = evtContactConfId;
             this.productList = productList;
-            this.params = params;
-            this.privateParams = privateParams;
             this.context = context;
         }
 
         @Override
         public Map<String, Object> call() {
             Date now = new Date();
-
-            long begin = System.currentTimeMillis();
 
             //初始化返回结果推荐信息
             Map<String, Object> channelMap = new HashMap<>();
@@ -1965,7 +1958,7 @@ public class EventApiServiceImpl implements EventApiService {
                 redisUtils.set("CHL_CONF_DETAIL_" + evtContactConfId, mktCamChlConfDetail);
             }
 
-            if(camScript != null) {
+            if (camScript != null) {
                 contactScript = camScript.getScriptDesc();
                 if (contactScript != null) {
                     scriptLabelList.addAll(subScript(contactScript));
