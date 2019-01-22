@@ -6,6 +6,8 @@
     <result column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId" />
     <result column="ITEM_TYPE" jdbcType="VARCHAR" property="itemType" />
     <result column="ITEM_ID" jdbcType="BIGINT" property="itemId" />
+    <result column="OFFER_CODE" jdbcType="VARCHAR" property="offerCode" />
+    <result column="OFFER_NAME" jdbcType="VARCHAR" property="offerName" />
     <result column="PRIORITY" jdbcType="BIGINT" property="priority" />
     <result column="ITEM_GROUP" jdbcType="BIGINT" property="itemGroup" />
     <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
@@ -23,51 +25,86 @@
   </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamItem" useGeneratedKeys="true" keyProperty="mktCamItemId">
     insert into mkt_cam_item (MKT_CAM_ITEM_ID, MKT_CAMPAIGN_ID, ITEM_TYPE,
-      ITEM_ID, PRIORITY, ITEM_GROUP, 
-      STATUS_CD, STATUS_DATE, CREATE_STAFF, 
-      CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, 
-      REMARK, LAN_ID)
-    values (#{mktCamItemId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{itemType,jdbcType=VARCHAR}, 
-      #{itemId,jdbcType=BIGINT}, #{priority,jdbcType=BIGINT}, #{itemGroup,jdbcType=BIGINT}, 
-      #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT}, 
-      #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, 
-      #{remark,jdbcType=VARCHAR}, #{lanId,jdbcType=BIGINT})
+    ITEM_ID, PRIORITY, ITEM_GROUP,OFFER_CODE,OFFER_NAME,
+    STATUS_CD, STATUS_DATE, CREATE_STAFF,
+    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
+    REMARK, LAN_ID)
+    values (#{mktCamItemId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{itemType,jdbcType=VARCHAR},
+    #{itemId,jdbcType=BIGINT}, #{priority,jdbcType=BIGINT}, #{itemGroup,jdbcType=BIGINT}, #{offerCode,jdbcType=VARCHAR},#{offerName,jdbcType=VARCHAR},
+    #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT},
+    #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP},
+    #{remark,jdbcType=VARCHAR}, #{lanId,jdbcType=BIGINT})
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamItem">
     update mkt_cam_item
     set MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},
-      ITEM_TYPE = #{itemType,jdbcType=VARCHAR},
-      ITEM_ID = #{itemId,jdbcType=BIGINT},
-      PRIORITY = #{priority,jdbcType=BIGINT},
-      ITEM_GROUP = #{itemGroup,jdbcType=BIGINT},
-      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
-      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
-      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
-      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
-      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
-      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
-      REMARK = #{remark,jdbcType=VARCHAR},
-      LAN_ID = #{lanId,jdbcType=BIGINT}
+    ITEM_TYPE = #{itemType,jdbcType=VARCHAR},
+    ITEM_ID = #{itemId,jdbcType=BIGINT},
+    PRIORITY = #{priority,jdbcType=BIGINT},
+    ITEM_GROUP = #{itemGroup,jdbcType=BIGINT},
+    OFFER_CODE = #{offerCode,jdbcType=VARCHAR},
+    OFFER_NAME = #{offerName,jdbcType=VARCHAR},
+    STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+    STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+    CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+    CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+    UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+    UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+    REMARK = #{remark,jdbcType=VARCHAR},
+    LAN_ID = #{lanId,jdbcType=BIGINT}
     where MKT_CAM_ITEM_ID = #{mktCamItemId,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select MKT_CAM_ITEM_ID, MKT_CAMPAIGN_ID, ITEM_TYPE, ITEM_ID, PRIORITY, ITEM_GROUP, 
-    STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, 
+    select MKT_CAM_ITEM_ID, MKT_CAMPAIGN_ID, ITEM_TYPE, ITEM_ID, PRIORITY, ITEM_GROUP, OFFER_CODE,OFFER_NAME,
+    STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK,
     LAN_ID
     from mkt_cam_item
     where MKT_CAM_ITEM_ID = #{mktCamItemId,jdbcType=BIGINT}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
-    select MKT_CAM_ITEM_ID, MKT_CAMPAIGN_ID, ITEM_TYPE, ITEM_ID, PRIORITY, ITEM_GROUP, 
-    STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, 
+    select MKT_CAM_ITEM_ID, MKT_CAMPAIGN_ID, ITEM_TYPE, ITEM_ID, PRIORITY, ITEM_GROUP, OFFER_CODE,OFFER_NAME,
+    STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK,
     LAN_ID
     from mkt_cam_item
   </select>
 
-  <delete id="deleteByCampaignId" parameterType="java.lang.Long">
-    delete from mkt_cam_item
-    where MKT_CAMPAIGN_ID = #{campaignId,jdbcType=BIGINT}
-  </delete>
+  <insert id="insertByBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="mktCamItemId">
+    insert into mkt_cam_item (MKT_CAM_ITEM_ID, MKT_CAMPAIGN_ID, ITEM_TYPE,
+    ITEM_ID, PRIORITY, ITEM_GROUP,OFFER_CODE,OFFER_NAME,
+    STATUS_CD, STATUS_DATE, CREATE_STAFF,
+    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
+    REMARK, LAN_ID)
+    values
+    <foreach collection="list" item="item" separator="," index="i">
+      (#{item.mktCamItemId,jdbcType=BIGINT}, #{item.mktCampaignId,jdbcType=BIGINT}, #{item.itemType,jdbcType=VARCHAR},
+      #{item.itemId,jdbcType=BIGINT}, #{item.priority,jdbcType=BIGINT}, #{item.itemGroup,jdbcType=BIGINT}, #{item.offerCode,jdbcType=VARCHAR},#{item.offerName,jdbcType=VARCHAR},
+      #{item.statusCd,jdbcType=VARCHAR}, #{item.statusDate,jdbcType=TIMESTAMP}, #{item.createStaff,jdbcType=BIGINT},
+      #{item.createDate,jdbcType=TIMESTAMP}, #{item.updateStaff,jdbcType=BIGINT}, #{item.updateDate,jdbcType=TIMESTAMP},
+      #{item.remark,jdbcType=VARCHAR}, #{item.lanId,jdbcType=BIGINT})
+    </foreach>
+  </insert>
+  <select id="selectByBatch" parameterType="java.util.List" resultMap="BaseResultMap">
+    select MKT_CAM_ITEM_ID, MKT_CAMPAIGN_ID, ITEM_TYPE, ITEM_ID, PRIORITY, ITEM_GROUP, OFFER_CODE,OFFER_NAME,
+    STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK,
+    LAN_ID
+    from mkt_cam_item
+    where MKT_CAM_ITEM_ID IN
+    <foreach collection="list" item="item" index="index"  open="(" close=")" separator=",">
+      #{item}
+    </foreach>
+  </select>
 
+  <select id="selectByCampaignAndType" resultMap="BaseResultMap">
+    select MKT_CAM_ITEM_ID, MKT_CAMPAIGN_ID, ITEM_TYPE, ITEM_ID, PRIORITY, ITEM_GROUP, OFFER_CODE,OFFER_NAME,
+    STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK,
+    LAN_ID
+    from mkt_cam_item where 1=1
+    <if test="campaignId != null">
+      and MKT_CAMPAIGN_ID = #{campaignId}
+    </if>
+    <if test="type != null and type != '' ">
+      and ITEM_TYPE = #{type}
+    </if>
+  </select>
 
 </mapper>
