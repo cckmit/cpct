@@ -107,4 +107,12 @@
     </if>
   </select>
 
+  <delete id="deleteByCampaignId" parameterType="java.lang.Long">
+    delete from mkt_cam_item
+    where MKT_CAMPAIGN_ID = #{campaignId,jdbcType=BIGINT}
+  </delete>
+
+
+
+
 </mapper>
