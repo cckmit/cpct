@@ -1,6 +1,6 @@
 #服务器部署相关配置
 logging:
-  path: /app/cpct/user_service/logs/stdout.log
+  path: /app/logs/cpct/cpct-dubbo-server
   level:
 #    com.zjtelcom.cpct.dao: debug
     com.ctg.itrdc.cache.pool.CtgJedisPool: warn
@@ -38,11 +38,15 @@ redisConfig:
    password: bss_cpct_common_user#bss_cpct_common_user123
 
 
+redisConfig_Prd:
+   ip: 134.96.231.228
+   port: 40201
+   database: 4970
+   password: bss_cpct_common_user#bss_cpct_common_user123
+
 #事件接入线程（活动校验部分）
 thread:
   maxPoolSize: 20
-
-
 
 
 

@@ -1,42 +1,60 @@
 #端口配置
 server:
-  port: 8080
+  port: 30821
 
-#数据库相关配置  cpc库
+#数据库相关配置
 spring:
-# 第一数据源
+# 第一数据源   cpc数据库
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://134.108.1.12:8803/smt_bss_cpc?useUnicode=true&characterEncoding=UTF-8&useSSL=true
     username: cpc_user_cpct
     password: cpc_user_cpct_prod
 
-# 第二数据源
+# 第二数据源   独立schema
   datasource_prd:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://134.108.1.12:8803/smt_bss_cpc_zsc?useUnicode=true&characterEncoding=UTF-8&useSSL=true
     username: cpc_user_cpct_zsc
     password: cpc_user_cpct_zsc_prod
+
+# 第三数据源   链接cpc数据库
+  datasourcethird:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://134.108.1.12:8803/smt_bss_cpc?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: cpc_user_cpct
+    password: cpc_user_cpct_prod
+
 # 第四数据源
   datasourcefourth:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://134.108.1.12:8803/smt_bss_cpc_zsc?useUnicode=true&characterEncoding=UTF-8&useSSL=true
-    username: cpc_user_cpct_zsc
-    password: cpc_user_cpct_zsc_prod
+    url: jdbc:mysql://134.108.1.12:8803/smt_bss_cpc?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: cpc_user_cpct
+    password: cpc_user_cpct_prod
 
 
-
-#redis相关配置
+  #redis相关配置
   redis:
-    host: 134.96.252.170
-    port: 30305
-    password: xc.cpct
+    host: 47.94.168.117
+    port: 6379
+    password: 9bOCHtdJkNZ1hb2e35OmgIrLvGEaBXuT2udRBQNt5VQ
     pool:
       max-active: 8
       max-wait: -1
       max-idle: 8
       min-idle: 0
     timeout: 30000
+  #ES
+  elasticsearch:
+      ip: 134.108.0.88
+      port: 9700
+      pool: 5
+      cluster:
+        name: my-application2
+
+#是否同步  0不开启  1开启
+sync:
+   value: 1
 
 #集团定制的redis配置prod环境
 redisConfig:

@@ -2,29 +2,20 @@
 server:
   port: 8080
 
-#数据库相关配置  cpc库
+#数据库相关配置
 spring:
-# 第一数据源
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://134.108.1.12:8803/smt_bss_cpc?useUnicode=true&characterEncoding=UTF-8&useSSL=true
     username: cpc_user_cpct
     password: cpc_user_cpct_prod
+    driver-class-name: com.mysql.jdbc.Driver
 
-# 第二数据源
+# 第二数据源   独立schema
   datasource_prd:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://134.108.1.12:8803/smt_bss_cpc_zsc?useUnicode=true&characterEncoding=UTF-8&useSSL=true
     username: cpc_user_cpct_zsc
     password: cpc_user_cpct_zsc_prod
-# 第四数据源
-  datasourcefourth:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://134.108.1.12:8803/smt_bss_cpc_zsc?useUnicode=true&characterEncoding=UTF-8&useSSL=true
-    username: cpc_user_cpct_zsc
-    password: cpc_user_cpct_zsc_prod
-
-
 
 #redis相关配置
   redis:
@@ -37,6 +28,7 @@ spring:
       max-idle: 8
       min-idle: 0
     timeout: 30000
+
 
 #集团定制的redis配置prod环境
 redisConfig:

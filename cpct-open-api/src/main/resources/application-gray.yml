@@ -54,3 +54,5 @@ redisConfig_Prd:
    port: 41701
    database: 4970
    password: bss_cpcp_pocpro_user#bssCpc_ro
+
+
