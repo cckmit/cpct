@@ -299,6 +299,7 @@ public class RedisUtils {
                 }
                 jedis.close();
             } catch (Throwable je) {
+                System.out.println(key);
                 je.printStackTrace();
                 jedis.close();
             }
