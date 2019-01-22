@@ -618,7 +618,6 @@ public class EventApiServiceImpl implements EventApiService {
                             esJson.put("msg", "客户级资产查询出错");
                             esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
                         }
-
                     } else {
                         //资产级
                         Map<String, String> privateParams = new HashMap<>();
@@ -1238,7 +1237,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                     System.out.println(activityId + "活动7777" + params.get("accNbr") + "**************************" + (System.currentTimeMillis() - begin));
                     timeJson.put("time6", System.currentTimeMillis() - begin);
-                    esHitService.save(timeJson, IndexList.TIME_MODULE, reqId + "0_" + activityId + "_" + params.get("accNbr"));
+                    esHitService.save(timeJson, IndexList.TIME_MKT_MODULE, reqId + "0_" + activityId + "_" + params.get("accNbr"));
 
                 } else {
                     esJson.put("hit", false);
@@ -1785,7 +1784,7 @@ public class EventApiServiceImpl implements EventApiService {
                 ruleMap.put("taskChlList", taskChlList);
 
                 timeJson.put("time8", System.currentTimeMillis() - begin);
-                esHitService.save(timeJson, IndexList.TIME_MODULE, reqId + "0_" + ruleId + "_" + params.get("accNbr"));
+                esHitService.save(timeJson, IndexList.TIME_RULE_MODULE, reqId + "0_" + ruleId + "_" + params.get("accNbr"));
 
                 if (taskChlList.size() > 0) {
                     jsonObject.put("hit", true);
