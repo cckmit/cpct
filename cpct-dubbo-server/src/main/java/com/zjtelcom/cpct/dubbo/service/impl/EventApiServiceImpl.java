@@ -784,7 +784,7 @@ public class EventApiServiceImpl implements EventApiService {
             long begin = System.currentTimeMillis();
 
             JSONObject timeJson = new JSONObject();
-            timeJson.put("reqId", reqId + "000");
+            timeJson.put("reqId", reqId + "0_" + activityId + "_" + params.get("accNbr"));
             timeJson.put("time1", begin);
 
             System.out.println(activityId + "活动1111 " + params.get("accNbr") + "**************************" + (System.currentTimeMillis() - begin));
@@ -925,6 +925,8 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 }
 
+                timeJson.put("time3-1", System.currentTimeMillis() - begin);
+
                 //客户级标签
                 if (mktAllLabel.get("custLabels") != null && !"".equals(mktAllLabel.get("custLabels"))) {
 
@@ -953,6 +955,8 @@ public class EventApiServiceImpl implements EventApiService {
                         return Collections.EMPTY_MAP;
                     }
                 }
+
+                timeJson.put("time3-2", System.currentTimeMillis() - begin);
 
                 //销售品级标签
                 if (mktAllLabel.get("promLabels") != null && !"".equals(mktAllLabel.get("promLabels"))) {
@@ -1031,19 +1035,6 @@ public class EventApiServiceImpl implements EventApiService {
                         }
                     }
                     //判断过滤类型(红名单，黑名单)
-//                    if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
-//                        //获取名单
-//                        String userList = filterRule.getUserList();
-//                        if (userList != null && !"".equals(userList)) {
-//                            int index = userList.indexOf(privateParams.get("accNbr"));
-//                            if (index >= 0) {
-//                                esJson.put("hit", "false");
-//                                esJson.put("msg", "红黑名单过滤规则验证被拦截");
-//                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-//                                return Collections.EMPTY_MAP;
-//                            }
-//                        }
-//                    } else
                     if ("3000".equals(filterRule.getFilterType())) {  //销售品过滤
                         boolean productCheck = true;
                         //获取需要过滤的销售品
@@ -1250,7 +1241,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                     System.out.println(activityId + "活动7777" + params.get("accNbr") + "**************************" + (System.currentTimeMillis() - begin));
                     timeJson.put("time6", System.currentTimeMillis() - begin);
-                    esHitService.save(timeJson, IndexList.TIME_MODULE,reqId + "000");
+                    esHitService.save(timeJson, IndexList.TIME_MODULE,reqId + "0_" + activityId + "_" + params.get("accNbr"));
 
                 } else {
                     esJson.put("hit", false);
