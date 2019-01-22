@@ -164,13 +164,18 @@ public class ProductServiceImpl extends BaseService implements ProductService {
      * @return
      */
     @Override
-    public Map<String, Object> copyItemByCampaignPublish(Long oldCampaignId, Long newCampaignId) {
+    public Map<String, Object> copyItemByCampaignPublish(Long oldCampaignId, Long newCampaignId, String mktCampaignCategory) {
         Map<String,Object> result = new HashMap<>();
         List<Long> idList = new ArrayList<>();
         List<MktCamItem> oldItemList = camItemMapper.selectByCampaignId(oldCampaignId);
         for (MktCamItem item : oldItemList){
             MktCamItem newItem = BeanUtil.create(item,new MktCamItem());
-            newItem.setStatusCd(StatusCode.STATUS_CODE_FAILURE.getStatusCode());
+            if(StatusCode.ENFORCEMENT_CAMPAIGN.getStatusCode().equals(mktCampaignCategory)){
+                newItem.setStatusCd(StatusCode.STATUS_CODE_FAILURE.getStatusCode());
+            } else {
+                newItem.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+            }
+
             newItem.setMktCamItemId(null);
             newItem.setMktCampaignId(newCampaignId);
             camItemMapper.insert(newItem);
