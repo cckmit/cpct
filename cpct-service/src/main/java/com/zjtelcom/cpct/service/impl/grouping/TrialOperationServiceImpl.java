@@ -28,6 +28,7 @@ import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
+import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
@@ -35,6 +36,7 @@ import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.grouping.*;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
+import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
 import com.zjtelcom.cpct.service.channel.MessageLabelService;
@@ -861,6 +863,18 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "试运算记录不存在");
             return result;
         }
+        int timeLimit = 1200000;
+        List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign("TRIAL_TIME");
+        if (sysParams.get(0)!=null){
+            timeLimit = Integer.valueOf(sysParams.get(0).getParamValue());
+        }
+        Date upTime = new Date(new Date().getTime() - timeLimit);
+        List<TrialOperation> operationList = trialOperationMapper.listOperationByUpdateTime(upTime);
+        if (!operationList.isEmpty()){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "正在下发文件 请稍后再试。");
+            return result;
+        }
         BeanUtil.copy(operation,trialOperation);
 
         // 通过活动id获取关联的标签字段数组
@@ -933,6 +947,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "文件下发成功，稍后请联系相关业务人员校验结果");
             return result;
         }
+        //更新试算记录状态和时间
+        trialOperation.setUpdateDate(new Date());
+        trialOperation.setStatusCd(StatusCode.STATUS_CODE_ARCHIVED.getStatusCode());
+        trialOperationMapper.updateByPrimaryKey(trialOperation);
         result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", "文件下发成功，稍后请联系相关业务人员校验结果");
         return result;
