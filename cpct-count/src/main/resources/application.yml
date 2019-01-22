@@ -1,13 +1,6 @@
 #contextPath
 openPath: api
 
-#服务器部署相关配置
-logging:
-  path: /app/cpct/user_service/logs/open_api.log
-  level:
-    com.zjtelcom.cpct.dao: debug
-    com.ctg.itrdc.cache.pool.CtgJedisPool: warn
-#    root: error
 
 
 
@@ -51,3 +44,5 @@ redisConfig_Prd:
       port: 40201
       database: 4970
       password: bss_cpct_common_user#bss_cpct_common_user123
+
+
