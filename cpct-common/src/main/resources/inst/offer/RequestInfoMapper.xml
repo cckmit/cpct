@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct_offer.dao.inst.RequestInfoMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.RequestInfo">
+    <id column="REQUEST_TEMPLATE_INST_ID" jdbcType="BIGINT" property="requestTemplateInstId" />
+    <result column="BATCH_NO" jdbcType="VARCHAR" property="batchNo" />
+    <result column="NAME" jdbcType="VARCHAR" property="name" />
+    <result column="DESC" jdbcType="VARCHAR" property="desc" />
+    <result column="DEPT_CODE" jdbcType="VARCHAR" property="deptCode" />
+    <result column="CONT_NAME" jdbcType="VARCHAR" property="contName" />
+    <result column="CONT_TELE" jdbcType="VARCHAR" property="contTele" />
+    <result column="START_DATE" jdbcType="DATE" property="startDate" />
+    <result column="FINISH_DATE" jdbcType="DATE" property="finishDate" />
+    <result column="EXPECT_FINISH_DATE" jdbcType="DATE" property="expectFinishDate" />
+    <result column="REQUEST_TYPE" jdbcType="VARCHAR" property="requestType" />
+    <result column="ACTION_TYPE" jdbcType="VARCHAR" property="actionType" />
+    <result column="ACTIVITI_KEY" jdbcType="VARCHAR" property="activitiKey" />
+    <result column="REQUEST_URGENT_TYPE" jdbcType="VARCHAR" property="requestUrgentType" />
+    <result column="REASON" jdbcType="VARCHAR" property="reason" />
+    <result column="PROCESS_TYPE" jdbcType="VARCHAR" property="processType" />
+    <result column="ISSTARTUP" jdbcType="CHAR" property="isstartup" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="ATTR_VAL" jdbcType="VARCHAR" property="attrVal" />
+    <result column="TEST_TYPE" jdbcType="VARCHAR" property="testType" />
+    <result column="PRIORITY" jdbcType="VARCHAR" property="priority" />
+    <result column="PST_DATE" jdbcType="TIMESTAMP" property="pstDate" />
+    <result column="PROD_DATE" jdbcType="TIMESTAMP" property="prodDate" />
+    <result column="OUTLINE_DESIGN" jdbcType="VARCHAR" property="outlineDesign" />
+    <result column="TEST_POINTS" jdbcType="VARCHAR" property="testPoints" />
+    <result column="JT_CONT_NAME" jdbcType="VARCHAR" property="jtContName" />
+    <result column="JT_CONT_TELE" jdbcType="VARCHAR" property="jtContTele" />
+    <result column="PATCH_SERIAL" jdbcType="VARCHAR" property="patchSerial" />
+    <result column="business_type" jdbcType="VARCHAR" property="businessType" />
+    <result column="report_tag" jdbcType="VARCHAR" property="reportTag" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from request_info
+    where REQUEST_TEMPLATE_INST_ID = #{requestTemplateInstId,jdbcType=BIGINT}
+  </delete>
+
+
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.RequestInfo">
+    insert into request_info (REQUEST_TEMPLATE_INST_ID, BATCH_NO, NAME, 
+      DESC, DEPT_CODE, CONT_NAME, 
+      CONT_TELE, START_DATE, FINISH_DATE, 
+      EXPECT_FINISH_DATE, REQUEST_TYPE, ACTION_TYPE, 
+      ACTIVITI_KEY, REQUEST_URGENT_TYPE, REASON, 
+      PROCESS_TYPE, ISSTARTUP, STATUS_CD, 
+      STATUS_DATE, CREATE_STAFF, CREATE_DATE, 
+      UPDATE_STAFF, UPDATE_DATE, ATTR_VAL, 
+      TEST_TYPE, PRIORITY, PST_DATE, 
+      PROD_DATE, OUTLINE_DESIGN, TEST_POINTS, 
+      JT_CONT_NAME, JT_CONT_TELE, PATCH_SERIAL, 
+      business_type, report_tag)
+    values (#{requestTemplateInstId,jdbcType=BIGINT}, #{batchNo,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{desc,jdbcType=VARCHAR}, #{deptCode,jdbcType=VARCHAR}, #{contName,jdbcType=VARCHAR}, 
+      #{contTele,jdbcType=VARCHAR}, #{startDate,jdbcType=DATE}, #{finishDate,jdbcType=DATE}, 
+      #{expectFinishDate,jdbcType=DATE}, #{requestType,jdbcType=VARCHAR}, #{actionType,jdbcType=VARCHAR}, 
+      #{activitiKey,jdbcType=VARCHAR}, #{requestUrgentType,jdbcType=VARCHAR}, #{reason,jdbcType=VARCHAR}, 
+      #{processType,jdbcType=VARCHAR}, #{isstartup,jdbcType=CHAR}, #{statusCd,jdbcType=VARCHAR}, 
+      #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, #{attrVal,jdbcType=VARCHAR}, 
+      #{testType,jdbcType=VARCHAR}, #{priority,jdbcType=VARCHAR}, #{pstDate,jdbcType=TIMESTAMP}, 
+      #{prodDate,jdbcType=TIMESTAMP}, #{outlineDesign,jdbcType=VARCHAR}, #{testPoints,jdbcType=VARCHAR}, 
+      #{jtContName,jdbcType=VARCHAR}, #{jtContTele,jdbcType=VARCHAR}, #{patchSerial,jdbcType=VARCHAR}, 
+      #{businessType,jdbcType=VARCHAR}, #{reportTag,jdbcType=VARCHAR})
+  </insert>
+
+
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.RequestInfo">
+    update request_info
+    set BATCH_NO = #{batchNo,jdbcType=VARCHAR},
+      NAME = #{name,jdbcType=VARCHAR},
+      DESC = #{desc,jdbcType=VARCHAR},
+      DEPT_CODE = #{deptCode,jdbcType=VARCHAR},
+      CONT_NAME = #{contName,jdbcType=VARCHAR},
+      CONT_TELE = #{contTele,jdbcType=VARCHAR},
+      START_DATE = #{startDate,jdbcType=DATE},
+      FINISH_DATE = #{finishDate,jdbcType=DATE},
+      EXPECT_FINISH_DATE = #{expectFinishDate,jdbcType=DATE},
+      REQUEST_TYPE = #{requestType,jdbcType=VARCHAR},
+      ACTION_TYPE = #{actionType,jdbcType=VARCHAR},
+      ACTIVITI_KEY = #{activitiKey,jdbcType=VARCHAR},
+      REQUEST_URGENT_TYPE = #{requestUrgentType,jdbcType=VARCHAR},
+      REASON = #{reason,jdbcType=VARCHAR},
+      PROCESS_TYPE = #{processType,jdbcType=VARCHAR},
+      ISSTARTUP = #{isstartup,jdbcType=CHAR},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      ATTR_VAL = #{attrVal,jdbcType=VARCHAR},
+      TEST_TYPE = #{testType,jdbcType=VARCHAR},
+      PRIORITY = #{priority,jdbcType=VARCHAR},
+      PST_DATE = #{pstDate,jdbcType=TIMESTAMP},
+      PROD_DATE = #{prodDate,jdbcType=TIMESTAMP},
+      OUTLINE_DESIGN = #{outlineDesign,jdbcType=VARCHAR},
+      TEST_POINTS = #{testPoints,jdbcType=VARCHAR},
+      JT_CONT_NAME = #{jtContName,jdbcType=VARCHAR},
+      JT_CONT_TELE = #{jtContTele,jdbcType=VARCHAR},
+      PATCH_SERIAL = #{patchSerial,jdbcType=VARCHAR},
+      business_type = #{businessType,jdbcType=VARCHAR},
+      report_tag = #{reportTag,jdbcType=VARCHAR}
+    where REQUEST_TEMPLATE_INST_ID = #{requestTemplateInstId,jdbcType=BIGINT}
+  </update>
+
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select REQUEST_TEMPLATE_INST_ID, BATCH_NO, NAME, DESC, DEPT_CODE, CONT_NAME, CONT_TELE, 
+    START_DATE, FINISH_DATE, EXPECT_FINISH_DATE, REQUEST_TYPE, ACTION_TYPE, ACTIVITI_KEY, 
+    REQUEST_URGENT_TYPE, REASON, PROCESS_TYPE, ISSTARTUP, STATUS_CD, STATUS_DATE, CREATE_STAFF, 
+    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, ATTR_VAL, TEST_TYPE, PRIORITY, PST_DATE, 
+    PROD_DATE, OUTLINE_DESIGN, TEST_POINTS, JT_CONT_NAME, JT_CONT_TELE, PATCH_SERIAL, 
+    business_type, report_tag
+    from request_info
+    where REQUEST_TEMPLATE_INST_ID = #{requestTemplateInstId,jdbcType=BIGINT}
+  </select>
+
+
+  <select id="selectAll" resultMap="BaseResultMap">
+    select REQUEST_TEMPLATE_INST_ID, BATCH_NO, NAME, DESC, DEPT_CODE, CONT_NAME, CONT_TELE, 
+    START_DATE, FINISH_DATE, EXPECT_FINISH_DATE, REQUEST_TYPE, ACTION_TYPE, ACTIVITI_KEY, 
+    REQUEST_URGENT_TYPE, REASON, PROCESS_TYPE, ISSTARTUP, STATUS_CD, STATUS_DATE, CREATE_STAFF, 
+    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, ATTR_VAL, TEST_TYPE, PRIORITY, PST_DATE, 
+    PROD_DATE, OUTLINE_DESIGN, TEST_POINTS, JT_CONT_NAME, JT_CONT_TELE, PATCH_SERIAL, 
+    business_type, report_tag
+    from request_info
+  </select>
+</mapper>

@@ -2,24 +2,34 @@ package com.zjtelcom.cpct.service.impl.grouping;
 
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamGrpRulMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
+import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
+import com.zjtelcom.cpct.dao.channel.MktVerbalMapper;
+import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.org.OrgTreeMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
-import com.zjtelcom.cpct.domain.channel.Label;
-import com.zjtelcom.cpct.domain.channel.LabelValue;
+import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.TarGrpConditionDO;
 import com.zjtelcom.cpct.domain.org.OrgTreeDO;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
+import com.zjtelcom.cpct.dto.campaign.MktCampaign;
+import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.channel.LabelValueVO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
+import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.SysAreaVO;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.service.BaseService;
+import com.zjtelcom.cpct.service.channel.MessageLabelService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
@@ -33,6 +43,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -64,6 +76,158 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     private OrgTreeMapper orgTreeMapper;
     @Autowired
     private MktCamGrpRulMapper grpRulMapper;
+    @Autowired
+    private MktStrategyConfRuleMapper ruleMapper;
+    @Autowired
+    private MktCamScriptMapper camScriptMapper;
+    @Autowired
+    private MktVerbalMapper verbalMapper;
+    @Autowired
+    private MktCampaignMapper campaignMapper;
+    @Autowired
+    private MessageLabelService messageLabelService;
+    @Autowired
+    private FilterRuleMapper filterRuleMapper;
+
+
+    @Override
+    public Map<String, Object> labelListByCampaignId(List<Integer> campaignId) {
+        Map<String,Object> re = new HashMap<>();
+        List<String> assetCode = new ArrayList<>();//2000
+        List<String> promCode = new ArrayList<>();//3000
+        List<String> custCode = new ArrayList<>();//1000
+
+        List<Long> idlIst = new ArrayList<>();
+        for (Integer id : campaignId){
+            MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(Long.valueOf(id.toString()));
+            if (campaign==null){
+                continue;
+            }
+            //展示列标签
+            DisplayColumn req = new DisplayColumn();
+            req.setDisplayColumnId(campaign.getCalcDisplay());
+            Map<String, Object> labelMap = messageLabelService.queryLabelListByDisplayId(req);
+            List<LabelDTO> labelDTOList = (List<LabelDTO>) labelMap.get("labels");
+            for (LabelDTO labelDTO : labelDTOList) {
+                Label label = injectionLabelMapper.selectByLabelCode(labelDTO.getLabelCode());
+                if (label!=null) {
+                    if (idlIst.contains(label.getInjectionLabelId())) {
+                        continue;
+                    }
+                    codeList(assetCode, promCode, custCode, label);
+                }
+            }
+            //过滤规则标签
+            List<FilterRule> filterRules = filterRuleMapper.selectFilterRuleList(Long.valueOf(id.toString()));
+            for (FilterRule filterRule : filterRules){
+                if ("6000".equals(filterRule.getFilterType()) && filterRule.getConditionId()!=null){
+                    Label label = injectionLabelMapper.selectByPrimaryKey(filterRule.getConditionId());
+                    if (label!=null) {
+                        if (idlIst.contains(label.getInjectionLabelId())) {
+                            continue;
+                        }
+                        codeList(assetCode, promCode, custCode, label);
+                    }
+                }
+                if ("3000".equals(filterRule.getFilterType()) && !promCode.contains("PROM_LIST")){
+                    promCode.add("PROM_LIST");
+                }
+            }
+            //规则级的标签
+            List<MktStrategyConfRuleDO> ruleList =ruleMapper.selectByCampaignId(Long.valueOf(id.toString()));
+            for (MktStrategyConfRuleDO rule : ruleList) {
+                if (rule.getTarGrpId() == null) {
+                    continue;
+                }
+                if (rule.getEvtContactConfId()!=null && !rule.getEvtContactConfId().equals("")){
+                    String[] confList = rule.getEvtContactConfId().split("/");
+                    //推荐指引标签
+                    for (String confId : confList){
+                        CamScript camScript = camScriptMapper.selectByConfId(Long.valueOf(confId));
+                        if (camScript!=null && camScript.getScriptDesc()!=null){
+                            List<String> labelSc = subScript(camScript.getScriptDesc());
+                            for (String code : labelSc){
+                                Label label = injectionLabelMapper.selectByLabelCode(code);
+
+                                if (label!=null){
+                                    if (idlIst.contains(label.getInjectionLabelId())){
+                                        continue;
+                                    }
+                                    codeList(assetCode, promCode, custCode, label);
+                                }
+
+                            }
+                        }
+                        //话术标签
+                        List<MktVerbal> verbalList = verbalMapper.findVerbalListByConfId(Long.valueOf(confId));
+                        for (MktVerbal verbal : verbalList){
+                            List<String> labelSc = subScript(verbal.getScriptDesc());
+                            for (String code : labelSc){
+                                Label label = injectionLabelMapper.selectByLabelCode(code);
+                                if (label!=null){
+                                    if (idlIst.contains(label.getInjectionLabelId())){
+                                        continue;
+                                    }
+                                    codeList(assetCode, promCode, custCode, label);
+                                }
+                            }
+                        }
+                    }
+                }
+                //分群标签
+                List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(rule.getTarGrpId());
+                for (TarGrpCondition condition : conditionList) {
+                    Label label = injectionLabelMapper.selectByPrimaryKey(Long.valueOf(condition.getLeftParam()));
+                    if (idlIst.contains(label.getInjectionLabelId())){
+                        continue;
+                    }
+                    idlIst.add(label.getInjectionLabelId());
+                    if (label != null ) {
+                        codeList(assetCode, promCode, custCode, label);
+                    }
+                }
+
+            }
+        }
+        if (!promCode.isEmpty() && !assetCode.contains("PROM_INTEG_ID")){
+            assetCode.add("PROM_INTEG_ID");
+        }
+        re.put("code",CODE_SUCCESS);
+        re.put("assetCode",ChannelUtil.StringList2String(assetCode));
+        re.put("promCode",ChannelUtil.StringList2String(promCode));
+        re.put("custCode",ChannelUtil.StringList2String(custCode));
+        return re;
+    }
+
+    private void codeList(List<String> assetCode, List<String> promCode, List<String> custCode, Label label) {
+        if (label.getLabelType().equals("1000")){
+            custCode.add(label.getInjectionLabelCode());
+        }else if (label.getLabelType().equals("2000")){
+            assetCode.add(label.getInjectionLabelCode());
+        }else {
+            promCode.add(label.getInjectionLabelCode());
+        }
+    }
+
+    private List<String> subScript(String str) {
+        List<String> result = new ArrayList<>();
+//        Pattern p = Pattern.compile("\\$");
+        Pattern p = Pattern.compile("(?<=\\$\\{)([^$]+)(?=\\}\\$)");
+        Matcher m = p.matcher(str);
+//        List<Integer> list = new ArrayList<>();
+
+        while (m.find()) {
+//            list.add(m.start());
+            result.add(m.group(1));
+        }
+
+//        for (int i = 0; i < list.size(); ) {
+//            result.add(str.substring(list.get(i) + 1, list.get(++i)));
+//            i++;
+//        }
+        return result;
+    }
+
 
 
     /**

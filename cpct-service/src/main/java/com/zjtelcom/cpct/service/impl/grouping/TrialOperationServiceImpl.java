@@ -199,6 +199,16 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(operationVO.getStrategyId());
         for (MktStrategyConfRuleRelDO ruleRelDO : ruleRelList) {
             TrialOperationParamES param = getTrialOperationParamES(operationVO,null, ruleRelDO.getMktStrategyConfRuleId(),true);
+            List<LabelResultES> labelResultList = param.getLabelResultList();
+            List<String> labelTypeList = new ArrayList<>();
+            for (LabelResultES la : labelResultList){
+                labelTypeList.add(la.getRightOperand());
+            }
+            if (!labelTypeList.contains("2000")){
+                result.put("resultCode", CODE_FAIL);
+                result.put("resultMsg", "规则："+param.getRuleName()+"不满足查询条件，请至少配置一条用户级标签查询条件！");
+                return result;
+            }
             paramList.add(param);
           Map<String,Object> stringObjectMap =  getProductAndChannelByRuleId(ruleRelDO.getMktStrategyConfRuleId());
           List<String> stringList = (List<String>) stringObjectMap.get("scriptLabel");
@@ -583,6 +593,16 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(operationVO.getStrategyId());
         for (MktStrategyConfRuleRelDO ruleRelDO : ruleRelList) {
             TrialOperationParamES param = getTrialOperationParamES(operationVO, trialOperation.getBatchNum(), ruleRelDO.getMktStrategyConfRuleId(),true);
+            List<LabelResultES> labelResultList = param.getLabelResultList();
+            List<String> labelTypeList = new ArrayList<>();
+            for (LabelResultES la : labelResultList){
+                labelTypeList.add(la.getRightOperand());
+            }
+            if (!labelTypeList.contains("2000")){
+                result.put("resultCode", CODE_FAIL);
+                result.put("resultMsg", "规则："+param.getRuleName()+"不满足查询条件，请至少配置一条用户级标签查询条件！");
+                return result;
+            }
             paramList.add(param);
         }
         requests.setParamList(paramList);
