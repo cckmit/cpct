@@ -14,7 +14,7 @@ public class MktCampaignDO extends BaseEntity{
     private Date beginTime;
     private Date endTime;
     private String mktCampaignType;
-    private String mktCampaignCategory;
+    private String mktCampaignCategory;  // MANAGE_TYPE为集团后来新增加的字段，之前自定义为这个字段
     private String mktActivityNbr;
     private String mktActivityTarget;
     private String mktCampaignDesc;

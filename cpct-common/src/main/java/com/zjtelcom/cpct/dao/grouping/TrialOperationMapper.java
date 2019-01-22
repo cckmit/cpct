@@ -5,6 +5,7 @@ package com.zjtelcom.cpct.dao.grouping;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface TrialOperationMapper {
@@ -21,4 +22,6 @@ public interface TrialOperationMapper {
     List<TrialOperation> findOperationListByStrategyId(@Param("strategyId")Long strategyId);
 
     int updateByPrimaryKey(TrialOperation record);
+
+    List<TrialOperation> listOperationByUpdateTime(@Param("updateTime")Date updateTime);
 }
