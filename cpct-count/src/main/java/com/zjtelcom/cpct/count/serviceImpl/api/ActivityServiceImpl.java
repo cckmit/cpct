@@ -3,6 +3,9 @@ package com.zjtelcom.cpct.count.serviceImpl.api;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.count.base.enums.ResultEnum;
 import com.zjtelcom.cpct.count.base.enums.StatusEnum;
 import com.zjtelcom.cpct.count.controller.ActivityController;
@@ -10,12 +13,17 @@ import com.zjtelcom.cpct.count.service.api.ActivityService;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.campaign.MktOperatorLogMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
+import com.zjtelcom.cpct.domain.campaign.MktCampaignCountDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.campaign.MktOperatorLogDO;
+import com.zjtelcom.cpct.domain.channel.RequestInstRel;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.campaign.MktCampaign;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.util.MD5Util;
+import com.zjtelcom.cpct_offer.dao.inst.RequestInfoMapper;
+import com.zjtelcom.cpct_offer.dao.inst.RequestInfoMapper;
+import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Auther: anson
@@ -49,9 +54,21 @@ public class ActivityServiceImpl implements ActivityService {
     @Autowired
     private SysParamsMapper sysParamsMapper;
 
+    @Autowired
+    private RequestInstRelMapper requestInstRelMapper;
+
+    @Autowired
+    private RequestInfoMapper requestInfoMapper;
+
     private static String DUBBO_CONFIG="DUBBO_CONFIG";    //系统参数表 权限相关key
 
     private static String PASSWORD_TIP="2019";            //加密字段
+
+    private static String GET_CAMPAIGN_LIST="1000";       //获取活动列表
+
+    private static String DEL_QEQUEST="2000";             //删除需求函和活动关联
+
+    private static String GET_IDS="3000";                 //校验活动是否存在需求函关系
 
 
     /**
@@ -180,6 +197,147 @@ public class ActivityServiceImpl implements ActivityService {
 
 
 
+    @Override
+    public Map<String, Object> getCampaignList(Map<String, Object> paramMap) {
+        Map<String, Object> map=new HashMap<>();
+        map.put("resultCode", ResultEnum.SUCCESS.getStatus());
+        map.put("resultMsg", "操作成功");
+        if(paramMap.isEmpty()){
+            map.put("resultCode", ResultEnum.FAILED.getStatus());
+            map.put("resultMsg", "传参不能为空");
+            return map;
+        }
+        //获取操作类型
+        String type = (String) paramMap.get("type");
+        if(StringUtils.isBlank(type)||(!GET_CAMPAIGN_LIST.equals(type)&&!DEL_QEQUEST.equals(type))&&!GET_IDS.equals(type)){
+            map.put("resultCode", ResultEnum.FAILED.getStatus());
+            map.put("resultMsg", "请指定正确的操作类型");
+            return map;
+        }
+        //1.删除活动和需求函关系
+        if(type.equals(DEL_QEQUEST)){
+            map=delQequest(paramMap);
+        }else if(type.equals(GET_CAMPAIGN_LIST)){
+             //获取活动列表
+            map=getCamList(paramMap);
+        }else if(type.equals(GET_IDS)){
+            //校验活动是否存在需求函关系
+            map=campaignIsUse(paramMap);
+        }
+        return map;
+    }
+
+
+    /**
+     * 框架活动生成子活动需求函
+     * @param paramMap
+     * @return
+     */
+    @Override
+    public Map<String, Object> generateRequestInfo(Map<String, Object> paramMap) {
+        Map<String, Object> map=new HashMap<>();
+        map.put("resultCode", ResultEnum.SUCCESS.getStatus());
+        map.put("resultMsg", "操作成功");
+        if(paramMap.isEmpty()){
+            map.put("resultCode", ResultEnum.FAILED.getStatus());
+            map.put("resultMsg", "传参不能为空");
+            return map;
+        }
+        //得到父需求函id
+        String requestInfoId = (String) map.get("requestInfoId");
+
+
+
+        return map;
+    }
+
+
+    /**
+     * 删除活动和需求函的关系
+     * @param map
+     * @return
+     */
+    private  Map<String, Object> delQequest(Map<String, Object> map){
+        Map<String, Object> result=new HashMap<>();
+        result.put("resultCode", ResultEnum.SUCCESS.getStatus());
+        result.put("resultMsg", "操作成功");
+
+        String mktCampaignId = (String)map.get("mktCampaignId");  //活动id
+        String requestInfoId = (String)map.get("requestInfoId");          //需求函id
+        if(StringUtils.isBlank(mktCampaignId)||StringUtils.isBlank(requestInfoId)){
+            result.put("resultCode", ResultEnum.FAILED.getStatus());
+            result.put("resultMsg", "活动id和需求函id信息不能为空");
+            return result;
+        }
+        //删除活动和需求函关联关系
+        requestInstRelMapper.deleteByCampaignId(Long.valueOf(requestInfoId),Long.valueOf(mktCampaignId));
+        return result;
+    }
+
+
+    /**
+     * 获取活动列表
+     * @param map
+     * @return
+     */
+    private  Map<String, Object> getCamList(Map<String, Object> map){
+        Map<String, Object> result=new HashMap<>();
+        result.put("resultCode", ResultEnum.SUCCESS.getStatus());
+        result.put("resultMsg", "操作成功");
+        String mktCampaignName = (String) map.get("mktCampaignName");
+        String mktActivityNbr = (String) map.get("mktActivityNbr");
+        String mktCampaignType = (String) map.get("mktCampaignType");
+        Integer page= (Integer) map.get("page") ;
+        Integer pageSize= (Integer) map.get("pageSize") ;
+        MktCampaignDO mktCampaignDO = new MktCampaignDO();
+        mktCampaignDO.setMktCampaignName(mktCampaignName);
+        mktCampaignDO.setMktActivityNbr(mktActivityNbr);
+        mktCampaignDO.setMktCampaignType(mktCampaignType);
+        if(page==null){
+            page=1;
+        }
+        if(pageSize==null){
+            pageSize=10;
+        }
+        PageHelper.startPage(page,pageSize);
+        List<MktCampaignCountDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListPage(mktCampaignDO);
+        result.put("data",mktCampaignDOList);
+        result.put("pageInfo",new Page(new PageInfo(mktCampaignDOList)));
+        return result;
+    }
+
+
+    /**
+     * 判断该活动是否和某个需求函关联了
+     * @param map
+     * @return
+     */
+    private  Map<String, Object> campaignIsUse(Map<String, Object> map){
+        Map<String, Object> result=new HashMap<>();
+        result.put("resultCode", ResultEnum.SUCCESS.getStatus());
+        result.put("resultMsg", "操作成功");
+
+        String ids = (String)map.get("ids");  //活动id集合
+        if(StringUtils.isBlank(ids)){
+            result.put("resultCode", ResultEnum.FAILED.getStatus());
+            result.put("resultMsg", "活动id不能为空");
+            return result;
+        }
+        String[] split = ids.split(",");
+        for (int i = 0; i <split.length ; i++) {
+            System.out.println("当前split:"+split[i]);
+            List<RequestInstRel> mkt = requestInstRelMapper.selectByCampaignId(Long.valueOf(split[i]), "mkt");
+            //如果存在关联关系则返回对应提醒
+            if(mkt!=null&&!mkt.isEmpty()){
+                result.put("resultCode", ResultEnum.FAILED.getStatus());
+                result.put("resultMsg", "活动id "+mkt.get(0).getRequestObjId()+"和需求函id "+mkt.get(0).getRequestInfoId()+"存在关联关系");
+                return result;
+            }
+        }
+        return result;
+    }
+
+
 
 
 
@@ -280,6 +438,7 @@ public class ActivityServiceImpl implements ActivityService {
         String s = MD5Util.encodePassword(code).toUpperCase();
         System.out.println(s.length());
         System.out.println(s);
+
     }
 
 

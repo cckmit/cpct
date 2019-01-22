@@ -63,4 +63,18 @@
     from request_inst_rel where request_info_id = #{requestId} and request_obj_type = #{type}
   </select>
 
+  <delete id="deleteByCampaignId">
+    delete from request_inst_rel
+    where request_info_id = #{requestInfoId,jdbcType=BIGINT}
+    and
+    request_obj_id=#{requestObjId,jdbcType=BIGINT}
+  </delete>
+
+  <select id="selectByCampaignId" resultMap="BaseResultMap">
+    select request_inst_rel_id, request_info_id, request_obj_id, STATUS_CD, CREATE_STAFF,
+    UPDATE_STAFF, STATUS_DATE, CREATE_DATE, UPDATE_DATE, REMARK, request_obj_type
+    from request_inst_rel where request_obj_id = #{requestObjId} and request_obj_type = #{type}
+  </select>
+
+
 </mapper>
