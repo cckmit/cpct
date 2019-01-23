@@ -934,6 +934,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     try {
                         SystemPost systemPost = new SystemPost();
                         systemPost.setSysPostCode(mktCampaignCountDO.getCreateChannel());
+                        logger.info("[op:qryMktCampaignListPage] SysPostCode = " + mktCampaignCountDO.getCreateChannel());
                         QrySystemPostReq qrySystemPostReq = new QrySystemPostReq();
                         qrySystemPostReq.setSystemPost(systemPost);
                         SysmgrResultObject<com.ctzj.smt.bss.sysmgr.model.common.Page> pageSysmgrResultObject =
@@ -1046,8 +1047,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                                     roleName = sysStaff.getRoleName();
                                 }
                                 synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
+                                // 删除生产redis缓存
+                                synchronizeCampaignService.deleteCampaignRedisProd(mktCampaignId);
                             } catch (Exception e) {
-                                e.printStackTrace();
+                                logger.error("[op:MktCampaignServiceImpl] 活动同步失败 by mktCampaignId = {}, Expection = ",mktCampaignId, e);
                             }
                         }
                     }.start();
@@ -1171,7 +1174,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
 
                 // 推荐条目下发
-                productService.copyItemByCampaignPublish(parentMktCampaignId, childMktCampaignId);
+                productService.copyItemByCampaignPublish(parentMktCampaignId, childMktCampaignId, mktCampaignDO.getMktCampaignCategory());
 
                 // 遍历活动下策略的集合
                 for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {

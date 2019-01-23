@@ -1,12 +1,9 @@
 package com.zjtelcom.cpct.dubbo.service.impl;
 
-import com.zjtelcom.cpct.dao.campaign.MktCamGrpRulMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
-import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
-import com.zjtelcom.cpct.dao.org.OrgTreeMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
@@ -18,7 +15,6 @@ import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dubbo.service.SearchLabelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
-import com.zjtelcom.cpct.util.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,21 +50,21 @@ public class SearchLabelServiceImpl implements SearchLabelService {
 
 
     @Override
-    public Map<String, Object> labelListByCampaignId(List<Integer> campaignId) {
-        Map<String,Object> re = new HashMap<>();
+    public Map<String, String> labelListByCampaignId(List<Long> campaignId) {
+        Map<String,String> re = new HashMap<>();
         List<String> assetCode = new ArrayList<>();//2000
         List<String> promCode = new ArrayList<>();//3000
         List<String> custCode = new ArrayList<>();//1000
 
         List<Long> idlIst = new ArrayList<>();
-        for (Integer id : campaignId){
-            MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(Long.valueOf(id.toString()));
+        for (Long id : campaignId){
+            MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(id);
             if (campaign==null){
                 continue;
             }
             //展示列标签
             DisplayColumn req = new DisplayColumn();
-            req.setDisplayColumnId(campaign.getCalcDisplay());
+            req.setDisplayColumnId(campaign.getIsaleDisplay());
             Map<String, Object> labelMap = queryLabelListByDisplayId(req);
             List<LabelDTO> labelDTOList = (List<LabelDTO>) labelMap.get("labels");
             for (LabelDTO labelDTO : labelDTOList) {
@@ -81,7 +77,7 @@ public class SearchLabelServiceImpl implements SearchLabelService {
                 }
             }
             //过滤规则标签
-            List<FilterRule> filterRules = filterRuleMapper.selectFilterRuleListByStrategyId(Long.valueOf(id.toString()));
+            List<FilterRule> filterRules = filterRuleMapper.selectFilterRuleList(Long.valueOf(id.toString()));
             for (FilterRule filterRule : filterRules){
                 if ("6000".equals(filterRule.getFilterType()) && filterRule.getConditionId()!=null){
                     Label label = injectionLabelMapper.selectByPrimaryKey(filterRule.getConditionId());
@@ -155,10 +151,10 @@ public class SearchLabelServiceImpl implements SearchLabelService {
         if (!promCode.isEmpty() && !assetCode.contains("PROM_INTEG_ID")){
             assetCode.add("PROM_INTEG_ID");
         }
-        re.put("code",CODE_SUCCESS);
-        re.put("assetCode",ChannelUtil.StringList2String(assetCode));
-        re.put("promCode",ChannelUtil.StringList2String(promCode));
-        re.put("custCode",ChannelUtil.StringList2String(custCode));
+//        re.put("code",CODE_SUCCESS);
+        re.put("assetLabels",ChannelUtil.StringList2String(assetCode));
+        re.put("promLabels",ChannelUtil.StringList2String(promCode));
+        re.put("custLabels",ChannelUtil.StringList2String(custCode));
         return re;
     }
 

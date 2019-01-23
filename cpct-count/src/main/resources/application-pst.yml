@@ -10,6 +10,13 @@ spring:
     username: cpc_user
     password: cpc_user_123
 
+# 第二数据源  需求函相关
+  datasourceprd:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://134.96.253.29:8801/smt_bss_cpc_evo2?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: cpc_user
+    password: cpc_user_123
+
 
 #redis相关配置
   redis:

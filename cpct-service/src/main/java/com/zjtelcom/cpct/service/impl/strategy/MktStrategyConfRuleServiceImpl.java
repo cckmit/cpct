@@ -1291,9 +1291,9 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         public Map<String, Object> call() throws Exception {
             Map map = new HashMap();
             MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleId);
-            String productIdsNew = "";
+            String productIdsNew = mktStrategyConfRuleDO.getProductId();
             for (int i = 0; i < camitemIdList.size(); i++) {
-                if (i == 0) {
+                if (i == 0 && (productIdsNew == null || "".equals(productIdsNew))) {
                     productIdsNew += camitemIdList.get(i);
                 } else {
                     productIdsNew += "/" + camitemIdList.get(i);
