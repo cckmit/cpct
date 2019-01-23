@@ -1174,7 +1174,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
 
                 // 推荐条目下发
-                productService.copyItemByCampaignPublish(parentMktCampaignId, childMktCampaignId);
+                productService.copyItemByCampaignPublish(parentMktCampaignId, childMktCampaignId, mktCampaignDO.getMktCampaignCategory());
 
                 // 遍历活动下策略的集合
                 for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {

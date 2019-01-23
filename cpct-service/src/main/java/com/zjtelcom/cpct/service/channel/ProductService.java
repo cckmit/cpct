@@ -25,7 +25,7 @@ public interface ProductService {
 
     Map<String,Object> getProductRuleListByCampaign(ProductParam param);
 
-    Map<String,Object> copyItemByCampaignPublish(Long oldCampaignId,Long newCampaignId);
+    Map<String,Object> copyItemByCampaignPublish(Long oldCampaignId,Long newCampaignId, String mktCampaignCategory);
 
 
 
