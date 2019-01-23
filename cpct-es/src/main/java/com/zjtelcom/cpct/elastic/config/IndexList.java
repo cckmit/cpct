@@ -44,6 +44,8 @@ public class IndexList {
     public static String TIME_MODULE = "time_module";
     public static String TIME_RULE_MODULE = "time_rule_module";
     public static String TIME_MKT_MODULE = "time_mkt_module";
+    public static String TIME_CHL_MODULE = "time_chl_module";
+    public static String TIME_STR_MODULE = "time_str_module";
 
     /**
      * 规则模块索引
