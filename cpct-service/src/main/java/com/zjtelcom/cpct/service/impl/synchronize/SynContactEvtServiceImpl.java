@@ -79,7 +79,7 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
      */
     @Override
     public Map<String, Object> synchronizeSingleEvent(Long eventId, String roleName) {
-        System.out.println("同步单个事件： ");
+        System.out.println("同步单个事件： "+eventId);
         Map<String, Object> maps = new HashMap<>();
         //查询源数据库
         ContactEvt contactEvt = contactEvtMapper.getEventById(eventId);

@@ -1072,6 +1072,36 @@ public class SynchronizeController extends BaseController {
     }
 
 
+    /**
+     *
+     * 删除活动下的redis缓存 -- 生产
+     * @param params
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("/deleteCampaignRedisProd")
+    @CrossOrigin
+    public String deleteCampaignRedisProd(@RequestBody Map<String, Object> params) throws Exception {
+        Long mktCampaignId = Long.valueOf((Integer) params.get("mktCampaignId"));
+        Map<String, Object> deleteCampaignRedisMap = synchronizeCampaignService.deleteCampaignRedisProd(mktCampaignId);
+        return JSON.toJSONString(deleteCampaignRedisMap);
+    }
+
+    /**
+     *
+     * 删除活动下的redis缓存 -- 生产
+     * @param params
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("/deleteCampaignRedisPre")
+    @CrossOrigin
+    public String deleteCampaignRedisPre(@RequestBody Map<String, Object> params) throws Exception {
+        Long mktCampaignId = Long.valueOf((Integer) params.get("mktCampaignId"));
+        Map<String, Object> deleteCampaignRedisMap = synchronizeCampaignService.deleteCampaignRedisPre(mktCampaignId);
+        return JSON.toJSONString(deleteCampaignRedisMap);
+    }
+
 
     /**
      * 单个标签同步

@@ -10,6 +10,12 @@ spring:
     username: root
     password: root
 
+# 第二数据源  需求函相关
+  datasourceprd:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/smt_bss_cpc_evo2?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: root
+    password: root
 
 
 

@@ -1,4 +1,9 @@
-
+#服务器部署相关配置
+logging:
+  path: /app/logs/cpct/cpct-dubbo-server
+  level:
+#    com.zjtelcom.cpct.dao: debug
+    com.ctg.itrdc.cache.pool.CtgJedisPool: warn
 
 #Mybatis配置
 mybatis:
@@ -44,12 +49,7 @@ thread:
   maxPoolSize: 20
 
 
-#服务器部署相关配置
-logging:
-  path: /app/logs/cpct/cpct-dubbo-server
-  level:
-    com.ctg.itrdc.cache.pool.CtgJedisPool: warn
-    com.alibaba.dubbo.rpc.protocol.dubbo.DubboProtocol: error
+
 
 
 

@@ -1,0 +1,42 @@
+#端口配置
+server:
+  port: 8080
+
+#数据库相关配置
+spring:
+  datasource:
+    url: jdbc:mysql://134.108.1.12:8803/smt_bss_cpc_zsc?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: cpc_user_cpct_zsc
+    password: cpc_user_cpct_zsc_prod
+    driver-class-name: com.mysql.jdbc.Driver
+# 第二数据源   独立schema
+  datasource_prd:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://134.108.1.12:8803/smt_bss_cpc_zsc?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: cpc_user_cpct_zsc
+    password: cpc_user_cpct_zsc_prod
+
+#redis相关配置
+  redis:
+    host: 134.96.252.170
+    port: 30305
+    password: xc.cpct
+    pool:
+      max-active: 8
+      max-wait: -1
+      max-idle: 8
+      min-idle: 0
+    timeout: 30000
+
+#集团定制的redis配置prod环境
+redisConfig:
+   ip: 134.108.0.59
+   port: 41701
+   database: 4970
+   password: bss_cpcp_pocpro_user#bssCpc_ro
+
+redisConfig_Prd:
+   ip: 134.108.0.59
+   port: 41701
+   database: 4970
+   password: bss_cpcp_pocpro_user#bssCpc_ro

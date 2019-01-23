@@ -371,6 +371,145 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
 
 
     /**
+     * 删除活动下的所有redis -- 生成
+     * @param mktCampaignId
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public Map<String, Object> deleteCampaignRedisProd(Long mktCampaignId) {
+        Map<String, Object> resultMap = new HashMap<>();
+        try{
+            MktCampaignDO mktCampaignDO = mktCampaignPrdMapper.selectByPrimaryKey(mktCampaignId);
+            // 删除活动缓存
+            redisUtils_prd.del("MKT_CAMPAIGN_" + mktCampaignId);
+            // 删除活动所有标签缓存
+            redisUtils_prd.del("MKT_ALL_LABEL_" + mktCampaignId);
+
+            // 删除过滤规则缓存
+            List<Long> longList = mktStrategyFilterRuleRelPrdMapper.selectByStrategyId(mktCampaignId);
+            for (Long filterRuleId : longList) {
+                redisUtils_prd.del("MKT_FILTER_RULE_IDS_" + filterRuleId);
+                redisUtils_prd.del("FILTER_RULE_DISTURB_" + filterRuleId);
+            }
+
+            // 删除展示列的标签
+            redisUtils_prd.del("MKT_ISALE_LABEL_" + mktCampaignDO.getIsaleDisplay());
+
+            List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOS = mktCamStrategyConfRelPrdMapper.selectByMktCampaignId(mktCampaignId);
+            for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOS) {
+                // 删除策略关系缓存
+                redisUtils_prd.del("MKT_STRATEGY_REL_" + mktCamStrategyConfRelDO.getStrategyConfId());
+                List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList = mktStrategyConfRulePrdMapper.selectByMktStrategyConfId(mktCamStrategyConfRelDO.getStrategyConfId());
+                for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleDOList) {
+                    // 删除客户分群标签
+                    redisUtils_prd.del("RULE_ALL_LABEL_" + mktStrategyConfRuleDO.getTarGrpId());
+                    //表达式存入redis
+                    redisUtils_prd.del("EXPRESS_" + mktStrategyConfRuleDO.getTarGrpId());
+
+                    // 删除推荐条目
+                    if (mktStrategyConfRuleDO.getProductId() != null) {
+                        String[] productIds = mktStrategyConfRuleDO.getProductId().split("/");
+                        if (productIds != null && !"".equals(productIds[0])) {
+                            for (String productId : productIds) {
+                                redisUtils_prd.del("MKT_CAM_ITEM_" + productId);
+                            }
+                        }
+                    }
+
+                    // 删除推送渠道
+                    if (mktStrategyConfRuleDO.getEvtContactConfId() != null) {
+                        String[] evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
+                        if (evtContactConfIds != null && !"".equals(evtContactConfIds[0])) {
+                            for (String evtContactConfId : evtContactConfIds) {
+                                redisUtils_prd.del("CHL_CONF_DETAIL_" + evtContactConfIds);
+                            }
+                        }
+                    }
+                }
+            }
+            resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            resultMap.put("resultMsg", "删除生产环境redis成功！");
+        } catch (Exception e) {
+            resultMap.put("resultCode", CommonConstant.CODE_FAIL);
+            resultMap.put("resultMsg", "删除生产环境redis失败！");
+            logger.error("[op:SynchronizeCampaignServiceImpl] failed to delete campaignRedisProd by mktCampaignId = {} , Exception = ", mktCampaignId, e);
+        }
+        return resultMap;
+    }
+
+
+    /**
+     * 删除活动下的所有redis -- 准生成
+     * @param mktCampaignId
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public Map<String, Object> deleteCampaignRedisPre(Long mktCampaignId) {
+        Map<String, Object> resultMap = new HashMap<>();
+        try{
+            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
+            // 删除活动缓存
+            redisUtils.del("MKT_CAMPAIGN_" + mktCampaignId);
+            // 删除活动所有标签缓存
+            redisUtils.del("MKT_ALL_LABEL_" + mktCampaignId);
+
+            // 删除过滤规则缓存
+            List<Long> longList = mktStrategyFilterRuleRelMapper.selectByStrategyId(mktCampaignId);
+            for (Long filterRuleId : longList) {
+                redisUtils.del("MKT_FILTER_RULE_IDS_" + filterRuleId);
+                redisUtils.del("FILTER_RULE_DISTURB_" + filterRuleId);
+            }
+
+            // 删除展示列的标签
+            redisUtils.del("MKT_ISALE_LABEL_" + mktCampaignDO.getIsaleDisplay());
+
+            List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOS = mktCamStrategyConfRelMapper.selectByMktCampaignId(mktCampaignId);
+            for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOS) {
+                // 删除策略关系缓存
+                redisUtils.del("MKT_STRATEGY_REL_" + mktCamStrategyConfRelDO.getStrategyConfId());
+                List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(mktCamStrategyConfRelDO.getStrategyConfId());
+                for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleDOList) {
+                    // 删除客户分群标签
+                    redisUtils.del("RULE_ALL_LABEL_" + mktStrategyConfRuleDO.getTarGrpId());
+                    //表达式存入redis
+                    redisUtils.del("EXPRESS_" + mktStrategyConfRuleDO.getTarGrpId());
+
+                    // 删除推荐条目
+                    if (mktStrategyConfRuleDO.getProductId() != null) {
+                        String[] productIds = mktStrategyConfRuleDO.getProductId().split("/");
+                        if (productIds != null && !"".equals(productIds[0])) {
+                            for (String productId : productIds) {
+                                redisUtils.del("MKT_CAM_ITEM_" + productId);
+                            }
+                        }
+                    }
+
+                    // 删除推送渠道
+                    if (mktStrategyConfRuleDO.getEvtContactConfId() != null) {
+                        String[] evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
+                        if (evtContactConfIds != null && !"".equals(evtContactConfIds[0])) {
+                            for (String evtContactConfId : evtContactConfIds) {
+                                redisUtils.del("CHL_CONF_DETAIL_" + evtContactConfIds);
+                            }
+                        }
+                    }
+                }
+            }
+            resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            resultMap.put("resultMsg", "删除准生产环境redis成功！");
+        } catch (Exception e) {
+            resultMap.put("resultCode", CommonConstant.CODE_FAIL);
+            resultMap.put("resultMsg", "删除准生产环境redis失败！");
+            logger.error("[op:SynchronizeCampaignServiceImpl] failed to delete campaignRedisPre by mktCampaignId = {} , Exception = ", mktCampaignId, e);
+        }
+        return resultMap;
+    }
+
+
+
+    /**
      * 删除活动下策略的所有信息
      *
      * @param mktStrategyConfId

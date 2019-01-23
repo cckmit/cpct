@@ -9,6 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -26,12 +27,14 @@ import javax.sql.DataSource;
 @MapperScan(basePackages = "com.zjtelcom.cpct.dao", sqlSessionFactoryRef = "masterSqlSessionFactory")
 public class DataSourceConfig {
 
+    @Primary
     @Bean
     @ConfigurationProperties(prefix = "spring.datasource")
     public DataSource dataSource() {
         return DataSourceBuilder.create().type(DruidDataSource.class).build();
     }
 
+    @Primary
     @Bean(name = "masterSqlSessionFactory")
     public SqlSessionFactory sqlSessionFactory(@Qualifier("dataSource")DataSource dataSource) throws Exception {
         SqlSessionFactoryBean sessionFactoryBean = new SqlSessionFactoryBean();
@@ -41,6 +44,7 @@ public class DataSourceConfig {
         return sessionFactoryBean.getObject();
     }
 
+    @Primary
     @Bean(name = "TransactionManager")
     public PlatformTransactionManager testTransactionManager(@Qualifier("dataSource") DataSource dataSource) {
         DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dataSource);

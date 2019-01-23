@@ -262,7 +262,6 @@ public class ContactEvtController extends BaseController {
             maps = contactEvtService.modContactEvt(createContactEvtReq);
             final Long eventId = (Long) maps.get("eventId");
             if (SystemParamsUtil.isCampaignSync()&& eventId!=null){
-                System.out.println("开始同步修改事件");
                 new Thread(){
                     public void run(){
                         try {

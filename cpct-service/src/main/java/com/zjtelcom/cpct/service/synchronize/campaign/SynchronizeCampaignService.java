@@ -21,4 +21,8 @@ public interface SynchronizeCampaignService {
 
     Map<String, Object> updateCampaignRedis(Long mktCampaignId) throws Exception;
 
+    Map<String, Object> deleteCampaignRedisProd(Long mktCampaignId);
+
+    Map<String, Object> deleteCampaignRedisPre(Long mktCampaignId);
+
 }

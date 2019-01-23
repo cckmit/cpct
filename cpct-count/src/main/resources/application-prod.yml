@@ -22,15 +22,15 @@ spring:
 
 
   redis:
-      host: 47.94.168.117
-      port: 6379
-      password: 9bOCHtdJkNZ1hb2e35OmgIrLvGEaBXuT2udRBQNt5VQ
-      pool:
-        max-active: 8
-        max-wait: -1
-        max-idle: 8
-        min-idle: 0
-      timeout: 30000
+    host: 134.96.252.170
+    port: 30305
+    password: xc.cpct
+    pool:
+      max-active: 8
+      max-wait: -1
+      max-idle: 8
+      min-idle: 0
+    timeout: 30000
 
 
 #集团定制的redis配置prod环境

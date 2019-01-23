@@ -9,10 +9,8 @@
     <!-- 提供方应用信息，用于计算依赖关系 33.1059  00.1083-->
     <dubbo:application name="00.1083"/>
 
-    <dubbo:registry id="esb3" protocol="dubbo" address="134.96.253.65:8001"/>
-    <dubbo:registry id="esb2" protocol="dubbo" address="134.96.159.11:8033"/>
-
-    <dubbo:registry id="esb1" protocol="dubbo" address="134.96.253.59:8033"/> <!--msit环境-->
+    <dubbo:registry id="esb3" protocol="dubbo" address="134.96.253.65:8001"/><!--bss3.0 pst-->
+    <dubbo:registry id="esb2" protocol="dubbo" address="134.96.161.20:8001"/><!--esb2.0 prod-->
 
 
     <!-- 因子实时查询 -->
@@ -21,16 +19,18 @@
         <dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="10000"/>
     </dubbo:reference>
 
-    <!--CRM标识查询-->
-    <dubbo:reference registry="esb1" interface="com.ctzj.smt.bss.custview.query.service.api.ICustomerDubboService" id="iCustomerDubboService"
+
+    <!--crm资产查询服务-->
+    <dubbo:reference registry="esb2" interface="com.zjpii.biz.service.crm.AssetQueryService" id="assetQueryService"
                      version="1.0" retries="0" check="false">
-        <dubbo:method name="getCrmPrivil" servicecode="33.1074.getCrmPrivil" timeout="30000"/>
+        <dubbo:method name="assetQueryList" servicecode="33.1016.assetQueryList"/>
     </dubbo:reference>
 
-    <!--用户信息查询-->
-    <dubbo:reference registry="esb1" interface="com.ctzj.smt.bss.custview.query.service.api.IUserDubboService"
-                     id="iUserDubboService" version="1.0" retries="0" check="false">
-        <dubbo:method name="qryCustProdInst" servicecode="33.1074.qryCustProdInst"/>
+    <!--协同渠道接触任务-->
+    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskService" id="iContactTaskService"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="queryTaskDetail4openApi" servicecode="00.1079.queryTaskDetail4openApi"/>
     </dubbo:reference>
+
 
 </beans>
