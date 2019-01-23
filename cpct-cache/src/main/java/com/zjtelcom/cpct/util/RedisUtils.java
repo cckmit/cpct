@@ -111,10 +111,12 @@ public class RedisUtils {
                 jedis.close();
                 result = true;
             } catch (Throwable je) {
+                System.out.println("REDIS*********" + key);
                 je.printStackTrace();
                 jedis.close();
             }
         } catch (Exception e) {
+            System.out.println("REDIS2*********" + key);
             e.printStackTrace();
         }
         return result;
@@ -160,11 +162,13 @@ public class RedisUtils {
                 }
                 jedis.close();
             } catch (Throwable je) {
+                System.out.println("REDIS_EDL*********" + key);
                 je.printStackTrace();
                 jedis.close();
             }
             ctgJedisPool.close();
         } catch (Exception e) {
+            System.out.println("REDIS_EDL2*********" + key);
             e.printStackTrace();
         }
         return result;
@@ -299,11 +303,12 @@ public class RedisUtils {
                 }
                 jedis.close();
             } catch (Throwable je) {
-                System.out.println(key);
+                System.out.println("REDIS_GET*********" + key);
                 je.printStackTrace();
                 jedis.close();
             }
         } catch (Exception e) {
+            System.out.println("REDIS_GET2*********" + key);
             e.printStackTrace();
         }
         return result;
@@ -328,10 +333,12 @@ public class RedisUtils {
                 jedis.close();
                 result = true;
             } catch (Exception e) {
+                System.out.println("REDIS*********" + key);
                 e.printStackTrace();
                 jedis.close();
             }
         } catch (Exception e) {
+            System.out.println("REDIS*********" + key);
             e.printStackTrace();
         }
         return result;
