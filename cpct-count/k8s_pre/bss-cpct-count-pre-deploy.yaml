@@ -27,7 +27,7 @@ spec:
 #           fieldRef:
 #            fieldPath: status.hostIP
 #        - name: DUBBO_PORT_TO_REGISTRY
-#          value: "30821"
+#          value: "30810"
         - name: ESB_UNREGISTER_URI
           valueFrom:
             configMapKeyRef:
@@ -43,10 +43,10 @@ spec:
         - name: app-log
           mountPath: /app/logs
         ports:
-        - containerPort: 30821    #修改端口号
+        - containerPort: 30810    #修改端口号
         readinessProbe:
           tcpSocket:
-            port: 30821   #修改端口号
+            port: 30810   #修改端口号
           initialDelaySeconds: 20
           periodSeconds: 10
           failureThreshold: 3
