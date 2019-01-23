@@ -21,6 +21,13 @@ spec:
       - name: bss-cpct-open-api  #这里修改
         image: 134.96.180.23:8001/hchc/bss-cpct-open-api:1.0  #这里修改  地址使用这个么？
         imagePullPolicy: Always
+        lifecycle:     #处理dubbo没有取消注册问题
+          preStop:
+            exec:
+              command:
+                - "/bin/sh"
+                - "/app/project/unregister.sh"
+                - "30007"
         env:
         - name: DUBBO_IP_TO_REGISTRY     # 当项目为对外项目时，此处注解取消
           valueFrom:
