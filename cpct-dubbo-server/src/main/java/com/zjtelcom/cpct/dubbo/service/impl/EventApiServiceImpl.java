@@ -1585,6 +1585,7 @@ public class EventApiServiceImpl implements EventApiService {
                 timeJson.put("time3-4", System.currentTimeMillis() - begin);
 
             } else {
+
                 List<LabelResult> labelResultList = new ArrayList<>();
                 timeJson.put("time4-1", System.currentTimeMillis() - begin);
                 try {
@@ -1672,7 +1673,6 @@ public class EventApiServiceImpl implements EventApiService {
                 runnerQ.addFunction("checkProm", new PromCheckOperator("checkProm"));
                 try {
                     ruleResult = runnerQ.executeRule(express, context, true, true);
-
                 } catch (Exception e) {
                     ruleMap.put("msg", "规则引擎计算失败");
 
