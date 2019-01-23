@@ -373,9 +373,9 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
         for (MktCamEvtRel c : updateList) {
             camEvtRelPrdMapper.updateByPrimaryKey(c);
         }
-        //开始删除
+        //开始删除 根据关联关系的主键删除
         for (MktCamEvtRel c : deleteList) {
-            camEvtRelPrdMapper.deleteByMktCampaignId(c.getMktCampaignId());
+            camEvtRelPrdMapper.deleteByPrimaryKey(c.getMktCampEvtRelId());
         }
     }
 
