@@ -88,11 +88,8 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
         sysParams.setUpdateDate(new Date());
         int flag = sysParamsMapper.updateByPrimaryKey(sysParams);
         result.put("resultCode",CommonConstant.CODE_SUCCESS);
-        //修改静态参数  如果是同步开关的修改则重新初始化同步值
-        if((SystemParamsUtil.getSyncName()).equals(sysParams.getParamKey())){
-            //初始化同步值
-            SystemParamsUtil.initValue();
-        }
+        //修改静态参数  同时将修改的参数同步到redis
+        SystemParamsUtil.initValue(sysParams);
         if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
