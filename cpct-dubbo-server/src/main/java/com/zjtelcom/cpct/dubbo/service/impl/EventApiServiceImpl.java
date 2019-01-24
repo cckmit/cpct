@@ -21,12 +21,14 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
+import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.dao.system.SystemParamMapper;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
+import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
@@ -44,7 +46,6 @@ import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -153,7 +154,7 @@ public class EventApiServiceImpl implements EventApiService {
     private SearchLabelService searchLabelService;  //查询活动下使用的所有标签
 
     @Autowired(required = false)
-    private SystemParamMapper systemParamMapper;  //查询系统参数
+    private SysParamsMapper sysParamsMapper;  //查询系统参数
 
 
     @Override
@@ -579,14 +580,6 @@ public class EventApiServiceImpl implements EventApiService {
 
                 timeJson.put("time4", System.currentTimeMillis() - begin);
 
-                //查询事件下使用的所有标签
-//                List<Map<String, String>> eventAllLabel = (List<Map<String, String>>) redisUtils.get("EVENT_ALL_LABEL_" + map.get("eventCode"));
-//                if (eventAllLabel == null) {
-////                    eventAllLabel = mktStrategyConfRuleMapper.selectAllLabelByStrategyConfId(strategyConfId);  //todo 查询所有活动的客户级标签
-//                    redisUtils.set("EVENT_ALL_LABEL_" + map.get("eventCode"), eventAllLabel);
-//                }
-
-
                 //初始化结果集
                 List<Future<Map<String, Object>>> threadList = new ArrayList<>();
                 //初始化线程池
@@ -747,7 +740,7 @@ public class EventApiServiceImpl implements EventApiService {
                 result.put("custId", custId);
                 return result;
             }
-            log.info("事件计算流程开始:" + map.get("eventCode") + "***" + map.get("reqId") + "***" + (System.currentTimeMillis() - begin));
+            log.info("事件计算流程结束:" + map.get("eventCode") + "***" + map.get("reqId") + "（" + (System.currentTimeMillis() - begin) + "）");
             return result;
         }
     }
@@ -1478,6 +1471,14 @@ public class EventApiServiceImpl implements EventApiService {
             //判断表达式在缓存中有没有
             String express = (String) redisUtils.get("EXPRESS_" + tarGrpId);
 
+            SysParams sysParams = (SysParams) redisUtils.get("EVT_SWITCH_CHECK_LABEL");
+            if (sysParams == null) {
+                List<SysParams> systemParamList = sysParamsMapper.findParamKeyIn("CHECK_LABEL");
+                if (systemParamList.size() > 0) {
+                    redisUtils.set("EVT_SWITCH_CHECK_LABEL", systemParamList.get(0));
+                }
+            }
+
             timeJson.put("time3", System.currentTimeMillis() - begin);
             if (express == null || "".equals(express)) {
                 List<LabelResult> labelResultList = new ArrayList<>();
@@ -1534,16 +1535,17 @@ public class EventApiServiceImpl implements EventApiService {
                         //判断标签实例是否足够
                         if (context.containsKey(labelMap.get("code"))) {
                             lr.setRightParam(context.get(labelMap.get("code")).toString());
-
-                            try {
-                                RuleResult ruleResultOne = runner.executeRule(cpcLabel(labelMap.get("code"), type, labelMap.get("rightParam")), context, true, true);
-                                if (null != ruleResultOne.getResult()) {
-                                    lr.setResult((Boolean) ruleResultOne.getResult());
-                                } else {
+                            if (sysParams != null && "1".equals(sysParams.getParamValue())) {
+                                try {
+                                    RuleResult ruleResultOne = runner.executeRule(cpcLabel(labelMap.get("code"), type, labelMap.get("rightParam")), context, true, true);
+                                    if (null != ruleResultOne.getResult()) {
+                                        lr.setResult((Boolean) ruleResultOne.getResult());
+                                    } else {
+                                        lr.setResult(false);
+                                    }
+                                } catch (Exception e) {
                                     lr.setResult(false);
                                 }
-                            } catch (Exception e) {
-                                lr.setResult(false);
                             }
                         } else {
                             notEnoughLabel.append(labelMap.get("code")).append(",");
@@ -1576,78 +1578,68 @@ public class EventApiServiceImpl implements EventApiService {
                 timeJson.put("time3-4", System.currentTimeMillis() - begin);
 
             } else {
-                SystemParam systemParam = (SystemParam) redisUtils.get("EVT_SWITCH_CHECK_LABEL");
-                if (systemParam == null) {
-                    List<SystemParam> systemParamList = systemParamMapper.findParamKeyIn("CHECK_LABEL");
-                    if (systemParamList.size() > 0) {
-                        redisUtils.set("EVT_SWITCH_CHECK_LABEL", systemParamList.get(0));
-                    }
-                }
-                if (systemParam != null) {
-                    if ("1".equals(systemParam.getParamValue())) {
-                        List<LabelResult> labelResultList = new ArrayList<>();
-                        timeJson.put("time4-1", System.currentTimeMillis() - begin);
+                List<LabelResult> labelResultList = new ArrayList<>();
+                timeJson.put("time4-1", System.currentTimeMillis() - begin);
+                try {
+                    LabelResult lr;
+                    //查询规则下所有标签
+                    List<Map<String, String>> labelMapList = (List<Map<String, String>>) redisUtils.get("RULE_ALL_LABEL_" + tarGrpId);
+                    if (labelMapList == null) {
                         try {
-                            LabelResult lr;
-                            //查询规则下所有标签
-                            List<Map<String, String>> labelMapList = (List<Map<String, String>>) redisUtils.get("RULE_ALL_LABEL_" + tarGrpId);
-                            if (labelMapList == null) {
-                                try {
-                                    labelMapList = tarGrpConditionMapper.selectAllLabelByTarId(tarGrpId);
-                                } catch (Exception e) {
-                                    jsonObject.put("hit", "false");
-                                    jsonObject.put("msg", "规则下标签查询失败");
-                                    esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                                    return Collections.EMPTY_MAP;
-                                }
-                                redisUtils.set("RULE_ALL_LABEL_" + tarGrpId, labelMapList);
-                            }
-
-                            timeJson.put("time4-2", System.currentTimeMillis() - begin);
-                            //将规则拼装为表达式
-                            //遍历所有规则
-                            for (Map<String, String> labelMap : labelMapList) {
-                                String type = labelMap.get("operType");
-                                //保存标签的es log
-                                lr = new LabelResult();
-                                lr.setOperType(type);
-                                lr.setLabelCode(labelMap.get("code"));
-                                lr.setLabelName(labelMap.get("name"));
-                                lr.setRightOperand(labelMap.get("rightParam"));
-                                lr.setClassName(labelMap.get("className"));
-
-                                //判断标签实例是否足够
-                                if (context.containsKey(labelMap.get("code"))) {
-                                    lr.setRightParam(context.get(labelMap.get("code")).toString());
-
-                                    try {
-                                        RuleResult ruleResultOne = runner.executeRule(cpcLabel(labelMap.get("code"), type, labelMap.get("rightParam")), context, true, true);
-                                        if (null != ruleResultOne.getResult()) {
-                                            lr.setResult((Boolean) ruleResultOne.getResult());
-                                        } else {
-                                            lr.setResult(false);
-                                        }
-                                    } catch (Exception e) {
-                                        lr.setResult(false);
-                                    }
-                                } else {
-                                    notEnoughLabel.append(labelMap.get("code")).append(",");
-                                    lr.setRightParam("无值");
-                                    lr.setResult(false);
-                                }
-
-                                labelResultList.add(lr);
-                            }
-
-                            timeJson.put("time4-3", System.currentTimeMillis() - begin);
-                            esJson.put("labelResultList", JSONArray.toJSON(labelResultList));
+                            labelMapList = tarGrpConditionMapper.selectAllLabelByTarId(tarGrpId);
                         } catch (Exception e) {
-                            esJson.put("hit", "false");
-                            esJson.put("msg", "表达式拼接异常");
+                            jsonObject.put("hit", "false");
+                            jsonObject.put("msg", "规则下标签查询失败");
                             esHitService.save(jsonObject, IndexList.RULE_MODULE);
                             return Collections.EMPTY_MAP;
                         }
+                        redisUtils.set("RULE_ALL_LABEL_" + tarGrpId, labelMapList);
                     }
+
+                    timeJson.put("time4-2", System.currentTimeMillis() - begin);
+                    //将规则拼装为表达式
+                    //遍历所有规则
+                    for (Map<String, String> labelMap : labelMapList) {
+                        String type = labelMap.get("operType");
+                        //保存标签的es log
+                        lr = new LabelResult();
+                        lr.setOperType(type);
+                        lr.setLabelCode(labelMap.get("code"));
+                        lr.setLabelName(labelMap.get("name"));
+                        lr.setRightOperand(labelMap.get("rightParam"));
+                        lr.setClassName(labelMap.get("className"));
+
+                        //判断标签实例是否足够
+                        if (context.containsKey(labelMap.get("code"))) {
+                            lr.setRightParam(context.get(labelMap.get("code")).toString());
+                            if (sysParams != null && "1".equals(sysParams.getParamValue())) {
+                                try {
+                                    RuleResult ruleResultOne = runner.executeRule(cpcLabel(labelMap.get("code"), type, labelMap.get("rightParam")), context, true, true);
+                                    if (null != ruleResultOne.getResult()) {
+                                        lr.setResult((Boolean) ruleResultOne.getResult());
+                                    } else {
+                                        lr.setResult(false);
+                                    }
+                                } catch (Exception e) {
+                                    lr.setResult(false);
+                                }
+                            }
+                        } else {
+                            notEnoughLabel.append(labelMap.get("code")).append(",");
+                            lr.setRightParam("无值");
+                            lr.setResult(false);
+                        }
+
+                        labelResultList.add(lr);
+                    }
+
+                    timeJson.put("time4-3", System.currentTimeMillis() - begin);
+                    esJson.put("labelResultList", JSONArray.toJSON(labelResultList));
+                } catch (Exception e) {
+                    esJson.put("hit", "false");
+                    esJson.put("msg", "表达式拼接异常");
+                    esHitService.save(jsonObject, IndexList.RULE_MODULE);
+                    return Collections.EMPTY_MAP;
                 }
                 timeJson.put("time4-4", System.currentTimeMillis() - begin);
             }
@@ -1751,9 +1743,17 @@ public class EventApiServiceImpl implements EventApiService {
                     String[] evtContactConfIdArray = evtContactConfIdStr.split("/");
 
                     //判断需要返回的渠道
-
-
-
+                    Channel channelMessage = (Channel) redisUtils.get("MKT_ISALE_LABEL_" + params.get("channelCode"));
+                    if (channelMessage == null) {
+                        channelMessage = contactChannelMapper.selectByCode(params.get("channelCode"));
+                        redisUtils.set("MKT_ISALE_LABEL_" + params.get("channelCode"), channelMessage);
+                    }
+                    String channelCode = null;
+                    for (String str : evtContactConfIdArray) {
+                        if (str.equals(channelMessage.getContactChlId().toString())) {
+                            channelCode = str;
+                        }
+                    }
 
                     //初始化结果集
                     List<Future<Map<String, Object>>> threadList = new ArrayList<>();
@@ -1762,13 +1762,21 @@ public class EventApiServiceImpl implements EventApiService {
 
                     try {
                         //遍历协同渠道
-                        for (String str : evtContactConfIdArray) {
-                            //协同渠道规则表id（自建表）
-                            Long evtContactConfId = Long.parseLong(str);
+                        if (channelCode != null) {
+                            Long evtContactConfId = Long.parseLong(channelCode);
                             //提交线程
                             Future<Map<String, Object>> f = executorService.submit(new ChannelTask(evtContactConfId, productList, context));
                             //将线程处理结果添加到结果集
                             threadList.add(f);
+                        } else {
+                            for (String str : evtContactConfIdArray) {
+                                //协同渠道规则表id（自建表）
+                                Long evtContactConfId = Long.parseLong(str);
+                                //提交线程
+                                Future<Map<String, Object>> f = executorService.submit(new ChannelTask(evtContactConfId, productList, context));
+                                //将线程处理结果添加到结果集
+                                threadList.add(f);
+                            }
                         }
                         //获取结果
                         timeJson.put("time8", System.currentTimeMillis() - begin);
@@ -2766,7 +2774,7 @@ public class EventApiServiceImpl implements EventApiService {
      * @return
      */
     public Map<String, Object> matchRulCondition(Long eventId, Map<String, String> labelItems, Map<String, String> map) {
-        log.info("开始验证事件规则条件");
+//        log.info("开始验证事件规则条件");
         Map<String, Object> result = new HashMap<>();
         result.put("code", "success");
         //查询事件规则
@@ -3069,7 +3077,7 @@ public class EventApiServiceImpl implements EventApiService {
             if (!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaign.getStatusCd())) {
                 esJson.put("hit", false);
                 esJson.put("msg", "活动状态未发布");
-                log.info("活动状态未发布");
+//                log.info("活动状态未发布");
                 esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
                 return Collections.EMPTY_MAP;
             }
@@ -3107,7 +3115,7 @@ public class EventApiServiceImpl implements EventApiService {
                 //验证策略生效时间
                 if (!(now.after(mktStrategyConf.getBeginTime()) && now.before(mktStrategyConf.getEndTime()))) {
                     //若当前时间在策略生效时间外
-                    log.info("当前时间不在策略生效时间内");
+//                    log.info("当前时间不在策略生效时间内");
                     esJsonStrategy.put("hit", false);
                     esJsonStrategy.put("msg", "当前时间不在策略生效时间内");
                     esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
@@ -3125,7 +3133,7 @@ public class EventApiServiceImpl implements EventApiService {
                             }
                         } else {
                             //适用地市获取异常 lanId
-                            log.info("适用地市获取异常");
+//                            log.info("适用地市获取异常");
                             strategyMap.put("msg", "适用地市获取异常");
                             esJsonStrategy.put("hit", "false");
                             esJsonStrategy.put("msg", "适用地市获取异常");
@@ -3141,7 +3149,7 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 } else {
                     //适用地市数据异常
-                    log.info("适用地市数据异常");
+//                    log.info("适用地市数据异常");
                     strategyMap.put("msg", "适用地市数据异常");
                     esJsonStrategy.put("hit", "false");
                     esJsonStrategy.put("msg", "适用地市数据异常");
@@ -3168,7 +3176,7 @@ public class EventApiServiceImpl implements EventApiService {
                             }
                         } else {
                             //适用地市获取异常 lanId
-                            log.info("适用渠道获取异常");
+//                            log.info("适用渠道获取异常");
                             strategyMap.put("msg", "适用渠道获取异常");
                             esJsonStrategy.put("hit", "false");
                             esJsonStrategy.put("msg", "适用渠道获取异常");
@@ -3176,7 +3184,7 @@ public class EventApiServiceImpl implements EventApiService {
                         }
                     }
                     if (channelCheck) {
-                        log.info("适用渠道不符");
+//                        log.info("适用渠道不符");
                         strategyMap.put("msg", "适用渠道不符");
                         esJsonStrategy.put("hit", "false");
                         esJsonStrategy.put("msg", "适用渠道不符");
