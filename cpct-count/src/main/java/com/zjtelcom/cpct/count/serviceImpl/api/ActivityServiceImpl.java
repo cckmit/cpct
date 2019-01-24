@@ -229,7 +229,7 @@ public class ActivityServiceImpl implements ActivityService {
 
 
     /**
-     * 框架活动生成子活动需求函
+     * 框架活动生成子活动需求函   这个操作用在cpct后端框架活动发布的时候执行操作  这个接口目前作废
      * @param paramMap
      * @return
      */
