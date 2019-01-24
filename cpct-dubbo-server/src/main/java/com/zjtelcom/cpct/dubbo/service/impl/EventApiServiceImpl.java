@@ -523,6 +523,10 @@ public class EventApiServiceImpl implements EventApiService {
                     //事件采集项没有客户编码
                     result.put("CPCResultCode", "1000");
                     result.put("CPCResultMsg", "success");
+
+                    paramsJson.put("backParams", result);
+                    timeJson.put("time7", System.currentTimeMillis() - begin);
+                    esHitService.save(paramsJson, IndexList.PARAMS_MODULE);
                     return result;
                 }
 
