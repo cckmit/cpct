@@ -5,38 +5,31 @@ import com.ctg.itrdc.cache.pool.CtgJedisPoolConfig;
 import com.ctg.itrdc.cache.pool.CtgJedisPoolException;
 import com.ctg.itrdc.cache.pool.ProxyJedis;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisPoolConfig;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
- * @Description
- * @Author pengy
- * @Date 2018/7/4 10:41
+ *  集团es存储的redis配置  主要用来和bss因子实时查询和批量查询公用数据而增加
  */
 @Service
-public class RedisUtils_prd {
+public class RedisUtils_es {
 
-    @Value("${redisConfig_Prd.ip}")
-    private String redisIp;
+    private String redisIp="134.108.0.61";
 
-    @Value("${redisConfig_Prd.port}")
-    private Integer redisPort;
+    private Integer redisPort=41801;
 
-    @Value("${redisConfig_Prd.database}")
-    private Integer redisDatabase;
+    private Integer redisDatabase=4970;
 
-    @Value("${redisConfig_Prd.password}")
-    private String redisPassword;
+    private String redisPassword="bss_cpcp_pocins_user#Bsscpc!1n";
 
     /**
      * 写入缓存

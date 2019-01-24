@@ -6,7 +6,6 @@ import com.zjpii.biz.serv.YzServ;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.dubbo.service.MktCampaignSyncApiService;
-//import com.zjtelcom.cpct_prd.dao.campaign.MktCampaignPrdMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -42,14 +42,14 @@ spring:
 
 #集团定制的redis配置prod环境
 redisConfig:
-   ip: 134.108.0.59
+   ip: 134.108.0.59,134.108.0.60
    port: 41701
    database: 4970
    password: bss_cpcp_pocpro_user#bssCpc_ro
 
 
 redisConfig_Prd:
-   ip: 134.108.0.59
+   ip: 134.108.0.59,134.108.0.60
    port: 41701
    database: 4970
    password: bss_cpcp_pocpro_user#bssCpc_ro

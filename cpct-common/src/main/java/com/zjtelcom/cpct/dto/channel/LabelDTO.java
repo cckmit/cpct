@@ -18,11 +18,21 @@ public class LabelDTO implements Serializable {
      */
     private String injectionLabelName;
 
-
     private Long messageType;
 
     private String labelCode;
 
+    private String labelType;
+
+
+
+    public String getLabelType() {
+        return labelType;
+    }
+
+    public void setLabelType(String labelType) {
+        this.labelType = labelType;
+    }
 
     public String getLabelCode() {
         return labelCode;
