@@ -80,7 +80,7 @@ spec:
             memory: "2Gi"
             cpu: "2000m"
       nodeSelector:
-        center: crmcontroller   #修改镜像所属中心标签
+        center: bssOther   #修改镜像所属中心标签
       volumes:
       - name: tz-config
         hostPath:
