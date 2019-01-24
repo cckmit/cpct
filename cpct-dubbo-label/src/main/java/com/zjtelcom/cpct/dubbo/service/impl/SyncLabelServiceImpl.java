@@ -277,7 +277,6 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
                 label.setLabelValueType("1000");
             }
             //label.setLabelDataType(ChannelUtil.getDataType(tagModel.getSourceTableColumnType()));
-
             label.setStatusCd(STATUSCD_EFFECTIVE);
             label.setCreateStaff(UserUtil.loginId());
             label.setCreateDate(new Date());

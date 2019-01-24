@@ -31,7 +31,6 @@
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.count.service.api.ActivityService" ref="activityServiceImpl" version="1.0">
         <dubbo:method name="changeActivityStatus" servicecode="00.1083.changeActivityStatus"/>
         <dubbo:method name="getCampaignList" servicecode="00.1083.getCampaignList"/>
-        <dubbo:method name="generateRequestInfo" servicecode="00.1083.generateRequestInfo"/>
     </dubbo:service>
 
 

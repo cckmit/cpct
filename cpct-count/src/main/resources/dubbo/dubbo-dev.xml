@@ -28,9 +28,10 @@
     </dubbo:reference>
 
 
-    <!--修改活动状态-->
+    <!--修改活动状态 - 获取活动列表校验-->
     <dubbo:service registry="esb2" interface="com.zjtelcom.cpct.count.service.api.ActivityService" ref="activityServiceImpl" version="1.0">
         <dubbo:method name="changeActivityStatus" servicecode="00.1083.changeActivityStatus"/>
+        <dubbo:method name="getCampaignList" servicecode="00.1083.getCampaignList"/>
     </dubbo:service>
 
 

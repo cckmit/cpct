@@ -90,7 +90,9 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
         result.put("resultCode",CommonConstant.CODE_SUCCESS);
         //修改静态参数  同时将修改的参数同步到redis
         SystemParamsUtil.initValue(sysParams);
-        if (SystemParamsUtil.isSync()){
+        //静态参数的同步 如果是同步开关状态千万不能同步到生产环境，生产环境应该一直保持关闭状态,
+        // 为保证生产环境的安全,生产数据库SYS_PARAMS表不能存在  PARAM_KEY为 IS_OPEN_SYNC的记录
+        if (SystemParamsUtil.isSync()&&!SystemParamsUtil.getSyncName().equals(sysParams.getParamKey())){
             new Thread(){
                 public void run(){
                     try {

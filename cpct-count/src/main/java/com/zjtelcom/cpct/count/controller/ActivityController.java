@@ -76,7 +76,7 @@ public class ActivityController {
         Map<String, Object> map = new HashMap<>();
         System.out.println("子活动需求函："+params);
         try {
-            map=activityService.getCampaignList(params);
+            map=activityService.generateRequestInfo(params);
         } catch (Exception e) {
             map.put("resultCode", ResultEnum.FAILED.getStatus());
             map.put("resultMsg", e.getMessage());
