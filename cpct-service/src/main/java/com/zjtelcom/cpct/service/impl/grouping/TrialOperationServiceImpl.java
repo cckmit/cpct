@@ -585,6 +585,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "策略信息有误");
             return result;
         }
+        //添加策略适用地市
+        redisUtils.set("STRATEGY_CONF_AREA_"+operationVO.getStrategyId(),strategy.getAreaId());
+
         String[] fieldList = getStrings(campaign,strategy);
 
 
