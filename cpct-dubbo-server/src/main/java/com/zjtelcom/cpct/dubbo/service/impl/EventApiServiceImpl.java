@@ -1750,8 +1750,10 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                     String channelCode = null;
                     for (String str : evtContactConfIdArray) {
-                        if (str.equals(channelMessage.getContactChlId().toString())) {
+                        MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(Long.valueOf(str));
+                        if (mktCamChlConfDO.getContactChlId().equals(channelMessage.getContactChlId())) {
                             channelCode = str;
+                            break;
                         }
                     }
 
@@ -2783,7 +2785,7 @@ public class EventApiServiceImpl implements EventApiService {
         List<ContactEvtMatchRul> contactEvtMatchRuls = contactEvtMatchRulMapper.listEventMatchRuls(evtMatchRul);
         //事件规则为空不用判断,直接返回
         if (contactEvtMatchRuls.isEmpty()) {
-            log.info("事件规则为空直接返回");
+//            log.info("事件规则为空直接返回");
             return result;
         }
         //查询事件规则条件
@@ -3012,196 +3014,197 @@ public class EventApiServiceImpl implements EventApiService {
         @Override
         public Map<String, Object> call() throws Exception {
 
-            Long mktCampaginId = (Long) act.get("mktCampaginId");
+            Map<String, Object> mktCampaignMap = new HashMap<>();
 
-            //初始化es log
-            JSONObject esJson = new JSONObject();
-            esJson.put("reqId", reqId);
-            esJson.put("activityId", mktCampaginId);
-            esJson.put("activityName", act.get("mktCampaginName"));
-            esJson.put("activityCode", act.get("mktCampaginNbr"));
-            esJson.put("hitEntity", accNbr); //命中对象
+            try {
+                Long mktCampaginId = (Long) act.get("mktCampaginId");
 
-            List<String> strategyTypeList = new ArrayList<>();
-            strategyTypeList.add("1000");
-            strategyTypeList.add("2000");
-            strategyTypeList.add("5000");
-            //验证过滤规则时间,默认只查询5000类型的时间段过滤
-            List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(mktCampaginId, strategyTypeList);
-            for (FilterRule filterRule : filterRuleList) {
-                if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
-                    //获取名单
-                    String userList = filterRule.getUserList();
-                    if (userList != null && !"".equals(userList)) {
-                        int index = userList.indexOf(accNbr);
-                        if (index >= 0) {
+                //初始化es log
+                JSONObject esJson = new JSONObject();
+                esJson.put("reqId", reqId);
+                esJson.put("activityId", mktCampaginId);
+                esJson.put("activityName", act.get("mktCampaginName"));
+                esJson.put("activityCode", act.get("mktCampaginNbr"));
+                esJson.put("hitEntity", accNbr); //命中对象
+
+                List<String> strategyTypeList = new ArrayList<>();
+                strategyTypeList.add("1000");
+                strategyTypeList.add("2000");
+                strategyTypeList.add("5000");
+                //验证过滤规则时间,默认只查询5000类型的时间段过滤
+                List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(mktCampaginId, strategyTypeList);
+                for (FilterRule filterRule : filterRuleList) {
+                    if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
+                        //获取名单
+                        String userList = filterRule.getUserList();
+                        if (userList != null && !"".equals(userList)) {
+                            int index = userList.indexOf(accNbr);
+                            if (index >= 0) {
+                                esJson.put("hit", false);
+                                esJson.put("msg", "红黑名单过滤规则验证被拦截");
+                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                                return Collections.EMPTY_MAP;
+                            }
+                        }
+                    } else if ("5000".equals(filterRule.getFilterType())) {
+                        //时间段的格式
+                        if (compareHourAndMinute(filterRule)) {
+                            log.info("过滤时间段验证被拦截");
                             esJson.put("hit", false);
-                            esJson.put("msg", "红黑名单过滤规则验证被拦截");
+                            esJson.put("msg", "过滤时间段验证被拦截");
                             esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
                             return Collections.EMPTY_MAP;
                         }
                     }
-                } else if ("5000".equals(filterRule.getFilterType())) {
-                    //时间段的格式
-                    if (compareHourAndMinute(filterRule)) {
-                        log.info("过滤时间段验证被拦截");
-                        esJson.put("hit", false);
-                        esJson.put("msg", "过滤时间段验证被拦截");
-                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                        return Collections.EMPTY_MAP;
-                    }
                 }
-            }
 
-            Map<String, Object> mktCampaignMap = new HashMap<>();
-            //查询活动信息
-            MktCampaignDO mktCampaign = (MktCampaignDO) redisUtils.get("MKT_CAMPAIGN_" + mktCampaginId);
-            if (mktCampaign == null) {
-                mktCampaign = mktCampaignMapper.selectByPrimaryKey(mktCampaginId);
-                redisUtils.set("MKT_CAMPAIGN_" + mktCampaginId, mktCampaign);
-            }
-            Date now = new Date();
-            //验证活动生效时间
-            Date beginTime = mktCampaign.getPlanBeginTime();
-            Date endTime = mktCampaign.getPlanEndTime();
-            if (now.before(beginTime) || now.after(endTime)) {
-                //当前时间不在活动生效时间内
-                esJson.put("hit", false);
-                esJson.put("msg", "当前时间不在活动生效时间内");
-                log.info("当前时间不在活动生效时间内");
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                return Collections.EMPTY_MAP;
-            }
+                //查询活动信息
+                MktCampaignDO mktCampaign = (MktCampaignDO) redisUtils.get("MKT_CAMPAIGN_" + mktCampaginId);
+                if (mktCampaign == null) {
+                    mktCampaign = mktCampaignMapper.selectByPrimaryKey(mktCampaginId);
+                    redisUtils.set("MKT_CAMPAIGN_" + mktCampaginId, mktCampaign);
+                }
+                Date now = new Date();
+                //验证活动生效时间
+                Date beginTime = mktCampaign.getPlanBeginTime();
+                Date endTime = mktCampaign.getPlanEndTime();
+                if (now.before(beginTime) || now.after(endTime)) {
+                    //当前时间不在活动生效时间内
+                    esJson.put("hit", false);
+                    esJson.put("msg", "当前时间不在活动生效时间内");
+                    log.info("当前时间不在活动生效时间内");
+                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                    return Collections.EMPTY_MAP;
+                }
 
-            // 判断活动状态
-            if (!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaign.getStatusCd())) {
-                esJson.put("hit", false);
-                esJson.put("msg", "活动状态未发布");
+                // 判断活动状态
+                if (!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaign.getStatusCd())) {
+                    esJson.put("hit", false);
+                    esJson.put("msg", "活动状态未发布");
 //                log.info("活动状态未发布");
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                return Collections.EMPTY_MAP;
-            }
+                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                    return Collections.EMPTY_MAP;
+                }
 
-            // 判断活动类型
-            if (!StatusCode.REAL_TIME_CAMPAIGN.getStatusCode().equals(mktCampaign.getTiggerType())) {
-                esJson.put("hit", false);
-                esJson.put("msg", "活动类型不符");
-                log.info("活动类型不符");
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                return Collections.EMPTY_MAP;
-            }
+                // 判断活动类型
+                if (!StatusCode.REAL_TIME_CAMPAIGN.getStatusCode().equals(mktCampaign.getTiggerType())) {
+                    esJson.put("hit", false);
+                    esJson.put("msg", "活动类型不符");
+                    log.info("活动类型不符");
+                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                    return Collections.EMPTY_MAP;
+                }
 
-            // 查询策略信息
-            List<MktStrategyConfDO> mktStrategyConfDOS = mktStrategyConfMapper.selectByCampaignId(mktCampaginId);
-            if (mktStrategyConfDOS == null) {
-                esJson.put("hit", false);
-                esJson.put("msg", "策略查询失败");
-                log.info("策略查询失败");
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                return Collections.EMPTY_MAP;
-            }
-            List<Map<String, Object>> strategyMapList = new ArrayList<>();
-            for (MktStrategyConfDO mktStrategyConf : mktStrategyConfDOS) {
+                // 查询策略信息
+                List<MktStrategyConfDO> mktStrategyConfDOS = mktStrategyConfMapper.selectByCampaignId(mktCampaginId);
+                if (mktStrategyConfDOS == null) {
+                    esJson.put("hit", false);
+                    esJson.put("msg", "策略查询失败");
+                    log.info("策略查询失败");
+                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                    return Collections.EMPTY_MAP;
+                }
+                List<Map<String, Object>> strategyMapList = new ArrayList<>();
+                for (MktStrategyConfDO mktStrategyConf : mktStrategyConfDOS) {
 
-                //初始化es log
-                JSONObject esJsonStrategy = new JSONObject();
-                esJsonStrategy.put("reqId", reqId);
-                esJsonStrategy.put("activityId", mktCampaginId);
-                esJsonStrategy.put("hitEntity", accNbr); //命中对象
-                esJsonStrategy.put("strategyConfId", mktStrategyConf.getMktStrategyConfId());
-                esJsonStrategy.put("strategyConfName", mktStrategyConf.getMktStrategyConfName());
+                    //初始化es log
+                    JSONObject esJsonStrategy = new JSONObject();
+                    esJsonStrategy.put("reqId", reqId);
+                    esJsonStrategy.put("activityId", mktCampaginId);
+                    esJsonStrategy.put("hitEntity", accNbr); //命中对象
+                    esJsonStrategy.put("strategyConfId", mktStrategyConf.getMktStrategyConfId());
+                    esJsonStrategy.put("strategyConfName", mktStrategyConf.getMktStrategyConfName());
 
-                Map<String, Object> strategyMap = new HashMap<>();
-                //验证策略生效时间
-                if (!(now.after(mktStrategyConf.getBeginTime()) && now.before(mktStrategyConf.getEndTime()))) {
-                    //若当前时间在策略生效时间外
+                    Map<String, Object> strategyMap = new HashMap<>();
+                    //验证策略生效时间
+                    if (!(now.after(mktStrategyConf.getBeginTime()) && now.before(mktStrategyConf.getEndTime()))) {
+                        //若当前时间在策略生效时间外
 //                    log.info("当前时间不在策略生效时间内");
-                    esJsonStrategy.put("hit", false);
-                    esJsonStrategy.put("msg", "当前时间不在策略生效时间内");
-                    esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
-                    continue;
-                }
-                //适用地市校验
-                if (mktStrategyConf.getAreaId() != null && !"".equals(mktStrategyConf.getAreaId())) {
-                    String[] strArrayCity = mktStrategyConf.getAreaId().split("/");
-                    boolean areaCheck = true;
-                    for (String str : strArrayCity) {
-                        if (lanId != null) {
-                            if (lanId.equals(str)) {
-                                areaCheck = false;
-                                break;
-                            }
-                        } else {
-                            //适用地市获取异常 lanId
+                        esJsonStrategy.put("hit", false);
+                        esJsonStrategy.put("msg", "当前时间不在策略生效时间内");
+                        esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
+                        continue;
+                    }
+                    //适用地市校验
+                    if (mktStrategyConf.getAreaId() != null && !"".equals(mktStrategyConf.getAreaId())) {
+                        String[] strArrayCity = mktStrategyConf.getAreaId().split("/");
+                        boolean areaCheck = true;
+                        for (String str : strArrayCity) {
+                            if (lanId != null) {
+                                if (lanId.equals(str)) {
+                                    areaCheck = false;
+                                    break;
+                                }
+                            } else {
+                                //适用地市获取异常 lanId
 //                            log.info("适用地市获取异常");
-                            strategyMap.put("msg", "适用地市获取异常");
-                            esJsonStrategy.put("hit", "false");
-                            esJsonStrategy.put("msg", "适用地市获取异常");
-                            esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
-                        }
-                    }
-                    if (areaCheck) {
-                        strategyMap.put("msg", "适用地市不符");
-                        esJsonStrategy.put("hit", "false");
-                        esJsonStrategy.put("msg", "适用地市不符");
-                        esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
-                        continue;
-                    }
-                } else {
-                    //适用地市数据异常
-//                    log.info("适用地市数据异常");
-                    strategyMap.put("msg", "适用地市数据异常");
-                    esJsonStrategy.put("hit", "false");
-                    esJsonStrategy.put("msg", "适用地市数据异常");
-                    esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
-                    continue;
-                }
-                //判断适用渠道
-                if (mktStrategyConf.getChannelsId() != null && !"".equals(mktStrategyConf.getChannelsId())) {
-                    String[] strArrayChannelsId = mktStrategyConf.getChannelsId().split("/");
-                    List<Long> channelsIdList = new ArrayList<>();
-                    if (strArrayChannelsId != null && !"".equals(strArrayChannelsId[0])) {
-
-                        for (String channelsId : strArrayChannelsId) {
-                            channelsIdList.add(Long.valueOf(channelsId));
-                        }
-                    }
-                    List<String> channelCodeList = contactChannelMapper.selectChannelCodeByPrimaryKey(channelsIdList);
-                    boolean channelCheck = true;
-                    for (String channelCode : channelCodeList) {
-                        if (channel != null) {
-                            if (channel.equals(channelCode)) {
-                                channelCheck = false;
-                                break;
+                                strategyMap.put("msg", "适用地市获取异常");
+                                esJsonStrategy.put("hit", "false");
+                                esJsonStrategy.put("msg", "适用地市获取异常");
+                                esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
                             }
-                        } else {
-                            //适用地市获取异常 lanId
-//                            log.info("适用渠道获取异常");
-                            strategyMap.put("msg", "适用渠道获取异常");
-                            esJsonStrategy.put("hit", "false");
-                            esJsonStrategy.put("msg", "适用渠道获取异常");
-                            esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
                         }
-                    }
-                    if (channelCheck) {
-//                        log.info("适用渠道不符");
-                        strategyMap.put("msg", "适用渠道不符");
+                        if (areaCheck) {
+                            strategyMap.put("msg", "适用地市不符");
+                            esJsonStrategy.put("hit", "false");
+                            esJsonStrategy.put("msg", "适用地市不符");
+                            esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
+                            continue;
+                        }
+                    } else {
+                        //适用地市数据异常
+//                    log.info("适用地市数据异常");
+                        strategyMap.put("msg", "适用地市数据异常");
                         esJsonStrategy.put("hit", "false");
-                        esJsonStrategy.put("msg", "适用渠道不符");
+                        esJsonStrategy.put("msg", "适用地市数据异常");
                         esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
                         continue;
                     }
-                } else {
-                    //适用地市数据异常
-                    log.info("适用渠道数据异常");
-                    strategyMap.put("msg", "适用渠道数据异常");
-                    esJsonStrategy.put("hit", "false");
-                    esJsonStrategy.put("msg", "适用渠道数据异常");
-                    esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
-                    continue;
-                }
+                    //判断适用渠道
+                    if (mktStrategyConf.getChannelsId() != null && !"".equals(mktStrategyConf.getChannelsId())) {
+                        String[] strArrayChannelsId = mktStrategyConf.getChannelsId().split("/");
+                        List<Long> channelsIdList = new ArrayList<>();
+                        if (strArrayChannelsId != null && !"".equals(strArrayChannelsId[0])) {
+                            for (String channelsId : strArrayChannelsId) {
+                                channelsIdList.add(Long.valueOf(channelsId));
+                            }
+                        }
+                        List<String> channelCodeList = contactChannelMapper.selectChannelCodeByPrimaryKey(channelsIdList);
+                        boolean channelCheck = true;
+                        for (String channelCode : channelCodeList) {
+                            if (channel != null) {
+                                if (channel.equals(channelCode)) {
+                                    channelCheck = false;
+                                    break;
+                                }
+                            } else {
+                                //适用地市获取异常 lanId
+//                            log.info("适用渠道获取异常");
+                                strategyMap.put("msg", "适用渠道获取异常");
+                                esJsonStrategy.put("hit", "false");
+                                esJsonStrategy.put("msg", "适用渠道获取异常");
+                                esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
+                            }
+                        }
+                        if (channelCheck) {
+//                        log.info("适用渠道不符");
+                            strategyMap.put("msg", "适用渠道不符");
+                            esJsonStrategy.put("hit", "false");
+                            esJsonStrategy.put("msg", "适用渠道不符");
+                            esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
+                            continue;
+                        }
+                    } else {
+                        //适用地市数据异常
+                        log.info("适用渠道数据异常");
+                        strategyMap.put("msg", "适用渠道数据异常");
+                        esJsonStrategy.put("hit", "false");
+                        esJsonStrategy.put("msg", "适用渠道数据异常");
+                        esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
+                        continue;
+                    }
 
-                // 获取规则
+                    // 获取规则
 //                List<Map<String, Object>> ruleMapList = new ArrayList<>();
 //                List<MktStrategyConfRuleDO> mktStrategyConfRuleList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(strategyConfId);
 //                for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleList) {
@@ -3274,17 +3277,23 @@ public class EventApiServiceImpl implements EventApiService {
 //                strategyMapList.add(strategyMap);
 //                }
 
-                strategyMap.put("strategyConfId", mktStrategyConf.getMktStrategyConfId());
-                strategyMap.put("strategyConfName", mktStrategyConf.getMktStrategyConfName());
-                strategyMapList.add(strategyMap);
+                    strategyMap.put("strategyConfId", mktStrategyConf.getMktStrategyConfId());
+                    strategyMap.put("strategyConfName", mktStrategyConf.getMktStrategyConfName());
+                    strategyMapList.add(strategyMap);
 
+                }
+                if (strategyMapList != null && strategyMapList.size() > 0) {
+                    mktCampaignMap.put("mktCampaginId", mktCampaginId);
+                    mktCampaignMap.put("levelConfig", act.get("levelConfig"));
+                    mktCampaignMap.put("campaignSeq", act.get("campaignSeq"));
+                    mktCampaignMap.put("strategyMapList", strategyMapList);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                log.info("预校验出错");
             }
-            if (strategyMapList != null && strategyMapList.size() > 0) {
-                mktCampaignMap.put("mktCampaginId", mktCampaginId);
-                mktCampaignMap.put("levelConfig", act.get("levelConfig"));
-                mktCampaignMap.put("campaignSeq", act.get("campaignSeq"));
-                mktCampaignMap.put("strategyMapList", strategyMapList);
-            }
+
             return mktCampaignMap;
         }
     }
