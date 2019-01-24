@@ -96,6 +96,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
             LabelDTO labelDTO = new LabelDTO();
             labelDTO.setInjectionLabelId(label.getInjectionLabelId());
             labelDTO.setInjectionLabelName(label.getInjectionLabelName());
+            labelDTO.setLabelType(label.getLabelType());
             labelDTO.setMessageType(real.getMessageType());
             labelDTO.setLabelCode(label.getInjectionLabelCode());
             labelList.add(labelDTO);

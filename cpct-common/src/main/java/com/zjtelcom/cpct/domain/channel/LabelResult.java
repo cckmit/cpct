@@ -48,6 +48,19 @@ public class LabelResult  implements Serializable {
      */
     private String className;
 
+    /**
+     * 标签数据类型   1100 日期时间型;1200	字符型;1300	浮点型
+     */
+    private String labelDataType;
+
+
+    public String getLabelDataType() {
+        return labelDataType;
+    }
+
+    public void setLabelDataType(String labelDataType) {
+        this.labelDataType = labelDataType;
+    }
 
     public String getOperType() {
         return operType;

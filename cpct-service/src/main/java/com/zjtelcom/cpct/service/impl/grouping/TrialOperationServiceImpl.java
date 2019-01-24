@@ -116,6 +116,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private EsService esService;
     @Autowired
     private MktResourceMapper resourceMapper;
+    @Autowired
+    private MktStrategyConfMapper strategyConfMapper;
 
     /**
      * 销售品service
@@ -188,9 +190,11 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "策略信息有误");
             return result;
         }
+        //添加策略适用地市
+        redisUtils.set("STRATEGY_CONF_AREA_"+operationVO.getStrategyId(),strategy.getAreaId());
+
         // 通过活动id获取关联的标签字段数组
         String[] fieldList = getStrings(campaign,strategy);
-
 
         TrialOperationVO request = BeanUtil.create(operationVO,new TrialOperationVO());
         //抽样业务校验
@@ -884,11 +888,19 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "活动不存在");
             return result;
         }
-//        if(!"2002".equals(campaignDO.getStatusCd())){
-//            result.put("resultCode", CODE_FAIL);
-//            result.put("resultMsg", "发布活动后才能下发");
-//            return result;
-//        }
+        if(!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(campaignDO.getStatusCd())){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "发布活动后才能下发");
+            return result;
+        }
+        MktStrategyConfDO strategyConfDO = strategyConfMapper.selectByPrimaryKey(operation.getStrategyId());
+        if (strategyConfDO==null){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "策略不存在");
+            return result;
+        }
+        //添加策略适用地市
+        redisUtils.set("STRATEGY_CONF_AREA_"+operation.getStrategyId(),strategyConfDO.getAreaId());
         // 通过活动id获取关联的标签字段数组
         DisplayColumn req = new DisplayColumn();
         req.setDisplayColumnId(campaignDO.getCalcDisplay());
@@ -901,6 +913,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             Map<String,Object> label = new HashMap<>();
             label.put("code",labelDTOList.get(i).getLabelCode());
             label.put("name",labelDTOList.get(i).getInjectionLabelName());
+            label.put("labelType",labelDTOList.get(i).getLabelType());
             labelList.add(label);
         }
         redisUtils.set("LABEL_DETAIL_"+trialOperation.getBatchNum(),labelList);
@@ -1166,6 +1179,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         labelResult.setRightParam(tarGrpConditionDOs.get(i).getRightParam());
                         labelResult.setClassName(label.getClassName());
                         labelResult.setOperType(type);
+                        labelResult.setLabelDataType(label.getLabelDataType()==null ? "1100" : label.getLabelDataType());
                         labelResultList.add(labelResult);
                         codeList.add(label.getInjectionLabelCode());
                         if ("7100".equals(type)) {
