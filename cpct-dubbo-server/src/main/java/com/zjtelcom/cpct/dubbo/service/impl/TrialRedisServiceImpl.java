@@ -25,6 +25,7 @@ import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+import static org.apache.logging.log4j.ThreadContext.isEmpty;
 
 @Service
 public class TrialRedisServiceImpl implements TrialRedisService {
@@ -61,7 +62,7 @@ public class TrialRedisServiceImpl implements TrialRedisService {
                 }
                 result.put("result",redisUtils.hgetAllRedisList(key));
             }else if (key.contains("LABEL_DETAIL_")){
-                if (redisUtils.get(key)==null){
+                if (redisUtils.get(key)==null || ((ArrayList)redisUtils.get(key)).isEmpty()){
                     String  batchNum = key.substring(13,key.length());
                     TrialOperation operation = trialOperationMapper.selectByBatchNum(batchNum);
                     if (operation==null){
@@ -88,10 +89,13 @@ public class TrialRedisServiceImpl implements TrialRedisService {
                         Map<String,Object> label = new HashMap<>();
                         label.put("code",labelDTOList.get(i).getLabelCode());
                         label.put("name",labelDTOList.get(i).getInjectionLabelName());
+                        label.put("labelType",labelDTOList.get(i).getLabelType());
                         labelList.add(label);
                     }
                     redisUtils.set("LABEL_DETAIL_"+operation.getBatchNum(),labelList);
                 }
+                result.put("result",redisUtils.get(key));
+            }else {
                 result.put("result",redisUtils.get(key));
             }
         }catch (Exception e){
@@ -121,6 +125,7 @@ public class TrialRedisServiceImpl implements TrialRedisService {
             labelDTO.setInjectionLabelName(label.getInjectionLabelName());
             labelDTO.setMessageType(real.getMessageType());
             labelDTO.setLabelCode(label.getInjectionLabelCode());
+            labelDTO.setLabelType(label.getLabelType());
             labelList.add(labelDTO);
             if (!messageTypes.contains(real.getMessageType())){
                 messageTypes.add(real.getMessageType());
