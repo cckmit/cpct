@@ -51,7 +51,7 @@ public class EsController {
     @RequestMapping("/searchLabelInfoByRuleId")
     @CrossOrigin
     public Map<String, Object> searchLabelInfoByRuleId(@RequestBody HashMap<String,Object> param) {
-        return esService.searchLabelInfoByRuleId(param.get("ruleId").toString(),param.get("isi").toString());
+        return esService.searchLabelInfoByRuleId(param.get("ruleId").toString(),param.get("isi").toString(),param.get("hitEntity").toString());
     }
 
 
