@@ -546,6 +546,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         trialOp.setStrategyName(strategy.getMktStrategyConfName());
         trialOp.setBatchNum(Long.valueOf(batchNumSt));
         trialOp.setStatusCd("1000");
+        trialOp.setStatusDate(new Date());
         trialOperationMapper.insert(trialOp);
 
         operationVO.setTrialId(trialOp.getId());
@@ -964,7 +965,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             return result;
         }
         //更新试算记录状态和时间
-        trialOperation.setUpdateDate(new Date());
+        trialOperation.setStatusDate(new Date());
         trialOperation.setStatusCd(StatusCode.STATUS_CODE_ARCHIVED.getStatusCode());
         trialOperationMapper.updateByPrimaryKey(trialOperation);
         result.put("resultCode", CODE_SUCCESS);
