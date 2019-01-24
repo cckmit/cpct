@@ -534,8 +534,6 @@ public class EventApiServiceImpl implements EventApiService {
 
                     log.info("事件计算流程结束:" + map.get("eventCode") + "***" + map.get("reqId") + "（" + (System.currentTimeMillis() - begin) + "）");
 
-
-
                     return result;
                 }
 
@@ -1449,6 +1447,7 @@ public class EventApiServiceImpl implements EventApiService {
             esJson.put("eventId", params.get("eventCode"));
             esJson.put("activityId", privateParams.get("activityId"));
             esJson.put("ruleId", ruleId);
+            esJson.put("ruleName", ruleName);
             esJson.put("integrationId", params.get("integrationId"));
             esJson.put("accNbr", params.get("accNbr"));
             esJson.put("strategyConfId", strategyConfId);
