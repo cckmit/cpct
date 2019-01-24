@@ -61,9 +61,11 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
             }
             // 从数据库中查询不到
             if(camScript == null){
-                if(scriptDesc!=null){
+                if(scriptDesc != null){
                     newScript.setScriptDesc(scriptDesc);
                 }
+            } else{
+                newScript.setScriptDesc(camScript.getScriptDesc());
             }
         }
 
