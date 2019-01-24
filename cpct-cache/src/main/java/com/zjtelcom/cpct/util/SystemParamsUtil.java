@@ -135,12 +135,12 @@ public class SystemParamsUtil {
     }
 
     /**
-     * 判断是否为实时或者批量因子查询的开关操作
+     * 判断是否为实时或者批量因子查询的开关操作,或者试算标签数据类型是否有效
      * @param str
      * @return
      */
     private static boolean isYZ(String str){
-        if(str.equals("IS_ES_FLG") ||str.equals("YZS_ES_FLG") ||str.equals("YZ_ES_FLG")){
+        if(str.equals("IS_ES_FLG") ||str.equals("YZS_ES_FLG") ||str.equals("YZ_ES_FLG")||str.equals("TRIAL_LABEL_DATA_TYPE")){
               return  true;
         }else{
               return false;
