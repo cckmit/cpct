@@ -186,17 +186,17 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
     @Override
     public Map<String, Object> listUserList(UserList userList) throws IOException {
         Map<String, Object> maps = new HashMap<>();
-        List<UserList> userLists = new ArrayList<>();
-        Set<Object> keys = redisUtils.keys("[1-9]*");
-        for (Object str : keys) {
-            UserList userListT = new UserList();
-            userListT.setUserName(String.valueOf(redisUtils.hmGet((String) str, "userName")));
-            userListT.setUserPhone(String.valueOf(redisUtils.hmGet((String) str, "userPhone")));
-            userLists.add(userListT);
-        }
-        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
-        maps.put("resultMsg", StringUtils.EMPTY);
-        maps.put("userLists", userLists);
+//        List<UserList> userLists = new ArrayList<>();
+//        Set<Object> keys = redisUtils.keys("[1-9]*");
+//        for (Object str : keys) {
+//            UserList userListT = new UserList();
+//            userListT.setUserName(String.valueOf(redisUtils.hmGet((String) str, "userName")));
+//            userListT.setUserPhone(String.valueOf(redisUtils.hmGet((String) str, "userPhone")));
+//            userLists.add(userListT);
+//        }
+//        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+//        maps.put("resultMsg", StringUtils.EMPTY);
+//        maps.put("userLists", userLists);
         return maps;
     }
 
