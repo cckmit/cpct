@@ -348,6 +348,9 @@ public class EventApiServiceImpl implements EventApiService {
             long begin = System.currentTimeMillis();
             log.info("事件计算流程开始:" + map.get("eventCode") + "***" + map.get("reqId"));
 
+            //初始化返回结果中的工单信息
+            List<Map<String, Object>> activityList = new ArrayList<>();
+
             //初始化返回结果
             Map<String, Object> result = new HashMap();
 
@@ -512,7 +515,7 @@ public class EventApiServiceImpl implements EventApiService {
                 timeJson.put("time3", System.currentTimeMillis() - begin);
 
                 if (resultByEvent == null || resultByEvent.size() <= 0) {
-                    log.info("预校验均为空");
+                    log.info("预校验为空");
                     long cost = System.currentTimeMillis() - begin;
                     esJson.put("timeCost", cost);
                     esJson.put("hit", false);
@@ -523,15 +526,20 @@ public class EventApiServiceImpl implements EventApiService {
                     //事件采集项没有客户编码
                     result.put("CPCResultCode", "1000");
                     result.put("CPCResultMsg", "success");
+                    result.put("taskList", activityList);
 
                     paramsJson.put("backParams", result);
                     timeJson.put("time7", System.currentTimeMillis() - begin);
                     esHitService.save(paramsJson, IndexList.PARAMS_MODULE);
+
+                    log.info("事件计算流程结束:" + map.get("eventCode") + "***" + map.get("reqId") + "（" + (System.currentTimeMillis() - begin) + "）");
+
+
+
                     return result;
                 }
 
-                //初始化返回结果中的工单信息
-                List<Map<String, Object>> activityList = new ArrayList<>();
+
 
                 //判断有没有客户级活动
                 Boolean hasCust = false;  //是否有客户级
