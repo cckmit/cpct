@@ -6,8 +6,6 @@ import com.zjpii.biz.serv.YzServ;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.dubbo.service.MktCampaignSyncApiService;
-//import com.zjtelcom.cpct_prd.dao.campaign.MktCampaignPrdMapper;
-import com.zjtelcom.cpct.dubbo.service.TrialRedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +21,6 @@ public class EventApiTestController {
 
     @Autowired(required = false)
     private EventApiService eventApiService;
-    @Autowired
-    private TrialRedisService trialRedisService;
 
     @Autowired(required = false)
     private YzServ yzServ;
@@ -34,11 +30,11 @@ public class EventApiTestController {
     private MktCampaignSyncApiService syncApiService;
 
     @PostMapping("test")
-    public  Map<String,Object> test(@RequestBody Map<String,String> params) {
+    public  Map<String,Object> test(@RequestBody Map<String, Long> params) {
         Map<String,Object> result = new HashMap<>();
         List<MktCampaignDO> campaigns = new ArrayList<>();
         try {
-            result = trialRedisService.searchFromRedis(params.get("key"));
+            result = syncApiService.publishMktCampaign(params.get("requestId"));
         } catch (Exception e) {
             e.printStackTrace();
         }

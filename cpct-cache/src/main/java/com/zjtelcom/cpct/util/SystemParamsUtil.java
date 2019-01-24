@@ -94,17 +94,17 @@ public class SystemParamsUtil {
 
 
     /**
-     * 初始化同步值  将redis里的值设为空
+     * 初始化系统参数值  修改redis里的值
      */
-    public static void initValue(){
+    public static void initValue(SysParams sysParams){
         try {
             RedisUtils bean = SpringUtil.getBean(RedisUtils.class);
-            bean.set(SYNC_VALUE,"");
+            bean.set(sysParams.getParamKey(),sysParams.getParamValue());
         } catch (Exception e) {
             e.printStackTrace();
             log.info("redis存储IS_OPEN_SYNC值失败");
+            IS_OPEN_SYNC="";
         }
-        IS_OPEN_SYNC="";
     }
 
 
