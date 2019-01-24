@@ -24,4 +24,6 @@ public interface TrialOperationMapper {
     int updateByPrimaryKey(TrialOperation record);
 
     List<TrialOperation> listOperationByUpdateTime(@Param("updateTime")Date updateTime);
+
+    TrialOperation selectByBatchNum(@Param("batchNum") String batchNum);
 }
