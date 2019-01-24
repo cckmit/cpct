@@ -38,12 +38,6 @@ public class RedisUtils_prd {
     @Value("${redisConfig_Prd.password}")
     private String redisPassword;
 
-    @Autowired
-    private RedisTemplate redisTemplate;
-
-//    @Autowired
-//    private HashOperations<String,String,Object> hashOperations;
-
     /**
      * 写入缓存
      *
@@ -54,10 +48,6 @@ public class RedisUtils_prd {
     public boolean set(final String key, Object value) {
         boolean result = false;
         try {
-            // 原方法
-         // ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-         // operations.set(key, value);
-
             // 改造后方法
             result = setRedis(key, value);
         } catch (Exception e) {
@@ -85,10 +75,10 @@ public class RedisUtils_prd {
                 //sendCommand 可能会抛出 运行时异常
                 jedis.set(key, serialize(value));
                 //sendCommand 可能会抛出 运行时异常
-                jedis.close();
                 result = true;
             } catch (Throwable je) {
                 je.printStackTrace();
+            } finally {
                 jedis.close();
             }
             ctgJedisPool.close();
@@ -105,52 +95,19 @@ public class RedisUtils_prd {
      * @param value
      * @return
      */
-    public boolean set(final String key, Object value, Long expireTime, TimeUnit timeUnit) {
-        boolean result = false;
-        try {
-            ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-            operations.set(key, value);
-            redisTemplate.expire(key, expireTime, timeUnit);
-            result = true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
+//    public boolean set(final String key, Object value, Long expireTime, TimeUnit timeUnit) {
+//        boolean result = false;
+//        try {
+//            ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+//            operations.set(key, value);
+//            redisTemplate.expire(key, expireTime, timeUnit);
+//            result = true;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return result;
+//    }
 
-    /**
-     * 批量删除对应的value
-     *
-     * @param keys
-     */
-    public void remove(final String... keys) {
-        for (String key : keys) {
-            remove(key);
-        }
-    }
-
-    /**
-     * 批量删除key
-     *
-     * @param pattern
-     */
-    public void removePattern(final String pattern) {
-        Set<Serializable> keys = redisTemplate.keys(pattern);
-        if (keys.size() > 0) {
-            redisTemplate.delete(keys);
-        }
-    }
-
-    /**
-     * 删除对应的value
-     *
-     * @param key
-     */
-    public void remove(final String key) {
-        if (exists(key)) {
-            redisTemplate.delete(key);
-        }
-    }
 
     /**
      * 判断缓存中是否有对应的value
@@ -159,7 +116,7 @@ public class RedisUtils_prd {
      * @return
      */
     public boolean exists(final String key) {
-        return redisTemplate.hasKey(key);
+        return existsRedis(key);
     }
 
 
@@ -177,12 +134,12 @@ public class RedisUtils_prd {
             try {
                 jedis = ctgJedisPool.getResource();
                 result = jedis.exists(key);
-                jedis.close();
             } catch (Throwable je) {
                 je.printStackTrace();
+            } finally {
                 jedis.close();
+                ctgJedisPool.close();
             }
-            ctgJedisPool.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -197,11 +154,6 @@ public class RedisUtils_prd {
      */
     public Object get(final String key) {
         Object result = null;
-
-        // 原方法
-        // ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-        //   result = operations.get(key);
-
         // 改造后方法
         result = getRedis(key);
         return result;
@@ -230,9 +182,9 @@ public class RedisUtils_prd {
                 if(jedis.exists(key)) {
                     result = unserizlize(jedis.get(key));
                 }
-                jedis.close();
             } catch (Throwable je) {
                 je.printStackTrace();
+            } finally {
                 jedis.close();
             }
             ctgJedisPool.close();
@@ -260,12 +212,12 @@ public class RedisUtils_prd {
                     jedis.del(key);
                     result = true;
                 }
-                jedis.close();
             } catch (Throwable je) {
                 je.printStackTrace();
+            } finally {
                 jedis.close();
+                ctgJedisPool.close();
             }
-            ctgJedisPool.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -279,10 +231,10 @@ public class RedisUtils_prd {
      * @param hashKey
      * @param value
      */
-    public void hmSet(String key, Object hashKey, Object value) {
-        HashOperations<String, Object, Object> hash = redisTemplate.opsForHash();
-        hash.put(key, hashKey, value);
-    }
+//    public void hmSet(String key, Object hashKey, Object value) {
+//        HashOperations<String, Object, Object> hash = redisTemplate.opsForHash();
+//        hash.put(key, hashKey, value);
+//    }
 
     /**
      * 哈希获取数据
@@ -291,10 +243,10 @@ public class RedisUtils_prd {
      * @param hashKey
      * @return
      */
-    public Object hmGet(String key, Object hashKey) {
-        HashOperations<String, Object, Object> hash = redisTemplate.opsForHash();
-        return hash.get(key, hashKey);
-    }
+//    public Object hmGet(String key, Object hashKey) {
+//        HashOperations<String, Object, Object> hash = redisTemplate.opsForHash();
+//        return hash.get(key, hashKey);
+//    }
 
     /**
      * 哈希获取数据
@@ -302,11 +254,10 @@ public class RedisUtils_prd {
      * @param key
      * @return Map<HK, HV>
      */
-    public Object hKeys(String key) {
-        HashOperations<String, Object, Object> hash = redisTemplate.opsForHash();
-        return hash.entries(key);
-
-    }
+//    public Object hKeys(String key) {
+//        HashOperations<String, Object, Object> hash = redisTemplate.opsForHash();
+//        return hash.entries(key);
+//    }
 
     /**
      * 列表添加
@@ -314,10 +265,10 @@ public class RedisUtils_prd {
      * @param k
      * @param v
      */
-    public void lPush(String k, Object v) {
-        ListOperations<String, Object> list = redisTemplate.opsForList();
-        list.rightPush(k, v);
-    }
+//    public void lPush(String k, Object v) {
+//        ListOperations<String, Object> list = redisTemplate.opsForList();
+//        list.rightPush(k, v);
+//    }
 
     /**
      * 列表获取
@@ -327,10 +278,10 @@ public class RedisUtils_prd {
      * @param l1
      * @return
      */
-    public List<Object> lRange(String k, long l, long l1) {
-        ListOperations<String, Object> list = redisTemplate.opsForList();
-        return list.range(k, l, l1);
-    }
+//    public List<Object> lRange(String k, long l, long l1) {
+//        ListOperations<String, Object> list = redisTemplate.opsForList();
+//        return list.range(k, l, l1);
+//    }
 
     /**
      * 集合添加
@@ -338,10 +289,10 @@ public class RedisUtils_prd {
      * @param key
      * @param value
      */
-    public void add(String key, Object value) {
-        SetOperations<String, Object> set = redisTemplate.opsForSet();
-        set.add(key, value);
-    }
+//    public void add(String key, Object value) {
+//        SetOperations<String, Object> set = redisTemplate.opsForSet();
+//        set.add(key, value);
+//    }
 
     /**
      * 集合获取
@@ -349,10 +300,10 @@ public class RedisUtils_prd {
      * @param key
      * @return
      */
-    public Set<Object> setMembers(String key) {
-        SetOperations<String, Object> set = redisTemplate.opsForSet();
-        return set.members(key);
-    }
+//    public Set<Object> setMembers(String key) {
+//        SetOperations<String, Object> set = redisTemplate.opsForSet();
+//        return set.members(key);
+//    }
 
     /**
      * 有序集合添加
@@ -361,10 +312,10 @@ public class RedisUtils_prd {
      * @param value
      * @param scoure
      */
-    public void zAdd(String key, Object value, double scoure) {
-        ZSetOperations<String, Object> zset = redisTemplate.opsForZSet();
-        zset.add(key, value, scoure);
-    }
+//    public void zAdd(String key, Object value, double scoure) {
+//        ZSetOperations<String, Object> zset = redisTemplate.opsForZSet();
+//        zset.add(key, value, scoure);
+//    }
 
     /**
      * 有序集合获取
@@ -374,10 +325,10 @@ public class RedisUtils_prd {
      * @param scoure1
      * @return
      */
-    public Set<Object> rangeByScore(String key, double scoure, double scoure1) {
-        ZSetOperations<String, Object> zset = redisTemplate.opsForZSet();
-        return zset.rangeByScore(key, scoure, scoure1);
-    }
+//    public Set<Object> rangeByScore(String key, double scoure, double scoure1) {
+//        ZSetOperations<String, Object> zset = redisTemplate.opsForZSet();
+//        return zset.rangeByScore(key, scoure, scoure1);
+//    }
 //
 //    /**
 //     * 查询该key下所有值
@@ -393,18 +344,20 @@ public class RedisUtils_prd {
     /**
      * 通过表达式匹配获取所有key
      */
-    public Set<Object> keys(String pattern) {
-        Set<Object> set = redisTemplate.keys(pattern);
-        return set;
-    }
+//    public Set<Object> keys(String pattern) {
+//        Set<Object> set = redisTemplate.keys(pattern);
+//        return set;
+//    }
 
 
     private CtgJedisPool initCatch() {
         List<HostAndPort> hostAndPortList = new ArrayList();
         // 接入机的ip和端口号
-        HostAndPort host = new HostAndPort(redisIp, redisPort);
-        hostAndPortList.add(host);
-
+        String[] strArr = redisIp.split(",");
+        for (String str : strArr) {
+            HostAndPort host = new HostAndPort(str, redisPort);
+            hostAndPortList.add(host);
+        }
         GenericObjectPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxIdle(5); //最大空闲连接数
         poolConfig.setMaxTotal(10); // 最大连接数（空闲+使用中），不超过应用线程数，建议为应用线程数的一半

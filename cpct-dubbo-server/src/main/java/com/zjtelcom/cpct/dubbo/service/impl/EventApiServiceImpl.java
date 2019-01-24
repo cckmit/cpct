@@ -345,7 +345,7 @@ public class EventApiServiceImpl implements EventApiService {
         public Map<String, Object> cpc(Map<String, String> map) {
             //记录开始时间
             long begin = System.currentTimeMillis();
-            System.out.println(map.get("reqId") + "***事件开始**************************");
+            log.info("事件计算流程开始:" + map.get("eventCode") + "***" + map.get("reqId"));
 
             //初始化返回结果
             Map<String, Object> result = new HashMap();
@@ -747,7 +747,7 @@ public class EventApiServiceImpl implements EventApiService {
                 result.put("custId", custId);
                 return result;
             }
-            System.out.println(map.get("reqId") + "***事件结束**************************" + (System.currentTimeMillis() - begin));
+            log.info("事件计算流程开始:" + map.get("eventCode") + "***" + map.get("reqId") + "***" + (System.currentTimeMillis() - begin));
             return result;
         }
     }
@@ -979,7 +979,6 @@ public class EventApiServiceImpl implements EventApiService {
                         }
 
                     } else {
-                        System.out.println("查询销售品级标签失败:");
                         esJson.put("hit", "false");
                         esJson.put("msg", "查询销售品级标签失败");
                         esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
@@ -1725,7 +1724,6 @@ public class EventApiServiceImpl implements EventApiService {
                                 }
                                 redisUtils.set("MKT_CAM_ITEM_" + mktCamItem.getMktCamItemId(), mktCamItem);
                             }
-
                             product.put("productId", mktCamItem.getItemId().toString());
                             product.put("productCode", mktCamItem.getOfferCode());
                             product.put("productName", mktCamItem.getOfferName());
@@ -1751,6 +1749,12 @@ public class EventApiServiceImpl implements EventApiService {
 
                     //获取协同渠道所有id
                     String[] evtContactConfIdArray = evtContactConfIdStr.split("/");
+
+                    //判断需要返回的渠道
+
+
+
+
                     //初始化结果集
                     List<Future<Map<String, Object>>> threadList = new ArrayList<>();
                     //初始化线程池
@@ -1906,8 +1910,6 @@ public class EventApiServiceImpl implements EventApiService {
                         taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
                         taskChlAttrList.add(taskChlAttr);
                     }
-
-
                 }
                 if (mktCamChlConfAttr.getAttrId() == 500600010007L) {
                     if (now.after(new Date(Long.parseLong(mktCamChlConfAttr.getAttrValue())))) {
@@ -2104,10 +2106,8 @@ public class EventApiServiceImpl implements EventApiService {
     }
 
     private Map<String, Object> getLabelValue(JSONObject param) {
-//        System.out.println("paramScript " + param.toString());
         //更换为dubbo因子查询-----------------------------------------------------
         Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
-//        System.out.println(dubboResult.toString());
         return dubboResult;
     }
 

@@ -57,9 +57,6 @@ public class RedisConfig extends CachingConfigurerSupport {
             HostAndPort host = new HostAndPort(str, redisPort);
             hostAndPortList.add(host);
         }
-        HostAndPort host = new HostAndPort(redisIp, redisPort);
-        hostAndPortList.add(host);
-
         GenericObjectPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxIdle(100); //最大空闲连接数
         poolConfig.setMaxTotal(300); // 最大连接数（空闲+使用中），不超过应用线程数，建议为应用线程数的一半
@@ -70,5 +67,6 @@ public class RedisConfig extends CachingConfigurerSupport {
 
         return new CtgJedisPool(config);
     }
+
 
 }
