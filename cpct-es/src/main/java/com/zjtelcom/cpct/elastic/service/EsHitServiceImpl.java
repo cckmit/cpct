@@ -281,13 +281,13 @@ public class EsHitServiceImpl implements EsHitService {
      * @return
      */
     @Override
-    public Map<String, Object> searchLabelInfoByRuleId(String ruleId, String isi) {
+    public Map<String, Object> searchLabelInfoByRuleId(String ruleId, String isi,String hitEntity) {
         Map<String, Object> result = new HashMap<>();
         CampaignHitParam param = new CampaignHitParam();
         param.setIsi(isi);
         param.setFrom(0);
         List<Map<String, Object>> labelList = new ArrayList<>();
-        SearchHits labelHits = searchLabelByRuleId(param, ruleId, "");
+        SearchHits labelHits = searchLabelByRuleId(param, ruleId, hitEntity);
         labelList = hitsToMapList(labelList, labelHits);
         Map<String, Object> labelInfo = new HashMap<>();
         for (Map<String, Object> label : labelList) {
