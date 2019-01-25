@@ -82,7 +82,7 @@
     from trial_operation
     where
     <![CDATA[
-          UPDATE_DATE >= #{updateTime}
+          STATUS_DATE >= #{updateTime}
     ]]>
     and STATUS_CD = 1300
   </select>
