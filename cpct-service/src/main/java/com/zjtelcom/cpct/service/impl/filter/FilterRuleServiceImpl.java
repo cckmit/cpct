@@ -397,6 +397,9 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         List<FilterRule> filterRuleList = new ArrayList<>();
         for (Integer filterRuleId : filterRuleIdList) {
             FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId.longValue());
+            if (filterRule==null){
+                continue;
+            }
             filterRuleList.add(filterRule);
         }
         map.put("resultCode", CommonConstant.CODE_SUCCESS);

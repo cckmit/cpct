@@ -950,7 +950,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                             }
                         }
                     }catch (Exception e){
-                        e.printStackTrace();
+                        logger.error("iSystemPostDubboService.qrySystemPostPage接口错误！Exception = " , e);
                     }
                     mktCampaignVO.setCreateChannelName(postName);
                     mktCampaignVO.setCreateDate(mktCampaignCountDO.getCreateDate());

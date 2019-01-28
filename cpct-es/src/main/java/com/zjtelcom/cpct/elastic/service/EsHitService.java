@@ -17,5 +17,5 @@ public interface EsHitService {
 
     Map<String,Object> searchCampaignHitsTotal(CampaignHitParam param);
 
-    Map<String,Object> searchLabelInfoByRuleId(String ruleId,String isi);
+    Map<String,Object> searchLabelInfoByRuleId(String ruleId,String isi,String hitEntity);
 }

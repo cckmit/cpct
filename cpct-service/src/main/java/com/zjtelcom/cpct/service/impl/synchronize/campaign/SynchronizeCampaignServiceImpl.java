@@ -64,6 +64,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -464,38 +466,45 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
 
             // 删除展示列的标签
             redisUtils.del("MKT_ISALE_LABEL_" + mktCampaignDO.getIsaleDisplay());
-
+            ExecutorService executorService = Executors.newCachedThreadPool();
             List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOS = mktCamStrategyConfRelMapper.selectByMktCampaignId(mktCampaignId);
             for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOS) {
-                // 删除策略关系缓存
-                redisUtils.del("MKT_STRATEGY_REL_" + mktCamStrategyConfRelDO.getStrategyConfId());
-                List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(mktCamStrategyConfRelDO.getStrategyConfId());
-                for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleDOList) {
-                    // 删除客户分群标签
-                    redisUtils.del("RULE_ALL_LABEL_" + mktStrategyConfRuleDO.getTarGrpId());
-                    //表达式存入redis
-                    redisUtils.del("EXPRESS_" + mktStrategyConfRuleDO.getTarGrpId());
 
-                    // 删除推荐条目
-                    if (mktStrategyConfRuleDO.getProductId() != null) {
-                        String[] productIds = mktStrategyConfRuleDO.getProductId().split("/");
-                        if (productIds != null && !"".equals(productIds[0])) {
-                            for (String productId : productIds) {
-                                redisUtils.del("MKT_CAM_ITEM_" + productId);
+                executorService.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        // 删除策略关系缓存
+
+                        redisUtils.del("MKT_STRATEGY_REL_" + mktCamStrategyConfRelDO.getStrategyConfId());
+                        List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(mktCamStrategyConfRelDO.getStrategyConfId());
+                        for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleDOList) {
+                            // 删除客户分群标签
+                            redisUtils.del("RULE_ALL_LABEL_" + mktStrategyConfRuleDO.getTarGrpId());
+                            //表达式存入redis
+                            redisUtils.del("EXPRESS_" + mktStrategyConfRuleDO.getTarGrpId());
+
+                            // 删除推荐条目
+                            if (mktStrategyConfRuleDO.getProductId() != null) {
+                                String[] productIds = mktStrategyConfRuleDO.getProductId().split("/");
+                                if (productIds != null && !"".equals(productIds[0])) {
+                                    for (String productId : productIds) {
+                                        redisUtils.del("MKT_CAM_ITEM_" + productId);
+                                    }
+                                }
+                            }
+
+                            // 删除推送渠道
+                            if (mktStrategyConfRuleDO.getEvtContactConfId() != null) {
+                                String[] evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
+                                if (evtContactConfIds != null && !"".equals(evtContactConfIds[0])) {
+                                    for (String evtContactConfId : evtContactConfIds) {
+                                        redisUtils.del("CHL_CONF_DETAIL_" + evtContactConfIds);
+                                    }
+                                }
                             }
                         }
                     }
-
-                    // 删除推送渠道
-                    if (mktStrategyConfRuleDO.getEvtContactConfId() != null) {
-                        String[] evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
-                        if (evtContactConfIds != null && !"".equals(evtContactConfIds[0])) {
-                            for (String evtContactConfId : evtContactConfIds) {
-                                redisUtils.del("CHL_CONF_DETAIL_" + evtContactConfIds);
-                            }
-                        }
-                    }
-                }
+                });
             }
             resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             resultMap.put("resultMsg", "删除准生产环境redis成功！");
@@ -1073,16 +1082,7 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
         Map<String, Object> mktCamChlResultMap = new HashMap<>();
         try {
 //            MktCamChlResult mktCamChlResult = (MktCamChlResult) redisUtils.get("MktCamChlResult_" + parentMktCamChlResultId);
-            MktCamChlResult mktCamChlResult = null;
-            MktCamChlResultDO mktCamChlResultDO = new MktCamChlResultDO();
-            if (mktCamChlResult == null) {
-                mktCamChlResultDO = mktCamChlResultMapper.selectByPrimaryKey(parentMktCamChlResultId);
-                BeanUtil.copy(mktCamChlResultDO, mktCamChlResult);
-            } else {
-                BeanUtil.copy(mktCamChlResult, mktCamChlResultDO);
-            }
-//            redisUtils.set("MktCamChlResult_" + parentMktCamChlResultId, mktCamChlResult);
-//            redisUtils_prd.set_prd("MktCamChlResult_" + parentMktCamChlResultId, mktCamChlResult);
+            MktCamChlResultDO mktCamChlResultDO = mktCamChlResultMapper.selectByPrimaryKey(parentMktCamChlResultId);
             // 新增结果 并获取Id
             mktCamChlResultPrdMapper.insert(mktCamChlResultDO);
             // 获取原二次协同渠道下结果的推送渠道
