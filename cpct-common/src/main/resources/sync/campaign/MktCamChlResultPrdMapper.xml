@@ -4,6 +4,7 @@
   <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.campaign.MktCamChlResultDO">
     <id column="MKT_CAM_CHL_RESULT_ID" jdbcType="BIGINT" property="mktCamChlResultId" />
     <result column="MKT_CAM_CHL_RESULT_NAME" jdbcType="VARCHAR" property="mktCamChlResultName" />
+    <result column="RESULT_TYPE" jdbcType="VARCHAR" property="resultType" />
     <result column="RESULT" jdbcType="BIGINT" property="result" />
     <result column="REASON" jdbcType="BIGINT" property="reason" />
     <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
@@ -17,17 +18,21 @@
   </delete>
   <insert id="insert" useGeneratedKeys="true" keyProperty="mktCamChlResultId" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamChlResultDO">
     insert into mkt_cam_chl_result (MKT_CAM_CHL_RESULT_ID, MKT_CAM_CHL_RESULT_NAME, 
-      RESULT, REASON, CREATE_STAFF, 
+      RESULT_TYPE, RESULT, REASON, CREATE_STAFF,
       CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
       )
-    values (#{mktCamChlResultId,jdbcType=BIGINT}, #{mktCamChlResultName,jdbcType=VARCHAR}, 
-      #{result,jdbcType=BIGINT}, #{reason,jdbcType=BIGINT}, #{createStaff,jdbcType=BIGINT}, 
-      #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}
+    values (#{mktCamChlResultId,jdbcType=BIGINT}, #{mktCamChlResultName,jdbcType=VARCHAR},
+      #{resultType,jdbcType=VARCHAR}, #{result,jdbcType=BIGINT}, #{reason,jdbcType=BIGINT},
+      #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT},
+      #{updateDate,jdbcType=TIMESTAMP}
       )
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamChlResultDO">
     update mkt_cam_chl_result
     set
+    <if test="resultType != null and resultType != ''">
+      RESULT_TYPE = #{resultType,jdbcType=VARCHAR},
+    </if>
     <if test="mktCamChlResultName != null and mktCamChlResultName != ''">
       MKT_CAM_CHL_RESULT_NAME = #{mktCamChlResultName,jdbcType=VARCHAR},
     </if>
@@ -40,22 +45,29 @@
     <if test="createStaff != null and createStaff != ''">
       CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
     </if>
-    <if test="createDate != null and createDate != ''">
+    <if test="createDate != null">
       CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
     </if>
-      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
-      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
+    UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+    UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
     where MKT_CAM_CHL_RESULT_ID = #{mktCamChlResultId,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select MKT_CAM_CHL_RESULT_ID, MKT_CAM_CHL_RESULT_NAME, RESULT, REASON, CREATE_STAFF, 
+    select MKT_CAM_CHL_RESULT_ID, MKT_CAM_CHL_RESULT_NAME, RESULT_TYPE, RESULT, REASON, CREATE_STAFF,
     CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
     from mkt_cam_chl_result
     where MKT_CAM_CHL_RESULT_ID = #{mktCamChlResultId,jdbcType=BIGINT}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
-    select MKT_CAM_CHL_RESULT_ID, MKT_CAM_CHL_RESULT_NAME, RESULT, REASON, CREATE_STAFF, 
+    select MKT_CAM_CHL_RESULT_ID, MKT_CAM_CHL_RESULT_NAME, RESULT_TYPE, RESULT, REASON, CREATE_STAFF,
     CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
     from mkt_cam_chl_result
+  </select>
+  <select id="selectResultByMktCampaignId" resultMap="BaseResultMap">
+    select t.MKT_CAM_CHL_RESULT_ID, t.MKT_CAM_CHL_RESULT_NAME, t.RESULT_TYPE, t.RESULT, t.REASON,
+    t.CREATE_STAFF, t.CREATE_DATE, t.UPDATE_STAFF, t.UPDATE_DATE
+    from mkt_cam_chl_result t, mkt_cam_result_rel r
+    where t.MKT_CAM_CHL_RESULT_ID = r.MKT_RESULT_ID
+    and r.MKT_CAMPAIGN_ID = #{mktCampaignId, jdbcType=BIGINT}
   </select>
 </mapper>
