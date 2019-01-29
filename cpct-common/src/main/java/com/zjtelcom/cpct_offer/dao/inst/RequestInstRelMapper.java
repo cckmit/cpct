@@ -26,4 +26,7 @@ public interface RequestInstRelMapper {
 
     List<RequestInstRel> selectByCampaignId(@Param("requestObjId") Long requestObjId,@Param("type")String type);
 
+    int insertInfo(RequestInstRel record);
+
+
 }

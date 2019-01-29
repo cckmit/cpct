@@ -47,4 +47,10 @@ public interface RequestInfoMapper {
      * @mbg.generated
      */
     int updateByPrimaryKey(RequestInfo record);
+
+    /**
+     * 得到当前主键最大值
+     * @return
+     */
+    RequestInfo selectMaxId();
 }
