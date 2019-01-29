@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.impl.campaign;
 
+import com.alibaba.fastjson.JSON;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dataobject.SystemPost;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemPostDto;
@@ -22,6 +23,7 @@ import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.*;
+import com.zjtelcom.cpct.domain.channel.RequestInfo;
 import com.zjtelcom.cpct.domain.channel.RequestInstRel;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
@@ -44,6 +46,7 @@ import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.util.*;
+import com.zjtelcom.cpct_offer.dao.inst.RequestInfoMapper;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
@@ -1200,6 +1203,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktStrategyFilterRuleRelDO.setStrategyId(childMktCampaignId);
                     mktStrategyFilterRuleRelMapper.insert(mktStrategyFilterRuleRelDO);
                 }
+                //如果是框架活动 生成子活动后  生成对应的子需求函
+                generateRequest(childMktCampaignId);
             }
             mktCampaignMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCampaignMap.put("resultMsg", "发布活动成功！");
@@ -1211,6 +1216,46 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         }
         return mktCampaignMap;
     }
+
+    @Autowired
+    private RequestInfoMapper requestInfoMapper;
+
+    /**
+     * 生成子需求函，子活动和子需求函的关联
+     * @param childMktCampaignId 新生成的子活动id
+     */
+    public void generateRequest(Long childMktCampaignId){
+        System.out.println("开始生成子需求函");
+        RequestInfo requestInfo=new RequestInfo();
+//        RequestInfo info = requestInfoMapper.selectMaxId();
+//        long id=info.getRequestTemplateInstId()+1;
+        requestInfo.setRequestType("mkt");
+        requestInfo.setBatchNo("浙电产品套餐需求浙【2018】1000965号");
+        requestInfo.setName("活动测试");
+        requestInfo.setStatusCd("1000");
+        requestInfo.setStatusDate(new Date());
+        requestInfo.setCreateDate(new Date());
+        requestInfo.setUpdateDate(new Date());
+        requestInfoMapper.insert(requestInfo);
+        System.out.println("插入后："+ JSON.toJSONString(requestInfo));
+        //开始增加子活动和需求函的关系
+        RequestInstRel rel=new RequestInstRel();
+        rel.setRequestObjId(childMktCampaignId);
+        rel.setRequestInfoId(requestInfo.getRequestTemplateInstId());
+        rel.setRequestObjType("mkt");
+        rel.setStatusDate(new Date());
+        rel.setUpdateDate(new Date());
+        rel.setCreateDate(new Date());
+        rel.setStatusCd(STATUSCD_EFFECTIVE);
+        requestInstRelMapper.insertInfo(rel);
+
+
+
+
+    }
+
+
+
 
     /**
      * 升级活动
