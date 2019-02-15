@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.service.impl.campaign;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dataobject.SystemPost;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemPostDto;
@@ -176,6 +178,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private ISystemPostDubboService iSystemPostDubboService;
 
     private final static String createChannel = "cpcpcj0001";
+
+    @Autowired
+    private RequestInfoMapper requestInfoMapper;
+
+    //指定下发地市人员的数据集合
+    private final static String CITY_PUBLISH="CITY_PUBLISH";
 
 
 
@@ -1203,8 +1211,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktStrategyFilterRuleRelDO.setStrategyId(childMktCampaignId);
                     mktStrategyFilterRuleRelMapper.insert(mktStrategyFilterRuleRelDO);
                 }
-                //如果是框架活动 生成子活动后  生成对应的子需求函
-                generateRequest(childMktCampaignId);
+                //如果是框架活动 生成子活动后  生成对应的子需求函 下发给指定岗位的指定人员
+                generateRequest(mktCampaignDO,mktCamCityRelDO.getCityId());
             }
             mktCampaignMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCampaignMap.put("resultMsg", "发布活动成功！");
@@ -1217,30 +1225,56 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         return mktCampaignMap;
     }
 
-    @Autowired
-    private RequestInfoMapper requestInfoMapper;
+
 
     /**
-     * 生成子需求函，子活动和子需求函的关联
-     * @param childMktCampaignId 新生成的子活动id
+     * 根据地市生成子需求函，子活动和子需求函的关联，和指定的承接人员
+     * @param mktCampaignDO 新生成的子活动
+     * @param lanId 地市id
      */
-    public void generateRequest(Long childMktCampaignId){
-        System.out.println("开始生成子需求函");
+    public void generateRequest(MktCampaignDO mktCampaignDO,Long lanId){
         RequestInfo requestInfo=new RequestInfo();
-//        RequestInfo info = requestInfoMapper.selectMaxId();
-//        long id=info.getRequestTemplateInstId()+1;
         requestInfo.setRequestType("mkt");
-        requestInfo.setBatchNo("浙电产品套餐需求浙【2018】1000965号");
-        requestInfo.setName("活动测试");
+        //需求函批次号按规律递增1
+        requestInfo.setBatchNo(getBatchNo(requestInfoMapper.selectMaxBatchNo()));
+        requestInfo.setName(mktCampaignDO.getMktCampaignName());
+        requestInfo.setDesc(mktCampaignDO.getMktCampaignName());
+        requestInfo.setReason(mktCampaignDO.getMktCampaignName());
+        requestInfo.setStartDate(mktCampaignDO.getPlanBeginTime());
+        requestInfo.setExpectFinishDate(mktCampaignDO.getPlanEndTime());
         requestInfo.setStatusCd("1000");
         requestInfo.setStatusDate(new Date());
         requestInfo.setCreateDate(new Date());
         requestInfo.setUpdateDate(new Date());
+        requestInfo.setActionType("add");
+        requestInfo.setActivitiKey("mkt_force_province");  //需求函活动类型
+        requestInfo.setRequestUrgentType("一般");
+        requestInfo.setProcessType("0");
+        requestInfo.setIsstartup("1");
+        requestInfo.setReportTag("0");
+        //得到指定下发的人员信息集合
+        List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign(CITY_PUBLISH);
+        if(!sysParams.isEmpty()){
+                SysParams s=sysParams.get(0);
+                String paramValue = s.getParamValue();
+                if(StringUtils.isNotBlank(paramValue)){
+                    JSONArray jsonArray = JSONArray.parseArray(paramValue);
+                    for (int i = 0; i <jsonArray.size() ; i++) {
+                        JSONObject o = JSONObject.parseObject(JSON.toJSONString(jsonArray.get(i)));
+                        String lan =o.getString("lanId");
+                        if(lanId-Long.valueOf(lan)==0){
+                            requestInfo.setContName(o.getString("name"));
+                            requestInfo.setDeptCode(o.getString("department"));
+                            requestInfo.setCreateStaff(o.getLong("employeeId"));   //创建人,目前指定到承接人的工号
+                            break;
+                        }
+                    }
+                }
+        }
         requestInfoMapper.insert(requestInfo);
-        System.out.println("插入后："+ JSON.toJSONString(requestInfo));
         //开始增加子活动和需求函的关系
         RequestInstRel rel=new RequestInstRel();
-        rel.setRequestObjId(childMktCampaignId);
+        rel.setRequestObjId(mktCampaignDO.getMktCampaignId());
         rel.setRequestInfoId(requestInfo.getRequestTemplateInstId());
         rel.setRequestObjType("mkt");
         rel.setStatusDate(new Date());
@@ -1249,11 +1283,20 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         rel.setStatusCd(STATUSCD_EFFECTIVE);
         requestInstRelMapper.insertInfo(rel);
 
-
-
-
     }
 
+    /**
+     * 得到最新的批次编号
+     * 浙电产品套餐需求浙【2019】1002116号
+     * @param batchNo
+     * @return
+     */
+    public String getBatchNo(String batchNo){
+        String substring = batchNo.substring(0,batchNo.length() - 8);
+        Long s1=Long.valueOf(batchNo.substring(batchNo.length() - 8, batchNo.length() - 1))+1;
+        String path=substring+s1+"号";
+        return  path;
+    }
 
 
 
