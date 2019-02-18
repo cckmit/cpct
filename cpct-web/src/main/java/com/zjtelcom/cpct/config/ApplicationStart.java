@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.util.RedisUtils;
+import com.zjtelcom.cpct.util.SystemParamsUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,19 +33,34 @@ public class ApplicationStart implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
          //加载系统参数到redis
-        List<SysParams> sysParams = sysParamsMapper.selectAll(null, null);
-        log.info("初始化系统参数到redis："+ JSONObject.toJSONString(JSON.toJSON(sysParams)));
-        for (SysParams params:sysParams){
-            if (StringUtils.isNotBlank(params.getParamKey())){
-                try {
-                    redisUtils.set(params.getParamKey(),params.getParamValue());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    log.info("redis插入数据错误");
+        if(isTrue()) {
+            List<SysParams> sysParams = sysParamsMapper.selectAll(null, null);
+            log.info("初始化系统参数到redis：" + JSONObject.toJSONString(JSON.toJSON(sysParams)));
+            for (SysParams params : sysParams) {
+                if (StringUtils.isNotBlank(params.getParamKey())) {
+                    try {
+                        redisUtils.set(params.getParamKey(), params.getParamValue());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        log.info("redis插入数据错误");
+                    }
                 }
             }
+            log.info("系统参数缓存完毕");
         }
-        log.info("系统参数缓存完毕");
+    }
 
+    /**
+     * 是否初始化系统参数到redis  防止本地环境启动混淆参数
+     * @return
+     */
+    private boolean isTrue(){
+        String isOpen= SystemParamsUtil.getActiveStatus();
+        if(StringUtils.isNotBlank(isOpen)){
+            if("pst".equals(isOpen)||"pre".equals(isOpen)||"prod".equals(isOpen)||"gray".equals(isOpen)){
+                  return true;
+            }
+        }
+        return false;
     }
 }

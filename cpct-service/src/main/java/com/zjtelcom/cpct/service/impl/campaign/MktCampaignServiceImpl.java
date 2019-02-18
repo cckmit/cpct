@@ -1,5 +1,8 @@
 package com.zjtelcom.cpct.service.impl.campaign;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dataobject.SystemPost;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemPostDto;
@@ -22,6 +25,7 @@ import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.*;
+import com.zjtelcom.cpct.domain.channel.RequestInfo;
 import com.zjtelcom.cpct.domain.channel.RequestInstRel;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
@@ -44,6 +48,7 @@ import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.util.*;
+import com.zjtelcom.cpct_offer.dao.inst.RequestInfoMapper;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
@@ -173,6 +178,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private ISystemPostDubboService iSystemPostDubboService;
 
     private final static String createChannel = "cpcpcj0001";
+
+    @Autowired
+    private RequestInfoMapper requestInfoMapper;
+
+    //指定下发地市人员的数据集合
+    private final static String CITY_PUBLISH="CITY_PUBLISH";
 
 
 
@@ -950,7 +961,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                             }
                         }
                     }catch (Exception e){
-                        e.printStackTrace();
+                        logger.error("iSystemPostDubboService.qrySystemPostPage接口错误！Exception = " , e);
                     }
                     mktCampaignVO.setCreateChannelName(postName);
                     mktCampaignVO.setCreateDate(mktCampaignCountDO.getCreateDate());
@@ -1200,6 +1211,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktStrategyFilterRuleRelDO.setStrategyId(childMktCampaignId);
                     mktStrategyFilterRuleRelMapper.insert(mktStrategyFilterRuleRelDO);
                 }
+                //如果是框架活动 生成子活动后  生成对应的子需求函 下发给指定岗位的指定人员
+                generateRequest(mktCampaignDO,mktCamCityRelDO.getCityId());
             }
             mktCampaignMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCampaignMap.put("resultMsg", "发布活动成功！");
@@ -1211,6 +1224,81 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         }
         return mktCampaignMap;
     }
+
+
+
+    /**
+     * 根据地市生成子需求函，子活动和子需求函的关联，和指定的承接人员
+     * @param mktCampaignDO 新生成的子活动
+     * @param lanId 地市id
+     */
+    public void generateRequest(MktCampaignDO mktCampaignDO,Long lanId){
+        RequestInfo requestInfo=new RequestInfo();
+        requestInfo.setRequestType("mkt");
+        //需求函批次号按规律递增1
+        requestInfo.setBatchNo(getBatchNo(requestInfoMapper.selectMaxBatchNo()));
+        requestInfo.setName(mktCampaignDO.getMktCampaignName());
+        requestInfo.setDesc(mktCampaignDO.getMktCampaignName());
+        requestInfo.setReason(mktCampaignDO.getMktCampaignName());
+        requestInfo.setStartDate(mktCampaignDO.getPlanBeginTime());
+        requestInfo.setExpectFinishDate(mktCampaignDO.getPlanEndTime());
+        requestInfo.setStatusCd("1000");
+        requestInfo.setStatusDate(new Date());
+        requestInfo.setCreateDate(new Date());
+        requestInfo.setUpdateDate(new Date());
+        requestInfo.setActionType("add");
+        requestInfo.setActivitiKey("mkt_force_province");  //需求函活动类型
+        requestInfo.setRequestUrgentType("一般");
+        requestInfo.setProcessType("0");
+        requestInfo.setIsstartup("1");
+        requestInfo.setReportTag("0");
+        //得到指定下发的人员信息集合
+        List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign(CITY_PUBLISH);
+        if(!sysParams.isEmpty()){
+                SysParams s=sysParams.get(0);
+                String paramValue = s.getParamValue();
+                if(StringUtils.isNotBlank(paramValue)){
+                    JSONArray jsonArray = JSONArray.parseArray(paramValue);
+                    for (int i = 0; i <jsonArray.size() ; i++) {
+                        JSONObject o = JSONObject.parseObject(JSON.toJSONString(jsonArray.get(i)));
+                        String lan =o.getString("lanId");
+                        if(lanId-Long.valueOf(lan)==0){
+                            requestInfo.setContName(o.getString("name"));
+                            requestInfo.setDeptCode(o.getString("department"));
+                            requestInfo.setCreateStaff(o.getLong("employeeId"));   //创建人,目前指定到承接人的工号
+                            break;
+                        }
+                    }
+                }
+        }
+        requestInfoMapper.insert(requestInfo);
+        //开始增加子活动和需求函的关系
+        RequestInstRel rel=new RequestInstRel();
+        rel.setRequestObjId(mktCampaignDO.getMktCampaignId());
+        rel.setRequestInfoId(requestInfo.getRequestTemplateInstId());
+        rel.setRequestObjType("mkt");
+        rel.setStatusDate(new Date());
+        rel.setUpdateDate(new Date());
+        rel.setCreateDate(new Date());
+        rel.setStatusCd(STATUSCD_EFFECTIVE);
+        requestInstRelMapper.insertInfo(rel);
+
+    }
+
+    /**
+     * 得到最新的批次编号
+     * 浙电产品套餐需求浙【2019】1002116号
+     * @param batchNo
+     * @return
+     */
+    public String getBatchNo(String batchNo){
+        String substring = batchNo.substring(0,batchNo.length() - 8);
+        Long s1=Long.valueOf(batchNo.substring(batchNo.length() - 8, batchNo.length() - 1))+1;
+        String path=substring+s1+"号";
+        return  path;
+    }
+
+
 
     /**
      * 升级活动

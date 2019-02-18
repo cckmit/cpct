@@ -117,7 +117,7 @@
         <if test= "createDate!=null">CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},</if>
         <if test= "updateStaff!=null">UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},</if>
         REMARK = #{remark,jdbcType=VARCHAR},
-        CREATE_CHANNEL = #{createChannel,jdbcType=VARCHAR},
+        <if test= "createChannel!=null">CREATE_CHANNEL = #{createChannel,jdbcType=VARCHAR},</if>
         DIRECTORY_ID = #{directoryId,jdbcType=BIGINT},
         <if test= "lanId!=null">LAN_ID = #{lanId,jdbcType=BIGINT},</if>
         CAM_LEVEL = #{camLevel,jdbcType=BIGINT},
