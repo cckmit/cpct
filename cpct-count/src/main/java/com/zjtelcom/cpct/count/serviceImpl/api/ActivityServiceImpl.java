@@ -280,7 +280,7 @@ public class ActivityServiceImpl implements ActivityService {
             return result;
         }else{
             for (RequestInstRel requestInstRel:mkt){
-                if(Long.valueOf(requestInfoId)==requestInstRel.getRequestInfoId()){
+                if(Long.valueOf(requestInfoId)-requestInstRel.getRequestInfoId()==0){
                     //存在记录
                     tip=true;
                     break;
