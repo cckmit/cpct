@@ -6,12 +6,15 @@ import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.dto.grouping.TrialOperationVO;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
+import com.zjtelcom.cpct.util.ChannelUtil;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -104,15 +107,27 @@ public class TrialOperationController extends BaseController {
         Map<String, Object> result = new HashMap<>();
         try {
 
+            InputStream inputStream = file.getInputStream();
+            byte[] bytes = new byte[3];
+            inputStream.read(bytes,0,bytes.length);
+            String head = ChannelUtil.bytesToHexString(bytes);
+            head = head.toUpperCase();
+            if (!head.equals("D0CF11") && !head.equals("504B03")){
+                result.put("resultCode", CODE_FAIL);
+                result.put("resultMsg", "文件格式不正确");
+                return result;
+            }
             result = operationService.importUserList(file,operation,ruleId);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to importUserList", e);
             result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", " fail to importUserList");
+            result.put("resultMsg", "客户清单导入失败！");
             return result;
         }
         return result;
     }
+
+
 
     /**
      * 策略试运算统计查询
