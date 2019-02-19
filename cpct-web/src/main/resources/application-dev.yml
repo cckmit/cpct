@@ -13,7 +13,7 @@ spring:
 
 # 第二数据源
   datasourceprd:
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.jdbc.Driver初始化系统参数到redis
     url: jdbc:mysql://47.94.168.117:3306/fpc_system?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
     username: root
     password: Yanlei2018

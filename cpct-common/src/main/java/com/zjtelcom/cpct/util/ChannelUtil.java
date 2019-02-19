@@ -9,6 +9,7 @@ import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.Operator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -315,26 +316,26 @@ public class ChannelUtil  {
 
     public static Object getCellValue(Cell cell) {
         Object cellValue;
+        if (cell==null){
+            return "null";
+        }
         switch (cell.getCellTypeEnum()){
             case NUMERIC://数字
-                cellValue = cell.getNumericCellValue() + "";
+                cell.setCellType(CellType.STRING);
+                cellValue = cell.getStringCellValue() + "";
                 break;
             case STRING: // 字符串
-                cellValue = cell.getStringCellValue();
+                cellValue = cell.getStringCellValue()+"";
                 break;
-
             case BOOLEAN: // Boolean
                 cellValue = cell.getBooleanCellValue() + "";
                 break;
-
             case FORMULA: // 公式
                 cellValue = cell.getCellFormula() + "";
                 break;
-
             case BLANK: // 空值
-                cellValue = "";
+                cellValue = "null";
                 break;
-
             case ERROR: // 故障
                 cellValue = "非法字符";
                 break;

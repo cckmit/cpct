@@ -31,6 +31,46 @@ public class TrialOperationController extends BaseController {
 
 
     /**
+     * 查询试算记录日志
+     * @param param
+     * @return
+     */
+    @PostMapping("trialLog")
+    @CrossOrigin
+    public Map<String, Object> trialLog( @RequestBody HashMap<String, Long> param){
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = operationService.trialLog(param.get("batchId"));
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to trialLog", e);
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", " fail to trialLog");
+            return result;
+        }
+        return result;
+    }
+
+    /**
+     * 下发文件到生产sftp
+     * @param param
+     * @return
+     */
+    @PostMapping("uploadFile")
+    @CrossOrigin
+    public Map<String, Object> uploadFile( @RequestBody HashMap<String, Long> param){
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = operationService.uploadFile(param.get("batchId"));
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to uploadFile", e);
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", " fail to uploadFile");
+            return result;
+        }
+        return result;
+    }
+
+    /**
      * 抽样业务校验
      * @param operation
      * @return
