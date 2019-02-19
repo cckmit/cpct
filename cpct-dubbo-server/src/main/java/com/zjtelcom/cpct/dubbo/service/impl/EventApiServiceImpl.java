@@ -348,6 +348,9 @@ public class EventApiServiceImpl implements EventApiService {
             long begin = System.currentTimeMillis();
             log.info("事件计算流程开始:" + map.get("eventCode") + "***" + map.get("reqId"));
 
+            //初始化返回结果中的工单信息
+            List<Map<String, Object>> activityList = new ArrayList<>();
+
             //初始化返回结果
             Map<String, Object> result = new HashMap();
 
@@ -512,7 +515,7 @@ public class EventApiServiceImpl implements EventApiService {
                 timeJson.put("time3", System.currentTimeMillis() - begin);
 
                 if (resultByEvent == null || resultByEvent.size() <= 0) {
-                    log.info("预校验均为空");
+                    log.info("预校验为空");
                     long cost = System.currentTimeMillis() - begin;
                     esJson.put("timeCost", cost);
                     esJson.put("hit", false);
@@ -523,15 +526,18 @@ public class EventApiServiceImpl implements EventApiService {
                     //事件采集项没有客户编码
                     result.put("CPCResultCode", "1000");
                     result.put("CPCResultMsg", "success");
+                    result.put("taskList", activityList);
 
                     paramsJson.put("backParams", result);
                     timeJson.put("time7", System.currentTimeMillis() - begin);
                     esHitService.save(paramsJson, IndexList.PARAMS_MODULE);
+
+                    log.info("事件计算流程结束:" + map.get("eventCode") + "***" + map.get("reqId") + "（" + (System.currentTimeMillis() - begin) + "）");
+
                     return result;
                 }
 
-                //初始化返回结果中的工单信息
-                List<Map<String, Object>> activityList = new ArrayList<>();
+
 
                 //判断有没有客户级活动
                 Boolean hasCust = false;  //是否有客户级
@@ -617,7 +623,7 @@ public class EventApiServiceImpl implements EventApiService {
                             esJson.put("hitEntity", map.get("accNbr")); //命中对象
                             esJson.put("hit", false);
                             esJson.put("msg", "客户级资产查询出错");
-                            esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                            esHitService.save(esJson, IndexList.ACTIVITY_MODULE,map.get("reqId") + activeMap.get("mktCampaginId") + map.get("accNbr"));
                         }
                     } else {
                         //资产级
@@ -804,7 +810,7 @@ public class EventApiServiceImpl implements EventApiService {
                         //活动信息查询失败
                         esJson.put("hit", false);
                         esJson.put("msg", "活动信息查询失败，活动为null");
-                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
                         return Collections.EMPTY_MAP;
                     } else {
                         redisUtils.set("MKT_CAMPAIGN_" + activityId, mktCampaign);
@@ -814,7 +820,7 @@ public class EventApiServiceImpl implements EventApiService {
                 e.printStackTrace();
                 esJson.put("hit", false);
                 esJson.put("msg", "活动信息查询失败");
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
                 return Collections.EMPTY_MAP;
             }
 
@@ -822,7 +828,7 @@ public class EventApiServiceImpl implements EventApiService {
                 //活动信息查询失败
                 esJson.put("hit", false);
                 esJson.put("msg", "活动信息查询失败，活动为null");
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
                 return Collections.EMPTY_MAP;
             }
 
@@ -868,7 +874,7 @@ public class EventApiServiceImpl implements EventApiService {
                 } catch (Exception e) {
                     esJson.put("hit", false);
                     esJson.put("msg", "获取活动下所有标签异常");
-                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
                     return Collections.EMPTY_MAP;
                 }
             }
@@ -879,7 +885,7 @@ public class EventApiServiceImpl implements EventApiService {
                 log.info("获取活动下所有标签失败");
                 esJson.put("hit", false);
                 esJson.put("msg", "获取活动下所有标签失败");
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
                 return Collections.EMPTY_MAP;
             } else {
                 String saleId = "";
@@ -910,7 +916,7 @@ public class EventApiServiceImpl implements EventApiService {
                         log.info("查询资产标签失败");
                         esJson.put("hit", "false");
                         esJson.put("msg", "查询资产标签失败");
-                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
                         return Collections.EMPTY_MAP;
                     }
                 }
@@ -941,7 +947,7 @@ public class EventApiServiceImpl implements EventApiService {
                     } else {
                         esJson.put("hit", "false");
                         esJson.put("msg", "查询客户标签失败");
-                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
                         return Collections.EMPTY_MAP;
                     }
                 }
@@ -954,7 +960,7 @@ public class EventApiServiceImpl implements EventApiService {
                         esJson.put("hit", false);
                         esJson.put("msg", "主销售品数据错误");
                         log.info("主销售品数据错误");
-                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
                         return Collections.EMPTY_MAP;
                     }
 
@@ -974,11 +980,10 @@ public class EventApiServiceImpl implements EventApiService {
                             //添加到上下文
                             context.put(entry.getKey(), entry.getValue());
                         }
-
                     } else {
                         esJson.put("hit", "false");
                         esJson.put("msg", "查询销售品级标签失败");
-                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
                         return Collections.EMPTY_MAP;
                     }
                 }
@@ -999,7 +1004,7 @@ public class EventApiServiceImpl implements EventApiService {
                     //过滤规则信息查询失败
                     esJson.put("hit", false);
                     esJson.put("msg", "过滤规则信息查询失败");
-                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
                     return Collections.EMPTY_MAP;
                 } else {
                     redisUtils.set("MKT_FILTER_RULE_IDS_" + activityId, filterRuleIds);
@@ -1017,7 +1022,7 @@ public class EventApiServiceImpl implements EventApiService {
 //                            //过滤规则信息查询失败
 //                            esJson.put("hit", false);
 //                            esJson.put("msg", "过滤规则信息查询失败 byId: " + filterRuleId);
-//                            esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+//                            esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
 //                            return Collections.EMPTY_MAP;
 //                        } else {
 //                            redisUtils.set("FILTER_RULE_" + filterRuleId, filterRule);
@@ -1080,7 +1085,7 @@ public class EventApiServiceImpl implements EventApiService {
                             if (productCheck) {
                                 esJson.put("hit", "false");
                                 esJson.put("msg", "销售品过滤验证未通过:" + esMsg);
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
                                 return Collections.EMPTY_MAP;
                             }
                         }
@@ -1097,7 +1102,7 @@ public class EventApiServiceImpl implements EventApiService {
                                 //过滤规则信息查询失败
                                 esJson.put("hit", false);
                                 esJson.put("msg", "过扰规则信息查询失败 byId: " + filterRuleId);
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
                                 return Collections.EMPTY_MAP;
                             } else {
                                 redisUtils.set("FILTER_RULE_DISTURB_" + filterRuleId, labels);
@@ -1232,12 +1237,12 @@ public class EventApiServiceImpl implements EventApiService {
                     esJson.put("hit", false);
                     esJson.put("msg", "策略均未命中");
                 }
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
 
             } catch (Exception e) {
                 esJson.put("hit", false);
                 esJson.put("msg", "获取计算结果异常");
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
                 //发生异常关闭线程池
                 executorService.shutdown();
             } finally {
@@ -3124,6 +3129,11 @@ public class EventApiServiceImpl implements EventApiService {
                     if (!(now.after(mktStrategyConf.getBeginTime()) && now.before(mktStrategyConf.getEndTime()))) {
                         //若当前时间在策略生效时间外
 //                    log.info("当前时间不在策略生效时间内");
+
+                        esJson.put("hit", false);
+                        esJson.put("msg", "策略未命中");
+                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE,reqId + mktCampaginId + accNbr);
+
                         esJsonStrategy.put("hit", false);
                         esJsonStrategy.put("msg", "当前时间不在策略生效时间内");
                         esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
@@ -3142,6 +3152,11 @@ public class EventApiServiceImpl implements EventApiService {
                             } else {
                                 //适用地市获取异常 lanId
 //                            log.info("适用地市获取异常");
+
+                                esJson.put("hit", false);
+                                esJson.put("msg", "策略未命中");
+                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,reqId + mktCampaginId + accNbr);
+
                                 strategyMap.put("msg", "适用地市获取异常");
                                 esJsonStrategy.put("hit", "false");
                                 esJsonStrategy.put("msg", "适用地市获取异常");
@@ -3149,6 +3164,11 @@ public class EventApiServiceImpl implements EventApiService {
                             }
                         }
                         if (areaCheck) {
+
+                            esJson.put("hit", false);
+                            esJson.put("msg", "策略未命中");
+                            esHitService.save(esJson, IndexList.ACTIVITY_MODULE,reqId + mktCampaginId + accNbr);
+
                             strategyMap.put("msg", "适用地市不符");
                             esJsonStrategy.put("hit", "false");
                             esJsonStrategy.put("msg", "适用地市不符");
@@ -3158,6 +3178,11 @@ public class EventApiServiceImpl implements EventApiService {
                     } else {
                         //适用地市数据异常
 //                    log.info("适用地市数据异常");
+
+                        esJson.put("hit", false);
+                        esJson.put("msg", "策略未命中");
+                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE,reqId + mktCampaginId + accNbr);
+
                         strategyMap.put("msg", "适用地市数据异常");
                         esJsonStrategy.put("hit", "false");
                         esJsonStrategy.put("msg", "适用地市数据异常");
@@ -3184,6 +3209,11 @@ public class EventApiServiceImpl implements EventApiService {
                             } else {
                                 //适用地市获取异常 lanId
 //                            log.info("适用渠道获取异常");
+
+                                esJson.put("hit", false);
+                                esJson.put("msg", "策略未命中");
+                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,reqId + mktCampaginId + accNbr);
+
                                 strategyMap.put("msg", "适用渠道获取异常");
                                 esJsonStrategy.put("hit", "false");
                                 esJsonStrategy.put("msg", "适用渠道获取异常");
@@ -3192,6 +3222,11 @@ public class EventApiServiceImpl implements EventApiService {
                         }
                         if (channelCheck) {
 //                        log.info("适用渠道不符");
+
+                            esJson.put("hit", false);
+                            esJson.put("msg", "策略未命中");
+                            esHitService.save(esJson, IndexList.ACTIVITY_MODULE,reqId + mktCampaginId + accNbr);
+
                             strategyMap.put("msg", "适用渠道不符");
                             esJsonStrategy.put("hit", "false");
                             esJsonStrategy.put("msg", "适用渠道不符");
@@ -3201,6 +3236,11 @@ public class EventApiServiceImpl implements EventApiService {
                     } else {
                         //适用地市数据异常
                         log.info("适用渠道数据异常");
+
+                        esJson.put("hit", false);
+                        esJson.put("msg", "策略未命中");
+                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE,reqId + mktCampaginId + accNbr);
+
                         strategyMap.put("msg", "适用渠道数据异常");
                         esJsonStrategy.put("hit", "false");
                         esJsonStrategy.put("msg", "适用渠道数据异常");

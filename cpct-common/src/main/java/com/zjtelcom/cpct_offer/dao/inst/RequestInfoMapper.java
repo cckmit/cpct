@@ -47,4 +47,10 @@ public interface RequestInfoMapper {
      * @mbg.generated
      */
     int updateByPrimaryKey(RequestInfo record);
+
+    /**
+     * 得到当前需求函最大批次编码
+     * @return
+     */
+    String selectMaxBatchNo();
 }

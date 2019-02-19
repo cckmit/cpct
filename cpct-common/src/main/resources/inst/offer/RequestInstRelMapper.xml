@@ -77,4 +77,18 @@
   </select>
 
 
+  <insert id="insertInfo" parameterType="com.zjtelcom.cpct.domain.channel.RequestInstRel">
+    <selectKey keyColumn="requestInstRelId" keyProperty="requestInstRelId" order="BEFORE" resultType="Long">
+      select max(request_inst_rel_id)+1 as requestInstRelId from request_inst_rel
+    </selectKey>
+    insert into request_inst_rel (request_inst_rel_id, request_info_id, request_obj_id,
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    STATUS_DATE, CREATE_DATE, UPDATE_DATE,
+    REMARK, request_obj_type)
+    values (#{requestInstRelId,jdbcType=BIGINT}, #{requestInfoId,jdbcType=BIGINT}, #{requestObjId,jdbcType=BIGINT},
+    #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT},
+    #{statusDate,jdbcType=TIMESTAMP}, #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP},
+    #{remark,jdbcType=VARCHAR}, #{requestObjType,jdbcType=VARCHAR})
+  </insert>
+
 </mapper>

@@ -495,8 +495,10 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                     for (int i = 0; i < mktCamChlResultIds.length; i++) {
                         if (mktCamChlResultIds[i] != null && !"".equals(mktCamChlResultIds[i])) {
                             MktCamChlResultDO mktCamChlResultDO = mktCamChlResultMapper.selectByPrimaryKey(Long.valueOf(mktCamChlResultIds[i]));
-                            MktCamChlResult mktCamChlResult = BeanUtil.create(mktCamChlResultDO, new MktCamChlResult());
-                            mktCamChlResultList.add(mktCamChlResult);
+                            if(mktCamChlResultDO!=null){
+                                MktCamChlResult mktCamChlResult = BeanUtil.create(mktCamChlResultDO, new MktCamChlResult());
+                                mktCamChlResultList.add(mktCamChlResult);
+                            }
                         }
                     }
                     mktStrategyConfRule.setMktCamChlResultList(mktCamChlResultList);
