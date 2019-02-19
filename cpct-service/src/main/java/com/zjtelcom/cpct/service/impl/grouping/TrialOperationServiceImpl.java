@@ -477,6 +477,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         request.setBatchNum(Long.valueOf(batchNumSt));
         request.setCampaignType(campaignDO.getMktCampaignType());
         request.setLanId(campaignDO.getLanId());
+        request.setCampaignName(campaignDO.getMktCampaignName());
         request.setCamLevel(campaignDO.getCamLevel());
         // 获取创建人员code
         request.setStaffCode("SYS987329864");
