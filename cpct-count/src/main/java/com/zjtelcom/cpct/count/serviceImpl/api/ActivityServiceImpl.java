@@ -16,6 +16,7 @@ import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignCountDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.campaign.MktOperatorLogDO;
+import com.zjtelcom.cpct.domain.channel.RequestInfo;
 import com.zjtelcom.cpct.domain.channel.RequestInstRel;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.campaign.MktCampaign;
@@ -199,6 +200,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public Map<String, Object> getCampaignList(Map<String, Object> paramMap) {
+        log.info("getCampaignList请求入参:"+paramMap);
         Map<String, Object> map=new HashMap<>();
         map.put("resultCode", ResultEnum.SUCCESS.getStatus());
         map.put("resultMsg", "操作成功");
@@ -269,9 +271,33 @@ public class ActivityServiceImpl implements ActivityService {
             result.put("resultMsg", "活动id和需求函id信息不能为空");
             return result;
         }
-        //删除活动和需求函关联关系
-        requestInstRelMapper.deleteByCampaignId(Long.valueOf(requestInfoId),Long.valueOf(mktCampaignId));
-        return result;
+        //先判断活动和需求函对应的记录是否存在
+        List<RequestInstRel> mkt = requestInstRelMapper.selectByCampaignId(Long.valueOf(mktCampaignId), "mkt");
+        boolean tip=false;
+        if(mkt.isEmpty()){
+            result.put("resultCode", ResultEnum.FAILED.getStatus());
+            result.put("resultMsg", "活动"+mktCampaignId+"没有关联的需求函信息");
+            return result;
+        }else{
+            for (RequestInstRel requestInstRel:mkt){
+                if(Long.valueOf(requestInfoId)-requestInstRel.getRequestInfoId()==0){
+                    //存在记录
+                    tip=true;
+                    break;
+                }
+            }
+        }
+        if(tip){
+            //删除活动和需求函关联关系
+            requestInstRelMapper.deleteByCampaignId(Long.valueOf(requestInfoId),Long.valueOf(mktCampaignId));
+            return result;
+        }else{
+            result.put("resultCode", ResultEnum.FAILED.getStatus());
+            result.put("resultMsg", "活动"+mktCampaignId+"和需求函id "+requestInfoId+"没有关联关系,无需删除");
+            return result;
+        }
+
+
     }
 
 
@@ -287,12 +313,14 @@ public class ActivityServiceImpl implements ActivityService {
         String mktCampaignName = (String) map.get("mktCampaignName");
         String mktActivityNbr = (String) map.get("mktActivityNbr");
         String mktCampaignType = (String) map.get("mktCampaignType");
+        String status=(String) map.get("statusCd");  //活动状态 我们目前流程只返回已发布的活动
         Integer page= (Integer) map.get("page") ;
         Integer pageSize= (Integer) map.get("pageSize") ;
         MktCampaignDO mktCampaignDO = new MktCampaignDO();
         mktCampaignDO.setMktCampaignName(mktCampaignName);
         mktCampaignDO.setMktActivityNbr(mktActivityNbr);
         mktCampaignDO.setMktCampaignType(mktCampaignType);
+        mktCampaignDO.setStatusCd(status);
         if(page==null){
             page=1;
         }
@@ -301,14 +329,26 @@ public class ActivityServiceImpl implements ActivityService {
         }
         PageHelper.startPage(page,pageSize);
         List<MktCampaignCountDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListPage(mktCampaignDO);
-        result.put("data",mktCampaignDOList);
-        result.put("pageInfo",new Page(new PageInfo(mktCampaignDOList)));
+        List<MktCampaignCountDO> list=new ArrayList<>();
+        for (MktCampaignCountDO mktCampaignCountDO:mktCampaignDOList){
+             list.add(mktCampaignCountDO);
+        }
+        result.put("data",list);
+        Page p=new Page(new PageInfo(mktCampaignDOList));
+        JSONObject json=new JSONObject();
+        json.put("page",p.getPage());
+        json.put("pageSize",p.getPageSize());
+        json.put("total",p.getTotal());
+        json.put("totalPage",p.getTotalPage());
+        result.put("pageInfo",json);
         return result;
     }
 
 
     /**
-     * 判断该活动是否和某个需求函关联了
+     * 判断该活动是否和某个需求函关联了  而且这个需求函是未办结的  这样的活动是不能被新的需求函关联的
+     * request_info的ISSTARTUP的值为2则 需求函已办结
+     * 如果满足关联条件则将该活动的状态改为已暂停
      * @param map
      * @return
      */
@@ -326,11 +366,34 @@ public class ActivityServiceImpl implements ActivityService {
         String[] split = ids.split(",");
         for (int i = 0; i <split.length ; i++) {
             System.out.println("当前split:"+split[i]);
+            //活动是否和需求函有关联
             List<RequestInstRel> mkt = requestInstRelMapper.selectByCampaignId(Long.valueOf(split[i]), "mkt");
-            //如果存在关联关系则返回对应提醒
             if(mkt!=null&&!mkt.isEmpty()){
+                //判断该需求函是否已办结  如果未办结则不能关联新的需求函
+                for (RequestInstRel requestInstRel:mkt){
+                    RequestInfo requestInfo = requestInfoMapper.selectByPrimaryKey(requestInstRel.getRequestInfoId());
+                    if (requestInfo!=null&&!"2".equals(requestInfo.getIsstartup())){
+                        result.put("resultCode", ResultEnum.FAILED.getStatus());
+                        result.put("resultMsg", "活动id "+mkt.get(0).getRequestObjId()+"和未办结的需求函id "+requestInstRel.getRequestInfoId()+"存在关联关系");
+                        return result;
+                    }
+                }
+
+            }
+        }
+
+        for (int i = 0; i <split.length ; i++) {
+            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(split[i]));
+            if(mktCampaignDO!=null){
+                //如果活动状态是已发布则改为已暂停
+                if(mktCampaignDO.getStatusCd().equals(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode())) {
+                    mktCampaignMapper.changeMktCampaignStatus(Long.valueOf(split[i]), StatusCode.STATUS_CODE_STOP.getStatusCode(), new Date(), 1L);
+                    //活动修改后 增加修改操作记录
+                    addOperatorLog(mktCampaignDO, StatusEnum.PAUSE.getStatusCode(), "cpc", StatusCode.STATUS_CODE_STOP.getStatusCode());
+                }
+            }else{
                 result.put("resultCode", ResultEnum.FAILED.getStatus());
-                result.put("resultMsg", "活动id "+mkt.get(0).getRequestObjId()+"和需求函id "+mkt.get(0).getRequestInfoId()+"存在关联关系");
+                result.put("resultMsg", "活动id "+Long.valueOf(split[i])+"对应活动信息不存在");
                 return result;
             }
         }
@@ -411,7 +474,7 @@ public class ActivityServiceImpl implements ActivityService {
         mktOperatorLogDO.setMktCampaignName(mktCampaign.getMktCampaignName());
         mktOperatorLogDO.setMktCampaignId(mktCampaign.getMktCampaignId());
         mktOperatorLogDO.setMktActivityNbr(mktCampaign.getMktActivityNbr());
-        mktOperatorLogDO.setOperatorType("调用00.1083.changeActivityStatus服务 操作类型："+StatusEnum.getNameByCode(type));
+        mktOperatorLogDO.setOperatorType("操作类型："+StatusEnum.getNameByCode(type));
         if(StringUtils.isNotBlank(mktCampaign.getStatusCd())){
             //修改前
             mktOperatorLogDO.setMktCampaignStateBefore(mktCampaign.getStatusCd());

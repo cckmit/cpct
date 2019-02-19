@@ -49,8 +49,8 @@ public interface RequestInfoMapper {
     int updateByPrimaryKey(RequestInfo record);
 
     /**
-     * 得到当前主键最大值
+     * 得到当前需求函最大批次编码
      * @return
      */
-    RequestInfo selectMaxId();
+    String selectMaxBatchNo();
 }

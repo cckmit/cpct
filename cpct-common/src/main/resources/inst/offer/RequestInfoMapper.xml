@@ -128,15 +128,10 @@
   </select>
 
 
-  <select id="selectMaxId" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select REQUEST_TEMPLATE_INST_ID, BATCH_NO, `NAME`, `DESC`, DEPT_CODE, CONT_NAME, CONT_TELE,
-    START_DATE, FINISH_DATE, EXPECT_FINISH_DATE, REQUEST_TYPE, ACTION_TYPE, ACTIVITI_KEY,
-    REQUEST_URGENT_TYPE, REASON, PROCESS_TYPE, ISSTARTUP, STATUS_CD, STATUS_DATE, CREATE_STAFF,
-    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, ATTR_VAL, TEST_TYPE, PRIORITY, PST_DATE,
-    PROD_DATE, OUTLINE_DESIGN, TEST_POINTS, JT_CONT_NAME, JT_CONT_TELE, PATCH_SERIAL,
-    business_type, report_tag
+  <select id="selectMaxBatchNo" resultType="java.lang.String">
+    select BATCH_NO
     from request_info
-    ORDER BY REQUEST_TEMPLATE_INST_ID desc LIMIT 1
+    ORDER BY BATCH_NO desc LIMIT 1
   </select>
 
   <select id="selectAll" resultMap="BaseResultMap">
