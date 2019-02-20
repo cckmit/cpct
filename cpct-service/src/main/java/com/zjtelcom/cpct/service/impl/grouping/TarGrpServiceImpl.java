@@ -114,6 +114,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                     if (idlIst.contains(label.getInjectionLabelId())) {
                         continue;
                     }
+                    idlIst.add(label.getInjectionLabelId());
                     codeList(assetCode, promCode, custCode, label);
                 }
             }
@@ -126,6 +127,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                         if (idlIst.contains(label.getInjectionLabelId())) {
                             continue;
                         }
+                        idlIst.add(label.getInjectionLabelId());
                         codeList(assetCode, promCode, custCode, label);
                     }
                 }
@@ -148,11 +150,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                             List<String> labelSc = subScript(camScript.getScriptDesc());
                             for (String code : labelSc){
                                 Label label = injectionLabelMapper.selectByLabelCode(code);
-
                                 if (label!=null){
                                     if (idlIst.contains(label.getInjectionLabelId())){
                                         continue;
                                     }
+                                    idlIst.add(label.getInjectionLabelId());
                                     codeList(assetCode, promCode, custCode, label);
                                 }
 
@@ -168,6 +170,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                                     if (idlIst.contains(label.getInjectionLabelId())){
                                         continue;
                                     }
+                                    idlIst.add(label.getInjectionLabelId());
                                     codeList(assetCode, promCode, custCode, label);
                                 }
                             }
