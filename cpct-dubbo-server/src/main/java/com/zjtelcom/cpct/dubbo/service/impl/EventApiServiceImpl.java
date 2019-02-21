@@ -1725,11 +1725,11 @@ public class EventApiServiceImpl implements EventApiService {
                                     if (mktCamItem == null) {
                                         continue;
                                     }
-                                    mktCamItemList.add(mktCamItem);
                                     redisUtils.set("MKT_CAM_ITEM_" + mktCamItem.getMktCamItemId(), mktCamItem);
                                 }
-
+                                mktCamItemList.add(mktCamItem);
                             }
+                            redisUtils.set("MKT_CAM_ITEM_LIST_" + ruleId.toString(), mktCamItemList);
                         }
                         for (MktCamItem mktCamItem : mktCamItemList) {
                             Map<String, String> product = new HashMap<>();
@@ -3113,13 +3113,13 @@ public class EventApiServiceImpl implements EventApiService {
 
                 // 判断活动状态
 
-                if (!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaign.getStatusCd())) {
+/*                if (!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaign.getStatusCd())) {
                     esJson.put("hit", false);
                     esJson.put("msg", "活动状态未发布");
 //                log.info("活动状态未发布");
                     esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
                     return Collections.EMPTY_MAP;
-                }
+                }*/
 
 
                 // 判断活动类型
@@ -3422,7 +3422,7 @@ public class EventApiServiceImpl implements EventApiService {
                 }
                 labelResultList.add(lr);
             }
-            esJson.put("labelResultList", 1);
+            esJson.put("labelResultList", JSONArray.toJSON(labelResultList));
             esHitService.save(esJson, IndexList.Label_MODULE);  //储存标签比较结果
         }
     }
