@@ -230,7 +230,7 @@ public class TrialOperationController extends BaseController {
     }
 
     /**
-     * 刷新列表
+     * 刷新列表(策略试运算)
      *
      * @param
      * @return
@@ -251,6 +251,26 @@ public class TrialOperationController extends BaseController {
 
     }
 
+    /**
+     * 刷新列表(客户清单导入)
+     *
+     * @param
+     * @return
+     */
+    @PostMapping("getTrialListByRuleId")
+    @CrossOrigin
+    public Map<String, Object> getTrialListByRuleId(@RequestBody HashMap<String, Long> param) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = operationService.getTrialListByRuleId(param.get("ruleId"));
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to getTrialListByRuleId", e);
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", " fail to getTrialListByRuleId");
+            return result;
+        }
+        return result;
 
+    }
 
 }

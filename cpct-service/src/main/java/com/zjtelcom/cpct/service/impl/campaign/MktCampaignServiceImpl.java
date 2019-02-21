@@ -956,6 +956,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                                 if(dataList!=null){
                                     if(dataList.get(0)!=null){
                                         postName = dataList.get(0).getSysPostName();
+                                        logger.info("--->>> 岗位信息：" + postName);
                                     }
                                 }
                             }
@@ -972,6 +973,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     if (systemUserDtoSysmgrResultObject != null) {
                         if (systemUserDtoSysmgrResultObject.getResultObject() != null) {
                             mktCampaignVO.setCreateStaffName(systemUserDtoSysmgrResultObject.getResultObject().getStaffName());
+                            logger.info("--->>> 创建人信息：" + systemUserDtoSysmgrResultObject.getResultObject().getStaffName());
                         }
                     }
 

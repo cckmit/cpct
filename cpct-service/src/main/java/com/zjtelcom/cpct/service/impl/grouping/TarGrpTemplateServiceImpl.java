@@ -11,12 +11,14 @@ import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateMapper;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO;
 import com.zjtelcom.cpct.dto.channel.*;
+import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.*;
 import com.zjtelcom.cpct.enums.LeftParamType;
 import com.zjtelcom.cpct.enums.Operator;
@@ -79,6 +81,8 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     private OfferMapper offerMapper;
     @Autowired
     private ContactChannelMapper channelMapper;
+    @Autowired
+    private FilterRuleMapper filterRuleMapper;
     @Autowired
     private ProductService productService;
     @Value("${sync.value}")
@@ -472,7 +476,14 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             tarGrpTemConditionVO.setValueList(valueList);
             tarGrpTemConditionVO.setConditionType(label.getConditionType());
             tarGrpTemConditionVO.setOperatorList(operatorList);
+            tarGrpTemConditionVO.setLabelCode(label.getInjectionLabelCode());
             tarGrpTemConditionVOList.add(tarGrpTemConditionVO);
+            if ("PROM_LIST".equals(label.getInjectionLabelCode()) && tarGrpTemConditionVO.getRightParam()!=null){
+                FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.valueOf(tarGrpTemConditionVO.getRightParam()));
+                if (filterRule!=null){
+                    tarGrpTemConditionVO.setPromListName(filterRule.getRuleName());
+                }
+            }
         }
         tarGrpTemplateDetail.setTarGrpTemConditionVOList(tarGrpTemConditionVOList);
         tarGrpTemplateMap.put("resultCode", CommonConstant.CODE_SUCCESS);

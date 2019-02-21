@@ -62,8 +62,8 @@ public class SysStaffController extends BaseController {
             for (PrivilegeDetail detail : userDetail.getPrivilegeDetails()){
                 Long detailId = detail.getPrivFuncRelDetails().get(0).getFuncMenu().getParMenuId();
                 if (detailId!=null && detailId.equals(parentId) ){
-                    String urlAddr = detail.getPrivFuncRelDetails().get(0).getFuncMenu().getUrlAddr();
-                    String detailName = urlAddr.substring(1,urlAddr.length());
+//                    String urlAddr = detail.getPrivFuncRelDetails().get(0).getFuncMenu().getUrlAddr();
+//                    String detailName = urlAddr.substring(1,urlAddr.length());
                     childList.add(detail);
                 }
             }
