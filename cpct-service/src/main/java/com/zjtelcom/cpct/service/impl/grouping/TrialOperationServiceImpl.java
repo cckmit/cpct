@@ -32,6 +32,7 @@ import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.grouping.*;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.enums.StatusCode;
+import com.zjtelcom.cpct.enums.TrialCreateType;
 import com.zjtelcom.cpct.enums.TrialStatus;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
@@ -178,7 +179,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "试运算记录不存在");
             return result;
         }
-        if (!TrialStatus.ALL_SAMPEL_SUCCESS.getValue().equals(operation.getStatusCd())){
+        if (!TrialStatus.ALL_SAMPEL_SUCCESS.getValue().equals(operation.getStatusCd()) && !TrialStatus.IMPORT_SUCCESS.getValue().equals(operation.getStatusCd())){
             result.put("resultCode", CODE_FAIL);
             result.put("resultMsg", "不满足下发条件，无法操作");
             return result;
@@ -427,11 +428,30 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
         Sheet sheet = wb.getSheetAt(0);
         Integer rowNums = sheet.getLastRowNum() + 1;
+
+        MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(operation.getCampaignId());
+        MktStrategyConfDO strategy = strategyMapper.selectByPrimaryKey(operation.getStrategyId());
+        MktStrategyConfRuleDO confRule = ruleMapper.selectByPrimaryKey(ruleId);
+        if (campaign == null || strategy == null || confRule==null) {
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "未找到有效的活动策略或规则");
+            return result;
+        }
+        TrialOperation trialOp = BeanUtil.create(operation, new TrialOperation());
+        trialOp.setCampaignName(campaign.getMktCampaignName());
+        //当清单导入时 strategyId name 存储规则信息
+        trialOp.setStrategyId(confRule.getMktStrategyConfRuleId());
+        trialOp.setStrategyName(confRule.getMktStrategyConfRuleName());
+        trialOp.setBatchNum(Long.valueOf(batchNumSt));
+        trialOp.setStatusCd(TrialStatus.IMPORT_GOING.getValue());
+        trialOp.setStatusDate(new Date());
+        trialOp.setCreateStaff(TrialCreateType.TRIAL_OPERATION.getValue());
+        trialOperationMapper.insert(trialOp);
+
         List<Map<String,Object>> customerList = new ArrayList<>();
-
         List<Map<String,Object>> labelList = new ArrayList<>();
-
         List<LabelDTO>  labelDTOList = new ArrayList<>();
+
         Row labelRowFirst = sheet.getRow(0);
         Row labelRow = sheet.getRow(1);
         for (int j = 0; j < labelRow.getLastCellNum(); j++) {
@@ -481,7 +501,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         request.setCamLevel(campaignDO.getCamLevel());
         // 获取创建人员code
         request.setStaffCode("SYS987329864");
-
 
         //获取销售品及规则列表
         TrialOperationParamES param = getTrialOperationParamES(operation, Long.valueOf(batchNumSt), ruleId,false);
@@ -612,10 +631,11 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         trialOp.setBatchNum(Long.valueOf(batchNumSt));
         trialOp.setStatusCd(TrialStatus.SAMPEL_GOING.getValue());
         trialOp.setStatusDate(new Date());
+        trialOp.setCreateStaff(TrialCreateType.TRIAL_OPERATION.getValue());
         trialOperationMapper.insert(trialOp);
 
         operationVO.setTrialId(trialOp.getId());
-        List<TrialOperation> operationList = trialOperationMapper.findOperationListByStrategyId(operationVO.getStrategyId());
+        List<TrialOperation> operationList = trialOperationMapper.findOperationListByStrategyId(operationVO.getStrategyId(),TrialCreateType.TRIAL_OPERATION.getValue());
         // 调用es的抽样接口
         final TrialOperationVO vo = operationVO;
         new Thread() {
@@ -1005,31 +1025,48 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 */
 
     /**
-     * 刷新列表
-     *
+     * 刷新列表(策略试运算)
      * @param strategyId
      * @return
      */
     @Override
     public Map<String, Object> getTrialListByStrategyId(Long strategyId) {
         Map<String, Object> result = new HashMap<>();
-        List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyId(strategyId);
-        List<TrialOperationDetail> operationDetailList = new ArrayList<>();
-        for (TrialOperation trialOperation : trialOperations) {
-            TrialOperationDetail detail = BeanUtil.create(trialOperation, new TrialOperationDetail());
-            if (trialOperation.getUpdateDate() != null) {
-//                Double cost =  ((double)(trialOperation.getUpdateDate().getTime() - trialOperation.getCreateDate().getTime()) / 1000);
-//                DecimalFormat df = new DecimalFormat("#.00");
-                Long cost = (trialOperation.getUpdateDate().getTime() - trialOperation.getCreateDate().getTime());
-                detail.setCost(cost + "ms");
-            }
-            operationDetailList.add(detail);
-        }
+        List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyId(strategyId,TrialCreateType.TRIAL_OPERATION.getValue());
+        List<TrialOperationDetail> operationDetailList = supplementOperation(trialOperations);
         result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", operationDetailList);
         return result;
     }
 
+    /**
+     * 刷新列表(清单导入)
+     * @param ruleId
+     * @return
+     */
+    @Override
+    public Map<String, Object> getTrialListByRuleId(Long ruleId) {
+        Map<String, Object> result = new HashMap<>();
+        List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyId(ruleId,TrialCreateType.IMPORT_USER_LIST.getValue());
+        List<TrialOperationDetail> operationDetailList = supplementOperation(trialOperations);
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", operationDetailList);
+        return result;
+    }
+
+    //试算记录补充信息
+    private List<TrialOperationDetail> supplementOperation(List<TrialOperation> trialOperations) {
+        List<TrialOperationDetail> operationDetailList = new ArrayList<>();
+        for (TrialOperation trialOperation : trialOperations) {
+            TrialOperationDetail detail = BeanUtil.create(trialOperation, new TrialOperationDetail());
+            if (trialOperation.getUpdateDate() != null) {
+                Long cost = (trialOperation.getUpdateDate().getTime() - trialOperation.getCreateDate().getTime());
+                detail.setCost(cost + "ms");
+            }
+            operationDetailList.add(detail);
+        }
+        return operationDetailList;
+    }
 
     /**
      * 下发参数

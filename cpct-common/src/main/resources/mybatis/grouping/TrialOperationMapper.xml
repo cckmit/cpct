@@ -73,6 +73,7 @@
     REMARK
     from trial_operation
     where STRATEGY_ID = #{strategyId}
+    and CREATE_STAFF = #{createStaff}
     order by CREATE_DATE desc
   </select>
 
