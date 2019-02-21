@@ -445,7 +445,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         trialOp.setBatchNum(Long.valueOf(batchNumSt));
         trialOp.setStatusCd(TrialStatus.IMPORT_GOING.getValue());
         trialOp.setStatusDate(new Date());
-        trialOp.setCreateStaff(TrialCreateType.TRIAL_OPERATION.getValue());
+        trialOp.setCreateStaff(TrialCreateType.IMPORT_USER_LIST.getValue());
         trialOperationMapper.insert(trialOp);
 
         List<Map<String,Object>> customerList = new ArrayList<>();
@@ -519,7 +519,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             }
         }.start();
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
-        result.put("resultMsg", "导入成功");
+        result.put("resultMsg", "导入成功,请稍后查看结果");
         return result;
     }
 
