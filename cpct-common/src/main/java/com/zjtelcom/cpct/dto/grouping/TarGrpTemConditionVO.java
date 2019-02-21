@@ -25,6 +25,9 @@ public class TarGrpTemConditionVO extends TarGrpTemplateCondition {
 
     private Long fitDomainId;//领域对象id
 
+    private String promListName;
+    private String labelCode;
+
     private String fitDomainName;//领域对象名字
 
     private String conditionType;
@@ -32,6 +35,23 @@ public class TarGrpTemConditionVO extends TarGrpTemplateCondition {
     private List<LabelValueVO> valueList;
 
     private List<OperatorDetail> operatorList;//运算符
+
+
+    public String getPromListName() {
+        return promListName;
+    }
+
+    public void setPromListName(String promListName) {
+        this.promListName = promListName;
+    }
+
+    public String getLabelCode() {
+        return labelCode;
+    }
+
+    public void setLabelCode(String labelCode) {
+        this.labelCode = labelCode;
+    }
 
     public String getLeftParamName() {
         return leftParamName;

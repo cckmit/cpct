@@ -19,6 +19,8 @@ public class TarGrpConditionVO extends TarGrpCondition {
     private String operTypeName;//运算类型,1000> 2000< 3000==  4000!=   5000>=  6000<=  7000in   8000&   9000||   7100	not in
     private Long fitDomainId;//领域对象id
     private String fitDomainName;//领域对象名字
+    private String promListName;
+    private String labelCode;
 
     private String conditionType;
 
@@ -28,6 +30,22 @@ public class TarGrpConditionVO extends TarGrpCondition {
 
     private List<SysAreaVO> sysAreaList;
 
+
+    public String getLabelCode() {
+        return labelCode;
+    }
+
+    public void setLabelCode(String labelCode) {
+        this.labelCode = labelCode;
+    }
+
+    public String getPromListName() {
+        return promListName;
+    }
+
+    public void setPromListName(String promListName) {
+        this.promListName = promListName;
+    }
 
     public List<SysAreaVO> getSysAreaList() {
         return sysAreaList;

@@ -13,15 +13,13 @@ import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.channel.MessageLabelInfo;
 import com.zjtelcom.cpct.dubbo.service.TrialRedisService;
+import com.zjtelcom.cpct.enums.TrialStatus;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -32,7 +30,7 @@ public class TrialRedisServiceImpl implements TrialRedisService {
     @Autowired
     private RedisUtils redisUtils;
     @Autowired
-    private TrialOperationMapper trialOperationMapper;
+    private TrialOperationMapper  trialOperationMapper;
     @Autowired
     private MktCampaignMapper campaignMapper;
 
@@ -44,7 +42,37 @@ public class TrialRedisServiceImpl implements TrialRedisService {
     @Autowired
     private DisplayColumnLabelMapper displayColumnLabelMapper;
 
-
+    /**
+     * 更新试算记录状态
+     * @param batchNum
+     * @param status
+     * @return
+     */
+    @Override
+    public Map<String, Object> updateOperationStatus(Long batchNum, String status) {
+        Map<String,Object> result = new HashMap<>();
+        TrialOperation operation = trialOperationMapper.selectByBatchNum(batchNum.toString());
+        if (operation==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","试算记录不存在");
+            return  result;
+        }
+        operation.setStatusCd(status);
+        if (status.equals(TrialStatus.SAMPEL_SUCCESS.getValue())){
+            operation.setUpdateDate(new Date());
+            operation.setRemark("抽样试算成功");
+        }else if (status.equals(TrialStatus.ALL_SAMPEL_SUCCESS.getValue())){
+            operation.setRemark("全量试算成功");
+        }else if (status.equals(TrialStatus.UPLOAD_SUCCESS.getValue())){
+            operation.setRemark("文件下发成功");
+        }else {
+            operation.setRemark("操作失败");
+        }
+        trialOperationMapper.updateByPrimaryKey(operation);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","修改成功");
+        return  result;
+    }
 
     @Override
     public Map<String, Object> searchFromRedis(String key) {
