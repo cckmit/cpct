@@ -24,6 +24,7 @@ import com.zjtelcom.cpct.domain.channel.Offer;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
+import com.zjtelcom.cpct.enums.TrialCreateType;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SyncActivityService;
 import org.apache.commons.lang.StringUtils;
@@ -94,7 +95,7 @@ public class SyncActivityServiceImpl implements SyncActivityService {
             policyModel.setEndDate(mktStrategyConfDO.getEndTime());
             policyModel.setHandoutType(activityModel.getHandoutType());
             //通过策略id  得到对应的批次id 按降序取第一个批次id
-            List<TrialOperation> operationListByStrategyId = trialOperationMapper.findOperationListByStrategyId(mktStrategyConfDO.getMktStrategyConfId());
+            List<TrialOperation> operationListByStrategyId = trialOperationMapper.findOperationListByStrategyId(mktStrategyConfDO.getMktStrategyConfId(),TrialCreateType.TRIAL_OPERATION.getValue());
             if(!operationListByStrategyId.isEmpty()){
                 policyModel.setBatchId(operationListByStrategyId.get(0).getBatchNum().toString());
             }
