@@ -55,6 +55,11 @@
         <dubbo:method name="getQuestionnaireDetail" servicecode="00.1083.getQuestionnaireDetail" timeout="10000"/>
     </dubbo:service>
 
+    <!-- 活动发布接口 -->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.MktCampaignSyncApiService" ref="mktCampaignSyncApiServiceImpl" version="1.0" >
+        <dubbo:method name="publishMktCampaign" servicecode="00.1083.publishMktCampaign" timeout="10000"/>
+    </dubbo:service>
+
     <!-- 订阅 -->
     <!-- cpc计算协同中心回调 -->
     <dubbo:reference interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService" id="iContactTaskReceiptService"
