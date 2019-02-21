@@ -14,6 +14,8 @@ public interface TrialOperationService  {
 
     Map<String, Object> getTrialListByStrategyId(Long strategyId);
 
+    Map<String, Object> getTrialListByRuleId(Long ruleId);
+
     Map<String,Object> findBatchHitsList(Long batchId);
 
     Map<String,Object> issueTrialResult(TrialOperation trialOperation);

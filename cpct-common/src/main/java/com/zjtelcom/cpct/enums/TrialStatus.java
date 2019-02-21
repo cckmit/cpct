@@ -10,6 +10,10 @@ public enum TrialStatus {
     ALL_SAMPEL_SUCCESS("5000","全量试算成功"),
     ALL_SAMPEL_FAIL("6000","全量试算失败"),
 
+    IMPORT_GOING("1100", "导入中"),
+    IMPORT_SUCCESS("1200","导入成功"),
+    IMPORT_FAIL("1300","导入失败"),
+
     UPLOAD_GOING("7000", "下发中"),
     UPLOAD_SUCCESS("8000","下发成功"),
     UPLOAD_FAIL("9000","下发失败");
