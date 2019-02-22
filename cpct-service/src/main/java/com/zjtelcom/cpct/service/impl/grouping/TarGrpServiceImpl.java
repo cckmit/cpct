@@ -114,6 +114,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                     if (idlIst.contains(label.getInjectionLabelId())) {
                         continue;
                     }
+                    idlIst.add(label.getInjectionLabelId());
                     codeList(assetCode, promCode, custCode, label);
                 }
             }
@@ -126,6 +127,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                         if (idlIst.contains(label.getInjectionLabelId())) {
                             continue;
                         }
+                        idlIst.add(label.getInjectionLabelId());
                         codeList(assetCode, promCode, custCode, label);
                     }
                 }
@@ -148,11 +150,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                             List<String> labelSc = subScript(camScript.getScriptDesc());
                             for (String code : labelSc){
                                 Label label = injectionLabelMapper.selectByLabelCode(code);
-
                                 if (label!=null){
                                     if (idlIst.contains(label.getInjectionLabelId())){
                                         continue;
                                     }
+                                    idlIst.add(label.getInjectionLabelId());
                                     codeList(assetCode, promCode, custCode, label);
                                 }
 
@@ -168,6 +170,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                                     if (idlIst.contains(label.getInjectionLabelId())){
                                         continue;
                                     }
+                                    idlIst.add(label.getInjectionLabelId());
                                     codeList(assetCode, promCode, custCode, label);
                                 }
                             }
@@ -333,7 +336,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             //插入客户分群记录
             TarGrp tarGrp = new TarGrp();
             tarGrp = tarGrpDetail;
-            tarGrp.setTarGrpType("1000");
+            tarGrp.setTarGrpType(tarGrpDetail.getTarGrpType()==null ? "1000" : tarGrpDetail.getTarGrpType());
             tarGrp.setCreateDate(DateUtil.getCurrentTime());
             tarGrp.setUpdateDate(DateUtil.getCurrentTime());
             tarGrp.setStatusDate(DateUtil.getCurrentTime());
@@ -677,9 +680,6 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             maps.put("resultMsg","");
             return maps;
         }
-        //通过mktCamGrpRulId获取所有活动关联关系
-//        MktCamGrpRul mktCamGrpRul = mktCamGrpRulMapper.selectByPrimaryKey(mktCamGrpRulId);
-//        TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(mktCamGrpRul.getTarGrpId());
         List<TarGrpCondition> listTarGrpCondition = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
         List<TarGrpConditionVO> grpConditionList = new ArrayList<>();
         List<TarGrpVO> tarGrpVOS = new ArrayList<>();//传回前端展示信息
@@ -687,7 +687,6 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             List<OperatorDetail> operatorList = new ArrayList<>();
             TarGrpConditionVO tarGrpConditionVO = new TarGrpConditionVO();
             BeanUtil.copy(tarGrpCondition,tarGrpConditionVO);
-//            CopyPropertiesUtil.copyBean2Bean(tarGrpConditionVO, tarGrpCondition);
             //塞入左参中文名
             Label label = injectionLabelMapper.selectByPrimaryKey(Long.valueOf(tarGrpConditionVO.getLeftParam()));
             if (label==null){
@@ -696,6 +695,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(label.getInjectionLabelId());
             List<LabelValueVO> valueList = ChannelUtil.valueList2VOList(labelValues);
             tarGrpConditionVO.setLeftParamName(label.getInjectionLabelName());
+            tarGrpConditionVO.setLabelCode(label.getInjectionLabelCode());
             //将操作符转为中文
             if (tarGrpConditionVO.getOperType()!=null && !tarGrpConditionVO.getOperType().equals("")){
                 Operator op = Operator.getOperator(Integer.parseInt(tarGrpConditionVO.getOperType()));
@@ -724,6 +724,12 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             tarGrpConditionVO.setConditionType(label.getConditionType());
             tarGrpConditionVO.setValueList(valueList);
             tarGrpConditionVO.setOperatorList(operatorList);
+            if ("PROM_LIST".equals(label.getInjectionLabelCode()) && tarGrpConditionVO.getRightParam()!=null){
+                FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.valueOf(tarGrpConditionVO.getRightParam()));
+                if (filterRule!=null){
+                    tarGrpConditionVO.setPromListName(filterRule.getRuleName());
+                }
+            }
             grpConditionList.add(tarGrpConditionVO);
         }
         List<OrgTreeDO> sysAreaList = (List<OrgTreeDO>)redisUtils.get("AREA_RULE_ENTITY_"+tarGrpId);
@@ -734,7 +740,6 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 voList.add(vo);
             }
             TarGrpConditionVO tarGrpConditionVO = new TarGrpConditionVO();
-
             tarGrpConditionVO.setSysAreaList(voList);
             grpConditionList.add(tarGrpConditionVO);
         }

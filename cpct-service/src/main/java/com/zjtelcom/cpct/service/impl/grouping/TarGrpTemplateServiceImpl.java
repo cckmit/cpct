@@ -6,22 +6,30 @@
  */
 package com.zjtelcom.cpct.service.impl.grouping;
 
+import com.alibaba.fastjson.JSON;
+import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.IFuncCompDubboService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.gson.JsonObject;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateMapper;
+import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO;
+import com.zjtelcom.cpct.domain.grouping.TrialOperation;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.channel.*;
+import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.*;
-import com.zjtelcom.cpct.enums.LeftParamType;
-import com.zjtelcom.cpct.enums.Operator;
-import com.zjtelcom.cpct.enums.RightParamType;
+import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.service.BaseService;
+import com.zjtelcom.cpct.service.channel.LabelService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.service.grouping.TarGrpTemplateService;
@@ -30,11 +38,21 @@ import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
 import com.zjtelcom.cpct.vo.grouping.TarGrpVO;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
+import com.zjtelcom.es.es.entity.TrialOperationVOES;
+import com.zjtelcom.es.es.entity.model.TrialOperationParamES;
+import com.zjtelcom.es.es.entity.model.TrialResponseES;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
@@ -80,9 +98,132 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     @Autowired
     private ContactChannelMapper channelMapper;
     @Autowired
+    private FilterRuleMapper filterRuleMapper;
+    @Autowired
+    private LabelService labelService;
+    @Autowired
     private ProductService productService;
+    @Autowired
+    private MktCamCustMapper camCustMapper;
     @Value("${sync.value}")
     private String value;
+
+
+    /**
+     * 分群模板导入清单
+     */
+    @Transactional(readOnly = false)
+    @Override
+    public Map<String, Object> importUserList4TarTemp(MultipartFile multipartFile,String tempName)throws IOException{
+        Map<String, Object> result = new HashMap<>();
+        String batchNumSt = DateUtil.date2St4Trial(new Date()) + ChannelUtil.getRandomStr(4);
+
+        InputStream inputStream = multipartFile.getInputStream();
+        XSSFWorkbook wb = new XSSFWorkbook(inputStream);
+        Sheet sheet = wb.getSheetAt(0);
+        Integer rowNums = sheet.getLastRowNum() + 1;
+        List<Map<String,Object>> customerList = new ArrayList<>();
+        List<LabelDTO>  labelDTOList = new ArrayList<>();
+        List<Map<String,Object>> labelList = new ArrayList<>();
+        Row labelRowFirst = sheet.getRow(0);
+        Row labelRow = sheet.getRow(1);
+        for (int j = 0; j < labelRow.getLastCellNum(); j++) {
+            Cell cellTitle = labelRowFirst.getCell(j);
+            Cell cell = labelRow.getCell(j);
+            LabelDTO  labelDTO = new LabelDTO();
+            labelDTO.setLabelCode((String) ChannelUtil.getCellValue(cell));
+            labelDTO.setInjectionLabelName(cellTitle.getStringCellValue());
+            labelDTOList.add(labelDTO);
+        }
+        for (int i = 3; i < rowNums ; i++) {
+            Map<String, Object> customers = new HashMap<>();
+            Row rowCode = sheet.getRow(1);
+            Row row = sheet.getRow(i);
+            for (int j = 0; j < row.getLastCellNum(); j++) {
+                Cell cellTitle = rowCode.getCell(j);
+                Cell cell = row.getCell(j);
+                customers.put(cellTitle.getStringCellValue(), ChannelUtil.getCellValue(cell));
+            }
+            customerList.add(customers);
+        }
+        for (int i = 0 ; i< labelDTOList.size();i++){
+            Map<String,Object> label = new HashMap<>();
+            label.put("code",labelDTOList.get(i).getLabelCode());
+            label.put("name",labelDTOList.get(i).getInjectionLabelName());
+            labelList.add(label);
+        }
+        //
+        TarGrp tarGrpTemplateDO = new TarGrp();
+        //销售品类型模板
+        tarGrpTemplateDO.setTarGrpType(TarTempType.PROM_IMPORT_TEMPLETE.getValue());
+        tarGrpTemplateDO.setTarGrpName(tempName );
+        tarGrpTemplateDO.setTarGrpDesc(tempName );
+        tarGrpTemplateDO.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+        tarGrpTemplateDO.setStatusDate(new Date());
+        tarGrpTemplateDO.setCreateStaff(TarTempCreateType.NAORMAL_TEMP.getValue());
+        tarGrpTemplateDO.setCreateDate(new Date());
+        tarGrpTemplateDO.setUpdateStaff(UserUtil.loginId());
+        tarGrpTemplateDO.setUpdateDate(new Date());
+        //todo 待验证
+        tarGrpTemplateDO.setRemark("0");
+        // 新增目标分群模板
+        tarGrpMapper.createTarGrp(tarGrpTemplateDO);
+
+        Label label = injectionLabelMapper.selectByLabelCode("PPM_IMPROT_USER_LIST");
+        if (label==null){
+            LabelAddVO addVO = new LabelAddVO();
+            addVO.setInjectionLabelName("PPM清单导入特殊标签");
+            addVO.setConditionType(LabelCondition.INPUT.getValue().toString());
+            addVO.setInjectionLabelCode("PPM_IMPROT_USER_LIST");
+            addVO.setRightOperand("1/2");
+            labelService.addLabel(1L,addVO);
+            label = injectionLabelMapper.selectByLabelCode("PPM_IMPROT_USER_LIST");
+        }
+        TarGrpCondition condition = new TarGrpCondition();
+        condition.setLeftParam(label.getInjectionLabelId().toString());
+        condition.setOperType("3000");
+        condition.setRightParam(tarGrpTemplateDO.getTarGrpId().toString());
+        condition.setRootFlag(0L);
+        condition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
+        condition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
+        condition.setTarGrpId(tarGrpTemplateDO.getTarGrpId());
+        condition.setCreateDate(new Date());
+        condition.setUpdateDate(new Date());
+        condition.setStatusDate(new Date());
+        condition.setUpdateStaff(UserUtil.loginId());
+        condition.setCreateStaff(UserUtil.loginId());
+        condition.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+        tarGrpConditionMapper.insert(condition);
+        new Thread(){
+            public void run(){
+                addCamCust(customerList,labelList,tarGrpTemplateDO.getTarGrpId());
+            }
+        }.start();
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
+        result.put("resultMsg", "导入成功,请稍后查看结果");
+        return result;
+    }
+
+    private void addCamCust( List<Map<String,Object>> customerList, List<Map<String,Object>>  labelList,Long tarTempId){
+        List<MktCamCust> camCustList = new ArrayList<>();
+        for (Map<String,Object> customer : customerList){
+            if (customer.get("CCUST_ID")==null || customer.get("CCUST_ID").toString().equals("null")){
+                continue;
+            }
+            MktCamCust camCust = new MktCamCust();
+            camCust.setMktCampaignId(tarTempId);
+            camCust.setTargetObjNbr(customer.get("CCUST_ID").toString());
+            camCust.setTargetObjType("1000");
+            camCust.setAttrValue(JSON.toJSONString(customer));
+            camCust.setStatusCd("1000");
+            camCust.setCreateDate(new Date());
+            camCust.setRemark(JSON.toJSONString(labelList));
+            camCustList.add(camCust);
+        }
+        if (!camCustList.isEmpty()){
+            camCustMapper.insertByBatch(camCustList);
+        }
+    }
 
     /**
      * 需求涵id 获取分类对象
@@ -122,6 +263,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             List<OfferRestrict> restrict = offerRestrictMapper.selectByOfferId(offerId,"7000");
             if (restrict!=null && restrict.size()>0){
                 List<TarGrpCondition> tarGrpConditions = new ArrayList<>();
+                boolean save = false;
                 for (OfferRestrict offerRestrict : restrict){
                     if (offerRestrict.getRstrObjId()==null){
                         continue;
@@ -131,12 +273,15 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                     if (tarGrpTem==null){
                         continue;
                     }
+                    if (tarGrpTem.getTarGrpType().equals(TarTempType.PROM_IMPORT_TEMPLETE.getValue())){
+                        save = true;
+                    }
                     List<TarGrpCondition> conditionDOList = tarGrpConditionMapper.listTarGrpCondition(targrpId);
                     tarGrpConditions.addAll(conditionDOList);
                 }
                 TarGrpDetail addVO = new TarGrpDetail();
                 addVO.setTarGrpName("增存量模板导入转换模板");
-                addVO.setTarGrpType("1000");
+                addVO.setTarGrpType(save? TarTempType.PROM_IMPORT_TEMPLETE.getValue() : "1000" );
                 addVO.setCreateDate(DateUtil.getCurrentTime());
                 addVO.setUpdateDate(DateUtil.getCurrentTime());
                 addVO.setStatusDate(DateUtil.getCurrentTime());
@@ -204,6 +349,9 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         return result;
     }
 
+
+
+
     /**
      * 新增目标分群模板
      *
@@ -218,7 +366,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         tarGrpTemplateDO.setTarGrpDesc(tarGrpTemplateDetail.getTarGrpTemplateDesc()==null ? "" : tarGrpTemplateDetail.getTarGrpTemplateDesc() );
         tarGrpTemplateDO.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
         tarGrpTemplateDO.setStatusDate(new Date());
-        tarGrpTemplateDO.setCreateStaff(UserUtil.loginId());
+        tarGrpTemplateDO.setCreateStaff(TarTempCreateType.NAORMAL_TEMP.getValue());
         tarGrpTemplateDO.setCreateDate(new Date());
         tarGrpTemplateDO.setUpdateStaff(UserUtil.loginId());
         tarGrpTemplateDO.setUpdateDate(new Date());
@@ -472,7 +620,14 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             tarGrpTemConditionVO.setValueList(valueList);
             tarGrpTemConditionVO.setConditionType(label.getConditionType());
             tarGrpTemConditionVO.setOperatorList(operatorList);
+            tarGrpTemConditionVO.setLabelCode(label.getInjectionLabelCode());
             tarGrpTemConditionVOList.add(tarGrpTemConditionVO);
+            if ("PROM_LIST".equals(label.getInjectionLabelCode()) && tarGrpTemConditionVO.getRightParam()!=null){
+                FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.valueOf(tarGrpTemConditionVO.getRightParam()));
+                if (filterRule!=null){
+                    tarGrpTemConditionVO.setPromListName(filterRule.getRuleName());
+                }
+            }
         }
         tarGrpTemplateDetail.setTarGrpTemConditionVOList(tarGrpTemConditionVOList);
         tarGrpTemplateMap.put("resultCode", CommonConstant.CODE_SUCCESS);

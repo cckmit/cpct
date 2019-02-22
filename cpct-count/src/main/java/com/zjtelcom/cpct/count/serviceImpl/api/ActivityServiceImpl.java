@@ -280,7 +280,7 @@ public class ActivityServiceImpl implements ActivityService {
             return result;
         }else{
             for (RequestInstRel requestInstRel:mkt){
-                if(Long.valueOf(requestInfoId)==requestInstRel.getRequestInfoId()){
+                if(Long.valueOf(requestInfoId)-requestInstRel.getRequestInfoId()==0){
                     //存在记录
                     tip=true;
                     break;
@@ -386,7 +386,7 @@ public class ActivityServiceImpl implements ActivityService {
             MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(split[i]));
             if(mktCampaignDO!=null){
                 //如果活动状态是已发布则改为已暂停
-                if(mktCampaignDO.getStatusCd()==StatusCode.STATUS_CODE_PUBLISHED.getStatusCode()) {
+                if(mktCampaignDO.getStatusCd().equals(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode())) {
                     mktCampaignMapper.changeMktCampaignStatus(Long.valueOf(split[i]), StatusCode.STATUS_CODE_STOP.getStatusCode(), new Date(), 1L);
                     //活动修改后 增加修改操作记录
                     addOperatorLog(mktCampaignDO, StatusEnum.PAUSE.getStatusCode(), "cpc", StatusCode.STATUS_CODE_STOP.getStatusCode());

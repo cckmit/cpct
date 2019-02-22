@@ -73,6 +73,7 @@
     REMARK
     from trial_operation
     where STRATEGY_ID = #{strategyId}
+    and CREATE_STAFF = #{createStaff}
     order by CREATE_DATE desc
   </select>
 
@@ -95,6 +96,12 @@
     where BATCH_NUM = #{batchNum}
   </select>
 
+
+  <select id="listOperationByStatusCd" resultMap="BaseResultMap">
+    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM,  STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,  UPDATE_DATE, REMARK
+    from trial_operation
+    where STATUS_CD = #{statusCd}
+  </select>
 
 
 

@@ -25,14 +25,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 
 /**
  * @Description 规律规则controller
@@ -310,6 +309,16 @@ public class FilterRuleController extends BaseController {
     public String importUserList(MultipartFile file, @Param("ruleId") Long ruleId) {
         Map<String, Object> maps = new HashMap<>();
         try {
+            InputStream inputStream = file.getInputStream();
+            byte[] bytes = new byte[3];
+            inputStream.read(bytes,0,bytes.length);
+            String head = ChannelUtil.bytesToHexString(bytes);
+            head = head.toUpperCase();
+            if (!head.equals("D0CF11") && !head.equals("504B03")){
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg", "文件格式不正确");
+                return JSON.toJSONString(maps);
+            }
             maps = filterRuleService.importUserList(file, ruleId);
         } catch (Exception e) {
             logger.error("[op:FilterRuleController] fail to listEvents for multipartFile = {}! Exception: ", JSONArray.toJSON(file), e);

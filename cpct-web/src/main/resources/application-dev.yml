@@ -1,36 +1,37 @@
 #端口配置
 server:
-  port: 9090
+  port: 8090
 
 #数据库相关配置
 spring:
 # 第一数据源
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/cpct?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
-    username: root
-    password: root
+    url: jdbc:mysql://134.96.253.29:8801/smt_bss_cpc2?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: cpc_user
+    password: cpc_user_123
+
 
 # 第二数据源
   datasourceprd:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/smt_bss_cpc_evo2?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    driver-class-name: com.mysql.jdbc.Driver初始化系统参数到redis
+    url: jdbc:mysql://47.94.168.117:3306/fpc_system?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
     username: root
-    password: root
+    password: Yanlei2018
 
 # 第三数据源
   datasourcethird:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/smt_bss_cpc_evo2?useUnicode=true&characterEncoding=UTF-8&useSSL=true
-    username: root
-    password: root
+    url: jdbc:mysql://134.96.253.29:8801/smt_bss_cpc2?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: cpc_user
+    password: cpc_user_123
 
 # 第四数据源
   datasourcefourth:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/smt_bss_cpc_evo2?useUnicode=true&characterEncoding=UTF-8&useSSL=true
-    username: root
-    password: root
+    url: jdbc:mysql://134.96.253.29:8801/smt_bss_cpc_evo2?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: cpc_user
+    password: cpc_user_123
 
 
   #redis相关配置

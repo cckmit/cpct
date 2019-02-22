@@ -19,11 +19,13 @@ public interface TrialOperationMapper {
 
     List<TrialOperation> findOperationListByRuleId(@Param("ruleId")Long ruleId);
 
-    List<TrialOperation> findOperationListByStrategyId(@Param("strategyId")Long strategyId);
+    List<TrialOperation> findOperationListByStrategyId(@Param("strategyId")Long strategyId,@Param("createStaff")Long createType);
 
     int updateByPrimaryKey(TrialOperation record);
 
     List<TrialOperation> listOperationByUpdateTime(@Param("updateTime")Date updateTime);
+
+    List<TrialOperation> listOperationByStatusCd(@Param("statusCd")String statusCd);
 
     TrialOperation selectByBatchNum(@Param("batchNum") String batchNum);
 }

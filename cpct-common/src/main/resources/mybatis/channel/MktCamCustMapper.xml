@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.MktCamCustMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.MktCamCust">
+    <id column="MKT_CAM_CUST_ID" jdbcType="BIGINT" property="mktCamCustId" />
+    <result column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId" />
+    <result column="TARGET_OBJ_TYPE" jdbcType="VARCHAR" property="targetObjType" />
+    <result column="TARGET_OBJ_NBR" jdbcType="VARCHAR" property="targetObjNbr" />
+    <result column="ATTR_VALUE" jdbcType="VARCHAR" property="attrValue" />
+    <result column="STATUS_CD" jdbcType="BIGINT" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="LAN_ID" jdbcType="BIGINT" property="lanId" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from mkt_cam_cust
+    where MKT_CAM_CUST_ID = #{mktCamCustId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.MktCamCust">
+    insert into mkt_cam_cust (MKT_CAM_CUST_ID, MKT_CAMPAIGN_ID, TARGET_OBJ_TYPE, 
+      TARGET_OBJ_NBR, ATTR_VALUE, STATUS_CD, 
+      CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
+      UPDATE_DATE, STATUS_DATE, REMARK, 
+      LAN_ID)
+    values (#{mktCamCustId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{targetObjType,jdbcType=VARCHAR}, 
+      #{targetObjNbr,jdbcType=VARCHAR}, #{attrValue,jdbcType=VARCHAR}, #{statusCd,jdbcType=BIGINT}, 
+      #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, 
+      #{lanId,jdbcType=BIGINT})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.MktCamCust">
+    update mkt_cam_cust
+    set MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},
+      TARGET_OBJ_TYPE = #{targetObjType,jdbcType=VARCHAR},
+      TARGET_OBJ_NBR = #{targetObjNbr,jdbcType=VARCHAR},
+      ATTR_VALUE = #{attrValue,jdbcType=VARCHAR},
+      STATUS_CD = #{statusCd,jdbcType=BIGINT},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      LAN_ID = #{lanId,jdbcType=BIGINT}
+    where MKT_CAM_CUST_ID = #{mktCamCustId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_CAM_CUST_ID, MKT_CAMPAIGN_ID, TARGET_OBJ_TYPE, TARGET_OBJ_NBR, ATTR_VALUE, 
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, UPDATE_DATE, STATUS_DATE, REMARK, 
+    LAN_ID
+    from mkt_cam_cust
+    where MKT_CAM_CUST_ID = #{mktCamCustId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select MKT_CAM_CUST_ID, MKT_CAMPAIGN_ID, TARGET_OBJ_TYPE, TARGET_OBJ_NBR, ATTR_VALUE, 
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, UPDATE_DATE, STATUS_DATE, REMARK, 
+    LAN_ID
+    from mkt_cam_cust
+  </select>
+
+  <select id="selectByTarGrpTempId" resultMap="BaseResultMap">
+    select MKT_CAM_CUST_ID, MKT_CAMPAIGN_ID, TARGET_OBJ_TYPE, TARGET_OBJ_NBR, ATTR_VALUE,
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, UPDATE_DATE, STATUS_DATE, REMARK,
+    LAN_ID
+    from mkt_cam_cust
+    where MKT_CAMPAIGN_ID = #{tarTempId}
+  </select>
+
+
+
+  <insert id="insertByBatch" parameterType="java.util.List" useGeneratedKeys="true"
+          keyProperty="mktCamCustId">
+    insert into mkt_cam_cust (MKT_CAM_CUST_ID, MKT_CAMPAIGN_ID, TARGET_OBJ_TYPE,
+    TARGET_OBJ_NBR, ATTR_VALUE, STATUS_CD,
+    CREATE_STAFF, UPDATE_STAFF, CREATE_DATE,
+    UPDATE_DATE, STATUS_DATE, REMARK,
+    LAN_ID)
+    values
+    <foreach collection="list" item="item" separator="," index="i">
+      (#{item.mktCamCustId,jdbcType=BIGINT}, #{item.mktCampaignId,jdbcType=BIGINT}, #{item.targetObjType,jdbcType=VARCHAR},
+      #{item.targetObjNbr,jdbcType=VARCHAR}, #{item.attrValue,jdbcType=VARCHAR}, #{item.statusCd,jdbcType=BIGINT},
+      #{item.createStaff,jdbcType=BIGINT}, #{item.updateStaff,jdbcType=BIGINT}, #{item.createDate,jdbcType=TIMESTAMP},
+      #{item.updateDate,jdbcType=TIMESTAMP}, #{item.statusDate,jdbcType=TIMESTAMP}, #{item.remark,jdbcType=VARCHAR},
+      #{item.lanId,jdbcType=BIGINT})
+    </foreach>
+  </insert>
+</mapper>
