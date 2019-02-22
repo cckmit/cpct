@@ -404,4 +404,13 @@
         </if>
         order by UPDATE_DATE desc
     </select>
+
+    <select id="selectByRuleId" resultMap="BaseResultMap">
+        select cam.MKT_CAMPAIGN_ID, cam.TIGGER_TYPE, cam.MKT_CAMPAIGN_NAME, cam.PLAN_BEGIN_TIME, cam.PLAN_END_TIME
+        from mkt_campaign cam left join mkt_cam_strategy_conf_rel csrel on csrel.MKT_CAMPAIGN_ID = cam.MKT_CAMPAIGN_ID
+        left join mkt_strategy_conf_rule_rel srrel on srrel.MKT_STRATEGY_CONF_ID = csrel.STRATEGY_CONF_ID
+        where srrel.MKT_STRATEGY_CONF_RULE_ID = #{ruleId}
+    </select>
+
+
 </mapper>
