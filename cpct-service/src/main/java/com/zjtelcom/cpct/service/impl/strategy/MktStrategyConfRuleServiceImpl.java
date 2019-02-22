@@ -11,6 +11,7 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
+import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.strategy.MktCamStrategyRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
@@ -18,6 +19,7 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyMapper;
 import com.zjtelcom.cpct.domain.User;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.CamScript;
+import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
@@ -28,10 +30,7 @@ import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.dto.strategy.MktStrategy;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
-import com.zjtelcom.cpct.enums.AreaCodeEnum;
-import com.zjtelcom.cpct.enums.ErrorCode;
-import com.zjtelcom.cpct.enums.PostEnum;
-import com.zjtelcom.cpct.enums.StatusCode;
+import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.pojo.MktCamStrategyRel;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
@@ -40,10 +39,7 @@ import com.zjtelcom.cpct.service.channel.CamScriptService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
-import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.CopyPropertiesUtil;
-import com.zjtelcom.cpct.util.RedisUtils;
-import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -120,6 +116,12 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
 
     @Autowired
     private MktCamGrpRulMapper mktCamGrpRulMapper;
+
+    @Autowired
+    private TrialOperationMapper trialOperationMapper;
+
+    @Autowired
+    private MktCampaignMapper campaignMapper;
 
     /**
      * 添加策略规则
@@ -245,6 +247,23 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktStrategyConfRuleDO.setUpdateStaff(UserUtil.loginId());
             mktStrategyConfRuleDO.setUpdateDate(new Date());
             mktStrategyConfRuleMapper.insert(mktStrategyConfRuleDO);
+
+            //如果是增存量联动并且是导入的用户分群模板 创建试算记录
+            TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(mktStrategyConfRuleDO.getTarGrpId());
+            if (tarGrp!=null && tarGrp.getTarGrpType().equals(TarTempType.PROM_IMPORT_TEMPLETE.getValue())){
+                String batchNumSt = DateUtil.date2St4Trial(new Date()) + ChannelUtil.getRandomStr(4);
+                TrialOperation trialOp = new TrialOperation();
+                //当清单导入时 strategyId name 存储规则信息
+                trialOp.setCampaignId(mktStrategyConfRule.getMktCampaignId());
+                trialOp.setCampaignName(mktStrategyConfRule.getMktCampaignName());
+                trialOp.setStrategyId(mktStrategyConfRuleDO.getMktStrategyConfRuleId());
+                trialOp.setStrategyName(mktStrategyConfRuleDO.getMktStrategyConfRuleName());
+                trialOp.setBatchNum(Long.valueOf(batchNumSt));
+                trialOp.setStatusCd(TrialStatus.PPM_IMPORT_GOING.getValue());
+                trialOp.setStatusDate(new Date());
+                trialOp.setCreateStaff(TrialCreateType.IMPORT_USER_LIST.getValue());
+                trialOperationMapper.insert(trialOp);
+            }
 
 
             // 配置推送渠道关系mkt_strategy表 和 mkt_cam_strategy_rel

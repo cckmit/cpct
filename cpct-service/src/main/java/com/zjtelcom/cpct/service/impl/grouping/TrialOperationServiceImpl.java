@@ -5,10 +5,7 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
-import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
-import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
-import com.zjtelcom.cpct.dao.channel.MktResourceMapper;
-import com.zjtelcom.cpct.dao.channel.OfferMapper;
+import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
@@ -114,6 +111,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private MktResourceMapper resourceMapper;
     @Autowired
     private MktStrategyConfMapper strategyConfMapper;
+    @Autowired
+    private MktCamCustMapper camCustMapper;
 
     /**
      * 销售品service
@@ -133,6 +132,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
     @Autowired
     private MktCamItemMapper itemMapper;
+
+
+
 
     /**
      * 查询试算记录日志
@@ -414,6 +416,98 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     }
 
 
+    /**
+     * ppm-文件下发
+     * @param batchId
+     * @return
+     */
+    @Override
+    public Map<String, Object> importFromCust4Ppm(Long batchId) {
+        Map<String, Object> result = new HashMap<>();
+        TrialOperation trialOperation = trialOperationMapper.selectByPrimaryKey(batchId);
+        if (trialOperation == null) {
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "试运算记录不存在");
+            return result;
+        }
+        if (!trialOperation.getStatusCd().equals(TrialStatus.PPM_IMPORT_GOING.getValue())){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "无法导入");
+            return result;
+        }
+        TrialOperationVO operation = BeanUtil.create(trialOperation,new TrialOperationVO());
+        MktStrategyConfRuleDO confRule = ruleMapper.selectByPrimaryKey(operation.getStrategyId());
+        if (confRule==null) {
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "未找到有效的活动策略或规则");
+            return result;
+        }
+        Long tarGrpTempId = null;
+        Long ruleId = operation.getStrategyId();
+        String batchNumSt = operation.getBatchNum().toString();
+        List<Map<String,Object>> customerList = new ArrayList<>();
+        List<Map<String,Object>> labelList = new ArrayList<>();
+        List<Map<String, String>> labelMapList = tarGrpConditionMapper.selectAllLabelByTarId(confRule.getTarGrpId());
+        if (!labelMapList.isEmpty()){
+            tarGrpTempId = Long.valueOf(labelMapList.get(0).get("rightParam"));
+            List<MktCamCust> camCustList = camCustMapper.selectByTarGrpTempId(tarGrpTempId);
+            if (camCustList!=null && !camCustList.isEmpty()){
+                labelList = (List<Map<String,Object>>)JSON.parse(camCustList.get(0).getRemark());
+                for (MktCamCust camCust : camCustList){
+                    Map<String,Object> jsonObject = (Map<String,Object>)JSON.parse(camCust.getAttrValue());
+                    customerList.add(jsonObject);
+                }
+            }
+        }
+        return importUserList(result, operation, ruleId, batchNumSt, customerList, labelList);
+    }
+
+    //下发文件
+    private Map<String, Object> importUserList(Map<String, Object> result, TrialOperationVO operation, Long ruleId, String batchNumSt, List<Map<String, Object>> customerList, List<Map<String, Object>> labelList) {
+        redisUtils.set("LABEL_DETAIL_"+batchNumSt,labelList);
+        int num = (customerList.size() / 500) + 1;
+        List<List<Map<String,Object>>> smallCustomers = ChannelUtil.averageAssign(customerList,num);
+        //按规则存储客户信息
+        for (int i = 0; i < num; i++) {
+            redisUtils.hset("ISSURE_" + batchNumSt + "_" + ruleId, i + "",smallCustomers.get(i));
+        }
+//        redisUtils.set("ISSURE_" + batchNumSt + "_" + ruleId,customerList);
+        MktCampaignDO campaignDO = campaignMapper.selectByPrimaryKey(operation.getCampaignId());
+        if (campaignDO==null){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "活动不存在");
+            return result;
+        }
+        final TrialOperationVOES request = BeanUtil.create(operation,new TrialOperationVOES());
+        request.setBatchNum(Long.valueOf(batchNumSt));
+        request.setCampaignType(campaignDO.getMktCampaignType());
+        request.setLanId(campaignDO.getLanId());
+        request.setCampaignName(campaignDO.getMktCampaignName());
+        request.setCamLevel(campaignDO.getCamLevel());
+        // 获取创建人员code
+        request.setStaffCode("SYS987329864");
+
+        //获取销售品及规则列表
+        TrialOperationParamES param = getTrialOperationParamES(operation, Long.valueOf(batchNumSt), ruleId,false);
+        ArrayList<TrialOperationParamES> paramESList = new ArrayList<>();
+        paramESList.add(param);
+        request.setParamList(paramESList);
+        new Thread(){
+            public void run(){
+                try {
+                    TrialResponseES responseES = esService.issueByFile(request);
+//                   TrialResponseES responseES =  restTemplate.postForObject("http://localhost:8080/es/issueByFile",request,TrialResponseES.class);
+                }catch (Exception e){
+                    e.printStackTrace();
+                    logger.info("导入清单下发失败");
+                }
+            }
+        }.start();
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
+        result.put("resultMsg", "导入成功,请稍后查看结果");
+        return result;
+    }
+
 
     /**
      * 导入试运算清单
@@ -479,48 +573,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             label.put("name",labelDTOList.get(i).getInjectionLabelName());
             labelList.add(label);
         }
-        redisUtils.set("LABEL_DETAIL_"+batchNumSt,labelList);
-        int num = (customerList.size() / 500) + 1;
-        List<List<Map<String,Object>>> smallCustomers = ChannelUtil.averageAssign(customerList,num);
-        //按规则存储客户信息
-        for (int i = 0; i < num; i++) {
-            redisUtils.hset("ISSURE_" + batchNumSt + "_" + ruleId, i + "",smallCustomers.get(i));
-        }
-//        redisUtils.set("ISSURE_" + batchNumSt + "_" + ruleId,customerList);
-        MktCampaignDO campaignDO = campaignMapper.selectByPrimaryKey(operation.getCampaignId());
-        if (campaignDO==null){
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "活动不存在");
-            return result;
-        }
-        final TrialOperationVOES request = BeanUtil.create(operation,new TrialOperationVOES());
-        request.setBatchNum(Long.valueOf(batchNumSt));
-        request.setCampaignType(campaignDO.getMktCampaignType());
-        request.setLanId(campaignDO.getLanId());
-        request.setCampaignName(campaignDO.getMktCampaignName());
-        request.setCamLevel(campaignDO.getCamLevel());
-        // 获取创建人员code
-        request.setStaffCode("SYS987329864");
-
-        //获取销售品及规则列表
-        TrialOperationParamES param = getTrialOperationParamES(operation, Long.valueOf(batchNumSt), ruleId,false);
-        ArrayList<TrialOperationParamES> paramESList = new ArrayList<>();
-        paramESList.add(param);
-        request.setParamList(paramESList);
-        new Thread(){
-            public void run(){
-                try {
-                    TrialResponseES responseES = esService.issueByFile(request);
-//                   TrialResponseES responseES =  restTemplate.postForObject("http://localhost:8080/es/issueByFile",request,TrialResponseES.class);
-                }catch (Exception e){
-                    e.printStackTrace();
-                    logger.info("导入清单下发失败");
-                }
-            }
-        }.start();
-        result.put("resultCode", CommonConstant.CODE_SUCCESS);
-        result.put("resultMsg", "导入成功,请稍后查看结果");
-        return result;
+        return importUserList(result, operation, ruleId, batchNumSt, customerList, labelList);
     }
 
 

@@ -34,4 +34,6 @@ public interface TrialOperationService  {
 
     Map<String,Object> trialLog(Long batchId);
 
+    Map<String,Object> importFromCust4Ppm(Long batchId);
+
 }
