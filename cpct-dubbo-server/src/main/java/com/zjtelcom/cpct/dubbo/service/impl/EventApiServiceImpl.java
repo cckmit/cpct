@@ -1774,13 +1774,13 @@ public class EventApiServiceImpl implements EventApiService {
                     String channelCode = null;
 
                     //新增加入reids -- linchao
-                    List<MktCamChlConfDO> mktCamChlConfDOS = (List<MktCamChlConfDO>) redisUtils.get("MKT_CAMCHL_CONF_LIST_" +  params.get("channelCode"));
+                    List<MktCamChlConfDO> mktCamChlConfDOS = (List<MktCamChlConfDO>) redisUtils.get("MKT_CAMCHL_CONF_LIST_" +  ruleId.toString());
                     if (mktCamChlConfDOS == null) {
                         mktCamChlConfDOS = new ArrayList<>();
                         for (String str : evtContactConfIdArray) {
                             MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(Long.valueOf(str));
                             mktCamChlConfDOS.add(mktCamChlConfDO);
-                            redisUtils.set("MKT_CAMCHL_CONF_LIST_" + params.get("channelCode"), mktCamChlConfDOS);
+                            redisUtils.set("MKT_CAMCHL_CONF_LIST_" + ruleId.toString(), mktCamChlConfDOS);
                         }
                     }
                     for (MktCamChlConfDO mktCamChlConfDO : mktCamChlConfDOS) {
@@ -3122,6 +3122,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                 // 判断活动状态
 
+/*
                 if (!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaign.getStatusCd())) {
                     esJson.put("hit", false);
                     esJson.put("msg", "活动状态未发布");
@@ -3129,6 +3130,7 @@ public class EventApiServiceImpl implements EventApiService {
                     esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
                     return Collections.EMPTY_MAP;
                 }
+*/
 
 
                 // 判断活动类型
