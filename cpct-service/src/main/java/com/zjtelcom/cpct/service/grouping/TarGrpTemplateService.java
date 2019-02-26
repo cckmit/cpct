@@ -7,7 +7,9 @@
 package com.zjtelcom.cpct.service.grouping;
 
 import com.zjtelcom.cpct.dto.grouping.TarGrpTemplateDetail;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -33,4 +35,6 @@ public interface TarGrpTemplateService {
     Map<String, Object> listTarGrpTemplatePage(String tarGrpTemplateName,String tarGrpType, Integer page, Integer pageSize);
 
     Map<String, Object> getTarGrpTemByOfferId(Long requestId);
+
+    Map<String, Object> importUserList4TarTemp(MultipartFile file,String tempName)throws IOException ;
 }

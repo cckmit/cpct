@@ -1089,7 +1089,7 @@ public class SynchronizeController extends BaseController {
 
     /**
      *
-     * 删除活动下的redis缓存 -- 生产
+     * 删除活动下的redis缓存 -- 准生产
      * @param params
      * @return
      * @throws Exception

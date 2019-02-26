@@ -33,6 +33,27 @@ public class TrialOperationController extends BaseController {
     private TrialOperationService operationService;
 
 
+
+
+    /**
+     * ppm-导入清单
+     * @param param
+     * @return
+     */
+    @PostMapping("importFromCust4Ppm")
+    @CrossOrigin
+    public Map<String, Object> importFromCust4Ppm( @RequestBody HashMap<String, Long> param){
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = operationService.importFromCust4Ppm(param.get("batchId"));
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to importFromCust4Ppm", e);
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", " fail to importFromCust4Ppm");
+            return result;
+        }
+        return result;
+    }
     /**
      * 查询试算记录日志
      * @param param
@@ -230,7 +251,7 @@ public class TrialOperationController extends BaseController {
     }
 
     /**
-     * 刷新列表
+     * 刷新列表(策略试运算)
      *
      * @param
      * @return
@@ -251,6 +272,26 @@ public class TrialOperationController extends BaseController {
 
     }
 
+    /**
+     * 刷新列表(客户清单导入)
+     *
+     * @param
+     * @return
+     */
+    @PostMapping("getTrialListByRuleId")
+    @CrossOrigin
+    public Map<String, Object> getTrialListByRuleId(@RequestBody HashMap<String, Long> param) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = operationService.getTrialListByRuleId(param.get("ruleId"));
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to getTrialListByRuleId", e);
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", " fail to getTrialListByRuleId");
+            return result;
+        }
+        return result;
 
+    }
 
 }
