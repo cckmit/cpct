@@ -493,6 +493,8 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
                                 }
                             }
 
+                            redisUtils.del("MKT_CAMCHL_CONF_LIST_" + mktStrategyConfRuleDO.getMktStrategyConfRuleId());
+
                             // 删除推送渠道
                             if (mktStrategyConfRuleDO.getEvtContactConfId() != null) {
                                 String[] evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
