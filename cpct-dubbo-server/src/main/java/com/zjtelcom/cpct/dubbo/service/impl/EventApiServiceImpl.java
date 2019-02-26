@@ -399,6 +399,12 @@ public class EventApiServiceImpl implements EventApiService {
                 //事件验证开始↓↓↓↓↓↓↓↓↓↓↓↓↓
                 //解析事件采集项
                 JSONObject evtParams = JSONObject.parseObject(map.get("evtContent"));
+                //获取C4的数据用于过滤
+                String c4 = null;
+                if(evtParams!=null){
+                    c4 = (String) evtParams.get("C4");
+                }
+
                 //根据事件code查询事件信息
                 ContactEvt event = (ContactEvt) redisUtils.get("EVENT_" + map.get("eventCode"));
                 if (event == null) {
@@ -510,7 +516,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                 timeJson.put("time2", System.currentTimeMillis() - begin);
                 //事件下所有活动的规则预校验，返回初步可命中活动
-                List<Map<String, Object>> resultByEvent = getResultByEvent(eventId, map.get("lanId"), map.get("channelCode"), map.get("reqId"), map.get("accNbr"));
+                List<Map<String, Object>> resultByEvent = getResultByEvent(eventId, map.get("lanId"), map.get("channelCode"), map.get("reqId"), map.get("accNbr"), c4);
 
                 timeJson.put("time3", System.currentTimeMillis() - begin);
 
@@ -733,6 +739,7 @@ public class EventApiServiceImpl implements EventApiService {
 
             } catch (Exception e) {
                 log.info("策略中心计算异常");
+                log.error("Exception = ", e);
                 paramsJson.put("errorMsg", e.getMessage());
                 esHitService.save(paramsJson, IndexList.PARAMS_MODULE);
 
@@ -1767,13 +1774,13 @@ public class EventApiServiceImpl implements EventApiService {
                     String channelCode = null;
 
                     //新增加入reids -- linchao
-                    List<MktCamChlConfDO> mktCamChlConfDOS = (List<MktCamChlConfDO>) redisUtils.get("MKT_CAMCHL_CONF_LIST_" +  params.get("channelCode"));
+                    List<MktCamChlConfDO> mktCamChlConfDOS = (List<MktCamChlConfDO>) redisUtils.get("MKT_CAMCHL_CONF_LIST_" +  ruleId.toString());
                     if (mktCamChlConfDOS == null) {
                         mktCamChlConfDOS = new ArrayList<>();
                         for (String str : evtContactConfIdArray) {
                             MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(Long.valueOf(str));
                             mktCamChlConfDOS.add(mktCamChlConfDO);
-                            redisUtils.set("MKT_CAMCHL_CONF_LIST_" + params.get("channelCode"), mktCamChlConfDOS);
+                            redisUtils.set("MKT_CAMCHL_CONF_LIST_" + ruleId.toString(), mktCamChlConfDOS);
                         }
                     }
                     for (MktCamChlConfDO mktCamChlConfDO : mktCamChlConfDOS) {
@@ -2184,11 +2191,11 @@ public class EventApiServiceImpl implements EventApiService {
         }
 
         public Object executeInner(Object[] list) throws Exception {
-            boolean productCheck = true;
+            boolean productCheck = false;
             //获取用户已办理销售品
             String productStr = (String) list[0];
             //获取过滤类型
-            String type = (String) list[1];
+            String type = list[1].toString();
             //过滤规则配置的销售品
             String[] checkProductArr = new String[list.length-2];
             for (int i = 2; i < list.length; i++) {
@@ -2202,7 +2209,7 @@ public class EventApiServiceImpl implements EventApiService {
                         for (String product : checkProductArr) {
                             int index = productStr.indexOf(product);
                             if (index >= 0) {
-                                productCheck = false;
+                                productCheck = true;
                                 break;
                             }
                         }
@@ -2211,22 +2218,22 @@ public class EventApiServiceImpl implements EventApiService {
                         for (String product : checkProductArr) {
                             int index = productStr.indexOf(product);
                             if (index >= 0) {
-                                productCheck = true;
+                                productCheck = false;
                                 noExistCheck = false;
                                 //被过滤的销售品
                                 break;
                             }
                         }
                         if (noExistCheck) {
-                            productCheck = false;
+                            productCheck = true;
                         }
                     }
                 } else {
                     //存在于校验
                     if ("7100".equals(type)) {
-                        productCheck = false;
-                    } else if ("7000".equals(type)) {
                         productCheck = true;
+                    } else if ("7000".equals(type)) {
+                        productCheck = false;
                     }
                 }
             }
@@ -2253,7 +2260,7 @@ public class EventApiServiceImpl implements EventApiService {
     public static String cpcExpression(String code, String type, String rightParam) {
         StringBuilder express = new StringBuilder();
         if ("PROM_LIST".equals(code)) {
-            express.append("(checkProm(").append(code).append(",").append("type").append(",").append(rightParam);
+            express.append("(checkProm(").append(code).append(",").append(type).append(",").append(rightParam);
             express.append("))");
         } else {
             if ("7100".equals(type)) {
@@ -3000,7 +3007,7 @@ public class EventApiServiceImpl implements EventApiService {
      * @param channel
      * @return
      */
-    private List<Map<String, Object>> getResultByEvent(Long eventId, String lanId, String channel, String reqId, String accNbr) {
+    private List<Map<String, Object>> getResultByEvent(Long eventId, String lanId, String channel, String reqId, String accNbr, String c4) {
         List<Map<String, Object>> mktCampaginIdList = mktCamEvtRelMapper.listActivityByEventId(eventId);
         // 初始化线程
         ExecutorService fixThreadPool = Executors.newFixedThreadPool(maxPoolSize);
@@ -3009,7 +3016,7 @@ public class EventApiServiceImpl implements EventApiService {
         try {
             for (Map<String, Object> act : mktCampaginIdList) {
                 Future<Map<String, Object>> future = fixThreadPool.submit(
-                        new ListResultByEventTask(act, lanId, channel, reqId, accNbr));
+                        new ListResultByEventTask(lanId, channel, reqId, accNbr, act, c4));
                 futureList.add(future);
             }
             if (futureList != null && futureList.size() > 0) {
@@ -3035,14 +3042,16 @@ public class EventApiServiceImpl implements EventApiService {
         private String channel;
         private String reqId;
         private String accNbr;
-        Map<String, Object> act;
+        private Map<String, Object> act;
+        private String c4;
 
-        public ListResultByEventTask(Map<String, Object> act, String lanId, String channel, String reqId, String accNbr) {
-            this.act = act;
+        public ListResultByEventTask(String lanId, String channel, String reqId, String accNbr, Map<String, Object> act, String c4) {
             this.lanId = lanId;
             this.channel = channel;
             this.reqId = reqId;
             this.accNbr = accNbr;
+            this.act = act;
+            this.c4 = c4;
         }
 
         @Override
@@ -3113,13 +3122,15 @@ public class EventApiServiceImpl implements EventApiService {
 
                 // 判断活动状态
 
-/*                if (!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaign.getStatusCd())) {
+/*
+                if (!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaign.getStatusCd())) {
                     esJson.put("hit", false);
                     esJson.put("msg", "活动状态未发布");
 //                log.info("活动状态未发布");
                     esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
                     return Collections.EMPTY_MAP;
-                }*/
+                }
+*/
 
 
                 // 判断活动类型
@@ -3171,7 +3182,12 @@ public class EventApiServiceImpl implements EventApiService {
                         String[] strArrayCity = mktStrategyConf.getAreaId().split("/");
                         boolean areaCheck = true;
                         for (String str : strArrayCity) {
-                            if (lanId != null) {
+                            if (c4 != null) {
+                                if (c4.equals(str)) {
+                                    areaCheck = false;
+                                    break;
+                                }
+                            }else if (lanId != null) {
                                 if (lanId.equals(str)) {
                                     areaCheck = false;
                                     break;
