@@ -505,6 +505,9 @@ public class EventApiServiceImpl implements EventApiService {
                     return result;
                 }
 
+                //添加内置标签
+                setInlayLabel(labelItems);
+
                 //获取事件推荐活动数
                 int recCampaignAmount;
                 String recCampaignAmountStr = event.getRecCampaignAmount();
@@ -597,10 +600,11 @@ public class EventApiServiceImpl implements EventApiService {
                 timeJson.put("time4", System.currentTimeMillis() - begin);
 
                 //初始化结果集
-                List<Future<Map<String, Object>>> threadList = new ArrayList<>();
+//                List<Future<Map<String, Object>>> threadList = new ArrayList<>();
                 //初始化线程池
 //                ExecutorService executorService = Executors.newFixedThreadPool(THREAD_COUNT_ACTIVE);
                 ExecutorService executorService = Executors.newCachedThreadPool();
+                CompletionService<Map<String, Object>> completionService = new ExecutorCompletionService<>(executorService);
                 //遍历活动
                 for (Map<String, Object> activeMap : resultByEvent) {
                     //提交线程
@@ -616,14 +620,14 @@ public class EventApiServiceImpl implements EventApiService {
                                 privateParams.put("custId", map.get("custId"));
                                 //活动优先级为空的时候默认0
                                 privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
-                                Future<Map<String, Object>> f = executorService.submit(
-                                        new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList")));
+//                                Future<Map<String, Object>> f = executorService.submit(
+//                                        new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList")));
+                                completionService.submit( new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList")));
                                 //将线程处理结果添加到结果集
-                                threadList.add(f);
+                                //threadList.add(f);
                             }
                         } else {
                             log.error("客户级资产查询出错:" + map.get("reqId"));
-
                             esJson.put("reqId", map.get("reqId"));
                             esJson.put("activityId", activeMap.get("mktCampaginId"));
                             esJson.put("hitEntity", map.get("accNbr")); //命中对象
@@ -640,10 +644,11 @@ public class EventApiServiceImpl implements EventApiService {
                         privateParams.put("custId", map.get("custId"));
                         privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
                         //资产级
-                        Future<Map<String, Object>> f = executorService.submit(
-                                new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList")));
+//                        Future<Map<String, Object>> f = executorService.submit(
+//                                new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList")));
+                        completionService.submit(new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList")));
                         //将线程处理结果添加到结果集
-                        threadList.add(f);
+//                        threadList.add(f);
                     }
                 }
 
@@ -651,10 +656,13 @@ public class EventApiServiceImpl implements EventApiService {
 
                 //获取结果
                 try {
-                    for (Future<Map<String, Object>> future : threadList) {
+                   /* for (Future<Map<String, Object>> future : threadList) {
                         if (!future.get().isEmpty()) {
                             activityList.addAll((List<Map<String, Object>>) future.get().get("strategyList"));
                         }
+                    }*/
+                    for (int i = 0; i < resultByEvent.size(); i++) {
+                        activityList.addAll((List<Map<String, Object>>) completionService.take().get().get("strategyList"));
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -1141,24 +1149,32 @@ public class EventApiServiceImpl implements EventApiService {
 
             timeJson.put("time5", System.currentTimeMillis() - begin);
             //初始化结果集
-            List<Future<Map<String, Object>>> threadList = new ArrayList<>();
+            //List<Future<Map<String, Object>>> threadList = new ArrayList<>();
             //初始化线程池
             ExecutorService executorService = Executors.newCachedThreadPool();
+            CompletionService<Map<String, Object>> completionService = new ExecutorCompletionService<>(executorService);
             //遍历策略列表
             for (Map<String, Object> strategyMap : strategyMapList) {
                 //提交线程
+/*
                 Future<Map<String, Object>> f = executorService.submit(
                         new StrategyTask(params, (Long) strategyMap.get("strategyConfId"), (String) strategyMap.get("strategyConfName"),
                                 privateParams, context));
                 //将线程处理结果添加到结果集
                 threadList.add(f);
+*/
+                completionService.submit(new StrategyTask(params, (Long) strategyMap.get("strategyConfId"), (String) strategyMap.get("strategyConfName"),
+                        privateParams, context));
             }
             //获取结果
             try {
-                for (Future<Map<String, Object>> future : threadList) {
+                /*for (Future<Map<String, Object>> future : threadList) {
                     if (!future.get().isEmpty()) {
                         strategyList.addAll((List<Map<String, Object>>) future.get().get("ruleList"));
                     }
+                }*/
+                for (int i = 0; i <strategyMapList.size() ; i++) {
+                    strategyList.addAll((List<Map<String, Object>>) completionService.take().get().get("ruleList"));
                 }
                 activity.put("strategyList", strategyList);
 
@@ -1327,9 +1343,10 @@ public class EventApiServiceImpl implements EventApiService {
             timeJson.put("time2", System.currentTimeMillis() - begin);
             //遍历规则↓↓↓↓↓↓↓↓↓↓
             //初始化结果集
-            List<Future<Map<String, Object>>> threadList = new ArrayList<>();
+            //List<Future<Map<String, Object>>> threadList = new ArrayList<>();
             //初始化线程池
             ExecutorService executorService = Executors.newCachedThreadPool();
+            CompletionService<Map<String, Object>> completionService = new ExecutorCompletionService<>(executorService);
             //遍历规则列表
             timeJson.put("time2--", System.currentTimeMillis() - begin);
             if (mktStrategyConfRuleDOS != null && mktStrategyConfRuleDOS.size() > 0) {
@@ -1347,10 +1364,12 @@ public class EventApiServiceImpl implements EventApiService {
                     //策略名称
                     String mktStrategyConfRuleName = mktStrategyConfRuleDO.getMktStrategyConfRuleName();*/
                     //提交线程
-                    Future<Map<String, Object>> f = executorService.submit(new RuleTask(params, privateParams, strategyConfId, strategyConfName, mktStrategyConfRuleDOS.get(i).getTarGrpId(), mktStrategyConfRuleDOS.get(i).getProductId(),
+                    /*Future<Map<String, Object>> f = executorService.submit(new RuleTask(params, privateParams, strategyConfId, strategyConfName, mktStrategyConfRuleDOS.get(i).getTarGrpId(), mktStrategyConfRuleDOS.get(i).getProductId(),
                             mktStrategyConfRuleDOS.get(i).getEvtContactConfId(), mktStrategyConfRuleDOS.get(i).getMktStrategyConfRuleId(), mktStrategyConfRuleDOS.get(i).getMktStrategyConfRuleName(), context));
                     //将线程处理结果添加到结果集
-                    threadList.add(f);
+                    threadList.add(f);*/
+                    completionService.submit(new RuleTask(params, privateParams, strategyConfId, strategyConfName, mktStrategyConfRuleDOS.get(i).getTarGrpId(), mktStrategyConfRuleDOS.get(i).getProductId(),
+                            mktStrategyConfRuleDOS.get(i).getEvtContactConfId(), mktStrategyConfRuleDOS.get(i).getMktStrategyConfRuleId(), mktStrategyConfRuleDOS.get(i).getMktStrategyConfRuleName(), context));
                     timeJson.put("time2-"+ i, System.currentTimeMillis() - begin);
                 }
             }
@@ -1359,10 +1378,13 @@ public class EventApiServiceImpl implements EventApiService {
 
             //获取结果
             try {
-                for (Future<Map<String, Object>> future : threadList) {
+               /* for (Future<Map<String, Object>> future : threadList) {
                     if (!future.get().isEmpty()) {
                         ruleList.add(future.get());
                     }
+                }*/
+                for (int i = 0; i < mktStrategyConfRuleDOS.size(); i++) {
+                    ruleList.add(completionService.take().get());
                 }
                 strategyMap.put("ruleList", ruleList);
 
@@ -1791,36 +1813,42 @@ public class EventApiServiceImpl implements EventApiService {
                     }
 
                     //初始化结果集
-                    List<Future<Map<String, Object>>> threadList = new ArrayList<>();
+                    //List<Future<Map<String, Object>>> threadList = new ArrayList<>();
                     //初始化线程池
                     ExecutorService executorService = Executors.newCachedThreadPool();
-
+                    CompletionService<Map<String, Object>> completionService = new ExecutorCompletionService<>(executorService);
                     try {
+                        int s = 0;
                         //遍历协同渠道
                         if (channelCode != null) {
                             Long evtContactConfId = Long.parseLong(channelCode);
                             //提交线程
-                            Future<Map<String, Object>> f = executorService.submit(new ChannelTask(evtContactConfId, productList, context));
+/*                            Future<Map<String, Object>> f = executorService.submit(new ChannelTask(evtContactConfId, productList, context));
                             //将线程处理结果添加到结果集
-                            threadList.add(f);
+                            threadList.add(f);*/
+                            completionService.submit(new ChannelTask(evtContactConfId, productList, context));
+                            s++;
                         } else {
                             for (String str : evtContactConfIdArray) {
                                 //协同渠道规则表id（自建表）
                                 Long evtContactConfId = Long.parseLong(str);
                                 //提交线程
-                                Future<Map<String, Object>> f = executorService.submit(new ChannelTask(evtContactConfId, productList, context));
+                               /* Future<Map<String, Object>> f = executorService.submit(new ChannelTask(evtContactConfId, productList, context));
                                 //将线程处理结果添加到结果集
-                                threadList.add(f);
+                                threadList.add(f);*/ completionService.submit(new ChannelTask(evtContactConfId, productList, context));
+                                s++;
                             }
                         }
                         //获取结果
 
-                        for (Future<Map<String, Object>> future : threadList) {
+                       /* for (Future<Map<String, Object>> future : threadList) {
                             if (!future.get().isEmpty()) {
                                 taskChlList.add(future.get());
                             }
+                        }*/
+                        for (int i = 0; i < s; i++) {
+                            taskChlList.add(completionService.take().get());
                         }
-
                         timeJson.put("time8", System.currentTimeMillis() - begin);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -2203,7 +2231,7 @@ public class EventApiServiceImpl implements EventApiService {
             }
             //获取需要过滤的销售品
             if (checkProductArr != null && checkProductArr.length > 0) {
-            //    String[] checkProductArr = checkProduct.split(",");
+                //    String[] checkProductArr = checkProduct.split(",");
                 if (productStr != null && !"".equals(productStr)) {
                     if ("7000".equals(type)) {  //存在于
                         for (String product : checkProductArr) {
@@ -3011,25 +3039,33 @@ public class EventApiServiceImpl implements EventApiService {
         List<Map<String, Object>> mktCampaginIdList = mktCamEvtRelMapper.listActivityByEventId(eventId);
         // 初始化线程
         ExecutorService fixThreadPool = Executors.newFixedThreadPool(maxPoolSize);
-        List<Future<Map<String, Object>>> futureList = new ArrayList<>();
+        // List<Future<Map<String, Object>>> futureList = new ArrayList<>();
+        CompletionService<Map<String, Object>> completionService = new ExecutorCompletionService<>(fixThreadPool);
         List<Map<String, Object>> mktCampaignMapList = new ArrayList<>();
         try {
             for (Map<String, Object> act : mktCampaginIdList) {
-                Future<Map<String, Object>> future = fixThreadPool.submit(
+                /*Future<Map<String, Object>> future = fixThreadPool.submit(
                         new ListResultByEventTask(lanId, channel, reqId, accNbr, act, c4));
-                futureList.add(future);
+                futureList.add(future);*/
+                completionService.submit(new ListResultByEventTask(lanId, channel, reqId, accNbr, act, c4));
             }
-            if (futureList != null && futureList.size() > 0) {
-                for (Future<Map<String, Object>> future : futureList) {
+            if (mktCampaginIdList != null && mktCampaginIdList.size() > 0) {
+                /*for (Future<Map<String, Object>> future : futureList) {
                     Map<String, Object> mktCampaignMap = future.get();
                     if (mktCampaignMap != null && !mktCampaignMap.isEmpty()) {
                         mktCampaignMapList.add(mktCampaignMap);
                     }
+                }*/
+                for (int i = 0; i < mktCampaginIdList.size(); i++) {
+                    mktCampaignMapList.add(completionService.take().get());
                 }
+                System.out.println(mktCampaignMapList);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            fixThreadPool.shutdown();
             log.error("[op:getResultByEvent] failed to getResultByEvent by eventId = {}, lanId = {}, channel = {}, Expection = ", eventId, lanId, channel, e);
+        } finally {
+            fixThreadPool.shutdown();
         }
         return mktCampaignMapList;
     }
@@ -3121,8 +3157,6 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
                 // 判断活动状态
-
-/*
                 if (!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaign.getStatusCd())) {
                     esJson.put("hit", false);
                     esJson.put("msg", "活动状态未发布");
@@ -3130,7 +3164,6 @@ public class EventApiServiceImpl implements EventApiService {
                     esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
                     return Collections.EMPTY_MAP;
                 }
-*/
 
 
                 // 判断活动类型
@@ -3443,5 +3476,16 @@ public class EventApiServiceImpl implements EventApiService {
         }
     }
 
+
+    /**
+     * 添加内置的标签并赋值
+     * @param map
+     */
+    private void setInlayLabel(Map<String,String> map) {
+        Calendar calendar = Calendar.getInstance();
+        map.put("CPCP_IN_EVENT_YEAR",String.valueOf(calendar.get(Calendar.YEAR)));
+        map.put("CPCP_IN_EVENT_MONTH",String.valueOf(calendar.get(Calendar.MONTH) + 1));
+        map.put("CPCP_IN_EVENT_DAY",String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)));
+    }
 
 }
