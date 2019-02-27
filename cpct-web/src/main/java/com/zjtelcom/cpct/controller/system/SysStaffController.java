@@ -64,7 +64,7 @@ public class SysStaffController extends BaseController {
             map.put("parent",parent);
             List<PrivilegeDetail> childList = new ArrayList<>();
             for (PrivilegeDetail detail : userDetail.getPrivilegeDetails()){
-                if (!detail.getPrivFuncRelDetails().isEmpty() && detail.getPrivFuncRelDetails().get(0)!=null
+                if (detail.getPrivFuncRelDetails()!=null && !detail.getPrivFuncRelDetails().isEmpty() && detail.getPrivFuncRelDetails().get(0)!=null
                         && detail.getPrivFuncRelDetails().get(0).getFuncMenu()!=null ) {
                     Long detailId = detail.getPrivFuncRelDetails().get(0).getFuncMenu().getParMenuId();
                     if (detailId != null && detailId.equals(parentId)) {
