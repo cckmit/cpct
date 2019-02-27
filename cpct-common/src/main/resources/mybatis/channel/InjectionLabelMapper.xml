@@ -401,6 +401,16 @@
     where dcl.DISPLAY_ID = #{grpId,jdbcType=BIGINT}
   </select>
 
-
+  <select id="listLabelByRuleId" parameterType="java.lang.Long" resultType="java.lang.String">
+    select i.LABEL_TYPE
+    from injection_label i
+    left join tar_grp_condition con
+    on con.LEFT_PARAM = i.INJECTION_LABEL_ID
+    left join tar_grp grp
+    on grp.TAR_GRP_ID = con.TAR_GRP_ID
+    left join mkt_strategy_conf_rule rule
+    on rule.TAR_GRP_ID = grp.TAR_GRP_ID
+    where rule.MKT_STRATEGY_CONF_RULE_ID = #{ruleId}
+  </select>
 
 </mapper>
