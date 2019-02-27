@@ -7,8 +7,9 @@ public class LabModel implements Serializable {
     private String labName;//标签名称
     private String labEngName;//英文名称
     private String labCode;//标签编码
+    private String labDataType;//标签数据类型(字符型/数值型/时间型)
     private String labManageType;//标签管理类型(A集团/B省份/C地市（可扩展）)
-    private String labType;//标签类型(文本、数值、枚举)
+    private String labType;//标签类型(文本\枚举)
     private String labRelevantFlag;//标签置信度
     private String labMissRate;//标签缺失率
     private String labObjectCode;//标签对象编码
@@ -29,6 +30,14 @@ public class LabModel implements Serializable {
     private String labBusiDesc;//业务口径
     private String labTechDesc;//技术口径
     private String labState;//上线：3；下线：5
+
+    public String getLabDataType() {
+        return labDataType;
+    }
+
+    public void setLabDataType(String labDataType) {
+        this.labDataType = labDataType;
+    }
 
     public Long getLabRowId() {
         return labRowId;

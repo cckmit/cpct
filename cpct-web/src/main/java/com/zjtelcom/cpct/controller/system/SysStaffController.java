@@ -50,6 +50,10 @@ public class SysStaffController extends BaseController {
         List<Map<String,Object>> resultList = new ArrayList<>();
         List<PrivilegeDetail> parentList = new ArrayList<>();
         for (PrivilegeDetail detail : userDetail.getPrivilegeDetails()){
+            if (detail.getPrivFuncRelDetails().isEmpty() || detail.getPrivFuncRelDetails().get(0)==null
+                    || detail.getPrivFuncRelDetails().get(0).getFuncMenu()==null){
+                continue;
+            }
             if (detail.getPrivCode().contains("CPCP") && detail.getPrivFuncRelDetails().get(0).getFuncMenu().getParMenuId()==null){
                 parentList.add(detail);
             }
@@ -60,11 +64,10 @@ public class SysStaffController extends BaseController {
             map.put("parent",parent);
             List<PrivilegeDetail> childList = new ArrayList<>();
             for (PrivilegeDetail detail : userDetail.getPrivilegeDetails()){
-                if (detail.getPrivFuncRelDetails().get(0)!=null && detail.getPrivFuncRelDetails().get(0).getFuncMenu()!=null ) {
+                if (detail.getPrivFuncRelDetails()!=null && !detail.getPrivFuncRelDetails().isEmpty() && detail.getPrivFuncRelDetails().get(0)!=null
+                        && detail.getPrivFuncRelDetails().get(0).getFuncMenu()!=null ) {
                     Long detailId = detail.getPrivFuncRelDetails().get(0).getFuncMenu().getParMenuId();
                     if (detailId != null && detailId.equals(parentId)) {
-//                    String urlAddr = detail.getPrivFuncRelDetails().get(0).getFuncMenu().getUrlAddr();
-//                    String detailName = urlAddr.substring(1,urlAddr.length());
                         childList.add(detail);
                     }
                 }

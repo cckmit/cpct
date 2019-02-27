@@ -12,6 +12,7 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
+import com.zjtelcom.cpct.domain.Rule;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
@@ -38,6 +39,7 @@ import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.util.*;
+import com.zjtelcom.cpct_prod.dao.offer.MktResourceProdMapper;
 import com.zjtelcom.es.es.entity.*;
 import com.zjtelcom.es.es.entity.model.LabelResultES;
 import com.zjtelcom.es.es.entity.model.TrialOperationParamES;
@@ -48,6 +50,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -108,7 +111,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Autowired(required = false)
     private EsService esService;
     @Autowired
-    private MktResourceMapper resourceMapper;
+    private MktResourceProdMapper resourceMapper;
     @Autowired
     private MktStrategyConfMapper strategyConfMapper;
     @Autowired
@@ -660,6 +663,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         return result;
     }
 
+
+
     /**
      * 新增策略试运算记录
      *
@@ -677,6 +682,25 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultCode", CODE_FAIL);
             result.put("resultMsg", "活动策略信息有误");
             return result;
+        }
+        List<MktStrategyConfRuleDO> ruleList = ruleMapper.selectByMktStrategyConfId(operationVO.getStrategyId());
+        if (ruleList==null || ruleList.isEmpty()){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "未找到有效的规则信息");
+            return result;
+        }
+        for (MktStrategyConfRuleDO rule : ruleList){
+            List<String> labelTypeList = injectionLabelMapper.listLabelByRuleId(rule.getMktStrategyConfRuleId());
+            if (labelTypeList == null || labelTypeList.isEmpty()){
+                result.put("resultCode", CODE_FAIL);
+                result.put("resultMsg", "请检查规则："+rule.getMktStrategyConfRuleName()+"条件配置");
+                return result;
+            }
+            if (!labelTypeList.contains("2000")){
+                result.put("resultCode", CODE_FAIL);
+                result.put("resultMsg", "规则："+rule.getMktStrategyConfRuleName()+"请至少配置一条用户级条件");
+                return result;
+            }
         }
         TrialOperation trialOp = BeanUtil.create(operationVO, new TrialOperation());
         trialOp.setCampaignName(campaign.getMktCampaignName());
@@ -749,20 +773,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         for (MktStrategyConfRuleRelDO ruleRelDO : ruleRelList) {
             TrialOperationParamES param = getTrialOperationParamES(operationVO, trialOperation.getBatchNum(), ruleRelDO.getMktStrategyConfRuleId(),true);
             List<LabelResultES> labelResultList = param.getLabelResultList();
-            List<String> labelTypeList = new ArrayList<>();
-            for (LabelResultES la : labelResultList){
-                labelTypeList.add(la.getRightOperand());
-            }
-            if (!labelTypeList.contains("2000")){
-                result.put("resultCode", CODE_FAIL);
-                result.put("resultMsg", "规则："+param.getRuleName()+"不满足查询条件，请至少配置一条用户级标签查询条件！");
-                return result;
-            }
             paramList.add(param);
         }
         requests.setParamList(paramList);
-//        TrialResponse response = new TrialResponse();
-//        TrialResponse countResponse = new TrialResponse();
         TrialResponseES response = new TrialResponseES();
         TrialResponseES countResponse = new TrialResponseES();
 
@@ -781,7 +794,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 //            }
         } catch (Exception e) {
             e.printStackTrace();
-            // 抽样试算失败
+
         }
         // 抽样试算成功
         result.put("resultCode", CODE_SUCCESS);
@@ -902,29 +915,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             userList.add(map);
 
         }
-//        for (String key : hitsList.keySet()) {
-//            Map<String, Object> searchMap = (Map<String, Object>) ((Map<String, Object>) hitsList.get(key)).get("searchHitMap");
-//            Map<String, Object> ruleInfoMap = new HashMap<>();
-//            if (((Map<String, Object>) hitsList.get(key)).get("ruleInfo") != null) {
-//                ruleInfoMap = (Map<String, Object>) ((Map<String, Object>) hitsList.get(key)).get("ruleInfo");
-//            }
-//            Map<String, Object> map = new HashMap<>();
-//            for (String set : searchMap.keySet()) {
-//                if (labelCodeList.size() < searchMap.keySet().size()) {
-//                    labelCodeList.add(set);
-//                }
-//                map.put(set, searchMap.get(set));
-//            }
-//            map.put("campaignId", operation.getCampaignId());
-//            map.put("campaignName", operation.getCampaignName());
-//            map.put("strategyId", operation.getStrategyId());
-//            map.put("strategyName", operation.getStrategyName());
-//            map.put("ruleId", ruleInfoMap.get("ruleId"));
-//            map.put("ruleName", ruleInfoMap.get("ruleName").toString());
-//            //todo 工单号
-//            map.put("orderId", "49736605");
-//            userList.add(map);
-//        }
         if (labelCodeList.size() > 0) {
             List<SimpleInfo> titleList = labelMapper.listLabelByCodeList(labelCodeList);
             vo.setTitleList(titleList);
