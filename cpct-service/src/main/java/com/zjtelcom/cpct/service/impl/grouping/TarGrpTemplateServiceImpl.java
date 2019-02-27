@@ -38,6 +38,7 @@ import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
 import com.zjtelcom.cpct.vo.grouping.TarGrpVO;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
+import com.zjtelcom.cpct_prod.dao.offer.MktResourceProdMapper;
 import com.zjtelcom.es.es.entity.TrialOperationVOES;
 import com.zjtelcom.es.es.entity.model.TrialOperationParamES;
 import com.zjtelcom.es.es.entity.model.TrialResponseES;
@@ -88,7 +89,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     @Autowired
     private OfferResRelMapper offerResRelMapper;
     @Autowired
-    private MktResourceMapper resourceMapper;
+    private MktResourceProdMapper resourceMapper;
     @Autowired
     private GrpSystemRelMapper grpSystemRelMapper;
     @Autowired
