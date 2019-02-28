@@ -219,7 +219,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             labelValodate.setLabTagCode(labModel.getLabCode());//标签编码
             labelValodate.setInjectionLabelDesc(labModel.getLabBusiDesc());
 
-
+            labelValodate.setLabelDataType(labModel.getLabDataType()==null ? "1200" : labModel.getLabDataType());
             labelValodate.setConditionType(labModel.getLabType());
             if("4".equals(labelValodate.getConditionType())){
                 labelValodate.setOperator("2000,3000,1000,4000,6000,5000,7000,7200");
@@ -255,7 +255,6 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             label.setTagRowId(labModel.getLabRowId());//标签id
             label.setInjectionLabelName(labModel.getLabName());//标签名称
             label.setInjectionLabelCode(labModel.getLabEngName());//英文名称
-            //label.setInjectionLabelDesc();
             label.setLabTagCode(labModel.getLabCode());//标签编码
             label.setInjectionLabelDesc(labModel.getLabBusiDesc());
             label.setConditionType(labModel.getLabType());
@@ -267,16 +266,13 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             label.setScope(1);
             label.setIsShared(0);
             label.setCatalogId(labModel.getLabObjectCode() + labModel.getLabLevel1() + labModel.getLabLevel2() + labModel.getLabLevel3());
-
-            //todo 暂无标签类型
+            label.setLabelDataType(labModel.getLabDataType()==null ? "1200" : labModel.getLabDataType());
             label.setLabelType("1000");
-            //todo 暂无值类型
             if (record.getLabelValueList()!=null && !record.getLabelValueList().isEmpty()){
                 label.setLabelValueType("2000");
             }else {
                 label.setLabelValueType("1000");
             }
-            //label.setLabelDataType(ChannelUtil.getDataType(tagModel.getSourceTableColumnType()));
             label.setStatusCd(STATUSCD_EFFECTIVE);
             label.setCreateStaff(UserUtil.loginId());
             label.setCreateDate(new Date());
@@ -369,47 +365,47 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
 
         //标签数据初始化
         List<Label> labels = labelMapper.selectAll();
-        for (Label label : labels) {
-            labelMapper.deleteByPrimaryKey(label.getInjectionLabelId());
-            Label labelModel = BeanUtil.create(label, new Label());
-
-            //label.setInjectionLabelDesc();
-            if(label.getConditionType().equals("4")){
-                labelModel.setOperator("2000,3000,1000,4000,6000,5000,7000,7200");
-                labelModel.setLabelValueType("1000");
-            }else{
-                labelModel.setOperator("7000");
-                labelModel.setLabelValueType("2000");
-            }
-            if (labelModel.getLabObject().equals("客户级")){
-                labelModel.setLabelType("1000");
-            }else if (labelModel.getLabObject().equals("用户级")) {
-                labelModel.setLabelType("2000");
-            }else if (labelModel.getLabObject().equals("销售品级")) {
-                labelModel.setLabelType("3000");
-            }else if (labelModel.getLabObject().equals("区域级")) {
-                labelModel.setLabelType("4000");
-            }
-            labelModel.setLabelDataType("1000");
-            labelModel.setScope(1);
-            labelModel.setIsShared(0);
-            labelModel.setSystemInfoId(0L);
-            labelModel.setCatalogId(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3());
-
-//            //todo 暂无值类型
-//            if (record.getLabelValueList()!=null && !record.getLabelValueList().isEmpty()){
-//                labelModel.setLabelValueType("2000");
-//            }else {
+//        for (Label label : labels) {
+//            labelMapper.deleteByPrimaryKey(label.getInjectionLabelId());
+//            Label labelModel = BeanUtil.create(label, new Label());
+//
+//            //label.setInjectionLabelDesc();
+//            if(label.getConditionType().equals("4")){
+//                labelModel.setOperator("2000,3000,1000,4000,6000,5000,7000,7200");
 //                labelModel.setLabelValueType("1000");
+//            }else{
+//                labelModel.setOperator("7000");
+//                labelModel.setLabelValueType("2000");
 //            }
-            //label.setLabelDataType(ChannelUtil.getDataType(tagModel.getSourceTableColumnType()));
-
-            labelModel.setStatusCd(STATUSCD_EFFECTIVE);
-            labelModel.setCreateStaff(UserUtil.loginId());
-            labelModel.setCreateDate(new Date());
-
-            labelMapper.insert(labelModel);
-        }
+//            if (labelModel.getLabObject().equals("客户级")){
+//                labelModel.setLabelType("1000");
+//            }else if (labelModel.getLabObject().equals("用户级")) {
+//                labelModel.setLabelType("2000");
+//            }else if (labelModel.getLabObject().equals("销售品级")) {
+//                labelModel.setLabelType("3000");
+//            }else if (labelModel.getLabObject().equals("区域级")) {
+//                labelModel.setLabelType("4000");
+//            }
+//            labelModel.setLabelDataType("1000");
+//            labelModel.setScope(1);
+//            labelModel.setIsShared(0);
+//            labelModel.setSystemInfoId(0L);
+//            labelModel.setCatalogId(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3());
+//
+////            //todo 暂无值类型
+////            if (record.getLabelValueList()!=null && !record.getLabelValueList().isEmpty()){
+////                labelModel.setLabelValueType("2000");
+////            }else {
+////                labelModel.setLabelValueType("1000");
+////            }
+//            //label.setLabelDataType(ChannelUtil.getDataType(tagModel.getSourceTableColumnType()));
+//
+//            labelModel.setStatusCd(STATUSCD_EFFECTIVE);
+//            labelModel.setCreateStaff(UserUtil.loginId());
+//            labelModel.setCreateDate(new Date());
+//
+//            labelMapper.insert(labelModel);
+//        }
 
         //标签目录初始化
 //        List<Label> labels = labelMapper.selectAll();
@@ -420,7 +416,9 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         return result;
     }
 
-    private void initLabelCatalog(List<Label> labels) {
+    private void initLabelCatalog(List<Label> labelList) {
+        List<Label> labels = injectionLabelMapper.selectByScope(1L);
+
         for (Label label : labels){
             //标签目录插入
             LabelCatalog labelCatalog =new LabelCatalog();
@@ -455,13 +453,13 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
                 labelCatalog.setParentId(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2());
                 labelCatalogMapper.insert(labelCatalog);
             }
-            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3() + label.getLabLevel4()), 5L) == null) {
-                labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3() + label.getLabLevel4());
-                labelCatalog.setCatalogName(label.getLabLevel4Name());
-                labelCatalog.setLevelId(5L);
-                labelCatalog.setParentId(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3());
-                labelCatalogMapper.insert(labelCatalog);
-            }
+//            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3() + label.getLabLevel4()), 5L) == null) {
+//                labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3() + label.getLabLevel4());
+//                labelCatalog.setCatalogName(label.getLabLevel4Name());
+//                labelCatalog.setLevelId(5L);
+//                labelCatalog.setParentId(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3());
+//                labelCatalogMapper.insert(labelCatalog);
+//            }
         }
     }
 
