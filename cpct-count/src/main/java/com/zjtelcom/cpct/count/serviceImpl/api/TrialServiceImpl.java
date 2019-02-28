@@ -78,7 +78,7 @@ public class TrialServiceImpl implements TrialService {
         }
         trialTarGrp.setSize(size);
         try {
-//            String url="http://192.168.137.1:8080/es/searchByTarGrp";
+//            String url="http://localhost:8080/es/searchByTarGrp";
 //            responseES = restTemplate.postForObject(url, trialTarGrp, TrialResponseES.class);
             responseES = esService.searchByTarGrp(trialTarGrp);
             log.info("es返回信息："+ JSONObject.parseObject(JSON.toJSONString(responseES)));
@@ -226,6 +226,7 @@ public class TrialServiceImpl implements TrialService {
                         labelResult.setRightParam(conditionList.get(i).getRightParam());
                         labelResult.setClassName(label.getClassName());
                         labelResult.setOperType(type);
+                        labelResult.setLabelDataType(label.getLabelDataType()==null ? "1100" : label.getLabelDataType());
                         labelResultList.add(labelResult);
                         codeList.add(label.getInjectionLabelCode());
                         if ("7100".equals(type)) {

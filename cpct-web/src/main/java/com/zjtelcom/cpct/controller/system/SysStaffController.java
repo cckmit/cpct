@@ -50,7 +50,7 @@ public class SysStaffController extends BaseController {
         List<Map<String,Object>> resultList = new ArrayList<>();
         List<PrivilegeDetail> parentList = new ArrayList<>();
         for (PrivilegeDetail detail : userDetail.getPrivilegeDetails()){
-            if (detail.getPrivFuncRelDetails()==null || detail.getPrivFuncRelDetails().isEmpty() || detail.getPrivFuncRelDetails().get(0)==null
+            if (detail.getPrivFuncRelDetails().isEmpty() || detail.getPrivFuncRelDetails().get(0)==null
                     || detail.getPrivFuncRelDetails().get(0).getFuncMenu()==null){
                 continue;
             }
