@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.OrganizationMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.Organization">
+    <id column="ORG_ID" jdbcType="BIGINT" property="orgId" />
+    <result column="PARTY_ID" jdbcType="BIGINT" property="partyId" />
+    <result column="ORG_CODE" jdbcType="VARCHAR" property="orgCode" />
+    <result column="ORG_NAME" jdbcType="VARCHAR" property="orgName" />
+    <result column="REGION_ID" jdbcType="BIGINT" property="regionId" />
+    <result column="ORG_TYPE" jdbcType="VARCHAR" property="orgType" />
+    <result column="ORG_SUBTYPE" jdbcType="VARCHAR" property="orgSubtype" />
+    <result column="VILLAGE_FLAG" jdbcType="VARCHAR" property="villageFlag" />
+    <result column="PARENT_ORG_ID" jdbcType="BIGINT" property="parentOrgId" />
+    <result column="ORG_LEVEL" jdbcType="INTEGER" property="orgLevel" />
+    <result column="ORG_INDEX" jdbcType="INTEGER" property="orgIndex" />
+    <result column="SALESORG_CODE" jdbcType="VARCHAR" property="salesorgCode" />
+    <result column="DIVORG_FLAG" jdbcType="SMALLINT" property="divorgFlag" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="ORG_DIVISION" jdbcType="VARCHAR" property="orgDivision" />
+    <result column="org_id_4a" jdbcType="BIGINT" property="orgId4a" />
+    <result column="ORG_CONTRACT_TYPE" jdbcType="VARCHAR" property="orgContractType" />
+    <result column="ORG_AREA_LEVEL" jdbcType="VARCHAR" property="orgAreaLevel" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="ORG_DESC" jdbcType="VARCHAR" property="orgDesc" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from organization
+    where ORG_ID = #{orgId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.Organization">
+    insert into organization (ORG_ID, PARTY_ID, ORG_CODE, 
+      ORG_NAME, REGION_ID, ORG_TYPE, 
+      ORG_SUBTYPE, VILLAGE_FLAG, PARENT_ORG_ID, 
+      ORG_LEVEL, ORG_INDEX, SALESORG_CODE, 
+      DIVORG_FLAG, CREATE_DATE, CREATE_STAFF, 
+      STATUS_CD, STATUS_DATE, UPDATE_DATE, 
+      UPDATE_STAFF, ORG_DIVISION, org_id_4a, 
+      ORG_CONTRACT_TYPE, ORG_AREA_LEVEL, REMARK, 
+      ORG_DESC)
+    values (#{orgId,jdbcType=BIGINT}, #{partyId,jdbcType=BIGINT}, #{orgCode,jdbcType=VARCHAR}, 
+      #{orgName,jdbcType=VARCHAR}, #{regionId,jdbcType=BIGINT}, #{orgType,jdbcType=VARCHAR}, 
+      #{orgSubtype,jdbcType=VARCHAR}, #{villageFlag,jdbcType=VARCHAR}, #{parentOrgId,jdbcType=BIGINT}, 
+      #{orgLevel,jdbcType=INTEGER}, #{orgIndex,jdbcType=INTEGER}, #{salesorgCode,jdbcType=VARCHAR}, 
+      #{divorgFlag,jdbcType=SMALLINT}, #{createDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT}, 
+      #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{updateStaff,jdbcType=BIGINT}, #{orgDivision,jdbcType=VARCHAR}, #{orgId4a,jdbcType=BIGINT}, 
+      #{orgContractType,jdbcType=VARCHAR}, #{orgAreaLevel,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
+      #{orgDesc,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.Organization">
+    update organization
+    set PARTY_ID = #{partyId,jdbcType=BIGINT},
+      ORG_CODE = #{orgCode,jdbcType=VARCHAR},
+      ORG_NAME = #{orgName,jdbcType=VARCHAR},
+      REGION_ID = #{regionId,jdbcType=BIGINT},
+      ORG_TYPE = #{orgType,jdbcType=VARCHAR},
+      ORG_SUBTYPE = #{orgSubtype,jdbcType=VARCHAR},
+      VILLAGE_FLAG = #{villageFlag,jdbcType=VARCHAR},
+      PARENT_ORG_ID = #{parentOrgId,jdbcType=BIGINT},
+      ORG_LEVEL = #{orgLevel,jdbcType=INTEGER},
+      ORG_INDEX = #{orgIndex,jdbcType=INTEGER},
+      SALESORG_CODE = #{salesorgCode,jdbcType=VARCHAR},
+      DIVORG_FLAG = #{divorgFlag,jdbcType=SMALLINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      ORG_DIVISION = #{orgDivision,jdbcType=VARCHAR},
+      org_id_4a = #{orgId4a,jdbcType=BIGINT},
+      ORG_CONTRACT_TYPE = #{orgContractType,jdbcType=VARCHAR},
+      ORG_AREA_LEVEL = #{orgAreaLevel,jdbcType=VARCHAR},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      ORG_DESC = #{orgDesc,jdbcType=VARCHAR}
+    where ORG_ID = #{orgId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select ORG_ID, PARTY_ID, ORG_CODE, ORG_NAME, REGION_ID, ORG_TYPE, ORG_SUBTYPE, VILLAGE_FLAG, 
+    PARENT_ORG_ID, ORG_LEVEL, ORG_INDEX, SALESORG_CODE, DIVORG_FLAG, CREATE_DATE, CREATE_STAFF, 
+    STATUS_CD, STATUS_DATE, UPDATE_DATE, UPDATE_STAFF, ORG_DIVISION, org_id_4a, ORG_CONTRACT_TYPE, 
+    ORG_AREA_LEVEL, REMARK, ORG_DESC
+    from organization
+    where ORG_ID = #{orgId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select ORG_ID, PARTY_ID, ORG_CODE, ORG_NAME, REGION_ID, ORG_TYPE, ORG_SUBTYPE, VILLAGE_FLAG, 
+    PARENT_ORG_ID, ORG_LEVEL, ORG_INDEX, SALESORG_CODE, DIVORG_FLAG, CREATE_DATE, CREATE_STAFF, 
+    STATUS_CD, STATUS_DATE, UPDATE_DATE, UPDATE_STAFF, ORG_DIVISION, org_id_4a, ORG_CONTRACT_TYPE, 
+    ORG_AREA_LEVEL, REMARK, ORG_DESC
+    from organization
+  </select>
+</mapper>
