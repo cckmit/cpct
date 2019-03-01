@@ -689,11 +689,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "未找到有效的规则信息");
             return result;
         }
-        if (strategy.getAreaId()==null || "".equals(strategy.getAreaId())){
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "请配置策略适用地市");
-            return result;
-        }
         for (MktStrategyConfRuleDO rule : ruleList){
             List<String> labelTypeList = injectionLabelMapper.listLabelByRuleId(rule.getMktStrategyConfRuleId());
             if (labelTypeList == null || labelTypeList.isEmpty()){

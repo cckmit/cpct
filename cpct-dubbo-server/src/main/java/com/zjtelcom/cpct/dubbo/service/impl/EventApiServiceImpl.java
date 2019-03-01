@@ -1806,7 +1806,8 @@ public class EventApiServiceImpl implements EventApiService {
                             //Future<Map<String, Object>> f = executorService.submit(new ChannelTask(evtContactConfId, productList, context, reqId));
                             //将线程处理结果添加到结果集
                             //threadList.add(f);
-                            ChannelTask(evtContactConfId, productList, context, reqId);
+                            Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId);
+                            taskChlList.add(channelMap);
                         } else {
                             for (String str : evtContactConfIdArray) {
                                 //协同渠道规则表id（自建表）
@@ -1815,23 +1816,20 @@ public class EventApiServiceImpl implements EventApiService {
                                 //Future<Map<String, Object>> f = executorService.submit(new ChannelTask(evtContactConfId, productList, context, reqId));
                                 //将线程处理结果添加到结果集
                                 //threadList.add(f);
-                                ChannelTask(evtContactConfId, productList, context, reqId);
+                                Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId);
+                                taskChlList.add(channelMap);
                             }
                         }
                         //获取结果
 
-                        for (Future<Map<String, Object>> future : threadList) {
-                            if (!future.get().isEmpty()) {
-                                taskChlList.add(future.get());
-                            }
-                        }
+//                        for (Future<Map<String, Object>> future : threadList) {
+//                            if (!future.get().isEmpty()) {
+//                                taskChlList.add(future.get());
+//                            }
+//                        }
 
                         timeJson.put("time8", System.currentTimeMillis() - begin);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        //发生异常关闭线程池
-                        executorService.shutdown();
-                    } catch (ExecutionException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                         //发生异常关闭线程池
                         executorService.shutdown();
@@ -3131,7 +3129,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                 // 判断活动状态
 
-/*
+
                 if (!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaign.getStatusCd())) {
                     esJson.put("hit", false);
                     esJson.put("msg", "活动状态未发布");
@@ -3139,7 +3137,7 @@ public class EventApiServiceImpl implements EventApiService {
                     esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
                     return Collections.EMPTY_MAP;
                 }
-*/
+
 
 
                 // 判断活动类型
