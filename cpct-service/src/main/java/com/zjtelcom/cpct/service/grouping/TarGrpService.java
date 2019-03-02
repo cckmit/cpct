@@ -39,4 +39,6 @@ public interface TarGrpService {
 
     Map<String,Object> labelListByCampaignId(List<Integer> campaignId);
 
+    Map<String,Object> labelListByEventId(Long eventId);
+
 }
