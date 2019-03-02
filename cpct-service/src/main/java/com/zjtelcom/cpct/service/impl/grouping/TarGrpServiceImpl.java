@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.service.impl.grouping;
 
+import com.sun.corba.se.spi.ior.ObjectKey;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamGrpRulMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
@@ -12,6 +14,7 @@ import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.org.OrgTreeMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
+import com.zjtelcom.cpct.domain.campaign.MktCamEvtRelDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
@@ -88,7 +91,23 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     private MessageLabelService messageLabelService;
     @Autowired
     private FilterRuleMapper filterRuleMapper;
+    @Autowired
+    private MktCamEvtRelMapper evtRelMapper;
 
+
+    @Override
+    public Map<String, Object> labelListByEventId(Long eventId) {
+        List<Map<String,Object>> campaignDOS = evtRelMapper.listActivityByEventId(eventId);
+        List<Integer> campaigns = new ArrayList<>();
+        if (campaignDOS!=null && !campaignDOS.isEmpty()){
+            for (Map<String,Object> cam : campaignDOS){
+                if (cam.get("mktCampaginId")!=null){
+                    campaigns.add(Integer.valueOf(cam.get("mktCampaginId").toString()));
+                }
+            }
+        }
+        return labelListByCampaignId(campaigns);
+    }
 
     @Override
     public Map<String, Object> labelListByCampaignId(List<Integer> campaignId) {

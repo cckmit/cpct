@@ -32,7 +32,7 @@ public class EsHitServiceImpl implements EsHitService {
 
     protected Logger logger = LoggerFactory.getLogger(EsHitServiceImpl.class);
 
-    @Autowired(required = false)
+    @Autowired
     private TransportClient client;
 
     /**
