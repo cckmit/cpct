@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://code.alibabatech.com/schema/dubbo 
+	http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <!-- 提供方应用信息，用于计算依赖关系 -->
+    <dubbo:application name="00.1083"/>
+
+    <dubbo:registry id="esb3" protocol="dubbo" address="134.96.253.59:8033"/>
+    <dubbo:registry id="esb2" protocol="dubbo" address="134.96.253.59:8033"/>
+    <dubbo:registry id="esb1" protocol="dubbo" address="134.96.253.59:8033"/>
+
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.EventApiService" id="eventApiService"
+                     version="1.0" retries="0" check="false">
+        <!--<dubbo:method name="CalculateCPC" servicecode="00.1083.CalculateCPC" timeout="20000"/>-->
+        <dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="20000"/>
+        <dubbo:method name="secondChannelSynergy" servicecode="00.1083.SecondChannelSynergy" timeout="5000"/>
+    </dubbo:reference>
+
+    <!-- 订阅 -->
+    <!-- cpc计算协同中心回调 -->
+    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService" id="iContactTaskReceiptService"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="contactTaskReceipt" servicecode="00.1079.CPCResultFeedback" timeout="20000"/>
+    </dubbo:reference>
+
+    <dubbo:reference registry="esb3" interface="org.springframework.session.data.ctg.IDubboCtgService"
+                     id="dubboCtgService" version="1.0" check="false">
+        <dubbo:method name="smembers" servicecode="00.1077.ctgSessionSmembers"/>
+        <dubbo:method name="hgetAll" servicecode="00.1077.ctgSessionHgetAll"/>
+        <dubbo:method name="exists" servicecode="00.1077.ctgSessionExists"/>
+    </dubbo:reference>
+
+    <!-- es提供试算接口 -->
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.es.es.service.EsService" id="esService"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="findBatchHitsList" servicecode="00.1083.findBatchHitsList" timeout="10000"/>
+        <dubbo:method name="searchBatchInfo" servicecode="00.1083.searchBatchInfo" timeout="300000"/>
+        <dubbo:method name="searchCountInfo" servicecode="00.1083.searchCountInfo" timeout="100000"/>
+        <dubbo:method name="strategyIssure" servicecode="00.1083.strategyIssure" timeout="100000"/>
+        <dubbo:method name="issueByFile" servicecode="00.1083.issueByFile" timeout="10000"/>
+        <dubbo:method name="uploadFile2Prod" servicecode="00.1083.uploadFile2Prod" timeout="10000"/>
+        <dubbo:method name="trialLog" servicecode="00.1083.trialLog" timeout="10000"/>
+    </dubbo:reference>
+
+    <!--活动信息同步大数据-->
+    <dubbo:reference registry="esb1" id="activitySyncService" interface="com.zjhcsoft.eagle.main.dubbo.service.ActivitySyncService" version="1.0">
+        <dubbo:method name="syncActivity" servicecode="33.1307.syncActivity" timeout="30000"/>
+    </dubbo:reference>
+
+    <!-- 门户-获取用户岗位信息 -->
+    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemPostDubboService"
+                     id="iSystemPostDubboService" version="1.0" retries="0" check="false">
+        <dubbo:method name="qrySystemPostPage" servicecode="00.1077.qrySystemPostPage" timeout="10000"/>
+    </dubbo:reference>
+
+    <!-- 门户-获取用户角色信息 -->
+    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService"
+                     id="iSystemUserDtoDubboService" version="1.0" retries="0" check="false">
+        <dubbo:method name="qrySystemUserDto" servicecode="00.1077.qrySystemUserDto" timeout="10000"/>
+    </dubbo:reference>
+
+</beans>
