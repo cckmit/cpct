@@ -45,7 +45,6 @@ import com.zjtelcom.cpct_prd.dao.channel.MktVerbalPrdMapper;
 import com.zjtelcom.cpct_prd.dao.grouping.TarGrpConditionPrdMapper;
 import com.zjtelcom.cpct_prd.dao.grouping.TarGrpPrdMapper;
 import com.zjtelcom.cpct_prd.dao.strategy.*;
-import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -331,11 +330,7 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
                                 @Override
                                 public void run() {
                                     try {
-                                        SysStaff sysStaff = (SysStaff) SecurityUtils.getSubject().getPrincipal();
                                         String roleName = "admin";
-                                        if (sysStaff != null) {
-                                            roleName = sysStaff.getRoleName();
-                                        }
                                         synchronizeCampaign(mktCampaignId, roleName);
                                         // 删除生产redis缓存
                                         deleteCampaignRedisProd(mktCampaignId);
