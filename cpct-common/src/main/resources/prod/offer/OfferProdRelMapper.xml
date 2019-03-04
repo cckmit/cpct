@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct_prod.dao.offer.OfferProdRelMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.OfferProdRel">
+    <id column="OFFER_PROD_REL_ID" jdbcType="BIGINT" property="offerProdRelId" />
+    <result column="PAR_OFFER_PROD_REL_ID" jdbcType="BIGINT" property="parOfferProdRelId" />
+    <result column="OFFER_ID" jdbcType="BIGINT" property="offerId" />
+    <result column="PROD_ID" jdbcType="BIGINT" property="prodId" />
+    <result column="REL_TYPE" jdbcType="VARCHAR" property="relType" />
+    <result column="EFF_DATE" jdbcType="TIMESTAMP" property="effDate" />
+    <result column="EXP_DATE" jdbcType="TIMESTAMP" property="expDate" />
+    <result column="PROD_EXIST_TYPE" jdbcType="VARCHAR" property="prodExistType" />
+    <result column="ROLE_ID" jdbcType="BIGINT" property="roleId" />
+    <result column="APPLY_REGION_ID" jdbcType="BIGINT" property="applyRegionId" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from offer_prod_rel
+    where OFFER_PROD_REL_ID = #{offerProdRelId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.OfferProdRel">
+    insert into offer_prod_rel (OFFER_PROD_REL_ID, PAR_OFFER_PROD_REL_ID, 
+      OFFER_ID, PROD_ID, REL_TYPE, 
+      EFF_DATE, EXP_DATE, PROD_EXIST_TYPE, 
+      ROLE_ID, APPLY_REGION_ID, STATUS_CD, 
+      CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
+      UPDATE_DATE, STATUS_DATE, REMARK
+      )
+    values (#{offerProdRelId,jdbcType=BIGINT}, #{parOfferProdRelId,jdbcType=BIGINT}, 
+      #{offerId,jdbcType=BIGINT}, #{prodId,jdbcType=BIGINT}, #{relType,jdbcType=VARCHAR}, 
+      #{effDate,jdbcType=TIMESTAMP}, #{expDate,jdbcType=TIMESTAMP}, #{prodExistType,jdbcType=VARCHAR}, 
+      #{roleId,jdbcType=BIGINT}, #{applyRegionId,jdbcType=BIGINT}, #{statusCd,jdbcType=VARCHAR}, 
+      #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.OfferProdRel">
+    update offer_prod_rel
+    set PAR_OFFER_PROD_REL_ID = #{parOfferProdRelId,jdbcType=BIGINT},
+      OFFER_ID = #{offerId,jdbcType=BIGINT},
+      PROD_ID = #{prodId,jdbcType=BIGINT},
+      REL_TYPE = #{relType,jdbcType=VARCHAR},
+      EFF_DATE = #{effDate,jdbcType=TIMESTAMP},
+      EXP_DATE = #{expDate,jdbcType=TIMESTAMP},
+      PROD_EXIST_TYPE = #{prodExistType,jdbcType=VARCHAR},
+      ROLE_ID = #{roleId,jdbcType=BIGINT},
+      APPLY_REGION_ID = #{applyRegionId,jdbcType=BIGINT},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where OFFER_PROD_REL_ID = #{offerProdRelId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select OFFER_PROD_REL_ID, PAR_OFFER_PROD_REL_ID, OFFER_ID, PROD_ID, REL_TYPE, EFF_DATE, 
+    EXP_DATE, PROD_EXIST_TYPE, ROLE_ID, APPLY_REGION_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+    CREATE_DATE, UPDATE_DATE, STATUS_DATE, REMARK
+    from offer_prod_rel
+    where OFFER_PROD_REL_ID = #{offerProdRelId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select OFFER_PROD_REL_ID, PAR_OFFER_PROD_REL_ID, OFFER_ID, PROD_ID, REL_TYPE, EFF_DATE, 
+    EXP_DATE, PROD_EXIST_TYPE, ROLE_ID, APPLY_REGION_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+    CREATE_DATE, UPDATE_DATE, STATUS_DATE, REMARK
+    from offer_prod_rel
+  </select>
+</mapper>
