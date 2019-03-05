@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct_prod.dao.offer.ProductMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.Product">
+    <id column="PROD_ID" jdbcType="BIGINT" property="prodId" />
+    <result column="PROD_NBR" jdbcType="VARCHAR" property="prodNbr" />
+    <result column="PROD_SYS_NBR" jdbcType="VARCHAR" property="prodSysNbr" />
+    <result column="PROD_NAME" jdbcType="VARCHAR" property="prodName" />
+    <result column="PROD_DESC" jdbcType="VARCHAR" property="prodDesc" />
+    <result column="MANAGE_GRADE" jdbcType="VARCHAR" property="manageGrade" />
+    <result column="EFF_DATE" jdbcType="TIMESTAMP" property="effDate" />
+    <result column="EXP_DATE" jdbcType="TIMESTAMP" property="expDate" />
+    <result column="PROD_COMP_TYPE" jdbcType="VARCHAR" property="prodCompType" />
+    <result column="PROD_FUNC_TYPE" jdbcType="VARCHAR" property="prodFuncType" />
+    <result column="BILL_PROD_TYPE" jdbcType="VARCHAR" property="billProdType" />
+    <result column="PROD_USE_TYPE" jdbcType="VARCHAR" property="prodUseType" />
+    <result column="BASE_OFFER_ID" jdbcType="BIGINT" property="baseOfferId" />
+    <result column="MANAGE_REGION_ID" jdbcType="BIGINT" property="manageRegionId" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="ALIAS_NAME" jdbcType="VARCHAR" property="aliasName" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="GRP_PROD_NBR" jdbcType="VARCHAR" property="grpProdNbr" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from product
+    where PROD_ID = #{prodId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.Product">
+    insert into product (PROD_ID, PROD_NBR, PROD_SYS_NBR, 
+      PROD_NAME, PROD_DESC, MANAGE_GRADE, 
+      EFF_DATE, EXP_DATE, PROD_COMP_TYPE, 
+      PROD_FUNC_TYPE, BILL_PROD_TYPE, PROD_USE_TYPE, 
+      BASE_OFFER_ID, MANAGE_REGION_ID, STATUS_CD, 
+      CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
+      STATUS_DATE, UPDATE_DATE, ALIAS_NAME, 
+      REMARK, GRP_PROD_NBR)
+    values (#{prodId,jdbcType=BIGINT}, #{prodNbr,jdbcType=VARCHAR}, #{prodSysNbr,jdbcType=VARCHAR}, 
+      #{prodName,jdbcType=VARCHAR}, #{prodDesc,jdbcType=VARCHAR}, #{manageGrade,jdbcType=VARCHAR}, 
+      #{effDate,jdbcType=TIMESTAMP}, #{expDate,jdbcType=TIMESTAMP}, #{prodCompType,jdbcType=VARCHAR}, 
+      #{prodFuncType,jdbcType=VARCHAR}, #{billProdType,jdbcType=VARCHAR}, #{prodUseType,jdbcType=VARCHAR}, 
+      #{baseOfferId,jdbcType=BIGINT}, #{manageRegionId,jdbcType=BIGINT}, #{statusCd,jdbcType=VARCHAR}, 
+      #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{aliasName,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{grpProdNbr,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.Product">
+    update product
+    set PROD_NBR = #{prodNbr,jdbcType=VARCHAR},
+      PROD_SYS_NBR = #{prodSysNbr,jdbcType=VARCHAR},
+      PROD_NAME = #{prodName,jdbcType=VARCHAR},
+      PROD_DESC = #{prodDesc,jdbcType=VARCHAR},
+      MANAGE_GRADE = #{manageGrade,jdbcType=VARCHAR},
+      EFF_DATE = #{effDate,jdbcType=TIMESTAMP},
+      EXP_DATE = #{expDate,jdbcType=TIMESTAMP},
+      PROD_COMP_TYPE = #{prodCompType,jdbcType=VARCHAR},
+      PROD_FUNC_TYPE = #{prodFuncType,jdbcType=VARCHAR},
+      BILL_PROD_TYPE = #{billProdType,jdbcType=VARCHAR},
+      PROD_USE_TYPE = #{prodUseType,jdbcType=VARCHAR},
+      BASE_OFFER_ID = #{baseOfferId,jdbcType=BIGINT},
+      MANAGE_REGION_ID = #{manageRegionId,jdbcType=BIGINT},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      ALIAS_NAME = #{aliasName,jdbcType=VARCHAR},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      GRP_PROD_NBR = #{grpProdNbr,jdbcType=VARCHAR}
+    where PROD_ID = #{prodId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select PROD_ID, PROD_NBR, PROD_SYS_NBR, PROD_NAME, PROD_DESC, MANAGE_GRADE, EFF_DATE, 
+    EXP_DATE, PROD_COMP_TYPE, PROD_FUNC_TYPE, BILL_PROD_TYPE, PROD_USE_TYPE, BASE_OFFER_ID, 
+    MANAGE_REGION_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
+    UPDATE_DATE, ALIAS_NAME, REMARK, GRP_PROD_NBR
+    from product
+    where PROD_ID = #{prodId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select PROD_ID, PROD_NBR, PROD_SYS_NBR, PROD_NAME, PROD_DESC, MANAGE_GRADE, EFF_DATE, 
+    EXP_DATE, PROD_COMP_TYPE, PROD_FUNC_TYPE, BILL_PROD_TYPE, PROD_USE_TYPE, BASE_OFFER_ID, 
+    MANAGE_REGION_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
+    UPDATE_DATE, ALIAS_NAME, REMARK, GRP_PROD_NBR
+    from product
+  </select>
+</mapper>

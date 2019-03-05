@@ -40,6 +40,7 @@ import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_prod.dao.offer.MktResourceProdMapper;
+import com.zjtelcom.cpct_prod.dao.offer.OfferProdMapper;
 import com.zjtelcom.es.es.entity.*;
 import com.zjtelcom.es.es.entity.model.LabelResultES;
 import com.zjtelcom.es.es.entity.model.TrialOperationParamES;
@@ -101,7 +102,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Autowired
     private InjectionLabelMapper labelMapper;
     @Autowired
-    private OfferMapper offerMapper;
+    private OfferProdMapper offerMapper;
     @Autowired
     private MktCamChlConfMapper chlConfMapper;
     @Autowired
