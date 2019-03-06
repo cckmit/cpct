@@ -30,11 +30,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.zjtelcom.cpct</groupId>
-            <artifactId>cpct-shiro</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>

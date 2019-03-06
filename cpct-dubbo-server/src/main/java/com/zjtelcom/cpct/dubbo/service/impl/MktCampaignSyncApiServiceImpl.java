@@ -1,7 +1,5 @@
 package com.zjtelcom.cpct.dubbo.service.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.*;
@@ -19,7 +17,6 @@ import com.zjtelcom.cpct.domain.Rule;
 import com.zjtelcom.cpct.domain.RuleDetail;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
-import com.zjtelcom.cpct.domain.org.OrgTreeDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
@@ -45,14 +42,12 @@ import com.zjtelcom.cpct_prd.dao.channel.MktVerbalPrdMapper;
 import com.zjtelcom.cpct_prd.dao.grouping.TarGrpConditionPrdMapper;
 import com.zjtelcom.cpct_prd.dao.grouping.TarGrpPrdMapper;
 import com.zjtelcom.cpct_prd.dao.strategy.*;
-import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.security.auth.callback.Callback;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -61,7 +56,6 @@ import java.util.concurrent.Future;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
-import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 
 @Service
 @Transactional
@@ -331,11 +325,7 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
                                 @Override
                                 public void run() {
                                     try {
-                                        SysStaff sysStaff = (SysStaff) SecurityUtils.getSubject().getPrincipal();
                                         String roleName = "admin";
-                                        if (sysStaff != null) {
-                                            roleName = sysStaff.getRoleName();
-                                        }
                                         synchronizeCampaign(mktCampaignId, roleName);
                                         // 删除生产redis缓存
                                         deleteCampaignRedisProd(mktCampaignId);

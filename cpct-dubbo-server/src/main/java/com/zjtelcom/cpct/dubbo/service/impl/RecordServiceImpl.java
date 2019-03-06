@@ -7,7 +7,6 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.synchronize.SynchronizeRecordMapper;
 import com.zjtelcom.cpct.dto.synchronize.SynchronizeRecord;
 import com.zjtelcom.cpct.dubbo.service.RecordService;
-import com.zjtelcom.cpct.service.synchronize.SynchronizeRecordService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
