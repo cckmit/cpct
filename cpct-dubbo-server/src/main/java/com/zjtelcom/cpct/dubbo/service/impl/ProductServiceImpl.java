@@ -70,7 +70,7 @@ public class ProductServiceImpl implements ProductService{
                     }
                 }
                 if(policyList.size() > 0) {
-                    map.put("`",split[i]);
+                    map.put("productCode",split[i]);
                     map.put("policyList", policyList);
                     productList.add(map);
                 }
