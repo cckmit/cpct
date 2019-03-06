@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.dubbo.service.impl;
 
+import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
@@ -47,6 +48,8 @@ public class SearchLabelServiceImpl implements SearchLabelService {
     private DisplayColumnLabelMapper displayColumnLabelMapper;
     @Autowired
     private FilterRuleMapper filterRuleMapper;
+    @Autowired
+    private MktCamEvtRelMapper evtRelMapper;
 
 
     @Override
@@ -234,5 +237,19 @@ public class SearchLabelServiceImpl implements SearchLabelService {
 //            i++;
 //        }
         return result;
+    }
+
+    @Override
+    public Map<String, String> labelListByEventId(Long eventId) {
+        List<Map<String,Object>> campaignDOS = evtRelMapper.listActivityByEventId(eventId);
+        List<Long> campaigns = new ArrayList<>();
+        if (campaignDOS!=null && !campaignDOS.isEmpty()){
+            for (Map<String,Object> cam : campaignDOS){
+                if (cam.get("mktCampaginId")!=null){
+                    campaigns.add(Long.valueOf(cam.get("mktCampaginId").toString()));
+                }
+            }
+        }
+        return labelListByCampaignId(campaigns);
     }
 }
