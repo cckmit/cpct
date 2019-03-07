@@ -1197,6 +1197,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             TrialOperationDetail detail = BeanUtil.create(trialOperation, new TrialOperationDetail());
             if (trialOperation.getUpdateDate() != null && !trialOperation.getStatusCd().equals(TrialStatus.SAMPEL_GOING.getValue())) {
                 Long cost = (trialOperation.getUpdateDate().getTime() - trialOperation.getCreateDate().getTime());
+                cost = cost<0L ? 0L : cost;
                 detail.setCost(cost + "ms");
             }
             operationDetailList.add(detail);
