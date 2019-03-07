@@ -1338,7 +1338,7 @@ public class EventApiServiceImpl implements EventApiService {
             if (mktStrategyConfRuleDOS != null && mktStrategyConfRuleDOS.size() > 0) {
                 for (int i = 0; i < mktStrategyConfRuleDOS.size(); i++) {
 
-               /* for (MktStrategyConfRuleDO mktStrategyConfRuleDO : ) {*/
+                    /* for (MktStrategyConfRuleDO mktStrategyConfRuleDO : ) {*/
 /*                    //获取分群id
                     Long tarGrpId = mktStrategyConfRuleDO.getTarGrpId();
                     //获取销售品
@@ -1806,30 +1806,30 @@ public class EventApiServiceImpl implements EventApiService {
                             //Future<Map<String, Object>> f = executorService.submit(new ChannelTask(evtContactConfId, productList, context, reqId));
                             //将线程处理结果添加到结果集
                             //threadList.add(f);
+                            Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId);
+                            taskChlList.add(channelMap);
                         } else {
                             for (String str : evtContactConfIdArray) {
                                 //协同渠道规则表id（自建表）
                                 Long evtContactConfId = Long.parseLong(str);
                                 //提交线程
-                                Future<Map<String, Object>> f = executorService.submit(new ChannelTask(evtContactConfId, productList, context, reqId));
+                                //Future<Map<String, Object>> f = executorService.submit(new ChannelTask(evtContactConfId, productList, context, reqId));
                                 //将线程处理结果添加到结果集
-                                threadList.add(f);
+                                //threadList.add(f);
+                                Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId);
+                                taskChlList.add(channelMap);
                             }
                         }
                         //获取结果
 
-                        for (Future<Map<String, Object>> future : threadList) {
-                            if (!future.get().isEmpty()) {
-                                taskChlList.add(future.get());
-                            }
-                        }
+//                        for (Future<Map<String, Object>> future : threadList) {
+//                            if (!future.get().isEmpty()) {
+//                                taskChlList.add(future.get());
+//                            }
+//                        }
 
                         timeJson.put("time8", System.currentTimeMillis() - begin);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        //发生异常关闭线程池
-                        executorService.shutdown();
-                    } catch (ExecutionException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                         //发生异常关闭线程池
                         executorService.shutdown();
@@ -1875,9 +1875,10 @@ public class EventApiServiceImpl implements EventApiService {
 
     }
 
-    class ChannelTask implements Callable<Map<String, Object>> {
+    private Map<String, Object> ChannelTask(Long evtContactConfId, List<Map<String, String>> productList, DefaultContext<String, Object> context, String reqId) {
 
         //策略配置id
+/*
         private Long evtContactConfId;
 
         private List<Map<String, String>> productList;
@@ -1891,228 +1892,229 @@ public class EventApiServiceImpl implements EventApiService {
             this.reqId = reqId;
         }
 
+
         @Override
         public Map<String, Object> call() {
-            Date now = new Date();
+       */
+        Date now = new Date();
 
-            long begin = System.currentTimeMillis();
-            JSONObject timeJson = new JSONObject();
-            timeJson.put("time1", System.currentTimeMillis() - begin);
+        long begin = System.currentTimeMillis();
+        JSONObject timeJson = new JSONObject();
+        timeJson.put("time1", System.currentTimeMillis() - begin);
 
-            //初始化返回结果推荐信息
-            Map<String, Object> channelMap = new HashMap<>();
+        //初始化返回结果推荐信息
+        Map<String, Object> channelMap = new HashMap<>();
 
-            List<Map<String, Object>> taskChlAttrList = new ArrayList<>();
-            Map<String, Object> taskChlAttr;
+        List<Map<String, Object>> taskChlAttrList = new ArrayList<>();
+        Map<String, Object> taskChlAttr;
 
-            //查询渠道属性，渠道生失效时间过滤
-            MktCamChlConfDetail mktCamChlConfDetail = null;
-            List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = new ArrayList<>();
-            if (mktCamChlConfDetail == null) {
-                // 从数据库中获取并拼成mktCamChlConfDetail对象存入redis
-                MktCamChlConfDO mktCamChlConfDO = new MktCamChlConfDO();
-                mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(evtContactConfId);
-                mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(evtContactConfId);
-                List<MktCamChlConfAttr> mktCamChlConfAttrList = new ArrayList<>();
-                mktCamChlConfDetail = BeanUtil.create(mktCamChlConfDO, new MktCamChlConfDetail());
-                for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
-                    MktCamChlConfAttr mktCamChlConfAttrNew = BeanUtil.create(mktCamChlConfAttrDO, new MktCamChlConfAttr());
-                    mktCamChlConfAttrList.add(mktCamChlConfAttrNew);
-                }
-                mktCamChlConfDetail.setMktCamChlConfAttrList(mktCamChlConfAttrList);
-                redisUtils.set("CHL_CONF_DETAIL_" + evtContactConfId, mktCamChlConfDetail);
+        //查询渠道属性，渠道生失效时间过滤
+        MktCamChlConfDetail mktCamChlConfDetail = null;
+        List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = new ArrayList<>();
+        if (mktCamChlConfDetail == null) {
+            // 从数据库中获取并拼成mktCamChlConfDetail对象存入redis
+            MktCamChlConfDO mktCamChlConfDO = new MktCamChlConfDO();
+            mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(evtContactConfId);
+            mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(evtContactConfId);
+            List<MktCamChlConfAttr> mktCamChlConfAttrList = new ArrayList<>();
+            mktCamChlConfDetail = BeanUtil.create(mktCamChlConfDO, new MktCamChlConfDetail());
+            for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
+                MktCamChlConfAttr mktCamChlConfAttrNew = BeanUtil.create(mktCamChlConfAttrDO, new MktCamChlConfAttr());
+                mktCamChlConfAttrList.add(mktCamChlConfAttrNew);
+            }
+            mktCamChlConfDetail.setMktCamChlConfAttrList(mktCamChlConfAttrList);
+            redisUtils.set("CHL_CONF_DETAIL_" + evtContactConfId, mktCamChlConfDetail);
+        }
+
+        timeJson.put("time2", System.currentTimeMillis() - begin);
+
+        boolean checkTime = true;
+        for (MktCamChlConfAttr mktCamChlConfAttr : mktCamChlConfDetail.getMktCamChlConfAttrList()) {
+
+            //渠道属性数据返回给协同中心
+            if (mktCamChlConfAttr.getAttrId() == 500600010001L
+                    || mktCamChlConfAttr.getAttrId() == 500600010002L
+                    || mktCamChlConfAttr.getAttrId() == 500600010003L
+                    || mktCamChlConfAttr.getAttrId() == 500600010004L) {
+                taskChlAttr = new HashMap<>();
+                taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
+                taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
+                taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
+                taskChlAttrList.add(taskChlAttr);
             }
 
-            timeJson.put("time2", System.currentTimeMillis() - begin);
+            if (mktCamChlConfAttr.getAttrId() == 500600010005L ||
+                    mktCamChlConfAttr.getAttrId() == 500600010011L) {
+                taskChlAttr = new HashMap<>();
+                taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
+                taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
+                taskChlAttr.put("attrValue", mktCamChlConfAttr.getAttrValue());
+                taskChlAttrList.add(taskChlAttr);
+            }
 
-            boolean checkTime = true;
-            for (MktCamChlConfAttr mktCamChlConfAttr : mktCamChlConfDetail.getMktCamChlConfAttrList()) {
-
-                //渠道属性数据返回给协同中心
-                if (mktCamChlConfAttr.getAttrId() == 500600010001L
-                        || mktCamChlConfAttr.getAttrId() == 500600010002L
-                        || mktCamChlConfAttr.getAttrId() == 500600010003L
-                        || mktCamChlConfAttr.getAttrId() == 500600010004L) {
+            //判断渠道生失效时间
+            if (mktCamChlConfAttr.getAttrId() == 500600010006L) {
+                if (!now.after(new Date(Long.parseLong(mktCamChlConfAttr.getAttrValue())))) {
+                    checkTime = false;
+                } else {
                     taskChlAttr = new HashMap<>();
                     taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
                     taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
                     taskChlAttrList.add(taskChlAttr);
                 }
-
-                if (mktCamChlConfAttr.getAttrId() == 500600010005L ||
-                        mktCamChlConfAttr.getAttrId() == 500600010011L) {
+            }
+            if (mktCamChlConfAttr.getAttrId() == 500600010007L) {
+                if (now.after(new Date(Long.parseLong(mktCamChlConfAttr.getAttrValue())))) {
+                    checkTime = false;
+                } else {
                     taskChlAttr = new HashMap<>();
                     taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
                     taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
-                    taskChlAttr.put("attrValue", mktCamChlConfAttr.getAttrValue());
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
                     taskChlAttrList.add(taskChlAttr);
                 }
+            }
 
-                //判断渠道生失效时间
-                if (mktCamChlConfAttr.getAttrId() == 500600010006L) {
-                    if (!now.after(new Date(Long.parseLong(mktCamChlConfAttr.getAttrValue())))) {
-                        checkTime = false;
+            //获取调查问卷ID
+            if (mktCamChlConfAttr.getAttrId() == 500600010008L) {
+                //调查问卷
+                channelMap.put("naireId", mktCamChlConfAttr.getAttrValue());
+            }
+
+            //获取接触账号/推送账号(如果有)
+            if (mktCamChlConfAttr.getAttrId() == 500600010012L) {
+                if (mktCamChlConfAttr.getAttrValue() != null && !"".equals(mktCamChlConfAttr.getAttrValue())) {
+                    if (context.containsKey(mktCamChlConfAttr.getAttrValue())) {
+                        channelMap.put("contactAccount", context.get(mktCamChlConfAttr.getAttrValue()));
                     } else {
-                        taskChlAttr = new HashMap<>();
-                        taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
-                        taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
-                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
-                        taskChlAttrList.add(taskChlAttr);
-                    }
-                }
-                if (mktCamChlConfAttr.getAttrId() == 500600010007L) {
-                    if (now.after(new Date(Long.parseLong(mktCamChlConfAttr.getAttrValue())))) {
-                        checkTime = false;
-                    } else {
-                        taskChlAttr = new HashMap<>();
-                        taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
-                        taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
-                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
-                        taskChlAttrList.add(taskChlAttr);
-                    }
-                }
-
-                //获取调查问卷ID
-                if (mktCamChlConfAttr.getAttrId() == 500600010008L) {
-                    //调查问卷
-                    channelMap.put("naireId", mktCamChlConfAttr.getAttrValue());
-                }
-
-                //获取接触账号/推送账号(如果有)
-                if (mktCamChlConfAttr.getAttrId() == 500600010012L) {
-                    if (mktCamChlConfAttr.getAttrValue() != null && !"".equals(mktCamChlConfAttr.getAttrValue())) {
-                        if (context.containsKey(mktCamChlConfAttr.getAttrValue())) {
-                            channelMap.put("contactAccount", context.get(mktCamChlConfAttr.getAttrValue()));
-                        } else {
-                            //未查询到推送账号 就不命中
-                            return Collections.EMPTY_MAP;
-                        }
+                        //未查询到推送账号 就不命中
+                        return Collections.EMPTY_MAP;
                     }
                 }
             }
-            channelMap.put("taskChlAttrList", taskChlAttrList);
+        }
+        channelMap.put("taskChlAttrList", taskChlAttrList);
 
-            timeJson.put("time3", System.currentTimeMillis() - begin);
+        timeJson.put("time3", System.currentTimeMillis() - begin);
 
-            if (!checkTime) {
-                return Collections.EMPTY_MAP;
-            }
+        if (!checkTime) {
+            return Collections.EMPTY_MAP;
+        }
 
-            //渠道信息
-            if (mktCamChlConfDetail.getContactChlCode() == null) {
-                Channel channelMessage = contactChannelMapper.selectByPrimaryKey(mktCamChlConfDetail.getContactChlId());
-                mktCamChlConfDetail.setContactChlCode(channelMessage.getContactChlCode());
-                redisUtils.set("CHL_CONF_DETAIL_" + evtContactConfId, mktCamChlConfDetail);
-            }
-            channelMap.put("channelId", mktCamChlConfDetail.getContactChlCode());
-            //查询渠道id
-            channelMap.put("channelConfId", mktCamChlConfDetail.getContactChlId().toString()); //渠道id
-            channelMap.put("pushType", mktCamChlConfDetail.getPushType()); //推送类型
+        //渠道信息
+        if (mktCamChlConfDetail.getContactChlCode() == null) {
+            Channel channelMessage = contactChannelMapper.selectByPrimaryKey(mktCamChlConfDetail.getContactChlId());
+            mktCamChlConfDetail.setContactChlCode(channelMessage.getContactChlCode());
+            redisUtils.set("CHL_CONF_DETAIL_" + evtContactConfId, mktCamChlConfDetail);
+        }
+        channelMap.put("channelId", mktCamChlConfDetail.getContactChlCode());
+        //查询渠道id
+        channelMap.put("channelConfId", mktCamChlConfDetail.getContactChlId().toString()); //渠道id
+        channelMap.put("pushType", mktCamChlConfDetail.getPushType()); //推送类型
 
-            channelMap.put("pushTime", ""); // 推送时间
+        channelMap.put("pushTime", ""); // 推送时间
 
-            //返回结果中添加销售品信息
-            channelMap.put("productList", JSONArray.toJSON(productList));
+        //返回结果中添加销售品信息
+        channelMap.put("productList", JSONArray.toJSON(productList));
 
-            //查询渠道子策略 这里老系统暂时不返回
+        //查询渠道子策略 这里老系统暂时不返回
 //              List<MktVerbalCondition> mktVerbalConditions = mktVerbalConditionMapper.findConditionListByVerbalId(evtContactConfId);
 
-            timeJson.put("time4", System.currentTimeMillis() - begin);
+        timeJson.put("time4", System.currentTimeMillis() - begin);
 
-            //查询话术
-            List<String> scriptLabelList = new ArrayList<>();
-            String contactScript = null;
-            String mktVerbalStr = null;
-            // 从redis获取的mktCamChlConfDetail中获取脚本
-            CamScript camScript = mktCamChlConfDetail.getCamScript();
-            if (camScript == null) {
-                // 数据库中获取脚本存入redis
-                camScript = mktCamScriptMapper.selectByConfId(evtContactConfId);
-                mktCamChlConfDetail.setCamScript(camScript);
-                redisUtils.set("CHL_CONF_DETAIL_" + evtContactConfId, mktCamChlConfDetail);
+        //查询话术
+        List<String> scriptLabelList = new ArrayList<>();
+        String contactScript = null;
+        String mktVerbalStr = null;
+        // 从redis获取的mktCamChlConfDetail中获取脚本
+        CamScript camScript = mktCamChlConfDetail.getCamScript();
+        if (camScript == null) {
+            // 数据库中获取脚本存入redis
+            camScript = mktCamScriptMapper.selectByConfId(evtContactConfId);
+            mktCamChlConfDetail.setCamScript(camScript);
+            redisUtils.set("CHL_CONF_DETAIL_" + evtContactConfId, mktCamChlConfDetail);
+        }
+
+        if (camScript != null) {
+            contactScript = camScript.getScriptDesc();
+            if (contactScript != null) {
+                scriptLabelList.addAll(subScript(contactScript));
             }
+        } else {
+            //未查询到话术 不命中
+            return Collections.EMPTY_MAP;
+        }
 
-            if (camScript != null) {
-                contactScript = camScript.getScriptDesc();
-                if (contactScript != null) {
-                    scriptLabelList.addAll(subScript(contactScript));
-                }
-            } else {
-                //未查询到话术 不命中
-                return Collections.EMPTY_MAP;
+        //查询指引
+        // 从redis获取的mktCamChlConfDetail中获取指引
+        List<VerbalVO> verbalVOList = mktCamChlConfDetail.getVerbalVOList();
+        if (verbalVOList == null) {
+            List<MktVerbal> mktVerbals = mktVerbalMapper.findVerbalListByConfId(evtContactConfId);
+            verbalVOList = new ArrayList<>();
+            for (MktVerbal mktVerbal : mktVerbals) {
+                VerbalVO verbalVO = BeanUtil.create(mktVerbal, new VerbalVO());
+                verbalVOList.add(verbalVO);
             }
+            mktCamChlConfDetail.setVerbalVOList(verbalVOList);
+            redisUtils.set("CHL_CONF_DETAIL_" + evtContactConfId, mktCamChlConfDetail);
+        }
 
-            //查询指引
-            // 从redis获取的mktCamChlConfDetail中获取指引
-            List<VerbalVO> verbalVOList = mktCamChlConfDetail.getVerbalVOList();
-            if (verbalVOList == null) {
-                List<MktVerbal> mktVerbals = mktVerbalMapper.findVerbalListByConfId(evtContactConfId);
-                verbalVOList = new ArrayList<>();
-                for (MktVerbal mktVerbal : mktVerbals) {
-                    VerbalVO verbalVO = BeanUtil.create(mktVerbal, new VerbalVO());
-                    verbalVOList.add(verbalVO);
-                }
-                mktCamChlConfDetail.setVerbalVOList(verbalVOList);
-                redisUtils.set("CHL_CONF_DETAIL_" + evtContactConfId, mktCamChlConfDetail);
-            }
-
-            if (verbalVOList.size() > 0) {
-                for (VerbalVO verbalVO : verbalVOList) {
-                    //查询指引规则 todo
+        if (verbalVOList.size() > 0) {
+            for (VerbalVO verbalVO : verbalVOList) {
+                //查询指引规则 todo
 //                        List<MktVerbalCondition> channelConditionList = mktVerbalConditionMapper.findChannelConditionListByVerbalId(mktVerbal.getVerbalId());
 
-                    mktVerbalStr = verbalVOList.get(0).getScriptDesc();
+                mktVerbalStr = verbalVOList.get(0).getScriptDesc();
+                if (mktVerbalStr != null) {
+                    scriptLabelList.addAll(subScript(mktVerbalStr));
+                }
+            }
+        }
+
+        timeJson.put("time5", System.currentTimeMillis() - begin);
+
+        if (scriptLabelList.size() > 0) {
+            for (String labelStr : scriptLabelList) {
+                if (context.containsKey(labelStr)) {
+                    if (contactScript != null) {
+                        contactScript = contactScript.replace("${" + labelStr + "}$", (String) context.get(labelStr));
+                    }
                     if (mktVerbalStr != null) {
-                        scriptLabelList.addAll(subScript(mktVerbalStr));
+                        mktVerbalStr = mktVerbalStr.replace("${" + labelStr + "}$", (String) context.get(labelStr));
                     }
                 }
             }
+        }
 
-            timeJson.put("time5", System.currentTimeMillis() - begin);
-
-            if (scriptLabelList.size() > 0) {
-                for (String labelStr : scriptLabelList) {
-                    if (context.containsKey(labelStr)) {
-                        if (contactScript != null) {
-                            contactScript = contactScript.replace("${" + labelStr + "}$", (String) context.get(labelStr));
-                        }
-                        if (mktVerbalStr != null) {
-                            mktVerbalStr = mktVerbalStr.replace("${" + labelStr + "}$", (String) context.get(labelStr));
-                        }
-                    }
-                }
-            }
-
-            //判断脚本中有无未查询到的标签
+        //判断脚本中有无未查询到的标签
 //            if (contactScript != null) {
 //                if (subScript(contactScript).size() > 0) {
 ////                    System.out.println("推荐话术标签替换含有无值的标签");
 //                    return Collections.EMPTY_MAP;
 //                }
 //            }
-            //返回结果中添加脚本信息
-            channelMap.put("contactScript", contactScript == null ? "" : contactScript);
-            //痛痒点
+        //返回结果中添加脚本信息
+        channelMap.put("contactScript", contactScript == null ? "" : contactScript);
+        //痛痒点
 //            if (mktVerbalStr != null) {
 //                if (subScript(mktVerbalStr).size() > 0) {
 ////                    System.out.println("推荐指引标签替换含有无值的标签");
 //                    return Collections.EMPTY_MAP;
 //                }
 //            }
-            channelMap.put("reason", mktVerbalStr == null ? "" : mktVerbalStr);
-            //展示列标签
+        channelMap.put("reason", mktVerbalStr == null ? "" : mktVerbalStr);
+        //展示列标签
 
-            timeJson.put("time6", System.currentTimeMillis() - begin);
-            timeJson.put("name", "渠道");
-            timeJson.put("reqId", reqId);
-            esHitService.save(timeJson, IndexList.TIME_CHL_MODULE);
+        timeJson.put("time6", System.currentTimeMillis() - begin);
+        timeJson.put("name", "渠道");
+        timeJson.put("reqId", reqId);
+        esHitService.save(timeJson, IndexList.TIME_CHL_MODULE);
 
-            return channelMap;
-        }
+        return channelMap;
     }
 
 
@@ -3127,7 +3129,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                 // 判断活动状态
 
-/*
+
                 if (!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaign.getStatusCd())) {
                     esJson.put("hit", false);
                     esJson.put("msg", "活动状态未发布");
@@ -3135,7 +3137,7 @@ public class EventApiServiceImpl implements EventApiService {
                     esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
                     return Collections.EMPTY_MAP;
                 }
-*/
+
 
 
                 // 判断活动类型

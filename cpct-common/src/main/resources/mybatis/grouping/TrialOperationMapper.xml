@@ -83,9 +83,34 @@
     from trial_operation
     where
     <![CDATA[
-          STATUS_DATE >= #{updateTime}
+          UPDATE_DATE >= #{updateTime}
     ]]>
-    and STATUS_CD = 1300
+    <if test="campaignId !=null">
+    and CAMPAIGN_ID = #{campaignId}
+    </if>
+    and STATUS_CD in
+    <foreach item="item" index="index" collection="list"
+             open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </select>
+
+  <select id="listOperationByCreateTime" resultMap="BaseResultMap">
+    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM,  STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
+    REMARK
+    from trial_operation
+    where
+    <![CDATA[
+          CREATE_DATE <= #{createTime}
+    ]]>
+    <if test="campaignId !=null">
+      and CAMPAIGN_ID = #{campaignId}
+    </if>
+    and STATUS_CD in
+    <foreach item="item" index="index" collection="list"
+             open="(" separator="," close=")">
+      #{item}
+    </foreach>
   </select>
 
     <select id="selectByBatchNum" resultMap="BaseResultMap">
@@ -102,6 +127,19 @@
     from trial_operation
     where STATUS_CD = #{statusCd}
   </select>
+
+
+  <select id="listOperationCheck" resultMap="BaseResultMap">
+    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM,  STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
+    REMARK
+    from trial_operation
+    where STATUS_CD in
+    <foreach item="item" index="index" collection="list"
+             open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </select>
+
 
 
 
