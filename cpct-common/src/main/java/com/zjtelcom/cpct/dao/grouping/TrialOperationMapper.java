@@ -23,7 +23,11 @@ public interface TrialOperationMapper {
 
     int updateByPrimaryKey(TrialOperation record);
 
-    List<TrialOperation> listOperationByUpdateTime(@Param("updateTime")Date updateTime);
+    List<TrialOperation> listOperationByUpdateTime(@Param("campaignId")Long campaignId,@Param("updateTime")Date updateTime,@Param("list")String[] list);
+
+    List<TrialOperation> listOperationByCreateTime(@Param("campaignId")Long campaignId,@Param("createTime")Date updateTime,@Param("list")String[] list);
+
+    List<TrialOperation> listOperationCheck(@Param("list")String[] list);
 
     List<TrialOperation> listOperationByStatusCd(@Param("statusCd")String statusCd);
 
