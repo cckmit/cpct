@@ -2,6 +2,9 @@ package com.zjtelcom.cpct.service.impl.grouping;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
+import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
+import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
@@ -23,6 +26,7 @@ import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
+import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
@@ -137,8 +141,28 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
     @Autowired
     private MktCamItemMapper itemMapper;
+    @Autowired
+    private ISystemUserDtoDubboService iSystemUserDtoDubboService;
 
 
+
+
+    private String getCreater(Long createStaff){
+        String codeNumber = null;
+        try {
+            // 获取创建人信息
+            SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(createStaff, new ArrayList<Long>());
+            if (systemUserDtoSysmgrResultObject != null) {
+                if (systemUserDtoSysmgrResultObject.getResultObject() != null) {
+                    codeNumber = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            codeNumber = null;
+        }
+        return codeNumber;
+    }
 
 
     /**
@@ -495,7 +519,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         request.setCampaignName(campaignDO.getMktCampaignName());
         request.setCamLevel(campaignDO.getCamLevel());
         // 获取创建人员code
-        request.setStaffCode("SYS987329864");
+        request.setStaffCode(getCreater(campaignDO.getCreateStaff())==null ? "null" : getCreater(campaignDO.getCreateStaff()));
 
         //获取销售品及规则列表
         TrialOperationParamES param = getTrialOperationParamES(operation, Long.valueOf(batchNumSt), ruleId,false);
@@ -680,6 +704,17 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
      */
     @Override
     public Map<String, Object> createTrialOperation(TrialOperationVO operationVO) {
+
+        String[] statusCd  = new String[1];
+        statusCd[0] = TrialStatus.SAMPEL_GOING.getValue();
+        Date createTime = new Date(new Date().getTime() - 300000);
+        List<TrialOperation> operationCheck = trialOperationMapper.listOperationByCreateTime(null,createTime,statusCd);
+        if (operationCheck!=null && !operationCheck.isEmpty()){
+            for (TrialOperation operation : operationCheck){
+                operation.setStatusCd(TrialStatus.SAMPEL_FAIL.getValue());
+                trialOperationMapper.updateByPrimaryKey(operation);
+            }
+        }
         Map<String, Object> result = new HashMap<>();
         //生成批次号
         String batchNumSt = DateUtil.date2St4Trial(new Date()) + ChannelUtil.getRandomStr(4);
@@ -701,6 +736,32 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "请配置策略适用地市");
             return result;
         }
+        String[] strings  = new String[1];
+        strings[0] = TrialStatus.SAMPEL_GOING.getValue();
+        List<TrialOperation> listOperationCheck = trialOperationMapper.listOperationCheck(strings);
+        if (listOperationCheck.size()>5){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "同时抽样人数过多，请稍后再试");
+            return result;
+        }
+
+        String[] status  = new String[3];
+        status[0] = TrialStatus.SAMPEL_FAIL.getValue();
+        status[1] = TrialStatus.SAMPEL_SUCCESS.getValue();
+        status[2] = TrialStatus.SAMPEL_GOING.getValue();
+        int timeLimit = 180000;
+        List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign("TRIAL_BATCH_TIME");
+        if (sysParams.get(0)!=null){
+            timeLimit = Integer.valueOf(sysParams.get(0).getParamValue());
+        }
+        Date upTime = new Date(new Date().getTime() - timeLimit);
+        List<TrialOperation> operations = trialOperationMapper.listOperationByUpdateTime(operationVO.getCampaignId(),upTime,status);
+        if (!operations.isEmpty()){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "相同活动3分钟只能抽样一次，请稍后再试");
+            return result;
+        }
+
         for (MktStrategyConfRuleDO rule : ruleList){
             List<String> labelTypeList = injectionLabelMapper.listLabelByRuleId(rule.getMktStrategyConfRuleId());
             if (labelTypeList == null || labelTypeList.isEmpty()){
@@ -714,12 +775,14 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 return result;
             }
         }
+
         TrialOperation trialOp = BeanUtil.create(operationVO, new TrialOperation());
         trialOp.setCampaignName(campaign.getMktCampaignName());
         trialOp.setStrategyName(strategy.getMktStrategyConfName());
         trialOp.setBatchNum(Long.valueOf(batchNumSt));
         trialOp.setStatusCd(TrialStatus.SAMPEL_GOING.getValue());
         trialOp.setStatusDate(new Date());
+        trialOp.setUpdateDate(new Date());
         trialOp.setCreateStaff(TrialCreateType.TRIAL_OPERATION.getValue());
         trialOperationMapper.insert(trialOp);
 
@@ -936,6 +999,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         return result;
     }
 
+
+
     /**
      * 下发策略试运算结果
      *
@@ -959,7 +1024,24 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         List<TrialOperation> operationList = trialOperationMapper.listOperationByStatusCd(TrialStatus.ALL_SAMPEL_GOING.getValue());
         if (!operationList.isEmpty()){
             result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "正在下发文件 请稍后再试。");
+            result.put("resultMsg", "系统正在全量试算 请稍后再试。");
+            return result;
+        }
+
+        int timeLimit = 1800000;
+        List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign("TRIAL_TIME");
+        if (sysParams.get(0)!=null){
+            timeLimit = Integer.valueOf(sysParams.get(0).getParamValue());
+        }
+        Date upTime = new Date(new Date().getTime() - timeLimit);
+        String[] status  = new String[2];
+        status[0] = TrialStatus.ALL_SAMPEL_SUCCESS.getValue();
+        status[1] = TrialStatus.ALL_SAMPEL_FAIL.getValue();
+
+        List<TrialOperation> operations = trialOperationMapper.listOperationByUpdateTime(trialOperation.getCampaignId(),upTime,status);
+        if (!operations.isEmpty()){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "相同活动30分钟只能全量试算一次，请稍后再试");
             return result;
         }
         BeanUtil.copy(operation,trialOperation);
@@ -1008,7 +1090,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         request.setLanId(campaignDO.getLanId());
         request.setCamLevel(campaignDO.getCamLevel());
         // 获取创建人员code
-        request.setStaffCode("SYS827364823");
+        request.setStaffCode(getCreater(campaignDO.getCreateStaff())==null ? "null" : getCreater(campaignDO.getCreateStaff()));
 
          TrialOperationVOES requests = BeanUtil.create(request,new TrialOperationVOES());
         //todo 待测试
@@ -1113,8 +1195,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         List<TrialOperationDetail> operationDetailList = new ArrayList<>();
         for (TrialOperation trialOperation : trialOperations) {
             TrialOperationDetail detail = BeanUtil.create(trialOperation, new TrialOperationDetail());
-            if (trialOperation.getUpdateDate() != null) {
+            if (trialOperation.getUpdateDate() != null && !trialOperation.getStatusCd().equals(TrialStatus.SAMPEL_GOING.getValue())) {
                 Long cost = (trialOperation.getUpdateDate().getTime() - trialOperation.getCreateDate().getTime());
+                cost = cost<0L ? 0L : cost;
                 detail.setCost(cost + "ms");
             }
             operationDetailList.add(detail);
