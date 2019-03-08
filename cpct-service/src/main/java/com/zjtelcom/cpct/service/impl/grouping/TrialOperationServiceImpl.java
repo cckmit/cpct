@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.service.impl.grouping;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
@@ -457,12 +456,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             tarGrpTempId = Long.valueOf(labelMapList.get(0).get("rightParam"));
             List<MktCamCust> camCustList = camCustMapper.selectByTarGrpTempId(tarGrpTempId);
             if (camCustList!=null && !camCustList.isEmpty()){
-               JSONArray list = (JSONArray) JSON.parse(camCustList.get(0).getRemark());
-               if (list!=null){
-                   for (Object map : list){
-                       labelList.add((Map<String, Object>) map);
-                   }
-               }
+                labelList = (List<Map<String,Object>>)JSON.parse(camCustList.get(0).getRemark());
                 for (MktCamCust camCust : camCustList){
                     Map<String,Object> jsonObject = (Map<String,Object>)JSON.parse(camCust.getAttrValue());
                     customerList.add(jsonObject);
@@ -806,6 +800,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 //            }
         } catch (Exception e) {
             e.printStackTrace();
+
         }
         // 抽样试算成功
         result.put("resultCode", CODE_SUCCESS);

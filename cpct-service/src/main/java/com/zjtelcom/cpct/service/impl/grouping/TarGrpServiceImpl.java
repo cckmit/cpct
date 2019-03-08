@@ -5,7 +5,10 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamGrpRulMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
-import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelValueMapper;
+import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
+import com.zjtelcom.cpct.dao.channel.MktVerbalMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
@@ -148,7 +151,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                     }
                 }
                 if ("3000".equals(filterRule.getFilterType()) && !promCode.contains("PROM_LIST")){
-                    assetCode.add("PROM_LIST");
+                    promCode.add("PROM_LIST");
                 }
             }
             //规则级的标签

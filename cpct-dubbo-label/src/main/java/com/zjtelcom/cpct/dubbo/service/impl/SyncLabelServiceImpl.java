@@ -194,32 +194,6 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
     }
 
 
-    private boolean  labelDataType(LabModel labModel,Label label){
-        boolean x = true;
-        if (labModel.getLabDataType()==null || labModel.getLabDataType().equals("")){
-            x = false;
-        }
-        String type = labModel.getLabDataType();
-        if (type.toLowerCase().contains("VARCHAR")){
-            label.setLabelDataType("1200");
-        }else
-        if (type.toUpperCase().contains("INTEGER")){
-            label.setLabelDataType("1300");
-        }else
-        if (type.toUpperCase().contains("NUMERIC")){
-            label.setLabelDataType("1300");
-        }else
-        if (type.toUpperCase().contains("DATE")){
-            label.setLabelDataType("1100");
-        }else
-        if (type.toUpperCase().contains("CHAR")){
-            label.setLabelDataType("1200");
-        }else {
-            x = false;
-        }
-        return x;
-    }
-
     /**
      * 新增标签
      * @param record
@@ -244,12 +218,8 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             //label.setInjectionLabelDesc();
             labelValodate.setLabTagCode(labModel.getLabCode());//标签编码
             labelValodate.setInjectionLabelDesc(labModel.getLabBusiDesc());
-            if ( !labelDataType(labModel,labelValodate)){
-                result.put("resultCode",CODE_FAIL);
-                result.put("resultMsg","无法识别标签字段类型");
-                return result;
-            }
 
+            labelValodate.setLabelDataType(labModel.getLabDataType()==null ? "1200" : labModel.getLabDataType());
             labelValodate.setConditionType(labModel.getLabType());
             if("4".equals(labelValodate.getConditionType())){
                 labelValodate.setOperator("2000,3000,1000,4000,6000,5000,7000,7200");
@@ -296,11 +266,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             label.setScope(1);
             label.setIsShared(0);
             label.setCatalogId(labModel.getLabObjectCode() + labModel.getLabLevel1() + labModel.getLabLevel2() + labModel.getLabLevel3());
-            if (!labelDataType(labModel,label)){
-                result.put("resultCode",CODE_FAIL);
-                result.put("resultMsg","无法识别标签字段类型");
-                return result;
-            }
+            label.setLabelDataType(labModel.getLabDataType()==null ? "1200" : labModel.getLabDataType());
             label.setLabelType("1000");
             if (record.getLabelValueList()!=null && !record.getLabelValueList().isEmpty()){
                 label.setLabelValueType("2000");
