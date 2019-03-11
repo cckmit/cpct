@@ -30,65 +30,63 @@ public class ProductServiceImpl implements ProductService{
 
     //销售品关联活动查询
     @Override
-    public Map<String,Object> selectProductCam(Map<String,Object> paramMap) {
-
+    public Map<String,Object> selectProductCam(List<Map<String,Object>> paramList) {
         Map<String,Object> paramMaps = new HashMap<>();
-        Map<String,Object> resultMap = new HashMap<>();
-        List<Map<String,Object>> productList = new ArrayList<>();
+        for (Map<String,Object> paramMap : paramList) {
+            Map<String,Object> resultMap = new HashMap<>();
+            List<Map<String,Object>> productList = new ArrayList<>();
 
-        String offerInfo = null;
+            String offerInfo = null;
 
-        String productCode = (String) paramMap.get("productCode");
-        String[] split = productCode.split(",");
-        for(int i = 0; i < split.length; i++) {
-            List<Map<String,Object>> policyList = new ArrayList<>();
-            Map<String,Object> map = new HashMap<>();
+            String productCode = (String) paramMap.get("productCode");
+            String type = (String) paramMap.get("type");
+            String[] split = productCode.split(",");
+            for(int i = 0; i < split.length; i++) {
+                List<Map<String,Object>> policyList = new ArrayList<>();
+                Map<String,Object> map = new HashMap<>();
+                List<FilterRule> filterRuleList = filterRuleMapper.selectByProduct(split[i], type);
+                for(FilterRule filterRule1 : filterRuleList) {
+                    List<MktStrategyFilterRuleRelDO> mktStrategyFilterRuleRelDOList = mktStrategyFilterRuleRelMapper.selectByRuleId(filterRule1.getRuleId());
 
-            FilterRule filterRule = new FilterRule();
-            filterRule.setChooseProduct(split[i]);
-            List<FilterRule> filterRuleList = filterRuleMapper.selectByProduct(split[i]);
-            for(FilterRule filterRule1 : filterRuleList) {
-                List<MktStrategyFilterRuleRelDO> mktStrategyFilterRuleRelDOList = mktStrategyFilterRuleRelMapper.selectByRuleId(filterRule1.getRuleId());
+                    for(MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO : mktStrategyFilterRuleRelDOList) {
+                        List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByStrategyConfId(mktStrategyFilterRuleRelDO.getStrategyId());
 
-                for(MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO : mktStrategyFilterRuleRelDOList) {
-                    List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByStrategyConfId(mktStrategyFilterRuleRelDO.getStrategyId());
-
-                    for(MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {
-                        Map<String,Object> maps = new HashMap<>();
-                        maps.put("activityId",mktCamStrategyConfRelDO.getMktCampaignId());
-                        maps.put("policyId",mktStrategyFilterRuleRelDO.getStrategyId());
-                        if(filterRule1.getOfferInfo()!=null) {
-                            if (filterRule1.getOfferInfo().equals("1000")) {
-                                offerInfo = "0";
-                            } else if (filterRule1.getOfferInfo().equals("2000")) {
-                                offerInfo = "1";
+                        for(MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {
+                            Map<String,Object> maps = new HashMap<>();
+                            maps.put("activityId",mktCamStrategyConfRelDO.getMktCampaignId());
+                            maps.put("policyId",mktStrategyFilterRuleRelDO.getStrategyId());
+                            if(filterRule1.getOfferInfo()!=null) {
+                                if (filterRule1.getOfferInfo().equals("1000")) {
+                                    offerInfo = "0";
+                                } else if (filterRule1.getOfferInfo().equals("2000")) {
+                                    offerInfo = "1";
+                                } else if (filterRule1.getOfferInfo().equals("3000")) {
+                                    offerInfo = "2";
+                                }
                             }
+                            maps.put("closeType",offerInfo);
+                            policyList.add(maps);
                         }
-                        maps.put("closeType",offerInfo);
-                        policyList.add(maps);
                     }
                 }
+                if(policyList.size() > 0) {
+                    map.put("productCode",split[i]);
+                    map.put("policyList", policyList);
+                    productList.add(map);
+                }
+
             }
-            if(policyList.size() > 0) {
-                map.put("productCode",split[i]);
-                map.put("policyList", policyList);
-                productList.add(map);
+            resultMap.put("reqId", DateUtil.getDetailTime() + EsSearchUtil.getRandomStr(2));
+            if(productList.size() > 0) {
+                resultMap.put("resultCode", "1");
+                resultMap.put("resultMsg", "有推荐结果");
+            }else{
+                resultMap.put("resultCode", "1000");
+                resultMap.put("resultMsg", "没有匹配推荐结果");
             }
-
+            resultMap.put("productList",productList);
+            paramMaps.put("paramMap",resultMap);
         }
-
-        resultMap.put("reqId", DateUtil.getDetailTime() + EsSearchUtil.getRandomStr(2));
-        if(productList.size() > 0) {
-            resultMap.put("resultCode", "1");
-            resultMap.put("resultMsg", "有推荐结果");
-        }else{
-            resultMap.put("resultCode", "1000");
-            resultMap.put("resultMsg", "没有匹配推荐结果");
-        }
-
-        resultMap.put("productList",productList);
-
-        paramMaps.put("paramMap",resultMap);
         return paramMaps;
     }
 }
