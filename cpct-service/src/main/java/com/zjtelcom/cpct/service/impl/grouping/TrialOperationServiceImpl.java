@@ -707,7 +707,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
         String[] statusCd  = new String[1];
         statusCd[0] = TrialStatus.SAMPEL_GOING.getValue();
-        Date createTime = new Date(new Date().getTime() - 300000);
+        Date createTime = new Date(new Date().getTime() - 600000);
         List<TrialOperation> operationCheck = trialOperationMapper.listOperationByCreateTime(null,createTime,statusCd);
         if (operationCheck!=null && !operationCheck.isEmpty()){
             for (TrialOperation operation : operationCheck){

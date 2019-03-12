@@ -89,7 +89,7 @@ public class SearchLabelServiceImpl implements SearchLabelService {
                     }
                 }
                 if ("3000".equals(filterRule.getFilterType()) && !promCode.contains("PROM_LIST")){
-                    custCode.add("PROM_LIST");
+                    assetCode.add("PROM_LIST");
                 }
             }
             //规则级的标签
