@@ -4,6 +4,7 @@ package com.zjtelcom.cpct.dao.channel;
 
 import com.zjtelcom.cpct.domain.channel.Organization;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,4 +21,6 @@ public interface OrganizationMapper {
     List<Organization> selectAll();
 
     int updateByPrimaryKey(Organization record);
+
+    List<Organization> selectByParentId(@Param("parentId")Long parentId);
 }
