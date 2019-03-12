@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.EventRelMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.EventRel">
+    <id column="COMPLEX_EVT_RELA_ID" jdbcType="BIGINT" property="complexEvtRelaId" />
+    <result column="A_EVT_ID" jdbcType="BIGINT" property="aEvtId" />
+    <result column="Z_EVT_ID" jdbcType="BIGINT" property="zEvtId" />
+    <result column="SORT" jdbcType="BIGINT" property="sort" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from event_rel
+    where COMPLEX_EVT_RELA_ID = #{complexEvtRelaId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.EventRel">
+    insert into event_rel (COMPLEX_EVT_RELA_ID, A_EVT_ID, Z_EVT_ID, 
+      SORT, STATUS_CD, CREATE_STAFF, 
+      UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
+      UPDATE_DATE, REMARK)
+    values (#{complexEvtRelaId,jdbcType=BIGINT}, #{aEvtId,jdbcType=BIGINT}, #{zEvtId,jdbcType=BIGINT}, 
+      #{sort,jdbcType=BIGINT}, #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, 
+      #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.EventRel">
+    update event_rel
+    set A_EVT_ID = #{aEvtId,jdbcType=BIGINT},
+      Z_EVT_ID = #{zEvtId,jdbcType=BIGINT},
+      SORT = #{sort,jdbcType=BIGINT},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where COMPLEX_EVT_RELA_ID = #{complexEvtRelaId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select COMPLEX_EVT_RELA_ID, A_EVT_ID, Z_EVT_ID, SORT, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from event_rel
+    where COMPLEX_EVT_RELA_ID = #{complexEvtRelaId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select COMPLEX_EVT_RELA_ID, A_EVT_ID, Z_EVT_ID, SORT, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from event_rel
+  </select>
+
+</mapper>
