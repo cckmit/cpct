@@ -136,7 +136,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         Integer rowNums = sheet.getLastRowNum() + 1;
         List<String> resultList = new ArrayList<>();
         String key = "USER_LIST_"+ChannelUtil.getRandomStr(5);
-        for (int i = 0; i < rowNums; i++) {
+        for (int i = 1; i < rowNums; i++) {
             Row row = sheet.getRow(i);
             if (row.getLastCellNum()>=2){
                 maps.put("resultCode", CODE_FAIL);
@@ -146,7 +146,9 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
 //            for (int j = 0; j < row.getLastCellNum(); j++) {
             Cell cell = row.getCell(0);
             String cellValue = ChannelUtil.getCellValue(cell).toString();
-            resultList.add(cellValue);
+            if (!cellValue.equals("null")){
+                resultList.add(cellValue);
+            }
 //            }
 //            UserList userListT = userListMapper.getUserList(userList);
 //            if (userListT != null) {
