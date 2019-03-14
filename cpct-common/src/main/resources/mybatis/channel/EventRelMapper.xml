@@ -53,5 +53,11 @@
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
     from event_rel
   </select>
+  <select id="selectByZEvtId" resultMap="BaseResultMap">
+    select COMPLEX_EVT_RELA_ID, A_EVT_ID, Z_EVT_ID, SORT, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+           CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from event_rel
+    where Z_EVT_ID = #{zEvtId,jdbcType=BIGINT}
+  </select>
 
 </mapper>
