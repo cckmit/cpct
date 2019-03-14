@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.controller.system;
 
 import com.alibaba.fastjson.JSON;
 import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
+import com.ctzj.smt.bss.sysmgr.model.dto.PrivFuncRelDetail;
 import com.ctzj.smt.bss.sysmgr.model.dto.PrivilegeDetail;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.zjtelcom.cpct.controller.BaseController;

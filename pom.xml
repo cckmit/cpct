@@ -60,6 +60,10 @@
         <session-data-redis.verson>1.3.3.RELEASE</session-data-redis.verson>
         <dubbo-server.version>1.1.2</dubbo-server.version>
         <bss-centralized.verson>msit-test</bss-centralized.verson>
+        <bss-sysmgr-model.verson>1.1.2</bss-sysmgr-model.verson>
+        <privilege-service-api.verson>1.1.2</privilege-service-api.verson>
+
+
 
         <service-batch.version>1.0.4</service-batch.version>
 
@@ -388,12 +392,30 @@
                 <version>${service-batch.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>16.0.1</version>
+            </dependency>
+
+
+
             <!-- 引入门户模块 -->
             <dependency>
                 <groupId>com.ctzj.smt.bss</groupId>
                 <artifactId>bss-centralized-authenticate</artifactId>
                 <version>${bss-centralized.verson}</version>
             </dependency>
+            <!--<dependency>-->
+                <!--<groupId>com.ctzj.smt.bss</groupId>-->
+                <!--<artifactId>bss-sysmgr-model</artifactId>-->
+                <!--<version>${bss-sysmgr-model.verson}</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>com.ctzj.smt.bss</groupId>-->
+                <!--<artifactId>bss-sysmgr-privilege-service-api</artifactId>-->
+                <!--<version>${privilege-service-api.verson}</version>-->
+            <!--</dependency>-->
             <dependency>
                 <groupId>com.zjhcsoft.session</groupId>
                 <artifactId>spring-session</artifactId>
