@@ -211,63 +211,63 @@ public class TrialServiceImpl implements TrialService {
             List<String> codeList = new ArrayList<>();
 
             StringBuilder express = new StringBuilder();
-            //将规则拼装为表达式
-            if (conditionList != null && conditionList.size() > 0) {
-                express.append("if(");
-                //遍历所有规则
-                for (int i = 0; i < conditionList.size(); i++) {
-                    LabelResult labelResult = new LabelResult();
-                    String type = conditionList.get(i).getOperType();
-                    Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(conditionList.get(i).getLeftParam()));
+                //将规则拼装为表达式
+                if (conditionList != null && conditionList.size() > 0) {
+                    express.append("if(");
+                    //遍历所有规则
+                    for (int i = 0; i < conditionList.size(); i++) {
+                        LabelResult labelResult = new LabelResult();
+                        String type = conditionList.get(i).getOperType();
+                        Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(conditionList.get(i).getLeftParam()));
 
-                    labelResult.setLabelCode(label.getInjectionLabelCode());
-                    labelResult.setLabelName(label.getInjectionLabelName());
-                    labelResult.setRightOperand(label.getLabelType());
-                    labelResult.setRightParam(conditionList.get(i).getRightParam());
-                    labelResult.setClassName(label.getClassName());
-                    labelResult.setOperType(type);
-                    labelResult.setLabelDataType(label.getLabelDataType()==null ? "1100" : label.getLabelDataType());
-                    labelResultList.add(labelResult);
-                    codeList.add(label.getInjectionLabelCode());
-                    if ("7100".equals(type)) {
-                        express.append("!");
+                        labelResult.setLabelCode(label.getInjectionLabelCode());
+                        labelResult.setLabelName(label.getInjectionLabelName());
+                        labelResult.setRightOperand(label.getLabelType());
+                        labelResult.setRightParam(conditionList.get(i).getRightParam());
+                        labelResult.setClassName(label.getClassName());
+                        labelResult.setOperType(type);
+                        labelResult.setLabelDataType(label.getLabelDataType()==null ? "1100" : label.getLabelDataType());
+                        labelResultList.add(labelResult);
+                        codeList.add(label.getInjectionLabelCode());
+                        if ("7100".equals(type)) {
+                            express.append("!");
+                        }
+                        express.append("(");
+                        express.append(label.getInjectionLabelCode());
+                        if ("1000".equals(type)) {
+                            express.append(">");
+                        } else if ("2000".equals(type)) {
+                            express.append("<");
+                        } else if ("3000".equals(type)) {
+                            express.append("==");
+                        } else if ("4000".equals(type)) {
+                            express.append("!=");
+                        } else if ("5000".equals(type)) {
+                            express.append(">=");
+                        } else if ("6000".equals(type)) {
+                            express.append("<=");
+                        } else if ("7000".equals(type) || "7100".equals(type)) {
+                            express.append("in");
+                        }else if ("7200".equals(type)) {
+                            express.append("@@@@");//区间于
+                        } else if ("7100".equals(type)) {
+                            express.append("notIn");
+                        }
+                        express.append(conditionList.get(i).getRightParam());
+                        express.append(")");
+                        if (i + 1 != conditionList.size()) {
+                            express.append("&&");
+                        }
                     }
-                    express.append("(");
-                    express.append(label.getInjectionLabelCode());
-                    if ("1000".equals(type)) {
-                        express.append(">");
-                    } else if ("2000".equals(type)) {
-                        express.append("<");
-                    } else if ("3000".equals(type)) {
-                        express.append("==");
-                    } else if ("4000".equals(type)) {
-                        express.append("!=");
-                    } else if ("5000".equals(type)) {
-                        express.append(">=");
-                    } else if ("6000".equals(type)) {
-                        express.append("<=");
-                    } else if ("7000".equals(type) || "7100".equals(type)) {
-                        express.append("in");
-                    }else if ("7200".equals(type)) {
-                        express.append("@@@@");//区间于
-                    } else if ("7100".equals(type)) {
-                        express.append("notIn");
-                    }
-                    express.append(conditionList.get(i).getRightParam());
-                    express.append(")");
-                    if (i + 1 != conditionList.size()) {
-                        express.append("&&");
-                    }
+                    express.append(") {return true} else {return false}");
+                }else {
+                    express.append("");
                 }
-                express.append(") {return true} else {return false}");
-            }else {
-                express.append("");
-            }
 
-            // 将表达式存入Redis
-            System.out.println(">>express->>>>:" + JSON.toJSONString(express));
+                // 将表达式存入Redis
+                System.out.println(">>express->>>>:" + JSON.toJSONString(express));
 
-            System.out.println("TAR_GRP_ID>>>>>>>>>>" + tarGrpId + ">>>>>>>>codeList->>>>:" + JSON.toJSONString(codeList));
+                System.out.println("TAR_GRP_ID>>>>>>>>>>" + tarGrpId + ">>>>>>>>codeList->>>>:" + JSON.toJSONString(codeList));
 
             result.put("express",express.toString());
             result.put("labelResultList",labelResultList);

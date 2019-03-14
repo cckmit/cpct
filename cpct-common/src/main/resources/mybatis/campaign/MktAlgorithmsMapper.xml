@@ -95,5 +95,6 @@
         <if test="algoName != null and algoName != ''">
             and ALGO_NAME LIKE CONCAT(CONCAT('%',#{algoName}),'%')
         </if>
+        order by UPDATE_DATE desc
     </select>
 </mapper>
