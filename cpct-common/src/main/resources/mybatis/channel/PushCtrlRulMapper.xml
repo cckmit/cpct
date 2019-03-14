@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.PushCtrlRulMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.PushCtrlRul">
+    <id column="PUSH_CTRL_RUL_ID" jdbcType="BIGINT" property="pushCtrlRulId" />
+    <result column="CONTACT_CHL_ID" jdbcType="BIGINT" property="contactChlId" />
+    <result column="PRIORITY" jdbcType="BIGINT" property="priority" />
+    <result column="CUST_COUNT" jdbcType="BIGINT" property="custCount" />
+    <result column="NO_PUST_DATE" jdbcType="VARCHAR" property="noPustDate" />
+    <result column="PERIOD_TYPE" jdbcType="BIGINT" property="periodType" />
+    <result column="CTRL_MARK" jdbcType="BIGINT" property="ctrlMark" />
+    <result column="TIME_SET" jdbcType="VARCHAR" property="timeSet" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from push_ctrl_rul
+    where PUSH_CTRL_RUL_ID = #{pushCtrlRulId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.PushCtrlRul">
+    insert into push_ctrl_rul (PUSH_CTRL_RUL_ID, CONTACT_CHL_ID, PRIORITY, 
+      CUST_COUNT, NO_PUST_DATE, PERIOD_TYPE, 
+      CTRL_MARK, TIME_SET, STATUS_CD, 
+      CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
+      STATUS_DATE, UPDATE_DATE, REMARK
+      )
+    values (#{pushCtrlRulId,jdbcType=BIGINT}, #{contactChlId,jdbcType=BIGINT}, #{priority,jdbcType=BIGINT}, 
+      #{custCount,jdbcType=BIGINT}, #{noPustDate,jdbcType=VARCHAR}, #{periodType,jdbcType=BIGINT}, 
+      #{ctrlMark,jdbcType=BIGINT}, #{timeSet,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR}, 
+      #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.PushCtrlRul">
+    update push_ctrl_rul
+    set CONTACT_CHL_ID = #{contactChlId,jdbcType=BIGINT},
+      PRIORITY = #{priority,jdbcType=BIGINT},
+      CUST_COUNT = #{custCount,jdbcType=BIGINT},
+      NO_PUST_DATE = #{noPustDate,jdbcType=VARCHAR},
+      PERIOD_TYPE = #{periodType,jdbcType=BIGINT},
+      CTRL_MARK = #{ctrlMark,jdbcType=BIGINT},
+      TIME_SET = #{timeSet,jdbcType=VARCHAR},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where PUSH_CTRL_RUL_ID = #{pushCtrlRulId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select PUSH_CTRL_RUL_ID, CONTACT_CHL_ID, PRIORITY, CUST_COUNT, NO_PUST_DATE, PERIOD_TYPE, 
+    CTRL_MARK, TIME_SET, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
+    UPDATE_DATE, REMARK
+    from push_ctrl_rul
+    where PUSH_CTRL_RUL_ID = #{pushCtrlRulId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select PUSH_CTRL_RUL_ID, CONTACT_CHL_ID, PRIORITY, CUST_COUNT, NO_PUST_DATE, PERIOD_TYPE, 
+    CTRL_MARK, TIME_SET, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
+    UPDATE_DATE, REMARK
+    from push_ctrl_rul
+  </select>
+</mapper>
