@@ -18,7 +18,6 @@ public class FilterRuleAddVO implements Serializable {
     private String expression;
     private Date dayStart;
     private Date dayEnd;
-    private String userList;
     private VerbalConditionAddVO condition;//过扰规则条件
     private String days;
     private String times;
@@ -72,14 +71,6 @@ public class FilterRuleAddVO implements Serializable {
 
     public void setOfferInfo(String offerInfo) {
         this.offerInfo = offerInfo;
-    }
-
-    public String getUserList() {
-        return userList;
-    }
-
-    public void setUserList(String userList) {
-        this.userList = userList;
     }
 
     public Long getRuleId() {
