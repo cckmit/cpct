@@ -11,11 +11,19 @@ import java.util.List;
 public interface MktCamGrpRulPrdMapper {
     int deleteByPrimaryKey(Long mktCamGrpRulId);
 
+    int deleteByTarGrpId(Long tarGrpId);
+
     int insert(MktCamGrpRul record);
 
     MktCamGrpRul selectByPrimaryKey(Long mktCamGrpRulId);
 
+    MktCamGrpRul selectByRuleId(Long mktStrategyConfRuleId);
+
+    int countByTarGrpId(Long tarGrpId);
+
     List<MktCamGrpRul> selectAll();
+
+    MktCamGrpRul selectByTarGrpId(Long tarGrpId);
 
     int updateByPrimaryKey(MktCamGrpRul record);
 

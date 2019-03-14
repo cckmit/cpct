@@ -18,6 +18,10 @@
     delete from mkt_cam_strategy_rel
     where CAMP_STR_REL_ID = #{campStrRelId,jdbcType=BIGINT}
   </delete>
+  <delete id="deleteByStrategyId" parameterType="java.lang.Long">
+    delete from mkt_cam_strategy_rel
+    where STRATEGY_ID = #{strategyId,jdbcType=BIGINT}
+  </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.pojo.MktCamStrategyRel">
     insert into mkt_cam_strategy_rel (CAMP_STR_REL_ID, MKT_CAMPAIGN_ID, STRATEGY_ID, 
       STATUS_CD, STATUS_DATE, CREATE_STAFF, 

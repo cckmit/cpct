@@ -141,7 +141,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
     @Autowired
     private MktCamItemMapper itemMapper;
-    @Autowired
+    @Autowired(required = false)
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
 
 
