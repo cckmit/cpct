@@ -37,3 +37,17 @@ spring:
       max-idle: 8
       min-idle: 0
     timeout: 30000
+
+  #集团定制的redis配置msit环境
+  redisConfig:
+     ip: 134.96.231.226
+     port: 41003
+     database: 4970
+     password: bss_cpct_user#bss_cpct_user123
+
+
+  redisConfig_Prd:
+     ip: 134.96.231.226
+     port: 41003
+     database: 4970
+     password: bss_cpct_user#bss_cpct_user123
