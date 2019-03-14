@@ -141,6 +141,12 @@
 			</properties>
 		</profile>
 		<profile>
+			<id>msit</id>
+			<properties>
+				<spring.profiles.active>msit</spring.profiles.active>
+			</properties>
+		</profile>
+		<profile>
 			<id>pre</id>
 			<properties>
 				<spring.profiles.active>pre</spring.profiles.active>

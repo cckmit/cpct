@@ -413,4 +413,11 @@
     where rule.MKT_STRATEGY_CONF_RULE_ID = #{ruleId}
   </select>
 
+  <!--根据LABEL_DATA_TYPE查询对应的INJECTION_LABEL_CODE集合-->
+  <select id="selectLabelCodeByType" parameterType="java.lang.String" resultType="java.lang.String">
+    select INJECTION_LABEL_CODE
+    from injection_label
+    where LABEL_DATA_TYPE = #{labelDataType}
+  </select>
+
 </mapper>
