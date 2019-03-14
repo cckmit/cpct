@@ -51,10 +51,10 @@ spring:
 
 #集团定制的redis配置pst环境
 redisConfig:
-   ip: 134.96.231.228
-   port: 40201
+   ip: 134.96.231.226
+   port: 41003
    database: 4970
-   password: bss_cpct_common_user#bss_cpct_common_user123
+   password: bss_cpct_user#bss_cpct_user123
 
 
 #调用统一平台的参数  测试环境
@@ -68,7 +68,7 @@ platformConfig:
 
 #集团定制的redis配置pst环境
 redisConfig_Prd:
-   ip: 134.96.231.228
-   port: 40201
+   ip: 134.96.231.226
+   port: 41003
    database: 4970
-   password: bss_cpct_common_user#bss_cpct_common_user123
+   password: bss_cpct_user#bss_cpct_user123

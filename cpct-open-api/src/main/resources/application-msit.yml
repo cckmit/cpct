@@ -1,0 +1,38 @@
+#端口配置
+server:
+  port: 30809
+
+spring:
+# 第一数据源
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://134.96.231.202:8801/smt_bss_cpc1213?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: cpc_user
+    password: cpc_user_123
+
+
+
+
+
+#redis相关配置
+  redis:
+    host: 134.96.252.170
+    port: 30305
+    password: xc.cpct
+    pool:
+      max-active: 8
+      max-wait: -1
+      max-idle: 8
+      min-idle: 0
+    timeout: 30000
+
+
+#调用统一平台的参数  生产环境
+platformConfig:
+   channel: CLZX
+   channel_token: rAx5T2pIvvw5W9vQ
+   bis_module: 内容策略中心
+   bis_detail: 内容策略中心
+   version: v1.0
+
+
