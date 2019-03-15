@@ -15,6 +15,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
@@ -23,10 +24,12 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.MultipartConfigElement;
+
 
 @SpringBootApplication
 @ImportResource("classpath:dubbo/dubbo-${spring.profiles.active}.xml")
-@Import({WebSecurityConfig.class, HttpSessionConfig.class, MyUserDetailsService.class})
+//@Import({WebSecurityConfig.class, HttpSessionConfig.class, MyUserDetailsService.class})
 @ComponentScan(value = {"com.zjtelcom.cpct"})
 @EnableTransactionManagement
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class,DataSourceTransactionManagerAutoConfiguration.class, MybatisAutoConfiguration.class})
@@ -46,6 +49,19 @@ public class Application {
         logger.info("***********CPCT*********启动**********");
     }
 
+    /**
+     * 文件上传配置
+     * @return
+     */
+    @Bean
+    public MultipartConfigElement multipartConfigElement() {
+        MultipartConfigFactory factory = new MultipartConfigFactory();
+        //单个文件最大
+        factory.setMaxFileSize("10240KB"); //KB,MB
+        /// 设置总上传数据总大小
+        factory.setMaxRequestSize("102400KB");
+        return factory.createMultipartConfig();
+    }
 
 }
 

@@ -141,7 +141,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
     @Autowired
     private MktCamItemMapper itemMapper;
-    @Autowired
+    @Autowired(required = false)
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
 
 
@@ -512,12 +512,19 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "活动不存在");
             return result;
         }
+        MktStrategyConfDO strategyConfDO = strategyConfMapper.selectByPrimaryKey(operation.getStrategyId());
+        if (campaignDO==null){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "策略不存在");
+            return result;
+        }
         final TrialOperationVOES request = BeanUtil.create(operation,new TrialOperationVOES());
         request.setBatchNum(Long.valueOf(batchNumSt));
         request.setCampaignType(campaignDO.getMktCampaignType());
         request.setLanId(campaignDO.getLanId());
         request.setCampaignName(campaignDO.getMktCampaignName());
         request.setCamLevel(campaignDO.getCamLevel());
+        request.setStrategyName(strategyConfDO.getMktStrategyConfName());
         // 获取创建人员code
         request.setStaffCode(getCreater(campaignDO.getCreateStaff())==null ? "null" : getCreater(campaignDO.getCreateStaff()));
 
@@ -530,7 +537,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             public void run(){
                 try {
                     TrialResponseES responseES = esService.issueByFile(request);
-//                   TrialResponseES responseES =  restTemplate.postForObject("http://localhost:8080/es/issueByFile",request,TrialResponseES.class);
                 }catch (Exception e){
                     e.printStackTrace();
                     logger.info("导入清单下发失败");
@@ -594,6 +600,11 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             Map<String, Object> customers = new HashMap<>();
             Row rowCode = sheet.getRow(1);
             Row row = sheet.getRow(i);
+            System.out.println("处理--------："+i);
+            if (row==null){
+                System.out.println("这一行是空的："+i);
+                continue;
+            }
             for (int j = 0; j < row.getLastCellNum(); j++) {
                 Cell cellTitle = rowCode.getCell(j);
                 Cell cell = row.getCell(j);
@@ -707,7 +718,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
         String[] statusCd  = new String[1];
         statusCd[0] = TrialStatus.SAMPEL_GOING.getValue();
-        Date createTime = new Date(new Date().getTime() - 300000);
+        Date createTime = new Date(new Date().getTime() - 600000);
         List<TrialOperation> operationCheck = trialOperationMapper.listOperationByCreateTime(null,createTime,statusCd);
         if (operationCheck!=null && !operationCheck.isEmpty()){
             for (TrialOperation operation : operationCheck){

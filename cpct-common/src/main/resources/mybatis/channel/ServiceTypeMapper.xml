@@ -33,18 +33,43 @@
     </insert>
     <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.ServiceType">
         update service_type
-        set SERVICE_TYPE_NBR = #{serviceTypeNbr,jdbcType=VARCHAR},
+        set
+        <if test="serviceTypeNbr != null and serviceTypeNbr != ''">
+            SERVICE_TYPE_NBR = #{serviceTypeNbr,jdbcType=VARCHAR},
+        </if>
+        <if test="serviceTypeName != null and serviceTypeName != ''">
             SERVICE_TYPE_NAME = #{serviceTypeName,jdbcType=VARCHAR},
+        </if>
+        <if test="parServiceTypeId != null and parServiceTypeId != ''">
             PAR_SERVICE_TYPE_ID = #{parServiceTypeId,jdbcType=BIGINT},
+        </if>
+        <if test="extServiceTypeId != null and extServiceTypeId != ''">
             EXT_SERVICE_TYPE_ID = #{extServiceTypeId,jdbcType=BIGINT},
+        </if>
+        <if test="serviceTypeDesc != null and serviceTypeDesc != ''">
             SERVICE_TYPE_DESC = #{serviceTypeDesc,jdbcType=VARCHAR},
+        </if>
+        <if test="statusCd != null and statusCd != ''">
             STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+        </if>
+        <if test="statusDate != null">
             STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="createStaff != null and createStaff != ''">
             CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
-            CREATE_DATE= #{createDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="createDate != null">
+            CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="updateStaff != null and updateStaff != ''">
             UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
-            UPDATE_DATE= #{updateDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="updateDate != null">
+            UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="remark != null and remark != ''">
             REMARK = #{remark,jdbcType=VARCHAR}
+        </if>
         where SERVICE_TYPE_ID = #{serviceTypeId,jdbcType=BIGINT}
     </update>
     <select id="selectAll" resultMap="BaseResultMap">
@@ -53,11 +78,29 @@
               CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
         from service_type
     </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select SERVICE_TYPE_ID, SERVICE_TYPE_NBR, SERVICE_TYPE_NAME, PAR_SERVICE_TYPE_ID,
+               EXT_SERVICE_TYPE_ID, SERVICE_TYPE_DESC, STATUS_CD, STATUS_DATE, CREATE_STAFF,
+               CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
+        from service_type
+        where SERVICE_TYPE_ID = #{serviceTypeId,jdbcType=BIGINT}
+    </select>
     <select id="findServiceTypeListByPar" resultMap="BaseResultMap">
         select SERVICE_TYPE_ID, SERVICE_TYPE_NBR, SERVICE_TYPE_NAME, PAR_SERVICE_TYPE_ID,
               EXT_SERVICE_TYPE_ID, SERVICE_TYPE_DESC, STATUS_CD, STATUS_DATE, CREATE_STAFF,
               CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
         from service_type
         where PAR_SERVICE_TYPE_ID = #{parServiceTypeId}
+    </select>
+    <select id="getServiceTypeByConditon" resultMap="BaseResultMap">
+        select SERVICE_TYPE_ID, SERVICE_TYPE_NBR, SERVICE_TYPE_NAME, PAR_SERVICE_TYPE_ID,
+               EXT_SERVICE_TYPE_ID, SERVICE_TYPE_DESC, STATUS_CD, STATUS_DATE, CREATE_STAFF,
+               CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
+        from service_type
+        where 1=1
+        <if test="serviceTypeName != null and serviceTypeName != ''">
+              and SERVICE_TYPE_NAME LIKE CONCAT(CONCAT('%',#{serviceTypeName}),'%')
+        </if>
+        order by UPDATE_DATE desc
     </select>
 </mapper>

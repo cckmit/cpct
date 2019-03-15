@@ -81,7 +81,9 @@
       STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
       UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
       REMARK = #{remark,jdbcType=VARCHAR},
+        <if test="userList != null and userList != ''">
       USER_LIST = #{userList,jdbcType=VARCHAR},
+        </if>
       CONDITION_ID = #{conditionId,jdbcType=BIGINT},
       DAYS = #{days,jdbcType=VARCHAR},
       TIMES = #{times,jdbcType=VARCHAR},

@@ -95,4 +95,13 @@
     ORG_AREA_LEVEL, REMARK, ORG_DESC
     from organization
   </select>
+
+  <select id="selectByParentId" resultMap="BaseResultMap">
+    select ORG_ID, PARTY_ID, ORG_CODE, ORG_NAME, REGION_ID, ORG_TYPE, ORG_SUBTYPE, VILLAGE_FLAG,
+    PARENT_ORG_ID, ORG_LEVEL, ORG_INDEX, SALESORG_CODE, DIVORG_FLAG, CREATE_DATE, CREATE_STAFF,
+    STATUS_CD, STATUS_DATE, UPDATE_DATE, UPDATE_STAFF, ORG_DIVISION, org_id_4a, ORG_CONTRACT_TYPE,
+    ORG_AREA_LEVEL, REMARK, ORG_DESC
+    from organization where PARENT_ORG_ID = #{parentId}
+  </select>
+
 </mapper>
