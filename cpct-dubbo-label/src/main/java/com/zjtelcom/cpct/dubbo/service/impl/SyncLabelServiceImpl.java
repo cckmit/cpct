@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.dubbo.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelCatalogMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
@@ -198,9 +199,10 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         boolean x = true;
         if (labModel.getLabDataType()==null || labModel.getLabDataType().equals("")){
             x = false;
+            return x;
         }
         String type = labModel.getLabDataType();
-        if (type.toLowerCase().contains("VARCHAR")){
+        if (type.toUpperCase().contains("VARCHAR")){
             label.setLabelDataType("1200");
         }else
         if (type.toUpperCase().contains("INTEGER")){
@@ -226,6 +228,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
      * @return
      */
     private Map<String,Object> addLabel(RecordModel record) {
+        logger.info("**********入参**************："+JSON.toJSONString(record));
         Map<String, Object> result = new HashMap<>();
         LabModel labModel = record.getLabel();
         Label labelValodate = labelMapper.selectByTagRowId(record.getLabel().getLabRowId());

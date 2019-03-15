@@ -17,6 +17,8 @@ public interface MktCamGrpRulMapper {
 
     MktCamGrpRul selectByPrimaryKey(Long mktCamGrpRulId);
 
+    MktCamGrpRul selectByRuleId(Long mktStrategyConfRuleId);
+
     int countByTarGrpId(Long tarGrpId);
 
     List<MktCamGrpRul> selectAll();

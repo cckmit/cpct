@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zjtelcom.cpct.dao.campaign.MktCamGrpRulMapper">
+<mapper namespace=" com.zjtelcom.cpct_prd.dao.campaign.MktCamGrpRulPrdMapper">
   <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.campaign.MktCamGrpRul">
     <id column="MKT_CAM_GRP_RUL_ID" jdbcType="BIGINT" property="mktCamGrpRulId" />
     <result column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId" />
     <result column="TAR_GRP_ID" jdbcType="BIGINT" property="tarGrpId" />
+    <result column="MKT_STRATEGY_CONF_ID" jdbcType="BIGINT" property="mktStrategyConfId" />
+    <result column="MKT_STRATEGY_CONF_RULE_ID" jdbcType="BIGINT" property="mktStrategyConfRuleId" />
     <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
     <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
     <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
@@ -18,61 +20,85 @@
     delete from mkt_cam_grp_rul
     where MKT_CAM_GRP_RUL_ID = #{mktCamGrpRulId,jdbcType=BIGINT}
   </delete>
+  <delete id="deleteByTarGrpId" parameterType="java.lang.Long">
+    delete from mkt_cam_grp_rul
+    where TAR_GRP_ID = #{tarGrpId,jdbcType=BIGINT}
+  </delete>
   <insert id="insert" useGeneratedKeys="true" keyProperty="mktCamGrpRulId" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamGrpRul">
-    insert into mkt_cam_grp_rul (MKT_CAM_GRP_RUL_ID, MKT_CAMPAIGN_ID, TAR_GRP_ID, 
-      STATUS_CD, STATUS_DATE, CREATE_STAFF, 
-      CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, 
-      REMARK, LAN_ID)
-    values (#{mktCamGrpRulId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{tarGrpId,jdbcType=BIGINT}, 
-      #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT}, 
-      #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, 
-      #{remark,jdbcType=VARCHAR}, #{lanId,jdbcType=BIGINT})
+    insert into mkt_cam_grp_rul (MKT_CAM_GRP_RUL_ID, MKT_CAMPAIGN_ID, TAR_GRP_ID, MKT_STRATEGY_CONF_ID, MKT_STRATEGY_CONF_RULE_ID,
+    STATUS_CD, STATUS_DATE, CREATE_STAFF,
+    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
+    REMARK, LAN_ID)
+    values (#{mktCamGrpRulId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{tarGrpId,jdbcType=BIGINT},  #{mktStrategyConfId,jdbcType=BIGINT},
+    #{mktStrategyConfRuleId,jdbcType=BIGINT}, #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT},
+    #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP},
+    #{remark,jdbcType=VARCHAR}, #{lanId,jdbcType=BIGINT})
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamGrpRul">
     update mkt_cam_grp_rul
     set
-      <if test="mktCampaignId != null and mktCampaignId != 0">
-        MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},
-      </if>
-      <if test="tarGrpId != null and tarGrpId != 0">
-        TAR_GRP_ID = #{tarGrpId,jdbcType=BIGINT},
-      </if>
-      <if test="statusCd != null and statusCd != ''">
-        STATUS_CD = #{statusCd,jdbcType=VARCHAR},
-      </if>
-      <if test="statusDate != null and statusDate != ''">
-        STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
-      </if>
-      <if test="createStaff != null and createStaff != 0">
-        CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
-      </if>
-      <if test="createDate != null">
-        CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateStaff != null and updateStaff != 0">
-        UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
-      </if>
-      <if test="updateDate != null ">
-        UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
-      </if>
-      <if test="remark != null and remark != ''">
-        REMARK = #{remark,jdbcType=VARCHAR},
-      </if>
-      <if test="lanId != null and lanId != 0">
-        LAN_ID = #{lanId,jdbcType=BIGINT}
-      </if>
-      MKT_CAM_GRP_RUL_ID = #{mktCamGrpRulId,jdbcType=BIGINT}
+    <if test="mktCampaignId != null and mktCampaignId != 0">
+      MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},
+    </if>
+    <if test="tarGrpId != null and tarGrpId != 0">
+      TAR_GRP_ID = #{tarGrpId,jdbcType=BIGINT},
+    </if>
+    <if test="mktStrategyConfId != null and mktStrategyConfId != 0">
+      MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=BIGINT},
+    </if>
+    <if test="mktStrategyConfRuleId != null and mktStrategyConfRuleId != 0">
+      MKT_STRATEGY_CONF_RULE_ID = #{mktStrategyConfRuleId,jdbcType=BIGINT},
+    </if>
+    <if test="statusCd != null and statusCd != ''">
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+    </if>
+    <if test="statusDate != null and statusDate != ''">
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+    </if>
+    <if test="createStaff != null and createStaff != 0">
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+    </if>
+    <if test="createDate != null">
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+    </if>
+    <if test="updateStaff != null and updateStaff != 0">
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+    </if>
+    <if test="updateDate != null ">
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+    </if>
+    <if test="remark != null and remark != ''">
+      REMARK = #{remark,jdbcType=VARCHAR},
+    </if>
+    <if test="lanId != null and lanId != 0">
+      LAN_ID = #{lanId,jdbcType=BIGINT}
+    </if>
+    MKT_CAM_GRP_RUL_ID = #{mktCamGrpRulId,jdbcType=BIGINT}
     where MKT_CAM_GRP_RUL_ID = #{mktCamGrpRulId,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select MKT_CAM_GRP_RUL_ID, MKT_CAMPAIGN_ID, TAR_GRP_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, 
+    select MKT_CAM_GRP_RUL_ID, MKT_CAMPAIGN_ID, TAR_GRP_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, MKT_STRATEGY_CONF_ID, MKT_STRATEGY_CONF_RULE_ID,
     CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
     from mkt_cam_grp_rul
     where MKT_CAM_GRP_RUL_ID = #{mktCamGrpRulId,jdbcType=BIGINT}
   </select>
+  <select id="selectByRuleId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_CAM_GRP_RUL_ID, MKT_CAMPAIGN_ID, TAR_GRP_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, MKT_STRATEGY_CONF_ID, MKT_STRATEGY_CONF_RULE_ID,
+    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
+    from mkt_cam_grp_rul
+    where MKT_STRATEGY_CONF_RULE_ID = #{mktStrategyConfRuleId,jdbcType=BIGINT}
+  </select>
   <select id="selectAll" resultMap="BaseResultMap">
-    select MKT_CAM_GRP_RUL_ID, MKT_CAMPAIGN_ID, TAR_GRP_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, 
+    select MKT_CAM_GRP_RUL_ID, MKT_CAMPAIGN_ID, TAR_GRP_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, MKT_STRATEGY_CONF_ID, MKT_STRATEGY_CONF_RULE_ID,
     CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
     from mkt_cam_grp_rul
   </select>
+
+  <select id="selectByTarGrpId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_CAM_GRP_RUL_ID, MKT_CAMPAIGN_ID, TAR_GRP_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, MKT_STRATEGY_CONF_ID,
+    MKT_STRATEGY_CONF_RULE_ID, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
+    from mkt_cam_grp_rul
+    where TAR_GRP_ID = #{tarGrpId,jdbcType=BIGINT}
+  </select>
+
 </mapper>

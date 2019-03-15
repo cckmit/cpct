@@ -73,7 +73,14 @@
             <groupId>com.ctzj.smt.bss</groupId>
             <artifactId>bss-centralized-authenticate</artifactId>
         </dependency>
-
+        <!--<dependency>-->
+            <!--<groupId>com.ctzj.smt.bss</groupId>-->
+            <!--<artifactId>bss-sysmgr-model</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>com.ctzj.smt.bss</groupId>-->
+            <!--<artifactId>bss-sysmgr-privilege-service-api</artifactId>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>com.zjhcsoft.session</groupId>
             <artifactId>spring-session</artifactId>
@@ -128,6 +135,12 @@
             <artifactId>dubbo-eagle-service</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+
+
 
     </dependencies>
 
@@ -151,6 +164,12 @@
             <id>pst</id>
             <properties>
                 <spring.profiles.active>pst</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>msit</id>
+            <properties>
+                <spring.profiles.active>msit</spring.profiles.active>
             </properties>
         </profile>
         <profile>

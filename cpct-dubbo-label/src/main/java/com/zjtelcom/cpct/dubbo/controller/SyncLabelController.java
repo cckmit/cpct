@@ -23,22 +23,9 @@ public class SyncLabelController {
     @CrossOrigin
     public String syncLabel(@RequestBody RecordModel model) {
         Map result = new HashMap();
-//        try{
-//            InputStream inputStream = multipartFile.getInputStream();
-//            XSSFWorkbook wb = new XSSFWorkbook(inputStream);
-//            Sheet sheet = wb.getSheetAt(0);
-//            Integer rowNums = sheet.getLastRowNum() + 1;
-//            for (int i = 1; i < rowNums - 1; i++) {
-//                Row rowFirst = sheet.getRow(0);
-//                Row row = sheet.getRow(i);
-//                Cell cell = row.getCell(0);
-//            }
-//        }catch (Exception e) {
-//            e.printStackTrace();
-//        }
 
-        result = syncLabelService.initialization();
-//        result = syncLabelService.syncLabelInfo(model);
+//        result = syncLabelService.initialization();
+        result = syncLabelService.syncLabelInfo(model);
         return JSON.toJSON(result).toString();
     }
 
