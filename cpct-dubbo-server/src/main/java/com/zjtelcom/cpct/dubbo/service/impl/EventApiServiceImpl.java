@@ -585,11 +585,11 @@ public class EventApiServiceImpl implements EventApiService {
                 // 过滤事件采集相中的标签
                 Map<String, String> mktAllLabel = new HashMap<>();
                 Iterator<Map.Entry<String, String>> iterator = labelItems.entrySet().iterator();
+                List<String> assetLabelList = ChannelUtil.StringToList(mktAllLabels.get("assetLabels"));
+                List<String> promLabelList = ChannelUtil.StringToList(mktAllLabels.get("promLabels"));
+                List<String> custLabelList = ChannelUtil.StringToList(mktAllLabels.get("custLabels"));
                 while (iterator.hasNext()) {
                     Map.Entry<String, String> entry = iterator.next();
-                    List<String> assetLabelList = ChannelUtil.StringToList(mktAllLabels.get("assetLabels"));
-                    List<String> promLabelList = ChannelUtil.StringToList(mktAllLabels.get("promLabels"));
-                    List<String> custLabelList = ChannelUtil.StringToList(mktAllLabels.get("custLabels"));
                     if(assetLabelList.contains(entry.getKey())){
                         assetLabelList.remove(entry.getKey());
                     } else if(promLabelList.contains(entry.getKey())){
@@ -597,17 +597,17 @@ public class EventApiServiceImpl implements EventApiService {
                     } else if(custLabelList.contains(entry.getKey())){
                         custLabelList.remove(entry.getKey());
                     }
-                    if (assetLabelList != null && assetLabelList.size() > 0) {
-                        mktAllLabel.put("assetLabels", ChannelUtil.StringList2String(assetLabelList));
-                    }
-                    if (promLabelList != null && promLabelList.size() > 0) {
-                        mktAllLabel.put("promLabels", ChannelUtil.StringList2String(promLabelList));
-                    }
-                    if (custLabelList != null && custLabelList.size() > 0) {
-                        mktAllLabel.put("custLabels", ChannelUtil.StringList2String(custLabelList));
-                    }
-
                 }
+                if (assetLabelList != null && assetLabelList.size() > 0) {
+                    mktAllLabel.put("assetLabels", ChannelUtil.StringList2String(assetLabelList));
+                }
+                if (promLabelList != null && promLabelList.size() > 0) {
+                    mktAllLabel.put("promLabels", ChannelUtil.StringList2String(promLabelList));
+                }
+                if (custLabelList != null && custLabelList.size() > 0) {
+                    mktAllLabel.put("custLabels", ChannelUtil.StringList2String(custLabelList));
+                }
+                log.info("assetLabelList = " +assetLabelList  + "   " + "promLabelList = " + promLabelList + "   " + "custLabelList = " + custLabelList);
 
 
 
