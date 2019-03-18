@@ -36,6 +36,18 @@ public class ContactEvtController extends BaseController {
     private SynContactEvtService synContactEvtService;
 
 
+    @RequestMapping("editEventRelConfig")
+    @CrossOrigin
+    public Map<String, Object> editEventRelConfig(@RequestBody HashMap<String,Object> param) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = contactEvtService.editEventRelConfig(param);
+        } catch (Exception e) {
+            logger.error("[op:EventController] fail to editEventRelConfig");
+        }
+        return maps;
+    }
+
     /**
      * 获取事件类型列表
      * @return

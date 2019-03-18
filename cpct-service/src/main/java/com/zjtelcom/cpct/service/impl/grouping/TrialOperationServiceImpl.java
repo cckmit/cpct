@@ -618,7 +618,19 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             label.put("name",labelDTOList.get(i).getInjectionLabelName());
             labelList.add(label);
         }
-        return importUserList(result, operation, ruleId, batchNumSt, customerList, labelList);
+        new Thread(){
+            public void run(){
+                try {
+                    importUserList(result, operation, ruleId, batchNumSt, customerList, labelList);
+                }catch (Exception e){
+                    e.printStackTrace();
+                    logger.error("导入失败");
+                }
+            }
+        }.start();
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
+        result.put("resultMsg", "导入成功,请稍后查看结果");
+        return result;
     }
 
 
