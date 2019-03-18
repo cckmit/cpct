@@ -44,6 +44,7 @@ import com.zjtelcom.cpct.elastic.service.EsHitService;
 import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.util.BeanUtil;
+import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -578,6 +579,18 @@ public class EventApiServiceImpl implements EventApiService {
                         esJson.put("msg", "获取事件下所有标签异常");
                         esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
                         return Collections.EMPTY_MAP;
+                    }
+                }
+
+                // 过滤事件采集相中的标签
+                Iterator<Map.Entry<String, String>> iterator = labelItems.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<String, String> entry = iterator.next();
+                    List<String> assetLabelList = ChannelUtil.StringToList(mktAllLabel.get("assetLabels"));
+                    List<String> promLabelList = ChannelUtil.StringToList(mktAllLabel.get("promLabels"));
+                    List<String> custLabelList = ChannelUtil.StringToList(mktAllLabel.get("custLabels"));
+                    if (assetLabelList.contains(entry.getKey()) && promLabelList.contains(entry.getKey()) && custLabelList.contains(entry.getKey())) {
+                        iterator.remove();
                     }
                 }
 
