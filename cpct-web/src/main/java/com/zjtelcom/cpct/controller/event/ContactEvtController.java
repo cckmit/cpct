@@ -36,6 +36,19 @@ public class ContactEvtController extends BaseController {
     private SynContactEvtService synContactEvtService;
 
 
+
+    @RequestMapping("getEventRelConfig")
+    @CrossOrigin
+    public Map<String, Object> getEventRelConfig(@RequestBody HashMap<String,Object> param) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = contactEvtService.getEventRelConfig(param);
+        } catch (Exception e) {
+            logger.error("[op:EventController] fail to getEventRelConfig");
+        }
+        return maps;
+    }
+
     @RequestMapping("editEventRelConfig")
     @CrossOrigin
     public Map<String, Object> editEventRelConfig(@RequestBody HashMap<String,Object> param) {

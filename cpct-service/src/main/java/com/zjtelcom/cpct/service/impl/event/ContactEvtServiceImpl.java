@@ -84,6 +84,22 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     @Value("${sync.value}")
     private String value;
 
+    @Override
+    public Map<String, Object> getEventRelConfig(Map<String, Object> param) {
+        Map<String,Object> result = new HashMap<>();
+        Long eventId = MapUtil.getLongNum(param.get("eventId"));
+        Long campaignId = MapUtil.getLongNum(param.get("campaignId"));
+        MktCamEvtRelDO eventRel = mktCamEvtRelMapper.findByCampaignIdAndEvtId(campaignId,eventId);
+        if (eventRel==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","未找到有效的关联关系");
+            return result;
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",eventRel);
+        return result;
+    }
+
     /**
      * 活动事件关系修改优先级及类型
      * @param param
@@ -92,10 +108,11 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     @Override
     public Map<String, Object> editEventRelConfig(Map<String, Object> param) {
         Map<String,Object> result = new HashMap<>();
-        Long eventRelId = MapUtil.getLongNum(param.get("eventRelId"));
+        Long eventId = MapUtil.getLongNum(param.get("eventId"));
+        Long campaignId = MapUtil.getLongNum(param.get("campaignId"));
         Integer levelConfig = MapUtil.getIntNum(param.get("levelConfig"));
         Integer campaignSeq = MapUtil.getIntNum(param.get("campaignSeq"));
-        MktCamEvtRelDO eventRel = mktCamEvtRelMapper.selectByPrimaryKey(eventRelId);
+        MktCamEvtRelDO eventRel = mktCamEvtRelMapper.findByCampaignIdAndEvtId(campaignId,eventId);
         if (eventRel==null){
             result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","未找到有效的关联关系");
