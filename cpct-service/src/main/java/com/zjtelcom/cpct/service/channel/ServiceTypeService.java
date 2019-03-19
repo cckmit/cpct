@@ -8,6 +8,8 @@ public interface ServiceTypeService {
 
     Map<String, Object> getServiceTypeList();
 
+    Map<String, Object> getAllServiceTypeList(Map<String,Object> params);
+
     Map<String, Object> getServiceTypeByCondition(Long userId, Map<String,Object> params);
 
     Map<String, Object> createServiceType(Long userId, ServiceType addVO);
