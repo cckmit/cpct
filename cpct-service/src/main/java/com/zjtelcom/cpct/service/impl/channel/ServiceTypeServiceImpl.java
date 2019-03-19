@@ -58,6 +58,60 @@ public class ServiceTypeServiceImpl implements ServiceTypeService {
     }
 
     @Override
+    public Map<String, Object> getAllServiceTypeList(Map<String,Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        String serviceTypeName = MapUtil.getString(params.get("serviceTypeName"));
+        List<ServiceType> rootList = new ArrayList<>();
+        List<ServiceTypeTree> serviceTypeTrees = new ArrayList<>();
+        ServiceType serviceType = new ServiceType();
+        serviceType.setServiceTypeName(serviceTypeName);
+        serviceType.setServiceTypeName("服务类型");
+        serviceType.setServiceTypeId(0L);
+        rootList.add(serviceType);
+        for (ServiceType root : rootList) {
+            ServiceTypeTree parentTree = BeanUtil.create(root, new ServiceTypeTree());
+            List<ServiceType> parentList = serviceTypeMapper.findServiceTypeListByPar(0L);
+            List<ServiceTypeTree> parentTreeList = new ArrayList<>();
+
+            for (ServiceType parent : parentList) {
+                if (null != serviceTypeName && !serviceTypeName.equals("") && !parent.getServiceTypeName().contains(serviceTypeName)) {
+                    continue;
+                }
+                ServiceTypeTree onceTree = BeanUtil.create(parent, new ServiceTypeTree());
+                List<ServiceType> firstList = serviceTypeMapper.findServiceTypeListByPar(parent.getServiceTypeId());
+                List<ServiceTypeTree> firstTreeList = new ArrayList<>();
+
+                for (ServiceType first : firstList) {
+                    if (!first.getServiceTypeName().contains(serviceTypeName)) {
+                        continue;
+                    }
+                    ServiceTypeTree twiceTree = BeanUtil.create(first, new ServiceTypeTree());
+                    List<ServiceType> twiceList = serviceTypeMapper.findServiceTypeListByPar(first.getServiceTypeId());
+                    List<ServiceTypeTree> twiceTreeList = new ArrayList<>();
+
+                    for (ServiceType second : twiceList) {
+                        if (!second.getServiceTypeName().contains(serviceTypeName)) {
+                            continue;
+                        }
+                        ServiceTypeTree thirdTree = BeanUtil.create(second, new ServiceTypeTree());
+                        twiceTreeList.add(thirdTree);
+                    }
+                    twiceTree.setChildren(twiceTreeList);
+                    firstTreeList.add(twiceTree);
+                }
+                onceTree.setChildren(firstTreeList);
+                parentTreeList.add(onceTree);
+            }
+            parentTree.setChildren(parentTreeList);
+            serviceTypeTrees.add(parentTree);
+        }
+
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",serviceTypeTrees);
+        return result;
+    }
+
+    @Override
     public Map<String, Object> getServiceTypeByCondition(Long userId, Map<String,Object> params) {
         Map<String, Object> result = new HashMap<>();
         ServiceType serviceType = new ServiceType();

@@ -16,6 +16,7 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.ObjMktCampaignRelMapper;
+import com.zjtelcom.cpct.dao.channel.OfferMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
@@ -25,6 +26,8 @@ import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.*;
+import com.zjtelcom.cpct.domain.channel.ObjMktCampaignRel;
+import com.zjtelcom.cpct.domain.channel.Offer;
 import com.zjtelcom.cpct.domain.channel.RequestInfo;
 import com.zjtelcom.cpct.domain.channel.RequestInstRel;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
@@ -35,6 +38,7 @@ import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.campaign.CampaignVO;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
+import com.zjtelcom.cpct.dto.channel.ProductParam;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.EventDTO;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
@@ -50,6 +54,7 @@ import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInfoMapper;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
+import com.zjtelcom.cpct_prod.dao.offer.OfferProdMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,6 +132,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      */
     @Autowired
     private SysAreaMapper sysAreaMapper;
+
+    @Autowired
+    private OfferProdMapper offerMapper;
 
     /**
      * redis
@@ -331,8 +339,26 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 requestInstRel.setCreateDate(new Date());
                 requestInstRel.setRequestObjType("mkt");
                 requestInstRelMapper.insert(requestInstRel);
+                List<RequestInstRel> requestInstRels = requestInstRelMapper.selectByRequestId(mktCampaignVO.getRequestId(),"offer");
+                for (RequestInstRel request : requestInstRels){
+                    Long offerId = request.getRequestObjId();
+                    Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
+                    if (offer==null){
+                        continue;
+                    }
+                    ObjMktCampaignRel objMktCam = new ObjMktCampaignRel();
+                    objMktCam.setRelType("1000");
+                    objMktCam.setObjType("1000");
+                    objMktCam.setObjId(offerId);
+                    objMktCam.setMktCampaignId(mktCampaignId);
+                    objMktCam.setStatusCd(STATUSCD_EFFECTIVE);
+                    objMktCam.setStatusDate(new Date());
+                    objMktCam.setUpdateDate(new Date());
+                    objMktCam.setCreateStaff(UserUtil.loginId());
+                    objMktCam.setCreateDate(new Date());
+                    objMktCampaignRelMapper.insert(objMktCam);
+                }
             }
-
             //保存策略与过滤规则关系
             if (mktCampaignVO.getFilterRuleIdList() != null && mktCampaignVO.getFilterRuleIdList().size() > 0) {
                 for (Long FilterRuleId : mktCampaignVO.getFilterRuleIdList()) {
