@@ -386,9 +386,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             result.put("resultMsg","推荐条目不存在");
             return result;
         }
-        camItemMapper.deleteByPrimaryKey(ruleId);
-        //更新redis数据
-        redisUtils.remove("MKT_CAM_ITEM_"+ruleId);
         if (campaignId!=null){
             List<MktStrategyConfRuleDO> ruleList = ruleMapper.selectByCampaignId(campaignId);
             for (MktStrategyConfRuleDO rule : ruleList){
@@ -396,13 +393,30 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                     String[] idList = rule.getProductId().split("/");
                     List<String> ids = Arrays.asList(idList);
                     if (ids.contains(ruleId.toString())){
-                        ids.remove(ruleId.toString());
+                        result.put("resultCode",CODE_FAIL);
+                        result.put("resultMsg","推荐条目已关联规则："+rule.getMktStrategyConfRuleName()+" 无法删除");
+                        return result;
                     }
-                    rule.setProductId(ChannelUtil.list2String(ids,"/"));
-                    ruleMapper.updateByPrimaryKey(rule);
                 }
             }
         }
+        camItemMapper.deleteByPrimaryKey(ruleId);
+        //更新redis数据
+        redisUtils.remove("MKT_CAM_ITEM_"+ruleId);
+//        if (campaignId!=null){
+//            List<MktStrategyConfRuleDO> ruleList = ruleMapper.selectByCampaignId(campaignId);
+//            for (MktStrategyConfRuleDO rule : ruleList){
+//                if (rule.getProductId()!=null && !rule.getProductId().equals("")){
+//                    String[] idList = rule.getProductId().split("/");
+//                    List<String> ids = Arrays.asList(idList);
+//                    if (ids.contains(ruleId.toString())){
+//                        ids.remove(ruleId.toString());
+//                    }
+//                    rule.setProductId(ChannelUtil.list2String(ids,"/"));
+//                    ruleMapper.updateByPrimaryKey(rule);
+//                }
+//            }
+//        }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
         return result;

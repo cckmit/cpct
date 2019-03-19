@@ -42,6 +42,8 @@ public interface ContactEvtService {
 
     Map<String,Object> editEventRelConfig(Map<String,Object> param);
 
+    Map<String,Object> getEventRelConfig(Map<String,Object> param);
+
 
 
 }

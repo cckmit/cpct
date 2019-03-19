@@ -189,7 +189,7 @@ public class EsHitServiceImpl implements EsHitService {
             String hitEntity = null;
 
             id = Long.valueOf(activity.get("activityId").toString());
-            name = activity.get("activityName").toString();
+            name = activity.get("activityName")==null ? "" : activity.get("activityName").toString();
             booleanResult = activity.get("hit") == null ? "false" : activity.get("hit").toString();
             hitEntity = activity.get("hitEntity") == null ? "未知对象" : activity.get("hitEntity").toString();
             if (booleanResult.equals("false")) {
