@@ -294,6 +294,8 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktStrategyMapper.insert(mktStrategy);
             MktCamStrategyRel mktCamStrategyRel = new MktCamStrategyRel();
             mktCamStrategyRel.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
+            mktCamStrategyRel.setMktStrategyConfId(mktStrategyConfRule.getStrategyConfId());
+            mktCamStrategyRel.setMktStrategyConfRuleId(mktStrategyConfRule.getMktStrategyConfRuleId());
             mktCamStrategyRel.setStrategyId(mktStrategy.getStrategyId());
             mktCamStrategyRel.setCreateStaff(UserUtil.loginId());
             mktCamStrategyRel.setCreateDate(new Date());

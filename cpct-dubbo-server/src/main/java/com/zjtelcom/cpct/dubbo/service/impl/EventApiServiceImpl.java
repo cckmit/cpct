@@ -44,6 +44,7 @@ import com.zjtelcom.cpct.elastic.service.EsHitService;
 import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.util.BeanUtil;
+import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -560,12 +561,12 @@ public class EventApiServiceImpl implements EventApiService {
 
                 //查询事件下使用的所有标签
                 DefaultContext<String, Object> context = new DefaultContext<String, Object>();
-                Map<String, String> mktAllLabel = (Map<String, String>) redisUtils.get("EVT_ALL_LABEL_" + eventId);
-                if (mktAllLabel == null) {
+                Map<String, String> mktAllLabels = (Map<String, String>) redisUtils.get("EVT_ALL_LABEL_" + eventId);
+                if (mktAllLabels == null) {
                     try {
-                        mktAllLabel = searchLabelService.labelListByEventId(eventId);  //查询事件下使用的所有标签
-                        if (null != mktAllLabel) {
-                            redisUtils.set("EVT_ALL_LABEL_" + eventId, mktAllLabel);
+                        mktAllLabels = searchLabelService.labelListByEventId(eventId);  //查询事件下使用的所有标签
+                        if (null != mktAllLabels) {
+                            redisUtils.set("EVT_ALL_LABEL_" + eventId, mktAllLabels);
                         } else {
                             log.info("获取事件下所有标签失败");
                             esJson.put("hit", false);
@@ -580,6 +581,35 @@ public class EventApiServiceImpl implements EventApiService {
                         return Collections.EMPTY_MAP;
                     }
                 }
+
+                // 过滤事件采集相中的标签
+                Map<String, String> mktAllLabel = new HashMap<>();
+                Iterator<Map.Entry<String, String>> iterator = labelItems.entrySet().iterator();
+                List<String> assetLabelList = ChannelUtil.StringToList(mktAllLabels.get("assetLabels"));
+                List<String> promLabelList = ChannelUtil.StringToList(mktAllLabels.get("promLabels"));
+                List<String> custLabelList = ChannelUtil.StringToList(mktAllLabels.get("custLabels"));
+                while (iterator.hasNext()) {
+                    Map.Entry<String, String> entry = iterator.next();
+                    if(assetLabelList.contains(entry.getKey())){
+                        assetLabelList.remove(entry.getKey());
+                    } else if(promLabelList.contains(entry.getKey())){
+                        promLabelList.remove(entry.getKey());
+                    } else if(custLabelList.contains(entry.getKey())){
+                        custLabelList.remove(entry.getKey());
+                    }
+                }
+                if (assetLabelList != null && assetLabelList.size() > 0) {
+                    mktAllLabel.put("assetLabels", ChannelUtil.StringList2String(assetLabelList));
+                }
+                if (promLabelList != null && promLabelList.size() > 0) {
+                    mktAllLabel.put("promLabels", ChannelUtil.StringList2String(promLabelList));
+                }
+                if (custLabelList != null && custLabelList.size() > 0) {
+                    mktAllLabel.put("custLabels", ChannelUtil.StringList2String(custLabelList));
+                }
+                log.info("assetLabelList = " +assetLabelList  + "   " + "promLabelList = " + promLabelList + "   " + "custLabelList = " + custLabelList);
+
+
 
                 List<Map<String, Object>> resultMapList = new ArrayList<>();
                 JSONArray accArray = new JSONArray();

@@ -5,6 +5,8 @@
     <id column="CAMP_STR_REL_ID" jdbcType="BIGINT" property="campStrRelId" />
     <result column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId" />
     <result column="STRATEGY_ID" jdbcType="BIGINT" property="strategyId" />
+    <result column="MKT_STRATEGY_CONF_ID" jdbcType="BIGINT" property="mktStrategyConfId" />
+    <result column="MKT_STRATEGY_CONF_RULE_ID" jdbcType="BIGINT" property="mktStrategyConfRuleId" />
     <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
     <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
     <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
@@ -23,12 +25,11 @@
     where STRATEGY_ID = #{strategyId,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.pojo.MktCamStrategyRel">
-    insert into mkt_cam_strategy_rel (CAMP_STR_REL_ID, MKT_CAMPAIGN_ID, STRATEGY_ID, 
-      STATUS_CD, STATUS_DATE, CREATE_STAFF, 
-      CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, 
+    insert into mkt_cam_strategy_rel (CAMP_STR_REL_ID, MKT_CAMPAIGN_ID, STRATEGY_ID, MKT_STRATEGY_CONF_ID ,
+      MKT_STRATEGY_CONF_RULE_ID ,STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
       REMARK, LAN_ID)
-    values (#{campStrRelId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{strategyId,jdbcType=BIGINT}, 
-      #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT}, 
+    values (#{campStrRelId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{strategyId,jdbcType=BIGINT}, #{mktStrategyConfId,jdbcType=BIGINT},
+      #{mktStrategyConfRuleId,jdbcType=BIGINT},#{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT},
       #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, 
       #{remark,jdbcType=VARCHAR}, #{lanId,jdbcType=BIGINT})
   </insert>
@@ -36,6 +37,8 @@
     update mkt_cam_strategy_rel
     set MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},
       STRATEGY_ID = #{strategyId,jdbcType=BIGINT},
+      MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=BIGINT},
+      MKT_STRATEGY_CONF_RULE_ID = #{mktStrategyConfRuleId,jdbcType=BIGINT},
       STATUS_CD = #{statusCd,jdbcType=VARCHAR},
       STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
       CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
@@ -47,20 +50,23 @@
     where CAMP_STR_REL_ID = #{campStrRelId,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select CAMP_STR_REL_ID, MKT_CAMPAIGN_ID, STRATEGY_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, 
-    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
+    select CAMP_STR_REL_ID, MKT_CAMPAIGN_ID, STRATEGY_ID, MKT_STRATEGY_CONF_ID ,
+      MKT_STRATEGY_CONF_RULE_ID ,STATUS_CD, STATUS_DATE, CREATE_STAFF,
+      CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
     from mkt_cam_strategy_rel
     where CAMP_STR_REL_ID = #{campStrRelId,jdbcType=BIGINT}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
-    select CAMP_STR_REL_ID, MKT_CAMPAIGN_ID, STRATEGY_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, 
+    select CAMP_STR_REL_ID, MKT_CAMPAIGN_ID, STRATEGY_ID, MKT_STRATEGY_CONF_ID,
+      MKT_STRATEGY_CONF_RULE_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF,
     CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
     from mkt_cam_strategy_rel
   </select>
 
   <select id="selectByMktCampaignId" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select CAMP_STR_REL_ID, MKT_CAMPAIGN_ID, STRATEGY_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF,
-    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
+    select CAMP_STR_REL_ID, MKT_CAMPAIGN_ID, STRATEGY_ID, MKT_STRATEGY_CONF_ID,
+      MKT_STRATEGY_CONF_RULE_ID,  STATUS_CD, STATUS_DATE, CREATE_STAFF,
+      CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID
     from mkt_cam_strategy_rel
     where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
   </select>

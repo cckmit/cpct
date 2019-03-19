@@ -25,10 +25,7 @@ import com.zjtelcom.cpct.service.event.ContactEvtItemService;
 import com.zjtelcom.cpct.service.event.ContactEvtService;
 import com.zjtelcom.cpct.service.event.EventMatchRulService;
 import com.zjtelcom.cpct.service.synchronize.SynContactEvtService;
-import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.DateUtil;
-import com.zjtelcom.cpct.util.SystemParamsUtil;
-import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.util.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -86,6 +83,31 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
 
     @Value("${sync.value}")
     private String value;
+
+    /**
+     * 活动事件关系修改优先级及类型
+     * @param param
+     * @return
+     */
+    @Override
+    public Map<String, Object> editEventRelConfig(Map<String, Object> param) {
+        Map<String,Object> result = new HashMap<>();
+        Long eventRelId = MapUtil.getLongNum(param.get("eventRelId"));
+        Integer levelConfig = MapUtil.getIntNum(param.get("levelConfig"));
+        Integer campaignSeq = MapUtil.getIntNum(param.get("campaignSeq"));
+        MktCamEvtRelDO eventRel = mktCamEvtRelMapper.selectByPrimaryKey(eventRelId);
+        if (eventRel==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","未找到有效的关联关系");
+            return result;
+        }
+        eventRel.setLevelConfig(levelConfig);
+        eventRel.setCampaignSeq(campaignSeq);
+        mktCamEvtRelMapper.updateByPrimaryKey(eventRel);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","修改成功");
+        return result;
+    }
 
     /**
      * 获取事件类型列表

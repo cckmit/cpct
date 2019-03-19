@@ -40,4 +40,8 @@ public interface ContactEvtService {
 
     Map<String,Object> evtDetailsByIdList(List<Integer> idList );
 
+    Map<String,Object> editEventRelConfig(Map<String,Object> param);
+
+
+
 }
