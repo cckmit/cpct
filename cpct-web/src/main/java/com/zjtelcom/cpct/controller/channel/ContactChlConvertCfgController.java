@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.controller.channel;
 
+import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.channel.ContactChlConvertCfgMapper;
 import com.zjtelcom.cpct.domain.channel.ContactChlConvertCfg;
@@ -28,11 +29,11 @@ public class ContactChlConvertCfgController extends BaseController {
      */
     @PostMapping("createContactChlConvertCfg")
     @CrossOrigin
-    public Map<String, Object> createContactChlConvertCfg(@RequestBody ContactChlConvertCfg contactChlConvertCfg) {
+    public Map<String, Object> createContactChlConvertCfg(@RequestBody Map<String,Object> params) {
         Map<String ,Object> result = new HashMap<>();
         Long userId = UserUtil.loginId();
         try {
-            ContactChlConvertCfg contactChlConvert = BeanUtil.create(contactChlConvertCfg, new ContactChlConvertCfg());
+            ContactChlConvertCfg contactChlConvert = JSON.parseObject(JSON.toJSONString(params), ContactChlConvertCfg.class);
             contactChlConvert.setCreateStaff(userId);
             contactChlConvert.setCreateDate(new Date());
             contactChlConvert.setUpdateStaff(userId);

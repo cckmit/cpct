@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.controller.channel;
 
+import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.channel.ContactChlAblAttrMapper;
 import com.zjtelcom.cpct.domain.channel.ContactChlAblAttr;
@@ -28,11 +29,11 @@ public class ContactChlAblAttrController extends BaseController {
      */
     @PostMapping("createContactChlAblAttr")
     @CrossOrigin
-    public Map<String, Object> createContactChlAblAttr(@RequestBody ContactChlAblAttr contactChlAblAttr) {
+    public Map<String, Object> createContactChlAblAttr(@RequestBody Map<String,Object> params) {
         Map<String ,Object> result = new HashMap<>();
         Long userId = UserUtil.loginId();
         try {
-            ContactChlAblAttr contactChlAblAttrs = BeanUtil.create(contactChlAblAttr, new ContactChlAblAttr());
+            ContactChlAblAttr contactChlAblAttrs = JSON.parseObject(JSON.toJSONString(params), ContactChlAblAttr.class);
             contactChlAblAttrs.setCreateStaff(userId);
             contactChlAblAttrs.setCreateDate(new Date());
             contactChlAblAttrs.setUpdateStaff(userId);
