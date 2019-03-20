@@ -597,7 +597,7 @@ public class EventApiServiceImpl implements EventApiService {
                     } else if(custLabelList.contains(entry.getKey())){
                         custLabelList.remove(entry.getKey());
                     }
-                }
+                    }
                 if (assetLabelList != null && assetLabelList.size() > 0) {
                     mktAllLabel.put("assetLabels", ChannelUtil.StringList2String(assetLabelList));
                 }
@@ -608,6 +608,7 @@ public class EventApiServiceImpl implements EventApiService {
                     mktAllLabel.put("custLabels", ChannelUtil.StringList2String(custLabelList));
                 }
                 log.info("assetLabelList = " +assetLabelList  + "   " + "promLabelList = " + promLabelList + "   " + "custLabelList = " + custLabelList);
+
 
 
 
@@ -1194,105 +1195,107 @@ public class EventApiServiceImpl implements EventApiService {
 //                        }
 //                    }
                     //判断过滤类型(红名单，黑名单)
-                    if ("3000".equals(filterRule.getFilterType())) {  //销售品过滤
-                        boolean productCheck = true; // 默认拦截
-                        //获取需要过滤的销售品
-                        String checkProduct = filterRule.getChooseProduct();
-                        if (checkProduct != null && !"".equals(checkProduct)) {
-                            String esMsg = "";
-                            //获取用户已办理销售品
-                            if (!context.containsKey("PROM_LIST")) { // 有没有办理销售品--销售列表标签
-                                //存在于校验
-                                if ("2000".equals(filterRule.getOperator())) { // 不存在
-                                    productCheck = false;
-                                } else if ("1000".equals(filterRule.getOperator())) { // 存在于
-                                    productCheck = true;
-                                    esMsg = "未查询到销售品实例";
-                                }
-                            } else {
-                                String productStr = (String) context.get("PROM_LIST");
-                                String[] checkProductArr = checkProduct.split(",");
-                                if (productStr != null && !"".equals(productStr)) {
-                                    if ("1000".equals(filterRule.getOperator())) {  //存在于
-                                        for (String product : checkProductArr) {
-                                            int index = productStr.indexOf(product);
-                                            if (index >= 0) {
-                                                productCheck = false;
-                                                break;
-                                            }
-                                        }
-                                    } else if ("2000".equals(filterRule.getOperator())) { //不存在于
-
-                                        boolean noExistCheck = true;
-                                        for (String product : checkProductArr) {
-                                            int index = productStr.indexOf(product);
-                                            if (index >= 0) {
-                                                productCheck = true;
-                                                noExistCheck = false;
-                                                //被过滤的销售品
-                                                esMsg = product;
-                                                break;
-                                            }
-                                        }
-                                        if (noExistCheck) {
-                                            productCheck = false;
-                                        }
-                                    }
-                                } else {
+                    if(filterRule!=null){
+                        if ("3000".equals(filterRule.getFilterType())) {  //销售品过滤
+                            boolean productCheck = true; // 默认拦截
+                            //获取需要过滤的销售品
+                            String checkProduct = filterRule.getChooseProduct();
+                            if (checkProduct != null && !"".equals(checkProduct)) {
+                                String esMsg = "";
+                                //获取用户已办理销售品
+                                if (!context.containsKey("PROM_LIST")) { // 有没有办理销售品--销售列表标签
                                     //存在于校验
-                                    if ("2000".equals(filterRule.getOperator())) {
+                                    if ("2000".equals(filterRule.getOperator())) { // 不存在
                                         productCheck = false;
-                                    } else if ("1000".equals(filterRule.getOperator())) {
+                                    } else if ("1000".equals(filterRule.getOperator())) { // 存在于
                                         productCheck = true;
+                                        esMsg = "未查询到销售品实例";
+                                    }
+                                } else {
+                                    String productStr = (String) context.get("PROM_LIST");
+                                    String[] checkProductArr = checkProduct.split(",");
+                                    if (productStr != null && !"".equals(productStr)) {
+                                        if ("1000".equals(filterRule.getOperator())) {  //存在于
+                                            for (String product : checkProductArr) {
+                                                int index = productStr.indexOf(product);
+                                                if (index >= 0) {
+                                                    productCheck = false;
+                                                    break;
+                                                }
+                                            }
+                                        } else if ("2000".equals(filterRule.getOperator())) { //不存在于
+
+                                            boolean noExistCheck = true;
+                                            for (String product : checkProductArr) {
+                                                int index = productStr.indexOf(product);
+                                                if (index >= 0) {
+                                                    productCheck = true;
+                                                    noExistCheck = false;
+                                                    //被过滤的销售品
+                                                    esMsg = product;
+                                                    break;
+                                                }
+                                            }
+                                            if (noExistCheck) {
+                                                productCheck = false;
+                                            }
+                                        }
+                                    } else {
+                                        //存在于校验
+                                        if ("2000".equals(filterRule.getOperator())) {
+                                            productCheck = false;
+                                        } else if ("1000".equals(filterRule.getOperator())) {
+                                            productCheck = true;
+                                        }
+                                    }
+                                }
+                                if (productCheck) {
+                                    esJson.put("hit", "false");
+                                    esJson.put("msg", "销售品过滤验证未通过:" + esMsg);
+                                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
+                                    return Collections.EMPTY_MAP;
+                                }
+                            }
+                        } else if ("4000".equals(filterRule.getFilterType())) {  //表达式过滤
+                            //暂不处理
+                            //do something
+                        } else if ("6000".equals(filterRule.getFilterType())) {  //过扰规则
+                            //将过扰规则的标签放到iSale展示列
+                            //获取过扰标签
+                            List<String> labels = (List<String>) redisUtils.get("FILTER_RULE_DISTURB_" + filterRuleId);
+                            if (labels == null) {
+                                labels = mktVerbalConditionMapper.getLabelListByConditionId(filterRule.getConditionId());
+                                if (labels == null) {
+                                    //过滤规则信息查询失败
+                                    esJson.put("hit", false);
+                                    esJson.put("msg", "过扰规则信息查询失败 byId: " + filterRuleId);
+                                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
+                                    return Collections.EMPTY_MAP;
+                                } else {
+                                    redisUtils.set("FILTER_RULE_DISTURB_" + filterRuleId, labels);
+                                }
+                            }
+
+                            List<Map<String, Object>> triggerList = new ArrayList<>();
+                            if (labels != null && labels.size() > 0) {
+                                for (String labelCode : labels) {
+                                    if (context.containsKey(labelCode)) {
+                                        Map<String, Object> map = new HashMap<>();
+                                        map.put("key", labelCode);
+                                        map.put("value", context.get(labelCode));
+                                        map.put("display", "0");
+                                        map.put("name", "");
+                                        triggerList.add(map);
+                                    } else {
+                                        //todo 过扰标签未查询到
                                     }
                                 }
                             }
-                            if (productCheck) {
-                                esJson.put("hit", "false");
-                                esJson.put("msg", "销售品过滤验证未通过:" + esMsg);
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-                                return Collections.EMPTY_MAP;
-                            }
+                            Map<String, Object> disturb = new HashMap<>();
+                            disturb.put("type", "disturb");
+                            disturb.put("triggerList", triggerList);
+                            itgTriggers.add(disturb);
                         }
-                    } else if ("4000".equals(filterRule.getFilterType())) {  //表达式过滤
-                        //暂不处理
-                        //do something
-                    } else if ("6000".equals(filterRule.getFilterType())) {  //过扰规则
-                        //将过扰规则的标签放到iSale展示列
-                        //获取过扰标签
-                        List<String> labels = (List<String>) redisUtils.get("FILTER_RULE_DISTURB_" + filterRuleId);
-                        if (labels == null) {
-                            labels = mktVerbalConditionMapper.getLabelListByConditionId(filterRule.getConditionId());
-                            if (labels == null) {
-                                //过滤规则信息查询失败
-                                esJson.put("hit", false);
-                                esJson.put("msg", "过扰规则信息查询失败 byId: " + filterRuleId);
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-                                return Collections.EMPTY_MAP;
-                            } else {
-                                redisUtils.set("FILTER_RULE_DISTURB_" + filterRuleId, labels);
-                            }
-                        }
-
-                        List<Map<String, Object>> triggerList = new ArrayList<>();
-                        if (labels != null && labels.size() > 0) {
-                            for (String labelCode : labels) {
-                                if (context.containsKey(labelCode)) {
-                                    Map<String, Object> map = new HashMap<>();
-                                    map.put("key", labelCode);
-                                    map.put("value", context.get(labelCode));
-                                    map.put("display", "0");
-                                    map.put("name", "");
-                                    triggerList.add(map);
-                                } else {
-                                    //todo 过扰标签未查询到
-                                }
-                            }
-                        }
-                        Map<String, Object> disturb = new HashMap<>();
-                        disturb.put("type", "disturb");
-                        disturb.put("triggerList", triggerList);
-                        itgTriggers.add(disturb);
                     }
                 }
             }
