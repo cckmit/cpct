@@ -338,10 +338,10 @@ public class ChannelUtil  {
         switch (cell.getCellTypeEnum()){
             case NUMERIC://数字
                 cell.setCellType(CellType.STRING);
-                cellValue = cell.getStringCellValue() + "";
+                cellValue = cell.getStringCellValue().equals("") ? "null" : cell.getStringCellValue()+"";
                 break;
             case STRING: // 字符串
-                cellValue = cell.getStringCellValue()+"";
+                cellValue = cell.getStringCellValue().equals("") ? "null" : cell.getStringCellValue()+"";
                 break;
             case BOOLEAN: // Boolean
                 cellValue = cell.getBooleanCellValue() + "";
