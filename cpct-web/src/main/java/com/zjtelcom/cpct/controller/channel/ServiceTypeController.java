@@ -41,6 +41,25 @@ public class ServiceTypeController extends BaseController{
     }
 
     /*
+     *服务类型页面列表
+     */
+    @PostMapping("getAllServiceTypeList")
+    @CrossOrigin
+    public Map<String, Object> getAllServiceTypeList(@RequestBody HashMap<String,Object> params) {
+        Map<String ,Object> result = new HashMap<>();
+        Long userId = UserUtil.loginId();
+        try {
+            result = serviceTypeService.getAllServiceTypeList(params);
+        }catch (Exception e){
+            logger.error("[op:ServiceTypeController] fail to getServiceTypeList",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to getServiceTypeList");
+            return result;
+        }
+        return result;
+    }
+
+    /*
      *创建服务类型
      */
     @PostMapping("createServiceType")

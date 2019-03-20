@@ -87,6 +87,48 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     @Value("${sync.value}")
     private String value;
 
+    @Override
+    public Map<String, Object> getEventRelConfig(Map<String, Object> param) {
+        Map<String,Object> result = new HashMap<>();
+        Long eventId = MapUtil.getLongNum(param.get("eventId"));
+        Long campaignId = MapUtil.getLongNum(param.get("campaignId"));
+        MktCamEvtRelDO eventRel = mktCamEvtRelMapper.findByCampaignIdAndEvtId(campaignId,eventId);
+        if (eventRel==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","未找到有效的关联关系");
+            return result;
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",eventRel);
+        return result;
+    }
+
+    /**
+     * 活动事件关系修改优先级及类型
+     * @param param
+     * @return
+     */
+    @Override
+    public Map<String, Object> editEventRelConfig(Map<String, Object> param) {
+        Map<String,Object> result = new HashMap<>();
+        Long eventId = MapUtil.getLongNum(param.get("eventId"));
+        Long campaignId = MapUtil.getLongNum(param.get("campaignId"));
+        Integer levelConfig = MapUtil.getIntNum(param.get("levelConfig"));
+        Integer campaignSeq = MapUtil.getIntNum(param.get("campaignSeq"));
+        MktCamEvtRelDO eventRel = mktCamEvtRelMapper.findByCampaignIdAndEvtId(campaignId,eventId);
+        if (eventRel==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","未找到有效的关联关系");
+            return result;
+        }
+        eventRel.setLevelConfig(levelConfig);
+        eventRel.setCampaignSeq(campaignSeq);
+        mktCamEvtRelMapper.updateByPrimaryKey(eventRel);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","修改成功");
+        return result;
+    }
+
     /**
      * 获取事件类型列表
      * @param userId
