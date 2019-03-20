@@ -13,7 +13,7 @@ public class EventRel extends BaseEntity {
 
     private Long sort;
 
-
+    private String aEvtName;
 
     public Long getComplexEvtRelaId() {
         return complexEvtRelaId;
@@ -47,5 +47,11 @@ public class EventRel extends BaseEntity {
         this.sort = sort;
     }
 
+    public String getaEvtName() {
+        return aEvtName;
+    }
 
+    public void setaEvtName(String aEvtName) {
+        this.aEvtName = aEvtName;
+    }
 }

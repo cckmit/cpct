@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 @Service
@@ -29,6 +30,10 @@ public class EventRelServiceImpl implements EventRelService {
     @Autowired
     private ContactEvtMapper contactEvtMapper;
 
+    /*
+    ** 获取未被当前事件关联的事件
+    ** aEvtId-被关联的事件 zEvtId-进行关联操作的事件
+    */
     @Override
     public Map<String,Object> getEventNoRelation(Long userId, ContactEvt contactEvt) {
         Map<String,Object> resultMap = new HashMap<>();
@@ -52,7 +57,7 @@ public class EventRelServiceImpl implements EventRelService {
     }
 
     @Override
-    public Map<String,Object> creatEventRelation(Long userId, EventRel addVO) {
+    public Map<String,Object> createEventRelation(Long userId, EventRel addVO) {
         Map<String,Object> resultMap = new HashMap<>();
         EventRel eventRel = BeanUtil.create(addVO, new EventRel());
         eventRel.setSort(1L);
@@ -65,6 +70,36 @@ public class EventRelServiceImpl implements EventRelService {
         eventRelMapper.insert(eventRel);
         resultMap.put("resultCode", CODE_SUCCESS);
         resultMap.put("resultMsg", "添加成功");
+        return resultMap;
+    }
+
+    /*
+     ** 删除关联关系
+     */
+    @Override
+    public Map<String,Object> delEventRelation(Long userId, EventRel delVO) {
+        Map<String,Object> resultMap = new HashMap<>();
+        EventRel eventRel = eventRelMapper.selectByPrimaryKey(delVO.getComplexEvtRelaId());
+        if(null == eventRel) {
+            resultMap.put("resultCode", CODE_FAIL);
+            resultMap.put("resultMsg", "被关联的事件不存在");
+        }
+        eventRelMapper.deleteByPrimaryKey(delVO.getComplexEvtRelaId());
+        resultMap.put("resultCode", CODE_SUCCESS);
+        resultMap.put("resultMsg", "删除成功");
+        return resultMap;
+    }
+
+
+    /*
+     ** 获取被关联的事件列表
+     */
+    @Override
+    public Map<String,Object> getEventRelList(Long userId, ContactEvt contactEvt) {
+        Map<String,Object> resultMap = new HashMap<>();
+        List<EventRel> eventRelList = eventRelMapper.selectByZEvtId(contactEvt.getContactEvtId());
+        resultMap.put("resultCode", CODE_SUCCESS);
+        resultMap.put("resultMsg", eventRelList);
         return resultMap;
     }
 

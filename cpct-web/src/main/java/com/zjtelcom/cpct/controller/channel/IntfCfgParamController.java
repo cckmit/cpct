@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.controller.channel;
 
+import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.channel.IntfCfgParamMapper;
 import com.zjtelcom.cpct.domain.channel.IntfCfgParam;
@@ -27,11 +28,11 @@ public class IntfCfgParamController extends BaseController {
      */
     @PostMapping("createIntfCfgParam")
     @CrossOrigin
-    public Map<String, Object> createIntfCfgParam(@RequestBody IntfCfgParam intfCfgParam) {
+    public Map<String, Object> createIntfCfgParam(@RequestBody Map<String,Object> params) {
         Map<String ,Object> result = new HashMap<>();
         Long userId = UserUtil.loginId();
         try {
-            IntfCfgParam intfCfgParams = BeanUtil.create(intfCfgParam, new IntfCfgParam());
+            IntfCfgParam intfCfgParams = JSON.parseObject(JSON.toJSONString(params), IntfCfgParam.class);
             intfCfgParams.setCreateStaff(userId);
             intfCfgParams.setCreateDate(new Date());
             intfCfgParams.setUpdateStaff(userId);

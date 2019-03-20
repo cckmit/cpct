@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.controller.channel;
 
+import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.channel.PushCtrlRulMapper;
 import com.zjtelcom.cpct.domain.channel.MktKeywords;
@@ -29,11 +30,11 @@ public class PushCtrlRulController extends BaseController {
      */
     @PostMapping("createPushCtrlRul")
     @CrossOrigin
-    public Map<String, Object> createPushCtrlRul(@RequestBody PushCtrlRul pushCtrlRul) {
+    public Map<String, Object> createPushCtrlRul(@RequestBody Map<String,Object> params) {
         Map<String ,Object> result = new HashMap<>();
         Long userId = UserUtil.loginId();
         try {
-            PushCtrlRul pushCtrlRules = BeanUtil.create(pushCtrlRul, new PushCtrlRul());
+            PushCtrlRul pushCtrlRules = JSON.parseObject(JSON.toJSONString(params), PushCtrlRul.class);
             pushCtrlRules.setCreateStaff(userId);
             pushCtrlRules.setCreateDate(new Date());
             pushCtrlRules.setUpdateStaff(userId);

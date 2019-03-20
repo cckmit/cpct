@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.controller.channel;
 
+import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.channel.MktKeywordsMapper;
 import com.zjtelcom.cpct.domain.channel.MktKeywords;
@@ -28,11 +29,11 @@ public class MktKeywordsController extends BaseController {
      */
     @PostMapping("createMktKeywords")
     @CrossOrigin
-    public Map<String, Object> createMktKeywords(@RequestBody MktKeywords mktKeywords) {
+    public Map<String, Object> createMktKeywords(@RequestBody Map<String,Object> params) {
         Map<String ,Object> result = new HashMap<>();
         Long userId = UserUtil.loginId();
         try {
-            MktKeywords mktKeyword = BeanUtil.create(mktKeywords, new MktKeywords());
+            MktKeywords mktKeyword = JSON.parseObject(JSON.toJSONString(params), MktKeywords.class);
             mktKeyword.setCreateStaff(userId);
             mktKeyword.setCreateDate(new Date());
             mktKeyword.setUpdateStaff(userId);
