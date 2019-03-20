@@ -25,10 +25,7 @@ import com.zjtelcom.cpct.service.event.ContactEvtItemService;
 import com.zjtelcom.cpct.service.event.ContactEvtService;
 import com.zjtelcom.cpct.service.event.EventMatchRulService;
 import com.zjtelcom.cpct.service.synchronize.SynContactEvtService;
-import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.DateUtil;
-import com.zjtelcom.cpct.util.SystemParamsUtil;
-import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.util.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -83,6 +80,9 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     private EventMatchRulService eventMatchRulService;
     @Autowired
     private SynContactEvtService synContactEvtService;
+
+    @Autowired
+    private RedisUtils redisUtils;
 
     @Value("${sync.value}")
     private String value;
@@ -619,11 +619,13 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                     mktCamEvtRelDO.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
                     mktCamEvtRelMapper.insert(mktCamEvtRelDO);
                 }
+                redisUtils.del("EVT_ALL_LABEL_" + mktCamEvtRelDO.getEventId());
             }
             //删除不存在的关联关系
             for (MktCamEvtRel evtRel : oldRelList){
                 if (!relIdList.contains(evtRel.getMktCampEvtRelId())){
                     mktCamEvtRelMapper.deleteByPrimaryKey(evtRel.getMktCampEvtRelId());
+                    redisUtils.del("EVT_ALL_LABEL_" + evtRel.getEventId());
                 }
             }
             //更新事件规则
