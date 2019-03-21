@@ -10,6 +10,10 @@ public class MktCamGrpRul extends BaseEntity {
 
     private Long mktCampaignId;
 
+    private Long mktStrategyConfId;
+
+    private Long mktStrategyConfRuleId;
+
     private Long tarGrpId;
 
     private Long lanId;

@@ -59,4 +59,6 @@ public interface InjectionLabelMapper{
 
     List<String> listLabelByRuleId(@Param("ruleId")Long ruleId);
 
+    List<String> selectLabelCodeByType(@Param("labelDataType")String labelDataType);
+
 }

@@ -22,6 +22,8 @@ import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_prod.dao.offer.MktResourceProdMapper;
 import com.zjtelcom.cpct_prod.dao.offer.OfferProdMapper;
+import com.zjtelcom.cpct_prod.dao.offer.OfferProdRelMapper;
+import com.zjtelcom.cpct_prod.dao.offer.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +36,7 @@ import static com.zjtelcom.cpct.constants.CommonConstant.*;
 public class ProductServiceImpl extends BaseService implements ProductService {
 
     @Autowired
-    private OfferProdMapper productMapper;
+    private OfferProdMapper offerProdMapper;
     @Autowired
     private MktCamItemMapper camItemMapper;
     @Autowired
@@ -49,6 +51,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     private MktCampaignMapper campaignMapper;
     @Autowired
     private MktStrategyConfRuleMapper ruleMapper;
+    @Autowired
+    private ProductMapper productProdMapper;
 
 
     @Override
@@ -57,7 +61,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         Map<String,Object> result = new HashMap<>();
         List<OfferDetail> nameList = new ArrayList<>();
         for (Long productId : productIdList){
-            Offer product = productMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
+            Offer product = offerProdMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
             if (product==null){
                 continue;
             }
@@ -80,7 +84,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             productName = params.get("productName").toString();
         }
         PageHelper.startPage(page,pageSize);
-        productList = productMapper.findByName(productName);
+        productList = offerProdMapper.findByName(productName);
         Page pageInfo = new Page(new PageInfo(productList));
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",productList);
@@ -94,27 +98,15 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         List<Offer> productList = new ArrayList<>();
         Integer page = MapUtil.getIntNum(params.get("page"));
         Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
-        PageHelper.startPage(page,pageSize);
-        if (params.get("productName") != null){
-            String productName = params.get("productName").toString();
-            productList = productMapper.findByName(productName);
-        }else {
-            productList = productMapper.selectAll();
-        }
-
-        List<Offer> productLists = new ArrayList<>();
+        String produtType = MapUtil.getString(params.get("productType"));
+        String productName = MapUtil.getString(params.get("productName"));
         List<Long> producetIdList = (List<Long>)params.get("productIdList");
-        if(productList !=null && producetIdList != null) {
-            for(Offer offer : productList) {
-                if(!producetIdList.contains(offer.getOfferId())) {
-                    productLists.add(offer);
-                }
-            }
-        }
+        PageHelper.startPage(page,pageSize);
+        productList = offerProdMapper.findByType(productName,produtType,producetIdList);
 
         Page pageInfo = new Page(new PageInfo(productList));
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",productLists);
+        result.put("resultMsg",productList);
         result.put("page",pageInfo);
         return result;
     }
@@ -192,7 +184,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         //销售品
         if (param.getItemType().equals("1000")){
             for (Long productId : param.getIdList()){
-                Offer product = productMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
+                Offer product = offerProdMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
                 if (product==null){
                     result.put("resultCode",CODE_FAIL);
                     result.put("resultMsg","产品不存在");
@@ -318,7 +310,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             }
             //销售品
             if (item.getItemType().equals("1000")){
-                Offer product = productMapper.selectByPrimaryKey(Integer.valueOf(item.getItemId().toString()));
+                Offer product = offerProdMapper.selectByPrimaryKey(Integer.valueOf(item.getItemId().toString()));
                 if (product==null){
                     continue;
                 }
@@ -386,9 +378,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             result.put("resultMsg","推荐条目不存在");
             return result;
         }
-        camItemMapper.deleteByPrimaryKey(ruleId);
-        //更新redis数据
-        redisUtils.remove("MKT_CAM_ITEM_"+ruleId);
         if (campaignId!=null){
             List<MktStrategyConfRuleDO> ruleList = ruleMapper.selectByCampaignId(campaignId);
             for (MktStrategyConfRuleDO rule : ruleList){
@@ -396,13 +385,30 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                     String[] idList = rule.getProductId().split("/");
                     List<String> ids = Arrays.asList(idList);
                     if (ids.contains(ruleId.toString())){
-                        ids.remove(ruleId.toString());
+                        result.put("resultCode",CODE_FAIL);
+                        result.put("resultMsg","推荐条目已关联规则："+rule.getMktStrategyConfRuleName()+" 无法删除");
+                        return result;
                     }
-                    rule.setProductId(ChannelUtil.list2String(ids,"/"));
-                    ruleMapper.updateByPrimaryKey(rule);
                 }
             }
         }
+        camItemMapper.deleteByPrimaryKey(ruleId);
+        //更新redis数据
+        redisUtils.remove("MKT_CAM_ITEM_"+ruleId);
+//        if (campaignId!=null){
+//            List<MktStrategyConfRuleDO> ruleList = ruleMapper.selectByCampaignId(campaignId);
+//            for (MktStrategyConfRuleDO rule : ruleList){
+//                if (rule.getProductId()!=null && !rule.getProductId().equals("")){
+//                    String[] idList = rule.getProductId().split("/");
+//                    List<String> ids = Arrays.asList(idList);
+//                    if (ids.contains(ruleId.toString())){
+//                        ids.remove(ruleId.toString());
+//                    }
+//                    rule.setProductId(ChannelUtil.list2String(ids,"/"));
+//                    ruleMapper.updateByPrimaryKey(rule);
+//                }
+//            }
+//        }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
         return result;
