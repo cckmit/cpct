@@ -585,6 +585,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                 continue;
             }
             tarGrpTemConditionVO.setLeftParamName(label.getInjectionLabelName());
+            tarGrpTemConditionVO.setLabelDataType(label.getLabelDataType());
             //塞入领域
 //            FitDomain fitDomain = null;
 //            if (label.getFitDomain() != null) {

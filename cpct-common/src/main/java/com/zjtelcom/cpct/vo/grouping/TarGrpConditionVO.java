@@ -30,6 +30,16 @@ public class TarGrpConditionVO extends TarGrpCondition {
 
     private List<SysAreaVO> sysAreaList;
 
+    private String labelDataType;
+
+
+    public String getLabelDataType() {
+        return labelDataType;
+    }
+
+    public void setLabelDataType(String labelDataType) {
+        this.labelDataType = labelDataType;
+    }
 
     public String getLabelCode() {
         return labelCode;
