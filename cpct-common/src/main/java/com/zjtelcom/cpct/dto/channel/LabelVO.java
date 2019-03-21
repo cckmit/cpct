@@ -18,7 +18,25 @@ public class LabelVO implements Serializable {
     private String labelValueSt;
     private String scope;
     private Integer isShared;
+    private String labBusiDesc;
+    private String labTechDesc;
 
+
+    public String getLabBusiDesc() {
+        return labBusiDesc;
+    }
+
+    public void setLabBusiDesc(String labBusiDesc) {
+        this.labBusiDesc = labBusiDesc;
+    }
+
+    public String getLabTechDesc() {
+        return labTechDesc;
+    }
+
+    public void setLabTechDesc(String labTechDesc) {
+        this.labTechDesc = labTechDesc;
+    }
 
     public String getLabelValueSt() {
         return labelValueSt;
