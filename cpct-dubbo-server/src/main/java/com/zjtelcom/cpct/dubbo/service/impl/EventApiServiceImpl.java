@@ -749,7 +749,7 @@ public class EventApiServiceImpl implements EventApiService {
                             //客户级
                             if (successCust) {
                                 for (DefaultContext<String, Object> o : resultMapList) {
-                                    log.info("o = ", o);
+                                    log.info("o = " + o);
                                     //客户级下，循环资产级
                                     Map<String, String> privateParams = new HashMap<>();
                                     privateParams.put("isCust", "0"); //是客户级
@@ -1855,7 +1855,9 @@ public class EventApiServiceImpl implements EventApiService {
 
                 timeJson.put("time5-1", System.currentTimeMillis() - begin);
                 try {
+                    log.info("express = " + express);
                     ruleResult = runnerQ.executeRule(express, context, true, true);
+
                 } catch (Exception e) {
                     ruleMap.put("msg", "规则引擎计算失败");
 
