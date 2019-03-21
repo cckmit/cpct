@@ -36,6 +36,16 @@ public class TarGrpTemConditionVO extends TarGrpTemplateCondition {
 
     private List<OperatorDetail> operatorList;//运算符
 
+    private String labelDataType;
+
+
+    public String getLabelDataType() {
+        return labelDataType;
+    }
+
+    public void setLabelDataType(String labelDataType) {
+        this.labelDataType = labelDataType;
+    }
 
     public String getPromListName() {
         return promListName;

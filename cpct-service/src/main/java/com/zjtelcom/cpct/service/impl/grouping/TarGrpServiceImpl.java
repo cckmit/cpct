@@ -715,6 +715,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             List<LabelValueVO> valueList = ChannelUtil.valueList2VOList(labelValues);
             tarGrpConditionVO.setLeftParamName(label.getInjectionLabelName());
             tarGrpConditionVO.setLabelCode(label.getInjectionLabelCode());
+            tarGrpConditionVO.setLabelDataType(label.getLabelDataType());
             //将操作符转为中文
             if (tarGrpConditionVO.getOperType()!=null && !tarGrpConditionVO.getOperType().equals("")){
                 Operator op = Operator.getOperator(Integer.parseInt(tarGrpConditionVO.getOperType()));
