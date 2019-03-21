@@ -655,9 +655,9 @@ public class EventApiServiceImpl implements EventApiService {
                             privateParams.put("integrationId", map.get("integrationId"));
                             privateParams.put("custId", map.get("custId"));
 
-                            Map<String, Object> custLabelMap = new HashMap<>();
+//                            Map<String, Object> custLabelMap = new HashMap<>();
                             if(!"".equals(mktAllLabel.get("custLabels")) && mktAllLabel.get("custLabels")!=null ){
-                                custLabelMap = getCustLabel(mktAllLabel, map, privateParams, context, esJson);
+                                getCustLabel(mktAllLabel, map, privateParams, context, esJson);
                             }
 
                             ExecutorService executorService = Executors.newCachedThreadPool();
@@ -674,7 +674,7 @@ public class EventApiServiceImpl implements EventApiService {
                             for (Future<DefaultContext<String, Object>> future : futureList) {
                                 if (future.get() != null && !future.get().isEmpty()) {
                                     DefaultContext<String, Object> reultMap = future.get();
-                                    reultMap.putAll(custLabelMap);
+//                                    reultMap.putAll(context);
                                     resultMapList.add(reultMap);
                                 }
                             }
@@ -749,6 +749,7 @@ public class EventApiServiceImpl implements EventApiService {
                             //客户级
                             if (successCust) {
                                 for (DefaultContext<String, Object> o : resultMapList) {
+                                    log.info("o = ", o);
                                     //客户级下，循环资产级
                                     Map<String, String> privateParams = new HashMap<>();
                                     privateParams.put("isCust", "0"); //是客户级
@@ -1621,10 +1622,7 @@ public class EventApiServiceImpl implements EventApiService {
 
             jsonObject.put("ruleId", ruleId);
             jsonObject.put("ruleName", ruleName);
-            jsonObject.put("hitEntity", privateParams.get("ac" +
-                    "" +
-                    "" +
-                    "cNbr")); //命中对象
+            jsonObject.put("hitEntity", privateParams.get("accNbr")); //命中对象
             jsonObject.put("reqId", reqId);
             jsonObject.put("eventId", params.get("eventCode"));
             jsonObject.put("activityId", privateParams.get("activityId"));
@@ -1769,6 +1767,7 @@ public class EventApiServiceImpl implements EventApiService {
                     express = expressSb.toString();
 
                 } catch (Exception e) {
+                    e.printStackTrace();
                     esJson.put("hit", "false");
                     esJson.put("msg", "表达式拼接异常");
                     esHitService.save(jsonObject, IndexList.RULE_MODULE);
@@ -1825,6 +1824,7 @@ public class EventApiServiceImpl implements EventApiService {
                 } catch (Exception e) {
                     esJson.put("hit", "false");
                     esJson.put("msg", "表达式拼接异常");
+                    e.printStackTrace();
                     esHitService.save(jsonObject, IndexList.RULE_MODULE);
                     return Collections.EMPTY_MAP;
                 }
@@ -2021,6 +2021,7 @@ public class EventApiServiceImpl implements EventApiService {
                 } else {
 
                     ruleMap.put("msg", "规则引擎匹配未通过");
+                    log.info("规则引擎匹配未通过");
 
                     jsonObject.put("hit", "false");
                     jsonObject.put("msg", "规则引擎匹配未通过");
@@ -2039,6 +2040,7 @@ public class EventApiServiceImpl implements EventApiService {
                 if (taskChlList.size() > 0) {
                     jsonObject.put("hit", true);
                 } else {
+                    log.info("渠道均未命中");
                     jsonObject.put("hit", false);
                     jsonObject.put("msg", "渠道均未命中");
                     esHitService.save(jsonObject, IndexList.RULE_MODULE);
@@ -2046,6 +2048,7 @@ public class EventApiServiceImpl implements EventApiService {
                 }
                 esHitService.save(jsonObject, IndexList.RULE_MODULE);
             } catch (Exception e) {
+                e.printStackTrace();
                 jsonObject.put("hit", false);
                 jsonObject.put("msg", "规则异常");
                 esHitService.save(jsonObject, IndexList.RULE_MODULE);
