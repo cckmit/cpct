@@ -151,7 +151,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                     }
                 }
                 if ("3000".equals(filterRule.getFilterType()) && !promCode.contains("PROM_LIST")){
-                    promCode.add("PROM_LIST");
+                    assetCode.add("PROM_LIST");
                 }
             }
             //规则级的标签
