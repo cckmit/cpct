@@ -386,7 +386,10 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
             // 删除活动缓存
             redisUtils_prd.del("MKT_CAMPAIGN_" + mktCampaignId);
             // 删除活动所有标签缓存
-            redisUtils_prd.del("MKT_ALL_LABEL_" + mktCampaignId);
+            List<MktCamEvtRelDO> mktCamEvtRelDOS = mktCamEvtRelPrdMapper.selectByMktCampaignId(mktCampaignId);
+            for (MktCamEvtRelDO mktCamEvtRelDO : mktCamEvtRelDOS) {
+                redisUtils_prd.del("EVT_ALL_LABEL_" + mktCamEvtRelDO.getEventId());
+            }
 
             // 删除过滤规则缓存
             List<Long> longList = mktStrategyFilterRuleRelPrdMapper.selectByStrategyId(mktCampaignId);
@@ -454,8 +457,11 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
             MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
             // 删除活动缓存
             redisUtils.del("MKT_CAMPAIGN_" + mktCampaignId);
-            // 删除活动所有标签缓存
-            redisUtils.del("MKT_ALL_LABEL_" + mktCampaignId);
+            // 删除活动对应数据的所有标签缓存
+            List<MktCamEvtRelDO> mktCamEvtRelDOS = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignId);
+            for (MktCamEvtRelDO mktCamEvtRelDO : mktCamEvtRelDOS) {
+                redisUtils.del("EVT_ALL_LABEL_" + mktCamEvtRelDO.getEventId());
+            }
 
             // 删除过滤规则缓存
             List<Long> longList = mktStrategyFilterRuleRelMapper.selectByStrategyId(mktCampaignId);

@@ -306,7 +306,7 @@ public class FilterRuleController extends BaseController {
      */
     @RequestMapping("/importUserList")
     @CrossOrigin
-    public String importUserList(MultipartFile file, @Param("ruleId") Long ruleId) {
+    public String importUserList(MultipartFile file, @RequestBody FilterRule filterRule) {
         Map<String, Object> maps = new HashMap<>();
         try {
             InputStream inputStream = file.getInputStream();
@@ -319,7 +319,7 @@ public class FilterRuleController extends BaseController {
                 maps.put("resultMsg", "文件格式不正确");
                 return JSON.toJSONString(maps);
             }
-            maps = filterRuleService.importUserList(file, ruleId);
+            maps = filterRuleService.importUserList(file, filterRule);
         } catch (Exception e) {
             logger.error("[op:FilterRuleController] fail to listEvents for multipartFile = {}! Exception: ", JSONArray.toJSON(file), e);
             return JSON.toJSONString(maps);

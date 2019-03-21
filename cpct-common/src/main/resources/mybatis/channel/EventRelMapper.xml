@@ -6,6 +6,7 @@
     <result column="A_EVT_ID" jdbcType="BIGINT" property="aEvtId" />
     <result column="Z_EVT_ID" jdbcType="BIGINT" property="zEvtId" />
     <result column="SORT" jdbcType="BIGINT" property="sort" />
+    <result column="A_EVT_Name" jdbcType="VARCHAR" property="aEvtName" />
     <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
     <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
     <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
@@ -52,6 +53,13 @@
     select COMPLEX_EVT_RELA_ID, A_EVT_ID, Z_EVT_ID, SORT, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
     from event_rel
+  </select>
+  <select id="selectByZEvtId" resultMap="BaseResultMap">
+    select er.COMPLEX_EVT_RELA_ID, er.A_EVT_ID, er.Z_EVT_ID, er.SORT, er.STATUS_CD, er.CREATE_STAFF, er.UPDATE_STAFF,
+           er.CREATE_DATE, er.STATUS_DATE, er.UPDATE_DATE, er.REMARK, e.EVENT_NAME as A_EVT_Name
+    from event_rel er
+    left join event e on e.EVENT_ID = er.A_EVT_ID
+    where Z_EVT_ID = #{zEvtId,jdbcType=BIGINT}
   </select>
 
 </mapper>

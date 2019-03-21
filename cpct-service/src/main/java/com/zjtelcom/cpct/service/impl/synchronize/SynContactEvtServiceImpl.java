@@ -17,6 +17,7 @@ import com.zjtelcom.cpct.exception.SystemException;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.synchronize.SynContactEvtService;
 import com.zjtelcom.cpct.service.synchronize.SynchronizeRecordService;
+import com.zjtelcom.cpct.util.RedisUtils_prd;
 import com.zjtelcom.cpct_prd.dao.campaign.MktCamEvtRelPrdMapper;
 import com.zjtelcom.cpct_prd.dao.campaign.MktCampaignPrdMapper;
 import com.zjtelcom.cpct_prd.dao.event.*;
@@ -63,7 +64,8 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
     private MktCamEvtRelPrdMapper mktCamEvtRelPrdMapper;
     @Autowired
     private MktCampaignPrdMapper mktCampaignPrdMapper;
-
+    @Autowired
+    private RedisUtils_prd redisUtils_prd;
     @Autowired
     private CamEvtRelPrdMapper camEvtRelPrdMapper;
     //同步表名
@@ -152,6 +154,9 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
             diffEventMatchRulCondition(listEventMatchRulCondition, eventById);
             //3.5修改关联的活动
             diffMktCamEvtRel(mktCamEvtRels, eventById);
+            // 删除事件接入的标签缓存
+            redisUtils_prd.del("EVT_ALL_LABEL_" + eventId);
+
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
@@ -425,16 +430,22 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
         for (ContactEvt c : addList) {
             addEvent(c);
             synchronizeRecordService.addRecord(roleName, tableName, c.getContactEvtId(), SynchronizeType.add.getType());
+            // 删除事件接入的标签缓存
+            redisUtils_prd.del("EVT_ALL_LABEL_" + c.getContactEvtId());
         }
         //开始修改
         for (ContactEvt c : updateList) {
             updateEvent(c);
             synchronizeRecordService.addRecord(roleName, tableName, c.getContactEvtId(), SynchronizeType.update.getType());
+            // 删除事件接入的标签缓存
+            redisUtils_prd.del("EVT_ALL_LABEL_" + c.getContactEvtId());
         }
         //开始删除
         for (ContactEvt c : deleteList) {
             deleteSingleEvent(c.getContactEvtId(), roleName);
             synchronizeRecordService.addRecord(roleName, tableName, c.getContactEvtId(), SynchronizeType.delete.getType());
+            // 删除事件接入的标签缓存
+            redisUtils_prd.del("EVT_ALL_LABEL_" + c.getContactEvtId());
         }
 
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -474,6 +485,8 @@ public class SynContactEvtServiceImpl extends BaseService implements SynContactE
             }
         }
         synchronizeRecordService.addRecord(roleName, tableName, eventId, SynchronizeType.delete.getType());
+        // 删除事件接入的标签缓存
+        redisUtils_prd.del("EVT_ALL_LABEL_" + eventId);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         return maps;
