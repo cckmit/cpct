@@ -21,11 +21,11 @@ public class EventRelController extends BaseController {
     EventRelService eventRelService;
 
     /*
-     **事件关联列表
+     **事件未被关联列表
      */
-    @PostMapping("getEventRelList")
+    @PostMapping("getEventNoRelList")
     @CrossOrigin
-    public Map<String, Object> getEventRelList(@RequestBody ContactEvt contactEvt) {
+    public Map<String, Object> getEventNoRelList(@RequestBody ContactEvt contactEvt) {
         Map<String ,Object> result = new HashMap<>();
         Long userId = UserUtil.loginId();
         try {
@@ -42,13 +42,51 @@ public class EventRelController extends BaseController {
     /*
      *创建事件关联
      */
-    @PostMapping("createEventRelList")
+    @PostMapping("createEventRel")
     @CrossOrigin
-    public Map<String, Object> createEventRelList(@RequestBody EventRel eventRel) {
+    public Map<String, Object> createEventRel(@RequestBody EventRel eventRel) {
         Map<String ,Object> result = new HashMap<>();
         Long userId = UserUtil.loginId();
         try {
-            result = eventRelService.creatEventRelation(userId, eventRel);
+            result = eventRelService.createEventRelation(userId, eventRel);
+        }catch (Exception e){
+            logger.error("[op:ServiceController] fail to createEventRelList",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to createEventRelList");
+            return result;
+        }
+        return result;
+    }
+
+    /*
+     *删除事件关联关系
+     */
+    @PostMapping("delEventRelation")
+    @CrossOrigin
+    public Map<String, Object> delEventRelation(@RequestBody EventRel eventRel) {
+        Map<String ,Object> result = new HashMap<>();
+        Long userId = UserUtil.loginId();
+        try {
+            result = eventRelService.delEventRelation(userId, eventRel);
+        }catch (Exception e){
+            logger.error("[op:ServiceController] fail to createEventRelList",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to createEventRelList");
+            return result;
+        }
+        return result;
+    }
+
+    /*
+     *获取被关联的事件列表
+     */
+    @PostMapping("getEventRelList")
+    @CrossOrigin
+    public Map<String, Object> getEventRelList(@RequestBody ContactEvt contactEvt) {
+        Map<String ,Object> result = new HashMap<>();
+        Long userId = UserUtil.loginId();
+        try {
+            result = eventRelService.getEventRelList(userId, contactEvt);
         }catch (Exception e){
             logger.error("[op:ServiceController] fail to createEventRelList",e);
             result.put("resultCode",CODE_FAIL);

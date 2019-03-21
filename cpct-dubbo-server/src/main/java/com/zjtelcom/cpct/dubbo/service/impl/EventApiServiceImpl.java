@@ -597,7 +597,7 @@ public class EventApiServiceImpl implements EventApiService {
                     } else if(custLabelList.contains(entry.getKey())){
                         custLabelList.remove(entry.getKey());
                     }
-                    }
+                }
                 if (assetLabelList != null && assetLabelList.size() > 0) {
                     mktAllLabel.put("assetLabels", ChannelUtil.StringList2String(assetLabelList));
                 }
@@ -3659,6 +3659,14 @@ public class EventApiServiceImpl implements EventApiService {
 
         @Override
         public void run() {
+            // 从redis 中获取所有的时间类型标签集合
+            List<String> labelCodeList = (List<String>) redisUtils.get("LABEL_CODE_LIST");
+            if (labelCodeList == null) {
+                labelCodeList = injectionLabelMapper.selectLabelCodeByType("1100");// 1100 代表为时间类型的标签
+                if (labelCodeList != null) {
+                    redisUtils.set("LABEL_CODE_LIST", labelCodeList);
+                }
+            }
             for(Map<String, String> labelMap : labelMapList) {
                 String type = labelMap.get("operType");
                 //保存标签的es log
@@ -3674,12 +3682,31 @@ public class EventApiServiceImpl implements EventApiService {
                     lr.setRightParam(context.get(labelMap.get("code")).toString());
                     if (sysParams != null && "1".equals(sysParams.getParamValue())) {
                         try {
-                            RuleResult ruleResultOne = runner.executeRule(cpcLabel(labelMap.get("code"), type, labelMap.get("rightParam")), context, true, true);
-                            if (null != ruleResultOne.getResult()) {
-                                lr.setResult((Boolean) ruleResultOne.getResult());
+
+                            if (labelCodeList != null && labelCodeList.contains(labelMap.get("code"))) {
+                                ExpressRunner runnerQ = new ExpressRunner();
+
+                                //将规则拼装为表达式
+                                StringBuilder expressSb = new StringBuilder();
+                                expressSb.append("if(");
+                                expressSb.append(cpcExpression(labelMap.get("code"), type, labelMap.get("rightParam")));
+                                runnerQ.addFunction("dateLabel", new ComperDateLabel("dateLabel"));
+                                expressSb.append(") {return true} else {return false}");
+                                RuleResult ruleResult = runnerQ.executeRule(expressSb.toString(), context, true, true);
+                                if (null != ruleResult.getResult()) {
+                                    lr.setResult((Boolean) ruleResult.getResult());
+                                } else {
+                                    lr.setResult(false);
+                                }
                             } else {
-                                lr.setResult(false);
+                                RuleResult ruleResultOne = runner.executeRule(cpcLabel(labelMap.get("code"), type, labelMap.get("rightParam")), context, true, true);
+                                if (null != ruleResultOne.getResult()) {
+                                    lr.setResult((Boolean) ruleResultOne.getResult());
+                                } else {
+                                    lr.setResult(false);
+                                }
                             }
+
                         } catch (Exception e) {
                             lr.setResult(false);
                         }
@@ -3689,6 +3716,7 @@ public class EventApiServiceImpl implements EventApiService {
                     lr.setResult(false);
                 }
                 labelResultList.add(lr);
+
             }
             esJson.put("labelResultList", JSONArray.toJSON(labelResultList));
             esHitService.save(esJson, IndexList.Label_MODULE);  //储存标签比较结果

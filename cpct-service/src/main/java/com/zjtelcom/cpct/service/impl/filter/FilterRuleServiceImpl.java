@@ -36,6 +36,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -122,14 +123,9 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
      */
     @Transactional(readOnly = false)
     @Override
-    public Map<String, Object> importUserList(MultipartFile multipartFile, Long ruleId) throws IOException {
+    public Map<String, Object> importUserList(MultipartFile multipartFile, FilterRule filterRule) throws IOException {
         Map<String, Object> maps = new HashMap<>();
-        FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(ruleId);
-        if (filterRule==null){
-            maps.put("resultCode", CODE_FAIL);
-            maps.put("resultMsg","过滤规则不存在");
-            return maps;
-        }
+
         InputStream inputStream = multipartFile.getInputStream();
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
         Sheet sheet = wb.getSheetAt(0);
@@ -173,8 +169,30 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
 //            System.out.println(redisUtils.hmGet(key, "userList"));
 
         }
-        filterRule.setUserList(ChannelUtil.StringList2String(resultList));
-        filterRuleMapper.updateByPrimaryKey(filterRule);
+
+        if(filterRule.getRuleId() == null) {
+            FilterRule filterRules = BeanUtil.create(filterRule, new FilterRule());
+            filterRules.setCreateDate(new Date());
+            filterRules.setCreateStaff(UserUtil.loginId());
+            filterRules.setUpdateDate(new Date());
+            filterRules.setUpdateStaff(UserUtil.loginId());
+            filterRules.setStatusDate(new Date());
+            filterRules.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+            filterRule.setUserList(ChannelUtil.StringList2String(resultList));
+            filterRuleMapper.insert(filterRules);
+        }else {
+            FilterRule filterRules = filterRuleMapper.selectByPrimaryKey(filterRule.getRuleId());
+            if (filterRules==null){
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg","过滤规则不存在");
+                return maps;
+            }
+            BeanUtil.copy(filterRule,filterRules);
+            filterRules.setUpdateDate(new Date());
+            filterRules.setUpdateStaff(UserUtil.loginId());
+            filterRules.setUserList(ChannelUtil.StringList2String(resultList));
+            filterRuleMapper.updateByPrimaryKey(filterRules);
+        }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", filterRule.getUserList());
         maps.put("key",key);
