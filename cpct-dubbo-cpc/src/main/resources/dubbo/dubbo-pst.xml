@@ -79,11 +79,10 @@
         <dubbo:method name="publishMktCampaign" servicecode="00.1083.publishMktCampaign" timeout="10000"/>
     </dubbo:service>
 
-    <!-- 事件接入活动任务订阅 1.0 -->
-    <dubbo:reference interface="com.zjtelcom.cpct.dubbo.service.CamApiService" id="camApiService"
-                     version="1.0" retries="0" check="false">
-        <dubbo:method name="ActivityTask" servicecode="00.1083.ActivityTask" timeout="5000"/>
-    </dubbo:reference>
 
+    <!-- 事件接入活动任务注册 1.0 -->
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.CamApiService" ref="CamApiServiceImpl" version="1.0" >
+        <dubbo:method name="ActivityTask" servicecode="00.1083.ActivityTask" timeout="10000"/>
+    </dubbo:service>
 
 </beans>

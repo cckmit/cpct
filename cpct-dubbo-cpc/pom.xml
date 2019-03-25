@@ -9,8 +9,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>cpct-dubbo-server</artifactId>
-    <name>cpct-dubbo-server</name>
+    <artifactId>cpct-dubbo-cpc</artifactId>
+    <name>cpct-dubbo-cpc</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -27,12 +27,6 @@
         <dependency>
             <groupId>com.zjtelcom.cpct</groupId>
             <artifactId>cpct-es</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.zjtelcom.cpct</groupId>
-            <artifactId>cpct-dubbo-cpc</artifactId>
-            <version>1.0.0</version>
         </dependency>
 
         <dependency>
@@ -151,7 +145,7 @@
     </properties>
 
     <build>
-        <finalName>cpct-dubbo-server</finalName>
+        <finalName>cpct-dubbo-cpc</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
