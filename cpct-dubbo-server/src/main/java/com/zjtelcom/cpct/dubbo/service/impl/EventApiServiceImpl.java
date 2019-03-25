@@ -778,7 +778,7 @@ public class EventApiServiceImpl implements EventApiService {
                             for (DefaultContext<String, Object> o : resultMapList) {
                                 String assetId = o.get("integrationId").toString();
                                 // 判断资产编码是否与接入的一致
-                                if (map.get("integrationId").equals(assetId)) {
+                                if (assetId.equals(map.get("integrationId"))) {
                                     Map<String, String> privateParams = new HashMap<>();
                                     privateParams.put("isCust", "1"); //是否是客户级
                                     privateParams.put("accNbr", map.get("accNbr"));
@@ -3487,15 +3487,15 @@ public class EventApiServiceImpl implements EventApiService {
         }
 
         //销售品级标签
-        if (mktAllLabel.get("promLabels") != null && !"".equals(mktAllLabel.get("promLabels"))) {
-            if ("".equals(saleId)) {
+        if (mktAllLabel.get("promLabels") != null && !"".equals(mktAllLabel.get("promLabels")) && "".equals(saleId)) {
+/*            if ("".equals(saleId)) {
                 esJson.put("hit", false);
                 esJson.put("msg", "主销售品数据错误");
                 log.info("主销售品数据错误");
                 //esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
                 esHitService.save(esJson, IndexList.EVENT_MODULE, params.get("reqId"));
                 return null;
-            }
+            }*/
 
             JSONObject paramSale = new JSONObject();
             paramSale.put("queryNum", "");
