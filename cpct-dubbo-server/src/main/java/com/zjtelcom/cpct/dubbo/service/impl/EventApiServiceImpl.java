@@ -2287,12 +2287,12 @@ public class EventApiServiceImpl implements EventApiService {
                 express.append(rightParam);
                 break;
             case "3000":
-                express.append(code).append(")");
+                express.append("toNum(").append(code).append("))");
                 express.append(" == ");
                 express.append("\"").append(rightParam).append("\"");
                 break;
             case "4000":
-                express.append(code).append(")");
+                express.append("toNum(").append(code).append("))");
                 express.append(" != ");
                 express.append("\"").append(rightParam).append("\"");
                 break;
