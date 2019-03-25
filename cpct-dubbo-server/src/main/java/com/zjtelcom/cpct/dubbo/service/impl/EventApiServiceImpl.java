@@ -607,7 +607,7 @@ public class EventApiServiceImpl implements EventApiService {
                 if (custLabelList != null && custLabelList.size() > 0) {
                     mktAllLabel.put("custLabels", ChannelUtil.StringList2String(custLabelList));
                 }
-            //    log.info("assetLabelList = " +assetLabelList  + "   " + "promLabelList = " + promLabelList + "   " + "custLabelList = " + custLabelList);
+                log.info("assetLabelList = " +assetLabelList  + "   " + "promLabelList = " + promLabelList + "   " + "custLabelList = " + custLabelList);
 
 
 
@@ -3487,7 +3487,7 @@ public class EventApiServiceImpl implements EventApiService {
         }
 
         //销售品级标签
-        if (mktAllLabel.get("promLabels") != null && !"".equals(mktAllLabel.get("promLabels")) && "".equals(saleId)) {
+        if (mktAllLabel.get("promLabels") != null && !"".equals(mktAllLabel.get("promLabels")) && !"".equals(saleId)) {
 /*            if ("".equals(saleId)) {
                 esJson.put("hit", false);
                 esJson.put("msg", "主销售品数据错误");
