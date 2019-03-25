@@ -726,7 +726,7 @@ public class EventApiServiceImpl implements EventApiService {
                         isAllAsset = true;
                     }
                 }
-                log.info("resultByEvent size = " + resultByEvent.size() + "resultByEvent = " + resultByEvent);
+                log.info("resultMapList size = " + resultMapList.size() + "   resultMapList = " + resultMapList);
                 // 全部为资产级时直接遍历活动
                 if(isAllAsset){
                     for (Map<String, Object> activeMap : resultByEvent) {
