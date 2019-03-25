@@ -1087,7 +1087,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         }
         if(!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(campaignDO.getStatusCd())){
             result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "发布活动后才能下发");
+            result.put("resultMsg", "发布活动后才能全量试算");
             return result;
         }
         MktStrategyConfDO strategyConfDO = strategyConfMapper.selectByPrimaryKey(operation.getStrategyId());

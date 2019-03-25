@@ -22,11 +22,10 @@ public class MapUtil {
 
     public static String getString(Object obj){
         try {
-            return  String.valueOf(obj);
+            return obj.toString();
         }catch (Throwable e){
-
+            return  "";
         }
-        return  "";
     }
 
 }
