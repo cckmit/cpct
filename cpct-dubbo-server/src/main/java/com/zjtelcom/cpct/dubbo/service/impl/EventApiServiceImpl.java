@@ -726,7 +726,6 @@ public class EventApiServiceImpl implements EventApiService {
                         isAllAsset = true;
                     }
                 }
-                log.info("resultMapList size = " + resultMapList.size() + "   resultMapList = " + resultMapList);
                 // 全部为资产级时直接遍历活动
                 if(isAllAsset){
                     for (Map<String, Object> activeMap : resultByEvent) {
@@ -939,7 +938,6 @@ public class EventApiServiceImpl implements EventApiService {
 
         @Override
         public Map<String, Object> call() {
-            log.info("进入ActivityTask方法");
             Map<String, Object> activity = new HashMap<>();
 
             long begin = System.currentTimeMillis();
@@ -1334,7 +1332,6 @@ public class EventApiServiceImpl implements EventApiService {
 
         @Override
         public Map<String, Object> call() throws Exception {
-            log.info("进入RuleTask方法");
             long begin = System.currentTimeMillis();
             JSONObject timeJson = new JSONObject();
             timeJson.put("reqId", reqId + "0_" + ruleId + "_" + params.get("accNbr"));

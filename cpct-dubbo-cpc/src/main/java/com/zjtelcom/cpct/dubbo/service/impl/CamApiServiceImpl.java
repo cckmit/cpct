@@ -135,7 +135,7 @@ public class CamApiServiceImpl implements CamApiService {
     public Map<String, Object>  ActivityTask(Map<String, String> params, Long activityId, Map<String, String> privateParams,
                                              Map<String, String> laubelItems, List<Map<String, Object>> evtTriggers, List<Map<String, Object>> strategyMapList, DefaultContext<String, Object> context) {
 
-            Map<String, Object> activity = new HashMap<>();
+            Map<String, Object> activity = new ConcurrentHashMap<>();
             long begin = System.currentTimeMillis();
             String reqId = params.get("reqId");
             JSONObject timeJson = new JSONObject();
@@ -323,7 +323,7 @@ public class CamApiServiceImpl implements CamApiService {
                             if (labels != null && labels.size() > 0) {
                                 for (String labelCode : labels) {
                                     if (context.containsKey(labelCode)) {
-                                        Map<String, Object> map = new HashMap<>();
+                                        Map<String, Object> map = new ConcurrentHashMap<>();
                                         map.put("key", labelCode);
                                         map.put("value", context.get(labelCode));
                                         map.put("display", "0");
@@ -334,7 +334,7 @@ public class CamApiServiceImpl implements CamApiService {
                                     }
                                 }
                             }
-                            Map<String, Object> disturb = new HashMap<>();
+                            Map<String, Object> disturb = new ConcurrentHashMap<>();
                             disturb.put("type", "disturb");
                             disturb.put("triggerList", triggerList);
                             itgTriggers.add(disturb);
@@ -421,7 +421,7 @@ public class CamApiServiceImpl implements CamApiService {
                             }
                         }
                         if (triggerList1.size() > 0) {
-                            itgTrigger = new HashMap<>();
+                            itgTrigger = new ConcurrentHashMap<>();
                             itgTrigger.put("triggerList", triggerList1);
                             itgTrigger.put("type", "固定信息");
                             itgTriggers.add(new JSONObject(itgTrigger));
@@ -555,7 +555,7 @@ public class CamApiServiceImpl implements CamApiService {
             esJson.put("tarGrpId", tarGrpId);
             esJson.put("hitEntity", privateParams.get("accNbr")); //命中对象
 
-            Map<String, Object> ruleMap = new HashMap<>();
+            Map<String, Object> ruleMap = new ConcurrentHashMap<>();
             //初始化返回结果中的推荐信息列表
             List<Map<String, Object>> taskChlList = new ArrayList<>();
 
@@ -829,7 +829,7 @@ public class CamApiServiceImpl implements CamApiService {
                             redisUtils.set("MKT_CAM_ITEM_LIST_" + ruleId.toString(), mktCamItemList);
                         }
                         for (MktCamItem mktCamItem : mktCamItemList) {
-                            Map<String, String> product = new HashMap<>();
+                            Map<String, String> product = new ConcurrentHashMap<>();
                             product.put("productId", mktCamItem.getItemId().toString());
                             product.put("productCode", mktCamItem.getOfferCode());
                             product.put("productName", mktCamItem.getOfferName());
@@ -994,7 +994,7 @@ public class CamApiServiceImpl implements CamApiService {
             timeJson.put("time1", System.currentTimeMillis() - begin);
 
             //初始化返回结果推荐信息
-            Map<String, Object> channelMap = new HashMap<>();
+            Map<String, Object> channelMap = new ConcurrentHashMap<>();
 
             List<Map<String, Object>> taskChlAttrList = new ArrayList<>();
             Map<String, Object> taskChlAttr;
@@ -1027,7 +1027,7 @@ public class CamApiServiceImpl implements CamApiService {
                         || mktCamChlConfAttr.getAttrId() == 500600010002L
                         || mktCamChlConfAttr.getAttrId() == 500600010003L
                         || mktCamChlConfAttr.getAttrId() == 500600010004L) {
-                    taskChlAttr = new HashMap<>();
+                    taskChlAttr = new ConcurrentHashMap<>();
                     taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
                     taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
@@ -1037,7 +1037,7 @@ public class CamApiServiceImpl implements CamApiService {
 
                 if (mktCamChlConfAttr.getAttrId() == 500600010005L ||
                         mktCamChlConfAttr.getAttrId() == 500600010011L) {
-                    taskChlAttr = new HashMap<>();
+                    taskChlAttr = new ConcurrentHashMap<>();
                     taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
                     taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
                     taskChlAttr.put("attrValue", mktCamChlConfAttr.getAttrValue());
@@ -1049,7 +1049,7 @@ public class CamApiServiceImpl implements CamApiService {
                     if (!now.after(new Date(Long.parseLong(mktCamChlConfAttr.getAttrValue())))) {
                         checkTime = false;
                     } else {
-                        taskChlAttr = new HashMap<>();
+                        taskChlAttr = new ConcurrentHashMap<>();
                         taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
                         taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
                         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -1061,7 +1061,7 @@ public class CamApiServiceImpl implements CamApiService {
                     if (now.after(new Date(Long.parseLong(mktCamChlConfAttr.getAttrValue())))) {
                         checkTime = false;
                     } else {
-                        taskChlAttr = new HashMap<>();
+                        taskChlAttr = new ConcurrentHashMap<>();
                         taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
                         taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
                         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -1213,7 +1213,7 @@ public class CamApiServiceImpl implements CamApiService {
         //查询标签实例数据
         Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
         if ("0".equals(dubboResult.get("result_code").toString())) {
-            JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
+            JSONObject body = new JSONObject((ConcurrentHashMap) dubboResult.get("msgbody"));
             //解析返回结果
             return body;
         } else {
@@ -1599,7 +1599,7 @@ public class CamApiServiceImpl implements CamApiService {
      */
     public Map<String, Object> matchRulCondition(Long eventId, Map<String, String> labelItems, Map<String, String> map) {
 //        log.info("开始验证事件规则条件");
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new ConcurrentHashMap<>();
         result.put("code", "success");
         //查询事件规则
         ContactEvtMatchRul evtMatchRul = new ContactEvtMatchRul();
@@ -1720,7 +1720,7 @@ public class CamApiServiceImpl implements CamApiService {
      * @return
      */
     public Map<String, Object> selectLabelByEs(List<Label> selectByEs, Map<String, String> map) {
-        Map<String, Object> dubboLabel = new HashMap<>();
+        Map<String, Object> dubboLabel = new ConcurrentHashMap<>();
         dubboLabel.put("result", "success");
         JSONObject param = new JSONObject();
         //查询标识
@@ -1742,7 +1742,7 @@ public class CamApiServiceImpl implements CamApiService {
         log.info("事件规则请求ES返回：" + dubboResult.toString());
         if ("0".equals(dubboResult.get("result_code").toString())) {
             //查询成功
-            JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
+            JSONObject body = new JSONObject((ConcurrentHashMap) dubboResult.get("msgbody"));
             dubboLabel.put("body", body);
         } else {
             //查询失败
@@ -1759,7 +1759,7 @@ public class CamApiServiceImpl implements CamApiService {
      */
     public Map<String, String> decideExpress(EventMatchRulCondition condition, Label label, DefaultContext<String, Object> context) {
         String type = condition.getOperType();
-        Map<String, String> message = new HashMap<>();
+        Map<String, String> message = new ConcurrentHashMap<>();
         message.put("code", "success");
         ExpressRunner runner = new ExpressRunner();
         runner.addFunction("toNum", new StringToNumOperator("toNum"));
@@ -1838,7 +1838,7 @@ public class CamApiServiceImpl implements CamApiService {
         @Override
         public Map<String, Object> call() throws Exception {
 
-            Map<String, Object> mktCampaignMap = new HashMap<>();
+            Map<String, Object> mktCampaignMap = new ConcurrentHashMap<>();
 
             try {
                 Long mktCampaginId = (Long) act.get("mktCampaginId");
@@ -1945,7 +1945,7 @@ public class CamApiServiceImpl implements CamApiService {
                     esJsonStrategy.put("strategyConfId", mktStrategyConf.getMktStrategyConfId());
                     esJsonStrategy.put("strategyConfName", mktStrategyConf.getMktStrategyConfName());
 
-                    Map<String, Object> strategyMap = new HashMap<>();
+                    Map<String, Object> strategyMap = new ConcurrentHashMap<>();
                     //验证策略生效时间
                     if (!(now.after(mktStrategyConf.getBeginTime()) && now.before(mktStrategyConf.getEndTime()))) {
                         //若当前时间在策略生效时间外
@@ -2078,14 +2078,14 @@ public class CamApiServiceImpl implements CamApiService {
                 List<Map<String, Object>> ruleMapList = new ArrayList<>();
                 List<MktStrategyConfRuleDO> mktStrategyConfRuleList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(mktStrategyConf.getMktStrategyConfId());
                 for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleList) {
-                    Map<String, Object> ruleMap = new HashMap<>();
+                    Map<String, Object> ruleMap = new ConcurrentHashMap<>();
                     String evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId();
 /*                    String[] evtContactConfIdArray = evtContactConfIds.split("/");
                     // 获取推送渠道
                     List<Map<String, Object>> evtContactConfMapList = new ArrayList<>();
                     if (evtContactConfIdArray != null && !"".equals(evtContactConfIdArray[0])) {
                         for (String evtContactConfId : evtContactConfIdArray) {
-                            Map<String, Object> evtContactConfMap = new HashMap<>();
+                            Map<String, Object> evtContactConfMap = new ConcurrentHashMap<>();
                             //查询渠道属性，渠道生失效时间过滤
                             MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) redisUtils.get("MktCamChlConfDetail_" + evtContactConfId);
                             MktCamChlConfDO mktCamChlConfDO = new MktCamChlConfDO();
@@ -2119,7 +2119,7 @@ public class CamApiServiceImpl implements CamApiService {
                                         log.info("渠道生失效时间");
                                         continue;
                                     } else {
-                                        Map<String, Object> taskChlAttrMap = new HashMap<>();
+                                        Map<String, Object> taskChlAttrMap = new ConcurrentHashMap<>();
                                         taskChlAttrMap.put("attrId", mktCamChlConfAttrDO.getAttrId().toString());
                                         taskChlAttrMap.put("attrKey", mktCamChlConfAttrDO.getAttrId().toString());
                                         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -2282,7 +2282,7 @@ public class CamApiServiceImpl implements CamApiService {
             Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(paramCust));
 
             if ("0".equals(dubboResult.get("result_code").toString())) {
-                JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
+                JSONObject body = new JSONObject((ConcurrentHashMap) dubboResult.get("msgbody"));
 
                 //拼接规则引擎上下文
                 for (Map.Entry<String, Object> entry : body.entrySet()) {
@@ -2317,7 +2317,7 @@ public class CamApiServiceImpl implements CamApiService {
             //因子查询-----------------------------------------------------
             Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(assParam));
             if ("0".equals(dubboResult.get("result_code").toString())) {
-                JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
+                JSONObject body = new JSONObject((ConcurrentHashMap) dubboResult.get("msgbody"));
                 //ES log 标签实例
                 //拼接规则引擎上下文
                 for (Map.Entry<String, Object> entry : body.entrySet()) {
@@ -2339,15 +2339,15 @@ public class CamApiServiceImpl implements CamApiService {
         }
 
         //销售品级标签
-        if (mktAllLabel.get("promLabels") != null && !"".equals(mktAllLabel.get("promLabels"))) {
-            if ("".equals(saleId)) {
+        if (mktAllLabel.get("promLabels") != null && !"".equals(mktAllLabel.get("promLabels")) && !"".equals(saleId)) {
+/*            if ("".equals(saleId)) {
                 esJson.put("hit", false);
                 esJson.put("msg", "主销售品数据错误");
                 log.info("主销售品数据错误");
                 //esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
                 esHitService.save(esJson, IndexList.EVENT_MODULE, params.get("reqId"));
                 return Collections.EMPTY_MAP;
-            }
+            }*/
 
             JSONObject paramSale = new JSONObject();
             paramSale.put("queryNum", "");
@@ -2359,7 +2359,7 @@ public class CamApiServiceImpl implements CamApiService {
             //因子查询
             Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(paramSale));
             if ("0".equals(dubboResult.get("result_code").toString())) {
-                JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
+                JSONObject body = new JSONObject((ConcurrentHashMap) dubboResult.get("msgbody"));
                 //拼接规则引擎上下文
                 for (Map.Entry<String, Object> entry : body.entrySet()) {
                     //添加到上下文
@@ -2401,8 +2401,8 @@ public class CamApiServiceImpl implements CamApiService {
         @Override
         public Map<String, Object> call() throws Exception {
 
-            Map<String, Object> resultMap = new HashMap<>();
-            Map<String, String> privateParams = new HashMap<>();
+            Map<String, Object> resultMap = new ConcurrentHashMap<>();
+            Map<String, String> privateParams = new ConcurrentHashMap<>();
             privateParams.put("isCust", "0"); //是客户级
             privateParams.put("accNbr", ((Map) o).get("ACC_NBR").toString());
             privateParams.put("integrationId", ((Map) o).get("ASSET_INTEG_ID").toString());

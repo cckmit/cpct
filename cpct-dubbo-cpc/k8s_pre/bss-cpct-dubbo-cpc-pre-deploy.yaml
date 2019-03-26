@@ -1,9 +1,9 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: bss-cpct-dubbo-server-pre #这里修改
+  name: bss-cpct-dubbo-cpc-pre #这里修改
   labels:
-    name: bss-cpct-dubbo-server-pre  #这里修改
+    name: bss-cpct-dubbo-cpc-pre  #这里修改
 spec:
   replicas: 1
   strategy:
