@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bss-cpct-dubbo-cpc
+  labels:
+    name: bss-cpct-dubbo-cpc
+spec:
+  type: NodePort
+  ports:
+  - port: 30812
+    nodePort: 30812
+  selector:
+    name: bss-cpct-dubbo-cpc
