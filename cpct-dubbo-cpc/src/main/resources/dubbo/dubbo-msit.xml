@@ -9,8 +9,8 @@
     <!-- 提供方应用信息，用于计算依赖关系 -->
     <dubbo:application name="00.1083"/>
 
-    <dubbo:registry id="esb3" protocol="dubbo" address="134.96.253.65:8001"/>
-    <dubbo:registry id="esb2" protocol="dubbo" address="134.96.159.11:8033"/>
+    <dubbo:registry id="esb3" protocol="dubbo" address="134.96.253.59:8033"/>
+    <dubbo:registry id="esb2" protocol="dubbo" address="134.96.253.59:8033"/>
 
     <!-- 暴露服务 -->
     <dubbo:protocol name="dubbo" port="30803"/>
@@ -59,6 +59,7 @@
     <!-- redis实时查询服务 -->
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.TrialRedisService" ref="trialRedisServiceImpl" version="1.0" >
         <dubbo:method name="searchFromRedis" servicecode="00.1083.searchFromRedis" timeout="10000"/>
+        <dubbo:method name="updateOperationStatus" servicecode="00.1083.updateOperationStatus" timeout="10000"/>
     </dubbo:service>
 
     <!-- 订阅 -->
@@ -78,12 +79,5 @@
     <dubbo:service registry="esb2" interface="com.zjtelcom.cpct.dubbo.service.MktCampaignSyncApiService" ref="mktCampaignSyncApiServiceImpl" version="1.0" >
         <dubbo:method name="publishMktCampaign" servicecode="00.1083.publishMktCampaign" timeout="10000"/>
     </dubbo:service>
-
-    <!-- 事件接入活动任务订阅 1.0 -->
-    <dubbo:reference interface="com.zjtelcom.cpct.dubbo.service.CamApiService" id="camApiService"
-                     version="1.0" retries="0" check="false">
-        <dubbo:method name="ActivityTask" servicecode="00.1083.ActivityTask" timeout="5000"/>
-    </dubbo:reference>
-
 
 </beans>

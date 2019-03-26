@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bss-cpct-dubbo-server
+  labels:
+    name: bss-cpct-dubbo-server
+spec:
+  type: NodePort
+  ports:
+  - port: 30803
+    nodePort: 30803
+  selector:
+    name: bss-cpct-dubbo-server
