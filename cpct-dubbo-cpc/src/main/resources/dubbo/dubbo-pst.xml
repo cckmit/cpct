@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://code.alibabatech.com/schema/dubbo
+    http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <!-- 提供方应用信息，用于计算依赖关系 -->
+    <dubbo:application name="00.1083"/>
+
+    <dubbo:registry id="esb3" protocol="dubbo" address="134.96.253.65:8001"/>
+    <dubbo:registry id="esb2" protocol="dubbo" address="134.96.159.11:8033"/>
+
+    <!-- 暴露服务 -->
+    <dubbo:protocol name="dubbo" port="30803"/>
+    <dubbo:monitor protocol="registry" />
+
+    <!-- 注册 -->
+    <!-- 二次协同查询服务 -->
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.EventApiService" ref="eventApiServiceImpl" version="1.0" >
+        <!-- 策略cpct计算服务 -->
+        <dubbo:method name="CalculateCPC" servicecode="00.1083.CalculateCPC" timeout="10000"/>
+        <!-- 策略cpct计算服务（同步） -->
+        <dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="10000"/>
+        <!-- 二次协同 -->
+        <dubbo:method name="secondChannelSynergy" servicecode="00.1083.SecondChannelSynergy" timeout="10000"/>
+    </dubbo:service>
+
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MktCamChlResultApiService" ref="mktCamChlResultApiServiceImpl" version="1.0" >
+        <dubbo:method name="selectResultList" servicecode="00.1083.selectResultList" timeout="10000"/>
+    </dubbo:service>
+
+    <!-- 编码查询事件详情服务 -->
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ChannelService" ref="channelServiceImpl" version="1.0" >
+        <dubbo:method name="getEventDetail" servicecode="00.1083.getEventDetail" timeout="10000"/>
+    </dubbo:service>
+
+    <!-- 名单导入服务 -->
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ChannelService" ref="channelServiceImpl" version="1.0" >
+        <dubbo:method name="importRuleUserList" servicecode="00.1083.importRuleUserList" timeout="10000"/>
+    </dubbo:service>
+
+    <!-- 营销活动详情服务 -->
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MktCampaignApiService" ref="mktCampaignApiServiceImpl" version="1.0" >
+        <dubbo:method name="qryMktCampaignDetail" servicecode="00.1083.qryMktCampaignDetail" timeout="10000"/>
+    </dubbo:service>
+
+    <!-- 编码查询渠道详细服务 -->
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ChannelService" ref="channelServiceImpl" version="1.0" >
+        <dubbo:method name="getChannelDetail" servicecode="00.1083.getChannelDetail" timeout="10000"/>
+    </dubbo:service>
+
+    <!-- 调查问卷详情查询服务 -->
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.QuestionService" ref="questionServiceImpl" version="1.0" >
+        <dubbo:method name="getQuestionnaireDetail" servicecode="00.1083.getQuestionnaireDetail" timeout="10000"/>
+    </dubbo:service>
+
+    <!-- redis实时查询服务 -->
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.TrialRedisService" ref="trialRedisServiceImpl" version="1.0" >
+        <dubbo:method name="searchFromRedis" servicecode="00.1083.searchFromRedis" timeout="10000"/>
+    </dubbo:service>
+
+    <!-- 订阅 -->
+    <!-- cpc计算协同中心回调 -->
+    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService" id="iContactTaskReceiptService"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="contactTaskReceipt" servicecode="00.1079.CPCResultFeedback" timeout="20000"/>
+    </dubbo:reference>
+
+    <!-- 因子实时查询 -->
+    <dubbo:reference registry="esb3" interface="com.zjpii.biz.serv.YzServ" id="yzServ"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="10000"/>
+    </dubbo:reference>
+
+    <!-- 营销活动发布接口 注册 2.0 -->
+    <dubbo:service registry="esb2" interface="com.zjtelcom.cpct.dubbo.service.MktCampaignSyncApiService" ref="mktCampaignSyncApiServiceImpl" version="1.0" >
+        <dubbo:method name="publishMktCampaign" servicecode="00.1083.publishMktCampaign" timeout="10000"/>
+    </dubbo:service>
+
+
+    <!-- 事件接入活动任务注册 1.0 -->
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.CamApiService" ref="CamApiServiceImpl" version="1.0" >
+        <dubbo:method name="ActivityTask" servicecode="00.1083.ActivityTask" timeout="10000"/>
+    </dubbo:service>
+
+</beans>

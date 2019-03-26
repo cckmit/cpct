@@ -1,0 +1,90 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: bss-cpct-dubbo-server-pre #这里修改
+  labels:
+    name: bss-cpct-dubbo-server-pre  #这里修改
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1%
+      maxUnavailable: 1%
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        name: bss-cpct-dubbo-server-pre  #这里修改
+    spec:
+      containers:
+      - name: bss-cpct-dubbo-server-pre  #这里修改
+        image: 134.96.180.23:8001/hchc/bss-cpct-dubbo-server-pre:1.0  #这里修改  地址使用这个么？
+        imagePullPolicy: Always
+        lifecycle:     #处理dubbo没有取消注册问题
+          preStop:
+            exec:
+              command:
+                - "/bin/sh"
+                - "/app/project/unregister.sh"
+                - "30007"
+        env:
+#        - name: DUBBO_IP_TO_REGISTRY     # 当项目为对外项目时，此处注解取消
+#          valueFrom:
+#           fieldRef:
+#            fieldPath: status.hostIP
+#        - name: DUBBO_PORT_TO_REGISTRY
+#          value: "30823"
+        - name: ESB_UNREGISTER_URI
+          valueFrom:
+            configMapKeyRef:
+              name: esb-url
+              key: ESB_UNREGISTER
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        volumeMounts:
+        - name: tz-config
+          mountPath: /etc/localtime
+        - name: app-log
+          mountPath: /app/dubbo/logs
+        ports:
+        - containerPort: 30823    #修改端口号
+        readinessProbe:
+          tcpSocket:
+            port: 30823   #修改端口号
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          failureThreshold: 3
+          successThreshold: 1
+          timeoutSeconds: 5
+        resources:   #镜像环境  不修改就用docker默认
+          requests:
+            memory: "4Gi"
+            cpu: "2000m"
+          limits:
+            memory: "8Gi"
+            cpu: "4000m"
+      - name: jmx
+        image: 134.108.5.132:8000/mgt/jmxtrans:v3.0
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: tz-config
+          mountPath: /etc/localtime
+        resources:   #镜镜像环境  不修改就用docker默认
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+      nodeSelector:
+        center: bssOther  #修改镜像所属中心标签
+      volumes:
+      - name: tz-config
+        hostPath:
+          path: /etc/localtime
+      - name: app-log
+        hostPath:
+          path: /app/app-log/bss-cpct-dubbo-pre
