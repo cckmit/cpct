@@ -53,7 +53,7 @@ spec:
         - containerPort: 30823    #修改端口号
         readinessProbe:
           tcpSocket:
-            port: 30823   #修改端口号
+            port: 30832   #修改端口号
           initialDelaySeconds: 20
           periodSeconds: 10
           failureThreshold: 3

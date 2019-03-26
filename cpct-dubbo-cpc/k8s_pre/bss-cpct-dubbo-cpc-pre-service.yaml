@@ -7,7 +7,7 @@ metadata:
 spec:
   type: NodePort
   ports:
-  - port: 30823
-    nodePort: 30823
+  - port: 30832
+    nodePort: 30832
   selector:
     name: bss-cpct-dubbo-cpc-pre
