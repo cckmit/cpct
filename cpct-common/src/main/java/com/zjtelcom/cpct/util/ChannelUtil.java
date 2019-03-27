@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.util;
 
+import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.question.Question;
@@ -8,17 +9,150 @@ import com.zjtelcom.cpct.dto.campaign.CampaignVO;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.Operator;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.lang.reflect.Field;
+import java.util.*;
 
 @Component
 public class ChannelUtil  {
+
+    /**
+     * 实体类转Map
+     * @param sysArea
+     * @return
+     */
+    public static SysArea setOrgArea(SysArea sysArea) {
+        String area = sysArea.getAreaId().toString();
+        if (area.contains("571")){
+            sysArea.setOrgArea("800000000037");
+        }
+        if (area.contains("570")){
+            sysArea.setOrgArea("800000000040");
+        }
+        if (area.contains("572")){
+            sysArea.setOrgArea("800000000021");
+        }
+        if (area.contains("573")){
+            sysArea.setOrgArea("800000000022");
+        }
+        if (area.contains("574")){
+            sysArea.setOrgArea("800000000023");
+        }
+        if (area.contains("575")){
+            sysArea.setOrgArea("800000000024");
+        }
+        if (area.contains("576")){
+            sysArea.setOrgArea("800000000041");
+        }
+        if (area.contains("577")){
+            sysArea.setOrgArea("800000000025");
+        }
+        if (area.contains("578")){
+            sysArea.setOrgArea("800000000039");
+        }
+        if (area.contains("579")){
+            sysArea.setOrgArea("800000000038");
+        }
+        if (area.contains("580")){
+            sysArea.setOrgArea("800000000026");
+        }
+        return sysArea;
+    }
+
+    public static String getOrgByArea(String area) {
+        if (area.contains("571")){
+           return "800000000037";
+        }
+        if (area.contains("570")){
+            return "800000000040";
+        }
+        if (area.contains("572")){
+            return "800000000021";
+        }
+        if (area.contains("573")){
+            return "800000000022";
+        }
+        if (area.contains("574")){
+            return "800000000023";
+        }
+        if (area.contains("575")){
+            return "800000000024";
+        }
+        if (area.contains("576")){
+            return "800000000041";
+        }
+        if (area.contains("577")){
+            return "800000000025";
+        }
+        if (area.contains("578")){
+            return "800000000039";
+        }
+        if (area.contains("579")){
+            return "800000000038";
+        }
+        if (area.contains("580")){
+            return "800000000026";
+        }
+        return null;
+    }
+
+
+    /**
+     * 实体类转Map
+     * @param object
+     * @return
+     */
+    public static Map<String, Object> entityToMap(Object object) {
+        Map<String, Object> map = new HashMap();
+        for (Field field : object.getClass().getDeclaredFields()){
+            try {
+                boolean flag = field.isAccessible();
+                field.setAccessible(true);
+                Object o = field.get(object);
+                map.put(field.getName(), o);
+                field.setAccessible(flag);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return map;
+    }
+
+    /**
+     * Map转实体类
+     * @param map 需要初始化的数据，key字段必须与实体类的成员名字一样，否则赋值为空
+     * @param entity  需要转化成的实体类
+     * @return
+     */
+    public static <T> T mapToEntity(Map<String, Object> map, Class<T> entity) {
+        T t = null;
+        try {
+            t = entity.newInstance();
+            for(Field field : entity.getDeclaredFields()) {
+                if (map.containsKey(field.getName())) {
+                    boolean flag = field.isAccessible();
+                    field.setAccessible(true);
+                    Object object = map.get(field.getName());
+                    if (object!= null && field.getType().isAssignableFrom(object.getClass())) {
+                        field.set(t, object);
+                    }
+                    field.setAccessible(flag);
+                }
+            }
+            return t;
+        } catch (InstantiationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return t;
+    }
 
 
     public static String bytesToHexString(byte[] src) {

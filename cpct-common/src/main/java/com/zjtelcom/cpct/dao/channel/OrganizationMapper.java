@@ -23,4 +23,8 @@ public interface OrganizationMapper {
     int updateByPrimaryKey(Organization record);
 
     List<Organization> selectByParentId(@Param("parentId")Long parentId);
+
+    List<Organization> selectMenu();
+
+    Organization selectBy4aId(@Param("areaId") Long areaId);
 }
