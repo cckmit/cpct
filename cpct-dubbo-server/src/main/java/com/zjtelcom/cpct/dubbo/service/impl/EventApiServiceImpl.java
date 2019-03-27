@@ -134,8 +134,6 @@ public class EventApiServiceImpl implements EventApiService {
     @Autowired(required = false)
     private CamApiService camApiService; // 活动任务
 
-    @Autowired
-    private RestTemplate restTemplate;
 
 
     @Override
