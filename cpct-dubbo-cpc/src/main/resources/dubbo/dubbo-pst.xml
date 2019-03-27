@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://code.alibabatech.com/schema/dubbo
+    http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <!-- 提供方应用信息，用于计算依赖关系 -->
+    <dubbo:application name="00.1083"/>
+
+    <dubbo:registry id="esb3" protocol="dubbo" address="134.96.253.65:8001"/>
+<!--    <dubbo:registry id="esb2" protocol="dubbo" address="134.96.159.11:8033"/>-->
+
+    <!-- 暴露服务 -->
+    <dubbo:protocol name="dubbo" port="30808"/>
+    <dubbo:monitor protocol="registry" />
+
+    <!-- 订阅 -->
+    <!-- cpc计算协同中心回调 -->
+    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService" id="iContactTaskReceiptService"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="contactTaskReceipt" servicecode="00.1079.CPCResultFeedback" timeout="20000"/>
+    </dubbo:reference>
+
+    <!-- 因子实时查询 -->
+    <dubbo:reference registry="esb3" interface="com.zjpii.biz.serv.YzServ" id="yzServ"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="10000"/>
+    </dubbo:reference>
+
+
+    <!-- 事件接入活动任务注册 1.0 -->
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.CamApiService" ref="camApiServiceImpl" version="1.0" >
+        <dubbo:method name="ActivityTask" servicecode="00.1083.ActivityTask" timeout="10000"/>
+    </dubbo:service>
+
+</beans>

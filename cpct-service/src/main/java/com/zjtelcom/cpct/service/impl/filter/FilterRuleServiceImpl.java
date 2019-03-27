@@ -123,7 +123,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
      */
     @Transactional(readOnly = false)
     @Override
-    public Map<String, Object> importUserList(MultipartFile multipartFile, FilterRule filterRule) throws IOException {
+    public Map<String, Object> importUserList(MultipartFile multipartFile, Long ruleId, String ruleName, String filterType) throws IOException {
         Map<String, Object> maps = new HashMap<>();
 
         InputStream inputStream = multipartFile.getInputStream();
@@ -169,32 +169,34 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
 //            System.out.println(redisUtils.hmGet(key, "userList"));
 
         }
-
-        if(filterRule.getRuleId() == null) {
-            FilterRule filterRules = BeanUtil.create(filterRule, new FilterRule());
+        FilterRule filterRules = new FilterRule();
+        if(ruleId == null) {
+            filterRules.setRuleName(ruleName);
+            filterRules.setFilterType(filterType);
             filterRules.setCreateDate(new Date());
             filterRules.setCreateStaff(UserUtil.loginId());
             filterRules.setUpdateDate(new Date());
             filterRules.setUpdateStaff(UserUtil.loginId());
             filterRules.setStatusDate(new Date());
             filterRules.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-            filterRule.setUserList(ChannelUtil.StringList2String(resultList));
+            filterRules.setUserList(ChannelUtil.StringList2String(resultList));
             filterRuleMapper.insert(filterRules);
         }else {
-            FilterRule filterRules = filterRuleMapper.selectByPrimaryKey(filterRule.getRuleId());
+            filterRules = filterRuleMapper.selectByPrimaryKey(ruleId);
             if (filterRules==null){
                 maps.put("resultCode", CODE_FAIL);
                 maps.put("resultMsg","过滤规则不存在");
                 return maps;
             }
-            BeanUtil.copy(filterRule,filterRules);
+            filterRules.setRuleName(ruleName);
+            filterRules.setFilterType(filterType);
             filterRules.setUpdateDate(new Date());
             filterRules.setUpdateStaff(UserUtil.loginId());
             filterRules.setUserList(ChannelUtil.StringList2String(resultList));
             filterRuleMapper.updateByPrimaryKey(filterRules);
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
-        maps.put("resultMsg", filterRule.getUserList());
+        maps.put("resultMsg", filterRules.getUserList());
         maps.put("key",key);
         return maps;
     }
