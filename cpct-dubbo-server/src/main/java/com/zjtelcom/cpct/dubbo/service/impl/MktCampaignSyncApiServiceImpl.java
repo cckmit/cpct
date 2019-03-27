@@ -1,5 +1,7 @@
 package com.zjtelcom.cpct.dubbo.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.*;
@@ -17,6 +19,7 @@ import com.zjtelcom.cpct.domain.Rule;
 import com.zjtelcom.cpct.domain.RuleDetail;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
+import com.zjtelcom.cpct.domain.org.OrgTreeDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
@@ -48,6 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.security.auth.callback.Callback;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -56,6 +60,7 @@ import java.util.concurrent.Future;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 
 @Service
 @Transactional
