@@ -10,10 +10,10 @@
     <dubbo:application name="00.1083"/>
 
     <dubbo:registry id="esb3" protocol="dubbo" address="134.96.253.65:8001"/>
-    <dubbo:registry id="esb2" protocol="dubbo" address="134.96.159.11:8033"/>
+<!--    <dubbo:registry id="esb2" protocol="dubbo" address="134.96.159.11:8033"/>-->
 
     <!-- 暴露服务 -->
-    <dubbo:protocol name="dubbo" port="30803"/>
+    <dubbo:protocol name="dubbo" port="30808"/>
     <dubbo:monitor protocol="registry" />
 
     <!-- 订阅 -->
@@ -31,7 +31,7 @@
 
 
     <!-- 事件接入活动任务注册 1.0 -->
-    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.CamApiService" ref="CamApiServiceImpl" version="1.0" >
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.CamApiService" ref="camApiServiceImpl" version="1.0" >
         <dubbo:method name="ActivityTask" servicecode="00.1083.ActivityTask" timeout="10000"/>
     </dubbo:service>
 
