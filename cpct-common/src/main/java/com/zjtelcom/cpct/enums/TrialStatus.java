@@ -20,6 +20,17 @@ public enum TrialStatus {
     UPLOAD_SUCCESS("8000","下发成功"),
     UPLOAD_FAIL("9000","下发失败");
 
+
+
+
+
+
+
+
+
+
+
+
     private String value;
     private String name;
 

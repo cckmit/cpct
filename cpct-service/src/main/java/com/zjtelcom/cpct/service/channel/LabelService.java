@@ -6,11 +6,15 @@ import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.dto.channel.LabelAddVO;
 import com.zjtelcom.cpct.dto.channel.LabelEditVO;
 import com.zjtelcom.cpct.dto.channel.LabelGrpParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
 public interface LabelService {
 
+
+
+    Map<String,Object> importLabel(MultipartFile file) throws Exception;
     //标签
     Map<String,Object> addLabel(Long userId, LabelAddVO addVO);
 
@@ -69,6 +73,10 @@ public interface LabelService {
     Map<String,Object> getLabelValueList(Long userId, Map<String,Object> params, Integer page, Integer pageSize);
 
     Map<String,Object> getLabelValueDetail(Long userId,Long labelValueId);
+
+
+
+
 
 
 
