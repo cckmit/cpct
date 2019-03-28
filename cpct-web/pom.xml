@@ -73,7 +73,14 @@
             <groupId>com.ctzj.smt.bss</groupId>
             <artifactId>bss-centralized-authenticate</artifactId>
         </dependency>
-
+        <!--<dependency>-->
+            <!--<groupId>com.ctzj.smt.bss</groupId>-->
+            <!--<artifactId>bss-sysmgr-model</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>com.ctzj.smt.bss</groupId>-->
+            <!--<artifactId>bss-sysmgr-privilege-service-api</artifactId>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>com.zjhcsoft.session</groupId>
             <artifactId>spring-session</artifactId>
@@ -116,6 +123,13 @@
             <artifactId>biz</artifactId>
         </dependency>
 
+        <!-- 引入协同中心dubbo服务jar包 -->
+        <dependency>
+            <groupId>com.ctzj.smt.bss</groupId>
+            <artifactId>bss-cooperate-service-api</artifactId>
+        </dependency>
+
+
         <!-- 自己的dubbo-server对内jar  测试用 -->
         <dependency>
             <groupId>com.zjtelcom.cpct.dubbo</groupId>
@@ -127,6 +141,12 @@
             <groupId>com.zjhcsoft.eagle</groupId>
             <artifactId>dubbo-eagle-service</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+
 
 
     </dependencies>
@@ -151,6 +171,12 @@
             <id>pst</id>
             <properties>
                 <spring.profiles.active>pst</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>msit</id>
+            <properties>
+                <spring.profiles.active>msit</spring.profiles.active>
             </properties>
         </profile>
         <profile>

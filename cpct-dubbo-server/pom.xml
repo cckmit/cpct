@@ -30,6 +30,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.zjtelcom.cpct</groupId>
+            <artifactId>cpct-dubbo-cpc</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
@@ -112,6 +118,12 @@
             <id>pst</id>
             <properties>
                 <spring.profiles.active>pst</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>msit</id>
+            <properties>
+                <spring.profiles.active>msit</spring.profiles.active>
             </properties>
         </profile>
         <profile>

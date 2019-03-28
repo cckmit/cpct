@@ -15,4 +15,6 @@ public interface EventRelMapper {
     List<EventRel> selectAll();
 
     int updateByPrimaryKey(EventRel record);
+
+    List<EventRel> selectByZEvtId(Long zEvtId);
 }

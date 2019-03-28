@@ -8,6 +8,8 @@ import java.util.List;
 public interface MktCamStrategyRelMapper {
     int deleteByPrimaryKey(Long campStrRelId);
 
+    int deleteByStrategyId(Long strategyId);
+
     int insert(MktCamStrategyRel record);
 
     MktCamStrategyRel selectByPrimaryKey(Long campStrRelId);

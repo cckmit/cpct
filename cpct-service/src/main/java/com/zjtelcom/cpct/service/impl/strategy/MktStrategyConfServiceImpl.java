@@ -154,7 +154,10 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             // 删除规则
             mktStrategyConfRuleMapper.deleteByPrimaryKey(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId());
             // 删除活动与分群的关系
-            mktCamGrpRulMapper.deleteByTarGrpId(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId());
+            MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId());
+            mktCamGrpRulMapper.deleteByTarGrpId(mktStrategyConfRuleDO.getTarGrpId());
+
+            //删除策略与规则的关联关系
             mktStrategyConfRuleRelMapper.deleteByPrimaryKey(mktStrategyConfRuleRelDO.getMktStrategyConfRuleRelId());
         }
         //删除策略与活动的关联

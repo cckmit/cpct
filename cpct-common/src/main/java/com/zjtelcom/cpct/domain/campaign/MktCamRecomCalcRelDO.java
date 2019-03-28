@@ -10,7 +10,11 @@ public class MktCamRecomCalcRelDO  implements Serializable {
 
     private Long algoId;
 
+    private Long mktStrategyConfRuleId;
+
     private Long algorithmsRulId;
+
+    private Long mktStrategyConfId;
 
     private Integer priority;
 
@@ -122,5 +126,21 @@ public class MktCamRecomCalcRelDO  implements Serializable {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public Long getMktStrategyConfRuleId() {
+        return mktStrategyConfRuleId;
+    }
+
+    public void setMktStrategyConfRuleId(Long mktStrategyConfRuleId) {
+        this.mktStrategyConfRuleId = mktStrategyConfRuleId;
+    }
+
+    public Long getMktStrategyConfId() {
+        return mktStrategyConfId;
+    }
+
+    public void setMktStrategyConfId(Long mktStrategyConfId) {
+        this.mktStrategyConfId = mktStrategyConfId;
     }
 }

@@ -1074,6 +1074,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
                     mktCamResultRelMapper.updateByPrimaryKey(mktCamResultRelDO);
                 }
+                // 删除准生产的redis缓存
+                synchronizeCampaignService.deleteCampaignRedisPre(mktCampaignId);
                 if (SystemParamsUtil.isCampaignSync()) {
                     // 发布活动异步同步活动到生产环境
                     new Thread() {
