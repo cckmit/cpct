@@ -3427,6 +3427,7 @@ public class EventApiServiceImpl implements EventApiService {
             esJsonCustLabel.put("type", "2");
             esJsonCustLabel.put("queryFields", mktAllLabel.get("custLabels"));
             esJsonCustLabel.put("eventCode", params.get("eventCode"));
+            esJsonCustLabel.put("reqId", params.get("reqId"));
 
             try {
                 //客户级因子查询-----------------------------------------------------
@@ -3477,6 +3478,7 @@ public class EventApiServiceImpl implements EventApiService {
             esJsonAssetLabel.put("type", "1");
             esJsonAssetLabel.put("queryFields", mktAllLabel.get("assetLabels"));
             esJsonAssetLabel.put("eventCode", params.get("eventCode"));
+            esJsonAssetLabel.put("reqId", params.get("reqId"));
 
             try {
                 //因子查询-----------------------------------------------------
@@ -3523,6 +3525,7 @@ public class EventApiServiceImpl implements EventApiService {
             esJsonPromLabel.put("type", "3");
             esJsonPromLabel.put("queryFields", mktAllLabel.get("promLabels"));
             esJsonPromLabel.put("eventCode", params.get("eventCode"));
+            esJsonPromLabel.put("reqId", params.get("reqId"));
 
             try {
                 //因子查询
@@ -3539,13 +3542,13 @@ public class EventApiServiceImpl implements EventApiService {
                     esJson.put("hit", "false");
                     esJson.put("msg", "查询销售品级标签失败");
                     //esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-                    esHitService.save(esJson, IndexList.EVENT_MODULE, params.get("reqId"));
+                    esHitService.save(esJson, IndexList.EVENT_MODULE);
                     return null;
                 }
             } catch (Exception e) {
                 esJsonPromLabel.put("promLabel_Exception", e);
             } finally {
-                esHitService.save(esJsonPromLabel, IndexList.PARAMS_LABEL_MODULE);
+                esHitService.save(esJsonPromLabel, IndexList.PARAMS_LABEL_MODULE, params.get("reqId"));
             }
         }
         contextNew.putAll(labelItems);   //添加事件采集项中作为标签使用的实例
