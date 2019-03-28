@@ -1750,7 +1750,7 @@ public class EventApiServiceImpl implements EventApiService {
                     jsonObject.put("msg", "规则引擎匹配未通过");
                     esHitService.save(jsonObject, IndexList.RULE_MODULE);
 
-                    esHitService.save(timeJson, IndexList.TIME_RULE_MODULE, reqId + "0_" + ruleId + "_" + params.get("accNbr"));
+                    esHitService.save(timeJson, IndexList.TIME_RULE_MODULE, reqId + "差了两分0_" + ruleId + "_" + params.get("accNbr"));
 
                     return Collections.EMPTY_MAP;
                 }
@@ -3412,6 +3412,7 @@ public class EventApiServiceImpl implements EventApiService {
     //客户级标签
     private DefaultContext<String, Object> getCustLabel( Map<String, String> mktAllLabel, Map<String, String> params,Map<String, String> privateParams,
                                DefaultContext<String, Object> context,  JSONObject esJson){
+        JSONObject esJsonCustLabel = new JSONObject();
         if (mktAllLabel.get("custLabels") != null && !"".equals(mktAllLabel.get("custLabels"))) {
             JSONObject paramCust = new JSONObject();
             paramCust.put("queryNum", "");
@@ -3420,23 +3421,35 @@ public class EventApiServiceImpl implements EventApiService {
             paramCust.put("type", "2");
             paramCust.put("queryFields", mktAllLabel.get("custLabels"));
 
-            //客户级因子查询-----------------------------------------------------
-            Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(paramCust));
+            esJsonCustLabel.put("queryNum", "");
+            esJsonCustLabel.put("c3", params.get("lanId"));
+            esJsonCustLabel.put("queryId", privateParams.get("custId"));
+            esJsonCustLabel.put("type", "2");
+            esJsonCustLabel.put("queryFields", mktAllLabel.get("custLabels"));
+            esJsonCustLabel.put("eventCode", params.get("eventCode"));
 
-            if ("0".equals(dubboResult.get("result_code").toString())) {
-                JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
-
-                //拼接规则引擎上下文
-                for (Map.Entry<String, Object> entry : body.entrySet()) {
-                    //添加到上下文
-                    context.put(entry.getKey(), entry.getValue());
+            try {
+                //客户级因子查询-----------------------------------------------------
+                Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(paramCust));
+                esJsonCustLabel.put("custLabel_dubboResult", dubboResult.toString());
+                if ("0".equals(dubboResult.get("result_code").toString())) {
+                    JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
+                    //拼接规则引擎上下文
+                    for (Map.Entry<String, Object> entry : body.entrySet()) {
+                        //添加到上下文
+                        context.put(entry.getKey(), entry.getValue());
+                    }
+                } else {
+                    esJson.put("hit", "false");
+                    esJson.put("msg", "查询客户标签失败");
+    //                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
+                    esHitService.save(esJson, IndexList.EVENT_MODULE, params.get("reqId"));
+                    return null;
                 }
-            } else {
-                esJson.put("hit", "false");
-                esJson.put("msg", "查询客户标签失败");
-//                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-                esHitService.save(esJson, IndexList.EVENT_MODULE, params.get("reqId"));
-                return null;
+            } catch (Exception e) {
+                esJsonCustLabel.put("custLabel_Exception", e);
+            } finally {
+                esHitService.save(esJsonCustLabel, IndexList.PARAMS_LABEL_MODULE);
             }
         }
         return context;
@@ -3448,6 +3461,7 @@ public class EventApiServiceImpl implements EventApiService {
                                               DefaultContext<String, Object> context,  JSONObject esJson, Map<String, String> labelItems){
         String saleId = "";
         //资产级标签
+        JSONObject esJsonAssetLabel = new JSONObject();
         DefaultContext<String, Object> contextNew = new DefaultContext<String, Object>();
         if (mktAllLabel.get("assetLabels") != null && !"".equals(mktAllLabel.get("assetLabels"))) {
             JSONObject assParam = new JSONObject();
@@ -3457,41 +3471,45 @@ public class EventApiServiceImpl implements EventApiService {
             assParam.put("type", "1");
             assParam.put("queryFields", mktAllLabel.get("assetLabels"));
 
-            //因子查询-----------------------------------------------------
-            Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(assParam));
-            if ("0".equals(dubboResult.get("result_code").toString())) {
-                JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
-                //ES log 标签实例
-                //拼接规则引擎上下文
-                for (Map.Entry<String, Object> entry : body.entrySet()) {
-                    //添加到上下文
-                    contextNew.put(entry.getKey(), entry.getValue());
+            esJsonAssetLabel.put("queryNum", privateParams.get("accNbr"));
+            esJsonAssetLabel.put("c3", params.get("lanId"));
+            esJsonAssetLabel.put("queryId", privateParams.get("integrationId"));
+            esJsonAssetLabel.put("type", "1");
+            esJsonAssetLabel.put("queryFields", mktAllLabel.get("assetLabels"));
+            esJsonAssetLabel.put("eventCode", params.get("eventCode"));
 
-                    if ("PROM_INTEG_ID".equals(entry.getKey())) {
-                        saleId = entry.getValue().toString();
+            try {
+                //因子查询-----------------------------------------------------
+                Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(assParam));
+                esJsonAssetLabel.put("assetLabel_dubboResult", dubboResult.toString());
+                if ("0".equals(dubboResult.get("result_code").toString())) {
+                    JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
+                    //ES log 标签实例
+                    //拼接规则引擎上下文
+                    for (Map.Entry<String, Object> entry : body.entrySet()) {
+                        //添加到上下文
+                        contextNew.put(entry.getKey(), entry.getValue());
+                        if ("PROM_INTEG_ID".equals(entry.getKey())) {
+                            saleId = entry.getValue().toString();
+                        }
                     }
+                } else {
+                    log.info("查询资产标签失败");
+                    esJson.put("hit", "false");
+                    esJson.put("msg", "查询资产标签失败");
+                    esHitService.save(esJson, IndexList.EVENT_MODULE, params.get("reqId"));
+                    return null;
                 }
-            } else {
-                log.info("查询资产标签失败");
-                esJson.put("hit", "false");
-                esJson.put("msg", "查询资产标签失败");
-                //esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-                esHitService.save(esJson, IndexList.EVENT_MODULE, params.get("reqId"));
-                return null;
+            } catch (Exception e) {
+                esJsonAssetLabel.put("assetLabel_Exception", e);
+            }finally {
+                esHitService.save(esJsonAssetLabel, IndexList.PARAMS_LABEL_MODULE);
             }
         }
 
         //销售品级标签
+        JSONObject esJsonPromLabel = new JSONObject();
         if (mktAllLabel.get("promLabels") != null && !"".equals(mktAllLabel.get("promLabels")) && !"".equals(saleId)) {
-/*            if ("".equals(saleId)) {
-                esJson.put("hit", false);
-                esJson.put("msg", "主销售品数据错误");
-                log.info("主销售品数据错误");
-                //esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-                esHitService.save(esJson, IndexList.EVENT_MODULE, params.get("reqId"));
-                return null;
-            }*/
-
             JSONObject paramSale = new JSONObject();
             paramSale.put("queryNum", "");
             paramSale.put("c3", params.get("lanId"));
@@ -3499,21 +3517,35 @@ public class EventApiServiceImpl implements EventApiService {
             paramSale.put("type", "3");
             paramSale.put("queryFields", mktAllLabel.get("promLabels"));
 
-            //因子查询
-            Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(paramSale));
-            if ("0".equals(dubboResult.get("result_code").toString())) {
-                JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
-                //拼接规则引擎上下文
-                for (Map.Entry<String, Object> entry : body.entrySet()) {
-                    //添加到上下文
-                    contextNew.put(entry.getKey(), entry.getValue());
+            esJsonPromLabel.put("queryNum", "");
+            esJsonPromLabel.put("c3", params.get("lanId"));
+            esJsonPromLabel.put("queryId", saleId);
+            esJsonPromLabel.put("type", "3");
+            esJsonPromLabel.put("queryFields", mktAllLabel.get("promLabels"));
+            esJsonPromLabel.put("eventCode", params.get("eventCode"));
+
+            try {
+                //因子查询
+                Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(paramSale));
+                esJsonPromLabel.put("promLabel_dubboResult", dubboResult.toString());
+                if ("0".equals(dubboResult.get("result_code").toString())) {
+                    JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
+                    //拼接规则引擎上下文
+                    for (Map.Entry<String, Object> entry : body.entrySet()) {
+                        //添加到上下文
+                        contextNew.put(entry.getKey(), entry.getValue());
+                    }
+                } else {
+                    esJson.put("hit", "false");
+                    esJson.put("msg", "查询销售品级标签失败");
+                    //esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
+                    esHitService.save(esJson, IndexList.EVENT_MODULE, params.get("reqId"));
+                    return null;
                 }
-            } else {
-                esJson.put("hit", "false");
-                esJson.put("msg", "查询销售品级标签失败");
-                //esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-                esHitService.save(esJson, IndexList.EVENT_MODULE, params.get("reqId"));
-                return null;
+            } catch (Exception e) {
+                esJsonPromLabel.put("promLabel_Exception", e);
+            } finally {
+                esHitService.save(esJsonPromLabel, IndexList.PARAMS_LABEL_MODULE);
             }
         }
         contextNew.putAll(labelItems);   //添加事件采集项中作为标签使用的实例
