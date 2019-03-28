@@ -60,6 +60,7 @@ public class SearchLabelServiceImpl implements SearchLabelService {
         List<String> custCode = new ArrayList<>();//1000
 
         List<Long> idlIst = new ArrayList<>();
+
         for (Long id : campaignId){
             MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(id);
             if (campaign==null){
@@ -76,6 +77,7 @@ public class SearchLabelServiceImpl implements SearchLabelService {
                     if (idlIst.contains(label.getInjectionLabelId())) {
                         continue;
                     }
+                    idlIst.add(label.getInjectionLabelId());
                     codeList(assetCode, promCode, custCode, label);
                 }
             }
@@ -88,6 +90,7 @@ public class SearchLabelServiceImpl implements SearchLabelService {
                         if (idlIst.contains(label.getInjectionLabelId())) {
                             continue;
                         }
+                        idlIst.add(label.getInjectionLabelId());
                         codeList(assetCode, promCode, custCode, label);
                     }
                 }
@@ -110,11 +113,11 @@ public class SearchLabelServiceImpl implements SearchLabelService {
                             List<String> labelSc = subScript(camScript.getScriptDesc());
                             for (String code : labelSc){
                                 Label label = injectionLabelMapper.selectByLabelCode(code);
-
                                 if (label!=null){
                                     if (idlIst.contains(label.getInjectionLabelId())){
                                         continue;
                                     }
+                                    idlIst.add(label.getInjectionLabelId());
                                     codeList(assetCode, promCode, custCode, label);
                                 }
 
@@ -130,6 +133,7 @@ public class SearchLabelServiceImpl implements SearchLabelService {
                                     if (idlIst.contains(label.getInjectionLabelId())){
                                         continue;
                                     }
+                                    idlIst.add(label.getInjectionLabelId());
                                     codeList(assetCode, promCode, custCode, label);
                                 }
                             }

@@ -4,8 +4,10 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.channel.OrganizationMapper;
 import com.zjtelcom.cpct.dao.org.OrgTreeMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
+import com.zjtelcom.cpct.domain.channel.Organization;
 import com.zjtelcom.cpct.domain.org.OrgTree;
 import com.zjtelcom.cpct.domain.org.OrgTreeDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
@@ -13,6 +15,7 @@ import com.zjtelcom.cpct.exception.SystemException;
 import com.zjtelcom.cpct.service.org.OrgTreeService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.FtpUtils;
+import com.zjtelcom.cpct.util.MapUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,6 +39,8 @@ public class OrgTreeServiceImpl implements OrgTreeService{
     private OrgTreeMapper orgTreeMapper;
     @Autowired
     private SysParamsMapper systemParamMapper;
+    @Autowired
+    private OrganizationMapper organizationMapper;
 
     /**
      * 批量操作一次插入最多的数据条数
@@ -109,8 +114,26 @@ public class OrgTreeServiceImpl implements OrgTreeService{
     }
 
 
-
-
+    /**
+     * 4aId查询组织树信息
+     * @param params
+     * @return
+     */
+    @Override
+    public Map<String, Object> selectByAreaId(Map<String, Object> params) {
+        Map<String, Object> maps = new HashMap<>();
+        List<Long> areaIds = (List<Long>) params.get("areaIdList");
+        List<Organization> organizations = new ArrayList<>();
+        for (Long areaId : areaIds){
+            Organization organization = organizationMapper.selectBy4aId(areaId);
+            if (organization!=null){
+                organizations.add(organization);
+            }
+        }
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg",organizations);
+        return  maps;
+    }
 
     /**
      * 通过父级菜单查询子菜单
@@ -119,40 +142,20 @@ public class OrgTreeServiceImpl implements OrgTreeService{
      */
     @Override
     public Map<String,Object> selectBySumAreaId(Map<String, Object> params) {
-        String areaId= (String) params.get("areaId");
-        String page= (String) params.get("page");
-        String pageSize= (String) params.get("pageSize");
-        Integer id=null;
-        Integer pageId=0;
-        Integer pageSizeId=0;
-        //如果page 和pageSize为空时 传回所有数据
-        if(StringUtils.isNotBlank(page)&&StringUtils.isNotBlank(pageSize)){
-            pageId=Integer.parseInt(page);
-            pageSizeId=Integer.parseInt(pageSize);
-        }
-        if(StringUtils.isNotBlank(areaId)){
-            id=Integer.parseInt(areaId);
-        }
-
-
         Map<String, Object> maps = new HashMap<>();
-        boolean tip=false;
-        if(pageId!=0) {
-            PageHelper.startPage(pageId, pageSizeId);
-            tip=true;
-        }
-        List<OrgTreeDO> list=new ArrayList<>();
-        if(id==null){
-            list=orgTreeMapper.selectMenu();
+        List<Long> areaIds = (List<Long>) params.get("areaId");
+        List<Organization> list=new ArrayList<>();
+        if(areaIds==null || areaIds.isEmpty()){
+            list=organizationMapper.selectMenu();
         }else{
-            list=orgTreeMapper.selectBySumAreaId(id);
+            for (Long id : areaIds){
+                List<Organization> organizations = organizationMapper.selectByParentId(id);
+                list.addAll(organizations);
+            }
         }
         Page pageInfo = new Page(new PageInfo(list));
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg",list);
-        if(tip){
-            maps.put("page",pageInfo);
-        }
         return  maps;
     }
 

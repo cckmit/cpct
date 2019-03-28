@@ -90,6 +90,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     private FilterRuleMapper filterRuleMapper;
     @Autowired
     private MktCamEvtRelMapper evtRelMapper;
+    @Autowired
+    private OrganizationMapper organizationMapper;
 
 
     @Override
@@ -373,9 +375,9 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                         maps.put("resultMsg", "请选择下拉框运算类型");
                         return maps;
                     }
-                    if (tarGrpCondition.getAreaIdList()!=null){
-                        area2RedisThread(tarGrp, tarGrpCondition);
-                    }
+//                    if (tarGrpCondition.getAreaIdList()!=null){
+//                        area2RedisThread(tarGrp, tarGrpCondition);
+//                    }
                     tarGrpCondition.setConditionId(null);
                     tarGrpCondition.setRootFlag(0L);
                     tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
@@ -408,42 +410,42 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         return maps;
     }
 
-    private void area2RedisThread(TarGrp tarGrp, final TarGrpCondition tarGrpCondition) {
-        final Long targrpId = tarGrp.getTarGrpId();
-        List<OrgTreeDO> sysAreaList = new ArrayList<>();
-        for (Integer id : tarGrpCondition.getAreaIdList()){
-            OrgTreeDO orgTreeDO = orgTreeMapper.selectByAreaId(id);
-            if (orgTreeDO!=null){
-                sysAreaList.add(orgTreeDO);
-            }
-        }
-        redisUtils.set("AREA_RULE_ENTITY_"+targrpId,sysAreaList);
-        new Thread() {
-            public void run() {
-                areaList2Redis(targrpId,tarGrpCondition.getAreaIdList());
-            }
-        }.start();
-    }
+//    private void area2RedisThread(TarGrp tarGrp, final TarGrpCondition tarGrpCondition) {
+//        final Long targrpId = tarGrp.getTarGrpId();
+//        List<OrgTreeDO> sysAreaList = new ArrayList<>();
+//        for (Integer id : tarGrpCondition.getAreaIdList()){
+//            OrgTreeDO orgTreeDO = orgTreeMapper.selectByAreaId(id);
+//            if (orgTreeDO!=null){
+//                sysAreaList.add(orgTreeDO);
+//            }
+//        }
+//        redisUtils.set("AREA_RULE_ENTITY_"+targrpId,sysAreaList);
+//        new Thread() {
+//            public void run() {
+//                areaList2Redis(targrpId,tarGrpCondition.getAreaIdList());
+//            }
+//        }.start();
+//    }
 
 
-    public void areaList2Redis(Long targrpId,List<Integer> areaIdList){
+    public void areaList2Redis(Long targrpId,List<Long> areaIdList){
         List<String> resultList = new ArrayList<>();
-        List<OrgTreeDO> sysAreaList = new ArrayList<>();
-        for (Integer id : areaIdList){
+        List<Organization> sysAreaList = new ArrayList<>();
+        for (Long id : areaIdList){
             areaList(id,resultList,sysAreaList);
         }
         redisUtils.set("AREA_RULE_"+targrpId,resultList.toArray(new String[resultList.size()]));
     }
 
-    public List<String> areaList(Integer parentId,List<String> resultList,List<OrgTreeDO> areas){
-        List<OrgTreeDO> sysAreaList = orgTreeMapper.selectBySumAreaId(parentId);
+    public List<String> areaList(Long parentId,List<String> resultList,List<Organization> areas){
+        List<Organization> sysAreaList = organizationMapper.selectByParentId(parentId);
         if (sysAreaList.isEmpty()){
             return resultList;
         }
-        for (OrgTreeDO area : sysAreaList){
-            resultList.add(area.getAreaName());
+        for (Organization area : sysAreaList){
+            resultList.add(area.getOrgId4a().toString());
             areas.add(area);
-            areaList(area.getAreaId(),resultList,areas);
+            areaList(area.getOrgId(),resultList,areas);
         }
         return resultList;
     }
@@ -586,9 +588,9 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                         return maps;
                     }
                     TarGrpCondition condition = BeanUtil.create(tarGrpCondition,new TarGrpCondition());
-                    if (tarGrpCondition.getAreaIdList()!=null){
-                        area2RedisThread(tarGrp, tarGrpCondition);
-                    }
+//                    if (tarGrpCondition.getAreaIdList()!=null){
+//                        area2RedisThread(tarGrp, tarGrpCondition);
+//                    }
                     condition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
                     condition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
                     condition.setRootFlag(0L);
