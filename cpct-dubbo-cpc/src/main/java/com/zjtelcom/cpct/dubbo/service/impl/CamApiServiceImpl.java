@@ -469,10 +469,10 @@ public class CamApiServiceImpl implements CamApiService {
                 esJson.put("msg", "获取计算结果异常");
                 esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
                 //发生异常关闭线程池
-                executorService.shutdown();
+                executorService.shutdownNow();
             } finally {
                 //关闭线程池
-                executorService.shutdown();
+                executorService.shutdownNow();
             }
 
             return activity;
@@ -923,10 +923,10 @@ public class CamApiServiceImpl implements CamApiService {
                     } catch (Exception e) {
                         e.printStackTrace();
                         //发生异常关闭线程池
-                        executorService.shutdown();
+                        executorService.shutdownNow();
                     } finally {
                         //关闭线程池
-                        executorService.shutdown();
+                        executorService.shutdownNow();
                     }
                 } else {
 
