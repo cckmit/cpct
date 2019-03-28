@@ -342,7 +342,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
 
             if (mktStrategyConfRule.getOrganizationList()!=null){
                 redisUtils.set("ORG_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString(),mktStrategyConfRule.getOrganizationList());
-//                area2RedisThread(mktStrategyConfRule.getMktStrategyConfRuleId(),mktStrategyConfRule.getOrganizationList());
+                area2RedisThread(mktStrategyConfRule.getMktStrategyConfRuleId(),mktStrategyConfRule.getOrganizationList());
             }
 
 
@@ -461,10 +461,13 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktStrategyConfRuleDO.setUpdateStaff(UserUtil.loginId());
             mktStrategyConfRuleDO.setUpdateDate(new Date());
             mktStrategyConfRuleMapper.updateByPrimaryKey(mktStrategyConfRuleDO);
-
+            //营销组织树
             if (mktStrategyConfRule.getOrganizationList()!=null){
-                redisUtils.set("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString(),mktStrategyConfRule.getOrganizationList());
-//                area2RedisThread(mktStrategyConfRule.getMktStrategyConfRuleId(),mktStrategyConfRule.getOrganizationList());
+                if (redisUtils.get("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString())==null
+                        || !ChannelUtil.equalsList((List<Long>)redisUtils.get("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString()),mktStrategyConfRule.getOrganizationList())){
+                    redisUtils.set("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString(),mktStrategyConfRule.getOrganizationList());
+                    area2RedisThread(mktStrategyConfRule.getMktStrategyConfRuleId(),mktStrategyConfRule.getOrganizationList());
+                }
             }
             String confs = "";
             if (mktStrategyConfRule.getMktCamChlConfDetailList() != null) {
@@ -586,33 +589,36 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
     @Override
     public Map<String, Object> test(Long ruleId, List<Long> orgList) {
         Map<String,Object> result = new HashMap<>();
-        areaList2Redis(ruleId,orgList);
-         result.put("res",redisUtils.get("AREA_RULE_"+ruleId));
+        area2RedisThread(ruleId,orgList);
+         result.put("res",redisUtils.hgetAllRedisList("AREA_RULE_"+ruleId));
          return result;
     }
 
     //添加营销组织树集合
     private void area2RedisThread(Long ruleId,List<Long> orgIdList) {
+        //过滤 选择level 大于3 的
+        List<Long> orgs = organizationMapper.selectByIdList(orgIdList);
+        //添加所有选择的节点信息到缓存
+        redisUtils.set("ORG_ID_"+ruleId.toString(),orgs);
         new Thread() {
             public void run() {
-                areaList2Redis(ruleId,orgIdList);
+                areaList2Redis(ruleId,orgs);
             }
         }.start();
     }
 
     public void areaList2Redis(Long ruleId,List<Long> areaIdList){
-        List<String> resultList = new ArrayList<>();
         List<Organization> sysAreaList = new ArrayList<>();
         for (Long id : areaIdList){
             new Thread(){
                 public void run(){
+                    logger.info("查询开始："+id);
+                    List<String> resultList = new ArrayList<>();
                     areaList(id,resultList,sysAreaList);
+                    logger.info("父级id :"+id,resultList);
+                    redisUtils.hset("AREA_RULE_ISSURE_"+ruleId,id.toString(),resultList);
                 }
             }.start();
-
-        }
-        if (!resultList.isEmpty()){
-            redisUtils.set("AREA_RULE_"+ruleId,resultList.toArray(new String[resultList.size()]));
         }
     }
 
@@ -632,7 +638,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
 
 
 
-    /**
+    /**-
      * 查询策略规则
      *
      * @param mktStrategyConfRuleId
