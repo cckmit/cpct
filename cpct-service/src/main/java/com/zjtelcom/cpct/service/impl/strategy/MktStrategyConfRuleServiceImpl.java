@@ -333,7 +333,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktCamRecomCalcRelMapper.insert(mktCamRecomCalcRelDO);
 
             if (mktStrategyConfRule.getOrganizationList()!=null){
-                redisUtils.set("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString(),mktStrategyConfRule.getOrganizationList());
+                redisUtils.set("ORG_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString(),mktStrategyConfRule.getOrganizationList());
 //                area2RedisThread(mktStrategyConfRule.getMktStrategyConfRuleId(),mktStrategyConfRule.getOrganizationList());
             }
 
@@ -493,7 +493,12 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         List<String> resultList = new ArrayList<>();
         List<Organization> sysAreaList = new ArrayList<>();
         for (Long id : areaIdList){
-            areaList(id,resultList,sysAreaList);
+            new Thread(){
+                public void run(){
+                    areaList(id,resultList,sysAreaList);
+                }
+            }.start();
+
         }
         if (!resultList.isEmpty()){
             redisUtils.set("AREA_RULE_"+ruleId,resultList.toArray(new String[resultList.size()]));
