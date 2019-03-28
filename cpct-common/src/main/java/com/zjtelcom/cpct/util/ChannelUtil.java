@@ -20,6 +20,24 @@ import java.util.*;
 @Component
 public class ChannelUtil  {
 
+    public static boolean equalsList(List<Long> list1, List<Long> list2){
+        // null情况
+        if (list1 == null) {
+            return list2 == null;
+        }
+
+        // 大小比较
+        if (list1.size() != list2.size()) {
+            return false;
+        }
+
+        Long[] arr1 = list1.toArray(new Long[]{});
+        Long[] arr2 = list2.toArray(new Long[]{});
+        Arrays.sort(arr1);
+        Arrays.sort(arr1);
+        return Arrays.equals(arr1,arr2);
+    }
+
     /**
      * 实体类转Map
      * @param sysArea

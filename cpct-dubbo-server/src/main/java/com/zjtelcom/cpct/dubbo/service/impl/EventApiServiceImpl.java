@@ -806,15 +806,15 @@ public class EventApiServiceImpl implements EventApiService {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     //发生异常关闭线程池
-                    executorService.shutdownNow();
+                    executorService.shutdown();
                 } catch (ExecutionException e) {
                     e.printStackTrace();
                     //发生异常关闭线程池
-                    executorService.shutdownNow();
+                    executorService.shutdown();
                     return Collections.EMPTY_MAP;
                 } finally {
                     //关闭线程池
-                    executorService.shutdownNow();
+                    executorService.shutdown();
                 }
 
                 timeJson.put("time6", System.currentTimeMillis() - begin);
@@ -1287,10 +1287,10 @@ public class EventApiServiceImpl implements EventApiService {
                 esJson.put("msg", "获取计算结果异常");
                 esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
                 //发生异常关闭线程池
-                executorService.shutdownNow();
+                executorService.shutdown();
             } finally {
                 //关闭线程池
-                executorService.shutdownNow();
+                executorService.shutdown();
             }
 
             return activity;
@@ -1736,10 +1736,10 @@ public class EventApiServiceImpl implements EventApiService {
                     } catch (Exception e) {
                         e.printStackTrace();
                         //发生异常关闭线程池
-                        executorService.shutdownNow();
+                        executorService.shutdown();
                     } finally {
                         //关闭线程池
-                        executorService.shutdownNow();
+                        executorService.shutdown();
                     }
                 } else {
 
@@ -3483,14 +3483,6 @@ public class EventApiServiceImpl implements EventApiService {
 
         //销售品级标签
         if (mktAllLabel.get("promLabels") != null && !"".equals(mktAllLabel.get("promLabels")) && !"".equals(saleId)) {
-/*            if ("".equals(saleId)) {
-                esJson.put("hit", false);
-                esJson.put("msg", "主销售品数据错误");
-                log.info("主销售品数据错误");
-                //esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-                esHitService.save(esJson, IndexList.EVENT_MODULE, params.get("reqId"));
-                return null;
-            }*/
 
             JSONObject paramSale = new JSONObject();
             paramSale.put("queryNum", "");

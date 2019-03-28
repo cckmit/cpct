@@ -80,7 +80,9 @@ public class TrialRedisServiceImpl implements TrialRedisService {
         try {
             result.put("resultCode",CODE_SUCCESS);
             result.put("resultMsg","查询成功");
-            if (key.contains("ISSURE_")){
+            if (key.contains("AREA_RULE_")){
+                result.put("result",redisUtils.hgetAll(key));
+            }else if (key.contains("ISSURE_")){
                 if (redisUtils.hgetAllRedisList(key) == null){
                     String keyString = key.substring(7,key.length());
                     String[] keyList = keyString.split("_");

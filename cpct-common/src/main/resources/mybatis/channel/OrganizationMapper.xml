@@ -129,6 +129,20 @@
   </select>
 
 
+  <select id="selectByIdList" resultType="java.lang.Long">
+    select ORG_ID
+    from organization
+    where 1=1
+    <if test="null != list and list.size > 0">
+     and ORG_ID in
+      <foreach collection="list" item="item" open="(" close=")" separator=",">
+        #{item}
+      </foreach>
+      and ORG_LEVEL > 3
+    </if>
+  </select>
+
+
 
 
 </mapper>
