@@ -27,4 +27,6 @@ public interface OrganizationMapper {
     List<Organization> selectMenu();
 
     Organization selectBy4aId(@Param("areaId") Long areaId);
+
+    List<Long> selectByIdList(@Param("list")List<Long> idList);
 }
