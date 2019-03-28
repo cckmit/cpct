@@ -63,4 +63,25 @@ public class OrgTreeController extends BaseController {
         }
         return JSON.toJSONString(maps);
     }
+
+    /**
+     * 组织id查询名称信息
+     * @param params
+     * @return
+     */
+    @RequestMapping("selectByAreaId")
+    @CrossOrigin
+    public String selectByAreaId(@RequestBody Map<String, Object> params){
+        Map<String, Object> maps = new HashMap<>();
+        try{
+            maps = orgTreeService.selectByAreaId(params);
+        } catch (Exception e) {
+            maps.put("resultCode", CommonConstant.CODE_FAIL);
+            maps.put("resultMsg", e.getMessage());
+            logger.error("名称查询失败！Exception: ", e.getMessage());
+        }
+        return JSON.toJSONString(maps);
+    }
+
+
 }

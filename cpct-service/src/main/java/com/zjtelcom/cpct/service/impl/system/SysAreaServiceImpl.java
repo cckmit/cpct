@@ -11,8 +11,10 @@ import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.City;
 import com.zjtelcom.cpct.domain.campaign.CityProperty;
+import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.enums.AreaLeveL;
 import com.zjtelcom.cpct.service.system.SysAreaService;
+import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,11 +91,14 @@ public class SysAreaServiceImpl implements SysAreaService {
                 // 重新从redis中获取
                 sysArea = (SysArea) redisUtils.get("CITY_" + provinceArea.getAreaId().toString());
             }
-            sysAreaList.add(sysArea);
+            sysAreaList.add(ChannelUtil.setOrgArea(sysArea));
         }
         areaMap.put("sysAreaList", sysAreaList);
         return areaMap;
     }
+
+
+
 
 
     @Override
@@ -232,7 +237,9 @@ public class SysAreaServiceImpl implements SysAreaService {
         List<SysArea> sysAreas = sysAreaMapper.selectByParnetArea(parentArea);
         if (sysAreas != null && sysAreas.size() > 0) {
             sysParentArea.setChildAreaList(sysAreas);
+            ChannelUtil.setOrgArea(sysParentArea);
             for (SysArea sysArea : sysAreas) {
+                ChannelUtil.setOrgArea(sysArea);
                 getByParentArea(sysArea.getAreaId(), sysArea);
             }
         }

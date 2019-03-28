@@ -64,6 +64,20 @@ public class MktStrategyConfRule {
      */
     private List<MktCamChlResult> mktCamChlResultList;
 
+    /**
+     * 营销组织树id list
+     */
+    private List<Long> organizationList;
+
+
+
+    public List<Long> getOrganizationList() {
+        return organizationList;
+    }
+
+    public void setOrganizationList(List<Long> organizationList) {
+        this.organizationList = organizationList;
+    }
 
     public Long getMktStrategyConfRuleId() {
         return mktStrategyConfRuleId;
