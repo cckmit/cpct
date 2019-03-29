@@ -1115,6 +1115,13 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             labelList.add(label);
         }
         redisUtils.set("LABEL_DETAIL_"+trialOperation.getBatchNum(),labelList);
+        List<Map<String, Object>> iSaleDisplay = new ArrayList<>();
+        iSaleDisplay = (List<Map<String, Object>>) redisUtils.get("EVT_ISALE_LABEL_" + campaignDO.getIsaleDisplay());
+        if (iSaleDisplay == null) {
+            iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(campaignDO.getIsaleDisplay());
+            redisUtils.set("EVT_ISALE_LABEL_" + campaignDO.getIsaleDisplay(), iSaleDisplay);
+        }
+        redisUtils.set("ISALE_LABEL_"+trialOperation.getBatchNum(),iSaleDisplay);
 
         TrialOperationVO request = BeanUtil.create(trialOperation,new TrialOperationVO());
         request.setFieldList(fieldList);
