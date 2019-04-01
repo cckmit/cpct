@@ -44,6 +44,7 @@ import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
+import com.zjtelcom.es.es.service.EsService;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +59,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.util.Calendar.MONTH;
+import static org.bouncycastle.asn1.x500.style.RFC4519Style.o;
 
 @Service
 public class EventApiServiceImpl implements EventApiService {
@@ -154,6 +156,9 @@ public class EventApiServiceImpl implements EventApiService {
 
     @Autowired(required = false)
     private SysParamsMapper sysParamsMapper;  //查询系统参数
+
+    @Autowired(required = false)
+    private EsService esService;
 
 
     @Override
@@ -516,6 +521,12 @@ public class EventApiServiceImpl implements EventApiService {
                     recCampaignAmount = Integer.parseInt(recCampaignAmountStr);
                 }
 
+
+                /*判断是否为温州资产*/
+//                if("577".equals(map.get("lanId"))){
+//                    getCustList(eventId, map.get("lanId") ,custId, map);
+//                }
+
                 timeJson.put("time2", System.currentTimeMillis() - begin);
                 //事件下所有活动的规则预校验，返回初步可命中活动
                 List<Map<String, Object>> resultByEvent = getResultByEvent(eventId, map.get("lanId"), map.get("channelCode"), map.get("reqId"), map.get("accNbr"), c4);
@@ -638,7 +649,7 @@ public class EventApiServiceImpl implements EventApiService {
                         param.put("queryNum", "");
                         param.put("queryFields", "");
                         param.put("type", "4");
-
+                        ExecutorService executorService = Executors.newCachedThreadPool();
                         try {
                             Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
                             if ("0".equals(dubboResult.get("result_code").toString())) {
@@ -658,7 +669,6 @@ public class EventApiServiceImpl implements EventApiService {
                                 getCustLabel(mktAllLabel, map, privateParams, context, esJson);
                             }
 
-                            ExecutorService executorService = Executors.newCachedThreadPool();
                             // 客户级
                             List<Future<DefaultContext<String, Object>>> futureList = new ArrayList<>();
 
@@ -678,7 +688,10 @@ public class EventApiServiceImpl implements EventApiService {
                             }
 
                         } catch (Exception e) {
+                            executorService.shutdownNow();
                             log.error("Exception = " + e);
+                        } finally {
+                            executorService.shutdownNow();
                         }
                     }
                 } else{
@@ -2285,12 +2298,12 @@ public class EventApiServiceImpl implements EventApiService {
             case "3000":
                 express.append("toNum(").append(code).append("))");
                 express.append(" == ");
-                express.append("\"").append(rightParam).append("\"");
+                express.append("").append(rightParam).append("");
                 break;
             case "4000":
                 express.append("toNum(").append(code).append("))");
                 express.append(" != ");
-                express.append("\"").append(rightParam).append("\"");
+                express.append("").append(rightParam).append("");
                 break;
             case "5000":
                 express.append("toNum(").append(code).append("))");
@@ -3102,7 +3115,7 @@ public class EventApiServiceImpl implements EventApiService {
 
 
 
-/*
+
 
                 if (!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaign.getStatusCd())) {
                     esJson.put("hit", false);
@@ -3111,7 +3124,7 @@ public class EventApiServiceImpl implements EventApiService {
                     esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
                     return Collections.EMPTY_MAP;
                 }
-*/
+
 
 
 
@@ -3595,5 +3608,91 @@ public class EventApiServiceImpl implements EventApiService {
             }
             return resultMap;
         }
+    }
+
+
+
+
+    private Map<String, Object> getCustList(Long eventId, String landId , String custId, Map<String, String> map){
+        Map<String, Object> resultMap = new HashMap<>();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            List<Long> ruleIdList = mktCamEvtRelMapper.selectRuleIdsByEventId(eventId);
+            List<String> ruleIdStrList = new ArrayList<>();
+            for (Long ruleId : ruleIdList) {
+                ruleIdStrList.add(ruleId.toString());
+            }
+           // ruleIdStrList.add("1845");
+
+            JSONObject param = new JSONObject();
+            //查询标识
+            param.put("c3", landId);
+            param.put("queryId", custId);
+            param.put("queryNum", "");
+            param.put("queryFields", "");
+            param.put("type", "4");
+
+
+            Map<String, Object> paramMap = new HashMap<>();
+            JSONArray accArray = new JSONArray();
+            List<String> assetIntegIdList = new ArrayList<>();
+            Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
+            if ("0".equals(dubboResult.get("result_code").toString())) {
+                accArray = new JSONArray((List<Object>) dubboResult.get("msgbody"));
+                for (Object o : accArray) {
+                    assetIntegIdList.add(((Map) o).get("ASSET_INTEG_ID").toString());
+                }
+            }
+//            assetIntegIdList.add("1-I7LEq011724");
+//            assetIntegIdList.add("5-GBND3E6");
+            paramMap.put("assetList", assetIntegIdList);
+            paramMap.put("ruleList", ruleIdStrList);
+            Map<String, Object> paramResultMap = new HashMap<>();
+            paramResultMap = esService.queryCustomer4Event(paramMap);
+
+            List<Map<String, Object>> resultList = new ArrayList<>();
+            // 解析
+            if ("200".equals(paramResultMap.get("resultCode"))) {
+                List<Map<String, Object>> resultMapList = (List<Map<String, Object>>) paramResultMap.get("data");
+                if (resultMapList != null && resultMapList.size() > 0) {
+                    for (Map<String, Object> resultMap1 : resultMapList) {
+                        Map result = new HashMap();
+                        result.putAll((Map)resultMap1.get("CPC_VALUE"));
+                        result.put("orderISI", map.get("reqId"));
+                        result.put("skipCheck", "0");
+                        result.put("orderPriority", "0");
+                        Long activityId = Long.valueOf (resultMap1.get("ACTIVITY_ID").toString());
+                        MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(activityId);
+                        if(mktCampaignDO!=null){
+                            if ("1000".equals(mktCampaignDO.getMktCampaignType())) {
+                                result.put("activityType", "0"); //营销
+                            } else if ("5000".equals(mktCampaignDO.getMktCampaignType())) {
+                                result.put("activityType", "1"); //服务
+                            } else if ("6000".equals(mktCampaignDO.getMktCampaignType())) {
+                                result.put("activityType", "2"); //随销
+                            } else {
+                                result.put("activityType", "0"); //活动类型 默认营销
+                            }
+
+                            result.put("activityStartTime", simpleDateFormat.format(mktCampaignDO.getPlanBeginTime()));
+                            result.put("activityEndTime",  simpleDateFormat.format(mktCampaignDO.getPlanEndTime()));
+                        } else {
+                            result.put("activityType", "");
+                            result.put("activityStartTime", "");
+                            result.put("activityEndTime", "");
+                        }
+                        resultList.add(result);
+                    }
+                }
+            }
+            resultMap.put("CPCResultMsg", "success");
+            resultMap.put("custId", "success");
+            resultMap.put("taskList", resultList);
+            resultMap.put("CPCResultCode", "1");
+            resultMap.put("reqId", map.get("reqId"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return resultMap;
     }
 }

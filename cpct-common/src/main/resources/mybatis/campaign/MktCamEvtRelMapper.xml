@@ -129,4 +129,16 @@
         </if>
     </select>
 
+    <select id="selectRuleIdsByEventId" parameterType="java.lang.Long" resultType="java.lang.Long">
+        SELECT
+          k.MKT_STRATEGY_CONF_RULE_ID
+        FROM
+          mkt_strategy_conf_rule_rel k
+          JOIN mkt_cam_strategy_conf_rel t ON t.STRATEGY_CONF_ID= k.MKT_STRATEGY_CONF_ID
+          JOIN mkt_cam_evt_rel b ON b.MKT_CAMPAIGN_ID = t.MKT_CAMPAIGN_ID
+        WHERE
+          b.EVENT_ID = #{evtId}
+    </select>
+
+
 </mapper>
