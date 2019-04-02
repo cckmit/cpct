@@ -15,11 +15,11 @@ spec:
   template:
     metadata:
       labels:
-        name: bss-cpct-dubbo-server-pre  #这里修改
+        name: bss-cpct-dubbo-cpc-pre  #这里修改
     spec:
       containers:
-      - name: bss-cpct-dubbo-server-pre  #这里修改
-        image: 134.96.180.23:8001/hchc/bss-cpct-dubbo-server-pre:1.0  #这里修改  地址使用这个么？
+      - name: bss-cpct-dubbo-cpc-pre  #这里修改
+        image: 134.96.180.23:8001/hchc/bss-cpct-dubbo-cpc-pre:1.0  #这里修改  地址使用这个么？
         imagePullPolicy: Always
         lifecycle:     #处理dubbo没有取消注册问题
           preStop:
