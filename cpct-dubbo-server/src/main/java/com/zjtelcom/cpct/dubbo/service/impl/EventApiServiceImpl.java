@@ -653,7 +653,6 @@ public class EventApiServiceImpl implements EventApiService {
 
                         } catch (Exception e) {
                             log.error("Exception = " + e);
-                            executorService.shutdown();
                         } finally {
                             executorService.shutdown();
                         }
@@ -724,7 +723,7 @@ public class EventApiServiceImpl implements EventApiService {
                             //客户级
                             if (successCust) {
                                 for (DefaultContext<String, Object> o : resultMapList) {
-                                    log.info("o = " + o);
+ //                                   log.info("o = " + o);
                                     //客户级下，循环资产级
                                     Map<String, String> privateParams = new HashMap<>();
                                     privateParams.put("isCust", "0"); //是客户级
@@ -1672,8 +1671,9 @@ public class EventApiServiceImpl implements EventApiService {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             log.error("[op:getResultByEvent] failed to getResultByEvent by eventId = {}, lanId = {}, channel = {}, Expection = ", eventId, lanId, channel, e);
+        } finally {
+            fixThreadPool.shutdown();
         }
         return mktCampaignMapList;
     }
