@@ -741,7 +741,7 @@ public class EventApiServiceImpl implements EventApiService {
                 if(isAllAsset){
                     for (Map<String, Object> activeMap : resultByEvent) {
                         //资产级
-                        Map<String, String> privateParams = new ConcurrentHashMap<>();
+                        Map<String, String> privateParams = new HashMap<>();
                         privateParams.put("isCust", "1"); //是否是客户级
                         privateParams.put("accNbr", map.get("accNbr"));
                         privateParams.put("integrationId", map.get("integrationId"));
@@ -949,7 +949,7 @@ public class EventApiServiceImpl implements EventApiService {
 
         @Override
         public Map<String, Object> call() {
-            Map<String, Object> activity = new ConcurrentHashMap<>();
+            Map<String, Object> activity = new HashMap<>();
 
             long begin = System.currentTimeMillis();
 
@@ -1252,7 +1252,7 @@ public class EventApiServiceImpl implements EventApiService {
                             }
                         }
                         if (triggerList1.size() > 0) {
-                            itgTrigger = new ConcurrentHashMap<>();
+                            itgTrigger = new HashMap<>();
                             itgTrigger.put("triggerList", triggerList1);
                             itgTrigger.put("type", "固定信息");
                             itgTriggers.add(new JSONObject(itgTrigger));
@@ -1377,7 +1377,7 @@ public class EventApiServiceImpl implements EventApiService {
             esJson.put("tarGrpId", tarGrpId);
             esJson.put("hitEntity", privateParams.get("accNbr")); //命中对象
 
-            Map<String, Object> ruleMap = new ConcurrentHashMap<>();
+            Map<String, Object> ruleMap = new HashMap<>();
             //初始化返回结果中的推荐信息列表
             List<Map<String, Object>> taskChlList = new ArrayList<>();
 
@@ -1655,7 +1655,7 @@ public class EventApiServiceImpl implements EventApiService {
                             redisUtils.set("MKT_CAM_ITEM_LIST_" + ruleId.toString(), mktCamItemList);
                         }
                         for (MktCamItem mktCamItem : mktCamItemList) {
-                            Map<String, String> product = new ConcurrentHashMap<>();
+                            Map<String, String> product = new HashMap<>();
                             product.put("productId", mktCamItem.getItemId().toString());
                             product.put("productCode", mktCamItem.getOfferCode());
                             product.put("productName", mktCamItem.getOfferName());
@@ -3048,7 +3048,7 @@ public class EventApiServiceImpl implements EventApiService {
         @Override
         public Map<String, Object> call() throws Exception {
 
-            Map<String, Object> mktCampaignMap = new HashMap<>();
+            Map<String, Object> mktCampaignMap = new ConcurrentHashMap<>();
 
             try {
                 Long mktCampaginId = (Long) act.get("mktCampaginId");
@@ -3159,7 +3159,7 @@ public class EventApiServiceImpl implements EventApiService {
                     esJsonStrategy.put("strategyConfId", mktStrategyConf.getMktStrategyConfId());
                     esJsonStrategy.put("strategyConfName", mktStrategyConf.getMktStrategyConfName());
 
-                    Map<String, Object> strategyMap = new HashMap<>();
+                    Map<String, Object> strategyMap = new ConcurrentHashMap<>();
                     //验证策略生效时间
                     if (!(now.after(mktStrategyConf.getBeginTime()) && now.before(mktStrategyConf.getEndTime()))) {
                         //若当前时间在策略生效时间外
@@ -3292,7 +3292,7 @@ public class EventApiServiceImpl implements EventApiService {
                 List<Map<String, Object>> ruleMapList = new ArrayList<>();
                 List<MktStrategyConfRuleDO> mktStrategyConfRuleList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(mktStrategyConf.getMktStrategyConfId());
                 for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleList) {
-                    Map<String, Object> ruleMap = new HashMap<>();
+                    Map<String, Object> ruleMap = new ConcurrentHashMap<>();
                     ruleMap.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
                     ruleMap.put("ruleName", mktStrategyConfRuleDO.getMktStrategyConfRuleName());
                     ruleMap.put("tarGrpId", mktStrategyConfRuleDO.getTarGrpId());
@@ -3447,7 +3447,7 @@ public class EventApiServiceImpl implements EventApiService {
                 Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(paramCust));
                 esJsonCustLabel.put("custLabel_dubboResult", dubboResult.toString());
                 if ("0".equals(dubboResult.get("result_code").toString())) {
-                    JSONObject body = new JSONObject((ConcurrentHashMap) dubboResult.get("msgbody"));
+                    JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
                     //拼接规则引擎上下文
                     for (Map.Entry<String, Object> entry : body.entrySet()) {
                         //添加到上下文
@@ -3498,7 +3498,7 @@ public class EventApiServiceImpl implements EventApiService {
                 Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(assParam));
                 esJsonAssetLabel.put("assetLabel_dubboResult", dubboResult.toString());
                 if ("0".equals(dubboResult.get("result_code").toString())) {
-                    JSONObject body = new JSONObject((ConcurrentHashMap) dubboResult.get("msgbody"));
+                    JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
                     //ES log 标签实例
                     //拼接规则引擎上下文
                     for (Map.Entry<String, Object> entry : body.entrySet()) {
@@ -3545,7 +3545,7 @@ public class EventApiServiceImpl implements EventApiService {
                 Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(paramSale));
                 esJsonPromLabel.put("promLabel_dubboResult", dubboResult.toString());
                 if ("0".equals(dubboResult.get("result_code").toString())) {
-                    JSONObject body = new JSONObject((ConcurrentHashMap) dubboResult.get("msgbody"));
+                    JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
                     //拼接规则引擎上下文
                     for (Map.Entry<String, Object> entry : body.entrySet()) {
                         //添加到上下文
