@@ -1,9 +1,9 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: bss-cpct-dubbo-cpc-pre #这里修改
+  name: bss-cpct-dubbo-cpc #这里修改
   labels:
-    name: bss-cpct-dubbo-cpc-pre  #这里修改
+    name: bss-cpct-dubbo-cpc  #这里修改
 spec:
   replicas: 1
   strategy:
@@ -15,11 +15,11 @@ spec:
   template:
     metadata:
       labels:
-        name: bss-cpct-dubbo-server-pre  #这里修改
+        name: bss-cpct-dubbo-cpc  #这里修改
     spec:
       containers:
-      - name: bss-cpct-dubbo-server-pre  #这里修改
-        image: 134.96.180.23:8001/hchc/bss-cpct-dubbo-server-pre:1.0  #这里修改  地址使用这个么？
+      - name: bss-cpct-dubbo-cpc  #这里修改
+        image: 134.96.180.23:8001/hchc/bss-cpct-dubbo-cpc:1.0  #这里修改  地址使用这个么？
         imagePullPolicy: Always
         lifecycle:     #处理dubbo没有取消注册问题
           preStop:
@@ -29,12 +29,12 @@ spec:
                 - "/app/project/unregister.sh"
                 - "30007"
         env:
-#        - name: DUBBO_IP_TO_REGISTRY     # 当项目为对外项目时，此处注解取消
-#          valueFrom:
-#           fieldRef:
-#            fieldPath: status.hostIP
-#        - name: DUBBO_PORT_TO_REGISTRY
-#          value: "30828"
+        - name: DUBBO_IP_TO_REGISTRY     # 当项目为对外项目时，此处注解取消
+          valueFrom:
+           fieldRef:
+            fieldPath: status.hostIP
+        - name: DUBBO_PORT_TO_REGISTRY
+          value: "30808"
         - name: ESB_UNREGISTER_URI
           valueFrom:
             configMapKeyRef:
@@ -48,12 +48,12 @@ spec:
         - name: tz-config
           mountPath: /etc/localtime
         - name: app-log
-          mountPath: /app/dubbo/logs
+          mountPath: /app/logs
         ports:
-        - containerPort: 30828    #修改端口号
+        - containerPort: 30808    #修改端口号
         readinessProbe:
           tcpSocket:
-            port: 30828   #修改端口号
+            port: 30808   #修改端口号
           initialDelaySeconds: 20
           periodSeconds: 10
           failureThreshold: 3
@@ -87,4 +87,4 @@ spec:
           path: /etc/localtime
       - name: app-log
         hostPath:
-          path: /app/app-log/bss-cpct-dubbo-pre
+          path: /app/app-log
