@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.service.impl.channel;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zjhcsoft.eagle.main.dubbo.model.policy.RecordModel;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
@@ -105,14 +106,39 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         for (Label label : labels){
             Label entity = labelMapper.selectByLabelCode(label.getInjectionLabelCode());
             if (entity!=null){
-                entity.setLabBusiDesc(label.getLabBusiDesc());
+//                entity.setLabBusiDesc(label.getLabBusiDesc());
                 entity.setLabTechDesc(label.getLabTechDesc());
+                labelDataType(label,entity);
                 labelMapper.updateByPrimaryKey(entity);
             }
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","size:"+labels.size());
         return result;
+    }
+
+    private void labelDataType(Label file, Label entity){
+        boolean x = true;
+        if (file.getLabelDataType()!=null && !file.getLabelDataType().equals("")){
+            String type = file.getLabelDataType();
+            if (type.toUpperCase().contains("VARCHAR")){
+                entity.setLabelDataType("1200");
+            }else
+            if (type.toUpperCase().contains("INTEGER")|| type.toUpperCase().contains("INT")){
+                entity.setLabelDataType("1300");
+            }else
+            if (type.toUpperCase().contains("NUMERIC")){
+                entity.setLabelDataType("1300");
+            }else
+            if (type.toUpperCase().contains("DATE")){
+                entity.setLabelDataType("1100");
+            }else
+            if (type.toUpperCase().contains("CHAR")){
+                entity.setLabelDataType("1200");
+            }else {
+                x = false;
+            }
+        }
     }
 
 
