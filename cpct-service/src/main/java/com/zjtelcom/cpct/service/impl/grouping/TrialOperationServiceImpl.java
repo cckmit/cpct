@@ -499,7 +499,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     //下发文件
     private Map<String, Object> importUserList(Map<String, Object> result, TrialOperationVO operation, Long ruleId, String batchNumSt, List<Map<String, Object>> customerList, List<Map<String, Object>> labelList) {
         redisUtils.set("LABEL_DETAIL_"+batchNumSt,labelList);
-        int num = (customerList.size() / 500) + 1;
+        int num = (customerList.size() / 100) + 1;
         List<List<Map<String,Object>>> smallCustomers = ChannelUtil.averageAssign(customerList,num);
         //按规则存储客户信息
         for (int i = 0; i < num; i++) {
@@ -533,6 +533,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         ArrayList<TrialOperationParamES> paramESList = new ArrayList<>();
         paramESList.add(param);
         request.setParamList(paramESList);
+        System.out.println(request);
         new Thread(){
             public void run(){
                 try {
@@ -819,6 +820,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         trialOperationMapper.insert(trialOp);
 
         operationVO.setTrialId(trialOp.getId());
+        operationVO.setCampaignName(campaign.getMktCampaignName());
+        operationVO.setStrategyName(strategy.getMktStrategyConfName());
         List<TrialOperation> operationList = trialOperationMapper.findOperationListByStrategyId(operationVO.getStrategyId(),TrialCreateType.TRIAL_OPERATION.getValue());
         // 调用es的抽样接口
         final TrialOperationVO vo = operationVO;
@@ -1397,7 +1400,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         LabelResult labelResult = new LabelResult();
                         String type = tarGrpConditionDOs.get(i).getOperType();
                         Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i).getLeftParam()));
-
+                        if (label==null){
+                            continue;
+                        }
                         labelResult.setLabelCode(label.getInjectionLabelCode());
                         labelResult.setLabelName(label.getInjectionLabelName());
                         labelResult.setRightOperand(label.getLabelType());

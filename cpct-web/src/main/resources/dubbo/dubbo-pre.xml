@@ -30,6 +30,8 @@
 
     <dubbo:reference registry="esb3" interface="org.springframework.session.data.ctg.IDubboCtgService"
                      id="dubboCtgService" version="1.0" check="false">
+        <dubbo:method name="hmget" servicecode="00.1077.ctgSessionHmget"/>
+        <dubbo:method name="hget" servicecode="00.1077.ctgSessionHget"/>
         <dubbo:method name="smembers" servicecode="00.1077.ctgSessionSmembers"/>
         <dubbo:method name="hgetAll" servicecode="00.1077.ctgSessionHgetAll"/>
         <dubbo:method name="exists" servicecode="00.1077.ctgSessionExists"/>

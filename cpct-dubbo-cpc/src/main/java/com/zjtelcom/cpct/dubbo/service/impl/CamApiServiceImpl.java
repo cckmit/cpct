@@ -1469,12 +1469,12 @@ public class CamApiServiceImpl implements CamApiService {
             case "3000":
                 express.append("toNum(").append(code).append("))");
                 express.append(" == ");
-                express.append("\"").append(rightParam).append("\"");
+                express.append(rightParam);
                 break;
             case "4000":
                 express.append("toNum(").append(code).append("))");
                 express.append(" != ");
-                express.append("\"").append(rightParam).append("\"");
+                express.append(rightParam);
                 break;
             case "5000":
                 express.append("toNum(").append(code).append("))");
