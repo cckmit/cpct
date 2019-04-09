@@ -51,22 +51,22 @@ public class SysStaffController extends BaseController {
         List<PrivilegeDetail> parentList = new ArrayList<>();
         for (PrivilegeDetail detail : userDetail.getPrivilegeDetails()){
             if (detail.getPrivFuncRelDetails()==null || detail.getPrivFuncRelDetails().isEmpty() || detail.getPrivFuncRelDetails().get(0)==null
-                    || detail.getPrivFuncRelDetails().get(0).getFuncMenu()==null){
+                    || detail.getPrivFuncRelDetails().get(0).getFuncMenuDto()==null){
                 continue;
             }
-            if (detail.getPrivCode().contains("CPCP") && detail.getPrivFuncRelDetails().get(0).getFuncMenu().getParMenuId()==null){
+            if (detail.getPrivCode().contains("CPCP") && detail.getPrivFuncRelDetails().get(0).getFuncMenuDto().getParMenuId()==null){
                 parentList.add(detail);
             }
         }
         for (PrivilegeDetail parent  : parentList){
-            Long parentId = parent.getPrivFuncRelDetails().get(0).getFuncMenu().getMenuId();
+            Long parentId = parent.getPrivFuncRelDetails().get(0).getFuncMenuDto().getMenuId();
             Map<String,Object> map = new HashMap<>();
             map.put("parent",parent);
             List<PrivilegeDetail> childList = new ArrayList<>();
             for (PrivilegeDetail detail : userDetail.getPrivilegeDetails()){
                 if (detail.getPrivFuncRelDetails()!=null && !detail.getPrivFuncRelDetails().isEmpty() && detail.getPrivFuncRelDetails().get(0)!=null
-                        && detail.getPrivFuncRelDetails().get(0).getFuncMenu()!=null ) {
-                    Long detailId = detail.getPrivFuncRelDetails().get(0).getFuncMenu().getParMenuId();
+                        && detail.getPrivFuncRelDetails().get(0).getFuncMenuDto()!=null ) {
+                    Long detailId = detail.getPrivFuncRelDetails().get(0).getFuncMenuDto().getParMenuId();
                     if (detailId != null && detailId.equals(parentId)) {
                         childList.add(detail);
                     }
