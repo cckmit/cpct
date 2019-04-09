@@ -1400,7 +1400,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         LabelResult labelResult = new LabelResult();
                         String type = tarGrpConditionDOs.get(i).getOperType();
                         Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i).getLeftParam()));
-
+                        if (label==null){
+                            continue;
+                        }
                         labelResult.setLabelCode(label.getInjectionLabelCode());
                         labelResult.setLabelName(label.getInjectionLabelName());
                         labelResult.setRightOperand(label.getLabelType());
