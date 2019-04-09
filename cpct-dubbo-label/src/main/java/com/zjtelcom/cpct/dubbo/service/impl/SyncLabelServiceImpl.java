@@ -151,12 +151,13 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
      */
     @Override
     @Transactional
-    public Map<String, Object> syncLabelInfo(final RecordModel record) {
+    public Map<String, Object> syncLabelInfo(Map<String,Object> record) {
         Map<String,Object> result = new HashMap<>();
+        RecordModel recordModel = ChannelUtil.mapToEntity(record,RecordModel.class);
         try {
-            switch (record.getLabel().getLabState()){
+            switch (record.get("labState").toString()){
                 case "3":
-                    result = addLabel(record);
+                    result = addLabel(recordModel);
 //                    if (result.get("resultCode").equals(CODE_SUCCESS)){
 //                        new Thread(){
 //                            public void run(){
@@ -170,7 +171,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
 //                    }
                     break;
                 case "5":
-                    result = deleteLabel(record);
+                    result = deleteLabel(recordModel);
 //                    if (result.get("resultCode").equals(CODE_SUCCESS)){
 //                        new Thread(){
 //                            public void run(){
@@ -195,7 +196,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
     }
 
 
-    private boolean  labelDataType(LabModel labModel,Label label){
+    private boolean  labelDataType(RecordModel labModel,Label label){
         boolean x = true;
         if (labModel.getLabDataType()==null || labModel.getLabDataType().equals("")){
             x = false;
@@ -230,12 +231,15 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
     private Map<String,Object> addLabel(RecordModel record) {
         logger.info("**********入参**************："+JSON.toJSONString(record));
         Map<String, Object> result = new HashMap<>();
-        LabModel labModel = record.getLabel();
-        Label labelValodate = labelMapper.selectByTagRowId(record.getLabel().getLabRowId());
+        RecordModel labModel = record;
+        Label labelValodate = labelMapper.selectByTagRowId(record.getLabRowId());
         List<LabValueModel> valueModelList = new ArrayList<>();
         final List<Label> labelList = new ArrayList<>();
         if (record.getLabelValueList() != null && !record.getLabelValueList().isEmpty()) {
-            valueModelList = record.getLabelValueList();
+            for (Map<String,Object> valueMap : record.getLabelValueList()){
+                LabValueModel valueModel = ChannelUtil.mapToEntity(valueMap,LabValueModel.class);
+                valueModelList.add(valueModel);
+            }
         }
         Long labelId = null;
         if (labelValodate != null) {
@@ -352,7 +356,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
      */
     private Map<String,Object> deleteLabel(RecordModel record){
         Map<String,Object> result = new HashMap<>();
-        LabModel tagModel = record.getLabel();
+        RecordModel tagModel = record;
         Label label = labelMapper.selectByTagRowId(tagModel.getLabRowId());
         if (label==null){
             result.put("resultCode",CODE_FAIL);
