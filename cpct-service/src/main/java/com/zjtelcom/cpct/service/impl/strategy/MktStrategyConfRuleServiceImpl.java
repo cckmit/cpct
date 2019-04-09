@@ -622,6 +622,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     Organization org = organizationMapper.selectByPrimaryKey(id);
                     if (org!=null){
                         List<String> resultList = new ArrayList<>();
+                        resultList.add(org.getOrgId4a().toString());
                         if (false){
                             areaC4List(id,resultList,sysAreaList);
                         }else {
