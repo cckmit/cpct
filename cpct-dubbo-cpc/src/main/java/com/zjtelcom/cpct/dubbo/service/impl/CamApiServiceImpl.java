@@ -1474,7 +1474,7 @@ public class CamApiServiceImpl implements CamApiService {
             case "4000":
                 express.append("toNum(").append(code).append("))");
                 express.append(" != ");
-                express.append(rightParam);
+                express.append(rightParam).append("\"");
                 break;
             case "5000":
                 express.append("toNum(").append(code).append("))");
@@ -1545,12 +1545,12 @@ public class CamApiServiceImpl implements CamApiService {
             case "3000":
                 express.append(label.getInjectionLabelCode()).append(")");
                 express.append(" == ");
-                express.append("\"").append(rightParam).append("\"");
+                express.append(rightParam);
                 break;
             case "4000":
                 express.append(label.getInjectionLabelCode()).append(")");
                 express.append(" != ");
-                express.append("\"").append(rightParam).append("\"");
+                express.append(rightParam);
                 break;
             case "5000":
                 express.append("toNum(").append(label.getInjectionLabelCode()).append("))");
