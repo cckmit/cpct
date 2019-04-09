@@ -76,6 +76,7 @@ public class SearchLabelServiceImpl implements SearchLabelService {
                     if (idlIst.contains(label.getInjectionLabelId())) {
                         continue;
                     }
+                    idlIst.add(label.getInjectionLabelId());
                     codeList(assetCode, promCode, custCode, label);
                 }
             }
@@ -88,6 +89,7 @@ public class SearchLabelServiceImpl implements SearchLabelService {
                         if (idlIst.contains(label.getInjectionLabelId())) {
                             continue;
                         }
+                        idlIst.add(label.getInjectionLabelId());
                         codeList(assetCode, promCode, custCode, label);
                     }
                 }
@@ -115,6 +117,7 @@ public class SearchLabelServiceImpl implements SearchLabelService {
                                     if (idlIst.contains(label.getInjectionLabelId())){
                                         continue;
                                     }
+                                    idlIst.add(label.getInjectionLabelId());
                                     codeList(assetCode, promCode, custCode, label);
                                 }
 
@@ -130,6 +133,7 @@ public class SearchLabelServiceImpl implements SearchLabelService {
                                     if (idlIst.contains(label.getInjectionLabelId())){
                                         continue;
                                     }
+                                    idlIst.add(label.getInjectionLabelId());
                                     codeList(assetCode, promCode, custCode, label);
                                 }
                             }

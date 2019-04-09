@@ -86,8 +86,8 @@
 
         <dependency>
             <groupId>com.zjtelcom.es</groupId>
-            <artifactId>es-server</artifactId>
-            <version>1.0</version>
+            <artifactId>es-event-access</artifactId>
+            <version>1.0.1</version>
         </dependency>
 
         <!-- 黄懿慧dubbo服务jar包 -->

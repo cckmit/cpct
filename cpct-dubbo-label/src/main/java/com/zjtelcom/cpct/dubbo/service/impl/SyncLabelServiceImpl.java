@@ -198,7 +198,8 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
     private boolean  labelDataType(LabModel labModel,Label label){
         boolean x = true;
         if (labModel.getLabDataType()==null || labModel.getLabDataType().equals("")){
-            return false;
+            x = false;
+            return x;
         }
         String type = labModel.getLabDataType();
         if (type.toUpperCase().contains("VARCHAR")){

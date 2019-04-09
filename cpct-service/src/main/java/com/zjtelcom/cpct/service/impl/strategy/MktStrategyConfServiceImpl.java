@@ -155,8 +155,9 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             mktStrategyConfRuleMapper.deleteByPrimaryKey(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId());
             // 删除活动与分群的关系
             MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId());
-            mktCamGrpRulMapper.deleteByTarGrpId(mktStrategyConfRuleDO.getTarGrpId());
-
+            if (mktStrategyConfRuleDO!=null && mktStrategyConfRuleDO.getTarGrpId()!=null) {
+                mktCamGrpRulMapper.deleteByTarGrpId(mktStrategyConfRuleDO.getTarGrpId());
+            }
             //删除策略与规则的关联关系
             mktStrategyConfRuleRelMapper.deleteByPrimaryKey(mktStrategyConfRuleRelDO.getMktStrategyConfRuleRelId());
         }
@@ -165,7 +166,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
         //删除策略
         mktStrategyConfMapper.deleteByPrimaryKey(mktStrategyConfId);
         mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
-        mktStrategyConfMap.put("resultMsg", ErrorCode.SAVE_MKT_STR_CONF_SUCCESS.getErrorMsg());
+        mktStrategyConfMap.put("resultMsg", ErrorCode.DELETE_MKT_STR_CONF_SUCCESS.getErrorMsg());
         return mktStrategyConfMap;
     }
 
