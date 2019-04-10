@@ -1862,12 +1862,10 @@ public class EventApiServiceImpl implements EventApiService {
                         String[] strArrayCity = mktStrategyConf.getAreaId().split("/");
                         boolean areaCheck = true;
                         for (String str : strArrayCity) {
-                            if (c4 != null) {
-                                if (c4.equals(str)) {
-                                    areaCheck = false;
-                                    break;
-                                }
-                            }else if (lanId != null) {
+                            if (c4 != null && c4.equals(str)) {
+                                areaCheck = false;
+                                break;
+                            } else if (lanId != null) {
                                 if (lanId.equals(str)) {
                                     areaCheck = false;
                                     break;
