@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.LabelSaturationMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.LabelSaturation">
+    <id column="LABEL_SATURATION_ID" jdbcType="BIGINT" property="labelSaturationId" />
+    <result column="LABEL_CODE" jdbcType="VARCHAR" property="labelCode" />
+    <result column="SATURATION_BATCH_NUMBER" jdbcType="VARCHAR" property="saturationBatchNumber" />
+    <result column="BIGDATA_SATURATION" jdbcType="BIGINT" property="bigdataSaturation" />
+    <result column="ES_SATURATION" jdbcType="BIGINT" property="esSaturation" />
+    <result column="COMPARING_RESULTS" jdbcType="VARCHAR" property="comparingResults" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMAKE" jdbcType="VARCHAR" property="remake" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from label_saturation
+    where LABEL_SATURATION_ID = #{labelSaturationId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.LabelSaturation">
+    insert into label_saturation (LABEL_SATURATION_ID, LABEL_CODE, SATURATION_BATCH_NUMBER, 
+      BIGDATA_SATURATION, ES_SATURATION, COMPARING_RESULTS, 
+      STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+      CREATE_DATE, STATUS_DATE, UPDATE_DATE, 
+      REMAKE)
+    values (#{labelSaturationId,jdbcType=BIGINT}, #{labelCode,jdbcType=VARCHAR}, #{saturationBatchNumber,jdbcType=VARCHAR}, 
+      #{bigdataSaturation,jdbcType=BIGINT}, #{esSaturation,jdbcType=BIGINT}, #{comparingResults,jdbcType=VARCHAR}, 
+      #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{remake,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.LabelSaturation">
+    update label_saturation
+    set LABEL_CODE = #{labelCode,jdbcType=VARCHAR},
+      SATURATION_BATCH_NUMBER = #{saturationBatchNumber,jdbcType=VARCHAR},
+      BIGDATA_SATURATION = #{bigdataSaturation,jdbcType=BIGINT},
+      ES_SATURATION = #{esSaturation,jdbcType=BIGINT},
+      COMPARING_RESULTS = #{comparingResults,jdbcType=VARCHAR},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMAKE = #{remake,jdbcType=VARCHAR}
+    where LABEL_SATURATION_ID = #{labelSaturationId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select LABEL_SATURATION_ID, LABEL_CODE, SATURATION_BATCH_NUMBER, BIGDATA_SATURATION, 
+    ES_SATURATION, COMPARING_RESULTS, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
+    STATUS_DATE, UPDATE_DATE, REMAKE
+    from label_saturation
+    where LABEL_SATURATION_ID = #{labelSaturationId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select LABEL_SATURATION_ID, LABEL_CODE, SATURATION_BATCH_NUMBER, BIGDATA_SATURATION, 
+    ES_SATURATION, COMPARING_RESULTS, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
+    STATUS_DATE, UPDATE_DATE, REMAKE
+    from label_saturation
+  </select>
+</mapper>

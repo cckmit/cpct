@@ -286,10 +286,27 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "策略信息有误");
             return result;
         }
+        //生成批次号
+        String batchNumSt = DateUtil.date2St4Trial(new Date()) + ChannelUtil.getRandomStr(4);
         //添加策略适用地市
         redisUtils.set("STRATEGY_CONF_AREA_"+operationVO.getStrategyId(),strategy.getAreaId());
-
         // 通过活动id获取关联的标签字段数组
+        DisplayColumn req = new DisplayColumn();
+        req.setDisplayColumnId(campaign.getCalcDisplay());
+        Map<String,Object> labelMap = messageLabelService.queryLabelListByDisplayId(req);
+        List<LabelDTO> labelDTOList = (List<LabelDTO>)labelMap.get("labels");
+        String[] displays = new String[labelDTOList.size()];
+        List<Map<String,Object>> labelList = new ArrayList<>();
+        for (int i = 0 ; i< labelDTOList.size();i++){
+            displays[i] = labelDTOList.get(i).getLabelCode();
+            Map<String,Object> label = new HashMap<>();
+            label.put("code",labelDTOList.get(i).getLabelCode());
+            label.put("name",labelDTOList.get(i).getInjectionLabelName());
+            label.put("labelType",labelDTOList.get(i).getLabelType());
+            labelList.add(label);
+        }
+        redisUtils.set("LABEL_DETAIL_"+batchNumSt,labelList);
+
         String[] fieldList = getStrings(campaign,strategy);
 
         TrialOperationVO request = BeanUtil.create(operationVO,new TrialOperationVO());
@@ -300,7 +317,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         ArrayList<TrialOperationParamES> paramList = new ArrayList<>();
         List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(operationVO.getStrategyId());
         for (MktStrategyConfRuleRelDO ruleRelDO : ruleRelList) {
-            TrialOperationParamES param = getTrialOperationParamES(operationVO,null, ruleRelDO.getMktStrategyConfRuleId(),true);
+            TrialOperationParamES param = getTrialOperationParamES(operationVO,Long.valueOf(batchNumSt), ruleRelDO.getMktStrategyConfRuleId(),true);
             List<LabelResultES> labelResultList = param.getLabelResultList();
             List<String> labelTypeList = new ArrayList<>();
             for (LabelResultES la : labelResultList){
@@ -318,13 +335,14 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         }
         requests.setFieldList(fieldList);
         requests.setParamList(paramList);
-//        TrialResponse response = new TrialResponse();
+        requests.setBatchNum(Long.valueOf(batchNumSt));
         TrialResponseES response = new TrialResponseES();
 
         try {
             //todo
-             response = esService.searchBatchInfo(requests);
-//            response = restTemplate.postForObject(batchInfo, request, TrialResponse.class);
+            System.out.println(JSON.toJSONString(requests));
+//             response = esService.searchBatchInfo(requests);
+            response = restTemplate.postForObject("http://localhost:8080/es/searchBatchInfo", requests, TrialResponseES.class);
 
             if (response.getResultCode().equals(CODE_FAIL)){
                 result.put("resultCode", CODE_FAIL);
@@ -533,7 +551,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         ArrayList<TrialOperationParamES> paramESList = new ArrayList<>();
         paramESList.add(param);
         request.setParamList(paramESList);
-        System.out.println(request);
+        System.out.println(JSON.toJSONString(request));
         new Thread(){
             public void run(){
                 try {
