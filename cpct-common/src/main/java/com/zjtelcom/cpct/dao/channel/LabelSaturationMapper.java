@@ -10,6 +10,8 @@ public interface LabelSaturationMapper {
 
     int insert(LabelSaturation record);
 
+    int insertBatch(List<LabelSaturation> labelSaturationList);
+
     LabelSaturation selectByPrimaryKey(Long labelSaturationId);
 
     List<LabelSaturation> selectAll();

@@ -38,7 +38,7 @@ public interface MktCamEvtRelMapper {
 
     List<MktCamEvtRelDO> listActByEventId(@Param("eventId") Long eventId);
 
-    List<Long> selectRuleIdsByEventId(Long eventId);
+    List<Map<String, Object>> selectRuleIdsByEventId(Long eventId);
 
 
 
