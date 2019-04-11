@@ -4,6 +4,7 @@ import com.zjtelcom.cpct.BaseEntity;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 
 @Data
@@ -70,6 +71,18 @@ public class Label extends BaseEntity implements Serializable {
     private String labTagCode;
 
     private Long systemInfoId;
+
+    private String labExample;
+
+    private Date labEffectiveDate;
+
+    private Date labExpirationDate;
+
+    private String damander;
+
+    private String damandDepartment;
+
+    private String damandDescription;
 
 
 

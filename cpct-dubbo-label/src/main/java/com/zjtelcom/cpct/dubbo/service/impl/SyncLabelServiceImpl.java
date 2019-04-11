@@ -208,13 +208,15 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         }else
         if (type.toUpperCase().contains("INTEGER")){
             label.setLabelDataType("1300");
+        }else if (type.toUpperCase().contains("INT")){
+            label.setLabelDataType("1300");
         }else
         if (type.toUpperCase().contains("NUMERIC")){
             label.setLabelDataType("1300");
         }else
         if (type.toUpperCase().contains("DATE")){
             label.setLabelDataType("1100");
-        }else
+        } else
         if (type.toUpperCase().contains("CHAR")){
             label.setLabelDataType("1200");
         }else {

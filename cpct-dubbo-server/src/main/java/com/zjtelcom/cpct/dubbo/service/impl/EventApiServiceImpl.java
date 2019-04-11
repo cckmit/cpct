@@ -19,11 +19,13 @@ import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
+import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
+import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.ContactEvtMatchRul;
 import com.zjtelcom.cpct.dto.event.EventMatchRulCondition;
@@ -37,6 +39,7 @@ import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
+import com.zjtelcom.es.es.service.EsService;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,10 +131,16 @@ public class EventApiServiceImpl implements EventApiService {
     private EventMatchRulConditionMapper eventMatchRulConditionMapper;  //事件规则条件
 
     @Autowired(required = false)
+    private SysParamsMapper sysParamsMapper;  //查询系统参数
+
+    @Autowired(required = false)
     private SearchLabelService searchLabelService;  //查询活动下使用的所有标签
 
     @Autowired(required = false)
     private CamApiService camApiService; // 活动任务
+
+    @Autowired(required = false)
+    private EsService esService;
 
 
 
@@ -495,6 +504,23 @@ public class EventApiServiceImpl implements EventApiService {
                     recCampaignAmount = Integer.parseInt(recCampaignAmountStr);
                 }
 
+
+                /* 判断是否为对应事件的资产 */
+                List<String> eventCodeList = ( List<String> ) redisUtils.get("EVT_API_CODE");
+                if (eventCodeList == null){
+                    List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("EVT_API_CODE");
+                    eventCodeList = new ArrayList<>();
+                    for (SysParams sysParams : sysParamsList) {
+                        eventCodeList.add(sysParams.getParamValue());
+                    }
+                    redisUtils.set("EVT_API_CODE", eventCodeList);
+                }
+                if(eventCodeList.contains(map.get("eventCode"))){
+                    getCustList(eventId, map.get("lanId") ,custId, map);
+                }
+
+
+
                 timeJson.put("time2", System.currentTimeMillis() - begin);
                 //事件下所有活动的规则预校验，返回初步可命中活动
                 List<Map<String, Object>> resultByEvent = getResultByEvent(eventId, map.get("lanId"), map.get("channelCode"), map.get("reqId"), map.get("accNbr"), c4);
@@ -584,7 +610,7 @@ public class EventApiServiceImpl implements EventApiService {
                 if (custLabelList != null && custLabelList.size() > 0) {
                     mktAllLabel.put("custLabels", ChannelUtil.StringList2String(custLabelList));
                 }
-                log.info("assetLabelList = " +assetLabelList  + "   " + "promLabelList = " + promLabelList + "   " + "custLabelList = " + custLabelList);
+ //               log.info("assetLabelList = " +assetLabelList  + "   " + "promLabelList = " + promLabelList + "   " + "custLabelList = " + custLabelList);
 
 
 
@@ -1407,12 +1433,20 @@ public class EventApiServiceImpl implements EventApiService {
             case "3000":
                 express.append(label.getInjectionLabelCode()).append(")");
                 express.append(" == ");
-                express.append(rightParam);
+                if(NumberUtils.isNumber(rightParam)) {
+                    express.append(rightParam);
+                } else {
+                    express.append("\"").append(rightParam).append("\"");
+                }
                 break;
             case "4000":
                 express.append(label.getInjectionLabelCode()).append(")");
                 express.append(" != ");
-                express.append(rightParam);
+                if(NumberUtils.isNumber(rightParam)) {
+                    express.append(rightParam);
+                } else {
+                    express.append("\"").append(rightParam).append("\"");
+                }
                 break;
             case "5000":
                 express.append("toNum(").append(label.getInjectionLabelCode()).append("))");
@@ -1828,12 +1862,10 @@ public class EventApiServiceImpl implements EventApiService {
                         String[] strArrayCity = mktStrategyConf.getAreaId().split("/");
                         boolean areaCheck = true;
                         for (String str : strArrayCity) {
-                            if (c4 != null) {
-                                if (c4.equals(str)) {
-                                    areaCheck = false;
-                                    break;
-                                }
-                            }else if (lanId != null) {
+                            if (c4 != null && c4.equals(str)) {
+                                areaCheck = false;
+                                break;
+                            } else if (lanId != null) {
                                 if (lanId.equals(str)) {
                                     areaCheck = false;
                                     break;
@@ -2131,5 +2163,97 @@ public class EventApiServiceImpl implements EventApiService {
             }
             return resultMap;
         }
+    }
+
+
+    /**
+     * 获取客户清单
+     * @param eventId
+     * @param landId
+     * @param custId
+     * @param map
+     * @return
+     */
+    private Map<String, Object> getCustList(Long eventId, String landId , String custId, Map<String, String> map){
+        Map<String, Object> resultMap = new HashMap<>();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            List<Long> ruleIdList = mktCamEvtRelMapper.selectRuleIdsByEventId(eventId);
+            List<String> ruleIdStrList = new ArrayList<>();
+            for (Long ruleId : ruleIdList) {
+                ruleIdStrList.add(ruleId.toString());
+            }
+            // ruleIdStrList.add("1845");
+
+            JSONObject param = new JSONObject();
+            //查询标识
+            param.put("c3", landId);
+            param.put("queryId", custId);
+            param.put("queryNum", "");
+            param.put("queryFields", "");
+            param.put("type", "4");
+
+
+            Map<String, Object> paramMap = new HashMap<>();
+            JSONArray accArray = new JSONArray();
+            List<String> assetIntegIdList = new ArrayList<>();
+            Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
+            if ("0".equals(dubboResult.get("result_code").toString())) {
+                accArray = new JSONArray((List<Object>) dubboResult.get("msgbody"));
+                for (Object o : accArray) {
+                    assetIntegIdList.add(((Map) o).get("ASSET_INTEG_ID").toString());
+                }
+            }
+//            assetIntegIdList.add("1-I7LEq011724");
+//            assetIntegIdList.add("5-GBND3E6");
+            paramMap.put("assetList", assetIntegIdList);
+            paramMap.put("ruleList", ruleIdStrList);
+            Map<String, Object> paramResultMap = new HashMap<>();
+            paramResultMap = esService.queryCustomer4Event(paramMap);
+
+            List<Map<String, Object>> resultList = new ArrayList<>();
+            // 解析
+            if ("200".equals(paramResultMap.get("resultCode"))) {
+                List<Map<String, Object>> resultMapList = (List<Map<String, Object>>) paramResultMap.get("data");
+                if (resultMapList != null && resultMapList.size() > 0) {
+                    for (Map<String, Object> resultMap1 : resultMapList) {
+                        Map result = new HashMap();
+                        result.putAll((Map)resultMap1.get("CPC_VALUE"));
+                        result.put("orderISI", map.get("reqId"));
+                        result.put("skipCheck", "0");
+                        result.put("orderPriority", "0");
+                        Long activityId = Long.valueOf (resultMap1.get("ACTIVITY_ID").toString());
+                        MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(activityId);
+                        if(mktCampaignDO!=null){
+                            if ("1000".equals(mktCampaignDO.getMktCampaignType())) {
+                                result.put("activityType", "0"); //营销
+                            } else if ("5000".equals(mktCampaignDO.getMktCampaignType())) {
+                                result.put("activityType", "1"); //服务
+                            } else if ("6000".equals(mktCampaignDO.getMktCampaignType())) {
+                                result.put("activityType", "2"); //随销
+                            } else {
+                                result.put("activityType", "0"); //活动类型 默认营销
+                            }
+
+                            result.put("activityStartTime", simpleDateFormat.format(mktCampaignDO.getPlanBeginTime()));
+                            result.put("activityEndTime",  simpleDateFormat.format(mktCampaignDO.getPlanEndTime()));
+                        } else {
+                            result.put("activityType", "");
+                            result.put("activityStartTime", "");
+                            result.put("activityEndTime", "");
+                        }
+                        resultList.add(result);
+                    }
+                }
+            }
+            resultMap.put("CPCResultMsg", "success");
+            resultMap.put("custId", "success");
+            resultMap.put("taskList", resultList);
+            resultMap.put("CPCResultCode", "1");
+            resultMap.put("reqId", map.get("reqId"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return resultMap;
     }
 }
