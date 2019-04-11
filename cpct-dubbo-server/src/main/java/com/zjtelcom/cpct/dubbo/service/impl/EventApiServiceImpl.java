@@ -26,6 +26,7 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
+import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.ContactEvtMatchRul;
 import com.zjtelcom.cpct.dto.event.EventMatchRulCondition;
@@ -504,16 +505,15 @@ public class EventApiServiceImpl implements EventApiService {
                     recCampaignAmount = Integer.parseInt(recCampaignAmountStr);
                 }
 
-
                 /* 判断是否为对应事件的资产 */
-                List<String> eventCodeList = ( List<String> ) redisUtils.get("EVT_API_CODE");
+                List<String> eventCodeList = (List<String>) redisUtils.get("EVT_API_CODE_" + map.get("eventCode"));
                 if (eventCodeList == null){
                     List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("EVT_API_CODE");
-                    eventCodeList = new ArrayList<>();
+                    eventCodeList = new ArrayList<String>();
                     for (SysParams sysParams : sysParamsList) {
                         eventCodeList.add(sysParams.getParamValue());
                     }
-                    redisUtils.set("EVT_API_CODE", eventCodeList);
+                    redisUtils.set("EVT_API_CODE_" +  map.get("eventCode"), eventCodeList);
                 }
                 if(eventCodeList.contains(map.get("eventCode"))){
                     getCustList(eventId, map.get("lanId") ,custId, map);
@@ -2178,12 +2178,27 @@ public class EventApiServiceImpl implements EventApiService {
         Map<String, Object> resultMap = new HashMap<>();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
-            List<Long> ruleIdList = mktCamEvtRelMapper.selectRuleIdsByEventId(eventId);
-            List<String> ruleIdStrList = new ArrayList<>();
-            for (Long ruleId : ruleIdList) {
-                ruleIdStrList.add(ruleId.toString());
+
+            List<MktCamEvtRel> resultByEvent = mktCamEvtRelMapper.qryBycontactEvtId(eventId);
+
+            //判断有没有客户级活动
+            Boolean hasCust = false;  //是否有客户级
+            for (MktCamEvtRel mktCamEvtRel : resultByEvent) {
+                if (mktCamEvtRel.getLevelConfig() == 1) {
+                    hasCust = true;
+                    break;
+                }
             }
-            // ruleIdStrList.add("1845");
+            List<String> custRuleIdList = new ArrayList<>();
+            List<String> assetRuleIdList = new ArrayList<>();
+            List<Map<String, Object>> mapList = mktCamEvtRelMapper.selectRuleIdsByEventId(eventId);
+            for (Map<String, Object> ruleMap : mapList) {
+                if((Integer)ruleMap.get("levelConfig") == 1){  // 客户级
+                    custRuleIdList.add(ruleMap.get("ruleId").toString());
+                } else{
+                    assetRuleIdList.add(ruleMap.get("ruleId").toString());  // 资产级
+                }
+            }
 
             JSONObject param = new JSONObject();
             //查询标识
@@ -2193,23 +2208,32 @@ public class EventApiServiceImpl implements EventApiService {
             param.put("queryFields", "");
             param.put("type", "4");
 
+            Map<String, Object> custParamMap = new HashMap<>();
+            Map<String, Object> assetParamMap = new HashMap<>();
+            JSONArray accArray = new JSONArray();
+            List<String> custIdList = new ArrayList<>();
+            List<String> assetIdList = new ArrayList<>();
+            if(custId!=null && !"".equals(custId) && hasCust){
+                Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
+                if ("0".equals(dubboResult.get("result_code").toString())) {
+                    accArray = new JSONArray((List<Object>) dubboResult.get("msgbody"));
+                    for (Object o : accArray) {
+                        custIdList.add(((Map) o).get("ASSET_INTEG_ID").toString());
+                    }
+                }
+            } else {
+                assetIdList.add(map.get("integrationId"));
+            }
+            custParamMap.put("assetList", custIdList);
+            custParamMap.put("ruleList", custRuleIdList);
+
+            assetParamMap.put("assetList", assetIdList);
+            assetParamMap.put("ruleList", assetRuleIdList);
 
             Map<String, Object> paramMap = new HashMap<>();
-            JSONArray accArray = new JSONArray();
-            List<String> assetIntegIdList = new ArrayList<>();
-            Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
-            if ("0".equals(dubboResult.get("result_code").toString())) {
-                accArray = new JSONArray((List<Object>) dubboResult.get("msgbody"));
-                for (Object o : accArray) {
-                    assetIntegIdList.add(((Map) o).get("ASSET_INTEG_ID").toString());
-                }
-            }
-//            assetIntegIdList.add("1-I7LEq011724");
-//            assetIntegIdList.add("5-GBND3E6");
-            paramMap.put("assetList", assetIntegIdList);
-            paramMap.put("ruleList", ruleIdStrList);
-            Map<String, Object> paramResultMap = new HashMap<>();
-            paramResultMap = esService.queryCustomer4Event(paramMap);
+            paramMap.put("cust", custParamMap);
+            paramMap.put("asset", assetParamMap);
+            Map<String, Object> paramResultMap = esService.queryCustomer4Event(paramMap);
 
             List<Map<String, Object>> resultList = new ArrayList<>();
             // 解析
@@ -2253,6 +2277,7 @@ public class EventApiServiceImpl implements EventApiService {
             resultMap.put("reqId", map.get("reqId"));
         } catch (Exception e) {
             e.printStackTrace();
+           log.error("Exception = " + e);
         }
         return resultMap;
     }
