@@ -98,7 +98,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         List<Offer> productList = new ArrayList<>();
         Integer page = MapUtil.getIntNum(params.get("page"));
         Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
-        String produtType = MapUtil.getString(params.get("productType"));
+        String produtType = MapUtil.getString(params.get("type"));
         String productName = MapUtil.getString(params.get("productName"));
         List<Long> producetIdList = (List<Long>)params.get("productIdList");
         PageHelper.startPage(page,pageSize);
