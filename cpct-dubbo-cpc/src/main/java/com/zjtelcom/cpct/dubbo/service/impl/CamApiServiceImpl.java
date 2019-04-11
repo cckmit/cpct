@@ -1469,12 +1469,20 @@ public class CamApiServiceImpl implements CamApiService {
             case "3000":
                 express.append("toNum(").append(code).append("))");
                 express.append(" == ");
-                express.append(rightParam);
+                if(NumberUtils.isNumber(rightParam)) {
+                    express.append(rightParam);
+                } else {
+                    express.append("\"").append(rightParam).append("\"");
+                }
                 break;
             case "4000":
                 express.append("toNum(").append(code).append("))");
                 express.append(" != ");
-                express.append(rightParam);
+                if(NumberUtils.isNumber(rightParam)) {
+                    express.append(rightParam);
+                } else {
+                    express.append("\"").append(rightParam).append("\"");
+                }
                 break;
             case "5000":
                 express.append("toNum(").append(code).append("))");
@@ -1545,12 +1553,21 @@ public class CamApiServiceImpl implements CamApiService {
             case "3000":
                 express.append(label.getInjectionLabelCode()).append(")");
                 express.append(" == ");
-                express.append("\"").append(rightParam).append("\"");
+                if(NumberUtils.isNumber(rightParam)) {
+                    express.append(rightParam);
+                } else {
+                    express.append("\"").append(rightParam).append("\"");
+                }
                 break;
             case "4000":
                 express.append(label.getInjectionLabelCode()).append(")");
                 express.append(" != ");
-                express.append("\"").append(rightParam).append("\"");
+                if(NumberUtils.isNumber(rightParam)) {
+                    express.append(rightParam);
+                } else {
+                    express.append("\"").append(rightParam).append("\"");
+                }
+
                 break;
             case "5000":
                 express.append("toNum(").append(label.getInjectionLabelCode()).append("))");
