@@ -2271,7 +2271,7 @@ public class EventApiServiceImpl implements EventApiService {
                 }
             }
             resultMap.put("CPCResultMsg", "success");
-            resultMap.put("custId", "success");
+            resultMap.put("custId", custId);
             resultMap.put("taskList", resultList);
             resultMap.put("CPCResultCode", "1");
             resultMap.put("reqId", map.get("reqId"));
