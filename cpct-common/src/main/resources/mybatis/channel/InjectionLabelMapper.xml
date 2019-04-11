@@ -47,6 +47,12 @@
     <result column="LAB_MANAGE_TYPE" jdbcType="VARCHAR" property="labManageType" />
     <result column="LAB_TAG_CODE" jdbcType="VARCHAR" property="labTagCode" />
     <result column="SYSTEM_INFO_ID" jdbcType="BIGINT" property="systemInfoId" />
+    <result column="LAB_EXAMPLE" jdbcType="VARCHAR" property="labExample" />
+    <result column="LAB_EFFECTIVE_DATE" jdbcType="TIMESTAMP" property="labEffectiveDate" />
+    <result column="LAB_EXPIRATION_DATE" jdbcType="TIMESTAMP" property="labExpirationDate" />
+    <result column="DAMANDER" jdbcType="VARCHAR" property="damander" />
+    <result column="DAMAND_DEPARTMENT" jdbcType="VARCHAR" property="damandDepartment" />
+    <result column="DAMAND_DESCRIPTION" jdbcType="VARCHAR" property="damandDescription" />
   </resultMap>
 
   <resultMap id="BaseResultMapT" type="com.zjtelcom.cpct.domain.channel.Label">
@@ -73,7 +79,9 @@
       LAB_LEVEL5, LAB_LEVEL5_NAME, LAB_LEVEL6,
       LAB_LEVEL6_NAME, LAB_UPDATE_FEQ, LAB_BUSI_DESC,
       LAB_TECH_DESC, LAB_STATE, LAB_MANAGE_TYPE,
-      LAB_TAG_CODE,SYSTEM_INFO_ID)
+      LAB_TAG_CODE,SYSTEM_INFO_ID, LAB_EXAMPLE,
+      LAB_EFFECTIVE_DATE, LAB_EXPIRATION_DATE,
+      DAMANDER, DAMAND_DEPARTMENT, DAMAND_DESCRIPTION)
     values (#{injectionLabelId,jdbcType=BIGINT}, #{injectionLabelCode,jdbcType=VARCHAR},
       #{injectionLabelName,jdbcType=VARCHAR}, #{injectionLabelDesc,jdbcType=VARCHAR},
       #{labelType,jdbcType=VARCHAR}, #{labelValueType,jdbcType=VARCHAR}, #{labelDataType,jdbcType=VARCHAR},
@@ -89,7 +97,9 @@
       #{labLevel5,jdbcType=VARCHAR}, #{labLevel5Name,jdbcType=VARCHAR}, #{labLevel6,jdbcType=VARCHAR},
       #{labLevel6Name,jdbcType=VARCHAR}, #{labUpdateFeq,jdbcType=VARCHAR}, #{labBusiDesc,jdbcType=VARCHAR},
       #{labTechDesc,jdbcType=VARCHAR}, #{labState,jdbcType=VARCHAR}, #{labManageType,jdbcType=VARCHAR},
-      #{labTagCode,jdbcType=VARCHAR},#{systemInfoId,jdbcType=BIGINT})
+      #{labTagCode,jdbcType=VARCHAR},#{systemInfoId,jdbcType=BIGINT},#{labExample,jdbcType=VARCHAR},
+      #{labEffectiveDate,jdbcType=TIMESTAMP}, #{labExpirationDate,jdbcType=TIMESTAMP},
+      #{damander,jdbcType=VARCHAR}, #{damandDepartment,jdbcType=VARCHAR}, #{damandDescription,jdbcType=VARCHAR})
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.Label">
     update injection_label
@@ -136,7 +146,13 @@
       LAB_STATE = #{labState,jdbcType=VARCHAR},
       LAB_MANAGE_TYPE = #{labManageType,jdbcType=VARCHAR},
       LAB_TAG_CODE = #{labTagCode,jdbcType=VARCHAR},
-      SYSTEM_INFO_ID = #{systemInfoId,jdbcType=BIGINT}
+      SYSTEM_INFO_ID = #{systemInfoId,jdbcType=BIGINT},
+      LAB_EXAMPLE = #{labExample,jdbcType=VARCHAR},
+      LAB_EFFECTIVE_DATE = #{labEffectiveDate,jdbcType=TIMESTAMP},
+      LAB_EXPIRATION_DATE = #{labExpirationDate,jdbcType=TIMESTAMP},
+      DAMANDER = #{damander,jdbcType=VARCHAR},
+      DAMAND_DEPARTMENT = #{damandDepartment,jdbcType=VARCHAR},
+      DAMAND_DESCRIPTION = #{damandDescription,jdbcType=VARCHAR}
     where INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
