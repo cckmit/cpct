@@ -24,6 +24,8 @@
         <dubbo:method name="searchCountInfo" servicecode="00.1083.searchCountInfo" timeout="100000"/>
         <dubbo:method name="strategyIssure" servicecode="00.1083.strategyIssure" timeout="100000"/>
         <dubbo:method name="issueByFile" servicecode="00.1083.issueByFile" timeout="10000"/>
+        <dubbo:method name="uploadFile2Prod" servicecode="00.1083.uploadFile2Prod" timeout="10000"/>
+        <dubbo:method name="trialLog" servicecode="00.1083.trialLog" timeout="10000"/>
     </dubbo:reference>
 
     <dubbo:reference registry="esb3" interface="org.springframework.session.data.ctg.IDubboCtgService"
@@ -38,6 +40,18 @@
     <!--活动信息同步大数据-->
     <dubbo:reference registry="esb2" id="activitySyncService" interface="com.zjhcsoft.eagle.main.dubbo.service.ActivitySyncService" version="1.0">
         <dubbo:method name="syncActivity" servicecode="33.1307.syncActivity" timeout="30000"/>
+    </dubbo:reference>
+
+    <!-- 门户-获取用户岗位信息 -->
+    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemPostDubboService"
+                     id="iSystemPostDubboService" version="2.0" retries="0" check="false">
+        <dubbo:method name="qrySystemPostPage" servicecode="00.1077.qrySystemPostPage" timeout="10000"/>
+    </dubbo:reference>
+
+    <!-- 门户-获取用户角色信息 -->
+    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService"
+                     id="iSystemUserDtoDubboService" version="2.0" retries="0" check="false">
+        <dubbo:method name="qrySystemUserDto" servicecode="00.1077.qrySystemUserDto" timeout="10000"/>
     </dubbo:reference>
 
 
