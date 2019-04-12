@@ -154,10 +154,16 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
     public Map<String, Object> syncLabelInfo(Map<String,Object> record) {
         Map<String,Object> result = new HashMap<>();
         System.out.println("*******************入参："+JSON.toJSONString(record));
-        RecordModel recordModel = ChannelUtil.mapToEntity(record,RecordModel.class);
+        Map<String,Object> labModel = (Map<String, Object>) record.get("labModel");
+        List<Map<String,Object>> valueList = new ArrayList<>();
+        if (record.get("labelValueList")!=null){
+            valueList = (List<Map<String,Object>>) record.get("labelValueList");
+        }
+        RecordModel recordModel = ChannelUtil.mapToEntity(labModel,RecordModel.class);
+        recordModel.setLabelValueList(valueList);
         System.out.println("*******************实体转换："+JSON.toJSONString(recordModel));
         try {
-            switch (record.get("labState").toString()){
+            switch (recordModel.getLabState()){
                 case "3":
                     result = addLabel(recordModel);
 //                    if (result.get("resultCode").equals(CODE_SUCCESS)){
