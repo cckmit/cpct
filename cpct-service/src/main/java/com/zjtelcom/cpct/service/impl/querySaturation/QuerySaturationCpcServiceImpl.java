@@ -41,6 +41,7 @@ public class QuerySaturationCpcServiceImpl implements QuerySaturationCpcService 
         boolean result = false;
         try {
             Map<String, String> map = querySaturationService.querySaturation(queryDate, lanId);
+            log.info("map = " + JSON.toJSONString(map));
             List<Map<String,Object>>  labelList = (List<Map<String,Object>>) JSON.parse(map.get("labelSaturation"));
             List<LabelSaturation> labelSaturationList = new ArrayList<>();
             for (Map<String,Object> labelMap : labelList) {
