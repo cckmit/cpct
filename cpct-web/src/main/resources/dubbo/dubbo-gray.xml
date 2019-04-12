@@ -54,5 +54,11 @@
         <dubbo:method name="qrySystemUserDto" servicecode="00.1077.qrySystemUserDto" timeout="10000"/>
     </dubbo:reference>
 
+    <!-- 标签饱和度查询接口 -->
+    <dubbo:reference registry="esb2" interface="com.zjhcsoft.eagle.main.dubbo.service.QuerySaturationService"
+                     id="querySaturationService" version="1.0" retries="0" check="false">
+        <dubbo:method name="querySaturation" servicecode="33.1307.querySaturation" timeout="10000"/>
+    </dubbo:reference>
+
 
 </beans>
