@@ -153,7 +153,9 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
     @Transactional
     public Map<String, Object> syncLabelInfo(Map<String,Object> record) {
         Map<String,Object> result = new HashMap<>();
+        System.out.println("*******************入参："+JSON.toJSONString(record));
         RecordModel recordModel = ChannelUtil.mapToEntity(record,RecordModel.class);
+        System.out.println("*******************实体转换："+JSON.toJSONString(recordModel));
         try {
             switch (record.get("labState").toString()){
                 case "3":
