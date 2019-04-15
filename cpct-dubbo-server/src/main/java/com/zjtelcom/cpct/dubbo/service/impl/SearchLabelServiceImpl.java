@@ -1,11 +1,13 @@
 package com.zjtelcom.cpct.dubbo.service.impl;
 
+import com.zjtelcom.cpct.dao.campaign.MktCamChlConfAttrMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
+import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
@@ -14,6 +16,7 @@ import com.zjtelcom.cpct.dto.channel.MessageLabelInfo;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dubbo.service.SearchLabelService;
+import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +53,8 @@ public class SearchLabelServiceImpl implements SearchLabelService {
     private FilterRuleMapper filterRuleMapper;
     @Autowired
     private MktCamEvtRelMapper evtRelMapper;
+    @Autowired
+    private MktCamChlConfAttrMapper confAttrMapper;
 
 
     @Override
@@ -138,17 +143,30 @@ public class SearchLabelServiceImpl implements SearchLabelService {
                                 }
                             }
                         }
+                        List<MktCamChlConfAttrDO> confAttrDOList = confAttrMapper.selectByEvtContactConfId(Long.valueOf(confId));
+                        for (MktCamChlConfAttrDO confAttrDO : confAttrDOList){
+                            if (ConfAttrEnum.ACCOUNT.getArrId().equals(confAttrDO.getAttrId())){
+                                Label label = injectionLabelMapper.selectByLabelCode(confAttrDO.getAttrValue());
+                                if (label!=null){
+                                    if (idlIst.contains(label.getInjectionLabelId())){
+                                        continue;
+                                    }
+                                    idlIst.add(label.getInjectionLabelId());
+                                    codeList(assetCode, promCode, custCode, label);
+                                }
+                            }
+                        }
                     }
                 }
                 //分群标签
                 List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(rule.getTarGrpId());
                 for (TarGrpCondition condition : conditionList) {
                     Label label = injectionLabelMapper.selectByPrimaryKey(Long.valueOf(condition.getLeftParam()));
-                    if (idlIst.contains(label.getInjectionLabelId())){
-                        continue;
-                    }
-                    idlIst.add(label.getInjectionLabelId());
-                    if (label != null ) {
+                    if (label != null) {
+                        if (idlIst.contains(label.getInjectionLabelId())) {
+                            continue;
+                        }
+                        idlIst.add(label.getInjectionLabelId());
                         codeList(assetCode, promCode, custCode, label);
                     }
                 }
