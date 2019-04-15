@@ -183,6 +183,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         request.setBatchNum(operation.getBatchNum());
         TrialResponseES responseES = new TrialResponseES();
         try {
+//            responseES = restTemplate.postForObject("http://localhost:8080/es/trialLog", request, TrialResponseES.class);
             responseES = esService.trialLog(request);
         }catch (Exception e){
             logger.error("日志查询失败");
@@ -638,7 +639,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 }
                 customers.put(cellTitle.getStringCellValue(), ChannelUtil.getCellValue(cell));
             }
-            customerList.add(customers);
+            if (!customers.isEmpty()){
+                customerList.add(customers);
+            }
         }
         for (int i = 0 ; i< labelDTOList.size();i++){
             Map<String,Object> label = new HashMap<>();
