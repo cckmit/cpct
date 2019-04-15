@@ -655,6 +655,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             mktCamChlConfDO.setCreateDate(new Date());
             mktCamChlConfDO.setUpdateStaff(UserUtil.loginId());
             mktCamChlConfDO.setUpdateDate(new Date());
+            mktCamChlConfDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
             // 新增协同渠道
             mktCamChlConfMapper.insert(mktCamChlConfDO);
             Long childEvtContactConfId = mktCamChlConfDO.getEvtContactConfId();

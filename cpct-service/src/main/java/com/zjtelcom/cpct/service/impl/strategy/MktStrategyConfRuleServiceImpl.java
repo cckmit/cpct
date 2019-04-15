@@ -1823,9 +1823,11 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                  */
                 Map<String, Object> tarGrpMap = new HashMap<>();
                 tarGrpMap = tarGrpService.copyTarGrp(mktStrategyConfRuleDO.getTarGrpId(), false);
-                TarGrp tarGrp = (TarGrp) tarGrpMap.get("tarGrp");
-                if (tarGrp != null) {
-                    mktStrategyConfRule.setTarGrpId(tarGrp.getTarGrpId());
+                if (tarGrpMap != null) {
+                    TarGrp tarGrp = (TarGrp) tarGrpMap.get("tarGrp");
+                    if (tarGrp != null) {
+                        mktStrategyConfRule.setTarGrpId(tarGrp.getTarGrpId());
+                    }
                 }
 
                 /**
