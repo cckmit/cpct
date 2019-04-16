@@ -27,7 +27,7 @@ public class QuerySaturationCpcController extends BaseController {
      */
     @CrossOrigin
     @RequestMapping("query")
-    public void querySaturation(String queryDate, String lanId){
-        querySaturationCpcService.querySaturationCpc(queryDate, lanId);
+    public boolean querySaturation(String queryDate, String lanId){
+         return querySaturationCpcService.querySaturationCpc(queryDate, lanId);
     }
 }

@@ -531,10 +531,7 @@ public class CamApiServiceImpl implements CamApiService {
 
             jsonObject.put("ruleId", ruleId);
             jsonObject.put("ruleName", ruleName);
-            jsonObject.put("hitEntity", privateParams.get("ac" +
-                    "" +
-                    "" +
-                    "cNbr")); //命中对象
+            jsonObject.put("hitEntity", privateParams.get("accNbr")); //命中对象
             jsonObject.put("reqId", reqId);
             jsonObject.put("eventId", params.get("eventCode"));
             jsonObject.put("activityId", privateParams.get("activityId"));
@@ -907,7 +904,9 @@ public class CamApiServiceImpl implements CamApiService {
                                     //将线程处理结果添加到结果集
                                     //threadList.add(f);
                                     Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId);
-                                    taskChlList.add(channelMap);
+                                    if(channelMap!=null && !channelMap.isEmpty() ){
+                                        taskChlList.add(channelMap);
+                                    }
                                 }
                             }
                         }

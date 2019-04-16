@@ -42,21 +42,22 @@ public class QuerySaturationCpcServiceImpl implements QuerySaturationCpcService 
         try {
             Map<String, String> map = querySaturationService.querySaturation(queryDate, lanId);
             log.info("map = " + JSON.toJSONString(map));
-
             List<Map<String,Object>>  labelList = (List<Map<String,Object>>) JSON.parse(map.get("labelSaturation"));
             List<LabelSaturation> labelSaturationList = new ArrayList<>();
-            for (Map<String,Object> labelMap : labelList) {
-                LabelSaturation labelSaturation = new LabelSaturation();
-                labelSaturation.setLabelCode(labelMap.get("LABEL_ENG_NAME").toString());
-                labelSaturation.setBigdataSaturation(Long.valueOf(labelMap.get("LABEL_NOT_NULL_CNT").toString()));
-                labelSaturation.setSaturationBatchNumber(labelMap.get("DATE_CD").toString());
-                labelSaturation.setCreateDate(new Date());
-                labelSaturation.setUpdateDate(new Date());
-                labelSaturation.setCreateStaff(UserUtil.loginId());
-                labelSaturation.setUpdateStaff(UserUtil.loginId());
-                labelSaturationList.add(labelSaturation);
+            if(labelList !=null && labelList.size()>0){
+                for (Map<String,Object> labelMap : labelList) {
+                    LabelSaturation labelSaturation = new LabelSaturation();
+                    labelSaturation.setLabelCode(labelMap.get("LABEL_ENG_NAME").toString());
+                    labelSaturation.setBigdataSaturation(Long.valueOf(labelMap.get("LABEL_NOT_NULL_CNT").toString()));
+                    labelSaturation.setSaturationBatchNumber(labelMap.get("DATE_CD").toString());
+                    labelSaturation.setCreateDate(new Date());
+                    labelSaturation.setUpdateDate(new Date());
+                    labelSaturation.setCreateStaff(UserUtil.loginId());
+                    labelSaturation.setUpdateStaff(UserUtil.loginId());
+                    labelSaturationList.add(labelSaturation);
+                }
+                labelSaturationMapper.insertBatch(labelSaturationList);
             }
-            labelSaturationMapper.insertBatch(labelSaturationList);
             result = true;
         } catch (Exception e) {
             log.error("标签饱和度接口查询失败，Exception = " + e);

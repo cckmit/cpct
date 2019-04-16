@@ -601,19 +601,24 @@ public class EventApiServiceImpl implements EventApiService {
                         custLabelList.remove(entry.getKey());
                     }
                 }
+
+                List<String> labelList = new ArrayList<>();
+                labelList.addAll(assetLabelList);
+                labelList.addAll(promLabelList);
+                labelList.addAll(custLabelList);
+
+
                 if (assetLabelList != null && assetLabelList.size() > 0) {
-                    mktAllLabel.put("assetLabels", ChannelUtil.StringList2String(assetLabelList));
+                    mktAllLabel.put("assetLabels", ChannelUtil.StringList2String(labelList));
                 }
+/*
                 if (promLabelList != null && promLabelList.size() > 0) {
                     mktAllLabel.put("promLabels", ChannelUtil.StringList2String(promLabelList));
                 }
                 if (custLabelList != null && custLabelList.size() > 0) {
                     mktAllLabel.put("custLabels", ChannelUtil.StringList2String(custLabelList));
                 }
- //               log.info("assetLabelList = " +assetLabelList  + "   " + "promLabelList = " + promLabelList + "   " + "custLabelList = " + custLabelList);
-
-
-
+*/
 
                 List<DefaultContext<String, Object>> resultMapList = new ArrayList<>();
                 JSONArray accArray = new JSONArray();
@@ -657,9 +662,11 @@ public class EventApiServiceImpl implements EventApiService {
                             privateParams.put("accNbr", map.get("accNbr"));
                             privateParams.put("integrationId", map.get("integrationId"));
                             privateParams.put("custId", map.get("custId"));
+/*
                             if(!"".equals(mktAllLabel.get("custLabels")) && mktAllLabel.get("custLabels")!=null ){
                                 getCustLabel(mktAllLabel, map, privateParams, context, esJson);
                             }
+*/
                             // 客户级
                             List<Future<DefaultContext<String, Object>>> futureList = new ArrayList<>();
 
@@ -695,12 +702,14 @@ public class EventApiServiceImpl implements EventApiService {
                     Map<String, Object> assetLabelMap= getAssetAndPromLabel(mktAllLabel, map, privateParams, context, esJson, labelItems);
                     if (assetLabelMap != null) {
                         reultMap.putAll(assetLabelMap);
+/*
                         Map<String, Object> custLabelMap = getCustLabel(mktAllLabel, map, privateParams, context, esJson);
                         if (custLabelMap != null) {
                             reultMap.putAll(custLabelMap);
                         } else {
                             return null;
                         }
+*/
                     } else {
                         return null;
                     }
@@ -2021,7 +2030,7 @@ public class EventApiServiceImpl implements EventApiService {
 
 
     //客户级标签
-    private DefaultContext<String, Object> getCustLabel( Map<String, String> mktAllLabel, Map<String, String> params,Map<String, String> privateParams,
+/*    private DefaultContext<String, Object> getCustLabel( Map<String, String> mktAllLabel, Map<String, String> params,Map<String, String> privateParams,
                                                          DefaultContext<String, Object> context,  JSONObject esJson){
         if (mktAllLabel.get("custLabels") != null && !"".equals(mktAllLabel.get("custLabels"))) {
             JSONObject paramCust = new JSONObject();
@@ -2051,7 +2060,7 @@ public class EventApiServiceImpl implements EventApiService {
             }
         }
         return context;
-    }
+    }*/
 
 
     // 处理资产级标签和销售品级标签
@@ -2093,6 +2102,7 @@ public class EventApiServiceImpl implements EventApiService {
         }
 
         //销售品级标签
+/*
         if (mktAllLabel.get("promLabels") != null && !"".equals(mktAllLabel.get("promLabels")) && !"".equals(saleId)) {
 
             JSONObject paramSale = new JSONObject();
@@ -2119,6 +2129,7 @@ public class EventApiServiceImpl implements EventApiService {
                 return null;
             }
         }
+*/
         contextNew.putAll(labelItems);   //添加事件采集项中作为标签使用的实例
         contextNew.putAll(context);      // 客户级标签
         contextNew.put("integrationId", privateParams.get("integrationId"));
@@ -2183,10 +2194,11 @@ public class EventApiServiceImpl implements EventApiService {
 
             //判断有没有客户级活动
             Boolean hasCust = false;  //是否有客户级
+            List<String> campaignList = new ArrayList<>();
             for (MktCamEvtRel mktCamEvtRel : resultByEvent) {
+                campaignList.add(mktCamEvtRel.getMktCampaignId().toString());
                 if (mktCamEvtRel.getLevelConfig() == 1) {
                     hasCust = true;
-                    break;
                 }
             }
             List<String> custRuleIdList = new ArrayList<>();
@@ -2233,6 +2245,7 @@ public class EventApiServiceImpl implements EventApiService {
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("cust", custParamMap);
             paramMap.put("asset", assetParamMap);
+            paramMap.put("campaignList", campaignList);
             Map<String, Object> paramResultMap = esService.queryCustomer4Event(paramMap);
 
             List<Map<String, Object>> resultList = new ArrayList<>();
@@ -2271,7 +2284,7 @@ public class EventApiServiceImpl implements EventApiService {
                 }
             }
             resultMap.put("CPCResultMsg", "success");
-            resultMap.put("custId", "success");
+            resultMap.put("custId", custId);
             resultMap.put("taskList", resultList);
             resultMap.put("CPCResultCode", "1");
             resultMap.put("reqId", map.get("reqId"));

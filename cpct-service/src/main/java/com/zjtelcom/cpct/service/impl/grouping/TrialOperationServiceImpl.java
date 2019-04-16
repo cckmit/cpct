@@ -183,6 +183,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         request.setBatchNum(operation.getBatchNum());
         TrialResponseES responseES = new TrialResponseES();
         try {
+//            responseES = restTemplate.postForObject("http://localhost:8080/es/trialLog", request, TrialResponseES.class);
             responseES = esService.trialLog(request);
         }catch (Exception e){
             logger.error("日志查询失败");
@@ -638,7 +639,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 }
                 customers.put(cellTitle.getStringCellValue(), ChannelUtil.getCellValue(cell));
             }
-            customerList.add(customers);
+            if (!customers.isEmpty()){
+                customerList.add(customers);
+            }
         }
         for (int i = 0 ; i< labelDTOList.size();i++){
             Map<String,Object> label = new HashMap<>();
@@ -1069,17 +1072,35 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "试运算记录不存在");
             return result;
         }
+        // 通过活动id获取关联的标签字段数组
+        MktCampaignDO campaignDO = campaignMapper.selectByPrimaryKey(trialOperation.getCampaignId());
+        if (campaignDO==null){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "活动不存在");
+            return result;
+        }
+        if(!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(campaignDO.getStatusCd())){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "发布活动后才能全量试算");
+            return result;
+        }
+        MktStrategyConfDO strategyConfDO = strategyConfMapper.selectByPrimaryKey(operation.getStrategyId());
+        if (strategyConfDO==null){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "策略不存在");
+            return result;
+        }
         if (!operation.getStatusCd().equals(TrialStatus.SAMPEL_SUCCESS.getValue())){
             result.put("resultCode", CODE_FAIL);
             result.put("resultMsg", "抽样试算失败，无法全量试算");
             return result;
         }
-        List<TrialOperation> operationList = trialOperationMapper.listOperationByStatusCd(TrialStatus.ALL_SAMPEL_GOING.getValue());
-        if (!operationList.isEmpty()){
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "系统正在全量试算 请稍后再试。");
-            return result;
-        }
+//        List<TrialOperation> operationList = trialOperationMapper.listOperationByStatusCd(TrialStatus.ALL_SAMPEL_GOING.getValue());
+//        if (!operationList.isEmpty()){
+//            result.put("resultCode", CODE_FAIL);
+//            result.put("resultMsg", "系统正在全量试算 请稍后再试。");
+//            return result;
+//        }
 
         int timeLimit = 1800000;
         List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign("TRIAL_TIME");
@@ -1099,24 +1120,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         }
         BeanUtil.copy(operation,trialOperation);
 
-        // 通过活动id获取关联的标签字段数组
-        MktCampaignDO campaignDO = campaignMapper.selectByPrimaryKey(trialOperation.getCampaignId());
-        if (campaignDO==null){
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "活动不存在");
-            return result;
-        }
-        if(!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(campaignDO.getStatusCd())){
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "发布活动后才能全量试算");
-            return result;
-        }
-        MktStrategyConfDO strategyConfDO = strategyConfMapper.selectByPrimaryKey(operation.getStrategyId());
-        if (strategyConfDO==null){
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "策略不存在");
-            return result;
-        }
+
 
         //添加策略适用地市
         redisUtils.set("STRATEGY_CONF_AREA_"+operation.getStrategyId(),strategyConfDO.getAreaId());
