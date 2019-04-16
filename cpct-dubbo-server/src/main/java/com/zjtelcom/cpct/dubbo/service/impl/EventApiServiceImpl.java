@@ -2194,10 +2194,11 @@ public class EventApiServiceImpl implements EventApiService {
 
             //判断有没有客户级活动
             Boolean hasCust = false;  //是否有客户级
+            List<String> campaignList = new ArrayList<>();
             for (MktCamEvtRel mktCamEvtRel : resultByEvent) {
+                campaignList.add(mktCamEvtRel.getMktCampaignId().toString());
                 if (mktCamEvtRel.getLevelConfig() == 1) {
                     hasCust = true;
-                    break;
                 }
             }
             List<String> custRuleIdList = new ArrayList<>();
@@ -2244,6 +2245,7 @@ public class EventApiServiceImpl implements EventApiService {
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("cust", custParamMap);
             paramMap.put("asset", assetParamMap);
+            paramMap.put("campaignList", campaignList);
             Map<String, Object> paramResultMap = esService.queryCustomer4Event(paramMap);
 
             List<Map<String, Object>> resultList = new ArrayList<>();
