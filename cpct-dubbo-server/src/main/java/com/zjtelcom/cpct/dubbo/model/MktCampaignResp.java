@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.dubbo.model;
 
 import com.zjtelcom.cpct.dto.campaign.MktCampaign;
+import com.zjtelcom.cpct.dto.filter.FilterRuleModel;
 
 import java.util.ArrayList;
 
@@ -66,6 +67,11 @@ public class MktCampaignResp extends MktCampaign{
      * 策略配置信息
      */
     private ArrayList<MktStrategyConfResp> mktStrategyConfRespList;
+
+    /**
+     * 过滤规则
+     */
+    private ArrayList<FilterRuleModel> filterRuleModelList;
 
 
     public String getMktCampaignTypeValue() {
@@ -163,5 +169,13 @@ public class MktCampaignResp extends MktCampaign{
 
     public void setMktStrategyConfRespList(ArrayList<MktStrategyConfResp> mktStrategyConfRespList) {
         this.mktStrategyConfRespList = mktStrategyConfRespList;
+    }
+
+    public ArrayList<FilterRuleModel> getFilterRuleModelList() {
+        return filterRuleModelList;
+    }
+
+    public void setFilterRuleModelList(ArrayList<FilterRuleModel> filterRuleModelList) {
+        this.filterRuleModelList = filterRuleModelList;
     }
 }

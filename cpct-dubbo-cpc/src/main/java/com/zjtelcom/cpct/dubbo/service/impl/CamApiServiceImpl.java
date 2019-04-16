@@ -531,10 +531,7 @@ public class CamApiServiceImpl implements CamApiService {
 
             jsonObject.put("ruleId", ruleId);
             jsonObject.put("ruleName", ruleName);
-            jsonObject.put("hitEntity", privateParams.get("ac" +
-                    "" +
-                    "" +
-                    "cNbr")); //命中对象
+            jsonObject.put("hitEntity", privateParams.get("accNbr")); //命中对象
             jsonObject.put("reqId", reqId);
             jsonObject.put("eventId", params.get("eventCode"));
             jsonObject.put("activityId", privateParams.get("activityId"));
@@ -907,7 +904,9 @@ public class CamApiServiceImpl implements CamApiService {
                                     //将线程处理结果添加到结果集
                                     //threadList.add(f);
                                     Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId);
-                                    taskChlList.add(channelMap);
+                                    if(channelMap!=null && !channelMap.isEmpty() ){
+                                        taskChlList.add(channelMap);
+                                    }
                                 }
                             }
                         }
@@ -1469,12 +1468,20 @@ public class CamApiServiceImpl implements CamApiService {
             case "3000":
                 express.append("toNum(").append(code).append("))");
                 express.append(" == ");
-                express.append("\"").append(rightParam).append("\"");
+                if(NumberUtils.isNumber(rightParam)) {
+                    express.append(rightParam);
+                } else {
+                    express.append("\"").append(rightParam).append("\"");
+                }
                 break;
             case "4000":
                 express.append("toNum(").append(code).append("))");
                 express.append(" != ");
-                express.append("\"").append(rightParam).append("\"");
+                if(NumberUtils.isNumber(rightParam)) {
+                    express.append(rightParam);
+                } else {
+                    express.append("\"").append(rightParam).append("\"");
+                }
                 break;
             case "5000":
                 express.append("toNum(").append(code).append("))");
@@ -1545,12 +1552,21 @@ public class CamApiServiceImpl implements CamApiService {
             case "3000":
                 express.append(label.getInjectionLabelCode()).append(")");
                 express.append(" == ");
-                express.append("\"").append(rightParam).append("\"");
+                if(NumberUtils.isNumber(rightParam)) {
+                    express.append(rightParam);
+                } else {
+                    express.append("\"").append(rightParam).append("\"");
+                }
                 break;
             case "4000":
                 express.append(label.getInjectionLabelCode()).append(")");
                 express.append(" != ");
-                express.append("\"").append(rightParam).append("\"");
+                if(NumberUtils.isNumber(rightParam)) {
+                    express.append(rightParam);
+                } else {
+                    express.append("\"").append(rightParam).append("\"");
+                }
+
                 break;
             case "5000":
                 express.append("toNum(").append(label.getInjectionLabelCode()).append("))");

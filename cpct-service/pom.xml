@@ -80,6 +80,11 @@
             <artifactId>dubbo-eagle-service</artifactId>
         </dependency>
 
+        <dependency>
+            <artifactId>eagle-main-zj</artifactId>
+            <groupId>com.zjhcsoft.main</groupId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
 
 

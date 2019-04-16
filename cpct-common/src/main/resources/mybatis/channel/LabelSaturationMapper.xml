@@ -32,6 +32,22 @@
       #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
       #{remake,jdbcType=VARCHAR})
   </insert>
+  <!-- 批量插入 -->
+  <insert id="insertBatch" parameterType="java.util.List">
+    insert into label_saturation (LABEL_SATURATION_ID, LABEL_CODE, SATURATION_BATCH_NUMBER,
+    BIGDATA_SATURATION, ES_SATURATION, COMPARING_RESULTS,
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE,
+    REMAKE)
+    values
+      <foreach collection="list" item="item" separator="," index="i">
+         (#{item.labelSaturationId,jdbcType=BIGINT}, #{item.labelCode,jdbcType=VARCHAR}, #{item.saturationBatchNumber,jdbcType=VARCHAR},
+        #{item.bigdataSaturation,jdbcType=BIGINT}, #{item.esSaturation,jdbcType=BIGINT}, #{item.comparingResults,jdbcType=VARCHAR},
+        #{item.statusCd,jdbcType=VARCHAR}, #{item.createStaff,jdbcType=BIGINT}, #{item.updateStaff,jdbcType=BIGINT},
+        #{item.createDate,jdbcType=TIMESTAMP}, #{item.statusDate,jdbcType=TIMESTAMP}, #{item.updateDate,jdbcType=TIMESTAMP},
+        #{item.remake,jdbcType=VARCHAR})
+      </foreach>
+  </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.LabelSaturation">
     update label_saturation
     set LABEL_CODE = #{labelCode,jdbcType=VARCHAR},
