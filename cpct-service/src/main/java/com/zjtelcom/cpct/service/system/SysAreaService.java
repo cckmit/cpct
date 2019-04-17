@@ -29,4 +29,6 @@ public interface SysAreaService {
 
     Map<String, Object> listCityByParentId(Integer parentCityId);
 
+    Map<String, Object> listCityAndParentByParentId(Integer parentCityId);
+
 }

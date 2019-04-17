@@ -2197,7 +2197,7 @@ public class EventApiServiceImpl implements EventApiService {
             List<String> campaignList = new ArrayList<>();
             for (MktCamEvtRel mktCamEvtRel : resultByEvent) {
                 campaignList.add(mktCamEvtRel.getMktCampaignId().toString());
-                if (mktCamEvtRel.getLevelConfig() == 1) {
+                if (!hasCust && mktCamEvtRel.getLevelConfig() == 1) {
                     hasCust = true;
                 }
             }
