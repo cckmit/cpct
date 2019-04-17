@@ -1072,6 +1072,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "试运算记录不存在");
             return result;
         }
+        BeanUtil.copy(operation,trialOperation);
         // 通过活动id获取关联的标签字段数组
         MktCampaignDO campaignDO = campaignMapper.selectByPrimaryKey(trialOperation.getCampaignId());
         if (campaignDO==null){
@@ -1118,9 +1119,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "相同活动30分钟只能全量试算一次，请稍后再试");
             return result;
         }
-        BeanUtil.copy(operation,trialOperation);
-
-
 
         //添加策略适用地市
         redisUtils.set("STRATEGY_CONF_AREA_"+operation.getStrategyId(),strategyConfDO.getAreaId());
@@ -1267,7 +1265,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 }else {
                     detail.setCost(cost+"ms");
                 }
-
             }
             operationDetailList.add(detail);
         }
