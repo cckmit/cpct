@@ -565,7 +565,13 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         List<MktCampaignRelDO> mktCampaignRelDOS = mktCampaignRelMapper.selectByZmktCampaignId(mktCampaignId, "1000");
         MktCampaignDO mktCampaignDOPre = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(mktCampaignRelDOS.get(0).getaMktCampaignId()));
         mktCampaignVO.setPreMktCampaignId(mktCampaignDOPre.getMktCampaignId());
-        mktCampaignVO.setPreMktCampaignType(StatusCode.getMsgByCode(mktCampaignDOPre.getMktCampaignCategory()));
+        if("1000".equals(mktCampaignDOPre.getMktCampaignCategory())){
+            mktCampaignVO.setPreMktCampaignType("框架活动");
+        }else if("2000".equals(mktCampaignDOPre.getMktCampaignCategory())){
+            mktCampaignVO.setPreMktCampaignType("强制活动");
+        }else if("3000".equals(mktCampaignDOPre.getMktCampaignCategory())){
+            mktCampaignVO.setPreMktCampaignType("自主活动");
+        }
 
         MktCamDirectoryDO mktCamDirectoryDO = mktCamDirectoryMapper.selectByPrimaryKey(mktCampaignDO.getDirectoryId());
         if (mktCamDirectoryDO != null) {
@@ -1002,7 +1008,14 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCampaignVO.setCreateDate(mktCampaignCountDO.getCreateDate());
                     mktCampaignVO.setPreMktCampaignId(mktCampaignCountDO.getPreMktCampaignId());
                     MktCampaignDO mktCampaignDOPre = mktCampaignMapper.selectByPrimaryKey(mktCampaignCountDO.getPreMktCampaignId());
-                    mktCampaignVO.setPreMktCampaignType(StatusCode.getMsgByCode(mktCampaignDOPre.getMktCampaignCategory()));
+                    mktCampaignVO.setPreMktCampaignId(mktCampaignDOPre.getMktCampaignId());
+                    if("1000".equals(mktCampaignDOPre.getMktCampaignCategory())){
+                        mktCampaignVO.setPreMktCampaignType("框架活动");
+                    }else if("2000".equals(mktCampaignDOPre.getMktCampaignCategory())){
+                        mktCampaignVO.setPreMktCampaignType("强制活动");
+                    }else if("3000".equals(mktCampaignDOPre.getMktCampaignCategory())){
+                        mktCampaignVO.setPreMktCampaignType("自主活动");
+                    }
                     // 获取创建人信息
                     long before2 = System.currentTimeMillis();
                     SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(mktCampaignCountDO.getCreateStaff(), new ArrayList<Long>());
