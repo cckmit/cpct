@@ -563,7 +563,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
         //查询父活动信息
         List<MktCampaignRelDO> mktCampaignRelDOS = mktCampaignRelMapper.selectByZmktCampaignId(mktCampaignId, "1000");
-        MktCampaignDO mktCampaignDOPre = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(mktCampaignRelDOS.get(0).toString()));
+        MktCampaignDO mktCampaignDOPre = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(mktCampaignRelDOS.get(0).getaMktCampaignId()));
         mktCampaignVO.setPreMktCampaignId(mktCampaignDOPre.getMktCampaignId());
         mktCampaignVO.setPreMktCampaignType(StatusCode.getMsgByCode(mktCampaignDOPre.getMktCampaignCategory()));
 
