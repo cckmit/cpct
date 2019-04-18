@@ -291,6 +291,7 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
                     for (MktCamCityRelDO mktCamCityRelDO : mktCamCityRelDOList) {
                         // 为下发城市生成新的活动
                         mktCampaignDO.setMktCampaignId(null);
+                        mktCampaignDO.setMktCampaignCategory(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()); // 子活动默认为自主活动
                         mktCampaignDO.setLanId(mktCamCityRelDO.getCityId()); // 本地网标识
                         mktCampaignDO.setCreateDate(new Date());
                         mktCampaignDO.setCreateStaff(UserUtil.loginId());
