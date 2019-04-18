@@ -212,6 +212,8 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
     //指定下发地市人员的数据集合
     private final static String CITY_PUBLISH="CITY_PUBLISH";
 
+    private final static String createChannel = "cpcpcj0001";
+
 
     /**
      * 发布并下发活动
@@ -293,18 +295,18 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
                         mktCampaignDO.setMktCampaignId(null);
                         mktCampaignDO.setMktCampaignCategory(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()); // 子活动默认为自主活动
                         mktCampaignDO.setLanId(mktCamCityRelDO.getCityId()); // 本地网标识
+                        mktCampaignDO.setRegionId(AreaCodeEnum.getRegionIdByLandId(mktCamCityRelDO.getCityId()));
                         mktCampaignDO.setCreateDate(new Date());
-                        mktCampaignDO.setCreateStaff(UserUtil.loginId());
                         mktCampaignDO.setUpdateDate(new Date());
                         mktCampaignDO.setUpdateStaff(UserUtil.loginId());
                         mktCampaignDO.setStatusCd(StatusCode.STATUS_CODE_DRAFT.getStatusCode());
+                        mktCampaignDO.setCreateChannel(createChannel);
                         mktCampaignMapper.insert(mktCampaignDO);
                         // 获取新的活动的Id
                         Long childMktCampaignId = mktCampaignDO.getMktCampaignId();
                         // 活动编码
                         mktCampaignDO.setMktActivityNbr("MKT" + String.format("%06d", childMktCampaignId));
                         mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
-
 
                         childMktCampaignIdList.add(childMktCampaignId);
                         // 与父活动进行关联
