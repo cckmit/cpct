@@ -525,6 +525,8 @@ public class EventApiServiceImpl implements EventApiService {
                     return result;
                 }
 
+
+
                 timeJson.put("time2", System.currentTimeMillis() - begin);
                 //事件下所有活动的规则预校验，返回初步可命中活动
                 List<Map<String, Object>> resultByEvent = getResultByEvent(eventId, map.get("lanId"), map.get("channelCode"), map.get("reqId"), map.get("accNbr"), c4);
@@ -2251,7 +2253,6 @@ public class EventApiServiceImpl implements EventApiService {
             paramMap.put("asset", assetParamMap);
             paramMap.put("campaignList", campaignList);
             Map<String, Object> paramResultMap = esService.queryCustomer4Event(paramMap);
-            System.out.println("**********es查询返回"+JSON.toJSONString(paramResultMap));
 
             List<Map<String, Object>> resultList = new ArrayList<>();
             // 解析
@@ -2260,6 +2261,18 @@ public class EventApiServiceImpl implements EventApiService {
                 if (resultMapList != null && resultMapList.size() > 0) {
                     for (Map<String, Object> resultMap1 : resultMapList) {
                         Map result = new HashMap();
+                        List<Map<String, Object>> taskChlList = (List<Map<String, Object>>) ((Map) resultMap1.get("CPC_VALUE")).get("taskChlList");
+                        int count = 0;  // 统计符合渠道的个数
+                        List<Map<String, Object>> taskChlListNew = new ArrayList<>();
+                        for (Map<String, Object> taskChlMap : taskChlList) {
+                            if (map.get("channelCode").equals(taskChlMap.get("channelId"))) {
+                                count++;
+                                taskChlListNew.add(taskChlMap);
+                            }
+                        }
+                        if (count > 0) {
+                            ((Map) resultMap1.get("CPC_VALUE")).put("taskChlList", taskChlListNew);
+                        }
                         result.putAll((Map)resultMap1.get("CPC_VALUE"));
                         result.put("orderISI", map.get("reqId"));
                         result.put("skipCheck", "0");
@@ -2288,6 +2301,7 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 }
             }
+
             resultMap.put("CPCResultMsg", "success");
             resultMap.put("custId", custId);
             resultMap.put("taskList", resultList);

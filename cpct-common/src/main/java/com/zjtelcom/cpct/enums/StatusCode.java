@@ -93,4 +93,13 @@ public enum StatusCode {
     public void setStatusCode(String statusCode) {
         this.statusCode = statusCode;
     }
+
+    public static String getMsgByCode(String code){
+        for (StatusCode statusCode : StatusCode.values()) {
+            if(code.equals(statusCode.statusCode)){
+                return statusCode.statusMsg;
+            }
+        }
+        return null;
+    }
 }
