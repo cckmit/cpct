@@ -517,7 +517,12 @@ public class EventApiServiceImpl implements EventApiService {
                 }
                 // 获取客户清单
                 if(eventCodeList.contains(map.get("eventCode"))){
-                    getCustList(eventId, map.get("lanId") ,custId, map);
+                    System.out.println("*******************清单方案接入*********"+eventId);
+                    result = getCustList(eventId, map.get("lanId") ,custId, map);
+                    paramsJson.put("backParams", result);
+                    paramsJson.put("planType", "2");
+                    esHitService.save(paramsJson, IndexList.PARAMS_MODULE);
+                    return result;
                 }
 
 
@@ -2256,6 +2261,18 @@ public class EventApiServiceImpl implements EventApiService {
                 if (resultMapList != null && resultMapList.size() > 0) {
                     for (Map<String, Object> resultMap1 : resultMapList) {
                         Map result = new HashMap();
+                        List<Map<String, Object>> taskChlList = (List<Map<String, Object>>) ((Map) resultMap1.get("CPC_VALUE")).get("taskChlList");
+                        int count = 0;  // 统计符合渠道的个数
+                        List<Map<String, Object>> taskChlListNew = new ArrayList<>();
+                        for (Map<String, Object> taskChlMap : taskChlList) {
+                            if (map.get("channelCode").equals(taskChlMap.get("channelId"))) {
+                                count++;
+                                taskChlListNew.add(taskChlMap);
+                            }
+                        }
+                        if (count > 0) {
+                            ((Map) resultMap1.get("CPC_VALUE")).put("taskChlList", taskChlListNew);
+                        }
                         result.putAll((Map)resultMap1.get("CPC_VALUE"));
                         result.put("orderISI", map.get("reqId"));
                         result.put("skipCheck", "0");
@@ -2284,6 +2301,7 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 }
             }
+
             resultMap.put("CPCResultMsg", "success");
             resultMap.put("custId", custId);
             resultMap.put("taskList", resultList);
