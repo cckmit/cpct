@@ -506,15 +506,16 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
                 /* 判断是否为对应事件的资产 */
-                List<String> eventCodeList = (List<String>) redisUtils.get("EVT_API_CODE_" + map.get("eventCode"));
+                List<String> eventCodeList = (List<String>) redisUtils.get("EVT_API_CODE");
                 if (eventCodeList == null){
                     List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("EVT_API_CODE");
                     eventCodeList = new ArrayList<String>();
                     for (SysParams sysParams : sysParamsList) {
                         eventCodeList.add(sysParams.getParamValue());
                     }
-                    redisUtils.set("EVT_API_CODE_" +  map.get("eventCode"), eventCodeList);
+                    redisUtils.set("EVT_API_CODE", eventCodeList);
                 }
+                // 获取客户清单
                 if(eventCodeList.contains(map.get("eventCode"))){
                     getCustList(eventId, map.get("lanId") ,custId, map);
                 }
