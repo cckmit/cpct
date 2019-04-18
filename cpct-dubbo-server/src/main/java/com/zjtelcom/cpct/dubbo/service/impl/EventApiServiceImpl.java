@@ -517,10 +517,13 @@ public class EventApiServiceImpl implements EventApiService {
                 }
                 // 获取客户清单
                 if(eventCodeList.contains(map.get("eventCode"))){
-                    getCustList(eventId, map.get("lanId") ,custId, map);
+                    System.out.println("*******************清单方案接入*********"+eventId);
+                    result = getCustList(eventId, map.get("lanId") ,custId, map);
+                    paramsJson.put("backParams", result);
+                    paramsJson.put("planType", "2");
+                    esHitService.save(paramsJson, IndexList.PARAMS_MODULE);
+                    return result;
                 }
-
-
 
                 timeJson.put("time2", System.currentTimeMillis() - begin);
                 //事件下所有活动的规则预校验，返回初步可命中活动
@@ -2248,6 +2251,7 @@ public class EventApiServiceImpl implements EventApiService {
             paramMap.put("asset", assetParamMap);
             paramMap.put("campaignList", campaignList);
             Map<String, Object> paramResultMap = esService.queryCustomer4Event(paramMap);
+            System.out.println("**********es查询返回"+JSON.toJSONString(paramResultMap));
 
             List<Map<String, Object>> resultList = new ArrayList<>();
             // 解析
