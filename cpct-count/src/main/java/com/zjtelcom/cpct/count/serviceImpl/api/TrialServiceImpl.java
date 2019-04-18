@@ -12,8 +12,6 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
-import com.zjtelcom.cpct.util.HttpUtil;
-import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.es.es.entity.TrialTarGrp;
 import com.zjtelcom.es.es.entity.TrilTarGrpParam;
 import com.zjtelcom.es.es.entity.model.LabelResultES;
