@@ -1177,6 +1177,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 mktCampaignDO.setLanId(mktCamCityRelDO.getCityId()); // 本地网标识
                 mktCampaignDO.setCreateDate(new Date());
                 mktCampaignDO.setUpdateDate(new Date());
+                mktCampaignDO.setUpdateStaff(UserUtil.loginId());
                 mktCampaignDO.setStatusCd(StatusCode.STATUS_CODE_DRAFT.getStatusCode());
                 mktCampaignDO.setCreateChannel(createChannel);
                 mktCampaignMapper.insert(mktCampaignDO);
