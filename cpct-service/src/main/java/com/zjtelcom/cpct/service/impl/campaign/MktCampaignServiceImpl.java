@@ -561,6 +561,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         }
         mktCampaignVO.setApplyRegionIdList(applyRegionIds);
 
+        //查询父活动信息
+        List<MktCampaignRelDO> mktCampaignRelDOS = mktCampaignRelMapper.selectByZmktCampaignId(mktCampaignId, "1000");
+        MktCampaignDO mktCampaignDOPre = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(mktCampaignRelDOS.get(0).toString()));
+        mktCampaignVO.setPreMktCampaignId(mktCampaignDOPre.getMktCampaignId());
+        mktCampaignVO.setPreMktCampaignType(StatusCode.getMsgByCode(mktCampaignDOPre.getMktCampaignCategory()));
+
         MktCamDirectoryDO mktCamDirectoryDO = mktCamDirectoryMapper.selectByPrimaryKey(mktCampaignDO.getDirectoryId());
         if (mktCamDirectoryDO != null) {
             mktCampaignVO.setDirectoryName(mktCamDirectoryDO.getMktCamDirectoryName());
@@ -995,7 +1001,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCampaignVO.setCreateChannelName(postName);
                     mktCampaignVO.setCreateDate(mktCampaignCountDO.getCreateDate());
                     mktCampaignVO.setPreMktCampaignId(mktCampaignCountDO.getPreMktCampaignId());
-
+                    MktCampaignDO mktCampaignDOPre = mktCampaignMapper.selectByPrimaryKey(mktCampaignCountDO.getPreMktCampaignId());
+                    mktCampaignVO.setPreMktCampaignType(StatusCode.getMsgByCode(mktCampaignDOPre.getMktCampaignCategory()));
                     // 获取创建人信息
                     long before2 = System.currentTimeMillis();
                     SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(mktCampaignCountDO.getCreateStaff(), new ArrayList<Long>());
@@ -1211,6 +1218,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         MktCamEvtRelDO childMktCamEvtRelDO = new MktCamEvtRelDO();
                         childMktCamEvtRelDO.setMktCampaignId(childMktCampaignId);
                         childMktCamEvtRelDO.setEventId(mktCamEvtRelDO.getEventId());
+                        childMktCamEvtRelDO.setCampaignSeq(0); // 默认等级为 0
+                        childMktCamEvtRelDO.setLevelConfig(0); // 默认为资产级 0
                         childMktCamEvtRelDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
                         childMktCamEvtRelDO.setStatusDate(new Date());
                         childMktCamEvtRelDO.setCreateDate(new Date());
