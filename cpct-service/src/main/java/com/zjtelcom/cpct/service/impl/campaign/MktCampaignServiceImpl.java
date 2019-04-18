@@ -974,8 +974,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         logger.info("[op:qryMktCampaignListPage] SysPostCode = " + mktCampaignCountDO.getCreateChannel());
                         QrySystemPostReq qrySystemPostReq = new QrySystemPostReq();
                         qrySystemPostReq.setSystemPost(systemPost);
+                        long before1 = System.currentTimeMillis();
                         SysmgrResultObject<com.ctzj.smt.bss.sysmgr.model.common.Page> pageSysmgrResultObject =
                                 iSystemPostDubboService.qrySystemPostPage(new com.ctzj.smt.bss.sysmgr.model.common.Page(), qrySystemPostReq);
+                        logger.info("iSystemPostDubboService.qrySystemPostPage 消耗时间：" + (System.currentTimeMillis() - before1) + " ms");
                         if(pageSysmgrResultObject!=null){
                             if( pageSysmgrResultObject.getResultObject()!=null){
                                 List<SystemPost> dataList = (List<SystemPost>) pageSysmgrResultObject.getResultObject().getDataList();
@@ -995,7 +997,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCampaignVO.setPreMktCampaignId(mktCampaignCountDO.getPreMktCampaignId());
 
                     // 获取创建人信息
+                    long before2 = System.currentTimeMillis();
                     SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(mktCampaignCountDO.getCreateStaff(), new ArrayList<Long>());
+                    logger.info(" iSystemUserDtoDubboService.qrySystemUserDto 消耗时间：" + (System.currentTimeMillis() - before2) + "ms");
                     if (systemUserDtoSysmgrResultObject != null) {
                         if (systemUserDtoSysmgrResultObject.getResultObject() != null) {
                             mktCampaignVO.setCreateStaffName(systemUserDtoSysmgrResultObject.getResultObject().getStaffName());
@@ -1169,9 +1173,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             for (MktCamCityRelDO mktCamCityRelDO : mktCamCityRelDOList) {
                 // 为下发城市生成新的活动
                 mktCampaignDO.setMktCampaignId(null);
+                mktCampaignDO.setMktCampaignCategory(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()); // 子活动默认为自主活动
                 mktCampaignDO.setLanId(mktCamCityRelDO.getCityId()); // 本地网标识
+                mktCampaignDO.setRegionId(AreaCodeEnum.getRegionIdByLandId(mktCamCityRelDO.getCityId()));
                 mktCampaignDO.setCreateDate(new Date());
-                mktCampaignDO.setCreateStaff(UserUtil.loginId());
                 mktCampaignDO.setUpdateDate(new Date());
                 mktCampaignDO.setUpdateStaff(UserUtil.loginId());
                 mktCampaignDO.setStatusCd(StatusCode.STATUS_CODE_DRAFT.getStatusCode());

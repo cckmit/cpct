@@ -77,6 +77,24 @@ public class SysAreaServiceImpl implements SysAreaService {
         return map;
     }
 
+    /**
+     * 通过父节点获取子节点地区 +父节点（树形）
+     *
+     * @param parentCityId
+     * @return
+     */
+    @Override
+    public Map<String, Object> listCityAndParentByParentId(Integer parentCityId) {
+        Map<String, Object> map = new HashMap<>();
+        SysArea sysArea = sysAreaMapper.selectByPrimaryKey(parentCityId);
+        List<SysArea> sysAreaList = sysAreaMapper.selectByParnetArea(parentCityId);
+        sysArea.setChildAreaList(sysAreaList);
+        map.put("resultCode", CommonConstant.CODE_SUCCESS);
+        map.put("resultMsg", StringUtils.EMPTY);
+        map.put("sysAreaList", sysArea);
+        return map;
+    }
+
     @Override
     public Map<String, Object> listAllAreaTrea() {
         Map<String, Object> areaMap = new HashMap<>();

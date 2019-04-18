@@ -1265,7 +1265,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 }else {
                     detail.setCost(cost+"ms");
                 }
-
             }
             operationDetailList.add(detail);
         }
