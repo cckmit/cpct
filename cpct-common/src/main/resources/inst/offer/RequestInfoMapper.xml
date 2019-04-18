@@ -144,6 +144,12 @@
     from request_info
   </select>
 
+  <select id="selectBatchNoNum" resultType="java.lang.Long">
+  select smt_bss_cpc_batchno_sequence.nextval
+  </select>
+
+
+
 
 
 </mapper>
