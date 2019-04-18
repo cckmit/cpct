@@ -172,13 +172,10 @@ public class FilterRuleController extends BaseController {
         try {
             String fileName = "用户名单.xls";
 
-            String filePath = getClass().getResource("/file/" + "templete.xlsx").getPath();
-            FileInputStream input = new FileInputStream(filePath);
-
             byte[] buffer = new byte[1024];
             FileInputStream fis = null; //
             BufferedInputStream bis = null;
-            fis = new FileInputStream("cpct-web/src/main/resources/file/templete.xlsx");
+            fis = new FileInputStream("/app/templete.xlsx");
             bis = new BufferedInputStream(fis);
 
             //处理导出问题
@@ -221,13 +218,10 @@ public class FilterRuleController extends BaseController {
         try {
             String fileName = "下发导入模板.xls";
 
-            String filePath = getClass().getResource("/file/" + "trialOperationTemplate.xlsx").getPath();
-            FileInputStream input = new FileInputStream(filePath);
-
             byte[] buffer = new byte[1024];
             FileInputStream fis = null; //文件输入流
             BufferedInputStream bis = null;
-            fis = new FileInputStream("cpct-web/src/main/resources/file/trialOperationTemplate.xlsx");
+            fis = new FileInputStream("/app/trialOperationTemplate.xlsx");
             bis = new BufferedInputStream(fis);
 
             //处理导出问题
