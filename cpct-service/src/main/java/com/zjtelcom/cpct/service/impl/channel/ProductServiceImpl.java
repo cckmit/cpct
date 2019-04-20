@@ -319,7 +319,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 rule.setProductId(item.getItemId());
                 rule.setProductName(product.getOfferName());
                 rule.setProductCode(product.getOfferNbr());
-                rule.setProductType(item.getItemType()==null ? "" : item.getItemType());
+                rule.setProductType(product.getOfferType()==null ? "" : product.getOfferType());
                 rule.setRemark(item.getRemark());
                 rule.setItemType(item.getItemType()==null ? "" : item.getItemType());
                 rule.setPriority(item.getPriority()==null ? 0 : item.getPriority());
