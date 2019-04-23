@@ -21,7 +21,7 @@ public class SyncLabelController {
 
     @RequestMapping(value = "syncLabel", method = RequestMethod.POST)
     @CrossOrigin
-    public String syncLabel(@RequestBody RecordModel model) {
+    public String syncLabel(@RequestBody HashMap<String,Object> model) {
         Map result = new HashMap();
 
 //        result = syncLabelService.initialization();

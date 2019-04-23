@@ -97,6 +97,11 @@ public class MktCampaign extends BaseEntity {
     private Long preMktCampaignId;
 
     /**
+     * 二次营销中的上次活动类型
+     */
+    private String preMktCampaignType;
+
+    /**
      * 所属地市名称
      */
     private String landName;
@@ -340,5 +345,13 @@ public class MktCampaign extends BaseEntity {
 
     public void setCreateChannelName(String createChannelName) {
         this.createChannelName = createChannelName;
+    }
+
+    public String getPreMktCampaignType() {
+        return preMktCampaignType;
+    }
+
+    public void setPreMktCampaignType(String preMktCampaignType) {
+        this.preMktCampaignType = preMktCampaignType;
     }
 }

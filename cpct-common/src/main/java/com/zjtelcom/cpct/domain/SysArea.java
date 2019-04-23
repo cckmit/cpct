@@ -12,10 +12,21 @@ public class SysArea implements Serializable {
 
     private Integer areaLevel;
 
+    private String orgArea;
+
     /**
      * 下级区域列表
      */
     private List<SysArea> childAreaList;
+
+
+    public String getOrgArea() {
+        return orgArea;
+    }
+
+    public void setOrgArea(String orgArea) {
+        this.orgArea = orgArea;
+    }
 
     public Integer getAreaId() {
         return areaId;

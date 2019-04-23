@@ -39,6 +39,11 @@ public class IndexList {
     public static String PARAMS_MODULE = "params_module";
 
     /**
+     * 标签索引
+     */
+    public static String PARAMS_LABEL_MODULE = "params_label_module";
+
+    /**
      * 耗时模块索引
      */
     public static String TIME_MODULE = "time_module";

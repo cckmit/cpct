@@ -10,6 +10,7 @@ import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
@@ -32,6 +33,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
+import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.*;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.enums.StatusCode;
@@ -122,6 +124,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private MktStrategyConfMapper strategyConfMapper;
     @Autowired
     private MktCamCustMapper camCustMapper;
+    @Autowired
+    private FilterRuleMapper filterRuleMapper;
+    @Autowired
+    private RedisUtils_es redisUtils_es;
 
     /**
      * 销售品service
@@ -183,6 +189,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         request.setBatchNum(operation.getBatchNum());
         TrialResponseES responseES = new TrialResponseES();
         try {
+//            responseES = restTemplate.postForObject("http://localhost:8080/es/trialLog", request, TrialResponseES.class);
             responseES = esService.trialLog(request);
         }catch (Exception e){
             logger.error("日志查询失败");
@@ -286,10 +293,27 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "策略信息有误");
             return result;
         }
+        //生成批次号
+        String batchNumSt = DateUtil.date2St4Trial(new Date()) + ChannelUtil.getRandomStr(4);
         //添加策略适用地市
         redisUtils.set("STRATEGY_CONF_AREA_"+operationVO.getStrategyId(),strategy.getAreaId());
-
         // 通过活动id获取关联的标签字段数组
+        DisplayColumn req = new DisplayColumn();
+        req.setDisplayColumnId(campaign.getCalcDisplay());
+        Map<String,Object> labelMap = messageLabelService.queryLabelListByDisplayId(req);
+        List<LabelDTO> labelDTOList = (List<LabelDTO>)labelMap.get("labels");
+        String[] displays = new String[labelDTOList.size()];
+        List<Map<String,Object>> labelList = new ArrayList<>();
+        for (int i = 0 ; i< labelDTOList.size();i++){
+            displays[i] = labelDTOList.get(i).getLabelCode();
+            Map<String,Object> label = new HashMap<>();
+            label.put("code",labelDTOList.get(i).getLabelCode());
+            label.put("name",labelDTOList.get(i).getInjectionLabelName());
+            label.put("labelType",labelDTOList.get(i).getLabelType());
+            labelList.add(label);
+        }
+        redisUtils.set("LABEL_DETAIL_"+batchNumSt,labelList);
+
         String[] fieldList = getStrings(campaign,strategy);
 
         TrialOperationVO request = BeanUtil.create(operationVO,new TrialOperationVO());
@@ -300,7 +324,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         ArrayList<TrialOperationParamES> paramList = new ArrayList<>();
         List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(operationVO.getStrategyId());
         for (MktStrategyConfRuleRelDO ruleRelDO : ruleRelList) {
-            TrialOperationParamES param = getTrialOperationParamES(operationVO,null, ruleRelDO.getMktStrategyConfRuleId(),true);
+            TrialOperationParamES param = getTrialOperationParamES(operationVO,Long.valueOf(batchNumSt), ruleRelDO.getMktStrategyConfRuleId(),true);
             List<LabelResultES> labelResultList = param.getLabelResultList();
             List<String> labelTypeList = new ArrayList<>();
             for (LabelResultES la : labelResultList){
@@ -318,13 +342,14 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         }
         requests.setFieldList(fieldList);
         requests.setParamList(paramList);
-//        TrialResponse response = new TrialResponse();
+        requests.setBatchNum(Long.valueOf(batchNumSt));
         TrialResponseES response = new TrialResponseES();
 
         try {
             //todo
-             response = esService.searchBatchInfo(requests);
-//            response = restTemplate.postForObject(batchInfo, request, TrialResponse.class);
+            System.out.println(JSON.toJSONString(requests));
+//             response = esService.searchBatchInfo(requests);
+            response = restTemplate.postForObject("http://localhost:8080/es/searchBatchInfo", requests, TrialResponseES.class);
 
             if (response.getResultCode().equals(CODE_FAIL)){
                 result.put("resultCode", CODE_FAIL);
@@ -499,7 +524,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     //下发文件
     private Map<String, Object> importUserList(Map<String, Object> result, TrialOperationVO operation, Long ruleId, String batchNumSt, List<Map<String, Object>> customerList, List<Map<String, Object>> labelList) {
         redisUtils.set("LABEL_DETAIL_"+batchNumSt,labelList);
-        int num = (customerList.size() / 500) + 1;
+        int num = (customerList.size() / 100) + 1;
         List<List<Map<String,Object>>> smallCustomers = ChannelUtil.averageAssign(customerList,num);
         //按规则存储客户信息
         for (int i = 0; i < num; i++) {
@@ -533,6 +558,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         ArrayList<TrialOperationParamES> paramESList = new ArrayList<>();
         paramESList.add(param);
         request.setParamList(paramESList);
+        System.out.println(JSON.toJSONString(request));
         new Thread(){
             public void run(){
                 try {
@@ -619,7 +645,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 }
                 customers.put(cellTitle.getStringCellValue(), ChannelUtil.getCellValue(cell));
             }
-            customerList.add(customers);
+            if (!customers.isEmpty()){
+                customerList.add(customers);
+            }
         }
         for (int i = 0 ; i< labelDTOList.size();i++){
             Map<String,Object> label = new HashMap<>();
@@ -819,6 +847,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         trialOperationMapper.insert(trialOp);
 
         operationVO.setTrialId(trialOp.getId());
+        operationVO.setCampaignName(campaign.getMktCampaignName());
+        operationVO.setStrategyName(strategy.getMktStrategyConfName());
         List<TrialOperation> operationList = trialOperationMapper.findOperationListByStrategyId(operationVO.getStrategyId(),TrialCreateType.TRIAL_OPERATION.getValue());
         // 调用es的抽样接口
         final TrialOperationVO vo = operationVO;
@@ -847,7 +877,21 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         MktStrategyConfDO strategy = strategyMapper.selectByPrimaryKey(operationVO.getStrategyId());
         //添加策略适用地市
         redisUtils.set("STRATEGY_CONF_AREA_"+operationVO.getStrategyId(),strategy.getAreaId());
-
+        List<String> typeList = new ArrayList<>();
+        typeList.add("1000");
+        List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(campaign.getMktCampaignId(),typeList);
+        if (filterRuleList!=null && !filterRuleList.isEmpty()){
+            List<String> userList = new ArrayList<>();
+            for (FilterRule filterRule : filterRuleList){
+                String[] users = filterRule.getUserList().split(",");
+                userList.addAll(Arrays.asList(users));
+            }
+            int num = userList.size()/100 + 1;
+            List<List<String>> list = ChannelUtil.averageAssign(userList,num);
+            for (int i = 0; i < num; i++) {
+                redisUtils.hset("AREA_RULE_BLACK_LIST_"+campaign.getMktCampaignId(),i+"",list.get(i));
+            }
+        }
         // 通过活动id获取关联的标签字段数组
         DisplayColumn req = new DisplayColumn();
         req.setDisplayColumnId(campaign.getCalcDisplay());
@@ -1048,36 +1092,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "试运算记录不存在");
             return result;
         }
-        if (!operation.getStatusCd().equals(TrialStatus.SAMPEL_SUCCESS.getValue())){
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "抽样试算失败，无法全量试算");
-            return result;
-        }
-        List<TrialOperation> operationList = trialOperationMapper.listOperationByStatusCd(TrialStatus.ALL_SAMPEL_GOING.getValue());
-        if (!operationList.isEmpty()){
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "系统正在全量试算 请稍后再试。");
-            return result;
-        }
-
-        int timeLimit = 1800000;
-        List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign("TRIAL_TIME");
-        if (sysParams.get(0)!=null){
-            timeLimit = Integer.valueOf(sysParams.get(0).getParamValue());
-        }
-        Date upTime = new Date(new Date().getTime() - timeLimit);
-        String[] status  = new String[2];
-        status[0] = TrialStatus.ALL_SAMPEL_SUCCESS.getValue();
-        status[1] = TrialStatus.ALL_SAMPEL_FAIL.getValue();
-
-        List<TrialOperation> operations = trialOperationMapper.listOperationByUpdateTime(trialOperation.getCampaignId(),upTime,status);
-        if (!operations.isEmpty()){
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "相同活动30分钟只能全量试算一次，请稍后再试");
-            return result;
-        }
         BeanUtil.copy(operation,trialOperation);
-
         // 通过活动id获取关联的标签字段数组
         MktCampaignDO campaignDO = campaignMapper.selectByPrimaryKey(trialOperation.getCampaignId());
         if (campaignDO==null){
@@ -1094,6 +1109,34 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         if (strategyConfDO==null){
             result.put("resultCode", CODE_FAIL);
             result.put("resultMsg", "策略不存在");
+            return result;
+        }
+        if (!operation.getStatusCd().equals(TrialStatus.SAMPEL_SUCCESS.getValue())){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "抽样试算失败，无法全量试算");
+            return result;
+        }
+//        List<TrialOperation> operationList = trialOperationMapper.listOperationByStatusCd(TrialStatus.ALL_SAMPEL_GOING.getValue());
+//        if (!operationList.isEmpty()){
+//            result.put("resultCode", CODE_FAIL);
+//            result.put("resultMsg", "系统正在全量试算 请稍后再试。");
+//            return result;
+//        }
+
+        int timeLimit = 1800000;
+        List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign("TRIAL_TIME");
+        if (sysParams.get(0)!=null){
+            timeLimit = Integer.valueOf(sysParams.get(0).getParamValue());
+        }
+        Date upTime = new Date(new Date().getTime() - timeLimit);
+        String[] status  = new String[2];
+        status[0] = TrialStatus.ALL_SAMPEL_SUCCESS.getValue();
+        status[1] = TrialStatus.ALL_SAMPEL_FAIL.getValue();
+
+        List<TrialOperation> operations = trialOperationMapper.listOperationByUpdateTime(trialOperation.getCampaignId(),upTime,status);
+        if (!operations.isEmpty()){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "相同活动30分钟只能全量试算一次，请稍后再试");
             return result;
         }
 
@@ -1115,6 +1158,13 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             labelList.add(label);
         }
         redisUtils.set("LABEL_DETAIL_"+trialOperation.getBatchNum(),labelList);
+        List<Map<String, Object>> iSaleDisplay = new ArrayList<>();
+        iSaleDisplay = (List<Map<String, Object>>) redisUtils.get("EVT_ISALE_LABEL_" + campaignDO.getIsaleDisplay());
+        if (iSaleDisplay == null) {
+            iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(campaignDO.getIsaleDisplay());
+            redisUtils.set("EVT_ISALE_LABEL_" + campaignDO.getIsaleDisplay(), iSaleDisplay);
+        }
+        redisUtils.set("ISALE_LABEL_"+trialOperation.getBatchNum(),iSaleDisplay);
 
         TrialOperationVO request = BeanUtil.create(trialOperation,new TrialOperationVO());
         request.setFieldList(fieldList);
@@ -1230,7 +1280,11 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             if (trialOperation.getUpdateDate() != null && !trialOperation.getStatusCd().equals(TrialStatus.SAMPEL_GOING.getValue())) {
                 Long cost = (trialOperation.getUpdateDate().getTime() - trialOperation.getCreateDate().getTime());
                 cost = cost<0L ? 0L : cost;
-                detail.setCost(cost + "ms");
+                if (cost>1000){
+                    detail.setCost(cost/1000 + "s");
+                }else {
+                    detail.setCost(cost+"ms");
+                }
             }
             operationDetailList.add(detail);
         }
@@ -1390,7 +1444,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         LabelResult labelResult = new LabelResult();
                         String type = tarGrpConditionDOs.get(i).getOperType();
                         Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i).getLeftParam()));
-
+                        if (label==null){
+                            continue;
+                        }
                         labelResult.setLabelCode(label.getInjectionLabelCode());
                         labelResult.setLabelName(label.getInjectionLabelName());
                         labelResult.setRightOperand(label.getLabelType());

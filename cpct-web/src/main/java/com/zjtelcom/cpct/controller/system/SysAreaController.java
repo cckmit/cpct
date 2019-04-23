@@ -69,6 +69,33 @@ public class SysAreaController {
 
 
     /**
+     * 获取地市级别列表
+     *
+     * @return
+     */
+    @RequestMapping(value = "/listSysCityAndParent", method = RequestMethod.POST)
+    @CrossOrigin
+    public String listCityAndParentByParentId(@RequestBody  Map<String, Object> params) {
+        String lanId = (String) params.get("lanId");
+        Integer areaId;
+        if (lanId == null || "".equals(lanId) || "null".equals(lanId)) {
+            //TODO 获取当前用户所在地区
+            areaId = 1;
+        } else {
+            areaId = Integer.valueOf(lanId);
+        }
+        Map<String, Object> map = null;
+        try {
+            map = sysAreaService.listCityAndParentByParentId(areaId);
+            map.put("resultCode", CommonConstant.CODE_SUCCESS);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+        }
+        return JSON.toJSONString(map);
+    }
+
+
+    /**
      * 获取下发城市树
      *
      * @return

@@ -35,10 +35,7 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.thread.TarGrpRule;
-import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.CopyPropertiesUtil;
-import com.zjtelcom.cpct.util.RedisUtils;
-import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -158,8 +155,9 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             mktStrategyConfRuleMapper.deleteByPrimaryKey(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId());
             // 删除活动与分群的关系
             MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId());
-            mktCamGrpRulMapper.deleteByTarGrpId(mktStrategyConfRuleDO.getTarGrpId());
-
+            if (mktStrategyConfRuleDO!=null && mktStrategyConfRuleDO.getTarGrpId()!=null) {
+                mktCamGrpRulMapper.deleteByTarGrpId(mktStrategyConfRuleDO.getTarGrpId());
+            }
             //删除策略与规则的关联关系
             mktStrategyConfRuleRelMapper.deleteByPrimaryKey(mktStrategyConfRuleRelDO.getMktStrategyConfRuleRelId());
         }
@@ -168,7 +166,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
         //删除策略
         mktStrategyConfMapper.deleteByPrimaryKey(mktStrategyConfId);
         mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
-        mktStrategyConfMap.put("resultMsg", ErrorCode.SAVE_MKT_STR_CONF_SUCCESS.getErrorMsg());
+        mktStrategyConfMap.put("resultMsg", ErrorCode.DELETE_MKT_STR_CONF_SUCCESS.getErrorMsg());
         return mktStrategyConfMap;
     }
 
@@ -438,13 +436,17 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             MktStrategyConfDO mktStrategyConfDO = mktStrategyConfMapper.selectByPrimaryKey(mktStrategyConfId);
             CopyPropertiesUtil.copyBean2Bean(mktStrategyConfDetail, mktStrategyConfDO);
             List<Integer> areaIdList = new ArrayList<>();
+            List<Long> orgList = new ArrayList<>();
             String[] areaIds = mktStrategyConfDO.getAreaId().split("/");
             if (areaIds != null && !"".equals(areaIds[0])) {
                 for (String areaId : areaIds) {
                     areaIdList.add(Integer.valueOf(areaId));
+                    if (ChannelUtil.getOrgByArea(areaId)!=null){
+                        orgList.add(Long.valueOf(ChannelUtil.getOrgByArea(areaId)));
+                    }
                 }
                 mktStrategyConfDetail.setAreaIdList(areaIdList);
-
+                mktStrategyConfDetail.setOrganizationList(orgList);
             }
             // 策略下发渠道
             String[] channelIds = mktStrategyConfDO.getChannelsId().split("/");
@@ -506,7 +508,9 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                     }
                     mktStrategyConfRule.setMktCamChlResultList(mktCamChlResultList);
                 }
-
+                if (redisUtils.get("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId())!=null){
+                    mktStrategyConfRule.setOrganizationList((List<Long> )redisUtils.get("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId()));
+                }
                 mktStrategyConfRuleList.add(mktStrategyConfRule);
             }
             mktStrategyConfDetail.setMktStrategyConfRuleList(mktStrategyConfRuleList);
@@ -705,13 +709,17 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                 MktStrategyConfDO mktStrategyConfDO = mktStrategyConfMapper.selectByPrimaryKey(preStrategyConfId);
                 CopyPropertiesUtil.copyBean2Bean(mktStrategyConfDetail, mktStrategyConfDO);
                 List<Integer> areaIdList = new ArrayList<>();
+                List<Long> orgList = new ArrayList<>();
                 String[] areaIds = mktStrategyConfDO.getAreaId().split("/");
                 if (areaIds != null && !"".equals(areaIds[0])) {
                     for (String areaId : areaIds) {
                         areaIdList.add(Integer.valueOf(areaId));
+                        if (ChannelUtil.getOrgByArea(areaId)!=null){
+                            orgList.add(Long.valueOf(ChannelUtil.getOrgByArea(areaId)));
+                        }
                     }
+                    mktStrategyConfDetail.setOrganizationList(orgList);
                     mktStrategyConfDetail.setAreaIdList(areaIdList);
-
                 }
                 // 策略下发渠道
                 String[] channelIds = mktStrategyConfDO.getChannelsId().split("/");

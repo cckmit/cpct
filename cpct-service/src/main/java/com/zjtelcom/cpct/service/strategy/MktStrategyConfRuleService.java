@@ -39,4 +39,8 @@ public interface MktStrategyConfRuleService {
 
     Map<String, Object> getRuleTemplate(Long preStrategyConfId);
 
+    Map<String, Object> test(Long ruleId ,List<Long> orgList);
+
+
+
 }

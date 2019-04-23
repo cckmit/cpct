@@ -21,5 +21,5 @@ public interface MktResourceProdMapper {
 
     int updateByPrimaryKey(MktResource record);
 
-    List<MktResource> selectByResourceName(@Param("mktResName") String mktResName);
+    List<MktResource> selectByResourceName(@Param("mktResName") String mktResName,@Param("resourceIds")List<Long> resourceIds);
 }

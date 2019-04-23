@@ -35,6 +35,19 @@ public class MktStrategyConf implements Serializable {
      */
     private List<Integer> areaIdList;
 
+    /**
+     * 组织树id集合
+     */
+    private List<Long> organizationList;
+
+
+    public List<Long> getOrganizationList() {
+        return organizationList;
+    }
+
+    public void setOrganizationList(List<Long> organizationList) {
+        this.organizationList = organizationList;
+    }
 
     public Long getMktStrategyConfId() {
         return mktStrategyConfId;

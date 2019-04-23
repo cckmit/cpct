@@ -3,7 +3,6 @@ package com.zjtelcom.cpct.dubbo.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService;
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.Operator;
@@ -11,22 +10,18 @@ import com.ql.util.express.rule.RuleResult;
 import com.zjpii.biz.serv.YzServ;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.*;
-import com.zjtelcom.cpct.dao.event.ContactEvtItemMapper;
-import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMatchRulMapper;
 import com.zjtelcom.cpct.dao.event.EventMatchRulConditionMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
-import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
-import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
@@ -35,10 +30,8 @@ import com.zjtelcom.cpct.dto.event.ContactEvtMatchRul;
 import com.zjtelcom.cpct.dto.event.EventMatchRulCondition;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dubbo.service.CamApiService;
-import com.zjtelcom.cpct.dubbo.service.SearchLabelService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.elastic.service.EsHitService;
-import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
@@ -469,10 +462,10 @@ public class CamApiServiceImpl implements CamApiService {
                 esJson.put("msg", "获取计算结果异常");
                 esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
                 //发生异常关闭线程池
-                executorService.shutdown();
+                executorService.shutdownNow();
             } finally {
                 //关闭线程池
-                executorService.shutdown();
+                executorService.shutdownNow();
             }
 
             return activity;
@@ -531,10 +524,7 @@ public class CamApiServiceImpl implements CamApiService {
 
             jsonObject.put("ruleId", ruleId);
             jsonObject.put("ruleName", ruleName);
-            jsonObject.put("hitEntity", privateParams.get("ac" +
-                    "" +
-                    "" +
-                    "cNbr")); //命中对象
+            jsonObject.put("hitEntity", privateParams.get("accNbr")); //命中对象
             jsonObject.put("reqId", reqId);
             jsonObject.put("eventId", params.get("eventCode"));
             jsonObject.put("activityId", privateParams.get("activityId"));
@@ -907,7 +897,9 @@ public class CamApiServiceImpl implements CamApiService {
                                     //将线程处理结果添加到结果集
                                     //threadList.add(f);
                                     Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId);
-                                    taskChlList.add(channelMap);
+                                    if(channelMap!=null && !channelMap.isEmpty() ){
+                                        taskChlList.add(channelMap);
+                                    }
                                 }
                             }
                         }
@@ -923,10 +915,10 @@ public class CamApiServiceImpl implements CamApiService {
                     } catch (Exception e) {
                         e.printStackTrace();
                         //发生异常关闭线程池
-                        executorService.shutdown();
+                        executorService.shutdownNow();
                     } finally {
                         //关闭线程池
-                        executorService.shutdown();
+                        executorService.shutdownNow();
                     }
                 } else {
 
@@ -1469,12 +1461,20 @@ public class CamApiServiceImpl implements CamApiService {
             case "3000":
                 express.append("toNum(").append(code).append("))");
                 express.append(" == ");
-                express.append("\"").append(rightParam).append("\"");
+                if(NumberUtils.isNumber(rightParam)) {
+                    express.append(rightParam);
+                } else {
+                    express.append("\"").append(rightParam).append("\"");
+                }
                 break;
             case "4000":
                 express.append("toNum(").append(code).append("))");
                 express.append(" != ");
-                express.append("\"").append(rightParam).append("\"");
+                if(NumberUtils.isNumber(rightParam)) {
+                    express.append(rightParam);
+                } else {
+                    express.append("\"").append(rightParam).append("\"");
+                }
                 break;
             case "5000":
                 express.append("toNum(").append(code).append("))");
@@ -1545,12 +1545,21 @@ public class CamApiServiceImpl implements CamApiService {
             case "3000":
                 express.append(label.getInjectionLabelCode()).append(")");
                 express.append(" == ");
-                express.append("\"").append(rightParam).append("\"");
+                if(NumberUtils.isNumber(rightParam)) {
+                    express.append(rightParam);
+                } else {
+                    express.append("\"").append(rightParam).append("\"");
+                }
                 break;
             case "4000":
                 express.append(label.getInjectionLabelCode()).append(")");
                 express.append(" != ");
-                express.append("\"").append(rightParam).append("\"");
+                if(NumberUtils.isNumber(rightParam)) {
+                    express.append(rightParam);
+                } else {
+                    express.append("\"").append(rightParam).append("\"");
+                }
+
                 break;
             case "5000":
                 express.append("toNum(").append(label.getInjectionLabelCode()).append("))");

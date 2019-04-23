@@ -217,6 +217,10 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
             mktCampaignResp.setStatusCdValue(paramMap.
                     get(ParamKeyEnum.STATUS_CD.getParamKey() + mktCampaignDO.getStatusCd()));
 
+            // 获取过滤规则集合
+            ArrayList<FilterRuleModel> filterRuleModels = filterRuleMapper.selectFilterRuleByStrategyIdArrayList(mktCampaignId);
+            mktCampaignResp.setFilterRuleModelList(filterRuleModels);
+
             // 获取活动关联策略集合
             ArrayList<MktStrategyConfResp> mktStrategyConfRespList = new ArrayList<>();
             List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByMktCampaignId(mktCampaignId);
@@ -249,11 +253,6 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
         //更具Id查询策略配置信息
         MktStrategyConfDO mktStrategyConfDO = mktStrategyConfMapper.selectByPrimaryKey(mktStrategyConfId);
         CopyPropertiesUtil.copyBean2Bean(mktStrategyConfResp, mktStrategyConfDO);
-
-        // 获取过滤规则集合
-        ArrayList<FilterRuleModel> filterRuleModels = filterRuleMapper.selectFilterRuleByStrategyIdArrayList(mktStrategyConfId);
-//        ArrayList<FilterRuleModel> filterRuleModelArrayList = new ArrayList<>(filterRuleModels);
-        mktStrategyConfResp.setFilterRuleModelList(filterRuleModels);
 
         //查询与策略匹配的所有规则
         ArrayList<MktStrConfRuleResp> mktStrConfRuleRespList = new ArrayList<>();

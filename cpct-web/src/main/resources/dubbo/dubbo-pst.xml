@@ -28,6 +28,8 @@
 
     <dubbo:reference registry="esb3" interface="org.springframework.session.data.ctg.IDubboCtgService"
                      id="dubboCtgService" version="1.0" check="false">
+        <dubbo:method name="hmget" servicecode="00.1077.ctgSessionHmget"/>
+        <dubbo:method name="hget" servicecode="00.1077.ctgSessionHget"/>
         <dubbo:method name="smembers" servicecode="00.1077.ctgSessionSmembers"/>
         <dubbo:method name="hgetAll" servicecode="00.1077.ctgSessionHgetAll"/>
         <dubbo:method name="exists" servicecode="00.1077.ctgSessionExists"/>
@@ -60,6 +62,18 @@
     <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService"
                      id="iSystemUserDtoDubboService" version="1.0" retries="0" check="false">
         <dubbo:method name="qrySystemUserDto" servicecode="00.1077.qrySystemUserDto" timeout="10000"/>
+    </dubbo:reference>
+
+    <!-- 门户-获取用户岗位信息 -->
+    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.IDictionaryDubboService"
+                     id="dictionaryDubboService" version="1.0" retries="0" check="false">
+        <dubbo:method name="getDictionaryByType" servicecode="00.1077.getDictionaryByType"/>
+    </dubbo:reference>
+
+    <!-- 标签饱和度查询接口 -->
+    <dubbo:reference registry="esb2" interface="com.zjhcsoft.eagle.main.dubbo.service.QuerySaturationService"
+                     id="querySaturationService" version="1.0" retries="0" check="false">
+        <dubbo:method name="querySaturation" servicecode="33.1307.querySaturation" timeout="10000"/>
     </dubbo:reference>
 
 </beans>
