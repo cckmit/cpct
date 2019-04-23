@@ -425,7 +425,7 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
         requestInfo.setActivitiKey("mkt_force_province_city");  //需求函活动类型
         requestInfo.setRequestUrgentType("一般");
         requestInfo.setProcessType("0");
-        requestInfo.setIsstartup("1");
+//        requestInfo.setIsstartup("1");
         requestInfo.setReportTag("0");
         //得到指定下发的人员信息集合
         List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign(CITY_PUBLISH);
