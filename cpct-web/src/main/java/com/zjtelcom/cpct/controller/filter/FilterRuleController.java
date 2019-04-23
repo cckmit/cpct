@@ -170,7 +170,7 @@ public class FilterRuleController extends BaseController {
     public String downloadTemplate(HttpServletRequest request, HttpServletResponse response) {
         OutputStream ouputStream = null;
         try {
-            String fileName = "用户名单.xls";
+            String fileName = "用户名单.xlsx";
 
             byte[] buffer = new byte[1024];
             FileInputStream fis = null; //
@@ -216,7 +216,7 @@ public class FilterRuleController extends BaseController {
     public String downloadTrialOperationTemplate(HttpServletRequest request, HttpServletResponse response) {
         OutputStream ouputStream = null;
         try {
-            String fileName = "下发导入模板.xls";
+            String fileName = "下发导入模板.xlsx";
 
             byte[] buffer = new byte[1024];
             FileInputStream fis = null; //文件输入流
