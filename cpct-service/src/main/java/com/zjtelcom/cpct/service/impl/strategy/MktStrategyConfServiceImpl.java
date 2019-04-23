@@ -34,6 +34,7 @@ import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
+import com.zjtelcom.cpct.service.system.SysAreaService;
 import com.zjtelcom.cpct.service.thread.TarGrpRule;
 import com.zjtelcom.cpct.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -131,6 +132,9 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
      */
     @Autowired
     private MktStrategyConfRuleService mktStrategyConfRuleService;
+
+    @Autowired
+    private SysAreaService sysAreaService;
 
     @Autowired
     private MktCamChlResultMapper mktCamChlResultMapper;
@@ -536,13 +540,20 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
      * @throws Exception
      */
     @Override
-    public Map<String, Object> copyMktStrategyConf(Long parentMktStrategyConfId, Long childMktCampaignId, Boolean isPublish) throws Exception {
+    public Map<String, Object> copyMktStrategyConf(Long parentMktStrategyConfId, Long childMktCampaignId, Boolean isPublish, Long LanId) throws Exception {
         Map<String, Object> mktStrategyConfMap = new HashMap<>();
         // 通过原策略id 获取原策略基本信息
         try {
             MktStrategyConfDO mktStrategyConfDO = mktStrategyConfMapper.selectByPrimaryKey(parentMktStrategyConfId);
             // 获取策略下规则信息
             List<MktStrategyConfRuleRelDO> mktStrategyConfRuleRelDOList = mktStrategyConfRuleRelMapper.selectByMktStrategyConfId(parentMktStrategyConfId);
+
+            // 获取适用地市的Id集合
+            if(LanId!=null){
+                 Map<String, Object> areaMap = sysAreaService.listStrAreaTree(LanId.toString());
+                 String sysAreaString = sysAreaService.getAreaString((List<SysArea>) areaMap.get("sysAreaList"));
+                mktStrategyConfDO.setAreaId(sysAreaString);
+            }
 
             mktStrategyConfDO.setMktStrategyConfId(null);
             mktStrategyConfDO.setCreateDate(new Date());
