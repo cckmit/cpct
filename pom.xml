@@ -20,6 +20,7 @@
         <module>cpct-dubbo-label</module>
         <module>cpct-open-api</module>
         <module>cpct-count</module>
+        <module>cpct-dtts-tasktracker</module>
     </modules>
 
     <properties>
