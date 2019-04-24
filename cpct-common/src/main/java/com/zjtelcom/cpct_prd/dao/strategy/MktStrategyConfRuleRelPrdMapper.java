@@ -1,9 +1,13 @@
 package com.zjtelcom.cpct_prd.dao.strategy;
 
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
+import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Mapper
+@Repository
 public interface MktStrategyConfRuleRelPrdMapper {
     int deleteByPrimaryKey(Long mktStrategyConfRuleRelId);
 

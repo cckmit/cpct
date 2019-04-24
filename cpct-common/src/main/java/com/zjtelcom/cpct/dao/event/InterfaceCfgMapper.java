@@ -3,10 +3,14 @@ package com.zjtelcom.cpct.dao.event;
 
 
 import com.zjtelcom.cpct.domain.event.InterfaceCfg;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Mapper
+@Repository
 public interface InterfaceCfgMapper {
     int deleteByPrimaryKey(Long interfaceCfgId);
 
