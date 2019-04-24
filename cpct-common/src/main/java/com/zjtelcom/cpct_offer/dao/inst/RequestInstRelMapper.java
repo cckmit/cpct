@@ -8,7 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-
+@Mapper
+@Repository
 public interface RequestInstRelMapper {
     int deleteByPrimaryKey(Long requestInstRelId);
 
