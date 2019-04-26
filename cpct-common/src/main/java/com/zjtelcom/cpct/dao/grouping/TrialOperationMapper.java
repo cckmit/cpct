@@ -3,11 +3,15 @@ package com.zjtelcom.cpct.dao.grouping;
 
 
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
 
+@Mapper
+@Repository
 public interface TrialOperationMapper {
     int deleteByPrimaryKey(Long id);
 

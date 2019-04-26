@@ -1,9 +1,3 @@
-/**
- * @(#)SysAreaServiceImpl.java, 2018/7/9.
- * <p/>
- * Copyright 2018 Netease, Inc. All rights reserved.
- * NETEASE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
 package com.zjtelcom.cpct.service.impl.system;
 
 import com.zjtelcom.cpct.constants.CommonConstant;
@@ -12,6 +6,7 @@ import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.City;
 import com.zjtelcom.cpct.domain.campaign.CityProperty;
 import com.zjtelcom.cpct.domain.channel.Channel;
+import com.zjtelcom.cpct.enums.AreaCodeEnum;
 import com.zjtelcom.cpct.enums.AreaLeveL;
 import com.zjtelcom.cpct.service.system.SysAreaService;
 import com.zjtelcom.cpct.util.ChannelUtil;
@@ -77,6 +72,24 @@ public class SysAreaServiceImpl implements SysAreaService {
         return map;
     }
 
+    /**
+     * 通过父节点获取子节点地区 +父节点（树形）
+     *
+     * @param parentCityId
+     * @return
+     */
+    @Override
+    public Map<String, Object> listCityAndParentByParentId(Integer parentCityId) {
+        Map<String, Object> map = new HashMap<>();
+        SysArea sysArea = sysAreaMapper.selectByPrimaryKey(parentCityId);
+        List<SysArea> sysAreaList = sysAreaMapper.selectByParnetArea(parentCityId);
+        sysArea.setChildAreaList(sysAreaList);
+        map.put("resultCode", CommonConstant.CODE_SUCCESS);
+        map.put("resultMsg", StringUtils.EMPTY);
+        map.put("sysAreaList", sysArea);
+        return map;
+    }
+
     @Override
     public Map<String, Object> listAllAreaTrea() {
         Map<String, Object> areaMap = new HashMap<>();
@@ -93,6 +106,27 @@ public class SysAreaServiceImpl implements SysAreaService {
             }
             sysAreaList.add(ChannelUtil.setOrgArea(sysArea));
         }
+        areaMap.put("sysAreaList", sysAreaList);
+        return areaMap;
+    }
+
+
+    @Override
+    public Map<String, Object> listStrAreaTree(String lanId) {
+        Map<String, Object> areaMap = new HashMap<>();
+        List<SysArea> sysAreaList = new ArrayList<>();
+        //获取省级
+        if("".equals(lanId)){
+            lanId = AreaCodeEnum.ZHEJIAGN.getLanId().toString();
+        }
+        SysArea sysArea = (SysArea) redisUtils.get("CITY_" + lanId);
+        if (sysArea == null) {
+            // 将城市数据存入到redis
+            saveCityTORedis();
+            // 重新从redis中获取
+            sysArea = (SysArea) redisUtils.get("CITY_" + lanId);
+        }
+        sysAreaList.add(ChannelUtil.setOrgArea(sysArea));
         areaMap.put("sysAreaList", sysAreaList);
         return areaMap;
     }
@@ -264,5 +298,28 @@ public class SysAreaServiceImpl implements SysAreaService {
             }
         }
         return isContains;
+    }
+
+    /**
+     * 所有地址转换成字符串形式 例如571/572/573
+     * @param sysAreaList
+     * @return
+     */
+    @Override
+    public String getAreaString(List<SysArea> sysAreaList){
+        StringBuilder sysAreaString = new StringBuilder();
+        for (SysArea sysArea : sysAreaList) {
+                if(sysAreaString.length() == 0){
+                    sysAreaString.append(sysArea.getAreaId());
+                } else {
+                    sysAreaString.append("/" + sysArea.getAreaId());
+                }
+                // 递归获取子地市
+                if(sysArea.getChildAreaList()!=null && sysArea.getChildAreaList().size()>0){
+                    String areaString = getAreaString(sysArea.getChildAreaList());
+                    sysAreaString.append("/" + areaString);
+                }
+        }
+        return sysAreaString.toString();
     }
 }

@@ -3,10 +3,14 @@ package com.zjtelcom.cpct.dao.question;
 
 
 import com.zjtelcom.cpct.domain.question.Question;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Mapper
+@Repository
 public interface MktQuestionMapper {
     int deleteByPrimaryKey(Long questionId);
 

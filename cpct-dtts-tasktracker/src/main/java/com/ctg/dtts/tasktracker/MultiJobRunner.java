@@ -7,6 +7,7 @@ import com.ctg.dtts.core.logger.LoggerFactory;
 import com.ctg.dtts.tasktracker.logger.BizLogger;
 import com.ctg.dtts.tasktracker.runner.DttsLoggerFactory;
 import com.zjtelcom.cpct.service.campaign.MktCamCycleTimingService;
+import com.zjtelcom.cpct.service.campaign.MktOperatorLogService;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryUntilElapsed;
@@ -21,8 +22,10 @@ public class MultiJobRunner {
 
     @Autowired TestSpringBean springBean;
 
-    @Autowired(required = false)
+    @Autowired
     private MktCamCycleTimingService mktCamCycleTimingService;
+    @Autowired
+    private MktOperatorLogService mktOperatorLogService;
 
 //    public Result runJob1(Job job) throws Throwable {   //带Job job，返回Result，适用于需要参数、返回结果的任务
 //        try {
@@ -49,7 +52,11 @@ public class MultiJobRunner {
 
     public void runCampaignCycleMonth() throws Throwable { //不带Job job参数、没有返回，适用于无参数无返回的任务
         try {
-            mktCamCycleTimingService.findCampaignCycleMonth();
+            int result = mktOperatorLogService.addMktOperatorLog("测试",1L,"123456","test1","test2",2L,"test3");
+//            mktCamCycleTimingService.findCampaignCycleMonth();
+            for(int i = 0; i <10 ; i++) {
+                System.out.println("*******结果:" + result + "*********");
+            }
             springBean.hello();
             String msg = "runCampaignCycleMonth执行任务";
             LOGGER.info(msg);
@@ -57,6 +64,7 @@ public class MultiJobRunner {
             bizLogger.info(msg);
         } catch (Exception e) {
             LOGGER.info("Run job2 failed!", e);
+            e.printStackTrace();
         }
     }
 

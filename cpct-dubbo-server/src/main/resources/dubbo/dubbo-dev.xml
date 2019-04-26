@@ -9,11 +9,11 @@
     <!-- 提供方应用信息，用于计算依赖关系 -->
     <dubbo:application name="00.1083"/>
 
-    <dubbo:registry protocol="dubbo" address="134.96.253.86:8033"/>
-    <!--<dubbo:registry protocol="dubbo" address="134.96.253.65:8001"/>-->
+    <!--<dubbo:registry protocol="dubbo" address="134.96.253.86:8033"/>-->
+    <dubbo:registry protocol="dubbo" address="134.96.253.65:8001"/>
 
     <!-- 暴露服务 -->
-    <dubbo:protocol name="dubbo" port="30311"/>
+    <dubbo:protocol name="dubbo" port="30308"/>
     <dubbo:monitor protocol="registry" />
 
     <!-- 注册 -->
@@ -54,6 +54,18 @@
     <dubbo:reference interface="com.zjtelcom.cpct.dubbo.service.ProductService" id="productService"
                      version="1.0" retries="0" check="false">
         <dubbo:method name="selectProductCam" servicecode="00.1083.selectProductCam" timeout="5000"/>
+    </dubbo:reference>
+
+    <!-- 事件接入dubbo接口 -->
+    <dubbo:reference interface="com.zjtelcom.es.es.service.EsService" id="esService"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="queryCustomer4Event" servicecode="00.1083.queryCustomer4Event" timeout="10000"/>
+    </dubbo:reference>
+
+    <!-- 事件接入活动任务订阅 1.0 -->
+    <dubbo:reference interface="com.zjtelcom.cpct.dubbo.service.CamApiService" id="camApiService"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="ActivityTask" servicecode="00.1083.ActivityTask" timeout="15000"/>
     </dubbo:reference>
 
 </beans>
