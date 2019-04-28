@@ -62,6 +62,10 @@
         <dubbo:method name="updateOperationStatus" servicecode="00.1083.updateOperationStatus" timeout="10000"/>
     </dubbo:service>
 
+    <dubbo:reference registry="esb2" interface="com.ctzj.bss.customer.data.carrier.outbound.api.CtgCacheAssetService" version="1.0" retries="0" check="false">
+        <dubbo:method name="queryCachedAssetDetailByIntegId" servicecode="33.1001.queryCachedAssetDetailByIntegId"  timeout="10000"/>
+    </dubbo:reference>
+
     <!-- 订阅 -->
     <!-- cpc计算协同中心回调 -->
     <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService" id="iContactTaskReceiptService"
@@ -86,6 +90,10 @@
         <dubbo:method name="ActivityTask" servicecode="00.1083.ActivityTask" timeout="15000"/>
     </dubbo:reference>
 
+    <dubbo:reference interface="com.zjtelcom.cpct.dubbo.service.ProductService" id="productService"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="selectProductCam" servicecode="00.1083.selectProductCam" timeout="5000"/>
+    </dubbo:reference>
 
     <!-- 事件接入dubbo接口 -->
     <dubbo:reference interface="com.zjtelcom.es.es.service.EsService" id="esService"

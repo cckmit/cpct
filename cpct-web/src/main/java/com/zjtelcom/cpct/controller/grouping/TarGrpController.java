@@ -9,6 +9,7 @@ import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.util.FastJsonUtils;
+import com.zjtelcom.cpct.util.MapUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +31,26 @@ public class TarGrpController extends BaseController {
     private TarGrpService tarGrpService;
     @Autowired
     private TrialOperationService operationService;
+
+
+    @RequestMapping("/conditionSwitch")
+    @CrossOrigin
+    public String conditionSwitch(@RequestBody HashMap<String,Object> param) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            Long conditionId =MapUtil.getLongNum(param.get("conditionId"));
+            String type = MapUtil.getString(param.get("type"));
+            String  value =  MapUtil.getString(param.get("value"));
+            maps = tarGrpService.conditionSwitch(conditionId,type,value);
+        } catch (Exception e) {
+            logger.error("[op:TarGrpController] fail to conditionSwitch for tarGrpDTO = {}!" +
+                    " Exception: ", JSONArray.toJSON(maps), e);
+            return FastJsonUtils.objToJson(maps);
+        }
+        return FastJsonUtils.objToJson(maps);
+    }
+
+
 
 
     @PostMapping("labelListByCampaignId")

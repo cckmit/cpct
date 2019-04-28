@@ -73,6 +73,11 @@
         <dubbo:method name="searchFromRedis" servicecode="00.1083.searchFromRedis" timeout="10000"/>
     </dubbo:service>
 
+    <dubbo:reference interface="com.zjtelcom.cpct.dubbo.service.ProductService" id="productService"
+                     version="2.0" retries="0" check="false">
+        <dubbo:method name="selectProductCam" servicecode="00.1083.selectProductCam" timeout="5000"/>
+    </dubbo:reference>
+
     <!-- 事件接入活动任务订阅 2.0 -->
     <dubbo:reference interface="com.zjtelcom.cpct.dubbo.service.CamApiService" id="camApiService"
                      version="2.0" retries="0" check="false">

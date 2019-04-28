@@ -95,6 +95,49 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
 
 
     @Override
+    public Map<String, Object> conditionSwitch(Long conditionId, String type, String value) {
+        Map<String,Object> result = new HashMap<>();
+        TarGrpCondition condition = tarGrpConditionMapper.selectByPrimaryKey(conditionId);
+        if (condition==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","条件不存在");
+            return result;
+        }
+        TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(condition.getTarGrpId());
+        if (tarGrp==null){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "分群不存在");
+            return result;
+        }
+        if (type.equals("1000")){
+            if (condition.getConditionText()!=null && condition.getConditionText().equals("1000")){
+                condition.setConditionText("2000");
+            }else {
+                condition.setConditionText("1000");
+            }
+            tarGrpConditionMapper.updateByPrimaryKey(condition);
+        }
+        if (type.equals("2000")){
+            if (condition.getRemark()!=null && condition.getRemark().equals("1000")){
+                condition.setRemark("2000");
+            }else {
+                condition.setRemark("1000");
+            }
+            tarGrpConditionMapper.updateByPrimaryKey(condition);
+        }
+        TarGrpDetail detail = (TarGrpDetail)redisUtils.get("TAR_GRP_"+condition.getTarGrpId());
+        List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(condition.getTarGrpId());
+        if (detail!=null){
+            detail = BeanUtil.create(tarGrp,new TarGrpDetail());
+            detail.setTarGrpConditions(conditionList);
+            redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),detail);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","修改成功");
+        return result;
+    }
+
+    @Override
     public Map<String, Object> labelListByEventId(Long eventId) {
         List<Map<String,Object>> campaignDOS = evtRelMapper.listActivityByEventId(eventId);
         List<Integer> campaigns = new ArrayList<>();
@@ -311,6 +354,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         List<TarGrpCondition> conditionAdd = new ArrayList<>();
         for (TarGrpCondition conditionDO : conditionDOList){
             TarGrpCondition con = BeanUtil.create(conditionDO,new TarGrpCondition());
+            con.setRemark(con.getRemark()==null ? "1000" : con.getRemark());
+            con.setConditionText(con.getConditionText()==null ?"1000" : con.getConditionText());
             if (needDeleted.equals("0")){
                 con.setStatusCd("1100");
             }
@@ -380,6 +425,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
 //                    }
                     tarGrpCondition.setConditionId(null);
                     tarGrpCondition.setRootFlag(0L);
+                    tarGrpCondition.setRemark(tarGrpCondition.getRemark()==null ? "1000" : tarGrpCondition.getRemark());
+                    tarGrpCondition.setConditionText(tarGrpCondition.getConditionText()==null ?"1000" : tarGrpCondition.getConditionText());
                     tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
                     tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
                     tarGrpCondition.setTarGrpId(tarGrp.getTarGrpId());
@@ -593,6 +640,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
 //                    }
                     condition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
                     condition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
+                    condition.setRemark(tarGrpCondition.getRemark()==null ? "1000" : tarGrpCondition.getRemark());
+                    condition.setConditionText(tarGrpCondition.getConditionText()==null ?"1000" : tarGrpCondition.getConditionText());
                     condition.setRootFlag(0L);
                     condition.setTarGrpId(tarGrp.getTarGrpId());
                     condition.setUpdateDate(DateUtil.getCurrentTime());

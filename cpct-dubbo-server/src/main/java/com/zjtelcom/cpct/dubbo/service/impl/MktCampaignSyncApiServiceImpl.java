@@ -425,7 +425,7 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
         requestInfo.setActivitiKey("mkt_force_province_city");  //需求函活动类型
         requestInfo.setRequestUrgentType("一般");
         requestInfo.setProcessType("0");
-//        requestInfo.setIsstartup("1");
+        requestInfo.setIsstartup("1");
         requestInfo.setReportTag("0");
         //得到指定下发的人员信息集合
         List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign(CITY_PUBLISH);
@@ -1357,6 +1357,8 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
 //                    }
                     tarGrpCondition.setConditionId(null);
                     tarGrpCondition.setRootFlag(0L);
+                    tarGrpCondition.setRemark(tarGrpCondition.getRemark()==null ? "1000" : tarGrpCondition.getRemark());
+                    tarGrpCondition.setConditionText(tarGrpCondition.getConditionText()==null ?"1000" : tarGrpCondition.getConditionText());
                     tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
                     tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
                     tarGrpCondition.setTarGrpId(tarGrp.getTarGrpId());
