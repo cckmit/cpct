@@ -25,8 +25,9 @@
     <!--</dubbo:service>-->
 
     <!--受理清单校验接口-->
-    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.TarGrpApiService" ref="tarGrpApiServiceImpl" version="1.0" >
-        <dubbo:method name="getCpcTargrp" servicecode="00.1083.getCpcTargrp" timeout="10000"/>
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.TarGrpApiService" ref="arGrpApiServiceImpl" version="1.0" >
+    <!-- 策略cpct计算服务（同步） -->
+    <dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="10000"/>
     </dubbo:service>
 
     <!-- 编码查询事件详情服务 -->
@@ -57,7 +58,7 @@
         <dubbo:method name="selectProductCam" servicecode="00.1083.selectProductCam" timeout="10000"/>
     </dubbo:service>-->
 
-    <dubbo:reference registry="esb2" interface="com.ctzj.bss.customer.data.carrier.outbound.api.CtgCacheAssetService" version="1.0" retries="0" check="false">
+    <dubbo:reference registry="esb2" id="ctgCacheAssetService" interface="com.ctzj.bss.customer.data.carrier.outbound.api.CtgCacheAssetService" version="1.0" retries="0" check="false">
         <dubbo:method name="queryCachedAssetDetailByIntegId" servicecode="33.1001.queryCachedAssetDetailByIntegId"  timeout="10000"/>
     </dubbo:reference>
 
