@@ -105,5 +105,4 @@
                      version="2.0" retries="0" check="false">
         <dubbo:method name="getCpcTargrp" servicecode="00.1083.getCpcTargrp_zsc" timeout="10000"/>
     </dubbo:reference>
-
 </beans>

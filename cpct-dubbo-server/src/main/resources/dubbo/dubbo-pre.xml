@@ -100,11 +100,5 @@
         <dubbo:method name="queryCachedAssetDetailByIntegId" servicecode="33.1001.queryCachedAssetDetailByIntegId"  timeout="10000"/>
     </dubbo:reference>
 
-    <!--受理清单校验接口-->
-    <dubbo:reference interface="com.zjtelcom.cpct.dubbo.service.TarGrpApiService" id="tarGrpApiService"
-                     version="1.0" retries="0" check="false">
-        <dubbo:method name="getCpcTargrp" servicecode="00.1083.getCpcTargrp_zsc" timeout="10000"/>
-    </dubbo:reference>
-
 
 </beans>
