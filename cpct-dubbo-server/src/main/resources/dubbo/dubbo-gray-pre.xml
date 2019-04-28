@@ -92,7 +92,7 @@
 
     <!-- 事件接入dubbo接口 -->
     <dubbo:reference registry="esb3" interface="com.zjtelcom.es.es.service.EsService" id="esService"
-                     version="2.0" retries="0" check="false">
+                     version="1.0" retries="0" check="false">
         <dubbo:method name="queryCustomer4Event" servicecode="00.1083.queryCustomer4Event" timeout="10000"/>
     </dubbo:reference>
 

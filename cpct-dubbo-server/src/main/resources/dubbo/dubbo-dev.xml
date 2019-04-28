@@ -24,6 +24,11 @@
         <!--<dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="10000"/>-->
     <!--</dubbo:service>-->
 
+    <!--受理清单校验接口-->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.TarGrpApiService" ref="tarGrpApiServiceImpl" version="1.0" >
+        <dubbo:method name="getCpcTargrp" servicecode="00.1083.getCpcTargrp" timeout="10000"/>
+    </dubbo:service>
+
     <!-- 编码查询事件详情服务 -->
     <!--<dubbo:service interface="com.zjtelcom.cpct.dubbo.service.ChannelService" ref="channelServiceImpl" version="1.0" >-->
         <!--<dubbo:method name="getEventDetail" servicecode="00.1083.getEventDetail" timeout="10000"/>-->
