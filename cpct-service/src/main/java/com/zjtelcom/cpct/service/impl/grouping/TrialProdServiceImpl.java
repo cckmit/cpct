@@ -144,8 +144,11 @@ public class TrialProdServiceImpl implements TrialProdService {
     public void campaignIndexTask(Map<String,Object> param) {
         List<MktCampaignDO> campaignList = new ArrayList<>();
         Long campaignId = MapUtil.getLongNum(param.get("id"));
-        MktCampaignDO cam = campaignMapper.selectByPrimaryKey(campaignId);
-        campaignList.add(cam);
+        List<Integer> idList = ( List<Integer>)param.get("idList");
+        for (Integer id : idList){
+            MktCampaignDO cam = campaignMapper.selectByPrimaryKey(Long.valueOf(id.toString()));
+            campaignList.add(cam);
+        }
         for (MktCampaignDO campaignDO : campaignList){
             if(!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(campaignDO.getStatusCd())){
                continue;
