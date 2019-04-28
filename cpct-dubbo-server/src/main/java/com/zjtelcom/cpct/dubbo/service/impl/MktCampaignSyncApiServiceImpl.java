@@ -1357,6 +1357,8 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
 //                    }
                     tarGrpCondition.setConditionId(null);
                     tarGrpCondition.setRootFlag(0L);
+                    tarGrpCondition.setRemark(tarGrpCondition.getRemark()==null ? "1000" : tarGrpCondition.getRemark());
+                    tarGrpCondition.setConditionText(tarGrpCondition.getConditionText()==null ?"1000" : tarGrpCondition.getConditionText());
                     tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
                     tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
                     tarGrpCondition.setTarGrpId(tarGrp.getTarGrpId());

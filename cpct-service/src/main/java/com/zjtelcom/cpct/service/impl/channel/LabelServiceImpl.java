@@ -107,7 +107,13 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             Label entity = labelMapper.selectByLabelCode(label.getInjectionLabelCode());
             if (entity!=null){
 //                entity.setLabBusiDesc(label.getLabBusiDesc());
-                entity.setLabTechDesc(label.getLabTechDesc());
+                if (label.getLabExample()!=null && label.getLabExample().length()<255){
+                    entity.setLabExample(label.getLabExample());
+                }
+                entity.setInjectionLabelName(label.getInjectionLabelName());
+                if (label.getLabBusiDesc()!=null&& label.getLabBusiDesc().length()<1000){
+                    entity.setLabBusiDesc(label.getLabBusiDesc());
+                }
                 labelDataType(label,entity);
                 labelMapper.updateByPrimaryKey(entity);
             }

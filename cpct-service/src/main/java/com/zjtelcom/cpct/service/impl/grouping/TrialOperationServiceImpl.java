@@ -634,14 +634,20 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             for (int j = 0; j < row.getLastCellNum(); j++) {
                 Cell cellTitle = rowCode.getCell(j);
                 Cell cell = row.getCell(j);
+                if (cellTitle.getStringCellValue().equals("CCUST_NAME") && ChannelUtil.getCellValue(cell).equals("null")){
+                    break;
+                }
                 if (cellTitle.getStringCellValue().equals("CCUST_ID") && ChannelUtil.getCellValue(cell).equals("null")){
-                    continue;
+                   break;
                 }
                 if (cellTitle.getStringCellValue().equals("ASSET_INTEG_ID") && ChannelUtil.getCellValue(cell).equals("null")){
-                    continue;
+                   break;
                 }
                 if (cellTitle.getStringCellValue().equals("ASSET_NUMBER") && ChannelUtil.getCellValue(cell).equals("null")){
-                    continue;
+                    break;
+                }
+                if (cellTitle.getStringCellValue().equals("LATN_ID") && ChannelUtil.getCellValue(cell).equals("null")){
+                    break;
                 }
                 customers.put(cellTitle.getStringCellValue(), ChannelUtil.getCellValue(cell));
             }
