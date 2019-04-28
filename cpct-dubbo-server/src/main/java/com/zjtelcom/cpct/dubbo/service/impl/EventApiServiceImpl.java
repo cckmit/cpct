@@ -2287,7 +2287,6 @@ public class EventApiServiceImpl implements EventApiService {
                                     prodConfig = true;
                                 }
                                 if (prodConfig) {
-                                    integrationId = "3-1AYT3V55";
                                     ResponseResult<AssetDto> assetDtoResponseResult = ctgCacheAssetService.queryCachedAssetDetailByIntegId(integrationId, landName);
                                     AssetDto assetDto = assetDtoResponseResult.getData();
                                     List<String> prodStrList = new ArrayList<>();
