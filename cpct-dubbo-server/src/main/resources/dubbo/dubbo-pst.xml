@@ -16,6 +16,10 @@
     <dubbo:protocol name="dubbo" port="30803"/>
     <dubbo:monitor protocol="registry" />
 
+    <!--受理清单校验接口-->
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.TarGrpApiService" ref="tarGrpApiServiceImpl" version="1.0" >
+        <dubbo:method name="getCpcTargrp" servicecode="00.1083.getCpcTargrp" timeout="10000"/>
+    </dubbo:service>
     <!-- 注册 -->
     <!-- 二次协同查询服务 -->
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.EventApiService" ref="eventApiServiceImpl" version="1.0" >
