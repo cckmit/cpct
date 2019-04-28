@@ -92,12 +92,18 @@
 
     <!-- 事件接入dubbo接口 -->
     <dubbo:reference registry="esb3" interface="com.zjtelcom.es.es.service.EsService" id="esService"
-                     version="1.0" retries="0" check="false">
+                     version="2.0" retries="0" check="false">
         <dubbo:method name="queryCustomer4Event" servicecode="00.1083.queryCustomer4Event" timeout="10000"/>
     </dubbo:reference>
 
     <dubbo:reference registry="esb2" id="ctgCacheAssetService"  interface="com.ctzj.bss.customer.data.carrier.outbound.api.CtgCacheAssetService" version="1.0" retries="0" check="false">
         <dubbo:method name="queryCachedAssetDetailByIntegId" servicecode="33.1001.queryCachedAssetDetailByIntegId"  timeout="10000"/>
+    </dubbo:reference>
+
+    <!--受理清单校验接口-->
+    <dubbo:reference interface="com.zjtelcom.cpct.dubbo.service.TarGrpApiService" id="tarGrpApiService"
+                     version="2.0" retries="0" check="false">
+        <dubbo:method name="getCpcTargrp" servicecode="00.1083.getCpcTargrp_zsc" timeout="10000"/>
     </dubbo:reference>
 
 </beans>
