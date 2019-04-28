@@ -2273,7 +2273,7 @@ public class EventApiServiceImpl implements EventApiService {
                             redisUtils.set("CUST_PROD_FILTER", sysParamsList);
                         }
 
-                        if (sysParamsList != null && sysParamsList.get(0) != null && "1".equals(sysParamsList.get(0).getParamValue())) {
+                        if (sysParamsList != null && sysParamsList.size()>0 && sysParamsList.get(0) != null && "1".equals(sysParamsList.get(0).getParamValue())) {
                             List<Map<String, Object>> taskMapNewList = new ArrayList<>();
 
                             Map<String, Object> taskMap = (Map<String, Object>) resultMap1.get("CPC_VALUE");
