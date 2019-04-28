@@ -640,6 +640,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
 //                    }
                     condition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
                     condition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
+                    condition.setRemark(tarGrpCondition.getRemark()==null ? "1000" : tarGrpCondition.getRemark());
+                    condition.setConditionText(tarGrpCondition.getConditionText()==null ?"1000" : tarGrpCondition.getConditionText());
                     condition.setRootFlag(0L);
                     condition.setTarGrpId(tarGrp.getTarGrpId());
                     condition.setUpdateDate(DateUtil.getCurrentTime());
