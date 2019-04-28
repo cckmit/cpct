@@ -2267,7 +2267,12 @@ public class EventApiServiceImpl implements EventApiService {
                         }
 
                         // 销售品过滤
-                        List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("CUST_PROD_FILTER");
+                        List<SysParams> sysParamsList = (List<SysParams>) redisUtils.get("CUST_PROD_FILTER");
+                        if(sysParamsList==null){
+                            sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("CUST_PROD_FILTER");
+                            redisUtils.set("CUST_PROD_FILTER", sysParamsList);
+                        }
+
                         if (sysParamsList != null && sysParamsList.get(0) != null && "1".equals(sysParamsList.get(0).getParamValue())) {
                             List<Map<String, Object>> taskMapNewList = new ArrayList<>();
 
@@ -2279,7 +2284,13 @@ public class EventApiServiceImpl implements EventApiService {
 
                             // 判断该活动是否配置了销售品过滤
                             Integer mktCampaignId = (Integer) taskMap.get("activityId");
-                            List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleList(Long.valueOf(mktCampaignId));
+
+                            List<FilterRule> filterRuleList = (List<FilterRule>) redisUtils.get("FILTER_RULE_" + mktCampaignId);
+                            if (filterRuleList == null) {
+                               filterRuleList = filterRuleMapper.selectFilterRuleList(Long.valueOf(mktCampaignId));
+                               redisUtils.set("FILTER_RULE_" + mktCampaignId, filterRuleList);
+                            }
+
                             boolean prodConfig = false;
                             boolean pordFilter = true; // true:未包含要过滤的销售品， false：包含要过滤的销售品
                             for (FilterRule filterRule : filterRuleList) {
