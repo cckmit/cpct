@@ -6,6 +6,7 @@ import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.dto.grouping.TrialOperationVO;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
+import com.zjtelcom.cpct.service.grouping.TrialProdService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +32,28 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 public class TrialOperationController extends BaseController {
     @Autowired
     private TrialOperationService operationService;
+    @Autowired
+    private TrialProdService trialProdService;
 
-
-
+    /**
+     * ppm-导入清单
+     * @param param
+     * @return
+     */
+    @PostMapping("campaignIndexTask")
+    @CrossOrigin
+    public Map<String, Object> campaignIndexTask( @RequestBody HashMap<String,Object> param){
+        Map<String, Object> result = new HashMap<>();
+        try {
+             trialProdService.campaignIndexTask(param);
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to importFromCust4Ppm", e);
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", " fail to importFromCust4Ppm");
+            return result;
+        }
+        return result;
+    }
 
     /**
      * ppm-导入清单

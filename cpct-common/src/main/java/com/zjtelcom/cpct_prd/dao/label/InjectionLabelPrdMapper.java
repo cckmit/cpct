@@ -41,5 +41,7 @@ public interface InjectionLabelPrdMapper {
 
     List<Label> queryLabelsExceptSelected(@Param("injectionLabelIds") List<Long> injectionLabelIds, @Param("labelName") String labelName);
 
+    List<Map<String,Object>> listLabelByDisplayId(@Param("grpId")Long grpId);
+
 
 }
