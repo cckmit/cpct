@@ -10,6 +10,7 @@ import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
@@ -32,6 +33,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
+import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.*;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.enums.StatusCode;
@@ -122,6 +124,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private MktStrategyConfMapper strategyConfMapper;
     @Autowired
     private MktCamCustMapper camCustMapper;
+    @Autowired
+    private FilterRuleMapper filterRuleMapper;
+    @Autowired
+    private RedisUtils_es redisUtils_es;
 
     /**
      * 销售品service
@@ -871,7 +877,21 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         MktStrategyConfDO strategy = strategyMapper.selectByPrimaryKey(operationVO.getStrategyId());
         //添加策略适用地市
         redisUtils.set("STRATEGY_CONF_AREA_"+operationVO.getStrategyId(),strategy.getAreaId());
-
+        List<String> typeList = new ArrayList<>();
+        typeList.add("1000");
+        List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(campaign.getMktCampaignId(),typeList);
+        if (filterRuleList!=null && !filterRuleList.isEmpty()){
+            List<String> userList = new ArrayList<>();
+            for (FilterRule filterRule : filterRuleList){
+                String[] users = filterRule.getUserList().split(",");
+                userList.addAll(Arrays.asList(users));
+            }
+            int num = userList.size()/100 + 1;
+            List<List<String>> list = ChannelUtil.averageAssign(userList,num);
+            for (int i = 0; i < num; i++) {
+                redisUtils.hset("AREA_RULE_BLACK_LIST_"+campaign.getMktCampaignId(),i+"",list.get(i));
+            }
+        }
         // 通过活动id获取关联的标签字段数组
         DisplayColumn req = new DisplayColumn();
         req.setDisplayColumnId(campaign.getCalcDisplay());

@@ -140,7 +140,7 @@ public class SystemParamsUtil {
      * @return
      */
     private static boolean isYZ(String str){
-        if(str.equals("IS_ES_FLG") ||str.equals("YZS_ES_FLG") ||str.equals("YZ_ES_FLG")||str.equals("TRIAL_LABEL_DATA_TYPE")){
+        if(str.equals("IS_ES_FLG") ||str.equals("YZS_ES_FLG") ||str.equals("YZ_ES_FLG")||str.equals("TRIAL_LABEL_DATA_TYPE")||str.equals("ISALE_CHECK_FLG")){
               return  true;
         }else{
               return false;
