@@ -63,9 +63,9 @@
     </dubbo:reference>
 
     <!-- 事件接入活动任务订阅 1.0 -->
-    <dubbo:reference interface="com.zjtelcom.cpct.dubbo.service.CamApiService" id="camApiService"
-                     version="1.0" retries="0" check="false">
-        <dubbo:method name="ActivityTask" servicecode="00.1083.ActivityTask" timeout="15000"/>
-    </dubbo:reference>
+    <!--<dubbo:reference interface="com.zjtelcom.cpct.dubbo.service.CamApiService" id="camApiService"-->
+                     <!--version="1.0" retries="0" check="false">-->
+        <!--<dubbo:method name="ActivityTask" servicecode="00.1083.ActivityTask" timeout="15000"/>-->
+    <!--</dubbo:reference>-->
 
 </beans>
