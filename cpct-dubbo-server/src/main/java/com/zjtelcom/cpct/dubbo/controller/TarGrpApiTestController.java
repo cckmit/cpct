@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/tarGrpTest")
+@RequestMapping("${adminPath}/tarGrpTest")
 public class TarGrpApiTestController {
 
     @Autowired
