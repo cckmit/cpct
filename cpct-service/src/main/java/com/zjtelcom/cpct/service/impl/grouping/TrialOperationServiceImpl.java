@@ -525,10 +525,11 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private Map<String, Object> importUserList(Map<String, Object> result, TrialOperationVO operation, Long ruleId, String batchNumSt, List<Map<String, Object>> customerList, List<Map<String, Object>> labelList) {
         redisUtils.set("LABEL_DETAIL_"+batchNumSt,labelList);
         int num = (customerList.size() / 100) + 1;
+        redisUtils_es.set("IMPORT_USER_LIST_"+batchNumSt,num);
         List<List<Map<String,Object>>> smallCustomers = ChannelUtil.averageAssign(customerList,num);
         //按规则存储客户信息
         for (int i = 0; i < num; i++) {
-            redisUtils.hset("ISSURE_" + batchNumSt + "_" + ruleId, i + "",smallCustomers.get(i));
+            redisUtils_es.hset("ISSURE_" + batchNumSt + "_" + ruleId, i + "",smallCustomers.get(i));
         }
 //        redisUtils.set("ISSURE_" + batchNumSt + "_" + ruleId,customerList);
         MktCampaignDO campaignDO = campaignMapper.selectByPrimaryKey(operation.getCampaignId());
@@ -607,65 +608,65 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         trialOp.setStatusDate(new Date());
         trialOp.setCreateStaff(TrialCreateType.IMPORT_USER_LIST.getValue());
         trialOperationMapper.insert(trialOp);
+        new Thread() {
+            public void run() {
+                List<Map<String, Object>> customerList = new ArrayList<>();
+                List<Map<String, Object>> labelList = new ArrayList<>();
+                List<LabelDTO> labelDTOList = new ArrayList<>();
 
-        List<Map<String,Object>> customerList = new ArrayList<>();
-        List<Map<String,Object>> labelList = new ArrayList<>();
-        List<LabelDTO>  labelDTOList = new ArrayList<>();
+                Row labelRowFirst = sheet.getRow(0);
+                Row labelRow = sheet.getRow(1);
+                for (int j = 0; j < labelRow.getLastCellNum(); j++) {
+                    Cell cellTitle = labelRowFirst.getCell(j);
+                    Cell cell = labelRow.getCell(j);
+                    LabelDTO labelDTO = new LabelDTO();
+                    labelDTO.setLabelCode((String) ChannelUtil.getCellValue(cell));
+                    labelDTO.setInjectionLabelName(cellTitle.getStringCellValue());
+                    labelDTOList.add(labelDTO);
+                }
+                for (int i = 3; i < rowNums; i++) {
+                    Map<String, Object> customers = new HashMap<>();
+                    Row rowCode = sheet.getRow(1);
+                    Row row = sheet.getRow(i);
+                    System.out.println("处理--------：" + i);
+                    if (row == null) {
+                        System.out.println("这一行是空的：" + i);
+                        continue;
+                    }
+                    for (int j = 0; j < row.getLastCellNum(); j++) {
+                        Cell cellTitle = rowCode.getCell(j);
+                        Cell cell = row.getCell(j);
+                        if (cellTitle.getStringCellValue().equals("CCUST_NAME") && ChannelUtil.getCellValue(cell).equals("null")) {
+                            break;
+                        }
+                        if (cellTitle.getStringCellValue().equals("CCUST_ID") && ChannelUtil.getCellValue(cell).equals("null")) {
+                            break;
+                        }
+                        if (cellTitle.getStringCellValue().equals("ASSET_INTEG_ID") && ChannelUtil.getCellValue(cell).equals("null")) {
+                            break;
+                        }
+                        if (cellTitle.getStringCellValue().equals("ASSET_NUMBER") && ChannelUtil.getCellValue(cell).equals("null")) {
+                            break;
+                        }
+                        if (cellTitle.getStringCellValue().equals("LATN_ID") && ChannelUtil.getCellValue(cell).equals("null")) {
+                            break;
+                        }
+                        customers.put(cellTitle.getStringCellValue(), ChannelUtil.getCellValue(cell));
+                    }
+                    if (!customers.isEmpty()) {
+                        customerList.add(customers);
+                    }
+                }
+                for (int i = 0; i < labelDTOList.size(); i++) {
+                    Map<String, Object> label = new HashMap<>();
+                    label.put("code", labelDTOList.get(i).getLabelCode());
+                    label.put("name", labelDTOList.get(i).getInjectionLabelName());
+                    labelList.add(label);
+                }
 
-        Row labelRowFirst = sheet.getRow(0);
-        Row labelRow = sheet.getRow(1);
-        for (int j = 0; j < labelRow.getLastCellNum(); j++) {
-            Cell cellTitle = labelRowFirst.getCell(j);
-            Cell cell = labelRow.getCell(j);
-            LabelDTO  labelDTO = new LabelDTO();
-            labelDTO.setLabelCode((String) ChannelUtil.getCellValue(cell));
-            labelDTO.setInjectionLabelName(cellTitle.getStringCellValue());
-            labelDTOList.add(labelDTO);
-        }
-        for (int i = 3; i < rowNums ; i++) {
-            Map<String, Object> customers = new HashMap<>();
-            Row rowCode = sheet.getRow(1);
-            Row row = sheet.getRow(i);
-            System.out.println("处理--------："+i);
-            if (row==null){
-                System.out.println("这一行是空的："+i);
-                continue;
-            }
-            for (int j = 0; j < row.getLastCellNum(); j++) {
-                Cell cellTitle = rowCode.getCell(j);
-                Cell cell = row.getCell(j);
-                if (cellTitle.getStringCellValue().equals("CCUST_NAME") && ChannelUtil.getCellValue(cell).equals("null")){
-                    break;
-                }
-                if (cellTitle.getStringCellValue().equals("CCUST_ID") && ChannelUtil.getCellValue(cell).equals("null")){
-                   break;
-                }
-                if (cellTitle.getStringCellValue().equals("ASSET_INTEG_ID") && ChannelUtil.getCellValue(cell).equals("null")){
-                   break;
-                }
-                if (cellTitle.getStringCellValue().equals("ASSET_NUMBER") && ChannelUtil.getCellValue(cell).equals("null")){
-                    break;
-                }
-                if (cellTitle.getStringCellValue().equals("LATN_ID") && ChannelUtil.getCellValue(cell).equals("null")){
-                    break;
-                }
-                customers.put(cellTitle.getStringCellValue(), ChannelUtil.getCellValue(cell));
-            }
-            if (!customers.isEmpty()){
-                customerList.add(customers);
-            }
-        }
-        for (int i = 0 ; i< labelDTOList.size();i++){
-            Map<String,Object> label = new HashMap<>();
-            label.put("code",labelDTOList.get(i).getLabelCode());
-            label.put("name",labelDTOList.get(i).getInjectionLabelName());
-            labelList.add(label);
-        }
-        new Thread(){
-            public void run(){
                 try {
                     importUserList(result, operation, ruleId, batchNumSt, customerList, labelList);
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                     logger.error("导入失败");
                 }

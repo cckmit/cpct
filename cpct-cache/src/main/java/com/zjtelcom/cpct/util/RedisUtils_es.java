@@ -51,6 +51,35 @@ public class RedisUtils_es {
 
 
     /**
+     * hash存储Redis
+     * @param key
+     * @param field
+     * @param value
+     * @return
+     */
+    public boolean hset(final String key, String field, Object value) {
+        boolean result = false;
+        CtgJedisPool ctgJedisPool = initCatch();
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                jedis.hset(key, field, serialize(value));
+                result = true;
+            } catch (Exception e) {
+                System.out.println("REDIShset*********" + key);
+                e.printStackTrace();
+            } finally {
+                jedis.close();
+            }
+        } catch (Exception e) {
+            System.out.println("REDIShset2*********" + key);
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
      * 更换集团redis方法
      *
      * @param key

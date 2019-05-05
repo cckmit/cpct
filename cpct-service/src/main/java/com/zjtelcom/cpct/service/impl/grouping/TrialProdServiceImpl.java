@@ -166,6 +166,7 @@ public class TrialProdServiceImpl implements TrialProdService {
                 operation.setStrategyId(strategy.getMktStrategyConfId());
                 operation.setStrategyName(strategy.getMktStrategyConfName());
                 operation.setBatchNum(Long.valueOf(batchNumSt));
+                trialOperationMapper.insert(operation);
                 Map<String,Object> res = issue(operation,campaignDO,strategy);
                 System.out.println(JSON.toJSONString(res));
             }
