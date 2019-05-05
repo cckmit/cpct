@@ -618,20 +618,19 @@ public class CamApiServiceImpl implements CamApiService {
                     //遍历所有规则
                     for (Map<String, String> labelMap : labelMapList) {
                         String type = labelMap.get("operType");
-
-                        if ("PROM_LIST".equals(labelMap.get("code"))) {
-                            FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.valueOf(labelMap.get("rightParam")));
-                            labelMap.put("rightParam", filterRule.getChooseProduct());
-                        }
-
-
-
                         //保存标签的es log
                         lr = new LabelResult();
+                        if ("PROM_LIST".equals(labelMap.get("code"))) {
+                            FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.valueOf(labelMap.get("rightParam")));
+                            lr.setRightOperand(filterRule.getChooseProduct());
+                            labelMap.put("rightParam", filterRule.getChooseProduct());
+                        }else{
+                            lr.setRightOperand(labelMap.get("rightParam"));
+                        }
+
                         lr.setOperType(type);
                         lr.setLabelCode(labelMap.get("code"));
                         lr.setLabelName(labelMap.get("name"));
-                        lr.setRightOperand(labelMap.get("rightParam"));
                         lr.setClassName(labelMap.get("className"));
 
                         //拼接表达式：主表达式
@@ -1296,6 +1295,7 @@ public class CamApiServiceImpl implements CamApiService {
                 //    String[] checkProductArr = checkProduct.split(",");
                 if (productStr != null && !"".equals(productStr)) {
                     if ("7000".equals(type)) {  //存在于
+                        productCheck = false;
                         for (String product : checkProductArr) {
                             int index = productStr.indexOf(product);
                             if (index >= 0) {
@@ -1304,19 +1304,14 @@ public class CamApiServiceImpl implements CamApiService {
                             }
                         }
                     } else if ("7100".equals(type)) { //不存在于
-                       // boolean noExistCheck = true;
+                        productCheck = true;
                         for (String product : checkProductArr) {
                             int index = productStr.indexOf(product);
                             if (index >= 0) {
                                 productCheck = false;
-                         //       noExistCheck = false;
-                                //被过滤的销售品
                                 break;
                             }
                         }
-                      /*  if (noExistCheck) {
-                            productCheck = true;
-                        }*/
                     }
                 } else {
                     //存在于校验
@@ -2214,7 +2209,13 @@ public class CamApiServiceImpl implements CamApiService {
                 lr.setOperType(type);
                 lr.setLabelCode(labelMap.get("code"));
                 lr.setLabelName(labelMap.get("name"));
-                lr.setRightOperand(labelMap.get("rightParam"));
+                if ("PROM_LIST".equals(labelMap.get("code"))) {
+                    FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.valueOf(labelMap.get("rightParam")));
+                    lr.setRightOperand(filterRule.getChooseProduct());
+                }else{
+                    lr.setRightOperand(labelMap.get("rightParam"));
+                }
+
                 lr.setClassName(labelMap.get("className"));
 
                 //判断标签实例是否足够

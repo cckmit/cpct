@@ -14,7 +14,7 @@ import java.util.Map;
 @RequestMapping("${adminPath}/tarGrpTest")
 public class TarGrpApiTestController {
 
-    @Autowired
+    @Autowired(required = false)
     private TarGrpApiService tarGrpApiService;
 
     /**
