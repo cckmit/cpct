@@ -23,13 +23,50 @@ import java.util.List;
 @Service
 public class RedisUtils_es {
 
-    private String redisIp="134.108.0.61";
+//    private String redisIp="134.108.0.61";
+//
+//    private Integer redisPort=41801;
+//
+//    private Integer redisDatabase=4970;
+//
+//    private String redisPassword="bss_cpcp_pocins_user#Bsscpc!1n";
 
-    private Integer redisPort=41801;
+    private String redisIp="134.96.231.228";
+
+    private Integer redisPort=40201;
 
     private Integer redisDatabase=4970;
 
-    private String redisPassword="bss_cpcp_pocins_user#Bsscpc!1n";
+    private String redisPassword="bss_cpct_common_user#bss_cpct_common_user123";
+
+    /**
+     * hash存储Redis
+     * @param key
+     * @param field
+     * @param value
+     * @return
+     */
+    public boolean hset(final String key, String field, Object value) {
+        boolean result = false;
+        CtgJedisPool ctgJedisPool = initCatch();
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                jedis.hset(key, field, serialize(value));
+                result = true;
+            } catch (Exception e) {
+                System.out.println("REDIShset*********" + key);
+                e.printStackTrace();
+            } finally {
+                jedis.close();
+            }
+        } catch (Exception e) {
+            System.out.println("REDIShset2*********" + key);
+            e.printStackTrace();
+        }
+        return result;
+    }
 
     /**
      * 写入缓存
