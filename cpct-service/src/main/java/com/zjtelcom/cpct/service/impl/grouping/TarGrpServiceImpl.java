@@ -112,6 +112,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         if (type.equals("1000")){
             if (condition.getConditionText()!=null && condition.getConditionText().equals("1000")){
                 condition.setConditionText("2000");
+                condition.setRemark("2000");
             }else {
                 condition.setConditionText("1000");
             }

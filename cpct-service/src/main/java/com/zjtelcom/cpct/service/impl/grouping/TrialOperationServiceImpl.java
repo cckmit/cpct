@@ -521,46 +521,54 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         return importUserList(result, operation, ruleId, batchNumSt, customerList, labelList);
     }
 
+
+    private Map<String,Object> userList2Redis(int avg,int redisI,int fild,String batchNumSt,Long ruleId,List<Map<String,Object>> customerList){
+        Map<String,Object> result = new HashMap<>();
+        if (customerList.isEmpty()){
+            result.put("redisI",redisI);
+            result.put("listNum",fild);
+            return result;
+        }
+        List<List<Map<String,Object>>> smallCustomers = ChannelUtil.averageAssign(customerList,avg);
+        int listNum = fild;
+        //按规则存储客户信息
+        int number = listNum;
+        for (int j = listNum,i = 0; j < avg + number && i < smallCustomers.size(); j++,i++) {
+            redisUtils_es.hset("ISSURE_" + batchNumSt + "_" + ruleId + "_KEY_NUM_" + redisI, j + "", smallCustomers.get(i));
+            System.out.println("*************插入得key："+"ISSURE_" + batchNumSt + "_" + ruleId + "_KEY_NUM_" + redisI);
+            listNum++;
+        }
+        result.put("redisI",redisI+1);
+        result.put("listNum",listNum);
+        return result;
+    }
+
+
     //下发文件
     private Map<String, Object> importUserList(Map<String, Object> result, TrialOperationVO operation, Long ruleId, String batchNumSt, List<Map<String, Object>> customerList, List<Map<String, Object>> labelList) {
         redisUtils_es.set("LABEL_DETAIL_"+batchNumSt,labelList);
-        int x = 10000 / labelList.size();
-        int y = 100000 / labelList.size();
-        //num 分割后有多少个小list
-        int num = (customerList.size() / x) + 1;
-        //多少个key
-        int totalKey = (customerList.size() / y) + 1;
-        //多少个list存一个key
-        int avg = (num/totalKey)+1;
-        redisUtils_es.set("IMPORT_USER_LIST_"+batchNumSt,totalKey);
-        redisUtils_es.set("IMPORT_USER_LIST_AVG"+batchNumSt,avg);
-        List<List<Map<String,Object>>> smallCustomers = ChannelUtil.averageAssign(customerList,num);
-        int listNum = 0;
-        //按规则存储客户信息
-        for (int i = 0; i < totalKey; i++) {
-//            redisUtils_es.set("ISSURE_" + batchNumSt + "_" + ruleId + "_KEY_NUM_"+i,smallCustomers.get(i));
-            int number = listNum;
-            for (int j = listNum ;j < avg + number && j < smallCustomers.size(); j++){
-                redisUtils_es.hset("ISSURE_" + batchNumSt + "_" + ruleId + "_KEY_NUM_"+i, j + "",smallCustomers.get(j));
-                listNum++;
-            }
-        }
-//        for (int i = 0; i < num; i++) {
-//            redisUtils_es.hset("ISSURE_" + batchNumSt + "_" + ruleId, i + "",smallCustomers.get(i));
+//        int x = 10000 / labelList.size();
+//        int y = 100000 / labelList.size();
+//        //num 分割后有多少个小list
+//        int num = (customerList.size() / x) + 1;
+//        //多少个key
+//        int totalKey = (customerList.size() / y) + 1;
+//        //多少个list存一个key
+//        int avg = (num/totalKey)+1;
+//        redisUtils_es.set("IMPORT_USER_LIST_"+batchNumSt,totalKey);
+//        redisUtils_es.set("IMPORT_USER_LIST_AVG"+batchNumSt,avg);
+//        List<List<Map<String,Object>>> smallCustomers = ChannelUtil.averageAssign(customerList,num);
+//        int listNum = 0;
+//        //按规则存储客户信息
+//        for (int i = 0; i < totalKey; i++) {
+//            int number = listNum;
+//            for (int j = listNum ;j < avg + number && j < smallCustomers.size(); j++){
+//                redisUtils_es.hset("ISSURE_" + batchNumSt + "_" + ruleId + "_KEY_NUM_"+i, j + "",smallCustomers.get(j));
+//                listNum++;
+//            }
 //        }
-//        redisUtils.set("ISSURE_" + batchNumSt + "_" + ruleId,customerList);
         MktCampaignDO campaignDO = campaignMapper.selectByPrimaryKey(operation.getCampaignId());
-        if (campaignDO==null){
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "活动不存在");
-            return result;
-        }
         MktStrategyConfDO strategyConfDO = strategyConfMapper.selectByPrimaryKey(operation.getStrategyId());
-        if (campaignDO==null){
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "策略不存在");
-            return result;
-        }
         final TrialOperationVOES request = BeanUtil.create(operation,new TrialOperationVOES());
         request.setBatchNum(Long.valueOf(batchNumSt));
         request.setCampaignType(campaignDO.getMktCampaignType());
@@ -641,6 +649,25 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     labelDTO.setInjectionLabelName(cellTitle.getStringCellValue());
                     labelDTOList.add(labelDTO);
                 }
+                for (int i = 0; i < labelDTOList.size(); i++) {
+                    Map<String, Object> label = new HashMap<>();
+                    label.put("code", labelDTOList.get(i).getLabelCode());
+                    label.put("name", labelDTOList.get(i).getInjectionLabelName());
+                    labelList.add(label);
+                }
+
+                int x = 4000 / labelList.size();
+                int y = 80000 / labelList.size();
+                //num 分割后有多少个小list
+                int num = (rowNums / x) + 1;
+                //多少个key
+                int totalKey = (rowNums / y) + 1;
+                //多少个list存一个key
+                int avg = (num/totalKey)+1;
+
+                int redisI = 0;
+                int redisListNum = 0;
+
                 for (int i = 3; i < rowNums; i++) {
                     Map<String, Object> customers = new HashMap<>();
                     Row rowCode = sheet.getRow(1);
@@ -673,15 +700,17 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     if (!customers.isEmpty()) {
                         customerList.add(customers);
                     }
+                    if (customerList.size() >= avg*num || i==rowNums-1){
+                        Map<String,Object> resultMap = userList2Redis(avg,redisI,redisListNum,batchNumSt,ruleId,customerList);
+                        redisI = (int)resultMap.get("redisI");
+                        redisListNum = (int)resultMap.get("listNum");
+                        customerList = new ArrayList<>();
+                    }
                 }
-                for (int i = 0; i < labelDTOList.size(); i++) {
-                    Map<String, Object> label = new HashMap<>();
-                    label.put("code", labelDTOList.get(i).getLabelCode());
-                    label.put("name", labelDTOList.get(i).getInjectionLabelName());
-                    labelList.add(label);
-                }
-
+                redisUtils_es.set("IMPORT_USER_LIST_"+batchNumSt,redisI);
+                redisUtils_es.set("IMPORT_USER_LIST_AVG"+batchNumSt,avg);
                 try {
+                    inputStream.close();
                     importUserList(result, operation, ruleId, batchNumSt, customerList, labelList);
                 } catch (Exception e) {
                     e.printStackTrace();

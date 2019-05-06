@@ -13,4 +13,4 @@ ENV TZ Asia/Shanghai
 
 #VOLUME /app/dubbo/logs
 USER isale 
-ENTRYPOINT ["nohup","java", "-Xmx8000m","-Xms8000m","-Xmn256m","-XX:PermSize=128m","-Xss256k","-Dcom.sun.management.jmxremote","-Dcom.sun.management.jmxremote.port=12345","-Dcom.sun.management.jmxremote.ssl=false","-Dcom.sun.management.jmxremote.authenticate=false", "-jar","/app/project/cpct-web.jar","&"]
+ENTRYPOINT ["nohup","java", "-Xmx7000m","-Xms4000m","-Xmn256m","-XX:PermSize=128m","-Xss256k","-Dcom.sun.management.jmxremote","-Dcom.sun.management.jmxremote.port=12345","-Dcom.sun.management.jmxremote.ssl=false","-Dcom.sun.management.jmxremote.authenticate=false", "-jar","/app/project/cpct-web.jar","&"]
