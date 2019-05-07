@@ -348,8 +348,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         try {
             //todo
             System.out.println(JSON.toJSONString(requests));
-//             response = esService.searchBatchInfo(requests);
-            response = restTemplate.postForObject("http://localhost:8080/es/searchBatchInfo", requests, TrialResponseES.class);
+             response = esService.searchBatchInfo(requests);
+//            response = restTemplate.postForObject("http://localhost:8080/es/searchBatchInfo", requests, TrialResponseES.class);
 
             if (response.getResultCode().equals(CODE_FAIL)){
                 result.put("resultCode", CODE_FAIL);

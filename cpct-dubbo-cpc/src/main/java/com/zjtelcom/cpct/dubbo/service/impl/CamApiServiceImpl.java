@@ -2349,14 +2349,7 @@ public class CamApiServiceImpl implements CamApiService {
 
         //销售品级标签
         if (mktAllLabel.get("promLabels") != null && !"".equals(mktAllLabel.get("promLabels")) && !"".equals(saleId)) {
-/*            if ("".equals(saleId)) {
-                esJson.put("hit", false);
-                esJson.put("msg", "主销售品数据错误");
-                log.info("主销售品数据错误");
-                //esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-                esHitService.save(esJson, IndexList.EVENT_MODULE, params.get("reqId"));
-                return Collections.EMPTY_MAP;
-            }*/
+
 
             JSONObject paramSale = new JSONObject();
             paramSale.put("queryNum", "");

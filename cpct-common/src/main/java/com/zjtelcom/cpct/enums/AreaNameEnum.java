@@ -37,7 +37,7 @@ public enum AreaNameEnum {
      */
     public static String getNameByLandId(Long LandId){
         for (AreaNameEnum areaNameEnum:AreaNameEnum.values()){
-            if(LandId==areaNameEnum.lanId){
+            if(LandId.equals(areaNameEnum.lanId)){
                 return areaNameEnum.name;
             }
         }
