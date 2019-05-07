@@ -1314,6 +1314,7 @@ public class CamApiServiceImpl implements CamApiService {
                         }
                     }
                 } else {
+
                     //存在于校验
                     if ("7100".equals(type)) {
                         productCheck = true;
@@ -2231,6 +2232,8 @@ public class CamApiServiceImpl implements CamApiService {
                                 StringBuilder expressSb = new StringBuilder();
                                 expressSb.append("if(");
                                 expressSb.append(cpcExpression(labelMap.get("code"), type, labelMap.get("rightParam")));
+                                runnerQ.addFunction("toNum", new StringToNumOperator("toNum"));
+                                runnerQ.addFunction("checkProm", new PromCheckOperator("checkProm"));
                                 runnerQ.addFunction("dateLabel", new ComperDateLabel("dateLabel"));
                                 expressSb.append(") {return true} else {return false}");
                                 RuleResult ruleResult = runnerQ.executeRule(expressSb.toString(), context, true, true);
