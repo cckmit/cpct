@@ -42,7 +42,7 @@
 
     <!--销售品关联活动查询-->
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ProductService" ref="productServiceImpl" version="1.0" >
-        <dubbo:method name="selectProductCam" servicecode="00.1083.selectProductCam" timeout="10000"/>
+        <dubbo:method name="selectProductCam" servicecode="00.1083.selectProductCam_zsc" timeout="10000"/>
     </dubbo:service>
 
     <!-- 名单导入服务 -->
