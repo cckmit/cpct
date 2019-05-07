@@ -523,14 +523,31 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
     //下发文件
     private Map<String, Object> importUserList(Map<String, Object> result, TrialOperationVO operation, Long ruleId, String batchNumSt, List<Map<String, Object>> customerList, List<Map<String, Object>> labelList) {
-        redisUtils.set("LABEL_DETAIL_"+batchNumSt,labelList);
-        int num = (customerList.size() / 100) + 1;
-        redisUtils_es.set("IMPORT_USER_LIST_"+batchNumSt,num);
+        redisUtils_es.set("LABEL_DETAIL_"+batchNumSt,labelList);
+        int x = 5000 / labelList.size();
+        int y = 10000 / labelList.size();
+        //num 分割后有多少个小list
+        int num = (customerList.size() / x) + 1;
+        //多少个key
+        int totalKey = (customerList.size() / y) + 1;
+        //多少个list存一个key
+        int avg = (num/totalKey)+1;
+        redisUtils_es.set("IMPORT_USER_LIST_"+batchNumSt,totalKey);
+        redisUtils_es.set("IMPORT_USER_LIST_AVG"+batchNumSt,avg);
         List<List<Map<String,Object>>> smallCustomers = ChannelUtil.averageAssign(customerList,num);
+        int listNum = 0;
         //按规则存储客户信息
-        for (int i = 0; i < num; i++) {
-            redisUtils_es.hset("ISSURE_" + batchNumSt + "_" + ruleId, i + "",smallCustomers.get(i));
+        for (int i = 0; i < totalKey; i++) {
+//            redisUtils_es.set("ISSURE_" + batchNumSt + "_" + ruleId + "_KEY_NUM_"+i,smallCustomers.get(i));
+            int number = listNum;
+            for (int j = listNum ;j < avg + number && j < smallCustomers.size(); j++){
+                redisUtils_es.hset("ISSURE_" + batchNumSt + "_" + ruleId + "_KEY_NUM_"+i, j + "",smallCustomers.get(j));
+                listNum++;
+            }
         }
+//        for (int i = 0; i < num; i++) {
+//            redisUtils_es.hset("ISSURE_" + batchNumSt + "_" + ruleId, i + "",smallCustomers.get(i));
+//        }
 //        redisUtils.set("ISSURE_" + batchNumSt + "_" + ruleId,customerList);
         MktCampaignDO campaignDO = campaignMapper.selectByPrimaryKey(operation.getCampaignId());
         if (campaignDO==null){

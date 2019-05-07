@@ -23,7 +23,7 @@ import java.util.List;
 @Service
 public class RedisUtils_es {
 
-    private String redisIp="134.108.0.61";
+    private String redisIp="134.108.0.61,134.108.0.62,134.108.0.63";
 
     private Integer redisPort=41801;
 
@@ -72,6 +72,7 @@ public class RedisUtils_es {
             } finally {
                 jedis.close();
             }
+            ctgJedisPool.close();
         } catch (Exception e) {
             System.out.println("REDIShset2*********" + key);
             e.printStackTrace();
@@ -381,9 +382,9 @@ public class RedisUtils_es {
             hostAndPortList.add(host);
         }
         GenericObjectPoolConfig poolConfig = new JedisPoolConfig();
-        poolConfig.setMaxIdle(5); //最大空闲连接数
-        poolConfig.setMaxTotal(10); // 最大连接数（空闲+使用中），不超过应用线程数，建议为应用线程数的一半
-        poolConfig.setMinIdle(5); //保持的最小空闲连接数
+        poolConfig.setMaxIdle(0); //最大空闲连接数
+        poolConfig.setMaxTotal(5); // 最大连接数（空闲+使用中），不超过应用线程数，建议为应用线程数的一半
+        poolConfig.setMinIdle(1); //保持的最小空闲连接数
         poolConfig.setMaxWaitMillis(3000);
 
         CtgJedisPoolConfig config = new CtgJedisPoolConfig(hostAndPortList);
