@@ -33,11 +33,11 @@ public class EventApiTestController {
     private MktCampaignSyncApiService syncApiService;
 
     @PostMapping("test")
-    public  Map<String,Object> test(@RequestBody Map<String,String> params) {
+    public  Map<String,Object> test(String key) {
         Map<String,Object> result = new HashMap<>();
         List<MktCampaignDO> campaigns = new ArrayList<>();
         try {
-            result = trialRedisService.searchFromRedis(params.get("key").toString());
+            result = trialRedisService.searchFromRedis(key);
         } catch (Exception e) {
             e.printStackTrace();
         }

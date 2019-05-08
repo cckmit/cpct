@@ -41,4 +41,6 @@ public interface TarGrpService {
 
     Map<String,Object> labelListByEventId(Long eventId);
 
+    Map<String,Object> conditionSwitch(Long conditionId,String type,String value);
+
 }

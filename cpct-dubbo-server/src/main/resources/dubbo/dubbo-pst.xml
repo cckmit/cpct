@@ -16,6 +16,10 @@
     <dubbo:protocol name="dubbo" port="30803"/>
     <dubbo:monitor protocol="registry" />
 
+    <!--受理清单校验接口-->
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.TarGrpApiService" ref="tarGrpApiServiceImpl" version="1.0" >
+        <dubbo:method name="getCpcTargrp" servicecode="00.1083.getCpcTargrp" timeout="10000"/>
+    </dubbo:service>
     <!-- 注册 -->
     <!-- 二次协同查询服务 -->
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.EventApiService" ref="eventApiServiceImpl" version="1.0" >
@@ -25,6 +29,11 @@
         <dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="10000"/>
         <!-- 二次协同 -->
         <dubbo:method name="secondChannelSynergy" servicecode="00.1083.SecondChannelSynergy" timeout="10000"/>
+    </dubbo:service>
+
+    <!--销售品关联活动查询-->
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ProductService" ref="productServiceImpl" version="1.0" >
+        <dubbo:method name="selectProductCam" servicecode="00.1083.selectProductCam" timeout="10000"/>
     </dubbo:service>
 
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MktCamChlResultApiService" ref="mktCamChlResultApiServiceImpl" version="1.0" >
@@ -62,6 +71,10 @@
         <dubbo:method name="updateOperationStatus" servicecode="00.1083.updateOperationStatus" timeout="10000"/>
     </dubbo:service>
 
+    <dubbo:reference registry="esb2" id="ctgCacheAssetService"  interface="com.ctzj.bss.customer.data.carrier.outbound.api.CtgCacheAssetService" version="1.0" retries="0" check="false">
+        <dubbo:method name="queryCachedAssetDetailByIntegId" servicecode="33.1001.queryCachedAssetDetailByIntegId"  timeout="10000"/>
+    </dubbo:reference>
+
     <!-- 订阅 -->
     <!-- cpc计算协同中心回调 -->
     <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService" id="iContactTaskReceiptService"
@@ -85,7 +98,6 @@
                      version="1.0" retries="0" check="false">
         <dubbo:method name="ActivityTask" servicecode="00.1083.ActivityTask" timeout="15000"/>
     </dubbo:reference>
-
 
     <!-- 事件接入dubbo接口 -->
     <dubbo:reference interface="com.zjtelcom.es.es.service.EsService" id="esService"
