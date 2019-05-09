@@ -44,6 +44,13 @@ public class ProductServiceImpl implements ProductService{
             for(int i = 0; i < split.length; i++) {
                 List<Map<String,Object>> policyList = new ArrayList<>();
                 Map<String,Object> map = new HashMap<>();
+                if("0".equals(type)){
+                    type = "1000";
+                } else if("1".equals(type)){
+                    type = "2000";
+                } else if("2".equals(type)){
+                    type = "3000";
+                }
                 List<FilterRule> filterRuleList = filterRuleMapper.selectByProduct(split[i], type);
                 for(FilterRule filterRule1 : filterRuleList) {
                     List<MktStrategyFilterRuleRelDO> mktStrategyFilterRuleRelDOList = mktStrategyFilterRuleRelMapper.selectByRuleId(filterRule1.getRuleId());
