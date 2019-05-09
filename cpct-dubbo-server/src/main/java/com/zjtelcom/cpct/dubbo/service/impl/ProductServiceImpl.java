@@ -31,13 +31,10 @@ public class ProductServiceImpl implements ProductService{
     //销售品关联活动查询
     @Override
     public Map<String,Object> selectProductCam(List<Map<String,Object>> paramList) {
-        Map<String,Object> paramMaps = new HashMap<>();
+        Map<String,Object> resultMap = new HashMap<>();
         for (Map<String,Object> paramMap : paramList) {
-            Map<String,Object> resultMap = new HashMap<>();
             List<Map<String,Object>> productList = new ArrayList<>();
-
             String offerInfo = null;
-
             String productCode = (String) paramMap.get("productCode");
             String type = (String) paramMap.get("type");
             String[] split = productCode.split(",");
@@ -92,8 +89,7 @@ public class ProductServiceImpl implements ProductService{
                 resultMap.put("resultMsg", "没有匹配推荐结果");
             }
             resultMap.put("productList",productList);
-            paramMaps.put("paramMap",resultMap);
         }
-        return paramMaps;
+        return resultMap;
     }
 }
