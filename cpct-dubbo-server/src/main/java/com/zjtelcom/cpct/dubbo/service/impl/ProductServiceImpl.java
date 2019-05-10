@@ -53,12 +53,8 @@ public class ProductServiceImpl implements ProductService{
                     List<MktStrategyFilterRuleRelDO> mktStrategyFilterRuleRelDOList = mktStrategyFilterRuleRelMapper.selectByRuleId(filterRule1.getRuleId());
 
                     for(MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO : mktStrategyFilterRuleRelDOList) {
-                        List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByStrategyConfId(mktStrategyFilterRuleRelDO.getStrategyId());
-
-                        for(MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {
                             Map<String,Object> maps = new HashMap<>();
-                            maps.put("activityId",mktCamStrategyConfRelDO.getMktCampaignId());
-                            maps.put("policyId",mktStrategyFilterRuleRelDO.getStrategyId());
+                            maps.put("activityId",mktStrategyFilterRuleRelDO.getStrategyId());
                             if(filterRule1.getOfferInfo()!=null) {
                                 if (filterRule1.getOfferInfo().equals("1000")) {
                                     offerInfo = "0";
@@ -70,7 +66,6 @@ public class ProductServiceImpl implements ProductService{
                             }
                             maps.put("closeType",offerInfo);
                             policyList.add(maps);
-                        }
                     }
                 }
                 if(policyList.size() > 0) {

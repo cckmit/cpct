@@ -131,7 +131,7 @@
 
     <select id="selectRuleIdsByEventId" parameterType="java.lang.Long" resultType="java.util.HashMap">
         SELECT
-          k.MKT_STRATEGY_CONF_RULE_ID AS ruleId, b.LEVEL_CONFIG AS levelConfig
+          k.MKT_STRATEGY_CONF_RULE_ID AS ruleId, t.MKT_CAMPAIGN_ID AS campaignId, b.LEVEL_CONFIG AS levelConfig
         FROM
           mkt_strategy_conf_rule_rel k
           JOIN mkt_cam_strategy_conf_rel t ON t.STRATEGY_CONF_ID= k.MKT_STRATEGY_CONF_ID
