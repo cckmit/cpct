@@ -22,6 +22,8 @@ public class TarGrpTemplateDetail implements Serializable {
 
     private List<TarGrpTemConditionVO> tarGrpTemConditionVOList;
 
+    private Long offerId;
+
 
 
     public String getTarGrpTypeName() {
@@ -70,5 +72,13 @@ public class TarGrpTemplateDetail implements Serializable {
 
     public void setTarGrpTemConditionVOList(List<TarGrpTemConditionVO> tarGrpTemConditionVOList) {
         this.tarGrpTemConditionVOList = tarGrpTemConditionVOList;
+    }
+
+    public Long getOfferId() {
+        return offerId;
+    }
+
+    public void setOfferId(Long offerId) {
+        this.offerId = offerId;
     }
 }

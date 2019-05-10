@@ -22,4 +22,6 @@ public interface OfferRestrictMapper {
     int updateByPrimaryKey(OfferRestrict record);
 
     List<OfferRestrict> selectByOfferId(@Param("offerId") Long offerId,@Param("type")String type);
+
+    Long selectBatchNoNum();
 }
