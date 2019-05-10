@@ -39,7 +39,7 @@ public class ProductServiceImpl implements ProductService{
             String type = (String) paramMap.get("type");
             String[] split = productCode.split(",");
             for(int i = 0; i < split.length; i++) {
-                List<Map<String,Object>> policyList = new ArrayList<>();
+                List<Map<String,Object>> activityList = new ArrayList<>();
                 Map<String,Object> map = new HashMap<>();
                 if("0".equals(type)){
                     type = "1000";
@@ -65,12 +65,12 @@ public class ProductServiceImpl implements ProductService{
                                 }
                             }
                             maps.put("closeType",offerInfo);
-                            policyList.add(maps);
+                        activityList.add(maps);
                     }
                 }
-                if(policyList.size() > 0) {
+                if(activityList.size() > 0) {
                     map.put("productCode",split[i]);
-                    map.put("policyList", policyList);
+                    map.put("activityList", activityList);
                     productList.add(map);
                 }
 
