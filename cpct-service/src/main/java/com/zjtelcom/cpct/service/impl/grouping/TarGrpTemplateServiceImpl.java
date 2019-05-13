@@ -400,6 +400,23 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                 tarGrpConditionMapper.insert(tarGrpTemplateConditionDO);
             }
         }
+        //销售品
+        if(tarGrpTemplateDetail.getOfferId() != null) {
+            OfferRestrict offerRestrict = new OfferRestrict();
+            Long num = offerRestrictMapper.selectBatchNoNum();
+            offerRestrict.setOfferRestrictId(num);
+            offerRestrict.setOfferId(tarGrpTemplateDetail.getOfferId());
+            offerRestrict.setRstrObjType("7000");
+            offerRestrict.setRstrObjId(tarGrpTemplateId);
+            offerRestrict.setApplyRegionId(8330000L);
+            offerRestrict.setCreateDate(new Date());
+            offerRestrict.setUpdateDate(new Date());
+            offerRestrict.setStatusDate(new Date());
+            offerRestrict.setUpdateStaff(UserUtil.loginId());
+            offerRestrict.setCreateStaff(UserUtil.loginId());
+            offerRestrict.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+            offerRestrictMapper.insert(offerRestrict);
+        }
         if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){
