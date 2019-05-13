@@ -40,6 +40,25 @@ public class RedisUtils_es {
     private String redisPassword="bss_cpct_common_user#bss_cpct_common_user123";
 
     /**
+     * 写入缓存
+     *
+     * @param key
+     * @param value
+     * @return
+     */
+    public boolean set(final String key, Object value) {
+        boolean result = false;
+        try {
+            // 改造后方法
+            result = setRedis(key, value);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
+    /**
      * hash存储Redis
      * @param key
      * @param field
@@ -61,31 +80,13 @@ public class RedisUtils_es {
             } finally {
                 jedis.close();
             }
+            ctgJedisPool.close();
         } catch (Exception e) {
             System.out.println("REDIShset2*********" + key);
             e.printStackTrace();
         }
         return result;
     }
-
-    /**
-     * 写入缓存
-     *
-     * @param key
-     * @param value
-     * @return
-     */
-    public boolean set(final String key, Object value) {
-        boolean result = false;
-        try {
-            // 改造后方法
-            result = setRedis(key, value);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
-
 
     /**
      * 更换集团redis方法
