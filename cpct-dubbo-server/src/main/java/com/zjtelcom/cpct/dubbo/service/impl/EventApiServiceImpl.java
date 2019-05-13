@@ -761,64 +761,68 @@ public class EventApiServiceImpl implements EventApiService {
                     for (Map<String, Object> resultMap : resultByEvent) {
                         //资产级
                         Map<String, Object> activeMap = (Map<String, Object>) resultMap.get("mktCampaignMap");
-                        Map<String, String> privateParams = new HashMap<>();
-                        privateParams.put("isCust", "1"); //是否是客户级
-                        privateParams.put("accNbr", map.get("accNbr"));
-                        privateParams.put("integrationId", map.get("integrationId"));
-                        privateParams.put("custId", map.get("custId"));
-                        privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
-                        //资产级
-                        Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList"), resultMapList.get(0)));
-                        //将线程处理结果添加到结果集
+                        if (activeMap != null && !activeMap.isEmpty()) {
+                            Map<String, String> privateParams = new HashMap<>();
+                            privateParams.put("isCust", "1"); //是否是客户级
+                            privateParams.put("accNbr", map.get("accNbr"));
+                            privateParams.put("integrationId", map.get("integrationId"));
+                            privateParams.put("custId", map.get("custId"));
+                            privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
+                            //资产级
+                            Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList"), resultMapList.get(0)));
+                            //将线程处理结果添加到结果集
                             threadList.add(f);
+                        }
                     }
                 } else {
                     //遍历活动
                     for (Map<String, Object> resultMap : resultByEvent) {
                         //提交线程
                         Map<String, Object> activeMap = (Map<String, Object>) resultMap.get("mktCampaignMap");
-                        if (activeMap!=null && !activeMap.isEmpty() && (Integer) activeMap.get("levelConfig") == 1) { //判断是客户级还是资产级
-                            //客户级
-                            if (successCust) {
-                                for (DefaultContext<String, Object> o : resultMapList) {
-                                    //                                   log.info("o = " + o);
-                                    //客户级下，循环资产级
-                                    Map<String, String> privateParams = new HashMap<>();
-                                    privateParams.put("isCust", "0"); //是客户级
-                                    privateParams.put("accNbr", o.get("accNbr").toString());
-                                    privateParams.put("integrationId", o.get("integrationId").toString());
-                                    privateParams.put("custId", map.get("custId"));
-                                    //活动优先级为空的时候默认0
-                                    privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
-                                    Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList"), o));
-                                    //将线程处理结果添加到结果集
-                                    threadList.add(f);
+                        if(activeMap!=null && !activeMap.isEmpty()){
+                            if ((Integer) activeMap.get("levelConfig") == 1) { //判断是客户级还是资产级
+                                //客户级
+                                if (successCust) {
+                                    for (DefaultContext<String, Object> o : resultMapList) {
+                                        //                                   log.info("o = " + o);
+                                        //客户级下，循环资产级
+                                        Map<String, String> privateParams = new HashMap<>();
+                                        privateParams.put("isCust", "0"); //是客户级
+                                        privateParams.put("accNbr", o.get("accNbr").toString());
+                                        privateParams.put("integrationId", o.get("integrationId").toString());
+                                        privateParams.put("custId", map.get("custId"));
+                                        //活动优先级为空的时候默认0
+                                        privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
+                                        Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList"), o));
+                                        //将线程处理结果添加到结果集
+                                        threadList.add(f);
+                                    }
+                                } else {
+                                    log.error("客户级资产查询出错:" + map.get("reqId"));
+                                    esJson.put("reqId", map.get("reqId"));
+                                    esJson.put("activityId", activeMap.get("mktCampaginId"));
+                                    esJson.put("hitEntity", map.get("accNbr")); //命中对象
+                                    esJson.put("hit", false);
+                                    esJson.put("msg", "客户级资产查询出错");
+                                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE, map.get("reqId") + activeMap.get("mktCampaginId") + map.get("accNbr"));
                                 }
                             } else {
-                                log.error("客户级资产查询出错:" + map.get("reqId"));
-                                esJson.put("reqId", map.get("reqId"));
-                                esJson.put("activityId", activeMap.get("mktCampaginId"));
-                                esJson.put("hitEntity", map.get("accNbr")); //命中对象
-                                esJson.put("hit", false);
-                                esJson.put("msg", "客户级资产查询出错");
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, map.get("reqId") + activeMap.get("mktCampaginId") + map.get("accNbr"));
-                            }
-                        } else {
-                            //资产级
-                            for (DefaultContext<String, Object> o : resultMapList) {
-                                String assetId = o.get("integrationId").toString();
-                                // 判断资产编码是否与接入的一致
-                                if (assetId.equals(map.get("integrationId"))) {
-                                    Map<String, String> privateParams = new HashMap<>();
-                                    privateParams.put("isCust", "1"); //是否是客户级
-                                    privateParams.put("accNbr", map.get("accNbr"));
-                                    privateParams.put("integrationId", map.get("integrationId"));
-                                    privateParams.put("custId", map.get("custId"));
-                                    privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
-                                    //资产级
-                                    Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList"), o));
-                                    //将线程处理结果添加到结果集
-                                    threadList.add(f);
+                                //资产级
+                                for (DefaultContext<String, Object> o : resultMapList) {
+                                    String assetId = o.get("integrationId").toString();
+                                    // 判断资产编码是否与接入的一致
+                                    if (assetId.equals(map.get("integrationId"))) {
+                                        Map<String, String> privateParams = new HashMap<>();
+                                        privateParams.put("isCust", "1"); //是否是客户级
+                                        privateParams.put("accNbr", map.get("accNbr"));
+                                        privateParams.put("integrationId", map.get("integrationId"));
+                                        privateParams.put("custId", map.get("custId"));
+                                        privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
+                                        //资产级
+                                        Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList"), o));
+                                        //将线程处理结果添加到结果集
+                                        threadList.add(f);
+                                    }
                                 }
                             }
                         }
@@ -2334,7 +2338,8 @@ public class EventApiServiceImpl implements EventApiService {
                                 // 判断该活动是否配置了销售品过滤
                                 Integer mktCampaignId = (Integer) taskMap.get("activityId");
 
-                                List<FilterRule> filterRuleList = (List<FilterRule>) redisUtils.get("FILTER_RULE_" + mktCampaignId);
+                           //     List<FilterRule> filterRuleList = (List<FilterRule>) redisUtils.get("FILTER_RULE_" + mktCampaignId);
+                                List<FilterRule> filterRuleList = null;
                                 if (filterRuleList == null) {
                                     filterRuleList = filterRuleMapper.selectFilterRuleList(Long.valueOf(mktCampaignId));
                                     redisUtils.set("FILTER_RULE_" + mktCampaignId, filterRuleList);
