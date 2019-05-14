@@ -248,6 +248,34 @@ public class RedisUtils_es {
     }
 
     /**
+     * 更换集团redis方法
+     *
+     * @param key
+     * @return
+     */
+    public void remove(final String key) {
+
+        CtgJedisPool ctgJedisPool = initCatch();
+        boolean result = false;
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                if (jedis.exists(key)){
+                    jedis.del(key);
+                }
+            } catch (Throwable je) {
+                je.printStackTrace();
+            } finally {
+                jedis.close();
+                ctgJedisPool.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * 哈希 添加
      *
      * @param key
