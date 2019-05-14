@@ -640,6 +640,11 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             dataVO = xlsxProcess.processAllSheet(multipartFile);
             String[] nameList = dataVO.getContentList().get(0).split("\\|@\\|");
             String[] codeList = dataVO.getContentList().get(1).split("\\|@\\|");
+            if (nameList.length!=codeList.length){
+                result.put("resultCode", CODE_FAIL);
+                result.put("resultMsg", "标签中文名个数与英文个数不匹配请重新检查文件");
+                return result;
+            }
             for (int i = 0; i < nameList.length; i++) {
                 if (labelNameList.contains(nameList[i])) {
                     result.put("resultCode", CODE_FAIL);
@@ -655,11 +660,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             if (labelList.size() > 87) {
                 result.put("resultCode", CODE_FAIL);
                 result.put("resultMsg", "扩展字段不能超过87个");
-                return result;
-            }
-            if (nameList.length!=codeList.length){
-                result.put("resultCode", CODE_FAIL);
-                result.put("resultMsg", "标签中文名个数与英文个数不匹配请重新检查文件");
                 return result;
             }
             int size = dataVO.contentList.size() - 3;
