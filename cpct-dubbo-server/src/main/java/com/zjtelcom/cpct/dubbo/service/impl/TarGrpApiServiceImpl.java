@@ -486,6 +486,7 @@ public class TarGrpApiServiceImpl implements TarGrpApiService {
                 //    String[] checkProductArr = checkProduct.split(",");
                 if (productStr != null && !"".equals(productStr)) {
                     if ("7000".equals(type)) {  //存在于
+                        productCheck = false;
                         for (String product : checkProductArr) {
                             int index = productStr.indexOf(product);
                             if (index >= 0) {
@@ -494,19 +495,14 @@ public class TarGrpApiServiceImpl implements TarGrpApiService {
                             }
                         }
                     } else if ("7100".equals(type)) { //不存在于
-                        // boolean noExistCheck = true;
+                        productCheck = true;
                         for (String product : checkProductArr) {
                             int index = productStr.indexOf(product);
                             if (index >= 0) {
                                 productCheck = false;
-                                //       noExistCheck = false;
-                                //被过滤的销售品
                                 break;
                             }
                         }
-                      /*  if (noExistCheck) {
-                            productCheck = true;
-                        }*/
                     }
                 } else {
                     //存在于校验

@@ -66,4 +66,8 @@
     from offer_restrict where OFFER_ID = #{offerId} and RSTR_OBJ_TYPE = #{type}
   </select>
 
+  <select id="selectBatchNoNum" resultType="java.lang.Long">
+    select smt_bss_cpc_batchno_sequence.nextval
+  </select>
+
 </mapper>

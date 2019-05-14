@@ -429,5 +429,88 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         return map;
     }
 
+    /**
+     * 导入销售品
+     */
+    @Override
+    public Map<String,Object> importOfferList(MultipartFile multipartFile, Long ruleId, String ruleName, String filterType, String operator, Long[] rightListId)throws IOException {
+        Map<String,Object> maps = new HashMap<>();
+        if(ruleName == null || operator == null || filterType == null) {
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg", "过滤规则信息不完善");
+        }
+        List<String> resultList = new ArrayList<>();
+        InputStream inputStream = multipartFile.getInputStream();
+        XSSFWorkbook wb = new XSSFWorkbook(inputStream);
+        Sheet sheet = wb.getSheetAt(0);
+        int total = sheet.getLastRowNum() + rightListId.length;
+        if(total > 100) {
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg", "销售品数量超过上限100个");
+            return maps;
+        }
+        for(int i=0;i<rightListId.length;i++) {
+            Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(rightListId[i].toString()));
+            if (offer==null){
+                continue;
+            }
+            resultList.add(offer.getOfferNbr());
+        }
+        Integer rowNums = sheet.getLastRowNum() + 1;
+        for (int i = 1; i < rowNums; i++) {
+            Row row = sheet.getRow(i);
+            if (row.getLastCellNum() >= 2) {
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg", "请返回检查模板格式");
+                return maps;
+            }
+            Cell cell = row.getCell(0);
+            String cellValue = ChannelUtil.getCellValue(cell).toString();
+            if (!cellValue.equals("null")){
+                List<Offer> offer = offerMapper.selectByCode(cellValue);
+                if (offer!=null && !offer.isEmpty()) {
+                    if(!resultList.contains(cellValue)) {
+                        resultList.add(cellValue);
+                    }
+                }else {
+                    maps.put("resultCode", CODE_FAIL);
+                    maps.put("resultMsg", cellValue + "销售品不存在");
+                    return maps;
+                }
+            }
+        }
+        FilterRule filterRules = new FilterRule();
+        if(ruleId == null) {
+            filterRules.setRuleName(ruleName);
+            filterRules.setFilterType(filterType);
+            filterRules.setLabelCode("PROM_LIST");
+            filterRules.setChooseProduct(ChannelUtil.StringList2String(resultList));
+            filterRules.setOperator(operator);
+            filterRules.setCreateDate(new Date());
+            filterRules.setCreateStaff(UserUtil.loginId());
+            filterRules.setUpdateDate(new Date());
+            filterRules.setUpdateStaff(UserUtil.loginId());
+            filterRules.setStatusDate(new Date());
+            filterRules.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+            filterRuleMapper.insert(filterRules);
+        }else {
+            filterRules = filterRuleMapper.selectByPrimaryKey(ruleId);
+            if (filterRules==null){
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg","过滤规则不存在");
+                return maps;
+            }
+            filterRules.setRuleName(ruleName);
+            filterRules.setFilterType(filterType);
+            filterRules.setChooseProduct(ChannelUtil.StringList2String(resultList));
+            filterRules.setOperator(operator);
+            filterRules.setUpdateDate(new Date());
+            filterRules.setUpdateStaff(UserUtil.loginId());
+            filterRuleMapper.updateByPrimaryKey(filterRules);
+        }
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", filterRules.getChooseProduct());
+        return maps;
+    }
 
 }

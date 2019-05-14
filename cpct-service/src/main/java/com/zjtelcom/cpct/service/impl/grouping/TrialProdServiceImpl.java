@@ -141,7 +141,8 @@ public class TrialProdServiceImpl implements TrialProdService {
      * 提供dtts定时任务清单存入es
      */
     @Override
-    public void campaignIndexTask(Map<String,Object> param) {
+    public Map<String,Object> campaignIndexTask(Map<String,Object> param) {
+        Map<String, Object> result = new HashMap<>();
         List<MktCampaignDO> campaignList = new ArrayList<>();
         Long campaignId = MapUtil.getLongNum(param.get("id"));
         List<Integer> idList = ( List<Integer>)param.get("idList");
@@ -171,6 +172,9 @@ public class TrialProdServiceImpl implements TrialProdService {
                 System.out.println(JSON.toJSONString(res));
             }
         }
+        result.put("resultCode", CODE_FAIL);
+        result.put("resultMsg", "全量试算中");
+        return result;
     }
 
     private Map<String, Object> issue(TrialOperation trialOperation, MktCampaignDO campaignDO,MktStrategyConfDO strategyConfDO){
