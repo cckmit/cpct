@@ -32,6 +32,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
+import com.zjtelcom.cpct.dto.channel.TransDetailDataVO;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.*;
@@ -348,8 +349,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         try {
             //todo
             System.out.println(JSON.toJSONString(requests));
-//             response = esService.searchBatchInfo(requests);
-            response = restTemplate.postForObject("http://localhost:8080/es/searchBatchInfo", requests, TrialResponseES.class);
+             response = esService.searchBatchInfo(requests);
+//            response = restTemplate.postForObject("http://localhost:8080/es/searchBatchInfo", requests, TrialResponseES.class);
 
             if (response.getResultCode().equals(CODE_FAIL)){
                 result.put("resultCode", CODE_FAIL);
@@ -609,11 +610,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     public Map<String, Object> importUserList(MultipartFile multipartFile, TrialOperationVO operation, Long ruleId) throws IOException {
         Map<String, Object> result = new HashMap<>();
         String batchNumSt = DateUtil.date2St4Trial(new Date()) + ChannelUtil.getRandomStr(4);
-
+        XlsxProcessAbstract xlsxProcess = new XlsxProcessAbstract();
         InputStream inputStream = multipartFile.getInputStream();
-        XSSFWorkbook wb = new XSSFWorkbook(inputStream);
-        Sheet sheet = wb.getSheetAt(0);
-        Integer rowNums = sheet.getLastRowNum() + 1;
 
         MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(operation.getCampaignId());
         MktStrategyConfDO strategy = strategyMapper.selectByPrimaryKey(operation.getStrategyId());
@@ -633,94 +631,117 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         trialOp.setStatusDate(new Date());
         trialOp.setCreateStaff(TrialCreateType.IMPORT_USER_LIST.getValue());
         trialOperationMapper.insert(trialOp);
-        new Thread() {
-            public void run() {
-                List<Map<String, Object>> customerList = new ArrayList<>();
-                List<Map<String, Object>> labelList = new ArrayList<>();
-                List<LabelDTO> labelDTOList = new ArrayList<>();
-
-                Row labelRowFirst = sheet.getRow(0);
-                Row labelRow = sheet.getRow(1);
-                for (int j = 0; j < labelRow.getLastCellNum(); j++) {
-                    Cell cellTitle = labelRowFirst.getCell(j);
-                    Cell cell = labelRow.getCell(j);
-                    LabelDTO labelDTO = new LabelDTO();
-                    labelDTO.setLabelCode((String) ChannelUtil.getCellValue(cell));
-                    labelDTO.setInjectionLabelName(cellTitle.getStringCellValue());
-                    labelDTOList.add(labelDTO);
-                }
-                for (int i = 0; i < labelDTOList.size(); i++) {
-                    Map<String, Object> label = new HashMap<>();
-                    label.put("code", labelDTOList.get(i).getLabelCode());
-                    label.put("name", labelDTOList.get(i).getInjectionLabelName());
-                    labelList.add(label);
-                }
-
-                int x = 4000 / labelList.size();
-                int y = 80000 / labelList.size();
-                //num 分割后有多少个小list
-                int num = (rowNums / x) + 1;
-                //多少个key
-                int totalKey = (rowNums / y) + 1;
-                //多少个list存一个key
-                int avg = (num/totalKey)+1;
-
-                int redisI = 0;
-                int redisListNum = 0;
-
-                for (int i = 3; i < rowNums; i++) {
-                    Map<String, Object> customers = new HashMap<>();
-                    Row rowCode = sheet.getRow(1);
-                    Row row = sheet.getRow(i);
-                    System.out.println("处理--------：" + i);
-                    if (row == null) {
-                        System.out.println("这一行是空的：" + i);
-                        continue;
-                    }
-                    for (int j = 0; j < row.getLastCellNum(); j++) {
-                        Cell cellTitle = rowCode.getCell(j);
-                        Cell cell = row.getCell(j);
-                        if (cellTitle.getStringCellValue().equals("CCUST_NAME") && ChannelUtil.getCellValue(cell).equals("null")) {
-                            break;
-                        }
-                        if (cellTitle.getStringCellValue().equals("CCUST_ID") && ChannelUtil.getCellValue(cell).equals("null")) {
-                            break;
-                        }
-                        if (cellTitle.getStringCellValue().equals("ASSET_INTEG_ID") && ChannelUtil.getCellValue(cell).equals("null")) {
-                            break;
-                        }
-                        if (cellTitle.getStringCellValue().equals("ASSET_NUMBER") && ChannelUtil.getCellValue(cell).equals("null")) {
-                            break;
-                        }
-                        if (cellTitle.getStringCellValue().equals("LATN_ID") && ChannelUtil.getCellValue(cell).equals("null")) {
-                            break;
-                        }
-                        customers.put(cellTitle.getStringCellValue(), ChannelUtil.getCellValue(cell));
-                    }
-                    if (!customers.isEmpty()) {
-                        customerList.add(customers);
-                    }
-                    if (customerList.size() >= avg*num || i==rowNums-1){
-                        Map<String,Object> resultMap = userList2Redis(avg,redisI,redisListNum,batchNumSt,ruleId,customerList);
-                        redisI = (int)resultMap.get("redisI");
-                        redisListNum = (int)resultMap.get("listNum");
-                        customerList = new ArrayList<>();
-                    }
-                }
-                redisUtils_es.set("IMPORT_USER_LIST_"+batchNumSt,redisI);
-                redisUtils_es.set("IMPORT_USER_LIST_AVG"+batchNumSt,avg);
-                try {
-                    inputStream.close();
-                    importUserList(result, operation, ruleId, batchNumSt, customerList, labelList);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    logger.error("导入失败");
-                }
+        //添加红黑名单列表
+        blackList2Redis(campaign);
+        List<String> labelNameList = new ArrayList<>();
+        TransDetailDataVO dataVO ;
+        List<Map<String, Object>> labelList = new ArrayList<>();
+        try {
+            dataVO = xlsxProcess.processAllSheet(multipartFile);
+            String[] nameList = dataVO.getContentList().get(0).split("\\|@\\|");
+            String[] codeList = dataVO.getContentList().get(1).split("\\|@\\|");
+            if (nameList.length!=codeList.length){
+                result.put("resultCode", CODE_FAIL);
+                result.put("resultMsg", "标签中文名个数与英文个数不匹配请重新检查文件");
+                return result;
             }
-        }.start();
+            for (int i = 0; i < nameList.length; i++) {
+                if (labelNameList.contains(nameList[i])) {
+                    result.put("resultCode", CODE_FAIL);
+                    result.put("resultMsg", "标签中文名称不能重复:" + "\"" + nameList[i] + "\"");
+                    return result;
+                }
+                Map<String, Object> label = new HashMap<>();
+                label.put("code", codeList[i]);
+                label.put("name", nameList[i]);
+                labelList.add(label);
+                labelNameList.add(nameList[i]);
+            }
+            if (labelList.size() > 87) {
+                result.put("resultCode", CODE_FAIL);
+                result.put("resultMsg", "扩展字段不能超过87个");
+                return result;
+            }
+            int size = dataVO.contentList.size() - 3;
+            new Thread() {
+                public void run() {
+                    List<Map<String, Object>> customerList = new ArrayList<>();
+                    int k = 4000 / labelList.size();
+                    int y = 80000 / labelList.size();
+                    //num 分割后有多少个小list
+                    int num = (size / k) + 1;
+                    //多少个key
+                    int totalKey = (size / y) + 1;
+                    //多少个list存一个key
+                    int avg = (num / totalKey) + 1;
+
+                    int redisI = 0;
+                    int redisListNum = 0;
+
+                    for (int j = 3; j < dataVO.contentList.size(); j++) {
+                        String[] data = dataVO.contentList.get(j).split("\\|@\\|");
+                        Map<String, Object> customers = new HashMap<>();
+                        for (int x = 0; x < nameList.length; x++) {
+                            if (codeList[x].equals("CCUST_NAME") && data[x].equals("null")) {
+                                break;
+                            }
+                            if (codeList[x].equals("CCUST_ID") && data[x].equals("null")) {
+                                break;
+                            }
+                            if (codeList[x].equals("ASSET_INTEG_ID") && data[x].equals("null")) {
+                                break;
+                            }
+                            if (codeList[x].equals("ASSET_NUMBER") && data[x].equals("null")) {
+                                break;
+                            }
+                            if (codeList[x].equals("LATN_ID") && data[x].equals("null")) {
+                                break;
+                            }
+                            customers.put(codeList[x], data[x]);
+                        }
+                        customerList.add(customers);
+                        if (customerList.size() >= avg * k || j == dataVO.contentList.size() - 1) {
+                            Map<String, Object> resultMap = userList2Redis(avg, redisI, redisListNum, batchNumSt, ruleId, customerList);
+                            redisI = (int) resultMap.get("redisI");
+                            redisListNum = (int) resultMap.get("listNum");
+                            customerList = new ArrayList<>();
+                        }
+                    }
+                    redisUtils_es.set("IMPORT_USER_LIST_" + batchNumSt, redisI);
+                    redisUtils_es.set("IMPORT_USER_LIST_AVG" + batchNumSt, avg);
+                    try {
+                        inputStream.close();
+                        importUserList(result, operation, ruleId, batchNumSt, customerList, labelList);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        logger.error("导入失败");
+                    }
+                }
+            }.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg", "导入成功,请稍后查看结果");
         return result;
+    }
+
+    private void blackList2Redis(MktCampaignDO campaign) {
+        List<String> typeList = new ArrayList<>();
+        typeList.add("1000");
+        List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(campaign.getMktCampaignId(),typeList);
+        if (filterRuleList!=null && !filterRuleList.isEmpty()){
+            List<String> userList = new ArrayList<>();
+            for (FilterRule filterRule : filterRuleList){
+                String[] users = filterRule.getUserList().split(",");
+                userList.addAll(Arrays.asList(users));
+            }
+            int num = userList.size()/100 + 1;
+            List<List<String>> list = ChannelUtil.averageAssign(userList,num);
+            for (int i = 0; i < num; i++) {
+                redisUtils.hset("AREA_RULE_BLACK_LIST_"+campaign.getMktCampaignId(),i+"",list.get(i));
+            }
+        }
     }
 
 
@@ -930,21 +951,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         MktStrategyConfDO strategy = strategyMapper.selectByPrimaryKey(operationVO.getStrategyId());
         //添加策略适用地市
         redisUtils.set("STRATEGY_CONF_AREA_"+operationVO.getStrategyId(),strategy.getAreaId());
-        List<String> typeList = new ArrayList<>();
-        typeList.add("1000");
-        List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(campaign.getMktCampaignId(),typeList);
-        if (filterRuleList!=null && !filterRuleList.isEmpty()){
-            List<String> userList = new ArrayList<>();
-            for (FilterRule filterRule : filterRuleList){
-                String[] users = filterRule.getUserList().split(",");
-                userList.addAll(Arrays.asList(users));
-            }
-            int num = userList.size()/100 + 1;
-            List<List<String>> list = ChannelUtil.averageAssign(userList,num);
-            for (int i = 0; i < num; i++) {
-                redisUtils.hset("AREA_RULE_BLACK_LIST_"+campaign.getMktCampaignId(),i+"",list.get(i));
-            }
-        }
+        //添加红黑名单列表
+        blackList2Redis(campaign);
         // 通过活动id获取关联的标签字段数组
         DisplayColumn req = new DisplayColumn();
         req.setDisplayColumnId(campaign.getCalcDisplay());
@@ -1169,12 +1177,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "抽样试算失败，无法全量试算");
             return result;
         }
-//        List<TrialOperation> operationList = trialOperationMapper.listOperationByStatusCd(TrialStatus.ALL_SAMPEL_GOING.getValue());
-//        if (!operationList.isEmpty()){
-//            result.put("resultCode", CODE_FAIL);
-//            result.put("resultMsg", "系统正在全量试算 请稍后再试。");
-//            return result;
-//        }
 
         int timeLimit = 1800000;
         List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign("TRIAL_TIME");
@@ -1395,6 +1397,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConfDetailMap.get("mktCamChlConfDetail");
                     MktCamChlConfDetailES es = BeanUtil.create(mktCamChlConfDetail,new MktCamChlConfDetailES());
                     CamScriptES camScriptES = BeanUtil.create(mktCamChlConfDetail.getCamScript(),new CamScriptES());
+                    if (camScriptES.getScriptDesc().contains("\n")){
+                        camScriptES.setScriptDesc(camScriptES.getScriptDesc().replace("\n",""));
+                    }
                     es.setCamScript(camScriptES);
                     ArrayList<MktCamChlConfAttrES> attrs = new ArrayList<>();
                     ArrayList<VerbalVOES> verbalES = new ArrayList<>();
