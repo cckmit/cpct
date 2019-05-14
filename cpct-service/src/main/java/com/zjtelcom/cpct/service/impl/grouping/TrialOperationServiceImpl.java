@@ -223,6 +223,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "不满足下发条件，无法操作");
             return result;
         }
+        operation.setStatusCd(TrialStatus.UPLOAD_GOING.getValue());
+        trialOperationMapper.updateByPrimaryKey(operation);
         TrialOperationVOES request = new TrialOperationVOES();
         request.setCampaignId(operation.getCampaignId());
         request.setStrategyId(operation.getStrategyId());
@@ -640,6 +642,11 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             dataVO = xlsxProcess.processAllSheet(multipartFile);
             String[] nameList = dataVO.getContentList().get(0).split("\\|@\\|");
             String[] codeList = dataVO.getContentList().get(1).split("\\|@\\|");
+            if (nameList.length!=codeList.length){
+                result.put("resultCode", CODE_FAIL);
+                result.put("resultMsg", "标签中文名个数与英文个数不匹配请重新检查文件");
+                return result;
+            }
             for (int i = 0; i < nameList.length; i++) {
                 if (labelNameList.contains(nameList[i])) {
                     result.put("resultCode", CODE_FAIL);
@@ -655,11 +662,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             if (labelList.size() > 87) {
                 result.put("resultCode", CODE_FAIL);
                 result.put("resultMsg", "扩展字段不能超过87个");
-                return result;
-            }
-            if (nameList.length!=codeList.length){
-                result.put("resultCode", CODE_FAIL);
-                result.put("resultMsg", "标签中文名个数与英文个数不匹配请重新检查文件");
                 return result;
             }
             int size = dataVO.contentList.size() - 3;
@@ -679,25 +681,34 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     int redisListNum = 0;
 
                     for (int j = 3; j < dataVO.contentList.size(); j++) {
-                        String[] data = dataVO.contentList.get(j).split("\\|@\\|");
+                        List<String> data = Arrays.asList(dataVO.contentList.get(j).split("\\|@\\|"));
                         Map<String, Object> customers = new HashMap<>();
-                        for (int x = 0; x < nameList.length; x++) {
-                            if (codeList[x].equals("CCUST_NAME") && data[x].equals("null")) {
+                        for (int x = 0; x < codeList.length; x++) {
+                            if (codeList[x]==null){
                                 break;
                             }
-                            if (codeList[x].equals("CCUST_ID") && data[x].equals("null")) {
+                            String value = "";
+                            if (x>=data.size()){
+                                value = "null";
+                            }else {
+                                value = data.get(x);
+                            }
+                            if (codeList[x].equals("CCUST_NAME") && value.equals("null")) {
                                 break;
                             }
-                            if (codeList[x].equals("ASSET_INTEG_ID") && data[x].equals("null")) {
+                            if (codeList[x].equals("CCUST_ID") && value.equals("null")) {
                                 break;
                             }
-                            if (codeList[x].equals("ASSET_NUMBER") && data[x].equals("null")) {
+                            if (codeList[x].equals("ASSET_INTEG_ID") && value.equals("null")) {
                                 break;
                             }
-                            if (codeList[x].equals("LATN_ID") && data[x].equals("null")) {
+                            if (codeList[x].equals("ASSET_NUMBER") && value.equals("null")) {
                                 break;
                             }
-                            customers.put(codeList[x], data[x]);
+                            if (codeList[x].equals("LATN_ID") && value.equals("null")) {
+                                break;
+                            }
+                            customers.put(codeList[x], value);
                         }
                         customerList.add(customers);
                         if (customerList.size() >= avg * k || j == dataVO.contentList.size() - 1) {
