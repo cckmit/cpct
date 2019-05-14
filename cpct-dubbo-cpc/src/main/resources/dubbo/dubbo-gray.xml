@@ -29,11 +29,6 @@
         <dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="10000"/>
     </dubbo:reference>
 
-    <!-- redis实时查询服务 -->
-    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.TrialRedisService" ref="trialRedisServiceImpl" version="2.0" >
-        <dubbo:method name="searchFromRedis" servicecode="00.1083.searchFromRedis" timeout="10000"/>
-    </dubbo:service>
-
     <!-- 事件接入活动任务注册 2.0 -->
     <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.CamApiService" ref="camApiServiceImpl" version="2.0" >
         <dubbo:method name="ActivityTask" servicecode="00.1083.ActivityTask" timeout="20000"/>

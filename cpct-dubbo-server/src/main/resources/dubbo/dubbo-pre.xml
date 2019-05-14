@@ -40,6 +40,11 @@
         <dubbo:method name="getEventDetail" servicecode="00.1083.getEventDetail_zsc" timeout="10000"/>
     </dubbo:service>
 
+    <!--销售品关联活动查询-->
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ProductService" ref="productServiceImpl" version="1.0" >
+        <dubbo:method name="selectProductCam" servicecode="00.1083.selectProductCam_zsc" timeout="10000"/>
+    </dubbo:service>
+
     <!-- 名单导入服务 -->
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ChannelService" ref="channelServiceImpl" version="1.0" >
         <dubbo:method name="importRuleUserList" servicecode="00.1083.importRuleUserList_zsc" timeout="10000"/>
@@ -99,5 +104,6 @@
     <dubbo:reference registry="esb2" id="ctgCacheAssetService"  interface="com.ctzj.bss.customer.data.carrier.outbound.api.CtgCacheAssetService" version="1.0" retries="0" check="false">
         <dubbo:method name="queryCachedAssetDetailByIntegId" servicecode="33.1001.queryCachedAssetDetailByIntegId"  timeout="10000"/>
     </dubbo:reference>
+
 
 </beans>

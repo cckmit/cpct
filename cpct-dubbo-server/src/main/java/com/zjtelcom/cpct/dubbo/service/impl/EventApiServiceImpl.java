@@ -402,7 +402,8 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
                 //根据事件code查询事件信息
-                ContactEvt event = (ContactEvt) redisUtils.get("EVENT_" + map.get("eventCode"));
+           //     ContactEvt event = (ContactEvt) redisUtils.get("EVENT_" + map.get("eventCode"));
+                ContactEvt event = null;
                 if (event == null) {
                     event = contactEvtMapper.getEventByEventNbr(map.get("eventCode"));
                     redisUtils.set("EVENT_" + map.get("eventCode"), event);
@@ -601,9 +602,19 @@ public class EventApiServiceImpl implements EventApiService {
                 // 过滤事件采集相中的标签
                 Map<String, String> mktAllLabel = new HashMap<>();
                 Iterator<Map.Entry<String, String>> iterator = labelItems.entrySet().iterator();
-                List<String> assetLabelList = ChannelUtil.StringToList(mktAllLabels.get("assetLabels"));
-                List<String> promLabelList = ChannelUtil.StringToList(mktAllLabels.get("promLabels"));
-                List<String> custLabelList = ChannelUtil.StringToList(mktAllLabels.get("custLabels"));
+                List<String> assetLabelList = new ArrayList<>();
+                List<String> promLabelList = new ArrayList<>();
+                List<String> custLabelList = new ArrayList<>();
+                if(mktAllLabels.get("assetLabels")!=null && !"".equals(mktAllLabels.get("assetLabels"))){
+                    assetLabelList = ChannelUtil.StringToList(mktAllLabels.get("assetLabels"));
+                }
+                if(mktAllLabels.get("promLabels")!=null && !"".equals(mktAllLabels.get("promLabels"))) {
+                    promLabelList = ChannelUtil.StringToList(mktAllLabels.get("promLabels"));
+                }
+                if(mktAllLabels.get("custLabels")!=null && !"".equals(mktAllLabels.get("custLabels"))){
+                    custLabelList = ChannelUtil.StringToList(mktAllLabels.get("custLabels"));
+                }
+
                 while (iterator.hasNext()) {
                     Map.Entry<String, String> entry = iterator.next();
                     if (assetLabelList.contains(entry.getKey())) {
@@ -675,11 +686,7 @@ public class EventApiServiceImpl implements EventApiService {
                             privateParams.put("accNbr", map.get("accNbr"));
                             privateParams.put("integrationId", map.get("integrationId"));
                             privateParams.put("custId", map.get("custId"));
-/*
-                            if(!"".equals(mktAllLabel.get("custLabels")) && mktAllLabel.get("custLabels")!=null ){
-                                getCustLabel(mktAllLabel, map, privateParams, context, esJson);
-                            }
-*/
+
                             // 客户级
                             List<Future<DefaultContext<String, Object>>> futureList = new ArrayList<>();
 
@@ -692,7 +699,6 @@ public class EventApiServiceImpl implements EventApiService {
                             for (Future<DefaultContext<String, Object>> future : futureList) {
                                 if (future.get() != null && !future.get().isEmpty()) {
                                     DefaultContext<String, Object> reultMap = future.get();
-//                                    reultMap.putAll(context);
                                     resultMapList.add(reultMap);
                                 }
                             }
@@ -715,14 +721,6 @@ public class EventApiServiceImpl implements EventApiService {
                     Map<String, Object> assetLabelMap = getAssetAndPromLabel(mktAllLabel, map, privateParams, context, esJson, labelItems);
                     if (assetLabelMap != null) {
                         reultMap.putAll(assetLabelMap);
-/*
-                        Map<String, Object> custLabelMap = getCustLabel(mktAllLabel, map, privateParams, context, esJson);
-                        if (custLabelMap != null) {
-                            reultMap.putAll(custLabelMap);
-                        } else {
-                            return null;
-                        }
-*/
                     } else {
                         return null;
                     }
