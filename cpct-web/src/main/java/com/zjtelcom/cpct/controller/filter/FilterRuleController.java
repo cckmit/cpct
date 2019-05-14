@@ -337,4 +337,30 @@ public class FilterRuleController extends BaseController {
         return JSON.toJSONString(maps);
     }
 
+    /**
+     * 导入销售品
+     */
+    @RequestMapping("/importOfferList")
+    @CrossOrigin
+    public String importOfferList(MultipartFile file, Long ruleId, String ruleName, String filterType, String productMutual, Long[] rightListId) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            InputStream inputStream = file.getInputStream();
+            byte[] bytes = new byte[3];
+            inputStream.read(bytes,0,bytes.length);
+            String head = ChannelUtil.bytesToHexString(bytes);
+            head = head.toUpperCase();
+            if (!head.equals("D0CF11") && !head.equals("504B03")){
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg", "文件格式不正确");
+                return JSON.toJSONString(maps);
+            }
+            maps = filterRuleService.importOfferList(file, ruleId, ruleName, filterType, productMutual, rightListId);
+        } catch (Exception e) {
+            logger.error("[op:FilterRuleController] fail to listEvents for multipartFile = {}! Exception: ", JSONArray.toJSON(file), e);
+            return JSON.toJSONString(maps);
+        }
+        return JSON.toJSONString(maps);
+    }
+
 }
