@@ -38,5 +38,6 @@ public interface FilterRuleService {
 
     Map<String, Object> getFilterRule(List<Integer> filterRuleIdList);
 
+    Map<String,Object> importOfferList(MultipartFile multipartFile, Long ruleId, String ruleName, String filterType, String operator, Long[] rightListId)throws IOException;
 
 }
