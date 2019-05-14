@@ -449,7 +449,6 @@ public class CamApiServiceImpl implements CamApiService {
                     }
 
                     timeJson.put("time6", System.currentTimeMillis() - begin);
-                    esHitService.save(timeJson, IndexList.TIME_MKT_MODULE, reqId + "0_" + activityId + "_" + params.get("accNbr"));
 
                 } else {
                     esJson.put("hit", false);
@@ -594,9 +593,6 @@ public class CamApiServiceImpl implements CamApiService {
                             jsonObject.put("hit", "false");
                             jsonObject.put("msg", "规则下标签查询失败");
                             esHitService.save(jsonObject, IndexList.RULE_MODULE);
-
-                            esHitService.save(timeJson, IndexList.TIME_RULE_MODULE, reqId + "_" + ruleId + "_" + params.get("accNbr"));
-
                             return Collections.EMPTY_MAP;
                         }
                         redisUtils.set("RULE_ALL_LABEL_" + tarGrpId, labelMapList);
@@ -606,8 +602,8 @@ public class CamApiServiceImpl implements CamApiService {
 
                     if (labelMapList == null || labelMapList.size() <= 0) {
                         log.info("未查询到分群标签:" + privateParams.get("activityId") + "---" + ruleId);
-                        esJson.put("hit", "false");
-                        esJson.put("msg", "未查询到分群标签");
+                        jsonObject.put("hit", "false");
+                        jsonObject.put("msg", "未查询到分群标签");
                         esHitService.save(jsonObject, IndexList.RULE_MODULE);
                         return Collections.EMPTY_MAP;
                     }
@@ -668,12 +664,9 @@ public class CamApiServiceImpl implements CamApiService {
                     express = expressSb.toString();
 
                 } catch (Exception e) {
-                    esJson.put("hit", "false");
-                    esJson.put("msg", "表达式拼接异常");
+                    jsonObject.put("hit", "false");
+                    jsonObject.put("msg", "表达式拼接异常");
                     esHitService.save(jsonObject, IndexList.RULE_MODULE);
-
-                    esHitService.save(timeJson, IndexList.TIME_RULE_MODULE, reqId + "0_" + ruleId + "_" + params.get("accNbr"));
-
                     return Collections.EMPTY_MAP;
                 }
 
@@ -722,8 +715,8 @@ public class CamApiServiceImpl implements CamApiService {
                     timeJson.put("time4-3", System.currentTimeMillis() - begin);
 
                 } catch (Exception e) {
-                    esJson.put("hit", "false");
-                    esJson.put("msg", "表达式拼接异常");
+                    jsonObject.put("hit", "false");
+                    jsonObject.put("msg", "表达式拼接异常");
                     esHitService.save(jsonObject, IndexList.RULE_MODULE);
                     return Collections.EMPTY_MAP;
                 }
@@ -733,12 +726,9 @@ public class CamApiServiceImpl implements CamApiService {
             esHitService.save(esJson, IndexList.Label_MODULE);  //储存标签比较结果
             //验证是否标签实例不足
             if (notEnoughLabel.length() > 0) {
-                esJson.put("hit", "false");
-                esJson.put("msg", "标签实例不足：" + notEnoughLabel.toString());
-                esHitService.save(esJson, IndexList.RULE_MODULE);
-
-                esHitService.save(timeJson, IndexList.TIME_RULE_MODULE, reqId + "0_" + ruleId + "_" + params.get("accNbr"));
-
+                jsonObject.put("hit", "false");
+                jsonObject.put("msg", "标签实例不足：" + notEnoughLabel.toString());
+                esHitService.save(jsonObject, IndexList.RULE_MODULE);
                 return Collections.EMPTY_MAP;
             }
 
@@ -758,12 +748,9 @@ public class CamApiServiceImpl implements CamApiService {
                 } catch (Exception e) {
                     ruleMap.put("msg", "规则引擎计算失败");
 
-                    esJson.put("hit", "false");
-                    esJson.put("msg", "规则引擎计算失败");
+                    jsonObject.put("hit", "false");
+                    jsonObject.put("msg", "规则引擎计算失败");
                     esHitService.save(jsonObject, IndexList.RULE_MODULE);
-
-                    esHitService.save(timeJson, IndexList.TIME_RULE_MODULE, reqId + "0_" + ruleId + "_" + params.get("accNbr"));
-
                     return Collections.EMPTY_MAP;
                 }
 //                System.out.println("result=" + ruleResult.getResult());
@@ -926,17 +913,10 @@ public class CamApiServiceImpl implements CamApiService {
                     jsonObject.put("hit", "false");
                     jsonObject.put("msg", "规则引擎匹配未通过");
                     esHitService.save(jsonObject, IndexList.RULE_MODULE);
-
-                    esHitService.save(timeJson, IndexList.TIME_RULE_MODULE, reqId + "0_" + ruleId + "_" + params.get("accNbr"));
-
                     return Collections.EMPTY_MAP;
                 }
 
                 ruleMap.put("taskChlList", taskChlList);
-
-                timeJson.put("time9", System.currentTimeMillis() - begin);
-                esHitService.save(timeJson, IndexList.TIME_RULE_MODULE, reqId + "0_" + ruleId + "_" + params.get("accNbr"));
-
                 if (taskChlList.size() > 0) {
                     jsonObject.put("hit", true);
                 } else {
@@ -1194,8 +1174,6 @@ public class CamApiServiceImpl implements CamApiService {
             timeJson.put("time6", System.currentTimeMillis() - begin);
             timeJson.put("name", "渠道");
             timeJson.put("reqId", reqId);
-            esHitService.save(timeJson, IndexList.TIME_CHL_MODULE);
-
             return channelMap;
     }
 
