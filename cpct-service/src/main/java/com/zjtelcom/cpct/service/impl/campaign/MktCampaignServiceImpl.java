@@ -1196,6 +1196,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 // 为下发城市生成新的活动
                 if (!mktCamCityRelDOList.isEmpty()) {
                     mktCampaignDO.setMktCampaignId(null);
+                    // 活动名称加上地市
+                    String areaName = AreaNameEnum.getNameByLandId(mktCamCityRelDO.getCityId());
+                    mktCampaignDO.setMktCampaignName(mktCampaignDO.getMktCampaignName() + "-" + areaName );
                     mktCampaignDO.setMktCampaignCategory(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()); // 子活动默认为自主活动
                     mktCampaignDO.setLanId(mktCamCityRelDO.getCityId()); // 本地网标识
                     mktCampaignDO.setRegionId(AreaCodeEnum.getRegionIdByLandId(mktCamCityRelDO.getCityId()));
