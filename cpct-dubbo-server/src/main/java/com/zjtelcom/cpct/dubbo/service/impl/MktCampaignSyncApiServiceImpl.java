@@ -286,6 +286,11 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
                     mktCampaignMap.put("resultMsg", "活动不存在！");
                     return mktCampaignMap;
                 }
+                if (StatusCode.STATUS_CODE_PASS.getStatusCode().equals(mktCampaignDO.getStatusCd())){
+                    mktCampaignMap.put("resultCode", CommonConstant.CODE_FAIL);
+                    mktCampaignMap.put("resultMsg", "活动已发布，无法重复发布！");
+                    return mktCampaignMap;
+                }
                 if (!StatusCode.STATUS_CODE_CHECKING.getStatusCode().equals(mktCampaignDO.getStatusCd())){
                     mktCampaignMap.put("resultCode", CommonConstant.CODE_FAIL);
                     mktCampaignMap.put("resultMsg", "非已通过活动，无法发布！");
