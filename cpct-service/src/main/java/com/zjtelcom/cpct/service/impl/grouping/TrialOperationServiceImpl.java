@@ -623,26 +623,17 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "未找到有效的活动策略或规则");
             return result;
         }
-        TrialOperation trialOp = BeanUtil.create(operation, new TrialOperation());
-        trialOp.setCampaignName(campaign.getMktCampaignName());
-        //当清单导入时 strategyId name 存储规则信息
-        trialOp.setStrategyId(confRule.getMktStrategyConfRuleId());
-        trialOp.setStrategyName(confRule.getMktStrategyConfRuleName());
-        trialOp.setBatchNum(Long.valueOf(batchNumSt));
-        trialOp.setStatusCd(TrialStatus.IMPORT_GOING.getValue());
-        trialOp.setStatusDate(new Date());
-        trialOp.setCreateStaff(TrialCreateType.IMPORT_USER_LIST.getValue());
-        trialOperationMapper.insert(trialOp);
-        //添加红黑名单列表
-        blackList2Redis(campaign);
-        List<String> labelNameList = new ArrayList<>();
-        TransDetailDataVO dataVO ;
-        List<Map<String, Object>> labelList = new ArrayList<>();
         try {
+            //添加红黑名单列表
+            blackList2Redis(campaign);
+            List<String> labelNameList = new ArrayList<>();
+            List<String> labelEngNameList = new ArrayList<>();
+            TransDetailDataVO dataVO;
+            List<Map<String, Object>> labelList = new ArrayList<>();
             dataVO = xlsxProcess.processAllSheet(multipartFile);
             String[] nameList = dataVO.getContentList().get(0).split("\\|@\\|");
             String[] codeList = dataVO.getContentList().get(1).split("\\|@\\|");
-            if (nameList.length!=codeList.length){
+            if (nameList.length != codeList.length) {
                 result.put("resultCode", CODE_FAIL);
                 result.put("resultMsg", "标签中文名个数与英文个数不匹配请重新检查文件");
                 return result;
@@ -653,17 +644,33 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     result.put("resultMsg", "标签中文名称不能重复:" + "\"" + nameList[i] + "\"");
                     return result;
                 }
+                if (labelEngNameList.contains(codeList[i])) {
+                    result.put("resultCode", CODE_FAIL);
+                    result.put("resultMsg", "标签英文名称不能重复:" + "\"" + codeList[i] + "\"");
+                    return result;
+                }
                 Map<String, Object> label = new HashMap<>();
                 label.put("code", codeList[i]);
                 label.put("name", nameList[i]);
                 labelList.add(label);
                 labelNameList.add(nameList[i]);
+                labelEngNameList.add(codeList[i]);
             }
             if (labelList.size() > 87) {
                 result.put("resultCode", CODE_FAIL);
                 result.put("resultMsg", "扩展字段不能超过87个");
                 return result;
             }
+            TrialOperation trialOp = BeanUtil.create(operation, new TrialOperation());
+            trialOp.setCampaignName(campaign.getMktCampaignName());
+            //当清单导入时 strategyId name 存储规则信息
+            trialOp.setStrategyId(confRule.getMktStrategyConfRuleId());
+            trialOp.setStrategyName(confRule.getMktStrategyConfRuleName());
+            trialOp.setBatchNum(Long.valueOf(batchNumSt));
+            trialOp.setStatusCd(TrialStatus.IMPORT_GOING.getValue());
+            trialOp.setStatusDate(new Date());
+            trialOp.setCreateStaff(TrialCreateType.IMPORT_USER_LIST.getValue());
+            trialOperationMapper.insert(trialOp);
             int size = dataVO.contentList.size() - 3;
             new Thread() {
                 public void run() {
@@ -684,13 +691,13 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         List<String> data = Arrays.asList(dataVO.contentList.get(j).split("\\|@\\|"));
                         Map<String, Object> customers = new HashMap<>();
                         for (int x = 0; x < codeList.length; x++) {
-                            if (codeList[x]==null){
+                            if (codeList[x] == null) {
                                 break;
                             }
                             String value = "";
-                            if (x>=data.size()){
+                            if (x >= data.size()) {
                                 value = "null";
-                            }else {
+                            } else {
                                 value = data.get(x);
                             }
                             if (codeList[x].equals("CCUST_NAME") && value.equals("null")) {
@@ -1408,7 +1415,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConfDetailMap.get("mktCamChlConfDetail");
                     MktCamChlConfDetailES es = BeanUtil.create(mktCamChlConfDetail,new MktCamChlConfDetailES());
                     CamScriptES camScriptES = BeanUtil.create(mktCamChlConfDetail.getCamScript(),new CamScriptES());
-                    if (camScriptES.getScriptDesc().contains("\n")){
+                    if (camScriptES.getScriptDesc()!=null && !camScriptES.getScriptDesc().equals("") && camScriptES.getScriptDesc().contains("\n")){
                         camScriptES.setScriptDesc(camScriptES.getScriptDesc().replace("\n",""));
                     }
                     es.setCamScript(camScriptES);
