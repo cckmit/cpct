@@ -536,6 +536,7 @@ public class EventApiServiceImpl implements EventApiService {
                 //事件下所有活动的规则预校验，返回初步可命中活动
                 List<Map<String, Object>> resultByEvent = getResultByEvent(eventId, map.get("lanId"), map.get("channelCode"), map.get("reqId"), map.get("accNbr"), c4, map.get("custId"));
 
+                System.out.println("活动++++++" + resultByEvent.size());
 
                 if (resultByEvent == null || resultByEvent.size() <= 0) {
                     log.info("预校验为空");
@@ -1764,66 +1765,66 @@ public class EventApiServiceImpl implements EventApiService {
 
 
 
-                if("QD000015".equals(channel)){
-                    List<String> strategyTypeList = new ArrayList<>();
-                    strategyTypeList.add("1000");
-                    strategyTypeList.add("2000");
-                    strategyTypeList.add("5000");
-
-                    boolean iSRed = false;
-                    //验证过滤规则时间,默认只查询5000类型的时间段过滤
-                    List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(mktCampaginId, strategyTypeList);
-                    for (FilterRule filterRule : filterRuleList) {
-                        if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
-                            iSRed = true;
-                            break;
-                        }
-                    }
-                    JSONArray accArray = new JSONArray();
-                    if(iSRed) {
-                        JSONObject param = new JSONObject();
-                        //查询标识
-                        param.put("c3", lanId);
-                        param.put("queryId", custId);
-                        param.put("queryNum", accNbr);
-                        param.put("queryFields", "");
-                        param.put("type", "4");
-
-                        Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
-                        if ("0".equals(dubboResult.get("result_code").toString())) {
-                            accArray = new JSONArray((List<Object>) dubboResult.get("msgbody"));
-                        }
-                    }
-
-                    for (FilterRule filterRule : filterRuleList) {
-                        if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
-                            //获取名单
-                            String userList = filterRule.getUserList();
-                            if (userList != null && !"".equals(userList)) {
-                                for (Object o:accArray)
-                                 {
-                                    int index = userList.indexOf(((Map) o).get("ACC_NBR").toString());
-                                    if (index >= 0) {
-                                        esJson.put("hit", false);
-                                        esJson.put("msg", "红黑名单过滤规则验证被拦截");
-                                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                                        return Collections.EMPTY_MAP;
-                                    }
-                                }
-
-                            }
-                        } else if ("5000".equals(filterRule.getFilterType())) {
-                            //时间段的格式
-                            if (compareHourAndMinute(filterRule)) {
-                                log.info("过滤时间段验证被拦截");
-                                esJson.put("hit", false);
-                                esJson.put("msg", "过滤时间段验证被拦截");
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                                return Collections.EMPTY_MAP;
-                            }
-                        }
-                    }
-                } else {
+//                if("QD000015".equals(channel)){
+//                    List<String> strategyTypeList = new ArrayList<>();
+//                    strategyTypeList.add("1000");
+//                    strategyTypeList.add("2000");
+//                    strategyTypeList.add("5000");
+//
+//                    boolean iSRed = false;
+//                    //验证过滤规则时间,默认只查询5000类型的时间段过滤
+//                    List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(mktCampaginId, strategyTypeList);
+//                    for (FilterRule filterRule : filterRuleList) {
+//                        if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
+//                            iSRed = true;
+//                            break;
+//                        }
+//                    }
+//                    JSONArray accArrayF = new JSONArray();
+//                    if(iSRed) {
+//                        JSONObject param = new JSONObject();
+//                        //查询标识
+//                        param.put("c3", lanId);
+//                        param.put("queryId", custId);
+//                        param.put("queryNum", "");
+//                        param.put("queryFields", "");
+//                        param.put("type", "4");
+//
+//                        Map<String, Object> dubboResult_F = yzServ.queryYz(JSON.toJSONString(param));
+//                        if ("0".equals(dubboResult_F.get("result_code").toString())) {
+//                            accArrayF = new JSONArray((List<Object>) dubboResult_F.get("msgbody"));
+//                        }
+//                    }
+//
+//                    for (FilterRule filterRule : filterRuleList) {
+//                        if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
+//                            //获取名单
+//                            String userList = filterRule.getUserList();
+//                            if (userList != null && !"".equals(userList)) {
+//                                for (Object ob:accArrayF)
+//                                 {
+//                                    int index = userList.indexOf(((Map) ob).get("ACC_NBR").toString());
+//                                    if (index >= 0) {
+//                                        esJson.put("hit", false);
+//                                        esJson.put("msg", "红黑名单过滤规则验证被拦截");
+//                                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+//                                        return Collections.EMPTY_MAP;
+//                                    }
+//                                }
+//
+//                            }
+//                        } else if ("5000".equals(filterRule.getFilterType())) {
+//                            //时间段的格式
+//                            if (compareHourAndMinute(filterRule)) {
+//                                log.info("过滤时间段验证被拦截");
+//                                esJson.put("hit", false);
+//                                esJson.put("msg", "过滤时间段验证被拦截");
+//                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+//                                return Collections.EMPTY_MAP;
+//                            }
+//                        }
+//                    }
+//                } else {
                     List<String> strategyTypeList = new ArrayList<>();
                     strategyTypeList.add("1000");
                     strategyTypeList.add("2000");
@@ -1854,7 +1855,7 @@ public class EventApiServiceImpl implements EventApiService {
                             }
                         }
                     }
-                }
+//                }
 
 
                 //查询活动信息
