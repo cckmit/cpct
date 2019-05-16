@@ -49,7 +49,9 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.campaign.MktOperatorLogService;
 import com.zjtelcom.cpct.service.channel.ProductService;
+import com.zjtelcom.cpct.service.impl.synchronize.campaign.SyncActivityServiceImpl;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
+import com.zjtelcom.cpct.service.synchronize.campaign.SyncActivityService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInfoMapper;
@@ -180,6 +182,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
     @Autowired(required = false)
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
+
+    @Autowired
+    private SyncActivityService syncActivityService;
 
 
     @Autowired(required = false)
@@ -1176,6 +1181,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
             // 获取当前活动标识
             Long parentMktCampaignId = mktCampaignDO.getMktCampaignId();
+            // 获取当前活动名称
+            String parentMktCampaignName = mktCampaignDO.getMktCampaignName();
             // 获取活动下策略的集合
             List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByMktCampaignId(parentMktCampaignId);
             // 获取生失效时间
@@ -1191,6 +1198,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 // 为下发城市生成新的活动
                 if (!mktCamCityRelDOList.isEmpty()) {
                     mktCampaignDO.setMktCampaignId(null);
+                    // 活动名称加上地市
+                    String areaName = AreaNameEnum.getNameByLandId(mktCamCityRelDO.getCityId());
+                    mktCampaignDO.setMktCampaignName(parentMktCampaignName + "-" + areaName );
                     mktCampaignDO.setMktCampaignCategory(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()); // 子活动默认为自主活动
                     mktCampaignDO.setLanId(mktCamCityRelDO.getCityId()); // 本地网标识
                     mktCampaignDO.setRegionId(AreaCodeEnum.getRegionIdByLandId(mktCamCityRelDO.getCityId()));
@@ -1273,6 +1283,14 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCampaignMap.put("resultMsg", "发布活动成功！");
             mktCampaignMap.put("childMktCampaignIdList", childMktCampaignIdList);
+            if (SystemParamsUtil.isCampaignSync()) {
+                new Thread() {
+                    public void run() {
+                        logger.info("活动同步大数据：" + mktCampaignId);
+                        syncActivityService.syncActivity(mktCampaignId);
+                    }
+                }.start();
+            }
         } catch (Exception e) {
             logger.error("[op:MktCampaignServiceImpl] failed to publishMktCampaign by mktCampaignId = {}, Exception = ", mktCampaignId, e);
             mktCampaignMap.put("resultCode", CommonConstant.CODE_FAIL);
