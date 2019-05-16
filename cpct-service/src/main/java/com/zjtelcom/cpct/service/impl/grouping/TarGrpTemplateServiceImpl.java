@@ -319,7 +319,17 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                 if (grpSystemRel==null){
                     continue;
                 }
-                Channel channel = channelMapper.selectByPrimaryKey(grpSystemRel.getOfferVrulGrpId());
+                Long channelId = grpSystemRel.getOfferVrulGrpId();
+                if (channelId == 3221281L){
+                    channelId = 11L;
+                }
+                if (channelId == 3221280L){
+                    channelId = 36L;
+                }
+                if (channelId == 3221279L){
+                    channelId = 16L;
+                }
+                Channel channel = channelMapper.selectByPrimaryKey(channelId);
                 if (channel!=null && !channelIdList.contains(channel.getContactChlId())){
                     ChannelDetail detail = new ChannelDetail();
                     detail.setChannelId(channel.getContactChlId());
