@@ -271,6 +271,8 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
                 MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
                 // 获取当前活动标识
                 Long parentMktCampaignId = mktCampaignDO.getMktCampaignId();
+                // 获取当前活动名称
+                String parentMktCampaignName = mktCampaignDO.getMktCampaignName();
                 // 获取活动下策略的集合
                 List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByMktCampaignId(parentMktCampaignId);
                 // 获取生失效时间
@@ -305,7 +307,7 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
                         mktCampaignDO.setMktCampaignId(null);
                         // 活动名称加上地市
                         String areaName = AreaNameEnum.getNameByLandId(mktCamCityRelDO.getCityId());
-                        mktCampaignDO.setMktCampaignName(mktCampaignDO.getMktCampaignName() + "-" + areaName );
+                        mktCampaignDO.setMktCampaignName(parentMktCampaignName + "-" + areaName );
                         mktCampaignDO.setMktCampaignCategory(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()); // 子活动默认为自主活动
                         mktCampaignDO.setLanId(mktCamCityRelDO.getCityId()); // 本地网标识
                         mktCampaignDO.setRegionId(AreaCodeEnum.getRegionIdByLandId(mktCamCityRelDO.getCityId()));
