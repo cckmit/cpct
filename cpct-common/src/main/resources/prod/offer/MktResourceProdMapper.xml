@@ -96,6 +96,6 @@
                 #{item}
             </foreach>
         </if>
-        and MKT_RES_TYPE_ID = 2 or MKT_RES_TYPE_ID = 3
+        and (MKT_RES_TYPE_ID = 2 or MKT_RES_TYPE_ID = 3)
     </select>
 </mapper>
