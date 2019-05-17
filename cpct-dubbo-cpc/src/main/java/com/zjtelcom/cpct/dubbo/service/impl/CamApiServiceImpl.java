@@ -131,9 +131,6 @@ public class CamApiServiceImpl implements CamApiService {
             Map<String, Object> activity = new ConcurrentHashMap<>();
             long begin = System.currentTimeMillis();
             String reqId = params.get("reqId");
-            JSONObject timeJson = new JSONObject();
-            timeJson.put("reqId", reqId + "0_" + activityId + "_" + params.get("accNbr"));
-            timeJson.put("time1", begin);
 
             //初始化es log
             JSONObject esJson = new JSONObject();
@@ -203,9 +200,6 @@ public class CamApiServiceImpl implements CamApiService {
             esJson.put("activityId", mktCampaign.getMktCampaignId().toString());
             esJson.put("activityName", mktCampaign.getMktCampaignName());
             esJson.put("activityCode", mktCampaign.getMktCampaignId().toString());
-
-            timeJson.put("time2", System.currentTimeMillis() - begin);
-
 
             //活动标签实例查询完成 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
@@ -336,7 +330,6 @@ public class CamApiServiceImpl implements CamApiService {
                 }
             }
 
-            timeJson.put("time5", System.currentTimeMillis() - begin);
             //初始化结果集
             List<Future<Map<String, Object>>> threadList = new ArrayList<>();
             //初始化线程池
@@ -448,8 +441,6 @@ public class CamApiServiceImpl implements CamApiService {
                         }
                     }
 
-                    timeJson.put("time6", System.currentTimeMillis() - begin);
-
                 } else {
                     esJson.put("hit", false);
                     esJson.put("msg", "策略均未命中");
@@ -511,10 +502,6 @@ public class CamApiServiceImpl implements CamApiService {
         public Map<String, Object> call() throws Exception {
 
             long begin = System.currentTimeMillis();
-            JSONObject timeJson = new JSONObject();
-            timeJson.put("reqId", reqId + "0_" + ruleId + "_" + params.get("accNbr"));
-            timeJson.put("name", "规则：" + ruleId);
-            timeJson.put("time1", System.currentTimeMillis() - begin);
 
             //初始化es log   标签使用
             JSONObject esJson = new JSONObject();
@@ -565,8 +552,6 @@ public class CamApiServiceImpl implements CamApiService {
             //记录实例不足的标签
             StringBuilder notEnoughLabel = new StringBuilder();
 
-            timeJson.put("time2", System.currentTimeMillis() - begin);
-
             //判断表达式在缓存中有没有
             String express = (String) redisUtils.get("EXPRESS_" + tarGrpId);
 
@@ -578,12 +563,10 @@ public class CamApiServiceImpl implements CamApiService {
                 }
             }
 
-            timeJson.put("time3", System.currentTimeMillis() - begin);
             if (express == null || "".equals(express)) {
                 List<LabelResult> labelResultList = new ArrayList<>();
                 try {
                     LabelResult lr;
-                    timeJson.put("time3-1", System.currentTimeMillis() - begin);
                     //查询规则下所有标签
                     List<Map<String, String>> labelMapList = (List<Map<String, String>>) redisUtils.get("RULE_ALL_LABEL_" + tarGrpId);
                     if (labelMapList == null) {
@@ -597,8 +580,6 @@ public class CamApiServiceImpl implements CamApiService {
                         }
                         redisUtils.set("RULE_ALL_LABEL_" + tarGrpId, labelMapList);
                     }
-
-                    timeJson.put("time3-2", System.currentTimeMillis() - begin);
 
                     if (labelMapList == null || labelMapList.size() <= 0) {
                         log.info("未查询到分群标签:" + privateParams.get("activityId") + "---" + ruleId);
@@ -618,8 +599,13 @@ public class CamApiServiceImpl implements CamApiService {
                         lr = new LabelResult();
                         if ("PROM_LIST".equals(labelMap.get("code"))) {
                             FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.valueOf(labelMap.get("rightParam")));
-                            lr.setRightOperand(filterRule.getChooseProduct());
-                            labelMap.put("rightParam", filterRule.getChooseProduct());
+                            if (filterRule != null) {
+                                lr.setRightOperand(filterRule.getChooseProduct());
+                                labelMap.put("rightParam", filterRule.getChooseProduct());
+                            } else {
+                                jsonObject.put("hit", "false");
+                                jsonObject.put("msg", "未查询销售品过滤规则");
+                            }
                         }else{
                             lr.setRightOperand(labelMap.get("rightParam"));
                         }
@@ -652,13 +638,9 @@ public class CamApiServiceImpl implements CamApiService {
                             lr.setRightParam("无值");
                             lr.setResult(false);
                         }
-
                         expressSb.append("&&");
                         labelResultList.add(lr);
                     }
-
-                    timeJson.put("time3-3", System.currentTimeMillis() - begin);
-
                     expressSb.delete(expressSb.length() - 2, expressSb.length());
                     expressSb.append(") {return true} else {return false}");
                     express = expressSb.toString();
@@ -669,23 +651,16 @@ public class CamApiServiceImpl implements CamApiService {
                     esHitService.save(jsonObject, IndexList.RULE_MODULE);
                     return Collections.EMPTY_MAP;
                 }
-
                 //表达式存入redis
                 redisUtils.set("EXPRESS_" + tarGrpId, express);
-
                 esJson.put("labelResultList", JSONArray.toJSON(labelResultList));
-
-                timeJson.put("time3-4", System.currentTimeMillis() - begin);
-
             } else {
                 List<LabelResult> labelResultList = new ArrayList<>();
-                timeJson.put("time4-1", System.currentTimeMillis() - begin);
                 try {
                     LabelResult lr;
                     //查询规则下所有标签
                     List<Map<String, String>> labelMapList = (List<Map<String, String>>) redisUtils.get("RULE_ALL_LABEL_" + tarGrpId);
                     if (labelMapList == null) {
-                        timeJson.put("time4-1-1", System.currentTimeMillis() - begin);
                         try {
                             labelMapList = tarGrpConditionMapper.selectAllLabelByTarId(tarGrpId);
                         } catch (Exception e) {
@@ -694,11 +669,9 @@ public class CamApiServiceImpl implements CamApiService {
                             esHitService.save(jsonObject, IndexList.RULE_MODULE);
                             return Collections.EMPTY_MAP;
                         }
-                        timeJson.put("time4-1-2", System.currentTimeMillis() - begin);
                         redisUtils.set("RULE_ALL_LABEL_" + tarGrpId, labelMapList);
                     }
 
-                    timeJson.put("time4-2", System.currentTimeMillis() - begin);
                     //将规则拼装为表达式
                     //遍历所有规则
                     for (Map<String, String> labelMap : labelMapList) {
@@ -711,16 +684,12 @@ public class CamApiServiceImpl implements CamApiService {
                     // 异步执行当个标签比较结果
                     new labelResultThread(esJson,  labelMapList, context, sysParams, runner, labelResultList).run();
 
-
-                    timeJson.put("time4-3", System.currentTimeMillis() - begin);
-
                 } catch (Exception e) {
                     jsonObject.put("hit", "false");
                     jsonObject.put("msg", "表达式拼接异常");
                     esHitService.save(jsonObject, IndexList.RULE_MODULE);
                     return Collections.EMPTY_MAP;
                 }
-                timeJson.put("time4-4", System.currentTimeMillis() - begin);
             }
 
             esHitService.save(esJson, IndexList.Label_MODULE);  //储存标签比较结果
@@ -732,8 +701,6 @@ public class CamApiServiceImpl implements CamApiService {
                 return Collections.EMPTY_MAP;
             }
 
-            timeJson.put("time5", System.currentTimeMillis() - begin);
-
             try {
                 //规则引擎计算
                 RuleResult ruleResult = null;
@@ -742,7 +709,6 @@ public class CamApiServiceImpl implements CamApiService {
                 runnerQ.addFunction("checkProm", new PromCheckOperator("checkProm"));
                 runnerQ.addFunction("dateLabel", new ComperDateLabel("dateLabel"));
 
-                timeJson.put("time5-1", System.currentTimeMillis() - begin);
                 try {
                     ruleResult = runnerQ.executeRule(express, context, true, true);
                 } catch (Exception e) {
@@ -758,8 +724,6 @@ public class CamApiServiceImpl implements CamApiService {
 //                System.out.println("TraceMap=" + ruleResult.getTraceMap());
 
                 jsonObject.put("express", express);
-
-                timeJson.put("time6", System.currentTimeMillis() - begin);
 
                 //初始化返回结果中的销售品条目
                 List<Map<String, String>> productList = new ArrayList<>();
@@ -825,8 +789,6 @@ public class CamApiServiceImpl implements CamApiService {
                     if (ruleResult.getResult() == null) {
                         ruleResult.setResult(false);
                     }
-
-                    timeJson.put("time7", System.currentTimeMillis() - begin);
 
                     //获取协同渠道所有id
                     String[] evtContactConfIdArray = evtContactConfIdStr.split("/");
@@ -897,7 +859,6 @@ public class CamApiServiceImpl implements CamApiService {
                             }
                         }*/
 
-                        timeJson.put("time8", System.currentTimeMillis() - begin);
                     } catch (Exception e) {
                         e.printStackTrace();
                         //发生异常关闭线程池
@@ -961,8 +922,6 @@ public class CamApiServiceImpl implements CamApiService {
             Date now = new Date();
 
             long begin = System.currentTimeMillis();
-            JSONObject timeJson = new JSONObject();
-            timeJson.put("time1", System.currentTimeMillis() - begin);
 
             //初始化返回结果推荐信息
             Map<String, Object> channelMap = new ConcurrentHashMap<>();
@@ -987,8 +946,6 @@ public class CamApiServiceImpl implements CamApiService {
                 mktCamChlConfDetail.setMktCamChlConfAttrList(mktCamChlConfAttrList);
                 redisUtils.set("CHL_CONF_DETAIL_" + evtContactConfId, mktCamChlConfDetail);
             }
-
-            timeJson.put("time2", System.currentTimeMillis() - begin);
 
             boolean checkTime = true;
             for (MktCamChlConfAttr mktCamChlConfAttr : mktCamChlConfDetail.getMktCamChlConfAttrList()) {
@@ -1061,8 +1018,6 @@ public class CamApiServiceImpl implements CamApiService {
             }
             channelMap.put("taskChlAttrList", taskChlAttrList);
 
-            timeJson.put("time3", System.currentTimeMillis() - begin);
-
             if (!checkTime) {
                 return Collections.EMPTY_MAP;
             }
@@ -1085,8 +1040,6 @@ public class CamApiServiceImpl implements CamApiService {
 
             //查询渠道子策略 这里老系统暂时不返回
 //              List<MktVerbalCondition> mktVerbalConditions = mktVerbalConditionMapper.findConditionListByVerbalId(evtContactConfId);
-
-            timeJson.put("time4", System.currentTimeMillis() - begin);
 
             //查询话术
             List<String> scriptLabelList = new ArrayList<>();
@@ -1137,8 +1090,6 @@ public class CamApiServiceImpl implements CamApiService {
                 }
             }
 
-            timeJson.put("time5", System.currentTimeMillis() - begin);
-
             if (scriptLabelList.size() > 0) {
                 for (String labelStr : scriptLabelList) {
                     if (context.containsKey(labelStr)) {
@@ -1170,10 +1121,6 @@ public class CamApiServiceImpl implements CamApiService {
 //            }
             channelMap.put("reason", mktVerbalStr == null ? "" : mktVerbalStr);
             //展示列标签
-
-            timeJson.put("time6", System.currentTimeMillis() - begin);
-            timeJson.put("name", "渠道");
-            timeJson.put("reqId", reqId);
             return channelMap;
     }
 
