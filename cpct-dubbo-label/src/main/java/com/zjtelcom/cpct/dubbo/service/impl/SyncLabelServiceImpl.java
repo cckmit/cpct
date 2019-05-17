@@ -253,6 +253,23 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         }
         Long labelId = null;
         if (labelValodate != null) {
+            //标签中文名重复校验
+            List<Label> labelCheck = labelMapper.findByParam(record.getLabName());
+            for(int i = 0;i<labelCheck.size();i++) {
+                if(!labelCheck.get(i).getTagRowId().equals(record.getLabRowId())) {
+                    if (labelCheck.get(i).getInjectionLabelName().equals(record.getLabName())) {
+                        result.put("resultCode", CODE_FAIL);
+                        result.put("resultMsg", "标签中文名和已有标签重复");
+                        return result;
+                    }
+                    if (labelCheck.get(i).getInjectionLabelCode().equals(record.getLabEngName())) {
+                        result.put("resultCode", CODE_FAIL);
+                        result.put("resultMsg", "标签英文名和已有标签重复");
+                        return result;
+                    }
+                }
+            }
+            //更新标签
             BeanUtil.copy(labModel,labelValodate);
             labelValodate.setSystemInfoId(1L);
             labelValodate.setTagRowId(labModel.getLabRowId());//标签id
@@ -297,6 +314,21 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             syncLabelValue(valueModelList,labelValodate.getInjectionLabelId());
             labelList.add(labelValodate);
         }else {
+            //标签中文名重复校验
+            List<Label> labelCheck = labelMapper.findByParam(record.getLabName());
+            for(int i = 0;i<labelCheck.size();i++) {
+                if(labelCheck.get(i).getInjectionLabelName().equals(record.getLabName())) {
+                    result.put("resultCode",CODE_FAIL);
+                    result.put("resultMsg","标签中文名和已有标签重复");
+                    return result;
+                }
+                if(labelCheck.get(i).getInjectionLabelCode().equals(record.getLabEngName())) {
+                    result.put("resultCode",CODE_FAIL);
+                    result.put("resultMsg","标签英文名和已有标签重复");
+                    return result;
+                }
+            }
+            //新增标签
             Label label = BeanUtil.create(labModel, new Label());
             label.setSystemInfoId(1L);
             label.setTagRowId(labModel.getLabRowId());//标签id
