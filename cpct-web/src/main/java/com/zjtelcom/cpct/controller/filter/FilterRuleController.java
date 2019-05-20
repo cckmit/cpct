@@ -337,4 +337,74 @@ public class FilterRuleController extends BaseController {
         return JSON.toJSONString(maps);
     }
 
+    /**
+     * 导入销售品
+     */
+    @RequestMapping("/importOfferList")
+    @CrossOrigin
+    public String importOfferList(MultipartFile file, Long ruleId, String ruleName, String filterType, String productMutual, Long[] rightListId) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            InputStream inputStream = file.getInputStream();
+            byte[] bytes = new byte[3];
+            inputStream.read(bytes,0,bytes.length);
+            String head = ChannelUtil.bytesToHexString(bytes);
+            head = head.toUpperCase();
+            if (!head.equals("D0CF11") && !head.equals("504B03")){
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg", "文件格式不正确");
+                return JSON.toJSONString(maps);
+            }
+            maps = filterRuleService.importOfferList(file, ruleId, ruleName, filterType, productMutual, rightListId);
+        } catch (Exception e) {
+            logger.error("[op:FilterRuleController] fail to listEvents for multipartFile = {}! Exception: ", JSONArray.toJSON(file), e);
+            return JSON.toJSONString(maps);
+        }
+        return JSON.toJSONString(maps);
+    }
+
+    /**
+     *  销售品清单模板下载
+     */
+    @RequestMapping("downloadOfferTemplate")
+    @CrossOrigin
+    public String downloadOfferTemplate(HttpServletRequest request, HttpServletResponse response) {
+        OutputStream ouputStream = null;
+        try {
+            String fileName = "销售品清单导入模板.xlsx";
+
+            byte[] buffer = new byte[1024];
+            FileInputStream fis = null; //文件输入流
+            BufferedInputStream bis = null;
+            fis = new FileInputStream("/app/offerTemplate.xlsx");
+            bis = new BufferedInputStream(fis);
+
+            //处理导出问题
+            response.reset();
+            response.setContentType(CommonConstant.CONTENTTYPE);
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
+            ouputStream = response.getOutputStream();
+
+            int len = 0;
+            while ((len = bis.read(buffer)) > 0) {
+                ouputStream.write(buffer, 0, len);
+            }
+            int i = bis.read(buffer);
+//            while (i != -1) {
+//                ouputStream.write(buffer);
+//                i = bis.read(buffer);
+//            }
+            ouputStream.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                ouputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return initSuccRespInfo("导出成功");
+    }
+
 }

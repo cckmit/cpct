@@ -15,9 +15,11 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
 import com.zjtelcom.cpct.dao.synchronize.SynchronizeRecordMapper;
+import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.Rule;
 import com.zjtelcom.cpct.domain.RuleDetail;
+import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.org.OrgTreeDO;
@@ -206,6 +208,9 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
     @Autowired
     private MktCamScriptMapper camScriptMapper;
 
+    @Autowired
+    private SysAreaMapper sysAreaMapper;
+
     //同步表名
     private static final String tableName = "mkt_campaign";
 
@@ -266,6 +271,8 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
                 MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
                 // 获取当前活动标识
                 Long parentMktCampaignId = mktCampaignDO.getMktCampaignId();
+                // 获取当前活动名称
+                String parentMktCampaignName = mktCampaignDO.getMktCampaignName();
                 // 获取活动下策略的集合
                 List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByMktCampaignId(parentMktCampaignId);
                 // 获取生失效时间
@@ -293,6 +300,9 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
                     for (MktCamCityRelDO mktCamCityRelDO : mktCamCityRelDOList) {
                         // 为下发城市生成新的活动
                         mktCampaignDO.setMktCampaignId(null);
+                        // 活动名称加上地市
+                        String areaName = AreaNameEnum.getNameByLandId(mktCamCityRelDO.getCityId());
+                        mktCampaignDO.setMktCampaignName(parentMktCampaignName + "-" + areaName );
                         mktCampaignDO.setMktCampaignCategory(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()); // 子活动默认为自主活动
                         mktCampaignDO.setLanId(mktCamCityRelDO.getCityId()); // 本地网标识
                         mktCampaignDO.setRegionId(AreaCodeEnum.getRegionIdByLandId(mktCamCityRelDO.getCityId()));
@@ -347,7 +357,7 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
 
                         // 遍历活动下策略的集合
                         for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {
-                            Map<String, Object> mktStrategyConfMap = copyMktStrategyConf(mktCamStrategyConfRelDO.getStrategyConfId(), childMktCampaignId, true);
+                            Map<String, Object> mktStrategyConfMap = copyMktStrategyConf(mktCamStrategyConfRelDO.getStrategyConfId(), childMktCampaignId, true, mktCampaignDO.getLanId());
                             Long childMktStrategyConfId = (Long) mktStrategyConfMap.get("childMktStrategyConfId");
                             // 建立活动和策略的关系
                             MktCamStrategyConfRelDO chaildMktCamStrategyConfRelDO = new MktCamStrategyConfRelDO();
@@ -827,13 +837,20 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
      * @return
      * @throws Exception
      */
-    public Map<String, Object> copyMktStrategyConf(Long parentMktStrategyConfId, Long childMktCampaignId, Boolean isPublish) throws Exception {
+    public Map<String, Object> copyMktStrategyConf(Long parentMktStrategyConfId, Long childMktCampaignId, Boolean isPublish, Long LanId) throws Exception {
         Map<String, Object> mktStrategyConfMap = new HashMap<>();
         // 通过原策略id 获取原策略基本信息
         try {
             MktStrategyConfDO mktStrategyConfDO = mktStrategyConfMapper.selectByPrimaryKey(parentMktStrategyConfId);
             // 获取策略下规则信息
             List<MktStrategyConfRuleRelDO> mktStrategyConfRuleRelDOList = mktStrategyConfRuleRelMapper.selectByMktStrategyConfId(parentMktStrategyConfId);
+
+            // 获取适用地市的Id集合
+            if(LanId!=null){
+                Map<String, Object> areaMap = listStrAreaTree(LanId.toString());
+                String sysAreaString = getAreaString((List<SysArea>) areaMap.get("sysAreaList"));
+                mktStrategyConfDO.setAreaId(sysAreaString);
+            }
 
             mktStrategyConfDO.setMktStrategyConfId(null);
             mktStrategyConfDO.setCreateDate(new Date());
@@ -1849,5 +1866,83 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
         return mktCamChlResultMap;
     }
 
+
+    private Map<String, Object> listStrAreaTree(String lanId) {
+        Map<String, Object> areaMap = new HashMap<>();
+        List<SysArea> sysAreaList = new ArrayList<>();
+        //获取省级
+        if("".equals(lanId)){
+            lanId = AreaCodeEnum.ZHEJIAGN.getLanId().toString();
+        }
+        SysArea sysArea = (SysArea) redisUtils.get("CITY_" + lanId);
+        if (sysArea == null) {
+            // 将城市数据存入到redis
+            saveCityTORedis();
+            // 重新从redis中获取
+            sysArea = (SysArea) redisUtils.get("CITY_" + lanId);
+        }
+        sysAreaList.add(ChannelUtil.setOrgArea(sysArea));
+        areaMap.put("sysAreaList", sysAreaList);
+        return areaMap;
+    }
+
+    /**
+     * 初始化城市数据到redis
+     *
+     * @return
+     */
+    private Map<String, Object> saveCityTORedis() {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            List<SysArea> sysAreaList = new ArrayList<>();
+            List<SysArea> sysAreas = sysAreaMapper.selectAll();
+            for (SysArea sysArea : sysAreas) {
+                getByParentArea(sysArea.getAreaId(), sysArea);
+                // 存放单个下发地市信息
+                redisUtils.set("CITY_" + sysArea.getAreaId().toString(), sysArea);
+            }
+            map.put("resultCode", CommonConstant.CODE_SUCCESS);
+            map.put("resultMsg", "success");
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", "failure");
+        }
+        return map;
+    }
+
+    private SysArea getByParentArea(Integer parentArea, SysArea sysParentArea) {
+        List<SysArea> sysAreas = sysAreaMapper.selectByParnetArea(parentArea);
+        if (sysAreas != null && sysAreas.size() > 0) {
+            sysParentArea.setChildAreaList(sysAreas);
+            ChannelUtil.setOrgArea(sysParentArea);
+            for (SysArea sysArea : sysAreas) {
+                ChannelUtil.setOrgArea(sysArea);
+                getByParentArea(sysArea.getAreaId(), sysArea);
+            }
+        }
+        return sysParentArea;
+    }
+
+    /**
+     * 所有地址转换成字符串形式 例如571/572/573
+     * @param sysAreaList
+     * @return
+     */
+    private String getAreaString(List<SysArea> sysAreaList){
+        StringBuilder sysAreaString = new StringBuilder();
+        for (SysArea sysArea : sysAreaList) {
+            if(sysAreaString.length() == 0){
+                sysAreaString.append(sysArea.getAreaId());
+            } else {
+                sysAreaString.append("/" + sysArea.getAreaId());
+            }
+            // 递归获取子地市
+            if(sysArea.getChildAreaList()!=null && sysArea.getChildAreaList().size()>0){
+                String areaString = getAreaString(sysArea.getChildAreaList());
+                sysAreaString.append("/" + areaString);
+            }
+        }
+        return sysAreaString.toString();
+    }
 
 }

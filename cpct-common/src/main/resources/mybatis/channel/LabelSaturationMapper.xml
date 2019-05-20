@@ -23,14 +23,14 @@
   </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.LabelSaturation">
     insert into label_saturation (LABEL_SATURATION_ID, LABEL_CODE, LABEL_AREA, SATURATION_BATCH_NUMBER,
-      BIGDATA_SATURATION, ES_SATURATION, COMPARING_RESULTS,
-      STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
-      CREATE_DATE, STATUS_DATE, UPDATE_DATE,
+      BIGDATA_SATURATION, ES_SATURATION, COMPARING_RESULTS, 
+      STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+      CREATE_DATE, STATUS_DATE, UPDATE_DATE, 
       REMARK)
     values (#{labelSaturationId,jdbcType=BIGINT}, #{labelCode,jdbcType=VARCHAR}, #{labelArea,jdbcType=VARCHAR},#{saturationBatchNumber,jdbcType=VARCHAR},
-      #{bigdataSaturation,jdbcType=BIGINT}, #{esSaturation,jdbcType=BIGINT}, #{comparingResults,jdbcType=VARCHAR},
-      #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT},
-      #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP},
+      #{bigdataSaturation,jdbcType=BIGINT}, #{esSaturation,jdbcType=BIGINT}, #{comparingResults,jdbcType=VARCHAR}, 
+      #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
       #{remark,jdbcType=VARCHAR})
   </insert>
   <!-- 批量插入 -->
@@ -68,7 +68,7 @@
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select LABEL_SATURATION_ID, LABEL_CODE, LABEL_AREA, SATURATION_BATCH_NUMBER, BIGDATA_SATURATION,
-    ES_SATURATION, COMPARING_RESULTS, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE,
+    ES_SATURATION, COMPARING_RESULTS, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
     STATUS_DATE, UPDATE_DATE, REMARK
     from label_saturation
     where LABEL_SATURATION_ID = #{labelSaturationId,jdbcType=BIGINT}
