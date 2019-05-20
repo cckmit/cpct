@@ -39,6 +39,7 @@ import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.dto.synchronize.SynchronizeRecord;
 import com.zjtelcom.cpct.dubbo.service.MktCampaignSyncApiService;
 import com.zjtelcom.cpct.dubbo.service.RecordService;
+import com.zjtelcom.cpct.dubbo.service.SyncActivityService;
 import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInfoMapper;
@@ -207,6 +208,8 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
 
     @Autowired
     private MktCamScriptMapper camScriptMapper;
+    @Autowired
+    private SyncActivityService syncActivityService;
 
     @Autowired
     private SysAreaMapper sysAreaMapper;
@@ -393,6 +396,8 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
                                         synchronizeCampaign(mktCampaignId, roleName);
                                         // 删除生产redis缓存
                                         deleteCampaignRedisProd(mktCampaignId);
+                                        logger.info("活动同步大数据：" + mktCampaignId);
+                                        syncActivityService.syncActivity(mktCampaignId);
                                     } catch (Exception e) {
                                         logger.error("[op:MktCampaignServiceImpl] 活动同步失败 by mktCampaignId = {}, Expection = ",mktCampaignId, e);
                                     }
