@@ -278,6 +278,9 @@
         <if test="createChannel != null and createChannel != ''">
             AND t.CREATE_CHANNEL = #{createChannel,jdbcType=VARCHAR}
         </if>
+        <if test="createStaff != null and createStaff != ''">
+            AND t.CREATE_STAFF = #{createStaff,jdbcType=BIGINT}
+        </if>
         order by t.UPDATE_DATE desc
     </select>
 

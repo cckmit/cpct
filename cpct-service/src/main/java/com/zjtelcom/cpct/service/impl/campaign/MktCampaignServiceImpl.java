@@ -958,6 +958,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setTiggerType(params.get("tiggerType").toString());             // 活动触发类型 - 实时，批量
             mktCampaignDO.setMktCampaignCategory(params.get("mktCampaignCategory").toString());  // 活动分类 - 框架，强制，自主
             mktCampaignDO.setMktCampaignType(params.get("mktCampaignType").toString());   // 活动类别 - 服务，营销，服务+营销
+            if(params.get("createStaff").toString()!=null && !"".equals(params.get("createStaff").toString())){
+                mktCampaignDO.setCreateStaff(Long.valueOf(params.get("createStaff").toString()));  // 创建人
+            }
 
             List<Integer> landIdList = (List) params.get("landIds");
             if (landIdList.size() > 0 && !"".equals(landIdList.get(0))) {
@@ -1181,6 +1184,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
             // 获取当前活动标识
             Long parentMktCampaignId = mktCampaignDO.getMktCampaignId();
+            // 获取当前活动名称
+            String parentMktCampaignName = mktCampaignDO.getMktCampaignName();
             // 获取活动下策略的集合
             List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByMktCampaignId(parentMktCampaignId);
             // 获取生失效时间
@@ -1196,6 +1201,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 // 为下发城市生成新的活动
                 if (!mktCamCityRelDOList.isEmpty()) {
                     mktCampaignDO.setMktCampaignId(null);
+                    // 活动名称加上地市
+                    String areaName = AreaNameEnum.getNameByLandId(mktCamCityRelDO.getCityId());
+                    mktCampaignDO.setMktCampaignName(parentMktCampaignName + "-" + areaName );
                     mktCampaignDO.setMktCampaignCategory(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()); // 子活动默认为自主活动
                     mktCampaignDO.setLanId(mktCamCityRelDO.getCityId()); // 本地网标识
                     mktCampaignDO.setRegionId(AreaCodeEnum.getRegionIdByLandId(mktCamCityRelDO.getCityId()));
