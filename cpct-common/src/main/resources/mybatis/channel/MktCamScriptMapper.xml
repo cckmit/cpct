@@ -40,7 +40,7 @@
     <if test="evtContactConfId != null and evtContactConfId != 0">
       EVT_CONTACT_CONF_ID = #{evtContactConfId,jdbcType=BIGINT},
     </if>
-    <if test="scriptDesc != null and scriptDesc != ''">
+    <if test="scriptDesc != null">
       SCRIPT_DESC = #{scriptDesc,jdbcType=VARCHAR},
     </if>
     <if test="statusCd != null and statusCd != ''">

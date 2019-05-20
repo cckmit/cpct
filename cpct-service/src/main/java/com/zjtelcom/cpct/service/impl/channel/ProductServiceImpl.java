@@ -158,7 +158,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         List<MktCamItem> oldItemList = camItemMapper.selectByCampaignId(oldCampaignId);
         for (MktCamItem item : oldItemList){
             MktCamItem newItem = BeanUtil.create(item,new MktCamItem());
-            if(StatusCode.ENFORCEMENT_CAMPAIGN.getStatusCode().equals(mktCampaignCategory)){
+            if(StatusCode.ENFORCEMENT_CAMPAIGN.getStatusCode().equals(mktCampaignCategory) || StatusCode.FRAMEWORK_CAMPAIGN.getStatusCode().equals(mktCampaignCategory)){
                 newItem.setStatusCd(StatusCode.STATUS_CODE_FAILURE.getStatusCode());
             } else {
                 newItem.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
