@@ -4,6 +4,7 @@
   <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.LabelSaturation">
     <id column="LABEL_SATURATION_ID" jdbcType="BIGINT" property="labelSaturationId" />
     <result column="LABEL_CODE" jdbcType="VARCHAR" property="labelCode" />
+    <result column="LABEL_AREA" jdbcType="VARCHAR" property="labelArea" />
     <result column="SATURATION_BATCH_NUMBER" jdbcType="VARCHAR" property="saturationBatchNumber" />
     <result column="BIGDATA_SATURATION" jdbcType="BIGINT" property="bigdataSaturation" />
     <result column="ES_SATURATION" jdbcType="BIGINT" property="esSaturation" />
@@ -21,12 +22,12 @@
     where LABEL_SATURATION_ID = #{labelSaturationId,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.LabelSaturation">
-    insert into label_saturation (LABEL_SATURATION_ID, LABEL_CODE, SATURATION_BATCH_NUMBER, 
+    insert into label_saturation (LABEL_SATURATION_ID, LABEL_CODE, LABEL_AREA, SATURATION_BATCH_NUMBER,
       BIGDATA_SATURATION, ES_SATURATION, COMPARING_RESULTS, 
       STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
       CREATE_DATE, STATUS_DATE, UPDATE_DATE, 
       REMAKE)
-    values (#{labelSaturationId,jdbcType=BIGINT}, #{labelCode,jdbcType=VARCHAR}, #{saturationBatchNumber,jdbcType=VARCHAR}, 
+    values (#{labelSaturationId,jdbcType=BIGINT}, #{labelCode,jdbcType=VARCHAR}, #{labelArea,jdbcType=VARCHAR},#{saturationBatchNumber,jdbcType=VARCHAR},
       #{bigdataSaturation,jdbcType=BIGINT}, #{esSaturation,jdbcType=BIGINT}, #{comparingResults,jdbcType=VARCHAR}, 
       #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, 
       #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
@@ -34,14 +35,14 @@
   </insert>
   <!-- 批量插入 -->
   <insert id="insertBatch" parameterType="java.util.List">
-    insert into label_saturation (LABEL_SATURATION_ID, LABEL_CODE, SATURATION_BATCH_NUMBER,
+    insert into label_saturation (LABEL_SATURATION_ID, LABEL_CODE, LABEL_AREA, SATURATION_BATCH_NUMBER,
     BIGDATA_SATURATION, ES_SATURATION, COMPARING_RESULTS,
     STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
     CREATE_DATE, STATUS_DATE, UPDATE_DATE,
     REMAKE)
     values
       <foreach collection="list" item="item" separator="," index="i">
-         (#{item.labelSaturationId,jdbcType=BIGINT}, #{item.labelCode,jdbcType=VARCHAR}, #{item.saturationBatchNumber,jdbcType=VARCHAR},
+         (#{item.labelSaturationId,jdbcType=BIGINT}, #{item.labelCode,jdbcType=VARCHAR},  #{labelArea,jdbcType=VARCHAR}, #{item.saturationBatchNumber,jdbcType=VARCHAR},
         #{item.bigdataSaturation,jdbcType=BIGINT}, #{item.esSaturation,jdbcType=BIGINT}, #{item.comparingResults,jdbcType=VARCHAR},
         #{item.statusCd,jdbcType=VARCHAR}, #{item.createStaff,jdbcType=BIGINT}, #{item.updateStaff,jdbcType=BIGINT},
         #{item.createDate,jdbcType=TIMESTAMP}, #{item.statusDate,jdbcType=TIMESTAMP}, #{item.updateDate,jdbcType=TIMESTAMP},
@@ -51,6 +52,7 @@
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.LabelSaturation">
     update label_saturation
     set LABEL_CODE = #{labelCode,jdbcType=VARCHAR},
+      LABEL_AREA = #{labelArea,jdbcType=VARCHAR},
       SATURATION_BATCH_NUMBER = #{saturationBatchNumber,jdbcType=VARCHAR},
       BIGDATA_SATURATION = #{bigdataSaturation,jdbcType=BIGINT},
       ES_SATURATION = #{esSaturation,jdbcType=BIGINT},
@@ -65,14 +67,14 @@
     where LABEL_SATURATION_ID = #{labelSaturationId,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select LABEL_SATURATION_ID, LABEL_CODE, SATURATION_BATCH_NUMBER, BIGDATA_SATURATION, 
+    select LABEL_SATURATION_ID, LABEL_CODE, LABEL_AREA, SATURATION_BATCH_NUMBER, BIGDATA_SATURATION,
     ES_SATURATION, COMPARING_RESULTS, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
     STATUS_DATE, UPDATE_DATE, REMAKE
     from label_saturation
     where LABEL_SATURATION_ID = #{labelSaturationId,jdbcType=BIGINT}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
-    select LABEL_SATURATION_ID, LABEL_CODE, SATURATION_BATCH_NUMBER, BIGDATA_SATURATION, 
+    select LABEL_SATURATION_ID, LABEL_CODE, LABEL_AREA,SATURATION_BATCH_NUMBER, BIGDATA_SATURATION,
     ES_SATURATION, COMPARING_RESULTS, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
     STATUS_DATE, UPDATE_DATE, REMAKE
     from label_saturation

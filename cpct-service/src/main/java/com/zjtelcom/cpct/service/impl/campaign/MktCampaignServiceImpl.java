@@ -958,6 +958,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setTiggerType(params.get("tiggerType").toString());             // 活动触发类型 - 实时，批量
             mktCampaignDO.setMktCampaignCategory(params.get("mktCampaignCategory").toString());  // 活动分类 - 框架，强制，自主
             mktCampaignDO.setMktCampaignType(params.get("mktCampaignType").toString());   // 活动类别 - 服务，营销，服务+营销
+            if(params.get("createStaff").toString()!=null && !"".equals(params.get("createStaff").toString())){
+                mktCampaignDO.setCreateStaff(Long.valueOf(params.get("createStaff").toString()));  // 创建人
+            }
 
             List<Integer> landIdList = (List) params.get("landIds");
             if (landIdList.size() > 0 && !"".equals(landIdList.get(0))) {

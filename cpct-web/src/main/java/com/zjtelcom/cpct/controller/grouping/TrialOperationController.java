@@ -135,6 +135,28 @@ public class TrialOperationController extends BaseController {
     }
 
     /**
+     * conditionCheck
+     * @param param
+     * @return
+     */
+    @PostMapping("conditionCheck")
+    @CrossOrigin
+    public Map<String, Object> conditionCheck(@RequestBody HashMap<String,Object> param){
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = operationService.conditionCheck(param);
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to businessCheck", e);
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", 0);
+            return result;
+        }
+        return result;
+    }
+
+
+
+    /**
      * 客户清单导入试运算
      * @param file
      * @param operation
@@ -147,7 +169,6 @@ public class TrialOperationController extends BaseController {
     public Map<String, Object> importUserList(MultipartFile file, TrialOperationVO operation,@Param("ruleId") Long ruleId)throws IOException{
         Map<String, Object> result = new HashMap<>();
         try {
-
             InputStream inputStream = file.getInputStream();
             byte[] bytes = new byte[3];
             inputStream.read(bytes,0,bytes.length);
