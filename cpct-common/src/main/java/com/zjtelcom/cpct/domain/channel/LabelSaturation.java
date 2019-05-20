@@ -7,6 +7,8 @@ public class LabelSaturation {
 
     private String labelCode;
 
+    private String labelArea;
+
     private String saturationBatchNumber;
 
     private Long bigdataSaturation;
@@ -27,7 +29,15 @@ public class LabelSaturation {
 
     private Date updateDate;
 
-    private String remake;
+    private String remark;
+
+    public String getLabelArea() {
+        return labelArea;
+    }
+
+    public void setLabelArea(String labelArea) {
+        this.labelArea = labelArea;
+    }
 
     public Long getLabelSaturationId() {
         return labelSaturationId;
@@ -125,11 +135,11 @@ public class LabelSaturation {
         this.updateDate = updateDate;
     }
 
-    public String getRemake() {
-        return remake;
+    public String getRemark() {
+        return remark;
     }
 
-    public void setRemake(String remake) {
-        this.remake = remake;
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }
