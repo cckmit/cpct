@@ -36,6 +36,8 @@ public interface TrialOperationService  {
 
     Map<String,Object> importFromCust4Ppm(Long batchId);
 
+    Map<String,Object> conditionCheck(Map<String,Object> param);
+
 
 
 
