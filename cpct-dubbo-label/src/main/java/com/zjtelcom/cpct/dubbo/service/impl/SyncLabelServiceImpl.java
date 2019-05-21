@@ -256,18 +256,20 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             //标签中文名重复校验
             List<Label> labelCheck = labelMapper.findByParam(record.getLabName());
             for(int i = 0;i<labelCheck.size();i++) {
-                if(!labelCheck.get(i).getTagRowId().equals(record.getLabRowId())) {
+                if (!labelCheck.get(i).getTagRowId().equals(record.getLabRowId())) {
                     if (labelCheck.get(i).getInjectionLabelName().equals(record.getLabName())) {
                         result.put("resultCode", CODE_FAIL);
                         result.put("resultMsg", "标签中文名和已有标签重复");
                         return result;
                     }
-                    if (labelCheck.get(i).getInjectionLabelCode().equals(record.getLabEngName())) {
-                        result.put("resultCode", CODE_FAIL);
-                        result.put("resultMsg", "标签英文名和已有标签重复");
-                        return result;
-                    }
                 }
+            }
+            //标签英文名重复校验
+            Label labelEgCheck = labelMapper.selectByLabelCode(record.getLabEngName());
+            if (!labelEgCheck.getTagRowId().equals(record.getLabRowId())) {
+                result.put("resultCode", CODE_FAIL);
+                result.put("resultMsg", "标签英文名和已有标签重复");
+                return result;
             }
             //更新标签
             BeanUtil.copy(labModel,labelValodate);
@@ -322,11 +324,13 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
                     result.put("resultMsg","标签中文名和已有标签重复");
                     return result;
                 }
-                if(labelCheck.get(i).getInjectionLabelCode().equals(record.getLabEngName())) {
-                    result.put("resultCode",CODE_FAIL);
-                    result.put("resultMsg","标签英文名和已有标签重复");
-                    return result;
-                }
+            }
+            //标签英文名重复校验
+            Label labelEgCheck = labelMapper.selectByLabelCode(record.getLabEngName());
+            if(labelEgCheck != null) {
+                result.put("resultCode",CODE_FAIL);
+                result.put("resultMsg","标签英文名和已有标签重复");
+                return result;
             }
             //新增标签
             Label label = BeanUtil.create(labModel, new Label());
