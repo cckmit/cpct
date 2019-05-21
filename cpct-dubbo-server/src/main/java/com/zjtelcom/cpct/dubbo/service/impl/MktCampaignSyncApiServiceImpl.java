@@ -22,13 +22,11 @@ import com.zjtelcom.cpct.domain.RuleDetail;
 import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
-import com.zjtelcom.cpct.domain.org.OrgTreeDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyFilterRuleRelDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
-import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
@@ -39,7 +37,7 @@ import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.dto.synchronize.SynchronizeRecord;
 import com.zjtelcom.cpct.dubbo.service.MktCampaignSyncApiService;
 import com.zjtelcom.cpct.dubbo.service.RecordService;
-import com.zjtelcom.cpct.dubbo.service.SyncActivityService;
+import com.zjtelcom.cpct.dubbo.service.SyncActService;
 import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInfoMapper;
@@ -209,7 +207,7 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
     @Autowired
     private MktCamScriptMapper camScriptMapper;
     @Autowired
-    private SyncActivityService syncActivityService;
+    private SyncActService syncActService;
 
     @Autowired
     private SysAreaMapper sysAreaMapper;
@@ -291,7 +289,7 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
                     mktCampaignMap.put("resultMsg", "活动不存在！");
                     return mktCampaignMap;
                 }
-                if (StatusCode.STATUS_CODE_PASS.getStatusCode().equals(mktCampaignDO.getStatusCd())){
+                if (StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaignDO.getStatusCd())){
                     mktCampaignMap.put("resultCode", CommonConstant.CODE_FAIL);
                     mktCampaignMap.put("resultMsg", "活动已发布，无法重复发布！");
                     return mktCampaignMap;
@@ -386,29 +384,29 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
                         //如果是框架活动 生成子活动后  生成对应的子需求函 下发给指定岗位的指定人员
                         generateRequest(mktCampaignDO,mktCamCityRelDO.getCityId());
                         //  发布活动时异步去同步大数据
-                        if (SystemParamsUtil.isCampaignSync()) {
-                            // 发布活动异步同步活动到生产环境
-                            new Thread() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        String roleName = "admin";
-                                        synchronizeCampaign(mktCampaignId, roleName);
-                                        // 删除生产redis缓存
-                                        deleteCampaignRedisProd(mktCampaignId);
-                                        logger.info("活动同步大数据：" + mktCampaignId);
-                                        syncActivityService.syncActivity(mktCampaignId);
-                                    } catch (Exception e) {
-                                        logger.error("[op:MktCampaignServiceImpl] 活动同步失败 by mktCampaignId = {}, Expection = ",mktCampaignId, e);
-                                    }
-                                }
-                            }.start();
-                        }
                     }
                 }
                 mktCampaignMap.put("resultCode", CommonConstant.CODE_SUCCESS);
                 mktCampaignMap.put("resultMsg", "发布活动成功！");
                 mktCampaignMap.put("childMktCampaignIdList", childMktCampaignIdList);
+                if (SystemParamsUtil.isCampaignSync()) {
+                    // 发布活动异步同步活动到生产环境
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            try {
+                                String roleName = "admin";
+                                synchronizeCampaign(mktCampaignId, roleName);
+                                // 删除生产redis缓存
+                                deleteCampaignRedisProd(mktCampaignId);
+                                logger.info("活动同步大数据：" + mktCampaignId);
+                                syncActService.syncActivity(mktCampaignId);
+                            } catch (Exception e) {
+                                logger.error("[op:MktCampaignServiceImpl] 活动同步失败 by mktCampaignId = {}, Expection = ",mktCampaignId, e);
+                            }
+                        }
+                    }.start();
+                }
             } catch (Exception e) {
                 mktCampaignMap.put("resultCode", CommonConstant.CODE_FAIL);
                 mktCampaignMap.put("resultMsg", "发布活动失败！");

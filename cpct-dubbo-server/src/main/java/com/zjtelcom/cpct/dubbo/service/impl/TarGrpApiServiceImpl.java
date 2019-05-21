@@ -97,10 +97,10 @@ public class TarGrpApiServiceImpl implements TarGrpApiService {
         List<Map<String, Object>> resultMapList = new ArrayList<>();
         boolean result = true;
         Map<String, Object> resultMap = new HashMap<>();
+
+        ExecutorService executorService = Executors.newCachedThreadPool();
         try {
             for (Map<String, Object> assetParamMap : assetParamList) {
-
-                ExecutorService executorService = Executors.newCachedThreadPool();
                 Future<Map<String, Object>> targrpLabelFuture = executorService.submit(new TargrpLabelTask(targrpIdList, mktAllLabel, assetParamMap));
                 futureList.add(targrpLabelFuture);
             }
@@ -115,15 +115,23 @@ public class TarGrpApiServiceImpl implements TarGrpApiService {
                             resultMapList.add(resultDataMap);
                             result = false;
                         }
+                    } else {
+                        result = false;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                    resultMap.put("resultCode", "0");
+                    resultMap.put("resultMsg", "分群校验异常：线程处理异常");
+                    return resultMap;
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
             resultMap.put("resultCode", "0");
-            resultMap.put("resultMsg", e);
+            resultMap.put("resultMsg", "分群校验异常");
+            return resultMap;
+        } finally {
+            executorService.shutdown();
         }
         if(result){
             resultMap.put("resultCode", "1000");
@@ -169,12 +177,15 @@ public class TarGrpApiServiceImpl implements TarGrpApiService {
                     try {
                         labelMapList = tarGrpConditionMapper.selectAllLabelByTarId(Long.valueOf(tarGrpId));
                     } catch (Exception e) {
-                        return Collections.EMPTY_MAP;
+                        System.out.println("分群标签数据库查询失败");
+                        tarGrpResult = false;
                     }
                     redisUtils.set("TAR_GRP_LABEL_" + tarGrpId, labelMapList);
                 }
                 if (labelMapList == null || labelMapList.size() <= 0) {
-                    return Collections.EMPTY_MAP;
+//                    return Collections.EMPTY_MAP;
+                    System.out.println("分群标签为空");
+                    tarGrpResult = false;
                 }
 
                 //拼装redis key
@@ -182,13 +193,13 @@ public class TarGrpApiServiceImpl implements TarGrpApiService {
                 runner.addFunction("toNum", new StringToNumOperator("toNum"));
 
                 //判断表达式在缓存中有没有
-               // String express = (String) redisUtils.get("EXPRESS_TAR_GRP_" + tarGrpId);
+                // String express = (String) redisUtils.get("EXPRESS_TAR_GRP_" + tarGrpId);
 
                 String express = null;
                 if (express == null || "".equals(express)) {
-                    List<LabelResult> labelResultList = new ArrayList<>();
+//                    List<LabelResult> labelResultList = new ArrayList<>();
                     try {
-                        LabelResult lr;
+//                        LabelResult lr;
                         //将规则拼装为表达式
                         StringBuilder expressSb = new StringBuilder();
                         expressSb.append("if(");
@@ -202,57 +213,74 @@ public class TarGrpApiServiceImpl implements TarGrpApiService {
                             }
 
                             //保存标签的es log
-                            lr = new LabelResult();
+//                            lr = new LabelResult();
                             //拼接表达式：主表达式
                             expressSb.append(cpcExpression(labelMap.get("code"), type, labelMap.get("rightParam")));
 
                             //判断标签实例是否足够
-                            if (context.containsKey(labelMap.get("code"))) {
-                                try {
-                                    RuleResult ruleResultOne = runner.executeRule(cpcLabel(labelMap.get("code"), type, labelMap.get("rightParam")), context, true, true);
-                                    if (null != ruleResultOne.getResult()) {
-                                        lr.setResult((Boolean) ruleResultOne.getResult());
-                                    } else {
-                                        lr.setResult(false);
-                                        tarGrpResult = false;
-                                        break;
-                                    }
-                                } catch (Exception e) {
-                                    lr.setResult(false);
-                                    tarGrpResult = false;
-                                    break;
-                                }
-                            } else {
-                                lr.setRightParam("无值");
-                                lr.setResult(false);
+//                            if (context.containsKey(labelMap.get("code"))) {
+//                                try {
+//                                    RuleResult ruleResultOne = runner.executeRule(cpcLabel(labelMap.get("code"), type, labelMap.get("rightParam")), context, true, true);
+//                                    if (null != ruleResultOne.getResult()) {
+////                                        lr.setResult((Boolean) ruleResultOne.getResult());
+//                                    } else {
+////                                        lr.setResult(false);
+//                                        tarGrpResult = false;
+//                                        break;
+//                                    }
+//                                } catch (Exception e) {
+////                                    lr.setResult(false);
+//                                    tarGrpResult = false;
+//                                    break;
+//                                }
+//                            } else {
+////                                lr.setRightParam("无值");
+////                                lr.setResult(false);
+//                                tarGrpResult = false;
+//                                break;
+//                            }
+
+                            if (!context.containsKey(labelMap.get("code"))) {
                                 tarGrpResult = false;
                                 break;
                             }
 
                             expressSb.append("&&");
-                            labelResultList.add(lr);
+//                            labelResultList.add(lr);
                         }
 
+                        expressSb.delete(expressSb.length() - 2, expressSb.length());
                         expressSb.append(") {return true} else {return false}");
                         express = expressSb.toString();
 
                     } catch (Exception e) {
-                        return Collections.EMPTY_MAP;
+//                        return Collections.EMPTY_MAP;
+                        tarGrpResult = false;
                     }
                     //表达式存入redis
                     redisUtils.set("EXPRESS_TAR_GRP_" + tarGrpId, express);
                 }
 
-                //规则引擎计算
-                RuleResult ruleResult = null;
-                ExpressRunner runnerQ = new ExpressRunner();
-                runnerQ.addFunction("toNum", new StringToNumOperator("toNum"));
-                runnerQ.addFunction("checkProm", new PromCheckOperator("checkProm"));
-                runnerQ.addFunction("dateLabel", new ComperDateLabel("dateLabel"));
-                try {
-                    ruleResult = runnerQ.executeRule(express, context, true, true);
-                } catch (Exception e) {
-                    return Collections.EMPTY_MAP;
+                if(tarGrpResult) {
+                    //规则引擎计算
+                    RuleResult ruleResult = null;
+                    ExpressRunner runnerQ = new ExpressRunner();
+                    runnerQ.addFunction("toNum", new StringToNumOperator("toNum"));
+                    runnerQ.addFunction("checkProm", new PromCheckOperator("checkProm"));
+                    runnerQ.addFunction("dateLabel", new ComperDateLabel("dateLabel"));
+                    try {
+                        ruleResult = runnerQ.executeRule(express, context, true, true);
+                    } catch (Exception e) {
+//                    return Collections.EMPTY_MAP;
+                        tarGrpResult = false;
+                    }
+
+                    if (ruleResult != null && ruleResult.getResult() != null && ((Boolean) ruleResult.getResult())) {
+                        //命中
+                    } else {
+                        tarGrpResult = false;
+                        break;
+                    }
                 }
             }
             Map<String, Object> resultMap = new HashMap<>();
@@ -359,7 +387,7 @@ public class TarGrpApiServiceImpl implements TarGrpApiService {
                 if (NumberUtils.isNumber(rightParam)) {
                     express.append(rightParam);
                 } else {
-                    express.append("").append(rightParam).append("");
+                    express.append("\"").append(rightParam).append("\"");
                 }
                 break;
             case "4000":
@@ -368,7 +396,7 @@ public class TarGrpApiServiceImpl implements TarGrpApiService {
                 if (NumberUtils.isNumber(rightParam)) {
                     express.append(rightParam);
                 } else {
-                    express.append("").append(rightParam).append("");
+                    express.append("\"").append(rightParam).append("\"");
                 }
                 break;
             case "5000":

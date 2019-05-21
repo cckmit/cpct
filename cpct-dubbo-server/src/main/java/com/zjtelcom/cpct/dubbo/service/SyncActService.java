@@ -7,7 +7,7 @@ import com.zjhcsoft.eagle.main.dubbo.model.policy.ResponseHeaderModel;
  * @Date: 2018/12/5
  * @Description:
  */
-public interface SyncActivityService {
+public interface SyncActService {
 
     ResponseHeaderModel syncActivity(Long mktCampaignId);
 }
