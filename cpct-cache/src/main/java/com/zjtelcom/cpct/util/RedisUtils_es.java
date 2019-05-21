@@ -23,21 +23,13 @@ import java.util.List;
 @Service
 public class RedisUtils_es {
 
-//    private String redisIp="134.108.0.61";
-//
-//    private Integer redisPort=41801;
-//
-//    private Integer redisDatabase=4970;
-//
-//    private String redisPassword="bss_cpcp_pocins_user#Bsscpc!1n";
+    private String redisIp="134.108.0.61,134.108.0.62,134.108.0.63";
 
-    private String redisIp="134.96.231.228";
-
-    private Integer redisPort=40201;
+    private Integer redisPort=41801;
 
     private Integer redisDatabase=4970;
 
-    private String redisPassword="bss_cpct_common_user#bss_cpct_common_user123";
+    private String redisPassword="bss_cpcp_pocins_user#Bsscpc!1n";
 
     /**
      * 写入缓存

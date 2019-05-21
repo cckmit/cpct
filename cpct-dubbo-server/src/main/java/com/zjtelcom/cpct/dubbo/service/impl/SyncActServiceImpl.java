@@ -18,7 +18,7 @@ import com.zjtelcom.cpct.domain.channel.Offer;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
-import com.zjtelcom.cpct.dubbo.service.SyncActivityService;
+import com.zjtelcom.cpct.dubbo.service.SyncActService;
 import com.zjtelcom.cpct.enums.TrialCreateType;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ import java.util.List;
  */
 @Service
 @Transactional
-public class SyncActivityServiceImpl implements SyncActivityService {
+public class SyncActServiceImpl implements SyncActService {
 
     @Autowired
     private MktCampaignMapper mktCampaignMapper;
