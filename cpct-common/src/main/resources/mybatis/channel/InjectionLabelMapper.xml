@@ -227,6 +227,9 @@
     LAB_MANAGE_TYPE, LAB_TAG_CODE, SYSTEM_INFO_ID
     from injection_label
     where SCOPE = #{scope}
+    <if test="rightOperand != null and rightOperand != ''">
+      and RIGHT_OPERAND = #{rightOperand}
+    </if>
   </select>
 
   <delete id="deleteAll">

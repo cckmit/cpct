@@ -6,6 +6,7 @@ import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.dubbo.out.TrialStatusUpService;
 import com.zjtelcom.cpct.enums.TrialStatus;
 import com.zjtelcom.cpct.util.MapUtil;
+import com.zjtelcom.es.es.service.EsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,8 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 public class TrialStatusUpServiceImpl implements TrialStatusUpService {
     @Autowired
     private TrialOperationMapper  trialOperationMapper;
+    @Autowired(required = false)
+    private EsService esService;
 
     /**
      * 更新试算记录状态
@@ -48,6 +51,14 @@ public class TrialStatusUpServiceImpl implements TrialStatusUpService {
             operation.setRemark(remark);
         }
         trialOperationMapper.updateByPrimaryKey(operation);
+        try {
+            Map<String,Object> param = new HashMap<>();
+            param.put("batchNum",batchNum);
+            param.put("data",TrialStatus.getNameByCode(status).getName());
+            esService.addLogByBatchNum(param);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","修改成功");
         return  result;

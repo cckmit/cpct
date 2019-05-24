@@ -38,6 +38,16 @@ public class TarGrpTemConditionVO extends TarGrpTemplateCondition {
 
     private String labelDataType;
 
+    private String rightParamName;
+
+
+    public String getRightParamName() {
+        return rightParamName;
+    }
+
+    public void setRightParamName(String rightParamName) {
+        this.rightParamName = rightParamName;
+    }
 
     public String getLabelDataType() {
         return labelDataType;

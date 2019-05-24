@@ -15,7 +15,7 @@
     <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
     <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
     <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
-    <result column="REMAKE" jdbcType="VARCHAR" property="remake" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from label_saturation
@@ -26,12 +26,12 @@
       BIGDATA_SATURATION, ES_SATURATION, COMPARING_RESULTS, 
       STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
       CREATE_DATE, STATUS_DATE, UPDATE_DATE, 
-      REMAKE)
+      REMARK)
     values (#{labelSaturationId,jdbcType=BIGINT}, #{labelCode,jdbcType=VARCHAR}, #{labelArea,jdbcType=VARCHAR},#{saturationBatchNumber,jdbcType=VARCHAR},
       #{bigdataSaturation,jdbcType=BIGINT}, #{esSaturation,jdbcType=BIGINT}, #{comparingResults,jdbcType=VARCHAR}, 
       #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, 
       #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
-      #{remake,jdbcType=VARCHAR})
+      #{remark,jdbcType=VARCHAR})
   </insert>
   <!-- 批量插入 -->
   <insert id="insertBatch" parameterType="java.util.List">
@@ -39,14 +39,14 @@
     BIGDATA_SATURATION, ES_SATURATION, COMPARING_RESULTS,
     STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
     CREATE_DATE, STATUS_DATE, UPDATE_DATE,
-    REMAKE)
+    REMARK)
     values
       <foreach collection="list" item="item" separator="," index="i">
-         (#{item.labelSaturationId,jdbcType=BIGINT}, #{item.labelCode,jdbcType=VARCHAR},  #{labelArea,jdbcType=VARCHAR}, #{item.saturationBatchNumber,jdbcType=VARCHAR},
+         (#{item.labelSaturationId,jdbcType=BIGINT}, #{item.labelCode,jdbcType=VARCHAR},  #{item.labelArea,jdbcType=VARCHAR}, #{item.saturationBatchNumber,jdbcType=VARCHAR},
         #{item.bigdataSaturation,jdbcType=BIGINT}, #{item.esSaturation,jdbcType=BIGINT}, #{item.comparingResults,jdbcType=VARCHAR},
         #{item.statusCd,jdbcType=VARCHAR}, #{item.createStaff,jdbcType=BIGINT}, #{item.updateStaff,jdbcType=BIGINT},
         #{item.createDate,jdbcType=TIMESTAMP}, #{item.statusDate,jdbcType=TIMESTAMP}, #{item.updateDate,jdbcType=TIMESTAMP},
-        #{item.remake,jdbcType=VARCHAR})
+        #{item.remark,jdbcType=VARCHAR})
       </foreach>
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.LabelSaturation">
@@ -63,20 +63,20 @@
       CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
       STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
       UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
-      REMAKE = #{remake,jdbcType=VARCHAR}
+      REMARK = #{remark,jdbcType=VARCHAR}
     where LABEL_SATURATION_ID = #{labelSaturationId,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select LABEL_SATURATION_ID, LABEL_CODE, LABEL_AREA, SATURATION_BATCH_NUMBER, BIGDATA_SATURATION,
     ES_SATURATION, COMPARING_RESULTS, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
-    STATUS_DATE, UPDATE_DATE, REMAKE
+    STATUS_DATE, UPDATE_DATE, REMARK
     from label_saturation
     where LABEL_SATURATION_ID = #{labelSaturationId,jdbcType=BIGINT}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
     select LABEL_SATURATION_ID, LABEL_CODE, LABEL_AREA,SATURATION_BATCH_NUMBER, BIGDATA_SATURATION,
     ES_SATURATION, COMPARING_RESULTS, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
-    STATUS_DATE, UPDATE_DATE, REMAKE
+    STATUS_DATE, UPDATE_DATE, REMARK
     from label_saturation
   </select>
 </mapper>

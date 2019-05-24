@@ -16,19 +16,16 @@ public enum TrialStatus {
     IMPORT_FAIL("1300","导入失败"),
     PPM_IMPORT_GOING("1400", "未导入（ppm）"),
 
+    ISSEE_ANALYZE_SUCCESS("7100", "协同-解析成功"),
+    ISEE_ANALYZE_FAIL("7200","协同-解析失败"),
+    ISEE_PUBLISH_SUCCESS("7300","协同-下发成功"),
+    ISEE_PUBLISH_FAIL("7400", "协同-下发失败"),
+    CHANNEL_PUBLISH_SUCCESS("8100", "渠道-下发成功"),
+    CHANNEL_PUBLISH_FAIL("8200","渠道-下发失败"),
+
     UPLOAD_GOING("7000", "下发中"),
     UPLOAD_SUCCESS("8000","下发成功"),
     UPLOAD_FAIL("9000","下发失败");
-
-
-
-
-
-
-
-
-
-
 
 
     private String value;
@@ -37,6 +34,15 @@ public enum TrialStatus {
     TrialStatus(String value, String name) {
         this.value = value;
         this.name = name;
+    }
+
+    public static TrialStatus getNameByCode(String code) {
+        for (TrialStatus trialStatus : TrialStatus.values()) {
+            if (code != null && code.equals(trialStatus.value)) {
+                return trialStatus;
+            }
+        }
+        return null;
     }
 
     public String getValue() {
