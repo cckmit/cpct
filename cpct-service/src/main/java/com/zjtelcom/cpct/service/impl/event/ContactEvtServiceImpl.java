@@ -516,6 +516,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(rel.getMktCampaignId());
             if (campaign!=null){
                 rel.setCampaignName(campaign.getMktCampaignName());
+                rel.setMktActivityNbr(campaign.getMktActivityNbr());
             }
         }
         contactEventDetail.setMktCamEvtRels(mktCamEvtRels);
