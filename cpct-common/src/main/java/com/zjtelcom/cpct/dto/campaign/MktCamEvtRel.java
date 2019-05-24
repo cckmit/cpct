@@ -19,7 +19,7 @@ public class MktCamEvtRel extends BaseEntity implements Serializable{
 
     private Integer levelConfig;
 
-
+    private String mktActivityNbr;
 
     public String getCampaignName() {
         return campaignName;
@@ -73,5 +73,11 @@ public class MktCamEvtRel extends BaseEntity implements Serializable{
         this.eventId = eventId;
     }
 
+    public String getMktActivityNbr() {
+        return mktActivityNbr;
+    }
 
+    public void setMktActivityNbr(String mktActivityNbr) {
+        this.mktActivityNbr = mktActivityNbr;
+    }
 }
