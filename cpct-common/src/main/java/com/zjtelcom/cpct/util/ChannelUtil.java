@@ -454,7 +454,7 @@ public class ChannelUtil  {
         List<LabelValueVO> stringList = new ArrayList<>();
         for (LabelValue labelValue : valueList){
             LabelValueVO vo = BeanUtil.create(labelValue,new LabelValueVO());
-            vo.setLabelValue(labelValue.getValueName());
+//            vo.setLabelValue(labelValue.getValueName());
             stringList.add(vo);
         }
         return stringList;

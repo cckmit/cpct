@@ -12,7 +12,7 @@ import java.util.Map;
 
 public interface LabelService {
 
-
+    Map<String,Object> importLabelValue(MultipartFile file) throws Exception;
 
     Map<String,Object> importLabel(MultipartFile file) throws Exception;
     //标签

@@ -82,6 +82,7 @@
     CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
     from injection_label_value
     where INJECTION_LABEL_ID = #{labelId}
+    order by LABEL_VALUE_ID asc
   </select>
 
   <delete id="deleteByLabelId" parameterType="java.lang.Long">
