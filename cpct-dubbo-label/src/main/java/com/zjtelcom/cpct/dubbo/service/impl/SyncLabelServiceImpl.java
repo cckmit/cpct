@@ -248,6 +248,11 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         if (record.getLabelValueList() != null && !record.getLabelValueList().isEmpty()) {
             for (Map<String,Object> valueMap : record.getLabelValueList()){
                 LabValueModel valueModel = ChannelUtil.mapToEntity(valueMap,LabValueModel.class);
+                if (valueModel.getValueName()==null || valueModel.getValueName().equals("")){
+                    result.put("resultCode", CODE_FAIL);
+                    result.put("resultMsg", "请补充标签枚举值信息。");
+                    return result;
+                }
                 valueModelList.add(valueModel);
             }
         }
@@ -427,7 +432,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             LabelValue value = BeanUtil.create(info,new LabelValue());
             value.setInjectionLabelId(labelId);
             value.setValueDesc(info.getValueName());
-            value.setValueName(info.getLabValue());
+            value.setValueName(info.getValueName());
             value.setLabelValue(info.getLabValue());
             value.setCreateDate(new Date());
             value.setStatusCd("1000");
@@ -504,7 +509,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
     }
 
     private void initLabelCatalog(List<Label> labelList) {
-        List<Label> labels = injectionLabelMapper.selectByScope(1L);
+        List<Label> labels = injectionLabelMapper.selectByScope(1L,null);
 
         for (Label label : labels){
             //标签目录插入

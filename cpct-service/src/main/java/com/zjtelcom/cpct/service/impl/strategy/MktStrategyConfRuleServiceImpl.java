@@ -342,6 +342,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
 
             if (mktStrategyConfRule.getOrganizationList()!=null){
                 redisUtils.set("ORG_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString(),mktStrategyConfRule.getOrganizationList());
+                redisUtils.set("ORG_CHECK_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString(),"false");
                 area2RedisThread(mktStrategyConfRule.getMktStrategyConfRuleId(),mktStrategyConfRule.getOrganizationList());
             }
 
@@ -467,11 +468,13 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 if (redisUtils.get("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString())==null
                         || !ChannelUtil.equalsList((List<Long>)redisUtils.get("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString()),mktStrategyConfRule.getOrganizationList())){
                     redisUtils.set("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString(),mktStrategyConfRule.getOrganizationList());
+                    redisUtils.set("ORG_CHECK_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString(),"false");
                     area2RedisThread(mktStrategyConfRule.getMktStrategyConfRuleId(),mktStrategyConfRule.getOrganizationList());
                 }
             }else {
                 if (redisUtils.get("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString())!=null){
                     redisUtils.remove("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString());
+                    redisUtils.remove("ORG_CHECK_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString());
                     redisUtils.remove("AREA_RULE_ISSURE_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString());
                 }
             }
@@ -606,33 +609,58 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         List<Long> orgs = organizationMapper.selectByIdList(orgIdList);
         //添加所有选择的节点信息到缓存
         redisUtils.set("ORG_ID_"+ruleId.toString(),orgs);
-        new Thread() {
-            public void run() {
+        new Thread(){
+            public void run(){
                 areaList2Redis(ruleId,orgs);
             }
         }.start();
     }
 
     public void areaList2Redis(Long ruleId,List<Long> areaIdList){
+        ExecutorService fixedThreadPool = Executors.newFixedThreadPool(areaIdList.size());
         List<Organization> sysAreaList = new ArrayList<>();
-        for (Long id : areaIdList){
-            new Thread(){
-                public void run(){
-                    logger.info("查询开始："+id);
-                    Organization org = organizationMapper.selectByPrimaryKey(id);
-                    if (org!=null){
-                        List<String> resultList = new ArrayList<>();
-                        resultList.add(org.getOrgId4a().toString());
-                        if (false){
-                            areaC4List(id,resultList,sysAreaList);
-                        }else {
-                            areaList(id,resultList,sysAreaList);
-                        }
-                        logger.info("父级id :"+id,resultList);
-                        redisUtils.hset("AREA_RULE_ISSURE_"+ruleId,id.toString(),resultList);
-                    }
+        List<Future<Map<String,Object>>> futureList = new ArrayList<>();
+        try {
+            for (Long id : areaIdList){
+                Future<Map<String,Object>> future = fixedThreadPool.submit(new areaTask(ruleId,id,sysAreaList));
+                futureList.add(future);
+            }
+            for (Future<Map<String,Object>> future : futureList){
+                future.get();
+            }
+            redisUtils.set("ORG_CHECK_"+ruleId.toString(),"true");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    class areaTask implements Callable<Map<String,Object>>{
+        private Long ruleId;
+        private Long id;
+        private  List<Organization> sysAreaList;
+        public areaTask(Long ruleId,Long id, List<Organization> sysAreaList){
+            this.ruleId = ruleId;
+            this.id = id;
+            this.sysAreaList = sysAreaList;
+        }
+
+        @Override
+        public Map<String, Object> call() throws Exception {
+            Map<String,Object> result = new HashMap<>();
+            logger.info("查询开始："+id);
+            Organization org = organizationMapper.selectByPrimaryKey(id);
+            if (org!=null){
+                List<String> resultList = new ArrayList<>();
+                resultList.add(org.getOrgId4a().toString());
+                if (false){
+                    areaC4List(id,resultList,sysAreaList);
+                }else {
+                    areaList(id,resultList,sysAreaList);
                 }
-            }.start();
+                logger.info("父级id :"+id,resultList);
+                redisUtils.hset("AREA_RULE_ISSURE_"+ruleId,id.toString(),resultList);
+            }
+            return result;
         }
     }
 

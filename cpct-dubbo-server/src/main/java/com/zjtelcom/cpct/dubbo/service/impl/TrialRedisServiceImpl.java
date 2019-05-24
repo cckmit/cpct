@@ -58,8 +58,8 @@ public class TrialRedisServiceImpl implements TrialRedisService {
             return  result;
         }
         operation.setStatusCd(status);
+        operation.setStatusDate(new Date());
         if (status.equals(TrialStatus.SAMPEL_SUCCESS.getValue())){
-            operation.setUpdateDate(new Date());
             operation.setRemark("抽样试算成功");
         }else if (status.equals(TrialStatus.ALL_SAMPEL_SUCCESS.getValue())){
             operation.setRemark("全量试算成功");
