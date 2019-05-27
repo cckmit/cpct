@@ -9,7 +9,7 @@
     <!-- 提供方应用信息，用于计算依赖关系 -->
     <dubbo:application name="00.1083"/>
 
-    <dubbo:registry id="esb3" protocol="dubbo" address="134.96.249.149:8001"/>
+    <dubbo:registry id="esb3" protocol="dubbo" address="134.96.253.65:8001"/>
     <dubbo:registry id="esb2" protocol="dubbo" address="134.96.159.11:8033"/>
 
     <!-- 暴露服务 -->
@@ -36,7 +36,7 @@
     </dubbo:service>
 
     <dubbo:reference registry="esb2" id="ctgCacheAssetService"  interface="com.ctzj.bss.customer.data.carrier.outbound.api.CtgCacheAssetService" version="1.0" retries="0" check="false">
-            <dubbo:method name="queryCachedAssetDetailByIntegId" servicecode="33.1001.queryCachedAssetDetailByIntegId"  timeout="10000"/>
+        <dubbo:method name="queryCachedAssetDetailByIntegId" servicecode="33.1001.queryCachedAssetDetailByIntegId"  timeout="10000"/>
     </dubbo:reference>
 
 </beans>
