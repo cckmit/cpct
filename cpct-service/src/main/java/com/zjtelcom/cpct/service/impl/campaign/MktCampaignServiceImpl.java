@@ -16,7 +16,6 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.ObjMktCampaignRelMapper;
-import com.zjtelcom.cpct.dao.channel.OfferMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
@@ -38,7 +37,6 @@ import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.campaign.CampaignVO;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
-import com.zjtelcom.cpct.dto.channel.ProductParam;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.EventDTO;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
@@ -49,7 +47,6 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.campaign.MktOperatorLogService;
 import com.zjtelcom.cpct.service.channel.ProductService;
-import com.zjtelcom.cpct.service.impl.synchronize.campaign.SyncActivityServiceImpl;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SyncActivityService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
@@ -1139,6 +1136,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_NOTACTIVE.getStatusCode());
                     mktCamResultRelMapper.updateByPrimaryKey(mktCamResultRelDO);
                 }
+            } else if(StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)){
+                // 活动下线清缓存
+                redisUtils.remove("MKT_CAMPAIGN_" + mktCampaignId);
             }
 
             if (StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)) {
@@ -1241,8 +1241,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         MktCamEvtRelDO childMktCamEvtRelDO = new MktCamEvtRelDO();
                         childMktCamEvtRelDO.setMktCampaignId(childMktCampaignId);
                         childMktCamEvtRelDO.setEventId(mktCamEvtRelDO.getEventId());
-                        childMktCamEvtRelDO.setCampaignSeq(0); // 默认等级为 0
-                        childMktCamEvtRelDO.setLevelConfig(0); // 默认为资产级 0
+                        childMktCamEvtRelDO.setCampaignSeq(mktCamEvtRelDO.getCampaignSeq());
+                        childMktCamEvtRelDO.setLevelConfig(mktCamEvtRelDO.getLevelConfig());
                         childMktCamEvtRelDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
                         childMktCamEvtRelDO.setStatusDate(new Date());
                         childMktCamEvtRelDO.setCreateDate(new Date());
