@@ -2075,14 +2075,14 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 }
 
-                List<String> mktCamCodeList = (List<String>) redisUtils.get("MKT_CAM_API_CODE");
+                List<String> mktCamCodeList = (List<String>) redisUtils.get("MKT_CAM_API_CODE_KEY");
                 if (mktCamCodeList == null) {
                     List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("MKT_CAM_API_CODE");
                     mktCamCodeList = new ArrayList<String>();
                     for (SysParams sysParams : sysParamsList) {
                         mktCamCodeList.add(sysParams.getParamValue());
                     }
-                    redisUtils.set("MKT_CAM_API_CODE", mktCamCodeList);
+                    redisUtils.set("MKT_CAM_API_CODE_KEY", mktCamCodeList);
                 }
 
                 if (strategyMapList != null && strategyMapList.size() > 0) {
@@ -2313,13 +2313,13 @@ public class EventApiServiceImpl implements EventApiService {
                             }
 
                             // 销售品过滤
-                            //String custProdFilter = (String) redisUtils.get("CUST_PROD_FILTER");
-                            String custProdFilter = null;
+                            String custProdFilter = (String) redisUtils.get("CUST_PROD_FILTER");
+                            //String custProdFilter = null;
                             if (custProdFilter == null) {
                                 List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("CUST_PROD_FILTER");
                                 if (sysParamsList != null && sysParamsList.size() > 0) {
                                     custProdFilter = sysParamsList.get(0).getParamValue();
-                                   // redisUtils.set("CUST_PROD_FILTER", custProdFilter);
+                                    redisUtils.set("CUST_PROD_FILTER", custProdFilter);
                                 }
                             }
 
