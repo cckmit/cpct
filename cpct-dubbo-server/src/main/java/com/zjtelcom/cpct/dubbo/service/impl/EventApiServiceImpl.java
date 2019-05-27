@@ -504,7 +504,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                 //判断是否有流量事件,EVTS000001001,EVTS000001002
                 // CPCP_USED_FLOW为已使用流量， CPCP_LEFT_FLOW为剩余流量, CPCP_NEED_FLOW 需要流量
-                String channelCode = (String) map.get("channelCode");
+                String channelCode = (String) map.get("eventCode");
                 if("EVTS000001001".equals(channelCode)|| "EVTS000001002".equals(channelCode) && evtParams!=null
                         && evtParams.get("CPCP_USED_FLOW")!=null && evtParams.get("CPCP_LEFT_FLOW")!=null){
                     String cpcpNeedFlow = getCpcpNeedFlow((String) evtParams.get("CPCP_USED_FLOW"), (String) evtParams.get("CPCP_LEFT_FLOW"));
