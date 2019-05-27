@@ -17,7 +17,7 @@
 
 
     <!--客户分群id标签试算-->
-    <dubbo:service registry="esb2" interface="com.zjtelcom.cpct.count.service.api.GroupApiService" ref="groupApiServiceImpl" version="1.0" >
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.count.service.api.GroupApiService" ref="groupApiServiceImpl" version="1.0" >
         <dubbo:method name="groupTrial" servicecode="00.1083.groupTrial"/>
     </dubbo:service>
 

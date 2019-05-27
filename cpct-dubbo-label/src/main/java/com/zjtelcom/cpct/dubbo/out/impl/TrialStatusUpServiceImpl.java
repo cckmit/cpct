@@ -5,6 +5,7 @@ import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.dubbo.out.TrialStatusUpService;
 import com.zjtelcom.cpct.enums.TrialStatus;
+import com.zjtelcom.cpct.service.grouping.TrialProdService;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.es.es.service.EsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,16 @@ public class TrialStatusUpServiceImpl implements TrialStatusUpService {
     private TrialOperationMapper  trialOperationMapper;
     @Autowired(required = false)
     private EsService esService;
+    @Autowired
+    private TrialProdService trialProdService;
+
+
+    @Override
+    public Map<String,Object> campaignIndexTask(Map<String,Object> param) {
+        Map<String, Object> result = new HashMap<>();
+        result = trialProdService.campaignIndexTask(param);
+        return result;
+    }
 
     /**
      * 更新试算记录状态

@@ -418,20 +418,16 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             if (mktStrategyConfRule.getMktCamChlConfDetailList() != null) {
                 for (int i = 0; i < mktStrategyConfRule.getMktCamChlConfDetailList().size(); i++) {
                     Long evtContactConfId = mktStrategyConfRule.getMktCamChlConfDetailList().get(i).getEvtContactConfId();
-
                     CamScriptAddVO camScriptAddVO = new CamScriptAddVO();
                     camScriptAddVO.setEvtContactConfId(evtContactConfId);
                     camScriptAddVO.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
                     camScriptAddVO.setScriptDesc(mktStrategyConfRule.getMktCamChlConfDetailList().get(i).getScriptDesc());
                     camScriptService.addCamScript(UserUtil.loginId(), camScriptAddVO);
-
                     if (i == 0) {
                         evtContactConfIds += evtContactConfId;
                     } else {
                         evtContactConfIds += "/" + evtContactConfId;
                     }
-
-
                 }
                 mktStrategyConfRuleDO.setEvtContactConfId(evtContactConfIds);
             }
