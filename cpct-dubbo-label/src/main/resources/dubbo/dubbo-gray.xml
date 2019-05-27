@@ -22,6 +22,19 @@
         <dubbo:method name="syncLabelInfo" servicecode="33.1083.syncLabelInfo" timeout="10000"/>
     </dubbo:service>
 
+    <!-- 试运算状态记录更新 -->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.TrialStatusUpService" ref="trialStatusUpServiceImpl"
+                   version="2.0">
+        <dubbo:method name="updateOperationStatus" servicecode="33.1083.updateOperationStatus" timeout="10000"/>
+        <dubbo:method name="campaignIndexTask" servicecode="33.1083.campaignIndexTask" timeout="10000"/>
+    </dubbo:service>
+
+    <!-- 更新试算日志 -->
+    <dubbo:reference interface="com.zjtelcom.es.es.service.EsService" id="esService"
+                     version="2.0" retries="0" check="false">
+        <dubbo:method name="addLogByBatchNum" servicecode="00.1083.addLogByBatchNum" timeout="5000"/>
+    </dubbo:reference>
+
     <!-- 事件外部调用测试 -->
     <!--<dubbo:service interface="com.zjtelcom.cpct.dubbo.service.SyncEventService" ref="syncEventServiceImpl"-->
                    <!--version="1.0">-->

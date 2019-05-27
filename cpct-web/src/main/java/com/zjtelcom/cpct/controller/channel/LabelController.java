@@ -10,6 +10,7 @@ import com.zjtelcom.cpct.service.channel.LabelCatalogService;
 import com.zjtelcom.cpct.service.channel.LabelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
+import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -64,10 +65,11 @@ public class LabelController extends BaseController {
 
     @PostMapping("listLabelCatalog")
     @CrossOrigin
-    public Map<String, Object> listLabelCatalog() {
+    public Map<String, Object> listLabelCatalog(@RequestBody HashMap<String,Object> param) {
         Map<String,Object> result = new HashMap<>();
         try {
-            result = labelCatalogService.listLabelCatalog();
+            String type = MapUtil.getString(param.get("type"));
+            result = labelCatalogService.listLabelCatalog(type);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to listLabelCatalog",e);
             result.put("resultCode",CODE_FAIL);

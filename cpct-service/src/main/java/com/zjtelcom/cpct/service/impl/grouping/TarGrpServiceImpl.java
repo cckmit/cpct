@@ -753,6 +753,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         List<TarGrpCondition> listTarGrpCondition = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
         List<TarGrpConditionVO> grpConditionList = new ArrayList<>();
         List<TarGrpVO> tarGrpVOS = new ArrayList<>();//传回前端展示信息
+        boolean  check = false;
         for (TarGrpCondition tarGrpCondition : listTarGrpCondition) {
             List<OperatorDetail> operatorList = new ArrayList<>();
             TarGrpConditionVO tarGrpConditionVO = new TarGrpConditionVO();
@@ -762,8 +763,27 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             if (label==null){
                 continue;
             }
+            if (label.getRightOperand()!=null && label.getRightOperand().equals("1")){
+                check = true;
+            }
             List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(label.getInjectionLabelId());
             List<LabelValueVO> valueList = ChannelUtil.valueList2VOList(labelValues);
+            //枚举标签替换中文名
+            if (valueList!=null && !valueList.isEmpty() ){
+                List<String> rightParam = new ArrayList<>();
+                String[] paramList = tarGrpConditionVO.getRightParam().split(",");
+                for (String value : paramList){
+                    for (LabelValueVO valueVO : valueList){
+                        if (valueVO.getLabelValue().equals(value)){
+                            rightParam.add(valueVO.getValueName());
+                        }
+                    }
+                }
+                tarGrpConditionVO.setRightParamName(ChannelUtil.list2String(rightParam,","));
+            }else {
+                tarGrpConditionVO.setRightParamName(tarGrpCondition.getRightParam());
+            }
+
             tarGrpConditionVO.setLeftParamName(label.getInjectionLabelName());
             tarGrpConditionVO.setLabelCode(label.getInjectionLabelCode());
             tarGrpConditionVO.setLabelDataType(label.getLabelDataType());
@@ -818,6 +838,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("listTarGrpCondition", grpConditionList);
         maps.put("conditionList",listTarGrpCondition);
+        maps.put("labelCheck",check);
         return maps;
     }
 

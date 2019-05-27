@@ -142,7 +142,7 @@ public class XlsxProcessAbstract {
                 for (int j = 0; j < minColumns; j++) {
                     rowStrs.append("|@|");
                 }
-                rowStrs.append('\n');
+                rowStrs.append("");
             }
         }
 

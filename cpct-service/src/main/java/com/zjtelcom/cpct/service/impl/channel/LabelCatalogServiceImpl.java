@@ -95,7 +95,7 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
      * @return
      */
     @Override
-    public Map<String, Object> listLabelCatalog() {
+    public Map<String, Object> listLabelCatalog(String rightOperand) {
 //        List<Label> resuList = new ArrayList<>();
 //        List<Label> labels = labelMapper.selectAllByCondition();
 //        List<LabelValue> vas = labelValueMapper.selectAll();
@@ -115,7 +115,7 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
         List<CatalogTreeParent> resultTree = new ArrayList<>();
 
         List<LabelCatalog> parentList = labelCatalogMapper.findByParentId(String.valueOf(0));
-        List<Label> allLabels = labelMapper.selectByScope(Long.valueOf(1));
+        List<Label> allLabels = labelMapper.selectByScope(Long.valueOf(1),rightOperand.equals("1") ? null : rightOperand);
         List<LabelCatalog> allCatalogs = labelCatalogMapper.selectAll();
         List<LabelValue> valueList = labelValueMapper.selectAll();
 
@@ -171,7 +171,7 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
             parentTree.setChildren(onceTreeList);
             resultTree.add(parentTree);
         }
-        List<Label> sysLabel = labelMapper.selectByScope(0L);
+        List<Label> sysLabel = labelMapper.selectByScope(0L,null);
         List<LabelCatalogTree> sysTreeList = new ArrayList<>();
         CatalogTreeParent treeParent = new CatalogTreeParent();
         for(Label la : sysLabel){

@@ -26,6 +26,7 @@
     <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.TrialStatusUpService" ref="trialStatusUpServiceImpl"
                    version="1.0">
         <dubbo:method name="updateOperationStatus" servicecode="33.1083.updateOperationStatus" timeout="10000"/>
+        <dubbo:method name="campaignIndexTask" servicecode="33.1083.campaignIndexTask" timeout="10000"/>
     </dubbo:service>
 
     <!-- 事件外部调用测试 -->
@@ -39,5 +40,13 @@
                      version="1.0" retries="0" check="false">
         <dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="5000"/>
     </dubbo:reference>
+
+    <!-- 更新试算日志 -->
+    <dubbo:reference interface="com.zjtelcom.es.es.service.EsService" id="esService"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="addLogByBatchNum" servicecode="00.1083.addLogByBatchNum" timeout="5000"/>
+    </dubbo:reference>
+
+
 
 </beans>

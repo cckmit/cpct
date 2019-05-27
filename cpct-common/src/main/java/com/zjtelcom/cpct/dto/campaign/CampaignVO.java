@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class CampaignVO implements Serializable {
     private Long mktCampaignId;
     private String campaignName;
+    private String mktActivityNbr;
 
     public Long getMktCampaignId() {
         return mktCampaignId;
@@ -20,5 +21,13 @@ public class CampaignVO implements Serializable {
 
     public void setCampaignName(String campaignName) {
         this.campaignName = campaignName;
+    }
+
+    public String getMktActivityNbr() {
+        return mktActivityNbr;
+    }
+
+    public void setMktActivityNbr(String mktActivityNbr) {
+        this.mktActivityNbr = mktActivityNbr;
     }
 }

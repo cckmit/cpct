@@ -107,7 +107,7 @@
     REMARK, MANAGE_REGION_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
     UPDATE_DATE
     from offer
-    where 1=1
+    where STATUS_CD=1000
     <if test="offerName != null and offerName != ''">
     and OFFER_NAME  LIKE CONCAT(CONCAT('%',#{offerName}),'%')
     </if>
@@ -179,7 +179,7 @@
     left join offer_prod_rel opr on opr.OFFER_ID = a.OFFER_ID
     left join product pr on pr.PROD_ID = opr.PROD_ID
     </if>
-    where 1=1
+    where a.STATUS_CD = 1000
     <if test="type != null and type != ''">
       and pr.PROD_USE_TYPE = #{type}
     </if>
