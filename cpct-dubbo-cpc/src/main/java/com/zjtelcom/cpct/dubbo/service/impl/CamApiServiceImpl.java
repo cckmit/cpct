@@ -253,7 +253,7 @@ public class CamApiServiceImpl implements CamApiService {
                                 }
                             }
 
-                            String integrationId = "3-1AYT3V55"; //params.get("integrationId");
+                            String integrationId = params.get("integrationId");
                             if (realProdFilter != null && "1".equals(realProdFilter)) {
                                 ResponseResult<AssetDto> assetDtoResponseResult = ctgCacheAssetService.queryCachedAssetDetailByIntegId(integrationId, lanName);
                                 AssetDto assetDto = assetDtoResponseResult.getData();
@@ -655,7 +655,7 @@ public class CamApiServiceImpl implements CamApiService {
                             // 获取本地网的中文名
                             String lanName = AreaNameEnum.getNameByLandId(Long.valueOf(lanId));
 
-                            String integrationId = "3-1AYT3V55"; //params.get("integrationId");
+                            String integrationId = params.get("integrationId");
 
                             if (realProdFilter != null && "1".equals(realProdFilter)) {
                                 ResponseResult<AssetDto> assetDtoResponseResult = ctgCacheAssetService.queryCachedAssetDetailByIntegId(integrationId, lanName);
