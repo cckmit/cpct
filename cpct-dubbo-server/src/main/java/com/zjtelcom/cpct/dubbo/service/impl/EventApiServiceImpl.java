@@ -2463,7 +2463,7 @@ public class EventApiServiceImpl implements EventApiService {
         double userAvg = cpcpUsedFlowDouble / currentDay;
         // 需要流量
         double needFlow = 0;
-        if (userAvg * (lastDay - currentDay) < cpcpLeftFlowDouble) {
+        if (userAvg * (lastDay - currentDay) > cpcpLeftFlowDouble) {
             needFlow = (userAvg * (lastDay - currentDay) - cpcpLeftFlowDouble ) * 1024;
         }
         DecimalFormat df = new DecimalFormat("#.##");
