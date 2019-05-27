@@ -57,6 +57,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
@@ -2459,18 +2460,14 @@ public class EventApiServiceImpl implements EventApiService {
         // 剩余的流量数
         double cpcpLeftFlowDouble = Double.valueOf(cpcpLeftFlow.replace("GB", ""));
         // 这个月到currentDay过的日均用量
-        double userAvg = (cpcpUsedFlowDouble - cpcpLeftFlowDouble) / currentDay;
+        double userAvg = cpcpUsedFlowDouble / currentDay;
         // 需要流量
-        int needFlowGB = (int) (userAvg * (lastDay - currentDay));
-        int needFlowMB = (int) ((userAvg * (lastDay - currentDay) - needFlowGB) * 1024);
-        String needFlow = "";
-        if (needFlowGB > 0) {
-            needFlow = needFlowGB + "GB";
-            if (needFlowMB > 0) {
-                needFlow += needFlowMB + "MB";
-            }
+        double needFlow = 0;
+        if (userAvg * (lastDay - currentDay) < cpcpLeftFlowDouble) {
+            needFlow = (userAvg * (lastDay - currentDay) - cpcpLeftFlowDouble ) * 1024;
         }
-        return needFlow;
+        DecimalFormat df = new DecimalFormat("#.##");
+        return String.valueOf(df.format(needFlow));
     }
 
 }
