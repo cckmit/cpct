@@ -407,7 +407,7 @@ public class CamApiServiceImpl implements CamApiService {
                                     prodConfig = true;
                                 }
                                 if (prodConfig) {
-                                    integrationId = "3-1AYT3V55";
+                                   // integrationId = "3-1AYT3V55";
                                     ResponseResult<AssetDto> assetDtoResponseResult = ctgCacheAssetService.queryCachedAssetDetailByIntegId(integrationId, lanName);
                                     AssetDto assetDto = assetDtoResponseResult.getData();
                                     List<String> prodStrList = new ArrayList<>();
