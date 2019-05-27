@@ -107,8 +107,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     private ProductService productService;
     @Autowired
     private MktCamCustMapper camCustMapper;
-    @Value("${sync.value}")
-    private String value;
+
 
 
     /**

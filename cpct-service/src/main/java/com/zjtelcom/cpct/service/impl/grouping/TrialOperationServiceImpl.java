@@ -97,7 +97,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private MktStrategyConfMapper strategyMapper;
     @Autowired
     private MktStrategyConfRuleRelMapper strategyConfRuleRelMapper;
-    @Autowired
+    @Autowired(required = false)
     private RestTemplate restTemplate;
     @Autowired
     private MktStrategyConfRuleRelMapper ruleRelMapper;
@@ -256,7 +256,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         TrialOperationVOES request = new TrialOperationVOES();
         request.setFieldList(codeList);
         try {
-            response = restTemplate.postForObject("localhost:8090/es/searchCountByLabelList", request, TrialResponseES.class);
+//            response = restTemplate.postForObject("localhost:8090/es/searchCountByLabelList", request, TrialResponseES.class);
             if (!response.getResultCode().equals("200")){
                 result.put("resultCode",CODE_FAIL);
                 result.put("resultMsg","查询失败");

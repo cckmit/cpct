@@ -48,7 +48,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Autowired
     private SynQuestionService synQuestionService;
 
-    @Value("${sync.value}")
+
     private String value;
     @Autowired(required = false)
     private ISystemPostDubboService iSystemPostDubboService;

@@ -74,8 +74,6 @@ import static com.zjtelcom.cpct.constants.CommonConstant.*;
 @Service
 @Transactional
 public class MktCampaignServiceImpl extends BaseService implements MktCampaignService {
-    @Value("${sync.value}")
-    private String value;
 
 
     /**

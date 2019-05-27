@@ -32,9 +32,6 @@ public class ServiceServiceImpl extends BaseService implements ServiceService {
     @Autowired
     private SynServiceService synServiceService;
 
-    @Value("${sync.value}")
-    private String value;
-
     @Override
     public Map<String, Object> getServiceList(Long userId, Map<String,Object> params) {
         Map<String, Object> result = new HashMap<>();

@@ -701,6 +701,18 @@ public class DateUtil {
     }
 
     /**
+     * 获取本月最后一天的号
+     *
+     * @return
+     */
+    public static int getLastDayForCurrentMonth() {
+        Calendar ca = Calendar.getInstance();
+        ca.set(Calendar.DAY_OF_MONTH, ca.getActualMaximum(Calendar.DAY_OF_MONTH) + 1);
+        ca.add(Calendar.DATE, -1);
+        return ca.get(Calendar.DAY_OF_MONTH);
+    }
+
+    /**
      * 通过传入 2018年3月2日返回毫秒值
      * eg input 2018年3月2日  output  1519920000000
      */

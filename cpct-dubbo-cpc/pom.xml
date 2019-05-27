@@ -90,6 +90,18 @@
             <artifactId>biz</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.ctzj.bss.customer.data.carrier</groupId>
+            <artifactId>customer-data-carrier-outbound-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ctzj.shared.biz.account.asset.model</groupId>
+            <artifactId>biz-account-asset-model</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
     </dependencies>
 
     <profiles>

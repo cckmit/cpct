@@ -15,6 +15,7 @@
     <dubbo:protocol name="dubbo" port="30804"/>
     <dubbo:monitor protocol="registry"/>
 
+
     <!-- 注册 -->
     <!-- 标签增量同步 -->
     <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.SyncLabelService" ref="syncLabelServiceImpl"
@@ -25,7 +26,7 @@
     <!-- 试运算状态记录更新 -->
     <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.TrialStatusUpService" ref="trialStatusUpServiceImpl"
                    version="2.0">
-        <dubbo:method name="updateOperationStatus" servicecode="33.1083.updateOperationStatus" timeout="10000"/>
+        <!--<dubbo:method name="updateOperationStatus" servicecode="33.1083.updateOperationStatus" timeout="10000"/>-->
         <dubbo:method name="campaignIndexTask" servicecode="33.1083.campaignIndexTask" timeout="10000"/>
     </dubbo:service>
 

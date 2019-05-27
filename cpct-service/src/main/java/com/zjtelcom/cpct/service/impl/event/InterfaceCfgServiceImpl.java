@@ -36,8 +36,7 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
     @Autowired
     private SynInterfaceCfgService synInterfaceCfgService;
 
-    @Value("${sync.value}")
-    private String value;
+
 
     @Override
     public Map<String, Object> createInterfaceCfg(InterfaceCfg interfaceCfg) {

@@ -36,8 +36,7 @@ import java.util.*;
 @Service
 @Transactional
 public class EventSorceServiceImpl extends BaseService implements EventSorceService {
-    @Value("${sync.value}")
-    private String value;
+
 
 
     @Autowired
