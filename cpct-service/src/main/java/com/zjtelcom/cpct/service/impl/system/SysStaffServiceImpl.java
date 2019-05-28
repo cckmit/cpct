@@ -42,8 +42,7 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
 
 
 
-    @Value("${sync.value}")
-    private String value;
+
 
     public Map<String, Object> queryUserByName(String userName) {
         Map<String, Object> resultMap = new HashMap<String, Object>();

@@ -64,8 +64,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     @Autowired
     private RedisUtils redisUtils;
 
-    @Value("${sync.value}")
-    private String value;
+
 
 
     /**

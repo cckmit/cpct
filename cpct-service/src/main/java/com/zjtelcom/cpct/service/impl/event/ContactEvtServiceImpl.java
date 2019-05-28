@@ -84,8 +84,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     @Autowired
     private RedisUtils redisUtils;
 
-    @Value("${sync.value}")
-    private String value;
+
 
     @Override
     public Map<String, Object> getEventRelConfig(Map<String, Object> param) {
@@ -516,6 +515,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(rel.getMktCampaignId());
             if (campaign!=null){
                 rel.setCampaignName(campaign.getMktCampaignName());
+                rel.setMktActivityNbr(campaign.getMktActivityNbr());
             }
         }
         contactEventDetail.setMktCamEvtRels(mktCamEvtRels);
