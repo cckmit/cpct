@@ -341,8 +341,8 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
                             MktCamEvtRelDO childMktCamEvtRelDO = new MktCamEvtRelDO();
                             childMktCamEvtRelDO.setMktCampaignId(childMktCampaignId);
                             childMktCamEvtRelDO.setEventId(mktCamEvtRelDO.getEventId());
-                            childMktCamEvtRelDO.setCampaignSeq(0); // 默认等级为 0
-                            childMktCamEvtRelDO.setLevelConfig(0); // 默认为资产级 0
+                            childMktCamEvtRelDO.setCampaignSeq(mktCamEvtRelDO.getCampaignSeq());
+                            childMktCamEvtRelDO.setLevelConfig(mktCamEvtRelDO.getLevelConfig());
                             childMktCamEvtRelDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
                             childMktCamEvtRelDO.setStatusDate(new Date());
                             childMktCamEvtRelDO.setCreateDate(new Date());
