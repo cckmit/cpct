@@ -122,10 +122,10 @@ public class OrgTreeServiceImpl implements OrgTreeService{
     @Override
     public Map<String, Object> selectByAreaId(Map<String, Object> params) {
         Map<String, Object> maps = new HashMap<>();
-        List<Long> areaIds = (List<Long>) params.get("areaIdList");
+        List<String> areaIds = (List<String>) params.get("areaIdList");
         List<Organization> organizations = new ArrayList<>();
-        for (Long areaId : areaIds){
-            Organization organization = organizationMapper.selectBy4aId(areaId);
+        for (String areaId : areaIds){
+            Organization organization = organizationMapper.selectBy4aId(Long.valueOf(areaId));
             if (organization!=null){
                 organizations.add(organization);
             }
@@ -143,13 +143,13 @@ public class OrgTreeServiceImpl implements OrgTreeService{
     @Override
     public Map<String,Object> selectBySumAreaId(Map<String, Object> params) {
         Map<String, Object> maps = new HashMap<>();
-        List<Long> areaIds = (List<Long>) params.get("areaId");
+        List<String> areaIds = (List<String>) params.get("areaId");
         List<Organization> list=new ArrayList<>();
         if(areaIds==null || areaIds.isEmpty()){
             list=organizationMapper.selectMenu();
         }else{
-            for (Long id : areaIds){
-                List<Organization> organizations = organizationMapper.selectByParentId(id);
+            for (String id : areaIds){
+                List<Organization> organizations = organizationMapper.selectByParentId(Long.valueOf(id));
                 list.addAll(organizations);
             }
         }
