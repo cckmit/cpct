@@ -734,13 +734,14 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             for (Map<String,Object> display : displayList){
                 String code = display.get("code")==null ? null : display.get("code").toString();
                 String name = display.get("name")==null ? null : display.get("name").toString();
-                if (code!=null && !labelEngNameList.contains(code)){
+                if (code!=null && !labelEngNameList.contains(code) && !labelNameList.contains(name)){
                     Map<String, Object> label = new HashMap<>();
                     label.put("code", code);
                     label.put("name", name);
                     labelList.add(label);
                     fields.add(code);
                     labelEngNameList.add(code);
+                    labelNameList.add(name);
                 }
             }
             if (!fields.isEmpty()){
@@ -782,6 +783,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     for (int j = 3; j < dataVO.contentList.size(); j++) {
                         List<String> data = Arrays.asList(dataVO.contentList.get(j).split("\\|@\\|"));
                         Map<String, Object> customers = new HashMap<>();
+                        boolean check = true;
                         for (int x = 0; x < codeList.length; x++) {
                             if (codeList[x] == null) {
                                 break;
@@ -793,23 +795,28 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                 value = data.get(x);
                             }
                             if (codeList[x].equals("CCUST_NAME") && (value.contains("null") || value.equals(""))) {
+                                check = false;
                                 break;
                             }
                             if (codeList[x].equals("CCUST_ID") && (value.contains("null") || value.equals(""))) {
+                                check = false;
                                 break;
                             }
                             if (codeList[x].equals("ASSET_INTEG_ID") && (value.contains("null") || value.equals(""))) {
+                                check = false;
                                 break;
                             }
                             if (codeList[x].equals("ASSET_NUMBER") && (value.contains("null") || value.equals(""))) {
+                                check = false;
                                 break;
                             }
                             if (codeList[x].equals("LATN_ID") && (value.contains("null") || value.equals(""))) {
+                                check = false;
                                 break;
                             }
                             customers.put(codeList[x], value);
                         }
-                        if (customers.isEmpty()){
+                        if (customers.isEmpty() || !check){
                            continue;
                         }
                         customerList.add(customers);
