@@ -19,6 +19,10 @@ public enum TrialStatus {
     ISSEE_ANALYZE_SUCCESS("7100", "协同-解析成功"),
     ISEE_ANALYZE_FAIL("7200","协同-解析失败"),
     ISEE_PUBLISH_SUCCESS("7300","协同-下发成功"),
+    ISSEE_ANALYZE_FAIL_REASON_ONE("7201", "协同-没有清单文件"),
+    ISEE_ANALYZE_FAIL_REASON_TWO("7202","协同-清单文件没有数据"),
+    ISEE_PUBLISH_FAIL_REASON_THREE("7203","协同-字段定义有重复字段"),
+
     ISEE_PUBLISH_FAIL("7400", "协同-下发失败"),
     CHANNEL_PUBLISH_SUCCESS("8100", "渠道-下发成功"),
     CHANNEL_PUBLISH_FAIL("8200","渠道-下发失败"),

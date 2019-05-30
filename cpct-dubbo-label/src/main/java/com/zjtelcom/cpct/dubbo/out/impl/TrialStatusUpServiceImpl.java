@@ -29,6 +29,7 @@ public class TrialStatusUpServiceImpl implements TrialStatusUpService {
     @Override
     public Map<String,Object> campaignIndexTask(Map<String,Object> param) {
         Map<String, Object> result = new HashMap<>();
+        System.out.println("全量试算活动入参："+param);
         result = trialProdService.campaignIndexTask(param);
         return result;
     }
