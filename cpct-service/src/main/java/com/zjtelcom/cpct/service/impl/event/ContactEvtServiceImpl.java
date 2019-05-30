@@ -84,8 +84,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     @Autowired
     private RedisUtils redisUtils;
 
-    @Value("${sync.value}")
-    private String value;
+
 
     @Override
     public Map<String, Object> getEventRelConfig(Map<String, Object> param) {

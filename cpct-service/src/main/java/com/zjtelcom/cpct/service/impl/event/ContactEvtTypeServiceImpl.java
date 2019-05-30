@@ -47,8 +47,7 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
     @Autowired
     SynContactEvtTypeService synContactEvtTypeService;
 
-    @Value("${sync.value}")
-    private String value;
+
 
     /**
      * 查询事件目录

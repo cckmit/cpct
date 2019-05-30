@@ -58,6 +58,7 @@ import com.zjtelcom.cpct_prod.dao.offer.OfferProdMapper;
 import com.zjtelcom.es.es.entity.*;
 import com.zjtelcom.es.es.entity.model.LabelResultES;
 import com.zjtelcom.es.es.entity.model.TrialOperationParamES;
+import com.zjtelcom.es.es.entity.model.TrialResponseES;
 import com.zjtelcom.es.es.service.EsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -77,10 +78,8 @@ public class TrialProdServiceImpl implements TrialProdService {
 
     @Autowired
     private TarGrpConditionPrdMapper tarGrpConditionMapper;
-
     @Autowired
     private InjectionLabelPrdMapper injectionLabelMapper;
-
     @Autowired
     private TrialOperationPrdMapper trialOperationMapper;
     @Autowired
@@ -89,8 +88,6 @@ public class TrialProdServiceImpl implements TrialProdService {
     private MktStrategyConfPrdMapper strategyMapper;
     @Autowired
     private MktStrategyConfRuleRelPrdMapper strategyConfRuleRelMapper;
-    @Autowired
-    private RestTemplate restTemplate;
     @Autowired
     private MktStrategyConfRuleRelPrdMapper ruleRelMapper;
     @Autowired
@@ -121,6 +118,8 @@ public class TrialProdServiceImpl implements TrialProdService {
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
     @Autowired
     private MktStrategyConfPrdMapper strategyConfPrdMapper;
+    @Autowired
+    private RedisUtils_es redisUtils_es;
     /**
      * 销售品service
      */
@@ -145,7 +144,9 @@ public class TrialProdServiceImpl implements TrialProdService {
         Map<String, Object> result = new HashMap<>();
         List<MktCampaignDO> campaignList = new ArrayList<>();
         Long campaignId = MapUtil.getLongNum(param.get("id"));
+        String perCampaign = MapUtil.getString(param.get("perCampaign"));
         List<Integer> idList = ( List<Integer>)param.get("idList");
+        List<Map<String,Object>> resList = new ArrayList<>();
         for (Integer id : idList){
             MktCampaignDO cam = campaignMapper.selectByPrimaryKey(Long.valueOf(id.toString()));
             campaignList.add(cam);
@@ -168,16 +169,21 @@ public class TrialProdServiceImpl implements TrialProdService {
                 operation.setStrategyName(strategy.getMktStrategyConfName());
                 operation.setBatchNum(Long.valueOf(batchNumSt));
                 trialOperationMapper.insert(operation);
-                Map<String,Object> res = issue(operation,campaignDO,strategy);
+                if (perCampaign.equals("PER_CAMPAIGN")){
+                    redisUtils_es.set("PER_CAMPAIGN_"+batchNumSt,"true");
+                }
+                Map<String,Object> res = issue(operation,campaignDO,strategy,perCampaign);
+                resList.add(res);
                 System.out.println(JSON.toJSONString(res));
             }
         }
         result.put("resultCode", CODE_FAIL);
         result.put("resultMsg", "全量试算中");
+        result.put("res",resList);
         return result;
     }
 
-    private Map<String, Object> issue(TrialOperation trialOperation, MktCampaignDO campaignDO,MktStrategyConfDO strategyConfDO){
+    private Map<String, Object> issue(TrialOperation trialOperation, MktCampaignDO campaignDO,MktStrategyConfDO strategyConfDO,String perCampaign){
             Map<String, Object> result = new HashMap<>();
             //添加策略适用地市
             redisUtils.set("STRATEGY_CONF_AREA_"+trialOperation.getStrategyId(),strategyConfDO.getAreaId());
@@ -237,7 +243,6 @@ public class TrialProdServiceImpl implements TrialProdService {
                 new Thread(){
                     public void run(){
                         esService.strategyIssure(issureRequest);
-//                    TrialResponseES res  =  restTemplate.postForObject("http://localhost:8080/es/cpcMatchFileToFtp", issureRequest, TrialResponseES.class);
                     }
                 }.start();
             } catch (Exception e) {
@@ -251,7 +256,7 @@ public class TrialProdServiceImpl implements TrialProdService {
             trialOperation.setStatusCd(TrialStatus.ALL_SAMPEL_GOING.getValue());
             trialOperationMapper.updateByPrimaryKey(trialOperation);
             result.put("resultCode", CODE_SUCCESS);
-            result.put("resultMsg", "全量试算中，请稍后刷新页面查看结果");
+            result.put("resultMsg", campaignDO.getMktCampaignName()+"&&&"+strategyConfDO.getMktStrategyConfName());
             return result;
 
     }
