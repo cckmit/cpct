@@ -76,8 +76,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
     @Autowired
     private SynFilterRuleService synFilterRuleService;
 
-    @Value("${sync.value}")
-    private String value;
+
 
     /**
      * 过滤规则列表（含分页）

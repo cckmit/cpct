@@ -39,8 +39,6 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
     @Autowired
     private SysParamsMapper sysParamsMapper;
 
-    @Value("${sync.value}")
-    private String value;
 
     @Override
     public Map<String, Object> getScriptList(Long userId, String scriptName,String scriptType) {

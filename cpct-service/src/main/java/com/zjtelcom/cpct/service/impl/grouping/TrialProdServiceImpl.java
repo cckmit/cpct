@@ -90,8 +90,6 @@ public class TrialProdServiceImpl implements TrialProdService {
     @Autowired
     private MktStrategyConfRuleRelPrdMapper strategyConfRuleRelMapper;
     @Autowired
-    private RestTemplate restTemplate;
-    @Autowired
     private MktStrategyConfRuleRelPrdMapper ruleRelMapper;
     @Autowired
     private RedisUtils redisUtils;
