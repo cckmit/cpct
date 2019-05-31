@@ -106,6 +106,19 @@ public class TestController extends BaseController {
         return result;
     }
 
+    @PostMapping("importLabelValue")
+    @CrossOrigin
+    public Object importLabelValue(MultipartFile file) {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = labelService.importLabelValue(file);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
     @PostMapping("searchByCampaignId")
     @CrossOrigin
     public Object searchByCampaignId(Long campaignId) {

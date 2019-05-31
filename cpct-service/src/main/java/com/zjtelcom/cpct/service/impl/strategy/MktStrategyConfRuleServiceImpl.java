@@ -605,6 +605,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         List<Long> orgs = organizationMapper.selectByIdList(orgIdList);
         //添加所有选择的节点信息到缓存
         redisUtils.set("ORG_ID_"+ruleId.toString(),orgs);
+        redisUtils.remove("AREA_RULE_ISSURE_"+ruleId);
         new Thread(){
             public void run(){
                 areaList2Redis(ruleId,orgs);

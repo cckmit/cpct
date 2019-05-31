@@ -28,8 +28,7 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
     @Autowired
     private SynSysMenuService synSysMenuService;
 
-    @Value("${sync.value}")
-    private String value;
+
 
     @Override
     public Map<String, Object> listMenu() {

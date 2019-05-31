@@ -23,6 +23,7 @@ import java.util.List;
 @Service
 public class RedisUtils_es {
 
+
     private String redisIp="134.96.231.228";
 
     private Integer redisPort=40201;

@@ -670,7 +670,6 @@ public class CamApiServiceImpl implements CamApiService {
                             String lanName = AreaNameEnum.getNameByLandId(Long.valueOf(lanId));
 
                             String integrationId = params.get("integrationId");
-
                             if (realProdFilter != null && "1".equals(realProdFilter)) {
                                 ResponseResult<AssetDto> assetDtoResponseResult = ctgCacheAssetService.queryCachedAssetDetailByIntegId(integrationId, lanName);
                                 AssetDto assetDto = assetDtoResponseResult.getData();

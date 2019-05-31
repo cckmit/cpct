@@ -35,8 +35,6 @@ public class SysRoleServiceImpl extends BaseService implements SysRoleService {
     @Autowired
     private SynSysRoleService synSysRoleService;
 
-    @Value("${sync.value}")
-    private String value;
 
     @Override
     public Map<String, Object> listRole(String RoleName, int page, int pageSize) {
