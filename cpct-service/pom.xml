@@ -85,6 +85,17 @@
             <groupId>com.zjhcsoft.main</groupId>
             <version>1.0.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.ctzj.smt.bss</groupId>
+            <artifactId>smt-bss-cpc-configure-dubbo-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ctzj.smt.bss</groupId>
+            <artifactId>smt-bss-cpc-model</artifactId>
+        </dependency>
+
     </dependencies>
 
 
