@@ -252,7 +252,7 @@ public class CamApiServiceImpl implements CamApiService {
                                     redisUtils.set("REAL_PROD_FILTER", realProdFilter);
                                 }
                             }
-
+                            ConcurrentHashMap filterRuleTimeMap = new ConcurrentHashMap();
                             String integrationId = params.get("integrationId");
                             if (realProdFilter != null && "1".equals(realProdFilter)) {
                                 ResponseResult<AssetDto> assetDtoResponseResult = ctgCacheAssetService.queryCachedAssetDetailByIntegId(integrationId, lanName);
@@ -262,6 +262,7 @@ public class CamApiServiceImpl implements CamApiService {
                                     List<AssetPromDto> assetPromDtoList = assetDto.getAssetPromDtoList();
                                     for (AssetPromDto assetPromDto : assetPromDtoList) {
                                         prodStrList.add(assetPromDto.getSelectablePromNum());
+                                        filterRuleTimeMap.put(assetPromDto.getSelectablePromNum(), assetPromDto.getSelectablePromStartDate());
                                     }
                                 }
                                 productStr = ChannelUtil.StringList2String(prodStrList);
@@ -282,7 +283,20 @@ public class CamApiServiceImpl implements CamApiService {
                                     for (String product : checkProductArr) {
                                         int index = productStr.indexOf(product);
                                         if (index >= 0) {
-                                            productCheck = false;
+                                            // 判断是否开启时间段过滤
+                                            if ("true".equals(filterRule.getRemark())) {
+                                                Date date = (Date) filterRuleTimeMap.get("product");
+                                                // 判断时间段
+                                                if (date != null && date.after(filterRule.getEffectiveDate()) && date.before(filterRule.getFailureDate())) {
+                                                    productCheck = false;
+                                                } else{
+                                                    productCheck = true;
+                                                    esMsg = "销售时间不在竣工时间范围内";
+                                                }
+                                            } else {
+                                                productCheck = false;
+                                            }
+
                                             break;
                                         }
                                     }
