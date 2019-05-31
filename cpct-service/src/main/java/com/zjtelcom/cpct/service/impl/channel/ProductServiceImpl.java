@@ -386,7 +386,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                     List<String> ids = Arrays.asList(idList);
                     if (ids.contains(ruleId.toString())){
                         result.put("resultCode",CODE_FAIL);
-                        result.put("resultMsg","推荐条目已关联规则："+rule.getMktStrategyConfRuleName()+" 无法删除");
+                        result.put("resultMsg","推荐条目已关联规则："+rule.getMktStrategyConfRuleName()+"  无法删除");
                         return result;
                     }
                 }

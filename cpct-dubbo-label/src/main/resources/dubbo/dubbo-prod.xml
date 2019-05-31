@@ -28,6 +28,18 @@
         <dubbo:method name="strategyIssure" servicecode="00.1083.strategyIssure" timeout="100000"/>
     </dubbo:reference>
 
+    <!-- 门户-获取用户岗位信息 -->
+    <dubbo:reference  interface="com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemPostDubboService"
+                     id="iSystemPostDubboService" version="1.0" retries="0" check="false">
+        <dubbo:method name="qrySystemPostPage" servicecode="00.1077.qrySystemPostPage" timeout="10000"/>
+    </dubbo:reference>
+
+    <!-- 门户-获取用户角色信息 -->
+    <dubbo:reference  interface="com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService"
+                     id="iSystemUserDtoDubboService" version="1.0" retries="0" check="false">
+        <dubbo:method name="qrySystemUserDto" servicecode="00.1077.qrySystemUserDto" timeout="10000"/>
+    </dubbo:reference>
+
     <!-- 事件外部调用测试 -->
     <!--<dubbo:service interface="com.zjtelcom.cpct.dubbo.service.SyncEventService" ref="syncEventServiceImpl"-->
                    <!--version="1.0">-->
