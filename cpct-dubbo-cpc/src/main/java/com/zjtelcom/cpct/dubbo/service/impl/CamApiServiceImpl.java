@@ -1162,7 +1162,18 @@ public class CamApiServiceImpl implements CamApiService {
 
         // 渠道话术拦截开关
         String channelFilterCode = (String) redisUtils.get("CHANNEL_FILTER_CODE");
-        int index = channelFilterCode.indexOf(mktCamChlConfDetail.getContactChlCode());
+        if (channelFilterCode == null){
+            List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("CHANNEL_FILTER_CODE");
+            if (sysParamsList != null && sysParamsList.size() > 0) {
+                channelFilterCode = sysParamsList.get(0).getParamValue();
+                redisUtils.set("CHANNEL_FILTER_CODE", channelFilterCode);
+            }
+        }
+        int index = -1;
+        if (channelFilterCode != null) {
+            index = channelFilterCode.indexOf(mktCamChlConfDetail.getContactChlCode());
+        }
+
         if (index >= 0) {
             //判断脚本中有无未查询到的标签
             if (contactScript != null) {
