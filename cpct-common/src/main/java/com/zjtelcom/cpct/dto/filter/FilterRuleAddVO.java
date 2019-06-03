@@ -23,7 +23,16 @@ public class FilterRuleAddVO implements Serializable {
     private String times;
     private String offerInfo;
     private String operator;
+    private String remark;
 
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
 
     public String getExecutionChannel() {
         return executionChannel;

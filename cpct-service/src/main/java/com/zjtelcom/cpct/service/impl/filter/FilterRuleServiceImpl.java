@@ -259,6 +259,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         if(null == filterRuleT) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", "过滤规则不存在");
+            return map;
         }
         FilterRuleVO vo = BeanUtil.create(filterRuleT,new FilterRuleVO());
         if (filterRuleT.getChooseProduct()!=null && !filterRuleT.getChooseProduct().equals("")){
