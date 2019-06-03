@@ -63,6 +63,8 @@
         <bss-centralized.verson>1.6</bss-centralized.verson>
 
         <service-batch.version>1.0.5</service-batch.version>
+        <cpct-trial.version>1.0.1</cpct-trial.version>
+        <smt-bss-cpc.version>1.0-SNAPSHOT</smt-bss-cpc.version>
 
     </properties>
 
@@ -449,6 +451,24 @@
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>5.1.45</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.zjtelcom.cpct</groupId>
+                <artifactId>cpct-trial</artifactId>
+                <version>${cpct-trial.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ctzj.smt.bss</groupId>
+                <artifactId>smt-bss-cpc-configure-dubbo-api</artifactId>
+                <version>${smt-bss-cpc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ctzj.smt.bss</groupId>
+                <artifactId>smt-bss-cpc-model</artifactId>
+                <version>${smt-bss-cpc.version}</version>
             </dependency>
 
         </dependencies>

@@ -13,6 +13,7 @@ public class FilterRuleVO extends FilterRule implements Serializable {
     private String rightParam;
     private List<OfferDetail> productList;
 
+
     public Long getLabelId() {
         return labelId;
     }

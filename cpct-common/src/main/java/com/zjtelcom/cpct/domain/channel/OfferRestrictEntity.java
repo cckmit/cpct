@@ -2,7 +2,7 @@ package com.zjtelcom.cpct.domain.channel;
 
 import java.util.Date;
 
-public class OfferRestrict {
+public class OfferRestrictEntity {
     private Long offerRestrictId;
 
     private Long offerId;
