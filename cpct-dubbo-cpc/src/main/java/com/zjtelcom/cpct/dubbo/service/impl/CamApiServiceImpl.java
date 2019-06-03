@@ -262,7 +262,9 @@ public class CamApiServiceImpl implements CamApiService {
                                     List<AssetPromDto> assetPromDtoList = assetDto.getAssetPromDtoList();
                                     for (AssetPromDto assetPromDto : assetPromDtoList) {
                                         prodStrList.add(assetPromDto.getSelectablePromNum());
-                                        filterRuleTimeMap.put(assetPromDto.getSelectablePromNum(), assetPromDto.getSelectablePromStartDate());
+                                        if (assetPromDto.getSelectablePromNum() != null && assetPromDto.getSelectablePromStartDate() != null) {
+                                            filterRuleTimeMap.put(assetPromDto.getSelectablePromNum(), assetPromDto.getSelectablePromStartDate());
+                                        }
                                     }
                                 }
                                 productStr = ChannelUtil.StringList2String(prodStrList);
@@ -285,7 +287,7 @@ public class CamApiServiceImpl implements CamApiService {
                                         if (index >= 0) {
                                             // 判断是否开启时间段过滤
                                             if ("true".equals(filterRule.getRemark())) {
-                                                Date date = (Date) filterRuleTimeMap.get("product");
+                                                Date date = (Date) filterRuleTimeMap.get(product);
                                                 // 判断时间段
                                                 if (date != null && date.after(filterRule.getEffectiveDate()) && date.before(filterRule.getFailureDate())) {
                                                     productCheck = false;
