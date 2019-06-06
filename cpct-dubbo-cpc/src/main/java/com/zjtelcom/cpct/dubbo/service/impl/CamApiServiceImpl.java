@@ -262,7 +262,9 @@ public class CamApiServiceImpl implements CamApiService {
                                     List<AssetPromDto> assetPromDtoList = assetDto.getAssetPromDtoList();
                                     for (AssetPromDto assetPromDto : assetPromDtoList) {
                                         prodStrList.add(assetPromDto.getSelectablePromNum());
-                                        filterRuleTimeMap.put(assetPromDto.getSelectablePromNum(), assetPromDto.getSelectablePromStartDate());
+                                        if (assetPromDto.getSelectablePromNum() != null && assetPromDto.getSelectablePromStartDate() != null) {
+                                            filterRuleTimeMap.put(assetPromDto.getSelectablePromNum(), assetPromDto.getSelectablePromStartDate());
+                                        }
                                     }
                                 }
                                 productStr = ChannelUtil.StringList2String(prodStrList);
@@ -285,7 +287,7 @@ public class CamApiServiceImpl implements CamApiService {
                                         if (index >= 0) {
                                             // 判断是否开启时间段过滤
                                             if ("true".equals(filterRule.getRemark())) {
-                                                Date date = (Date) filterRuleTimeMap.get("product");
+                                                Date date = (Date) filterRuleTimeMap.get(product);
                                                 // 判断时间段
                                                 if (date != null && date.after(filterRule.getEffectiveDate()) && date.before(filterRule.getFailureDate())) {
                                                     productCheck = false;
@@ -1160,7 +1162,18 @@ public class CamApiServiceImpl implements CamApiService {
 
         // 渠道话术拦截开关
         String channelFilterCode = (String) redisUtils.get("CHANNEL_FILTER_CODE");
-        int index = channelFilterCode.indexOf(mktCamChlConfDetail.getContactChlCode());
+        if (channelFilterCode == null){
+            List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("CHANNEL_FILTER_CODE");
+            if (sysParamsList != null && sysParamsList.size() > 0) {
+                channelFilterCode = sysParamsList.get(0).getParamValue();
+                redisUtils.set("CHANNEL_FILTER_CODE", channelFilterCode);
+            }
+        }
+        int index = -1;
+        if (channelFilterCode != null) {
+            index = channelFilterCode.indexOf(mktCamChlConfDetail.getContactChlCode());
+        }
+
         if (index >= 0) {
             //判断脚本中有无未查询到的标签
             if (contactScript != null) {
@@ -1169,8 +1182,7 @@ public class CamApiServiceImpl implements CamApiService {
                     return Collections.EMPTY_MAP;
                 }
             }
-            //返回结果中添加脚本信息
-            channelMap.put("contactScript", contactScript == null ? "" : contactScript);
+
             //痛痒点
             if (mktVerbalStr != null) {
                 if (subScript(mktVerbalStr).size() > 0) {
@@ -1178,9 +1190,10 @@ public class CamApiServiceImpl implements CamApiService {
                     return Collections.EMPTY_MAP;
                 }
             }
-            channelMap.put("reason", mktVerbalStr == null ? "" : mktVerbalStr);
         }
-
+        //返回结果中添加脚本信息
+        channelMap.put("contactScript", contactScript == null ? "" : contactScript);
+        channelMap.put("reason", mktVerbalStr == null ? "" : mktVerbalStr);
         //展示列标签
         return channelMap;
     }

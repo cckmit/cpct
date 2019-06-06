@@ -795,10 +795,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                 value = data.get(x);
                             }
                             if (value.contains("\r")){
-                                value.replace("\r","");
+                                value = value.replace("\r","");
                             }
                             if (value.contains("\n")){
-                                value.replace("\n","");
+                                value = value.replace("\n","");
                             }
                             if (codeList[x].equals("CCUST_NAME") && (value.contains("null") || value.equals(""))) {
                                 check = false;

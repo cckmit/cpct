@@ -39,7 +39,7 @@
         <commons-lang.version>2.6</commons-lang.version>
         <pagehelper.version>1.2.5</pagehelper.version>
         <QLExpress.version>3.2.0</QLExpress.version>
-        <dubbo-eagle-service.version>1.0.0</dubbo-eagle-service.version>
+        <dubbo-eagle-service.version>2.0.0</dubbo-eagle-service.version>
         <ehcache.version>2.9.1</ehcache.version>
         <groovy.version>2.4.7</groovy.version>
         <freemarker.version>2.3.23</freemarker.version>
@@ -65,7 +65,7 @@
         <service-batch.version>1.0.5</service-batch.version>
         <cpct-trial.version>1.0.1</cpct-trial.version>
         <smt-bss-cpc.version>1.0-SNAPSHOT</smt-bss-cpc.version>
-
+        <smt-bss-cpc-model.version>1.0.1</smt-bss-cpc-model.version>
     </properties>
 
     <parent>
@@ -468,7 +468,7 @@
             <dependency>
                 <groupId>com.ctzj.smt.bss</groupId>
                 <artifactId>smt-bss-cpc-model</artifactId>
-                <version>${smt-bss-cpc.version}</version>
+                <version>${smt-bss-cpc-model.version}</version>
             </dependency>
 
         </dependencies>
