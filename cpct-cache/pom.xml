@@ -62,6 +62,31 @@
             <version>1.9.3</version>
         </dependency>
 
+        <!-- ctgmq -->
+        <dependency>
+            <groupId>ctgmq.api</groupId>
+            <artifactId>ctgmq.api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ctgmq.client</groupId>
+            <artifactId>ctgmq.client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ctgmq.common</groupId>
+            <artifactId>ctgmq.common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ctgmq.remoting</groupId>
+            <artifactId>ctgmq.remoting</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ctgmq.srvutil</groupId>
+            <artifactId>ctgmq.srvutil</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ctgmq.tools</groupId>
+            <artifactId>ctgmq.tools</artifactId>
+        </dependency>
     </dependencies>
 
 

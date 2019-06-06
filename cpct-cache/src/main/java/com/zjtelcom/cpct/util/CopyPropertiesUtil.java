@@ -20,6 +20,7 @@ public class CopyPropertiesUtil extends PropertyUtilsBean {
 
     /**
      * 把orig和dest相同属性的value复制到dest中
+     *
      * @param dest
      * @param orig
      * @throws IllegalAccessException
@@ -39,37 +40,32 @@ public class CopyPropertiesUtil extends PropertyUtilsBean {
         }
         if (orig instanceof DynaBean) {
             DynaProperty origDescriptors[] =
-                    ( (DynaBean) orig).getDynaClass().getDynaProperties();
+                    ((DynaBean) orig).getDynaClass().getDynaProperties();
             for (int i = 0; i < origDescriptors.length; i++) {
                 String name = origDescriptors[i].getName();
                 if (PropertyUtils.isWriteable(dest, name)) {
-                    Object value = ( (DynaBean) orig).get(name);
+                    Object value = ((DynaBean) orig).get(name);
                     try {
                         getInstance().setSimpleProperty(dest, name, value);
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         ; // Should not happen
                     }
                 }
             }
-        }
-        else if (orig instanceof Map) {
-            Iterator names = ( (Map) orig).keySet().iterator();
+        } else if (orig instanceof Map) {
+            Iterator names = ((Map) orig).keySet().iterator();
             while (names.hasNext()) {
                 String name = (String) names.next();
                 if (PropertyUtils.isWriteable(dest, name)) {
-                    Object value = ( (Map) orig).get(name);
+                    Object value = ((Map) orig).get(name);
                     try {
                         getInstance().setSimpleProperty(dest, name, value);
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         ; // Should not happen
                     }
                 }
             }
-        }
-        else
-        {
+        } else {
             PropertyDescriptor origDescriptors[] =
                     PropertyUtils.getPropertyDescriptors(orig);
             for (int i = 0; i < origDescriptors.length; i++) {
@@ -82,11 +78,9 @@ public class CopyPropertiesUtil extends PropertyUtilsBean {
                     try {
                         Object value = PropertyUtils.getSimpleProperty(orig, name);
                         getInstance().setSimpleProperty(dest, name, value);
-                    }
-                    catch (IllegalArgumentException ie) {
+                    } catch (IllegalArgumentException ie) {
                         ; // Should not happen
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         ; // Should not happen
                     }
                 }
