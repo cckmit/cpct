@@ -142,7 +142,20 @@
     </if>
   </select>
 
-
+  <select id="fuzzySelectByName" resultType="java.util.HashMap">
+    select b.org_id orgId, b.org_name orgName
+    from org_rel a ,organization b
+    where a.status_cd=1000 and a.org_rel_type=1900 and a.z_org_id=b.org_id and b.org_division in (20,30)
+    <if test="null != parentIds and parentIds.size > 0">
+      and a.A_ORG_ID in
+      <foreach collection="parentIds" item="item" open="(" close=")" separator=",">
+        #{item}
+      </foreach>
+    </if>
+    <if test="null != orgName and '' != orgName">
+      and ORG_NAME like concat('%',concat(#{orgName},'%'))
+    </if>
+  </select>
 
 
 </mapper>

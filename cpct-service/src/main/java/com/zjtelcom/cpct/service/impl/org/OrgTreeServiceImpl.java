@@ -9,13 +9,11 @@ import com.zjtelcom.cpct.dao.org.OrgTreeMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.channel.Organization;
 import com.zjtelcom.cpct.domain.org.OrgTree;
-import com.zjtelcom.cpct.domain.org.OrgTreeDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.exception.SystemException;
 import com.zjtelcom.cpct.service.org.OrgTreeService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.FtpUtils;
-import com.zjtelcom.cpct.util.MapUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -158,7 +156,6 @@ public class OrgTreeServiceImpl implements OrgTreeService{
         maps.put("resultMsg",list);
         return  maps;
     }
-
 
     /**
      * 分段插入
@@ -322,8 +319,6 @@ public class OrgTreeServiceImpl implements OrgTreeService{
         System.out.println(list.get(0).toString());
     }
 
-
-
     public static void main(String[] args) throws IOException {
         //test();
         OrgTreeServiceImpl org=new OrgTreeServiceImpl();
@@ -331,8 +326,28 @@ public class OrgTreeServiceImpl implements OrgTreeService{
         String name="work.txt";
         org.getOrgTreeByFtp(name);
         System.out.println("耗时："+(System.currentTimeMillis()-start));
+    }
 
-
-
+    @Override
+    public Map<String,Object> fuzzyQuery(Map<String,Object> params){
+        Map<String,Object> map = new HashMap<>();
+        if(params == null || params.isEmpty()){
+            map.put("resultCode", CommonConstant.CODE_SUCCESS);
+            map.put("resultMsg","参数为空!");
+            return map;
+        }
+        List<String> areaIds = new ArrayList<>();
+        if(null != params.get("areaId") || ((List<String>)params.get("areaId")).size() > 0 ){
+            areaIds = (List<String>)params.get("areaId");
+        }
+        Integer page = Integer.valueOf((String) params.get("page"));
+        Integer pageSize = Integer.valueOf((String) params.get("pageSize"));
+        PageHelper.startPage(page,pageSize);
+        List<Map<String,String>> maps = organizationMapper.fuzzySelectByName(areaIds, params.get("fuzzyField") == null ? "":(String)params.get("fuzzyField"));
+        Page pageInfo = new Page(new PageInfo(maps));
+        map.put("resultCode", CommonConstant.CODE_SUCCESS);
+        map.put("resultMsg",maps);
+        map.put("page",pageInfo);
+        return map;
     }
 }
