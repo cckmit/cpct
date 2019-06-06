@@ -74,8 +74,6 @@ import static com.zjtelcom.cpct.constants.CommonConstant.*;
 @Service
 @Transactional
 public class MktCampaignServiceImpl extends BaseService implements MktCampaignService {
-    @Value("${sync.value}")
-    private String value;
 
 
     /**
@@ -1138,7 +1136,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
             } else if(StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)){
                 // 活动下线清缓存
-                redisUtils.remove("MKT_CAMPAIGN_" + mktCampaignId);
+                redisUtils.del("MKT_CAMPAIGN_" + mktCampaignId);
             }
 
             if (StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)) {

@@ -25,7 +25,8 @@ public enum ConfAttrEnum {
     RULE(500600010009L, "协同规则"),
     PUSH_TYPE(500600010010L, "推送方式"),
     IVR_NUMBER(500600010011L, "IVR外显号码"),
-    ACCOUNT(500600010012L, "接触账号");
+    ACCOUNT(500600010012L, "接触账号"),
+    AREA(500600010020L, "区域");
 
     private Long arrId;
     private String arrName;

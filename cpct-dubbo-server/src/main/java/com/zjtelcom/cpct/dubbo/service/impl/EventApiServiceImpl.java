@@ -57,6 +57,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
@@ -504,8 +505,8 @@ public class EventApiServiceImpl implements EventApiService {
 
                 //判断是否有流量事件,EVTS000001001,EVTS000001002
                 // CPCP_USED_FLOW为已使用流量， CPCP_LEFT_FLOW为剩余流量, CPCP_NEED_FLOW 需要流量
-                String channelCode = (String) map.get("channelCode");
-                if("EVTS000001001".equals(channelCode)|| "EVTS000001002".equals(channelCode) && evtParams!=null
+                String eventCode = (String) map.get("eventCode");
+                if("EVTS000001001".equals(eventCode)|| "EVTS000001002".equals(eventCode) && evtParams!=null
                         && evtParams.get("CPCP_USED_FLOW")!=null && evtParams.get("CPCP_LEFT_FLOW")!=null){
                     String cpcpNeedFlow = getCpcpNeedFlow((String) evtParams.get("CPCP_USED_FLOW"), (String) evtParams.get("CPCP_LEFT_FLOW"));
                     labelItems.put("CPCP_NEED_FLOW", cpcpNeedFlow);
@@ -2074,14 +2075,14 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 }
 
-                List<String> mktCamCodeList = (List<String>) redisUtils.get("MKT_CAM_API_CODE");
+                List<String> mktCamCodeList = (List<String>) redisUtils.get("MKT_CAM_API_CODE_KEY");
                 if (mktCamCodeList == null) {
                     List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("MKT_CAM_API_CODE");
                     mktCamCodeList = new ArrayList<String>();
                     for (SysParams sysParams : sysParamsList) {
                         mktCamCodeList.add(sysParams.getParamValue());
                     }
-                    redisUtils.set("MKT_CAM_API_CODE", mktCamCodeList);
+                    redisUtils.set("MKT_CAM_API_CODE_KEY", mktCamCodeList);
                 }
 
                 if (strategyMapList != null && strategyMapList.size() > 0) {
@@ -2312,13 +2313,13 @@ public class EventApiServiceImpl implements EventApiService {
                             }
 
                             // 销售品过滤
-                            //String custProdFilter = (String) redisUtils.get("CUST_PROD_FILTER");
-                            String custProdFilter = null;
+                            String custProdFilter = (String) redisUtils.get("CUST_PROD_FILTER");
+                            //String custProdFilter = null;
                             if (custProdFilter == null) {
                                 List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("CUST_PROD_FILTER");
                                 if (sysParamsList != null && sysParamsList.size() > 0) {
                                     custProdFilter = sysParamsList.get(0).getParamValue();
-                                   // redisUtils.set("CUST_PROD_FILTER", custProdFilter);
+                                    redisUtils.set("CUST_PROD_FILTER", custProdFilter);
                                 }
                             }
 
@@ -2459,18 +2460,14 @@ public class EventApiServiceImpl implements EventApiService {
         // 剩余的流量数
         double cpcpLeftFlowDouble = Double.valueOf(cpcpLeftFlow.replace("GB", ""));
         // 这个月到currentDay过的日均用量
-        double userAvg = (cpcpUsedFlowDouble - cpcpLeftFlowDouble) / currentDay;
+        double userAvg = cpcpUsedFlowDouble / currentDay;
         // 需要流量
-        int needFlowGB = (int) (userAvg * (lastDay - currentDay));
-        int needFlowMB = (int) (userAvg * (lastDay - currentDay) - needFlowGB);
-        String needFlow = "";
-        if (needFlowGB > 0) {
-            needFlow = needFlowGB + "GB";
-            if (needFlowMB > 0) {
-                needFlow += needFlowMB + "MB";
-            }
+        double needFlow = 0;
+        if (userAvg * (lastDay - currentDay) > cpcpLeftFlowDouble) {
+            needFlow = (userAvg * (lastDay - currentDay) - cpcpLeftFlowDouble ) * 1024;
         }
-        return needFlow;
+        DecimalFormat df = new DecimalFormat("#.##");
+        return String.valueOf(df.format(needFlow));
     }
 
 }

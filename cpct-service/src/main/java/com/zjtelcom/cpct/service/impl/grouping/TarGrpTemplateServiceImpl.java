@@ -7,6 +7,9 @@
 package com.zjtelcom.cpct.service.impl.grouping;
 
 import com.alibaba.fastjson.JSON;
+import com.ctzj.smt.bss.cpc.configure.service.api.offer.IOfferRestrictConfigureService;
+import com.ctzj.smt.bss.cpc.evn.type.EvnType;
+import com.ctzj.smt.bss.cpc.model.offer.atomic.OfferRestrict;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.IFuncCompDubboService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -107,8 +110,9 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     private ProductService productService;
     @Autowired
     private MktCamCustMapper camCustMapper;
-    @Value("${sync.value}")
-    private String value;
+    @Autowired(required = false)
+    private IOfferRestrictConfigureService iOfferRestrictConfigureService;
+
 
 
     /**
@@ -262,11 +266,11 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             instVO.setOfferName(offer.getOfferName());
             instVO.setOfferList(offerList);
             //客户分群列表
-            List<OfferRestrict> restrict = offerRestrictMapper.selectByOfferId(offerId,"7000");
+            List<OfferRestrictEntity> restrict = offerRestrictMapper.selectByOfferId(offerId,"7000");
             if (restrict!=null && restrict.size()>0){
                 List<TarGrpCondition> tarGrpConditions = new ArrayList<>();
                 boolean save = false;
-                for (OfferRestrict offerRestrict : restrict){
+                for (OfferRestrictEntity offerRestrict : restrict){
                     if (offerRestrict.getRstrObjId()==null){
                         continue;
                     }
@@ -311,10 +315,10 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             }
             instVO.setResourceList(resourceList);
             //渠道列表
-            List<OfferRestrict> channelRestrictList = offerRestrictMapper.selectByOfferId(offerId,"5000");
+            List<OfferRestrictEntity> channelRestrictList = offerRestrictMapper.selectByOfferId(offerId,"5000");
             List<ChannelDetail> channelList = new ArrayList<>();
             List<Long> channelIdList = new ArrayList<>();
-            for (OfferRestrict channelRestrict : channelRestrictList ){
+            for (OfferRestrictEntity channelRestrict : channelRestrictList ){
                 GrpSystemRel grpSystemRel = grpSystemRelMapper.selectByOfferId(channelRestrict.getRstrObjId());
                 if (grpSystemRel==null){
                     continue;
@@ -425,7 +429,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             offerRestrict.setUpdateStaff(UserUtil.loginId());
             offerRestrict.setCreateStaff(UserUtil.loginId());
             offerRestrict.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-            offerRestrictMapper.insert(offerRestrict);
+            iOfferRestrictConfigureService.saveOfferRestrict(offerRestrict, EvnType.EVO);
         }
         if (SystemParamsUtil.isSync()){
             new Thread(){

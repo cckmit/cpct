@@ -39,7 +39,7 @@
         <commons-lang.version>2.6</commons-lang.version>
         <pagehelper.version>1.2.5</pagehelper.version>
         <QLExpress.version>3.2.0</QLExpress.version>
-        <dubbo-eagle-service.version>1.0.0</dubbo-eagle-service.version>
+        <dubbo-eagle-service.version>2.0.0</dubbo-eagle-service.version>
         <ehcache.version>2.9.1</ehcache.version>
         <groovy.version>2.4.7</groovy.version>
         <freemarker.version>2.3.23</freemarker.version>
@@ -63,6 +63,9 @@
         <bss-centralized.verson>1.6</bss-centralized.verson>
         <service-batch.version>1.0.5</service-batch.version>
         <ctgmq.version>2.4.0</ctgmq.version>
+        <cpct-trial.version>1.0.1</cpct-trial.version>
+        <smt-bss-cpc.version>1.0-SNAPSHOT</smt-bss-cpc.version>
+
     </properties>
 
     <parent>
@@ -407,32 +410,32 @@
                 <artifactId>bss-centralized-authenticate</artifactId>
                 <version>${bss-centralized.verson}</version>
             </dependency>
-            <!--<dependency>-->
-                <!--<groupId>com.zjhcsoft.session</groupId>-->
-                <!--<artifactId>spring-session</artifactId>-->
-                <!--<version>${spring-session.verson}</version>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-                <!--<groupId>com.zjhcsoft.session</groupId>-->
-                <!--<artifactId>spring-session-api</artifactId>-->
-                <!--<version>${spring-session.verson}</version>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-                <!--<groupId>org.springframework.boot</groupId>-->
-                <!--<artifactId>spring-boot-starter-security</artifactId>-->
-                <!--<version>${security.verson}</version>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-                <!--<groupId>org.springframework.session</groupId>-->
-                <!--<artifactId>spring-session-data-redis</artifactId>-->
-                <!--<version>${session-data-redis.verson}</version>-->
-                <!--<exclusions>-->
-                    <!--<exclusion>-->
-                        <!--<groupId>org.springframework.session</groupId>-->
-                        <!--<artifactId>spring-session</artifactId>-->
-                    <!--</exclusion>-->
-                <!--</exclusions>-->
-            <!--</dependency>-->
+            <dependency>
+                <groupId>com.zjhcsoft.session</groupId>
+                <artifactId>spring-session</artifactId>
+                <version>${spring-session.verson}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.zjhcsoft.session</groupId>
+                <artifactId>spring-session-api</artifactId>
+                <version>${spring-session.verson}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-security</artifactId>
+                <version>${security.verson}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.session</groupId>
+                <artifactId>spring-session-data-redis</artifactId>
+                <version>${session-data-redis.verson}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework.session</groupId>
+                        <artifactId>spring-session</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
@@ -480,6 +483,24 @@
                 <groupId>ctgmq.tools</groupId>
                 <artifactId>ctgmq.tools</artifactId>
                 <version>${ctgmq.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.zjtelcom.cpct</groupId>
+                <artifactId>cpct-trial</artifactId>
+                <version>${cpct-trial.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ctzj.smt.bss</groupId>
+                <artifactId>smt-bss-cpc-configure-dubbo-api</artifactId>
+                <version>${smt-bss-cpc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ctzj.smt.bss</groupId>
+                <artifactId>smt-bss-cpc-model</artifactId>
+                <version>${smt-bss-cpc.version}</version>
             </dependency>
 
         </dependencies>

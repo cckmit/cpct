@@ -52,8 +52,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
     @Autowired
     private SynMessageLabelService synMessageLabelService;
 
-    @Value("${sync.value}")
-    private String value;
+
 
     /**
      * 查询标签列表
