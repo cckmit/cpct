@@ -110,8 +110,8 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     private ProductService productService;
     @Autowired
     private MktCamCustMapper camCustMapper;
-    @Autowired(required = false)
-    private IOfferRestrictConfigureService iOfferRestrictConfigureService;
+//    @Autowired(required = false)
+//    private IOfferRestrictConfigureService iOfferRestrictConfigureService;
 
 
 
