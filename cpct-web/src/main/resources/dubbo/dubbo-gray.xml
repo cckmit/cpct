@@ -67,4 +67,9 @@
         <dubbo:method name="getCpcTargrp" servicecode="00.1083.getCpcTargrp" timeout="10000"/>
     </dubbo:reference>
 
+    <dubbo:reference registry="esb2" interface="com.ctzj.smt.bss.cpc.configure.service.api.offer.IOfferRestrictConfigureService"
+                     id="offerRestrictConfigureServiceImpl" version="2.0" check="false">
+        <dubbo:method name="saveOfferRestrict" servicecode="00.1076.offerRestrict.saveOfferRestrict" timeout="120000"/>
+    </dubbo:reference>
+
 </beans>

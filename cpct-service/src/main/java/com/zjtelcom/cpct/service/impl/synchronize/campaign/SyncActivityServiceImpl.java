@@ -11,21 +11,24 @@ import com.alibaba.fastjson.JSONObject;
 import com.zjhcsoft.eagle.main.dubbo.model.policy.*;
 import com.zjhcsoft.eagle.main.dubbo.service.ActivitySyncService;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
 import com.zjtelcom.cpct.dao.channel.MktVerbalMapper;
 import com.zjtelcom.cpct.dao.channel.OfferMapper;
+import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.CamScript;
+import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.MktVerbal;
 import com.zjtelcom.cpct.domain.channel.Offer;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
+import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.enums.TrialCreateType;
-import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SyncActivityService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +62,12 @@ public class SyncActivityServiceImpl implements SyncActivityService {
 
     @Autowired
     private MktVerbalMapper mktVerbalMapper;
+
+    @Autowired
+    private TarGrpConditionMapper tarGrpConditionMapper;
+
+    @Autowired
+    private InjectionLabelMapper injectionLabelMapper;
 
     @Autowired(required = false)
     private ActivitySyncService activitySyncService;
@@ -153,6 +162,30 @@ public class SyncActivityServiceImpl implements SyncActivityService {
 
                 }
                 ruleModel.setVerbalDms(verbalDmsModelList);
+
+                // 分群条件 + 标签
+                List<TarGrpConditionModel> tarGrpConditionModelList = new ArrayList<>();
+                List<LabelModel> labelModelList = new ArrayList<>();
+                if (mktStrategyConfRuleDO.getTarGrpId() != null && !"".equals(mktStrategyConfRuleDO.getTarGrpId())) {
+                    List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(mktStrategyConfRuleDO.getTarGrpId());
+                    if (conditionList != null && conditionList.size() > 0) {
+                        for (TarGrpCondition tarGrpCondition : conditionList) {
+                            TarGrpConditionModel tarGrpConditionModel = new TarGrpConditionModel();
+                            LabelModel labelModel = new LabelModel();
+                            // 通过左参获取标签
+                            Label label = injectionLabelMapper.selectByPrimaryKey(Long.valueOf(tarGrpCondition.getLeftParam()));
+                            // 获取分群条件
+                            tarGrpConditionModel.setLeftParam(label.getInjectionLabelCode());
+                            tarGrpConditionModel.setOperType(tarGrpCondition.getOperType());
+                            tarGrpConditionModel.setRightParam(tarGrpCondition.getRightParam());
+                            tarGrpConditionModelList.add(tarGrpConditionModel);
+                            // 获取标签
+                            labelModel.setInjectionLabelCode(label.getInjectionLabelCode());
+                            labelModel.setInjectionLabelName(label.getInjectionLabelName());
+                            labelModelList.add(labelModel);
+                        }
+                    }
+                }
                 ruleList.add(ruleModel);
             }
             policyModel.setRuleList(ruleList);

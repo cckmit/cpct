@@ -42,7 +42,7 @@
     </dubbo:reference>
 
     <!-- redis实时查询服务 -->
-    <dubbo:service registry="esb_dev" interface="com.zjtelcom.cpct.dubbo.service.TrialRedisService" ref="trialRedisServiceImpl" version="1.0" >
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.TrialRedisService" ref="trialRedisServiceImpl" version="1.0" >
         <dubbo:method name="searchFromRedis" servicecode="00.1083.searchFromRedis" timeout="10000"/>
         <dubbo:method name="updateOperationStatus" servicecode="00.1083.updateOperationStatus" timeout="10000"/>
     </dubbo:service>
@@ -69,14 +69,9 @@
     </dubbo:reference>
 
     <!-- 事件接入活动任务订阅 1.0 -->
-    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.CamApiService" id="camApiService"
+    <dubbo:reference registry="esb_dev" interface="com.zjtelcom.cpct.dubbo.service.CamApiService" id="camApiService"
                      version="1.0" retries="0" check="false">
         <dubbo:method name="ActivityTask" servicecode="00.1083.ActivityTask" timeout="15000"/>
     </dubbo:reference>
-
-    <!--&lt;!&ndash; cpc提供流向校验服务 &ndash;&gt;-->
-    <!--<dubbo:service interface="com.zjtelcom.cpct.dubbo.service.MktCampaignApiService" ref="mktCampaignApiServiceImpl" version="1.0" >-->
-        <!--<dubbo:method name="flowCheck" servicecode="00.1083.flowCheck" timeout="10000"/>-->
-    <!--</dubbo:service>-->
 
 </beans>

@@ -5,11 +5,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
+import com.mysql.jdbc.StringUtils;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
-import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
+import com.zjtelcom.cpct.dao.channel.MktCamCustMapper;
+import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
@@ -17,7 +20,6 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
-import com.zjtelcom.cpct.domain.Rule;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
@@ -54,12 +56,7 @@ import com.zjtelcom.es.es.entity.model.LabelResultES;
 import com.zjtelcom.es.es.entity.model.TrialOperationParamES;
 import com.zjtelcom.es.es.entity.model.TrialResponseES;
 import com.zjtelcom.es.es.service.EsService;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -1230,6 +1227,22 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     labelCodeList.add(set);
                 }
                 map.put(set, searchMap.get(set));
+                // 数据脱敏(客户证件号)，查询全局开关（0：关；1：开）
+                String dataDesFilter = (String) redisUtils.get("DATA_DESENSITIZATION_FILTER");
+                if (dataDesFilter == null) {
+                    List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("DATA_DESENSITIZATION_FILTER");
+                    if (sysParamsList != null && sysParamsList.size() > 0) {
+                        dataDesFilter = sysParamsList.get(0).getParamValue();
+                        redisUtils.set("DATA_DESENSITIZATION_FILTER", dataDesFilter);
+                    }
+                }
+                // 数据脱敏(客户证件号)，脱敏操作
+                if (set.equals("ID_NBR") && ( null == dataDesFilter || dataDesFilter.equals("1"))) {
+                    String value = dataDesensitization((String) searchMap.get(set));
+                    map.put(set, value);
+                } else {
+                    map.put(set, searchMap.get(set));
+                }
             }
             map.put("campaignId", operation.getCampaignId());
             map.put("campaignName", operation.getCampaignName());
@@ -1252,7 +1265,23 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         return result;
     }
 
-
+    private String dataDesensitization(String sfz) {
+        String sfzyc = "";
+        if (!StringUtils.isNullOrEmpty(sfz)) {
+            if (sfz.length() == 18 || sfz.length() == 15) {
+                sfzyc = (sfz.substring(0, 6) + "********" + sfz.substring(sfz.length() - 4, sfz.length()));
+            } else if (sfz.length() == 10) {
+                sfzyc = (sfz.substring(0, 7) + "***");
+            } else if (sfz.length() > 18) {
+                sfzyc = (sfz.substring(0, 6) + "********" + sfz.substring(sfz.length() - 4, sfz.length()));
+            } else if (sfz.length() - 2 >= 4) {
+                sfzyc = (sfz.substring(0, 2) + "******" + sfz.substring(sfz.length() - 2, sfz.length()));
+            } else if (sfz.length() - 2 >= 1) {
+                sfzyc = (sfz.substring(0, 1) + "*****" + sfz.substring(sfz.length() - 1, sfz.length()));
+            }
+        }
+        return sfzyc;
+    }
 
     /**
      * 下发策略试运算结果

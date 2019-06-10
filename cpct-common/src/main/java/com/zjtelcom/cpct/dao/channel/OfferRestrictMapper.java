@@ -1,7 +1,7 @@
 package com.zjtelcom.cpct.dao.channel;
 
 
-import com.zjtelcom.cpct.domain.channel.OfferRestrict;
+import com.zjtelcom.cpct.domain.channel.OfferRestrictEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -13,15 +13,15 @@ import java.util.List;
 public interface OfferRestrictMapper {
     int deleteByPrimaryKey(Long offerRestrictId);
 
-    int insert(OfferRestrict record);
+    int insert(OfferRestrictEntity record);
 
-    OfferRestrict selectByPrimaryKey(Long offerRestrictId);
+    OfferRestrictEntity selectByPrimaryKey(Long offerRestrictId);
 
-    List<OfferRestrict> selectAll();
+    List<OfferRestrictEntity> selectAll();
 
-    int updateByPrimaryKey(OfferRestrict record);
+    int updateByPrimaryKey(OfferRestrictEntity record);
 
-    List<OfferRestrict> selectByOfferId(@Param("offerId") Long offerId,@Param("type")String type);
+    List<OfferRestrictEntity> selectByOfferId(@Param("offerId") Long offerId, @Param("type")String type);
 
     Long selectBatchNoNum();
 }
