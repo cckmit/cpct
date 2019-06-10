@@ -38,3 +38,26 @@ spring:
       min-idle: 0
     timeout: 30000
 
+
+# cpct_pst_topic 下二個分組 producerGroupName  producerGroupName2
+# cpct_push_end_topic 1個分組 pushGroupName : cpct_push_end_consumer
+ctg:
+  namesrvAddr: 134.108.11.159:9892;134.108.11.160:9892;134.108.11.161:9892
+  producerGroupName: cpct_pst_consumer
+  producerGroupName2: cpct_pst_consumer1
+  namesrvAuthID: cpct_user
+  namesrvAuthPwd: cpct_user123
+  consumeOrderly: false
+  instanceName: prod_es
+  maxMessageSize: 8242880
+  sendMaxRetryTimes: 2
+  sendMsgTimeout: 30000
+  compressMsgBodyOverHowmuch: 4098
+  clusterName: pst_crm_mq
+  tenantID: 2
+  topic: cpct_pst_topic
+
+  pushGroupName : cpct_push_end_consumer
+  pushGroupName2 : cpct_push_end_consumer1
+  pushTopic : cpct_push_end_topic
+

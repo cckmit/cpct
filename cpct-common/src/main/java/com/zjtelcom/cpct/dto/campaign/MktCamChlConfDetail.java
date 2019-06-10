@@ -25,7 +25,10 @@ public class MktCamChlConfDetail extends MktCamChlConf{
     private List<VerbalVO> verbalVOList;
 
     private CamScript camScript;
-
+    // iSee派单到人=1，派单到区域=2
+    private String order0ption;
+    // iSee派单到的详细值
+    private String order0ptionValue;
 
 
     public List<MktCamChlConfAttr> getMktCamChlConfAttrList() {
