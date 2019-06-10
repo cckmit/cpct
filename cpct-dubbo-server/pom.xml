@@ -97,11 +97,17 @@
         </dependency>
 
         <dependency>
+            <groupId>com.telin</groupId>
+            <artifactId>dubbo-wt</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+
+        <dependency>
             <groupId>com.zjtelcom.es</groupId>
             <artifactId>es-event-access</artifactId>
             <version>1.0.1</version>
         </dependency>
-
 
         <!-- 黄懿慧dubbo服务jar包 -->
         <dependency>
@@ -113,6 +119,19 @@
         <dependency>
             <groupId>com.zjhcsoft.eagle</groupId>
             <artifactId>dubbo-eagle-service</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.ctzj.smt.bss</groupId>
+            <artifactId>bss-cache-query-service-api</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ctzj.smt.bss</groupId>
+            <artifactId>bss-customer-model</artifactId>
+            <version>1.0</version>
         </dependency>
     </dependencies>
 

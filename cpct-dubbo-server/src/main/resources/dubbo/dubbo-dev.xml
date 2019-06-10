@@ -42,10 +42,10 @@
     </dubbo:reference>
 
     <!-- redis实时查询服务 -->
-    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.TrialRedisService" ref="trialRedisServiceImpl" version="1.0" >
-        <dubbo:method name="searchFromRedis" servicecode="00.1083.searchFromRedis" timeout="10000"/>
-        <dubbo:method name="updateOperationStatus" servicecode="00.1083.updateOperationStatus" timeout="10000"/>
-    </dubbo:service>
+    <!--<dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.TrialRedisService" ref="trialRedisServiceImpl" version="1.0" >-->
+        <!--<dubbo:method name="searchFromRedis" servicecode="00.1083.searchFromRedis" timeout="10000"/>-->
+        <!--<dubbo:method name="updateOperationStatus" servicecode="00.1083.updateOperationStatus" timeout="10000"/>-->
+    <!--</dubbo:service>-->
 
 
     <!-- 活动发布接口 -->
@@ -73,5 +73,17 @@
                      version="1.0" retries="0" check="false">
         <dubbo:method name="ActivityTask" servicecode="00.1083.ActivityTask" timeout="15000"/>
     </dubbo:reference>
+
+    <!-- 通过号码查询微厅绑定状态-->
+    <dubbo:reference registry="esb2" id="queryBindByAccCardService" interface="com.telin.dubbo.service.QueryBindByAccCardService" version="1.0" retries="0" check="false">
+        <dubbo:method name="queryBindByAccCard" servicecode="33.1037.queryBindByAccCard"  timeout="10000"/>
+    </dubbo:reference>
+
+
+    <!-- 根据accNum和statusCd查询prodInstId -->
+    <dubbo:reference registry="esb3" id="iCacheProdIndexQryService" interface="com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheProdIndexQryService" version="1.0" retries="0" check="false">
+        <dubbo:method name="qryProdInstIndex3" servicecode="00.1074.qryProdInstIndex3"  timeout="10000"/>
+    </dubbo:reference>
+
 
 </beans>
