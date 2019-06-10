@@ -708,12 +708,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 return result;
             }
             for (int i = 0; i < nameList.length; i++) {
-                if (labelNameList.contains(nameList[i])) {
+                if (labelNameList.contains(nameList[i].trim())) {
                     result.put("resultCode", CODE_FAIL);
                     result.put("resultMsg", "标签中文名称不能重复:" + "\"" + nameList[i] + "\"");
                     return result;
                 }
-                if (labelEngNameList.contains(codeList[i])) {
+                if (labelEngNameList.contains(codeList[i].trim())) {
                     result.put("resultCode", CODE_FAIL);
                     result.put("resultMsg", "标签英文名称不能重复:" + "\"" + codeList[i] + "\"");
                     return result;
@@ -792,10 +792,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                 value = data.get(x);
                             }
                             if (value.contains("\r")){
-                                value.replace("\r","");
+                                value = value.replace("\r","");
                             }
                             if (value.contains("\n")){
-                                value.replace("\n","");
+                                value = value.replace("\n","");
                             }
                             if (codeList[x].equals("CCUST_NAME") && (value.contains("null") || value.equals(""))) {
                                 check = false;
