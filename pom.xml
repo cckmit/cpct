@@ -61,11 +61,11 @@
         <session-data-redis.verson>1.3.3.RELEASE</session-data-redis.verson>
         <dubbo-server.version>1.1.6</dubbo-server.version>
         <bss-centralized.verson>1.6</bss-centralized.verson>
-
         <service-batch.version>1.0.5</service-batch.version>
+        <ctgmq.version>2.4.0</ctgmq.version>
         <cpct-trial.version>1.0.1</cpct-trial.version>
         <smt-bss-cpc.version>1.0-SNAPSHOT</smt-bss-cpc.version>
-
+        <smt-bss-cpc-model.version>1.0.1</smt-bss-cpc-model.version>
     </properties>
 
     <parent>
@@ -453,6 +453,38 @@
                 <version>5.1.45</version>
             </dependency>
 
+            <!-- ctgmq -->
+            <dependency>
+                <groupId>ctgmq.api</groupId>
+                <artifactId>ctgmq.api</artifactId>
+                <version>${ctgmq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ctgmq.client</groupId>
+                <artifactId>ctgmq.client</artifactId>
+                <version>${ctgmq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ctgmq.common</groupId>
+                <artifactId>ctgmq.common</artifactId>
+                <version>${ctgmq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ctgmq.remoting</groupId>
+                <artifactId>ctgmq.remoting</artifactId>
+                <version>${ctgmq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ctgmq.srvutil</groupId>
+                <artifactId>ctgmq.srvutil</artifactId>
+                <version>${ctgmq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ctgmq.tools</groupId>
+                <artifactId>ctgmq.tools</artifactId>
+                <version>${ctgmq.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.zjtelcom.cpct</groupId>
                 <artifactId>cpct-trial</artifactId>
@@ -468,7 +500,7 @@
             <dependency>
                 <groupId>com.ctzj.smt.bss</groupId>
                 <artifactId>smt-bss-cpc-model</artifactId>
-                <version>${smt-bss-cpc.version}</version>
+                <version>${smt-bss-cpc-model.version}</version>
             </dependency>
 
         </dependencies>
