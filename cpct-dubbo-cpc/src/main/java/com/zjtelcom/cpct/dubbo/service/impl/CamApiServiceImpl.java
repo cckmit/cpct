@@ -1084,18 +1084,13 @@ public class CamApiServiceImpl implements CamApiService {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
                 taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
                 taskChlAttrList.add(taskChlAttr);
-            }
-
-            if (mktCamChlConfAttr.getAttrId() == 500600010005L || mktCamChlConfAttr.getAttrId() == 500600010011L) {
+            } else if (mktCamChlConfAttr.getAttrId() == 500600010005L || mktCamChlConfAttr.getAttrId() == 500600010011L) {
                 taskChlAttr = new ConcurrentHashMap<>();
                 taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
                 taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
                 taskChlAttr.put("attrValue", mktCamChlConfAttr.getAttrValue());
                 taskChlAttrList.add(taskChlAttr);
-            }
-
-            //判断渠道生失效时间
-            if (mktCamChlConfAttr.getAttrId() == 500600010006L) {
+            } else if (mktCamChlConfAttr.getAttrId() == 500600010006L) { //判断渠道生失效时间
                 if (!now.after(new Date(Long.parseLong(mktCamChlConfAttr.getAttrValue())))) {
                     checkTime = false;
                 } else {
@@ -1106,8 +1101,7 @@ public class CamApiServiceImpl implements CamApiService {
                     taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
                     taskChlAttrList.add(taskChlAttr);
                 }
-            }
-            if (mktCamChlConfAttr.getAttrId() == 500600010007L) {
+            } else if (mktCamChlConfAttr.getAttrId() == 500600010007L) {
                 if (now.after(new Date(Long.parseLong(mktCamChlConfAttr.getAttrValue())))) {
                     checkTime = false;
                 } else {
@@ -1118,16 +1112,10 @@ public class CamApiServiceImpl implements CamApiService {
                     taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
                     taskChlAttrList.add(taskChlAttr);
                 }
-            }
-
-            //获取调查问卷ID
-            if (mktCamChlConfAttr.getAttrId() == 500600010008L) {
+            } else if (mktCamChlConfAttr.getAttrId() == 500600010008L) {  //获取调查问卷ID
                 //调查问卷
                 channelMap.put("naireId", mktCamChlConfAttr.getAttrValue());
-            }
-
-            //获取接触账号/推送账号(如果有)
-            if (mktCamChlConfAttr.getAttrId() == 500600010012L) {
+            } else if (mktCamChlConfAttr.getAttrId() == 500600010012L) {   //获取接触账号/推送账号(如果有)
                 if (mktCamChlConfAttr.getAttrValue() != null && !"".equals(mktCamChlConfAttr.getAttrValue())) {
                     if (context.containsKey(mktCamChlConfAttr.getAttrValue())) {
                         channelMap.put("contactAccount", context.get(mktCamChlConfAttr.getAttrValue()));
@@ -1136,7 +1124,14 @@ public class CamApiServiceImpl implements CamApiService {
                         return Collections.EMPTY_MAP;
                     }
                 }
+            } else {
+                taskChlAttr = new ConcurrentHashMap<>();
+                taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
+                taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
+                taskChlAttr.put("attrValue", mktCamChlConfAttr.getAttrValue().toString());
+                taskChlAttrList.add(taskChlAttr);
             }
+
         }
         channelMap.put("taskChlAttrList", taskChlAttrList);
 
