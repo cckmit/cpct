@@ -287,7 +287,7 @@ public class CamApiServiceImpl implements CamApiService {
                                 log.info("PROM_INTEG_ID --->" + promIntegId);
                                 List<String> prodStrList = new ArrayList<>();
                                 // 根据prodInstId 和 statusCd(1000-有效)查询offerProdInstRelId
-                                CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferInstRelIndex2(promIntegId, "1000");
+                                CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex2(promIntegId, "1000");
                                 log.info("111------setCacheResultObject --->" + JSON.toJSONString(setCacheResultObject));
                                 if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null) {
                                     Set<String> offerProdInstRelIdSet = setCacheResultObject.getResultObject();
