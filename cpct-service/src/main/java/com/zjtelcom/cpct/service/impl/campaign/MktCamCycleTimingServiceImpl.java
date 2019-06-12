@@ -23,7 +23,7 @@ public class MktCamCycleTimingServiceImpl extends BaseService implements MktCamC
 
     @Autowired
     MktCampaignMapper mktCampaignMapper;
-    @Autowired
+    @Autowired(required = false)
     TrialOperationService trialOperationService;
     @Autowired
     MktCamStrategyConfRelMapper mktCamStrategyConfRelMapper;

@@ -30,9 +30,9 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 @RestController
 @RequestMapping("${adminPath}/trialOperation")
 public class TrialOperationController extends BaseController {
-    @Autowired
+    @Autowired(required = false)
     private TrialOperationService operationService;
-    @Autowired
+    @Autowired(required = false)
     private TrialProdService trialProdService;
 
     /**
