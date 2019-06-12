@@ -706,42 +706,43 @@ public class CamApiServiceImpl implements CamApiService {
                                     redisUtils.set("REAL_PROD_FILTER", realProdFilter);
                                 }
                             }
-                            // 获取本地网的中文名
-                            String lanName = AreaNameEnum.getNameByLandId(Long.valueOf(lanId));
-
-                            String integrationId = params.get("integrationId");
-                            if (realProdFilter != null && "1".equals(realProdFilter)) {
-//                                ResponseResult<AssetDto> assetDtoResponseResult = ctgCacheAssetService.queryCachedAssetDetailByIntegId(integrationId, lanName);
-//                                AssetDto assetDto = assetDtoResponseResult.getData();
+                            if (realProdFilter != null && "2".equals(realProdFilter)) {
                                 List<String> prodStrList = new ArrayList<>();
-                                // 根据prodInstId 和 statusCd(1000-有效)查询offerProdInstRelId
-                                CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferInstRelIndex2(promIntegId, "1000");
-                                if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null) {
-                                    Set<String> offerProdInstRelIdSet = setCacheResultObject.getResultObject();
-                                    for (String offerProdInstRelId : offerProdInstRelIdSet) {
-                                        // 查询销售品产品实例关系缓存实体
-                                        CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
-                                        if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
-                                            OfferProdInstRel offerProdInstRel = offerProdInstRelCacheEntity.getResultObject();
+                                log.info("111------accNbr --->" + params.get("accNbr"));
+                                CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(params.get("accNbr"));
+                                log.info("222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
+                                if(prodInstIdsObject!=null &&  prodInstIdsObject.getResultObject() !=null ){
+                                    Set<String> prodInstIds = prodInstIdsObject.getResultObject();
+                                    for (String prodInstId : prodInstIds) {
+                                        // 根据prodInstId 和 statusCd(1000-有效)查询offerProdInstRelId
+                                        log.info("333------prodInstId --->" + prodInstId);
+                                        CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex2(prodInstId, "1000");
+                                        log.info("444------setCacheResultObject --->" + JSON.toJSONString(setCacheResultObject));
+                                        if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null) {
+                                            Set<String> offerProdInstRelIdSet = setCacheResultObject.getResultObject();
+                                            for (String offerProdInstRelId : offerProdInstRelIdSet) {
+                                                // 查询销售品产品实例关系缓存实体
+                                                CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
+                                                log.info("555------offerProdInstRelCacheEntity --->" + JSON.toJSONString(offerProdInstRelCacheEntity));
+                                                if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
+                                                    OfferProdInstRel offerProdInstRel = offerProdInstRelCacheEntity.getResultObject();
 
-                                            // 查询销售品实例缓存实体
-                                            CacheResultObject<OfferInst> offerInstCacheEntity = iCacheOfferEntityQryService.getOfferInstCacheEntity(offerProdInstRel.getOfferInstId().toString());
-                                            if(offerInstCacheEntity!=null && offerInstCacheEntity.getResultObject()!=null){
-                                                OfferInst offerInst = offerInstCacheEntity.getResultObject();
-                                                Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerInst.getOfferId().toString()));
-                                                prodStrList.add(offer.getOfferNbr());
+                                                    // 查询销售品实例缓存实体
+                                                    CacheResultObject<OfferInst> offerInstCacheEntity = iCacheOfferEntityQryService.getOfferInstCacheEntity(offerProdInstRel.getOfferInstId().toString());
+                                                    log.info("666------offerInstCacheEntity --->" + JSON.toJSONString(offerInstCacheEntity));
+                                                    if(offerInstCacheEntity!=null && offerInstCacheEntity.getResultObject()!=null){
+                                                        OfferInst offerInst = offerInstCacheEntity.getResultObject();
+                                                        Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerInst.getOfferId().toString()));
+                                                        log.info("777------offer --->" + JSON.toJSONString(offer));
+                                                        prodStrList.add(offer.getOfferNbr());
+                                                    }
+                                                }
                                             }
                                         }
                                     }
                                 }
-
-//                                if (assetDto != null) {
-//                                    List<AssetPromDto> assetPromDtoList = assetDto.getAssetPromDtoList();
-//                                    for (AssetPromDto assetPromDto : assetPromDtoList) {
-//                                        prodStrList.add(assetPromDto.getSelectablePromNum());
-//                                    }
-//                                }
                                 String productString = ChannelUtil.StringList2String(prodStrList);
+                                log.info("999------productStr --->" + JSON.toJSONString(productStr));
                                 context.put("PROM_LIST" , productString);
                             }
                         } else {
