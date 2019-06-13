@@ -1,15 +1,15 @@
 package com.zjtelcom.cpct.dubbo.service.impl;
 
 import com.zjtelcom.cpct.dao.campaign.MktCamStrategyConfRelMapper;
-import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
+import com.zjtelcom.cpct.dao.filter.CloseRuleMapper;
+import com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
-import com.zjtelcom.cpct.domain.campaign.MktCamStrategyConfRelDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyFilterRuleRelDO;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dubbo.service.ProductService;
 import com.zjtelcom.cpct.elastic.util.EsSearchUtil;
+import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.util.DateUtil;
-import org.I0Itec.zkclient.DataUpdater;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +22,10 @@ import java.util.Map;
 public class ProductServiceImpl implements ProductService{
 
     @Autowired(required = false)
-    private FilterRuleMapper filterRuleMapper;
+    private CloseRuleMapper closeRuleMapper;
+    @Autowired(required = false)
+    private MktStrategyCloseRuleRelMapper mktStrategyCloseRuleRelMapper;
+
     @Autowired(required = false)
     private MktStrategyFilterRuleRelMapper mktStrategyFilterRuleRelMapper;
     @Autowired(required = false)
@@ -48,10 +51,9 @@ public class ProductServiceImpl implements ProductService{
                 } else if("2".equals(type)){
                     type = "3000";
                 }
-                List<FilterRule> filterRuleList = filterRuleMapper.selectByProduct(split[i], type);
+                List<FilterRule> filterRuleList = closeRuleMapper.selectByProduct(split[i], type, StatusCode.RECEIVE_CLOSE.getStatusCode());
                 for(FilterRule filterRule1 : filterRuleList) {
-                    List<MktStrategyFilterRuleRelDO> mktStrategyFilterRuleRelDOList = mktStrategyFilterRuleRelMapper.selectByRuleId(filterRule1.getRuleId());
-
+                    List<MktStrategyFilterRuleRelDO> mktStrategyFilterRuleRelDOList = mktStrategyCloseRuleRelMapper.selectByRuleId(filterRule1.getRuleId());
                     for(MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO : mktStrategyFilterRuleRelDOList) {
                             Map<String,Object> maps = new HashMap<>();
                             maps.put("activityId",mktStrategyFilterRuleRelDO.getStrategyId());

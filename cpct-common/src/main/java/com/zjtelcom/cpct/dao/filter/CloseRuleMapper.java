@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.dao.filter;
 
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -29,4 +30,5 @@ public interface CloseRuleMapper {
 
     int modFilterRule(FilterRule filterRule);
 
+    List<FilterRule> selectByProduct(@Param("chooseProduct") String chooseProduct, @Param("executionChannel") String executionChannel, @Param("filterType") String filterType);
 }

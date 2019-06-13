@@ -57,7 +57,7 @@ public class CloseRuleServiceImpl implements CloseRuleService {
     private String value;
 
     /**
-     * 根据过滤规则id集合查询过滤规则集合
+     * 根据关单规则id集合查询过滤规则集合
      */
     @Override
     public Map<String, Object> getFilterRule(List<Integer> filterRuleIdList) {
@@ -74,7 +74,7 @@ public class CloseRuleServiceImpl implements CloseRuleService {
     }
 
     /**
-     * 过滤规则列表（含分页）
+     * 关单规则列表（含分页）
      */
     @Override
     public Map<String, Object> qryFilterRule(FilterRuleReq filterRuleReq) {
@@ -100,7 +100,7 @@ public class CloseRuleServiceImpl implements CloseRuleService {
     }
 
     /**
-     * 过滤规则列表（不含分页）
+     * 关单规则列表（不含分页）
      */
     @Override
     public Map<String, Object> qryFilterRules(FilterRuleReq filterRuleReq) {
@@ -113,7 +113,7 @@ public class CloseRuleServiceImpl implements CloseRuleService {
     }
 
     /**
-     * 删除过滤规则
+     * 删除关单规则
      */
     @Override
     public Map<String, Object> delFilterRule(FilterRule filterRule) {
@@ -141,7 +141,9 @@ public class CloseRuleServiceImpl implements CloseRuleService {
     }
 
     /**
-     * 新建过滤规则
+     * 新建关单规则
+     *  "operator": 1000 成功 2000 失败
+        " expression": "关单编号",
      */
     @Override
     public Map<String, Object> createFilterRule(FilterRuleAddVO addVO) {
@@ -155,14 +157,24 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         filterRule.setCreateStaff(UserUtil.loginId());
         filterRule.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
         List<String> codeList = new ArrayList<>();
-        for (Long offerId : addVO.getChooseProduct()){
-            Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
-            if (offer==null){
-                continue;
+        if (StringUtils.isNotBlank(addVO.getFilterType()) && addVO.getFilterType().equals("2000")){
+            if (addVO.getChooseProduct()!= null && !addVO.getChooseProduct().isEmpty()){
+                for (Long offerId : addVO.getChooseProduct()){
+                    Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
+                    if (offer==null){
+                        continue;
+                    }
+                    codeList.add(offer.getOfferNbr());
+                }
+                filterRule.setChooseProduct(ChannelUtil.StringList2String(codeList));
             }
-            codeList.add(offer.getOfferNbr());
         }
-        filterRule.setChooseProduct(ChannelUtil.StringList2String(codeList));
+        if (StringUtils.isNotBlank(addVO.getOfferInfo()) && !addVO.getOfferInfo().equals("2000")){
+            addVO.setOfferInfo("");
+        }
+        if (StringUtils.isNotBlank(addVO.getExecutionChannel()) && !addVO.getExecutionChannel().equals("2000")){
+            addVO.setExecutionChannel("");
+        }
         closeRuleMapper.createFilterRule(filterRule);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);

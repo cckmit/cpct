@@ -67,7 +67,13 @@ public enum StatusCode {
     CCUST_LEVEL("客户级","1000"),
     ASSET_LEVEL("用户级","2000"),
     PRODUCT_LEVEL("销售品级","3000"),
-    ZONE_LEVEL("区域级","4000");
+    ZONE_LEVEL("区域级","4000"),
+
+    //关单销售品类型
+    OPEN_CLOSE("拆机关单","1000"),
+    RECEIVE_CLOSE("受理关单","2000"),
+    ARREARS_CLOSE("欠费关单","3000");
+
 
 
     private String statusMsg;
