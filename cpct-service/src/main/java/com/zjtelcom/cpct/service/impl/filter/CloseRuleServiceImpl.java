@@ -14,9 +14,8 @@ import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
 import com.zjtelcom.cpct.domain.channel.Offer;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.channel.OfferDetail;
-import com.zjtelcom.cpct.dto.filter.FilterRule;
-import com.zjtelcom.cpct.dto.filter.FilterRuleAddVO;
-import com.zjtelcom.cpct.dto.filter.FilterRuleVO;
+import com.zjtelcom.cpct.dto.filter.*;
+import com.zjtelcom.cpct.request.filter.CloseRuleReq;
 import com.zjtelcom.cpct.request.filter.FilterRuleReq;
 import com.zjtelcom.cpct.service.filter.CloseRuleService;
 import com.zjtelcom.cpct.service.synchronize.filter.SynFilterRuleService;
@@ -60,16 +59,16 @@ public class CloseRuleServiceImpl implements CloseRuleService {
      * 根据关单规则id集合查询过滤规则集合
      */
     @Override
-    public Map<String, Object> getFilterRule(List<Integer> filterRuleIdList) {
+    public Map<String, Object> getFilterRule(List<Integer> closeRuleIdList) {
         Map<String, Object> map = new HashMap<>();
-        List<FilterRule> filterRuleList = new ArrayList<>();
-        for (Integer filterRuleId : filterRuleIdList) {
-            FilterRule filterRule = closeRuleMapper.selectByPrimaryKey(filterRuleId.longValue());
-            filterRuleList.add(filterRule);
+        List<CloseRule> closeRuleList = new ArrayList<>();
+        for (Integer closeRuleId : closeRuleIdList) {
+            CloseRule closeRule = closeRuleMapper.selectByPrimaryKey(closeRuleId.longValue());
+            closeRuleList.add(closeRule);
         }
         map.put("resultCode", CommonConstant.CODE_SUCCESS);
         map.put("resultMsg", StringUtils.EMPTY);
-        map.put("filterRuleList", filterRuleList);
+        map.put("filterRuleList", closeRuleList);
         return map;
     }
 
@@ -77,14 +76,14 @@ public class CloseRuleServiceImpl implements CloseRuleService {
      * 关单规则列表（含分页）
      */
     @Override
-    public Map<String, Object> qryFilterRule(FilterRuleReq filterRuleReq) {
+    public Map<String, Object> qryFilterRule(CloseRuleReq closeRuleReq) {
         Map<String, Object> maps = new HashMap<>();
-        Page pageInfo = filterRuleReq.getPageInfo();
+        Page pageInfo = closeRuleReq.getPageInfo();
         PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
-        List<FilterRule> filterRules = closeRuleMapper.qryFilterRule(filterRuleReq.getFilterRule());
-        Page page = new Page(new PageInfo(filterRules));
+        List<CloseRule> closeRules = closeRuleMapper.qryFilterRule(closeRuleReq.getCloseRule());
+        Page page = new Page(new PageInfo(closeRules));
         List<FilterRuleVO> voList = new ArrayList<>();
-        for (FilterRule rule : filterRules){
+        for (CloseRule rule : closeRules){
             FilterRuleVO vo = BeanUtil.create(rule,new FilterRuleVO());
             SysParams sysParams = sysParamsMapper.findParamsByValue("CAM-C-999",rule.getFilterType());
             if (sysParams!=null){
@@ -103,12 +102,12 @@ public class CloseRuleServiceImpl implements CloseRuleService {
      * 关单规则列表（不含分页）
      */
     @Override
-    public Map<String, Object> qryFilterRules(FilterRuleReq filterRuleReq) {
+    public Map<String, Object> qryFilterRules(CloseRuleReq closeRuleReq) {
         Map<String, Object> maps = new HashMap<>();
-        List<FilterRule> filterRules = closeRuleMapper.qryFilterRule(filterRuleReq.getFilterRule());
+        List<CloseRule> closeRules = closeRuleMapper.qryFilterRule(closeRuleReq.getCloseRule());
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
-        maps.put("filterRules", filterRules);
+        maps.put("filterRules", closeRules);
         return maps;
     }
 
@@ -116,11 +115,11 @@ public class CloseRuleServiceImpl implements CloseRuleService {
      * 删除关单规则
      */
     @Override
-    public Map<String, Object> delFilterRule(FilterRule filterRule) {
+    public Map<String, Object> delFilterRule(CloseRule closeRule) {
         Map<String, Object> maps = new HashMap<>();
-        FilterRule rule = closeRuleMapper.selectByPrimaryKey(filterRule.getRuleId());
+        CloseRule rule = closeRuleMapper.selectByPrimaryKey(closeRule.getRuleId());
         if(rule != null) {
-            closeRuleMapper.delFilterRule(filterRule);
+            closeRuleMapper.delFilterRule(closeRule);
             verbalConditionMapper.deleteByPrimaryKey(rule.getConditionId());
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -130,7 +129,7 @@ public class CloseRuleServiceImpl implements CloseRuleService {
             new Thread(){
                 public void run(){
                     try {
-                        synFilterRuleService.deleteSingleFilterRule(filterRule.getRuleId(),"");
+                        synFilterRuleService.deleteSingleFilterRule(closeRule.getRuleId(),"");
                     }catch (Exception e){
                         e.printStackTrace();
                     }
@@ -146,16 +145,16 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         " expression": "关单编号",
      */
     @Override
-    public Map<String, Object> createFilterRule(FilterRuleAddVO addVO) {
+    public Map<String, Object> createFilterRule(CloseRuleAddVO addVO) {
         //受理关单规则 欠费关单规则  拆机关单规则
         Map<String, Object> maps = new HashMap<>();
-        final FilterRule filterRule = BeanUtil.create(addVO,new FilterRule());
-        filterRule.setCreateDate(DateUtil.getCurrentTime());
-        filterRule.setUpdateDate(DateUtil.getCurrentTime());
-        filterRule.setStatusDate(DateUtil.getCurrentTime());
-        filterRule.setUpdateStaff(UserUtil.loginId());
-        filterRule.setCreateStaff(UserUtil.loginId());
-        filterRule.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+        final CloseRule closeRule = BeanUtil.create(addVO,new CloseRule());
+        closeRule.setCreateDate(DateUtil.getCurrentTime());
+        closeRule.setUpdateDate(DateUtil.getCurrentTime());
+        closeRule.setStatusDate(DateUtil.getCurrentTime());
+        closeRule.setUpdateStaff(UserUtil.loginId());
+        closeRule.setCreateStaff(UserUtil.loginId());
+        closeRule.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
         List<String> codeList = new ArrayList<>();
         if (StringUtils.isNotBlank(addVO.getFilterType()) && addVO.getFilterType().equals("2000")){
             if (addVO.getChooseProduct()!= null && !addVO.getChooseProduct().isEmpty()){
@@ -166,7 +165,7 @@ public class CloseRuleServiceImpl implements CloseRuleService {
                     }
                     codeList.add(offer.getOfferNbr());
                 }
-                filterRule.setChooseProduct(ChannelUtil.StringList2String(codeList));
+                closeRule.setChooseProduct(ChannelUtil.StringList2String(codeList));
             }
         }
         if (StringUtils.isNotBlank(addVO.getOfferInfo()) && !addVO.getOfferInfo().equals("2000")){
@@ -175,16 +174,16 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         if (StringUtils.isNotBlank(addVO.getExecutionChannel()) && !addVO.getExecutionChannel().equals("2000")){
             addVO.setExecutionChannel("");
         }
-        closeRuleMapper.createFilterRule(filterRule);
+        closeRuleMapper.createFilterRule(closeRule);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
-        maps.put("filterRule", filterRule);
+        maps.put("filterRule", closeRule);
 
         if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
-                        synFilterRuleService.synchronizeSingleFilterRule(filterRule.getRuleId(),"");
+                        synFilterRuleService.synchronizeSingleFilterRule(closeRule.getRuleId(),"");
                     }catch (Exception e){
                         e.printStackTrace();
                     }
@@ -199,17 +198,17 @@ public class CloseRuleServiceImpl implements CloseRuleService {
      * 修改过滤规则
      */
     @Override
-    public Map<String, Object> modFilterRule(FilterRuleAddVO editVO) {
+    public Map<String, Object> modFilterRule(CloseRuleAddVO editVO) {
         Map<String, Object> maps = new HashMap<>();
-        final FilterRule filterRule = closeRuleMapper.selectByPrimaryKey(editVO.getRuleId());
-        if (filterRule==null){
+        final CloseRule closeRule = closeRuleMapper.selectByPrimaryKey(editVO.getRuleId());
+        if (closeRule==null){
             maps.put("resultCode", CODE_FAIL);
             maps.put("resultMsg", StringUtils.EMPTY);
             return maps;
         }
-        BeanUtil.copy(editVO,filterRule);
-        filterRule.setUpdateDate(DateUtil.getCurrentTime());
-        filterRule.setUpdateStaff(UserUtil.loginId());
+        BeanUtil.copy(editVO,closeRule);
+        closeRule.setUpdateDate(DateUtil.getCurrentTime());
+        closeRule.setUpdateStaff(UserUtil.loginId());
 
         List<String> codeList = new ArrayList<>();
         for (Long offerId : editVO.getChooseProduct()){
@@ -219,7 +218,7 @@ public class CloseRuleServiceImpl implements CloseRuleService {
             }
             codeList.add(offer.getOfferNbr());
         }
-        filterRule.setChooseProduct(ChannelUtil.StringList2String(codeList));
+        closeRule.setChooseProduct(ChannelUtil.StringList2String(codeList));
 //        if (filterRule.getFilterType().equals("3000")){
 //            filterRule.setLabelCode("PROM_LIST");
 //        }
@@ -238,16 +237,16 @@ public class CloseRuleServiceImpl implements CloseRuleService {
 //                }
 //            }
 //        }
-        closeRuleMapper.updateByPrimaryKey(filterRule);
+        closeRuleMapper.updateByPrimaryKey(closeRule);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
-        maps.put("filterRule", filterRule);
+        maps.put("filterRule", closeRule);
 
         if (SystemParamsUtil.getSyncValue().equals("1")){
             new Thread(){
                 public void run(){
                     try {
-                        synFilterRuleService.synchronizeSingleFilterRule(filterRule.getRuleId(),"");
+                        synFilterRuleService.synchronizeSingleFilterRule(closeRule.getRuleId(),"");
                     }catch (Exception e){
                         e.printStackTrace();
                     }
@@ -264,14 +263,14 @@ public class CloseRuleServiceImpl implements CloseRuleService {
     @Override
     public Map<String, Object> getFilterRule(Long ruleId) {
         Map<String, Object> map = new HashMap<>();
-        FilterRule filterRuleT = closeRuleMapper.selectByPrimaryKey(ruleId);
-        if(null == filterRuleT) {
+        CloseRule closeRuleT = closeRuleMapper.selectByPrimaryKey(ruleId);
+        if(null == closeRuleT) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", "过滤规则不存在");
         }
-        FilterRuleVO vo = BeanUtil.create(filterRuleT,new FilterRuleVO());
-        if (filterRuleT.getChooseProduct()!=null && !filterRuleT.getChooseProduct().equals("")){
-            List<String> codeList = ChannelUtil.StringToList(filterRuleT.getChooseProduct());
+        FilterRuleVO vo = BeanUtil.create(closeRuleT,new FilterRuleVO());
+        if (closeRuleT.getChooseProduct()!=null && !closeRuleT.getChooseProduct().equals("")){
+            List<String> codeList = ChannelUtil.StringToList(closeRuleT.getChooseProduct());
             List<OfferDetail> productList = new ArrayList<>();
             for (String code : codeList){
                 List<Offer> offer = offerMapper.selectByCode(code);
@@ -282,8 +281,8 @@ public class CloseRuleServiceImpl implements CloseRuleService {
             }
             vo.setProductList(productList);
         }
-        if (filterRuleT.getConditionId()!=null){
-            MktVerbalCondition condition = verbalConditionMapper.selectByPrimaryKey(filterRuleT.getConditionId());
+        if (closeRuleT.getConditionId()!=null){
+            MktVerbalCondition condition = verbalConditionMapper.selectByPrimaryKey(closeRuleT.getConditionId());
             if (condition!=null){
                 Label label = labelMapper.selectByPrimaryKey(Long.valueOf(condition.getLeftParam()));
                 if (label!=null){

@@ -1,34 +1,38 @@
 package com.zjtelcom.cpct.dao.filter;
 
+import com.zjtelcom.cpct.dto.filter.CloseRule;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 @Repository
 public interface CloseRuleMapper {
-    int deleteByPrimaryKey(Long ruleId);
+//    int deleteByPrimaryKey(Long ruleId);
 
-    int insert(FilterRule record);
+//    int insert(FilterRule record);
 
-    FilterRule selectByPrimaryKey(Long ruleId);
+    CloseRule selectByPrimaryKey(Long ruleId);
 
-    List<FilterRule> selectAll();
+//    List<FilterRule> selectAll();
 
-    int updateByPrimaryKey(FilterRule record);
+    int updateByPrimaryKey(CloseRule record);
 
-    List<FilterRule> qryFilterRule(FilterRule filterRule);
+    List<CloseRule> qryFilterRule(CloseRule closeRule);
 
-    int delFilterRule(FilterRule filterRule);
+    int delFilterRule(CloseRule closeRule);
 
-    FilterRule getFilterRule(FilterRule filterRule);
+//    FilterRule getFilterRule(FilterRule filterRule);
 
-    int createFilterRule(FilterRule filterRule);
+    int createFilterRule(CloseRule closeRule);
 
-    int modFilterRule(FilterRule filterRule);
+//    int modFilterRule(FilterRule filterRule);
 
-    List<FilterRule> selectByProduct(@Param("chooseProduct") String chooseProduct, @Param("executionChannel") String executionChannel, @Param("filterType") String filterType);
+    List<CloseRule> selectByProduct(@Param("chooseProduct") String chooseProduct, @Param("executionChannel") String executionChannel, @Param("filterType") String filterType);
+
+    List<Map<String,Object>> getCloseCampaign(String filterType);
 }
