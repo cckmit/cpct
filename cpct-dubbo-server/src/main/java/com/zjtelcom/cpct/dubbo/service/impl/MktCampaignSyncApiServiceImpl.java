@@ -919,11 +919,7 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
              */
             //判断是否为发布操作
             Map<String, Object> tarGrpMap = new HashMap<>();
-            if (isPublish) {
-                tarGrpMap =copyTarGrp(mktStrategyConfRuleDO.getTarGrpId(), true);
-            } else {
-                tarGrpMap = copyTarGrp(mktStrategyConfRuleDO.getTarGrpId(), false);
-            }
+            tarGrpMap = copyTarGrp4Publish(mktStrategyConfRuleDO.getTarGrpId(), true);
 
             TarGrp tarGrp = (TarGrp) tarGrpMap.get("tarGrp");
             /**
@@ -1314,6 +1310,90 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
         mktVerbalConditionMapper.insert(mktVerbalCondition);
         return mktVerbalCondition.getConditionId();
     }
+
+
+
+    public Map<String, Object> copyTarGrp4Publish(Long tarGrpId,boolean isCopy) {
+        Map<String,Object> result = new HashMap<>();
+        TarGrpDetail detail = (TarGrpDetail)redisUtils.get("TAR_GRP_"+tarGrpId);
+        if (detail==null){
+            TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpId);
+            if (tarGrp!=null){
+                detail = BeanUtil.create(tarGrp,new TarGrpDetail());
+                List<TarGrpCondition> conditions = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
+                detail.setTarGrpConditions(conditions);
+            }else {
+                return null;
+            }
+        }
+        result = createTarGrp(detail,isCopy);
+        return result;
+    }
+
+    public Map<String, Object> createTarGrp4Publish(TarGrpDetail tarGrpDetail, boolean isCopy) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            //插入客户分群记录
+            TarGrp tarGrp = new TarGrp();
+            tarGrp = tarGrpDetail;
+            tarGrp.setTarGrpType(tarGrpDetail.getTarGrpType()==null ? "1000" : tarGrpDetail.getTarGrpType());
+            tarGrp.setCreateDate(DateUtil.getCurrentTime());
+            tarGrp.setUpdateDate(DateUtil.getCurrentTime());
+            tarGrp.setStatusDate(DateUtil.getCurrentTime());
+            tarGrp.setUpdateStaff(UserUtil.loginId());
+            tarGrp.setCreateStaff(UserUtil.loginId());
+            if (isCopy){
+                tarGrp.setStatusCd(StatusCode.STATUS_CODE_FAILURE.getStatusCode());
+            }else {
+                tarGrp.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+            }
+            tarGrpMapper.createTarGrp(tarGrp);
+            List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
+            List<TarGrpCondition> conditionList = new ArrayList<>();
+            if(tarGrpConditions!=null && tarGrpConditions.size()>0){
+                for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
+                    if (tarGrpCondition.getOperType()==null || tarGrpCondition.getOperType().equals("")){
+                        maps.put("resultCode", CODE_FAIL);
+                        maps.put("resultMsg", "请选择下拉框运算类型");
+                        return maps;
+                    }
+//                    if (tarGrpCondition.getAreaIdList()!=null){
+//                        area2RedisThread(tarGrp, tarGrpCondition);
+//                    }
+                    tarGrpCondition.setConditionId(null);
+                    tarGrpCondition.setRootFlag(0L);
+                    tarGrpCondition.setRemark(tarGrpCondition.getRemark()==null ? "2000" : tarGrpCondition.getRemark());
+                    tarGrpCondition.setConditionText(tarGrpCondition.getConditionText()==null ?"2000" : tarGrpCondition.getConditionText());
+                    tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
+                    tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
+                    tarGrpCondition.setTarGrpId(tarGrp.getTarGrpId());
+                    tarGrpCondition.setCreateDate(DateUtil.getCurrentTime());
+                    tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
+                    tarGrpCondition.setStatusDate(DateUtil.getCurrentTime());
+                    tarGrpCondition.setUpdateStaff(UserUtil.loginId());
+                    tarGrpCondition.setCreateStaff(UserUtil.loginId());
+                    if (isCopy){
+                        tarGrpCondition.setStatusCd(StatusCode.STATUS_CODE_FAILURE.getStatusCode());
+                    }else if (tarGrpCondition.getStatusCd()==null){
+                        tarGrpCondition.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                    }
+                    conditionList.add(tarGrpCondition);
+                }
+                tarGrpConditionMapper.insertByBatch(conditionList);
+            }
+            //数据加入redis
+            TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
+            detail.setTarGrpConditions(conditionList);
+            redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),detail);
+            //插入客户分群条件
+            maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+            maps.put("tarGrp", tarGrp);
+        } catch (Exception e) {
+            maps.put("resultCode", CommonConstant.CODE_FAIL);
+        }
+        return maps;
+    }
+
 
 
     /**
