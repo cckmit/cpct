@@ -53,4 +53,16 @@ public class MktCampaignApiTestController {
     }
 
 
+    @PostMapping("/getCloseCampaign")
+    @CrossOrigin
+    public String getCloseCampaign(@RequestBody Map<String,Object> paramListMap){
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            resultMap = productService.getCloseCampaign(paramListMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
+        return JSON.toJSONString(resultMap);
+    }
 }
