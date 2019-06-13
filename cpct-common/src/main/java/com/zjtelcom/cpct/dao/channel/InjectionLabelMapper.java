@@ -61,7 +61,8 @@ public interface InjectionLabelMapper{
 
     List<String> selectLabelCodeByType(@Param("labelDataType")String labelDataType);
     // 派单规则通过标签Code查询指定人或区域
-    List<Map<String, String>> selectByCode(@Param("labelType")Integer labelType);
+    List<Map<String, String>> selectDistributeLabelByType(@Param("labelType")Integer labelType);
 
+    Map<String, Object> selectDistributeLabelByCode(@Param("labelCode")String labelCode);
 
 }
