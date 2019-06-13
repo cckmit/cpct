@@ -113,6 +113,13 @@ public class MktCampaignDetailVO extends MktCampaign  {
     private List<Long>  filterRuleIdList;
 
 
+    /**
+     * 关单规则id集合
+     */
+    private List<Long>  closeRuleIdList;
+
+
+
     public List<EventDTO> getEventDTOS() {
         return eventDTOS;
     }
@@ -271,5 +278,13 @@ public class MktCampaignDetailVO extends MktCampaign  {
 
     public void setFilterRuleIdList(List<Long> filterRuleIdList) {
         this.filterRuleIdList = filterRuleIdList;
+    }
+
+    public List<Long> getCloseRuleIdList() {
+        return closeRuleIdList;
+    }
+
+    public void setCloseRuleIdList(List<Long> closeRuleIdList) {
+        this.closeRuleIdList = closeRuleIdList;
     }
 }

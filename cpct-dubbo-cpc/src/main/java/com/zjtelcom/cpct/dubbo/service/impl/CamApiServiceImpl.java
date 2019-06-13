@@ -296,7 +296,7 @@ public class CamApiServiceImpl implements CamApiService {
                                                         Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerInst.getOfferId().toString()));
                                                         log.info("777------offer --->" + JSON.toJSONString(offer));
                                                         prodStrList.add(offer.getOfferNbr());
-                                                        filterRuleTimeMap.put(offer.getOfferNbr(), offerProdInstRel.getEffDate());
+                                                        filterRuleTimeMap.put(offer.getOfferNbr(), offerInst.getEffDate());
                                                         log.info("888------filterRuleTimeMap --->" + JSON.toJSONString(filterRuleTimeMap));
                                                     }
                                                 }
