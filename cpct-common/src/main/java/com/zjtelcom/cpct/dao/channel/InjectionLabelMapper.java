@@ -60,5 +60,8 @@ public interface InjectionLabelMapper{
     List<String> listLabelByRuleId(@Param("ruleId")Long ruleId);
 
     List<String> selectLabelCodeByType(@Param("labelDataType")String labelDataType);
+    // 派单规则通过标签Code查询指定人或区域
+    List<Map<String, String>> selectByCode(@Param("labelType")Integer labelType);
+
 
 }

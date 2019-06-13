@@ -13,6 +13,7 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
+import com.zjtelcom.cpct.dto.pojo.Result;
 import com.zjtelcom.cpct.enums.LabelCondition;
 import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.enums.TrialCreateType;
@@ -956,4 +957,24 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         result.put("resultMsg",labelValue);
         return result;
     }
+
+    @Override
+    public Map<String,Object> distributeListRule(Integer labelType) {
+        Map<String,Object> result = new HashMap<>();
+        List<Map<String, String>> list = new ArrayList<>();
+        try {
+            list = labelMapper.selectByCode(labelType);
+            //return ResultUtil.responseSuccessResult(labelMapper.selectByCode(Integer.valueOf(labelType)));
+        }catch (Exception e){
+            e.printStackTrace();
+            logger.error("[op:LabelServiceImpl] fail to IssuedListRule ", e);
+            //return ResultUtil.responseErrorResult(e);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","处理成功");
+        result.put("resultObject",list);
+        return result;
+    }
+
+
 }

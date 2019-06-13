@@ -451,4 +451,11 @@
     where LABEL_DATA_TYPE = #{labelDataType}
   </select>
 
+  <select id="selectByCode" resultType="java.util.Map">
+    select LABEL_CODE labelCode,LABEL_NAME labelName
+    from label_distribute_rel
+    where LABEL_TYPE = #{labelType}
+  </select>
+
+
 </mapper>
