@@ -963,16 +963,32 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         Map<String,Object> result = new HashMap<>();
         List<Map<String, String>> list = new ArrayList<>();
         try {
-            list = labelMapper.selectByCode(labelType);
+            list = labelMapper.selectDistributeLabelByType(labelType);
             //return ResultUtil.responseSuccessResult(labelMapper.selectByCode(Integer.valueOf(labelType)));
         }catch (Exception e){
             e.printStackTrace();
-            logger.error("[op:LabelServiceImpl] fail to IssuedListRule ", e);
+            logger.error("[op:LabelServiceImpl] fail to distributeListRule ", e);
             //return ResultUtil.responseErrorResult(e);
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","处理成功");
         result.put("resultObject",list);
+        return result;
+    }
+
+    @Override
+    public Map<String,Object> queryDistributeLabel(String labelCode) {
+        Map<String,Object> result = new HashMap<>();
+        Map<String, Object> label = new HashMap<>();
+        try {
+            label = labelMapper.selectDistributeLabelByCode(labelCode);
+        }catch (Exception e){
+            e.printStackTrace();
+            logger.error("[op:LabelServiceImpl] fail to queryDistributeLabel ", e);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","处理成功");
+        result.put("resultObject",label);
         return result;
     }
 

@@ -563,7 +563,7 @@ public class LabelController extends BaseController {
 
     /**
      * 派单规则通过标签指定人或区域
-     * 查询派单标签
+     * 通过标签类型查询派单标签
      */
     @PostMapping("distributeListRule")
     @CrossOrigin
@@ -575,8 +575,26 @@ public class LabelController extends BaseController {
             logger.error("[op:LabelController] fail to distributeListRule", e);
             // return ResultUtil.responseFailResult();
             result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg"," fail to addCamScript");
+            result.put("resultMsg"," fail to distributeListRule");
             result.put("resultObject","");
+            return result;
+        }
+    }
+
+    /**
+     * 派单规则通过标签指定人或区域
+     * 通过标签编码查询派单标签
+     */
+    @PostMapping("queryDistributeLabel")
+    @CrossOrigin
+    public Map<String,Object> queryDistributeLabel(@RequestBody Map<String,String> params) {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            return labelService.queryDistributeLabel(params.get("labelCode"));
+        } catch (Exception e) {
+            logger.error("[op:LabelController] fail to queryDistributeLabel", e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to queryDistributeLabel");
             return result;
         }
     }
