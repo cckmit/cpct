@@ -237,7 +237,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                     logger.info("*************************************:mktCamChlConfAttr"+JSON.toJSONString(mktCamChlConfAttr.getClass().getMethods()));
                     logger.info("*************************************:mktCamChlConfAttr"+JSON.toJSONString(mktCamChlConfAttr.getClass().getPackage()));
                     mktCamChlConfAttr.setAttrValName(questionnaire.getNaireName());
-                } else if(mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.AREA.getArrId())){
+                } else if(mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.ISEE_AREA.getArrId())){
                     // 获取营销组织树的名称
                     Organization organization = organizationMapper.selectByPrimaryKey(Long.valueOf(mktCamChlConfAttr.getAttrValue()));
                     if (organization != null) {
