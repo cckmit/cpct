@@ -7,6 +7,7 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
+import com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.org.OrgTreeMapper;
@@ -22,10 +23,7 @@ import com.zjtelcom.cpct.domain.RuleDetail;
 import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
-import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
-import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
-import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
-import com.zjtelcom.cpct.domain.strategy.MktStrategyFilterRuleRelDO;
+import com.zjtelcom.cpct.domain.strategy.*;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
@@ -55,15 +53,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
-import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
-import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
+import static com.zjtelcom.cpct.constants.CommonConstant.*;
 
 @Service
 @Transactional
@@ -197,6 +194,12 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
     private MktCamScriptMapper mktCamScriptMapper;
     @Autowired
     private InjectionLabelValueMapper injectionLabelValueMapper;
+
+    @Autowired
+    private MktStrategyCloseRuleRelMapper mktStrategyCloseRuleRelMapper;
+
+    @Autowired
+    private MktStrategyCloseRuleRelPrdMapper mktStrategyCloseRuleRelPrdMapper;
 
     @Autowired
     private RequestInfoMapper requestInfoMapper;
@@ -379,6 +382,14 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
                             mktStrategyFilterRuleRelDO.setMktStrategyFilterRuleRelId(null);
                             mktStrategyFilterRuleRelDO.setStrategyId(childMktCampaignId);
                             mktStrategyFilterRuleRelMapper.insert(mktStrategyFilterRuleRelDO);
+                        }
+
+                        // 活动下关单规则
+                        List<MktStrategyCloseRuleRelDO> mktStrategyCloseRuleRelDOS = mktStrategyCloseRuleRelMapper.selectRuleByStrategyId(mktCampaignId);
+                        for (MktStrategyCloseRuleRelDO mktStrategyCloseRuleRelDO : mktStrategyCloseRuleRelDOS) {
+                            mktStrategyCloseRuleRelDO.setMktStrategyFilterRuleRelId(null);
+                            mktStrategyCloseRuleRelDO.setStrategyId(childMktCampaignId);
+                            mktStrategyCloseRuleRelMapper.insert(mktStrategyCloseRuleRelDO);
                         }
 
                         //如果是框架活动 生成子活动后  生成对应的子需求函 下发给指定岗位的指定人员
@@ -617,6 +628,11 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
         // 与新的策略建立关联
         for (MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO : mktStrategyFilterRuleRelDOList) {
             mktStrategyFilterRuleRelPrdMapper.insert(mktStrategyFilterRuleRelDO);
+        }
+
+        List<MktStrategyCloseRuleRelDO> mktStrategyCloseRuleRelDOList = mktStrategyCloseRuleRelMapper.selectRuleByStrategyId(mktCampaignDO.getMktCampaignId());
+        for (MktStrategyCloseRuleRelDO mktStrategyCloseRuleRelDO : mktStrategyCloseRuleRelDOList) {
+            mktStrategyCloseRuleRelPrdMapper.insert(mktStrategyCloseRuleRelDO);
         }
 
         /*复制活动下的策略到生产环境*/
