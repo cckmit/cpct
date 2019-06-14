@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.dubbo.service.impl;
 
 import com.zjtelcom.cpct.dao.filter.CloseRuleMapper;
 import com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyCloseRuleRelDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyFilterRuleRelDO;
 import com.zjtelcom.cpct.dto.filter.CloseRule;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
@@ -48,10 +49,10 @@ public class ProductServiceImpl implements ProductService {
                 }
                 List<CloseRule> filterRuleList = closeRuleMapper.selectByProduct(split[i], type, StatusCode.RECEIVE_CLOSE.getStatusCode());
                 for (CloseRule filterRule1 : filterRuleList) {
-                    List<MktStrategyFilterRuleRelDO> mktStrategyFilterRuleRelDOList = mktStrategyCloseRuleRelMapper.selectByRuleId(filterRule1.getRuleId());
-                    for (MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO : mktStrategyFilterRuleRelDOList) {
+                    List<MktStrategyCloseRuleRelDO> mktStrategyCloseRuleRelDOList = mktStrategyCloseRuleRelMapper.selectByRuleId(filterRule1.getRuleId());
+                    for (MktStrategyCloseRuleRelDO mktStrategyCloseRuleRelDO : mktStrategyCloseRuleRelDOList) {
                         Map<String, Object> maps = new HashMap<>();
-                        maps.put("activityId", mktStrategyFilterRuleRelDO.getStrategyId());
+                        maps.put("activityId", mktStrategyCloseRuleRelDO.getStrategyId());
                         if (filterRule1.getOfferInfo() != null) {
                             if (filterRule1.getOfferInfo().equals("1000")) {
                                 offerInfo = "0";
