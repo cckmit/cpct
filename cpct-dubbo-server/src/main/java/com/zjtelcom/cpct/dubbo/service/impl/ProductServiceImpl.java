@@ -86,9 +86,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Map<String, Object> getCloseCampaign(Map<String, Object> paramList) {
+    public Map<String, Object> getCloseCampaign(Map<String, Object> paramMap) {
         Map<String, Object> resultMap = new HashMap<>();
-        String filterType = (String) paramList.get("filterType");
+        String filterType = (String) paramMap.get("filterType");
         List<Map<String,Object>> list = null;
         if (StringUtils.isNotBlank(filterType)) {
             list = closeRuleMapper.getCloseCampaign(filterType);
