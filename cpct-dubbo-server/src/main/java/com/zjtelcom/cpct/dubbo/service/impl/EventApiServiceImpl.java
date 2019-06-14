@@ -864,7 +864,7 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 }
                 if (mktCampaginIdList != null && mktCampaginIdList.size() > 0) {
-                    Future<Map<String, Object>> f = executorService.submit(new getCustListTask(mktCampaginIdList, eventId, map.get("lanId"), custId, map));
+                    Future<Map<String, Object>> f = executorService.submit(new getCustListTask(mktCampaginIdList, eventId, map.get("lanId"), custId, map, evtTriggers));
                     threadList.add(f);
                 }
 
@@ -2368,13 +2368,15 @@ public class EventApiServiceImpl implements EventApiService {
         private String landId;
         private String custId;
         private Map<String, String> map;
+        private List<Map<String, Object>> evtTriggers;
 
-        public getCustListTask(List<String> campaignList, Long eventId, String landId, String custId, Map<String, String> map) {
+        public getCustListTask(List<String> campaignList, Long eventId, String landId, String custId, Map<String, String> map, List<Map<String, Object>> evtTriggers) {
             this.campaignList = campaignList;
             this.eventId = eventId;
             this.landId = landId;
             this.custId = custId;
             this.map = map;
+            this.evtTriggers = evtTriggers;
         }
 
         @Override
@@ -2554,6 +2556,11 @@ public class EventApiServiceImpl implements EventApiService {
                             }
 
                             List<Map> taskChlCountList = (List<Map>) ((Map) resultMap1.get("CPC_VALUE")).get("taskChlList");
+                            // 清单方案放入采集项
+                            for (Map<String, Object> taskChlCountMap : taskChlCountList) {
+                                taskChlCountMap.put("triggers", JSONArray.parse(JSONArray.toJSON(evtTriggers).toString()));
+                            }
+
                             if (taskChlCountList != null && taskChlCountList.size() > 0) {
                                 result.putAll((Map) resultMap1.get("CPC_VALUE"));
                                 result.put("orderISI", map.get("reqId"));

@@ -117,9 +117,29 @@
     </dubbo:reference>
 
 
-    <!-- 根据accNum和statusCd查询prodInstId -->
+
     <dubbo:reference registry="esb3" id="iCacheProdIndexQryService" interface="com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheProdIndexQryService" version="1.0" retries="0" check="false">
+        <!-- 根据accNum查询prodInstId-->
+        <dubbo:method name="qryProdInstIndex2" servicecode="00.1074.qryProdInstIndex2"  timeout="10000"/>
+        <!-- 根据accNum和statusCd查询prodInstId -->
         <dubbo:method name="qryProdInstIndex3" servicecode="00.1074.qryProdInstIndex3"  timeout="10000"/>
     </dubbo:reference>
+
+    <!-- 查询产品实例实体缓存-->
+    <dubbo:reference registry="esb3" id="iCacheProdEntityQryService" interface="com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheProdEntityQryService" version="1.0" retries="0" check="false">
+        <dubbo:method name="getProdInstCacheEntity" servicecode="00.1074.getProdInstCacheEntity"  timeout="10000"/>
+    </dubbo:reference>
+
+
+    <!-- 根据offerInstId和statusCd查询offerProdInstRelId -->
+    <dubbo:reference registry="esb3" id="iCacheOfferRelIndexQryService" interface="com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheOfferRelIndexQryService" version="1.0" retries="0" check="false">
+        <dubbo:method name="qryOfferProdInstRelIndex1" servicecode="00.1074.qryOfferProdInstRelIndex1"  timeout="10000"/>
+    </dubbo:reference>
+
+    <!-- 根据offerInstId和statusCd查询offerProdInstRelId -->
+    <dubbo:reference registry="esb3" id="iCacheRelEntityQryService" interface="com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheRelEntityQryService" version="1.0" retries="0" check="false">
+        <dubbo:method name="getOfferProdInstRelCacheEntity" servicecode="00.1074.getOfferProdInstRelCacheEntity"  timeout="10000"/>
+    </dubbo:reference>
+
 
 </beans>
