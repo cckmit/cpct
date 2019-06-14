@@ -267,7 +267,7 @@ public class CamApiServiceImpl implements CamApiService {
                             }
                             Map<String, Object> filterRuleTimeMap = new HashMap<>();
                             // 判断是否进行CRM销售品过滤
-                            if (realProdFilter != null && "2".equals(realProdFilter)) {
+                            if (realProdFilter != null && "0".equals(realProdFilter)) {
                                 log.info("111------accNbr --->" + params.get("accNbr"));
                                 List<String> prodStrList = new ArrayList<>();
                                 CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(params.get("accNbr"));
@@ -706,7 +706,7 @@ public class CamApiServiceImpl implements CamApiService {
                                     redisUtils.set("REAL_PROD_FILTER", realProdFilter);
                                 }
                             }
-                            if (realProdFilter != null && "2".equals(realProdFilter)) {
+                            if (realProdFilter != null && "0".equals(realProdFilter)) {
                                 List<String> prodStrList = new ArrayList<>();
                                 log.info("111------accNbr --->" + params.get("accNbr"));
                                 CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(params.get("accNbr"));
