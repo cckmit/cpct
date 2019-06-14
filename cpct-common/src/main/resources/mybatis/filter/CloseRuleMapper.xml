@@ -237,12 +237,14 @@
         <result property="filterType" column="FILTER_TYPE"/>
         <result property="activityNbr" column="MKT_ACTIVITY_NBR"/>
         <result property="activityId" column="MKT_CAMPAIGN_ID"/>
+        <result property="closeNumber" column="EXPRESSION"/>
     </resultMap>
 
     <select id="getCloseCampaign" parameterType="java.lang.String" resultMap="MktcloseRuleCampaignMap">
-        SELECT cr.FILTER_TYPE,mc.MKT_ACTIVITY_NBR,mc.MKT_CAMPAIGN_ID FROM close_rule cr
+        SELECT cr.FILTER_TYPE,cr.EXPRESSION,mc.MKT_ACTIVITY_NBR,mc.MKT_CAMPAIGN_ID FROM close_rule cr
             LEFT JOIN mkt_strategy_close_rule_rel ms ON cr.RULE_ID = ms.RULE_ID
-            LEFT JOIN mkt_campaign mc ON ms.STRATEGY_ID = mc.MKT_CAMPAIGN_ID WHERE cr.FILTER_TYPE = #{filterType}
+            LEFT JOIN mkt_campaign mc ON ms.STRATEGY_ID = mc.MKT_CAMPAIGN_ID
+            WHERE cr.FILTER_TYPE = #{filterType}
     </select>
 
 </mapper>

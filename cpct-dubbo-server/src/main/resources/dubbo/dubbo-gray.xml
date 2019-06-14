@@ -122,5 +122,8 @@
         <dubbo:method name="qryProdInstIndex3" servicecode="00.1074.qryProdInstIndex3"  timeout="10000"/>
     </dubbo:reference>
 
-
+    <!-- 根据filterType获取关单类型 -->
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ProductService" ref="productServiceImpl" version="2.0" >
+        <dubbo:method name="getCloseCampaign" servicecode="00.1083.getCloseCampaign" timeout="10000"/>
+    </dubbo:service>
 </beans>
