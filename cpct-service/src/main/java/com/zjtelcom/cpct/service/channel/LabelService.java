@@ -6,6 +6,7 @@ import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.dto.channel.LabelAddVO;
 import com.zjtelcom.cpct.dto.channel.LabelEditVO;
 import com.zjtelcom.cpct.dto.channel.LabelGrpParam;
+import com.zjtelcom.cpct.dto.pojo.Result;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
@@ -76,10 +77,9 @@ public interface LabelService {
 
 
 
+    Map<String,Object> distributeListRule(Integer labelType);
 
-
-
-
+    Map<String,Object> queryDistributeLabel(String labelCode);
 
 
 }
