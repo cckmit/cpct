@@ -34,5 +34,5 @@ public interface CloseRuleMapper {
 
     List<CloseRule> selectByProduct(@Param("chooseProduct") String chooseProduct, @Param("executionChannel") String executionChannel, @Param("filterType") String filterType);
 
-    List<Map<String,Object>> getCloseCampaign(String filterType);
+    List<Map<String,Object>> getCloseCampaign(@Param("filterType") String filterType);
 }
