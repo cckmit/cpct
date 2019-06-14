@@ -82,4 +82,17 @@
     STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, UPDATE_DATE, STATUS_DATE, REMARK
     from mkt_cam_chl_conf_attr
   </select>
+
+  <select id="selectByCampaignId" resultType="java.lang.Long">
+     select p1.ATTR_ID
+    from mkt_cam_chl_conf_attr p1 LEFT JOIN mkt_cam_chl_conf p2 on p1.EVT_CONTACT_CONF_ID = p2.EVT_CONTACT_CONF_ID
+    WHERE p2.MKT_CAMPAIGN_ID = #{campaignId}
+  </select>
+
+  <select id="selectAttrLabelValueByCampaignId" resultType="java.lang.String">
+     select p1.ATTR_ID
+    from mkt_cam_chl_conf_attr p1 LEFT JOIN mkt_cam_chl_conf p2 on p1.EVT_CONTACT_CONF_ID = p2.EVT_CONTACT_CONF_ID
+    WHERE p2.MKT_CAMPAIGN_ID = #{campaignId}
+    AND (p1.ATTR_ID = 500600010021 OR p1.ATTR_ID = 500600010022)
+  </select>
 </mapper>

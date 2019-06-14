@@ -1,4 +1,4 @@
-package com.zjtelcom.cpct.dao.filter;
+package com.zjtelcom.cpct_prd.dao.strategy;
 
 import com.zjtelcom.cpct.domain.strategy.MktStrategyCloseRuleRelDO;
 import org.apache.ibatis.annotations.Mapper;
@@ -8,7 +8,7 @@ import java.util.List;
 
 @Mapper
 @Repository
-public interface MktStrategyCloseRuleRelMapper {
+public interface MktStrategyCloseRuleRelPrdMapper {
 
     List<MktStrategyCloseRuleRelDO> selectByRuleId(Long ruleId);
 

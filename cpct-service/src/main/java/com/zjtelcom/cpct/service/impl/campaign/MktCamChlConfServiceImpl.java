@@ -236,12 +236,19 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                     Questionnaire questionnaire = mktQuestionnaireMapper.selectByPrimaryKey(Long.valueOf(mktCamChlConfAttr.getAttrValue()));
                     logger.info("*************************************:mktCamChlConfAttr"+JSON.toJSONString(mktCamChlConfAttr.getClass().getMethods()));
                     logger.info("*************************************:mktCamChlConfAttr"+JSON.toJSONString(mktCamChlConfAttr.getClass().getPackage()));
-                    mktCamChlConfAttr.setAttrValName(questionnaire.getNaireName());
-                } else if(mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.AREA.getArrId())){
+                    if (questionnaire != null) {
+                        mktCamChlConfAttr.setAttrValName(questionnaire.getNaireName());
+                    }
+                } else if(mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.ISEE_AREA.getArrId())){
                     // 获取营销组织树的名称
                     Organization organization = organizationMapper.selectByPrimaryKey(Long.valueOf(mktCamChlConfAttr.getAttrValue()));
                     if (organization != null) {
                         mktCamChlConfAttr.setAttrValName(organization.getOrgName());
+                    }
+                } else if(mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.ISEE_LABEL_CUSTOMER.getArrId()) || mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.ISEE_LABEL_AREA.getArrId())){
+                    Map<String, Object> map = injectionLabelMapper.selectDistributeLabelByCode(mktCamChlConfAttr.getAttrValue());
+                    if (map != null) {
+                        mktCamChlConfAttr.setAttrValName((String) map.get("labelName"));
                     }
                 }
                 mktCamChlConfAttrList.add(mktCamChlConfAttr);
