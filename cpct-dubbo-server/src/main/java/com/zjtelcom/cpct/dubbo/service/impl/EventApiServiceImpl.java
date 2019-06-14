@@ -571,12 +571,13 @@ public class EventApiServiceImpl implements EventApiService {
                         } else {
                             // 若未绑定微厅，查看联系号码是否为C网用户
                             // 价格判断是否为手机号码
-                            log.info("contactNumber --->" + contactNumber);
+                            log.info("111---contactNumber --->" + contactNumber);
                             boolean isMobile = isMobile(contactNumber);
                             boolean isCUser = false;
+                            log.info("222---isMobile --->" + isMobile);
                             if(isMobile){
-                                CacheResultObject<Set<String>> prodInstIdResult = iCacheProdIndexQryService.qryProdInstIndex3(contactNumber, "1000");
-                                log.info("是否为C网用户-----prodInstIdResult --->" + JSON.toJSONString(prodInstIdResult));
+                                CacheResultObject<Set<String>> prodInstIdResult = iCacheProdIndexQryService.qryProdInstIndex3(contactNumber, "100000");
+                                log.info("333---是否为C网用户-----prodInstIdResult --->" + JSON.toJSONString(prodInstIdResult));
                                 if (prodInstIdResult != null && prodInstIdResult.getResultObject() != null && prodInstIdResult.getResultObject().size() > 0) {
                                     labelItems.put("CPCP_PUSH_CHANNEL", "2"); // 1-微厅, 2-短厅, 3-IVR
                                     isCUser = true;
@@ -597,6 +598,7 @@ public class EventApiServiceImpl implements EventApiService {
                                 Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
                                 if ("0".equals(dubboResult.get("result_code").toString())) {
                                     JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
+                                    log.info("444---body --->" +JSON.toJSONString(body));
                                     //ES log 标签实例
                                     for (Map.Entry<String, Object> entry : body.entrySet()) {
                                         if ("PRD_NAME".equals(entry.getKey()) && "CDMA".equals(entry.getValue().toString())) {
@@ -617,7 +619,7 @@ public class EventApiServiceImpl implements EventApiService {
                             }
                         }
                     }
-                    log.info("labelItems --->" + JSON.toJSONString(labelItems));
+                    log.info("555---labelItems --->" + JSON.toJSONString(labelItems));
                 }
 
                 //获取事件推荐活动数
