@@ -8,6 +8,7 @@ import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
 import com.mysql.jdbc.StringUtils;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.campaign.MktCamChlConfAttrMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
@@ -21,6 +22,7 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
+import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
@@ -31,6 +33,7 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
@@ -76,6 +79,7 @@ import java.util.regex.Pattern;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+import static com.zjtelcom.cpct.enums.ConfAttrEnum.*;
 
 @Service
 public class TrialOperationServiceImpl extends BaseService implements TrialOperationService {
@@ -128,6 +132,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private FilterRuleMapper filterRuleMapper;
     @Autowired
     private RedisUtils_es redisUtils_es;
+    @Autowired
+    private MktCamChlConfMapper mktCamChlConfMapper;
+    @Autowired
+    private MktCamChlConfAttrMapper mktCamChlConfAttrMapper;
     @Autowired
     private CtgMQUtils ctgMQUtils;
 
@@ -321,6 +329,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         TrialOperationVOES requests = BeanUtil.create(request, new TrialOperationVOES());
         ArrayList<TrialOperationParamES> paramList = new ArrayList<>();
         TrialOperationParamES param = getTrialOperationParamES(request, Long.valueOf(batchNumSt),  Long.valueOf(new Date().getTime()+ChannelUtil.getRandomStr(2)) + 1, true, conditions);
+        param.setRuleId(ruleId);
         paramList.add(param);
         requests.setParamList(paramList);
         TrialResponseES response = new TrialResponseES();
@@ -684,7 +693,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     /**
      * 导入试运算清单
      */
-    /*@Transactional(readOnly = false)
+    @Transactional(readOnly = false)
     @Override
     public Map<String, Object> importUserList(MultipartFile multipartFile, TrialOperationVO operation, Long ruleId) throws IOException {
         Map<String, Object> result = new HashMap<>();
@@ -718,12 +727,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 return result;
             }
             for (int i = 0; i < nameList.length; i++) {
-                if (labelNameList.contains(nameList[i])) {
+                if (labelNameList.contains(nameList[i].trim())) {
                     result.put("resultCode", CODE_FAIL);
                     result.put("resultMsg", "标签中文名称不能重复:" + "\"" + nameList[i] + "\"");
                     return result;
                 }
-                if (labelEngNameList.contains(codeList[i])) {
+                if (labelEngNameList.contains(codeList[i].trim())) {
                     result.put("resultCode", CODE_FAIL);
                     result.put("resultMsg", "标签英文名称不能重复:" + "\"" + codeList[i] + "\"");
                     return result;
@@ -802,10 +811,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                 value = data.get(x);
                             }
                             if (value.contains("\r")){
-                                value.replace("\r","");
+                                value = value.replace("\r","");
                             }
                             if (value.contains("\n")){
-                                value.replace("\n","");
+                                value = value.replace("\n","");
                             }
                             if (codeList[x].equals("CCUST_NAME") && (value.contains("null") || value.equals(""))) {
                                 check = false;
@@ -1546,6 +1555,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             return result;
         }
 
+        //查询活动下面所有渠道属性id是21和22的value
+        List<String> attrValue = mktCamChlConfAttrMapper.selectAttrLabelValueByCampaignId(trialOperation.getCampaignId());
         //添加策略适用地市
         redisUtils.set("STRATEGY_CONF_AREA_"+operation.getStrategyId(),strategyConfDO.getAreaId());
         // 通过活动id获取关联的标签字段数组
@@ -1553,7 +1564,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         req.setDisplayColumnId(campaignDO.getCalcDisplay());
         Map<String,Object> labelMap = messageLabelService.queryLabelListByDisplayId(req);
         List<LabelDTO> labelDTOList = (List<LabelDTO>)labelMap.get("labels");
-        String[] fieldList = new String[labelDTOList.size()];
+        String[] fieldList = new String[labelDTOList.size()+attrValue.size()];
         List<Map<String,Object>> labelList = new ArrayList<>();
         for (int i = 0 ; i< labelDTOList.size();i++){
             fieldList[i] = labelDTOList.get(i).getLabelCode();
@@ -1563,6 +1574,25 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             label.put("labelType",labelDTOList.get(i).getLabelType());
             labelList.add(label);
         }
+        for (int i = labelDTOList.size(); i< labelDTOList.size()+attrValue.size();i++){
+            fieldList[i] = attrValue.get(i);
+        }
+        List<Long> attrList = mktCamChlConfAttrMapper.selectByCampaignId(trialOperation.getCampaignId());
+        if (attrList.contains(ISEE_CUSTOMER.getArrId()) || attrList.contains(ISEE_LABEL_CUSTOMER.getArrId()) ){
+            Map<String,Object> label = new HashMap<>();
+            label.put("code","SALE_EMP_NBR");
+            label.put("name","接单人号码");
+            label.put("labelType","1200");
+            labelList.add(label);
+        }
+        if (attrList.contains(ISEE_AREA.getArrId()) || attrList.contains(ISEE_LABEL_AREA.getArrId()) ){
+            Map<String,Object> label = new HashMap<>();
+            label.put("code","AREA");
+            label.put("name","派单区域");
+            label.put("labelType","1200");
+            labelList.add(label);
+        }
+
         redisUtils.set("LABEL_DETAIL_"+trialOperation.getBatchNum(),labelList);
         List<Map<String, Object>> iSaleDisplay = new ArrayList<>();
         iSaleDisplay = (List<Map<String, Object>>) redisUtils.get("EVT_ISALE_LABEL_" + campaignDO.getIsaleDisplay());
@@ -1598,9 +1628,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             }
             paramList.add(param);
         }
-        requests.setFieldList(request.getFieldList());
         requests.setParamList(paramList);
-
         final  TrialOperationVOES  issureRequest = requests;
         System.out.println(JSON.toJSONString(requests));
         operation.setStatusCd(TrialStatus.ALL_SAMPEL_GOING.getValue());
@@ -1707,8 +1735,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
      * @param isSample
      * @return
      */
-    private TrialOperationParamES getTrialOperationParamES(TrialOperationVO operationVO, Long batchNum, Long ruleId,
-                                                           boolean isSample,List<TarGrpCondition> conditions) {
+    private TrialOperationParamES getTrialOperationParamES(TrialOperationVO operationVO, Long batchNum, Long ruleId, boolean isSample,List<TarGrpCondition> conditions) {
         TrialOperationParamES param = new TrialOperationParamES();
         param.setRuleId(ruleId);
         MktStrategyConfRuleDO confRule = ruleMapper.selectByPrimaryKey(ruleId);
@@ -1716,8 +1743,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             param.setRuleName(confRule.getMktStrategyConfRuleName());
             param.setTarGrpId(confRule.getTarGrpId());
         }
-
-
         if (!isSample){
             // 获取规则信息
             Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.getMktStrategyConfRule(ruleId);
@@ -1759,56 +1784,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         }
                         if (camScriptES.getScriptDesc().contains("\r")){
                             camScriptES.setScriptDesc(camScriptES.getScriptDesc().replace("\r",""));
-                        }
-                    }
-
-                    // 推送渠道为沙盘时，获取配置的派单属性
-                    if(mktCamChlConf.getEvtContactConfId().equals("QD00014")){
-                        // 添加接单人或区域标签到展示列
-                        List<MktCamChlConfAttr> mktCamChlConfAttrList = mktCamChlConfDetail.getMktCamChlConfAttrList();
-                        List<Map<String, Object>> labelList = (List<Map<String, Object>>)redisUtils.get("LABEL_DETAIL_" + batchNum);
-                        List<String> labelCodeList = new ArrayList<>();
-                        for (Map<String, Object> label : labelList) {
-                            labelCodeList.add(label.get("code").toString());
-                        }
-                        for (MktCamChlConfAttr  attr : mktCamChlConfAttrList) {
-                            // 到人
-                            Map<String,Object> label = new HashMap<>();
-                            if(attr.getAttrId().equals("19") || attr.getAttrId().equals("21")){
-                                if(!labelCodeList.contains("SALE_EMP_NBR")){
-                                    label.put("code","SALE_EMP_NBR");
-                                    label.put("name","接单人号码");
-                                    label.put("labelType","1200");
-                                    redisUtils.set("LABEL_DETAIL_" + batchNum, labelList.add(label));
-                                }
-                                if(attr.getAttrId().equals("21")){
-                                    String[] fieldList = operationVO.getFieldList();
-                                    List list = Arrays.asList(fieldList);
-                                    if(!list.contains(attr.getAttrValue())){
-                                        list.add(attr.getAttrValue());
-                                        fieldList = (String[])list.toArray();
-                                        operationVO.setFieldList(fieldList);
-                                    }
-                                }
-                            }
-                            // 到区域
-                            if(attr.getAttrId().equals("20") || attr.getAttrId().equals("22")){
-                                if(!labelCodeList.contains("AREA")) {
-                                    label.put("code", "AREA");
-                                    label.put("name", "派单区域");
-                                    label.put("labelType", "1200");
-                                    redisUtils.set("LABEL_DETAIL_" + batchNum, labelList.add(label));
-                                }
-                                if(attr.getAttrId().equals("22")){
-                                    String[] fieldList = operationVO.getFieldList();
-                                    List list = Arrays.asList(fieldList);
-                                    if(!list.contains(attr.getAttrValue())){
-                                        list.add(attr.getAttrValue());
-                                        fieldList = (String[])list.toArray();
-                                        operationVO.setFieldList(fieldList);
-                                    }
-                                }
-                            }
                         }
                     }
                     es.setCamScript(camScriptES);

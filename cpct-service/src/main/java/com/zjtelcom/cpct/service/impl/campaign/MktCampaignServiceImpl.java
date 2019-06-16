@@ -17,6 +17,7 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.ObjMktCampaignRelMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
+import com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
@@ -29,6 +30,7 @@ import com.zjtelcom.cpct.domain.channel.ObjMktCampaignRel;
 import com.zjtelcom.cpct.domain.channel.Offer;
 import com.zjtelcom.cpct.domain.channel.RequestInfo;
 import com.zjtelcom.cpct.domain.channel.RequestInstRel;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyCloseRuleRelDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyFilterRuleRelDO;
@@ -159,6 +161,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
     @Autowired
     private MktCamItemMapper mktCamItemMapper;
+
+    @Autowired
+    private MktStrategyCloseRuleRelMapper mktStrategyCloseRuleRelMapper;
+
 
     /**
      * 过滤规则与策略关联 Mapper
@@ -359,17 +365,31 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     objMktCampaignRelMapper.insert(objMktCam);
                 }
             }
-            //保存策略与过滤规则关系
+            //保存活动与过滤规则关系
             if (mktCampaignVO.getFilterRuleIdList() != null && mktCampaignVO.getFilterRuleIdList().size() > 0) {
-                for (Long FilterRuleId : mktCampaignVO.getFilterRuleIdList()) {
+                for (Long closeRuleId : mktCampaignVO.getFilterRuleIdList()) {
                     MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO = new MktStrategyFilterRuleRelDO();
-                    mktStrategyFilterRuleRelDO.setRuleId(FilterRuleId);
+                    mktStrategyFilterRuleRelDO.setRuleId(closeRuleId);
                     mktStrategyFilterRuleRelDO.setStrategyId(mktCampaignId); //表结构不能变更, 逻辑变更, 策略字段放活动Id
                     mktStrategyFilterRuleRelDO.setCreateStaff(UserUtil.loginId());
                     mktStrategyFilterRuleRelDO.setCreateDate(new Date());
                     mktStrategyFilterRuleRelDO.setUpdateStaff(UserUtil.loginId());
                     mktStrategyFilterRuleRelDO.setUpdateDate(new Date());
                     mktStrategyFilterRuleRelMapper.insert(mktStrategyFilterRuleRelDO);
+                }
+            }
+
+            //保存活动与关单规则关系
+            if (mktCampaignVO.getCloseRuleIdList() != null && mktCampaignVO.getCloseRuleIdList().size() > 0) {
+                for (Long closeRuleId : mktCampaignVO.getCloseRuleIdList()) {
+                    MktStrategyCloseRuleRelDO mktStrategyCloseRuleRelDO = new MktStrategyCloseRuleRelDO();
+                    mktStrategyCloseRuleRelDO.setRuleId(closeRuleId);
+                    mktStrategyCloseRuleRelDO.setStrategyId(mktCampaignId); //表结构不能变更, 逻辑变更, 策略字段放活动Id
+                    mktStrategyCloseRuleRelDO.setCreateStaff(UserUtil.loginId());
+                    mktStrategyCloseRuleRelDO.setCreateDate(new Date());
+                    mktStrategyCloseRuleRelDO.setUpdateStaff(UserUtil.loginId());
+                    mktStrategyCloseRuleRelDO.setUpdateDate(new Date());
+                    mktStrategyCloseRuleRelMapper.insert(mktStrategyCloseRuleRelDO);
                 }
             }
 
@@ -497,7 +517,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
             }
 
-            //重建策略与过滤规则关系
+            //重建活动与过滤规则关系
             mktStrategyFilterRuleRelMapper.deleteByStrategyId(mktCampaignId);
             if (mktCampaignVO.getFilterRuleIdList() != null && mktCampaignVO.getFilterRuleIdList().size() > 0) {
                 for (Long FilterRuleId : mktCampaignVO.getFilterRuleIdList()) {
@@ -509,6 +529,21 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktStrategyFilterRuleRelDO.setUpdateStaff(UserUtil.loginId());
                     mktStrategyFilterRuleRelDO.setUpdateDate(new Date());
                     mktStrategyFilterRuleRelMapper.insert(mktStrategyFilterRuleRelDO);
+                }
+            }
+
+            //重建活动与关单规则关系
+            mktStrategyCloseRuleRelMapper.deleteByStrategyId(mktCampaignId);
+            if (mktCampaignVO.getCloseRuleIdList() != null && mktCampaignVO.getCloseRuleIdList().size() > 0) {
+                for (Long closeRuleId : mktCampaignVO.getCloseRuleIdList()) {
+                    MktStrategyCloseRuleRelDO mktStrategyCloseRuleRelDO = new MktStrategyCloseRuleRelDO();
+                    mktStrategyCloseRuleRelDO.setRuleId(closeRuleId);
+                    mktStrategyCloseRuleRelDO.setStrategyId(mktCampaignId);
+                    mktStrategyCloseRuleRelDO.setCreateStaff(UserUtil.loginId());
+                    mktStrategyCloseRuleRelDO.setCreateDate(new Date());
+                    mktStrategyCloseRuleRelDO.setUpdateStaff(UserUtil.loginId());
+                    mktStrategyCloseRuleRelDO.setUpdateDate(new Date());
+                    mktStrategyCloseRuleRelMapper.insert(mktStrategyCloseRuleRelDO);
                 }
             }
 
@@ -617,6 +652,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         List<Long> filterRuleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(mktCampaignId);
         mktCampaignVO.setFilterRuleIdList(filterRuleIdList);
 
+        // 获取关单规则集合
+        List<Long> closeRuleIdList = mktStrategyCloseRuleRelMapper.selectByStrategyId(mktCampaignId);
+        mktCampaignVO.setCloseRuleIdList(closeRuleIdList);
 
         // 获取活动关联策略集合
         List<MktStrategyConfDetail> mktStrategyConfDetailList = new ArrayList<>();
@@ -703,8 +741,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCamStrategyConfRelMapper.deleteByMktCampaignId(mktCampaignId);
             // 删除活动与事件的关系
             mktCamEvtRelMapper.deleteByMktCampaignId(mktCampaignId);
-            // 删除策略与规则集合
+            // 删除活动与规则集合
             mktStrategyFilterRuleRelMapper.deleteByStrategyId(mktCampaignId);
+            // 删除活动与关单规则集合
+            mktStrategyCloseRuleRelMapper.deleteByStrategyId(mktCampaignId);
 
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
             maps.put("resultMsg", "删除成功！");
@@ -1277,6 +1317,14 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         mktStrategyFilterRuleRelDO.setStrategyId(childMktCampaignId);
                         mktStrategyFilterRuleRelMapper.insert(mktStrategyFilterRuleRelDO);
                     }
+
+                    // 活动下关单规则
+                    List<MktStrategyCloseRuleRelDO> mktStrategyCloseRuleRelDOS = mktStrategyCloseRuleRelMapper.selectRuleByStrategyId(mktCampaignId);
+                    for (MktStrategyCloseRuleRelDO mktStrategyCloseRuleRelDO : mktStrategyCloseRuleRelDOS) {
+                        mktStrategyCloseRuleRelDO.setMktStrategyFilterRuleRelId(null);
+                        mktStrategyCloseRuleRelDO.setStrategyId(childMktCampaignId);
+                        mktStrategyCloseRuleRelMapper.insert(mktStrategyCloseRuleRelDO);
+                    }
                     //如果是框架活动 生成子活动后  生成对应的子需求函 下发给指定岗位的指定人员
                     generateRequest(mktCampaignDO, mktCamCityRelDO.getCityId());
                 }
@@ -1534,6 +1582,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             List<Long> filterRuleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(preMktCampaignId);
             mktCampaignVO.setFilterRuleIdList(filterRuleIdList);
 
+            // 获取关单规则集合
+            List<Long> closeRuleIdList = mktStrategyCloseRuleRelMapper.selectByStrategyId(preMktCampaignId);
+            mktCampaignVO.setCloseRuleIdList(closeRuleIdList);
 
             Map<String, Object> strategyTemplateMap = mktStrategyConfService.getStrategyTemplate(preMktCampaignId);
             List<MktStrategyConfDetail> mktStrategyConfDetailList = (List<MktStrategyConfDetail>) strategyTemplateMap.get("mktStrategyConfDetailList");

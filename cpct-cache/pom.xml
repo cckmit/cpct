@@ -64,28 +64,28 @@
 
         <!-- ctgmq -->
         <dependency>
-            <groupId>ctgmq.api</groupId>
-            <artifactId>ctgmq.api</artifactId>
+            <groupId>com.ctg.itrdc.mq</groupId>
+            <artifactId>ctg-mq-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>ctgmq.client</groupId>
-            <artifactId>ctgmq.client</artifactId>
+            <groupId>com.ctg.mq</groupId>
+            <artifactId>ctgmq-rocketmq-client</artifactId>
         </dependency>
         <dependency>
-            <groupId>ctgmq.common</groupId>
-            <artifactId>ctgmq.common</artifactId>
+            <groupId>com.ctg.mq</groupId>
+            <artifactId>ctgmq-rocketmq-common</artifactId>
         </dependency>
         <dependency>
-            <groupId>ctgmq.remoting</groupId>
-            <artifactId>ctgmq.remoting</artifactId>
+            <groupId>com.ctg.mq</groupId>
+            <artifactId>ctgmq-rocketmq-remoting</artifactId>
         </dependency>
         <dependency>
-            <groupId>ctgmq.srvutil</groupId>
-            <artifactId>ctgmq.srvutil</artifactId>
+            <groupId>com.ctg.mq</groupId>
+            <artifactId>ctgmq-rocketmq-srvutil</artifactId>
         </dependency>
         <dependency>
-            <groupId>ctgmq.tools</groupId>
-            <artifactId>ctgmq.tools</artifactId>
+            <groupId>com.ctg.mq</groupId>
+            <artifactId>ctgmq-rocketmq-tools</artifactId>
         </dependency>
     </dependencies>
 

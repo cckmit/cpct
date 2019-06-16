@@ -34,7 +34,7 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 @RequestMapping("${adminPath}/tarGrpTemplate")
 public class TarGrpTemplateController  extends BaseController {
 
-    @Autowired
+    @Autowired(required = false)
     private TarGrpTemplateService tarGrpTemplateService;
 
     @RequestMapping("/importUserList4TarTemp")

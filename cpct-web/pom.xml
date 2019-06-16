@@ -74,14 +74,6 @@
             <artifactId>bss-centralized-authenticate</artifactId>
         </dependency>
         <!--<dependency>-->
-            <!--<groupId>com.ctzj.smt.bss</groupId>-->
-            <!--<artifactId>bss-sysmgr-model</artifactId>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>com.ctzj.smt.bss</groupId>-->
-            <!--<artifactId>bss-sysmgr-privilege-service-api</artifactId>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
             <!--<groupId>com.zjhcsoft.session</groupId>-->
             <!--<artifactId>spring-session</artifactId>-->
         <!--</dependency>-->

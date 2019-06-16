@@ -62,10 +62,10 @@
         <dubbo-server.version>1.1.6</dubbo-server.version>
         <bss-centralized.verson>1.6</bss-centralized.verson>
         <service-batch.version>1.0.5</service-batch.version>
-        <ctgmq.version>2.4.0</ctgmq.version>
+        <ctg-mq.version>2.4.0</ctg-mq.version>
         <cpct-trial.version>1.0.1</cpct-trial.version>
         <smt-bss-cpc.version>1.0-SNAPSHOT</smt-bss-cpc.version>
-
+        <smt-bss-cpc-model.version>1.0.1</smt-bss-cpc-model.version>
     </properties>
 
     <parent>
@@ -455,34 +455,34 @@
 
             <!-- ctgmq -->
             <dependency>
-                <groupId>ctgmq.api</groupId>
-                <artifactId>ctgmq.api</artifactId>
-                <version>${ctgmq.version}</version>
+                <groupId>com.ctg.itrdc.mq</groupId>
+                <artifactId>ctg-mq-api</artifactId>
+                <version>${ctg-mq.version}</version>
             </dependency>
             <dependency>
-                <groupId>ctgmq.client</groupId>
-                <artifactId>ctgmq.client</artifactId>
-                <version>${ctgmq.version}</version>
+                <groupId>com.ctg.mq</groupId>
+                <artifactId>ctgmq-rocketmq-client</artifactId>
+                <version>${ctg-mq.version}</version>
             </dependency>
             <dependency>
-                <groupId>ctgmq.common</groupId>
-                <artifactId>ctgmq.common</artifactId>
-                <version>${ctgmq.version}</version>
+                <groupId>com.ctg.mq</groupId>
+                <artifactId>ctgmq-rocketmq-common</artifactId>
+                <version>${ctg-mq.version}</version>
             </dependency>
             <dependency>
-                <groupId>ctgmq.remoting</groupId>
-                <artifactId>ctgmq.remoting</artifactId>
-                <version>${ctgmq.version}</version>
+                <groupId>com.ctg.mq</groupId>
+                <artifactId>ctgmq-rocketmq-remoting</artifactId>
+                <version>${ctg-mq.version}</version>
             </dependency>
             <dependency>
-                <groupId>ctgmq.srvutil</groupId>
-                <artifactId>ctgmq.srvutil</artifactId>
-                <version>${ctgmq.version}</version>
+                <groupId>com.ctg.mq</groupId>
+                <artifactId>ctgmq-rocketmq-srvutil</artifactId>
+                <version>${ctg-mq.version}</version>
             </dependency>
             <dependency>
-                <groupId>ctgmq.tools</groupId>
-                <artifactId>ctgmq.tools</artifactId>
-                <version>${ctgmq.version}</version>
+                <groupId>com.ctg.mq</groupId>
+                <artifactId>ctgmq-rocketmq-tools</artifactId>
+                <version>${ctg-mq.version}</version>
             </dependency>
 
             <dependency>
@@ -500,7 +500,7 @@
             <dependency>
                 <groupId>com.ctzj.smt.bss</groupId>
                 <artifactId>smt-bss-cpc-model</artifactId>
-                <version>${smt-bss-cpc.version}</version>
+                <version>${smt-bss-cpc-model.version}</version>
             </dependency>
 
         </dependencies>
