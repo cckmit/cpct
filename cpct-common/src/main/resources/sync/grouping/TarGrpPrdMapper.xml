@@ -18,6 +18,7 @@
     delete from tar_grp
     where TAR_GRP_ID = #{tarGrpId,jdbcType=BIGINT}
   </delete>
+
     <insert id="insert" keyProperty="tarGrpId" useGeneratedKeys="true"
             parameterType="com.zjtelcom.cpct.dto.grouping.TarGrp">
     insert into tar_grp (TAR_GRP_ID, TAR_GRP_NAME, TAR_GRP_DESC,

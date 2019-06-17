@@ -317,6 +317,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         TrialOperationVOES requests = BeanUtil.create(request, new TrialOperationVOES());
         ArrayList<TrialOperationParamES> paramList = new ArrayList<>();
         TrialOperationParamES param = getTrialOperationParamES(request, Long.valueOf(batchNumSt),  Long.valueOf(new Date().getTime()+ChannelUtil.getRandomStr(2)) + 1, true, conditions);
+        param.setRuleId(ruleId);
         paramList.add(param);
         requests.setParamList(paramList);
         TrialResponseES response = new TrialResponseES();
