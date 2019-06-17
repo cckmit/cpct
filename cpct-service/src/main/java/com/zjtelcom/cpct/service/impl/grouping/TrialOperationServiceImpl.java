@@ -759,6 +759,16 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 result.put("resultMsg", "扩展字段不能超过87个");
                 return result;
             }
+            //todo 关单规则配置信息
+            if (true){
+                List<Map<String,Object>> closeRule = new ArrayList<>();
+                Map<String,Object> ruleMap = new HashMap<>();
+                ruleMap.put("closeName","测试关单规则");
+                ruleMap.put("closeCode","0");
+                ruleMap.put("closeNbr","CR001000001");
+                closeRule.add(ruleMap);
+                redisUtils_es.set("CLOSE_RULE_"+campaign.getMktCampaignId(),closeRule);
+            }
             TrialOperation trialOp = BeanUtil.create(operation, new TrialOperation());
             trialOp.setCampaignName(campaign.getMktCampaignName());
             //当清单导入时 strategyId name 存储规则信息
@@ -1331,24 +1341,16 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "抽样试算失败，无法全量试算");
             return result;
         }
-
-        int timeLimit = 1800000;
-        List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign("TRIAL_TIME");
-        if (sysParams.get(0)!=null){
-            timeLimit = Integer.valueOf(sysParams.get(0).getParamValue());
+        //todo 关单规则配置信息
+        if (true){
+            List<Map<String,Object>> closeRule = new ArrayList<>();
+            Map<String,Object> ruleMap = new HashMap<>();
+            ruleMap.put("closeName","测试关单规则");
+            ruleMap.put("closeCode","0");
+            ruleMap.put("closeNbr","CR001000001");
+            closeRule.add(ruleMap);
+            redisUtils_es.set("CLOSE_RULE_"+campaignDO.getMktCampaignId(),closeRule);
         }
-        Date upTime = new Date(new Date().getTime() - timeLimit);
-        String[] status  = new String[2];
-        status[0] = TrialStatus.ALL_SAMPEL_SUCCESS.getValue();
-        status[1] = TrialStatus.ALL_SAMPEL_FAIL.getValue();
-
-        List<TrialOperation> operations = trialOperationMapper.listOperationByUpdateTime(trialOperation.getCampaignId(),upTime,status);
-        if (!operations.isEmpty()){
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "相同活动30分钟只能全量试算一次，请稍后再试");
-            return result;
-        }
-
         //查询活动下面所有渠道属性id是21和22的value
         List<String> attrValue = mktCamChlConfAttrMapper.selectAttrLabelValueByCampaignId(trialOperation.getCampaignId());
         //添加策略适用地市
