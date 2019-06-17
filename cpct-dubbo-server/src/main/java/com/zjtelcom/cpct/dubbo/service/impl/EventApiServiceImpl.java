@@ -9,6 +9,7 @@ import com.ctzj.bss.customer.data.carrier.outbound.api.CtgCacheAssetService;
 import com.ctzj.bss.customer.data.carrier.outbound.model.ResponseResult;
 import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheProdEntityQryService;
 import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheRelEntityQryService;
+import com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheIdMappingIndexQryService;
 import com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheOfferRelIndexQryService;
 import com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheProdIndexQryService;
 import com.ctzj.smt.bss.cache.service.api.model.CacheResultObject;
@@ -178,6 +179,8 @@ public class EventApiServiceImpl implements EventApiService {
     @Autowired(required = false)
     private ICacheRelEntityQryService iCacheRelEntityQryService;
 
+    @Autowired(required = false)
+    private ICacheIdMappingIndexQryService iCacheIdMappingIndexQryService;
 
     @Override
     public Map<String, Object> CalculateCPC(Map<String, Object> map) {
@@ -2683,9 +2686,20 @@ public class EventApiServiceImpl implements EventApiService {
                                     log.info("777777------AccNum --->" + prodInstCacheEntityNew.getResultObject().getAccNum());
                                     if (!accNbrList.contains(prodInstCacheEntityNew.getResultObject().getAccNum())) {
                                         accNbrList.add(prodInstCacheEntityNew.getResultObject().getAccNum());
-                                        Map<String, Object> accNbrMap = new HashMap<>();
-                                        accNbrMap.put("ACC_NBR", prodInstCacheEntityNew.getResultObject().getAccNum());
-                                        accNbrMapList.add(accNbrMap);
+                                        List<String> integrationIdList = new ArrayList<>();
+                                        CacheResultObject<Set<String>> setCacheResultObjectNew = iCacheIdMappingIndexQryService.qryProdInstIdMappingIndex(prodInstIdNew.toString());
+                                        log.info("888888------setCacheResultObjectNew --->" + JSON.toJSONString(setCacheResultObjectNew));
+                                        if (setCacheResultObjectNew != null && setCacheResultObjectNew.getResultObject() != null && setCacheResultObjectNew.getResultObject().size() > 0) {
+                                            for (String integrationId : setCacheResultObjectNew.getResultObject()) {
+                                                if(!integrationIdList.contains(integrationId)){
+                                                    Map<String, Object> accNbrMap = new HashMap<>();
+                                                    accNbrMap.put("ACC_NBR", prodInstCacheEntityNew.getResultObject().getAccNum());
+                                                    accNbrMap.put("INTEGRATION_ID", integrationId);
+                                                    log.info("999999------accNbrMap --->" + JSON.toJSONString(accNbrMap));
+                                                    accNbrMapList.add(accNbrMap);
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -2694,7 +2708,7 @@ public class EventApiServiceImpl implements EventApiService {
                 }
             }
         }
-        log.info("8888888------AccNum --->" + JSON.toJSONString(accNbrList));
+        log.info("10101010------accNbrMapList --->" + JSON.toJSONString(accNbrMapList));
         return accNbrMapList;
     }
 
