@@ -215,21 +215,21 @@
     </update>
 
     <select id="selectByProduct" resultMap="BaseResultMap">
-        select RULE_ID, RULE_NAME, FILTER_TYPE,
-        EXECUTION_CHANNEL, CHANNEL_CONTACTS, EFFECTIVE_DATE,
+        select RULE_ID, CLOSE_NAME, CLOSE_TYPE,
+        PRODUCT_TYPE, CHANNEL_CONTACTS, EFFECTIVE_DATE,
         FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF,
         UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
         UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID,
-        DAYS, TIMES, OFFER_INFO,OPERATOR
+        DAYS, TIMES, OFFER_INFO,CLOSE_CODE
         from close_rule
         where 1 = 1
         <if test="chooseProduct != null and chooseProduct != ''">
             AND CHOOSE_PRODUCT like concat('%',concat(#{chooseProduct},'%'))
         </if>
         <if test="executionChannel != null and executionChannel != ''">
-            AND EXECUTION_CHANNEL = #{executionChannel}
+            AND PRODUCT_TYPE = #{executionChannel}
         </if>
-        AND FILTER_TYPE = #{filterType}
+        AND CLOSE_TYPE = #{filterType}
         ORDER BY UPDATE_DATE DESC
     </select>
 
@@ -238,13 +238,16 @@
         <result property="activityNbr" column="MKT_ACTIVITY_NBR"/>
         <result property="activityId" column="MKT_CAMPAIGN_ID"/>
         <result property="closeNumber" column="EXPRESSION"/>
+        <result property="closeName" column="CLOSE_NAME"/>
+        <result property="closeCode" column="CLOSE_CODE"/>
     </resultMap>
 
     <select id="getCloseCampaign" parameterType="java.util.Map" resultMap="MktcloseRuleCampaignMap">
-        SELECT cr.CLOSE_TYPE,cr.EXPRESSION,mc.MKT_ACTIVITY_NBR,mc.MKT_CAMPAIGN_ID FROM close_rule cr
+        SELECT cr.CLOSE_TYPE,cr.CLOSE_NAME,cr.CLOSE_CODE,cr.EXPRESSION,mc.MKT_ACTIVITY_NBR,mc.MKT_CAMPAIGN_ID FROM close_rule cr
             LEFT JOIN mkt_strategy_close_rule_rel ms ON cr.RULE_ID = ms.RULE_ID
             LEFT JOIN mkt_campaign mc ON ms.STRATEGY_ID = mc.MKT_CAMPAIGN_ID
-            WHERE cr.CLOSE_TYPE = #{0}  AND #{1} > mc.PLAN_BEGIN_TIME  AND mc.PLAN_END_TIME > #{1} AND mc.STATUS_CD = #{2}
+            WHERE cr.CLOSE_TYPE = #{map.filterType}  AND #{map.date} > mc.PLAN_BEGIN_TIME
+            AND mc.PLAN_END_TIME > #{map.date} AND mc.STATUS_CD = #{map.status}
     </select>
 
     <update id="updateExpression" parameterType="java.lang.String" >
