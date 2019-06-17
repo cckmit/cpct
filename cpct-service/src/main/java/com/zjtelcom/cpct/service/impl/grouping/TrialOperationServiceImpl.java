@@ -14,7 +14,9 @@ import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.MktCamCustMapper;
 import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
+import com.zjtelcom.cpct.dao.filter.CloseRuleMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
+import com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
@@ -28,6 +30,7 @@ import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.GroupingVO;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyCloseRuleRelDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
@@ -39,6 +42,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.channel.TransDetailDataVO;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
+import com.zjtelcom.cpct.dto.filter.CloseRule;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.*;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
@@ -155,6 +159,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private MktCamItemMapper itemMapper;
     @Autowired(required = false)
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
+    @Autowired
+    private MktStrategyCloseRuleRelMapper strategyCloseRuleRelMapper;
+    @Autowired
+    private CloseRuleMapper closeRuleMapper;
 
 
 
@@ -759,14 +767,20 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 result.put("resultMsg", "扩展字段不能超过87个");
                 return result;
             }
+            List<MktStrategyCloseRuleRelDO> closeRuleRelDOS = strategyCloseRuleRelMapper.selectRuleByStrategyId(campaign.getMktCampaignId());
             //todo 关单规则配置信息
-            if (true){
+            if (closeRuleRelDOS!=null && !closeRuleRelDOS.isEmpty()){
                 List<Map<String,Object>> closeRule = new ArrayList<>();
-                Map<String,Object> ruleMap = new HashMap<>();
-                ruleMap.put("closeName","测试关单规则");
-                ruleMap.put("closeCode","0");
-                ruleMap.put("closeNbr","CR001000001");
-                closeRule.add(ruleMap);
+                for (MktStrategyCloseRuleRelDO ruleRelDO : closeRuleRelDOS){
+                    CloseRule closeR = closeRuleMapper.selectByPrimaryKey(ruleRelDO.getRuleId());
+                    if (closeR!=null){
+                        Map<String,Object> ruleMap = new HashMap<>();
+                        ruleMap.put("closeName",closeR.getCloseName());
+                        ruleMap.put("closeCode",closeR.getCloseCode());
+                        ruleMap.put("closeNbr",closeR.getExpression());
+                        closeRule.add(ruleMap);
+                    }
+                }
                 redisUtils_es.set("CLOSE_RULE_"+campaign.getMktCampaignId(),closeRule);
             }
             TrialOperation trialOp = BeanUtil.create(operation, new TrialOperation());
@@ -1341,14 +1355,20 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "抽样试算失败，无法全量试算");
             return result;
         }
+        List<MktStrategyCloseRuleRelDO> closeRuleRelDOS = strategyCloseRuleRelMapper.selectRuleByStrategyId(campaignDO.getMktCampaignId());
         //todo 关单规则配置信息
-        if (true){
+        if (closeRuleRelDOS!=null && !closeRuleRelDOS.isEmpty()){
             List<Map<String,Object>> closeRule = new ArrayList<>();
-            Map<String,Object> ruleMap = new HashMap<>();
-            ruleMap.put("closeName","测试关单规则");
-            ruleMap.put("closeCode","0");
-            ruleMap.put("closeNbr","CR001000001");
-            closeRule.add(ruleMap);
+            for (MktStrategyCloseRuleRelDO ruleRelDO : closeRuleRelDOS){
+                CloseRule closeR = closeRuleMapper.selectByPrimaryKey(ruleRelDO.getRuleId());
+                if (closeR!=null){
+                    Map<String,Object> ruleMap = new HashMap<>();
+                    ruleMap.put("closeName",closeR.getCloseName());
+                    ruleMap.put("closeCode",closeR.getCloseCode());
+                    ruleMap.put("closeNbr",closeR.getExpression());
+                    closeRule.add(ruleMap);
+                }
+            }
             redisUtils_es.set("CLOSE_RULE_"+campaignDO.getMktCampaignId(),closeRule);
         }
         //查询活动下面所有渠道属性id是21和22的value
