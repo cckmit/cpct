@@ -451,4 +451,17 @@
     where LABEL_DATA_TYPE = #{labelDataType}
   </select>
 
+  <select id="selectDistributeLabelByType" resultType="java.util.Map">
+    select LABEL_CODE labelCode,LABEL_NAME labelName
+    from label_distribute_rel
+    where LABEL_TYPE = #{labelType}
+  </select>
+
+  <select id="selectDistributeLabelByCode" resultType="java.util.Map">
+    select LABEL_CODE labelCode,LABEL_NAME labelName, CONCAT(LABEL_TYPE, '') labelType
+    from label_distribute_rel
+    where LABEL_CODE = #{labelCode}
+  </select>
+
+
 </mapper>

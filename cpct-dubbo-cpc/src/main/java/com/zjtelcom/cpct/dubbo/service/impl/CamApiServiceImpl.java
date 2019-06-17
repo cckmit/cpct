@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheOfferEntityQryService;
 import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheRelEntityQryService;
 import com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheOfferRelIndexQryService;
+import com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheProdIndexQryService;
 import com.ctzj.smt.bss.cache.service.api.model.CacheResultObject;
 import com.ctzj.smt.bss.customer.model.dataobject.OfferInst;
 import com.ctzj.smt.bss.customer.model.dataobject.OfferProdInstRel;
@@ -136,6 +137,9 @@ public class CamApiServiceImpl implements CamApiService {
 
     @Autowired(required = false)
     private ICacheRelEntityQryService iCacheRelEntityQryService;
+
+    @Autowired(required = false)
+    private ICacheProdIndexQryService iCacheProdIndexQryService;
     /**
      * 活动级别验证
      */
@@ -261,53 +265,47 @@ public class CamApiServiceImpl implements CamApiService {
                                     redisUtils.set("REAL_PROD_FILTER", realProdFilter);
                                 }
                             }
-                            ConcurrentHashMap filterRuleTimeMap = new ConcurrentHashMap();
-                            String integrationId = params.get("integrationId");
+                            Map<String, Object> filterRuleTimeMap = new HashMap<>();
                             // 判断是否进行CRM销售品过滤
-                            if (realProdFilter != null && "2".equals(realProdFilter)) {
-//                                ResponseResult<AssetDto> assetDtoResponseResult = ctgCacheAssetService.queryCachedAssetDetailByIntegId(integrationId, lanName);
-//                                AssetDto assetDto = assetDtoResponseResult.getData();
-
-//                                if (assetDto != null) {
-//                                    List<AssetPromDto> assetPromDtoList = assetDto.getAssetPromDtoList();
-//                                    for (AssetPromDto assetPromDto : assetPromDtoList) {
-//                                        prodStrList.add(assetPromDto.getSelectablePromNum());
-//                                        if (assetPromDto.getSelectablePromNum() != null && assetPromDto.getSelectablePromStartDate() != null) {
-//                                            filterRuleTimeMap.put(assetPromDto.getSelectablePromNum(), assetPromDto.getSelectablePromStartDate());
-//                                        }
-//                                    }
-//                                }
-
-
-                                // 获取主产品PROM_INTEG_ID标签
-                                String promIntegId = "";
-                                if (context.get("PROM_INTEG_ID") != null) {
-                                    promIntegId = (String) context.get("PROM_INTEG_ID");
-                                }
+                            if (realProdFilter != null && "0".equals(realProdFilter)) {
+                                log.info("111------accNbr --->" + params.get("accNbr"));
                                 List<String> prodStrList = new ArrayList<>();
-                                // 根据prodInstId 和 statusCd(1000-有效)查询offerProdInstRelId
-                                CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferInstRelIndex2(promIntegId, "1000");
-                                if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null) {
-                                    Set<String> offerProdInstRelIdSet = setCacheResultObject.getResultObject();
-                                    for (String offerProdInstRelId : offerProdInstRelIdSet) {
-                                        // 查询销售品产品实例关系缓存实体
-                                        CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
-                                        if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
-                                            OfferProdInstRel offerProdInstRel = offerProdInstRelCacheEntity.getResultObject();
+                                CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(params.get("accNbr"));
+                                log.info("222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
+                                if(prodInstIdsObject!=null &&  prodInstIdsObject.getResultObject() !=null ){
+                                    Set<String> prodInstIds = prodInstIdsObject.getResultObject();
+                                    for (String prodInstId : prodInstIds) {
+                                        // 根据prodInstId 和 statusCd(1000-有效)查询offerProdInstRelId
+                                        log.info("333------prodInstId --->" + prodInstId);
+                                        CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex2(prodInstId, "1000");
+                                        log.info("444------setCacheResultObject --->" + JSON.toJSONString(setCacheResultObject));
+                                        if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null) {
+                                            Set<String> offerProdInstRelIdSet = setCacheResultObject.getResultObject();
+                                            for (String offerProdInstRelId : offerProdInstRelIdSet) {
+                                                // 查询销售品产品实例关系缓存实体
+                                                CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
+                                                log.info("555------offerProdInstRelCacheEntity --->" + JSON.toJSONString(offerProdInstRelCacheEntity));
+                                                if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
+                                                        OfferProdInstRel offerProdInstRel = offerProdInstRelCacheEntity.getResultObject();
 
-                                            // 查询销售品实例缓存实体
-                                            CacheResultObject<OfferInst> offerInstCacheEntity = iCacheOfferEntityQryService.getOfferInstCacheEntity(offerProdInstRel.getOfferInstId().toString());
-                                            if(offerInstCacheEntity!=null && offerInstCacheEntity.getResultObject()!=null){
-                                                OfferInst offerInst = offerInstCacheEntity.getResultObject();
-                                                Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerInst.getOfferId().toString()));
-                                                prodStrList.add(offer.getOfferNbr());
-                                                filterRuleTimeMap.put(offer.getOfferNbr(), offerProdInstRel.getEffDate());
+                                                    // 查询销售品实例缓存实体
+                                                    CacheResultObject<OfferInst> offerInstCacheEntity = iCacheOfferEntityQryService.getOfferInstCacheEntity(offerProdInstRel.getOfferInstId().toString());
+                                                    log.info("666------offerInstCacheEntity --->" + JSON.toJSONString(offerInstCacheEntity));
+                                                    if(offerInstCacheEntity!=null && offerInstCacheEntity.getResultObject()!=null){
+                                                        OfferInst offerInst = offerInstCacheEntity.getResultObject();
+                                                        Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerInst.getOfferId().toString()));
+                                                        log.info("777------offer --->" + JSON.toJSONString(offer));
+                                                        prodStrList.add(offer.getOfferNbr());
+                                                        filterRuleTimeMap.put(offer.getOfferNbr(), offerInst.getEffDate());
+                                                        log.info("888------filterRuleTimeMap --->" + JSON.toJSONString(filterRuleTimeMap));
+                                                    }
+                                                }
                                             }
                                         }
                                     }
                                 }
-
                                 productStr = ChannelUtil.StringList2String(prodStrList);
+                                log.info("999------productStr --->" + JSON.toJSONString(productStr));
                             } else if (!context.containsKey("PROM_LIST")) { // 有没有办理销售品--销售列表标签
                                 //存在于校验
                                 if ("2000".equals(filterRule.getOperator())) { // 不存在
@@ -708,42 +706,43 @@ public class CamApiServiceImpl implements CamApiService {
                                     redisUtils.set("REAL_PROD_FILTER", realProdFilter);
                                 }
                             }
-                            // 获取本地网的中文名
-                            String lanName = AreaNameEnum.getNameByLandId(Long.valueOf(lanId));
-
-                            String integrationId = params.get("integrationId");
-                            if (realProdFilter != null && "1".equals(realProdFilter)) {
-//                                ResponseResult<AssetDto> assetDtoResponseResult = ctgCacheAssetService.queryCachedAssetDetailByIntegId(integrationId, lanName);
-//                                AssetDto assetDto = assetDtoResponseResult.getData();
+                            if (realProdFilter != null && "0".equals(realProdFilter)) {
                                 List<String> prodStrList = new ArrayList<>();
-                                // 根据prodInstId 和 statusCd(1000-有效)查询offerProdInstRelId
-                                CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferInstRelIndex2(promIntegId, "1000");
-                                if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null) {
-                                    Set<String> offerProdInstRelIdSet = setCacheResultObject.getResultObject();
-                                    for (String offerProdInstRelId : offerProdInstRelIdSet) {
-                                        // 查询销售品产品实例关系缓存实体
-                                        CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
-                                        if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
-                                            OfferProdInstRel offerProdInstRel = offerProdInstRelCacheEntity.getResultObject();
+                                log.info("111------accNbr --->" + params.get("accNbr"));
+                                CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(params.get("accNbr"));
+                                log.info("222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
+                                if(prodInstIdsObject!=null &&  prodInstIdsObject.getResultObject() !=null ){
+                                    Set<String> prodInstIds = prodInstIdsObject.getResultObject();
+                                    for (String prodInstId : prodInstIds) {
+                                        // 根据prodInstId 和 statusCd(1000-有效)查询offerProdInstRelId
+                                        log.info("333------prodInstId --->" + prodInstId);
+                                        CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex2(prodInstId, "1000");
+                                        log.info("444------setCacheResultObject --->" + JSON.toJSONString(setCacheResultObject));
+                                        if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null) {
+                                            Set<String> offerProdInstRelIdSet = setCacheResultObject.getResultObject();
+                                            for (String offerProdInstRelId : offerProdInstRelIdSet) {
+                                                // 查询销售品产品实例关系缓存实体
+                                                CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
+                                                log.info("555------offerProdInstRelCacheEntity --->" + JSON.toJSONString(offerProdInstRelCacheEntity));
+                                                if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
+                                                    OfferProdInstRel offerProdInstRel = offerProdInstRelCacheEntity.getResultObject();
 
-                                            // 查询销售品实例缓存实体
-                                            CacheResultObject<OfferInst> offerInstCacheEntity = iCacheOfferEntityQryService.getOfferInstCacheEntity(offerProdInstRel.getOfferInstId().toString());
-                                            if(offerInstCacheEntity!=null && offerInstCacheEntity.getResultObject()!=null){
-                                                OfferInst offerInst = offerInstCacheEntity.getResultObject();
-                                                Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerInst.getOfferId().toString()));
-                                                prodStrList.add(offer.getOfferNbr());
+                                                    // 查询销售品实例缓存实体
+                                                    CacheResultObject<OfferInst> offerInstCacheEntity = iCacheOfferEntityQryService.getOfferInstCacheEntity(offerProdInstRel.getOfferInstId().toString());
+                                                    log.info("666------offerInstCacheEntity --->" + JSON.toJSONString(offerInstCacheEntity));
+                                                    if(offerInstCacheEntity!=null && offerInstCacheEntity.getResultObject()!=null){
+                                                        OfferInst offerInst = offerInstCacheEntity.getResultObject();
+                                                        Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerInst.getOfferId().toString()));
+                                                        log.info("777------offer --->" + JSON.toJSONString(offer));
+                                                        prodStrList.add(offer.getOfferNbr());
+                                                    }
+                                                }
                                             }
                                         }
                                     }
                                 }
-
-//                                if (assetDto != null) {
-//                                    List<AssetPromDto> assetPromDtoList = assetDto.getAssetPromDtoList();
-//                                    for (AssetPromDto assetPromDto : assetPromDtoList) {
-//                                        prodStrList.add(assetPromDto.getSelectablePromNum());
-//                                    }
-//                                }
                                 String productString = ChannelUtil.StringList2String(prodStrList);
+                                log.info("999------productStr --->" + JSON.toJSONString(productStr));
                                 context.put("PROM_LIST" , productString);
                             }
                         } else {
@@ -1080,18 +1079,13 @@ public class CamApiServiceImpl implements CamApiService {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
                 taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
                 taskChlAttrList.add(taskChlAttr);
-            }
-
-            if (mktCamChlConfAttr.getAttrId() == 500600010005L || mktCamChlConfAttr.getAttrId() == 500600010011L) {
+            } else if (mktCamChlConfAttr.getAttrId() == 500600010005L || mktCamChlConfAttr.getAttrId() == 500600010011L) {
                 taskChlAttr = new ConcurrentHashMap<>();
                 taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
                 taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
                 taskChlAttr.put("attrValue", mktCamChlConfAttr.getAttrValue());
                 taskChlAttrList.add(taskChlAttr);
-            }
-
-            //判断渠道生失效时间
-            if (mktCamChlConfAttr.getAttrId() == 500600010006L) {
+            } else if (mktCamChlConfAttr.getAttrId() == 500600010006L) { //判断渠道生失效时间
                 if (!now.after(new Date(Long.parseLong(mktCamChlConfAttr.getAttrValue())))) {
                     checkTime = false;
                 } else {
@@ -1102,8 +1096,7 @@ public class CamApiServiceImpl implements CamApiService {
                     taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
                     taskChlAttrList.add(taskChlAttr);
                 }
-            }
-            if (mktCamChlConfAttr.getAttrId() == 500600010007L) {
+            } else if (mktCamChlConfAttr.getAttrId() == 500600010007L) {
                 if (now.after(new Date(Long.parseLong(mktCamChlConfAttr.getAttrValue())))) {
                     checkTime = false;
                 } else {
@@ -1114,16 +1107,10 @@ public class CamApiServiceImpl implements CamApiService {
                     taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
                     taskChlAttrList.add(taskChlAttr);
                 }
-            }
-
-            //获取调查问卷ID
-            if (mktCamChlConfAttr.getAttrId() == 500600010008L) {
+            } else if (mktCamChlConfAttr.getAttrId() == 500600010008L) {  //获取调查问卷ID
                 //调查问卷
                 channelMap.put("naireId", mktCamChlConfAttr.getAttrValue());
-            }
-
-            //获取接触账号/推送账号(如果有)
-            if (mktCamChlConfAttr.getAttrId() == 500600010012L) {
+            } else if (mktCamChlConfAttr.getAttrId() == 500600010012L) {   //获取接触账号/推送账号(如果有)
                 if (mktCamChlConfAttr.getAttrValue() != null && !"".equals(mktCamChlConfAttr.getAttrValue())) {
                     if (context.containsKey(mktCamChlConfAttr.getAttrValue())) {
                         channelMap.put("contactAccount", context.get(mktCamChlConfAttr.getAttrValue()));
@@ -1132,7 +1119,14 @@ public class CamApiServiceImpl implements CamApiService {
                         return Collections.EMPTY_MAP;
                     }
                 }
+            } else {
+                taskChlAttr = new ConcurrentHashMap<>();
+                taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
+                taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
+                taskChlAttr.put("attrValue", mktCamChlConfAttr.getAttrValue().toString());
+                taskChlAttrList.add(taskChlAttr);
             }
+
         }
         channelMap.put("taskChlAttrList", taskChlAttrList);
 

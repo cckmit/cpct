@@ -7,6 +7,7 @@ import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
 import com.mysql.jdbc.StringUtils;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.campaign.MktCamChlConfAttrMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
@@ -20,6 +21,7 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
+import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
@@ -30,6 +32,7 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
@@ -74,6 +77,7 @@ import java.util.regex.Pattern;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+import static com.zjtelcom.cpct.enums.ConfAttrEnum.*;
 
 @Service
 public class TrialOperationServiceImpl extends BaseService implements TrialOperationService {
@@ -126,6 +130,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private FilterRuleMapper filterRuleMapper;
     @Autowired
     private RedisUtils_es redisUtils_es;
+    @Autowired
+    private MktCamChlConfMapper mktCamChlConfMapper;
+    @Autowired
+    private MktCamChlConfAttrMapper mktCamChlConfAttrMapper;
 
     /**
      * 销售品service
@@ -268,78 +276,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","查询成功");
         result.put("total",response.getHitsList());
-        return result;
-    }
-
-    @Override
-    public Map<String, Object> conditionCheck(Map<String, Object> params) {
-        Map<String,Object> result = new HashMap<>();
-
-        List<TarGrpCondition> conditions = new ArrayList<>();
-        if (params.get("conditionList")==null){
-            result.put("resultCode", CODE_SUCCESS);
-            result.put("resultMsg",0);
-            return result;
-        }
-        Long ruleId = MapUtil.getLongNum(params.get("ruleId"));
-        String orgCheck = redisUtils.get("ORG_CHECK_"+ruleId.toString())==null ? null :redisUtils.get("ORG_CHECK_"+ruleId.toString()).toString();
-        if (orgCheck!=null && orgCheck.equals("false")){
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "营销组织树配置正在努力加载请稍后再试");
-            return result;
-        }
-        List<Map<String,Object>> conditionMap = (List<Map<String,Object>>)params.get("conditionList");
-        for (Map<String,Object> map : conditionMap){
-            TarGrpCondition condition = ChannelUtil.mapToEntity(map,TarGrpCondition.class);
-            condition.setOperType(map.get("operType").toString());
-            condition.setLeftParam(map.get("leftParam").toString());
-            condition.setRightParam(map.get("rightParam").toString());
-            conditions.add(condition);
-        }
-        String strategyArea = MapUtil.getString(params.get("strategyArea"));
-        if (conditions.isEmpty() ){
-            result.put("resultCode", CODE_SUCCESS);
-            result.put("resultMsg",0);
-            return result;
-        }
-        TrialOperationVO request = new TrialOperationVO();
-        //生成批次号
-        String batchNumSt = DateUtil.date2St4Trial(new Date()) + ChannelUtil.getRandomStr(4);
-        request.setBatchNum(Long.valueOf(batchNumSt));
-        request.setFieldList(new String[new ArrayList<String>().size()]);
-        request.setSample(true);
-        if (!strategyArea.equals("")){
-            //添加策略适用地市
-            Long strategyId = Long.valueOf(new Date().getTime()+ChannelUtil.getRandomStr(2));
-            redisUtils.set("STRATEGY_CONF_AREA_"+strategyId,strategyArea);
-            request.setStrategyId(strategyId);
-        }
-        TrialOperationVOES requests = BeanUtil.create(request, new TrialOperationVOES());
-        ArrayList<TrialOperationParamES> paramList = new ArrayList<>();
-        TrialOperationParamES param = getTrialOperationParamES(request, Long.valueOf(batchNumSt),  Long.valueOf(new Date().getTime()+ChannelUtil.getRandomStr(2)) + 1, true, conditions);
-        param.setRuleId(ruleId);
-        paramList.add(param);
-        requests.setParamList(paramList);
-        TrialResponseES response = new TrialResponseES();
-        try {
-            //todo
-            System.out.println(JSON.toJSONString(requests));
-            response = esService.searchBatchInfo(requests);
-            if (response.getResultCode().equals(CODE_FAIL)){
-                result.put("resultCode", CODE_SUCCESS);
-                result.put("resultMsg", 0);
-                return result;
-            }
-            //todo 返回信息结果封装
-        } catch (Exception e) {
-            e.printStackTrace();
-            // 抽样试算失败
-            result.put("resultCode", CODE_SUCCESS);
-            result.put("resultMsg", 0);
-            return result;
-        }
-        result.put("resultCode", CODE_SUCCESS);
-        result.put("resultMsg", response.getTotal());
         return result;
     }
 
@@ -1380,25 +1316,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             return result;
         }
         if(!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(campaignDO.getStatusCd())){
-        BeanUtil.copy(operation,trialOperation);
-        // 通过活动id获取关联的标签字段数组
-        MktCampaignDO campaignDO = campaignMapper.selectByPrimaryKey(trialOperation.getCampaignId());
-        if (campaignDO==null){
             result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "发布活动后才能全量试算");
-            return result;
-        }
-        MktStrategyConfDO strategyConfDO = strategyConfMapper.selectByPrimaryKey(operation.getStrategyId());
-        if (strategyConfDO==null){
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "策略不存在");
-            result.put("resultMsg", "活动不存在");
-            return result;
-        }
-        if (!operation.getStatusCd().equals(TrialStatus.SAMPEL_SUCCESS.getValue())){
-        if(!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(campaignDO.getStatusCd())){
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "抽样试算失败，无法全量试算");
             result.put("resultMsg", "发布活动后才能全量试算");
             return result;
         }
@@ -1431,6 +1349,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             return result;
         }
 
+        //查询活动下面所有渠道属性id是21和22的value
+        List<String> attrValue = mktCamChlConfAttrMapper.selectAttrLabelValueByCampaignId(trialOperation.getCampaignId());
         //添加策略适用地市
         redisUtils.set("STRATEGY_CONF_AREA_"+operation.getStrategyId(),strategyConfDO.getAreaId());
         // 通过活动id获取关联的标签字段数组
@@ -1438,7 +1358,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         req.setDisplayColumnId(campaignDO.getCalcDisplay());
         Map<String,Object> labelMap = messageLabelService.queryLabelListByDisplayId(req);
         List<LabelDTO> labelDTOList = (List<LabelDTO>)labelMap.get("labels");
-        String[] fieldList = new String[labelDTOList.size()];
+        String[] fieldList = new String[labelDTOList.size()+attrValue.size()];
         List<Map<String,Object>> labelList = new ArrayList<>();
         for (int i = 0 ; i< labelDTOList.size();i++){
             fieldList[i] = labelDTOList.get(i).getLabelCode();
@@ -1448,6 +1368,25 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             label.put("labelType",labelDTOList.get(i).getLabelType());
             labelList.add(label);
         }
+        for (int i = labelDTOList.size(); i< labelDTOList.size()+attrValue.size();i++){
+            fieldList[i] = attrValue.get(i);
+        }
+        List<Long> attrList = mktCamChlConfAttrMapper.selectByCampaignId(trialOperation.getCampaignId());
+        if (attrList.contains(ISEE_CUSTOMER.getArrId()) || attrList.contains(ISEE_LABEL_CUSTOMER.getArrId()) ){
+            Map<String,Object> label = new HashMap<>();
+            label.put("code","SALE_EMP_NBR");
+            label.put("name","接单人号码");
+            label.put("labelType","1200");
+            labelList.add(label);
+        }
+        if (attrList.contains(ISEE_AREA.getArrId()) || attrList.contains(ISEE_LABEL_AREA.getArrId()) ){
+            Map<String,Object> label = new HashMap<>();
+            label.put("code","AREA");
+            label.put("name","派单区域");
+            label.put("labelType","1200");
+            labelList.add(label);
+        }
+
         redisUtils.set("LABEL_DETAIL_"+trialOperation.getBatchNum(),labelList);
         List<Map<String, Object>> iSaleDisplay = new ArrayList<>();
         iSaleDisplay = (List<Map<String, Object>>) redisUtils.get("EVT_ISALE_LABEL_" + campaignDO.getIsaleDisplay());

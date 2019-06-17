@@ -102,6 +102,8 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         return result;
     }
 
+
+
     /**
      * 活动事件关系修改优先级及类型
      * @param param

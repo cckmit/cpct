@@ -25,6 +25,8 @@ public enum StatusCode {
     STATUS_CODE_UNPASS("未通过", "2005"),
     STATUS_CODE_STOP("已暂停", "2006"),
     STATUS_CODE_ROLL("已下线", "2007"),
+    STATUS_CODE_ADJUST("调整中", "2008"),
+    STATUS_CODE_PRE_PUBLISHED("调整待发布", "2009"),
 
 
     /*活动关系*/
@@ -67,7 +69,13 @@ public enum StatusCode {
     CCUST_LEVEL("客户级","1000"),
     ASSET_LEVEL("用户级","2000"),
     PRODUCT_LEVEL("销售品级","3000"),
-    ZONE_LEVEL("区域级","4000");
+    ZONE_LEVEL("区域级","4000"),
+
+    //关单销售品类型
+    OPEN_CLOSE("拆机关单","1000"),
+    RECEIVE_CLOSE("受理关单","2000"),
+    ARREARS_CLOSE("欠费关单","3000");
+
 
 
     private String statusMsg;
