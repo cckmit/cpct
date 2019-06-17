@@ -340,7 +340,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktCamRecomCalcRelDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
             mktCamRecomCalcRelMapper.insert(mktCamRecomCalcRelDO);
 
-            if (mktStrategyConfRule.getOrganizationList()!=null){
+            if (mktStrategyConfRule.getOrganizationList()!=null && !mktStrategyConfRule.getOrganizationList().isEmpty()){
                 redisUtils.set("ORG_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString(),mktStrategyConfRule.getOrganizationList());
                 redisUtils.set("ORG_CHECK_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString(),"false");
                 area2RedisThread(mktStrategyConfRule.getMktStrategyConfRuleId(),mktStrategyConfRule.getOrganizationList());
