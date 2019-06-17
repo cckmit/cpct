@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>cpct</artifactId>
+        <groupId>com.zjtelcom.cpct</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>cpct-dubbo-cpc</artifactId>
+    <name>cpct-dubbo-cpc</name>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.zjtelcom.cpct</groupId>
+            <artifactId>cpct-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zjtelcom.cpct</groupId>
+            <artifactId>cpct-cache</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zjtelcom.cpct</groupId>
+            <artifactId>cpct-es</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- 阿里 连接池 -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--        <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+                </dependency>-->
+
+        <!-- 规则引擎 -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>QLExpress</artifactId>
+        </dependency>
+
+        <!--<dependency>-->
+        <!--<groupId>com.alibaba</groupId>-->
+        <!--<artifactId>dubbo</artifactId>-->
+        <!--</dependency>-->
+
+        <dependency>
+            <groupId>com.zjhcsoft</groupId>
+            <artifactId>dubbo</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+        </dependency>
+
+        <!-- 引入协同中心dubbo服务jar包 -->
+        <dependency>
+            <groupId>com.ctzj.smt.bss</groupId>
+            <artifactId>bss-cooperate-service-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zjtelcom.es</groupId>
+            <artifactId>es-server</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <!-- 黄懿慧dubbo服务jar包 -->
+        <dependency>
+            <groupId>com.zjpii.biz</groupId>
+            <artifactId>biz</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ctzj.bss.customer.data.carrier</groupId>
+            <artifactId>customer-data-carrier-outbound-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ctzj.shared.biz.account.asset.model</groupId>
+            <artifactId>biz-account-asset-model</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ctzj.smt.bss</groupId>
+            <artifactId>bss-cache-query-service-api</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ctzj.smt.bss</groupId>
+            <artifactId>bss-customer-model</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <spring.profiles.active>dev</spring.profiles.active>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>pre</id>
+            <properties>
+                <spring.profiles.active>pre</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>pst</id>
+            <properties>
+                <spring.profiles.active>pst</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>msit</id>
+            <properties>
+                <spring.profiles.active>msit</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <spring.profiles.active>prod</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>gray</id>
+            <properties>
+                <spring.profiles.active>gray</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>gray-pre</id>
+            <properties>
+                <spring.profiles.active>gray-pre</spring.profiles.active>
+            </properties>
+        </profile>
+    </profiles>
+
+    <properties>
+        <resource.delimiter>#</resource.delimiter>
+    </properties>
+
+    <build>
+        <finalName>cpct-dubbo-cpc</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources.${spring.profiles.active}</directory>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>1.4.3.RELEASE</version>
+                <configuration>
+                    <mainClass>com.zjtelcom.cpct.CamDubboServerApplication</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
