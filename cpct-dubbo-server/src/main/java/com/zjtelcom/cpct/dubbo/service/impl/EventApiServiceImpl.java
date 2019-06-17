@@ -2692,7 +2692,7 @@ public class EventApiServiceImpl implements EventApiService {
                                         if (prodInstIdMappingCacheEntity != null && prodInstIdMappingCacheEntity.getResultObject() != null ) {
                                             Map<String, Object> accNbrMap = new HashMap<>();
                                             accNbrMap.put("ACC_NBR", prodInstCacheEntityNew.getResultObject().getAccNum());
-                                            accNbrMap.put("INTEGRATION_ID", prodInstIdMappingCacheEntity.getResultObject().getCrmRowId());
+                                            accNbrMap.put("ASSET_INTEG_ID", prodInstIdMappingCacheEntity.getResultObject().getCrmRowId());
                                             log.info("999999------accNbrMap --->" + JSON.toJSONString(accNbrMap));
                                             accNbrMapList.add(accNbrMap);
                                         }
