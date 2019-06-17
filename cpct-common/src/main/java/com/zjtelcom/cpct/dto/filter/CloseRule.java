@@ -13,9 +13,9 @@ import java.util.Date;
 public class CloseRule extends BaseEntity implements Serializable{
 
     private Long ruleId;//规则标识
-    private String ruleName;//规则名称
-    private String filterType;//过滤类型
-    private String executionChannel;// 关单销售品类型（1000：销售品；2000：主产品；3000 子产品） --冗余字段再使用
+    private String closeName;//关单名称
+    private String closeType;//关单类型
+    private String productType;// 产品类型
     private String channelContacts;//渠道执行次数
     private Date effectiveDate;//生效时间
     private Date failureDate;//失效时间
@@ -29,15 +29,7 @@ public class CloseRule extends BaseEntity implements Serializable{
     private String days;
     private String times;
     private String offerInfo;
-    private String operator;
-
-    public String getOperator() {
-        return operator;
-    }
-
-    public void setOperator(String operator) {
-        this.operator = operator;
-    }
+    private String closeCode; //成功标识
 
     public Long getConditionId() {
         return conditionId;
@@ -127,30 +119,6 @@ public class CloseRule extends BaseEntity implements Serializable{
         this.ruleId = ruleId;
     }
 
-    public String getRuleName() {
-        return ruleName;
-    }
-
-    public void setRuleName(String ruleName) {
-        this.ruleName = ruleName;
-    }
-
-    public String getFilterType() {
-        return filterType;
-    }
-
-    public void setFilterType(String filterType) {
-        this.filterType = filterType;
-    }
-
-    public String getExecutionChannel() {
-        return executionChannel;
-    }
-
-    public void setExecutionChannel(String executionChannel) {
-        this.executionChannel = executionChannel;
-    }
-
     public String getChannelContacts() {
         return channelContacts;
     }
@@ -175,4 +143,35 @@ public class CloseRule extends BaseEntity implements Serializable{
         this.failureDate = failureDate;
     }
 
+    public String getCloseName() {
+        return closeName;
+    }
+
+    public void setCloseName(String closeName) {
+        this.closeName = closeName;
+    }
+
+    public String getCloseType() {
+        return closeType;
+    }
+
+    public void setCloseType(String closeType) {
+        this.closeType = closeType;
+    }
+
+    public String getProductType() {
+        return productType;
+    }
+
+    public void setProductType(String productType) {
+        this.productType = productType;
+    }
+
+    public String getCloseCode() {
+        return closeCode;
+    }
+
+    public void setCloseCode(String closeCode) {
+        this.closeCode = closeCode;
+    }
 }
