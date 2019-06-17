@@ -17,8 +17,6 @@ public class MktStrategyConfResp extends MktStrategyConf {
      */
     private ArrayList<MktStrConfRuleResp> mktStrConfRuleRespList;
 
-    private ArrayList<FilterRuleModel> filterRuleModelList;
-
     public Long getMktCampaignId() {
         return mktCampaignId;
     }
@@ -35,11 +33,4 @@ public class MktStrategyConfResp extends MktStrategyConf {
         this.mktStrConfRuleRespList = mktStrConfRuleRespList;
     }
 
-    public ArrayList<FilterRuleModel> getFilterRuleModelList() {
-        return filterRuleModelList;
-    }
-
-    public void setFilterRuleModelList(ArrayList<FilterRuleModel> filterRuleModelList) {
-        this.filterRuleModelList = filterRuleModelList;
-    }
 }

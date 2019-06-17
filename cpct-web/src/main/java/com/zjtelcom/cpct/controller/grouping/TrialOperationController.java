@@ -6,6 +6,7 @@ import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.dto.grouping.TrialOperationVO;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
+import com.zjtelcom.cpct.service.grouping.TrialProdService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +32,28 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 public class TrialOperationController extends BaseController {
     @Autowired
     private TrialOperationService operationService;
+    @Autowired
+    private TrialProdService trialProdService;
 
-
-
+    /**
+     * ppm-导入清单
+     * @param param
+     * @return
+     */
+    @PostMapping("campaignIndexTask")
+    @CrossOrigin
+    public Map<String, Object> campaignIndexTask( @RequestBody HashMap<String,Object> param){
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result =  trialProdService.campaignIndexTask(param);
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to importFromCust4Ppm", e);
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", " fail to importFromCust4Ppm");
+            return result;
+        }
+        return result;
+    }
 
     /**
      * ppm-导入清单
@@ -115,6 +135,28 @@ public class TrialOperationController extends BaseController {
     }
 
     /**
+     * conditionCheck
+     * @param param
+     * @return
+     */
+    @PostMapping("conditionCheck")
+    @CrossOrigin
+    public Map<String, Object> conditionCheck(@RequestBody HashMap<String,Object> param){
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = operationService.conditionCheck(param);
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to businessCheck", e);
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", 0);
+            return result;
+        }
+        return result;
+    }
+
+
+
+    /**
      * 客户清单导入试运算
      * @param file
      * @param operation
@@ -127,7 +169,6 @@ public class TrialOperationController extends BaseController {
     public Map<String, Object> importUserList(MultipartFile file, TrialOperationVO operation,@Param("ruleId") Long ruleId)throws IOException{
         Map<String, Object> result = new HashMap<>();
         try {
-
             InputStream inputStream = file.getInputStream();
             byte[] bytes = new byte[3];
             inputStream.read(bytes,0,bytes.length);
@@ -150,7 +191,7 @@ public class TrialOperationController extends BaseController {
 
 
 
-    /**
+    /**g
      * 策略试运算统计查询
      * @return
      */

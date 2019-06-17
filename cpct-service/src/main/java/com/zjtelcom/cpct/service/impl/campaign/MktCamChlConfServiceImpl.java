@@ -84,6 +84,9 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
     @Autowired
     private InjectionLabelValueMapper injectionLabelValueMapper;
 
+    @Autowired
+    private OrganizationMapper organizationMapper;
+
     @Override
     public Map<String, Object> saveMktCamChlConf(MktCamChlConfDetail mktCamChlConfDetail) {
         MktCamChlConfDO mktCamChlConfDO = new MktCamChlConfDO();
@@ -234,6 +237,12 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                     logger.info("*************************************:mktCamChlConfAttr"+JSON.toJSONString(mktCamChlConfAttr.getClass().getMethods()));
                     logger.info("*************************************:mktCamChlConfAttr"+JSON.toJSONString(mktCamChlConfAttr.getClass().getPackage()));
                     mktCamChlConfAttr.setAttrValName(questionnaire.getNaireName());
+                } else if(mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.AREA.getArrId())){
+                    // 获取营销组织树的名称
+                    Organization organization = organizationMapper.selectByPrimaryKey(Long.valueOf(mktCamChlConfAttr.getAttrValue()));
+                    if (organization != null) {
+                        mktCamChlConfAttr.setAttrValName(organization.getOrgName());
+                    }
                 }
                 mktCamChlConfAttrList.add(mktCamChlConfAttr);
             }
@@ -655,6 +664,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             mktCamChlConfDO.setCreateDate(new Date());
             mktCamChlConfDO.setUpdateStaff(UserUtil.loginId());
             mktCamChlConfDO.setUpdateDate(new Date());
+            mktCamChlConfDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
             // 新增协同渠道
             mktCamChlConfMapper.insert(mktCamChlConfDO);
             Long childEvtContactConfId = mktCamChlConfDO.getEvtContactConfId();

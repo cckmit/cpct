@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.controller.api;
 
 
 import com.alibaba.fastjson.JSON;
+import com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService;
 import com.zjpii.biz.serv.YzServ;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
@@ -30,30 +31,33 @@ public class EventApiController extends BaseController {
     @Autowired(required = false)
     private YzServ yzServ;
 
+    @Autowired(required = false)
+    private IContactTaskReceiptService iContactTaskReceiptService; //协同中心dubbo
+
     /**
      * 事件触发入口
      */
-//    @RequestMapping("/CalculateCPC")
-//    @CrossOrigin
-//    public String eventInput(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> params) {
-//        Map result = new HashMap();
-//        try {
-//            result = eventApiService.CalculateCPC(params);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return initFailRespInfo(e.getMessage(), "");
-//        }
-//        return initSuccRespInfo(result);
-//    }
+    @RequestMapping("/CalculateCPC")
+    @CrossOrigin
+    public String eventInput(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> params) {
+        Map result = new HashMap();
+        try {
+            result = eventApiService.CalculateCPC(params);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return initFailRespInfo(e.getMessage(), "");
+        }
+        return initSuccRespInfo(result);
+    }
 
     @RequestMapping(value = "/CalculateCPCSync", method = RequestMethod.POST)
     @CrossOrigin
     public String eventInputSync(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> params) {
 
-//        response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
-//        response.setHeader("Access-Control-Allow-Credentials", "true");
-//        response.setHeader("Access-Control-Allow-Methods", "POST, GET");
-//        response.setHeader("Access-Control-Allow-Headers", "Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With,userId,token");
+        response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET");
+        response.setHeader("Access-Control-Allow-Headers", "Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With,userId,token");
 
         Map<String,Object> result = new HashMap<>();
         Map<String,Object> resultMap = new HashMap<>();
@@ -77,18 +81,18 @@ public class EventApiController extends BaseController {
     }
 
 
-//    @RequestMapping("/SecondChannelSynergy")
-//    @CrossOrigin
-//    public String SecondChannelSynergy(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> params) {
-//        Map result = new HashMap();
-//        try {
-//            result = eventApiService.secondChannelSynergy(params);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return initFailRespInfo(e.getMessage(), "");
-//        }
-//        return initSuccRespInfo(result);
-//    }
+    @RequestMapping("/SecondChannelSynergy")
+    @CrossOrigin
+    public String SecondChannelSynergy(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> params) {
+        Map result = new HashMap();
+        try {
+            result = eventApiService.secondChannelSynergy(params);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return initFailRespInfo(e.getMessage(), "");
+        }
+        return initSuccRespInfo(result);
+    }
 
 
     @RequestMapping(value = "/label", method = RequestMethod.POST)
@@ -97,6 +101,23 @@ public class EventApiController extends BaseController {
         Map result = new HashMap();
         try {
             result = yzServ.queryYz(params);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
+        return JSON.toJSONString(result);
+    }
+
+
+    @RequestMapping(value = "/cpc", method = RequestMethod.POST)
+    @CrossOrigin
+    public String cpc(@RequestBody Map<String, Object> params) {
+        Map result = new HashMap();
+        try {
+            result = iContactTaskReceiptService.contactTaskReceipt(params);
+            if (result == null) {
+                return JSON.toJSONString("失败");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return e.getMessage();

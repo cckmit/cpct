@@ -2,23 +2,37 @@ package com.zjtelcom.cpct.service.impl.channel;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zjhcsoft.eagle.main.dubbo.model.policy.RecordModel;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
+import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
+import com.zjtelcom.cpct.domain.grouping.TrialOperation;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.enums.LabelCondition;
 import com.zjtelcom.cpct.enums.Operator;
+import com.zjtelcom.cpct.enums.TrialCreateType;
+import com.zjtelcom.cpct.enums.TrialStatus;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.LabelService;
 import com.zjtelcom.cpct.service.synchronize.label.SynLabelGrpService;
 import com.zjtelcom.cpct.service.synchronize.label.SynLabelService;
 import com.zjtelcom.cpct.util.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
@@ -50,8 +64,159 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     @Autowired
     private RedisUtils redisUtils;
 
-    @Value("${sync.value}")
-    private String value;
+
+
+
+    /**
+     * 标签枚举值文件导入（内部用）
+     * @param file
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public Map<String, Object> importLabelValue(MultipartFile file) throws Exception {
+        Map<String, Object> result = new HashMap<>();
+
+        InputStream inputStream = file.getInputStream();
+        XSSFWorkbook wb = new XSSFWorkbook(inputStream);
+        Sheet sheet = wb.getSheetAt(0);
+        Integer rowNums = sheet.getLastRowNum() + 1;
+
+        List<Map<String,Object>> labelList = new ArrayList<>();
+        List<LabelValue> valueList  = new ArrayList<>();
+
+        for (int i = 1; i < rowNums ; i++) {
+            Map<String, Object> customers = new HashMap<>();
+            Row rowCode = sheet.getRow(0);
+            Row row = sheet.getRow(i);
+            System.out.println("处理--------："+i);
+            if (row==null){
+                System.out.println("这一行是空的："+i);
+                continue;
+            }
+            for (int j = 0; j < row.getLastCellNum(); j++) {
+                Cell cellTitle = rowCode.getCell(j);
+                Cell cell = row.getCell(j);
+                customers.put(cellTitle.getStringCellValue(), ChannelUtil.getCellValue(cell));
+            }
+            LabelValue label = ChannelUtil.mapToEntity(customers,LabelValue.class);
+            label.setTagRowId(Long.valueOf(customers.get("tagRowId").toString()));
+            valueList.add(label);
+        }
+        List<String> ids = new ArrayList<>();
+        List<Long> labelIdList = new ArrayList<>();
+        int total = 0;
+        for (LabelValue labelValue : valueList) {
+            Label entity = labelMapper.selectByTagRowId(labelValue.getTagRowId());
+            if (entity != null) {
+                if (!labelIdList.contains(entity.getInjectionLabelId())) {
+                    labelIdList.add(entity.getInjectionLabelId());
+                    labelValueMapper.deleteByLabelId(entity.getInjectionLabelId());
+                }
+                LabelValue value = BeanUtil.create(labelValue, new LabelValue());
+                value.setInjectionLabelId(entity.getInjectionLabelId());
+                value.setValueDesc(labelValue.getValueName());
+                value.setValueName(labelValue.getValueName());
+                value.setLabelValue(labelValue.getLabelValue());
+                value.setCreateDate(new Date());
+                value.setStatusCd("1000");
+                value.setUpdateDate(new Date());
+                labelValueMapper.insert(value);
+                total++;
+            }
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","size:"+total);
+        result.put("ids",ids);
+        return result;
+    }
+
+    /**
+     * 标签文件导入（内部用）
+     * @param file
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public Map<String, Object> importLabel(MultipartFile file) throws Exception {
+        Map<String, Object> result = new HashMap<>();
+
+        InputStream inputStream = file.getInputStream();
+        XSSFWorkbook wb = new XSSFWorkbook(inputStream);
+        Sheet sheet = wb.getSheetAt(0);
+        Integer rowNums = sheet.getLastRowNum() + 1;
+
+        List<Map<String,Object>> labelList = new ArrayList<>();
+        List<Label> labels  = new ArrayList<>();
+
+        for (int i = 1; i < rowNums ; i++) {
+            Map<String, Object> customers = new HashMap<>();
+            Row rowCode = sheet.getRow(0);
+            Row row = sheet.getRow(i);
+            System.out.println("处理--------："+i);
+            if (row==null){
+                System.out.println("这一行是空的："+i);
+                continue;
+            }
+
+            for (int j = 0; j < row.getLastCellNum(); j++) {
+                Cell cellTitle = rowCode.getCell(j);
+                Cell cell = row.getCell(j);
+                customers.put(cellTitle.getStringCellValue(), ChannelUtil.getCellValue(cell));
+            }
+            Label label = ChannelUtil.mapToEntity(customers,Label.class);
+            label.setTagRowId(Long.valueOf(customers.get("tagRowId").toString()) );
+            labels.add(label);
+        }
+        List<String> ids = new ArrayList<>();
+        for (Label label : labels){
+            Label entity = labelMapper.selectByLabelCode(label.getInjectionLabelCode());
+            if (entity!=null){
+                if (label.getLabExample()!=null && label.getLabExample().length()<255){
+                    entity.setLabExample(label.getLabExample());
+                }
+                entity.setInjectionLabelName(label.getInjectionLabelName());
+                if (label.getLabBusiDesc()!=null&& label.getLabBusiDesc().length()<1000){
+                    entity.setLabBusiDesc(label.getLabBusiDesc());
+                }
+                labelDataType(label,entity);
+                entity.setRightOperand(label.getRightOperand());
+                entity.setTagRowId(label.getTagRowId());
+                labelMapper.updateByPrimaryKey(entity);
+            }else {
+                ids.add(label.getTagRowId().toString());
+            }
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","size:"+labels.size());
+        result.put("ids",ids);
+        return result;
+    }
+
+    private void labelDataType(Label file, Label entity){
+        boolean x = true;
+        if (file.getLabelDataType()!=null && !file.getLabelDataType().equals("")){
+            String type = file.getLabelDataType();
+            if (type.toUpperCase().contains("VARCHAR")){
+                entity.setLabelDataType("1200");
+            }else
+            if (type.toUpperCase().contains("INTEGER")|| type.toUpperCase().contains("INT")){
+                entity.setLabelDataType("1300");
+            }else
+            if (type.toUpperCase().contains("NUMERIC")){
+                entity.setLabelDataType("1300");
+            }else
+            if (type.toUpperCase().contains("DATE")){
+                entity.setLabelDataType("1100");
+            }else
+            if (type.toUpperCase().contains("CHAR")){
+                entity.setLabelDataType("1200");
+            }else {
+                x = false;
+            }
+        }
+    }
+
 
     /**
      *共享

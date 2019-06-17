@@ -22,6 +22,8 @@ public class TarGrpConditionVO extends TarGrpCondition {
     private String promListName;
     private String labelCode;
 
+    private String rightParamName;
+
     private String conditionType;
 
     private List<LabelValueVO> valueList;
@@ -30,6 +32,24 @@ public class TarGrpConditionVO extends TarGrpCondition {
 
     private List<SysAreaVO> sysAreaList;
 
+    private String labelDataType;
+
+
+    public String getRightParamName() {
+        return rightParamName;
+    }
+
+    public void setRightParamName(String rightParamName) {
+        this.rightParamName = rightParamName;
+    }
+
+    public String getLabelDataType() {
+        return labelDataType;
+    }
+
+    public void setLabelDataType(String labelDataType) {
+        this.labelDataType = labelDataType;
+    }
 
     public String getLabelCode() {
         return labelCode;

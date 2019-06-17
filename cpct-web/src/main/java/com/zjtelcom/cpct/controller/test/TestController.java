@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.controller.test;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.ctzj.smt.bss.sysmgr.model.common.Page;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dataobject.SystemPost;
@@ -16,19 +17,32 @@ import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
 import com.zjtelcom.cpct.dao.channel.ObjMktCampaignRelMapper;
 import com.zjtelcom.cpct.domain.channel.ObjMktCampaignRel;
 import com.zjtelcom.cpct.domain.channel.RequestInstRel;
+import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.service.EngineTestService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlResultApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
+import com.zjtelcom.cpct.service.channel.LabelService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
+import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
+import com.zjtelcom.cpct.util.ChannelUtil;
+import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UserUtil;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.util.*;
 
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 
 
@@ -61,6 +75,48 @@ public class TestController extends BaseController {
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
     @Autowired
     private MktCampaignService campaignService;
+    @Autowired
+    private LabelService labelService;
+    @Autowired
+    private MktStrategyConfRuleService ruleService;
+
+
+    @PostMapping("test")
+    @CrossOrigin
+    public Object test(@RequestBody HashMap<String,Object> params) {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            Long ruleId = MapUtil.getLongNum(params.get("ruleId"));
+            List<Long> list = (List<Long>) params.get("list");
+            result = ruleService.test(ruleId,list);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return result;
+    }
+    @PostMapping("importLabel")
+    @CrossOrigin
+    public Object importLabel(MultipartFile file) {
+        Map<String,Object> result = new HashMap<>();
+        try {
+             result = labelService.importLabel(file);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    @PostMapping("importLabelValue")
+    @CrossOrigin
+    public Object importLabelValue(MultipartFile file) {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = labelService.importLabelValue(file);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return result;
+    }
 
 
     @PostMapping("searchByCampaignId")
@@ -69,6 +125,8 @@ public class TestController extends BaseController {
         Map<String,Object> result = campaignService.searchByCampaignId(campaignId);
         return result;
     }
+
+
 
     @PostMapping("userTest")
     @CrossOrigin

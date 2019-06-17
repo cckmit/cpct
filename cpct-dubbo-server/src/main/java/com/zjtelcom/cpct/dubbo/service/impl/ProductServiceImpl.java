@@ -31,30 +31,30 @@ public class ProductServiceImpl implements ProductService{
     //销售品关联活动查询
     @Override
     public Map<String,Object> selectProductCam(List<Map<String,Object>> paramList) {
-        Map<String,Object> paramMaps = new HashMap<>();
+        Map<String,Object> resultMap = new HashMap<>();
         for (Map<String,Object> paramMap : paramList) {
-            Map<String,Object> resultMap = new HashMap<>();
             List<Map<String,Object>> productList = new ArrayList<>();
-
             String offerInfo = null;
-
             String productCode = (String) paramMap.get("productCode");
             String type = (String) paramMap.get("type");
             String[] split = productCode.split(",");
             for(int i = 0; i < split.length; i++) {
-                List<Map<String,Object>> policyList = new ArrayList<>();
+                List<Map<String,Object>> activityList = new ArrayList<>();
                 Map<String,Object> map = new HashMap<>();
+                if("0".equals(type)){
+                    type = "1000";
+                } else if("1".equals(type)){
+                    type = "2000";
+                } else if("2".equals(type)){
+                    type = "3000";
+                }
                 List<FilterRule> filterRuleList = filterRuleMapper.selectByProduct(split[i], type);
                 for(FilterRule filterRule1 : filterRuleList) {
                     List<MktStrategyFilterRuleRelDO> mktStrategyFilterRuleRelDOList = mktStrategyFilterRuleRelMapper.selectByRuleId(filterRule1.getRuleId());
 
                     for(MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO : mktStrategyFilterRuleRelDOList) {
-                        List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByStrategyConfId(mktStrategyFilterRuleRelDO.getStrategyId());
-
-                        for(MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {
                             Map<String,Object> maps = new HashMap<>();
-                            maps.put("activityId",mktCamStrategyConfRelDO.getMktCampaignId());
-                            maps.put("policyId",mktStrategyFilterRuleRelDO.getStrategyId());
+                            maps.put("activityId",mktStrategyFilterRuleRelDO.getStrategyId());
                             if(filterRule1.getOfferInfo()!=null) {
                                 if (filterRule1.getOfferInfo().equals("1000")) {
                                     offerInfo = "0";
@@ -65,13 +65,12 @@ public class ProductServiceImpl implements ProductService{
                                 }
                             }
                             maps.put("closeType",offerInfo);
-                            policyList.add(maps);
-                        }
+                        activityList.add(maps);
                     }
                 }
-                if(policyList.size() > 0) {
+                if(activityList.size() > 0) {
                     map.put("productCode",split[i]);
-                    map.put("policyList", policyList);
+                    map.put("activityList", activityList);
                     productList.add(map);
                 }
 
@@ -85,8 +84,7 @@ public class ProductServiceImpl implements ProductService{
                 resultMap.put("resultMsg", "没有匹配推荐结果");
             }
             resultMap.put("productList",productList);
-            paramMaps.put("paramMap",resultMap);
         }
-        return paramMaps;
+        return resultMap;
     }
 }

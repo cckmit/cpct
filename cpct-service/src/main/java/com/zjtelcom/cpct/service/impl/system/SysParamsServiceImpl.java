@@ -28,8 +28,7 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
     @Autowired
     private SynSysParamsService synSysParamsService;
 
-    @Value("${sync.value}")
-    private String value;
+
 
     @Override
     public Map<String,Object> listParams(String paramName, String paramKey,Integer page,Integer pageSize) {

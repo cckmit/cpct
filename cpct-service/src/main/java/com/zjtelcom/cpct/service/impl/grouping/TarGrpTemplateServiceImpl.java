@@ -7,6 +7,9 @@
 package com.zjtelcom.cpct.service.impl.grouping;
 
 import com.alibaba.fastjson.JSON;
+import com.ctzj.smt.bss.cpc.configure.service.api.offer.IOfferRestrictConfigureService;
+import com.ctzj.smt.bss.cpc.evn.type.EvnType;
+import com.ctzj.smt.bss.cpc.model.offer.atomic.OfferRestrict;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.IFuncCompDubboService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -107,8 +110,9 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     private ProductService productService;
     @Autowired
     private MktCamCustMapper camCustMapper;
-    @Value("${sync.value}")
-    private String value;
+    @Autowired(required = false)
+    private IOfferRestrictConfigureService iOfferRestrictConfigureService;
+
 
 
     /**
@@ -262,11 +266,11 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             instVO.setOfferName(offer.getOfferName());
             instVO.setOfferList(offerList);
             //客户分群列表
-            List<OfferRestrict> restrict = offerRestrictMapper.selectByOfferId(offerId,"7000");
+            List<OfferRestrictEntity> restrict = offerRestrictMapper.selectByOfferId(offerId,"7000");
             if (restrict!=null && restrict.size()>0){
                 List<TarGrpCondition> tarGrpConditions = new ArrayList<>();
                 boolean save = false;
-                for (OfferRestrict offerRestrict : restrict){
+                for (OfferRestrictEntity offerRestrict : restrict){
                     if (offerRestrict.getRstrObjId()==null){
                         continue;
                     }
@@ -311,15 +315,25 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             }
             instVO.setResourceList(resourceList);
             //渠道列表
-            List<OfferRestrict> channelRestrictList = offerRestrictMapper.selectByOfferId(offerId,"5000");
+            List<OfferRestrictEntity> channelRestrictList = offerRestrictMapper.selectByOfferId(offerId,"5000");
             List<ChannelDetail> channelList = new ArrayList<>();
             List<Long> channelIdList = new ArrayList<>();
-            for (OfferRestrict channelRestrict : channelRestrictList ){
+            for (OfferRestrictEntity channelRestrict : channelRestrictList ){
                 GrpSystemRel grpSystemRel = grpSystemRelMapper.selectByOfferId(channelRestrict.getRstrObjId());
                 if (grpSystemRel==null){
                     continue;
                 }
-                Channel channel = channelMapper.selectByPrimaryKey(grpSystemRel.getOfferVrulGrpId());
+                Long channelId = grpSystemRel.getOfferVrulGrpId();
+                if (channelId == 3221281L){
+                    channelId = 11L;
+                }
+                if (channelId == 3221280L){
+                    channelId = 36L;
+                }
+                if (channelId == 3221279L){
+                    channelId = 16L;
+                }
+                Channel channel = channelMapper.selectByPrimaryKey(channelId);
                 if (channel!=null && !channelIdList.contains(channel.getContactChlId())){
                     ChannelDetail detail = new ChannelDetail();
                     detail.setChannelId(channel.getContactChlId());
@@ -399,6 +413,23 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                 tarGrpTemplateConditionDO.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
                 tarGrpConditionMapper.insert(tarGrpTemplateConditionDO);
             }
+        }
+        //销售品
+        if(tarGrpTemplateDetail.getOfferId() != null) {
+            OfferRestrict offerRestrict = new OfferRestrict();
+            Long num = offerRestrictMapper.selectBatchNoNum();
+            offerRestrict.setOfferRestrictId(num);
+            offerRestrict.setOfferId(tarGrpTemplateDetail.getOfferId());
+            offerRestrict.setRstrObjType("7000");
+            offerRestrict.setRstrObjId(tarGrpTemplateId);
+            offerRestrict.setApplyRegionId(8330000L);
+            offerRestrict.setCreateDate(new Date());
+            offerRestrict.setUpdateDate(new Date());
+            offerRestrict.setStatusDate(new Date());
+            offerRestrict.setUpdateStaff(UserUtil.loginId());
+            offerRestrict.setCreateStaff(UserUtil.loginId());
+            offerRestrict.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+            iOfferRestrictConfigureService.saveOfferRestrict(offerRestrict, EvnType.EVO);
         }
         if (SystemParamsUtil.isSync()){
             new Thread(){
@@ -575,6 +606,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         // 获取目标分群模板的对应的条件
         List<TarGrpCondition> tarGrpTemplateConditionDOS = tarGrpConditionMapper.listTarGrpCondition(tarGrpTemplateId);
         List<TarGrpTemConditionVO> tarGrpTemConditionVOList = new ArrayList<>();
+        boolean  check = false;
         for (TarGrpCondition tarGrpTemplateConditionDO : tarGrpTemplateConditionDOS) {
             //TarGrpTemConditionVO tarGrpTemplateCondition = BeanUtil.create(tarGrpTemplateConditionDO, new TarGrpTemConditionVO());
             TarGrpTemConditionVO tarGrpTemConditionVO = BeanUtil.create(tarGrpTemplateConditionDO, new TarGrpTemConditionVO());
@@ -584,14 +616,11 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             if (label == null) {
                 continue;
             }
+            if (label.getRightOperand()!=null && label.getRightOperand().equals("1")){
+                check = true;
+            }
             tarGrpTemConditionVO.setLeftParamName(label.getInjectionLabelName());
-            //塞入领域
-//            FitDomain fitDomain = null;
-//            if (label.getFitDomain() != null) {
-//                fitDomain = FitDomain.getFitDomain(Integer.parseInt(label.getFitDomain()));
-//                tarGrpTemConditionVO.setFitDomainId(Long.valueOf(fitDomain.getValue()));
-//                tarGrpTemConditionVO.setFitDomainName(fitDomain.getDescription());
-//            }
+            tarGrpTemConditionVO.setLabelDataType(label.getLabelDataType());
             //将操作符转为中文
             if (tarGrpTemConditionVO.getOperType() != null && !tarGrpTemConditionVO.getOperType().equals("")) {
                 Operator op = Operator.getOperator(Integer.parseInt(tarGrpTemConditionVO.getOperType()));
@@ -619,6 +648,21 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             }
             List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(label.getInjectionLabelId());
             List<LabelValueVO> valueList = ChannelUtil.valueList2VOList(labelValues);
+            //枚举标签替换中文名
+            if (valueList!=null && !valueList.isEmpty() ){
+                List<String> rightParam = new ArrayList<>();
+                String[] paramList = tarGrpTemConditionVO.getRightParam().split(",");
+                for (String value : paramList){
+                    for (LabelValueVO valueVO : valueList){
+                        if (valueVO.getLabelValue().equals(value)){
+                            rightParam.add(valueVO.getValueName());
+                        }
+                    }
+                }
+                tarGrpTemConditionVO.setRightParamName(ChannelUtil.list2String(rightParam,","));
+            }else {
+                tarGrpTemConditionVO.setRightParamName(tarGrpTemConditionVO.getRightParam());
+            }
             tarGrpTemConditionVO.setValueList(valueList);
             tarGrpTemConditionVO.setConditionType(label.getConditionType());
             tarGrpTemConditionVO.setOperatorList(operatorList);
@@ -634,6 +678,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         tarGrpTemplateDetail.setTarGrpTemConditionVOList(tarGrpTemConditionVOList);
         tarGrpTemplateMap.put("resultCode", CommonConstant.CODE_SUCCESS);
         tarGrpTemplateMap.put("tarGrpTemplateDetail", tarGrpTemplateDetail);
+        tarGrpTemplateMap.put("labelCheck",check);
         return tarGrpTemplateMap;
     }
 

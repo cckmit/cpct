@@ -29,7 +29,7 @@ public interface InjectionLabelMapper{
 
     List<Label> findByLabel(Label record);
 
-    List<Label> selectByScope(@Param("scope") Long scope);
+    List<Label> selectByScope(@Param("scope") Long scope,@Param("rightOperand")String rightOperand);
 
     List<Label> findLabelList(@Param("labelName")String labelName,@Param("fitDomain")String fitDomain,@Param("labelCode")String labelCode,@Param("scope")Integer scope,@Param("conditionType")String conditionType);
 
@@ -58,5 +58,7 @@ public interface InjectionLabelMapper{
     List<Map<String,Object>> listLabelByDisplayId(@Param("grpId")Long grpId);
 
     List<String> listLabelByRuleId(@Param("ruleId")Long ruleId);
+
+    List<String> selectLabelCodeByType(@Param("labelDataType")String labelDataType);
 
 }

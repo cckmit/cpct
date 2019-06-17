@@ -51,4 +51,11 @@
     AREA_ID, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
     from mkt_strategy_conf
   </select>
+
+  <select id="selectByCampaignId" resultMap="BaseResultMap">
+    select s.MKT_STRATEGY_CONF_ID, s.MKT_STRATEGY_CONF_NAME, s.BEGIN_TIME, s.END_TIME, s.CHANNELS_ID,
+    s.AREA_ID, s.CREATE_STAFF, s.CREATE_DATE, s.UPDATE_STAFF, s.UPDATE_DATE
+    from mkt_strategy_conf as s left join mkt_cam_strategy_conf_rel as cs  on s.MKT_STRATEGY_CONF_ID = cs.STRATEGY_CONF_ID
+    where cs.MKT_CAMPAIGN_ID = #{campaignId}
+  </select>
 </mapper>

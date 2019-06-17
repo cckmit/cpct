@@ -1,13 +1,15 @@
 package com.zjtelcom.cpct.service.impl.org;
 
+import com.fasterxml.jackson.databind.node.LongNode;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.channel.OrganizationMapper;
 import com.zjtelcom.cpct.dao.org.OrgTreeMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
+import com.zjtelcom.cpct.domain.channel.Organization;
 import com.zjtelcom.cpct.domain.org.OrgTree;
-import com.zjtelcom.cpct.domain.org.OrgTreeDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.exception.SystemException;
 import com.zjtelcom.cpct.service.org.OrgTreeService;
@@ -36,6 +38,8 @@ public class OrgTreeServiceImpl implements OrgTreeService{
     private OrgTreeMapper orgTreeMapper;
     @Autowired
     private SysParamsMapper systemParamMapper;
+    @Autowired
+    private OrganizationMapper organizationMapper;
 
     /**
      * 批量操作一次插入最多的数据条数
@@ -109,8 +113,26 @@ public class OrgTreeServiceImpl implements OrgTreeService{
     }
 
 
-
-
+    /**
+     * 4aId查询组织树信息
+     * @param params
+     * @return
+     */
+    @Override
+    public Map<String, Object> selectByAreaId(Map<String, Object> params) {
+        Map<String, Object> maps = new HashMap<>();
+        List<String> areaIds = (List<String>) params.get("areaIdList");
+        List<Organization> organizations = new ArrayList<>();
+        for (String areaId : areaIds){
+            Organization organization = organizationMapper.selectBy4aId(Long.valueOf(areaId));
+            if (organization!=null){
+                organizations.add(organization);
+            }
+        }
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg",organizations);
+        return  maps;
+    }
 
     /**
      * 通过父级菜单查询子菜单
@@ -119,43 +141,22 @@ public class OrgTreeServiceImpl implements OrgTreeService{
      */
     @Override
     public Map<String,Object> selectBySumAreaId(Map<String, Object> params) {
-        String areaId= (String) params.get("areaId");
-        String page= (String) params.get("page");
-        String pageSize= (String) params.get("pageSize");
-        Integer id=null;
-        Integer pageId=0;
-        Integer pageSizeId=0;
-        //如果page 和pageSize为空时 传回所有数据
-        if(StringUtils.isNotBlank(page)&&StringUtils.isNotBlank(pageSize)){
-            pageId=Integer.parseInt(page);
-            pageSizeId=Integer.parseInt(pageSize);
-        }
-        if(StringUtils.isNotBlank(areaId)){
-            id=Integer.parseInt(areaId);
-        }
-
-
         Map<String, Object> maps = new HashMap<>();
-        boolean tip=false;
-        if(pageId!=0) {
-            PageHelper.startPage(pageId, pageSizeId);
-            tip=true;
-        }
-        List<OrgTreeDO> list=new ArrayList<>();
-        if(id==null){
-            list=orgTreeMapper.selectMenu();
+        List<String> areaIds = (List<String>) params.get("areaId");
+        List<Organization> list=new ArrayList<>();
+        if(areaIds==null || areaIds.isEmpty()){
+            list=organizationMapper.selectMenu();
         }else{
-            list=orgTreeMapper.selectBySumAreaId(id);
+            for (String id : areaIds){
+                List<Organization> organizations = organizationMapper.selectByParentId(Long.valueOf(id));
+                list.addAll(organizations);
+            }
         }
         Page pageInfo = new Page(new PageInfo(list));
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg",list);
-        if(tip){
-            maps.put("page",pageInfo);
-        }
         return  maps;
     }
-
 
     /**
      * 分段插入
@@ -319,8 +320,6 @@ public class OrgTreeServiceImpl implements OrgTreeService{
         System.out.println(list.get(0).toString());
     }
 
-
-
     public static void main(String[] args) throws IOException {
         //test();
         OrgTreeServiceImpl org=new OrgTreeServiceImpl();
@@ -328,8 +327,28 @@ public class OrgTreeServiceImpl implements OrgTreeService{
         String name="work.txt";
         org.getOrgTreeByFtp(name);
         System.out.println("耗时："+(System.currentTimeMillis()-start));
+    }
 
-
-
+    @Override
+    public Map<String,Object> fuzzyQuery(Map<String,Object> params){
+        Map<String,Object> map = new HashMap<>();
+        if(params == null || params.isEmpty()){
+            map.put("resultCode", CommonConstant.CODE_SUCCESS);
+            map.put("resultMsg","参数为空!");
+            return map;
+        }
+        List<String> areaIds = new ArrayList<>();
+        if(null != params.get("areaId") || ((List<String>)params.get("areaId")).size() > 0 ){
+            areaIds = (List<String>)params.get("areaId");
+        }
+        Integer page = Integer.valueOf((String) params.get("page"));
+        Integer pageSize = Integer.valueOf((String) params.get("pageSize"));
+        PageHelper.startPage(page,pageSize);
+        List<Map<String,String>> maps = organizationMapper.fuzzySelectByName(areaIds, params.get("fuzzyField") == null ? "":(String)params.get("fuzzyField"));
+        Page pageInfo = new Page(new PageInfo(maps));
+        map.put("resultCode", CommonConstant.CODE_SUCCESS);
+        map.put("resultMsg",maps);
+        map.put("page",pageInfo);
+        return map;
     }
 }

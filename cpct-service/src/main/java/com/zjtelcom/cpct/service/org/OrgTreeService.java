@@ -37,6 +37,8 @@ public interface OrgTreeService {
      */
     Map<String,Object> selectBySumAreaId(Map<String, Object> params);
 
+    Map<String,Object> selectByAreaId(Map<String, Object> params);
 
+    Map<String,Object> fuzzyQuery(Map<String,Object> params);
 
 }

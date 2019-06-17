@@ -16,6 +16,10 @@
     <dubbo:protocol name="dubbo" port="30803"/>
     <dubbo:monitor protocol="registry" />
 
+    <!--受理清单校验接口-->
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.TarGrpApiService" ref="tarGrpApiServiceImpl" version="1.0" >
+        <dubbo:method name="getCpcTargrp" servicecode="00.1083.getCpcTargrp" timeout="10000"/>
+    </dubbo:service>
     <!-- 注册 -->
     <!-- 二次协同查询服务 -->
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.EventApiService" ref="eventApiServiceImpl" version="1.0" >
@@ -25,6 +29,11 @@
         <dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="10000"/>
         <!-- 二次协同 -->
         <dubbo:method name="secondChannelSynergy" servicecode="00.1083.SecondChannelSynergy" timeout="10000"/>
+    </dubbo:service>
+
+    <!--销售品关联活动查询-->
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ProductService" ref="productServiceImpl" version="1.0" >
+        <dubbo:method name="selectProductCam" servicecode="00.1083.selectProductCam" timeout="10000"/>
     </dubbo:service>
 
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MktCamChlResultApiService" ref="mktCamChlResultApiServiceImpl" version="1.0" >
@@ -59,7 +68,12 @@
     <!-- redis实时查询服务 -->
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.TrialRedisService" ref="trialRedisServiceImpl" version="1.0" >
         <dubbo:method name="searchFromRedis" servicecode="00.1083.searchFromRedis" timeout="10000"/>
+        <dubbo:method name="updateOperationStatus" servicecode="00.1083.updateOperationStatus" timeout="10000"/>
     </dubbo:service>
+
+    <dubbo:reference registry="esb2" id="ctgCacheAssetService"  interface="com.ctzj.bss.customer.data.carrier.outbound.api.CtgCacheAssetService" version="1.0" retries="0" check="false">
+        <dubbo:method name="queryCachedAssetDetailByIntegId" servicecode="33.1001.queryCachedAssetDetailByIntegId"  timeout="10000"/>
+    </dubbo:reference>
 
     <!-- 订阅 -->
     <!-- cpc计算协同中心回调 -->
@@ -78,5 +92,22 @@
     <dubbo:service registry="esb2" interface="com.zjtelcom.cpct.dubbo.service.MktCampaignSyncApiService" ref="mktCampaignSyncApiServiceImpl" version="1.0" >
         <dubbo:method name="publishMktCampaign" servicecode="00.1083.publishMktCampaign" timeout="10000"/>
     </dubbo:service>
+
+    <!-- 事件接入活动任务订阅 1.0 -->
+    <dubbo:reference interface="com.zjtelcom.cpct.dubbo.service.CamApiService" id="camApiService"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="ActivityTask" servicecode="00.1083.ActivityTask" timeout="15000"/>
+    </dubbo:reference>
+
+    <!-- 事件接入dubbo接口 -->
+    <dubbo:reference interface="com.zjtelcom.es.es.service.EsService" id="esService"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="queryCustomer4Event" servicecode="00.1083.queryCustomer4Event" timeout="10000"/>
+    </dubbo:reference>
+
+    <!--活动信息同步大数据-->
+    <dubbo:reference registry="esb2" id="activitySyncService" interface="com.zjhcsoft.eagle.main.dubbo.service.ActivitySyncService" version="1.0">
+        <dubbo:method name="syncActivity" servicecode="33.1307.syncActivity" timeout="30000"/>
+    </dubbo:reference>
 
 </beans>

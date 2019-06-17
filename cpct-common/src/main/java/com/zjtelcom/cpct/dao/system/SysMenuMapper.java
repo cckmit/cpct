@@ -1,9 +1,13 @@
 package com.zjtelcom.cpct.dao.system;
 
 import com.zjtelcom.cpct.domain.system.SysMenu;
+import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Mapper
+@Repository
 public interface SysMenuMapper {
 
     int deleteByPrimaryKey(Long menuId);

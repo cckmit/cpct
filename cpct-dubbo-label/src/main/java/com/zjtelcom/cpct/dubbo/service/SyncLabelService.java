@@ -8,7 +8,7 @@ import java.util.Map;
 public interface SyncLabelService {
 
 
-    Map<String,Object> syncLabelInfo(RecordModel record);
+    Map<String,Object> syncLabelInfo(Map<String,Object> params);
 
     Map<String, Object> listLabelCatalog();
 

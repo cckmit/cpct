@@ -15,6 +15,7 @@
     <dubbo:protocol name="dubbo" port="30323"/>
     <dubbo:monitor protocol="registry" />
 
+
     <!-- 注册 -->
     <!-- 事件外部调用测试 -->
     <!--<dubbo:service interface="com.zjtelcom.cpct.dubbo.service.SyncEventService" ref="syncEventServiceImpl"-->
@@ -27,6 +28,13 @@
                      <!--version="1.0" retries="0" check="false">-->
         <!--<dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="10000"/>-->
     <!--</dubbo:reference>-->
+
+    <!-- 更新试算日志 -->
+    <dubbo:reference interface="com.zjtelcom.es.es.service.EsService" id="esService"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="addLogByBatchNum" servicecode="00.1083.addLogByBatchNum" timeout="5000"/>
+        <dubbo:method name="strategyIssure" servicecode="00.1083.strategyIssure" timeout="100000"/>
+    </dubbo:reference>
 
 
 

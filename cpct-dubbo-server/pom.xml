@@ -30,6 +30,24 @@
         </dependency>
 
         <dependency>
+            <groupId>com.zjtelcom.cpct</groupId>
+            <artifactId>cpct-dubbo-cpc</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ctzj.bss.customer.data.carrier</groupId>
+            <artifactId>customer-data-carrier-outbound-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ctzj.shared.biz.account.asset.model</groupId>
+            <artifactId>biz-account-asset-model</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
@@ -80,9 +98,10 @@
 
         <dependency>
             <groupId>com.zjtelcom.es</groupId>
-            <artifactId>es-server</artifactId>
-            <version>1.0</version>
+            <artifactId>es-event-access</artifactId>
+            <version>1.0.1</version>
         </dependency>
+
 
         <!-- 黄懿慧dubbo服务jar包 -->
         <dependency>
@@ -90,6 +109,11 @@
             <artifactId>biz</artifactId>
         </dependency>
 
+        <!--活动同步大数据-->
+        <dependency>
+            <groupId>com.zjhcsoft.eagle</groupId>
+            <artifactId>dubbo-eagle-service</artifactId>
+        </dependency>
     </dependencies>
 
     <profiles>
@@ -112,6 +136,12 @@
             <id>pst</id>
             <properties>
                 <spring.profiles.active>pst</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>msit</id>
+            <properties>
+                <spring.profiles.active>msit</spring.profiles.active>
             </properties>
         </profile>
         <profile>

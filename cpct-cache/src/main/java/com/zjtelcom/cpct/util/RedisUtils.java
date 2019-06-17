@@ -58,6 +58,34 @@ public class RedisUtils {
         return result;
     }
 
+    /**
+     *
+     * 通过key获取所有客户信息
+     * @param key
+     * @return List<String>
+     */
+    public Object hgetAll(final String key) {
+        Object result = null;
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                Map<String, String> resultMap = jedis.hgetAll(key);
+                List<String> mapList = new ArrayList<>();
+                for (Map.Entry<String, String> entry : resultMap.entrySet()) {
+                    mapList.addAll( (List<String>)unserizlize(entry.getValue()));
+                }
+                result = mapList;
+                jedis.close();
+            } catch (Throwable je) {
+                je.printStackTrace();
+                jedis.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 
     /**
      * 写入缓存

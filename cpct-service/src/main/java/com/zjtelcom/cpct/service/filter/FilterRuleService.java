@@ -32,11 +32,12 @@ public interface FilterRuleService {
 
     Map<String,Object> qryFilterRules(FilterRuleReq filterRuleReq);
 
-    Map<String,Object> importUserList(MultipartFile multipartFile ,Long ruleId) throws IOException;
+    Map<String,Object> importUserList(MultipartFile multipartFile, Long ruleId, String ruleName, String filterType) throws IOException;
 
     Map<String,Object> listUserList(UserList userList) throws IOException;
 
     Map<String, Object> getFilterRule(List<Integer> filterRuleIdList);
 
+    Map<String,Object> importOfferList(MultipartFile multipartFile, Long ruleId, String ruleName, String filterType, String operator, Long[] rightListId)throws IOException;
 
 }

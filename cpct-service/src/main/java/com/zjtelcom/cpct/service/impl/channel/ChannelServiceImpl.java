@@ -32,8 +32,7 @@ public class ChannelServiceImpl extends BaseService implements ChannelService {
     @Autowired
     private SynChannelService synChannelService;
 
-    @Value("${sync.value}")
-    private String value;
+
 
 /*
     @Autowired

@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.dubbo.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelCatalogMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
@@ -8,13 +9,12 @@ import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelCatalog;
 import com.zjtelcom.cpct.domain.channel.LabelValue;
 import com.zjtelcom.cpct.dto.channel.*;
-import com.zjtelcom.cpct.dubbo.model.LabModel;
 import com.zjtelcom.cpct.dubbo.model.LabValueModel;
 import com.zjtelcom.cpct.dubbo.model.RecordModel;
 import com.zjtelcom.cpct.dubbo.service.SyncLabelService;
-import com.zjtelcom.cpct.dubbo.service.SynchronizeRecordService;
 import com.zjtelcom.cpct.enums.SynchronizeType;
 import com.zjtelcom.cpct.exception.SystemException;
+import com.zjtelcom.cpct.service.synchronize.SynchronizeRecordService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_prd.dao.label.InjectionLabelPrdMapper;
 import com.zjtelcom.cpct_prd.dao.label.InjectionLabelValuePrdMapper;
@@ -22,7 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -150,12 +149,21 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
      */
     @Override
     @Transactional
-    public Map<String, Object> syncLabelInfo(final RecordModel record) {
+    public Map<String, Object> syncLabelInfo(Map<String,Object> record) {
         Map<String,Object> result = new HashMap<>();
+        System.out.println("*******************入参："+JSON.toJSONString(record));
+        Map<String,Object> labModel = (Map<String, Object>) record.get("labModel");
+        List<Map<String,Object>> valueList = new ArrayList<>();
+        if (record.get("labelValueList")!=null){
+            valueList = (List<Map<String,Object>>) record.get("labelValueList");
+        }
+        RecordModel recordModel = ChannelUtil.mapToEntity(labModel,RecordModel.class);
+        recordModel.setLabelValueList(valueList);
+        System.out.println("*******************实体转换："+JSON.toJSONString(recordModel));
         try {
-            switch (record.getLabel().getLabState()){
+            switch (recordModel.getLabState()){
                 case "3":
-                    result = addLabel(record);
+                    result = addLabel(recordModel);
 //                    if (result.get("resultCode").equals(CODE_SUCCESS)){
 //                        new Thread(){
 //                            public void run(){
@@ -169,7 +177,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
 //                    }
                     break;
                 case "5":
-                    result = deleteLabel(record);
+                    result = deleteLabel(recordModel);
 //                    if (result.get("resultCode").equals(CODE_SUCCESS)){
 //                        new Thread(){
 //                            public void run(){
@@ -194,16 +202,19 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
     }
 
 
-    private boolean  labelDataType(LabModel labModel,Label label){
+    private boolean  labelDataType(RecordModel labModel,Label label){
         boolean x = true;
         if (labModel.getLabDataType()==null || labModel.getLabDataType().equals("")){
             x = false;
+            return x;
         }
         String type = labModel.getLabDataType();
-        if (type.toLowerCase().contains("VARCHAR")){
+        if (type.toUpperCase().contains("VARCHAR")){
             label.setLabelDataType("1200");
         }else
         if (type.toUpperCase().contains("INTEGER")){
+            label.setLabelDataType("1300");
+        }else if (type.toUpperCase().contains("INT")){
             label.setLabelDataType("1300");
         }else
         if (type.toUpperCase().contains("NUMERIC")){
@@ -211,7 +222,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         }else
         if (type.toUpperCase().contains("DATE")){
             label.setLabelDataType("1100");
-        }else
+        } else
         if (type.toUpperCase().contains("CHAR")){
             label.setLabelDataType("1200");
         }else {
@@ -226,16 +237,44 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
      * @return
      */
     private Map<String,Object> addLabel(RecordModel record) {
+        logger.info("**********入参**************："+JSON.toJSONString(record));
         Map<String, Object> result = new HashMap<>();
-        LabModel labModel = record.getLabel();
-        Label labelValodate = labelMapper.selectByTagRowId(record.getLabel().getLabRowId());
+        RecordModel labModel = record;
+        Label labelValodate = labelMapper.selectByTagRowId(record.getLabRowId());
         List<LabValueModel> valueModelList = new ArrayList<>();
         final List<Label> labelList = new ArrayList<>();
         if (record.getLabelValueList() != null && !record.getLabelValueList().isEmpty()) {
-            valueModelList = record.getLabelValueList();
+            for (Map<String,Object> valueMap : record.getLabelValueList()){
+                LabValueModel valueModel = ChannelUtil.mapToEntity(valueMap,LabValueModel.class);
+                if (valueModel.getValueName()==null || valueModel.getValueName().equals("")){
+                    result.put("resultCode", CODE_FAIL);
+                    result.put("resultMsg", "请补充标签枚举值信息。");
+                    return result;
+                }
+                valueModelList.add(valueModel);
+            }
         }
         Long labelId = null;
         if (labelValodate != null) {
+            //标签中文名重复校验
+            List<Label> labelCheck = labelMapper.findByParam(record.getLabName());
+            for(int i = 0;i<labelCheck.size();i++) {
+                if (!labelCheck.get(i).getTagRowId().equals(record.getLabRowId())) {
+                    if (labelCheck.get(i).getInjectionLabelName().equals(record.getLabName())) {
+                        result.put("resultCode", CODE_FAIL);
+                        result.put("resultMsg", "标签中文名和已有标签重复");
+                        return result;
+                    }
+                }
+            }
+            //标签英文名重复校验
+            Label labelEgCheck = labelMapper.selectByLabelCode(record.getLabEngName());
+            if (!labelEgCheck.getTagRowId().equals(record.getLabRowId())) {
+                result.put("resultCode", CODE_FAIL);
+                result.put("resultMsg", "标签英文名和已有标签重复");
+                return result;
+            }
+            //更新标签
             BeanUtil.copy(labModel,labelValodate);
             labelValodate.setSystemInfoId(1L);
             labelValodate.setTagRowId(labModel.getLabRowId());//标签id
@@ -280,6 +319,23 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             syncLabelValue(valueModelList,labelValodate.getInjectionLabelId());
             labelList.add(labelValodate);
         }else {
+            //标签中文名重复校验
+            List<Label> labelCheck = labelMapper.findByParam(record.getLabName());
+            for(int i = 0;i<labelCheck.size();i++) {
+                if(labelCheck.get(i).getInjectionLabelName().equals(record.getLabName())) {
+                    result.put("resultCode",CODE_FAIL);
+                    result.put("resultMsg","标签中文名和已有标签重复");
+                    return result;
+                }
+            }
+            //标签英文名重复校验
+            Label labelEgCheck = labelMapper.selectByLabelCode(record.getLabEngName());
+            if(labelEgCheck != null) {
+                result.put("resultCode",CODE_FAIL);
+                result.put("resultMsg","标签英文名和已有标签重复");
+                return result;
+            }
+            //新增标签
             Label label = BeanUtil.create(labModel, new Label());
             label.setSystemInfoId(1L);
             label.setTagRowId(labModel.getLabRowId());//标签id
@@ -349,7 +405,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
      */
     private Map<String,Object> deleteLabel(RecordModel record){
         Map<String,Object> result = new HashMap<>();
-        LabModel tagModel = record.getLabel();
+        RecordModel tagModel = record;
         Label label = labelMapper.selectByTagRowId(tagModel.getLabRowId());
         if (label==null){
             result.put("resultCode",CODE_FAIL);
@@ -374,7 +430,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             LabelValue value = BeanUtil.create(info,new LabelValue());
             value.setInjectionLabelId(labelId);
             value.setValueDesc(info.getValueName());
-            value.setValueName(info.getLabValue());
+            value.setValueName(info.getValueName());
             value.setLabelValue(info.getLabValue());
             value.setCreateDate(new Date());
             value.setStatusCd("1000");
@@ -451,7 +507,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
     }
 
     private void initLabelCatalog(List<Label> labelList) {
-        List<Label> labels = injectionLabelMapper.selectByScope(1L);
+        List<Label> labels = injectionLabelMapper.selectByScope(1L,null);
 
         for (Label label : labels){
             //标签目录插入

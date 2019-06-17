@@ -50,8 +50,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     @Autowired
     private SynQuestionService synQuestionService;
 
-    @Value("${sync.value}")
-    private String value;
+
 
 
     /**

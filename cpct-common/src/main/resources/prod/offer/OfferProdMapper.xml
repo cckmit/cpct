@@ -107,7 +107,10 @@
     REMARK, MANAGE_REGION_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
     UPDATE_DATE
     from offer
-    where OFFER_NAME  LIKE CONCAT(CONCAT('%',#{offerName}),'%')
+    where STATUS_CD=1000
+    <if test="offerName != null and offerName != ''">
+    and OFFER_NAME  LIKE CONCAT(CONCAT('%',#{offerName}),'%')
+    </if>
   </select>
 
   <select id="selectByPrimaryKeyAndName" resultMap="BaseResultMap">
@@ -166,6 +169,33 @@
     from offer
     where OFFER_NBR = #{offerCode}
   </select>
+
+
+  <select id="findByType" resultMap="BaseResultMap">
+    select a.OFFER_ID, a.OFFER_TYPE, a.OFFER_NAME, a.OFFER_SYS_NAME, a.OFFER_SYS_PY_NAME,
+    a.OFFER_NBR
+    from offer a
+    <if test="type != null and type != ''">
+    left join offer_prod_rel opr on opr.OFFER_ID = a.OFFER_ID
+    left join product pr on pr.PROD_ID = opr.PROD_ID
+    </if>
+    where a.STATUS_CD = 1000
+    <if test="type != null and type != ''">
+      and pr.PROD_USE_TYPE = #{type}
+    </if>
+    <if test="null != offerIds and offerIds.size > 0">
+      and a.OFFER_ID not in
+      <foreach collection="offerIds" item="item" open="(" close=")" separator=",">
+        #{item}
+      </foreach>
+    </if>
+    <if test="offerName != null and offerName != ''">
+      and a.OFFER_NAME  LIKE CONCAT(CONCAT('%',#{offerName}),'%')
+    </if>
+  </select>
+
+
+
 
 
 

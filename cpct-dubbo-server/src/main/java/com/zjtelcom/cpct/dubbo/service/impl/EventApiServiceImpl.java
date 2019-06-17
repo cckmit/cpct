@@ -3,6 +3,10 @@ package com.zjtelcom.cpct.dubbo.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ctzj.biz.asset.model.dto.AssetDto;
+import com.ctzj.biz.asset.model.dto.AssetPromDto;
+import com.ctzj.bss.customer.data.carrier.outbound.api.CtgCacheAssetService;
+import com.ctzj.bss.customer.data.carrier.outbound.model.ResponseResult;
 import com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService;
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
@@ -10,41 +14,42 @@ import com.ql.util.express.Operator;
 import com.ql.util.express.rule.RuleResult;
 import com.zjpii.biz.serv.YzServ;
 import com.zjtelcom.cpct.dao.campaign.*;
-import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
+import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
+import com.zjtelcom.cpct.dao.channel.MktVerbalMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtItemMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMatchRulMapper;
 import com.zjtelcom.cpct.dao.event.EventMatchRulConditionMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
-import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
-import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
-import com.zjtelcom.cpct.dao.system.SystemParamMapper;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
-import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
-import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
-import com.zjtelcom.cpct.dto.channel.VerbalVO;
+import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.ContactEvtMatchRul;
 import com.zjtelcom.cpct.dto.event.EventMatchRulCondition;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
-import com.zjtelcom.cpct.dto.system.SystemParam;
+import com.zjtelcom.cpct.dubbo.service.CamApiService;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.dubbo.service.SearchLabelService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.elastic.service.EsHitService;
+import com.zjtelcom.cpct.enums.AreaNameEnum;
 import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
-import com.zjtelcom.cpct.util.BeanUtil;
+import com.zjtelcom.cpct.util.ChannelUtil;
+import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
+import com.zjtelcom.es.es.service.EsService;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +57,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
@@ -66,10 +72,6 @@ public class EventApiServiceImpl implements EventApiService {
     @Value("${thread.maxPoolSize}")
     private int maxPoolSize;
 
-    private static final int THREAD_COUNT_ACTIVE = 50;
-    private static final int THREAD_COUNT_STRATEGY = 20;
-    private static final int THREAD_COUNT_RULE = 20;
-
     private static final Logger log = LoggerFactory.getLogger(EventApiServiceImpl.class);
 
     @Autowired
@@ -82,9 +84,6 @@ public class EventApiServiceImpl implements EventApiService {
     private MktCampaignMapper mktCampaignMapper; //活动基本信息
 
     @Autowired
-    private TarGrpConditionMapper tarGrpConditionMapper; //分群规则条件表
-
-    @Autowired
     private MktStrategyConfMapper mktStrategyConfMapper; //策略基本信息
 
     @Autowired
@@ -94,19 +93,10 @@ public class EventApiServiceImpl implements EventApiService {
     private FilterRuleMapper filterRuleMapper; //过滤规则
 
     @Autowired
-    private MktStrategyFilterRuleRelMapper mktStrategyFilterRuleRelMapper;//过滤规则与策略关系
-
-    @Autowired
-    private MktCamItemMapper mktCamItemMapper; //销售品
-
-    @Autowired
     private MktCamChlConfAttrMapper mktCamChlConfAttrMapper; //协同渠道配置基本信息
 
     @Autowired
     private MktCamChlConfMapper mktCamChlConfMapper; //协同渠道配置的渠道
-
-    @Autowired
-    private MktVerbalConditionMapper mktVerbalConditionMapper; //规则存储公共表（此处查询协同渠道子策略规则和话术规则）
 
     @Autowired
     private MktCamScriptMapper mktCamScriptMapper; //营销脚本
@@ -151,10 +141,19 @@ public class EventApiServiceImpl implements EventApiService {
     private EventMatchRulConditionMapper eventMatchRulConditionMapper;  //事件规则条件
 
     @Autowired(required = false)
+    private SysParamsMapper sysParamsMapper;  //查询系统参数
+
+    @Autowired(required = false)
     private SearchLabelService searchLabelService;  //查询活动下使用的所有标签
 
     @Autowired(required = false)
-    private SysParamsMapper sysParamsMapper;  //查询系统参数
+    private CamApiService camApiService; // 活动任务
+
+    @Autowired(required = false)
+    private EsService esService;
+
+    @Autowired(required = false)
+    private CtgCacheAssetService ctgCacheAssetService;// 销售品过滤方法
 
 
     @Override
@@ -354,11 +353,6 @@ public class EventApiServiceImpl implements EventApiService {
             //初始化返回结果
             Map<String, Object> result = new HashMap();
 
-            JSONObject timeJson = new JSONObject();
-            timeJson.put("reqId", map.get("reqId"));
-            timeJson.put("name", "事件");
-            timeJson.put("time1", System.currentTimeMillis() - begin);
-
             //构造返回结果
             String custId = map.get("custId");
             result.put("reqId", map.get("reqId"));
@@ -401,12 +395,13 @@ public class EventApiServiceImpl implements EventApiService {
                 JSONObject evtParams = JSONObject.parseObject(map.get("evtContent"));
                 //获取C4的数据用于过滤
                 String c4 = null;
-                if(evtParams!=null){
+                if (evtParams != null) {
                     c4 = (String) evtParams.get("C4");
                 }
 
                 //根据事件code查询事件信息
-                ContactEvt event = (ContactEvt) redisUtils.get("EVENT_" + map.get("eventCode"));
+                //     ContactEvt event = (ContactEvt) redisUtils.get("EVENT_" + map.get("eventCode"));
+                ContactEvt event = null;
                 if (event == null) {
                     event = contactEvtMapper.getEventByEventNbr(map.get("eventCode"));
                     redisUtils.set("EVENT_" + map.get("eventCode"), event);
@@ -508,6 +503,16 @@ public class EventApiServiceImpl implements EventApiService {
                 //添加内置标签
                 setInlayLabel(labelItems);
 
+                //判断是否有流量事件,EVTS000001001,EVTS000001002
+                // CPCP_USED_FLOW为已使用流量， CPCP_LEFT_FLOW为剩余流量, CPCP_NEED_FLOW 需要流量
+                String eventCode = (String) map.get("eventCode");
+                if("EVTS000001001".equals(eventCode)|| "EVTS000001002".equals(eventCode) && evtParams!=null
+                        && evtParams.get("CPCP_USED_FLOW")!=null && evtParams.get("CPCP_LEFT_FLOW")!=null){
+                    String cpcpNeedFlow = getCpcpNeedFlow((String) evtParams.get("CPCP_USED_FLOW"), (String) evtParams.get("CPCP_LEFT_FLOW"));
+                    labelItems.put("CPCP_NEED_FLOW", cpcpNeedFlow);
+
+                }
+
                 //获取事件推荐活动数
                 int recCampaignAmount;
                 String recCampaignAmountStr = event.getRecCampaignAmount();
@@ -517,11 +522,32 @@ public class EventApiServiceImpl implements EventApiService {
                     recCampaignAmount = Integer.parseInt(recCampaignAmountStr);
                 }
 
-                timeJson.put("time2", System.currentTimeMillis() - begin);
-                //事件下所有活动的规则预校验，返回初步可命中活动
-                List<Map<String, Object>> resultByEvent = getResultByEvent(eventId, map.get("lanId"), map.get("channelCode"), map.get("reqId"), map.get("accNbr"), c4);
+                /* 判断是否为对应事件的资产 */
+                //    List<String> eventCodeList = (List<String>) redisUtils.get("EVT_API_CODE");
+/*
+                List<String> eventCodeList = null;
+                if (eventCodeList == null) {
+                    List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("EVT_API_CODE");
+                    eventCodeList = new ArrayList<String>();
+                    for (SysParams sysParams : sysParamsList) {
+                        eventCodeList.add(sysParams.getParamValue());
+                    }
+                    redisUtils.set("EVT_API_CODE", eventCodeList);
+                }
+                // 获取客户清单
+                if (eventCodeList.contains(map.get("eventCode"))) {
+                    System.out.println("*******************清单方案接入*********" + eventId);
+                    result = getCustList(eventId, map.get("lanId"), custId, map);
+                    paramsJson.put("backParams", result);
+                    paramsJson.put("planType", "2");
+                    esHitService.save(paramsJson, IndexList.PARAMS_MODULE);
+                    return result;
+                }
 
-                timeJson.put("time3", System.currentTimeMillis() - begin);
+*/
+
+                //事件下所有活动的规则预校验，返回初步可命中活动
+                List<Map<String, Object>> resultByEvent = getResultByEvent(eventId, map.get("lanId"), map.get("channelCode"), map.get("reqId"), map.get("accNbr"), c4, map.get("custId"));
 
                 if (resultByEvent == null || resultByEvent.size() <= 0) {
                     log.info("预校验为空");
@@ -538,7 +564,6 @@ public class EventApiServiceImpl implements EventApiService {
                     result.put("taskList", activityList);
 
                     paramsJson.put("backParams", result);
-                    timeJson.put("time7", System.currentTimeMillis() - begin);
                     esHitService.save(paramsJson, IndexList.PARAMS_MODULE);
 
                     log.info("事件计算流程结束:" + map.get("eventCode") + "***" + map.get("reqId") + "（" + (System.currentTimeMillis() - begin) + "）");
@@ -547,18 +572,83 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
 
-
                 //判断有没有客户级活动
                 Boolean hasCust = false;  //是否有客户级
                 Boolean successCust = false;  //客户级查询是否成功
                 for (Map<String, Object> activeMap : resultByEvent) {
-                    if ((Integer) activeMap.get("levelConfig") == 1) {
-                        hasCust = true;
-                        break;
+                    if (((Map) activeMap.get("mktCampaignMap")) != null && !((Map) activeMap.get("mktCampaignMap")).isEmpty()) {
+                        if ((Integer) ((Map<String, Object>) activeMap.get("mktCampaignMap")).get("levelConfig") == 1) {
+                            hasCust = true;
+                            break;
+                        }
                     }
                 }
 
+                //查询事件下使用的所有标签
+                DefaultContext<String, Object> context = new DefaultContext<String, Object>();
+                Map<String, String> mktAllLabels = (Map<String, String>) redisUtils.get("EVT_ALL_LABEL_" + eventId);
+                if (mktAllLabels == null) {
+                    try {
+                        mktAllLabels = searchLabelService.labelListByEventId(eventId);  //查询事件下使用的所有标签
+                        if (null != mktAllLabels) {
+                            redisUtils.set("EVT_ALL_LABEL_" + eventId, mktAllLabels);
+                        } else {
+                            log.info("获取事件下所有标签失败");
+                            esJson.put("hit", false);
+                            esJson.put("msg", "获取事件下所有标签失败");
+                            esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
+                            return Collections.EMPTY_MAP;
+                        }
+                    } catch (Exception e) {
+                        esJson.put("hit", false);
+                        esJson.put("msg", "获取事件下所有标签异常");
+                        esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
+                        return Collections.EMPTY_MAP;
+                    }
+                }
+
+                // 过滤事件采集相中的标签
+                Map<String, String> mktAllLabel = new HashMap<>();
+                Iterator<Map.Entry<String, String>> iterator = labelItems.entrySet().iterator();
+                List<String> assetLabelList = new ArrayList<>();
+                List<String> promLabelList = new ArrayList<>();
+                List<String> custLabelList = new ArrayList<>();
+                if (mktAllLabels.get("assetLabels") != null && !"".equals(mktAllLabels.get("assetLabels"))) {
+                    assetLabelList = ChannelUtil.StringToList(mktAllLabels.get("assetLabels"));
+                    // 添加 PROM_INTEG_ID标签
+                    assetLabelList.add("PROM_INTEG_ID");
+                }
+                if (mktAllLabels.get("promLabels") != null && !"".equals(mktAllLabels.get("promLabels"))) {
+                    promLabelList = ChannelUtil.StringToList(mktAllLabels.get("promLabels"));
+                }
+                if (mktAllLabels.get("custLabels") != null && !"".equals(mktAllLabels.get("custLabels"))) {
+                    custLabelList = ChannelUtil.StringToList(mktAllLabels.get("custLabels"));
+                }
+
+                while (iterator.hasNext()) {
+                    Map.Entry<String, String> entry = iterator.next();
+                    if (assetLabelList.contains(entry.getKey())) {
+                        assetLabelList.remove(entry.getKey());
+                    } else if (promLabelList.contains(entry.getKey())) {
+                        promLabelList.remove(entry.getKey());
+                    } else if (custLabelList.contains(entry.getKey())) {
+                        custLabelList.remove(entry.getKey());
+                    }
+                }
+
+                List<String> labelList = new ArrayList<>();
+                labelList.addAll(assetLabelList);
+                labelList.addAll(promLabelList);
+                labelList.addAll(custLabelList);
+
+
+                if (assetLabelList != null && assetLabelList.size() > 0) {
+                    mktAllLabel.put("assetLabels", ChannelUtil.StringList2String(labelList));
+                }
+
+                List<DefaultContext<String, Object>> resultMapList = new ArrayList<>();
                 JSONArray accArray = new JSONArray();
+                // 是客户级的
                 if (hasCust) {
                     if (custId == null || "".equals(custId)) {
                         //保存es log
@@ -584,79 +674,171 @@ public class EventApiServiceImpl implements EventApiService {
                         param.put("queryNum", "");
                         param.put("queryFields", "");
                         param.put("type", "4");
-
+                        ExecutorService executorService = Executors.newCachedThreadPool();
                         try {
                             Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
                             if ("0".equals(dubboResult.get("result_code").toString())) {
                                 accArray = new JSONArray((List<Object>) dubboResult.get("msgbody"));
                                 successCust = true;
                             }
+
+                            // 查询客户级的标签
+                            Map<String, String> privateParams = new HashMap<>();
+                            privateParams.put("isCust", "1");
+                            privateParams.put("accNbr", map.get("accNbr"));
+                            privateParams.put("integrationId", map.get("integrationId"));
+                            privateParams.put("custId", map.get("custId"));
+
+                            // 客户级
+                            List<Future<DefaultContext<String, Object>>> futureList = new ArrayList<>();
+
+                            //多线程获取资产级标签，并加上客户级标签
+                            for (Object o : accArray) {
+                                Future<DefaultContext<String, Object>> future = executorService.submit(new getListMapLabelTask(o, mktAllLabel, map, context, esJson, labelItems));
+                                futureList.add(future);
+                            }
+
+                            for (Future<DefaultContext<String, Object>> future : futureList) {
+                                if (future.get() != null && !future.get().isEmpty()) {
+                                    DefaultContext<String, Object> reultMap = future.get();
+                                    resultMapList.add(reultMap);
+                                }
+                            }
+
                         } catch (Exception e) {
-                            // todo
+                            log.error("Exception = " + e);
+                        } finally {
+                            executorService.shutdown();
                         }
                     }
-                }
+                } else {
+                    //资产级
+                    Map<String, String> privateParams = new HashMap<>();
+                    privateParams.put("isCust", "1"); //资产级
+                    privateParams.put("accNbr", map.get("accNbr"));
+                    privateParams.put("integrationId", map.get("integrationId"));// 资产集成编码
+                    privateParams.put("custId", map.get("custId"));
 
-                timeJson.put("time4", System.currentTimeMillis() - begin);
+                    DefaultContext<String, Object> reultMap = new DefaultContext<>();
+                    Map<String, Object> assetLabelMap = getAssetAndPromLabel(mktAllLabel, map, privateParams, context, esJson, labelItems);
+                    if (assetLabelMap != null) {
+                        reultMap.putAll(assetLabelMap);
+                    } else {
+                        return null;
+                    }
+                    resultMapList.add(reultMap);
+                }
 
                 //初始化结果集
                 List<Future<Map<String, Object>>> threadList = new ArrayList<>();
                 //初始化线程池
 //                ExecutorService executorService = Executors.newFixedThreadPool(THREAD_COUNT_ACTIVE);
                 ExecutorService executorService = Executors.newCachedThreadPool();
-                //遍历活动
-                for (Map<String, Object> activeMap : resultByEvent) {
-                    //提交线程
-                    if ((Integer) activeMap.get("levelConfig") == 1) { //判断是客户级还是资产级
-                        //客户级
-                        if (successCust) {
-                            for (Object o : accArray) {
-                                //客户级下，循环资产级
-                                Map<String, String> privateParams = new HashMap<>();
-                                privateParams.put("isCust", "0"); //是客户级
-                                privateParams.put("accNbr", ((Map) o).get("ACC_NBR").toString());
-                                privateParams.put("integrationId", ((Map) o).get("ASSET_INTEG_ID").toString());
-                                privateParams.put("custId", map.get("custId"));
-                                //活动优先级为空的时候默认0
-                                privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
-                                Future<Map<String, Object>> f = executorService.submit(
-                                        new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList")));
-                                //将线程处理结果添加到结果集
-                                threadList.add(f);
-                            }
-                        } else {
-                            log.error("客户级资产查询出错:" + map.get("reqId"));
 
-                            esJson.put("reqId", map.get("reqId"));
-                            esJson.put("activityId", activeMap.get("mktCampaginId"));
-                            esJson.put("hitEntity", map.get("accNbr")); //命中对象
-                            esJson.put("hit", false);
-                            esJson.put("msg", "客户级资产查询出错");
-                            esHitService.save(esJson, IndexList.ACTIVITY_MODULE,map.get("reqId") + activeMap.get("mktCampaginId") + map.get("accNbr"));
+                // 启动线程走清单流程
+                List<String> mktCampaginIdList = new ArrayList<>();
+                for (Map<String, Object> activeMap : resultByEvent) {
+                    if (activeMap.get("mktCampaignCustMap") != null && !((Map<String, Object>) activeMap.get("mktCampaignCustMap")).isEmpty()) {
+                        mktCampaginIdList.add(((Map<String, Object>) activeMap.get("mktCampaignCustMap")).get("mktCampaginId").toString());
+                    }
+                }
+                if (mktCampaginIdList != null && mktCampaginIdList.size() > 0) {
+                    Future<Map<String, Object>> f = executorService.submit(new getCustListTask(mktCampaginIdList, eventId, map.get("lanId"), custId, map));
+                    threadList.add(f);
+                }
+
+
+                //判断是否全部为资产级
+                boolean isAllAsset = false;
+                for (Map<String, Object> activeMap : resultByEvent) {
+                    if (((Map<String, Object>) activeMap.get("mktCampaignMap")) != null && !((Map<String, Object>) activeMap.get("mktCampaignMap")).isEmpty()) {
+                        if ((Integer) ((Map<String, Object>) activeMap.get("mktCampaignMap")).get("levelConfig") == 1) { // 1为客户级
+                            isAllAsset = false;
+                            break;
+                        } else if ((Integer) ((Map<String, Object>) activeMap.get("mktCampaignMap")).get("levelConfig") == 0) {  // 0为资产级
+                            isAllAsset = true;
                         }
-                    } else {
+                    }
+                }
+                // 全部为资产级时直接遍历活动
+                if (isAllAsset) {
+                    for (Map<String, Object> resultMap : resultByEvent) {
                         //资产级
-                        Map<String, String> privateParams = new HashMap<>();
-                        privateParams.put("isCust", "1"); //是否是客户级
-                        privateParams.put("accNbr", map.get("accNbr"));
-                        privateParams.put("integrationId", map.get("integrationId"));
-                        privateParams.put("custId", map.get("custId"));
-                        privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
-                        //资产级
-                        Future<Map<String, Object>> f = executorService.submit(
-                                new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList")));
-                        //将线程处理结果添加到结果集
-                        threadList.add(f);
+                        Map<String, Object> activeMap = (Map<String, Object>) resultMap.get("mktCampaignMap");
+                        if (activeMap != null && !activeMap.isEmpty()) {
+                            Map<String, String> privateParams = new HashMap<>();
+                            privateParams.put("isCust", "1"); //是否是客户级
+                            privateParams.put("accNbr", map.get("accNbr"));
+                            privateParams.put("integrationId", map.get("integrationId"));
+                            privateParams.put("custId", map.get("custId"));
+                            privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
+                            //资产级
+                            Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList"), resultMapList.get(0)));
+                            //将线程处理结果添加到结果集
+                            threadList.add(f);
+                        }
+                    }
+                } else {
+                    //遍历活动
+                    for (Map<String, Object> resultMap : resultByEvent) {
+                        //提交线程
+                        Map<String, Object> activeMap = (Map<String, Object>) resultMap.get("mktCampaignMap");
+                        if (activeMap != null && !activeMap.isEmpty()) {
+                            if ((Integer) activeMap.get("levelConfig") == 1) { //判断是客户级还是资产级
+                                //客户级
+                                if (successCust) {
+                                    for (DefaultContext<String, Object> o : resultMapList) {
+                                        //                                   log.info("o = " + o);
+                                        //客户级下，循环资产级
+                                        Map<String, String> privateParams = new HashMap<>();
+                                        privateParams.put("isCust", "0"); //是客户级
+                                        privateParams.put("accNbr", o.get("accNbr").toString());
+                                        privateParams.put("integrationId", o.get("integrationId").toString());
+                                        privateParams.put("custId", map.get("custId"));
+                                        //活动优先级为空的时候默认0
+                                        privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
+                                        Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList"), o));
+                                        //将线程处理结果添加到结果集
+                                        threadList.add(f);
+                                    }
+                                } else {
+                                    log.error("客户级资产查询出错:" + map.get("reqId"));
+                                    esJson.put("reqId", map.get("reqId"));
+                                    esJson.put("activityId", activeMap.get("mktCampaginId"));
+                                    esJson.put("hitEntity", map.get("accNbr")); //命中对象
+                                    esJson.put("hit", false);
+                                    esJson.put("msg", "客户级资产查询出错");
+                                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE, map.get("reqId") + activeMap.get("mktCampaginId") + map.get("accNbr"));
+                                }
+                            } else {
+                                //资产级
+                                for (DefaultContext<String, Object> o : resultMapList) {
+                                    String assetId = o.get("integrationId").toString();
+                                    // 判断资产编码是否与接入的一致
+                                    if (assetId.equals(map.get("integrationId"))) {
+                                        Map<String, String> privateParams = new HashMap<>();
+                                        privateParams.put("isCust", "1"); //是否是客户级
+                                        privateParams.put("accNbr", map.get("accNbr"));
+                                        privateParams.put("integrationId", map.get("integrationId"));
+                                        privateParams.put("custId", map.get("custId"));
+                                        privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
+                                        //资产级
+                                        Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList"), o));
+                                        //将线程处理结果添加到结果集
+                                        threadList.add(f);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 
-                timeJson.put("time5", System.currentTimeMillis() - begin);
 
                 //获取结果
                 try {
                     for (Future<Map<String, Object>> future : threadList) {
-                        if (!future.get().isEmpty()) {
-                            activityList.addAll((List<Map<String, Object>>) future.get().get("strategyList"));
+                        if (future.get() != null && !future.get().isEmpty()) {
+                            activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
                         }
                     }
                 } catch (InterruptedException e) {
@@ -673,7 +855,6 @@ public class EventApiServiceImpl implements EventApiService {
                     executorService.shutdown();
                 }
 
-                timeJson.put("time6", System.currentTimeMillis() - begin);
 
                 //判断事件推荐活动数，按照优先级排序
                 if (activityList.size() > 0 && recCampaignAmount > 0 && recCampaignAmount < activityList.size()) {
@@ -727,7 +908,6 @@ public class EventApiServiceImpl implements EventApiService {
                 result.put("custId", custId);
 
                 paramsJson.put("backParams", result);
-                timeJson.put("time7", System.currentTimeMillis() - begin);
                 esHitService.save(paramsJson, IndexList.PARAMS_MODULE);
 
                 //es log
@@ -735,10 +915,6 @@ public class EventApiServiceImpl implements EventApiService {
                 esJson.put("timeCost", cost);
                 esJson.put("success", true);
                 esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
-
-                timeJson.put("time8", System.currentTimeMillis() - begin);
-
-                esHitService.save(timeJson, IndexList.TIME_MODULE, map.get("reqId"));
 
             } catch (Exception e) {
                 log.info("策略中心计算异常");
@@ -765,6 +941,7 @@ public class EventApiServiceImpl implements EventApiService {
         }
     }
 
+
     /**
      * 活动级别验证
      */
@@ -776,9 +953,9 @@ public class EventApiServiceImpl implements EventApiService {
         private Map<String, String> labelItems;
         private List<Map<String, Object>> evtTriggers;
         private List<Map<String, Object>> strategyMapList;
+        private DefaultContext<String, Object> context;
 
-        ActivityTask(Map<String, String> params, Long activityId, Map<String, String> privateParams,
-                     Map<String, String> labelItems, List<Map<String, Object>> evtTriggers, List<Map<String, Object>> strategyMapList) {
+        ActivityTask(Map<String, String> params, Long activityId, Map<String, String> privateParams, Map<String, String> labelItems, List<Map<String, Object>> evtTriggers, List<Map<String, Object>> strategyMapList, DefaultContext<String, Object> context) {
             this.activityId = activityId;
             this.params = params;
             this.privateParams = privateParams;
@@ -786,1335 +963,14 @@ public class EventApiServiceImpl implements EventApiService {
             this.evtTriggers = evtTriggers;
             this.strategyMapList = strategyMapList;
             this.reqId = params.get("reqId");
-        }
-
-        @Override
-        public Map<String, Object> call() {
-            Map<String, Object> activity = new HashMap<>();
-
-            long begin = System.currentTimeMillis();
-
-            JSONObject timeJson = new JSONObject();
-            timeJson.put("reqId", reqId + "0_" + activityId + "_" + params.get("accNbr"));
-            timeJson.put("time1", begin);
-
-            //初始化es log
-            JSONObject esJson = new JSONObject();
-
-            List<Map<String, Object>> strategyList = new ArrayList<>();
-
-            //es log
-            esJson.put("reqId", reqId);
-            esJson.put("activityId", activityId);
-            esJson.put("integrationId", params.get("integrationId"));
-            esJson.put("accNbr", params.get("accNbr"));
-            esJson.put("hitEntity", privateParams.get("accNbr")); //命中对象
-
-            MktCampaignDO mktCampaign = null;
-            try {
-                //查询活动基本信息
-                mktCampaign = (MktCampaignDO) redisUtils.get("MKT_CAMPAIGN_" + activityId);
-                if (mktCampaign == null) {
-                    mktCampaign = mktCampaignMapper.selectByPrimaryKey(activityId);
-                    if (mktCampaign == null) {
-                        //活动信息查询失败
-                        esJson.put("hit", false);
-                        esJson.put("msg", "活动信息查询失败，活动为null");
-                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-                        return Collections.EMPTY_MAP;
-                    } else {
-                        redisUtils.set("MKT_CAMPAIGN_" + activityId, mktCampaign);
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                esJson.put("hit", false);
-                esJson.put("msg", "活动信息查询失败");
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-                return Collections.EMPTY_MAP;
-            }
-
-            if (mktCampaign == null) {
-                //活动信息查询失败
-                esJson.put("hit", false);
-                esJson.put("msg", "活动信息查询失败，活动为null");
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-                return Collections.EMPTY_MAP;
-            }
-
-            privateParams.put("activityId", mktCampaign.getMktCampaignId().toString()); //活动编码
-            privateParams.put("activityName", mktCampaign.getMktCampaignName()); //活动名称
-            if ("1000".equals(mktCampaign.getMktCampaignType())) {
-                privateParams.put("activityType", "0"); //营销
-            } else if ("5000".equals(mktCampaign.getMktCampaignType())) {
-                privateParams.put("activityType", "1"); //服务
-            } else if ("6000".equals(mktCampaign.getMktCampaignType())) {
-                privateParams.put("activityType", "2"); //随销
-            } else {
-                privateParams.put("activityType", "0"); //活动类型 默认营销
-            }
-            if ("0".equals(mktCampaign.getIsCheckRule()) || "校验".equals(mktCampaign.getIsCheckRule())) {
-                privateParams.put("skipCheck", "0"); //是否预校验
-            } else {
-                privateParams.put("skipCheck", "1"); //是否预校验
-            }
-
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            privateParams.put("activityStartTime", simpleDateFormat.format(mktCampaign.getPlanBeginTime())); //活动开始时间
-            privateParams.put("activityEndTime", simpleDateFormat.format(mktCampaign.getPlanEndTime())); //活动结束时间
-
-            //es log
-            esJson.put("activityId", mktCampaign.getMktCampaignId().toString());
-            esJson.put("activityName", mktCampaign.getMktCampaignName());
-            esJson.put("activityCode", mktCampaign.getMktCampaignId().toString());
-
-            timeJson.put("time2", System.currentTimeMillis() - begin);
-
-            //查询活动下使用的所有标签
-            DefaultContext<String, Object> context = new DefaultContext<String, Object>();
-            Map<String, String> mktAllLabel = (Map<String, String>) redisUtils.get("MKT_ALL_LABEL_" + activityId);
-            if (mktAllLabel == null) {
-                try {
-                    List<Long> paramSearch = new ArrayList();
-                    paramSearch.add(activityId);
-                    mktAllLabel = searchLabelService.labelListByCampaignId(paramSearch);  //查询活动下使用的所有标签
-                    if (null != mktAllLabel) {
-                        redisUtils.set("MKT_ALL_LABEL_" + activityId, mktAllLabel);
-                    }
-                } catch (Exception e) {
-                    esJson.put("hit", false);
-                    esJson.put("msg", "获取活动下所有标签异常");
-                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-                    return Collections.EMPTY_MAP;
-                }
-            }
-
-            timeJson.put("time3", System.currentTimeMillis() - begin);
-
-            if (mktAllLabel == null) {
-                log.info("获取活动下所有标签失败");
-                esJson.put("hit", false);
-                esJson.put("msg", "获取活动下所有标签失败");
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-                return Collections.EMPTY_MAP;
-            } else {
-                String saleId = "";
-                //资产级标签
-                if (mktAllLabel.get("assetLabels") != null && !"".equals(mktAllLabel.get("assetLabels"))) {
-                    JSONObject assParam = new JSONObject();
-                    assParam.put("queryNum", privateParams.get("accNbr"));
-                    assParam.put("c3", params.get("lanId"));
-                    assParam.put("queryId", privateParams.get("integrationId"));
-                    assParam.put("type", "1");
-                    assParam.put("queryFields", mktAllLabel.get("assetLabels"));
-
-                    //因子查询-----------------------------------------------------
-                    Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(assParam));
-                    if ("0".equals(dubboResult.get("result_code").toString())) {
-                        JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
-                        //ES log 标签实例
-                        //拼接规则引擎上下文
-                        for (Map.Entry<String, Object> entry : body.entrySet()) {
-                            //添加到上下文
-                            context.put(entry.getKey(), entry.getValue());
-
-                            if ("PROM_INTEG_ID".equals(entry.getKey())) {
-                                saleId = entry.getValue().toString();
-                            }
-                        }
-                    } else {
-                        log.info("查询资产标签失败");
-                        esJson.put("hit", "false");
-                        esJson.put("msg", "查询资产标签失败");
-                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-                        return Collections.EMPTY_MAP;
-                    }
-                }
-
-                timeJson.put("time3-1", System.currentTimeMillis() - begin);
-
-                //客户级标签
-                if (mktAllLabel.get("custLabels") != null && !"".equals(mktAllLabel.get("custLabels"))) {
-
-                    JSONObject paramCust = new JSONObject();
-                    paramCust.put("queryNum", "");
-                    paramCust.put("c3", params.get("lanId"));
-                    paramCust.put("queryId", privateParams.get("custId"));
-                    paramCust.put("type", "2");
-                    paramCust.put("queryFields", mktAllLabel.get("custLabels"));
-
-                    //客户级因子查询-----------------------------------------------------
-                    Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(paramCust));
-
-                    if ("0".equals(dubboResult.get("result_code").toString())) {
-                        JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
-
-                        //拼接规则引擎上下文
-                        for (Map.Entry<String, Object> entry : body.entrySet()) {
-                            //添加到上下文
-                            context.put(entry.getKey(), entry.getValue());
-                        }
-                    } else {
-                        esJson.put("hit", "false");
-                        esJson.put("msg", "查询客户标签失败");
-                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-                        return Collections.EMPTY_MAP;
-                    }
-                }
-
-                timeJson.put("time3-2", System.currentTimeMillis() - begin);
-
-                //销售品级标签
-                if (mktAllLabel.get("promLabels") != null && !"".equals(mktAllLabel.get("promLabels"))) {
-                    if ("".equals(saleId)) {
-                        esJson.put("hit", false);
-                        esJson.put("msg", "主销售品数据错误");
-                        log.info("主销售品数据错误");
-                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-                        return Collections.EMPTY_MAP;
-                    }
-
-                    JSONObject paramSale = new JSONObject();
-                    paramSale.put("queryNum", "");
-                    paramSale.put("c3", params.get("lanId"));
-                    paramSale.put("queryId", saleId);
-                    paramSale.put("type", "3");
-                    paramSale.put("queryFields", mktAllLabel.get("promLabels"));
-
-                    //因子查询
-                    Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(paramSale));
-                    if ("0".equals(dubboResult.get("result_code").toString())) {
-                        JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
-                        //拼接规则引擎上下文
-                        for (Map.Entry<String, Object> entry : body.entrySet()) {
-                            //添加到上下文
-                            context.put(entry.getKey(), entry.getValue());
-                        }
-                    } else {
-                        esJson.put("hit", "false");
-                        esJson.put("msg", "查询销售品级标签失败");
-                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-                        return Collections.EMPTY_MAP;
-                    }
-                }
-                context.putAll(labelItems);   //添加事件采集项中作为标签使用的实例
-
-            }
-
-            timeJson.put("time4", System.currentTimeMillis() - begin);
-            //活动标签实例查询完成 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
-
-            //iSale展示列参数对象初始化
-            List<Map<String, Object>> itgTriggers = new ArrayList<>();
-            //验证过滤规则 活动级
-            List<Long> filterRuleIds = (List<Long>) redisUtils.get("MKT_FILTER_RULE_IDS_" + activityId);
-            if (filterRuleIds == null) {
-                filterRuleIds = mktStrategyFilterRuleRelMapper.selectByStrategyId(activityId);
-                if (filterRuleIds == null) {
-                    //过滤规则信息查询失败
-                    esJson.put("hit", false);
-                    esJson.put("msg", "过滤规则信息查询失败");
-                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-                    return Collections.EMPTY_MAP;
-                } else {
-                    redisUtils.set("MKT_FILTER_RULE_IDS_" + activityId, filterRuleIds);
-                }
-            }
-
-            if (filterRuleIds != null && filterRuleIds.size() > 0) {
-                //循环并判断过滤规则
-                for (Long filterRuleId : filterRuleIds) {
-                    FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId);
-//                    FilterRule filterRule = (FilterRule) redisUtils.get("FILTER_RULE_" + filterRuleId);
-//                    if (filterRule == null) {
-//                        filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId);
-//                        if (filterRule == null) {
-//                            //过滤规则信息查询失败
-//                            esJson.put("hit", false);
-//                            esJson.put("msg", "过滤规则信息查询失败 byId: " + filterRuleId);
-//                            esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-//                            return Collections.EMPTY_MAP;
-//                        } else {
-//                            redisUtils.set("FILTER_RULE_" + filterRuleId, filterRule);
-//                        }
-//                    }
-                    //判断过滤类型(红名单，黑名单)
-                    if ("3000".equals(filterRule.getFilterType())) {  //销售品过滤
-                        boolean productCheck = true;
-                        //获取需要过滤的销售品
-                        String checkProduct = filterRule.getChooseProduct();
-                        if (checkProduct != null && !"".equals(checkProduct)) {
-                            String esMsg = "";
-                            //获取用户已办理销售品
-                            if (!context.containsKey("PROM_LIST")) {
-                                //存在于校验
-                                if ("2000".equals(filterRule.getOperator())) {
-                                    productCheck = false;
-                                } else if ("1000".equals(filterRule.getOperator())) {
-                                    productCheck = true;
-                                    esMsg = "未查询到销售品实例";
-                                }
-                            } else {
-                                String productStr = (String) context.get("PROM_LIST");
-                                String[] checkProductArr = checkProduct.split(",");
-                                if (productStr != null && !"".equals(productStr)) {
-                                    if ("1000".equals(filterRule.getOperator())) {  //存在于
-                                        for (String product : checkProductArr) {
-                                            int index = productStr.indexOf(product);
-                                            if (index >= 0) {
-                                                productCheck = false;
-                                                break;
-                                            }
-                                        }
-                                    } else if ("2000".equals(filterRule.getOperator())) { //不存在于
-
-                                        boolean noExistCheck = true;
-                                        for (String product : checkProductArr) {
-                                            int index = productStr.indexOf(product);
-                                            if (index >= 0) {
-                                                productCheck = true;
-                                                noExistCheck = false;
-                                                //被过滤的销售品
-                                                esMsg = product;
-                                                break;
-                                            }
-                                        }
-                                        if (noExistCheck) {
-                                            productCheck = false;
-                                        }
-                                    }
-                                } else {
-                                    //存在于校验
-                                    if ("2000".equals(filterRule.getOperator())) {
-                                        productCheck = false;
-                                    } else if ("1000".equals(filterRule.getOperator())) {
-                                        productCheck = true;
-                                    }
-                                }
-                            }
-                            if (productCheck) {
-                                esJson.put("hit", "false");
-                                esJson.put("msg", "销售品过滤验证未通过:" + esMsg);
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-                                return Collections.EMPTY_MAP;
-                            }
-                        }
-                    } else if ("4000".equals(filterRule.getFilterType())) {  //表达式过滤
-                        //暂不处理
-                        //do something
-                    } else if ("6000".equals(filterRule.getFilterType())) {  //过扰规则
-                        //将过扰规则的标签放到iSale展示列
-                        //获取过扰标签
-                        List<String> labels = (List<String>) redisUtils.get("FILTER_RULE_DISTURB_" + filterRuleId);
-                        if (labels == null) {
-                            labels = mktVerbalConditionMapper.getLabelListByConditionId(filterRule.getConditionId());
-                            if (labels == null) {
-                                //过滤规则信息查询失败
-                                esJson.put("hit", false);
-                                esJson.put("msg", "过扰规则信息查询失败 byId: " + filterRuleId);
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-                                return Collections.EMPTY_MAP;
-                            } else {
-                                redisUtils.set("FILTER_RULE_DISTURB_" + filterRuleId, labels);
-                            }
-                        }
-
-                        List<Map<String, Object>> triggerList = new ArrayList<>();
-                        if (labels != null && labels.size() > 0) {
-                            for (String labelCode : labels) {
-                                if (context.containsKey(labelCode)) {
-                                    Map<String, Object> map = new HashMap<>();
-                                    map.put("key", labelCode);
-                                    map.put("value", context.get(labelCode));
-                                    map.put("display", "0");
-                                    map.put("name", "");
-                                    triggerList.add(map);
-                                } else {
-                                    //todo 过扰标签未查询到
-                                }
-                            }
-                        }
-                        Map<String, Object> disturb = new HashMap<>();
-                        disturb.put("type", "disturb");
-                        disturb.put("triggerList", triggerList);
-                        itgTriggers.add(disturb);
-                    }
-                }
-            }
-
-            timeJson.put("time5", System.currentTimeMillis() - begin);
-            //初始化结果集
-            List<Future<Map<String, Object>>> threadList = new ArrayList<>();
-            //初始化线程池
-            ExecutorService executorService = Executors.newCachedThreadPool();
-            //遍历策略列表
-            for (Map<String, Object> strategyMap : strategyMapList) {
-                //提交线程
-                Future<Map<String, Object>> f = executorService.submit(
-                        new StrategyTask(params, (Long) strategyMap.get("strategyConfId"), (String) strategyMap.get("strategyConfName"),
-                                privateParams, context));
-                //将线程处理结果添加到结果集
-                threadList.add(f);
-            }
-            //获取结果
-            try {
-                for (Future<Map<String, Object>> future : threadList) {
-                    if (!future.get().isEmpty()) {
-                        strategyList.addAll((List<Map<String, Object>>) future.get().get("ruleList"));
-                    }
-                }
-                activity.put("strategyList", strategyList);
-
-                //判断是否有策略命中
-                if (strategyList.size() > 0) {
-                    esJson.put("hit", true); //添加命中标识
-
-                    Map<String, Object> itgTrigger;
-
-                    //查询展示列 （iSale）   todo  展示列的标签未查询到是否影响命中
-                    List<Map<String, Object>> iSaleDisplay = new ArrayList<>();
-                    iSaleDisplay = (List<Map<String, Object>>) redisUtils.get("MKT_ISALE_LABEL_" + mktCampaign.getIsaleDisplay());
-                    if (iSaleDisplay == null) {
-                        iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getIsaleDisplay());
-                        redisUtils.set("MKT_ISALE_LABEL_" + mktCampaign.getIsaleDisplay(), iSaleDisplay);
-                    }
-
-                    if (iSaleDisplay != null && iSaleDisplay.size() > 0) {
-
-                        Map<String, Object> triggers;
-                        List<Map<String, Object>> triggerList1 = new ArrayList<>();
-                        List<Map<String, Object>> triggerList2 = new ArrayList<>();
-                        List<Map<String, Object>> triggerList3 = new ArrayList<>();
-                        List<Map<String, Object>> triggerList4 = new ArrayList<>();
-
-                        for (Map<String, Object> label : iSaleDisplay) {
-                            if (context.containsKey((String) label.get("labelCode"))) {
-                                triggers = new JSONObject();
-                                triggers.put("key", label.get("labelCode"));
-                                triggers.put("value", context.get((String) label.get("labelCode")));
-                                triggers.put("display", 0); //todo 确定display字段
-                                triggers.put("name", label.get("labelName"));
-                                if ("1".equals(label.get("typeCode").toString())) {
-                                    triggerList1.add(triggers);
-                                } else if ("2".equals(label.get("typeCode").toString())) {
-                                    triggerList2.add(triggers);
-                                } else if ("3".equals(label.get("typeCode").toString())) {
-                                    triggerList3.add(triggers);
-                                } else if ("4".equals(label.get("typeCode").toString())) {
-                                    triggerList4.add(triggers);
-                                }
-                            }
-                        }
-                        if (triggerList1.size() > 0) {
-                            itgTrigger = new HashMap<>();
-                            itgTrigger.put("triggerList", triggerList1);
-                            itgTrigger.put("type", "固定信息");
-                            itgTriggers.add(new JSONObject(itgTrigger));
-                        }
-                        if (triggerList2.size() > 0) {
-                            itgTrigger = new JSONObject();
-                            itgTrigger.put("triggerList", triggerList2);
-                            itgTrigger.put("type", "营销信息");
-                            itgTriggers.add(new JSONObject(itgTrigger));
-                        }
-                        if (triggerList3.size() > 0) {
-                            itgTrigger = new JSONObject();
-                            itgTrigger.put("triggerList", triggerList3);
-                            itgTrigger.put("type", "费用信息");
-                            itgTriggers.add(new JSONObject(itgTrigger));
-                        }
-                        if (triggerList4.size() > 0) {
-                            itgTrigger = new JSONObject();
-                            itgTrigger.put("triggerList", triggerList4);
-                            itgTrigger.put("type", "协议信息");
-                            itgTriggers.add(new JSONObject(itgTrigger));
-                        }
-                    }
-
-                    //将iSale展示列的值放入返回结果
-                    for (Map<String, Object> strategyMap : strategyList) {
-                        List<Map<String, Object>> ChlMap = (List<Map<String, Object>>) strategyMap.get("taskChlList");
-                        for (Map<String, Object> map : ChlMap) {
-                            map.put("itgTriggers", JSONArray.parse(JSONArray.toJSON(itgTriggers).toString()));
-                            map.put("triggers", JSONArray.parse(JSONArray.toJSON(evtTriggers).toString()));
-                        }
-                    }
-
-                    timeJson.put("time6", System.currentTimeMillis() - begin);
-                    esHitService.save(timeJson, IndexList.TIME_MKT_MODULE, reqId + "0_" + activityId + "_" + params.get("accNbr"));
-
-                } else {
-                    esJson.put("hit", false);
-                    esJson.put("msg", "策略均未命中");
-                }
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-
-            } catch (Exception e) {
-                esJson.put("hit", false);
-                esJson.put("msg", "获取计算结果异常");
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-                //发生异常关闭线程池
-                executorService.shutdown();
-            } finally {
-                //关闭线程池
-                executorService.shutdown();
-            }
-
-            return activity;
-        }
-    }
-
-    /**
-     * 策略级
-     */
-    class StrategyTask implements Callable<Map<String, Object>> {
-        private Long strategyConfId; //策略配置id
-        private String strategyConfName; //策略配置id
-        private String reqId;
-        private Map<String, String> params; //公共参数
-        private Map<String, String> privateParams;  //私有参数
-        private DefaultContext<String, Object> context;  //标签实例
-
-        public StrategyTask(Map<String, String> params, Long strategyConfId, String strategyConfName,
-                            Map<String, String> privateParams, DefaultContext<String, Object> context) {
-            this.strategyConfId = strategyConfId;
-            this.strategyConfName = strategyConfName;
-            this.reqId = params.get("reqId");
-            this.params = params;
-            this.privateParams = privateParams;
-            this.context = context;
-
-        }
-
-        @Override
-        public Map<String, Object> call() {
-            //获取当前时间
-            Map<String, Object> strategyMap = new HashMap<>();
-
-            long begin = System.currentTimeMillis();
-            JSONObject timeJson = new JSONObject();
-            timeJson.put("reqId", reqId + "0_" + strategyConfId + "_" + params.get("accNbr"));
-            timeJson.put("name", "策略：" + strategyConfId);
-            timeJson.put("time1", System.currentTimeMillis() - begin);
-
-            //初始化es log
-            JSONObject esJson = new JSONObject();
-
-            //初始化返回结果中的推荐信息列表
-            List<Map<String, Object>> ruleList = new ArrayList<>();
-
-            //es log
-            esJson.put("activityId", privateParams.get("activityId"));
-            esJson.put("strategyConfId", strategyConfId);
-            esJson.put("strategyConfName", strategyConfName);
-            esJson.put("eventId", params.get("eventCode"));
-            esJson.put("reqId", reqId);
-            esJson.put("integrationId", params.get("integrationId"));
-            esJson.put("accNbr", params.get("accNbr"));
-            esJson.put("hitEntity", privateParams.get("accNbr")); //命中对象
-
-            //根据策略id获取策略下发规则列表
-            List<MktStrategyConfRuleDO> mktStrategyConfRuleDOS = (List<MktStrategyConfRuleDO>) redisUtils.get("MKT_STRATEGY_REL_" + strategyConfId);
-            if (mktStrategyConfRuleDOS == null) {
-                mktStrategyConfRuleDOS = mktStrategyConfRuleMapper.selectByMktStrategyConfId(strategyConfId);
-                if (mktStrategyConfRuleDOS != null) {
-                    redisUtils.set("MKT_STRATEGY_REL_" + strategyConfId, mktStrategyConfRuleDOS);
-                } else {
-                    esJson.put("hit", false);
-                    esJson.put("msg", "策略下规则查询异常");
-                    esHitService.save(esJson, IndexList.STRATEGY_MODULE);
-                    return Collections.EMPTY_MAP;
-                }
-            }
-
-            timeJson.put("time2", System.currentTimeMillis() - begin);
-            //遍历规则↓↓↓↓↓↓↓↓↓↓
-            //初始化结果集
-            List<Future<Map<String, Object>>> threadList = new ArrayList<>();
-            //初始化线程池
-            ExecutorService executorService = Executors.newCachedThreadPool();
-            //遍历规则列表
-            timeJson.put("time2--", System.currentTimeMillis() - begin);
-            if (mktStrategyConfRuleDOS != null && mktStrategyConfRuleDOS.size() > 0) {
-                for (int i = 0; i < mktStrategyConfRuleDOS.size(); i++) {
-
-                    /* for (MktStrategyConfRuleDO mktStrategyConfRuleDO : ) {*/
-/*                    //获取分群id
-                    Long tarGrpId = mktStrategyConfRuleDO.getTarGrpId();
-                    //获取销售品
-                    String productStr = mktStrategyConfRuleDO.getProductId();
-                    //协同渠道配置id
-                    String evtContactConfIdStr = mktStrategyConfRuleDO.getEvtContactConfId();
-                    //规则id
-                    Long mktStrategyConfRuleId = mktStrategyConfRuleDO.getMktStrategyConfRuleId();
-                    //策略名称
-                    String mktStrategyConfRuleName = mktStrategyConfRuleDO.getMktStrategyConfRuleName();*/
-                    //提交线程
-                    Future<Map<String, Object>> f = executorService.submit(new RuleTask(params, privateParams, strategyConfId, strategyConfName, mktStrategyConfRuleDOS.get(i).getTarGrpId(), mktStrategyConfRuleDOS.get(i).getProductId(),
-                            mktStrategyConfRuleDOS.get(i).getEvtContactConfId(), mktStrategyConfRuleDOS.get(i).getMktStrategyConfRuleId(), mktStrategyConfRuleDOS.get(i).getMktStrategyConfRuleName(), context));
-                    //将线程处理结果添加到结果集
-                    threadList.add(f);
-                    timeJson.put("time2-"+ i, System.currentTimeMillis() - begin);
-                }
-            }
-
-            timeJson.put("time3", System.currentTimeMillis() - begin);
-
-            //获取结果
-            try {
-                for (Future<Map<String, Object>> future : threadList) {
-                    if (!future.get().isEmpty()) {
-                        ruleList.add(future.get());
-                    }
-                }
-                strategyMap.put("ruleList", ruleList);
-
-                timeJson.put("time4", System.currentTimeMillis() - begin);
-                esHitService.save(timeJson, IndexList.TIME_STR_MODULE, reqId + "0_" + strategyConfId + "_" + params.get("accNbr"));
-
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                //发生异常关闭线程池
-                executorService.shutdown();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-                //发生异常关闭线程池
-                executorService.shutdown();
-            } finally {
-                //关闭线程池
-                executorService.shutdown();
-            }
-
-            if (ruleList.size() > 0) {
-                esJson.put("hit", "true");
-                esHitService.save(esJson, IndexList.STRATEGY_MODULE);
-            } else {
-                esJson.put("hit", "false");
-                esJson.put("msg", "规则均未命中");
-                esHitService.save(esJson, IndexList.STRATEGY_MODULE);
-                return Collections.EMPTY_MAP;
-            }
-
-
-            return strategyMap;
-        }
-    }
-
-    /**
-     * 获取规则列表（规则级）
-     */
-    class RuleTask implements Callable<Map<String, Object>> {
-        private Long strategyConfId; //策略配置id
-        private String strategyConfName; //策略配置id
-        private Long tarGrpId;
-        private String productStr;
-        private String evtContactConfIdStr;
-        private String reqId;
-        private Long ruleId;
-        private String ruleName;
-        private Map<String, String> params;
-        private Map<String, String> privateParams;
-        private DefaultContext<String, Object> context;
-
-        public RuleTask(Map<String, String> params, Map<String, String> privateParams, Long strategyConfId, String strategyConfName, Long tarGrpId, String productStr,
-                        String evtContactConfIdStr, Long mktStrategyConfRuleId, String mktStrategyConfRuleName, DefaultContext<String, Object> context) {
-            this.strategyConfId = strategyConfId;
-            this.strategyConfName = strategyConfName;
-            this.tarGrpId = tarGrpId;
-            this.reqId = params.get("reqId");
-            this.productStr = productStr;
-            this.evtContactConfIdStr = evtContactConfIdStr;
-            this.ruleId = mktStrategyConfRuleId;
-            this.ruleName = mktStrategyConfRuleName;
-            this.params = params;
-            this.privateParams = privateParams;
             this.context = context;
         }
 
         @Override
-        public Map<String, Object> call() throws Exception {
-
-            long begin = System.currentTimeMillis();
-            JSONObject timeJson = new JSONObject();
-            timeJson.put("reqId", reqId + "0_" + ruleId + "_" + params.get("accNbr"));
-            timeJson.put("name", "规则：" + ruleId);
-            timeJson.put("time1", System.currentTimeMillis() - begin);
-
-            //初始化es log   标签使用
-            JSONObject esJson = new JSONObject();
-            //初始化es log   规则使用
-            JSONObject jsonObject = new JSONObject();
-
-            jsonObject.put("ruleId", ruleId);
-            jsonObject.put("ruleName", ruleName);
-            jsonObject.put("hitEntity", privateParams.get("ac" +
-                    "" +
-                    "" +
-                    "cNbr")); //命中对象
-            jsonObject.put("reqId", reqId);
-            jsonObject.put("eventId", params.get("eventCode"));
-            jsonObject.put("activityId", privateParams.get("activityId"));
-            jsonObject.put("strategyConfId", strategyConfId);
-            jsonObject.put("productStr", productStr);
-            jsonObject.put("evtContactConfIdStr", evtContactConfIdStr);
-            jsonObject.put("tarGrpId", tarGrpId);
-
-            //ES log 标签实例
-            esJson.put("reqId", reqId);
-            esJson.put("eventId", params.get("eventCode"));
-            esJson.put("activityId", privateParams.get("activityId"));
-            esJson.put("ruleId", ruleId);
-            esJson.put("ruleName", ruleName);
-            esJson.put("integrationId", params.get("integrationId"));
-            esJson.put("accNbr", params.get("accNbr"));
-            esJson.put("strategyConfId", strategyConfId);
-            esJson.put("tarGrpId", tarGrpId);
-            esJson.put("hitEntity", privateParams.get("accNbr")); //命中对象
-
-            Map<String, Object> ruleMap = new HashMap<>();
-            //初始化返回结果中的推荐信息列表
-            List<Map<String, Object>> taskChlList = new ArrayList<>();
-
-            //  2.判断客户分群规则---------------------------
-            //判断匹配结果，如匹配则向下进行，如不匹配则continue结束本次循环
-            //拼装redis key
-            ExpressRunner runner = new ExpressRunner();
-            runner.addFunction("toNum", new StringToNumOperator("toNum"));
-
-            //如果分群id为空
-            if (tarGrpId == null) {
-                jsonObject.put("hit", "false");
-                jsonObject.put("msg", "分群ID异常");
-                esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                return Collections.EMPTY_MAP;
-            }
-
-            //记录实例不足的标签
-            StringBuilder notEnoughLabel = new StringBuilder();
-
-            timeJson.put("time2", System.currentTimeMillis() - begin);
-
-            //判断表达式在缓存中有没有
-            String express = (String) redisUtils.get("EXPRESS_" + tarGrpId);
-
-            SysParams sysParams = (SysParams) redisUtils.get("EVT_SWITCH_CHECK_LABEL");
-            if (sysParams == null) {
-                List<SysParams> systemParamList = sysParamsMapper.findParamKeyIn("CHECK_LABEL");
-                if (systemParamList.size() > 0) {
-                    redisUtils.set("EVT_SWITCH_CHECK_LABEL", systemParamList.get(0));
-                }
-            }
-
-            timeJson.put("time3", System.currentTimeMillis() - begin);
-            if (express == null || "".equals(express)) {
-                List<LabelResult> labelResultList = new ArrayList<>();
-                try {
-                    LabelResult lr;
-                    timeJson.put("time3-1", System.currentTimeMillis() - begin);
-                    //查询规则下所有标签
-                    List<Map<String, String>> labelMapList = (List<Map<String, String>>) redisUtils.get("RULE_ALL_LABEL_" + tarGrpId);
-                    if (labelMapList == null) {
-                        try {
-                            labelMapList = tarGrpConditionMapper.selectAllLabelByTarId(tarGrpId);
-                        } catch (Exception e) {
-                            jsonObject.put("hit", "false");
-                            jsonObject.put("msg", "规则下标签查询失败");
-                            esHitService.save(jsonObject, IndexList.RULE_MODULE);
-
-                            esHitService.save(timeJson, IndexList.TIME_RULE_MODULE, reqId + "0_" + ruleId + "_" + params.get("accNbr"));
-
-                            return Collections.EMPTY_MAP;
-                        }
-                        redisUtils.set("RULE_ALL_LABEL_" + tarGrpId, labelMapList);
-                    }
-
-                    timeJson.put("time3-2", System.currentTimeMillis() - begin);
-
-                    if (labelMapList == null || labelMapList.size() <= 0) {
-                        log.info("未查询到分群标签:" + privateParams.get("activityId") + "---" + ruleId);
-                        esJson.put("hit", "false");
-                        esJson.put("msg", "未查询到分群标签");
-                        esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                        return Collections.EMPTY_MAP;
-                    }
-
-                    //将规则拼装为表达式
-                    StringBuilder expressSb = new StringBuilder();
-                    expressSb.append("if(");
-                    //遍历所有规则
-                    for (Map<String, String> labelMap : labelMapList) {
-                        String type = labelMap.get("operType");
-
-                        if ("PROM_LIST".equals(labelMap.get("code"))) {
-                            FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.valueOf(labelMap.get("rightParam")));
-                            labelMap.put("rightParam", filterRule.getChooseProduct());
-                        }
-
-                        //保存标签的es log
-                        lr = new LabelResult();
-                        lr.setOperType(type);
-                        lr.setLabelCode(labelMap.get("code"));
-                        lr.setLabelName(labelMap.get("name"));
-                        lr.setRightOperand(labelMap.get("rightParam"));
-                        lr.setClassName(labelMap.get("className"));
-
-                        //拼接表达式：主表达式
-                        expressSb.append(cpcExpression(labelMap.get("code"), type, labelMap.get("rightParam")));
-
-                        //判断标签实例是否足够
-                        if (context.containsKey(labelMap.get("code"))) {
-                            lr.setRightParam(context.get(labelMap.get("code")).toString());
-                            if (sysParams != null && "1".equals(sysParams.getParamValue())) {
-                                try {
-                                    RuleResult ruleResultOne = runner.executeRule(cpcLabel(labelMap.get("code"), type, labelMap.get("rightParam")), context, true, true);
-                                    if (null != ruleResultOne.getResult()) {
-                                        lr.setResult((Boolean) ruleResultOne.getResult());
-                                    } else {
-                                        lr.setResult(false);
-                                    }
-                                } catch (Exception e) {
-                                    lr.setResult(false);
-                                }
-                            }
-                        } else {
-                            notEnoughLabel.append(labelMap.get("code")).append(",");
-                            lr.setRightParam("无值");
-                            lr.setResult(false);
-                        }
-
-                        expressSb.append("&&");
-                        labelResultList.add(lr);
-                    }
-
-                    timeJson.put("time3-3", System.currentTimeMillis() - begin);
-
-                    expressSb.delete(expressSb.length() - 2, expressSb.length());
-                    expressSb.append(") {return true} else {return false}");
-                    express = expressSb.toString();
-
-                } catch (Exception e) {
-                    esJson.put("hit", "false");
-                    esJson.put("msg", "表达式拼接异常");
-                    esHitService.save(jsonObject, IndexList.RULE_MODULE);
-
-                    esHitService.save(timeJson, IndexList.TIME_RULE_MODULE, reqId + "0_" + ruleId + "_" + params.get("accNbr"));
-
-                    return Collections.EMPTY_MAP;
-                }
-
-                //表达式存入redis
-                redisUtils.set("EXPRESS_" + tarGrpId, express);
-
-                esJson.put("labelResultList", JSONArray.toJSON(labelResultList));
-
-                timeJson.put("time3-4", System.currentTimeMillis() - begin);
-
-            } else {
-                List<LabelResult> labelResultList = new ArrayList<>();
-                timeJson.put("time4-1", System.currentTimeMillis() - begin);
-                try {
-                    LabelResult lr;
-                    //查询规则下所有标签
-                    List<Map<String, String>> labelMapList = (List<Map<String, String>>) redisUtils.get("RULE_ALL_LABEL_" + tarGrpId);
-                    if (labelMapList == null) {
-                        timeJson.put("time4-1-1", System.currentTimeMillis() - begin);
-                        try {
-                            labelMapList = tarGrpConditionMapper.selectAllLabelByTarId(tarGrpId);
-                        } catch (Exception e) {
-                            jsonObject.put("hit", "false");
-                            jsonObject.put("msg", "规则下标签查询失败");
-                            esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                            return Collections.EMPTY_MAP;
-                        }
-                        timeJson.put("time4-1-2", System.currentTimeMillis() - begin);
-                        redisUtils.set("RULE_ALL_LABEL_" + tarGrpId, labelMapList);
-                    }
-
-                    timeJson.put("time4-2", System.currentTimeMillis() - begin);
-                    //将规则拼装为表达式
-                    //遍历所有规则
-                    for (Map<String, String> labelMap : labelMapList) {
-                        //判断标签实例是否足够
-                        if (!context.containsKey(labelMap.get("code"))) {
-                            notEnoughLabel.append(labelMap.get("code")).append(",");
-                        }
-                    }
-
-                    // 异步执行当个标签比较结果
-                    new labelResultThread(esJson,  labelMapList, context, sysParams, runner, labelResultList).run();
-
-
-                    timeJson.put("time4-3", System.currentTimeMillis() - begin);
-
-                } catch (Exception e) {
-                    esJson.put("hit", "false");
-                    esJson.put("msg", "表达式拼接异常");
-                    esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                    return Collections.EMPTY_MAP;
-                }
-                timeJson.put("time4-4", System.currentTimeMillis() - begin);
-            }
-
-            esHitService.save(esJson, IndexList.Label_MODULE);  //储存标签比较结果
-            //验证是否标签实例不足
-            if (notEnoughLabel.length() > 0) {
-                esJson.put("hit", "false");
-                esJson.put("msg", "标签实例不足：" + notEnoughLabel.toString());
-                esHitService.save(esJson, IndexList.RULE_MODULE);
-
-                esHitService.save(timeJson, IndexList.TIME_RULE_MODULE, reqId + "0_" + ruleId + "_" + params.get("accNbr"));
-
-                return Collections.EMPTY_MAP;
-            }
-
-            timeJson.put("time5", System.currentTimeMillis() - begin);
-
-            try {
-                //规则引擎计算
-                RuleResult ruleResult = null;
-                ExpressRunner runnerQ = new ExpressRunner();
-                runnerQ.addFunction("toNum", new StringToNumOperator("toNum"));
-                runnerQ.addFunction("checkProm", new PromCheckOperator("checkProm"));
-
-                timeJson.put("time5-1", System.currentTimeMillis() - begin);
-                try {
-                    ruleResult = runnerQ.executeRule(express, context, true, true);
-                } catch (Exception e) {
-                    ruleMap.put("msg", "规则引擎计算失败");
-
-                    esJson.put("hit", "false");
-                    esJson.put("msg", "规则引擎计算失败");
-                    esHitService.save(jsonObject, IndexList.RULE_MODULE);
-
-                    esHitService.save(timeJson, IndexList.TIME_RULE_MODULE, reqId + "0_" + ruleId + "_" + params.get("accNbr"));
-
-                    return Collections.EMPTY_MAP;
-                }
-//                System.out.println("result=" + ruleResult.getResult());
-//                System.out.println("Tree=" + ruleResult.getRule().toTree());
-//                System.out.println("TraceMap=" + ruleResult.getTraceMap());
-
-                jsonObject.put("express", express);
-
-                timeJson.put("time6", System.currentTimeMillis() - begin);
-
-                //初始化返回结果中的销售品条目
-                List<Map<String, String>> productList = new ArrayList<>();
-                if (ruleResult.getResult() != null && ((Boolean) ruleResult.getResult())) {
-
-                    jsonObject.put("hit", true);
-
-                    //拼接返回结果
-                    ruleMap.put("orderISI", params.get("reqId")); //流水号
-                    ruleMap.put("activityId", privateParams.get("activityId")); //活动编码
-                    ruleMap.put("activityName", privateParams.get("activityName")); //活动名称
-                    ruleMap.put("activityType", privateParams.get("activityType")); //活动类型
-                    ruleMap.put("activityStartTime", privateParams.get("activityStartTime")); //活动开始时间
-                    ruleMap.put("activityEndTime", privateParams.get("activityEndTime")); //活动结束时间
-                    ruleMap.put("skipCheck", "0"); //todo 调过预校验
-                    ruleMap.put("orderPriority", privateParams.get("orderPriority")); //活动优先级
-                    ruleMap.put("integrationId", privateParams.get("integrationId")); //集成编号（必填）
-                    ruleMap.put("accNbr", privateParams.get("accNbr")); //业务号码（必填）
-                    ruleMap.put("policyId", strategyConfId.toString()); //策略编码
-                    ruleMap.put("policyName", strategyConfName); //策略名称
-                    ruleMap.put("ruleId", ruleId.toString()); //规则编码
-                    ruleMap.put("ruleName", ruleName); //规则名称
-
-                    //查询销售品列表
-                    if (productStr != null && !"".equals(productStr)) {
-                        // 推荐条目集合存入redis -- linchao
-                        List<MktCamItem> mktCamItemList = ( List<MktCamItem>) redisUtils.get("MKT_CAM_ITEM_LIST_" + ruleId.toString());
-                        if (mktCamItemList == null) {
-                            mktCamItemList = new ArrayList<>();
-                            String[] productArray = productStr.split("/");
-                            for (String str : productArray) {
-                                // 从redis中获取推荐条目
-                                MktCamItem mktCamItem = (MktCamItem) redisUtils.get("MKT_CAM_ITEM_" + str);
-                                if (mktCamItem == null) {
-                                    mktCamItem = mktCamItemMapper.selectByPrimaryKey(Long.valueOf(str));
-                                    if (mktCamItem == null) {
-                                        continue;
-                                    }
-                                    redisUtils.set("MKT_CAM_ITEM_" + mktCamItem.getMktCamItemId(), mktCamItem);
-                                }
-                                mktCamItemList.add(mktCamItem);
-                            }
-                            redisUtils.set("MKT_CAM_ITEM_LIST_" + ruleId.toString(), mktCamItemList);
-                        }
-                        for (MktCamItem mktCamItem : mktCamItemList) {
-                            Map<String, String> product = new HashMap<>();
-                            product.put("productId", mktCamItem.getItemId().toString());
-                            product.put("productCode", mktCamItem.getOfferCode());
-                            product.put("productName", mktCamItem.getOfferName());
-                            product.put("productType", mktCamItem.getItemType());
-                            product.put("productFlag", "1000");  //todo 销售品标签
-                            //销售品优先级
-                            if (mktCamItem.getPriority() != null) {
-                                product.put("productPriority", mktCamItem.getPriority().toString());
-                            } else {
-                                product.put("productPriority", "0");
-                            }
-                            productList.add(product);
-                        }
-                    }
-                    jsonObject.put("productList", productList);
-
-                    if (ruleResult.getResult() == null) {
-                        ruleResult.setResult(false);
-                    }
-
-                    timeJson.put("time7", System.currentTimeMillis() - begin);
-
-                    //获取协同渠道所有id
-                    String[] evtContactConfIdArray = evtContactConfIdStr.split("/");
-
-                    //判断需要返回的渠道
-                    Channel channelMessage = (Channel) redisUtils.get("MKT_ISALE_LABEL_" + params.get("channelCode"));
-                    if (channelMessage == null) {
-                        channelMessage = contactChannelMapper.selectByCode(params.get("channelCode"));
-                        redisUtils.set("MKT_ISALE_LABEL_" + params.get("channelCode"), channelMessage);
-                    }
-                    String channelCode = null;
-
-                    //新增加入reids -- linchao
-                    List<MktCamChlConfDO> mktCamChlConfDOS = (List<MktCamChlConfDO>) redisUtils.get("MKT_CAMCHL_CONF_LIST_" +  ruleId.toString());
-                    if (mktCamChlConfDOS == null) {
-                        mktCamChlConfDOS = new ArrayList<>();
-                        for (String str : evtContactConfIdArray) {
-                            MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(Long.valueOf(str));
-                            mktCamChlConfDOS.add(mktCamChlConfDO);
-                            redisUtils.set("MKT_CAMCHL_CONF_LIST_" + ruleId.toString(), mktCamChlConfDOS);
-                        }
-                    }
-                    for (MktCamChlConfDO mktCamChlConfDO : mktCamChlConfDOS) {
-                        if (mktCamChlConfDO.getContactChlId().equals(channelMessage.getContactChlId())) {
-                            channelCode = mktCamChlConfDO.getEvtContactConfId().toString();
-                            break;
-                        }
-                    }
-
-                    //初始化结果集
-                    List<Future<Map<String, Object>>> threadList = new ArrayList<>();
-                    //初始化线程池
-                    ExecutorService executorService = Executors.newCachedThreadPool();
-
-                    try {
-                        //遍历协同渠道
-                        if (channelCode != null) {
-                            Long evtContactConfId = Long.parseLong(channelCode);
-                            //提交线程
-                            //Future<Map<String, Object>> f = executorService.submit(new ChannelTask(evtContactConfId, productList, context, reqId));
-                            //将线程处理结果添加到结果集
-                            //threadList.add(f);
-                            Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId);
-                            taskChlList.add(channelMap);
-                        } else {
-                            for (String str : evtContactConfIdArray) {
-                                //协同渠道规则表id（自建表）
-                                Long evtContactConfId = Long.parseLong(str);
-                                //提交线程
-                                //Future<Map<String, Object>> f = executorService.submit(new ChannelTask(evtContactConfId, productList, context, reqId));
-                                //将线程处理结果添加到结果集
-                                //threadList.add(f);
-                                Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId);
-                                taskChlList.add(channelMap);
-                            }
-                        }
-                        //获取结果
-
-//                        for (Future<Map<String, Object>> future : threadList) {
-//                            if (!future.get().isEmpty()) {
-//                                taskChlList.add(future.get());
-//                            }
-//                        }
-
-                        timeJson.put("time8", System.currentTimeMillis() - begin);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        //发生异常关闭线程池
-                        executorService.shutdown();
-                    } finally {
-                        //关闭线程池
-                        executorService.shutdown();
-                    }
-                } else {
-
-                    ruleMap.put("msg", "规则引擎匹配未通过");
-
-                    jsonObject.put("hit", "false");
-                    jsonObject.put("msg", "规则引擎匹配未通过");
-                    esHitService.save(jsonObject, IndexList.RULE_MODULE);
-
-                    esHitService.save(timeJson, IndexList.TIME_RULE_MODULE, reqId + "0_" + ruleId + "_" + params.get("accNbr"));
-
-                    return Collections.EMPTY_MAP;
-                }
-
-                ruleMap.put("taskChlList", taskChlList);
-
-                timeJson.put("time9", System.currentTimeMillis() - begin);
-                esHitService.save(timeJson, IndexList.TIME_RULE_MODULE, reqId + "0_" + ruleId + "_" + params.get("accNbr"));
-
-                if (taskChlList.size() > 0) {
-                    jsonObject.put("hit", true);
-                } else {
-                    jsonObject.put("hit", false);
-                    jsonObject.put("msg", "渠道均未命中");
-                    esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                    return Collections.EMPTY_MAP;
-                }
-                esHitService.save(jsonObject, IndexList.RULE_MODULE);
-            } catch (Exception e) {
-                jsonObject.put("hit", false);
-                jsonObject.put("msg", "规则异常");
-                esHitService.save(jsonObject, IndexList.RULE_MODULE);
-            }
-
-            return ruleMap;
-        }
-
-    }
-
-    private Map<String, Object> ChannelTask(Long evtContactConfId, List<Map<String, String>> productList, DefaultContext<String, Object> context, String reqId) {
-
-        //策略配置id
-/*
-        private Long evtContactConfId;
-
-        private List<Map<String, String>> productList;
-        private DefaultContext<String, Object> context;
-        private String reqId;
-
-        public ChannelTask(Long evtContactConfId, List<Map<String, String>> productList, DefaultContext<String, Object> context, String reqId) {
-            this.evtContactConfId = evtContactConfId;
-            this.productList = productList;
-            this.context = context;
-            this.reqId = reqId;
-        }
-
-
-        @Override
         public Map<String, Object> call() {
-       */
-        Date now = new Date();
-
-        long begin = System.currentTimeMillis();
-        JSONObject timeJson = new JSONObject();
-        timeJson.put("time1", System.currentTimeMillis() - begin);
-
-        //初始化返回结果推荐信息
-        Map<String, Object> channelMap = new HashMap<>();
-
-        List<Map<String, Object>> taskChlAttrList = new ArrayList<>();
-        Map<String, Object> taskChlAttr;
-
-        //查询渠道属性，渠道生失效时间过滤
-        MktCamChlConfDetail mktCamChlConfDetail = null;
-        List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = new ArrayList<>();
-        if (mktCamChlConfDetail == null) {
-            // 从数据库中获取并拼成mktCamChlConfDetail对象存入redis
-            MktCamChlConfDO mktCamChlConfDO = new MktCamChlConfDO();
-            mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(evtContactConfId);
-            mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(evtContactConfId);
-            List<MktCamChlConfAttr> mktCamChlConfAttrList = new ArrayList<>();
-            mktCamChlConfDetail = BeanUtil.create(mktCamChlConfDO, new MktCamChlConfDetail());
-            for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
-                MktCamChlConfAttr mktCamChlConfAttrNew = BeanUtil.create(mktCamChlConfAttrDO, new MktCamChlConfAttr());
-                mktCamChlConfAttrList.add(mktCamChlConfAttrNew);
-            }
-            mktCamChlConfDetail.setMktCamChlConfAttrList(mktCamChlConfAttrList);
-            redisUtils.set("CHL_CONF_DETAIL_" + evtContactConfId, mktCamChlConfDetail);
+            Map<String, Object> activityTaskResultMap = camApiService.ActivityTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
+            return activityTaskResultMap;
         }
-
-        timeJson.put("time2", System.currentTimeMillis() - begin);
-
-        boolean checkTime = true;
-        for (MktCamChlConfAttr mktCamChlConfAttr : mktCamChlConfDetail.getMktCamChlConfAttrList()) {
-
-            //渠道属性数据返回给协同中心
-            if (mktCamChlConfAttr.getAttrId() == 500600010001L
-                    || mktCamChlConfAttr.getAttrId() == 500600010002L
-                    || mktCamChlConfAttr.getAttrId() == 500600010003L
-                    || mktCamChlConfAttr.getAttrId() == 500600010004L) {
-                taskChlAttr = new HashMap<>();
-                taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
-                taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
-                taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
-                taskChlAttrList.add(taskChlAttr);
-            }
-
-            if (mktCamChlConfAttr.getAttrId() == 500600010005L ||
-                    mktCamChlConfAttr.getAttrId() == 500600010011L) {
-                taskChlAttr = new HashMap<>();
-                taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
-                taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
-                taskChlAttr.put("attrValue", mktCamChlConfAttr.getAttrValue());
-                taskChlAttrList.add(taskChlAttr);
-            }
-
-            //判断渠道生失效时间
-            if (mktCamChlConfAttr.getAttrId() == 500600010006L) {
-                if (!now.after(new Date(Long.parseLong(mktCamChlConfAttr.getAttrValue())))) {
-                    checkTime = false;
-                } else {
-                    taskChlAttr = new HashMap<>();
-                    taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
-                    taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
-                    taskChlAttrList.add(taskChlAttr);
-                }
-            }
-            if (mktCamChlConfAttr.getAttrId() == 500600010007L) {
-                if (now.after(new Date(Long.parseLong(mktCamChlConfAttr.getAttrValue())))) {
-                    checkTime = false;
-                } else {
-                    taskChlAttr = new HashMap<>();
-                    taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
-                    taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
-                    taskChlAttrList.add(taskChlAttr);
-                }
-            }
-
-            //获取调查问卷ID
-            if (mktCamChlConfAttr.getAttrId() == 500600010008L) {
-                //调查问卷
-                channelMap.put("naireId", mktCamChlConfAttr.getAttrValue());
-            }
-
-            //获取接触账号/推送账号(如果有)
-            if (mktCamChlConfAttr.getAttrId() == 500600010012L) {
-                if (mktCamChlConfAttr.getAttrValue() != null && !"".equals(mktCamChlConfAttr.getAttrValue())) {
-                    if (context.containsKey(mktCamChlConfAttr.getAttrValue())) {
-                        channelMap.put("contactAccount", context.get(mktCamChlConfAttr.getAttrValue()));
-                    } else {
-                        //未查询到推送账号 就不命中
-                        return Collections.EMPTY_MAP;
-                    }
-                }
-            }
-        }
-        channelMap.put("taskChlAttrList", taskChlAttrList);
-
-        timeJson.put("time3", System.currentTimeMillis() - begin);
-
-        if (!checkTime) {
-            return Collections.EMPTY_MAP;
-        }
-
-        //渠道信息
-        if (mktCamChlConfDetail.getContactChlCode() == null) {
-            Channel channelMessage = contactChannelMapper.selectByPrimaryKey(mktCamChlConfDetail.getContactChlId());
-            mktCamChlConfDetail.setContactChlCode(channelMessage.getContactChlCode());
-            redisUtils.set("CHL_CONF_DETAIL_" + evtContactConfId, mktCamChlConfDetail);
-        }
-        channelMap.put("channelId", mktCamChlConfDetail.getContactChlCode());
-        //查询渠道id
-        channelMap.put("channelConfId", mktCamChlConfDetail.getContactChlId().toString()); //渠道id
-        channelMap.put("pushType", mktCamChlConfDetail.getPushType()); //推送类型
-
-        channelMap.put("pushTime", ""); // 推送时间
-
-        //返回结果中添加销售品信息
-        channelMap.put("productList", JSONArray.toJSON(productList));
-
-        //查询渠道子策略 这里老系统暂时不返回
-//              List<MktVerbalCondition> mktVerbalConditions = mktVerbalConditionMapper.findConditionListByVerbalId(evtContactConfId);
-
-        timeJson.put("time4", System.currentTimeMillis() - begin);
-
-        //查询话术
-        List<String> scriptLabelList = new ArrayList<>();
-        String contactScript = null;
-        String mktVerbalStr = null;
-        // 从redis获取的mktCamChlConfDetail中获取脚本
-        CamScript camScript = mktCamChlConfDetail.getCamScript();
-        if (camScript == null) {
-            // 数据库中获取脚本存入redis
-            camScript = mktCamScriptMapper.selectByConfId(evtContactConfId);
-            mktCamChlConfDetail.setCamScript(camScript);
-            redisUtils.set("CHL_CONF_DETAIL_" + evtContactConfId, mktCamChlConfDetail);
-        }
-
-        if (camScript != null) {
-            contactScript = camScript.getScriptDesc();
-            if (contactScript != null) {
-                scriptLabelList.addAll(subScript(contactScript));
-            }
-        } else {
-            //未查询到话术 不命中
-            return Collections.EMPTY_MAP;
-        }
-
-        //查询指引
-        // 从redis获取的mktCamChlConfDetail中获取指引
-        List<VerbalVO> verbalVOList = mktCamChlConfDetail.getVerbalVOList();
-        if (verbalVOList == null) {
-            List<MktVerbal> mktVerbals = mktVerbalMapper.findVerbalListByConfId(evtContactConfId);
-            verbalVOList = new ArrayList<>();
-            for (MktVerbal mktVerbal : mktVerbals) {
-                VerbalVO verbalVO = BeanUtil.create(mktVerbal, new VerbalVO());
-                verbalVOList.add(verbalVO);
-            }
-            mktCamChlConfDetail.setVerbalVOList(verbalVOList);
-            redisUtils.set("CHL_CONF_DETAIL_" + evtContactConfId, mktCamChlConfDetail);
-        }
-
-        if (verbalVOList.size() > 0) {
-            for (VerbalVO verbalVO : verbalVOList) {
-                //查询指引规则 todo
-//                        List<MktVerbalCondition> channelConditionList = mktVerbalConditionMapper.findChannelConditionListByVerbalId(mktVerbal.getVerbalId());
-
-                mktVerbalStr = verbalVOList.get(0).getScriptDesc();
-                if (mktVerbalStr != null) {
-                    scriptLabelList.addAll(subScript(mktVerbalStr));
-                }
-            }
-        }
-
-        timeJson.put("time5", System.currentTimeMillis() - begin);
-
-        if (scriptLabelList.size() > 0) {
-            for (String labelStr : scriptLabelList) {
-                if (context.containsKey(labelStr)) {
-                    if (contactScript != null) {
-                        contactScript = contactScript.replace("${" + labelStr + "}$", (String) context.get(labelStr));
-                    }
-                    if (mktVerbalStr != null) {
-                        mktVerbalStr = mktVerbalStr.replace("${" + labelStr + "}$", (String) context.get(labelStr));
-                    }
-                }
-            }
-        }
-
-        //判断脚本中有无未查询到的标签
-//            if (contactScript != null) {
-//                if (subScript(contactScript).size() > 0) {
-////                    System.out.println("推荐话术标签替换含有无值的标签");
-//                    return Collections.EMPTY_MAP;
-//                }
-//            }
-        //返回结果中添加脚本信息
-        channelMap.put("contactScript", contactScript == null ? "" : contactScript);
-        //痛痒点
-//            if (mktVerbalStr != null) {
-//                if (subScript(mktVerbalStr).size() > 0) {
-////                    System.out.println("推荐指引标签替换含有无值的标签");
-//                    return Collections.EMPTY_MAP;
-//                }
-//            }
-        channelMap.put("reason", mktVerbalStr == null ? "" : mktVerbalStr);
-        //展示列标签
-
-        timeJson.put("time6", System.currentTimeMillis() - begin);
-        timeJson.put("name", "渠道");
-        timeJson.put("reqId", reqId);
-        esHitService.save(timeJson, IndexList.TIME_CHL_MODULE);
-
-        return channelMap;
     }
 
 
@@ -2142,8 +998,7 @@ public class EventApiServiceImpl implements EventApiService {
         end.setTime(filterRule.getDayEnd());
         end.set(cal.get(Calendar.YEAR), cal.get(MONTH), cal.get(Calendar.DAY_OF_MONTH));
 
-        if ((cal.getTimeInMillis() - start.getTimeInMillis()) > 0
-                && (cal.getTimeInMillis() - end.getTimeInMillis()) < 0) {
+        if ((cal.getTimeInMillis() - start.getTimeInMillis()) > 0 && (cal.getTimeInMillis() - end.getTimeInMillis()) < 0) {
             result = true;
         }
 
@@ -2187,101 +1042,6 @@ public class EventApiServiceImpl implements EventApiService {
         }
     }
 
-    /**
-     * 规则引擎过滤：销售品标签过滤
-     * <p>
-     * 参数：已办理销售品、类型、过滤规则配置销售品
-     */
-    class PromCheckOperator extends Operator {
-        public PromCheckOperator(String name) {
-            this.name = name;
-        }
-
-        public Object executeInner(Object[] list) throws Exception {
-            boolean productCheck = false;
-            //获取用户已办理销售品
-            String productStr = (String) list[0];
-            //获取过滤类型
-            String type = list[1].toString();
-            //过滤规则配置的销售品
-            String[] checkProductArr = new String[list.length-2];
-            for (int i = 2; i < list.length; i++) {
-                checkProductArr[i-2] = list[i].toString();
-            }
-            //获取需要过滤的销售品
-            if (checkProductArr != null && checkProductArr.length > 0) {
-                //    String[] checkProductArr = checkProduct.split(",");
-                if (productStr != null && !"".equals(productStr)) {
-                    if ("7000".equals(type)) {  //存在于
-                        for (String product : checkProductArr) {
-                            int index = productStr.indexOf(product);
-                            if (index >= 0) {
-                                productCheck = true;
-                                break;
-                            }
-                        }
-                    } else if ("7100".equals(type)) { //不存在于
-                        boolean noExistCheck = true;
-                        for (String product : checkProductArr) {
-                            int index = productStr.indexOf(product);
-                            if (index >= 0) {
-                                productCheck = false;
-                                noExistCheck = false;
-                                //被过滤的销售品
-                                break;
-                            }
-                        }
-                        if (noExistCheck) {
-                            productCheck = true;
-                        }
-                    }
-                } else {
-                    //存在于校验
-                    if ("7100".equals(type)) {
-                        productCheck = true;
-                    } else if ("7000".equals(type)) {
-                        productCheck = false;
-                    }
-                }
-            }
-
-            return productCheck;
-
-        }
-    }
-
-
-    public static String cpcExpression(Label label, String type, String rightParam) {
-        StringBuilder express = new StringBuilder();
-
-        if ("7100".equals(type)) {
-            express.append("!");
-        }
-        express.append("((");
-        express.append(assLabel(label, type, rightParam));
-        express.append(")");
-
-        return express.toString();
-    }
-
-    public static String cpcExpression(String code, String type, String rightParam) {
-        StringBuilder express = new StringBuilder();
-        if ("PROM_LIST".equals(code)) {
-            express.append("(checkProm(").append(code).append(",").append(type).append(",").append(rightParam);
-            express.append("))");
-        } else {
-            if ("7100".equals(type)) {
-                express.append("!");
-            }
-            express.append("((");
-            express.append(assLabel(code, type, rightParam));
-            express.append(")");
-        }
-
-
-        return express.toString();
-    }
-
 
     public static String cpcLabel(Label label, String type, String rightParam) {
         StringBuilder express = new StringBuilder();
@@ -2292,82 +1052,6 @@ public class EventApiServiceImpl implements EventApiService {
         }
         express.append("(");
         express.append(assLabel(label, type, rightParam));
-        express.append(") {return true}");
-
-        return express.toString();
-    }
-
-    public static String assLabel(String code, String type, String rightParam) {
-        StringBuilder express = new StringBuilder();
-
-        switch (type) {
-            case "1000":
-                express.append("toNum(").append(code).append("))");
-                express.append(" > ");
-                express.append(rightParam);
-                break;
-            case "2000":
-                express.append("toNum(").append(code).append("))");
-                express.append(" < ");
-                express.append(rightParam);
-                break;
-            case "3000":
-                express.append(code).append(")");
-                express.append(" == ");
-                express.append("\"").append(rightParam).append("\"");
-                break;
-            case "4000":
-                express.append(code).append(")");
-                express.append(" != ");
-                express.append("\"").append(rightParam).append("\"");
-                break;
-            case "5000":
-                express.append("toNum(").append(code).append("))");
-                express.append(" >= ");
-                express.append(rightParam);
-                break;
-            case "6000":
-                express.append("toNum(").append(code).append("))");
-                express.append(" <= ");
-                express.append(rightParam);
-                break;
-            case "7100":    //不包含于
-            case "7000":    //包含于
-                express.append(code).append(")");
-                express.append(" in ");
-                String[] strArray = rightParam.split(",");
-                express.append("(");
-                for (int j = 0; j < strArray.length; j++) {
-                    express.append("\"").append(strArray[j]).append("\"");
-                    if (j != strArray.length - 1) {
-                        express.append(",");
-                    }
-                }
-                express.append(")");
-                break;
-            case "7200":  //区间于
-                express.append("toNum(").append(code).append("))");
-                String[] strArray2 = rightParam.split(",");
-                express.append(" >= ").append(strArray2[0]);
-                express.append(" && ").append("(toNum(");
-                express.append(code).append("))");
-                express.append(" <= ").append(strArray2[1]);
-                break;
-        }
-
-        return express.toString();
-    }
-
-
-    public static String cpcLabel(String code, String type, String rightParam) {
-        StringBuilder express = new StringBuilder();
-        express.append("if(");
-
-        if ("7100".equals(type)) {
-            express.append("!");
-        }
-        express.append("(");
-        express.append(assLabel(code, type, rightParam));
         express.append(") {return true}");
 
         return express.toString();
@@ -2459,10 +1143,7 @@ public class EventApiServiceImpl implements EventApiService {
                                         Map<String, Object> taskChlAttr = new HashMap<>();
 
                                         //渠道属性数据返回给协同中心
-                                        if (mktCamChlConfAttrDO.getAttrId() == 500600010001L
-                                                || mktCamChlConfAttrDO.getAttrId() == 500600010002L
-                                                || mktCamChlConfAttrDO.getAttrId() == 500600010003L
-                                                || mktCamChlConfAttrDO.getAttrId() == 500600010004L) {
+                                        if (mktCamChlConfAttrDO.getAttrId() == 500600010001L || mktCamChlConfAttrDO.getAttrId() == 500600010002L || mktCamChlConfAttrDO.getAttrId() == 500600010003L || mktCamChlConfAttrDO.getAttrId() == 500600010004L) {
                                             taskChlAttr = new HashMap<>();
                                             taskChlAttr.put("attrId", mktCamChlConfAttrDO.getAttrId().toString());
                                             taskChlAttr.put("attrKey", mktCamChlConfAttrDO.getAttrId().toString());
@@ -2473,8 +1154,7 @@ public class EventApiServiceImpl implements EventApiService {
                                             continue;
                                         }
 
-                                        if (mktCamChlConfAttrDO.getAttrId() == 500600010005L ||
-                                                mktCamChlConfAttrDO.getAttrId() == 500600010011L) {
+                                        if (mktCamChlConfAttrDO.getAttrId() == 500600010005L || mktCamChlConfAttrDO.getAttrId() == 500600010011L) {
                                             taskChlAttr = new HashMap<>();
                                             taskChlAttr.put("attrId", mktCamChlConfAttrDO.getAttrId().toString());
                                             taskChlAttr.put("attrKey", mktCamChlConfAttrDO.getAttrId().toString());
@@ -2771,12 +1451,20 @@ public class EventApiServiceImpl implements EventApiService {
             case "3000":
                 express.append(label.getInjectionLabelCode()).append(")");
                 express.append(" == ");
-                express.append("\"").append(rightParam).append("\"");
+                if (NumberUtils.isNumber(rightParam)) {
+                    express.append(rightParam);
+                } else {
+                    express.append("\"").append(rightParam).append("\"");
+                }
                 break;
             case "4000":
                 express.append(label.getInjectionLabelCode()).append(")");
                 express.append(" != ");
-                express.append("\"").append(rightParam).append("\"");
+                if (NumberUtils.isNumber(rightParam)) {
+                    express.append(rightParam);
+                } else {
+                    express.append("\"").append(rightParam).append("\"");
+                }
                 break;
             case "5000":
                 express.append("toNum(").append(label.getInjectionLabelCode()).append("))");
@@ -3014,31 +1702,31 @@ public class EventApiServiceImpl implements EventApiService {
      * @param channel
      * @return
      */
-    private List<Map<String, Object>> getResultByEvent(Long eventId, String lanId, String channel, String reqId, String accNbr, String c4) {
+    private List<Map<String, Object>> getResultByEvent(Long eventId, String lanId, String channel, String reqId, String accNbr, String c4, String custId) {
         List<Map<String, Object>> mktCampaginIdList = mktCamEvtRelMapper.listActivityByEventId(eventId);
         // 初始化线程
         ExecutorService fixThreadPool = Executors.newFixedThreadPool(maxPoolSize);
         List<Future<Map<String, Object>>> futureList = new ArrayList<>();
-        List<Map<String, Object>> mktCampaignMapList = new ArrayList<>();
+        List<Map<String, Object>> resultMapList = new ArrayList<>();
         try {
             for (Map<String, Object> act : mktCampaginIdList) {
-                Future<Map<String, Object>> future = fixThreadPool.submit(
-                        new ListResultByEventTask(lanId, channel, reqId, accNbr, act, c4));
+                Future<Map<String, Object>> future = fixThreadPool.submit(new ListResultByEventTask(lanId, channel, reqId, accNbr, act, c4, custId));
                 futureList.add(future);
             }
             if (futureList != null && futureList.size() > 0) {
                 for (Future<Map<String, Object>> future : futureList) {
-                    Map<String, Object> mktCampaignMap = future.get();
-                    if (mktCampaignMap != null && !mktCampaignMap.isEmpty()) {
-                        mktCampaignMapList.add(mktCampaignMap);
+                    Map<String, Object> resultMap = future.get();
+                    if (resultMap != null && !resultMap.isEmpty()) {
+                        resultMapList.add(resultMap);
                     }
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             log.error("[op:getResultByEvent] failed to getResultByEvent by eventId = {}, lanId = {}, channel = {}, Expection = ", eventId, lanId, channel, e);
+        } finally {
+            fixThreadPool.shutdown();
         }
-        return mktCampaignMapList;
+        return resultMapList;
     }
 
     /**
@@ -3051,20 +1739,26 @@ public class EventApiServiceImpl implements EventApiService {
         private String accNbr;
         private Map<String, Object> act;
         private String c4;
+        private String custId;
 
-        public ListResultByEventTask(String lanId, String channel, String reqId, String accNbr, Map<String, Object> act, String c4) {
+        public ListResultByEventTask(String lanId, String channel, String reqId, String accNbr, Map<String, Object> act, String c4, String custId) {
             this.lanId = lanId;
             this.channel = channel;
             this.reqId = reqId;
             this.accNbr = accNbr;
             this.act = act;
             this.c4 = c4;
+            this.custId = custId;
         }
 
         @Override
         public Map<String, Object> call() throws Exception {
 
-            Map<String, Object> mktCampaignMap = new HashMap<>();
+            Map<String, Object> resultMap = new ConcurrentHashMap<>();
+
+            Map<String, Object> mktCampaignMap = new ConcurrentHashMap<>();
+
+            Map<String, Object> mktCampaignCustMap = new ConcurrentHashMap<>();
 
             try {
                 Long mktCampaginId = (Long) act.get("mktCampaginId");
@@ -3077,36 +1771,98 @@ public class EventApiServiceImpl implements EventApiService {
                 esJson.put("activityCode", act.get("mktCampaginNbr"));
                 esJson.put("hitEntity", accNbr); //命中对象
 
-                List<String> strategyTypeList = new ArrayList<>();
-                strategyTypeList.add("1000");
-                strategyTypeList.add("2000");
-                strategyTypeList.add("5000");
-                //验证过滤规则时间,默认只查询5000类型的时间段过滤
-                List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(mktCampaginId, strategyTypeList);
-                for (FilterRule filterRule : filterRuleList) {
-                    if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
-                        //获取名单
-                        String userList = filterRule.getUserList();
-                        if (userList != null && !"".equals(userList)) {
-                            int index = userList.indexOf(accNbr);
-                            if (index >= 0) {
+
+                if ("QD000015".equals(channel)) {
+                    List<String> strategyTypeList = new ArrayList<>();
+                    strategyTypeList.add("1000");
+                    strategyTypeList.add("2000");
+                    strategyTypeList.add("5000");
+
+                    boolean iSRed = false;
+                    //验证过滤规则时间,默认只查询5000类型的时间段过滤
+                    List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(mktCampaginId, strategyTypeList);
+                    for (FilterRule filterRule : filterRuleList) {
+                        if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
+                            iSRed = true;
+                            break;
+                        }
+                    }
+                    JSONArray accArrayF = new JSONArray();
+                    if (iSRed) {
+                        JSONObject param = new JSONObject();
+                        //查询标识
+                        param.put("c3", lanId);
+                        param.put("queryId", custId);
+                        param.put("queryNum", "");
+                        param.put("queryFields", "");
+                        param.put("type", "4");
+
+                        Map<String, Object> dubboResult_F = yzServ.queryYz(JSON.toJSONString(param));
+                        if ("0".equals(dubboResult_F.get("result_code").toString())) {
+                            accArrayF = new JSONArray((List<Object>) dubboResult_F.get("msgbody"));
+                        }
+                    }
+
+                    for (FilterRule filterRule : filterRuleList) {
+                        if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
+                            //获取名单
+                            String userList = filterRule.getUserList();
+                            if (userList != null && !"".equals(userList)) {
+                                for (Object ob : accArrayF) {
+                                    int index = userList.indexOf(((Map) ob).get("ACC_NBR").toString());
+                                    if (index >= 0) {
+                                        esJson.put("hit", false);
+                                        esJson.put("msg", "红黑名单过滤规则验证被拦截");
+                                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                                        return Collections.EMPTY_MAP;
+                                    }
+                                }
+
+                            }
+                        } else if ("5000".equals(filterRule.getFilterType())) {
+                            //时间段的格式
+                            if (compareHourAndMinute(filterRule)) {
+                                log.info("过滤时间段验证被拦截");
                                 esJson.put("hit", false);
-                                esJson.put("msg", "红黑名单过滤规则验证被拦截");
+                                esJson.put("msg", "过滤时间段验证被拦截");
                                 esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
                                 return Collections.EMPTY_MAP;
                             }
                         }
-                    } else if ("5000".equals(filterRule.getFilterType())) {
-                        //时间段的格式
-                        if (compareHourAndMinute(filterRule)) {
-                            log.info("过滤时间段验证被拦截");
-                            esJson.put("hit", false);
-                            esJson.put("msg", "过滤时间段验证被拦截");
-                            esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                            return Collections.EMPTY_MAP;
+                    }
+                } else {
+                    List<String> strategyTypeList = new ArrayList<>();
+                    strategyTypeList.add("1000");
+                    strategyTypeList.add("2000");
+                    strategyTypeList.add("5000");
+                    //验证过滤规则时间,默认只查询5000类型的时间段过滤
+                    List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(mktCampaginId, strategyTypeList);
+                    for (FilterRule filterRule : filterRuleList) {
+                        if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
+                            //获取名单
+                            String userList = filterRule.getUserList();
+                            if (userList != null && !"".equals(userList)) {
+                                int index = userList.indexOf(accNbr);
+                                if (index >= 0) {
+                                    esJson.put("hit", false);
+                                    esJson.put("msg", "红黑名单过滤规则验证被拦截");
+                                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                                    return Collections.EMPTY_MAP;
+                                }
+                            }
+                        } else if ("5000".equals(filterRule.getFilterType())) {
+                            //时间段的格式
+                            if (compareHourAndMinute(filterRule)) {
+                                log.info("过滤时间段验证被拦截");
+                                esJson.put("hit", false);
+                                esJson.put("msg", "过滤时间段验证被拦截");
+                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                                return Collections.EMPTY_MAP;
+                            }
                         }
                     }
                 }
+
 
                 //查询活动信息
                 MktCampaignDO mktCampaign = (MktCampaignDO) redisUtils.get("MKT_CAMPAIGN_" + mktCampaginId);
@@ -3139,7 +1895,6 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
 
-
                 // 判断活动类型
                 if (!StatusCode.REAL_TIME_CAMPAIGN.getStatusCode().equals(mktCampaign.getTiggerType())) {
                     esJson.put("hit", false);
@@ -3169,7 +1924,7 @@ public class EventApiServiceImpl implements EventApiService {
                     esJsonStrategy.put("strategyConfId", mktStrategyConf.getMktStrategyConfId());
                     esJsonStrategy.put("strategyConfName", mktStrategyConf.getMktStrategyConfName());
 
-                    Map<String, Object> strategyMap = new HashMap<>();
+                    Map<String, Object> strategyMap = new ConcurrentHashMap<>();
                     //验证策略生效时间
                     if (!(now.after(mktStrategyConf.getBeginTime()) && now.before(mktStrategyConf.getEndTime()))) {
                         //若当前时间在策略生效时间外
@@ -3177,7 +1932,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                         esJson.put("hit", false);
                         esJson.put("msg", "策略未命中");
-                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE,reqId + mktCampaginId + accNbr);
+                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
 
                         esJsonStrategy.put("hit", false);
                         esJsonStrategy.put("msg", "当前时间不在策略生效时间内");
@@ -3189,12 +1944,10 @@ public class EventApiServiceImpl implements EventApiService {
                         String[] strArrayCity = mktStrategyConf.getAreaId().split("/");
                         boolean areaCheck = true;
                         for (String str : strArrayCity) {
-                            if (c4 != null) {
-                                if (c4.equals(str)) {
-                                    areaCheck = false;
-                                    break;
-                                }
-                            }else if (lanId != null) {
+                            if (c4 != null && c4.equals(str)) {
+                                areaCheck = false;
+                                break;
+                            } else if (lanId != null) {
                                 if (lanId.equals(str)) {
                                     areaCheck = false;
                                     break;
@@ -3205,7 +1958,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                                 esJson.put("hit", false);
                                 esJson.put("msg", "策略未命中");
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,reqId + mktCampaginId + accNbr);
+                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
 
                                 strategyMap.put("msg", "适用地市获取异常");
                                 esJsonStrategy.put("hit", "false");
@@ -3217,7 +1970,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                             esJson.put("hit", false);
                             esJson.put("msg", "策略未命中");
-                            esHitService.save(esJson, IndexList.ACTIVITY_MODULE,reqId + mktCampaginId + accNbr);
+                            esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
 
                             strategyMap.put("msg", "适用地市不符");
                             esJsonStrategy.put("hit", "false");
@@ -3231,7 +1984,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                         esJson.put("hit", false);
                         esJson.put("msg", "策略未命中");
-                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE,reqId + mktCampaginId + accNbr);
+                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
 
                         strategyMap.put("msg", "适用地市数据异常");
                         esJsonStrategy.put("hit", "false");
@@ -3262,7 +2015,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                                 esJson.put("hit", false);
                                 esJson.put("msg", "策略未命中");
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,reqId + mktCampaginId + accNbr);
+                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
 
                                 strategyMap.put("msg", "适用渠道获取异常");
                                 esJsonStrategy.put("hit", "false");
@@ -3275,7 +2028,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                             esJson.put("hit", false);
                             esJson.put("msg", "策略未命中");
-                            esHitService.save(esJson, IndexList.ACTIVITY_MODULE,reqId + mktCampaginId + accNbr);
+                            esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
 
                             strategyMap.put("msg", "适用渠道不符");
                             esJsonStrategy.put("hit", "false");
@@ -3289,7 +2042,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                         esJson.put("hit", false);
                         esJson.put("msg", "策略未命中");
-                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE,reqId + mktCampaginId + accNbr);
+                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
 
                         strategyMap.put("msg", "适用渠道数据异常");
                         esJsonStrategy.put("hit", "false");
@@ -3299,168 +2052,422 @@ public class EventApiServiceImpl implements EventApiService {
                     }
 
                     // 获取规则
-//                List<Map<String, Object>> ruleMapList = new ArrayList<>();
-//                List<MktStrategyConfRuleDO> mktStrategyConfRuleList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(strategyConfId);
-//                for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleList) {
-//                    Map<String, Object> ruleMap = new HashMap<>();
-//                    String evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId();
-//                    String[] evtContactConfIdArray = evtContactConfIds.split("/");
-//                    // 获取推送渠道
-//                    List<Map<String, Object>> evtContactConfMapList = new ArrayList<>();
-//                    if (evtContactConfIdArray != null && !"".equals(evtContactConfIdArray[0])) {
-//                        for (String evtContactConfId : evtContactConfIdArray) {
-//                            Map<String, Object> evtContactConfMap = new HashMap<>();
-//                            //查询渠道属性，渠道生失效时间过滤
-//                            MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) redisUtils.get("MktCamChlConfDetail_" + evtContactConfId);
-//                            MktCamChlConfDO mktCamChlConfDO = new MktCamChlConfDO();
-//                            List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = new ArrayList<>();
-//                            if (mktCamChlConfDetail != null) {
-//                                BeanUtil.copy(mktCamChlConfDetail, mktCamChlConfDO);
-//                                for (MktCamChlConfAttr mktCamChlConfAttr : mktCamChlConfDetail.getMktCamChlConfAttrList()) {
-//                                    MktCamChlConfAttrDO mktCamChlConfAttrDO = BeanUtil.create(mktCamChlConfAttr, new MktCamChlConfAttrDO());
-//                                    mktCamChlConfAttrDOList.add(mktCamChlConfAttrDO);
-//                                }
-//                            } else {
-//                                // 从数据库中获取并拼成ktCamChlConfDetail对象存入redis
-//                                mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(Long.valueOf(evtContactConfId));
-//                                mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(Long.valueOf(evtContactConfId));
-//                                List<MktCamChlConfAttr> mktCamChlConfAttrList = new ArrayList<>();
-//                                mktCamChlConfDetail = BeanUtil.create(mktCamChlConfDO, new MktCamChlConfDetail());
-//                                for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
-//                                    MktCamChlConfAttr mktCamChlConfAttrNew = BeanUtil.create(mktCamChlConfAttrDO, new MktCamChlConfAttr());
-//                                    mktCamChlConfAttrList.add(mktCamChlConfAttrNew);
-//                                }
-//                                mktCamChlConfDetail.setMktCamChlConfAttrList(mktCamChlConfAttrList);
-//                                redisUtils.set("MktCamChlConfDetail_" + evtContactConfId, mktCamChlConfDetail);
-//                            }
-//                            List<Map<String, Object>> taskChlAttrMapList = new ArrayList<>();
-//
-//                            //todo  这里要只查询出这个属性
-//                            for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
-//                                //判断渠道生失效时间
-//                                if (mktCamChlConfAttrDO.getAttrId() == 500600010006L) {
-//                                    if (!now.after(new Date(Long.parseLong(mktCamChlConfAttrDO.getAttrValue())))) {
-//                                        log.info("渠道生失效时间");
-//                                        continue;
-//                                    } else {
-//                                        Map<String, Object> taskChlAttrMap = new HashMap<>();
-//                                        taskChlAttrMap.put("attrId", mktCamChlConfAttrDO.getAttrId().toString());
-//                                        taskChlAttrMap.put("attrKey", mktCamChlConfAttrDO.getAttrId().toString());
-//                                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                                        taskChlAttrMap.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttrDO.getAttrValue())));
-//                                        taskChlAttrMapList.add(taskChlAttrMap);
-//                                    }
-//                                }
-//                            }
-//                            // 判断推送渠道不为空
-//                            if (taskChlAttrMapList != null && taskChlAttrMapList.size() > 0) {
-//                                evtContactConfMap.put("evtContactConfId", evtContactConfId);
-//                                evtContactConfMapList.add(evtContactConfMap);
-//                            }
-//                        }
-//                    }
+                    List<Map<String, Object>> ruleMapList = new ArrayList<>();
+                    List<MktStrategyConfRuleDO> mktStrategyConfRuleList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(mktStrategyConf.getMktStrategyConfId());
+                    for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleList) {
+                        Map<String, Object> ruleMap = new ConcurrentHashMap<>();
+                        String evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId();
 //                    if (evtContactConfMapList != null && evtContactConfMapList.size() > 0) {
-//                        ruleMap.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
+                        ruleMap.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
+                        ruleMap.put("ruleName", mktStrategyConfRuleDO.getMktStrategyConfRuleName());
+                        ruleMap.put("tarGrpId", mktStrategyConfRuleDO.getTarGrpId());
+                        ruleMap.put("productId", mktStrategyConfRuleDO.getProductId());
+                        ruleMap.put("evtContactConfId", mktStrategyConfRuleDO.getEvtContactConfId());
 //                        ruleMap.put("evtContactConfMapList", evtContactConfMapList);
-//                        ruleMapList.add(ruleMap);
+                        ruleMapList.add(ruleMap);
 //                    }
-//                }
-//                if (ruleMapList != null && ruleMapList.size() > 0) {
-//                strategyMap.put("strategyConfId", mktStrategyConf.getMktStrategyConfId());
-//                    strategyMap.put("ruleMapList", ruleMapList);
-//                strategyMapList.add(strategyMap);
-//                }
-
-                    strategyMap.put("strategyConfId", mktStrategyConf.getMktStrategyConfId());
-                    strategyMap.put("strategyConfName", mktStrategyConf.getMktStrategyConfName());
-                    strategyMapList.add(strategyMap);
-
+                    }
+                    if (ruleMapList != null && ruleMapList.size() > 0) {
+                        strategyMap.put("strategyConfId", mktStrategyConf.getMktStrategyConfId());
+                        strategyMap.put("strategyConfName", mktStrategyConf.getMktStrategyConfName());
+                        strategyMap.put("ruleMapList", ruleMapList);
+                        strategyMapList.add(strategyMap);
+                    }
                 }
+
+                List<String> mktCamCodeList = (List<String>) redisUtils.get("MKT_CAM_API_CODE_KEY");
+                if (mktCamCodeList == null) {
+                    List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("MKT_CAM_API_CODE");
+                    mktCamCodeList = new ArrayList<String>();
+                    for (SysParams sysParams : sysParamsList) {
+                        mktCamCodeList.add(sysParams.getParamValue());
+                    }
+                    redisUtils.set("MKT_CAM_API_CODE_KEY", mktCamCodeList);
+                }
+
                 if (strategyMapList != null && strategyMapList.size() > 0) {
-                    mktCampaignMap.put("mktCampaginId", mktCampaginId);
-                    mktCampaignMap.put("levelConfig", act.get("levelConfig"));
-                    mktCampaignMap.put("campaignSeq", act.get("campaignSeq"));
-                    mktCampaignMap.put("strategyMapList", strategyMapList);
+                    if (mktCamCodeList.contains(mktCampaign.getMktCampaignId().toString())) {
+                        mktCampaignCustMap.put("mktCampaginId", mktCampaginId);
+                        mktCampaignCustMap.put("levelConfig", act.get("levelConfig"));
+                        mktCampaignCustMap.put("campaignSeq", act.get("campaignSeq"));
+                        mktCampaignCustMap.put("strategyMapList", strategyMapList);
+                    } else {
+                        mktCampaignMap.put("mktCampaginId", mktCampaginId);
+                        mktCampaignMap.put("levelConfig", act.get("levelConfig"));
+                        mktCampaignMap.put("campaignSeq", act.get("campaignSeq"));
+                        mktCampaignMap.put("strategyMapList", strategyMapList);
+                    }
                 }
+                resultMap.put("mktCampaignMap", mktCampaignMap);
+                resultMap.put("mktCampaignCustMap", mktCampaignCustMap);
 
             } catch (Exception e) {
                 e.printStackTrace();
                 log.info("预校验出错");
             }
 
-            return mktCampaignMap;
+            return resultMap;
         }
     }
-
-    /**
-     * 异步执行当个标签比较结果
-     */
-    class labelResultThread implements Runnable{
-        private JSONObject esJson;
-        private List<Map<String, String>> labelMapList;
-        private DefaultContext<String, Object> context;
-        private SysParams sysParams;
-        private ExpressRunner runner;
-        private  List<LabelResult> labelResultList;
-
-        public labelResultThread(JSONObject esJson, List<Map<String, String>> labelMapList, DefaultContext<String, Object> context, SysParams sysParams, ExpressRunner runner, List<LabelResult> labelResultList) {
-            this.esJson = esJson;
-            this.labelMapList = labelMapList;
-            this.context = context;
-            this.sysParams = sysParams;
-            this.runner = runner;
-            this.labelResultList = labelResultList;
-        }
-
-        @Override
-        public void run() {
-            for(Map<String, String> labelMap : labelMapList) {
-                String type = labelMap.get("operType");
-                //保存标签的es log
-                LabelResult lr = new LabelResult();
-                lr.setOperType(type);
-                lr.setLabelCode(labelMap.get("code"));
-                lr.setLabelName(labelMap.get("name"));
-                lr.setRightOperand(labelMap.get("rightParam"));
-                lr.setClassName(labelMap.get("className"));
-
-                //判断标签实例是否足够
-                if (context.containsKey(labelMap.get("code"))) {
-                    lr.setRightParam(context.get(labelMap.get("code")).toString());
-                    if (sysParams != null && "1".equals(sysParams.getParamValue())) {
-                        try {
-                            RuleResult ruleResultOne = runner.executeRule(cpcLabel(labelMap.get("code"), type, labelMap.get("rightParam")), context, true, true);
-                            if (null != ruleResultOne.getResult()) {
-                                lr.setResult((Boolean) ruleResultOne.getResult());
-                            } else {
-                                lr.setResult(false);
-                            }
-                        } catch (Exception e) {
-                            lr.setResult(false);
-                        }
-                    }
-                } else {
-                    lr.setRightParam("无值");
-                    lr.setResult(false);
-                }
-                labelResultList.add(lr);
-            }
-            esJson.put("labelResultList", JSONArray.toJSON(labelResultList));
-            esHitService.save(esJson, IndexList.Label_MODULE);  //储存标签比较结果
-        }
-    }
-
 
     /**
      * 添加内置的标签并赋值
+     *
      * @param map
      */
-    private void setInlayLabel(Map<String,String> map) {
+    private void setInlayLabel(Map<String, String> map) {
         Calendar calendar = Calendar.getInstance();
-        map.put("CPCP_IN_EVENT_YEAR",String.valueOf(calendar.get(Calendar.YEAR)));
-        map.put("CPCP_IN_EVENT_MONTH",String.valueOf(calendar.get(Calendar.MONTH) + 1));
-        map.put("CPCP_IN_EVENT_DAY",String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)));
+        map.put("CPCP_IN_EVENT_YEAR", String.valueOf(calendar.get(Calendar.YEAR)));
+        map.put("CPCP_IN_EVENT_MONTH", String.valueOf(calendar.get(Calendar.MONTH) + 1));
+        map.put("CPCP_IN_EVENT_DAY", String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)));
     }
 
+
+    // 处理资产级标签和销售品级标签
+    private DefaultContext<String, Object> getAssetAndPromLabel(Map<String, String> mktAllLabel, Map<String, String> params, Map<String, String> privateParams, DefaultContext<String, Object> context, JSONObject esJson, Map<String, String> labelItems) {
+        String promIntegId = "";
+        //资产级标签
+        DefaultContext<String, Object> contextNew = new DefaultContext<String, Object>();
+        if (mktAllLabel.get("assetLabels") != null && !"".equals(mktAllLabel.get("assetLabels"))) {
+            JSONObject assParam = new JSONObject();
+            assParam.put("queryNum", privateParams.get("accNbr"));
+            assParam.put("c3", params.get("lanId"));
+            assParam.put("queryId", privateParams.get("integrationId"));
+            assParam.put("type", "1");
+            assParam.put("queryFields", mktAllLabel.get("assetLabels"));
+
+            //因子查询-----------------------------------------------------
+            Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(assParam));
+            if ("0".equals(dubboResult.get("result_code").toString())) {
+                JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
+                //ES log 标签实例
+                //拼接规则引擎上下文
+                for (Map.Entry<String, Object> entry : body.entrySet()) {
+                    //添加到上下文
+                    contextNew.put(entry.getKey(), entry.getValue());
+
+                    if ("PROM_INTEG_ID".equals(entry.getKey())) {
+                        promIntegId = entry.getValue().toString();
+                    }
+                }
+            } else {
+                log.info("查询资产标签失败");
+                esJson.put("hit", "false");
+                esJson.put("msg", "查询资产标签失败");
+                //esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
+                esHitService.save(esJson, IndexList.EVENT_MODULE, params.get("reqId"));
+                return null;
+            }
+        }
+
+        contextNew.putAll(labelItems);   //添加事件采集项中作为标签使用的实例
+        contextNew.putAll(context);      // 客户级标签
+        contextNew.put("integrationId", privateParams.get("integrationId"));
+        contextNew.put("accNbr", privateParams.get("accNbr"));
+        return contextNew;
+    }
+
+
+    class getListMapLabelTask implements Callable<DefaultContext<String, Object>> {
+
+        private Object o;
+        private Map<String, String> mktAllLabel;
+        private Map<String, String> map;
+        private DefaultContext<String, Object> context;
+        private JSONObject esJson;
+        Map<String, String> labelItems;
+
+        public getListMapLabelTask(Object o, Map<String, String> mktAllLabel, Map<String, String> map, DefaultContext<String, Object> context, JSONObject esJson, Map<String, String> labelItems) {
+            this.o = o;
+            this.mktAllLabel = mktAllLabel;
+            this.map = map;
+            this.context = context;
+            this.esJson = esJson;
+            this.labelItems = labelItems;
+        }
+
+        @Override
+        public DefaultContext<String, Object> call() throws Exception {
+
+            DefaultContext<String, Object> resultMap = new DefaultContext<>();
+            Map<String, String> privateParams = new ConcurrentHashMap<>();
+            privateParams.put("isCust", "0"); //是客户级
+            privateParams.put("accNbr", ((Map) o).get("ACC_NBR").toString());
+            privateParams.put("integrationId", ((Map) o).get("ASSET_INTEG_ID").toString());
+            privateParams.put("custId", map.get("custId"));
+
+            Map<String, Object> assetAndPromLabel = getAssetAndPromLabel(mktAllLabel, map, privateParams, context, esJson, labelItems);
+            if (assetAndPromLabel != null) {
+                resultMap.putAll(assetAndPromLabel);
+            }
+            return resultMap;
+        }
+    }
+
+
+    /**
+     * 获取客户清单 Task
+     */
+    class getCustListTask implements Callable<Map<String, Object>> {
+
+        private List<String> campaignList;
+        private Long eventId;
+        private String landId;
+        private String custId;
+        private Map<String, String> map;
+
+        public getCustListTask(List<String> campaignList, Long eventId, String landId, String custId, Map<String, String> map) {
+            this.campaignList = campaignList;
+            this.eventId = eventId;
+            this.landId = landId;
+            this.custId = custId;
+            this.map = map;
+        }
+
+        @Override
+        public Map<String, Object> call() throws Exception {
+            Map<String, Object> resultMap = new HashMap<>();
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try {
+
+                List<MktCamEvtRel> resultByEvent = mktCamEvtRelMapper.qryBycontactEvtId(eventId);
+
+                //判断有没有客户级活动
+                Boolean hasCust = false;  //是否有客户级
+                for (MktCamEvtRel mktCamEvtRel : resultByEvent) {
+                    if (campaignList.contains(mktCamEvtRel.getMktCampaignId().toString()) && !hasCust && mktCamEvtRel.getLevelConfig() == 1) {
+                        hasCust = true;
+                    }
+                }
+                List<String> custRuleIdList = new ArrayList<>();
+                List<String> assetRuleIdList = new ArrayList<>();
+                List<Map<String, Object>> mapList = mktCamEvtRelMapper.selectRuleIdsByEventId(eventId);
+                for (Map<String, Object> ruleMap : mapList) {
+                    if (campaignList.contains(ruleMap.get("campaignId").toString())) {
+                        if ((Integer) ruleMap.get("levelConfig") == 1) {  // 客户级
+                            custRuleIdList.add(ruleMap.get("ruleId").toString());
+                        } else {
+                            assetRuleIdList.add(ruleMap.get("ruleId").toString());  // 资产级
+                        }
+                    }
+                }
+
+                JSONObject param = new JSONObject();
+                //查询标识
+                param.put("c3", landId);
+                param.put("queryId", custId);
+                param.put("queryNum", "");
+                param.put("queryFields", "");
+                param.put("type", "4");
+
+                Map<String, Object> custParamMap = new HashMap<>();
+                Map<String, Object> assetParamMap = new HashMap<>();
+                JSONArray accArray = new JSONArray();
+                List<String> custIdList = new ArrayList<>();
+                List<String> assetIdList = new ArrayList<>();
+                if (custId != null && !"".equals(custId) && hasCust) {
+                    Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
+                    if ("0".equals(dubboResult.get("result_code").toString())) {
+                        accArray = new JSONArray((List<Object>) dubboResult.get("msgbody"));
+                        for (Object o : accArray) {
+                            custIdList.add(((Map) o).get("ASSET_INTEG_ID").toString());
+                        }
+                    }
+                } else {
+                    assetIdList.add(map.get("integrationId"));
+                }
+                custParamMap.put("assetList", custIdList);
+                custParamMap.put("ruleList", custRuleIdList);
+
+                assetParamMap.put("assetList", assetIdList);
+                assetParamMap.put("ruleList", assetRuleIdList);
+
+                Map<String, Object> paramMap = new HashMap<>();
+                paramMap.put("cust", custParamMap);
+                paramMap.put("asset", assetParamMap);
+                paramMap.put("campaignList", campaignList);
+
+                // 获取本地网的中文名
+                String landName = AreaNameEnum.getNameByLandId(Long.valueOf(landId));
+
+                Map<String, Object> paramResultMap = esService.queryCustomer4Event(paramMap);
+
+                List<Map<String, Object>> resultList = new ArrayList<>();
+                // 解析
+                if ("200".equals(paramResultMap.get("resultCode"))) {
+                    List<Map<String, Object>> resultMapList = (List<Map<String, Object>>) paramResultMap.get("data");
+                    if (resultMapList != null && resultMapList.size() > 0) {
+                        for (Map<String, Object> resultMap1 : resultMapList) {
+                            Map<String, Object> result = new HashMap();
+                            List<Map<String, Object>> taskChlList = (List<Map<String, Object>>) ((Map) resultMap1.get("CPC_VALUE")).get("taskChlList");
+                            int count = 0;  // 统计符合渠道的个数
+                            List<Map<String, Object>> taskChlListNew = new ArrayList<>();
+                            for (Map<String, Object> taskChlMap : taskChlList) {
+                                if (map.get("channelCode").equals(taskChlMap.get("channelId"))) {
+                                    count++;
+                                    taskChlListNew.add(taskChlMap);
+                                }
+                            }
+                            if (count > 0) {
+                                ((Map) resultMap1.get("CPC_VALUE")).put("taskChlList", taskChlListNew);
+                            }
+
+                            // 销售品过滤
+                            String custProdFilter = (String) redisUtils.get("CUST_PROD_FILTER");
+                            //String custProdFilter = null;
+                            if (custProdFilter == null) {
+                                List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("CUST_PROD_FILTER");
+                                if (sysParamsList != null && sysParamsList.size() > 0) {
+                                    custProdFilter = sysParamsList.get(0).getParamValue();
+                                    redisUtils.set("CUST_PROD_FILTER", custProdFilter);
+                                }
+                            }
+
+                            if (custProdFilter != null && "2".equals(custProdFilter)) {
+                                List<Map<String, Object>> taskMapNewList = new ArrayList<>();
+
+                                Map<String, Object> taskMap = (Map<String, Object>) resultMap1.get("CPC_VALUE");
+
+                                List<Map<String, Object>> taskChlNewList = (List<Map<String, Object>>) ((Map) resultMap1.get("CPC_VALUE")).get("taskChlList");
+
+                                String integrationId = (String) taskMap.get("integrationId");
+
+                                // 判断该活动是否配置了销售品过滤
+                                Integer mktCampaignId = (Integer) taskMap.get("activityId");
+
+                                List<FilterRule> filterRuleList = (List<FilterRule>) redisUtils.get("FILTER_RULE_" + mktCampaignId);
+                                if (filterRuleList == null) {
+                                    filterRuleList = filterRuleMapper.selectFilterRuleList(Long.valueOf(mktCampaignId));
+                                    redisUtils.set("FILTER_RULE_" + mktCampaignId, filterRuleList);
+                                }
+
+                                boolean prodConfig = false;
+                                boolean pordFilter = true; // true:未包含要过滤的销售品， false：包含要过滤的销售品
+                                for (FilterRule filterRule : filterRuleList) {
+                                    if ("3000".equals(filterRule.getFilterType()) || "3000" == filterRule.getFilterType()) {
+                                        prodConfig = true;
+                                    }
+                                    if (prodConfig) {
+                                        ResponseResult<AssetDto> assetDtoResponseResult = ctgCacheAssetService.queryCachedAssetDetailByIntegId(integrationId, landName);
+                                        AssetDto assetDto = assetDtoResponseResult.getData();
+                                        List<String> prodStrList = new ArrayList<>();
+                                        if (assetDto != null) {
+                                            List<AssetPromDto> assetPromDtoList = assetDto.getAssetPromDtoList();
+                                            for (AssetPromDto assetPromDto : assetPromDtoList) {
+                                                prodStrList.add(assetPromDto.getSelectablePromNum());
+                                            }
+                                        }
+                                        // 获取过滤规则中的销售品集合
+                                        List<String> codeList = ChannelUtil.StringToList(filterRule.getChooseProduct());
+                                        //存在于校验
+                                        if ("1000".equals(filterRule.getOperator())) {  //  1000 - 存在
+                                            int sum = 0;
+                                            for (String productCode : codeList) {
+                                                // 包含销售品过滤
+                                                if (prodStrList.contains(productCode)) {
+                                                    sum++;
+                                                    break;
+                                                }
+                                            }
+                                            // 若有销售品存在跳过，若没有，直接过滤
+                                            if (sum > 0) {
+                                                continue;
+                                            } else {
+                                                pordFilter = false;
+                                            }
+                                        } else if ("2000".equals(filterRule.getOperator())) {      //  2000 - 不存在
+                                            int cou = 0;
+                                            for (String productCode : codeList) {
+                                                // 不包含销售品过滤
+                                                if (prodStrList.contains(productCode)) {
+                                                    cou++;
+                                                    break;
+                                                }
+                                            }
+                                            // 若有销售品存在，这直接过滤
+                                            if (cou > 0) {
+                                                pordFilter = false;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    prodConfig = false;
+                                }
+                                if (pordFilter) {
+                                    taskMapNewList.addAll(taskChlNewList);
+
+                                }
+                                ((Map) resultMap1.get("CPC_VALUE")).put("taskChlList", taskMapNewList);
+                            }
+
+                            List<Map> taskChlCountList = (List<Map>) ((Map) resultMap1.get("CPC_VALUE")).get("taskChlList");
+                            if (taskChlCountList != null && taskChlCountList.size() > 0) {
+                                result.putAll((Map) resultMap1.get("CPC_VALUE"));
+                                result.put("orderISI", map.get("reqId"));
+                                result.put("skipCheck", "0");
+                                result.put("orderPriority", "0");
+                                Long activityId = Long.valueOf(resultMap1.get("ACTIVITY_ID").toString());
+                                MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(activityId);
+                                if (mktCampaignDO != null) {
+                                    if ("1000".equals(mktCampaignDO.getMktCampaignType())) {
+                                        result.put("activityType", "0"); //营销
+                                    } else if ("5000".equals(mktCampaignDO.getMktCampaignType())) {
+                                        result.put("activityType", "1"); //服务
+                                    } else if ("6000".equals(mktCampaignDO.getMktCampaignType())) {
+                                        result.put("activityType", "2"); //随销
+                                    } else {
+                                        result.put("activityType", "0"); //活动类型 默认营销
+                                    }
+
+                                    result.put("activityStartTime", simpleDateFormat.format(mktCampaignDO.getPlanBeginTime()));
+                                    result.put("activityEndTime", simpleDateFormat.format(mktCampaignDO.getPlanEndTime()));
+                                } else {
+                                    result.put("activityType", "");
+                                    result.put("activityStartTime", "");
+                                    result.put("activityEndTime", "");
+                                }
+                                resultList.add(result);
+                            }
+                        }
+                    }
+                }
+                resultMap.put("ruleList", resultList);
+
+/*
+                resultMap.put("CPCResultMsg", "success");
+                resultMap.put("custId", custId);
+                resultMap.put("taskList", resultList);
+                resultMap.put("CPCResultCode", "1");
+                resultMap.put("reqId", map.get("reqId"));
+*/
+            } catch (Exception e) {
+                e.printStackTrace();
+                log.error("Exception = " + e);
+            }
+            return resultMap;
+        }
+    }
+
+
+    // 计算剩余需要的流量
+    private String getCpcpNeedFlow(String cpcpUsedFlow, String cpcpLeftFlow) {
+        // 获取当天
+        int currentDay = DateUtil.getCurrentDay();
+        // 当前月的天数
+        int lastDay = DateUtil.getLastDayForCurrentMonth();
+        // 已用的流量数
+        double cpcpUsedFlowDouble = Double.valueOf(cpcpUsedFlow.replace("GB", ""));
+        // 剩余的流量数
+        double cpcpLeftFlowDouble = Double.valueOf(cpcpLeftFlow.replace("GB", ""));
+        // 这个月到currentDay过的日均用量
+        double userAvg = cpcpUsedFlowDouble / currentDay;
+        // 需要流量
+        double needFlow = 0;
+        if (userAvg * (lastDay - currentDay) > cpcpLeftFlowDouble) {
+            needFlow = (userAvg * (lastDay - currentDay) - cpcpLeftFlowDouble ) * 1024;
+        }
+        DecimalFormat df = new DecimalFormat("#.##");
+        return String.valueOf(df.format(needFlow));
+    }
 
 }

@@ -73,7 +73,6 @@
             <groupId>com.ctzj.smt.bss</groupId>
             <artifactId>bss-centralized-authenticate</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.zjhcsoft.session</groupId>
             <artifactId>spring-session</artifactId>
@@ -116,6 +115,13 @@
             <artifactId>biz</artifactId>
         </dependency>
 
+        <!-- 引入协同中心dubbo服务jar包 -->
+        <dependency>
+            <groupId>com.ctzj.smt.bss</groupId>
+            <artifactId>bss-cooperate-service-api</artifactId>
+        </dependency>
+
+
         <!-- 自己的dubbo-server对内jar  测试用 -->
         <dependency>
             <groupId>com.zjtelcom.cpct.dubbo</groupId>
@@ -127,6 +133,12 @@
             <groupId>com.zjhcsoft.eagle</groupId>
             <artifactId>dubbo-eagle-service</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+
 
 
     </dependencies>
@@ -151,6 +163,12 @@
             <id>pst</id>
             <properties>
                 <spring.profiles.active>pst</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>msit</id>
+            <properties>
+                <spring.profiles.active>msit</spring.profiles.active>
             </properties>
         </profile>
         <profile>
@@ -202,6 +220,21 @@
                 <version>1.4.3.RELEASE</version>
                 <configuration>
                     <mainClass>com.zjtelcom.cpct.Application</mainClass>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <nonFilteredFileExtensions>
+                        <nonFilteredFileExtension>woff</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>eot</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>svg</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>xls</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>xlsx</nonFilteredFileExtension>
+                    </nonFilteredFileExtensions>
                 </configuration>
             </plugin>
 

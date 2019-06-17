@@ -59,16 +59,15 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
             if(camScript ==null){
                 camScript = camScriptMapper.selectByConfId(contactConfId);
             }
-            // 从数据库中查询不到
-            if(camScript == null){
-                if(scriptDesc != null){
-                    newScript.setScriptDesc(scriptDesc);
-                }
-            } else{
-                newScript.setScriptDesc(camScript.getScriptDesc());
-            }
         }
-
+        // 从数据库中查询不到
+        if(camScript == null){
+            if(scriptDesc != null){
+                newScript.setScriptDesc(scriptDesc);
+            }
+        } else{
+            newScript.setScriptDesc(camScript.getScriptDesc());
+        }
         newScript.setMktCampaignId(0L);
         newScript.setEvtContactConfId(newConfId);
         newScript.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());

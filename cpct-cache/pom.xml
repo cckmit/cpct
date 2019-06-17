@@ -62,6 +62,31 @@
             <version>1.9.3</version>
         </dependency>
 
+        <!-- ctgmq -->
+        <dependency>
+            <groupId>com.ctg.itrdc.mq</groupId>
+            <artifactId>ctg-mq-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ctg.mq</groupId>
+            <artifactId>ctgmq-rocketmq-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ctg.mq</groupId>
+            <artifactId>ctgmq-rocketmq-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ctg.mq</groupId>
+            <artifactId>ctgmq-rocketmq-remoting</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ctg.mq</groupId>
+            <artifactId>ctgmq-rocketmq-srvutil</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ctg.mq</groupId>
+            <artifactId>ctgmq-rocketmq-tools</artifactId>
+        </dependency>
     </dependencies>
 
 

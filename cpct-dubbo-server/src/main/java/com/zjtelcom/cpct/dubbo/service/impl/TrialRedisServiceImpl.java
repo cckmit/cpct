@@ -58,8 +58,8 @@ public class TrialRedisServiceImpl implements TrialRedisService {
             return  result;
         }
         operation.setStatusCd(status);
+        operation.setStatusDate(new Date());
         if (status.equals(TrialStatus.SAMPEL_SUCCESS.getValue())){
-            operation.setUpdateDate(new Date());
             operation.setRemark("抽样试算成功");
         }else if (status.equals(TrialStatus.ALL_SAMPEL_SUCCESS.getValue())){
             operation.setRemark("全量试算成功");
@@ -80,7 +80,9 @@ public class TrialRedisServiceImpl implements TrialRedisService {
         try {
             result.put("resultCode",CODE_SUCCESS);
             result.put("resultMsg","查询成功");
-            if (key.contains("ISSURE_")){
+            if (key.contains("AREA_RULE_")){
+                result.put("result",redisUtils.hgetAll(key));
+            }else if (key.contains("ISSURE_")){
                 if (redisUtils.hgetAllRedisList(key) == null){
                     String keyString = key.substring(7,key.length());
                     String[] keyList = keyString.split("_");

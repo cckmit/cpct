@@ -90,7 +90,55 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     private FilterRuleMapper filterRuleMapper;
     @Autowired
     private MktCamEvtRelMapper evtRelMapper;
+    @Autowired
+    private OrganizationMapper organizationMapper;
 
+
+    @Override
+    public Map<String, Object> conditionSwitch(Long conditionId, String type, String value) {
+        Map<String,Object> result = new HashMap<>();
+        TarGrpCondition condition = tarGrpConditionMapper.selectByPrimaryKey(conditionId);
+        if (condition==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","条件不存在");
+            return result;
+        }
+        TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(condition.getTarGrpId());
+        if (tarGrp==null){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "分群不存在");
+            return result;
+        }
+        if (type.equals("1000")){
+            if (condition.getConditionText()!=null && condition.getConditionText().equals("1000")){
+                condition.setConditionText("2000");
+                condition.setRemark("2000");
+            }else {
+                condition.setConditionText("1000");
+            }
+            tarGrpConditionMapper.updateByPrimaryKey(condition);
+        }
+        if (type.equals("2000")){
+            if (condition.getRemark()!=null && condition.getRemark().equals("1000")){
+                condition.setRemark("2000");
+            }else if (condition.getConditionText().equals("2000")){
+                condition.setRemark("2000");
+            }else {
+                condition.setRemark("1000");
+            }
+            tarGrpConditionMapper.updateByPrimaryKey(condition);
+        }
+        TarGrpDetail detail = (TarGrpDetail)redisUtils.get("TAR_GRP_"+condition.getTarGrpId());
+        List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(condition.getTarGrpId());
+        if (detail!=null){
+            detail = BeanUtil.create(tarGrp,new TarGrpDetail());
+            detail.setTarGrpConditions(conditionList);
+            redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),detail);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","修改成功");
+        return result;
+    }
 
     @Override
     public Map<String, Object> labelListByEventId(Long eventId) {
@@ -309,6 +357,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         List<TarGrpCondition> conditionAdd = new ArrayList<>();
         for (TarGrpCondition conditionDO : conditionDOList){
             TarGrpCondition con = BeanUtil.create(conditionDO,new TarGrpCondition());
+            con.setRemark(con.getRemark()==null ? "2000" : con.getRemark());
+            con.setConditionText(con.getConditionText()==null ?"2000" : con.getConditionText());
             if (needDeleted.equals("0")){
                 con.setStatusCd("1100");
             }
@@ -373,11 +423,13 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                         maps.put("resultMsg", "请选择下拉框运算类型");
                         return maps;
                     }
-                    if (tarGrpCondition.getAreaIdList()!=null){
-                        area2RedisThread(tarGrp, tarGrpCondition);
-                    }
+//                    if (tarGrpCondition.getAreaIdList()!=null){
+//                        area2RedisThread(tarGrp, tarGrpCondition);
+//                    }
                     tarGrpCondition.setConditionId(null);
                     tarGrpCondition.setRootFlag(0L);
+                    tarGrpCondition.setRemark(tarGrpCondition.getRemark()==null ? "2000" : tarGrpCondition.getRemark());
+                    tarGrpCondition.setConditionText(tarGrpCondition.getConditionText()==null ?"2000" : tarGrpCondition.getConditionText());
                     tarGrpCondition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
                     tarGrpCondition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
                     tarGrpCondition.setTarGrpId(tarGrp.getTarGrpId());
@@ -408,42 +460,42 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         return maps;
     }
 
-    private void area2RedisThread(TarGrp tarGrp, final TarGrpCondition tarGrpCondition) {
-        final Long targrpId = tarGrp.getTarGrpId();
-        List<OrgTreeDO> sysAreaList = new ArrayList<>();
-        for (Integer id : tarGrpCondition.getAreaIdList()){
-            OrgTreeDO orgTreeDO = orgTreeMapper.selectByAreaId(id);
-            if (orgTreeDO!=null){
-                sysAreaList.add(orgTreeDO);
-            }
-        }
-        redisUtils.set("AREA_RULE_ENTITY_"+targrpId,sysAreaList);
-        new Thread() {
-            public void run() {
-                areaList2Redis(targrpId,tarGrpCondition.getAreaIdList());
-            }
-        }.start();
-    }
+//    private void area2RedisThread(TarGrp tarGrp, final TarGrpCondition tarGrpCondition) {
+//        final Long targrpId = tarGrp.getTarGrpId();
+//        List<OrgTreeDO> sysAreaList = new ArrayList<>();
+//        for (Integer id : tarGrpCondition.getAreaIdList()){
+//            OrgTreeDO orgTreeDO = orgTreeMapper.selectByAreaId(id);
+//            if (orgTreeDO!=null){
+//                sysAreaList.add(orgTreeDO);
+//            }
+//        }
+//        redisUtils.set("AREA_RULE_ENTITY_"+targrpId,sysAreaList);
+//        new Thread() {
+//            public void run() {
+//                areaList2Redis(targrpId,tarGrpCondition.getAreaIdList());
+//            }
+//        }.start();
+//    }
 
 
-    public void areaList2Redis(Long targrpId,List<Integer> areaIdList){
+    public void areaList2Redis(Long targrpId,List<Long> areaIdList){
         List<String> resultList = new ArrayList<>();
-        List<OrgTreeDO> sysAreaList = new ArrayList<>();
-        for (Integer id : areaIdList){
+        List<Organization> sysAreaList = new ArrayList<>();
+        for (Long id : areaIdList){
             areaList(id,resultList,sysAreaList);
         }
         redisUtils.set("AREA_RULE_"+targrpId,resultList.toArray(new String[resultList.size()]));
     }
 
-    public List<String> areaList(Integer parentId,List<String> resultList,List<OrgTreeDO> areas){
-        List<OrgTreeDO> sysAreaList = orgTreeMapper.selectBySumAreaId(parentId);
+    public List<String> areaList(Long parentId,List<String> resultList,List<Organization> areas){
+        List<Organization> sysAreaList = organizationMapper.selectByParentId(parentId);
         if (sysAreaList.isEmpty()){
             return resultList;
         }
-        for (OrgTreeDO area : sysAreaList){
-            resultList.add(area.getAreaName());
+        for (Organization area : sysAreaList){
+            resultList.add(area.getOrgId4a().toString());
             areas.add(area);
-            areaList(area.getAreaId(),resultList,areas);
+            areaList(area.getOrgId(),resultList,areas);
         }
         return resultList;
     }
@@ -586,11 +638,13 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                         return maps;
                     }
                     TarGrpCondition condition = BeanUtil.create(tarGrpCondition,new TarGrpCondition());
-                    if (tarGrpCondition.getAreaIdList()!=null){
-                        area2RedisThread(tarGrp, tarGrpCondition);
-                    }
+//                    if (tarGrpCondition.getAreaIdList()!=null){
+//                        area2RedisThread(tarGrp, tarGrpCondition);
+//                    }
                     condition.setLeftParamType(LeftParamType.LABEL.getErrorCode());//左参为注智标签
                     condition.setRightParamType(RightParamType.FIX_VALUE.getErrorCode());//右参为固定值
+                    condition.setRemark(tarGrpCondition.getRemark()==null ? "2000" : tarGrpCondition.getRemark());
+                    condition.setConditionText(tarGrpCondition.getConditionText()==null ?"2000" : tarGrpCondition.getConditionText());
                     condition.setRootFlag(0L);
                     condition.setTarGrpId(tarGrp.getTarGrpId());
                     condition.setUpdateDate(DateUtil.getCurrentTime());
@@ -699,6 +753,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         List<TarGrpCondition> listTarGrpCondition = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
         List<TarGrpConditionVO> grpConditionList = new ArrayList<>();
         List<TarGrpVO> tarGrpVOS = new ArrayList<>();//传回前端展示信息
+        boolean  check = false;
         for (TarGrpCondition tarGrpCondition : listTarGrpCondition) {
             List<OperatorDetail> operatorList = new ArrayList<>();
             TarGrpConditionVO tarGrpConditionVO = new TarGrpConditionVO();
@@ -708,10 +763,30 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             if (label==null){
                 continue;
             }
+            if (label.getRightOperand()!=null && label.getRightOperand().equals("1")){
+                check = true;
+            }
             List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(label.getInjectionLabelId());
             List<LabelValueVO> valueList = ChannelUtil.valueList2VOList(labelValues);
+            //枚举标签替换中文名
+            if (valueList!=null && !valueList.isEmpty() ){
+                List<String> rightParam = new ArrayList<>();
+                String[] paramList = tarGrpConditionVO.getRightParam().split(",");
+                for (String value : paramList){
+                    for (LabelValueVO valueVO : valueList){
+                        if (valueVO.getLabelValue().equals(value)){
+                            rightParam.add(valueVO.getValueName());
+                        }
+                    }
+                }
+                tarGrpConditionVO.setRightParamName(ChannelUtil.list2String(rightParam,","));
+            }else {
+                tarGrpConditionVO.setRightParamName(tarGrpCondition.getRightParam());
+            }
+
             tarGrpConditionVO.setLeftParamName(label.getInjectionLabelName());
             tarGrpConditionVO.setLabelCode(label.getInjectionLabelCode());
+            tarGrpConditionVO.setLabelDataType(label.getLabelDataType());
             //将操作符转为中文
             if (tarGrpConditionVO.getOperType()!=null && !tarGrpConditionVO.getOperType().equals("")){
                 Operator op = Operator.getOperator(Integer.parseInt(tarGrpConditionVO.getOperType()));
@@ -763,6 +838,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("listTarGrpCondition", grpConditionList);
         maps.put("conditionList",listTarGrpCondition);
+        maps.put("labelCheck",check);
         return maps;
     }
 

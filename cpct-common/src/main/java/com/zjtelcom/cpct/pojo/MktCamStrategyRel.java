@@ -12,6 +12,10 @@ public class MktCamStrategyRel implements Serializable {
 
     private Long strategyId;
 
+    private Long mktStrategyConfId;
+
+    private Long mktStrategyConfRuleId;
+
     private String statusCd;
 
     private Date statusDate;
@@ -29,6 +33,22 @@ public class MktCamStrategyRel implements Serializable {
     private Long lanId;
 
     private String actType;
+
+    public Long getMktStrategyConfId() {
+        return mktStrategyConfId;
+    }
+
+    public void setMktStrategyConfId(Long mktStrategyConfId) {
+        this.mktStrategyConfId = mktStrategyConfId;
+    }
+
+    public Long getMktStrategyConfRuleId() {
+        return mktStrategyConfRuleId;
+    }
+
+    public void setMktStrategyConfRuleId(Long mktStrategyConfRuleId) {
+        this.mktStrategyConfRuleId = mktStrategyConfRuleId;
+    }
 
     public Long getCampStrRelId() {
         return campStrRelId;

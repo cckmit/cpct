@@ -1,11 +1,7 @@
 package com.zjtelcom.cpct.dubbo.service.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.*;
-import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
@@ -16,27 +12,13 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
 import com.zjtelcom.cpct.dao.synchronize.SynchronizeRecordMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
-import com.zjtelcom.cpct.domain.Rule;
-import com.zjtelcom.cpct.domain.RuleDetail;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
-import com.zjtelcom.cpct.domain.org.OrgTreeDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
-import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
-import com.zjtelcom.cpct.domain.strategy.MktStrategyFilterRuleRelDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.campaign.*;
-import com.zjtelcom.cpct.dto.channel.VerbalAddVO;
-import com.zjtelcom.cpct.dto.channel.VerbalConditionAddVO;
-import com.zjtelcom.cpct.dto.channel.VerbalConditionVO;
-import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.filter.FilterRuleModel;
-import com.zjtelcom.cpct.dto.grouping.TarGrp;
-import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
-import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
-import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRuleRel;
-import com.zjtelcom.cpct.dto.synchronize.SynchronizeRecord;
 import com.zjtelcom.cpct.dubbo.model.*;
 import com.zjtelcom.cpct.dubbo.model.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dubbo.model.MktCamChlResult;
@@ -217,6 +199,14 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
             mktCampaignResp.setStatusCdValue(paramMap.
                     get(ParamKeyEnum.STATUS_CD.getParamKey() + mktCampaignDO.getStatusCd()));
 
+            // 获取过滤规则集合
+            ArrayList<FilterRuleModel> filterRuleModels = filterRuleMapper.selectFilterRuleByStrategyIdArrayList(mktCampaignId);
+            for (FilterRuleModel filterRuleModel:filterRuleModels) {
+                logger.info("filterRuleModel = " + filterRuleModel.getLabelName());
+            }
+
+            mktCampaignResp.setFilterRuleModelList(filterRuleModels);
+
             // 获取活动关联策略集合
             ArrayList<MktStrategyConfResp> mktStrategyConfRespList = new ArrayList<>();
             List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByMktCampaignId(mktCampaignId);
@@ -249,11 +239,6 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
         //更具Id查询策略配置信息
         MktStrategyConfDO mktStrategyConfDO = mktStrategyConfMapper.selectByPrimaryKey(mktStrategyConfId);
         CopyPropertiesUtil.copyBean2Bean(mktStrategyConfResp, mktStrategyConfDO);
-
-        // 获取过滤规则集合
-        ArrayList<FilterRuleModel> filterRuleModels = filterRuleMapper.selectFilterRuleByStrategyIdArrayList(mktStrategyConfId);
-//        ArrayList<FilterRuleModel> filterRuleModelArrayList = new ArrayList<>(filterRuleModels);
-        mktStrategyConfResp.setFilterRuleModelList(filterRuleModels);
 
         //查询与策略匹配的所有规则
         ArrayList<MktStrConfRuleResp> mktStrConfRuleRespList = new ArrayList<>();

@@ -122,7 +122,7 @@ public class PpmProductController extends BaseController  {
         }catch (Exception e){
             logger.error("[op:PpmProductController] fail to getProductListByName",e);
             result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg"," fail to addCamScript");
+            result.put("resultMsg"," fail to getProductListByName");
             return result;
         }
         return result;

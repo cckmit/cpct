@@ -23,7 +23,8 @@ import java.util.List;
 @Service
 public class RedisUtils_es {
 
-    private String redisIp="134.108.0.61";
+
+    private String redisIp="134.108.0.61,134.108.0.62,134.108.0.63";
 
     private Integer redisPort=41801;
 
@@ -49,6 +50,36 @@ public class RedisUtils_es {
         return result;
     }
 
+
+    /**
+     * hash存储Redis
+     * @param key
+     * @param field
+     * @param value
+     * @return
+     */
+    public boolean hset(final String key, String field, Object value) {
+        boolean result = false;
+        CtgJedisPool ctgJedisPool = initCatch();
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                jedis.hset(key, field, serialize(value));
+                result = true;
+            } catch (Exception e) {
+                System.out.println("REDIShset*********" + key);
+                e.printStackTrace();
+            } finally {
+                jedis.close();
+            }
+            ctgJedisPool.close();
+        } catch (Exception e) {
+            System.out.println("REDIShset2*********" + key);
+            e.printStackTrace();
+        }
+        return result;
+    }
 
     /**
      * 更换集团redis方法
@@ -218,6 +249,34 @@ public class RedisUtils_es {
     }
 
     /**
+     * 更换集团redis方法
+     *
+     * @param key
+     * @return
+     */
+    public void remove(final String key) {
+
+        CtgJedisPool ctgJedisPool = initCatch();
+        boolean result = false;
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                if (jedis.exists(key)){
+                    jedis.del(key);
+                }
+            } catch (Throwable je) {
+                je.printStackTrace();
+            } finally {
+                jedis.close();
+                ctgJedisPool.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * 哈希 添加
      *
      * @param key
@@ -352,9 +411,9 @@ public class RedisUtils_es {
             hostAndPortList.add(host);
         }
         GenericObjectPoolConfig poolConfig = new JedisPoolConfig();
-        poolConfig.setMaxIdle(5); //最大空闲连接数
-        poolConfig.setMaxTotal(10); // 最大连接数（空闲+使用中），不超过应用线程数，建议为应用线程数的一半
-        poolConfig.setMinIdle(5); //保持的最小空闲连接数
+        poolConfig.setMaxIdle(0); //最大空闲连接数
+        poolConfig.setMaxTotal(5); // 最大连接数（空闲+使用中），不超过应用线程数，建议为应用线程数的一半
+        poolConfig.setMinIdle(1); //保持的最小空闲连接数
         poolConfig.setMaxWaitMillis(3000);
 
         CtgJedisPoolConfig config = new CtgJedisPoolConfig(hostAndPortList);

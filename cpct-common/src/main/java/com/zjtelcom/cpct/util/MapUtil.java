@@ -11,14 +11,21 @@ public class MapUtil {
         return  0;
     }
 
-
-    public static String getString(Object obj){
+    public static Long getLongNum(Object obj){
         try {
-            return  String.valueOf(obj);
+            return  Long.valueOf(String.valueOf(obj));
         }catch (Throwable e){
 
         }
-        return  "";
+        return  0L;
+    }
+
+    public static String getString(Object obj){
+        try {
+            return obj.toString();
+        }catch (Throwable e){
+            return  "";
+        }
     }
 
 }

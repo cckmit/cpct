@@ -36,6 +36,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -75,8 +76,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
     @Autowired
     private SynFilterRuleService synFilterRuleService;
 
-    @Value("${sync.value}")
-    private String value;
+
 
     /**
      * 过滤规则列表（含分页）
@@ -122,21 +122,16 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
      */
     @Transactional(readOnly = false)
     @Override
-    public Map<String, Object> importUserList(MultipartFile multipartFile, Long ruleId) throws IOException {
+    public Map<String, Object> importUserList(MultipartFile multipartFile, Long ruleId, String ruleName, String filterType) throws IOException {
         Map<String, Object> maps = new HashMap<>();
-        FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(ruleId);
-        if (filterRule==null){
-            maps.put("resultCode", CODE_FAIL);
-            maps.put("resultMsg","过滤规则不存在");
-            return maps;
-        }
+
         InputStream inputStream = multipartFile.getInputStream();
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
         Sheet sheet = wb.getSheetAt(0);
         Integer rowNums = sheet.getLastRowNum() + 1;
         List<String> resultList = new ArrayList<>();
         String key = "USER_LIST_"+ChannelUtil.getRandomStr(5);
-        for (int i = 0; i < rowNums; i++) {
+        for (int i = 1; i < rowNums; i++) {
             Row row = sheet.getRow(i);
             if (row.getLastCellNum()>=2){
                 maps.put("resultCode", CODE_FAIL);
@@ -146,7 +141,9 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
 //            for (int j = 0; j < row.getLastCellNum(); j++) {
             Cell cell = row.getCell(0);
             String cellValue = ChannelUtil.getCellValue(cell).toString();
-            resultList.add(cellValue);
+            if (!cellValue.equals("null")){
+                resultList.add(cellValue);
+            }
 //            }
 //            UserList userListT = userListMapper.getUserList(userList);
 //            if (userListT != null) {
@@ -171,10 +168,34 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
 //            System.out.println(redisUtils.hmGet(key, "userList"));
 
         }
-        filterRule.setUserList(ChannelUtil.StringList2String(resultList));
-        filterRuleMapper.updateByPrimaryKey(filterRule);
+        FilterRule filterRules = new FilterRule();
+        if(ruleId == null) {
+            filterRules.setRuleName(ruleName);
+            filterRules.setFilterType(filterType);
+            filterRules.setCreateDate(new Date());
+            filterRules.setCreateStaff(UserUtil.loginId());
+            filterRules.setUpdateDate(new Date());
+            filterRules.setUpdateStaff(UserUtil.loginId());
+            filterRules.setStatusDate(new Date());
+            filterRules.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+            filterRules.setUserList(ChannelUtil.StringList2String(resultList));
+            filterRuleMapper.insert(filterRules);
+        }else {
+            filterRules = filterRuleMapper.selectByPrimaryKey(ruleId);
+            if (filterRules==null){
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg","过滤规则不存在");
+                return maps;
+            }
+            filterRules.setRuleName(ruleName);
+            filterRules.setFilterType(filterType);
+            filterRules.setUpdateDate(new Date());
+            filterRules.setUpdateStaff(UserUtil.loginId());
+            filterRules.setUserList(ChannelUtil.StringList2String(resultList));
+            filterRuleMapper.updateByPrimaryKey(filterRules);
+        }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
-        maps.put("resultMsg", filterRule.getUserList());
+        maps.put("resultMsg", filterRules.getUserList());
         maps.put("key",key);
         return maps;
     }
@@ -238,6 +259,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         if(null == filterRuleT) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", "过滤规则不存在");
+            return map;
         }
         FilterRuleVO vo = BeanUtil.create(filterRuleT,new FilterRuleVO());
         if (filterRuleT.getChooseProduct()!=null && !filterRuleT.getChooseProduct().equals("")){
@@ -407,5 +429,88 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         return map;
     }
 
+    /**
+     * 导入销售品
+     */
+    @Override
+    public Map<String,Object> importOfferList(MultipartFile multipartFile, Long ruleId, String ruleName, String filterType, String operator, Long[] rightListId)throws IOException {
+        Map<String,Object> maps = new HashMap<>();
+        if(ruleName == null || operator == null || filterType == null) {
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg", "过滤规则信息不完善");
+        }
+        List<String> resultList = new ArrayList<>();
+        InputStream inputStream = multipartFile.getInputStream();
+        XSSFWorkbook wb = new XSSFWorkbook(inputStream);
+        Sheet sheet = wb.getSheetAt(0);
+        int total = sheet.getLastRowNum() + rightListId.length;
+        if(total > 100) {
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg", "销售品数量超过上限100个");
+            return maps;
+        }
+        for(int i=0;i<rightListId.length;i++) {
+            Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(rightListId[i].toString()));
+            if (offer==null){
+                continue;
+            }
+            resultList.add(offer.getOfferNbr());
+        }
+        Integer rowNums = sheet.getLastRowNum() + 1;
+        for (int i = 1; i < rowNums; i++) {
+            Row row = sheet.getRow(i);
+            if (row.getLastCellNum() >= 2) {
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg", "请返回检查模板格式");
+                return maps;
+            }
+            Cell cell = row.getCell(0);
+            String cellValue = ChannelUtil.getCellValue(cell).toString();
+            if (!cellValue.equals("null")){
+                List<Offer> offer = offerMapper.selectByCode(cellValue);
+                if (offer!=null && !offer.isEmpty()) {
+                    if(!resultList.contains(cellValue)) {
+                        resultList.add(cellValue);
+                    }
+                }else {
+                    maps.put("resultCode", CODE_FAIL);
+                    maps.put("resultMsg", cellValue + "销售品不存在");
+                    return maps;
+                }
+            }
+        }
+        FilterRule filterRules = new FilterRule();
+        if(ruleId == null) {
+            filterRules.setRuleName(ruleName);
+            filterRules.setFilterType(filterType);
+            filterRules.setLabelCode("PROM_LIST");
+            filterRules.setChooseProduct(ChannelUtil.StringList2String(resultList));
+            filterRules.setOperator(operator);
+            filterRules.setCreateDate(new Date());
+            filterRules.setCreateStaff(UserUtil.loginId());
+            filterRules.setUpdateDate(new Date());
+            filterRules.setUpdateStaff(UserUtil.loginId());
+            filterRules.setStatusDate(new Date());
+            filterRules.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+            filterRuleMapper.insert(filterRules);
+        }else {
+            filterRules = filterRuleMapper.selectByPrimaryKey(ruleId);
+            if (filterRules==null){
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg","过滤规则不存在");
+                return maps;
+            }
+            filterRules.setRuleName(ruleName);
+            filterRules.setFilterType(filterType);
+            filterRules.setChooseProduct(ChannelUtil.StringList2String(resultList));
+            filterRules.setOperator(operator);
+            filterRules.setUpdateDate(new Date());
+            filterRules.setUpdateStaff(UserUtil.loginId());
+            filterRuleMapper.updateByPrimaryKey(filterRules);
+        }
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", filterRules.getChooseProduct());
+        return maps;
+    }
 
 }

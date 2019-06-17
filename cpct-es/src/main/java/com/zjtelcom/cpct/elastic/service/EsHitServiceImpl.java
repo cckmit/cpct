@@ -32,7 +32,7 @@ public class EsHitServiceImpl implements EsHitService {
 
     protected Logger logger = LoggerFactory.getLogger(EsHitServiceImpl.class);
 
-    @Autowired
+    @Autowired(required = false)
     private TransportClient client;
 
     /**
@@ -189,7 +189,7 @@ public class EsHitServiceImpl implements EsHitService {
             String hitEntity = null;
 
             id = Long.valueOf(activity.get("activityId").toString());
-            name = activity.get("activityName").toString();
+            name = activity.get("activityName")==null ? "" : activity.get("activityName").toString();
             booleanResult = activity.get("hit") == null ? "false" : activity.get("hit").toString();
             hitEntity = activity.get("hitEntity") == null ? "未知对象" : activity.get("hitEntity").toString();
             if (booleanResult.equals("false")) {
@@ -208,25 +208,25 @@ public class EsHitServiceImpl implements EsHitService {
             List<Map<String, Object>> strategyList = hitsToMapList4More(strategyHits);
 
             List<CampaignInfoTree> stratygyResult = new ArrayList<>();
-            for (Map<String, Object> strategy : strategyList) {
-                CampaignInfoTree strategyInfo = new CampaignInfoTree();
-
-                id = Long.valueOf(strategy.get("strategyConfId").toString());
-                name = strategy.get("strategyConfName") == null ? "" : strategy.get("strategyConfName").toString();
-                booleanResult = strategy.get("hit") == null ? "false" : strategy.get("hit").toString();
-                hitEntity = strategy.get("hitEntity") == null ? "未知对象" : strategy.get("hitEntity").toString();
-                if (booleanResult.equals("false")) {
-                    booleanResult = booleanResult + (strategy.get("msg") == null ? "(未知原因)" : "(" + strategy.get("msg") + ")");
-                }
-                strategyInfo.setId(id);
-                strategyInfo.setName(name);
-                strategyInfo.setResult(booleanResult);
-                strategyInfo.setHitEntity(hitEntity);
-                strategyInfo.setType("strategy");
+//            for (Map<String, Object> strategy : strategyList) {
+//                CampaignInfoTree strategyInfo = new CampaignInfoTree();
+//
+//                id = Long.valueOf(strategy.get("strategyConfId").toString());
+//                name = strategy.get("strategyConfName") == null ? "" : strategy.get("strategyConfName").toString();
+//                booleanResult = strategy.get("hit") == null ? "false" : strategy.get("hit").toString();
+//                hitEntity = strategy.get("hitEntity") == null ? "未知对象" : strategy.get("hitEntity").toString();
+//                if (booleanResult.equals("false")) {
+//                    booleanResult = booleanResult + (strategy.get("msg") == null ? "(未知原因)" : "(" + strategy.get("msg") + ")");
+//                }
+//                strategyInfo.setId(id);
+//                strategyInfo.setName(name);
+//                strategyInfo.setResult(booleanResult);
+//                strategyInfo.setHitEntity(hitEntity);
+//                strategyInfo.setType("strategy");
 
 
                 //查询规则信息
-                SearchHits ruleHits = searchRuleByParam(param, strategyInfo.getId().toString(), hitEntity);
+                SearchHits ruleHits = searchRuleByParam(param, activityInfo.getId().toString(), hitEntity);
                 List<Map<String, Object>> ruleList = hitsToMapList4More(ruleHits);
 
                 List<CampaignInfoTree> ruleResult = new ArrayList<>();
@@ -254,10 +254,10 @@ public class EsHitServiceImpl implements EsHitService {
                     ruleResult.add(ruleInfo);
 
                 }
-                strategyInfo.setChildren(ruleResult);
-                stratygyResult.add(strategyInfo);
-            }
-            activityInfo.setChildren(stratygyResult);
+//                strategyInfo.setChildren(ruleResult);
+//                stratygyResult.add(strategyInfo);
+//            }
+            activityInfo.setChildren(ruleResult);
             activityResult.add(activityInfo);
         }
 
@@ -470,7 +470,7 @@ public class EsHitServiceImpl implements EsHitService {
     private BoolQueryBuilder getBoolQueryBuilderByStrategyId(String isi, String strategyId, String hitEntity) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.
-                        termQuery("strategyConfId", Long.valueOf(strategyId)))
+                        termQuery("activityId", Long.valueOf(strategyId)))
                 .must(QueryBuilders.
                         matchQuery("reqId", isi));
         if (!"".equals(hitEntity) && !"未知对象".equals(hitEntity)) {

@@ -1,13 +1,8 @@
-/**
- * @(#)SysAreaController.java, 2018/7/9.
- * <p/>
- * Copyright 2018 Netease, Inc. All rights reserved.
- * NETEASE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
 package com.zjtelcom.cpct.controller.system;
 
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.enums.AreaCodeEnum;
 import com.zjtelcom.cpct.service.system.SysAreaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -69,6 +64,33 @@ public class SysAreaController {
 
 
     /**
+     * 获取地市级别列表
+     *
+     * @return
+     */
+    @RequestMapping(value = "/listSysCityAndParent", method = RequestMethod.POST)
+    @CrossOrigin
+    public String listCityAndParentByParentId(@RequestBody  Map<String, Object> params) {
+        String lanId = (String) params.get("lanId");
+        Integer areaId;
+        if (lanId == null || "".equals(lanId) || "null".equals(lanId)) {
+            //TODO 获取当前用户所在地区
+            areaId = 1;
+        } else {
+            areaId = Integer.valueOf(lanId);
+        }
+        Map<String, Object> map = null;
+        try {
+            map = sysAreaService.listCityAndParentByParentId(areaId);
+            map.put("resultCode", CommonConstant.CODE_SUCCESS);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+        }
+        return JSON.toJSONString(map);
+    }
+
+
+    /**
      * 获取下发城市树
      *
      * @return
@@ -79,6 +101,29 @@ public class SysAreaController {
         Map<String, Object> map = null;
         try {
             map = sysAreaService.listAllAreaTrea();
+            map.put("resultCode", CommonConstant.CODE_SUCCESS);
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+        }
+        return JSON.toJSONString(map);
+    }
+
+    /**
+     * 获取策略适用城市树
+     *
+     * @return
+     */
+    @RequestMapping(value = "/listStrAreaTree", method = RequestMethod.POST)
+    @CrossOrigin
+    public String listStrAreaTree(@RequestBody  Map<String, Object> params) {
+        String regionId = (String) params.get("regionId");
+        Map<String, Object> map = null;
+        try {
+            Long lanId = AreaCodeEnum.ZHEJIAGN.getLanId();
+            if(!"".equals(regionId)){
+                lanId = AreaCodeEnum.getLandIdByRegionId(Long.valueOf(regionId));
+            }
+            map = sysAreaService.listStrAreaTree(lanId.toString());
             map.put("resultCode", CommonConstant.CODE_SUCCESS);
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);

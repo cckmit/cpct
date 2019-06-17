@@ -29,27 +29,13 @@ public class ResourceServiceImpl implements ResourceService {
         List<MktResource> mktResourceList = new ArrayList<>();
         Integer page = MapUtil.getIntNum(params.get("page"));
         Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
-        PageHelper.startPage(page,pageSize);
-
-        if (params.get("mktResName") != null){
-            String mktResName = params.get("mktResName").toString();
-            mktResourceList = mktResourceMapper.selectByResourceName(mktResName);
-        }else {
-            mktResourceList = mktResourceMapper.selectAll();
-        }
-        List<MktResource> mktResources = new ArrayList<>();
+        String mktResName = MapUtil.getString(params.get("mktResName"));
         List<Long> resourceIdList = (List<Long>) params.get("resourceIdList");
-        if(mktResourceList != null && resourceIdList!= null) {
-            for(MktResource mktResource : mktResourceList) {
-                if(!resourceIdList.contains((mktResource.getMktResId()).intValue())) {
-                    mktResources.add(mktResource);
-                }
-            }
-        }
-
+        PageHelper.startPage(page,pageSize);
+        mktResourceList = mktResourceMapper.selectByResourceName(mktResName,resourceIdList);
         Page pageInfo = new Page(new PageInfo(mktResourceList));
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",mktResources);
+        result.put("resultMsg",mktResourceList);
         result.put("page",pageInfo);
         return result;
     }

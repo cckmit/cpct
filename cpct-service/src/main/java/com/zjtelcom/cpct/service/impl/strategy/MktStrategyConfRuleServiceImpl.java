@@ -9,6 +9,7 @@ package com.zjtelcom.cpct.service.impl.strategy;
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
+import com.zjtelcom.cpct.dao.channel.OrganizationMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
@@ -19,7 +20,9 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyMapper;
 import com.zjtelcom.cpct.domain.User;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.CamScript;
+import com.zjtelcom.cpct.domain.channel.Organization;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
+import com.zjtelcom.cpct.domain.org.OrgTreeDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
@@ -40,7 +43,9 @@ import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.util.*;
+import javafx.application.Application;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -122,6 +127,8 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
 
     @Autowired
     private MktCampaignMapper campaignMapper;
+    @Autowired
+    private OrganizationMapper organizationMapper;
 
     /**
      * 添加策略规则
@@ -134,32 +141,6 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();
         MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
         try {
-            //添加mkt_cam_grp_rul表
-            MktCamGrpRul mktCamGrpRul = new MktCamGrpRul();
-            if(mktStrategyConfRule.getTarGrpId()!=null){
-                mktCamGrpRul.setTarGrpId(mktStrategyConfRule.getTarGrpId());
-                mktCamGrpRul.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
-                //添加所属地市
-                if(UserUtil.getUser()!=null){
-                    mktCamGrpRul.setLanId(UserUtil.getUser().getLanId());
-                } else{
-                    mktCamGrpRul.setLanId((AreaCodeEnum.ZHEJIAGN.getRegionId()));
-                }
-                mktCamGrpRul.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
-                mktCamGrpRul.setStatusDate(new Date());
-                mktCamGrpRul.setCreateDate(new Date());
-                mktCamGrpRul.setCreateStaff(UserUtil.loginId());
-                mktCamGrpRul.setUpdateDate(new Date());
-                mktCamGrpRul.setUpdateStaff(UserUtil.loginId());
-                mktCamGrpRulMapper.insert(mktCamGrpRul);
-
-                // 更新客户分群名字为规则名称
-                TarGrp tarGrp = new TarGrp();
-                tarGrp.setTarGrpId(mktStrategyConfRule.getTarGrpId());
-                tarGrp.setTarGrpName(mktStrategyConfRule.getMktStrategyConfRuleName());
-                tarGrp.setTarGrpDesc(mktStrategyConfRule.getMktStrategyConfRuleName());
-            }
-
             CopyPropertiesUtil.copyBean2Bean(mktStrategyConfRuleDO, mktStrategyConfRule);
             String productIds = "";
             String evtContactConfIds = "";
@@ -248,6 +229,34 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktStrategyConfRuleDO.setUpdateDate(new Date());
             mktStrategyConfRuleMapper.insert(mktStrategyConfRuleDO);
 
+            //添加mkt_cam_grp_rul表
+            MktCamGrpRul mktCamGrpRul = new MktCamGrpRul();
+            if(mktStrategyConfRule.getTarGrpId()!=null){
+                mktCamGrpRul.setTarGrpId(mktStrategyConfRule.getTarGrpId());
+                mktCamGrpRul.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
+                //添加所属地市
+                if(UserUtil.getUser()!=null){
+                    mktCamGrpRul.setLanId(UserUtil.getUser().getLanId());
+                } else{
+                    mktCamGrpRul.setLanId((AreaCodeEnum.ZHEJIAGN.getRegionId()));
+                }
+                mktCamGrpRul.setMktStrategyConfId(mktStrategyConfRule.getStrategyConfId());
+                mktCamGrpRul.setMktStrategyConfRuleId(mktStrategyConfRuleDO.getMktStrategyConfRuleId());
+                mktCamGrpRul.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                mktCamGrpRul.setStatusDate(new Date());
+                mktCamGrpRul.setCreateDate(new Date());
+                mktCamGrpRul.setCreateStaff(UserUtil.loginId());
+                mktCamGrpRul.setUpdateDate(new Date());
+                mktCamGrpRul.setUpdateStaff(UserUtil.loginId());
+                mktCamGrpRulMapper.insert(mktCamGrpRul);
+
+                // 更新客户分群名字为规则名称
+                TarGrp tarGrp = new TarGrp();
+                tarGrp.setTarGrpId(mktStrategyConfRule.getTarGrpId());
+                tarGrp.setTarGrpName(mktStrategyConfRule.getMktStrategyConfRuleName());
+                tarGrp.setTarGrpDesc(mktStrategyConfRule.getMktStrategyConfRuleName());
+            }
+
             //如果是增存量联动并且是导入的用户分群模板 创建试算记录
             TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(mktStrategyConfRuleDO.getTarGrpId());
             if (tarGrp!=null && tarGrp.getTarGrpType().equals(TarTempType.PROM_IMPORT_TEMPLETE.getValue())){
@@ -270,13 +279,14 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             // 获取与结果关联的推送渠道信息
             String ruleExpression = "("+ confs + ")&&(" + resultConfs + ")";
             MktStrategy mktStrategy = new MktStrategy();
-            mktStrategy.setStrategyId(mktStrategyConfRule.getStrategyConfId());
+            mktStrategy.setStrategyId(mktStrategyConfRuleDO.getMktStrategyConfRuleId());
             // 活动分类为服务活动时,为关怀策略 ; 活动分类为营销活动，维系活动等其它活动时,为销售策略
             if(StatusCode.SERVICE_CAMPAIGN.getStatusCode().equals( mktStrategyConfRule.getMktCampaignType())){
                 mktStrategy.setStrategyType(StatusCode.CARE_STRATEGY.getStatusCode());
             } else{
                 mktStrategy.setStrategyType(StatusCode.SALES_STRATEGY.getStatusCode());
             }
+            mktStrategy.setStrategyId(mktStrategyConfRuleDO.getMktStrategyConfRuleId());
             mktStrategy.setStrategyName(mktStrategyConfRule.getMktStrategyConfRuleName());
             mktStrategy.setStrategyDesc(mktStrategyConfRule.getMktStrategyConfRuleName());
             mktStrategy.setRuleExpression(ruleExpression);
@@ -291,6 +301,8 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktStrategyMapper.insert(mktStrategy);
             MktCamStrategyRel mktCamStrategyRel = new MktCamStrategyRel();
             mktCamStrategyRel.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
+            mktCamStrategyRel.setMktStrategyConfId(mktStrategyConfRule.getStrategyConfId());
+            mktCamStrategyRel.setMktStrategyConfRuleId(mktStrategyConfRule.getMktStrategyConfRuleId());
             mktCamStrategyRel.setStrategyId(mktStrategy.getStrategyId());
             mktCamStrategyRel.setCreateStaff(UserUtil.loginId());
             mktCamStrategyRel.setCreateDate(new Date());
@@ -302,7 +314,8 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
 
             //添加cpc算法规则
             MktCpcAlgorithmsRulDO mktCpcAlgorithmsRulDO = new MktCpcAlgorithmsRulDO();
-            mktCpcAlgorithmsRulDO.setAlgorithmsRulName(mktStrategyConfRule.getMktStrategyConfRuleName());
+            mktCpcAlgorithmsRulDO.setAlgorithmsRulId(mktStrategyConfRuleDO.getMktStrategyConfRuleId());
+            mktCpcAlgorithmsRulDO.setAlgorithmsRulName(mktStrategyConfRuleDO.getMktStrategyConfRuleName());
             mktCpcAlgorithmsRulDO.setRuleExpression(
                     "{" + mktStrategyConfRule.getTarGrpId() +"}通过{" + mktStrategyConfRule.getStrategyConfId() +"}推送{" + mktStrategyConfRule.getProductIdlist() + "}");
             mktCpcAlgorithmsRulDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
@@ -316,6 +329,8 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             MktCamRecomCalcRelDO mktCamRecomCalcRelDO = new MktCamRecomCalcRelDO();
             mktCamRecomCalcRelDO.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
             mktCamRecomCalcRelDO.setAlgorithmsRulId(mktCpcAlgorithmsRulDO.getAlgorithmsRulId());
+            mktCamRecomCalcRelDO.setMktStrategyConfId(mktStrategyConfRule.getStrategyConfId());
+            mktCamRecomCalcRelDO.setMktStrategyConfRuleId(mktStrategyConfRuleDO.getMktStrategyConfRuleId());
             mktCamRecomCalcRelDO.setAlgoId(1L);
             mktCamRecomCalcRelDO.setStatusDate(new Date());
             mktCamRecomCalcRelDO.setCreateDate(new Date());
@@ -324,6 +339,12 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktCamRecomCalcRelDO.setUpdateDate(new Date());
             mktCamRecomCalcRelDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
             mktCamRecomCalcRelMapper.insert(mktCamRecomCalcRelDO);
+
+            if (mktStrategyConfRule.getOrganizationList()!=null){
+                redisUtils.set("ORG_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString(),mktStrategyConfRule.getOrganizationList());
+                redisUtils.set("ORG_CHECK_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString(),"false");
+                area2RedisThread(mktStrategyConfRule.getMktStrategyConfRuleId(),mktStrategyConfRule.getOrganizationList());
+            }
 
 
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -397,20 +418,16 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             if (mktStrategyConfRule.getMktCamChlConfDetailList() != null) {
                 for (int i = 0; i < mktStrategyConfRule.getMktCamChlConfDetailList().size(); i++) {
                     Long evtContactConfId = mktStrategyConfRule.getMktCamChlConfDetailList().get(i).getEvtContactConfId();
-
                     CamScriptAddVO camScriptAddVO = new CamScriptAddVO();
                     camScriptAddVO.setEvtContactConfId(evtContactConfId);
                     camScriptAddVO.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
                     camScriptAddVO.setScriptDesc(mktStrategyConfRule.getMktCamChlConfDetailList().get(i).getScriptDesc());
                     camScriptService.addCamScript(UserUtil.loginId(), camScriptAddVO);
-
                     if (i == 0) {
                         evtContactConfIds += evtContactConfId;
                     } else {
                         evtContactConfIds += "/" + evtContactConfId;
                     }
-
-
                 }
                 mktStrategyConfRuleDO.setEvtContactConfId(evtContactConfIds);
             }
@@ -442,6 +459,124 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktStrategyConfRuleDO.setUpdateDate(new Date());
             mktStrategyConfRuleMapper.updateByPrimaryKey(mktStrategyConfRuleDO);
 
+            //营销组织树
+            if (mktStrategyConfRule.getOrganizationList()!=null && !mktStrategyConfRule.getOrganizationList().isEmpty()){
+                if (redisUtils.get("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString())==null
+                        || !ChannelUtil.equalsList((List<Long>)redisUtils.get("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString()),mktStrategyConfRule.getOrganizationList())){
+                    redisUtils.set("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString(),mktStrategyConfRule.getOrganizationList());
+                    redisUtils.set("ORG_CHECK_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString(),"false");
+                    area2RedisThread(mktStrategyConfRule.getMktStrategyConfRuleId(),mktStrategyConfRule.getOrganizationList());
+                }
+            }else {
+                if (redisUtils.get("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString())!=null){
+                    redisUtils.remove("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString());
+                    redisUtils.remove("ORG_CHECK_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString());
+                    redisUtils.remove("AREA_RULE_ISSURE_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString());
+                }
+            }
+            String confs = "";
+            if (mktStrategyConfRule.getMktCamChlConfDetailList() != null) {
+                for (int i = 0; i < mktStrategyConfRule.getMktCamChlConfDetailList().size(); i++) {
+                    Long evtContactConfId =  mktStrategyConfRule.getMktCamChlConfDetailList().get(i).getEvtContactConfId();
+                    if (i == 0) {
+                        evtContactConfIds += evtContactConfId;
+                        confs += evtContactConfId;
+                    } else {
+                        evtContactConfIds += "/" + evtContactConfId;
+                        confs += "||" + evtContactConfId;
+                    }
+                }
+            }
+
+            // 新增二次协同结果 并且 将结果id的存到规则中
+            String resultConfs = "";
+            if (mktStrategyConfRule.getMktCamChlResultList() != null) {
+                for (int i = 0; i < mktStrategyConfRule.getMktCamChlResultList().size(); i++) {
+                    MktCamChlResult mktCamChlResult = mktStrategyConfRule.getMktCamChlResultList().get(i);
+                    List<MktCamChlConfDetail> mktCamChlConfDetailList = mktCamChlResult.getMktCamChlConfDetailList();
+                    for (MktCamChlConfDetail mktCamChlConfDetail : mktCamChlConfDetailList) {
+                        if("".equals(resultConfs)){
+                            resultConfs += mktCamChlConfDetail.getEvtContactConfId();
+                        } else{
+                            resultConfs += "||" + mktCamChlConfDetail.getEvtContactConfId();
+                        }
+                    }
+                }
+                mktStrategyConfRuleDO.setMktCamChlResultId(mktCamChlResultIds);
+            }
+            String ruleExpression = "("+ confs + ")&&(" + resultConfs + ")";
+
+            MktStrategy mktStrategy = mktStrategyMapper.selectByPrimaryKey(mktStrategyConfRule.getMktStrategyConfRuleId());
+
+            if (mktStrategy != null) {
+                // 活动分类为服务活动时,为关怀策略 ; 活动分类为营销活动，维系活动等其它活动时,为销售策略
+                if(StatusCode.SERVICE_CAMPAIGN.getStatusCode().equals( mktStrategyConfRule.getMktCampaignType())){
+                    mktStrategy.setStrategyType(StatusCode.CARE_STRATEGY.getStatusCode());
+                } else{
+                    mktStrategy.setStrategyType(StatusCode.SALES_STRATEGY.getStatusCode());
+                }
+                mktStrategy.setStrategyName(mktStrategyConfRule.getMktStrategyConfRuleName());
+                mktStrategy.setStrategyDesc(mktStrategyConfRule.getMktStrategyConfRuleName());
+                mktStrategy.setRuleExpression(ruleExpression);
+                mktStrategy.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                mktStrategy.setStatusDate(new Date());
+                mktStrategy.setUpdateStaff(UserUtil.loginId());
+                mktStrategy.setUpdateDate(new Date());
+                mktStrategyMapper.updateByPrimaryKey(mktStrategy);
+            } else {
+                mktStrategy = new MktStrategy();
+                mktStrategy.setStrategyId(mktStrategyConfRuleDO.getMktStrategyConfRuleId());
+                // 活动分类为服务活动时,为关怀策略 ; 活动分类为营销活动，维系活动等其它活动时,为销售策略
+                if(StatusCode.SERVICE_CAMPAIGN.getStatusCode().equals( mktStrategyConfRule.getMktCampaignType())){
+                    mktStrategy.setStrategyType(StatusCode.CARE_STRATEGY.getStatusCode());
+                } else{
+                    mktStrategy.setStrategyType(StatusCode.SALES_STRATEGY.getStatusCode());
+                }
+                mktStrategy.setStrategyName(mktStrategyConfRule.getMktStrategyConfRuleName());
+                mktStrategy.setStrategyDesc(mktStrategyConfRule.getMktStrategyConfRuleName());
+                mktStrategy.setRuleExpression(ruleExpression);
+                mktStrategy.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                mktStrategy.setStatusDate(new Date());
+                mktStrategy.setCreateStaff(UserUtil.loginId());
+                mktStrategy.setCreateDate(new Date());
+                mktStrategy.setUpdateStaff(UserUtil.loginId());
+                mktStrategy.setUpdateDate(new Date());
+                mktStrategyMapper.insert(mktStrategy);
+            }
+
+
+            //添加cpc算法规则
+            MktCpcAlgorithmsRulDO mktCpcAlgorithmsRulDO = mktCpcAlgorithmsRulMapper.selectByPrimaryKey(mktStrategyConfRule.getMktStrategyConfRuleId());
+            if(mktCpcAlgorithmsRulDO!=null){
+                mktCpcAlgorithmsRulDO.setAlgorithmsRulName(mktStrategyConfRule.getMktStrategyConfRuleName());
+                mktCpcAlgorithmsRulDO.setRuleExpression(
+                        "{" + mktStrategyConfRule.getTarGrpId() +"}通过{" + mktStrategyConfRule.getStrategyConfId() +"}推送{" + mktStrategyConfRule.getProductIdlist() + "}");
+                mktCpcAlgorithmsRulDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                mktCpcAlgorithmsRulDO.setStatusDate(new Date());
+                mktCpcAlgorithmsRulDO.setUpdateStaff(UserUtil.loginId());
+                mktCpcAlgorithmsRulDO.setUpdateDate(new Date());
+                mktCpcAlgorithmsRulMapper.updateByPrimaryKey(mktCpcAlgorithmsRulDO);
+            }
+
+            //cpc算法规则关联表
+            MktCamRecomCalcRelDO mktCamRecomCalcRelDO = mktCamRecomCalcRelMapper.selectByRuleId(mktStrategyConfRule.getMktStrategyConfRuleId());
+            if(mktCamRecomCalcRelDO == null){
+                mktCamRecomCalcRelDO = new MktCamRecomCalcRelDO();
+                mktCamRecomCalcRelDO.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
+                mktCamRecomCalcRelDO.setAlgorithmsRulId(mktCpcAlgorithmsRulDO.getAlgorithmsRulId());
+                mktCamRecomCalcRelDO.setMktStrategyConfId(mktStrategyConfRule.getStrategyConfId());
+                mktCamRecomCalcRelDO.setMktStrategyConfRuleId(mktStrategyConfRule.getMktStrategyConfRuleId());
+                mktCamRecomCalcRelDO.setAlgoId(1L);
+                mktCamRecomCalcRelDO.setStatusDate(new Date());
+                mktCamRecomCalcRelDO.setCreateDate(new Date());
+                mktCamRecomCalcRelDO.setCreateStaff(UserUtil.loginId());
+                mktCamRecomCalcRelDO.setUpdateStaff(UserUtil.loginId());
+                mktCamRecomCalcRelDO.setUpdateDate(new Date());
+                mktCamRecomCalcRelDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                mktCamRecomCalcRelMapper.insert(mktCamRecomCalcRelDO);
+            }
+
+
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.UPDATE_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
             mktStrategyConfRuleMap.put("mktCamChlResultIds", mktCamChlResultIds);
@@ -455,7 +590,111 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         return mktStrategyConfRuleMap;
     }
 
-    /**
+
+    @Override
+    public Map<String, Object> test(Long ruleId, List<Long> orgList) {
+        Map<String,Object> result = new HashMap<>();
+        area2RedisThread(ruleId,orgList);
+         result.put("res",redisUtils.hgetAllRedisList("AREA_RULE_"+ruleId));
+         return result;
+    }
+
+    //添加营销组织树集合
+    private void area2RedisThread(Long ruleId,List<Long> orgIdList) {
+        //过滤 选择level 大于3 的
+        List<Long> orgs = organizationMapper.selectByIdList(orgIdList);
+        //添加所有选择的节点信息到缓存
+        redisUtils.set("ORG_ID_"+ruleId.toString(),orgs);
+        redisUtils.remove("AREA_RULE_ISSURE_"+ruleId);
+        new Thread(){
+            public void run(){
+                areaList2Redis(ruleId,orgs);
+            }
+        }.start();
+    }
+
+    public void areaList2Redis(Long ruleId,List<Long> areaIdList){
+        ExecutorService fixedThreadPool = Executors.newFixedThreadPool(areaIdList.size());
+        List<Organization> sysAreaList = new ArrayList<>();
+        List<Future<Map<String,Object>>> futureList = new ArrayList<>();
+        try {
+            for (Long id : areaIdList){
+                Future<Map<String,Object>> future = fixedThreadPool.submit(new areaTask(ruleId,id,sysAreaList));
+                futureList.add(future);
+            }
+            for (Future<Map<String,Object>> future : futureList){
+                future.get();
+            }
+            redisUtils.set("ORG_CHECK_"+ruleId.toString(),"true");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    class areaTask implements Callable<Map<String,Object>>{
+        private Long ruleId;
+        private Long id;
+        private  List<Organization> sysAreaList;
+        public areaTask(Long ruleId,Long id, List<Organization> sysAreaList){
+            this.ruleId = ruleId;
+            this.id = id;
+            this.sysAreaList = sysAreaList;
+        }
+
+        @Override
+        public Map<String, Object> call() throws Exception {
+            Map<String,Object> result = new HashMap<>();
+            logger.info("查询开始："+id);
+            Organization org = organizationMapper.selectByPrimaryKey(id);
+            if (org!=null){
+                List<String> resultList = new ArrayList<>();
+                resultList.add(org.getOrgId4a().toString());
+                if (false){
+                    areaC4List(id,resultList,sysAreaList);
+                }else {
+                    areaList(id,resultList,sysAreaList);
+                }
+                logger.info("父级id :"+id,resultList);
+                redisUtils.hset("AREA_RULE_ISSURE_"+ruleId,id.toString(),resultList);
+            }
+            return result;
+        }
+    }
+
+    public List<String> areaList(Long parentId,List<String> resultList,List<Organization> areas){
+        List<Organization> sysAreaList = organizationMapper.selectByParentId(parentId);
+        if (sysAreaList.isEmpty()){
+            return resultList;
+        }
+        for (Organization area : sysAreaList){
+            resultList.add(area.getOrgId4a().toString());
+            areas.add(area);
+            areaList(area.getOrgId(),resultList,areas);
+        }
+        return resultList;
+    }
+
+    public List<String> areaC4List(Long parentId,List<String> resultList,List<Organization> areas){
+        List<Organization> sysAreaList = organizationMapper.selectByParentId(parentId);
+        if (sysAreaList.isEmpty()){
+            return resultList;
+        }
+        for (Organization area : sysAreaList){
+            new Thread(){
+                public void run(){
+                    resultList.add(area.getOrgId4a().toString());
+                    areas.add(area);
+                    areaList(area.getOrgId(),resultList,areas);
+                }
+            }.start();
+        }
+        return resultList;
+    }
+
+
+
+
+    /**-
      * 查询策略规则
      *
      * @param mktStrategyConfRuleId
@@ -508,7 +747,9 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 mktStrategyConfRule.setMktCamChlResultList(mktCamChlResultList);
             }
 
-
+            if (redisUtils.get("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId())!=null){
+                mktStrategyConfRule.setOrganizationList((List<Long> )redisUtils.get("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId()));
+            }
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
             mktStrategyConfRuleMap.put("mktStrategyConfRule", mktStrategyConfRule);
@@ -587,8 +828,24 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         try {
             //删除规则跟策略的关联
             mktStrategyConfRuleRelMapper.deleteByMktStrategyConfRulId(mktStrategyConfRuleId);
+            //删除活动与客户分群的关系
+            MktStrategyConfRuleDO strategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(mktStrategyConfRuleId);
+            if(strategyConfRuleDO!=null && strategyConfRuleDO.getTarGrpId()!=null){
+                mktCamGrpRulMapper.deleteByTarGrpId(strategyConfRuleDO.getTarGrpId());
+            }
             //删除规则
             mktStrategyConfRuleMapper.deleteByPrimaryKey(mktStrategyConfRuleId);
+
+            // 删除规则下的渠道关系
+            mktStrategyMapper.deleteByPrimaryKey(mktStrategyConfRuleId);
+            mktCamStrategyRelMapper.deleteByStrategyId(mktStrategyConfRuleId);
+
+            // 删除cpc算法
+            mktCpcAlgorithmsRulMapper.deleteByPrimaryKey(mktStrategyConfRuleId);
+
+            //
+            mktCamRecomCalcRelMapper.deleteByRuleId(mktStrategyConfRuleId);
+
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
         } catch (Exception e) {
@@ -1591,9 +1848,11 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                  */
                 Map<String, Object> tarGrpMap = new HashMap<>();
                 tarGrpMap = tarGrpService.copyTarGrp(mktStrategyConfRuleDO.getTarGrpId(), false);
-                TarGrp tarGrp = (TarGrp) tarGrpMap.get("tarGrp");
-                if (tarGrp != null) {
-                    mktStrategyConfRule.setTarGrpId(tarGrp.getTarGrpId());
+                if (tarGrpMap != null) {
+                    TarGrp tarGrp = (TarGrp) tarGrpMap.get("tarGrp");
+                    if (tarGrp != null) {
+                        mktStrategyConfRule.setTarGrpId(tarGrp.getTarGrpId());
+                    }
                 }
 
                 /**

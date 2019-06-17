@@ -58,5 +58,15 @@
     </dubbo:reference>
 
 
+    <!-- 标签饱和度查询接口 -->
+    <dubbo:reference registry="esb2" interface="com.zjhcsoft.eagle.main.dubbo.service.QuerySaturationService"
+                     id="querySaturationService" version="1.0" retries="0" check="false">
+        <dubbo:method name="querySaturation" servicecode="33.1307.querySaturation" timeout="10000"/>
+    </dubbo:reference>
+
+    <dubbo:reference registry="esb2" interface="com.ctzj.smt.bss.cpc.configure.service.api.offer.IOfferRestrictConfigureService"
+                     id="offerRestrictConfigureServiceImpl" version="1.0" check="false">
+        <dubbo:method name="saveOfferRestrict" servicecode="00.1076.offerRestrict.saveOfferRestrict" timeout="120000"/>
+    </dubbo:reference>
 
 </beans>
