@@ -9,9 +9,9 @@ import java.util.List;
 public class CloseRuleAddVO implements Serializable {
 
     private Long ruleId;//规则标识
-    private String ruleName;//规则名称
-    private String filterType;//过滤类型
-    private String executionChannel;// 关单销售品类型（1000：销售品；2000：主产品；3000 子产品） --冗余字段再使用
+    private String closeName;//关单名称
+    private String closeType;//关单类型
+    private String productType;// 产品类型
     private Date effectiveDate;//生效时间
     private Date failureDate;//失效时间
     private List<Long> chooseProduct;//选择的销售品
@@ -22,7 +22,7 @@ public class CloseRuleAddVO implements Serializable {
     private String days;
     private String times;
     private String offerInfo;
-    private String operator;
+    private String closeCode; //成功标识
     private String remark;
 
 
@@ -32,22 +32,6 @@ public class CloseRuleAddVO implements Serializable {
 
     public void setRemark(String remark) {
         this.remark = remark;
-    }
-
-    public String getExecutionChannel() {
-        return executionChannel;
-    }
-
-    public void setExecutionChannel(String executionChannel) {
-        this.executionChannel = executionChannel;
-    }
-
-    public String getOperator() {
-        return operator;
-    }
-
-    public void setOperator(String operator) {
-        this.operator = operator;
     }
 
     public VerbalConditionAddVO getCondition() {
@@ -88,22 +72,6 @@ public class CloseRuleAddVO implements Serializable {
 
     public void setRuleId(Long ruleId) {
         this.ruleId = ruleId;
-    }
-
-    public String getRuleName() {
-        return ruleName;
-    }
-
-    public void setRuleName(String ruleName) {
-        this.ruleName = ruleName;
-    }
-
-    public String getFilterType() {
-        return filterType;
-    }
-
-    public void setFilterType(String filterType) {
-        this.filterType = filterType;
     }
 
     public Date getEffectiveDate() {
@@ -154,5 +122,35 @@ public class CloseRuleAddVO implements Serializable {
         this.expression = expression;
     }
 
+    public String getCloseName() {
+        return closeName;
+    }
 
+    public void setCloseName(String closeName) {
+        this.closeName = closeName;
+    }
+
+    public String getCloseType() {
+        return closeType;
+    }
+
+    public void setCloseType(String closeType) {
+        this.closeType = closeType;
+    }
+
+    public String getProductType() {
+        return productType;
+    }
+
+    public void setProductType(String productType) {
+        this.productType = productType;
+    }
+
+    public String getCloseCode() {
+        return closeCode;
+    }
+
+    public void setCloseCode(String closeCode) {
+        this.closeCode = closeCode;
+    }
 }
