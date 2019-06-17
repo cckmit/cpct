@@ -147,9 +147,9 @@
         <dubbo:method name="getOfferProdInstRelCacheEntity" servicecode="00.1074.getOfferProdInstRelCacheEntity"  timeout="10000"/>
     </dubbo:reference>
 
-    <!-- 根据crmRowId查询prodInstIdMapping的rowId-->
-    <dubbo:reference registry="esb3" id="ICacheIdMappingIndexQryService" interface=" com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheIdMappingIndexQryService" version="1.0" retries="0" check="false">
-        <dubbo:method name="qryProdInstIdMappingIndex" servicecode="00.1074.qryProdInstIdMappingIndex"  timeout="10000"/>
+    <!-- 查询产品实例id映射缓存实体-->
+    <dubbo:reference registry="esb3" id="ICacheIdMappingEntityQryService" interface="com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheIdMappingEntityQryService" version="1.0" retries="0" check="false">
+        <dubbo:method name="getProdInstIdMappingCacheEntity" servicecode="00.1074.getProdInstIdMappingCacheEntity"  timeout="10000"/>
     </dubbo:reference>
 
     <!-- 根据filterType获取关单类型 -->

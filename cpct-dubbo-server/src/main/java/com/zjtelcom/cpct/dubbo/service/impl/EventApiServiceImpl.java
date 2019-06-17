@@ -7,15 +7,16 @@ import com.ctzj.biz.asset.model.dto.AssetDto;
 import com.ctzj.biz.asset.model.dto.AssetPromDto;
 import com.ctzj.bss.customer.data.carrier.outbound.api.CtgCacheAssetService;
 import com.ctzj.bss.customer.data.carrier.outbound.model.ResponseResult;
+import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheIdMappingEntityQryService;
 import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheProdEntityQryService;
 import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheRelEntityQryService;
-import com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheIdMappingIndexQryService;
 import com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheOfferRelIndexQryService;
 import com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheProdIndexQryService;
 import com.ctzj.smt.bss.cache.service.api.model.CacheResultObject;
 import com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService;
 import com.ctzj.smt.bss.customer.model.dataobject.OfferProdInstRel;
 import com.ctzj.smt.bss.customer.model.dataobject.ProdInst;
+import com.ctzj.smt.bss.customer.model.dataobject.RowIdMapping;
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.Operator;
@@ -180,7 +181,7 @@ public class EventApiServiceImpl implements EventApiService {
     private ICacheRelEntityQryService iCacheRelEntityQryService;
 
     @Autowired(required = false)
-    private ICacheIdMappingIndexQryService iCacheIdMappingIndexQryService;
+    private ICacheIdMappingEntityQryService iCacheIdMappingEntityQryService;
 
     @Override
     public Map<String, Object> CalculateCPC(Map<String, Object> map) {
@@ -2686,19 +2687,14 @@ public class EventApiServiceImpl implements EventApiService {
                                     log.info("777777------AccNum --->" + prodInstCacheEntityNew.getResultObject().getAccNum());
                                     if (!accNbrList.contains(prodInstCacheEntityNew.getResultObject().getAccNum())) {
                                         accNbrList.add(prodInstCacheEntityNew.getResultObject().getAccNum());
-                                        List<String> integrationIdList = new ArrayList<>();
-                                        CacheResultObject<Set<String>> setCacheResultObjectNew = iCacheIdMappingIndexQryService.qryProdInstIdMappingIndex(prodInstIdNew.toString());
-                                        log.info("888888------setCacheResultObjectNew --->" + JSON.toJSONString(setCacheResultObjectNew));
-                                        if (setCacheResultObjectNew != null && setCacheResultObjectNew.getResultObject() != null && setCacheResultObjectNew.getResultObject().size() > 0) {
-                                            for (String integrationId : setCacheResultObjectNew.getResultObject()) {
-                                                if(!integrationIdList.contains(integrationId)){
-                                                    Map<String, Object> accNbrMap = new HashMap<>();
-                                                    accNbrMap.put("ACC_NBR", prodInstCacheEntityNew.getResultObject().getAccNum());
-                                                    accNbrMap.put("INTEGRATION_ID", integrationId);
-                                                    log.info("999999------accNbrMap --->" + JSON.toJSONString(accNbrMap));
-                                                    accNbrMapList.add(accNbrMap);
-                                                }
-                                            }
+                                        final CacheResultObject<RowIdMapping> prodInstIdMappingCacheEntity = iCacheIdMappingEntityQryService.getProdInstIdMappingCacheEntity(prodInstIdNew.toString());
+                                        log.info("888888------prodInstIdMappingCacheEntity --->" + JSON.toJSONString(prodInstIdMappingCacheEntity));
+                                        if (prodInstIdMappingCacheEntity != null && prodInstIdMappingCacheEntity.getResultObject() != null ) {
+                                            Map<String, Object> accNbrMap = new HashMap<>();
+                                            accNbrMap.put("ACC_NBR", prodInstCacheEntityNew.getResultObject().getAccNum());
+                                            accNbrMap.put("INTEGRATION_ID", prodInstIdMappingCacheEntity.getResultObject().getCrmRowId());
+                                            log.info("999999------accNbrMap --->" + JSON.toJSONString(accNbrMap));
+                                            accNbrMapList.add(accNbrMap);
                                         }
                                     }
                                 }
