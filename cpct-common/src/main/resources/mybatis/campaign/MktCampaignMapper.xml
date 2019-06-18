@@ -122,7 +122,7 @@
         <if test= "lanId!=null">LAN_ID = #{lanId,jdbcType=BIGINT},</if>
         CAM_LEVEL = #{camLevel,jdbcType=BIGINT},
         IS_CHECK_RULE = #{isCheckRule,jdbcType=VARCHAR},
-        <if test= "srcId!=null"> SRC_ID #{srcId,jdbcType=VARCHAR},</if>
+        <if test= "srcId!=null"> SRC_ID = #{srcId,jdbcType=VARCHAR},</if>
         <if test= "srcType!=null">SRC_TYPE = #{srcType,jdbcType=VARCHAR},</if>
         <if test= "serviceCancleFlag!=null">SERVICE_CANCLE_FLAG = #{serviceCancleFlag,jdbcType=BIGINT},</if>
         <if test= "regionId!=null">REGION_ID = #{regionId,jdbcType=BIGINT},</if>
