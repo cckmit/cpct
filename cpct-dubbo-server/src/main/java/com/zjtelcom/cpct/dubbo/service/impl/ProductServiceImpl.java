@@ -63,7 +63,6 @@ public class ProductServiceImpl implements ProductService {
                         maps.put("closeName",filterRule1.getCloseName());
                         maps.put("closeCode",filterRule1.getCloseCode());
                         maps.put("closeNumber",filterRule1.getExpression());
-                        maps.put("closeType",filterRule1.getCloseType());
                         activityList.add(maps);
                     }
                 }
