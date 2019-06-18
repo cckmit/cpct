@@ -268,33 +268,33 @@ public class CamApiServiceImpl implements CamApiService {
                             Map<String, Object> filterRuleTimeMap = new HashMap<>();
                             // 判断是否进行CRM销售品过滤
                             if (realProdFilter != null && "0".equals(realProdFilter)) {
-                                log.info("111------accNbr --->" + params.get("accNbr"));
+                            //    log.info("111------accNbr --->" + params.get("accNbr"));
                                 List<String> prodStrList = new ArrayList<>();
                                 CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(params.get("accNbr"));
-                                log.info("222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
+                            //    log.info("222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
                                 if(prodInstIdsObject!=null &&  prodInstIdsObject.getResultObject() !=null ){
                                     Set<String> prodInstIds = prodInstIdsObject.getResultObject();
                                     for (String prodInstId : prodInstIds) {
                                         // 根据prodInstId 和 statusCd(1000-有效)查询offerProdInstRelId
-                                        log.info("333------prodInstId --->" + prodInstId);
+                            //            log.info("333------prodInstId --->" + prodInstId);
                                         CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex2(prodInstId, "1000");
-                                        log.info("444------setCacheResultObject --->" + JSON.toJSONString(setCacheResultObject));
+                            //            log.info("444------setCacheResultObject --->" + JSON.toJSONString(setCacheResultObject));
                                         if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null) {
                                             Set<String> offerProdInstRelIdSet = setCacheResultObject.getResultObject();
                                             for (String offerProdInstRelId : offerProdInstRelIdSet) {
                                                 // 查询销售品产品实例关系缓存实体
                                                 CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
-                                                log.info("555------offerProdInstRelCacheEntity --->" + JSON.toJSONString(offerProdInstRelCacheEntity));
+                            //                    log.info("555------offerProdInstRelCacheEntity --->" + JSON.toJSONString(offerProdInstRelCacheEntity));
                                                 if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
                                                         OfferProdInstRel offerProdInstRel = offerProdInstRelCacheEntity.getResultObject();
 
                                                     // 查询销售品实例缓存实体
                                                     CacheResultObject<OfferInst> offerInstCacheEntity = iCacheOfferEntityQryService.getOfferInstCacheEntity(offerProdInstRel.getOfferInstId().toString());
-                                                    log.info("666------offerInstCacheEntity --->" + JSON.toJSONString(offerInstCacheEntity));
+                            //                        log.info("666------offerInstCacheEntity --->" + JSON.toJSONString(offerInstCacheEntity));
                                                     if(offerInstCacheEntity!=null && offerInstCacheEntity.getResultObject()!=null){
                                                         OfferInst offerInst = offerInstCacheEntity.getResultObject();
                                                         Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerInst.getOfferId().toString()));
-                                                        log.info("777------offer --->" + JSON.toJSONString(offer));
+                             //                           log.info("777------offer --->" + JSON.toJSONString(offer));
                                                         prodStrList.add(offer.getOfferNbr());
                                                         filterRuleTimeMap.put(offer.getOfferNbr(), offerInst.getEffDate());
                                                         log.info("888------filterRuleTimeMap --->" + JSON.toJSONString(filterRuleTimeMap));

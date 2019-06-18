@@ -2707,7 +2707,7 @@ public class EventApiServiceImpl implements EventApiService {
                 }
             }
         }
-        //log.info("10101010------accNbrMapList --->" + JSON.toJSONString(accNbrMapList));
+        log.info("10101010------accNbrMapList --->" + JSON.toJSONString(accNbrMapList));
         return accNbrMapList;
     }
 
