@@ -22,14 +22,14 @@
     </dubbo:service>
     <!-- 注册 -->
     <!-- 二次协同查询服务 -->
-    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.EventApiService" ref="eventApiServiceImpl" version="1.0" >
-        <!-- 策略cpct计算服务 -->
-        <dubbo:method name="CalculateCPC" servicecode="00.1083.CalculateCPC" timeout="10000"/>
-        <!-- 策略cpct计算服务（同步） -->
-        <dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="10000"/>
-        <!-- 二次协同 -->
-        <dubbo:method name="secondChannelSynergy" servicecode="00.1083.SecondChannelSynergy" timeout="10000"/>
-    </dubbo:service>
+    <!--<dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.EventApiService" ref="eventApiServiceImpl" version="1.0" >-->
+        <!--&lt;!&ndash; 策略cpct计算服务 &ndash;&gt;-->
+        <!--<dubbo:method name="CalculateCPC" servicecode="00.1083.CalculateCPC" timeout="10000"/>-->
+        <!--&lt;!&ndash; 策略cpct计算服务（同步） &ndash;&gt;-->
+        <!--<dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="10000"/>-->
+        <!--&lt;!&ndash; 二次协同 &ndash;&gt;-->
+        <!--<dubbo:method name="secondChannelSynergy" servicecode="00.1083.SecondChannelSynergy" timeout="10000"/>-->
+    <!--</dubbo:service>-->
 
     <!--销售品关联活动查询-->
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ProductService" ref="productServiceImpl" version="1.0" >
