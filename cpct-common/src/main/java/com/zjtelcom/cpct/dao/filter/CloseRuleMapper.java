@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,5 +35,7 @@ public interface CloseRuleMapper {
 
     List<CloseRule> selectByProduct(@Param("chooseProduct") String chooseProduct, @Param("executionChannel") String executionChannel, @Param("filterType") String filterType);
 
-    List<Map<String,Object>> getCloseCampaign(@Param("filterType") String filterType);
+    List<Map<String,Object>> getCloseCampaign(@Param("map") HashMap<String, Object> map);
+
+    void updateExpression(@Param("filterRule")String filterRule, @Param("expression")String expression);
 }
