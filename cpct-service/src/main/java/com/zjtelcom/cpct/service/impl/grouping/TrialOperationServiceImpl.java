@@ -1391,7 +1391,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             labelList.add(label);
         }
         for (int i = labelDTOList.size(); i< labelDTOList.size()+attrValue.size();i++){
-            fieldList[i] = attrValue.get(i);
+            fieldList[i] = attrValue.get(i-labelDTOList.size());
         }
         List<Long> attrList = mktCamChlConfAttrMapper.selectByCampaignId(trialOperation.getCampaignId());
         if (attrList.contains(ISEE_CUSTOMER.getArrId()) || attrList.contains(ISEE_LABEL_CUSTOMER.getArrId()) ){
