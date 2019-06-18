@@ -234,7 +234,7 @@
     </select>
 
     <resultMap id="MktcloseRuleCampaignMap" type="java.util.Map">
-        <result property="filterType" column="FILTER_TYPE"/>
+        <result property="closeType" column="CLOSE_TYPE"/>
         <result property="activityNbr" column="MKT_ACTIVITY_NBR"/>
         <result property="activityId" column="MKT_CAMPAIGN_ID"/>
         <result property="closeNumber" column="EXPRESSION"/>
