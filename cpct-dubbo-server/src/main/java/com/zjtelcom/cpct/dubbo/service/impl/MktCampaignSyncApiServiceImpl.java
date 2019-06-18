@@ -1342,7 +1342,7 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
                 return null;
             }
         }
-        result = createTarGrp(detail,isCopy);
+        result = createTarGrp4Publish(detail,isCopy);
         return result;
     }
 
