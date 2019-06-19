@@ -7,6 +7,7 @@ import com.ctzj.biz.asset.model.dto.AssetDto;
 import com.ctzj.biz.asset.model.dto.AssetPromDto;
 import com.ctzj.bss.customer.data.carrier.outbound.api.CtgCacheAssetService;
 import com.ctzj.bss.customer.data.carrier.outbound.model.ResponseResult;
+import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheIdMappingEntityQryService;
 import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheProdEntityQryService;
 import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheRelEntityQryService;
 import com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheOfferRelIndexQryService;
@@ -15,6 +16,7 @@ import com.ctzj.smt.bss.cache.service.api.model.CacheResultObject;
 import com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService;
 import com.ctzj.smt.bss.customer.model.dataobject.OfferProdInstRel;
 import com.ctzj.smt.bss.customer.model.dataobject.ProdInst;
+import com.ctzj.smt.bss.customer.model.dataobject.RowIdMapping;
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.Operator;
@@ -178,6 +180,8 @@ public class EventApiServiceImpl implements EventApiService {
     @Autowired(required = false)
     private ICacheRelEntityQryService iCacheRelEntityQryService;
 
+    @Autowired(required = false)
+    private ICacheIdMappingEntityQryService iCacheIdMappingEntityQryService;
 
     @Override
     public Map<String, Object> CalculateCPC(Map<String, Object> map) {
@@ -377,9 +381,11 @@ public class EventApiServiceImpl implements EventApiService {
             Map<String, Object> result = new HashMap();
 
             //构造返回结果
+            List<Map<String, Object>> taskChlList = new ArrayList<>();
             String custId = map.get("custId");
             result.put("reqId", map.get("reqId"));
             result.put("custId", custId);
+            result.put("taskChlList", taskChlList);
 
             //初始化es log
             JSONObject esJson = new JSONObject();
@@ -570,13 +576,13 @@ public class EventApiServiceImpl implements EventApiService {
                         } else {
                             // 若未绑定微厅，查看联系号码是否为C网用户
                             // 价格判断是否为手机号码
-                            log.info("111---contactNumber --->" + contactNumber);
+                        //    log.info("111---contactNumber --->" + contactNumber);
                             boolean isMobile = isMobile(contactNumber);
                             boolean isCUser = false;
-                            log.info("222---isMobile --->" + isMobile);
+                        //    log.info("222---isMobile --->" + isMobile);
                             if (isMobile) {
                                 CacheResultObject<Set<String>> prodInstIdResult = iCacheProdIndexQryService.qryProdInstIndex3(contactNumber, "100000");
-                                log.info("333---是否为C网用户-----prodInstIdResult --->" + JSON.toJSONString(prodInstIdResult));
+                        //        log.info("333---是否为C网用户-----prodInstIdResult --->" + JSON.toJSONString(prodInstIdResult));
                                 if (prodInstIdResult != null && prodInstIdResult.getResultObject() != null && prodInstIdResult.getResultObject().size() > 0) {
                                     labelItems.put("CPCP_PUSH_CHANNEL", "2"); // 1-微厅, 2-短厅, 3-IVR
                                     isCUser = true;
@@ -597,7 +603,7 @@ public class EventApiServiceImpl implements EventApiService {
                                 Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
                                 if ("0".equals(dubboResult.get("result_code").toString())) {
                                     JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
-                                    log.info("444---body --->" + JSON.toJSONString(body));
+                         //           log.info("444---body --->" + JSON.toJSONString(body));
                                     //ES log 标签实例
                                     for (Map.Entry<String, Object> entry : body.entrySet()) {
                                         if ("PRD_NAME".equals(entry.getKey()) && "CDMA".equals(entry.getValue().toString())) {
@@ -618,7 +624,7 @@ public class EventApiServiceImpl implements EventApiService {
                             }
                         }
                     }
-                    log.info("555---labelItems --->" + JSON.toJSONString(labelItems));
+                  //  log.info("555---labelItems --->" + JSON.toJSONString(labelItems));
                 }
 
                 //获取事件推荐活动数
@@ -2050,7 +2056,8 @@ public class EventApiServiceImpl implements EventApiService {
 
 
                 // 判断活动类型
-                if (!StatusCode.REAL_TIME_CAMPAIGN.getStatusCode().equals(mktCampaign.getTiggerType())) {
+                if (!StatusCode.REAL_TIME_CAMPAIGN.getStatusCode().equals(mktCampaign.getTiggerType())
+                        && !StatusCode.MIXTURE_CAMPAIGN.getStatusCode().equals(mktCampaign.getTiggerType())) {
                     esJson.put("hit", false);
                     esJson.put("msg", "活动类型不符");
                     log.info("活动类型不符");
@@ -2656,36 +2663,42 @@ public class EventApiServiceImpl implements EventApiService {
         List<String> accNbrList = new ArrayList<>();
         List<Map<String, Object>> accNbrMapList = new ArrayList<>();
         // 根据accNum查询prodInstId
-        log.info("11111------prodInstIdsObject --->" + accNbr);
+        //log.info("11111------prodInstIdsObject --->" + accNbr);
         CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(accNbr);
-        log.info("22222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
+        //log.info("22222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
         if (prodInstIdsObject != null && prodInstIdsObject.getResultObject() != null) {
             Set<String> prodInstIds = prodInstIdsObject.getResultObject();
             for (String prodInstId : prodInstIds) {
                 // 查询产品实例实体缓存
                 CacheResultObject<ProdInst> prodInstCacheEntity = iCacheProdEntityQryService.getProdInstCacheEntity(prodInstId);
-                log.info("333333------prodInstCacheEntity --->" + JSON.toJSONString(prodInstCacheEntity));
+                //log.info("333333------prodInstCacheEntity --->" + JSON.toJSONString(prodInstCacheEntity));
                 if (prodInstCacheEntity != null && prodInstCacheEntity.getResultObject() != null) {
                     Long mainOfferInstId = prodInstCacheEntity.getResultObject().getMainOfferInstId();
                     // 根据offerInstId和statusCd查询offerProdInstRelId
                     CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex1(mainOfferInstId.toString(), "1000");
-                    log.info("444444------setCacheResultObject --->" + JSON.toJSONString(setCacheResultObject));
+                    //log.info("444444------setCacheResultObject --->" + JSON.toJSONString(setCacheResultObject));
                     if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null && setCacheResultObject.getResultObject().size() > 0) {
                         Set<String> offerProdInstRelIds = setCacheResultObject.getResultObject();
                         for (String offerProdInstRelId : offerProdInstRelIds) {
                             CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
-                            log.info("55555------offerProdInstRelCacheEntity --->" + JSON.toJSONString(offerProdInstRelCacheEntity));
+                            //log.info("55555------offerProdInstRelCacheEntity --->" + JSON.toJSONString(offerProdInstRelCacheEntity));
                             if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
                                 Long prodInstIdNew = offerProdInstRelCacheEntity.getResultObject().getProdInstId();
                                 CacheResultObject<ProdInst> prodInstCacheEntityNew = iCacheProdEntityQryService.getProdInstCacheEntity(prodInstIdNew.toString());
-                                log.info("6666666------prodInstCacheEntityNew --->" + JSON.toJSONString(prodInstCacheEntityNew));
+                                //log.info("6666666------prodInstCacheEntityNew --->" + JSON.toJSONString(prodInstCacheEntityNew));
                                 if (prodInstCacheEntityNew != null && prodInstCacheEntityNew.getResultObject() != null) {
-                                    log.info("777777------AccNum --->" + prodInstCacheEntityNew.getResultObject().getAccNum());
+                                    //log.info("777777------AccNum --->" + prodInstCacheEntityNew.getResultObject().getAccNum());
                                     if (!accNbrList.contains(prodInstCacheEntityNew.getResultObject().getAccNum())) {
                                         accNbrList.add(prodInstCacheEntityNew.getResultObject().getAccNum());
-                                        Map<String, Object> accNbrMap = new HashMap<>();
-                                        accNbrMap.put("ACC_NBR", prodInstCacheEntityNew.getResultObject().getAccNum());
-                                        accNbrMapList.add(accNbrMap);
+                                        final CacheResultObject<RowIdMapping> prodInstIdMappingCacheEntity = iCacheIdMappingEntityQryService.getProdInstIdMappingCacheEntity(prodInstIdNew.toString());
+                                        //log.info("888888------prodInstIdMappingCacheEntity --->" + JSON.toJSONString(prodInstIdMappingCacheEntity));
+                                        if (prodInstIdMappingCacheEntity != null && prodInstIdMappingCacheEntity.getResultObject() != null ) {
+                                            Map<String, Object> accNbrMap = new HashMap<>();
+                                            accNbrMap.put("ACC_NBR", prodInstCacheEntityNew.getResultObject().getAccNum());
+                                            accNbrMap.put("ASSET_INTEG_ID", prodInstIdMappingCacheEntity.getResultObject().getCrmRowId());
+                                            //log.info("999999------accNbrMap --->" + JSON.toJSONString(accNbrMap));
+                                            accNbrMapList.add(accNbrMap);
+                                        }
                                     }
                                 }
                             }
@@ -2694,7 +2707,7 @@ public class EventApiServiceImpl implements EventApiService {
                 }
             }
         }
-        log.info("8888888------AccNum --->" + JSON.toJSONString(accNbrList));
+        log.info("10101010------accNbrMapList --->" + JSON.toJSONString(accNbrMapList));
         return accNbrMapList;
     }
 

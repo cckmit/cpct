@@ -52,9 +52,6 @@ public class CloseRuleServiceImpl implements CloseRuleService {
     @Autowired
     private SynFilterRuleService synFilterRuleService;
 
-    @Value("${sync.value}")
-    private String value;
-
     /**
      * 根据关单规则id集合查询过滤规则集合
      */
@@ -82,10 +79,10 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
         List<CloseRule> closeRules = closeRuleMapper.qryFilterRule(closeRuleReq.getCloseRule());
         Page page = new Page(new PageInfo(closeRules));
-        List<FilterRuleVO> voList = new ArrayList<>();
+        List<CloseRuleVO> voList = new ArrayList<>();
         for (CloseRule rule : closeRules){
-            FilterRuleVO vo = BeanUtil.create(rule,new FilterRuleVO());
-            SysParams sysParams = sysParamsMapper.findParamsByValue("CAM-C-999",rule.getFilterType());
+            CloseRuleVO vo = BeanUtil.create(rule,new CloseRuleVO());
+            SysParams sysParams = sysParamsMapper.findParamsByValue("CAM-C-999",rule.getCloseType());
             if (sysParams!=null){
                 vo.setFilterTypeName(sysParams.getParamName());
             }
@@ -141,8 +138,9 @@ public class CloseRuleServiceImpl implements CloseRuleService {
 
     /**
      * 新建关单规则
-     *  "operator": 1000 成功 2000 失败
-        " expression": "关单编号",
+     *  "closeCode": 0 成功 1 失败
+        " productType": 产品类型,
+     expression 关单编码自动生成 关单类型 CR001: 判断类型 000001 自然数自增
      */
     @Override
     public Map<String, Object> createFilterRule(CloseRuleAddVO addVO) {
@@ -156,7 +154,7 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         closeRule.setCreateStaff(UserUtil.loginId());
         closeRule.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
         List<String> codeList = new ArrayList<>();
-        if (StringUtils.isNotBlank(addVO.getFilterType()) && addVO.getFilterType().equals("2000")){
+        if (StringUtils.isNotBlank(addVO.getCloseType()) && addVO.getCloseType().equals("2000")){
             if (addVO.getChooseProduct()!= null && !addVO.getChooseProduct().isEmpty()){
                 for (Long offerId : addVO.getChooseProduct()){
                     Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
@@ -171,26 +169,37 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         if (StringUtils.isNotBlank(addVO.getOfferInfo()) && !addVO.getOfferInfo().equals("2000")){
             addVO.setOfferInfo("");
         }
-        if (StringUtils.isNotBlank(addVO.getExecutionChannel()) && !addVO.getExecutionChannel().equals("2000")){
-            addVO.setExecutionChannel("");
+        if (StringUtils.isNotBlank(addVO.getProductType()) && !addVO.getProductType().equals("2000")){
+            addVO.setProductType("");
         }
         closeRuleMapper.createFilterRule(closeRule);
+        //关单编码确认类型 自然数自增
+        if (StringUtils.isNotBlank(addVO.getCloseType()) && addVO.getCloseType().equals("1000")){
+            addVO.setExpression("CR001");
+        }
+        if (StringUtils.isNotBlank(addVO.getCloseType()) && addVO.getCloseType().equals("3000")){
+            addVO.setExpression("CR003");
+        }
+        if (StringUtils.isNotBlank(addVO.getCloseType()) && addVO.getCloseType().equals("4000")){
+            addVO.setExpression("CR004");
+        }
+        //自动步枪6位数 前面补零
+        String expression = CpcUtil.addZeroForNum(String.valueOf(closeRule.getRuleId()), 6);
+        closeRuleMapper.updateExpression(closeRule.getRuleId().toString(),addVO.getExpression()+expression);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("filterRule", closeRule);
-
-        if (SystemParamsUtil.getSyncValue().equals("1")){
-            new Thread(){
-                public void run(){
-                    try {
-                        synFilterRuleService.synchronizeSingleFilterRule(closeRule.getRuleId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
-
+//        if (SystemParamsUtil.getSyncValue().equals("1")){
+//            new Thread(){
+//                public void run(){
+//                    try {
+//                        synFilterRuleService.synchronizeSingleFilterRule(closeRule.getRuleId(),"");
+//                    }catch (Exception e){
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }.start();
+//        }
         return maps;
     }
 
@@ -268,7 +277,7 @@ public class CloseRuleServiceImpl implements CloseRuleService {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", "过滤规则不存在");
         }
-        FilterRuleVO vo = BeanUtil.create(closeRuleT,new FilterRuleVO());
+        CloseRuleVO vo = BeanUtil.create(closeRuleT,new CloseRuleVO());
         if (closeRuleT.getChooseProduct()!=null && !closeRuleT.getChooseProduct().equals("")){
             List<String> codeList = ChannelUtil.StringToList(closeRuleT.getChooseProduct());
             List<OfferDetail> productList = new ArrayList<>();

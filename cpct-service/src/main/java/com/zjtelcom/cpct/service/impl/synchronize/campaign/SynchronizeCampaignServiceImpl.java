@@ -408,8 +408,8 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
 
             // 删除过滤规则缓存
             List<Long> longList = mktStrategyFilterRuleRelPrdMapper.selectByStrategyId(mktCampaignId);
+            redisUtils_prd.del("MKT_FILTER_RULE_IDS_" + mktCampaignId);
             for (Long filterRuleId : longList) {
-                redisUtils_prd.del("MKT_FILTER_RULE_IDS_" + filterRuleId);
                 redisUtils_prd.del("FILTER_RULE_DISTURB_" + filterRuleId);
             }
 
@@ -483,8 +483,8 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
 
             // 删除过滤规则缓存
             List<Long> longList = mktStrategyFilterRuleRelMapper.selectByStrategyId(mktCampaignId);
+            redisUtils.del("MKT_FILTER_RULE_IDS_" + mktCampaignId);
             for (Long filterRuleId : longList) {
-                redisUtils.del("MKT_FILTER_RULE_IDS_" + filterRuleId);
                 redisUtils.del("FILTER_RULE_DISTURB_" + filterRuleId);
             }
 

@@ -186,6 +186,8 @@ public class SyncActivityServiceImpl implements SyncActivityService {
                         }
                     }
                 }
+                ruleModel.setLabelList(labelModelList);
+                ruleModel.setTarGrpConditionList(tarGrpConditionModelList);
                 ruleList.add(ruleModel);
             }
             policyModel.setRuleList(ruleList);

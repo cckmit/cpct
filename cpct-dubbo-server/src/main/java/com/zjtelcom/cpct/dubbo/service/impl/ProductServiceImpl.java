@@ -14,10 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -52,7 +49,6 @@ public class ProductServiceImpl implements ProductService {
                     List<MktStrategyCloseRuleRelDO> mktStrategyCloseRuleRelDOList = mktStrategyCloseRuleRelMapper.selectByRuleId(filterRule1.getRuleId());
                     for (MktStrategyCloseRuleRelDO mktStrategyCloseRuleRelDO : mktStrategyCloseRuleRelDOList) {
                         Map<String, Object> maps = new HashMap<>();
-                        maps.put("activityId", mktStrategyCloseRuleRelDO.getStrategyId());
                         if (filterRule1.getOfferInfo() != null) {
                             if (filterRule1.getOfferInfo().equals("1000")) {
                                 offerInfo = "0";
@@ -63,6 +59,10 @@ public class ProductServiceImpl implements ProductService {
                             }
                         }
                         maps.put("closeType", offerInfo);
+                        maps.put("activityId", mktStrategyCloseRuleRelDO.getStrategyId());
+                        maps.put("closeName",filterRule1.getCloseName());
+                        maps.put("closeCode",filterRule1.getCloseCode());
+                        maps.put("closeNumber",filterRule1.getExpression());
                         activityList.add(maps);
                     }
                 }
@@ -91,8 +91,12 @@ public class ProductServiceImpl implements ProductService {
         Map<String, Object> resultMap = new HashMap<>();
         String filterType = (String) paramMap.get("filterType");
         List<Map<String,Object>> list = null;
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("filterType",filterType);
+        map.put("date",DateUtil.getDateFormatStr(new Date()));
+        map.put("status","2002");
         if (StringUtils.isNotBlank(filterType)) {
-            list = closeRuleMapper.getCloseCampaign(filterType);
+            list = closeRuleMapper.getCloseCampaign(map);
         }
         resultMap.put("resultCode","200");
         resultMap.put("resultData",list);

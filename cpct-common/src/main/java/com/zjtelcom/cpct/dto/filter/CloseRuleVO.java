@@ -5,7 +5,7 @@ import com.zjtelcom.cpct.dto.channel.OfferDetail;
 import java.io.Serializable;
 import java.util.List;
 
-public class CloseRuleVO extends FilterRule implements Serializable {
+public class CloseRuleVO extends CloseRule implements Serializable {
     private String filterTypeName;
     private Long labelId;
     private String conditionName;

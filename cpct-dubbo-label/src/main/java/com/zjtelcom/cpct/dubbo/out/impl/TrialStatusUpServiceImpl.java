@@ -44,7 +44,7 @@ public class TrialStatusUpServiceImpl implements TrialStatusUpService {
         Map<String,Object> result = new HashMap<>();
         String batchNum = MapUtil.getString(params.get("batchNum"));
         String status = MapUtil.getString(params.get("status"));
-        String remark = MapUtil.getString(params.get("remark"));
+        String remark = MapUtil.getString(params.get("message"));
         TrialOperation operation = trialOperationMapper.selectByBatchNum(batchNum);
         if (operation==null){
             result.put("resultCode",CODE_FAIL);
@@ -66,7 +66,11 @@ public class TrialStatusUpServiceImpl implements TrialStatusUpService {
         try {
             Map<String,Object> param = new HashMap<>();
             param.put("batchNum",batchNum);
-            param.put("data",TrialStatus.getNameByCode(status).getName());
+            if (status.equals(TrialStatus.ISEE_ANALYZE_FAIL.getValue())){
+                param.put("data",remark);
+            }else {
+                param.put("data",TrialStatus.getNameByCode(status).getName());
+            }
             esService.addLogByBatchNum(param);
         }catch (Exception e){
             e.printStackTrace();

@@ -515,8 +515,8 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
 
             // 删除过滤规则缓存
             List<Long> longList = mktStrategyFilterRuleRelPrdMapper.selectByStrategyId(mktCampaignId);
+            redisUtils_prd.del("MKT_FILTER_RULE_IDS_" + mktCampaignId);
             for (Long filterRuleId : longList) {
-                redisUtils_prd.del("MKT_FILTER_RULE_IDS_" + filterRuleId);
                 redisUtils_prd.del("FILTER_RULE_DISTURB_" + filterRuleId);
             }
 
@@ -948,12 +948,12 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
                     for (int i = 0; i <productIds.length ; i++) {
                         MktCamItem mktCamItem = mktCamItemMapper.selectByPrimaryKey(Long.valueOf(productIds[i]));
                         if (mktCamItem != null) {
-                            MktCamItem mktCamItemNew = mktCamItemMapper.selectByCampaignIdAndItemIdAndType(mktCamItem.getItemId(), childMktCampaignId, mktCamItem.getItemType());
-                            if (mktCamItemNew != null) {
+                            List<MktCamItem> mktCamItemList = mktCamItemMapper.selectByCampaignIdAndItemIdAndType(mktCamItem.getItemId(), childMktCampaignId, mktCamItem.getItemType());
+                            if (mktCamItemList != null && !mktCamItemList.isEmpty()) {
                                 if (i == 0){
-                                    childProductIds += mktCamItemNew.getMktCamItemId();
+                                    childProductIds += mktCamItemList.get(0).getMktCamItemId();
                                 } else {
-                                    childProductIds += "/" + mktCamItemNew.getMktCamItemId();
+                                    childProductIds += "/" + mktCamItemList.get(0).getMktCamItemId();
                                 }
                             }
                         }
@@ -1342,7 +1342,7 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
                 return null;
             }
         }
-        result = createTarGrp(detail,isCopy);
+        result = createTarGrp4Publish(detail,isCopy);
         return result;
     }
 
