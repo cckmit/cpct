@@ -414,5 +414,49 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         return map;
     }
 
+    /**
+     * 展示列标签展示类型配置
+     */
+    @Override
+    public Map<String, Object> configureLabelDisplayType(Long displayColumnId, Long labelId, List<String> labelDisplayTypeId) {
+        Map<String, Object> map = new HashMap<>();
+        List<DisplayColumnLabel> displayColumnLabels = displayColumnLabelMapper.findListByDisplayId(displayColumnId);
+        if(displayColumnLabels.size() == 0) {
+            map.put("resultCode", CODE_FAIL);
+            map.put("resultMsg", "展示列标签不存在，请保存后再操作");
+            return map;
+        }
+        DisplayColumnLabel displayColumnLabel = displayColumnLabelMapper.findByDisplayIdAndLabelId(displayColumnId, labelId);
+        String labelDisplayType = null;
+        if(labelDisplayTypeId.size() > 0) {
+            labelDisplayType = labelDisplayTypeId.get(0);
+            for(int i=1;i<labelDisplayTypeId.size();i++) {
+                labelDisplayType = labelDisplayType + "," + labelDisplayTypeId.get(i);
+            }
+        }
+        displayColumnLabel.setLabelDisplayType(labelDisplayType);
+        displayColumnLabel.setUpdateDate(DateUtil.getCurrentTime());
+        displayColumnLabelMapper.updateByPrimaryKey(displayColumnLabel);
+        map.put("resultCode", CODE_SUCCESS);
+        map.put("resultMsg", StringUtils.EMPTY);
+        return map;
+    }
 
+    /**
+     * 查询展示列标签展示类型
+     */
+    public Map<String, Object> viewLabelDisplayType(Long displayColumnId, Long labelId) {
+        Map<String, Object> map = new HashMap<>();
+        DisplayColumnLabel displayColumnLabel = displayColumnLabelMapper.findByDisplayIdAndLabelId(displayColumnId, labelId);
+        String[] labelDisplayTypeId = {};
+        if(displayColumnLabel != null) {
+            String labelDisplayType = displayColumnLabel.getLabelDisplayType();
+            if (labelDisplayType != null) {
+                labelDisplayTypeId = labelDisplayType.split(",");
+            }
+        }
+        map.put("resultCode", CODE_SUCCESS);
+        map.put("resultMsg", labelDisplayTypeId);
+        return map;
+    }
 }
