@@ -1,18 +1,18 @@
 package com.zjtelcom.cpct.controller.channel;
 
+import com.mysql.jdbc.util.ResultSetUtil;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dto.channel.LabelAddVO;
 import com.zjtelcom.cpct.dto.channel.LabelEditVO;
 import com.zjtelcom.cpct.dto.channel.LabelGrpParam;
 import com.zjtelcom.cpct.dto.channel.QryMktScriptReq;
+import com.zjtelcom.cpct.dto.pojo.Result;
 import com.zjtelcom.cpct.service.channel.LabelCatalogService;
 import com.zjtelcom.cpct.service.channel.LabelService;
-import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.ChannelUtil;
-import com.zjtelcom.cpct.util.MapUtil;
-import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -561,9 +561,41 @@ public class LabelController extends BaseController {
         return result;
     }
 
+    /**
+     * 派单规则通过标签指定人或区域
+     * 通过标签类型查询派单标签
+     */
+    @PostMapping("distributeListRule")
+    @CrossOrigin
+    public Map<String,Object> distributeListRule(@RequestBody Map<String,Integer> params) {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            return labelService.distributeListRule(params.get("labelType"));
+        } catch (Exception e) {
+            logger.error("[op:LabelController] fail to distributeListRule", e);
+            // return ResultUtil.responseFailResult();
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to distributeListRule");
+            result.put("resultObject","");
+            return result;
+        }
+    }
 
-
-
-
-
+    /**
+     * 派单规则通过标签指定人或区域
+     * 通过标签编码查询派单标签
+     */
+    @PostMapping("queryDistributeLabel")
+    @CrossOrigin
+    public Map<String,Object> queryDistributeLabel(@RequestBody Map<String,String> params) {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            return labelService.queryDistributeLabel(params.get("labelCode"));
+        } catch (Exception e) {
+            logger.error("[op:LabelController] fail to queryDistributeLabel", e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to queryDistributeLabel");
+            return result;
+        }
+    }
 }

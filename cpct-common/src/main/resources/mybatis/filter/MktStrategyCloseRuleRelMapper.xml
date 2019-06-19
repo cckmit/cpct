@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.strategy.MktStrategyCloseRuleRelDO">
+    <id column="MKT_STRATEGY_FILTER_RULE_REL_ID" jdbcType="BIGINT" property="mktStrategyFilterRuleRelId" />
+    <result column="STRATEGY_ID" jdbcType="BIGINT" property="strategyId" />
+    <result column="RULE_ID" jdbcType="BIGINT" property="ruleId" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+  </resultMap>
+
+  <select id="selectByRuleId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_STRATEGY_FILTER_RULE_REL_ID, STRATEGY_ID, RULE_ID, CREATE_STAFF, CREATE_DATE,
+    UPDATE_STAFF, UPDATE_DATE
+    from mkt_strategy_close_rule_rel
+    where RULE_ID = #{ruleId,jdbcType=BIGINT}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from mkt_strategy_close_rule_rel
+    where MKT_STRATEGY_FILTER_RULE_REL_ID = #{mktStrategyFilterRuleRelId,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByStrategyId" parameterType="java.lang.Long">
+    delete from mkt_strategy_close_rule_rel
+    where STRATEGY_ID = #{strategyId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyCloseRuleRelDO">
+    insert into mkt_strategy_close_rule_rel (MKT_STRATEGY_FILTER_RULE_REL_ID, STRATEGY_ID,
+    RULE_ID, CREATE_STAFF, CREATE_DATE,
+    UPDATE_STAFF, UPDATE_DATE)
+    values (#{mktStrategyFilterRuleRelId,jdbcType=BIGINT}, #{strategyId,jdbcType=BIGINT},
+    #{ruleId,jdbcType=BIGINT}, #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP},
+    #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertBatch" parameterType="java.util.List">
+    insert into mkt_strategy_close_rule_rel (MKT_STRATEGY_FILTER_RULE_REL_ID, STRATEGY_ID,
+    RULE_ID, CREATE_STAFF, CREATE_DATE,
+    UPDATE_STAFF, UPDATE_DATE)
+    values
+    <foreach collection="list" item="item" open="(" close=")" index="i" separator=",">
+      (#{item.mktStrategyFilterRuleRelId,jdbcType=BIGINT}, #{item.strategyId,jdbcType=BIGINT},
+      #{item.ruleId,jdbcType=BIGINT}, #{item.createStaff,jdbcType=BIGINT}, #{item.createDate,jdbcType=TIMESTAMP},
+      #{item.updateStaff,jdbcType=BIGINT}, #{item.updateDate,jdbcType=TIMESTAMP})
+    </foreach>
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyCloseRuleRelDO">
+    update mkt_strategy_close_rule_rel
+    set STRATEGY_ID = #{strategyId,jdbcType=BIGINT},
+    RULE_ID = #{ruleId,jdbcType=BIGINT},
+    CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+    CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+    UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+    UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
+    where MKT_STRATEGY_FILTER_RULE_REL_ID = #{mktStrategyFilterRuleRelId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_STRATEGY_FILTER_RULE_REL_ID, STRATEGY_ID, RULE_ID, CREATE_STAFF, CREATE_DATE,
+    UPDATE_STAFF, UPDATE_DATE
+    from mkt_strategy_close_rule_rel
+    where MKT_STRATEGY_FILTER_RULE_REL_ID = #{mktStrategyFilterRuleRelId,jdbcType=BIGINT}
+  </select>
+  <select id="selectByStrategyId" parameterType="java.lang.Long" resultType="java.lang.Long">
+    select RULE_ID
+    from mkt_strategy_close_rule_rel
+    where STRATEGY_ID = #{strategyId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select MKT_STRATEGY_FILTER_RULE_REL_ID, STRATEGY_ID, RULE_ID, CREATE_STAFF, CREATE_DATE,
+    UPDATE_STAFF, UPDATE_DATE
+    from mkt_strategy_close_rule_rel
+  </select>
+  <select id="selectRuleByStrategyId" resultMap="BaseResultMap">
+    select MKT_STRATEGY_FILTER_RULE_REL_ID, STRATEGY_ID, RULE_ID, CREATE_STAFF, CREATE_DATE,
+    UPDATE_STAFF, UPDATE_DATE
+    from mkt_strategy_close_rule_rel
+    where STRATEGY_ID = #{strategyId,jdbcType=BIGINT}
+  </select>
+
+</mapper>

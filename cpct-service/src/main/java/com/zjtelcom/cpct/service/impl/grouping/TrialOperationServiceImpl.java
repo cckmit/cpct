@@ -5,35 +5,44 @@ import com.alibaba.fastjson.JSONArray;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
+import com.mysql.jdbc.StringUtils;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.campaign.MktCamChlConfAttrMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
-import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
+import com.zjtelcom.cpct.dao.channel.MktCamCustMapper;
+import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
+import com.zjtelcom.cpct.dao.filter.CloseRuleMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
+import com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
-import com.zjtelcom.cpct.domain.Rule;
+import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.GroupingVO;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyCloseRuleRelDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.channel.TransDetailDataVO;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
+import com.zjtelcom.cpct.dto.filter.CloseRule;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.*;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
@@ -54,12 +63,7 @@ import com.zjtelcom.es.es.entity.model.LabelResultES;
 import com.zjtelcom.es.es.entity.model.TrialOperationParamES;
 import com.zjtelcom.es.es.entity.model.TrialResponseES;
 import com.zjtelcom.es.es.service.EsService;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -77,6 +81,7 @@ import java.util.regex.Pattern;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+import static com.zjtelcom.cpct.enums.ConfAttrEnum.*;
 
 @Service
 public class TrialOperationServiceImpl extends BaseService implements TrialOperationService {
@@ -129,6 +134,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private FilterRuleMapper filterRuleMapper;
     @Autowired
     private RedisUtils_es redisUtils_es;
+    @Autowired
+    private MktCamChlConfMapper mktCamChlConfMapper;
+    @Autowired
+    private MktCamChlConfAttrMapper mktCamChlConfAttrMapper;
 
     /**
      * 销售品service
@@ -150,6 +159,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private MktCamItemMapper itemMapper;
     @Autowired(required = false)
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
+    @Autowired
+    private MktStrategyCloseRuleRelMapper strategyCloseRuleRelMapper;
+    @Autowired
+    private CloseRuleMapper closeRuleMapper;
 
 
 
@@ -320,6 +333,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         TrialOperationVOES requests = BeanUtil.create(request, new TrialOperationVOES());
         ArrayList<TrialOperationParamES> paramList = new ArrayList<>();
         TrialOperationParamES param = getTrialOperationParamES(request, Long.valueOf(batchNumSt),  Long.valueOf(new Date().getTime()+ChannelUtil.getRandomStr(2)) + 1, true, conditions);
+        param.setRuleId(ruleId);
         paramList.add(param);
         requests.setParamList(paramList);
         TrialResponseES response = new TrialResponseES();
@@ -711,12 +725,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 return result;
             }
             for (int i = 0; i < nameList.length; i++) {
-                if (labelNameList.contains(nameList[i])) {
+                if (labelNameList.contains(nameList[i].trim())) {
                     result.put("resultCode", CODE_FAIL);
                     result.put("resultMsg", "标签中文名称不能重复:" + "\"" + nameList[i] + "\"");
                     return result;
                 }
-                if (labelEngNameList.contains(codeList[i])) {
+                if (labelEngNameList.contains(codeList[i].trim())) {
                     result.put("resultCode", CODE_FAIL);
                     result.put("resultMsg", "标签英文名称不能重复:" + "\"" + codeList[i] + "\"");
                     return result;
@@ -752,6 +766,22 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 result.put("resultCode", CODE_FAIL);
                 result.put("resultMsg", "扩展字段不能超过87个");
                 return result;
+            }
+            List<MktStrategyCloseRuleRelDO> closeRuleRelDOS = strategyCloseRuleRelMapper.selectRuleByStrategyId(campaign.getMktCampaignId());
+            //todo 关单规则配置信息
+            if (closeRuleRelDOS!=null && !closeRuleRelDOS.isEmpty()){
+                List<Map<String,Object>> closeRule = new ArrayList<>();
+                for (MktStrategyCloseRuleRelDO ruleRelDO : closeRuleRelDOS){
+                    CloseRule closeR = closeRuleMapper.selectByPrimaryKey(ruleRelDO.getRuleId());
+                    if (closeR!=null){
+                        Map<String,Object> ruleMap = new HashMap<>();
+                        ruleMap.put("closeName",closeR.getCloseName());
+                        ruleMap.put("closeCode",closeR.getCloseCode());
+                        ruleMap.put("closeNbr",closeR.getExpression());
+                        closeRule.add(ruleMap);
+                    }
+                }
+                redisUtils_es.set("CLOSE_RULE_"+campaign.getMktCampaignId(),closeRule);
             }
             TrialOperation trialOp = BeanUtil.create(operation, new TrialOperation());
             trialOp.setCampaignName(campaign.getMktCampaignName());
@@ -795,10 +825,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                 value = data.get(x);
                             }
                             if (value.contains("\r")){
-                                value.replace("\r","");
+                                value = value.replace("\r","");
                             }
                             if (value.contains("\n")){
-                                value.replace("\n","");
+                                value = value.replace("\n","");
                             }
                             if (codeList[x].equals("CCUST_NAME") && (value.contains("null") || value.equals(""))) {
                                 check = false;
@@ -1230,6 +1260,22 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     labelCodeList.add(set);
                 }
                 map.put(set, searchMap.get(set));
+                // 数据脱敏(客户证件号)，查询全局开关（0：关；1：开）
+                String dataDesFilter = (String) redisUtils.get("DATA_DESENSITIZATION_FILTER");
+                if (dataDesFilter == null) {
+                    List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("DATA_DESENSITIZATION_FILTER");
+                    if (sysParamsList != null && sysParamsList.size() > 0) {
+                        dataDesFilter = sysParamsList.get(0).getParamValue();
+                        redisUtils.set("DATA_DESENSITIZATION_FILTER", dataDesFilter);
+                    }
+                }
+                // 数据脱敏(客户证件号)，脱敏操作
+                if (set.equals("ID_NBR") && ( null == dataDesFilter || dataDesFilter.equals("1"))) {
+                    String value = dataDesensitization((String) searchMap.get(set));
+                    map.put(set, value);
+                } else {
+                    map.put(set, searchMap.get(set));
+                }
             }
             map.put("campaignId", operation.getCampaignId());
             map.put("campaignName", operation.getCampaignName());
@@ -1252,7 +1298,23 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         return result;
     }
 
-
+    private String dataDesensitization(String sfz) {
+        String sfzyc = "";
+        if (!StringUtils.isNullOrEmpty(sfz)) {
+            if (sfz.length() == 18 || sfz.length() == 15) {
+                sfzyc = (sfz.substring(0, 6) + "********" + sfz.substring(sfz.length() - 4, sfz.length()));
+            } else if (sfz.length() == 10) {
+                sfzyc = (sfz.substring(0, 7) + "***");
+            } else if (sfz.length() > 18) {
+                sfzyc = (sfz.substring(0, 6) + "********" + sfz.substring(sfz.length() - 4, sfz.length()));
+            } else if (sfz.length() - 2 >= 4) {
+                sfzyc = (sfz.substring(0, 2) + "******" + sfz.substring(sfz.length() - 2, sfz.length()));
+            } else if (sfz.length() - 2 >= 1) {
+                sfzyc = (sfz.substring(0, 1) + "*****" + sfz.substring(sfz.length() - 1, sfz.length()));
+            }
+        }
+        return sfzyc;
+    }
 
     /**
      * 下发策略试运算结果
@@ -1293,24 +1355,24 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "抽样试算失败，无法全量试算");
             return result;
         }
-
-        int timeLimit = 1800000;
-        List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign("TRIAL_TIME");
-        if (sysParams.get(0)!=null){
-            timeLimit = Integer.valueOf(sysParams.get(0).getParamValue());
+        List<MktStrategyCloseRuleRelDO> closeRuleRelDOS = strategyCloseRuleRelMapper.selectRuleByStrategyId(campaignDO.getMktCampaignId());
+        //todo 关单规则配置信息
+        if (closeRuleRelDOS!=null && !closeRuleRelDOS.isEmpty()){
+            List<Map<String,Object>> closeRule = new ArrayList<>();
+            for (MktStrategyCloseRuleRelDO ruleRelDO : closeRuleRelDOS){
+                CloseRule closeR = closeRuleMapper.selectByPrimaryKey(ruleRelDO.getRuleId());
+                if (closeR!=null){
+                    Map<String,Object> ruleMap = new HashMap<>();
+                    ruleMap.put("closeName",closeR.getCloseName());
+                    ruleMap.put("closeCode",closeR.getCloseCode());
+                    ruleMap.put("closeNbr",closeR.getExpression());
+                    closeRule.add(ruleMap);
+                }
+            }
+            redisUtils_es.set("CLOSE_RULE_"+campaignDO.getMktCampaignId(),closeRule);
         }
-        Date upTime = new Date(new Date().getTime() - timeLimit);
-        String[] status  = new String[2];
-        status[0] = TrialStatus.ALL_SAMPEL_SUCCESS.getValue();
-        status[1] = TrialStatus.ALL_SAMPEL_FAIL.getValue();
-
-        List<TrialOperation> operations = trialOperationMapper.listOperationByUpdateTime(trialOperation.getCampaignId(),upTime,status);
-        if (!operations.isEmpty()){
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "相同活动30分钟只能全量试算一次，请稍后再试");
-            return result;
-        }
-
+        //查询活动下面所有渠道属性id是21和22的value
+        List<String> attrValue = mktCamChlConfAttrMapper.selectAttrLabelValueByCampaignId(trialOperation.getCampaignId());
         //添加策略适用地市
         redisUtils.set("STRATEGY_CONF_AREA_"+operation.getStrategyId(),strategyConfDO.getAreaId());
         // 通过活动id获取关联的标签字段数组
@@ -1318,7 +1380,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         req.setDisplayColumnId(campaignDO.getCalcDisplay());
         Map<String,Object> labelMap = messageLabelService.queryLabelListByDisplayId(req);
         List<LabelDTO> labelDTOList = (List<LabelDTO>)labelMap.get("labels");
-        String[] fieldList = new String[labelDTOList.size()];
+        String[] fieldList = new String[labelDTOList.size()+attrValue.size()];
         List<Map<String,Object>> labelList = new ArrayList<>();
         for (int i = 0 ; i< labelDTOList.size();i++){
             fieldList[i] = labelDTOList.get(i).getLabelCode();
@@ -1328,6 +1390,25 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             label.put("labelType",labelDTOList.get(i).getLabelType());
             labelList.add(label);
         }
+        for (int i = labelDTOList.size(); i< labelDTOList.size()+attrValue.size();i++){
+            fieldList[i] = attrValue.get(i-labelDTOList.size());
+        }
+        List<Long> attrList = mktCamChlConfAttrMapper.selectByCampaignId(trialOperation.getCampaignId());
+        if (attrList.contains(ISEE_CUSTOMER.getArrId()) || attrList.contains(ISEE_LABEL_CUSTOMER.getArrId()) ){
+            Map<String,Object> label = new HashMap<>();
+            label.put("code","SALE_EMP_NBR");
+            label.put("name","接单人号码");
+            label.put("labelType","1200");
+            labelList.add(label);
+        }
+        if (attrList.contains(ISEE_AREA.getArrId()) || attrList.contains(ISEE_LABEL_AREA.getArrId()) ){
+            Map<String,Object> label = new HashMap<>();
+            label.put("code","AREA");
+            label.put("name","派单区域");
+            label.put("labelType","1200");
+            labelList.add(label);
+        }
+
         redisUtils.set("LABEL_DETAIL_"+trialOperation.getBatchNum(),labelList);
         List<Map<String, Object>> iSaleDisplay = new ArrayList<>();
         iSaleDisplay = (List<Map<String, Object>>) redisUtils.get("EVT_ISALE_LABEL_" + campaignDO.getIsaleDisplay());

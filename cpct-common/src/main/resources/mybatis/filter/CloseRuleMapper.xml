@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.filter.CloseRuleMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.dto.filter.CloseRule">
+        <id column="RULE_ID" jdbcType="BIGINT" property="ruleId"/>
+        <result column="CLOSE_NAME" jdbcType="VARCHAR" property="closeName"/>
+        <result column="CLOSE_TYPE" jdbcType="VARCHAR" property="closeType"/>
+        <result column="PRODUCT_TYPE" jdbcType="VARCHAR" property="productType"/>
+        <result column="CHANNEL_CONTACTS" jdbcType="VARCHAR" property="channelContacts"/>
+        <result column="EFFECTIVE_DATE" jdbcType="TIMESTAMP" property="effectiveDate"/>
+        <result column="FAILURE_DATE" jdbcType="TIMESTAMP" property="failureDate"/>
+        <result column="LABEL_CODE" jdbcType="VARCHAR" property="labelCode"/>
+        <result column="CHOOSE_PRODUCT" jdbcType="VARCHAR" property="chooseProduct"/>
+        <result column="EXPRESSION" jdbcType="VARCHAR" property="expression"/>
+        <result column="DAY_START" jdbcType="TIMESTAMP" property="dayStart"/>
+        <result column="DAY_END" jdbcType="TIMESTAMP" property="dayEnd"/>
+        <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd"/>
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff"/>
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate"/>
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
+        <result column="REMARK" jdbcType="VARCHAR" property="remark"/>
+        <result column="USER_LIST" jdbcType="VARCHAR" property="userList"/>
+        <result column="CONDITION_ID" jdbcType="BIGINT" property="conditionId"/>
+        <result column="DAYS" jdbcType="VARCHAR" property="days"/>
+        <result column="TIMES" jdbcType="VARCHAR" property="times"/>
+        <result column="OFFER_INFO" jdbcType="VARCHAR" property="offerInfo"/>
+        <result column="CLOSE_CODE" jdbcType="VARCHAR" property="closeCode"/>
+    </resultMap>
+
+    <resultMap id="FilterRuleModelMap" type="com.zjtelcom.cpct.dto.filter.FilterRuleModel">
+        <id column="RULE_ID" jdbcType="BIGINT" property="ruleId"/>
+        <result column="RULE_NAME" jdbcType="VARCHAR" property="ruleName"/>
+        <result column="FILTER_TYPE" jdbcType="VARCHAR" property="filterType"/>
+        <result column="INJECTION_LABEL_CODE" jdbcType="VARCHAR" property="labelCode"/>
+        <result column="INJECTION_LABEL_NAME" jdbcType="VARCHAR" property="labelName"/>
+        <result column="OPER_TYPE" jdbcType="VARCHAR" property="operType"/>
+        <result column="RIGHT_PARAM" jdbcType="VARCHAR" property="rightParam"/>
+        <result column="DAYS" jdbcType="VARCHAR" property="days"/>
+        <result column="TIMES" jdbcType="VARCHAR" property="times"/>
+    </resultMap>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from close_rule
+    where RULE_ID = #{ruleId,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" parameterType="com.zjtelcom.cpct.dto.filter.CloseRule">
+        insert into close_rule (RULE_ID, RULE_NAME, FILTER_TYPE,
+        EXECUTION_CHANNEL, CHANNEL_CONTACTS, EFFECTIVE_DATE,
+        FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF,
+        UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+        UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID, DAYS,
+        TIMES, OFFER_INFO,OPERATOR)
+        values (#{ruleId,jdbcType=BIGINT}, #{ruleName,jdbcType=VARCHAR}, #{filterType,jdbcType=VARCHAR},
+        #{executionChannel,jdbcType=VARCHAR}, #{channelContacts,jdbcType=VARCHAR}, #{effectiveDate,jdbcType=TIMESTAMP},
+        #{failureDate,jdbcType=TIMESTAMP},  #{labelCode,jdbcType=VARCHAR}, #{chooseProduct,jdbcType=VARCHAR},
+        #{expression,jdbcType=VARCHAR}, #{dayStart,jdbcType=TIMESTAMP}, #{dayEnd,jdbcType=TIMESTAMP},
+        #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT},
+        #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP},
+        #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, #{userList,jdbcType=VARCHAR}, #{conditionId,jdbcType=BIGINT},
+        #{days,jdbcType=VARCHAR},#{times,jdbcType=VARCHAR}, #{offerInfo,jdbcType=VARCHAR},#{operator,jdbcType=VARCHAR})
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.dto.filter.CloseRule">
+        update close_rule
+        set CLOSE_NAME = #{closeName,jdbcType=VARCHAR},
+        CLOSE_TYPE = #{closeType,jdbcType=VARCHAR},
+        PRODUCT_TYPE = #{productType,jdbcType=VARCHAR},
+        CHANNEL_CONTACTS = #{channelContacts,jdbcType=VARCHAR},
+        EFFECTIVE_DATE = #{effectiveDate,jdbcType=TIMESTAMP},
+        FAILURE_DATE = #{failureDate,jdbcType=TIMESTAMP},
+        LABEL_CODE =  #{labelCode,jdbcType=VARCHAR},
+        CHOOSE_PRODUCT = #{chooseProduct,jdbcType=VARCHAR},
+        EXPRESSION = #{expression,jdbcType=VARCHAR},
+        DAY_START = #{dayStart,jdbcType=TIMESTAMP},
+        DAY_END =  #{dayEnd,jdbcType=TIMESTAMP},
+        STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+        CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+        UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+        STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+        UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+        REMARK = #{remark,jdbcType=VARCHAR},
+        USER_LIST = #{userList,jdbcType=VARCHAR},
+        CONDITION_ID = #{conditionId,jdbcType=BIGINT},
+        DAYS = #{days,jdbcType=VARCHAR},
+        TIMES = #{times,jdbcType=VARCHAR},
+        OFFER_INFO = #{offerInfo,jdbcType=VARCHAR},
+        CLOSE_CODE = #{closeCode,jdbcType=VARCHAR}
+        where RULE_ID = #{ruleId,jdbcType=BIGINT}
+    </update>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select RULE_ID, CLOSE_NAME, CLOSE_TYPE,
+        PRODUCT_TYPE, CHANNEL_CONTACTS, EFFECTIVE_DATE,
+        FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF,
+        UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+        UPDATE_DATE, REMARK,USER_LIST,CONDITION_ID,DAYS,TIMES,OFFER_INFO,CLOSE_CODE
+        from close_rule
+        where RULE_ID = #{ruleId,jdbcType=BIGINT}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select RULE_ID, RULE_NAME, FILTER_TYPE,
+        EXECUTION_CHANNEL, CHANNEL_CONTACTS, EFFECTIVE_DATE,
+        FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF,
+        UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+        UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID,
+        DAYS, TIMES, OFFER_INFO,OPERATOR
+        from close_rule
+    </select>
+
+    <select id="qryFilterRule" resultMap="BaseResultMap">
+        select RULE_ID, CLOSE_NAME, CLOSE_TYPE,
+        PRODUCT_TYPE, CHANNEL_CONTACTS, EFFECTIVE_DATE,
+        FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF,
+        UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+        UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID,
+        DAYS, TIMES, OFFER_INFO,CLOSE_CODE
+        from close_rule
+        where 1 = 1
+        <if test="closeName != null and closeName != ''">
+            AND CLOSE_NAME like concat('%',concat(#{closeName},'%'))
+        </if>
+        <if test="closeType != null and closeType != ''">
+            AND CLOSE_TYPE = #{closeType}
+        </if>
+        ORDER BY RULE_ID DESC
+    </select>
+
+
+    <delete id="delFilterRule" parameterType="com.zjtelcom.cpct.dto.filter.CloseRule">
+        delete from close_rule
+        where RULE_ID = #{ruleId,jdbcType=BIGINT}
+    </delete>
+
+    <select id="getFilterRule" parameterType="com.zjtelcom.cpct.dto.filter.CloseRule" resultMap="BaseResultMap">
+        select RULE_ID, RULE_NAME, FILTER_TYPE,
+        EXECUTION_CHANNEL, CHANNEL_CONTACTS, EFFECTIVE_DATE,
+        FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF,
+        UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+        UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID,
+        DAYS, TIMES, OFFER_INFO,OPERATOR
+        from close_rule
+        where RULE_ID = #{ruleId,jdbcType=BIGINT}
+    </select>
+
+    <insert id="createFilterRule" parameterType="com.zjtelcom.cpct.dto.filter.CloseRule" useGeneratedKeys="true" keyProperty="ruleId">
+        insert into close_rule (RULE_ID, CLOSE_NAME, CLOSE_TYPE,
+        PRODUCT_TYPE, CHANNEL_CONTACTS, EFFECTIVE_DATE,
+        FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END, STATUS_CD, CREATE_STAFF,
+        UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+        UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID,
+        DAYS, TIMES, OFFER_INFO,CLOSE_CODE)
+        values (#{ruleId,jdbcType=BIGINT}, #{closeName,jdbcType=VARCHAR}, #{closeType,jdbcType=VARCHAR},
+        #{productType,jdbcType=VARCHAR}, #{channelContacts,jdbcType=VARCHAR}, #{effectiveDate,jdbcType=TIMESTAMP},
+        #{failureDate,jdbcType=TIMESTAMP},#{labelCode,jdbcType=VARCHAR},#{chooseProduct,jdbcType=VARCHAR},
+        #{expression,jdbcType=VARCHAR},#{dayStart,jdbcType=TIMESTAMP}, #{dayEnd,jdbcType=TIMESTAMP},
+        #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT},
+        #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP},
+        #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, #{userList,jdbcType=VARCHAR},
+        #{conditionId,jdbcType=BIGINT}, #{days,jdbcType=VARCHAR},
+        #{times,jdbcType=VARCHAR}, #{offerInfo,jdbcType=VARCHAR},#{closeCode,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="modFilterRule" parameterType="com.zjtelcom.cpct.dto.filter.CloseRule">
+        update close_rule
+        set
+        <if test="ruleName != null and ruleName != ''">
+            RULE_NAME = #{ruleName,jdbcType=VARCHAR},
+        </if>
+        <if test="filterType != null and filterType != ''">
+            FILTER_TYPE = #{filterType,jdbcType=VARCHAR},
+        </if>
+        <if test="executionChannel != null and executionChannel != ''">
+            EXECUTION_CHANNEL = #{executionChannel,jdbcType=VARCHAR},
+        </if>
+        <if test="channelContacts != null and channelContacts != ''">
+            CHANNEL_CONTACTS = #{channelContacts,jdbcType=VARCHAR},
+        </if>
+        <if test="effectiveDate != null">
+            EFFECTIVE_DATE = #{effectiveDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="failureDate != null">
+            FAILURE_DATE = #{failureDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="labelCode != null and labelCode != ''">
+            LABEL_CODE = #{labelCode,jdbcType=VARCHAR},
+        </if>
+        <if test="chooseProduct != null and chooseProduct != ''">
+            CHOOSE_PRODUCT = #{chooseProduct,jdbcType=VARCHAR},
+        </if>
+        <if test="expression != null and expression != ''">
+            EXPRESSION = #{expression,jdbcType=VARCHAR},
+        </if>
+        <if test="dayStart != null ">
+            DAY_START = #{dayStart,jdbcType=TIMESTAMP},
+        </if>
+        <if test="dayEnd != null ">
+            DAY_END = #{dayEnd,jdbcType=TIMESTAMP},
+        </if>
+        <if test="updateStaff != null and updateStaff != 0">
+            UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        </if>
+        <if test="updateDate != null">
+            UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="remark != null and remark != ''">
+            REMARK = #{remark,jdbcType=VARCHAR},
+        </if>
+        <if test="userList !=null and userList !=''">
+            USER_LIST = #{userList,jdbcType=VARCHAR},
+        </if>
+        RULE_ID = #{ruleId,jdbcType=BIGINT},
+        OPERATOR = #{OPERATOR,jdbcType=VARCHAR},
+        where RULE_ID = #{ruleId,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByProduct" resultMap="BaseResultMap">
+        select RULE_ID, CLOSE_NAME, CLOSE_TYPE,
+        PRODUCT_TYPE, CHANNEL_CONTACTS, EFFECTIVE_DATE,
+        FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF,
+        UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+        UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID,
+        DAYS, TIMES, OFFER_INFO,CLOSE_CODE
+        from close_rule
+        where 1 = 1
+        <if test="chooseProduct != null and chooseProduct != ''">
+            AND CHOOSE_PRODUCT like concat('%',concat(#{chooseProduct},'%'))
+        </if>
+        <if test="executionChannel != null and executionChannel != ''">
+            AND PRODUCT_TYPE = #{executionChannel}
+        </if>
+        AND CLOSE_TYPE = #{filterType}
+        ORDER BY UPDATE_DATE DESC
+    </select>
+
+    <resultMap id="MktcloseRuleCampaignMap" type="java.util.Map">
+        <result property="closeType" column="CLOSE_TYPE"/>
+        <result property="activityNbr" column="MKT_ACTIVITY_NBR"/>
+        <result property="activityId" column="MKT_CAMPAIGN_ID"/>
+        <result property="closeNumber" column="EXPRESSION"/>
+        <result property="closeName" column="CLOSE_NAME"/>
+        <result property="closeCode" column="CLOSE_CODE"/>
+    </resultMap>
+
+    <select id="getCloseCampaign" parameterType="java.util.Map" resultMap="MktcloseRuleCampaignMap">
+        SELECT cr.CLOSE_TYPE,cr.CLOSE_NAME,cr.CLOSE_CODE,cr.EXPRESSION,mc.MKT_ACTIVITY_NBR,mc.MKT_CAMPAIGN_ID FROM close_rule cr
+            LEFT JOIN mkt_strategy_close_rule_rel ms ON cr.RULE_ID = ms.RULE_ID
+            LEFT JOIN mkt_campaign mc ON ms.STRATEGY_ID = mc.MKT_CAMPAIGN_ID
+            WHERE cr.CLOSE_TYPE = #{map.filterType}  AND #{map.date} > mc.PLAN_BEGIN_TIME
+            AND mc.PLAN_END_TIME > #{map.date} AND mc.STATUS_CD = #{map.status}
+    </select>
+
+    <update id="updateExpression" parameterType="java.lang.String" >
+        UPDATE close_rule SET EXPRESSION = #{expression,jdbcType=VARCHAR} WHERE RULE_ID = #{filterRule}
+    </update>
+</mapper>

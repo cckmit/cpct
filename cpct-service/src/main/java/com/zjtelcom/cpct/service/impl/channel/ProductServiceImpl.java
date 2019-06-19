@@ -100,10 +100,11 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
         String produtType = MapUtil.getString(params.get("type"));
         String productName = MapUtil.getString(params.get("productName"));
+        // 1000查所有；空查有效
+        String statusCd = MapUtil.getString(params.get("statusCd") == null? "":params.get("statusCd"));
         List<Long> producetIdList = (List<Long>)params.get("productIdList");
         PageHelper.startPage(page,pageSize);
-        productList = offerProdMapper.findByType(productName,produtType,producetIdList);
-
+        productList = offerProdMapper.findByType(productName, produtType, statusCd, producetIdList);
         Page pageInfo = new Page(new PageInfo(productList));
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",productList);
