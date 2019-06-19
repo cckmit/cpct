@@ -30,6 +30,10 @@ public class DisplayColumnLabel extends BaseEntity{
      */
     private Long messageType;
 
+    /**
+     * 默认展示列类型
+     */
+    private  String labelDisplayType;
 
     public Long getMessageType() {
         return messageType;
@@ -61,5 +65,13 @@ public class DisplayColumnLabel extends BaseEntity{
 
     public void setInjectionLabelId(Long injectionLabelId) {
         this.injectionLabelId = injectionLabelId;
+    }
+
+    public String getLabelDisplayType() {
+        return labelDisplayType;
+    }
+
+    public void setLabelDisplayType(String labelDisplayType) {
+        this.labelDisplayType = labelDisplayType;
     }
 }
