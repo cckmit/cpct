@@ -1,20 +1,11 @@
 package com.zjtelcom.cpct.open.service.event;
 
-import com.zjtelcom.cpct.open.entity.event.Event;
+import com.zjtelcom.cpct.open.base.service.BaseDao;
+import com.zjtelcom.cpct.open.entity.event.ModEvtJt;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
-public interface OpenEventService {
+public interface OpenEventService extends BaseDao {
 
-    Map<String, Object> getEvent(Long contactEvtId);
-
-    Map<String, Object> saveEvent(Event event);
-
-    Map<String, Object> updateEvent(String eventId, String params);
-
-    Map<String, Object> deleteEvent(Long contactEvtId);
-
-    Map<String, Object> listEventPage(Map<String, Object> params);
-
+    Map<String,Object> updateEvent(ModEvtJt modEvtJt);
 }
