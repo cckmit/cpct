@@ -18,6 +18,13 @@ spring:
     username: cpc_cpct_user
     password: cpc_cpct_user_123
 
+# 第三数据源   链接cpc准生产数据库
+  datasourcethird:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://134.108.1.12:8803/smt_bss_cpc?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: cpc_user_cpct
+    password: cpc_user_cpct_prod
+
 # 第四数据源
   datasourcefourth:
     driver-class-name: com.mysql.jdbc.Driver
