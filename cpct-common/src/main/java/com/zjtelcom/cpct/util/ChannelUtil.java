@@ -348,6 +348,16 @@ public class ChannelUtil  {
     }
 
 
+    public static String idList2String(List<Long> idList,String separator){
+        if (idList == null || idList.isEmpty()){
+            return "";
+        }
+        Long[] ids = new Long[idList.size()];
+        for (int i = 0;i<ids.length;i++){
+            ids[i] = idList.get(i);
+        }
+        return StringUtils.join(ids,separator);
+    }
 
     public static String idList2String(List<Long> idList){
         if (idList == null || idList.isEmpty()){
