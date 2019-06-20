@@ -22,4 +22,8 @@ public interface SysAreaMapper {
     List<SysArea> selectByParnetArea(Integer parentArea);
 
     int updateByPrimaryKey(SysArea record);
+
+    List<SysArea> getByAreaLevelOne(Long regionIdByLandId);
+
+    List<SysArea> getByParentArea(Long regionIdByLandId);
 }
