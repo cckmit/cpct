@@ -1593,16 +1593,18 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     Map<String, Object> mktCamChlConfDetailMap = mktCamChlConfService.getMktCamChlConf(mktCamChlConf.getEvtContactConfId());
                     MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConfDetailMap.get("mktCamChlConfDetail");
                     MktCamChlConfDetailES es = BeanUtil.create(mktCamChlConfDetail,new MktCamChlConfDetailES());
-                    CamScriptES camScriptES = BeanUtil.create(mktCamChlConfDetail.getCamScript(),new CamScriptES());
-                    if (camScriptES.getScriptDesc()!=null && !camScriptES.getScriptDesc().equals("")){
-                        if (camScriptES.getScriptDesc().contains("\n")){
-                            camScriptES.setScriptDesc(camScriptES.getScriptDesc().replace("\n",""));
+                    if (mktCamChlConfDetail.getCamScript()!=null){
+                        CamScriptES camScriptES = BeanUtil.create(mktCamChlConfDetail.getCamScript(),new CamScriptES());
+                        if (camScriptES.getScriptDesc()!=null && !camScriptES.getScriptDesc().equals("")){
+                            if (camScriptES.getScriptDesc().contains("\n")){
+                                camScriptES.setScriptDesc(camScriptES.getScriptDesc().replace("\n",""));
+                            }
+                            if (camScriptES.getScriptDesc().contains("\r")){
+                                camScriptES.setScriptDesc(camScriptES.getScriptDesc().replace("\r",""));
+                            }
                         }
-                        if (camScriptES.getScriptDesc().contains("\r")){
-                            camScriptES.setScriptDesc(camScriptES.getScriptDesc().replace("\r",""));
-                        }
+                        es.setCamScript(camScriptES);
                     }
-                    es.setCamScript(camScriptES);
                     ArrayList<MktCamChlConfAttrES> attrs = new ArrayList<>();
                     ArrayList<VerbalVOES> verbalES = new ArrayList<>();
                     if (mktCamChlConfDetail.getMktCamChlConfAttrList()!=null){
