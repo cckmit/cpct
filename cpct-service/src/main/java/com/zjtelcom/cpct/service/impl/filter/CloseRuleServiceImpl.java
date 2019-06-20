@@ -52,9 +52,6 @@ public class CloseRuleServiceImpl implements CloseRuleService {
     @Autowired
     private SynFilterRuleService synFilterRuleService;
 
-    @Value("${sync.value}")
-    private String value;
-
     /**
      * 根据关单规则id集合查询过滤规则集合
      */

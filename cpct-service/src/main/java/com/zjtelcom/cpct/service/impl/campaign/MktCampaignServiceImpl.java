@@ -15,6 +15,7 @@ import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
+import com.zjtelcom.cpct.dao.channel.DisplayColumnLabelMapper;
 import com.zjtelcom.cpct.dao.channel.ObjMktCampaignRelMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper;
@@ -26,10 +27,7 @@ import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.*;
-import com.zjtelcom.cpct.domain.channel.ObjMktCampaignRel;
-import com.zjtelcom.cpct.domain.channel.Offer;
-import com.zjtelcom.cpct.domain.channel.RequestInfo;
-import com.zjtelcom.cpct.domain.channel.RequestInstRel;
+import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyCloseRuleRelDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
@@ -195,6 +193,18 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
     @Autowired
     private RequestInfoMapper requestInfoMapper;
+
+    /**
+     * 展示列
+     */
+    @Autowired
+    private DisplayColumnLabelMapper displayColumnLabelMapper;
+
+    /**
+     * 活动与展示列关联
+     */
+    @Autowired
+    private MktCamDisplayColumnRelMapper mktCamDisplayColumnRelMapper;
 
     //指定下发地市人员的数据集合
     private final static String CITY_PUBLISH="CITY_PUBLISH";
@@ -393,6 +403,27 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
             }
 
+            //试运算展示列实例化
+            if(mktCampaignVO.getCalcDisplay() != null) {
+                List<DisplayColumnLabel> displayColumnLabelList = displayColumnLabelMapper.findListByDisplayId(mktCampaignVO.getCalcDisplay());
+                for(DisplayColumnLabel displayColumnLabel : displayColumnLabelList) {
+                    MktCamDisplayColumnRel mktCamDisplayColumnRel = new MktCamDisplayColumnRel();
+                    mktCamDisplayColumnRel.setMktCampaignId(mktCampaignId);
+                    mktCamDisplayColumnRel.setInjectionLabelId(displayColumnLabel.getInjectionLabelId());
+                    mktCamDisplayColumnRel.setDisplayId(mktCampaignVO.getCalcDisplay());
+                    mktCamDisplayColumnRel.setDisplayColumnType("1000");
+                    mktCamDisplayColumnRel.setLabelDisplayType(displayColumnLabel.getLabelDisplayType());
+                    mktCamDisplayColumnRel.setRemark(displayColumnLabel.getMessageType().toString());
+                    mktCamDisplayColumnRel.setStatusCd(STATUSCD_EFFECTIVE);
+                    mktCamDisplayColumnRel.setStatusDate(new Date());
+                    mktCamDisplayColumnRel.setCreateStaff(UserUtil.loginId());
+                    mktCamDisplayColumnRel.setCreateDate(new Date());
+                    mktCamDisplayColumnRel.setUpdateStaff(UserUtil.loginId());
+                    mktCamDisplayColumnRel.setUpdateDate(new Date());
+                    mktCamDisplayColumnRelMapper.insert(mktCamDisplayColumnRel);
+                }
+            }
+
             maps = new HashMap<>();
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
             if (StatusCode.STATUS_CODE_DRAFT.getStatusCode().equals(mktCampaignVO.getStatusCd())) {
@@ -547,6 +578,27 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
             }
 
+            //重建展示列实例
+            mktCamDisplayColumnRelMapper.deleteByMktCampaignId(mktCampaignId);
+            if(mktCampaignVO.getCalcDisplay() != null) {
+                List<DisplayColumnLabel> displayColumnLabelList = displayColumnLabelMapper.findListByDisplayId(mktCampaignVO.getCalcDisplay());
+                for(DisplayColumnLabel displayColumnLabel : displayColumnLabelList) {
+                    MktCamDisplayColumnRel mktCamDisplayColumnRel = new MktCamDisplayColumnRel();
+                    mktCamDisplayColumnRel.setMktCampaignId(mktCampaignId);
+                    mktCamDisplayColumnRel.setInjectionLabelId(displayColumnLabel.getInjectionLabelId());
+                    mktCamDisplayColumnRel.setDisplayId(mktCampaignVO.getCalcDisplay());
+                    mktCamDisplayColumnRel.setDisplayColumnType("1000");
+                    mktCamDisplayColumnRel.setLabelDisplayType(displayColumnLabel.getLabelDisplayType());
+                    mktCamDisplayColumnRel.setRemark(displayColumnLabel.getMessageType().toString());
+                    mktCamDisplayColumnRel.setStatusCd(STATUSCD_EFFECTIVE);
+                    mktCamDisplayColumnRel.setStatusDate(new Date());
+                    mktCamDisplayColumnRel.setCreateStaff(UserUtil.loginId());
+                    mktCamDisplayColumnRel.setCreateDate(new Date());
+                    mktCamDisplayColumnRel.setUpdateStaff(UserUtil.loginId());
+                    mktCamDisplayColumnRel.setUpdateDate(new Date());
+                    mktCamDisplayColumnRelMapper.insert(mktCamDisplayColumnRel);
+                }
+            }
 
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
             if (StatusCode.STATUS_CODE_DRAFT.getStatusCode().equals(mktCampaignVO.getStatusCd())) {

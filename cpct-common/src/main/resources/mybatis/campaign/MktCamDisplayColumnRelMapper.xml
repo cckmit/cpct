@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.campaign.MktCamDisplayColumnRelMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.campaign.MktCamDisplayColumnRel">
+        <id column="MKT_CAM_DISPLAY_COLUMN_REL_ID" jdbcType="BIGINT" property="mktCamDisplayColumnRelId" />
+        <result column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId" />
+        <result column="INJECTION_LABEL_ID" jdbcType="BIGINT" property="injectionLabelId" />
+        <result column="DISPLAY_ID" jdbcType="BIGINT" property="displayId" />
+        <result column="DISPLAY_COLUMN_TYPE" jdbcType="VARCHAR" property="displayColumnType" />
+        <result column="LABEL_DISPLAY_TYPE" jdbcType="VARCHAR" property="labelDisplayType" />
+        <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+        <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+        <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select MKT_CAM_DISPLAY_COLUMN_REL_ID, MKT_CAMPAIGN_ID, INJECTION_LABEL_ID, DISPLAY_ID, DISPLAY_COLUMN_TYPE,
+               STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LABEL_DISPLAY_TYPE
+        from mkt_cam_display_column_rel
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select MKT_CAM_DISPLAY_COLUMN_REL_ID, MKT_CAMPAIGN_ID, INJECTION_LABEL_ID, DISPLAY_ID, DISPLAY_COLUMN_TYPE,
+               STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LABEL_DISPLAY_TYPE
+        from mkt_cam_display_column_rel
+        where MKT_CAM_DISPLAY_COLUMN_REL_ID = #{mktCamDisplayColumnRelId,jdbcType=BIGINT}
+    </select>
+
+    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamDisplayColumnRel" useGeneratedKeys="true"
+            keyProperty="mktCamDisplayColumnRelId">
+        insert into mkt_cam_display_column_rel (MKT_CAM_DISPLAY_COLUMN_REL_ID, MKT_CAMPAIGN_ID, INJECTION_LABEL_ID,
+                    DISPLAY_ID, DISPLAY_COLUMN_TYPE, LABEL_DISPLAY_TYPE, STATUS_CD, STATUS_DATE, CREATE_STAFF,
+                    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK)
+        values (#{mktCamDisplayColumnRelId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{injectionLabelId,jdbcType=BIGINT},
+                #{displayId,jdbcType=BIGINT}, #{displayColumnType,jdbcType=VARCHAR}, #{labelDisplayType,jdbcType=VARCHAR},
+                #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT},
+                #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP},
+                #{remark,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamDisplayColumnRel">
+        update mkt_cam_display_column_rel
+        set
+        MKT_CAM_DISPLAY_COLUMN_REL_ID = #{mktCamDisplayColumnRelId,jdbcType=BIGINT}
+        <if test="mktCampaignId != null and mktCampaignId != ''">
+            MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},
+        </if>
+        <if test="injectionLabelId != null and injectionLabelId != ''">
+            INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT},
+        </if>
+        <if test="displayId != null and displayId != ''">
+            DISPLAY_ID = #{displayId,jdbcType=BIGINT},
+        </if>
+        <if test="displayColumnType != null and displayColumnType != ''">
+            DISPLAY_COLUMN_TYPE = #{displayColumnType,jdbcType=VARCHAR},
+        </if>
+        <if test="labelDisplayType != null and labelDisplayType != ''">
+            LABEL_DISPLAY_TYPE = #{labelDisplayType,jdbcType=VARCHAR},
+        </if>
+        <if test="statusCd != null and statusCd != '' ">
+            STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+        </if>
+        <if test="statusDate != null">
+            STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="updateStaff != null">
+            UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        </if>
+        <if test="updateDate != null">
+            UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="remark != null and remark != '' ">
+            REMARK = #{remark,jdbcType=VARCHAR}
+        </if>
+        where MKT_CAM_DISPLAY_COLUMN_REL_ID = #{mktCamDisplayColumnRelId,jdbcType=BIGINT}
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from mkt_cam_display_column_rel
+        where MKT_CAM_DISPLAY_COLUMN_REL_ID = #{mktCamDisplayColumnRelId,jdbcType=BIGINT}
+    </delete>
+    
+    <select id="selectLabelByCampaignIdAndDisplayId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select MKT_CAM_DISPLAY_COLUMN_REL_ID, MKT_CAMPAIGN_ID, INJECTION_LABEL_ID, DISPLAY_ID, DISPLAY_COLUMN_TYPE,
+               STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LABEL_DISPLAY_TYPE
+        from mkt_cam_display_column_rel
+        where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT} and DISPLAY_ID = #{displayId,jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteByMktCampaignId" parameterType="java.lang.Long">
+        delete from mkt_cam_display_column_rel
+        where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+    </delete>
+</mapper>
