@@ -1,4 +1,4 @@
-package com.zjtelcom.cpct.util;
+package com.zjtelcom.cpct.service;
 
 import com.alibaba.fastjson.JSON;
 import com.ctg.mq.api.CTGMQFactory;
@@ -7,15 +7,13 @@ import com.ctg.mq.api.PropertyKeyConst;
 import com.ctg.mq.api.bean.MQMessage;
 import com.ctg.mq.api.bean.MQSendResult;
 import com.ctg.mq.api.bean.MQSendStatus;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Properties;
 
 @Service
-public class CtgMQUtils implements InitializingBean, DisposableBean {
+public class MqService {
 
     //地址
     @Value("${ctg.namesrvAddr}")
@@ -60,16 +58,6 @@ public class CtgMQUtils implements InitializingBean, DisposableBean {
 
     private IMQProducer producer;
 
-    @Override
-    public void destroy() throws Exception {
-        if (producer != null) producer.close();
-    }
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        initProducer();
-    }
-
     private void initProducer() throws Exception {
         Properties properties = new Properties();
         properties.setProperty(PropertyKeyConst.ProducerGroupName, producerGroupName);
@@ -86,6 +74,7 @@ public class CtgMQUtils implements InitializingBean, DisposableBean {
         connect = producer.connect();
     }
 
+
     public  String msg2Producer(Object msgBody, String key, String tag) throws Exception {
         try {
             if (connect == 0 && msgBody != null) {
@@ -98,11 +87,7 @@ public class CtgMQUtils implements InitializingBean, DisposableBean {
                     MQSendStatus sendStatus = send.getSendStatus();
                     System.out.println(send.getMessageID().getBytes());
                     if (sendStatus.toString().equals("SEND_OK")){
-//                        String[] split = key.split("_");
-//                        String flag = "0";
-                        //插入数据库 msgid ruleid batchnum createtime flag
-                        System.out.println(send.getMessageID().toString());
-//                        producerMapper.insertConsumerLog(send.getMessageID().toString(),split[1],split[0],new Date(),flag);
+                        System.out.println(send.getMessageID());
                     }
                     return sendStatus.toString();
                 } catch (Exception e) {
@@ -114,5 +99,4 @@ public class CtgMQUtils implements InitializingBean, DisposableBean {
         }
         return "error";
     }
-
 }

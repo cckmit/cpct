@@ -6,6 +6,7 @@ import com.zjtelcom.cpct.dto.channel.ProductParam;
 import com.zjtelcom.cpct.request.channel.DisplayAllMessageReq;
 import com.zjtelcom.cpct.request.channel.MessageReq;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -71,4 +72,13 @@ public interface MessageLabelService {
      */
     Map<String,Object> queryLabelListByDisplayId(DisplayColumn req);
 
+    /**
+     * 展示列标签展示类型配置
+     */
+    Map<String, Object> configureLabelDisplayType(Long displayColumnId, Long labelId, List<String> labelDisplayTypeId);
+
+    /**
+     * 查询展示列标签展示类型
+     */
+    Map<String, Object> viewLabelDisplayType(Long displayColumnId, Long labelId);
 }
