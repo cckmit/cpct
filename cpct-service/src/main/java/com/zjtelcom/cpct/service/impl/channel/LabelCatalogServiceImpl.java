@@ -95,7 +95,7 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
      * @return
      */
     @Override
-    public Map<String, Object> listLabelCatalog(String rightOperand) {
+    public Map<String, Object> listLabelCatalog(String rightOperand, String newOrOld) {
 //        List<Label> resuList = new ArrayList<>();
 //        List<Label> labels = labelMapper.selectAllByCondition();
 //        List<LabelValue> vas = labelValueMapper.selectAll();
@@ -116,7 +116,7 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
 
         List<LabelCatalog> parentList = labelCatalogMapper.findByParentId(String.valueOf(0));
         List<Label> allLabels = labelMapper.selectByScope(Long.valueOf(1),rightOperand.equals("1") ? null : rightOperand);
-        List<LabelCatalog> allCatalogs = labelCatalogMapper.selectAll();
+        List<LabelCatalog> allCatalogs = labelCatalogMapper.selectAll(newOrOld);
         List<LabelValue> valueList = labelValueMapper.selectAll();
 
         for (LabelCatalog parent : parentList) {

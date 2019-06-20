@@ -84,6 +84,12 @@ public class Label extends BaseEntity implements Serializable {
 
     private String damandDescription;
 
+    private String originalLabLevel1Name;
+    private String originalLabLevel2Name;
+    private String originalLabLevel3Name;
+    private String originalLabLevel1Code;
+    private String originalLabLevel2Code;
+    private String originalLabLevel3Code;
 
 
 }

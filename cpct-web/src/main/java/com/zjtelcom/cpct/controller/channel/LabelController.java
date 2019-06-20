@@ -69,7 +69,8 @@ public class LabelController extends BaseController {
         Map<String,Object> result = new HashMap<>();
         try {
             String type = MapUtil.getString(param.get("type"));
-            result = labelCatalogService.listLabelCatalog(type);
+            String status = MapUtil.getString(param.get("status"));
+            result = labelCatalogService.listLabelCatalog(type, status);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to listLabelCatalog",e);
             result.put("resultCode",CODE_FAIL);

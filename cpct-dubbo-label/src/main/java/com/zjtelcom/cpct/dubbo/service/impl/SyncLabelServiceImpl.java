@@ -506,9 +506,46 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         return result;
     }
 
+    @Override
+    public void initLabelCatalog() {
+        List<Label> labels = injectionLabelMapper.selectByScope(1L,null);
+        for (Label label : labels){
+            //标签目录插入
+            LabelCatalog labelCatalog =new LabelCatalog();
+            labelCatalog.setStatusCd(STATUSCD_EFFECTIVE);
+            labelCatalog.setCreateStaff(UserUtil.loginId());
+            labelCatalog.setCreateDate(new Date());
+            if(labelCatalogMapper.findByCodeAndLevel(label.getLabObjectCode(),1L) == null) {
+                labelCatalog.setCatalogCode(label.getLabObjectCode());
+                labelCatalog.setCatalogName(label.getLabObject());
+                labelCatalog.setLevelId(1L);
+                labelCatalog.setParentId("0");
+                labelCatalog.setRemark("1");
+                labelCatalogMapper.insert(labelCatalog);
+            }
+//            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1()),2L) == null) {
+//                labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getLabLevel1());
+            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getOriginalLabLevel2Code()),2L) == null) {
+                labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getOriginalLabLevel2Code());
+                labelCatalog.setCatalogName(label.getOriginalLabLevel2Name());
+                labelCatalog.setLevelId(2L);
+                labelCatalog.setParentId(label.getLabObjectCode());
+                labelCatalog.setRemark("1");
+                labelCatalogMapper.insert(labelCatalog);
+            }
+            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getOriginalLabLevel2Code() + label.getOriginalLabLevel3Code()), 3L) == null) {
+                labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getOriginalLabLevel2Code() + label.getOriginalLabLevel3Code());
+                labelCatalog.setCatalogName(label.getOriginalLabLevel3Name());
+                labelCatalog.setLevelId(3L);
+                labelCatalog.setParentId(label.getLabObjectCode() + label.getOriginalLabLevel2Code());
+                labelCatalog.setRemark("1");
+                labelCatalogMapper.insert(labelCatalog);
+            }
+        }
+    }
+
     private void initLabelCatalog(List<Label> labelList) {
         List<Label> labels = injectionLabelMapper.selectByScope(1L,null);
-
         for (Label label : labels){
             //标签目录插入
             LabelCatalog labelCatalog =new LabelCatalog();
