@@ -106,6 +106,7 @@
             <groupId>com.ctzj.smt.bss</groupId>
             <artifactId>smt-bss-cpc-model</artifactId>
         </dependency>
+
     </dependencies>
 
 

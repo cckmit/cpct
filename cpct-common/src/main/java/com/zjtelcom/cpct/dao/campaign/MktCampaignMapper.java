@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.dao.campaign;
 
 
+import com.zjtelcom.cpct.domain.campaign.MktCamDisplayColumnRel;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignCountDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import org.apache.ibatis.annotations.Mapper;
@@ -41,4 +42,6 @@ public interface MktCampaignMapper {
     List<MktCampaignDO> qryMktCampaignListByTypeAndStatus(@Param("execType") String execType, @Param("statusCd") String statusCd);
 
     MktCampaignDO selectByRuleId(@Param("ruleId") Long ruleId);
+
+    List<MktCamDisplayColumnRel> selectAllGroupByCamId();
 }

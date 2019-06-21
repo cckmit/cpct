@@ -7,36 +7,31 @@
  * 修改内容：
  */
 
-package com.zjtelcom.cpct.dto.pojo;
+package com.zjtelcom.cpct.controller.test;
 
-/**
- * 服务层处理结果
- * @author taowenwu
- * @version 1.0
- * @see Result
- * @since JDK1.7
- */
+import org.springframework.stereotype.Component;
 
-public class Result {
+@Component
+public class ResponseResult {
     private String resultCode;
 
     private String resultMsg;
 
     private Object resultObject;
 
-    public Result() {}
+    public ResponseResult() {}
 
-    public Result(String resultCode, String resultMsg, Object resultObject) {
+    public ResponseResult(String resultCode, String resultMessage, Object resultObject) {
         super();
         this.resultCode = resultCode;
-        this.resultMsg = resultMsg;
+        this.resultMsg = resultMessage;
         this.resultObject = resultObject;
     }
 
-    public Result(String resultCode, String resultMsg) {
+    public ResponseResult(String resultCode, String resultMessage) {
         super();
         this.resultCode = resultCode;
-        this.resultMsg = resultMsg;
+        this.resultMsg = resultMessage;
     }
 
     public String getResultCode() {
@@ -51,8 +46,8 @@ public class Result {
         return resultMsg;
     }
 
-    public void setResultMessage(String resultMsg) {
-        this.resultMsg = resultMsg;
+    public void setResultMessage(String resultMessage) {
+        this.resultMsg = resultMessage;
     }
 
     public Object getResultObject() {

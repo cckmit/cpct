@@ -11,17 +11,23 @@ import com.zjtelcom.cpct.domain.channel.DisplayColumn;
 import com.zjtelcom.cpct.domain.channel.DisplayColumnLabel;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.Message;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
+import com.zjtelcom.cpct.dto.channel.DisplayLabelInfo;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.channel.MessageLabelInfo;
 import com.zjtelcom.cpct.service.campaign.MktCamDisplayColumnRelService;
 import com.zjtelcom.cpct.service.channel.MessageLabelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct_prd.dao.campaign.MktCamDisplayColumnRelPrdMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
@@ -42,6 +48,9 @@ public class MktCamDisplayColumnRelServiceImpl implements MktCamDisplayColumnRel
     private MktCampaignMapper mktCampaignMapper;
     @Autowired
     private DisplayColumnLabelMapper displayColumnLabelMapper;
+    @Autowired
+    private MktCamDisplayColumnRelPrdMapper mktCamDisplayColumnRelPrdMapper;
+
 
     /**
      * 获取展示列实例标签列表
@@ -98,5 +107,88 @@ public class MktCamDisplayColumnRelServiceImpl implements MktCamDisplayColumnRel
             result = messageLabelService.queryLabelListByDisplayId(displayColumn);
         }
         return result;
+    }
+
+    @Override
+    public Map<String, Object> copyDisplayLabelByCamId(Long oldCampaignId, Long newCampaignId) {
+        Map<String,Object> result = new HashMap<>();
+        List<MktCamDisplayColumnRel> relList = mktCamDisplayColumnRelMapper.selectDisplayLabelByCamId(oldCampaignId);
+        if(relList.isEmpty() || relList.size() == 0){
+            result.put("resultCode", CODE_SUCCESS);
+            result.put("resultMsg", "MktCamDisplayColumnRelList为空");
+            return result;
+        }
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        for (MktCamDisplayColumnRel rel : relList) {
+            rel.setMktCampaignId(newCampaignId);
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    rel.setCreateStaff(UserUtil.loginId());
+                    rel.setCreateDate(new Date());
+                    rel.setStatusCd("1000");
+                    mktCamDisplayColumnRelMapper.insert(rel);
+                }
+            });
+        }
+        executorService.shutdown();
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", "同步完成");
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> syncMktCamDisplayColumnRel(Long mktCampaignId) {
+        Map<String,Object> result = new HashMap<>();
+        List<MktCamDisplayColumnRel> relList = mktCamDisplayColumnRelMapper.selectDisplayLabelByCamId(mktCampaignId);
+        if(relList.isEmpty() || relList.size() == 0){
+            result.put("resultCode", CODE_SUCCESS);
+            result.put("resultMsg", "MktCamDisplayColumnRelList为空");
+            return result;
+        }
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        for (MktCamDisplayColumnRel rel : relList) {
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    rel.setCreateStaff(UserUtil.loginId());
+                    rel.setCreateDate(new Date());
+                    rel.setStatusCd("1000");
+                    mktCamDisplayColumnRelPrdMapper.insert(rel);
+                }
+            });
+        }
+        executorService.shutdown();
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", "同步完成");
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> importOldCamDisplay(){
+        Map<String,Object> result = new HashMap<>();
+        List<MktCamDisplayColumnRel> relList = mktCampaignMapper.selectAllGroupByCamId();
+        if(relList.isEmpty() || relList.size() == 0){
+            result.put("resultCode", CODE_SUCCESS);
+            result.put("resultMsg", "MktCamDisplayColumnRelList为空");
+            return result;
+        }
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        for (MktCamDisplayColumnRel rel : relList) {
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    rel.setCreateStaff(UserUtil.loginId());
+                    rel.setCreateDate(new Date());
+                    rel.setStatusCd("1000");
+                    mktCamDisplayColumnRelMapper.insert(rel);
+                }
+            });
+        }
+        executorService.shutdown();
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", "更新完成");
+        return result;
+
     }
 }

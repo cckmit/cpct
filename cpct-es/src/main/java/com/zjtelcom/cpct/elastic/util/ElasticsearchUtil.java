@@ -41,7 +41,7 @@ public class ElasticsearchUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ElasticsearchUtil.class);
 
-    @Autowired
+    @Autowired(required = false)
     private TransportClient transportClient;
 
     private static TransportClient client;
