@@ -20,17 +20,45 @@ public class MktCamDisplayColumnRelController extends BaseController {
      */
     @PostMapping("/findLabelListByDisplayId")
     @CrossOrigin
-    public Map<String, Object> findLabelListByDisplayId(@RequestBody HashMap<String,String> param) {
+    public Map<String, Object> findLabelListByDisplayId(@RequestBody HashMap<String, String> param) {
         Map<String, Object> result = new HashMap<>();
         Long mktCampaignId = 0L;
         Long displayId = 0L;
-        if(param.get("mktCampaignId") != null) {
+        if (param.get("mktCampaignId") != null) {
             mktCampaignId = Long.valueOf(param.get("mktCampaignId"));
         }
-        if(param.get("displayColumnId") != null) {
+        if (param.get("displayColumnId") != null) {
             displayId = Long.valueOf(param.get("displayColumnId"));
         }
         result = mktCamDisplayColumnRelService.findLabelListByDisplayId(mktCampaignId, displayId);
         return result;
+    }
+
+    /**
+     * 展示列实例化复制
+     *
+     *  查询老活动下的所有展示列标签，复制插入到新活动下
+     * @param param
+     * @return
+     */
+    @PostMapping("/copyDisplayLabelByCamId")
+    @CrossOrigin
+    public Map<String, Object> copyDisplayLabelByCamId(@RequestBody HashMap<String, String> param) {
+        Map<String, Object> result = new HashMap<>();
+        Long oldCampaignId = 0L;
+        Long newCampaignId = 0L;
+        oldCampaignId = Long.valueOf(param.get("oldCampaignId"));
+        newCampaignId = Long.valueOf(param.get("newCampaignId"));
+        mktCamDisplayColumnRelService.copyDisplayLabelByCamId(oldCampaignId, newCampaignId);
+        return result;
+    }
+
+    @PostMapping("/importOldCamDisplay2")
+    public void importOldCamDisplay(){
+        try {
+            mktCamDisplayColumnRelService.importOldCamDisplay();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

@@ -616,7 +616,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
 
         List<LabelCatalog> parentList = labelCatalogMapper.findByParentId(String.valueOf(0));
         List<Label> allLabels = labelMapper.selectAll();
-        List<LabelCatalog> allCatalogs = labelCatalogMapper.selectAll();
+        List<LabelCatalog> allCatalogs = labelCatalogMapper.selectAll("0");
         List<LabelValue> valueList = labelValueMapper.selectAll();
 
         for (LabelCatalog parent : parentList) {

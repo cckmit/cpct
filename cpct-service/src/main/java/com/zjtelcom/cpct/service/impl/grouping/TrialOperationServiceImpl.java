@@ -51,10 +51,12 @@ import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.enums.TrialCreateType;
 import com.zjtelcom.cpct.enums.TrialStatus;
 import com.zjtelcom.cpct.service.BaseService;
+import com.zjtelcom.cpct.service.MqService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
 import com.zjtelcom.cpct.service.channel.MessageLabelService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
+import com.zjtelcom.cpct.service.impl.MqServiceImpl;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_prod.dao.offer.MktResourceProdMapper;
@@ -141,7 +143,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Autowired
     private MktCamChlConfAttrMapper mktCamChlConfAttrMapper;
     @Autowired
-    private CtgMQUtils ctgMQUtils;
+    private MqService mqService;
 
     /**
      * 销售品service
@@ -1048,7 +1050,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             msgBody.put("productFilterList", productFilter);
                             try {
                                 // 判断是否发送成功
-                                if (!ctgMQUtils.msg2Producer(msgBody, batchNumSt, null).equals(MQSendStatus.SEND_OK)) {
+                                if (!mqService.msg2Producer(msgBody, batchNumSt, null).equals(MQSendStatus.SEND_OK)) {
                                     // 发送失败自动重发2次，如果还是失败，记录
                                     logger.error("CTGMQ消息生产失败,batchNumSt:" + batchNumSt, msgBody);
                                 }

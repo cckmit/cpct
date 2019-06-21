@@ -1,7 +1,6 @@
-package com.zjtelcom.cpct.dao.campaign;
+package com.zjtelcom.cpct_prd.dao.campaign;
 
 import com.zjtelcom.cpct.domain.campaign.MktCamDisplayColumnRel;
-import com.zjtelcom.cpct.dto.channel.DisplayLabelInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -10,7 +9,7 @@ import java.util.List;
 
 @Mapper
 @Repository
-public interface MktCamDisplayColumnRelMapper {
+public interface MktCamDisplayColumnRelPrdMapper {
 
     List<MktCamDisplayColumnRel> selectAll();
 

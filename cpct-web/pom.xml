@@ -73,7 +73,7 @@
             <groupId>com.ctzj.smt.bss</groupId>
             <artifactId>bss-centralized-authenticate</artifactId>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>com.zjhcsoft.session</groupId>
             <artifactId>spring-session</artifactId>
         </dependency>
@@ -94,7 +94,7 @@
                     <artifactId>spring-session</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>

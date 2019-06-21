@@ -419,5 +419,10 @@
         where srrel.MKT_STRATEGY_CONF_RULE_ID = #{ruleId}
     </select>
 
+    <select id="selectAllGroupByCamId" resultType="com.zjtelcom.cpct.domain.campaign.MktCamDisplayColumnRel">
+        select MKT_CAMPAIGN_ID mktCampaignId, CALC_DISPLAY displayId, INJECTION_LABEL_ID injectionLabelId, LABEL_DISPLAY_TYPE labelDisplayType
+        from mkt_campaign cam, display_column_label label
+        where label.DISPLAY_ID = cam.CALC_DISPLAY
+    </select>
 
 </mapper>

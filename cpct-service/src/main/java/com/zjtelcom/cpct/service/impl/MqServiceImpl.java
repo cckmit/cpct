@@ -1,4 +1,4 @@
-package com.zjtelcom.cpct.service;
+package com.zjtelcom.cpct.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.ctg.mq.api.CTGMQFactory;
@@ -7,13 +7,14 @@ import com.ctg.mq.api.PropertyKeyConst;
 import com.ctg.mq.api.bean.MQMessage;
 import com.ctg.mq.api.bean.MQSendResult;
 import com.ctg.mq.api.bean.MQSendStatus;
+import com.zjtelcom.cpct.service.MqService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Properties;
 
 @Service
-public class MqService {
+public class MqServiceImpl implements MqService {
 
     //地址
     @Value("${ctg.namesrvAddr}")
@@ -58,7 +59,8 @@ public class MqService {
 
     private IMQProducer producer;
 
-    private void initProducer() throws Exception {
+    @Override
+    public void initProducer() throws Exception {
         Properties properties = new Properties();
         properties.setProperty(PropertyKeyConst.ProducerGroupName, producerGroupName);
         properties.setProperty(PropertyKeyConst.NamesrvAddr, namesrvAddr);
@@ -74,8 +76,8 @@ public class MqService {
         connect = producer.connect();
     }
 
-
-    public  String msg2Producer(Object msgBody, String key, String tag) throws Exception {
+    @Override
+    public String msg2Producer(Object msgBody, String key, String tag) throws Exception {
         try {
             if (connect == 0 && msgBody != null) {
                 MQMessage message = new MQMessage(topic, key, tag, null);

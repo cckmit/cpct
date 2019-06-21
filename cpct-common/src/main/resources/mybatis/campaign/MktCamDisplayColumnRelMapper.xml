@@ -17,9 +17,14 @@
         <result column="REMARK" jdbcType="VARCHAR" property="remark" />
     </resultMap>
 
+    <sql id="selectResultDisplay">
+        MKT_CAM_DISPLAY_COLUMN_REL_ID, MKT_CAMPAIGN_ID, INJECTION_LABEL_ID, DISPLAY_ID, DISPLAY_COLUMN_TYPE,
+        STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LABEL_DISPLAY_TYPE
+    </sql>
+
     <select id="selectAll" resultMap="BaseResultMap">
         select MKT_CAM_DISPLAY_COLUMN_REL_ID, MKT_CAMPAIGN_ID, INJECTION_LABEL_ID, DISPLAY_ID, DISPLAY_COLUMN_TYPE,
-               STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LABEL_DISPLAY_TYPE
+        STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LABEL_DISPLAY_TYPE
         from mkt_cam_display_column_rel
     </select>
 
@@ -95,4 +100,11 @@
         delete from mkt_cam_display_column_rel
         where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
     </delete>
+
+    <select id="selectDisplayLabelByCamId" resultMap="BaseResultMap">
+        select <include refid="selectResultDisplay"/>
+        from mkt_cam_display_column_rel
+        where MKT_CAMPAIGN_ID = #{mktCampaignId}
+    </select>
+
 </mapper>
