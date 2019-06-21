@@ -11,7 +11,7 @@ public interface LabelCatalogService  {
 
     Map<String,Object> addLabelCatalog( LabelCatalog addVO);
 
-    Map<String,Object> listLabelCatalog(String labelType);
+    Map<String,Object> listLabelCatalog(String labelType, String labelStatus);
 
     Map<String,Object> listLabelByCatalogId(Long catalogId);
 

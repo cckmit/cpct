@@ -10,6 +10,7 @@ import com.ctzj.smt.bss.centralized.authenticate.security.userdetails.service.My
 import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -28,8 +29,8 @@ import javax.servlet.MultipartConfigElement;
 
 
 @SpringBootApplication
-@ImportResource("classpath:dubbo/dubbo-${spring.profiles.active}.xml")
-@Import({WebSecurityConfig.class, HttpSessionConfig.class, MyUserDetailsService.class})
+//@ImportResource("classpath:dubbo/dubbo-${spring.profiles.active}.xml")
+//@Import({WebSecurityConfig.class, HttpSessionConfig.class, MyUserDetailsService.class})
 @ComponentScan(value = {"com.zjtelcom.cpct"})
 @EnableTransactionManagement
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class,DataSourceTransactionManagerAutoConfiguration.class, MybatisAutoConfiguration.class})
