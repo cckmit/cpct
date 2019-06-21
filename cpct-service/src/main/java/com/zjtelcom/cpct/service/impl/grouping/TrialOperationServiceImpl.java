@@ -1050,7 +1050,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             msgBody.put("productFilterList", productFilter);
                             try {
                                 // 判断是否发送成功
-                                if (!mqService.msg2Producer(msgBody, batchNumSt, null).equals(MQSendStatus.SEND_OK)) {
+                                if (!mqService.msg2Producer(msgBody, batchNumSt, null).equals("SEND_OK")) {
                                     // 发送失败自动重发2次，如果还是失败，记录
                                     logger.error("CTGMQ消息生产失败,batchNumSt:" + batchNumSt, msgBody);
                                 }
@@ -1058,11 +1058,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-                            //把customerList拆分成多个小list存入redis
-                            //Map<String, Object> resultMap = userList2Redis(avg, redisI, redisListNum, batchNumSt, ruleId, customerList);
-                            //redisI = (int) resultMap.get("redisI");
-                            //redisListNum = (int) resultMap.get("listNum");
-                            //customerList = new ArrayList<>();
                             customerList.clear();
                         }
                     }
