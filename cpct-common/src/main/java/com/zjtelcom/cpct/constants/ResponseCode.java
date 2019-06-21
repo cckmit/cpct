@@ -53,8 +53,6 @@ public interface ResponseCode {
 
     String SUCCESS_MSG = "处理成功";
 
-    String FAIL_MSG = "处理失败";
-
     String CANNOT_QUERY_RULE = "600104050001";
 
     String CANNOT_QUERY_RULE_MSG = "canot query rule";
