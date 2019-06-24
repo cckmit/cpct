@@ -144,7 +144,10 @@ public class TrialProdServiceImpl implements TrialProdService {
         Map<String, Object> result = new HashMap<>();
         List<MktCampaignDO> campaignList = new ArrayList<>();
         Long campaignId = MapUtil.getLongNum(param.get("id"));
+        //周期性活动标记
         String perCampaign = MapUtil.getString(param.get("perCampaign"));
+        //清单方案活动标记
+        String userListCam =  MapUtil.getString(param.get("userListCam"));
         List<Integer> idList = ( List<Integer>)param.get("idList");
         List<Map<String,Object>> resList = new ArrayList<>();
         for (Integer id : idList){
@@ -171,6 +174,9 @@ public class TrialProdServiceImpl implements TrialProdService {
                 trialOperationMapper.insert(operation);
                 if (perCampaign.equals("PER_CAMPAIGN")){
                     redisUtils_es.set("PER_CAMPAIGN_"+batchNumSt,"true");
+                }
+                if (userListCam.equals("USER_LIST_CAM")){
+                    redisUtils_es.set("USER_LIST_CAM"+batchNumSt,"true");
                 }
                 Map<String,Object> res = issue(operation,campaignDO,strategy,perCampaign);
                 resList.add(res);
