@@ -12,7 +12,7 @@ public class MqController extends BaseController implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        mqService.initProducer();
+//        mqService.initProducer();
     }
 
 }
