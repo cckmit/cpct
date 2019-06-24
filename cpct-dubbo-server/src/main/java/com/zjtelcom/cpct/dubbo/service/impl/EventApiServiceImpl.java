@@ -2066,7 +2066,7 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
                 // 判断活动类型
-                if (!StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode().equals(mktCampaign.getTiggerType())) {
+                if (!StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode().equals(mktCampaign.getMktCampaignCategory())) {
                     esJson.put("hit", false);
                     esJson.put("msg", "活动类型不符");
                     log.info("活动类型不符");
