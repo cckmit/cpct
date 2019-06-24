@@ -75,10 +75,6 @@ public final class ResultUtil {
         return new Result(CommonConstant.CODE_SUCCESS, ResponseCode.SUCCESS_MSG, result);
     }
 
-    public static Result responseFailResult() {
-        return new Result(CommonConstant.CODE_FAIL, ResponseCode.FAIL_MSG);
-    }
-
     public static Result responseErrorResult(Exception exception) {
 
         if (exception instanceof SQLException) {
