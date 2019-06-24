@@ -8,10 +8,12 @@ import com.zjtelcom.cpct.dto.channel.ProductParam;
 import com.zjtelcom.cpct.request.channel.DisplayAllMessageReq;
 import com.zjtelcom.cpct.request.channel.MessageReq;
 import com.zjtelcom.cpct.service.channel.MessageLabelService;
+import org.omg.CORBA.OBJ_ADAPTER;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -161,6 +163,48 @@ public class MessageLabelController extends BaseController {
     public String viewDisplayColumn(@RequestBody DisplayAllMessageReq displayAllMessageReq) {
         Map<String, Object> map = new HashMap<>();
         map = messageLabelService.viewDisplayColumn(displayAllMessageReq);
+        return JSON.toJSONString(map);
+    }
+
+    /**
+     * 展示列标签展示类型配置
+     */
+    @PostMapping("configureLabelDisplayType")
+    @CrossOrigin
+    public String configureLabelDisplayType(@RequestBody HashMap<String, Object> param) {
+        Map<String, Object> map = new HashMap<>();
+        Long displayColumnId = 0L;
+        Long labelId = 0L;
+        List<String> labelDisplayTypeId = null;
+        if(param.get("displayColumnId") != null) {
+            displayColumnId = Long.valueOf(param.get("displayColumnId").toString());
+        }
+        if(param.get("labelId") != null) {
+            labelId = Long.valueOf(param.get("labelId").toString());
+        }
+        if(param.get("labelDisplayTypeId") != null) {
+            labelDisplayTypeId = (List<String>)param.get("labelDisplayTypeId");
+        }
+        map = messageLabelService.configureLabelDisplayType(displayColumnId,labelId,labelDisplayTypeId);
+        return JSON.toJSONString(map);
+    }
+
+    /**
+     * 查询展示列标签展示类型
+     */
+    @PostMapping("viewLabelDisplayType")
+    @CrossOrigin
+    public String viewLabelDisplayType(@RequestBody HashMap<String,Object> param) {
+        Map<String, Object> map = new HashMap<>();
+        Long displayColumnId = 0L;
+        Long labelId = 0L;
+        if(param.get("displayColumnId") != null) {
+            displayColumnId = Long.valueOf(param.get("displayColumnId").toString());
+        }
+        if(param.get("labelId") != null) {
+            labelId = Long.valueOf(param.get("labelId").toString());
+        }
+        map = messageLabelService.viewLabelDisplayType(displayColumnId,labelId);
         return JSON.toJSONString(map);
     }
 

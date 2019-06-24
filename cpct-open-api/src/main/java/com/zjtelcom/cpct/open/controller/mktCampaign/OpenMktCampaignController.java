@@ -2,16 +2,15 @@ package com.zjtelcom.cpct.open.controller.mktCampaign;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.exception.SystemException;
-import com.zjtelcom.cpct.open.base.common.HttpUtil;
 import com.zjtelcom.cpct.open.base.controller.BaseController;
+import com.zjtelcom.cpct.open.entity.mktCampaignEntity.CreateMktCampaignReq;
+import com.zjtelcom.cpct.open.entity.mktCampaignEntity.ModMktCampaignReq;
 import com.zjtelcom.cpct.open.service.mktCampaign.OpenMktCampaignService;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
@@ -49,5 +48,37 @@ public class OpenMktCampaignController extends BaseController {
         }
     }
 
+    /**
+     * 新增营服活动
+     */
+    @CrossOrigin
+    @RequestMapping(value = "/mktCampaign", method = RequestMethod.POST)
+    public String saveMktCampaign(@RequestBody Map<String,Object> param, HttpServletResponse response) {
+        CreateMktCampaignReq requestObject = JSON.parseObject(JSON.toJSONString(param.get("requestObject")),CreateMktCampaignReq.class);
+        Map<String, Object> resultMap = openMktCampaignService.addByObject(requestObject);
+        response.setStatus(HttpStatus.SC_CREATED);
+        return JSON.toJSONString(resultMap, SerializerFeature.WriteMapNullValue);
+    }
 
+    /**
+     * 修改营服活动
+     */
+    @CrossOrigin
+    @RequestMapping(value = "/mktCampaign", method = RequestMethod.PATCH)
+    public String updateMktCampaign(@RequestBody Map<String,Object> param, HttpServletResponse response) {
+        try {
+            ModMktCampaignReq requestObject = JSON.parseObject(JSON.toJSONString(param.get("requestObject")),ModMktCampaignReq.class);
+            Map<String, Object> eventMap = openMktCampaignService.updateMktCampaign(requestObject);
+            return JSON.toJSONString(eventMap, SerializerFeature.WriteMapNullValue);
+        } catch (SystemException e) {
+            e.printStackTrace();
+            response.setStatus(HttpStatus.SC_NOT_FOUND);
+            return "";
+        } catch (Exception e) {
+            e.printStackTrace();
+            //参数错误
+            response.setStatus(HttpStatus.SC_CONFLICT);
+            return "";
+        }
+    }
 }

@@ -29,7 +29,7 @@ public class TarGrpController extends BaseController {
 
     @Autowired
     private TarGrpService tarGrpService;
-    @Autowired
+    @Autowired(required = false)
     private TrialOperationService operationService;
 
 

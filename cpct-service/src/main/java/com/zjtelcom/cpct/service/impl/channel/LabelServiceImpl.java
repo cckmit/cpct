@@ -13,6 +13,7 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
+import com.zjtelcom.cpct.dto.pojo.Result;
 import com.zjtelcom.cpct.enums.LabelCondition;
 import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.enums.TrialCreateType;
@@ -144,7 +145,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         InputStream inputStream = file.getInputStream();
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
         Sheet sheet = wb.getSheetAt(0);
-        Integer rowNums = sheet.getLastRowNum() + 1;
+        Integer rowNums = sheet.getLastRowNum();
 
         List<Map<String,Object>> labelList = new ArrayList<>();
         List<Label> labels  = new ArrayList<>();
@@ -182,6 +183,13 @@ public class LabelServiceImpl extends BaseService implements LabelService {
                 labelDataType(label,entity);
                 entity.setRightOperand(label.getRightOperand());
                 entity.setTagRowId(label.getTagRowId());
+                entity.setInjectionLabelCode(label.getInjectionLabelCode());
+                entity.setOriginalLabLevel1Code(null == label.getOriginalLabLevel1Code()? "":label.getOriginalLabLevel1Code());
+                entity.setOriginalLabLevel2Code(null == label.getOriginalLabLevel2Code()? "":label.getOriginalLabLevel2Code());
+                entity.setOriginalLabLevel3Code(null == label.getOriginalLabLevel3Code()? "":label.getOriginalLabLevel3Code());
+                entity.setOriginalLabLevel1Name(null == label.getOriginalLabLevel1Name()? "":label.getOriginalLabLevel1Name());
+                entity.setOriginalLabLevel2Name(null == label.getOriginalLabLevel2Name()? "":label.getOriginalLabLevel2Name());
+                entity.setOriginalLabLevel3Name(null == label.getOriginalLabLevel3Name()? "":label.getOriginalLabLevel3Name());
                 labelMapper.updateByPrimaryKey(entity);
             }else {
                 ids.add(label.getTagRowId().toString());
@@ -956,4 +964,40 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         result.put("resultMsg",labelValue);
         return result;
     }
+
+    @Override
+    public Map<String,Object> distributeListRule(Integer labelType) {
+        Map<String,Object> result = new HashMap<>();
+        List<Map<String, String>> list = new ArrayList<>();
+        try {
+            list = labelMapper.selectDistributeLabelByType(labelType);
+            //return ResultUtil.responseSuccessResult(labelMapper.selectByCode(Integer.valueOf(labelType)));
+        }catch (Exception e){
+            e.printStackTrace();
+            logger.error("[op:LabelServiceImpl] fail to distributeListRule ", e);
+            //return ResultUtil.responseErrorResult(e);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","处理成功");
+        result.put("resultObject",list);
+        return result;
+    }
+
+    @Override
+    public Map<String,Object> queryDistributeLabel(String labelCode) {
+        Map<String,Object> result = new HashMap<>();
+        Map<String, Object> label = new HashMap<>();
+        try {
+            label = labelMapper.selectDistributeLabelByCode(labelCode);
+        }catch (Exception e){
+            e.printStackTrace();
+            logger.error("[op:LabelServiceImpl] fail to queryDistributeLabel ", e);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","处理成功");
+        result.put("resultObject",label);
+        return result;
+    }
+
+
 }

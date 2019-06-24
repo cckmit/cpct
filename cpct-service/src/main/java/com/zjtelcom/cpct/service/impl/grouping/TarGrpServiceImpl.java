@@ -305,15 +305,6 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     @Override
     public Map<String, Object> copyTarGrp(Long tarGrpId,boolean isCopy) {
         Map<String,Object> result = new HashMap<>();
-//        TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpId);
-//        if (tarGrp==null){
-//            result.put("resultCode", CODE_FAIL);
-//            result.put("resultMsg", "请选择下拉框运算类型");
-//            return result;
-//        }
-//        List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
-//        TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
-//        detail.setTarGrpConditions(conditionList);
         TarGrpDetail detail = (TarGrpDetail)redisUtils.get("TAR_GRP_"+tarGrpId);
         if (detail==null){
             TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrpId);

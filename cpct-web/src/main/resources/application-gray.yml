@@ -69,3 +69,20 @@ redisConfig_Prd:
    port: 41701
    database: 4970
    password: bss_cpcp_pocpro_user#bssCpc_ro
+
+# cpct_pst_topic 下二個分組 producerGroupName  producerGroupName2
+# cpct_push_end_topic 1個分組 pushGroupName : cpct_push_end_consumer
+ctg:
+  namesrvAddr: 134.108.11.159:9892;134.108.11.160:9892;134.108.11.161:9892
+  cpctGroupName: cpct_detailed_list_group_gray
+  namesrvAuthID: cpct_user
+  namesrvAuthPwd: cpct_user123
+  consumeOrderly: false
+  instanceName: prod_cpct
+  maxMessageSize: 8242880
+  sendMaxRetryTimes: 2
+  sendMsgTimeout: 30000
+  compressMsgBodyOverHowmuch: 4098
+  clusterName: pst_crm_mq
+  tenantID: 2
+  cpctTopic: cpct_detailed_list_topic_gray

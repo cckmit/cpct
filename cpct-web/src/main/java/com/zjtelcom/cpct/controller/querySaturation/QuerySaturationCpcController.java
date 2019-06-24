@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("${adminPath}/saturation")
 public class QuerySaturationCpcController extends BaseController {
 
-    @Autowired
+    @Autowired(required = false)
     private QuerySaturationCpcService querySaturationCpcService;
 
     /**

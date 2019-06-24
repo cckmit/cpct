@@ -7,8 +7,10 @@ import com.zjtelcom.cpct.exception.SystemException;
 import com.zjtelcom.cpct.open.base.common.HttpUtil;
 import com.zjtelcom.cpct.open.base.controller.BaseController;
 import com.zjtelcom.cpct.open.service.channel.OpenChannelService;
+import io.swagger.annotations.Api;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
