@@ -145,7 +145,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         InputStream inputStream = file.getInputStream();
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
         Sheet sheet = wb.getSheetAt(0);
-        Integer rowNums = sheet.getLastRowNum() + 1;
+        Integer rowNums = sheet.getLastRowNum();
 
         List<Map<String,Object>> labelList = new ArrayList<>();
         List<Label> labels  = new ArrayList<>();
@@ -183,6 +183,13 @@ public class LabelServiceImpl extends BaseService implements LabelService {
                 labelDataType(label,entity);
                 entity.setRightOperand(label.getRightOperand());
                 entity.setTagRowId(label.getTagRowId());
+                entity.setInjectionLabelCode(label.getInjectionLabelCode());
+                entity.setOriginalLabLevel1Code(null == label.getOriginalLabLevel1Code()? "":label.getOriginalLabLevel1Code());
+                entity.setOriginalLabLevel2Code(null == label.getOriginalLabLevel2Code()? "":label.getOriginalLabLevel2Code());
+                entity.setOriginalLabLevel3Code(null == label.getOriginalLabLevel3Code()? "":label.getOriginalLabLevel3Code());
+                entity.setOriginalLabLevel1Name(null == label.getOriginalLabLevel1Name()? "":label.getOriginalLabLevel1Name());
+                entity.setOriginalLabLevel2Name(null == label.getOriginalLabLevel2Name()? "":label.getOriginalLabLevel2Name());
+                entity.setOriginalLabLevel3Name(null == label.getOriginalLabLevel3Name()? "":label.getOriginalLabLevel3Name());
                 labelMapper.updateByPrimaryKey(entity);
             }else {
                 ids.add(label.getTagRowId().toString());

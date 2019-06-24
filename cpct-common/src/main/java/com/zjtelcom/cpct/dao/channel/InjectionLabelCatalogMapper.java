@@ -17,7 +17,7 @@ public interface InjectionLabelCatalogMapper {
 
     LabelCatalog selectByPrimaryKey(Long catalogId);
 
-    List<LabelCatalog> selectAll();
+    List<LabelCatalog> selectAll(@Param("newOrOld")String newOrOld);
 
     List<LabelCatalog> findByLevelId(@Param("level") Long level);
 

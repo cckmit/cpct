@@ -50,9 +50,9 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class MktCampaignApiServiceImpl implements MktCampaignApiService {
+public class MktCampaignCpcServiceImpl implements MktCampaignApiService {
 
-    private static final Logger logger = LoggerFactory.getLogger(MktCampaignApiServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(MktCampaignCpcServiceImpl.class);
 
     /**
      * 营销活动

@@ -10,11 +10,13 @@
 package com.zjtelcom.cpct.util;
 
 
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.constants.ResponseCode;
 import com.zjtelcom.cpct.dto.pojo.Result;
 import com.zjtelcom.cpct.exception.ServicesException;
 import com.zjtelcom.cpct.exception.ValidateException;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.formula.functions.T;
 
 import java.sql.SQLException;
 
@@ -57,11 +59,44 @@ public final class ResultUtil {
 
         if (exception instanceof ServicesException) {
             if (StringUtils.isEmpty(exception.getMessage())) {
-                msg = ResponseCode.VALIDATE_ERROR_MSG;
+                msg = ResponseCode.SERVICE_ERROR_MSG;
             }
             return new Result(ResponseCode.SERVICE_ERROR, msg, resultObject);
         }
         return new Result(ResponseCode.INTERNAL_ERROR, ResponseCode.INTERNAL_ERROR_MSG,
             resultObject);
     }
+
+    public static Result responseSuccessResult() {
+        return new Result(CommonConstant.CODE_SUCCESS, ResponseCode.SUCCESS_MSG);
+    }
+
+    public static <T> Result responseSuccessResult(T result) {
+        return new Result(CommonConstant.CODE_SUCCESS, ResponseCode.SUCCESS_MSG, result);
+    }
+
+    public static Result responseErrorResult(Exception exception) {
+
+        if (exception instanceof SQLException) {
+            return new Result(ResponseCode.DATABASE_ERROR, ResponseCode.DATABASE_ERROR_MSG);
+        }
+
+        String msg = null;
+        if (exception instanceof ValidateException) {
+
+            if (StringUtils.isEmpty(exception.getMessage())) {
+                msg = ResponseCode.VALIDATE_ERROR_MSG;
+            }
+            return new Result(ResponseCode.VALIDATE_ERROR, msg);
+        }
+
+        if (exception instanceof ServicesException) {
+            if (StringUtils.isEmpty(exception.getMessage())) {
+                msg = ResponseCode.SERVICE_ERROR_MSG;
+            }
+            return new Result(ResponseCode.SERVICE_ERROR, msg);
+        }
+        return new Result(ResponseCode.INTERNAL_ERROR, ResponseCode.INTERNAL_ERROR_MSG);
+    }
+
 }

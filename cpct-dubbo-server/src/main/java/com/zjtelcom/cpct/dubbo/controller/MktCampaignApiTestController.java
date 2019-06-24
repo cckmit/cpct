@@ -23,6 +23,25 @@ public class MktCampaignApiTestController {
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private MktCampaignSyncApiService mktCampaignSyncApiService;
+
+
+
+    @RequestMapping(value = "/publishMktCampaign", method = RequestMethod.POST)
+    @CrossOrigin
+    public Map<String,Object> publishMktCampaign(Long mktCampaignId) {
+        Map<String,Object> retCamResp = new HashMap<>();
+        try {
+            retCamResp = mktCampaignSyncApiService.publishMktCampaign(mktCampaignId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return retCamResp;
+        }
+        return retCamResp;
+    }
+
+
     @RequestMapping(value = "/qryMktCampaignDetail", method = RequestMethod.POST)
     @CrossOrigin
     public String qryMktCampaignDetail(Long mktCampaignId) {
