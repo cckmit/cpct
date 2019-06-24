@@ -118,20 +118,13 @@ public class MktCamDisplayColumnRelServiceImpl implements MktCamDisplayColumnRel
             result.put("resultMsg", "MktCamDisplayColumnRelList为空");
             return result;
         }
-        ExecutorService executorService = Executors.newCachedThreadPool();
         for (MktCamDisplayColumnRel rel : relList) {
             rel.setMktCampaignId(newCampaignId);
-            executorService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    rel.setCreateStaff(UserUtil.loginId());
-                    rel.setCreateDate(new Date());
-                    rel.setStatusCd("1000");
-                    mktCamDisplayColumnRelMapper.insert(rel);
-                }
-            });
+            rel.setCreateStaff(UserUtil.loginId());
+            rel.setCreateDate(new Date());
+            rel.setStatusCd("1000");
+            mktCamDisplayColumnRelMapper.insert(rel);
         }
-        executorService.shutdown();
         result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", "同步完成");
         return result;
@@ -146,19 +139,12 @@ public class MktCamDisplayColumnRelServiceImpl implements MktCamDisplayColumnRel
             result.put("resultMsg", "MktCamDisplayColumnRelList为空");
             return result;
         }
-        ExecutorService executorService = Executors.newCachedThreadPool();
         for (MktCamDisplayColumnRel rel : relList) {
-            executorService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    rel.setCreateStaff(UserUtil.loginId());
-                    rel.setCreateDate(new Date());
-                    rel.setStatusCd("1000");
-                    mktCamDisplayColumnRelPrdMapper.insert(rel);
-                }
-            });
+            rel.setCreateStaff(UserUtil.loginId());
+            rel.setCreateDate(new Date());
+            rel.setStatusCd("1000");
+            mktCamDisplayColumnRelPrdMapper.insert(rel);
         }
-        executorService.shutdown();
         result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", "同步完成");
         return result;
@@ -173,19 +159,12 @@ public class MktCamDisplayColumnRelServiceImpl implements MktCamDisplayColumnRel
             result.put("resultMsg", "MktCamDisplayColumnRelList为空");
             return result;
         }
-        ExecutorService executorService = Executors.newCachedThreadPool();
         for (MktCamDisplayColumnRel rel : relList) {
-            executorService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    rel.setCreateStaff(UserUtil.loginId());
-                    rel.setCreateDate(new Date());
-                    rel.setStatusCd("1000");
-                    mktCamDisplayColumnRelMapper.insert(rel);
-                }
-            });
+            rel.setCreateStaff(UserUtil.loginId());
+            rel.setCreateDate(new Date());
+            rel.setStatusCd("1000");
+            mktCamDisplayColumnRelMapper.insert(rel);
         }
-        executorService.shutdown();
         result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", "更新完成");
         return result;
@@ -208,6 +187,5 @@ public class MktCamDisplayColumnRelServiceImpl implements MktCamDisplayColumnRel
         result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", "更新完成");
         return result;
-
     }
 }
