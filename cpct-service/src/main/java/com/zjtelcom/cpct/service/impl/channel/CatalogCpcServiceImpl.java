@@ -22,7 +22,7 @@ import java.util.Map;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 @Service
-public class CatalogServiceImpl extends BaseService implements CatalogService {
+public class CatalogCpcServiceImpl extends BaseService implements CatalogService {
     @Autowired
     private CatalogItemProdMapper catalogItemMapper;
     @Autowired
