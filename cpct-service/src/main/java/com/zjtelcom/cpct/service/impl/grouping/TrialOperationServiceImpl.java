@@ -8,10 +8,7 @@ import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
 import com.mysql.jdbc.StringUtils;
 import com.zjtelcom.cpct.constants.CommonConstant;
-import com.zjtelcom.cpct.dao.campaign.MktCamChlConfAttrMapper;
-import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
-import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
-import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
+import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.MktCamCustMapper;
 import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
@@ -144,6 +141,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private MktCamChlConfAttrMapper mktCamChlConfAttrMapper;
     @Autowired
     private MqService mqService;
+    @Autowired
+    private MktCamDisplayColumnRelMapper mktCamDisplayColumnRelMapper;
 
     /**
      * 销售品service
