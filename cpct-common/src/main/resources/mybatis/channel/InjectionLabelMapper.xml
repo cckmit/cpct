@@ -119,75 +119,65 @@
       #{labEffectiveDate,jdbcType=TIMESTAMP}, #{labExpirationDate,jdbcType=TIMESTAMP},
       #{damander,jdbcType=VARCHAR}, #{damandDepartment,jdbcType=VARCHAR}, #{damandDescription,jdbcType=VARCHAR})
   </insert>
-  <!--<update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.Label">-->
-    <!--update injection_label-->
-    <!--set INJECTION_LABEL_CODE = #{injectionLabelCode,jdbcType=VARCHAR},-->
-      <!--INJECTION_LABEL_NAME = #{injectionLabelName,jdbcType=VARCHAR},-->
-      <!--INJECTION_LABEL_DESC = #{injectionLabelDesc,jdbcType=VARCHAR},-->
-      <!--LABEL_TYPE = #{labelType,jdbcType=VARCHAR},-->
-      <!--LABEL_VALUE_TYPE = #{labelValueType,jdbcType=VARCHAR},-->
-      <!--LABEL_DATA_TYPE = #{labelDataType,jdbcType=VARCHAR},-->
-      <!--STATUS_CD = #{statusCd,jdbcType=VARCHAR},-->
-      <!--CREATE_STAFF = #{createStaff,jdbcType=BIGINT},-->
-      <!--UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},-->
-      <!--CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},-->
-      <!--STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},-->
-      <!--UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},-->
-      <!--REMARK = #{remark,jdbcType=VARCHAR},-->
-      <!--RIGHT_OPERAND = #{rightOperand,jdbcType=VARCHAR},-->
-      <!--CONDITION_TYPE = #{conditionType,jdbcType=VARCHAR},-->
-      <!--OPERATOR = #{operator,jdbcType=VARCHAR},-->
-      <!--SCOPE = #{scope,jdbcType=INTEGER},-->
-      <!--TAG_ROW_ID = #{tagRowId,jdbcType=BIGINT},-->
-      <!--IS_SHARED = #{isShared,jdbcType=INTEGER},-->
-      <!--CATALOG_ID = #{catalogId,jdbcType=VARCHAR},-->
-      <!--CLASS_NAME = #{className,jdbcType=VARCHAR},-->
-      <!--LAB_RELEVANT_FLAG = #{labRelevantFlag,jdbcType=VARCHAR},-->
-      <!--LAB_MISS_RATE = #{labMissRate,jdbcType=VARCHAR},-->
-      <!--LAB_OBJECT_CODE = #{labObjectCode,jdbcType=VARCHAR},-->
-      <!--LAB_OBJECT = #{labObject,jdbcType=VARCHAR},-->
-      <!--LAB_LEVEL1 = #{labLevel1,jdbcType=VARCHAR},-->
-      <!--LAB_LEVEL1_NAME = #{labLevel1Name,jdbcType=VARCHAR},-->
-      <!--LAB_LEVEL2 = #{labLevel2,jdbcType=VARCHAR},-->
-      <!--LAB_LEVEL2_NAME = #{labLevel2Name,jdbcType=VARCHAR},-->
-      <!--LAB_LEVEL3 = #{labLevel3,jdbcType=VARCHAR},-->
-      <!--LAB_LEVEL3_NAME = #{labLevel3Name,jdbcType=VARCHAR},-->
-      <!--LAB_LEVEL4 = #{labLevel4,jdbcType=VARCHAR},-->
-      <!--LAB_LEVEL4_NAME = #{labLevel4Name,jdbcType=VARCHAR},-->
-      <!--LAB_LEVEL5 = #{labLevel5,jdbcType=VARCHAR},-->
-      <!--LAB_LEVEL5_NAME = #{labLevel5Name,jdbcType=VARCHAR},-->
-      <!--LAB_LEVEL6 = #{labLevel6,jdbcType=VARCHAR},-->
-      <!--LAB_LEVEL6_NAME = #{labLevel6Name,jdbcType=VARCHAR},-->
-      <!--LAB_UPDATE_FEQ = #{labUpdateFeq,jdbcType=VARCHAR},-->
-      <!--LAB_BUSI_DESC = #{labBusiDesc,jdbcType=VARCHAR},-->
-      <!--LAB_TECH_DESC = #{labTechDesc,jdbcType=VARCHAR},-->
-      <!--LAB_STATE = #{labState,jdbcType=VARCHAR},-->
-      <!--LAB_MANAGE_TYPE = #{labManageType,jdbcType=VARCHAR},-->
-      <!--LAB_TAG_CODE = #{labTagCode,jdbcType=VARCHAR},-->
-      <!--SYSTEM_INFO_ID = #{systemInfoId,jdbcType=BIGINT},-->
-      <!--LAB_EXAMPLE = #{labExample,jdbcType=VARCHAR},-->
-      <!--LAB_EFFECTIVE_DATE = #{labEffectiveDate,jdbcType=TIMESTAMP},-->
-      <!--LAB_EXPIRATION_DATE = #{labExpirationDate,jdbcType=TIMESTAMP},-->
-      <!--DAMANDER = #{damander,jdbcType=VARCHAR},-->
-      <!--DAMAND_DEPARTMENT = #{damandDepartment,jdbcType=VARCHAR},-->
-      <!--DAMAND_DESCRIPTION = #{damandDescription,jdbcType=VARCHAR},-->
-      <!--ORIGINAL_LAB_LEVEL1_NAME = #{originalLabLevel1Name,jdbcType=VARCHAR},-->
-      <!--ORIGINAL_LAB_LEVEL2_NAME = #{originalLabLevel2Name,jdbcType=VARCHAR},-->
-      <!--ORIGINAL_LAB_LEVEL3_NAME = #{originalLabLevel3Name,jdbcType=VARCHAR},-->
-      <!--ORIGINAL_LAB_LEVEL1_CODE = #{originalLabLevel1Code,jdbcType=VARCHAR},-->
-      <!--ORIGINAL_LAB_LEVEL2_CODE = #{originalLabLevel2Code,jdbcType=VARCHAR},-->
-      <!--ORIGINAL_LAB_LEVEL3_CODE = #{originalLabLevel3Code,jdbcType=VARCHAR}-->
-    <!--where INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT}-->
-  <!--</update>-->
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.Label">
     update injection_label
-    set ORIGINAL_LAB_LEVEL1_NAME = #{originalLabLevel1Name,jdbcType=VARCHAR},
+    set INJECTION_LABEL_CODE = #{injectionLabelCode,jdbcType=VARCHAR},
+      INJECTION_LABEL_NAME = #{injectionLabelName,jdbcType=VARCHAR},
+      INJECTION_LABEL_DESC = #{injectionLabelDesc,jdbcType=VARCHAR},
+      LABEL_TYPE = #{labelType,jdbcType=VARCHAR},
+      LABEL_VALUE_TYPE = #{labelValueType,jdbcType=VARCHAR},
+      LABEL_DATA_TYPE = #{labelDataType,jdbcType=VARCHAR},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      RIGHT_OPERAND = #{rightOperand,jdbcType=VARCHAR},
+      CONDITION_TYPE = #{conditionType,jdbcType=VARCHAR},
+      OPERATOR = #{operator,jdbcType=VARCHAR},
+      SCOPE = #{scope,jdbcType=INTEGER},
+      TAG_ROW_ID = #{tagRowId,jdbcType=BIGINT},
+      IS_SHARED = #{isShared,jdbcType=INTEGER},
+      CATALOG_ID = #{catalogId,jdbcType=VARCHAR},
+      CLASS_NAME = #{className,jdbcType=VARCHAR},
+      LAB_RELEVANT_FLAG = #{labRelevantFlag,jdbcType=VARCHAR},
+      LAB_MISS_RATE = #{labMissRate,jdbcType=VARCHAR},
+      LAB_OBJECT_CODE = #{labObjectCode,jdbcType=VARCHAR},
+      LAB_OBJECT = #{labObject,jdbcType=VARCHAR},
+      LAB_LEVEL1 = #{labLevel1,jdbcType=VARCHAR},
+      LAB_LEVEL1_NAME = #{labLevel1Name,jdbcType=VARCHAR},
+      LAB_LEVEL2 = #{labLevel2,jdbcType=VARCHAR},
+      LAB_LEVEL2_NAME = #{labLevel2Name,jdbcType=VARCHAR},
+      LAB_LEVEL3 = #{labLevel3,jdbcType=VARCHAR},
+      LAB_LEVEL3_NAME = #{labLevel3Name,jdbcType=VARCHAR},
+      LAB_LEVEL4 = #{labLevel4,jdbcType=VARCHAR},
+      LAB_LEVEL4_NAME = #{labLevel4Name,jdbcType=VARCHAR},
+      LAB_LEVEL5 = #{labLevel5,jdbcType=VARCHAR},
+      LAB_LEVEL5_NAME = #{labLevel5Name,jdbcType=VARCHAR},
+      LAB_LEVEL6 = #{labLevel6,jdbcType=VARCHAR},
+      LAB_LEVEL6_NAME = #{labLevel6Name,jdbcType=VARCHAR},
+      LAB_UPDATE_FEQ = #{labUpdateFeq,jdbcType=VARCHAR},
+      LAB_BUSI_DESC = #{labBusiDesc,jdbcType=VARCHAR},
+      LAB_TECH_DESC = #{labTechDesc,jdbcType=VARCHAR},
+      LAB_STATE = #{labState,jdbcType=VARCHAR},
+      LAB_MANAGE_TYPE = #{labManageType,jdbcType=VARCHAR},
+      LAB_TAG_CODE = #{labTagCode,jdbcType=VARCHAR},
+      SYSTEM_INFO_ID = #{systemInfoId,jdbcType=BIGINT},
+      LAB_EXAMPLE = #{labExample,jdbcType=VARCHAR},
+      LAB_EFFECTIVE_DATE = #{labEffectiveDate,jdbcType=TIMESTAMP},
+      LAB_EXPIRATION_DATE = #{labExpirationDate,jdbcType=TIMESTAMP},
+      DAMANDER = #{damander,jdbcType=VARCHAR},
+      DAMAND_DEPARTMENT = #{damandDepartment,jdbcType=VARCHAR},
+      DAMAND_DESCRIPTION = #{damandDescription,jdbcType=VARCHAR},
+      ORIGINAL_LAB_LEVEL1_NAME = #{originalLabLevel1Name,jdbcType=VARCHAR},
       ORIGINAL_LAB_LEVEL2_NAME = #{originalLabLevel2Name,jdbcType=VARCHAR},
       ORIGINAL_LAB_LEVEL3_NAME = #{originalLabLevel3Name,jdbcType=VARCHAR},
       ORIGINAL_LAB_LEVEL1_CODE = #{originalLabLevel1Code,jdbcType=VARCHAR},
       ORIGINAL_LAB_LEVEL2_CODE = #{originalLabLevel2Code,jdbcType=VARCHAR},
       ORIGINAL_LAB_LEVEL3_CODE = #{originalLabLevel3Code,jdbcType=VARCHAR}
-    where INJECTION_LABEL_CODE = #{injectionLabelCode,jdbcType=VARCHAR}
+    where INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC,
@@ -209,7 +199,9 @@
     LAB_OBJECT_CODE, LAB_OBJECT, LAB_LEVEL1, LAB_LEVEL1_NAME, LAB_LEVEL2, LAB_LEVEL2_NAME,
     LAB_LEVEL3, LAB_LEVEL3_NAME, LAB_LEVEL4, LAB_LEVEL4_NAME, LAB_LEVEL5, LAB_LEVEL5_NAME,
     LAB_LEVEL6, LAB_LEVEL6_NAME, LAB_UPDATE_FEQ, LAB_BUSI_DESC, LAB_TECH_DESC, LAB_STATE,
-    LAB_MANAGE_TYPE, LAB_TAG_CODE, SYSTEM_INFO_ID
+    LAB_MANAGE_TYPE, LAB_TAG_CODE, SYSTEM_INFO_ID, LAB_EXAMPLE, LAB_EFFECTIVE_DATE, LAB_EXPIRATION_DATE,
+    DAMANDER, DAMAND_DEPARTMENT, DAMAND_DESCRIPTION, ORIGINAL_LAB_LEVEL1_NAME, ORIGINAL_LAB_LEVEL2_NAME,
+    ORIGINAL_LAB_LEVEL3_NAME, ORIGINAL_LAB_LEVEL1_CODE, ORIGINAL_LAB_LEVEL2_CODE, ORIGINAL_LAB_LEVEL3_CODE
     from injection_label
   </select>
 
