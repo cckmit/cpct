@@ -25,10 +25,7 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
-import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
-import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
-import com.zjtelcom.cpct.domain.campaign.MktCamItem;
-import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
@@ -123,6 +120,9 @@ public class CamApiServiceImpl implements CamApiService {
 
     @Autowired
     private EventMatchRulConditionMapper eventMatchRulConditionMapper;  //事件规则条件
+
+    @Autowired
+    private MktCamDisplayColumnRelMapper mktCamDisplayColumnRelMapper;
 
     @Autowired
     private OfferProdMapper offerProdMapper;
@@ -464,6 +464,18 @@ public class CamApiServiceImpl implements CamApiService {
                 iSaleDisplay = (List<Map<String, Object>>) redisUtils.get("MKT_ISALE_LABEL_" + mktCampaign.getIsaleDisplay());
                 if (iSaleDisplay == null) {
                     iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getIsaleDisplay());
+//                    List<Long> injectionLabelIds = new ArrayList<>();
+//                    List<MktCamDisplayColumnRel> mktCamDisplayColumnRelList = mktCamDisplayColumnRelMapper.selectLabelByCampaignIdAndDisplayId(mktCampaign.getMktCampaignId(), mktCampaign.getIsaleDisplay());
+//                    for (MktCamDisplayColumnRel mktCamDisplayColumnRel : mktCamDisplayColumnRelList) {
+//                        injectionLabelIds.add(mktCamDisplayColumnRel.getInjectionLabelId());
+//                    }
+//                    List<Label> labelList = injectionLabelMapper.listLabelByIdList(injectionLabelIds);
+//                    for (Label label : labelList) {
+//                        Map<String, Object> labelMap = new HashMap<>();
+//                        labelMap.put("labelCode", label.getInjectionLabelCode());
+//                        labelMap.put("labelName", label.getInjectionLabelName());
+//                        labelMap.put("typeCode", label);
+//                    }
                     redisUtils.set("MKT_ISALE_LABEL_" + mktCampaign.getIsaleDisplay(), iSaleDisplay);
                 }
 
@@ -524,7 +536,8 @@ public class CamApiServiceImpl implements CamApiService {
                     List<Map<String, Object>> ChlMap = (List<Map<String, Object>>) ruleMap.get("taskChlList");
                     for (Map<String, Object> map : ChlMap) {
                         map.put("itgTriggers", JSONArray.parse(JSONArray.toJSON(itgTriggers).toString()));
-                        map.put("triggers", JSONArray.parse(JSONArray.toJSON(evtTriggers).toString()));
+                       // map.put("triggers", JSONArray.parse(JSONArray.toJSON(evtTriggers).toString()));
+                        map.put("triggers", JSONArray.parse(params.get("evtContent")));
                     }
                 }
 
