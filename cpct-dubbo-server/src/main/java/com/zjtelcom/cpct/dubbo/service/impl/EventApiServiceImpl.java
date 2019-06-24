@@ -2055,9 +2055,18 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
 
-                // 判断活动类型
+                // 判断触发活动类型
                 if (!StatusCode.REAL_TIME_CAMPAIGN.getStatusCode().equals(mktCampaign.getTiggerType())
                         && !StatusCode.MIXTURE_CAMPAIGN.getStatusCode().equals(mktCampaign.getTiggerType())) {
+                    esJson.put("hit", false);
+                    esJson.put("msg", "活动触发类型不符");
+                    log.info("活动触发类型不符");
+                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                    return Collections.EMPTY_MAP;
+                }
+
+                // 判断活动类型
+                if (!StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode().equals(mktCampaign.getTiggerType())) {
                     esJson.put("hit", false);
                     esJson.put("msg", "活动类型不符");
                     log.info("活动类型不符");

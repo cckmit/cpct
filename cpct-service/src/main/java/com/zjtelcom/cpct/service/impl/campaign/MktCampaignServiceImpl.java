@@ -1235,7 +1235,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_NOTACTIVE.getStatusCode());
                     mktCamResultRelMapper.updateByPrimaryKey(mktCamResultRelDO);
                 }
-            } else if(StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)){
+            } else if(StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd) || StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)){
                 // 活动下线清缓存
                 redisUtils.del("MKT_CAMPAIGN_" + mktCampaignId);
             }
