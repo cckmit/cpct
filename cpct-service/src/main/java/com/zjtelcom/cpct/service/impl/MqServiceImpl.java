@@ -54,6 +54,9 @@ public class MqServiceImpl implements MqService {
     private String tenantID;
     @Value("${ctg.cpctTopic}")
     private String topic;
+    @Value("${ctg.clientWorkerThreads}")
+    private String clientWorkerThreads;
+
 
     private int connect;
 
@@ -70,6 +73,7 @@ public class MqServiceImpl implements MqService {
         properties.setProperty(PropertyKeyConst.SendMaxRetryTimes, sendMaxRetryTimes);
         properties.setProperty(PropertyKeyConst.SendMsgTimeout, sendMsgTimeout);//设置发送超时时间
         properties.setProperty(PropertyKeyConst.CompressMsgBodyOverHowmuch, compressMsgBodyOverHowmuch);//消息体到达2k，自动压缩
+        properties.setProperty(PropertyKeyConst.ClientWorkerThreads, clientWorkerThreads);
         properties.setProperty(PropertyKeyConst.ClusterName, clusterName);
         properties.setProperty(PropertyKeyConst.TenantID, tenantID);
         producer = CTGMQFactory.createProducer(properties);
