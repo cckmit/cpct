@@ -420,7 +420,7 @@
     </select>
 
     <select id="selectAllGroupByCamId" resultType="com.zjtelcom.cpct.domain.campaign.MktCamDisplayColumnRel">
-        select MKT_CAMPAIGN_ID mktCampaignId, CALC_DISPLAY displayId, INJECTION_LABEL_ID injectionLabelId, LABEL_DISPLAY_TYPE labelDisplayType
+        select cam.MKT_CAMPAIGN_ID mktCampaignId, cam.CALC_DISPLAY displayId, label.INJECTION_LABEL_ID injectionLabelId, label.LABEL_DISPLAY_TYPE labelDisplayType, label.MESSAGE_TYPE remark
         from mkt_campaign cam, display_column_label label
         where label.DISPLAY_ID = cam.CALC_DISPLAY
     </select>

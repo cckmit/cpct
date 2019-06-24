@@ -1061,7 +1061,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             customerList.clear();
                         }
                     }
-
                 }
             }.start();
         } catch (Exception e) {

@@ -189,6 +189,25 @@ public class MktCamDisplayColumnRelServiceImpl implements MktCamDisplayColumnRel
         result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", "更新完成");
         return result;
+    }
+
+    @Override
+    public Map<String, Object> updateOldCamDisplay(){
+        Map<String,Object> result = new HashMap<>();
+        List<MktCamDisplayColumnRel> relList = mktCampaignMapper.selectAllGroupByCamId();
+        if(relList.isEmpty() || relList.size() == 0){
+            result.put("resultCode", CODE_SUCCESS);
+            result.put("resultMsg", "MktCamDisplayColumnRelList为空");
+            return result;
+        }
+        for (MktCamDisplayColumnRel rel : relList) {
+            rel.setUpdateDate(new Date());
+            int i = mktCamDisplayColumnRelMapper.updateDisplayLabel(rel);
+            System.out.println(i);
+        }
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", "更新完成");
+        return result;
 
     }
 }

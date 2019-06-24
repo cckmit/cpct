@@ -28,4 +28,6 @@ public interface MktCamDisplayColumnRelMapper {
 
     List<MktCamDisplayColumnRel> selectDisplayLabelByCamId(@Param("mktCampaignId") Long mktCampaignId);
 
+    int updateDisplayLabel(MktCamDisplayColumnRel rel);
+
 }
