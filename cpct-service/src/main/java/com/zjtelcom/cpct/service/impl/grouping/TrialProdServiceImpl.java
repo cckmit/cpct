@@ -176,7 +176,7 @@ public class TrialProdServiceImpl implements TrialProdService {
                     redisUtils_es.set("PER_CAMPAIGN_"+batchNumSt,"true");
                 }
                 if (userListCam.equals("USER_LIST_CAM")){
-                    redisUtils_es.set("USER_LIST_CAM"+batchNumSt,"true");
+                    redisUtils_es.set("USER_LIST_CAM_"+batchNumSt,"true");
                 }
                 Map<String,Object> res = issue(operation,campaignDO,strategy,perCampaign);
                 resList.add(res);

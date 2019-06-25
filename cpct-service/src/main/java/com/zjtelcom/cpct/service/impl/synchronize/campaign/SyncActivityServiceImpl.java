@@ -30,12 +30,15 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.enums.TrialCreateType;
 import com.zjtelcom.cpct.service.synchronize.campaign.SyncActivityService;
+import com.zjtelcom.cpct.util.ChannelUtil;
+import com.zjtelcom.cpct.util.DateUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -105,8 +108,10 @@ public class SyncActivityServiceImpl implements SyncActivityService {
             policyModel.setHandoutType(activityModel.getHandoutType());
             //通过策略id  得到对应的批次id 按降序取第一个批次id
             List<TrialOperation> operationListByStrategyId = trialOperationMapper.findOperationListByStrategyId(mktStrategyConfDO.getMktStrategyConfId(),TrialCreateType.TRIAL_OPERATION.getValue());
-            if(!operationListByStrategyId.isEmpty()){
+            if (!operationListByStrategyId.isEmpty()) {
                 policyModel.setBatchId(operationListByStrategyId.get(0).getBatchNum().toString());
+            } else {
+                policyModel.setBatchId(DateUtil.date2St4Trial(new Date()) + ChannelUtil.getRandomStr(4));
             }
 
 
