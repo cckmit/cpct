@@ -537,7 +537,7 @@ public class CamApiServiceImpl implements CamApiService {
                     for (Map<String, Object> map : ChlMap) {
                         map.put("itgTriggers", JSONArray.parse(JSONArray.toJSON(itgTriggers).toString()));
                        // map.put("triggers", JSONArray.parse(JSONArray.toJSON(evtTriggers).toString()));
-                        map.put("triggers", JSONArray.parse(params.get("evtContent")));
+                        map.put("triggers", JSONArray.parse(JSONArray.toJSON(params.get("evtContent")).toString()));
                     }
                 }
 

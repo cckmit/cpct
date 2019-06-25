@@ -386,7 +386,7 @@ public class EventApiServiceImpl implements EventApiService {
             result.put("reqId", map.get("reqId"));
             result.put("custId", custId);
             result.put("taskList", activityList);
-            result.put("triggers", JSONArray.parse(map.get("evtContent")));
+            result.put("triggers", JSONArray.parse(JSONArray.toJSON(map.get("evtContent")).toString()));
 
 
             //初始化es log
@@ -2596,7 +2596,8 @@ public class EventApiServiceImpl implements EventApiService {
                             List<Map> taskChlCountList = (List<Map>) ((Map) resultMap1.get("CPC_VALUE")).get("taskChlList");
                             // 清单方案放入采集项
                             for (Map<String, Object> taskChlCountMap : taskChlCountList) {
-                                taskChlCountMap.put("triggers", JSONArray.parse(map.get("evtContent")));
+                                taskChlCountMap.put("triggers", JSONArray.parse(JSONArray.toJSON(map.get("evtContent")).toString()));
+
                             }
 
                             if (taskChlCountList != null && taskChlCountList.size() > 0) {
@@ -2693,40 +2694,40 @@ public class EventApiServiceImpl implements EventApiService {
         List<String> accNbrList = new ArrayList<>();
         List<Map<String, Object>> accNbrMapList = new ArrayList<>();
         // 根据accNum查询prodInstId
-        log.info("11111------prodInstIdsObject --->" + accNbr);
+        //log.info("11111------prodInstIdsObject --->" + accNbr);
         CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(accNbr);
-        log.info("22222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
+        //log.info("22222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
         if (prodInstIdsObject != null && prodInstIdsObject.getResultObject() != null) {
             Set<String> prodInstIds = prodInstIdsObject.getResultObject();
             for (String prodInstId : prodInstIds) {
                 // 查询产品实例实体缓存
                 CacheResultObject<ProdInst> prodInstCacheEntity = iCacheProdEntityQryService.getProdInstCacheEntity(prodInstId);
-                log.info("333333------prodInstCacheEntity --->" + JSON.toJSONString(prodInstCacheEntity));
+        //        log.info("333333------prodInstCacheEntity --->" + JSON.toJSONString(prodInstCacheEntity));
                 if (prodInstCacheEntity != null && prodInstCacheEntity.getResultObject() != null) {
                     Long mainOfferInstId = prodInstCacheEntity.getResultObject().getMainOfferInstId();
                     // 根据offerInstId和statusCd查询offerProdInstRelId
                     CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex1(mainOfferInstId.toString(), "1000");
-                    log.info("444444------setCacheResultObject --->" + JSON.toJSONString(setCacheResultObject));
+        //            log.info("444444------setCacheResultObject --->" + JSON.toJSONString(setCacheResultObject));
                     if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null && setCacheResultObject.getResultObject().size() > 0) {
                         Set<String> offerProdInstRelIds = setCacheResultObject.getResultObject();
                         for (String offerProdInstRelId : offerProdInstRelIds) {
                             CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
-                            log.info("55555------offerProdInstRelCacheEntity --->" + JSON.toJSONString(offerProdInstRelCacheEntity));
+        //                    log.info("55555------offerProdInstRelCacheEntity --->" + JSON.toJSONString(offerProdInstRelCacheEntity));
                             if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
                                 Long prodInstIdNew = offerProdInstRelCacheEntity.getResultObject().getProdInstId();
                                 CacheResultObject<ProdInst> prodInstCacheEntityNew = iCacheProdEntityQryService.getProdInstCacheEntity(prodInstIdNew.toString());
-                                log.info("6666666------prodInstCacheEntityNew --->" + JSON.toJSONString(prodInstCacheEntityNew));
+        //                        log.info("6666666------prodInstCacheEntityNew --->" + JSON.toJSONString(prodInstCacheEntityNew));
                                 if (prodInstCacheEntityNew != null && prodInstCacheEntityNew.getResultObject() != null) {
-                                    log.info("777777------AccNum --->" + prodInstCacheEntityNew.getResultObject().getAccNum());
+        //                            log.info("777777------AccNum --->" + prodInstCacheEntityNew.getResultObject().getAccNum());
                                     if (!accNbrList.contains(prodInstCacheEntityNew.getResultObject().getAccNum())) {
                                         accNbrList.add(prodInstCacheEntityNew.getResultObject().getAccNum());
                                         final CacheResultObject<RowIdMapping> prodInstIdMappingCacheEntity = iCacheIdMappingEntityQryService.getProdInstIdMappingCacheEntity(prodInstIdNew.toString());
-                                        log.info("888888------prodInstIdMappingCacheEntity --->" + JSON.toJSONString(prodInstIdMappingCacheEntity));
+         //                               log.info("888888------prodInstIdMappingCacheEntity --->" + JSON.toJSONString(prodInstIdMappingCacheEntity));
                                         if (prodInstIdMappingCacheEntity != null && prodInstIdMappingCacheEntity.getResultObject() != null ) {
                                             Map<String, Object> accNbrMap = new HashMap<>();
                                             accNbrMap.put("ACC_NBR", prodInstCacheEntityNew.getResultObject().getAccNum());
                                             accNbrMap.put("ASSET_INTEG_ID", prodInstIdMappingCacheEntity.getResultObject().getCrmRowId());
-                                            log.info("999999------accNbrMap --->" + JSON.toJSONString(accNbrMap));
+        //                                    log.info("999999------accNbrMap --->" + JSON.toJSONString(accNbrMap));
                                             accNbrMapList.add(accNbrMap);
                                         }
                                     }
