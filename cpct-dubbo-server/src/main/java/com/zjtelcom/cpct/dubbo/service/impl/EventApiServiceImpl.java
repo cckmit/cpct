@@ -386,6 +386,8 @@ public class EventApiServiceImpl implements EventApiService {
             result.put("reqId", map.get("reqId"));
             result.put("custId", custId);
             result.put("taskList", activityList);
+            result.put("triggers", JSONArray.parse(map.get("evtContent")));
+
 
             //初始化es log
             JSONObject esJson = new JSONObject();
