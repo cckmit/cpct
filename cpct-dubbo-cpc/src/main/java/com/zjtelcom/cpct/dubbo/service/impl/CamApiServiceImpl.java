@@ -532,12 +532,20 @@ public class CamApiServiceImpl implements CamApiService {
                 }
 
                 //将iSale展示列的值放入返回结果
+                Map<String, Object> evtContent = (Map<String, Object>) JSON.parse(params.get("evtContent"));
                 for (Map<String, Object> ruleMap : ruleList) {
                     List<Map<String, Object>> ChlMap = (List<Map<String, Object>>) ruleMap.get("taskChlList");
                     for (Map<String, Object> map : ChlMap) {
                         map.put("itgTriggers", JSONArray.parse(JSONArray.toJSON(itgTriggers).toString()));
                        // map.put("triggers", JSONArray.parse(JSONArray.toJSON(evtTriggers).toString()));
-                        map.put("triggers", JSONArray.parse(JSONArray.toJSON(params.get("evtContent")).toString()));
+                        List<Map<String, Object>> triggersList = new ArrayList<>();
+                        for (Map.Entry entry : evtContent.entrySet()) {
+                            Map<String, Object> trigger = new HashMap<>();
+                            trigger.put("key", entry.getKey());
+                            trigger.put("value", entry.getValue());
+                            triggersList.add(trigger);
+                        }
+                        map.put("triggers", triggersList);
                     }
                 }
 

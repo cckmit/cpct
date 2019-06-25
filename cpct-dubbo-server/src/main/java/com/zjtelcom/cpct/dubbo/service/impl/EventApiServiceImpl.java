@@ -386,7 +386,15 @@ public class EventApiServiceImpl implements EventApiService {
             result.put("reqId", map.get("reqId"));
             result.put("custId", custId);
             result.put("taskList", activityList);
-            result.put("triggers", JSONArray.parse(JSONArray.toJSON(map.get("evtContent")).toString()));
+            Map<String, Object> evtContent = (Map<String, Object>) JSON.parse(map.get("evtContent"));
+            List<Map<String, Object>> triggersList = new ArrayList<>();
+            for (Map.Entry entry : evtContent.entrySet()) {
+                Map<String, Object> trigger = new HashMap<>();
+                trigger.put("key", entry.getKey());
+                trigger.put("value", entry.getValue());
+                triggersList.add(trigger);
+            }
+            result.put("triggers", triggersList);
 
 
             //初始化es log
@@ -2595,9 +2603,17 @@ public class EventApiServiceImpl implements EventApiService {
 
                             List<Map> taskChlCountList = (List<Map>) ((Map) resultMap1.get("CPC_VALUE")).get("taskChlList");
                             // 清单方案放入采集项
+                            Map<String, Object> evtContent = (Map<String, Object>) JSON.parse(map.get("evtContent"));
                             for (Map<String, Object> taskChlCountMap : taskChlCountList) {
-                                taskChlCountMap.put("triggers", JSONArray.parse(JSONArray.toJSON(map.get("evtContent")).toString()));
-
+                               // taskChlCountMap.put("triggers", JSONArray.parse(JSONArray.toJSON(map.get("evtContent")).toString()));
+                                List<Map<String, Object>> triggersList = new ArrayList<>();
+                                for (Map.Entry entry : evtContent.entrySet()) {
+                                    Map<String, Object> trigger = new HashMap<>();
+                                    trigger.put("key", entry.getKey());
+                                    trigger.put("value", entry.getValue());
+                                    triggersList.add(trigger);
+                                }
+                                taskChlCountMap.put("triggers", triggersList);
                             }
 
                             if (taskChlCountList != null && taskChlCountList.size() > 0) {
