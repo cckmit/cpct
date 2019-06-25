@@ -66,7 +66,7 @@ public class TrialStatusUpServiceImpl implements TrialStatusUpService {
         try {
             Map<String,Object> param = new HashMap<>();
             param.put("batchNum",batchNum);
-            if (status.equals(TrialStatus.ISEE_ANALYZE_FAIL.getValue())){
+            if (!remark.equals("") && status.equals(TrialStatus.ISEE_ANALYZE_FAIL.getValue())){
                 param.put("data",remark);
             }else {
                 param.put("data",TrialStatus.getNameByCode(status).getName());
