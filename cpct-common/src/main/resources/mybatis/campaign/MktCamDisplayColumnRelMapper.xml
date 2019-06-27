@@ -88,7 +88,7 @@
         delete from mkt_cam_display_column_rel
         where MKT_CAM_DISPLAY_COLUMN_REL_ID = #{mktCamDisplayColumnRelId,jdbcType=BIGINT}
     </delete>
-    
+
     <select id="selectLabelByCampaignIdAndDisplayId" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select MKT_CAM_DISPLAY_COLUMN_REL_ID, MKT_CAMPAIGN_ID, INJECTION_LABEL_ID, DISPLAY_ID, DISPLAY_COLUMN_TYPE,
                STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LABEL_DISPLAY_TYPE
@@ -107,7 +107,9 @@
         where MKT_CAMPAIGN_ID = #{mktCampaignId}
     </select>
 
-    <select id="selectLabelDisplayListByCamId" parameterType="java.lang.Long" resultMap="com.zjtelcom.cpct.dto.channel.LabelDTO">
+
+
+    <select id="selectLabelDisplayListByCamId" parameterType="java.lang.Long" resultType="com.zjtelcom.cpct.dto.channel.LabelDTO">
         SELECT
 	p2.INJECTION_LABEL_ID AS injectionLabelId,
 	p2.INJECTION_LABEL_CODE AS labelCode,
@@ -115,7 +117,7 @@
 	p2.LABEL_TYPE AS labelType
 FROM
 	mkt_cam_display_column_rel p1
-LEFT JOIN injection_label p2 ON p1.INJECTION_LABEL_ID = p2.INJECTION_LABEL_ID
+INNER JOIN injection_label p2 ON p1.INJECTION_LABEL_ID = p2.INJECTION_LABEL_ID
 WHERE
 	p1.MKT_CAMPAIGN_ID = #{mktCampaignId}
     </select>
