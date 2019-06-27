@@ -1431,7 +1431,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         requestInfo.setCreateDate(new Date());
         requestInfo.setUpdateDate(new Date());
         requestInfo.setActionType("add");
- /       requestInfo.setActivitiKey("mkt_force_province");  //需求函活动类型
+        requestInfo.setActivitiKey("mkt_force_province");  //需求函活动类型
         requestInfo.setRequestUrgentType("一般");
         requestInfo.setProcessType("0");
         requestInfo.setReportTag("0");
