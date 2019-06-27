@@ -213,6 +213,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Autowired
     private MktCamDisplayColumnRelPrdMapper mktCamDisplayColumnRelPrdMapper;
 
+    @Autowired
+    private MktCamChlConfAttrMapper mktCamChlConfAttrMapper;
+
     //指定下发地市人员的数据集合
     private final static String CITY_PUBLISH="CITY_PUBLISH";
 
@@ -1025,16 +1028,26 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 maps.put("resultMsg", "时间只能后延");
                 return maps;
             }
+            // 策略生失效时间延期
             List<MktStrategyConfDO> strategyConfList = mktStrategyConfMapper.selectByCampaignId(campaignId);
             for (MktStrategyConfDO strategy : strategyConfList) {
                 strategy.setEndTime(lastTime);
                 mktStrategyConfMapper.updateByPrimaryKey(strategy);
             }
+
+            // 渠道生失效时间延期
+            List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectAttrEndDateByCampaignId(campaignId);
+            for (MktCamChlConfAttrDO mktCamChlConfAttrDO:mktCamChlConfAttrDOList) {
+                mktCamChlConfAttrDO.setAttrValue(String.valueOf(lastTime.getTime()));
+            }
+            mktCamChlConfAttrMapper.updateByPrimaryKeyBatch(mktCamChlConfAttrDOList);
+
             campaignDO.setPlanEndTime(lastTime);
             mktCampaignMapper.updateByPrimaryKey(campaignDO);
             maps.put("resultCode", CODE_SUCCESS);
             maps.put("resultMsg", "延期成功");
         } catch (Exception e) {
+            logger.error("Excepiton = " + e);
             maps.put("resultCode", CODE_FAIL);
             maps.put("resultMsg", "延期失败！");
         }
@@ -1207,11 +1220,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         @Override
                         public void run() {
                             try {
-                                SysStaff sysStaff = (SysStaff) SecurityUtils.getSubject().getPrincipal();
                                 String roleName = "admin";
-                                if (sysStaff != null) {
-                                    roleName = sysStaff.getRoleName();
-                                }
                                 synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
                                 // 删除生产redis缓存
                                 synchronizeCampaignService.deleteCampaignRedisProd(mktCampaignId);
@@ -1396,7 +1405,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCampaignMap.put("resultMsg", "发布活动成功！");
             mktCampaignMap.put("childMktCampaignIdList", childMktCampaignIdList);
-            if (SystemParamsUtil.isCampaignSync()) {
+            if (true) {
                 new Thread() {
                     public void run() {
                         logger.info("活动同步大数据：" + mktCampaignId);
