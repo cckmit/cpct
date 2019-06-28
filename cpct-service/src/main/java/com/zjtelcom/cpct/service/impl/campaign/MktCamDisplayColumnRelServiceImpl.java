@@ -119,6 +119,7 @@ public class MktCamDisplayColumnRelServiceImpl implements MktCamDisplayColumnRel
             return result;
         }
         for (MktCamDisplayColumnRel rel : relList) {
+            rel.setMktCamDisplayColumnRelId(null);
             rel.setMktCampaignId(newCampaignId);
             rel.setCreateStaff(UserUtil.loginId());
             rel.setCreateDate(new Date());

@@ -107,6 +107,21 @@
         where MKT_CAMPAIGN_ID = #{mktCampaignId}
     </select>
 
+    <select id="selectLabelDisplayListByCamId" parameterType="java.lang.Long" resultType="com.zjtelcom.cpct.dto.channel.LabelDTO">
+        SELECT
+	p2.INJECTION_LABEL_ID AS injectionLabelId,
+	p2.INJECTION_LABEL_CODE AS labelCode,
+	p2.INJECTION_LABEL_NAME AS injectionLabelName,
+	p2.LABEL_TYPE AS labelType
+FROM
+	mkt_cam_display_column_rel p1
+INNER JOIN injection_label p2 ON p1.INJECTION_LABEL_ID = p2.INJECTION_LABEL_ID
+WHERE
+	p1.MKT_CAMPAIGN_ID = #{mktCampaignId}
+    </select>
+
+
+
     <update id="updateDisplayLabel" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamDisplayColumnRel">
         update mkt_cam_display_column_rel
         set REMARK = #{remark}, UPDATE_DATE = #{updateDate}

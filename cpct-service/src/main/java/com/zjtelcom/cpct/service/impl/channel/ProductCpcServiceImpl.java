@@ -33,7 +33,7 @@ import java.util.*;
 import static com.zjtelcom.cpct.constants.CommonConstant.*;
 
 @Service
-public class ProductServiceImpl extends BaseService implements ProductService {
+public class ProductCpcServiceImpl extends BaseService implements ProductService {
 
     @Autowired
     private OfferProdMapper offerProdMapper;

@@ -42,7 +42,7 @@ import java.util.Map;
  * @version: V1.0
  */
 @Service
-public class MktCamChlResultApiServiceImpl extends BaseService implements MktCamChlResultApiService {
+public class MktCamChlResultCpcServiceImpl extends BaseService implements MktCamChlResultApiService {
 
     @Autowired
     private MktStrategyConfRuleMapper mktStrategyConfRuleMapper;

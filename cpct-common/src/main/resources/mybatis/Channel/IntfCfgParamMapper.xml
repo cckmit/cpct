@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.IntfCfgParamMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.IntfCfgParam">
+    <id column="INTF_CFG_PARAM_ID" jdbcType="BIGINT" property="intfCfgParamId" />
+    <result column="INTERFACE_CFG_ID" jdbcType="BIGINT" property="interfaceCfgId" />
+    <result column="URL" jdbcType="VARCHAR" property="url" />
+    <result column="PORT" jdbcType="VARCHAR" property="port" />
+    <result column="USER_NAME" jdbcType="VARCHAR" property="userName" />
+    <result column="PASSWORD" jdbcType="VARCHAR" property="password" />
+    <result column="TIMEOUT" jdbcType="BIGINT" property="timeout" />
+    <result column="PUBLIC_KEY" jdbcType="VARCHAR" property="publicKey" />
+    <result column="REGION_ID" jdbcType="BIGINT" property="regionId" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from intf_cfg_param
+    where INTF_CFG_PARAM_ID = #{intfCfgParamId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.IntfCfgParam">
+    insert into intf_cfg_param (INTF_CFG_PARAM_ID, INTERFACE_CFG_ID, URL, 
+      PORT, USER_NAME, PASSWORD, 
+      TIMEOUT, PUBLIC_KEY, REGION_ID, 
+      STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+      CREATE_DATE, STATUS_DATE, UPDATE_DATE, 
+      REMARK)
+    values (#{intfCfgParamId,jdbcType=BIGINT}, #{interfaceCfgId,jdbcType=BIGINT}, #{url,jdbcType=VARCHAR}, 
+      #{port,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{timeout,jdbcType=BIGINT}, #{publicKey,jdbcType=VARCHAR}, #{regionId,jdbcType=BIGINT}, 
+      #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.IntfCfgParam">
+    update intf_cfg_param
+    set INTERFACE_CFG_ID = #{interfaceCfgId,jdbcType=BIGINT},
+      URL = #{url,jdbcType=VARCHAR},
+      PORT = #{port,jdbcType=VARCHAR},
+      USER_NAME = #{userName,jdbcType=VARCHAR},
+      PASSWORD = #{password,jdbcType=VARCHAR},
+      TIMEOUT = #{timeout,jdbcType=BIGINT},
+      PUBLIC_KEY = #{publicKey,jdbcType=VARCHAR},
+      REGION_ID = #{regionId,jdbcType=BIGINT},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where INTF_CFG_PARAM_ID = #{intfCfgParamId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select INTF_CFG_PARAM_ID, INTERFACE_CFG_ID, URL, PORT, USER_NAME, PASSWORD, TIMEOUT, 
+    PUBLIC_KEY, REGION_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
+    UPDATE_DATE, REMARK
+    from intf_cfg_param
+    where INTF_CFG_PARAM_ID = #{intfCfgParamId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select INTF_CFG_PARAM_ID, INTERFACE_CFG_ID, URL, PORT, USER_NAME, PASSWORD, TIMEOUT, 
+    PUBLIC_KEY, REGION_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
+    UPDATE_DATE, REMARK
+    from intf_cfg_param
+  </select>
+
+</mapper>

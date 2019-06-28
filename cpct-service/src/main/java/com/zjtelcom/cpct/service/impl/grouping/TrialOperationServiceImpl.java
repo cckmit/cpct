@@ -50,7 +50,6 @@ import com.zjtelcom.cpct.enums.TrialStatus;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.MqService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
-import com.zjtelcom.cpct.service.channel.MessageLabelService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.impl.MqServiceImpl;
@@ -109,8 +108,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private MktStrategyConfRuleRelMapper ruleRelMapper;
     @Autowired
     private RedisUtils redisUtils;
-    @Autowired
-    private MessageLabelService messageLabelService;
     @Autowired
     private MktStrategyConfRuleMapper ruleMapper;
     @Autowired
@@ -388,6 +385,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         String batchNumSt = DateUtil.date2St4Trial(new Date()) + ChannelUtil.getRandomStr(4);
         //添加策略适用地市
         redisUtils.set("STRATEGY_CONF_AREA_"+operationVO.getStrategyId(),strategy.getAreaId());
+
+
         // 通过活动id获取关联的标签字段数组
         List<Map<String,Object>> labelList =displayLabel(campaign);
 
@@ -670,10 +669,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
     private List<Map<String,Object>> displayLabel(MktCampaignDO campaign) {
         List<Map<String,Object>> labelList = new ArrayList<>();
-        DisplayColumn req = new DisplayColumn();
-        req.setDisplayColumnId(campaign.getCalcDisplay());
-        Map<String,Object> labelMap = messageLabelService.queryLabelListByDisplayId(req);
-        List<LabelDTO> labelDTOList = (List<LabelDTO>)labelMap.get("labels");
+        List<LabelDTO> labelDTOList = mktCamDisplayColumnRelMapper.selectLabelDisplayListByCamId(campaign.getMktCampaignId());
+        if (labelDTOList==null){
+            labelDTOList = new ArrayList<>();
+        }
         String[] displays = new String[labelDTOList.size()];
         for (int i = 0 ; i< labelDTOList.size();i++){
             displays[i] = labelDTOList.get(i).getLabelCode();
@@ -1115,8 +1114,14 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 labelEngNameList.add(codeList[i]);
             }
 
-            List<Map<String, Object>> displayList = displayLabel(campaign);
+
+            //查询活动下面所有渠道属性id是21和22的value
+            List<String> attrValue = mktCamChlConfAttrMapper.selectAttrLabelValueByCampaignId(campaign.getMktCampaignId());
             List<String> fields = new ArrayList<>();
+            for (String attr : attrValue){
+                fields.add(attr);
+            }
+            List<Map<String, Object>> displayList = displayLabel(campaign);
             for (Map<String, Object> display : displayList) {
                 String code = display.get("code") == null ? null : display.get("code").toString();
                 String name = display.get("name") == null ? null : display.get("name").toString();
@@ -1132,6 +1137,26 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             if (!fields.isEmpty()) {
                 redisUtils_es.set("DISPLAY_LABEL_" + campaign.getMktCampaignId(), fields);
             }
+            List<Long> attrList = mktCamChlConfAttrMapper.selectByCampaignId(campaign.getMktCampaignId());
+            if (attrList.contains(ISEE_CUSTOMER.getArrId()) || attrList.contains(ISEE_LABEL_CUSTOMER.getArrId()) ){
+                if (!labelEngNameList.contains("SALE_EMP_NBR")){
+                    Map<String,Object> label = new HashMap<>();
+                    label.put("code","SALE_EMP_NBR");
+                    label.put("name","接单人号码");
+                    label.put("labelType","1200");
+                    labelList.add(label);
+                }
+            }
+            if (attrList.contains(ISEE_AREA.getArrId()) || attrList.contains(ISEE_LABEL_AREA.getArrId()) ){
+                if (!labelEngNameList.contains("AREA")){
+                    Map<String,Object> label = new HashMap<>();
+                    label.put("code","AREA");
+                    label.put("name","派单区域");
+                    label.put("labelType","1200");
+                    labelList.add(label);
+                }
+            }
+            redisUtils.set("LABEL_DETAIL_"+batchNumSt,labelList);
 
             if (labelList.size() > 87) {
                 result.put("resultCode", CODE_FAIL);
@@ -1460,6 +1485,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         redisUtils.set("STRATEGY_CONF_AREA_"+operationVO.getStrategyId(),strategy.getAreaId());
         //添加红黑名单列表
         blackList2Redis(campaign);
+
+
         // 通过活动id获取关联的标签字段数组
 
         List<Map<String,Object>> labelList = displayLabel(campaign);
@@ -1511,10 +1538,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
     private String[] getStrings(MktCampaignDO campaign,MktStrategyConfDO strategy) {
         // 通过活动id获取关联的标签字段数组
-        DisplayColumn req = new DisplayColumn();
-        req.setDisplayColumnId(campaign.getCalcDisplay());
-        Map<String, Object> labelMap = messageLabelService.queryLabelListByDisplayId(req);
-        List<LabelDTO> labelDTOList = (List<LabelDTO>) labelMap.get("labels");
+        List<LabelDTO> labelDTOList = mktCamDisplayColumnRelMapper.selectLabelDisplayListByCamId(campaign.getMktCampaignId());
+        if (labelDTOList==null){
+            labelDTOList = new ArrayList<>();
+        }
         List<String> codeList = new ArrayList<>();
         for (LabelDTO labelDTO : labelDTOList) {
             codeList.add(labelDTO.getLabelCode());
@@ -1726,10 +1753,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         //添加策略适用地市
         redisUtils.set("STRATEGY_CONF_AREA_"+operation.getStrategyId(),strategyConfDO.getAreaId());
         // 通过活动id获取关联的标签字段数组
-        DisplayColumn req = new DisplayColumn();
-        req.setDisplayColumnId(campaignDO.getCalcDisplay());
-        Map<String,Object> labelMap = messageLabelService.queryLabelListByDisplayId(req);
-        List<LabelDTO> labelDTOList = (List<LabelDTO>)labelMap.get("labels");
+        List<LabelDTO> labelDTOList = mktCamDisplayColumnRelMapper.selectLabelDisplayListByCamId(campaignDO.getMktCampaignId());
+        if (labelDTOList==null){
+            labelDTOList = new ArrayList<>();
+        }
         String[] fieldList = new String[labelDTOList.size()+attrValue.size()];
         List<Map<String,Object>> labelList = new ArrayList<>();
         for (int i = 0 ; i< labelDTOList.size();i++){
@@ -1740,6 +1767,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             label.put("labelType",labelDTOList.get(i).getLabelType());
             labelList.add(label);
         }
+
         for (int i = labelDTOList.size(); i< labelDTOList.size()+attrValue.size();i++){
             fieldList[i] = attrValue.get(i-labelDTOList.size());
         }
