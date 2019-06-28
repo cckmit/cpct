@@ -88,7 +88,7 @@
         delete from mkt_cam_display_column_rel
         where MKT_CAM_DISPLAY_COLUMN_REL_ID = #{mktCamDisplayColumnRelId,jdbcType=BIGINT}
     </delete>
-    
+
     <select id="selectLabelByCampaignIdAndDisplayId" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select MKT_CAM_DISPLAY_COLUMN_REL_ID, MKT_CAMPAIGN_ID, INJECTION_LABEL_ID, DISPLAY_ID, DISPLAY_COLUMN_TYPE,
                STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LABEL_DISPLAY_TYPE
