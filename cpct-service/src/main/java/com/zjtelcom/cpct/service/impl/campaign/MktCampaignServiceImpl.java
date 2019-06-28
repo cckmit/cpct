@@ -1406,7 +1406,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCampaignMap.put("resultMsg", "发布活动成功！");
             mktCampaignMap.put("childMktCampaignIdList", childMktCampaignIdList);
-            if (true) {
+            if (SystemParamsUtil.isCampaignSync()) {
                 new Thread() {
                     public void run() {
                         logger.info("活动同步大数据：" + mktCampaignId);
