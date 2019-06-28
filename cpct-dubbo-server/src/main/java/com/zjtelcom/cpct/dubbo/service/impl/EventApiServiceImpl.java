@@ -388,15 +388,14 @@ public class EventApiServiceImpl implements EventApiService {
             result.put("taskList", activityList);
             Map<String, Object> evtContent = (Map<String, Object>) JSON.parse(map.get("evtContent"));
             List<Map<String, Object>> triggersList = new ArrayList<>();
-            if(evtContent!=null){
-                for (Map.Entry entry : evtContent.entrySet()) {
-                    Map<String, Object> trigger = new HashMap<>();
-                    trigger.put("key", entry.getKey());
-                    trigger.put("value", entry.getValue());
-                    triggersList.add(trigger);
-                }
+            for (Map.Entry entry : evtContent.entrySet()) {
+                Map<String, Object> trigger = new HashMap<>();
+                trigger.put("key", entry.getKey());
+                trigger.put("value", entry.getValue());
+                triggersList.add(trigger);
             }
             result.put("triggers", triggersList);
+
 
             //初始化es log
             JSONObject esJson = new JSONObject();
