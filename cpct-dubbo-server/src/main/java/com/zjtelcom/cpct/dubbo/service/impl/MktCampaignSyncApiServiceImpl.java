@@ -37,6 +37,7 @@ import com.zjtelcom.cpct.dubbo.service.MktCampaignSyncApiService;
 import com.zjtelcom.cpct.dubbo.service.RecordService;
 import com.zjtelcom.cpct.dubbo.service.SyncActService;
 import com.zjtelcom.cpct.enums.*;
+import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInfoMapper;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
@@ -215,6 +216,10 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
     @Autowired
     private SysAreaMapper sysAreaMapper;
 
+    @Autowired
+    private MktCampaignService mktCampaignService;
+
+
     //同步表名
     private static final String tableName = "mkt_campaign";
 
@@ -271,6 +276,11 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
         public Map<String, Object> call() {
             Map<String, Object> mktCampaignMap = new HashMap<>();
             try {
+
+                mktCampaignMap = mktCampaignService.publishMktCampaign(mktCampaignId);
+                mktCampaignService.changeMktCampaignStatus(mktCampaignId, "2002");
+
+/*
                 // 获取当前活动信息
                 MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
                 // 获取当前活动标识
@@ -418,6 +428,7 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
                         }
                     }.start();
                 }
+*/
             } catch (Exception e) {
                 mktCampaignMap.put("resultCode", CommonConstant.CODE_FAIL);
                 mktCampaignMap.put("resultMsg", "发布活动失败！");

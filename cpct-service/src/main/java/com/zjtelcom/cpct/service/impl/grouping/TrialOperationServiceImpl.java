@@ -741,12 +741,27 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 labelEngNameList.add(codeList[i]);
             }
 
+<<<<<<< HEAD
             List<Map<String,Object>> displayList = displayLabel(campaign);
             List<String> fields = new ArrayList<>();
             for (Map<String,Object> display : displayList){
                 String code = display.get("code")==null ? null : display.get("code").toString();
                 String name = display.get("name")==null ? null : display.get("name").toString();
                 if (code!=null && !labelEngNameList.contains(code) && !labelNameList.contains(name)){
+=======
+
+            //查询活动下面所有渠道属性id是21和22的value
+            List<String> attrValue = mktCamChlConfAttrMapper.selectAttrLabelValueByCampaignId(campaign.getMktCampaignId());
+            List<String> fields = new ArrayList<>();
+            for (String attr : attrValue){
+                fields.add(attr);
+            }
+            List<Map<String, Object>> displayList = displayLabel(campaign);
+            for (Map<String, Object> display : displayList) {
+                String code = display.get("code") == null ? null : display.get("code").toString();
+                String name = display.get("name") == null ? null : display.get("name").toString();
+                if (code != null && !labelEngNameList.contains(code)) {
+>>>>>>> origin/dev_cpct_1212_svn_config
                     Map<String, Object> label = new HashMap<>();
                     label.put("code", code);
                     label.put("name", name);
@@ -759,6 +774,22 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             if (!fields.isEmpty()){
                 redisUtils_es.set("DISPLAY_LABEL_"+campaign.getMktCampaignId(),fields);
             }
+            List<Long> attrList = mktCamChlConfAttrMapper.selectByCampaignId(campaign.getMktCampaignId());
+            if (attrList.contains(ISEE_CUSTOMER.getArrId()) || attrList.contains(ISEE_LABEL_CUSTOMER.getArrId()) ){
+                Map<String,Object> label = new HashMap<>();
+                label.put("code","SALE_EMP_NBR");
+                label.put("name","接单人号码");
+                label.put("labelType","1200");
+                labelList.add(label);
+            }
+            if (attrList.contains(ISEE_AREA.getArrId()) || attrList.contains(ISEE_LABEL_AREA.getArrId()) ){
+                Map<String,Object> label = new HashMap<>();
+                label.put("code","AREA");
+                label.put("name","派单区域");
+                label.put("labelType","1200");
+                labelList.add(label);
+            }
+            redisUtils.set("LABEL_DETAIL_"+batchNumSt,labelList);
 
             if (labelList.size() > 87) {
                 result.put("resultCode", CODE_FAIL);

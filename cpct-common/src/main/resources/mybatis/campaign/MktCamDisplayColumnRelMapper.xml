@@ -107,8 +107,11 @@
         where MKT_CAMPAIGN_ID = #{mktCampaignId}
     </select>
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> origin/dev_cpct_1212_svn_config
     <select id="selectLabelDisplayListByCamId" parameterType="java.lang.Long" resultType="com.zjtelcom.cpct.dto.channel.LabelDTO">
         SELECT
 	p2.INJECTION_LABEL_ID AS injectionLabelId,

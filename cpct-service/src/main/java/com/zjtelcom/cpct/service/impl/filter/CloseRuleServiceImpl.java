@@ -52,6 +52,7 @@ public class CloseRuleServiceImpl implements CloseRuleService {
     @Autowired
     private SynFilterRuleService synFilterRuleService;
 
+
     /**
      * 根据关单规则id集合查询过滤规则集合
      */

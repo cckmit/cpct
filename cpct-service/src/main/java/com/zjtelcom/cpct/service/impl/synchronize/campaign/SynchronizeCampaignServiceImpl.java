@@ -40,6 +40,7 @@ import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.enums.SynchronizeType;
 import com.zjtelcom.cpct.service.BaseService;
+import com.zjtelcom.cpct.service.campaign.MktCamDisplayColumnRelService;
 import com.zjtelcom.cpct.service.synchronize.SynchronizeRecordService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.util.BeanUtil;
@@ -209,8 +210,13 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
     private MktStrategyCloseRuleRelPrdMapper mktStrategyCloseRuleRelPrdMapper;
 
     @Autowired
+    private MktCamDisplayColumnRelPrdMapper mktCamDisplayColumnRelPrdMapper;
+
+    @Autowired
     private SynchronizeRecordService synchronizeRecordService;
 
+    @Autowired
+    private MktCamDisplayColumnRelService mktCamDisplayColumnRelService;
     //同步表名
     private static final String tableName = "mkt_campaign";
 
@@ -293,6 +299,12 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
         for (MktStrategyCloseRuleRelDO mktStrategyCloseRuleRelDO : mktStrategyCloseRuleRelDOList) {
             mktStrategyCloseRuleRelPrdMapper.insert(mktStrategyCloseRuleRelDO);
         }
+
+
+        mktCamDisplayColumnRelPrdMapper.deleteByMktCampaignId(mktCampaignId);
+
+        // 试算展示列实例化同步
+        mktCamDisplayColumnRelService.syncMktCamDisplayColumnRel(mktCampaignId);
 
         /*复制活动下的策略到生产环境*/
         // 查询活动策略关系

@@ -120,6 +120,7 @@ public class MktCamDisplayColumnRelServiceImpl implements MktCamDisplayColumnRel
         }
         ExecutorService executorService = Executors.newCachedThreadPool();
         for (MktCamDisplayColumnRel rel : relList) {
+            rel.setMktCamDisplayColumnRelId(null);
             rel.setMktCampaignId(newCampaignId);
             executorService.execute(new Runnable() {
                 @Override
