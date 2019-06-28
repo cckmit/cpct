@@ -952,18 +952,22 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             }
             List<Long> attrList = mktCamChlConfAttrMapper.selectByCampaignId(campaign.getMktCampaignId());
             if (attrList.contains(ISEE_CUSTOMER.getArrId()) || attrList.contains(ISEE_LABEL_CUSTOMER.getArrId()) ){
-                Map<String,Object> label = new HashMap<>();
-                label.put("code","SALE_EMP_NBR");
-                label.put("name","接单人号码");
-                label.put("labelType","1200");
-                labelList.add(label);
+                if (!labelEngNameList.contains("SALE_EMP_NBR")){
+                    Map<String,Object> label = new HashMap<>();
+                    label.put("code","SALE_EMP_NBR");
+                    label.put("name","接单人号码");
+                    label.put("labelType","1200");
+                    labelList.add(label);
+                }
             }
             if (attrList.contains(ISEE_AREA.getArrId()) || attrList.contains(ISEE_LABEL_AREA.getArrId()) ){
-                Map<String,Object> label = new HashMap<>();
-                label.put("code","AREA");
-                label.put("name","派单区域");
-                label.put("labelType","1200");
-                labelList.add(label);
+                if (!labelEngNameList.contains("AREA")){
+                    Map<String,Object> label = new HashMap<>();
+                    label.put("code","AREA");
+                    label.put("name","派单区域");
+                    label.put("labelType","1200");
+                    labelList.add(label);
+                }
             }
             redisUtils.set("LABEL_DETAIL_"+batchNumSt,labelList);
 
@@ -1582,7 +1586,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             label.put("labelType",labelDTOList.get(i).getLabelType());
             labelList.add(label);
         }
-
 
         for (int i = labelDTOList.size(); i< labelDTOList.size()+attrValue.size();i++){
             fieldList[i] = attrValue.get(i-labelDTOList.size());
