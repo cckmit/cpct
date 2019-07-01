@@ -24,11 +24,9 @@ import com.zjtelcom.cpct.domain.channel.CamScript;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.MktVerbal;
 import com.zjtelcom.cpct.domain.channel.Offer;
-import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
-import com.zjtelcom.cpct.enums.TrialCreateType;
 import com.zjtelcom.cpct.service.synchronize.campaign.SyncActivityService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
@@ -95,6 +93,8 @@ public class SyncActivityServiceImpl implements SyncActivityService {
             activityModel.setHandoutType("1");
         } else if ("2000".equals(mktCampaignDO.getTiggerType())) {
             activityModel.setHandoutType("0");
+        } else if ("3000".equals(mktCampaignDO.getTiggerType())) {
+            activityModel.setHandoutType("2");
         }
         List<PolicyModel> policyList = new ArrayList<>();
         //获取活动下策略信息
@@ -106,14 +106,7 @@ public class SyncActivityServiceImpl implements SyncActivityService {
             policyModel.setStartDate(mktStrategyConfDO.getBeginTime());
             policyModel.setEndDate(mktStrategyConfDO.getEndTime());
             policyModel.setHandoutType(activityModel.getHandoutType());
-            //通过策略id  得到对应的批次id 按降序取第一个批次id
-            List<TrialOperation> operationListByStrategyId = trialOperationMapper.findOperationListByStrategyId(mktStrategyConfDO.getMktStrategyConfId(),TrialCreateType.TRIAL_OPERATION.getValue());
-            if (!operationListByStrategyId.isEmpty()) {
-                policyModel.setBatchId(operationListByStrategyId.get(0).getBatchNum().toString());
-            } else {
-                policyModel.setBatchId(DateUtil.date2St4Trial(new Date()) + ChannelUtil.getRandomStr(4));
-            }
-
+            policyModel.setBatchId(DateUtil.date2St4Trial(new Date()) + ChannelUtil.getRandomStr(4));
 
             List<RuleModel> ruleList = new ArrayList<>();
             // 获取策略下规则信息
