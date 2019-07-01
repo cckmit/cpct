@@ -90,16 +90,27 @@ public class ProductServiceImpl implements ProductService {
     public Map<String, Object> getCloseCampaign(Map<String, Object> paramMap) {
         Map<String, Object> resultMap = new HashMap<>();
         String filterType = (String) paramMap.get("filterType");
-        List<Map<String,Object>> list = null;
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("filterType",filterType);
-        map.put("date",DateUtil.getDateFormatStr(new Date()));
-        map.put("status","2002");
-        if (StringUtils.isNotBlank(filterType)) {
-            list = closeRuleMapper.getCloseCampaign(map);
+        List<Map<String,Object>> strings = new ArrayList<>();
+        if (StringUtils.isNotBlank(filterType)){
+            String[] split = filterType.split(",");
+            for (String s : split) {
+                List<Map<String,Object>> list = null;
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("filterType",s);
+                map.put("date",DateUtil.getDateFormatStr(new Date()));
+                map.put("status","2002");
+                if (StringUtils.isNotBlank(filterType)) {
+                    list = closeRuleMapper.getCloseCampaign(map);
+                }
+               if (!list.isEmpty() && list != null) {
+                   for (Map<String, Object> stringObjectMap : list) {
+                       strings.add(stringObjectMap);
+                   }
+               }
+            }
         }
         resultMap.put("resultCode","200");
-        resultMap.put("resultData",list);
+        resultMap.put("resultData",strings);
         return resultMap;
     }
 
