@@ -38,4 +38,6 @@ public interface CloseRuleMapper {
     List<Map<String,Object>> getCloseCampaign(@Param("map") HashMap<String, Object> map);
 
     void updateExpression(@Param("filterRule")String filterRule, @Param("expression")String expression);
+
+    void insertTarGrp(CloseRule closeRule);
 }

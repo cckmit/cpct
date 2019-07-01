@@ -30,6 +30,10 @@ public class CloseRule extends BaseEntity implements Serializable{
     private String times;
     private String offerInfo;
     private String closeCode; //成功标识
+    private String noteOne;
+    private String noteTwo;
+    private String noteThree;
+
 
     public Long getConditionId() {
         return conditionId;
@@ -173,5 +177,29 @@ public class CloseRule extends BaseEntity implements Serializable{
 
     public void setCloseCode(String closeCode) {
         this.closeCode = closeCode;
+    }
+
+    public String getNoteOne() {
+        return noteOne;
+    }
+
+    public void setNoteOne(String noteOne) {
+        this.noteOne = noteOne;
+    }
+
+    public String getNoteTwo() {
+        return noteTwo;
+    }
+
+    public void setNoteTwo(String noteTwo) {
+        this.noteTwo = noteTwo;
+    }
+
+    public String getNoteThree() {
+        return noteThree;
+    }
+
+    public void setNoteThree(String noteThree) {
+        this.noteThree = noteThree;
     }
 }
