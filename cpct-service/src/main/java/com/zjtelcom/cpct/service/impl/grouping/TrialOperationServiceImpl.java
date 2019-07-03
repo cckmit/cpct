@@ -1573,6 +1573,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             labelDTOList = new ArrayList<>();
         }
         String[] fieldList = new String[labelDTOList.size()+attrValue.size()];
+
         List<Map<String,Object>> labelList = new ArrayList<>();
         for (int i = 0 ; i< labelDTOList.size();i++){
             fieldList[i] = labelDTOList.get(i).getLabelCode();

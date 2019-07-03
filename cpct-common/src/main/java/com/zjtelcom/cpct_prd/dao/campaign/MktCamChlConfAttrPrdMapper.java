@@ -2,6 +2,7 @@ package com.zjtelcom.cpct_prd.dao.campaign;
 
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -22,4 +23,8 @@ public interface MktCamChlConfAttrPrdMapper {
     List<MktCamChlConfAttrDO> selectAll();
 
     int updateByPrimaryKey(MktCamChlConfAttrDO mktCamChlConfAttrDO);
+
+    List<Long> selectByCampaignId(@Param("campaignId") Long campaignId);
+
+    List<String> selectAttrLabelValueByCampaignId(@Param("campaignId") Long campaignId);
 }
