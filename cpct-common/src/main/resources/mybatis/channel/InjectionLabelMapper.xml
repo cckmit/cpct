@@ -179,6 +179,16 @@
       ORIGINAL_LAB_LEVEL3_CODE = #{originalLabLevel3Code,jdbcType=VARCHAR}
     where INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT}
   </update>
+  <!--<update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.Label">-->
+    <!--update injection_label-->
+    <!--set ORIGINAL_LAB_LEVEL1_NAME = #{originalLabLevel1Name,jdbcType=VARCHAR},-->
+      <!--ORIGINAL_LAB_LEVEL2_NAME = #{originalLabLevel2Name,jdbcType=VARCHAR},-->
+      <!--ORIGINAL_LAB_LEVEL3_NAME = #{originalLabLevel3Name,jdbcType=VARCHAR},-->
+      <!--ORIGINAL_LAB_LEVEL1_CODE = #{originalLabLevel1Code,jdbcType=VARCHAR},-->
+      <!--ORIGINAL_LAB_LEVEL2_CODE = #{originalLabLevel2Code,jdbcType=VARCHAR},-->
+      <!--ORIGINAL_LAB_LEVEL3_CODE = #{originalLabLevel3Code,jdbcType=VARCHAR}-->
+    <!--where INJECTION_LABEL_CODE = #{injectionLabelCode,jdbcType=VARCHAR}-->
+  <!--</update>-->
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC,
     LABEL_TYPE, LABEL_VALUE_TYPE, LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,

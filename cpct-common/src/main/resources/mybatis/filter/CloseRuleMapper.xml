@@ -27,6 +27,9 @@
         <result column="TIMES" jdbcType="VARCHAR" property="times"/>
         <result column="OFFER_INFO" jdbcType="VARCHAR" property="offerInfo"/>
         <result column="CLOSE_CODE" jdbcType="VARCHAR" property="closeCode"/>
+        <result column="NOTE_ONE" jdbcType="VARCHAR" property="noteOne"/>
+        <result column="NOTE_TWO" jdbcType="VARCHAR" property="noteTwo"/>
+        <result column="NOTE_THREE" jdbcType="VARCHAR" property="noteThree"/>
     </resultMap>
 
     <resultMap id="FilterRuleModelMap" type="com.zjtelcom.cpct.dto.filter.FilterRuleModel">
@@ -86,7 +89,10 @@
         DAYS = #{days,jdbcType=VARCHAR},
         TIMES = #{times,jdbcType=VARCHAR},
         OFFER_INFO = #{offerInfo,jdbcType=VARCHAR},
-        CLOSE_CODE = #{closeCode,jdbcType=VARCHAR}
+        CLOSE_CODE = #{closeCode,jdbcType=VARCHAR},
+        NOTE_ONE = #{noteOne,jdbcType=VARCHAR},
+        NOTE_TWO = #{noteTwo,jdbcType=VARCHAR},
+        NOTE_THREE = #{noteThree,jdbcType=VARCHAR}
         where RULE_ID = #{ruleId,jdbcType=BIGINT}
     </update>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -94,7 +100,7 @@
         PRODUCT_TYPE, CHANNEL_CONTACTS, EFFECTIVE_DATE,
         FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF,
         UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
-        UPDATE_DATE, REMARK,USER_LIST,CONDITION_ID,DAYS,TIMES,OFFER_INFO,CLOSE_CODE
+        UPDATE_DATE, REMARK,USER_LIST,CONDITION_ID,DAYS,TIMES,OFFER_INFO,CLOSE_CODE,NOTE_ONE,NOTE_TWO,NOTE_THREE
         from close_rule
         where RULE_ID = #{ruleId,jdbcType=BIGINT}
     </select>
@@ -114,7 +120,7 @@
         FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF,
         UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
         UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID,
-        DAYS, TIMES, OFFER_INFO,CLOSE_CODE
+        DAYS, TIMES, OFFER_INFO,CLOSE_CODE,NOTE_ONE,NOTE_TWO,NOTE_THREE
         from close_rule
         where 1 = 1
         <if test="closeName != null and closeName != ''">
@@ -149,7 +155,7 @@
         FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END, STATUS_CD, CREATE_STAFF,
         UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
         UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID,
-        DAYS, TIMES, OFFER_INFO,CLOSE_CODE)
+        DAYS, TIMES, OFFER_INFO,CLOSE_CODE,NOTE_ONE,NOTE_TWO,NOTE_THREE)
         values (#{ruleId,jdbcType=BIGINT}, #{closeName,jdbcType=VARCHAR}, #{closeType,jdbcType=VARCHAR},
         #{productType,jdbcType=VARCHAR}, #{channelContacts,jdbcType=VARCHAR}, #{effectiveDate,jdbcType=TIMESTAMP},
         #{failureDate,jdbcType=TIMESTAMP},#{labelCode,jdbcType=VARCHAR},#{chooseProduct,jdbcType=VARCHAR},
@@ -158,7 +164,8 @@
         #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP},
         #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, #{userList,jdbcType=VARCHAR},
         #{conditionId,jdbcType=BIGINT}, #{days,jdbcType=VARCHAR},
-        #{times,jdbcType=VARCHAR}, #{offerInfo,jdbcType=VARCHAR},#{closeCode,jdbcType=VARCHAR})
+        #{times,jdbcType=VARCHAR}, #{offerInfo,jdbcType=VARCHAR},#{closeCode,jdbcType=VARCHAR},
+        #{noteOne,jdbcType=VARCHAR},#{noteTwo,jdbcType=VARCHAR},#{noteThree,jdbcType=VARCHAR})
     </insert>
 
     <update id="modFilterRule" parameterType="com.zjtelcom.cpct.dto.filter.CloseRule">
@@ -240,10 +247,14 @@
         <result property="closeNumber" column="EXPRESSION"/>
         <result property="closeName" column="CLOSE_NAME"/>
         <result property="closeCode" column="CLOSE_CODE"/>
+        <result property="noteOne" column="NOTE_ONE"/>
+        <result property="noteTwo" column="NOTE_TWO"/>
+        <result property="noteThree" column="NOTE_THREE"/>
     </resultMap>
 
     <select id="getCloseCampaign" parameterType="java.util.Map" resultMap="MktcloseRuleCampaignMap">
-        SELECT cr.CLOSE_TYPE,cr.CLOSE_NAME,cr.CLOSE_CODE,cr.EXPRESSION,mc.MKT_ACTIVITY_NBR,mc.MKT_CAMPAIGN_ID FROM close_rule cr
+        SELECT cr.CLOSE_TYPE,cr.CLOSE_NAME,cr.CLOSE_CODE,cr.EXPRESSION,mc.MKT_ACTIVITY_NBR,mc.MKT_CAMPAIGN_ID,
+            cr.NOTE_ONE,cr.NOTE_TWO,cr.NOTE_THREE FROM close_rule cr
             LEFT JOIN mkt_strategy_close_rule_rel ms ON cr.RULE_ID = ms.RULE_ID
             LEFT JOIN mkt_campaign mc ON ms.STRATEGY_ID = mc.MKT_CAMPAIGN_ID
             WHERE cr.CLOSE_TYPE = #{map.filterType}  AND #{map.date} > mc.PLAN_BEGIN_TIME
@@ -253,4 +264,9 @@
     <update id="updateExpression" parameterType="java.lang.String" >
         UPDATE close_rule SET EXPRESSION = #{expression,jdbcType=VARCHAR} WHERE RULE_ID = #{filterRule}
     </update>
+
+    <update id="updateLabelCodeByPrimaryKey">
+        UPDATE close_rule SET NOTE_FIVE = #{express,jdbcType=VARCHAR} WHERE RULE_ID = #{ruleId}
+    </update>
+
 </mapper>
