@@ -280,10 +280,10 @@ public class CloseRuleServiceImpl implements CloseRuleService {
             codeList.add(offer.getOfferNbr());
         }
         if(editVO.getCloseType().equals("5000")){
-            closeRule.setChooseProduct(ChannelUtil.StringList2String(codeList));
             String express = saveExpressions2Redis(closeRule.getRuleId(), Long.valueOf(closeRule.getLabelCode()));
             closeRule.setNoteFive(express);
         }
+        closeRule.setChooseProduct(ChannelUtil.StringList2String(codeList));
         closeRuleMapper.updateByPrimaryKey(closeRule);
         if (StringUtils.isNotBlank(closeRule.getLabelCode())){
             String labelCode = closeRule.getLabelCode();
