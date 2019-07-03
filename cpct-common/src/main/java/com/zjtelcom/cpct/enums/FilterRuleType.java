@@ -7,8 +7,8 @@ public enum FilterRuleType {
     EXPRESS(4000,"表达式过滤"),
     TIME_SLOT(5000,"时间段过滤"),
     PERTURBED(6000,"过扰规则"),
-    RELATION_PRODUCT(7000,"关单销售品规则");
-
+    RELATION_PRODUCT(7000,"关单销售品规则"),
+    DISPATCHING_PERTURBED(8000,"客调过扰规则");
     private Integer value;
     private String description;
 

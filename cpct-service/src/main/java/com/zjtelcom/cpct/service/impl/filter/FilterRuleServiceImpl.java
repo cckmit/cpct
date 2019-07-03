@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.impl.filter;
 
+import com.ctzj.smt.bss.cpc.configure.service.api.offer.IFairValueConfigureService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
@@ -306,30 +307,34 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         filterRule.setCreateStaff(UserUtil.loginId());
         filterRule.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
         List<String> codeList = new ArrayList<>();
-        for (Long offerId : addVO.getChooseProduct()){
-            Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
-            if (offer==null){
-                continue;
+        if (filterRule.getFilterType().equals(FilterRuleType.DISPATCHING_PERTURBED.getValue().toString())){
+            filterRuleMapper.createFilterRule(filterRule);
+
+        }else {
+            for (Long offerId : addVO.getChooseProduct()){
+                Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
+                if (offer==null){
+                    continue;
+                }
+                codeList.add(offer.getOfferNbr());
             }
-            codeList.add(offer.getOfferNbr());
+            filterRule.setChooseProduct(ChannelUtil.StringList2String(codeList));
+            //销售品互斥过滤 加labelcode
+            if (filterRule.getFilterType().equals("3000")){
+                filterRule.setLabelCode("PROM_LIST");
+            }
+            if (addVO.getFilterType().equals(FilterRuleType.PERTURBED.getValue().toString())){
+                MktVerbalCondition condition = BeanUtil.create(addVO.getCondition(),new MktVerbalCondition());
+                condition.setVerbalId(0L);
+                condition.setConditionType(ConditionType.FILTER_RULE.getValue().toString());
+                verbalConditionMapper.insert(condition);
+                filterRule.setConditionId(condition.getConditionId());
+            }
+            filterRuleMapper.createFilterRule(filterRule);
         }
-        filterRule.setChooseProduct(ChannelUtil.StringList2String(codeList));
-        //销售品互斥过滤 加labelcode
-        if (filterRule.getFilterType().equals("3000")){
-            filterRule.setLabelCode("PROM_LIST");
-        }
-        if (addVO.getFilterType().equals(FilterRuleType.PERTURBED.getValue().toString())){
-            MktVerbalCondition condition = BeanUtil.create(addVO.getCondition(),new MktVerbalCondition());
-            condition.setVerbalId(0L);
-            condition.setConditionType(ConditionType.FILTER_RULE.getValue().toString());
-            verbalConditionMapper.insert(condition);
-            filterRule.setConditionId(condition.getConditionId());
-        }
-        filterRuleMapper.createFilterRule(filterRule);
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("filterRule", filterRule);
-
         if (SystemParamsUtil.isSync()){
             new Thread(){
                 public void run(){

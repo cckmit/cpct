@@ -5,6 +5,7 @@ import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamGrpRulMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.dao.filter.CloseRuleMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
@@ -19,6 +20,7 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.channel.LabelValueVO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
+import com.zjtelcom.cpct.dto.filter.CloseRule;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.SysAreaVO;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
@@ -28,6 +30,7 @@ import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.MessageLabelService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
+import com.zjtelcom.cpct.service.impl.filter.CloseRuleServiceImpl;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
 import com.zjtelcom.cpct.vo.grouping.TarGrpVO;
@@ -87,6 +90,10 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     private MktCamEvtRelMapper evtRelMapper;
     @Autowired
     private OrganizationMapper organizationMapper;
+    @Autowired
+    private CloseRuleServiceImpl closeRuleServiceImpl;
+    @Autowired
+    private CloseRuleMapper closeRuleMapper;
 
 
     @Override
@@ -525,11 +532,29 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         return maps;
     }
 
+    @Override
+    public Map<String, Object> delTarGrpCondition(Long conditionId) {
+       return delTarGrpConditions(conditionId);
+    }
+
+    @Override
+    public Map<String, Object> delTarGrpCondition(Long conditionId, Long ruleId) {
+        if(ruleId != null && ruleId != 0){
+            CloseRule closeRule = closeRuleMapper.selectByPrimaryKey(ruleId);
+            // LabelCode字段对应的是TarGrpId
+            String tarGrpId = closeRule.getLabelCode();
+            String express = closeRuleServiceImpl.saveExpressions2Redis(ruleId, Long.valueOf(tarGrpId));
+            // NoteFive字段对应的是express表达式
+            closeRule.setNoteFive(express);
+            closeRuleMapper.updateByPrimaryKey(closeRule);
+        }
+        return delTarGrpConditions(conditionId);
+    }
+
     /**
      * 删除目标分群条件
      */
-    @Override
-    public Map<String, Object> delTarGrpCondition(Long conditionId) {
+    public Map<String, Object> delTarGrpConditions(Long conditionId){
         Map<String, Object> mapsT = new HashMap<>();
         Long tarGrpId = null;
         boolean isDeleted = false;
@@ -551,7 +576,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             TarGrpDetail detail = (TarGrpDetail)redisUtils.get("TAR_GRP_"+tarGrpId);
             List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
             if (detail!=null){
-                 detail = BeanUtil.create(tarGrp,new TarGrpDetail());
+                detail = BeanUtil.create(tarGrp,new TarGrpDetail());
                 detail.setTarGrpConditions(conditionList);
                 redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),detail);
             }
