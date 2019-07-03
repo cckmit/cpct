@@ -40,4 +40,6 @@ public interface CloseRuleMapper {
     void updateExpression(@Param("filterRule")String filterRule, @Param("expression")String expression);
 
     void insertTarGrp(CloseRule closeRule);
+
+    void updateLabelCodeByPrimaryKey(@Param("ruleId")Long ruleId, @Param("express")String express);
 }

@@ -1672,5 +1672,4 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         }
         return maps;
     }
-
 }
