@@ -15,6 +15,11 @@ public class CloseRule extends BaseEntity implements Serializable{
     private Long ruleId;//规则标识
     private String closeName;//关单名称
     private String closeType;//关单类型
+    //受理关单	2000
+    //欠费关单	3000
+    //拆机关单	1000
+    //账期欠费关单	4000
+    //标签关单	5000
     private String productType;// 产品类型
     private String channelContacts;//渠道执行次数
     private Date effectiveDate;//生效时间

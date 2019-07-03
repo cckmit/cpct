@@ -23,7 +23,8 @@ public interface SysAreaMapper {
 
     int updateByPrimaryKey(SysArea record);
 
-    List<SysArea> getByAreaLevelOne(Long regionIdByLandId);
+    SysArea getByCityFour(String orgId);
 
-    List<SysArea> getByParentArea(Long regionIdByLandId);
+    SysArea getCityByName(String parentArea);
+
 }
