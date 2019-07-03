@@ -90,9 +90,107 @@
   </select>
 
   <select id="selectAttrLabelValueByCampaignId" resultType="java.lang.String">
-     select p1.ATTR_ID
+     select p1.ATTR_VALUE
     from mkt_cam_chl_conf_attr p1 LEFT JOIN mkt_cam_chl_conf p2 on p1.EVT_CONTACT_CONF_ID = p2.EVT_CONTACT_CONF_ID
     WHERE p2.MKT_CAMPAIGN_ID = #{campaignId}
     AND (p1.ATTR_ID = 500600010021 OR p1.ATTR_ID = 500600010022)
   </select>
+
+  <select id="selectAttrEndDateByCampaignId" resultMap="BaseResultMap">
+    select p1.CONTACT_CHL_ATTR_RSTR_ID, p1.EVT_CONTACT_CONF_ID, p1.ATTR_ID, p1.ATTR_VALUE_ID, p1.ATTR_VALUE,
+    p1.STATUS_CD, p1.CREATE_STAFF, p1.UPDATE_STAFF, p1.CREATE_DATE, p1.UPDATE_DATE, p1.STATUS_DATE, p1.REMARK
+    from mkt_cam_chl_conf_attr p1 LEFT JOIN mkt_cam_chl_conf p2 on p1.EVT_CONTACT_CONF_ID = p2.EVT_CONTACT_CONF_ID
+    WHERE p2.MKT_CAMPAIGN_ID = #{campaignId}
+    AND (p1.ATTR_ID = 500600010007)
+  </select>
+
+  <update id="updateByPrimaryKeyBatch" parameterType="java.util.ArrayList">
+    update mkt_cam_chl_conf_attr
+    <trim prefix="set" suffixOverrides=",">
+      <trim prefix="ATTR_ID = case" suffix="end," >
+        <foreach collection="list" item="item">
+          <if test="item.attrId !=null">
+            WHEN  EVT_CONTACT_CONF_ID = #{item.evtContactConfId} THEN #{item.attrId}
+          </if>
+        </foreach>
+      </trim>
+      <trim prefix="ATTR_VALUE_ID = case" suffix="end," >
+        <foreach collection="list" item="item">
+          <if test="item.attrValueId !=null">
+            WHEN  EVT_CONTACT_CONF_ID = #{item.evtContactConfId} THEN #{item.attrValueId}
+          </if>
+        </foreach>
+      </trim>
+
+      <trim prefix="ATTR_VALUE = case" suffix="end," >
+        <foreach collection="list" item="item">
+          <if test="item.attrValue !=null">
+            WHEN  EVT_CONTACT_CONF_ID = #{item.evtContactConfId} THEN #{item.attrValue}
+          </if>
+        </foreach>
+      </trim>
+
+      <trim prefix="STATUS_CD = case" suffix="end," >
+        <foreach collection="list" item="item">
+          <if test="item.statusCd !=null">
+            WHEN  EVT_CONTACT_CONF_ID = #{item.evtContactConfId} THEN #{item.statusCd}
+          </if>
+        </foreach>
+      </trim>
+
+      <trim prefix="CREATE_STAFF = case" suffix="end," >
+        <foreach collection="list" item="item">
+          <if test="item.createStaff !=null">
+            WHEN  EVT_CONTACT_CONF_ID = #{item.evtContactConfId} THEN #{item.createStaff}
+          </if>
+        </foreach>
+      </trim>
+
+      <trim prefix="UPDATE_STAFF = case" suffix="end," >
+        <foreach collection="list" item="item">
+          <if test="item.updateStaff !=null">
+            WHEN  EVT_CONTACT_CONF_ID = #{item.evtContactConfId} THEN #{item.updateStaff}
+          </if>
+        </foreach>
+      </trim>
+
+      <trim prefix="CREATE_DATE = case" suffix="end," >
+        <foreach collection="list" item="item">
+          <if test="item.createDate !=null">
+            WHEN  EVT_CONTACT_CONF_ID = #{item.evtContactConfId} THEN #{item.createDate}
+          </if>
+        </foreach>
+      </trim>
+
+      <trim prefix="UPDATE_DATE = case" suffix="end," >
+        <foreach collection="list" item="item">
+          <if test="item.updateDate !=null">
+            WHEN  EVT_CONTACT_CONF_ID = #{item.evtContactConfId} THEN #{item.updateDate}
+          </if>
+        </foreach>
+      </trim>
+
+      <trim prefix="STATUS_DATE = case" suffix="end," >
+        <foreach collection="list" item="item">
+          <if test="item.statusDate !=null">
+            WHEN  EVT_CONTACT_CONF_ID = #{item.evtContactConfId} THEN #{item.statusDate}
+          </if>
+        </foreach>
+      </trim>
+
+      <trim prefix="REMARK = case" suffix="end," >
+        <foreach collection="list" item="item">
+          <if test="item.remark !=null">
+            WHEN  EVT_CONTACT_CONF_ID = #{item.evtContactConfId} THEN #{item.remark}
+          </if>
+        </foreach>
+      </trim>
+    </trim>
+
+    <where>
+      <foreach collection="list" separator="or" item="item">
+        EVT_CONTACT_CONF_ID = #{item.evtContactConfId}
+      </foreach>
+    </where>
+  </update>
 </mapper>

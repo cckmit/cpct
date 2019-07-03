@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.controller.grouping;
 import com.alibaba.fastjson.JSONArray;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
+import com.zjtelcom.cpct.dto.filter.CloseRule;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDTO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
@@ -120,10 +121,10 @@ public class TarGrpController extends BaseController {
      */
     @RequestMapping("/delTarGrpCondition")
     @CrossOrigin
-    public String delTarGrpCondition(@RequestBody TarGrpCondition tarGrpCondition) {
+    public String delTarGrpCondition(@RequestBody TarGrpCondition tarGrpCondition,@RequestBody CloseRule closeRule) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            maps = tarGrpService.delTarGrpCondition(tarGrpCondition.getConditionId());
+            maps = tarGrpService.delTarGrpCondition(tarGrpCondition.getConditionId(), closeRule.getRuleId());
         } catch (Exception e) {
             logger.error("[op:TarGrpController] fail to delTarGrpCondition for tarGrpCondition = {}!" +
                     " Exception: ", JSONArray.toJSON(tarGrpCondition), e);

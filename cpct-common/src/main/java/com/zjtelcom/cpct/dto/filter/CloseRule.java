@@ -38,6 +38,8 @@ public class CloseRule extends BaseEntity implements Serializable{
     private String noteOne;
     private String noteTwo;
     private String noteThree;
+    private String noteFour;
+    private String noteFive;
 
 
     public Long getConditionId() {
@@ -206,5 +208,21 @@ public class CloseRule extends BaseEntity implements Serializable{
 
     public void setNoteThree(String noteThree) {
         this.noteThree = noteThree;
+    }
+
+    public String getNoteFour() {
+        return noteFour;
+    }
+
+    public void setNoteFour(String noteFour) {
+        this.noteFour = noteFour;
+    }
+
+    public String getNoteFive() {
+        return noteFive;
+    }
+
+    public void setNoteFive(String noteFive) {
+        this.noteFive = noteFive;
     }
 }

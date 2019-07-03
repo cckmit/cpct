@@ -264,4 +264,9 @@
     <update id="updateExpression" parameterType="java.lang.String" >
         UPDATE close_rule SET EXPRESSION = #{expression,jdbcType=VARCHAR} WHERE RULE_ID = #{filterRule}
     </update>
+
+    <update id="updateLabelCodeByPrimaryKey">
+        UPDATE close_rule SET NOTE_FIVE = #{express,jdbcType=VARCHAR} WHERE RULE_ID = #{ruleId}
+    </update>
+
 </mapper>

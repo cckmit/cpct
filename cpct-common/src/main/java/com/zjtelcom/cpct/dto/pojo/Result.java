@@ -20,23 +20,23 @@ package com.zjtelcom.cpct.dto.pojo;
 public class Result {
     private String resultCode;
 
-    private String resultMessage;
+    private String resultMsg;
 
     private Object resultObject;
 
     public Result() {}
 
-    public Result(String resultCode, String resultMessage, Object resultObject) {
+    public Result(String resultCode, String resultMsg, Object resultObject) {
         super();
         this.resultCode = resultCode;
-        this.resultMessage = resultMessage;
+        this.resultMsg = resultMsg;
         this.resultObject = resultObject;
     }
 
-    public Result(String resultCode, String resultMessage) {
+    public Result(String resultCode, String resultMsg) {
         super();
         this.resultCode = resultCode;
-        this.resultMessage = resultMessage;
+        this.resultMsg = resultMsg;
     }
 
     public String getResultCode() {
@@ -48,11 +48,11 @@ public class Result {
     }
 
     public String getResultMessage() {
-        return resultMessage;
+        return resultMsg;
     }
 
-    public void setResultMessage(String resultMessage) {
-        this.resultMessage = resultMessage;
+    public void setResultMessage(String resultMsg) {
+        this.resultMsg = resultMsg;
     }
 
     public Object getResultObject() {

@@ -25,7 +25,11 @@ public interface MktCamChlConfAttrMapper {
 
     int updateByPrimaryKey(MktCamChlConfAttrDO mktCamChlConfAttrDO);
 
+    int updateByPrimaryKeyBatch(List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList);
+
     List<Long> selectByCampaignId(@Param("campaignId") Long campaignId);
 
     List<String> selectAttrLabelValueByCampaignId(@Param("campaignId") Long campaignId);
+
+    List<MktCamChlConfAttrDO> selectAttrEndDateByCampaignId(@Param("campaignId") Long campaignId);
 }
