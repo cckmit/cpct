@@ -6,6 +6,7 @@
     <result column="INJECTION_LABEL_ID" jdbcType="BIGINT" property="injectionLabelId" />
     <result column="DISPLAY_ID" jdbcType="BIGINT" property="displayId" />
     <result column="MESSAGE_TYPE" jdbcType="BIGINT" property="messageType" />
+    <result column="LABEL_DISPLAY_TYPE" jdbcType="VARCHAR" property="labelDisplayType" />
     <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
     <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
     <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
@@ -20,20 +21,21 @@
     where DISPLAY_COLUMN_LABEL_ID = #{displayColumnLabelId,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.DisplayColumnLabel">
-    insert into display_column_label (DISPLAY_COLUMN_LABEL_ID, INJECTION_LABEL_ID, DISPLAY_ID,MESSAGE_TYPE,
+    insert into display_column_label (DISPLAY_COLUMN_LABEL_ID, INJECTION_LABEL_ID, DISPLAY_ID,MESSAGE_TYPE,LABEL_DISPLAY_TYPE,
       STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
       CREATE_DATE, STATUS_DATE, UPDATE_DATE, 
       REMARK)
-    values (#{displayColumnLabelId,jdbcType=BIGINT}, #{injectionLabelId,jdbcType=BIGINT}, #{displayId,jdbcType=BIGINT}, #{messageType,jdbcType=BIGINT},
-      #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, 
-      #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
-      #{remark,jdbcType=VARCHAR})
+    values (#{displayColumnLabelId,jdbcType=BIGINT}, #{injectionLabelId,jdbcType=BIGINT}, #{displayId,jdbcType=BIGINT},
+            #{messageType,jdbcType=BIGINT}, #{labelDisplayType,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR},
+            #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP},
+            #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR})
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.DisplayColumnLabel">
     update display_column_label
     set INJECTION_LABEL_ID = #{injectionLabelId,jdbcType=BIGINT},
       DISPLAY_ID = #{displayId,jdbcType=BIGINT},
       MESSAGE_TYPE = #{messageType,jdbcType=BIGINT},
+      LABEL_DISPLAY_TYPE = #{labelDisplayType,jdbcType=VARCHAR},
       STATUS_CD = #{statusCd,jdbcType=VARCHAR},
       CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
       UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
@@ -45,19 +47,19 @@
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select DISPLAY_COLUMN_LABEL_ID, INJECTION_LABEL_ID,DISPLAY_ID,MESSAGE_TYPE,STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
-    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK, LABEL_DISPLAY_TYPE
     from display_column_label
     where DISPLAY_COLUMN_LABEL_ID = #{displayColumnLabelId,jdbcType=BIGINT}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
     select DISPLAY_COLUMN_LABEL_ID, INJECTION_LABEL_ID,DISPLAY_ID,MESSAGE_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
-    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK, LABEL_DISPLAY_TYPE
     from display_column_label
   </select>
 
   <select id="findByDisplayIdAndLabelId" resultMap="BaseResultMap">
     select DISPLAY_COLUMN_LABEL_ID, INJECTION_LABEL_ID,DISPLAY_ID,MESSAGE_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
-    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK, LABEL_DISPLAY_TYPE
     from display_column_label
     where INJECTION_LABEL_ID = #{labelId}
     and DISPLAY_ID = #{displayId}
@@ -65,7 +67,7 @@
 
   <select id="findListByDisplayId" resultMap="BaseResultMap">
     select DISPLAY_COLUMN_LABEL_ID, INJECTION_LABEL_ID,DISPLAY_ID,MESSAGE_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
-    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK, LABEL_DISPLAY_TYPE
     from display_column_label
     where  DISPLAY_ID = #{displayId}
   </select>
@@ -84,7 +86,7 @@
 
   <select id="listByLabelId" resultMap="BaseResultMap">
     select DISPLAY_COLUMN_LABEL_ID, INJECTION_LABEL_ID,DISPLAY_ID,MESSAGE_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
-    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK, LABEL_DISPLAY_TYPE
     from display_column_label
     where  INJECTION_LABEL_ID = #{labelId}
   </select>

@@ -36,6 +36,12 @@ public class SyncLabelController {
         return "调用成功";
     }
 
+    @RequestMapping(value = "initLabelCatalog", method = RequestMethod.POST)
+    @CrossOrigin
+    public String initLabelCatalog() {
+        syncLabelService.initLabelCatalog();
+        return "调用成功";
+    }
 
 
 }

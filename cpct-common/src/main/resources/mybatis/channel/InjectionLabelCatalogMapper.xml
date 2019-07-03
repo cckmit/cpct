@@ -50,10 +50,12 @@
     from injection_label_catalog
     where CATALOG_ID = #{catalogId,jdbcType=BIGINT}
   </select>
+
   <select id="selectAll" resultMap="BaseResultMap">
     select CATALOG_ID,CATALOG_CODE, CATALOG_NAME, PARENT_ID, LEVEL_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
     from injection_label_catalog
+    where REMARK = #{newOrOld}
   </select>
 
   <select id="findByLevelId" resultMap="BaseResultMap">

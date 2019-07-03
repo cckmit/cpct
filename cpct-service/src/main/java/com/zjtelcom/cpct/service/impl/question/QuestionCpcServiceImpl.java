@@ -21,11 +21,8 @@ import com.zjtelcom.cpct.service.question.QuestionService;
 import com.zjtelcom.cpct.service.synchronize.SynQuestionService;
 import com.zjtelcom.cpct.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.*;
 
@@ -34,7 +31,7 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 @Service
 @Transactional
-public class QuestionServiceImpl implements QuestionService {
+public class QuestionCpcServiceImpl implements QuestionService {
 
 
     @Autowired

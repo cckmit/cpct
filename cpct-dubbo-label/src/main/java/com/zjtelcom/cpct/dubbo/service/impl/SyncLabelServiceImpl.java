@@ -506,9 +506,9 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         return result;
     }
 
-    private void initLabelCatalog(List<Label> labelList) {
+    @Override
+    public void initLabelCatalog() {
         List<Label> labels = injectionLabelMapper.selectByScope(1L,null);
-
         for (Label label : labels){
             //标签目录插入
             LabelCatalog labelCatalog =new LabelCatalog();
@@ -520,6 +520,44 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
                 labelCatalog.setCatalogName(label.getLabObject());
                 labelCatalog.setLevelId(1L);
                 labelCatalog.setParentId("0");
+                labelCatalog.setRemark("1");
+                labelCatalogMapper.insert(labelCatalog);
+            }
+//            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1()),2L) == null) {
+//                labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getLabLevel1());
+            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getOriginalLabLevel2Code()),2L) == null) {
+                labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getOriginalLabLevel2Code());
+                labelCatalog.setCatalogName(label.getOriginalLabLevel2Name());
+                labelCatalog.setLevelId(2L);
+                labelCatalog.setParentId(label.getLabObjectCode());
+                labelCatalog.setRemark("1");
+                labelCatalogMapper.insert(labelCatalog);
+            }
+            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getOriginalLabLevel2Code() + label.getOriginalLabLevel3Code()), 3L) == null) {
+                labelCatalog.setCatalogCode(label.getLabObjectCode() + label.getOriginalLabLevel2Code() + label.getOriginalLabLevel3Code());
+                labelCatalog.setCatalogName(label.getOriginalLabLevel3Name());
+                labelCatalog.setLevelId(3L);
+                labelCatalog.setParentId(label.getLabObjectCode() + label.getOriginalLabLevel2Code());
+                labelCatalog.setRemark("1");
+                labelCatalogMapper.insert(labelCatalog);
+            }
+        }
+    }
+
+    private void initLabelCatalog(List<Label> labelList) {
+        List<Label> labels = injectionLabelMapper.selectByScope(1L,null);
+        for (Label label : labels){
+            //标签目录插入
+            LabelCatalog labelCatalog =new LabelCatalog();
+            labelCatalog.setStatusCd(STATUSCD_EFFECTIVE);
+            labelCatalog.setCreateStaff(UserUtil.loginId());
+            labelCatalog.setCreateDate(new Date());
+            if(labelCatalogMapper.findByCodeAndLevel(label.getLabObjectCode(),1L) == null) {
+                labelCatalog.setCatalogCode(label.getLabObjectCode());
+                labelCatalog.setCatalogName(label.getLabObject());
+                labelCatalog.setLevelId(1L);
+                labelCatalog.setParentId("0");
+                labelCatalog.setRemark("0");
                 labelCatalogMapper.insert(labelCatalog);
             }
             if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1()),2L) == null) {
@@ -527,6 +565,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
                 labelCatalog.setCatalogName(label.getLabLevel1Name());
                 labelCatalog.setLevelId(2L);
                 labelCatalog.setParentId(label.getLabObjectCode());
+                labelCatalog.setRemark("0");
                 labelCatalogMapper.insert(labelCatalog);
             }
             if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2()), 3L) == null) {
@@ -534,6 +573,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
                 labelCatalog.setCatalogName(label.getLabLevel2Name());
                 labelCatalog.setLevelId(3L);
                 labelCatalog.setParentId(label.getLabObjectCode() + label.getLabLevel1());
+                labelCatalog.setRemark("0");
                 labelCatalogMapper.insert(labelCatalog);
             }
             if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3()),4L) == null) {
@@ -541,6 +581,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
                 labelCatalog.setCatalogName(label.getLabLevel3Name());
                 labelCatalog.setLevelId(4L);
                 labelCatalog.setParentId(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2());
+                labelCatalog.setRemark("0");
                 labelCatalogMapper.insert(labelCatalog);
             }
 //            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3() + label.getLabLevel4()), 5L) == null) {
@@ -579,7 +620,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
 
         List<LabelCatalog> parentList = labelCatalogMapper.findByParentId(String.valueOf(0));
         List<Label> allLabels = labelMapper.selectAll();
-        List<LabelCatalog> allCatalogs = labelCatalogMapper.selectAll();
+        List<LabelCatalog> allCatalogs = labelCatalogMapper.selectAll("0");
         List<LabelValue> valueList = labelValueMapper.selectAll();
 
         for (LabelCatalog parent : parentList) {
