@@ -121,13 +121,14 @@ public class TarGrpController extends BaseController {
      */
     @RequestMapping("/delTarGrpCondition")
     @CrossOrigin
-    public String delTarGrpCondition(@RequestBody TarGrpCondition tarGrpCondition,@RequestBody CloseRule closeRule) {
+    // public String delTarGrpCondition(@RequestBody TarGrpCondition tarGrpCondition,@RequestBody CloseRule closeRule) {
+    public String delTarGrpCondition(@RequestBody HashMap<String,Long> param) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            maps = tarGrpService.delTarGrpCondition(tarGrpCondition.getConditionId(), closeRule.getRuleId());
+            maps = tarGrpService.delTarGrpCondition(param.get("conditionId"), param.get("ruleId"));
         } catch (Exception e) {
             logger.error("[op:TarGrpController] fail to delTarGrpCondition for tarGrpCondition = {}!" +
-                    " Exception: ", JSONArray.toJSON(tarGrpCondition), e);
+                    " Exception: ", JSONArray.toJSON(param.get("conditionId")), e);
             return FastJsonUtils.objToJson(maps);
         }
         return FastJsonUtils.objToJson(maps);

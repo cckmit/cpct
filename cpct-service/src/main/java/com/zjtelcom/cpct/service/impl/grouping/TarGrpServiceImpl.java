@@ -539,14 +539,16 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
 
     @Override
     public Map<String, Object> delTarGrpCondition(Long conditionId, Long ruleId) {
-        if(ruleId != null && ruleId != 0){
+        if(ruleId != null && ruleId != 0 && ruleId.equals("")){
             CloseRule closeRule = closeRuleMapper.selectByPrimaryKey(ruleId);
-            // LabelCode字段对应的是TarGrpId
-            String tarGrpId = closeRule.getLabelCode();
-            String express = closeRuleServiceImpl.saveExpressions2Redis(ruleId, Long.valueOf(tarGrpId));
-            // NoteFive字段对应的是express表达式
-            closeRule.setNoteFive(express);
-            closeRuleMapper.updateByPrimaryKey(closeRule);
+            if(closeRule.getCloseType().equals("5000")){
+                // LabelCode字段对应的是TarGrpId
+                String tarGrpId = closeRule.getLabelCode();
+                String express = closeRuleServiceImpl.saveExpressions2Redis(ruleId, Long.valueOf(tarGrpId));
+                // NoteFive字段对应的是express表达式
+                closeRule.setNoteFive(express);
+                closeRuleMapper.updateByPrimaryKey(closeRule);
+            }
         }
         return delTarGrpConditions(conditionId);
     }
