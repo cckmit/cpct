@@ -256,6 +256,7 @@ public class CloseRuleServiceImpl implements CloseRuleService {
             }
             codeList.add(offer.getOfferNbr());
         }
+        //查看 这个代码 是否修改！！
         closeRule.setChooseProduct(ChannelUtil.StringList2String(codeList));
         closeRuleMapper.updateByPrimaryKey(closeRule);
         if (StringUtils.isNotBlank(closeRule.getLabelCode())){
