@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -90,6 +91,7 @@ public class ProductServiceImpl implements ProductService {
     public Map<String, Object> getCloseCampaign(Map<String, Object> paramMap) {
         Map<String, Object> resultMap = new HashMap<>();
         String filterType = (String) paramMap.get("filterType");
+        System.out.println("关单接口入参 ： ！！ "+filterType);
         List<Map<String,Object>> strings = new ArrayList<>();
         if (StringUtils.isNotBlank(filterType)){
             String[] split = filterType.split(",");
@@ -109,6 +111,7 @@ public class ProductServiceImpl implements ProductService {
                }
             }
         }
+        System.out.println("返回结果： "+strings.toArray());
         resultMap.put("resultCode","200");
         resultMap.put("resultData",strings);
         return resultMap;
