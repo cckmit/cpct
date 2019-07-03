@@ -1207,15 +1207,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         @Override
                         public void run() {
                             try {
-                                SysStaff sysStaff = (SysStaff) SecurityUtils.getSubject().getPrincipal();
                                 String roleName = "admin";
-                                if (sysStaff != null) {
-                                    roleName = sysStaff.getRoleName();
-                                }
                                 synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
                                 // 删除生产redis缓存
                                 synchronizeCampaignService.deleteCampaignRedisProd(mktCampaignId);
                             } catch (Exception e) {
+                                e.printStackTrace();
                                 logger.error("[op:MktCampaignServiceImpl] 活动同步失败 by mktCampaignId = {}, Expection = ",mktCampaignId, e);
                             }
                         }
@@ -1437,7 +1434,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         requestInfo.setActivitiKey("mkt_force_province");  //需求函活动类型
         requestInfo.setRequestUrgentType("一般");
         requestInfo.setProcessType("0");
-        requestInfo.setIsstartup("1");
         requestInfo.setReportTag("0");
         //得到指定下发的人员信息集合
         List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign(CITY_PUBLISH);

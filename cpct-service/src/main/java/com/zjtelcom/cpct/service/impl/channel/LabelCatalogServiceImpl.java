@@ -135,6 +135,9 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
                 List<LabelCatalogTree> onceTreeList = new ArrayList<>();
                 List<LabelCatalog> firstList = labelCatalogMapper.findByParentId(parent.getCatalogCode());
                 for (LabelCatalog first : firstList) {
+                    if(!first.getRemark().equals(newOrOld)) {
+                        continue;
+                    }
                     LabelCatalogTree firstTree = new LabelCatalogTree();
                     firstTree.setInjectionLabelId(first.getCatalogId());
                     firstTree.setInjectionLabelName(first.getCatalogName());
