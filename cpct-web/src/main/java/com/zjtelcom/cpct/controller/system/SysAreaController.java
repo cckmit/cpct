@@ -131,7 +131,7 @@ public class SysAreaController {
 //                map = sysAreaService.listStrAreaTree(lanId.toString());
 //                map = sysAreaService.getCityByAreaTree(user.getOrgId());
             Long orgId = Long.valueOf(user.getOrgId());
-            map = sysAreaService.getCityByAreaTree(Long.valueOf(orgId));
+            map = sysAreaService.getCityByAreaTree(orgId);
 
 //            }
             map.put("resultCode", CommonConstant.CODE_SUCCESS);
