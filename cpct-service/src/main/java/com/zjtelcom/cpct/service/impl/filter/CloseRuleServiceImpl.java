@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.service.impl.filter;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ctzj.smt.bss.cpc.configure.service.api.offer.IFairValueConfigureService;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -15,36 +14,31 @@ import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.channel.*;
-import com.zjtelcom.cpct.domain.org.OrgTreeDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
-import com.zjtelcom.cpct.dto.channel.LabelValueVO;
 import com.zjtelcom.cpct.dto.channel.OfferDetail;
 import com.zjtelcom.cpct.dto.filter.CloseRule;
 import com.zjtelcom.cpct.dto.filter.CloseRuleAddVO;
 import com.zjtelcom.cpct.dto.filter.CloseRuleVO;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
-import com.zjtelcom.cpct.dto.channel.OperatorDetail;
-import com.zjtelcom.cpct.dto.filter.*;
-import com.zjtelcom.cpct.dto.grouping.SysAreaVO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
-import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.request.filter.CloseRuleReq;
 import com.zjtelcom.cpct.service.filter.CloseRuleService;
-import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.service.synchronize.filter.SynFilterRuleService;
 import com.zjtelcom.cpct.util.*;
-import com.zjtelcom.cpct_prd.dao.grouping.TarGrpPrdMapper;
-import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
-import com.zjtelcom.cpct.vo.grouping.TarGrpVO;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -424,5 +418,92 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         redisUtils.hset("CLOSE_RULE_EXPRESS_" + ruleId,"express", express.toString());
         redisUtils.hset("CLOSE_RULE_EXPRESS_" + ruleId,"labelResultList", JSON.toJSONString(labelResultList));
         return express.toString();
+    }
+
+    /**
+     * 导入销售品
+     */
+    @Override
+    public Map<String,Object> importProductList(MultipartFile multipartFile, Long ruleId, String closeName, String closeType, String offerInfo, String productType, String closeCode, Long[] rightListId)throws IOException {
+        Map<String,Object> maps = new HashMap<>();
+        if(closeName.equals("") || closeType.equals("") || offerInfo.equals("") || closeCode.equals("")) {
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg", "关单规则信息不完善");
+        }
+        List<String> resultList = new ArrayList<>();
+        InputStream inputStream = multipartFile.getInputStream();
+        XSSFWorkbook wb = new XSSFWorkbook(inputStream);
+        Sheet sheet = wb.getSheetAt(0);
+        int total = sheet.getLastRowNum() + rightListId.length;
+        if(total > 100) {
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg", "销售品数量超过上限100个");
+            return maps;
+        }
+        for(int i=0;i<rightListId.length;i++) {
+            Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(rightListId[i].toString()));
+            if (offer==null){
+                continue;
+            }
+            resultList.add(offer.getOfferNbr());
+        }
+        Integer rowNums = sheet.getLastRowNum() + 1;
+        for (int i = 1; i < rowNums; i++) {
+            Row row = sheet.getRow(i);
+            if (row.getLastCellNum() >= 2) {
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg", "请返回检查模板格式");
+                return maps;
+            }
+            Cell cell = row.getCell(0);
+            String cellValue = ChannelUtil.getCellValue(cell).toString();
+            if (!cellValue.equals("null")){
+                List<Offer> offer = offerMapper.selectByCode(cellValue);
+                if (offer!=null && !offer.isEmpty()) {
+                    if(!resultList.contains(cellValue)) {
+                        resultList.add(cellValue);
+                    }
+                }else {
+                    maps.put("resultCode", CODE_FAIL);
+                    maps.put("resultMsg", cellValue + "销售品不存在");
+                    return maps;
+                }
+            }
+        }
+        CloseRule closeRule = new CloseRule();
+        if(ruleId == null) {
+            closeRule.setCloseName(closeName);
+            closeRule.setCloseType(closeType);
+            closeRule.setOfferInfo(offerInfo);
+            closeRule.setProductType(productType);
+            closeRule.setCloseCode(closeCode);
+            closeRule.setChooseProduct(ChannelUtil.StringList2String(resultList));
+            closeRule.setCreateDate(DateUtil.getCurrentTime());
+            closeRule.setCreateStaff(UserUtil.loginId());
+            closeRule.setUpdateDate(DateUtil.getCurrentTime());
+            closeRule.setUpdateStaff(UserUtil.loginId());
+            closeRule.setStatusDate(DateUtil.getCurrentTime());
+            closeRule.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+            closeRuleMapper.createFilterRule(closeRule);
+        }else {
+            closeRule = closeRuleMapper.selectByPrimaryKey(ruleId);
+            if (closeRule==null){
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg","关单规则不存在");
+                return maps;
+            }
+            closeRule.setCloseName(closeName);
+            closeRule.setCloseType(closeType);
+            closeRule.setOfferInfo(offerInfo);
+            closeRule.setProductType(productType);
+            closeRule.setCloseCode(closeCode);
+            closeRule.setChooseProduct(ChannelUtil.StringList2String(resultList));
+            closeRule.setUpdateDate(DateUtil.getCurrentTime());
+            closeRule.setUpdateStaff(UserUtil.loginId());
+            closeRuleMapper.updateByPrimaryKey(closeRule);
+        }
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", closeRule.getChooseProduct());
+        return maps;
     }
 }
