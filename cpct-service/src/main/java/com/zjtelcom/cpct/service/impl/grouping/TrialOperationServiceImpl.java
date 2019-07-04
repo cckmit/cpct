@@ -685,7 +685,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         return labelList;
     }
 
-
 //    /**
 //     * 导入试运算清单
 //     */
@@ -700,7 +699,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 //        MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(operation.getCampaignId());
 //        MktStrategyConfDO strategy = strategyMapper.selectByPrimaryKey(operation.getStrategyId());
 //        MktStrategyConfRuleDO confRule = ruleMapper.selectByPrimaryKey(ruleId);
-//        if (campaign == null || strategy == null || confRule==null) {
+//        if (campaign == null || strategy == null || confRule == null) {
 //            result.put("resultCode", CODE_FAIL);
 //            result.put("resultMsg", "未找到有效的活动策略或规则");
 //            return result;
@@ -882,7 +881,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         Map<String, Object> result = new HashMap<>();
         String batchNumSt = DateUtil.date2St4Trial(new Date()) + ChannelUtil.getRandomStr(4);
         XlsxProcessAbstract xlsxProcess = new XlsxProcessAbstract();
-        InputStream inputStream = multipartFile.getInputStream();
+        //InputStream inputStream = multipartFile.getInputStream();
 
         MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(operation.getCampaignId());
         MktStrategyConfDO strategy = strategyMapper.selectByPrimaryKey(operation.getStrategyId());
@@ -1006,79 +1005,76 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             int size = dataVO.contentList.size() - 3;
             new Thread() {
                 public void run() {
-                    List<FilterRule> productFilter = new ArrayList<>();
-                    final TrialOperationVOES request = getTrialOperationVOES(operation, ruleId, batchNumSt, labelList);
-                    List<Map<String, Object>> customerList = new ArrayList<>();
-                    //红黑名单过滤
-                    List<String> typeList = new ArrayList<>();
-                    typeList.add("3000");
-                    List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(campaign.getMktCampaignId(), typeList);
-                    if (filterRuleList != null && !filterRuleList.isEmpty()) {
-                        productFilter = filterRuleList;
+                List<FilterRule> productFilter = new ArrayList<>();
+                final TrialOperationVOES request = getTrialOperationVOES(operation, ruleId, batchNumSt, labelList);
+                List<Map<String, Object>> customerList = new ArrayList<>();
+                //红黑名单过滤
+                List<String> typeList = new ArrayList<>();
+                typeList.add("3000");
+                List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(campaign.getMktCampaignId(), typeList);
+                if (filterRuleList != null && !filterRuleList.isEmpty()) {
+                    productFilter = filterRuleList;
+                }
+                int customerListCount = 0;
+                for (int j = 3; j < dataVO.contentList.size(); j++) {
+                    List<String> data = Arrays.asList(dataVO.contentList.get(j).split("\\|@\\|"));
+                    Map<String, Object> customers = new HashMap<>();
+                    for (int x = 0; x < codeList.length; x++) {
+                        if (codeList[x] == null) {
+                            break;
+                        }
+                        String value = "";
+                        if (x >= data.size()) {
+                            value = "null";
+                        } else {
+                            value = data.get(x);
+                        }
+                        if (value.contains("\r") || value.equals("\n")) {
+                            // 过滤换行符
+                            value = value.replace("\r", "").replace("\n", "");
+                        }
+                        if (codeList[x].equals("CCUST_NAME") && (value.contains("null") || value.equals(""))) {
+                            break;
+                        }
+                        if (codeList[x].equals("CCUST_ID") && (value.contains("null") || value.equals(""))) {
+                            break;
+                        }
+                        if (codeList[x].equals("ASSET_INTEG_ID") && (value.contains("null") || value.equals(""))) {
+                            break;
+                        }
+                        if (codeList[x].equals("ASSET_NUMBER") && (value.contains("null") || value.equals(""))) {
+                            break;
+                        }
+                        if (codeList[x].equals("LATN_ID") && (value.contains("null") || value.equals(""))) {
+                            break;
+                        }
+                        customers.put(codeList[x], value);
                     }
-                    for (int j = 3; j < dataVO.contentList.size(); j++) {
-                        List<String> data = Arrays.asList(dataVO.contentList.get(j).split("\\|@\\|"));
-                        Map<String, Object> customers = new HashMap<>();
-                        for (int x = 0; x < codeList.length; x++) {
-                            if (codeList[x] == null) {
-                                break;
-                            }
-                            String value = "";
-                            if (x >= data.size()) {
-                                value = "null";
-                            } else {
-                                value = data.get(x);
-                            }
-                            if (value.contains("\r") || value.equals("\n")) {
-                                // 过滤换行符
-                                value = value.replace("\r", "").replace("\n", "");
-                            }
-                            if (codeList[x].equals("CCUST_NAME") && (value.contains("null") || value.equals(""))) {
-                                break;
-                            }
-                            if (codeList[x].equals("CCUST_ID") && (value.contains("null") || value.equals(""))) {
-                                break;
-                            }
-                            if (codeList[x].equals("ASSET_INTEG_ID") && (value.contains("null") || value.equals(""))) {
-                                break;
-                            }
-                            if (codeList[x].equals("ASSET_NUMBER") && (value.contains("null") || value.equals(""))) {
-                                break;
-                            }
-                            if (codeList[x].equals("LATN_ID") && (value.contains("null") || value.equals(""))) {
-                                break;
-                            }
-                            customers.put(codeList[x], value);
-                        }
-                        if (customers.isEmpty()) {
-                            continue;
-                        }
-                        customerList.add(customers);
-                        if (customerList.size() >= 1000 || j == dataVO.contentList.size() - 1) {
-                            // 向MQ中扔入request和customersList
-                            HashMap msgBody = new HashMap();
-                            msgBody.put("request", request);
-                            msgBody.put("customerList", customerList);
-                            msgBody.put("productFilterList", productFilter);
-                            try {
-                                // 判断是否发送成功
-                                if (!mqService.msg2Producer(msgBody, batchNumSt, null).equals(MQSendStatus.SEND_OK)) {
-                                    // 发送失败自动重发2次，如果还是失败，记录
-                                    logger.error("CTGMQ消息生产失败,batchNumSt:" + batchNumSt, msgBody);
-                                }
-                                msgBody = null;
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            //把customerList拆分成多个小list存入redis
-                            //Map<String, Object> resultMap = userList2Redis(avg, redisI, redisListNum, batchNumSt, ruleId, customerList);
-                            //redisI = (int) resultMap.get("redisI");
-                            //redisListNum = (int) resultMap.get("listNum");
-                            //customerList = new ArrayList<>();
-                            customerList.clear();
-                        }
+                    if (customers.isEmpty()) {
+                        continue;
                     }
-
+                    customerList.add(customers);
+                    if (customerList.size() >= 1000 || j == dataVO.contentList.size() - 1) {
+                        // 向MQ中扔入request和customersList
+                        HashMap msgBody = new HashMap();
+                        msgBody.put("request", request);
+                        msgBody.put("customerList", customerList);
+                        msgBody.put("productFilterList", productFilter);
+                        try {
+                            // 判断是否发送成功
+                            if (!mqService.msg2Producer(msgBody, batchNumSt, ruleId.toString()).equals("SEND_OK")) {
+                                // 发送失败自动重发2次，如果还是失败，记录
+                                logger.error("CTGMQ消息生产失败,batchNumSt:" + batchNumSt, msgBody);
+                            }
+                            customerListCount += customerList.size();
+                            msgBody = null;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        customerList.clear();
+                    }
+                }
+                logger.info("导入试运算清单importUserList->customerList的数量：" + customerListCount);
                 }
             }.start();
         } catch (Exception e) {
@@ -1577,6 +1573,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             labelDTOList = new ArrayList<>();
         }
         String[] fieldList = new String[labelDTOList.size()+attrValue.size()];
+
         List<Map<String,Object>> labelList = new ArrayList<>();
         for (int i = 0 ; i< labelDTOList.size();i++){
             fieldList[i] = labelDTOList.get(i).getLabelCode();

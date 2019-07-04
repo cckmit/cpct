@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct_prd.dao.campaign;
 
 import com.zjtelcom.cpct.domain.campaign.MktCamDisplayColumnRel;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyCloseRuleRelDO;
+import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -26,5 +28,9 @@ public interface MktCamDisplayColumnRelPrdMapper {
     int deleteByMktCampaignId(@Param("mktCampaignId") Long mktCampaignId);
 
     List<MktCamDisplayColumnRel> selectDisplayLabelByCamId(@Param("mktCampaignId") Long mktCampaignId);
+
+    List<MktStrategyCloseRuleRelDO> selectRuleByStrategyId(Long strategyId);
+
+    List<LabelDTO> selectLabelDisplayListByCamId(@Param("mktCampaignId") Long mktCampaignId);
 
 }

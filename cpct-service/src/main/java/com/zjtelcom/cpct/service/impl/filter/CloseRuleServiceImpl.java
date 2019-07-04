@@ -1,5 +1,8 @@
 package com.zjtelcom.cpct.service.impl.filter;
 
+import com.alibaba.fastjson.JSONObject;
+import com.ctzj.smt.bss.cpc.configure.service.api.offer.IFairValueConfigureService;
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
@@ -8,21 +11,37 @@ import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
 import com.zjtelcom.cpct.dao.channel.OfferMapper;
 import com.zjtelcom.cpct.dao.filter.CloseRuleMapper;
+import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
+import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
-import com.zjtelcom.cpct.domain.channel.Label;
-import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
-import com.zjtelcom.cpct.domain.channel.Offer;
+import com.zjtelcom.cpct.domain.channel.*;
+import com.zjtelcom.cpct.domain.org.OrgTreeDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
+import com.zjtelcom.cpct.dto.channel.LabelValueVO;
 import com.zjtelcom.cpct.dto.channel.OfferDetail;
+import com.zjtelcom.cpct.dto.filter.CloseRule;
+import com.zjtelcom.cpct.dto.filter.CloseRuleAddVO;
+import com.zjtelcom.cpct.dto.filter.CloseRuleVO;
+import com.zjtelcom.cpct.dto.grouping.TarGrp;
+import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
+import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.filter.*;
+import com.zjtelcom.cpct.dto.grouping.SysAreaVO;
+import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
+import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.request.filter.CloseRuleReq;
-import com.zjtelcom.cpct.request.filter.FilterRuleReq;
 import com.zjtelcom.cpct.service.filter.CloseRuleService;
+import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.service.synchronize.filter.SynFilterRuleService;
 import com.zjtelcom.cpct.util.*;
+import com.zjtelcom.cpct_prd.dao.grouping.TarGrpPrdMapper;
+import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
+import com.zjtelcom.cpct.vo.grouping.TarGrpVO;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +52,7 @@ import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 
+@EnableCaching(proxyTargetClass = true)
 @Service
 @Transactional
 public class CloseRuleServiceImpl implements CloseRuleService {
@@ -51,7 +71,12 @@ public class CloseRuleServiceImpl implements CloseRuleService {
     private InjectionLabelMapper labelMapper;
     @Autowired
     private SynFilterRuleService synFilterRuleService;
-
+    @Autowired
+    private TarGrpMapper TarGrpMapper;
+    @Autowired
+    private TarGrpConditionMapper tarGrpConditionMapper;
+    @Autowired
+    private InjectionLabelMapper injectionLabelMapper;
 
     /**
      * 根据关单规则id集合查询过滤规则集合
@@ -119,6 +144,11 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         if(rule != null) {
             closeRuleMapper.delFilterRule(closeRule);
             verbalConditionMapper.deleteByPrimaryKey(rule.getConditionId());
+            if (StringUtils.isNotBlank(rule.getLabelCode())){
+                TarGrpMapper.deleteByPrimaryKey(Long.valueOf(rule.getLabelCode()).longValue());
+                tarGrpConditionMapper.deleteByTarGrpTemplateId(Long.valueOf(rule.getLabelCode()).longValue());
+            }
+
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
@@ -155,6 +185,7 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         closeRule.setCreateStaff(UserUtil.loginId());
         closeRule.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
         List<String> codeList = new ArrayList<>();
+
         if (StringUtils.isNotBlank(addVO.getCloseType()) && addVO.getCloseType().equals("2000")){
             if (addVO.getChooseProduct()!= null && !addVO.getChooseProduct().isEmpty()){
                 for (Long offerId : addVO.getChooseProduct()){
@@ -174,6 +205,26 @@ public class CloseRuleServiceImpl implements CloseRuleService {
             addVO.setProductType("");
         }
         closeRuleMapper.createFilterRule(closeRule);
+        // 类型为标签关单时
+        if(addVO.getCloseType().equals("5000")){
+            Long ruleId = closeRule.getRuleId();
+            String express = saveExpressions2Redis(Long.valueOf(ruleId), Long.valueOf(closeRule.getLabelCode()));
+            if(ruleId > 0){
+                closeRuleMapper.updateLabelCodeByPrimaryKey(ruleId, express);
+            }
+        }
+        if (StringUtils.isNotBlank(closeRule.getLabelCode())){
+            String labelCode = closeRule.getLabelCode();
+            TarGrp tarGrp = TarGrpMapper.selectByPrimaryKey(Long.valueOf(labelCode).longValue());
+            if (tarGrp!=null){
+                JSONObject json = JSONObject.parseObject(JSONObject.toJSONString(tarGrp));
+                //赋值以后转为对象 再去更新
+                TarGrpDetail change = JSONObject.parseObject(json.toJSONString(), TarGrpDetail.class);
+                change.setTarGrpName(closeRule.getCloseName());
+                change.setTarGrpType("4000");
+                int i = TarGrpMapper.updateByPrimaryKey(change);
+            }
+        }
         //关单编码确认类型 自然数自增
         if (StringUtils.isNotBlank(addVO.getCloseType()) && addVO.getCloseType().equals("1000")){
             addVO.setExpression("CR001");
@@ -190,17 +241,17 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("filterRule", closeRule);
-//        if (SystemParamsUtil.getSyncValue().equals("1")){
-//            new Thread(){
-//                public void run(){
-//                    try {
-//                        synFilterRuleService.synchronizeSingleFilterRule(closeRule.getRuleId(),"");
-//                    }catch (Exception e){
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }.start();
-//        }
+        if (SystemParamsUtil.getSyncValue().equals("1")){
+            new Thread(){
+                public void run(){
+                    try {
+                        synFilterRuleService.synchronizeSingleFilterRule(closeRule.getRuleId(),"");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
+        }
         return maps;
     }
 
@@ -228,26 +279,24 @@ public class CloseRuleServiceImpl implements CloseRuleService {
             }
             codeList.add(offer.getOfferNbr());
         }
+        if(editVO.getCloseType().equals("5000")){
+            String express = saveExpressions2Redis(closeRule.getRuleId(), Long.valueOf(closeRule.getLabelCode()));
+            closeRule.setNoteFive(express);
+        }
         closeRule.setChooseProduct(ChannelUtil.StringList2String(codeList));
-//        if (filterRule.getFilterType().equals("3000")){
-//            filterRule.setLabelCode("PROM_LIST");
-//        }
-//        if (editVO.getFilterType().equals("6000")){
-//            if (filterRule.getConditionId()==null){
-//                MktVerbalCondition condition = BeanUtil.create(editVO.getCondition(),new MktVerbalCondition());
-//                condition.setVerbalId(0L);
-//                condition.setConditionType(ConditionType.FILTER_RULE.getValue().toString());
-//                verbalConditionMapper.insert(condition);
-//                filterRule.setConditionId(condition.getConditionId());
-//            }else {
-//                MktVerbalCondition condition = verbalConditionMapper.selectByPrimaryKey(filterRule.getConditionId());
-//                if (condition!=null){
-//                    BeanUtil.copy(editVO.getCondition(),condition);
-//                    verbalConditionMapper.updateByPrimaryKey(condition);
-//                }
-//            }
-//        }
         closeRuleMapper.updateByPrimaryKey(closeRule);
+        if (StringUtils.isNotBlank(closeRule.getLabelCode())){
+            String labelCode = closeRule.getLabelCode();
+            TarGrp tarGrp = TarGrpMapper.selectByPrimaryKey(Long.valueOf(labelCode).longValue());
+            if (tarGrp!=null && !tarGrp.getTarGrpType().equals("4000")){
+                JSONObject json = JSONObject.parseObject(JSONObject.toJSONString(tarGrp));
+                //赋值以后转为对象 再去更新
+                TarGrpDetail change = JSONObject.parseObject(json.toJSONString(), TarGrpDetail.class);
+                change.setTarGrpName(closeRule.getCloseName());
+                change.setTarGrpType("4000");
+                TarGrpMapper.updateByPrimaryKey(change);
+            }
+        }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("filterRule", closeRule);
@@ -309,6 +358,71 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         return map;
     }
 
+    // 创建、修改关单规则时，拼接表达式存入缓存
+    public String saveExpressions2Redis(Long ruleId, Long tarGrpId){
+        List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
 
-
+        List<LabelResult> labelResultList = new ArrayList<>();
+        List<String> codeList = new ArrayList<>();
+        StringBuilder express = new StringBuilder();
+        if (tarGrpId != null && tarGrpId != 0) {
+            //将规则拼装为表达式
+            if (conditionList != null && conditionList.size() > 0) {
+                express.append("if(");
+                //遍历所有规则
+                for (int i = 0; i < conditionList.size(); i++) {
+                    LabelResult labelResult = new LabelResult();
+                    String type = conditionList.get(i).getOperType();
+                    Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(conditionList.get(i).getLeftParam()));
+                    if (label==null){
+                        continue;
+                    }
+                    labelResult.setLabelCode(label.getInjectionLabelCode());
+                    labelResult.setLabelName(label.getInjectionLabelName());
+                    labelResult.setRightOperand(label.getLabelType());
+                    labelResult.setRightParam(conditionList.get(i).getRightParam());
+                    labelResult.setClassName(label.getClassName());
+                    labelResult.setOperType(type);
+                    labelResult.setLabelDataType(label.getLabelDataType()==null ? "1100" : label.getLabelDataType());
+                    labelResultList.add(labelResult);
+                    codeList.add(label.getInjectionLabelCode());
+                    if ("7100".equals(type)) {
+                        express.append("!");
+                    }
+                    express.append("(");
+                    express.append(label.getInjectionLabelCode());
+                    if ("1000".equals(type)) {
+                        express.append(">");
+                    } else if ("2000".equals(type)) {
+                        express.append("<");
+                    } else if ("3000".equals(type)) {
+                        express.append("==");
+                    } else if ("4000".equals(type)) {
+                        express.append("!=");
+                    } else if ("5000".equals(type)) {
+                        express.append(">=");
+                    } else if ("6000".equals(type)) {
+                        express.append("<=");
+                    } else if ("7000".equals(type)) {
+                        express.append("in");
+                    }else if ("7200".equals(type)) {
+                        express.append("@@@@");//区间于
+                    } else if ("7100".equals(type)) {
+                        express.append("notIn");
+                    }
+                    express.append(conditionList.get(i).getRightParam());
+                    express.append(")");
+                    if (i + 1 != conditionList.size()) {
+                        express.append("&&");
+                    }
+                }
+                express.append(") {return true} else {return false}");
+            }else {
+                express.append("");
+            }
+        }
+        redisUtils.hset("CLOSE_RULE_EXPRESS_" + ruleId,"express", express.toString());
+        redisUtils.hset("CLOSE_RULE_EXPRESS_" + ruleId,"labelResultList", JSON.toJSONString(labelResultList));
+        return express.toString();
+    }
 }

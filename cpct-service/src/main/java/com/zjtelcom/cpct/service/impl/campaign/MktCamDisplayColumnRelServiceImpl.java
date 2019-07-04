@@ -118,21 +118,14 @@ public class MktCamDisplayColumnRelServiceImpl implements MktCamDisplayColumnRel
             result.put("resultMsg", "MktCamDisplayColumnRelList为空");
             return result;
         }
-        ExecutorService executorService = Executors.newCachedThreadPool();
         for (MktCamDisplayColumnRel rel : relList) {
             rel.setMktCamDisplayColumnRelId(null);
             rel.setMktCampaignId(newCampaignId);
-            executorService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    rel.setCreateStaff(UserUtil.loginId());
-                    rel.setCreateDate(new Date());
-                    rel.setStatusCd("1000");
-                    mktCamDisplayColumnRelMapper.insert(rel);
-                }
-            });
+            rel.setCreateStaff(UserUtil.loginId());
+            rel.setCreateDate(new Date());
+            rel.setStatusCd("1000");
+            mktCamDisplayColumnRelMapper.insert(rel);
         }
-        executorService.shutdown();
         result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", "同步完成");
         return result;
@@ -147,19 +140,12 @@ public class MktCamDisplayColumnRelServiceImpl implements MktCamDisplayColumnRel
             result.put("resultMsg", "MktCamDisplayColumnRelList为空");
             return result;
         }
-        ExecutorService executorService = Executors.newCachedThreadPool();
         for (MktCamDisplayColumnRel rel : relList) {
-            executorService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    rel.setCreateStaff(UserUtil.loginId());
-                    rel.setCreateDate(new Date());
-                    rel.setStatusCd("1000");
-                    mktCamDisplayColumnRelPrdMapper.insert(rel);
-                }
-            });
+            rel.setCreateStaff(UserUtil.loginId());
+            rel.setCreateDate(new Date());
+            rel.setStatusCd("1000");
+            mktCamDisplayColumnRelPrdMapper.insert(rel);
         }
-        executorService.shutdown();
         result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", "同步完成");
         return result;
@@ -174,22 +160,33 @@ public class MktCamDisplayColumnRelServiceImpl implements MktCamDisplayColumnRel
             result.put("resultMsg", "MktCamDisplayColumnRelList为空");
             return result;
         }
-        ExecutorService executorService = Executors.newCachedThreadPool();
         for (MktCamDisplayColumnRel rel : relList) {
-            executorService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    rel.setCreateStaff(UserUtil.loginId());
-                    rel.setCreateDate(new Date());
-                    rel.setStatusCd("1000");
-                    mktCamDisplayColumnRelMapper.insert(rel);
-                }
-            });
+            rel.setCreateStaff(UserUtil.loginId());
+            rel.setCreateDate(new Date());
+            rel.setStatusCd("1000");
+            mktCamDisplayColumnRelMapper.insert(rel);
         }
-        executorService.shutdown();
         result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", "更新完成");
         return result;
+    }
 
+    @Override
+    public Map<String, Object> updateOldCamDisplay(){
+        Map<String,Object> result = new HashMap<>();
+        List<MktCamDisplayColumnRel> relList = mktCampaignMapper.selectAllGroupByCamId();
+        if(relList.isEmpty() || relList.size() == 0){
+            result.put("resultCode", CODE_SUCCESS);
+            result.put("resultMsg", "MktCamDisplayColumnRelList为空");
+            return result;
+        }
+        for (MktCamDisplayColumnRel rel : relList) {
+            rel.setUpdateDate(new Date());
+            int i = mktCamDisplayColumnRelMapper.updateDisplayLabel(rel);
+            System.out.println(i);
+        }
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", "更新完成");
+        return result;
     }
 }

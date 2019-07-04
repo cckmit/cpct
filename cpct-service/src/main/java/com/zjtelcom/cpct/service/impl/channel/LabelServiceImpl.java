@@ -184,12 +184,12 @@ public class LabelServiceImpl extends BaseService implements LabelService {
                 entity.setRightOperand(label.getRightOperand());
                 entity.setTagRowId(label.getTagRowId());
                 entity.setInjectionLabelCode(label.getInjectionLabelCode());
-                entity.setOriginalLabLevel1Code(null == label.getOriginalLabLevel1Code()? "":label.getOriginalLabLevel1Code());
-                entity.setOriginalLabLevel2Code(null == label.getOriginalLabLevel2Code()? "":label.getOriginalLabLevel2Code());
-                entity.setOriginalLabLevel3Code(null == label.getOriginalLabLevel3Code()? "":label.getOriginalLabLevel3Code());
-                entity.setOriginalLabLevel1Name(null == label.getOriginalLabLevel1Name()? "":label.getOriginalLabLevel1Name());
-                entity.setOriginalLabLevel2Name(null == label.getOriginalLabLevel2Name()? "":label.getOriginalLabLevel2Name());
-                entity.setOriginalLabLevel3Name(null == label.getOriginalLabLevel3Name()? "":label.getOriginalLabLevel3Name());
+                entity.setOriginalLabLevel1Code(null == label.getOriginalLabLevel1Code()? "":label.getOriginalLabLevel1Code() == "null"? "": label.getOriginalLabLevel1Code());
+                entity.setOriginalLabLevel2Code(null == label.getOriginalLabLevel2Code()? "":label.getOriginalLabLevel2Code() == "null"? "": label.getOriginalLabLevel2Code());
+                entity.setOriginalLabLevel3Code(null == label.getOriginalLabLevel3Code()? "":label.getOriginalLabLevel3Code() == "null"? "": label.getOriginalLabLevel3Code());
+                entity.setOriginalLabLevel1Name(null == label.getOriginalLabLevel1Name()? "":label.getOriginalLabLevel1Name() == "null"? "": label.getOriginalLabLevel1Name());
+                entity.setOriginalLabLevel2Name(null == label.getOriginalLabLevel2Name()? "":label.getOriginalLabLevel2Name() == "null"? "": label.getOriginalLabLevel2Name());
+                entity.setOriginalLabLevel3Name(null == label.getOriginalLabLevel3Name()? "":label.getOriginalLabLevel3Name() == "null"? "": label.getOriginalLabLevel3Name());
                 labelMapper.updateByPrimaryKey(entity);
             }else {
                 ids.add(label.getTagRowId().toString());

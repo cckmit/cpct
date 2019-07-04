@@ -15,6 +15,11 @@ public class CloseRule extends BaseEntity implements Serializable{
     private Long ruleId;//规则标识
     private String closeName;//关单名称
     private String closeType;//关单类型
+    //受理关单	2000
+    //欠费关单	3000
+    //拆机关单	1000
+    //账期欠费关单	4000
+    //标签关单	5000
     private String productType;// 产品类型
     private String channelContacts;//渠道执行次数
     private Date effectiveDate;//生效时间
@@ -30,6 +35,12 @@ public class CloseRule extends BaseEntity implements Serializable{
     private String times;
     private String offerInfo;
     private String closeCode; //成功标识
+    private String noteOne;
+    private String noteTwo;
+    private String noteThree;
+    private String noteFour;
+    private String noteFive;
+
 
     public Long getConditionId() {
         return conditionId;
@@ -173,5 +184,45 @@ public class CloseRule extends BaseEntity implements Serializable{
 
     public void setCloseCode(String closeCode) {
         this.closeCode = closeCode;
+    }
+
+    public String getNoteOne() {
+        return noteOne;
+    }
+
+    public void setNoteOne(String noteOne) {
+        this.noteOne = noteOne;
+    }
+
+    public String getNoteTwo() {
+        return noteTwo;
+    }
+
+    public void setNoteTwo(String noteTwo) {
+        this.noteTwo = noteTwo;
+    }
+
+    public String getNoteThree() {
+        return noteThree;
+    }
+
+    public void setNoteThree(String noteThree) {
+        this.noteThree = noteThree;
+    }
+
+    public String getNoteFour() {
+        return noteFour;
+    }
+
+    public void setNoteFour(String noteFour) {
+        this.noteFour = noteFour;
+    }
+
+    public String getNoteFive() {
+        return noteFive;
+    }
+
+    public void setNoteFive(String noteFive) {
+        this.noteFive = noteFive;
     }
 }
