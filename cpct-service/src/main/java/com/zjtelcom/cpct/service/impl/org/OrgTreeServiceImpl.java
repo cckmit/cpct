@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.impl.org;
 
+import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.fasterxml.jackson.databind.node.LongNode;
 import com.github.pagehelper.PageHelper;
@@ -147,7 +148,8 @@ public class OrgTreeServiceImpl implements OrgTreeService{
 //        String regionId1 = (String) params.get("regionId");
         Map<String, Object> maps = new HashMap<>();
         List<Organization> list=new ArrayList<>();
-        SystemUserDto user = UserUtil.getUser();
+//        SystemUserDto user = UserUtil.getUser();
+        SystemUserDto user = BssSessionHelp.getSystemUserDto();
         Long orgId = user.getOrgId();
 //        Long orgId = Long.valueOf(regionId1);
         Organization organization = organizationMapper.selectByPrimaryKey(orgId);
