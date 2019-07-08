@@ -21,13 +21,17 @@ public interface MktCampaignService {
 
     Map<String,Object> qryMktCampaignListPage (Map<String, Object> params);
 
+    Map<String,Object> qryMktCampaignListPageForNoPublish (Map<String, Object> params);
+
+    Map<String,Object> qryMktCampaignListPageForPublish (Map<String, Object> params);
+
     Map<String,Object> getCampaignList (String mktCampaignName,String mktCampaignType,Long eventId);
 
     Map<String,Object> getCampaignList4EventScene (String mktCampaignName);
 
     Map<String,Object> createMktCampaign(MktCampaignDetailVO mktCampaignVO) throws Exception;
 
-    Map<String,Object> delMktCampaign(Long mktCampaignId) throws Exception;
+    Map<String,Object> delMktCampaign(Long mktCampaignId, String statusCd) throws Exception;
 
     Map<String,Object> getMktCampaign(Long mktCampaignId) throws Exception;
 
@@ -52,5 +56,9 @@ public interface MktCampaignService {
     Map<String,Object> delayCampaign4Sync (Long campaignId, Date lastTime);
 
     Map<String, Object> getMktCampaignTemplate(Long preMktCampaignId) throws Exception;
+
+    Map<String, Object> copyMktCampaign(Long parentMktCampaignId);
+
+    Map<String, Object> dueMktCampaign();
 
 }

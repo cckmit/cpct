@@ -18,6 +18,8 @@ public interface MktCamEvtRelMapper {
 
     int insert(MktCamEvtRelDO mktCamEvtRelDO);
 
+    int insertBatch(List<MktCamEvtRelDO> mktCamEvtRelDOList);
+
     MktCamEvtRelDO selectByPrimaryKey(Long mktCampEvtRelId);
 
     MktCamEvtRelDO findByCampaignIdAndEvtId(@Param("campaignId")Long campaignId,@Param("evtId")Long evtId);

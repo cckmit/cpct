@@ -24,6 +24,7 @@ import com.zjtelcom.cpct.dubbo.model.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dubbo.model.MktCamChlResult;
 import com.zjtelcom.cpct.dubbo.service.MktCampaignApiService;
 import com.zjtelcom.cpct.enums.*;
+import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_prd.dao.campaign.*;
 import com.zjtelcom.cpct_prd.dao.channel.MktCamScriptPrdMapper;
@@ -171,17 +172,22 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
     @Autowired
     private RedisUtils_prd redisUtils_prd;
 
+    @Autowired
+    private MktCampaignService mktCampaignService;
+
     //同步表名
     private static final String tableName = "mkt_campaign";
 
 
 
     @Override
-    public RetCamResp qryMktCampaignDetail(Long mktCampaignId) throws Exception {
+    public RetCamResp qryMktCampaignDetail(Long initId) throws Exception {
         RetCamResp ret = new RetCamResp();
         MktCampaignResp mktCampaignResp = new MktCampaignResp();
         // 获取活动基本信息
-        MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
+        //MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
+        MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByInitId(initId);
+        Long mktCampaignId = mktCampaignDO.getMktCampaignId();
         try {
             mktCampaignResp = BeanUtil.create(mktCampaignDO, new MktCampaignResp());
             // 获取所有的sysParam
@@ -198,7 +204,7 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
                     get(ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey() + mktCampaignDO.getMktCampaignType()));
             mktCampaignResp.setStatusCdValue(paramMap.
                     get(ParamKeyEnum.STATUS_CD.getParamKey() + mktCampaignDO.getStatusCd()));
-
+            mktCampaignResp.setMktCampaignId(initId);
             // 获取过滤规则集合
             ArrayList<FilterRuleModel> filterRuleModels = filterRuleMapper.selectFilterRuleByStrategyIdArrayList(mktCampaignId);
             for (FilterRuleModel filterRuleModel:filterRuleModels) {
@@ -208,10 +214,12 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
             mktCampaignResp.setFilterRuleModelList(filterRuleModels);
 
             // 获取活动关联策略集合
+            List<MktStrategyConfDO> mktStrategyConfDOList = mktStrategyConfMapper.selectByCampaignId(mktCampaignId);
             ArrayList<MktStrategyConfResp> mktStrategyConfRespList = new ArrayList<>();
-            List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByMktCampaignId(mktCampaignId);
-            for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {
-                MktStrategyConfResp mktStrategyConfResp = getMktStrategyConf(mktCamStrategyConfRelDO.getStrategyConfId());
+        //    List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByMktCampaignId(mktCampaignId);
+            for (MktStrategyConfDO mktStrategyConfDO : mktStrategyConfDOList) {
+                MktStrategyConfResp mktStrategyConfResp = getMktStrategyConf(mktStrategyConfDO.getMktStrategyConfId());
+                mktStrategyConfResp.setMktStrategyConfId(mktStrategyConfDO.getInitId());
                 mktStrategyConfRespList.add(mktStrategyConfResp);
             }
             mktCampaignResp.setMktStrategyConfRespList(mktStrategyConfRespList);
@@ -245,6 +253,7 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
         List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(mktStrategyConfId);
         for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleDOList) {
             MktStrConfRuleResp mktStrConfRuleResp = BeanUtil.create(mktStrategyConfRuleDO, new MktStrConfRuleResp());
+            mktStrConfRuleResp.setMktStrategyConfRuleId(mktStrategyConfRuleDO.getInitId());
 
             if (mktStrategyConfRuleDO.getEvtContactConfId() != null) {
                 String[] evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
@@ -294,6 +303,7 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
             }
             mktStrConfRuleRespList.add(mktStrConfRuleResp);
         }
+        mktStrategyConfResp.setMktStrategyConfId(mktStrategyConfDO.getInitId());
         mktStrategyConfResp.setMktStrConfRuleRespList(mktStrConfRuleRespList);
         return mktStrategyConfResp;
     }
@@ -305,6 +315,12 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
         return mktCamChlConfDetail;
     }
 
+
+    @Override
+    public Map<String, Object> copyMktCampaign(Long parentMktCampaignId) {
+        Map<String, Object> resultMap = mktCampaignService.copyMktCampaign(parentMktCampaignId);
+        return resultMap;
+    }
 
 
 }

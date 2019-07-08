@@ -1,7 +1,9 @@
 package com.zjtelcom.cpct.dubbo.service.impl;
 
+import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.filter.CloseRuleMapper;
 import com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper;
+import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyCloseRuleRelDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyFilterRuleRelDO;
 import com.zjtelcom.cpct.dto.filter.CloseRule;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -23,6 +26,8 @@ public class ProductServiceImpl implements ProductService {
     private CloseRuleMapper closeRuleMapper;
     @Autowired(required = false)
     private MktStrategyCloseRuleRelMapper mktStrategyCloseRuleRelMapper;
+    @Autowired(required = false)
+    private MktCampaignMapper mktCampaignMapper;
 
     //销售品关联活动查询
     @Override
@@ -58,8 +63,9 @@ public class ProductServiceImpl implements ProductService {
                                 offerInfo = "2";
                             }
                         }
+                        MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktStrategyCloseRuleRelDO.getStrategyId());
                         maps.put("closeType", offerInfo);
-                        maps.put("activityId", mktStrategyCloseRuleRelDO.getStrategyId());
+                        maps.put("activityId", mktCampaignDO.getInitId());
                         maps.put("closeName",filterRule1.getCloseName());
                         maps.put("closeCode",filterRule1.getCloseCode());
                         maps.put("closeNumber",filterRule1.getExpression());
@@ -90,16 +96,29 @@ public class ProductServiceImpl implements ProductService {
     public Map<String, Object> getCloseCampaign(Map<String, Object> paramMap) {
         Map<String, Object> resultMap = new HashMap<>();
         String filterType = (String) paramMap.get("filterType");
-        List<Map<String,Object>> list = null;
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("filterType",filterType);
-        map.put("date",DateUtil.getDateFormatStr(new Date()));
-        map.put("status","2002");
-        if (StringUtils.isNotBlank(filterType)) {
-            list = closeRuleMapper.getCloseCampaign(map);
+        System.out.println("关单接口入参 ： ！！ "+filterType);
+        List<Map<String,Object>> strings = new ArrayList<>();
+        if (StringUtils.isNotBlank(filterType)){
+            String[] split = filterType.split(",");
+            for (String s : split) {
+                List<Map<String,Object>> list = null;
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("filterType",s);
+                map.put("date",DateUtil.getDateFormatStr(new Date()));
+                map.put("status","2002");
+                if (StringUtils.isNotBlank(filterType)) {
+                    list = closeRuleMapper.getCloseCampaign(map);
+                }
+               if (!list.isEmpty() && list != null) {
+                   for (Map<String, Object> stringObjectMap : list) {
+                       strings.add(stringObjectMap);
+                   }
+               }
+            }
         }
+        System.out.println("返回结果： "+strings.toArray());
         resultMap.put("resultCode","200");
-        resultMap.put("resultData",list);
+        resultMap.put("resultData",strings);
         return resultMap;
     }
 

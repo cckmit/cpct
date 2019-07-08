@@ -64,9 +64,13 @@
     where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
   </update>
   <select id="selectAllGroupByMktCampaignId" resultType="java.lang.Long">
-    select MKT_CAMPAIGN_ID
-    from mkt_cam_result_rel
-    GROUP BY MKT_CAMPAIGN_ID
+    SELECT
+        r.MKT_CAMPAIGN_ID
+    FROM
+        mkt_cam_result_rel r
+    JOIN mkt_campaign c ON ( r.MKT_CAMPAIGN_ID = c.MKT_CAMPAIGN_ID AND (c.STATUS_CD = 2002 OR c.STATUS_CD = 2008))
+    GROUP BY
+        r.MKT_CAMPAIGN_ID
   </select>
   <select id="selectResultByMktCampaignId" parameterType="java.lang.Long"  resultMap="BaseResultMap">
     SELECT t.* FROM

@@ -50,9 +50,11 @@
         <dubbo:method name="importRuleUserList" servicecode="00.1083.importRuleUserList" timeout="10000"/>
     </dubbo:service>
 
-    <!-- 营销活动详情服务 -->
-    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MktCampaignApiService" ref="mktCampaignApiServiceImpl" version="2.0" >
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MktCampaignApiService" ref="mktCampaignApiServiceImpl" version="1.0" >
+        <!-- 营销活动详情服务 -->
         <dubbo:method name="qryMktCampaignDetail" servicecode="00.1083.qryMktCampaignDetail" timeout="10000"/>
+        <!--活动复制服务-->
+        <dubbo:method name="copyMktCampaign" servicecode="00.1083.copyMktCampaign" timeout="10000"/>
     </dubbo:service>
 
     <!-- 编码查询渠道详细服务 -->

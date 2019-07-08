@@ -10,23 +10,21 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.zjhcsoft.eagle.main.dubbo.model.policy.*;
 import com.zjhcsoft.eagle.main.dubbo.service.ActivitySyncService;
+import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
-import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
-import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
-import com.zjtelcom.cpct.dao.channel.MktVerbalMapper;
-import com.zjtelcom.cpct.dao.channel.OfferMapper;
+import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
+import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
-import com.zjtelcom.cpct.domain.channel.CamScript;
-import com.zjtelcom.cpct.domain.channel.Label;
-import com.zjtelcom.cpct.domain.channel.MktVerbal;
-import com.zjtelcom.cpct.domain.channel.Offer;
+import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
+import com.zjtelcom.cpct.enums.AreaCodeEnum;
+import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.synchronize.campaign.SyncActivityService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
@@ -35,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -79,6 +78,12 @@ public class SyncActivityServiceImpl implements SyncActivityService {
     @Autowired
     private MktCamScriptMapper mktCamScriptMapper;
 
+    @Autowired
+    private MktCamChlConfMapper mktCamChlConfMapper;
+
+    @Autowired
+    private ContactChannelMapper contactChannelMapper;
+
     @Override
     public ResponseHeaderModel syncActivity(Long mktCampaignId) {
         // 获取活动基本信息
@@ -96,6 +101,18 @@ public class SyncActivityServiceImpl implements SyncActivityService {
         } else if ("3000".equals(mktCampaignDO.getTiggerType())) {
             activityModel.setHandoutType("2");
         }
+        if(mktCampaignDO.getMktCampaignType().equals(StatusCode.MARKETING_CAMPAIGN.getStatusCode())) {
+            activityModel.setMarketingType("1");
+        } else if (mktCampaignDO.getMktCampaignType().equals(StatusCode.SERVICE_CAMPAIGN.getStatusCode())) {
+            activityModel.setMarketingType("2");
+        } else {
+            activityModel.setMarketingType("3");
+        }
+        //省份标识
+        activityModel.setPrvnceId(AreaCodeEnum.ZHEJIAGN.getRegionId().toString());
+        //账期
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMM");
+        activityModel.setMonthId(Integer.parseInt(df.format(DateUtil.getCurrentTime())));
         List<PolicyModel> policyList = new ArrayList<>();
         //获取活动下策略信息
         List<MktStrategyConfDO> strategyConfList = mktStrategyConfMapper.selectByCampaignId(mktCampaignId);
@@ -186,6 +203,37 @@ public class SyncActivityServiceImpl implements SyncActivityService {
                 }
                 ruleModel.setLabelList(labelModelList);
                 ruleModel.setTarGrpConditionList(tarGrpConditionModelList);
+
+                //接触渠道
+                List<String> channelList = new ArrayList<>();
+                String[] evtContactConfIdList = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
+                for(int i=0; i<evtContactConfIdList.length; i++) {
+                    MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(Long.valueOf(evtContactConfIdList[i]));
+                    if(mktCamChlConfDO != null) {
+                        Channel channel = contactChannelMapper.selectByPrimaryKey(mktCamChlConfDO.getContactChlId());
+                        Channel contactChannel = contactChannelMapper.selectByPrimaryKey(channel.getParentId());
+                        if(contactChannel.getContactChlCode().equals("QD40001")) {
+                            channelList.add("1");
+                        } else if(contactChannel.getContactChlCode().equals("QD40002")) {
+                            channelList.add("3");
+                        } else if(contactChannel.getContactChlCode().equals("QD40003")) {
+                            channelList.add("4");
+                        } else if(contactChannel.getContactChlCode().equals("QD40004")) {
+                            channelList.add("2");
+                        } else if(contactChannel.getContactChlCode().equals("QD40005")) {
+                            channelList.add("6");
+                        } else if(contactChannel.getContactChlCode().equals("QD40006")) {
+                            channelList.add("5");
+                        } else if(contactChannel.getContactChlCode().equals("QD40007")) {
+                            channelList.add("7");
+                        }
+                    }
+                }
+                StringBuilder salexChannel = new StringBuilder(channelList.get(0));
+                for(int i=1; i<channelList.size(); i++) {
+                    salexChannel.append(",").append(channelList.get(i));
+                }
+                ruleModel.setSalexChannel(salexChannel.toString());
                 ruleList.add(ruleModel);
             }
             policyModel.setRuleList(ruleList);

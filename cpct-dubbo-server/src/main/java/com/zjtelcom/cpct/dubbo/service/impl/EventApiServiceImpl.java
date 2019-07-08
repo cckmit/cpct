@@ -388,14 +388,15 @@ public class EventApiServiceImpl implements EventApiService {
             result.put("taskList", activityList);
             Map<String, Object> evtContent = (Map<String, Object>) JSON.parse(map.get("evtContent"));
             List<Map<String, Object>> triggersList = new ArrayList<>();
-            for (Map.Entry entry : evtContent.entrySet()) {
-                Map<String, Object> trigger = new HashMap<>();
-                trigger.put("key", entry.getKey());
-                trigger.put("value", entry.getValue());
-                triggersList.add(trigger);
+            if (evtContent != null && !evtContent.isEmpty()) {
+                for (Map.Entry entry : evtContent.entrySet()) {
+                    Map<String, Object> trigger = new HashMap<>();
+                    trigger.put("key", entry.getKey());
+                    trigger.put("value", entry.getValue());
+                    triggersList.add(trigger);
+                }
+                result.put("triggers", triggersList);
             }
-            result.put("triggers", triggersList);
-
 
             //初始化es log
             JSONObject esJson = new JSONObject();
@@ -607,6 +608,7 @@ public class EventApiServiceImpl implements EventApiService {
                                 param.put("queryId", map.get("integrationId"));
                                 param.put("type", "1");
                                 param.put("queryFields", "PRD_NAME");
+                                param.put("centerType", "00");
 
                                 //因子查询-----------------------------------------------------
                                 boolean isCdma = false;
@@ -779,6 +781,7 @@ public class EventApiServiceImpl implements EventApiService {
                         param.put("queryNum", "");
                         param.put("queryFields", "");
                         param.put("type", "4");
+                        param.put("centerType", "00");
                         ExecutorService executorService = Executors.newCachedThreadPool();
                         try {
                             Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
@@ -1239,9 +1242,20 @@ public class EventApiServiceImpl implements EventApiService {
 
         //初始化返回结果
         Map<String, Object> result = new HashMap();
+        Long activityInitId = Long.valueOf((String) params.get("activityId"));
+        Long ruleInitId = Long.valueOf((String) params.get("ruleId"));
+        MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByInitId(activityInitId);
+        Long activityId = mktCampaignDO.getMktCampaignId();
 
-        Long activityId = Long.valueOf((String) params.get("activityId"));
-        Long ruleId = Long.valueOf((String) params.get("ruleId"));
+        Long ruleId = null;
+        // 通过活动Id查询所有规则
+        List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList = mktStrategyConfRuleMapper.selectByCampaignId(mktCampaignDO.getMktCampaignId());
+        for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleDOList) {
+            if(ruleInitId.equals(mktStrategyConfRuleDO.getInitId())){
+                ruleId = mktStrategyConfRuleDO.getMktStrategyConfRuleId();
+                break;
+            }
+        }
         String resultNbr = String.valueOf(params.get("resultNbr"));
         String accNbr = String.valueOf(params.get("accNbr"));
         String integrationId = String.valueOf(params.get("integrationId"));
@@ -1377,6 +1391,7 @@ public class EventApiServiceImpl implements EventApiService {
                                                 httpParams.put("type", "1");
                                                 //待查询的标签列表
                                                 httpParams.put("queryFields", mktCamChlConfAttrDO.getAttrValue());
+                                                httpParams.put("centerType", "00");
                                                 //dubbo接口查询标签
                                                 JSONObject resJson = getLabelByDubbo(httpParams);
                                                 if (resJson.containsKey(mktCamChlConfAttrDO.getAttrValue())) {
@@ -1585,12 +1600,14 @@ public class EventApiServiceImpl implements EventApiService {
             e.printStackTrace();
         }
 
-        result.put("activityId", activityId.toString());
+        result.put("activityId", activityInitId.toString());
 
+        MktStrategyConfRuleRelDO mktStrategyConfRuleRel = mktStrategyConfRuleRelMapper.selectByRuleId(ruleInitId);
         if (mktStrategyConfRuleRelDO != null) {
-            result.put("policyId", mktStrategyConfRuleRelDO.getMktStrategyConfId().toString());
+            result.put("policyId", mktStrategyConfRuleRel.getMktStrategyConfId().toString());
         }
-        result.put("ruleId", ruleId.toString());
+
+        result.put("ruleId", ruleInitId.toString());
         result.put("taskChlList", taskChlList);
         System.out.println("二次协同结果：" + new JSONObject(result).toString());
         if (taskChlList.size() > 0) {
@@ -1817,6 +1834,7 @@ public class EventApiServiceImpl implements EventApiService {
             queryFields.deleteCharAt(queryFields.length() - 1);
         }
         param.put("queryFields", queryFields.toString());
+        param.put("centerType", "00");
         //查询标签实例数据
         log.info("事件规则请求数据：" + JSON.toJSONString(param));
         Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
@@ -1966,7 +1984,7 @@ public class EventApiServiceImpl implements EventApiService {
                         param.put("queryNum", "");
                         param.put("queryFields", "");
                         param.put("type", "4");
-
+                        param.put("centerType", "00");
                         Map<String, Object> dubboResult_F = yzServ.queryYz(JSON.toJSONString(param));
                         if ("0".equals(dubboResult_F.get("result_code").toString())) {
                             accArrayF = new JSONArray((List<Object>) dubboResult_F.get("msgbody"));
@@ -2035,7 +2053,7 @@ public class EventApiServiceImpl implements EventApiService {
 
 
                 //查询活动信息
-                MktCampaignDO mktCampaign = null;//(MktCampaignDO) redisUtils.get("MKT_CAMPAIGN_" + mktCampaginId);
+                MktCampaignDO mktCampaign = (MktCampaignDO) redisUtils.get("MKT_CAMPAIGN_" + mktCampaginId);
                 if (mktCampaign == null) {
                     mktCampaign = mktCampaignMapper.selectByPrimaryKey(mktCampaginId);
                     redisUtils.set("MKT_CAMPAIGN_" + mktCampaginId, mktCampaign);
@@ -2056,7 +2074,8 @@ public class EventApiServiceImpl implements EventApiService {
                 // 判断活动状态
 
 
-                if (!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaign.getStatusCd())) {
+                if (!(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaign.getStatusCd())
+                        || StatusCode.STATUS_CODE_ADJUST.getStatusCode().equals(mktCampaign.getStatusCd()))) {
                     esJson.put("hit", false);
                     esJson.put("msg", "活动状态未发布");
 //                log.info("活动状态未发布");
@@ -2266,7 +2285,8 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
                 if (strategyMapList != null && strategyMapList.size() > 0) {
-                    if (mktCamCodeList.contains(mktCampaign.getMktCampaignId().toString())) {
+                    // 判断initId是否在清单列表里面
+                    if (mktCamCodeList.contains(mktCampaign.getInitId().toString())) {
                         mktCampaignCustMap.put("mktCampaginId", mktCampaginId);
                         mktCampaignCustMap.put("levelConfig", act.get("levelConfig"));
                         mktCampaignCustMap.put("campaignSeq", act.get("campaignSeq"));
@@ -2315,6 +2335,7 @@ public class EventApiServiceImpl implements EventApiService {
             assParam.put("queryId", privateParams.get("integrationId"));
             assParam.put("type", "1");
             assParam.put("queryFields", mktAllLabel.get("assetLabels"));
+            assParam.put("centerType", "00");
 
             //因子查询-----------------------------------------------------
             Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(assParam));
@@ -2447,6 +2468,7 @@ public class EventApiServiceImpl implements EventApiService {
                 param.put("queryNum", "");
                 param.put("queryFields", "");
                 param.put("type", "4");
+                param.put("centerType", "00");
 
                 Map<String, Object> custParamMap = new HashMap<>();
                 Map<String, Object> assetParamMap = new HashMap<>();
@@ -2536,7 +2558,7 @@ public class EventApiServiceImpl implements EventApiService {
                                 // 判断该活动是否配置了销售品过滤
                                 Integer mktCampaignId = (Integer) taskMap.get("activityId");
 
-                                List<FilterRule> filterRuleList = null;//(List<FilterRule>) redisUtils.get("FILTER_RULE_" + mktCampaignId);
+                                List<FilterRule> filterRuleList = (List<FilterRule>) redisUtils.get("FILTER_RULE_" + mktCampaignId);
                                 if (filterRuleList == null) {
                                     filterRuleList = filterRuleMapper.selectFilterRuleList(Long.valueOf(mktCampaignId));
                                     redisUtils.set("FILTER_RULE_" + mktCampaignId, filterRuleList);
@@ -2623,6 +2645,7 @@ public class EventApiServiceImpl implements EventApiService {
                                 result.put("orderPriority", "0");
                                 Long activityId = Long.valueOf(resultMap1.get("ACTIVITY_ID").toString());
                                 MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(activityId);
+                               // mktStrategyConfMapper.selectByPrimaryKey()
                                 if (mktCampaignDO != null) {
                                     if ("1000".equals(mktCampaignDO.getMktCampaignType())) {
                                         result.put("activityType", "0"); //营销
@@ -2634,6 +2657,9 @@ public class EventApiServiceImpl implements EventApiService {
                                         result.put("activityType", "0"); //活动类型 默认营销
                                     }
 
+                                    result.put("activityId", mktCampaignDO.getInitId());
+                                    result.put("policyId", mktCampaignDO.getInitId());
+                                    result.put("ruleId", mktCampaignDO.getInitId());
                                     result.put("activityStartTime", simpleDateFormat.format(mktCampaignDO.getPlanBeginTime()));
                                     result.put("activityEndTime", simpleDateFormat.format(mktCampaignDO.getPlanEndTime()));
                                 } else {
@@ -2647,14 +2673,6 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 }
                 resultMap.put("ruleList", resultList);
-
-/*
-                resultMap.put("CPCResultMsg", "success");
-                resultMap.put("custId", custId);
-                resultMap.put("taskList", resultList);
-                resultMap.put("CPCResultCode", "1");
-                resultMap.put("reqId", map.get("reqId"));
-*/
             } catch (Exception e) {
                 e.printStackTrace();
                 log.error("Exception = " + e);

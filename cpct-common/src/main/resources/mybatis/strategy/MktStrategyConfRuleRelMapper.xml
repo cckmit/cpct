@@ -23,12 +23,24 @@
     where MKT_STRATEGY_CONF_RULE_ID = #{mktStrategyConfRuleId,jdbcType=BIGINT}
   </delete>
   <insert id="insert" useGeneratedKeys="true" keyProperty="mktStrategyConfRuleRelId" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO">
-    insert into mkt_strategy_conf_rule_rel (MKT_STRATEGY_CONF_RULE_REL_ID, MKT_STRATEGY_CONF_ID, 
-      MKT_STRATEGY_CONF_RULE_ID, CREATE_STAFF, CREATE_DATE, 
+    insert into mkt_strategy_conf_rule_rel (MKT_STRATEGY_CONF_RULE_REL_ID, MKT_STRATEGY_CONF_ID,
+      MKT_STRATEGY_CONF_RULE_ID, CREATE_STAFF, CREATE_DATE,
       UPDATE_STAFF, UPDATE_DATE)
-    values (#{mktStrategyConfRuleRelId,jdbcType=BIGINT}, #{mktStrategyConfId,jdbcType=BIGINT}, 
-      #{mktStrategyConfRuleId,jdbcType=BIGINT}, #{createStaff,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, 
+    values (#{mktStrategyConfRuleRelId,jdbcType=BIGINT}, #{mktStrategyConfId,jdbcType=BIGINT},
+      #{mktStrategyConfRuleId,jdbcType=BIGINT}, #{createStaff,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP},
       #{updateStaff,jdbcType=VARCHAR}, #{updateDate,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertBatch" useGeneratedKeys="true" keyProperty="mktStrategyConfRuleRelId" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO">
+    insert into mkt_strategy_conf_rule_rel (MKT_STRATEGY_CONF_RULE_REL_ID, MKT_STRATEGY_CONF_ID,
+    MKT_STRATEGY_CONF_RULE_ID, CREATE_STAFF, CREATE_DATE,
+    UPDATE_STAFF, UPDATE_DATE)
+    values
+    <foreach collection="list" item="item" index="i" separator=",">
+      (#{item.mktStrategyConfRuleRelId,jdbcType=BIGINT}, #{item.mktStrategyConfId,jdbcType=BIGINT},
+      #{item.mktStrategyConfRuleId,jdbcType=BIGINT}, #{item.createStaff,jdbcType=VARCHAR}, #{item.createDate,jdbcType=TIMESTAMP},
+      #{item.updateStaff,jdbcType=VARCHAR}, #{item.updateDate,jdbcType=TIMESTAMP})
+    </foreach>
+
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO">
     update mkt_strategy_conf_rule_rel

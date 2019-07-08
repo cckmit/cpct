@@ -557,6 +557,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
                 labelCatalog.setCatalogName(label.getLabObject());
                 labelCatalog.setLevelId(1L);
                 labelCatalog.setParentId("0");
+                labelCatalog.setRemark("0");
                 labelCatalogMapper.insert(labelCatalog);
             }
             if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1()),2L) == null) {
@@ -564,6 +565,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
                 labelCatalog.setCatalogName(label.getLabLevel1Name());
                 labelCatalog.setLevelId(2L);
                 labelCatalog.setParentId(label.getLabObjectCode());
+                labelCatalog.setRemark("0");
                 labelCatalogMapper.insert(labelCatalog);
             }
             if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2()), 3L) == null) {
@@ -571,6 +573,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
                 labelCatalog.setCatalogName(label.getLabLevel2Name());
                 labelCatalog.setLevelId(3L);
                 labelCatalog.setParentId(label.getLabObjectCode() + label.getLabLevel1());
+                labelCatalog.setRemark("0");
                 labelCatalogMapper.insert(labelCatalog);
             }
             if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3()),4L) == null) {
@@ -578,6 +581,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
                 labelCatalog.setCatalogName(label.getLabLevel3Name());
                 labelCatalog.setLevelId(4L);
                 labelCatalog.setParentId(label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2());
+                labelCatalog.setRemark("0");
                 labelCatalogMapper.insert(labelCatalog);
             }
 //            if(labelCatalogMapper.findByCodeAndLevel((label.getLabObjectCode() + label.getLabLevel1() + label.getLabLevel2() + label.getLabLevel3() + label.getLabLevel4()), 5L) == null) {

@@ -122,4 +122,9 @@ WHERE
 
 
 
+    <update id="updateDisplayLabel" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamDisplayColumnRel">
+        update mkt_cam_display_column_rel
+        set REMARK = #{remark}, UPDATE_DATE = #{updateDate}
+        where MKT_CAMPAIGN_ID = #{mktCampaignId} and INJECTION_LABEL_ID = #{injectionLabelId} and DISPLAY_ID = #{displayId}
+    </update>
 </mapper>

@@ -64,6 +64,7 @@ ctg:
   clusterName: pst_crm_mq
   tenantID: 2
   cpctTopic: cpct_topic_import
+  clientWorkerThreads: 4
 
   pushGroupName : cpct_file_import
   pushGroupName2 : cpct_file_import2

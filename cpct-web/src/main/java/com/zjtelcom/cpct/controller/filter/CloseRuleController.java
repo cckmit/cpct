@@ -7,15 +7,20 @@ import com.zjtelcom.cpct.dto.filter.CloseRule;
 import com.zjtelcom.cpct.dto.filter.CloseRuleAddVO;
 import com.zjtelcom.cpct.request.filter.CloseRuleReq;
 import com.zjtelcom.cpct.service.filter.CloseRuleService;
+import com.zjtelcom.cpct.util.ChannelUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 
 @RestController
 @RequestMapping("${adminPath}/filter")
@@ -136,6 +141,32 @@ public class CloseRuleController extends BaseController {
             maps = closeRuleService.modFilterRule(closeRule);
         } catch (Exception e) {
             logger.error("[op:FilterRuleController] fail to listEvents for filterRule = {}! Exception: ", JSONArray.toJSON(closeRule), e);
+            return JSON.toJSONString(maps);
+        }
+        return JSON.toJSONString(maps);
+    }
+
+    /**
+     * 导入销售品
+     */
+    @RequestMapping("/importProductList")
+    @CrossOrigin
+    public String importProductList(MultipartFile file, Long ruleId, String closeName, String closeType, String offerInfo, String productType, String closeCode, Long[] rightListId) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            InputStream inputStream = file.getInputStream();
+            byte[] bytes = new byte[3];
+            inputStream.read(bytes,0,bytes.length);
+            String head = ChannelUtil.bytesToHexString(bytes);
+            head = head.toUpperCase();
+            if (!head.equals("D0CF11") && !head.equals("504B03")){
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg", "文件格式不正确");
+                return JSON.toJSONString(maps);
+            }
+            maps = closeRuleService.importProductList(file, ruleId, closeName, closeType, offerInfo, productType, closeCode, rightListId);
+        } catch (Exception e) {
+            logger.error("[op:FilterRuleController] fail to listEvents for multipartFile = {}! Exception: ", JSONArray.toJSON(file), e);
             return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);

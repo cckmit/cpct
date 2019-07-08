@@ -19,6 +19,8 @@ public interface TarGrpService {
 
     Map<String, Object> saveTagNumFetch(Long mktCamGrpRulId, List<TarGrpCondition> tarGrpConditionDTOList);
 
+    Map<String,Object> delTarGrpCondition(Long conditionId, Long closeRule);
+
     Map<String,Object> delTarGrpCondition(Long conditionId);
 
     Map<String,Object> editTarGrpConditionDO(Long conditionId);

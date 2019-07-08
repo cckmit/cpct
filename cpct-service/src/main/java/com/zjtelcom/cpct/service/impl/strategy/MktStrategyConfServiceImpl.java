@@ -218,6 +218,8 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             mktStrategyConfDO.setAreaId(areaIds);
             // 插入策略配置基本，并返回策略Id -- mktStrategyConfId
             mktStrategyConfMapper.insert(mktStrategyConfDO);
+            mktStrategyConfDO.setInitId(mktStrategyConfDO.getMktStrategyConfId());
+            mktStrategyConfMapper.updateByPrimaryKey(mktStrategyConfDO);
             // 策略Id
             Long mktStrategyConfId = mktStrategyConfDO.getMktStrategyConfId();
 
@@ -540,7 +542,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
      * @throws Exception
      */
     @Override
-    public Map<String, Object> copyMktStrategyConf(Long parentMktStrategyConfId, Long childMktCampaignId, Boolean isPublish, Long LanId) throws Exception {
+    public Map<String, Object> copyMktStrategyConf(Long parentMktStrategyConfId, Long parentMktCampaignId, Long childMktCampaignId, Boolean isPublish, Long LanId) throws Exception {
         Map<String, Object> mktStrategyConfMap = new HashMap<>();
         // 通过原策略id 获取原策略基本信息
         try {
@@ -579,7 +581,8 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             // 遍历规则
             for (MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO : mktStrategyConfRuleRelDOList) {
                 // 复制获取规则
-                Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.copyMktStrategyConfRule(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId(), childMktCampaignId,true);
+                Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();
+                mktStrategyConfRuleMap = mktStrategyConfRuleService.copyMktStrategyConfRule(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId(), childMktCampaignId,isPublish);
                 Long mktStrategyConfRuleId = (Long) mktStrategyConfRuleMap.get("mktStrategyConfRuleId");
                 // 简历策略和规则的关系
                 MktStrategyConfRuleRelDO childMktStrategyConfRuleRelDO = new MktStrategyConfRuleRelDO();
@@ -759,5 +762,68 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             return mktStrategyConfMap;
         }
     }
+
+
+
+
+    /**
+     * 调整活动-复制策略
+     *
+     * @param parentMktStrategyConfId
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public Map<String, Object> copyMktStrategyConfForAdjust(Long parentMktStrategyConfId, Long parentMktCampaignId, Long newMktCampaignId, Long LanId, Map<Long, Long> itemMap) throws Exception {
+        Map<String, Object> mktStrategyConfMap = new HashMap<>();
+        // 通过原策略id 获取原策略基本信息
+        try {
+            MktStrategyConfDO mktStrategyConfDO = mktStrategyConfMapper.selectByPrimaryKey(parentMktStrategyConfId);
+            // 获取策略下规则信息
+            List<MktStrategyConfRuleRelDO> mktStrategyConfRuleRelDOList = mktStrategyConfRuleRelMapper.selectByMktStrategyConfId(parentMktStrategyConfId);
+
+            mktStrategyConfDO.setInitId(parentMktStrategyConfId);
+            mktStrategyConfDO.setMktStrategyConfId(null);
+            mktStrategyConfDO.setCreateDate(new Date());
+            mktStrategyConfDO.setCreateStaff(UserUtil.loginId());
+            mktStrategyConfDO.setUpdateDate(new Date());
+            mktStrategyConfDO.setUpdateStaff(UserUtil.loginId());
+            mktStrategyConfMapper.insert(mktStrategyConfDO);
+            Long childMktStrategyConfId = mktStrategyConfDO.getMktStrategyConfId();
+
+            // 遍历规则
+            List<MktStrategyConfRuleRelDO> mktStrategyConfRuleRelDONewList = new ArrayList<>();
+            for (MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO : mktStrategyConfRuleRelDOList) {
+                // 复制获取规则
+                Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();
+                mktStrategyConfRuleMap = mktStrategyConfRuleService.copyMktStrategyConfRuleForAdjust(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId(), parentMktCampaignId,  newMktCampaignId, itemMap);
+                Long mktStrategyConfRuleId = (Long) mktStrategyConfRuleMap.get("mktStrategyConfRuleId");
+                // 简历策略和规则的关系
+                MktStrategyConfRuleRelDO childMktStrategyConfRuleRelDO = new MktStrategyConfRuleRelDO();
+                childMktStrategyConfRuleRelDO.setMktStrategyConfId(childMktStrategyConfId);
+                childMktStrategyConfRuleRelDO.setMktStrategyConfRuleId(mktStrategyConfRuleId);
+                childMktStrategyConfRuleRelDO.setCreateDate(new Date());
+                childMktStrategyConfRuleRelDO.setCreateStaff(UserUtil.loginId());
+                childMktStrategyConfRuleRelDO.setUpdateDate(new Date());
+                childMktStrategyConfRuleRelDO.setUpdateStaff(UserUtil.loginId());
+                childMktStrategyConfRuleRelDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                childMktStrategyConfRuleRelDO.setStatusDate(new Date());
+                mktStrategyConfRuleRelDONewList.add(childMktStrategyConfRuleRelDO);
+            }
+            if (mktStrategyConfRuleRelDONewList != null && !mktStrategyConfRuleRelDONewList.isEmpty()) {
+                mktStrategyConfRuleRelMapper.insertBatch(mktStrategyConfRuleRelDONewList);
+            }
+
+            mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            mktStrategyConfMap.put("resultMsg", "复制策略成功！");
+            mktStrategyConfMap.put("childMktStrategyConfId", childMktStrategyConfId);
+        } catch (Exception e) {
+            logger.error("[op:copyMktStrategyConf] copyMktStrategyConf parentMktStrategyConfId ={} 失败Exception = ", parentMktStrategyConfId, e);
+            mktStrategyConfMap.put("resultCode", CommonConstant.CODE_FAIL);
+            mktStrategyConfMap.put("resultMsg", "复制策略失败！");
+        }
+        return mktStrategyConfMap;
+    }
+
 
 }

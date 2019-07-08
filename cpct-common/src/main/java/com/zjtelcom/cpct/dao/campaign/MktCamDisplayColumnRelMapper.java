@@ -31,4 +31,6 @@ public interface MktCamDisplayColumnRelMapper {
 
     List<LabelDTO> selectLabelDisplayListByCamId(@Param("mktCampaignId") Long mktCampaignId);
 
+    int updateDisplayLabel(MktCamDisplayColumnRel rel);
+
 }

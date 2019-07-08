@@ -22,4 +22,9 @@ public interface SysAreaMapper {
     List<SysArea> selectByParnetArea(Integer parentArea);
 
     int updateByPrimaryKey(SysArea record);
+
+    SysArea getByCityFour(String orgId);
+
+    SysArea getCityByName(String parentArea);
+
 }

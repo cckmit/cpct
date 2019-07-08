@@ -18,6 +18,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.dto.campaign.MktCamResultRelDeatil;
 import com.zjtelcom.cpct.dto.channel.CamScriptAddVO;
 import com.zjtelcom.cpct.enums.ErrorCode;
+import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlResultService;
@@ -91,7 +92,7 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
             //存储结果信息
             CopyPropertiesUtil.copyBean2Bean(mktCamChlResultDO, mktCamChlResult);
             if (mktCamChlResult.getMktCamChlResultId() != null) {
-                mktCamChlResult.setMktCamChlResultId(null);
+                mktCamChlResultDO.setMktCamChlResultId(null);
             }
             mktCamChlResultDO.setCreateStaff(UserUtil.loginId());
             mktCamChlResultDO.setCreateDate(new Date());
@@ -298,6 +299,74 @@ public class MktCamChlResultServiceImpl extends BaseService implements MktCamChl
                 }
             }
             mktCamChlResult.setMktCamChlConfDetailList(mktCamChlConfDetailList);
+            mktCamChlResultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            mktCamChlResultMap.put("mktCamChlResult", mktCamChlResult);
+        } catch (Exception e) {
+            logger.error("[op:MktCamChlResultServiceImpl] failed to get mktCamChlResultDO by mktCamChlResultId = {}", parentMktCamChlResultId);
+            mktCamChlResultMap.put("resultCode", CommonConstant.CODE_FAIL);
+        }
+        return mktCamChlResultMap;
+    }
+
+
+
+    /**
+     * 复制二次协同渠道（调整活动）
+     *
+     * @param parentMktCamChlResultId
+     * @return
+     */
+    @Override
+    public Map<String, Object> copyMktCamChlResultForAdjust(Long parentMktCamChlResultId, Long childMktCampaignId) {
+        Map<String, Object> mktCamChlResultMap = new HashMap<>();
+        try {
+            MktCamChlResultDO mktCamChlResultDO = mktCamChlResultMapper.selectByPrimaryKey(parentMktCamChlResultId);
+            mktCamChlResultDO.setMktCamChlResultId(null);
+            mktCamChlResultDO.setCreateDate(new Date());
+            mktCamChlResultDO.setCreateStaff(UserUtil.loginId());
+            mktCamChlResultDO.setUpdateDate(new Date());
+            mktCamChlResultDO.setUpdateStaff(UserUtil.loginId());
+            // 新增结果 并获取Id
+            mktCamChlResultMapper.insert(mktCamChlResultDO);
+            Long mktCamChlResultId = mktCamChlResultDO.getMktCamChlResultId();
+            MktCamChlResult mktCamChlResult = BeanUtil.create(mktCamChlResultDO, new MktCamChlResult());
+            // 获取原二次协同渠道下结果的推送渠道
+            List<MktCamChlResultConfRelDO> mktCamChlResultConfRelDOList = mktCamChlResultConfRelMapper.selectByMktCamChlResultId(parentMktCamChlResultId);
+            List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
+            // 遍历获取原二次协同渠道下结果的推送渠道
+            for (MktCamChlResultConfRelDO mktCamChlResultConfRelDO : mktCamChlResultConfRelDOList) {
+                // 复制推送渠道
+                Map<String, Object> mktCamChlConfMap = mktCamChlConfService.copyMktCamChlConfForAdjust(mktCamChlResultConfRelDO.getEvtContactConfId(), childMktCampaignId);
+                MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConfMap.get("mktCamChlConfDetail");
+                // 新的推送渠道与新的结果简历关联
+                if (mktCamChlConfDetail != null) {
+                    mktCamChlConfDetailList.add(mktCamChlConfDetail);
+                    // 结果与推送渠道的关联
+                    MktCamChlResultConfRelDO childCamChlResultConfRelDO = new MktCamChlResultConfRelDO();
+                    childCamChlResultConfRelDO.setMktCamChlResultId(mktCamChlResultId);
+                    childCamChlResultConfRelDO.setEvtContactConfId(mktCamChlConfDetail.getEvtContactConfId());
+                    childCamChlResultConfRelDO.setCreateStaff(UserUtil.loginId());
+                    childCamChlResultConfRelDO.setCreateDate(new Date());
+                    childCamChlResultConfRelDO.setUpdateStaff(UserUtil.loginId());
+                    childCamChlResultConfRelDO.setUpdateDate(new Date());
+                    mktCamChlResultConfRelMapper.insert(childCamChlResultConfRelDO);
+                }
+            }
+            mktCamChlResult.setMktCamChlConfDetailList(mktCamChlConfDetailList);
+
+            // 判断类型是否为工单类型 , 保存二次营销结果和活动的关联
+            if ("1".equals(mktCamChlResultDO.getResultType())) {
+                MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();
+                mktCamResultRelDO.setMktCampaignId(childMktCampaignId);
+                mktCamResultRelDO.setMktResultId(mktCamChlResultDO.getMktCamChlResultId());
+                mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode()); //1000-有效
+                mktCamResultRelDO.setCreateDate(new Date());
+                mktCamResultRelDO.setCreateStaff(UserUtil.loginId());
+                mktCamResultRelDO.setUpdateDate(new Date());
+                mktCamResultRelDO.setUpdateStaff(UserUtil.loginId());
+                mktCamResultRelMapper.insert(mktCamResultRelDO);
+            }
+
             mktCamChlResultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCamChlResultMap.put("mktCamChlResult", mktCamChlResult);
         } catch (Exception e) {

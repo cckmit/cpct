@@ -34,6 +34,20 @@
       #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}
       )
   </insert>
+  <insert id="insertBatch" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamStrategyConfRelDO">
+    insert into mkt_cam_strategy_conf_rel (CAM_STR_CONF_REL_ID, MKT_CAMPAIGN_ID, STRATEGY_CONF_ID,
+    STATUS_CD, STATUS_DATE, CREATE_STAFF,
+    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+    )
+    values
+    <foreach collection="list" item="item" index="i" separator=",">
+      (#{item.camStrConfRelId,jdbcType=BIGINT}, #{item.mktCampaignId,jdbcType=BIGINT}, #{item.strategyConfId,jdbcType=BIGINT},
+      #{item.statusCd,jdbcType=VARCHAR}, #{item.statusDate,jdbcType=TIMESTAMP}, #{item.createStaff,jdbcType=BIGINT},
+      #{item.createDate,jdbcType=TIMESTAMP}, #{item.updateStaff,jdbcType=BIGINT}, #{item.updateDate,jdbcType=TIMESTAMP})
+    </foreach>
+  </insert>
+
+
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamStrategyConfRelDO">
     update mkt_cam_strategy_conf_rel
     set MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},

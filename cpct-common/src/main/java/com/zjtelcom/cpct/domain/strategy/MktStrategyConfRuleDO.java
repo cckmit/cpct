@@ -12,6 +12,11 @@ public class MktStrategyConfRuleDO extends BaseEntity {
     private Long mktStrategyConfRuleId;
 
     /**
+     * 初始策略配置规则Id
+     */
+    private Long initId;
+
+    /**
      * 策略配置规则Name
      */
     private String mktStrategyConfRuleName;
@@ -42,6 +47,14 @@ public class MktStrategyConfRuleDO extends BaseEntity {
 
     public void setMktStrategyConfRuleId(Long mktStrategyConfRuleId) {
         this.mktStrategyConfRuleId = mktStrategyConfRuleId;
+    }
+
+    public Long getInitId() {
+        return initId;
+    }
+
+    public void setInitId(Long initId) {
+        this.initId = initId;
     }
 
     public Long getTarGrpId() {

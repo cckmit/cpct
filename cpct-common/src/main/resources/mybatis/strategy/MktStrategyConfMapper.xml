@@ -3,6 +3,7 @@
 <mapper namespace="com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper">
   <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO">
     <id column="MKT_STRATEGY_CONF_ID" jdbcType="BIGINT" property="mktStrategyConfId" />
+    <result column="INIT_ID" jdbcType="BIGINT" property="initId"/>
     <result column="MKT_STRATEGY_CONF_NAME" jdbcType="VARCHAR" property="mktStrategyConfName" />
     <result column="BEGIN_TIME" jdbcType="DATE" property="beginTime" />
     <result column="END_TIME" jdbcType="DATE" property="endTime" />
@@ -18,42 +19,43 @@
     where MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=BIGINT}
   </delete>
   <insert id="insert" useGeneratedKeys="true" keyProperty="mktStrategyConfId" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO">
-    insert into mkt_strategy_conf (MKT_STRATEGY_CONF_ID, MKT_STRATEGY_CONF_NAME, 
-      BEGIN_TIME, END_TIME, CHANNELS_ID, 
-      AREA_ID, CREATE_STAFF, CREATE_DATE,
-      UPDATE_STAFF, UPDATE_DATE)
-    values (#{mktStrategyConfId,jdbcType=BIGINT}, #{mktStrategyConfName,jdbcType=VARCHAR},
-      #{beginTime,jdbcType=DATE}, #{endTime,jdbcType=DATE}, #{channelsId,jdbcType=VARCHAR},
-      #{areaId,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP},
-      #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP})
+    insert into mkt_strategy_conf (MKT_STRATEGY_CONF_ID, INIT_ID, MKT_STRATEGY_CONF_NAME,
+    BEGIN_TIME, END_TIME, CHANNELS_ID,
+    AREA_ID, CREATE_STAFF, CREATE_DATE,
+    UPDATE_STAFF, UPDATE_DATE)
+    values (#{mktStrategyConfId,jdbcType=BIGINT}, #{initId,jdbcType=BIGINT}, #{mktStrategyConfName,jdbcType=VARCHAR},
+    #{beginTime,jdbcType=DATE}, #{endTime,jdbcType=DATE}, #{channelsId,jdbcType=VARCHAR},
+    #{areaId,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP},
+    #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP})
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO">
     update mkt_strategy_conf
-    set MKT_STRATEGY_CONF_NAME = #{mktStrategyConfName,jdbcType=VARCHAR},
-      BEGIN_TIME = #{beginTime,jdbcType=DATE},
-      END_TIME = #{endTime,jdbcType=DATE},
-      CHANNELS_ID = #{channelsId,jdbcType=VARCHAR},
-      AREA_ID = #{areaId,jdbcType=VARCHAR},
-      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
-      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
-      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
-      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
+    set  <if test="initId!=null">INIT_ID =#{initId,jdbcType=BIGINT},</if>
+    MKT_STRATEGY_CONF_NAME = #{mktStrategyConfName,jdbcType=VARCHAR},
+    BEGIN_TIME = #{beginTime,jdbcType=DATE},
+    END_TIME = #{endTime,jdbcType=DATE},
+    CHANNELS_ID = #{channelsId,jdbcType=VARCHAR},
+    AREA_ID = #{areaId,jdbcType=VARCHAR},
+    CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+    CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+    UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+    UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
     where MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select MKT_STRATEGY_CONF_ID, MKT_STRATEGY_CONF_NAME, BEGIN_TIME, END_TIME, CHANNELS_ID, 
+    select MKT_STRATEGY_CONF_ID, INIT_ID, MKT_STRATEGY_CONF_NAME, BEGIN_TIME, END_TIME, CHANNELS_ID,
     AREA_ID, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
     from mkt_strategy_conf
     where MKT_STRATEGY_CONF_ID = #{mktStrategyConfId,jdbcType=BIGINT}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
-    select MKT_STRATEGY_CONF_ID, MKT_STRATEGY_CONF_NAME, BEGIN_TIME, END_TIME, CHANNELS_ID, 
+    select MKT_STRATEGY_CONF_ID, INIT_ID, MKT_STRATEGY_CONF_NAME, BEGIN_TIME, END_TIME, CHANNELS_ID,
     AREA_ID, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
     from mkt_strategy_conf
   </select>
 
   <select id="selectByCampaignId" resultMap="BaseResultMap">
-    select s.MKT_STRATEGY_CONF_ID, s.MKT_STRATEGY_CONF_NAME, s.BEGIN_TIME, s.END_TIME, s.CHANNELS_ID,
+    select s.MKT_STRATEGY_CONF_ID, s.INIT_ID, s.MKT_STRATEGY_CONF_NAME, s.BEGIN_TIME, s.END_TIME, s.CHANNELS_ID,
     s.AREA_ID, s.CREATE_STAFF, s.CREATE_DATE, s.UPDATE_STAFF, s.UPDATE_DATE
     from mkt_strategy_conf as s left join mkt_cam_strategy_conf_rel as cs  on s.MKT_STRATEGY_CONF_ID = cs.STRATEGY_CONF_ID
     where cs.MKT_CAMPAIGN_ID = #{campaignId}
