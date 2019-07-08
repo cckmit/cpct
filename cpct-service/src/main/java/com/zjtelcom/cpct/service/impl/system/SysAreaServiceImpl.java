@@ -1,6 +1,5 @@
 package com.zjtelcom.cpct.service.impl.system;
 
-import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.domain.SysArea;
@@ -12,7 +11,6 @@ import com.zjtelcom.cpct.enums.AreaLeveL;
 import com.zjtelcom.cpct.service.system.SysAreaService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
-import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -96,29 +94,19 @@ public class SysAreaServiceImpl implements SysAreaService {
     public Map<String, Object> listAllAreaTrea() {
         Map<String, Object> areaMap = new HashMap<>();
         List<SysArea> sysAreaList = new ArrayList<>();
-        SystemUserDto user = UserUtil.getUser();
-        List<SysArea> provinceAreas = null;
-        if (StringUtils.isNotBlank(user.getOrgId().toString())){
-            Long regionIdByLandId = AreaCodeEnum.getLandIdByRegionId(user.getOrgId());
-            if (regionIdByLandId == 1){
-                provinceAreas  = sysAreaMapper.getByAreaLevelOne(regionIdByLandId);
-            }else {
-                provinceAreas = sysAreaMapper.getByParentArea(regionIdByLandId);
+        //获取省级
+        List<SysArea> provinceAreas = sysAreaMapper.selectByAreaLevel(AreaLeveL.PROVINCE.getAreaLevel());
+        for (SysArea provinceArea : provinceAreas) {
+            SysArea sysArea = (SysArea) redisUtils.get("CITY_" + provinceArea.getAreaId().toString());
+            if (sysArea == null) {
+                // 将城市数据存入到redis
+                saveCityTORedis();
+                // 重新从redis中获取
+                sysArea = (SysArea) redisUtils.get("CITY_" + provinceArea.getAreaId().toString());
             }
-            if (!provinceAreas.isEmpty() && provinceAreas!= null){
-                for (SysArea provinceArea : provinceAreas) {
-                    SysArea sysArea = (SysArea) redisUtils.get("CITY_" + provinceArea.getAreaId().toString());
-                    if (sysArea == null) {
-                        // 将城市数据存入到redis
-                        saveCityTORedis();
-                        // 重新从redis中获取
-                        sysArea = (SysArea) redisUtils.get("CITY_" + provinceArea.getAreaId().toString());
-                    }
-                    sysAreaList.add(ChannelUtil.setOrgArea(sysArea));
-                }
-                areaMap.put("sysAreaList", sysAreaList);
-            }
+            sysAreaList.add(ChannelUtil.setOrgArea(sysArea));
         }
+        areaMap.put("sysAreaList", sysAreaList);
         return areaMap;
     }
 

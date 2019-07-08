@@ -43,16 +43,4 @@
     from sys_area
     where parent_area = #{parentArea,jdbcType=INTEGER}
   </select>
-
-  <select id="getByAreaLevelOne" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select area_id, parent_area, name, area_level
-    from sys_area
-    where area_level = #{regionIdByLandId}
-  </select>
-
-  <select id="getByParentArea"  parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select area_id, parent_area, name, area_level
-    from sys_area
-    where parent_area = #{regionIdByLandId}
-  </select>
 </mapper>
