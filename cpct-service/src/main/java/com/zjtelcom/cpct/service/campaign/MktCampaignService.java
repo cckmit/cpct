@@ -53,4 +53,6 @@ public interface MktCampaignService {
 
     Map<String, Object> getMktCampaignTemplate(Long preMktCampaignId) throws Exception;
 
+    Map<String, Object> batchSyncMktCampaign();
+
 }
