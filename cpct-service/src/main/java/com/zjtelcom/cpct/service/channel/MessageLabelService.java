@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.service.channel;
 
 import com.zjtelcom.cpct.domain.channel.DisplayColumn;
 import com.zjtelcom.cpct.domain.channel.Message;
+import com.zjtelcom.cpct.dto.channel.DisplayColumnEntity;
 import com.zjtelcom.cpct.dto.channel.ProductParam;
 import com.zjtelcom.cpct.request.channel.DisplayAllMessageReq;
 import com.zjtelcom.cpct.request.channel.MessageReq;
@@ -81,4 +82,19 @@ public interface MessageLabelService {
      * 查询展示列标签展示类型
      */
     Map<String, Object> viewLabelDisplayType(Long displayColumnId, Long labelId);
+
+    /**
+     * 分页查询出所有展示列
+     */
+    Map<String,Object> listDisplaysPage(String displayName, String displayType, Integer page, Integer pageSize);
+
+    /**
+     * 新增展示列（新）
+     */
+    Map<String, Object> createDisplayColumn(DisplayColumnEntity displayColumnEntity);
+
+    /**
+     * 修改展示列（新）
+     */
+    Map<String, Object> editDisplayColumn(DisplayColumnEntity displayColumnEntity);
 }
