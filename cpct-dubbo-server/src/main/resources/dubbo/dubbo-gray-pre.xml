@@ -72,10 +72,10 @@
 
     <!-- 订阅 -->
     <!-- cpc计算协同中心回调 -->
-    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService" id="iContactTaskReceiptService"
-                     version="2.0" retries="0" check="false">
-        <dubbo:method name="contactTaskReceipt" servicecode="00.1079.CPCResultFeedback" timeout="20000"/>
-    </dubbo:reference>
+    <!--<dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService" id="iContactTaskReceiptService"-->
+                     <!--version="2.0" retries="0" check="false">-->
+        <!--<dubbo:method name="contactTaskReceipt" servicecode="00.1079.CPCResultFeedback" timeout="20000"/>-->
+    <!--</dubbo:reference>-->
 
     <!-- 因子实时查询 -->
     <dubbo:reference registry="esb3" interface="com.zjpii.biz.serv.YzServ" id="yzServ"
