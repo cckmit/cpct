@@ -61,4 +61,14 @@ public class MktCamDisplayColumnRelController extends BaseController {
             e.printStackTrace();
         }
     }
+
+    @PostMapping("/updateOldCamDisplay")
+    public void update(){
+        try {
+            mktCamDisplayColumnRelService.updateOldCamDisplay();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
 }

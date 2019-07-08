@@ -24,6 +24,8 @@ public class LabelDTO implements Serializable {
 
     private String labelType;
 
+    private int displayTypeNum;
+
 
 
     public String getLabelType() {
@@ -64,5 +66,13 @@ public class LabelDTO implements Serializable {
 
     public void setInjectionLabelName(String injectionLabelName) {
         this.injectionLabelName = injectionLabelName;
+    }
+
+    public int getDisplayTypeNum() {
+        return displayTypeNum;
+    }
+
+    public void setDisplayTypeNum(int displayTypeNum) {
+        this.displayTypeNum = displayTypeNum;
     }
 }

@@ -4,6 +4,20 @@ import com.alibaba.fastjson.JSON;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
+import com.zjtelcom.cpct.dao.campaign.MktCamChlConfAttrMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCamDisplayColumnRelMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
+import com.zjtelcom.cpct.dao.channel.MktCamCustMapper;
+import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
+import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
+import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
+import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
+import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.DisplayColumn;
 import com.zjtelcom.cpct.domain.channel.Label;
@@ -24,13 +38,16 @@ import com.zjtelcom.cpct.dto.grouping.TrialOperationVO;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.enums.TrialStatus;
+import com.zjtelcom.cpct.service.MqService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
 import com.zjtelcom.cpct.service.channel.MessageLabelService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TrialProdService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.util.*;
+import com.zjtelcom.cpct_prd.dao.campaign.MktCamChlConfAttrPrdMapper;
 import com.zjtelcom.cpct_prd.dao.campaign.MktCamChlConfPrdMapper;
+import com.zjtelcom.cpct_prd.dao.campaign.MktCamDisplayColumnRelPrdMapper;
 import com.zjtelcom.cpct_prd.dao.campaign.MktCampaignPrdMapper;
 import com.zjtelcom.cpct_prd.dao.channel.MktCamScriptPrdMapper;
 import com.zjtelcom.cpct_prd.dao.filter.FilterRulePrdMapper;
@@ -60,6 +77,7 @@ import java.util.concurrent.Future;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+import static com.zjtelcom.cpct.enums.ConfAttrEnum.*;
 
 @Service
 public class TrialProdServiceImpl implements TrialProdService {
@@ -80,8 +98,6 @@ public class TrialProdServiceImpl implements TrialProdService {
     private MktStrategyConfRuleRelPrdMapper ruleRelMapper;
     @Autowired
     private RedisUtils redisUtils;
-    @Autowired
-    private MessageLabelService messageLabelService;
     @Autowired
     private MktStrategyConfRulePrdMapper ruleMapper;
     @Autowired
@@ -124,6 +140,11 @@ public class TrialProdServiceImpl implements TrialProdService {
     @Autowired
     private MktCamChlConfService mktCamChlConfService;
 
+    @Autowired
+    private MktCamChlConfAttrPrdMapper mktCamChlConfAttrMapper;
+    @Autowired
+    private MktCamDisplayColumnRelPrdMapper mktCamDisplayColumnRelMapper;
+
     /**
      * 提供dtts定时任务清单存入es
      */
@@ -157,6 +178,9 @@ public class TrialProdServiceImpl implements TrialProdService {
             if(!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(campaignDO.getStatusCd())){
                continue;
             }
+//            if (redisUtils.get("CAMPAIGN_ES_STOP")==null || "0".equals(redisUtils.get("CAMPAIGN_ES_STOP"))){
+//                break;
+//            }
             List<MktStrategyConfDO> strategyConfDOList = strategyConfPrdMapper.selectByCampaignId(campaignDO.getMktCampaignId());
             for (MktStrategyConfDO strategy : strategyConfDOList){
                 //生成批次号
@@ -192,80 +216,103 @@ public class TrialProdServiceImpl implements TrialProdService {
     }
 
     private Map<String, Object> issue(TrialOperation trialOperation, MktCampaignDO campaignDO,MktStrategyConfDO strategyConfDO,String perCampaign){
-            Map<String, Object> result = new HashMap<>();
-            //添加策略适用地市
-            redisUtils.set("STRATEGY_CONF_AREA_"+trialOperation.getStrategyId(),strategyConfDO.getAreaId());
-            // 通过活动id获取关联的标签字段数组
-            DisplayColumn req = new DisplayColumn();
-            req.setDisplayColumnId(campaignDO.getCalcDisplay());
-            Map<String,Object> labelMap = messageLabelService.queryLabelListByDisplayId(req);
-            List<LabelDTO> labelDTOList = (List<LabelDTO>)labelMap.get("labels");
-            String[] fieldList = new String[labelDTOList.size()];
-            List<Map<String,Object>> labelList = new ArrayList<>();
-            for (int i = 0 ; i< labelDTOList.size();i++){
-                fieldList[i] = labelDTOList.get(i).getLabelCode();
-                Map<String,Object> label = new HashMap<>();
-                label.put("code",labelDTOList.get(i).getLabelCode());
-                label.put("name",labelDTOList.get(i).getInjectionLabelName());
-                label.put("labelType",labelDTOList.get(i).getLabelType());
-                labelList.add(label);
-            }
-            redisUtils.set("LABEL_DETAIL_"+trialOperation.getBatchNum(),labelList);
-            List<Map<String, Object>> iSaleDisplay = new ArrayList<>();
-            iSaleDisplay = (List<Map<String, Object>>) redisUtils.get("EVT_ISALE_LABEL_" + campaignDO.getIsaleDisplay());
-            if (iSaleDisplay == null) {
-                iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(campaignDO.getIsaleDisplay());
-                redisUtils.set("EVT_ISALE_LABEL_" + campaignDO.getIsaleDisplay(), iSaleDisplay);
-            }
-            redisUtils.set("ISALE_LABEL_"+trialOperation.getBatchNum(),iSaleDisplay);
+        Map<String, Object> result = new HashMap<>();
+        //添加策略适用地市
+        redisUtils.set("STRATEGY_CONF_AREA_" + trialOperation.getStrategyId(), strategyConfDO.getAreaId());
+        //查询活动下面所有渠道属性id是21和22的value
+        List<String> attrValue = mktCamChlConfAttrMapper.selectAttrLabelValueByCampaignId(trialOperation.getCampaignId());
+        // 通过活动id获取关联的标签字段数组
+        List<LabelDTO> labelDTOList = mktCamDisplayColumnRelMapper.selectLabelDisplayListByCamId(campaignDO.getMktCampaignId());
+        if (labelDTOList == null) {
+            labelDTOList = new ArrayList<>();
+        }
+        String[] fieldList = new String[labelDTOList.size() + attrValue.size()];
 
-            TrialOperationVO request = BeanUtil.create(trialOperation,new TrialOperationVO());
-            request.setFieldList(fieldList);
-            request.setCampaignType(campaignDO.getMktCampaignType());
-            request.setLanId(campaignDO.getLanId());
-            request.setCamLevel(campaignDO.getCamLevel());
-            // 获取创建人员code
-            request.setStaffCode(getCreater(campaignDO.getCreateStaff())==null ? "null" : getCreater(campaignDO.getCreateStaff()));
+        List<Map<String, Object>> labelList = new ArrayList<>();
+        for (int i = 0; i < labelDTOList.size(); i++) {
+            fieldList[i] = labelDTOList.get(i).getLabelCode();
+            Map<String, Object> label = new HashMap<>();
+            label.put("code", labelDTOList.get(i).getLabelCode());
+            label.put("name", labelDTOList.get(i).getInjectionLabelName());
+            label.put("labelType", labelDTOList.get(i).getLabelType());
+            labelList.add(label);
+        }
 
-            TrialOperationVOES requests = BeanUtil.create(request,new TrialOperationVOES());
-            ArrayList<TrialOperationParamES> paramList = new ArrayList<>();
-            List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(request.getStrategyId());
-            for (MktStrategyConfRuleRelDO ruleRelDO : ruleRelList) {
-                TrialOperationParamES param = getTrialOperationParamES(request, trialOperation.getBatchNum(), ruleRelDO.getMktStrategyConfRuleId(),false);
-                List<LabelResultES> labelResultList = param.getLabelResultList();
-                List<String> labelTypeList = new ArrayList<>();
-                for (LabelResultES la : labelResultList){
-                    labelTypeList.add(la.getRightOperand());
-                }
-                if (!labelTypeList.contains("2000")){
-                    result.put("resultCode", CODE_FAIL);
-                    result.put("resultMsg", "规则："+param.getRuleName()+"不满足查询条件，请至少配置一条用户级标签查询条件！");
-                    return result;
-                }
-                paramList.add(param);
+        for (int i = labelDTOList.size(); i < labelDTOList.size() + attrValue.size(); i++) {
+            fieldList[i] = attrValue.get(i - labelDTOList.size());
+        }
+        List<Long> attrList = mktCamChlConfAttrMapper.selectByCampaignId(trialOperation.getCampaignId());
+        if (attrList.contains(ISEE_CUSTOMER.getArrId()) || attrList.contains(ISEE_LABEL_CUSTOMER.getArrId())) {
+            Map<String, Object> label = new HashMap<>();
+            label.put("code", "SALE_EMP_NBR");
+            label.put("name", "接单人号码");
+            label.put("labelType", "1200");
+            labelList.add(label);
+        }
+        if (attrList.contains(ISEE_AREA.getArrId()) || attrList.contains(ISEE_LABEL_AREA.getArrId())) {
+            Map<String, Object> label = new HashMap<>();
+            label.put("code", "AREA");
+            label.put("name", "派单区域");
+            label.put("labelType", "1200");
+            labelList.add(label);
+        }
+
+        redisUtils.set("LABEL_DETAIL_" + trialOperation.getBatchNum(), labelList);
+        List<Map<String, Object>> iSaleDisplay = new ArrayList<>();
+        iSaleDisplay = (List<Map<String, Object>>) redisUtils.get("EVT_ISALE_LABEL_" + campaignDO.getIsaleDisplay());
+        if (iSaleDisplay == null) {
+            iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(campaignDO.getIsaleDisplay());
+            redisUtils.set("EVT_ISALE_LABEL_" + campaignDO.getIsaleDisplay(), iSaleDisplay);
+        }
+        redisUtils.set("ISALE_LABEL_" + trialOperation.getBatchNum(), iSaleDisplay);
+
+        TrialOperationVO request = BeanUtil.create(trialOperation, new TrialOperationVO());
+        request.setFieldList(fieldList);
+        request.setCampaignType(campaignDO.getMktCampaignType());
+        request.setLanId(campaignDO.getLanId());
+        request.setCamLevel(campaignDO.getCamLevel());
+        // 获取创建人员code
+        request.setStaffCode(getCreater(campaignDO.getCreateStaff()) == null ? "null" : getCreater(campaignDO.getCreateStaff()));
+
+        TrialOperationVOES requests = BeanUtil.create(request, new TrialOperationVOES());
+        ArrayList<TrialOperationParamES> paramList = new ArrayList<>();
+        List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(request.getStrategyId());
+        for (MktStrategyConfRuleRelDO ruleRelDO : ruleRelList) {
+            TrialOperationParamES param = getTrialOperationParamES(request, trialOperation.getBatchNum(), ruleRelDO.getMktStrategyConfRuleId(), false);
+            List<LabelResultES> labelResultList = param.getLabelResultList();
+            List<String> labelTypeList = new ArrayList<>();
+            for (LabelResultES la : labelResultList) {
+                labelTypeList.add(la.getRightOperand());
             }
-            requests.setParamList(paramList);
-            final TrialOperationVOES issureRequest = requests;
-            System.out.println(JSON.toJSONString(requests));
-            try {
-                new Thread(){
-                    public void run(){
-                        esService.strategyIssure(issureRequest);
-                    }
-                }.start();
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (!labelTypeList.contains("2000")) {
                 result.put("resultCode", CODE_FAIL);
-                result.put("resultMsg", "全量试算中，请稍后刷新页面查看结果");
+                result.put("resultMsg", "规则：" + param.getRuleName() + "不满足查询条件，请至少配置一条用户级标签查询条件！");
                 return result;
             }
-            //更新试算记录状态和时间
-            trialOperation.setStatusDate(new Date());
-            trialOperation.setStatusCd(TrialStatus.ALL_SAMPEL_GOING.getValue());
-            trialOperationMapper.updateByPrimaryKey(trialOperation);
-            result.put("resultCode", CODE_SUCCESS);
-            result.put("resultMsg", campaignDO.getMktCampaignName()+"&&&"+strategyConfDO.getMktStrategyConfName());
+            paramList.add(param);
+        }
+        requests.setParamList(paramList);
+        final TrialOperationVOES issureRequest = requests;
+        System.out.println(JSON.toJSONString(requests));
+        try {
+            new Thread() {
+                public void run() {
+                    esService.strategyIssure(issureRequest);
+                }
+            }.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "全量试算中，请稍后刷新页面查看结果");
             return result;
+        }
+        //更新试算记录状态和时间
+        trialOperation.setStatusDate(new Date());
+        trialOperation.setStatusCd(TrialStatus.ALL_SAMPEL_GOING.getValue());
+        trialOperationMapper.updateByPrimaryKey(trialOperation);
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", campaignDO.getMktCampaignName() + "&&&" + strategyConfDO.getMktStrategyConfName());
+        return result;
 
     }
 

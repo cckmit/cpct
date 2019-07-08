@@ -13,8 +13,9 @@ public class MqController extends BaseController implements ApplicationRunner {
     private MqService mqService;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
         mqService.initProducer();
+        mqService.initConsumer();
     }
 
 }

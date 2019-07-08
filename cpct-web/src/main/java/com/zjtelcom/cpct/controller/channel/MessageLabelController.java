@@ -4,10 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.channel.DisplayColumn;
 import com.zjtelcom.cpct.domain.channel.Message;
+import com.zjtelcom.cpct.dto.channel.DisplayColumnEntity;
 import com.zjtelcom.cpct.dto.channel.ProductParam;
 import com.zjtelcom.cpct.request.channel.DisplayAllMessageReq;
 import com.zjtelcom.cpct.request.channel.MessageReq;
 import com.zjtelcom.cpct.service.channel.MessageLabelService;
+import com.zjtelcom.cpct.util.MapUtil;
 import org.omg.CORBA.OBJ_ADAPTER;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -205,6 +207,55 @@ public class MessageLabelController extends BaseController {
             labelId = Long.valueOf(param.get("labelId").toString());
         }
         map = messageLabelService.viewLabelDisplayType(displayColumnId,labelId);
+        return JSON.toJSONString(map);
+    }
+
+    /**
+     * 分页查询出所有展示列列表
+     */
+    @PostMapping("listDisplaysPage")
+    @CrossOrigin
+    public String listDisplaysPage(@RequestBody HashMap<String,String> param) {
+        Map<String, Object> map = new HashMap<>();
+        String displayName = null;
+        String displayType = null;
+        Integer page = null;
+        Integer pageSize = null;
+        if (param.get("displayName")!=null){
+            displayName = param.get("displayName");
+        }
+        if (param.get("displayType")!=null){
+            displayType = param.get("displayType");
+        }
+        if(param.get("page") != null) {
+            page = MapUtil.getIntNum(param.get("page"));
+        }
+        if(param.get("pageSize") != null) {
+            pageSize = MapUtil.getIntNum(param.get("pageSize"));
+        }
+        map = messageLabelService.listDisplaysPage(displayName,displayType,page,pageSize);
+        return JSON.toJSONString(map);
+    }
+
+    /**
+     * 新增展示列（新）
+     */
+    @PostMapping("createDisplayColumn")
+    @CrossOrigin
+    public String createDisplayColumn(@RequestBody DisplayColumnEntity displayColumnEntity) {
+        Map<String, Object> map = new HashMap<>();
+        map = messageLabelService.createDisplayColumn(displayColumnEntity);
+        return JSON.toJSONString(map);
+    }
+
+    /**
+     * 修改展示列（新）
+     */
+    @PostMapping("editDisplayColumn")
+    @CrossOrigin
+    public String editDisplayColumn(@RequestBody DisplayColumnEntity displayColumnEntity) {
+        Map<String, Object> map = new HashMap<>();
+        map = messageLabelService.editDisplayColumn(displayColumnEntity);
         return JSON.toJSONString(map);
     }
 

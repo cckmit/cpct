@@ -1671,4 +1671,29 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         return maps;
     }
 
+    /**
+     * 活动批量同步给大数据
+     */
+    @Override
+    public Map<String, Object> batchSyncMktCampaign() {
+        Map<String, Object> maps = new HashMap<>();
+        List<Long> campaignIdList = new ArrayList<>();
+        MktCampaignDO mktCampaignDO = new MktCampaignDO();
+        mktCampaignDO.setStatusCd(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode());
+        List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListByCondition(mktCampaignDO);
+        for(MktCampaignDO mktCampaign : mktCampaignDOList) {
+            String campaignName = mktCampaign.getMktCampaignName();
+            if(campaignName.contains("测试") || campaignName.contains("模板") || campaignName.contains("test") || campaignName.contains("演示") || campaignName.equals("")) {
+                continue;
+            }
+            campaignIdList.add(mktCampaign.getMktCampaignId());
+        }
+        for(int i=0;i<campaignIdList.size();i++) {
+            syncActivityService.syncActivity(campaignIdList.get(i));
+        }
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", "活动批量同步成功！");
+        return maps;
+    }
+
 }

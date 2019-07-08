@@ -14,4 +14,6 @@ public interface MktCamDisplayColumnRelService {
 
     Map<String, Object> importOldCamDisplay();
 
+    Map<String, Object> updateOldCamDisplay();
+
 }

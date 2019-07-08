@@ -367,4 +367,21 @@ public class CampaignController extends BaseController {
         return JSON.toJSONString(mktCampaignMap);
     }
 
+    /**
+     * 活动批量同步给大数据
+     */
+    @RequestMapping(value = "/batchSyncMktCampaign", method = RequestMethod.POST)
+    @CrossOrigin
+    public String batchSyncMktCampaign() {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            map = mktCampaignService.batchSyncMktCampaign();
+        } catch (Exception e) {
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", "活动批量同步失败");
+            logger.error("[op:batchSyncMktCampaign] 活动批量同步失败！Exception =  ", e);
+        }
+        return JSON.toJSONString(map);
+    }
+
 }
