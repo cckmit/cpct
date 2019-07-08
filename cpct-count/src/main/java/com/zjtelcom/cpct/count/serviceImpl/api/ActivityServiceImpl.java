@@ -291,15 +291,13 @@ public class ActivityServiceImpl implements ActivityService {
             //删除活动和需求函关联关系
             requestInstRelMapper.deleteByCampaignId(Long.valueOf(requestInfoId),Long.valueOf(mktCampaignId));
             return result;
-        }else{
+        }else {
             result.put("resultCode", ResultEnum.FAILED.getStatus());
-            result.put("resultMsg", "活动"+mktCampaignId+"和需求函id "+requestInfoId+"没有关联关系,无需删除");
+            result.put("resultMsg", "活动" + mktCampaignId + "和需求函id " + requestInfoId + "没有关联关系,无需删除");
             return result;
         }
 
-
     }
-
 
     /**
      * 获取活动列表
@@ -382,21 +380,21 @@ public class ActivityServiceImpl implements ActivityService {
             }
         }
 
-        for (int i = 0; i <split.length ; i++) {
-            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(split[i]));
-            if(mktCampaignDO!=null){
-                //如果活动状态是已发布则改为已暂停
-                if(mktCampaignDO.getStatusCd().equals(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode())) {
-                    mktCampaignMapper.changeMktCampaignStatus(Long.valueOf(split[i]), StatusCode.STATUS_CODE_STOP.getStatusCode(), new Date(), 1L);
-                    //活动修改后 增加修改操作记录
-                    addOperatorLog(mktCampaignDO, StatusEnum.PAUSE.getStatusCode(), "cpc", StatusCode.STATUS_CODE_STOP.getStatusCode());
-                }
-            }else{
-                result.put("resultCode", ResultEnum.FAILED.getStatus());
-                result.put("resultMsg", "活动id "+Long.valueOf(split[i])+"对应活动信息不存在");
-                return result;
-            }
-        }
+//        for (int i = 0; i <split.length ; i++) {
+//            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(split[i]));
+//            if(mktCampaignDO!=null){
+//                //如果活动状态是已发布则改为已暂停
+//                if(mktCampaignDO.getStatusCd().equals(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode())) {
+//                    mktCampaignMapper.changeMktCampaignStatus(Long.valueOf(split[i]), StatusCode.STATUS_CODE_STOP.getStatusCode(), new Date(), 1L);
+//                    //活动修改后 增加修改操作记录
+//                    addOperatorLog(mktCampaignDO, StatusEnum.PAUSE.getStatusCode(), "cpc", StatusCode.STATUS_CODE_STOP.getStatusCode());
+//                }
+//            }else{
+//                result.put("resultCode", ResultEnum.FAILED.getStatus());
+//                result.put("resultMsg", "活动id "+Long.valueOf(split[i])+"对应活动信息不存在");
+//                return result;
+//            }
+//        }
         return result;
     }
 

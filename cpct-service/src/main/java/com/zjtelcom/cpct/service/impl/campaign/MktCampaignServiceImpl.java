@@ -1444,7 +1444,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         requestInfo.setCreateDate(new Date());
         requestInfo.setUpdateDate(new Date());
         requestInfo.setActionType("add");
-        requestInfo.setActivitiKey("mkt_force_province");  //需求函活动类型
+        requestInfo.setActivitiKey("mkt_force_province_city");  //需求函活动类型
         requestInfo.setRequestUrgentType("一般");
         requestInfo.setProcessType("0");
         requestInfo.setReportTag("0");
@@ -1488,13 +1488,11 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      * @return
      */
     public String getBatchNo(String batchNo){
-        String substring = batchNo.substring(0,batchNo.length() - 8);
-        Long s1=Long.valueOf(batchNo.substring(batchNo.length() - 8, batchNo.length() - 1))+1;
-        String path=substring+s1+"号";
+        String substring = "浙电营销活动需求【"+DateUtil.getCurrentYear().toString()+"】";
+        Long num = requestInfoMapper.selectBatchNoNum();
+        String path=substring+num.toString()+"号";
         return  path;
     }
-
-
 
     /**
      * 升级活动
