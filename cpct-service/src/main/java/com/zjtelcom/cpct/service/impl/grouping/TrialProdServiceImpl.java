@@ -4,18 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
-import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
-import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
-import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
-import com.zjtelcom.cpct.dao.channel.MktCamCustMapper;
-import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
-import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
-import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
-import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
-import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
-import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
-import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
-import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.DisplayColumn;
 import com.zjtelcom.cpct.domain.channel.Label;
@@ -149,6 +137,17 @@ public class TrialProdServiceImpl implements TrialProdService {
         //清单方案活动标记
         String userListCam =  MapUtil.getString(param.get("userListCam"));
         List<Integer> idList = ( List<Integer>)param.get("idList");
+
+        List<String> mktCamCodeList = (List<String>) redisUtils.get("MKT_CAM_API_CODE_KEY");
+        if (mktCamCodeList == null) {
+            List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("MKT_CAM_API_CODE");
+            mktCamCodeList = new ArrayList<String>();
+            for (SysParams sysParams : sysParamsList) {
+                mktCamCodeList.add(sysParams.getParamValue());
+            }
+            redisUtils.set("MKT_CAM_API_CODE_KEY", mktCamCodeList);
+        }
+
         List<Map<String,Object>> resList = new ArrayList<>();
         for (Integer id : idList){
             MktCampaignDO cam = campaignMapper.selectByPrimaryKey(Long.valueOf(id.toString()));
@@ -158,9 +157,6 @@ public class TrialProdServiceImpl implements TrialProdService {
             if(!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(campaignDO.getStatusCd())){
                continue;
             }
-//            if (redisUtils.get("CAMPAIGN_ES_STOP")==null || "0".equals(redisUtils.get("CAMPAIGN_ES_STOP"))){
-//                break;
-//            }
             List<MktStrategyConfDO> strategyConfDOList = strategyConfPrdMapper.selectByCampaignId(campaignDO.getMktCampaignId());
             for (MktStrategyConfDO strategy : strategyConfDOList){
                 //生成批次号
@@ -172,11 +168,17 @@ public class TrialProdServiceImpl implements TrialProdService {
                 operation.setStrategyName(strategy.getMktStrategyConfName());
                 operation.setBatchNum(Long.valueOf(batchNumSt));
                 trialOperationMapper.insert(operation);
+                //周期性活动标记
                 if (perCampaign.equals("PER_CAMPAIGN")){
                     redisUtils_es.set("PER_CAMPAIGN_"+batchNumSt,"true");
                 }
-                if (userListCam.equals("USER_LIST_CAM")){
-                    redisUtils_es.set("USER_LIST_CAM_"+batchNumSt,"true");
+                //清单方案
+                if (userListCam.equals("USER_LIST_CAM") && mktCamCodeList.contains(campaignDO.getMktCampaignId().toString())){
+                    redisUtils_es.set("USER_LIST_CAM_"+batchNumSt,"USER_LIST_TEMP");
+                }
+                //大数据方案
+                if (userListCam.equals("USER_LIST_CAM") && mktCamCodeList.contains(campaignDO.getMktCampaignId().toString())){
+                    redisUtils_es.set("USER_LIST_CAM_"+batchNumSt,"BIG_DATA_TEMP");
                 }
                 Map<String,Object> res = issue(operation,campaignDO,strategy,perCampaign);
                 resList.add(res);
