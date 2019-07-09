@@ -817,7 +817,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCamDisplayColumnRelMapper.deleteByMktCampaignId(mktCampaignId);
 
             if(StatusCode.STATUS_CODE_PRE_PUBLISHED.getStatusCode().equals(statusCd)){
-                changeMktCampaignStatus(mktCampaignDO.getInitId(), StatusCode.STATUS_CODE_PUBLISHED.getStatusCode());
+                // 查询initId为mktCampaignId且状态为调整中
+                MktCampaignDO mktCampaignDOAdjust= mktCampaignMapper.selectPrimaryKeyByInitId(mktCampaignDO.getInitId(), StatusCode.STATUS_CODE_ADJUST.getStatusCode());
+                changeMktCampaignStatus(mktCampaignDOAdjust.getMktCampaignId(), StatusCode.STATUS_CODE_PUBLISHED.getStatusCode());
             }
 
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -1505,7 +1507,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 // 发布调整的活动，下线源活动
                 if(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)
                         && !mktCampaignId.equals(initId)){
-                    changeMktCampaignStatus(initId, StatusCode.STATUS_CODE_ROLL.getStatusCode());
+                    // 查询initId为mktCampaignId且状态为调整中
+                    MktCampaignDO mktCampaignDOAdjust= mktCampaignMapper.selectPrimaryKeyByInitId(initId, StatusCode.STATUS_CODE_ADJUST.getStatusCode());
+                    changeMktCampaignStatus(mktCampaignDOAdjust.getMktCampaignId(), StatusCode.STATUS_CODE_ROLL.getStatusCode());
+
                 }
 
                 // 删除准生产的redis缓存
@@ -1517,7 +1522,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         public void run() {
                             try {
                                 String roleName = "admin";
-                                synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
+                                //synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
                                 // 删除生产redis缓存
                                 synchronizeCampaignService.deleteCampaignRedisProd(mktCampaignId);
                             } catch (Exception e) {
@@ -1546,7 +1551,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 redisUtils.del("MKT_CAMPAIGN_" + mktCampaignId);
             } else if(StatusCode.STATUS_CODE_ROLL_BACK.getStatusCode().equals(statusCd)){
                 // 查询initId为mktCampaignId且状态为调整待发布
-                MktCampaignDO mktCampaignDONew = mktCampaignMapper.selectPrimaryKeyByInitId(mktCampaignId, StatusCode.STATUS_CODE_PRE_PUBLISHED.getStatusCode());
+                MktCampaignDO mktCampaignDONew = mktCampaignMapper.selectPrimaryKeyByInitId(mktCampaignDO.getInitId(), StatusCode.STATUS_CODE_PRE_PUBLISHED.getStatusCode());
                 // 删除“调整待发布”活动
                 delMktCampaign(mktCampaignDONew.getMktCampaignId(), "");
                 // 回滚活动, 改变原来状态为发布
@@ -1993,7 +1998,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(parentMktCampaignId);
             // 将新活动数据入库
             mktCampaignDO.setMktCampaignId(null);
-            mktCampaignDO.setInitId(parentMktCampaignId);
+            mktCampaignDO.setInitId(mktCampaignDO.getInitId());
             mktCampaignDO.setCreateStaff(UserUtil.loginId());
             mktCampaignDO.setCreateDate(new Date());
             mktCampaignDO.setUpdateStaff(UserUtil.loginId());

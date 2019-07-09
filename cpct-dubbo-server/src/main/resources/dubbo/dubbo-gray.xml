@@ -69,10 +69,10 @@
 
     <!-- 订阅 -->
     <!-- cpc计算协同中心回调 -->
-    <!--<dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService" id="iContactTaskReceiptService"-->
-                     <!--version="2.0" retries="0" check="false">-->
-        <!--<dubbo:method name="contactTaskReceipt" servicecode="00.1079.CPCResultFeedback" timeout="20000"/>-->
-    <!--</dubbo:reference>-->
+    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService" id="iContactTaskReceiptService"
+                     version="2.0" retries="0" check="false">
+        <dubbo:method name="contactTaskReceipt" servicecode="00.1079.CPCResultFeedback" timeout="20000"/>
+    </dubbo:reference>
 
     <!-- 因子实时查询 -->
     <dubbo:reference registry="esb3" interface="com.zjpii.biz.serv.YzServ" id="yzServ"
@@ -82,7 +82,8 @@
 
     <!-- redis实时查询服务 -->
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.TrialRedisService" ref="trialRedisServiceImpl" version="2.0" >
-        <dubbo:method name="searchFromRedis" servicecode="00.1083.searchFromRedis" timeout="10000"/>
+        <dubbo:method name="searchFromRedis" servicecode="00.1083.searchFromRedis_zsc" timeout="10000"/>
+        <dubbo:method name="updateOperationStatus" servicecode="00.1083.updateOperationStatus" timeout="10000"/>
     </dubbo:service>
 
     <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ProductService" id="productService"

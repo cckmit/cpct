@@ -2286,7 +2286,8 @@ public class EventApiServiceImpl implements EventApiService {
 
                 if (strategyMapList != null && strategyMapList.size() > 0) {
                     // 判断initId是否在清单列表里面
-                    if (mktCamCodeList.contains(mktCampaign.getInitId().toString())) {
+                    // if (mktCamCodeList.contains(mktCampaign.getInitId().toString())) {
+                    if (mktCamCodeList.contains(mktCampaign.getMktCampaignId().toString())) {
                         mktCampaignCustMap.put("mktCampaginId", mktCampaginId);
                         mktCampaignCustMap.put("levelConfig", act.get("levelConfig"));
                         mktCampaignCustMap.put("campaignSeq", act.get("campaignSeq"));
@@ -2558,7 +2559,7 @@ public class EventApiServiceImpl implements EventApiService {
                                 // 判断该活动是否配置了销售品过滤
                                 Integer mktCampaignId = (Integer) taskMap.get("activityId");
 
-                                List<FilterRule> filterRuleList = (List<FilterRule>) redisUtils.get("FILTER_RULE_" + mktCampaignId);
+                                List<FilterRule> filterRuleList = null;//(List<FilterRule>) redisUtils.get("FILTER_RULE_" + mktCampaignId);
                                 if (filterRuleList == null) {
                                     filterRuleList = filterRuleMapper.selectFilterRuleList(Long.valueOf(mktCampaignId));
                                     redisUtils.set("FILTER_RULE_" + mktCampaignId, filterRuleList);
@@ -2627,15 +2628,17 @@ public class EventApiServiceImpl implements EventApiService {
                             // 清单方案放入采集项
                             Map<String, Object> evtContent = (Map<String, Object>) JSON.parse(map.get("evtContent"));
                             for (Map<String, Object> taskChlCountMap : taskChlCountList) {
-                               // taskChlCountMap.put("triggers", JSONArray.parse(JSONArray.toJSON(map.get("evtContent")).toString()));
+                                // taskChlCountMap.put("triggers", JSONArray.parse(JSONArray.toJSON(map.get("evtContent")).toString()));
                                 List<Map<String, Object>> triggersList = new ArrayList<>();
-                                for (Map.Entry entry : evtContent.entrySet()) {
-                                    Map<String, Object> trigger = new HashMap<>();
-                                    trigger.put("key", entry.getKey());
-                                    trigger.put("value", entry.getValue());
-                                    triggersList.add(trigger);
+                                if(evtContent!=null){
+                                    for (Map.Entry entry : evtContent.entrySet()) {
+                                        Map<String, Object> trigger = new HashMap<>();
+                                        trigger.put("key", entry.getKey());
+                                        trigger.put("value", entry.getValue());
+                                        triggersList.add(trigger);
+                                    }
+                                    taskChlCountMap.put("triggers", triggersList);
                                 }
-                                taskChlCountMap.put("triggers", triggersList);
                             }
 
                             if (taskChlCountList != null && taskChlCountList.size() > 0) {
@@ -2645,7 +2648,6 @@ public class EventApiServiceImpl implements EventApiService {
                                 result.put("orderPriority", "0");
                                 Long activityId = Long.valueOf(resultMap1.get("ACTIVITY_ID").toString());
                                 MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(activityId);
-                               // mktStrategyConfMapper.selectByPrimaryKey()
                                 if (mktCampaignDO != null) {
                                     if ("1000".equals(mktCampaignDO.getMktCampaignType())) {
                                         result.put("activityType", "0"); //营销
@@ -2657,9 +2659,6 @@ public class EventApiServiceImpl implements EventApiService {
                                         result.put("activityType", "0"); //活动类型 默认营销
                                     }
 
-                                    result.put("activityId", mktCampaignDO.getInitId());
-                                    result.put("policyId", mktCampaignDO.getInitId());
-                                    result.put("ruleId", mktCampaignDO.getInitId());
                                     result.put("activityStartTime", simpleDateFormat.format(mktCampaignDO.getPlanBeginTime()));
                                     result.put("activityEndTime", simpleDateFormat.format(mktCampaignDO.getPlanEndTime()));
                                 } else {
@@ -2673,6 +2672,14 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 }
                 resultMap.put("ruleList", resultList);
+
+/*
+                resultMap.put("CPCResultMsg", "success");
+                resultMap.put("custId", custId);
+                resultMap.put("taskList", resultList);
+                resultMap.put("CPCResultCode", "1");
+                resultMap.put("reqId", map.get("reqId"));
+*/
             } catch (Exception e) {
                 e.printStackTrace();
                 log.error("Exception = " + e);

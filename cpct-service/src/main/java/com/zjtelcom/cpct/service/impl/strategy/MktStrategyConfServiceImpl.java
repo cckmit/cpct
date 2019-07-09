@@ -782,7 +782,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             // 获取策略下规则信息
             List<MktStrategyConfRuleRelDO> mktStrategyConfRuleRelDOList = mktStrategyConfRuleRelMapper.selectByMktStrategyConfId(parentMktStrategyConfId);
 
-            mktStrategyConfDO.setInitId(parentMktStrategyConfId);
+            mktStrategyConfDO.setInitId(mktStrategyConfDO.getMktStrategyConfId());
             mktStrategyConfDO.setMktStrategyConfId(null);
             mktStrategyConfDO.setCreateDate(new Date());
             mktStrategyConfDO.setCreateStaff(UserUtil.loginId());

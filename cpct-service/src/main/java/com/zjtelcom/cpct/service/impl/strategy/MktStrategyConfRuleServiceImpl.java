@@ -1977,7 +1977,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     }
                 }
             }
-            chiledMktStrategyConfRuleDO.setInitId(parentMktStrategyConfRuleId);
+            chiledMktStrategyConfRuleDO.setInitId(mktStrategyConfRuleDO.getInitId());
             chiledMktStrategyConfRuleDO.setMktStrategyConfRuleName(mktStrategyConfRuleDO.getMktStrategyConfRuleName());
             if (tarGrp != null) {
                 chiledMktStrategyConfRuleDO.setTarGrpId(tarGrp.getTarGrpId());
