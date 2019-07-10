@@ -1005,6 +1005,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             int size = dataVO.contentList.size() - 3;
             new Thread() {
                 public void run() {
+                    Long mqSum = 0L;
                 List<FilterRule> productFilter = new ArrayList<>();
                 final TrialOperationVOES request = getTrialOperationVOES(operation, ruleId, batchNumSt, labelList);
                 List<Map<String, Object>> customerList = new ArrayList<>();
@@ -1067,6 +1068,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                 logger.error("CTGMQ消息生产失败,batchNumSt:" + batchNumSt, msgBody);
                             }
                             customerListCount += customerList.size();
+                            mqSum++;
                             msgBody = null;
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -1074,6 +1076,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         customerList.clear();
                     }
                 }
+                redisUtils_es.set("MQ_SUM_"+batchNumSt,mqSum);
                 logger.info("导入试运算清单importUserList->customerList的数量：" + customerListCount);
                 }
             }.start();

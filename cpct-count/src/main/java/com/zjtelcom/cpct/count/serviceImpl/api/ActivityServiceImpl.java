@@ -20,6 +20,7 @@ import com.zjtelcom.cpct.domain.channel.RequestInfo;
 import com.zjtelcom.cpct.domain.channel.RequestInstRel;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.campaign.MktCampaign;
+import com.zjtelcom.cpct.dubbo.service.MktCampaignApiService;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.util.MD5Util;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInfoMapper;
@@ -60,6 +61,8 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Autowired
     private RequestInfoMapper requestInfoMapper;
+    @Autowired
+    private MktCampaignApiService mktCampaignApiService;
 
     private static String DUBBO_CONFIG="DUBBO_CONFIG";    //系统参数表 权限相关key
 
@@ -290,6 +293,12 @@ public class ActivityServiceImpl implements ActivityService {
         if(tip){
             //删除活动和需求函关联关系
             requestInstRelMapper.deleteByCampaignId(Long.valueOf(requestInfoId),Long.valueOf(mktCampaignId));
+            try {
+                mktCampaignApiService.rollBackMktCampaign(Long.valueOf(mktCampaignId));
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                log.error("回滚失败");
+            }
             return result;
         }else {
             result.put("resultCode", ResultEnum.FAILED.getStatus());

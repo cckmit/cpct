@@ -541,13 +541,15 @@ public class CamApiServiceImpl implements CamApiService {
                         map.put("itgTriggers", JSONArray.parse(JSONArray.toJSON(itgTriggers).toString()));
                        // map.put("triggers", JSONArray.parse(JSONArray.toJSON(evtTriggers).toString()));
                         List<Map<String, Object>> triggersList = new ArrayList<>();
-                        for (Map.Entry entry : evtContent.entrySet()) {
-                            Map<String, Object> trigger = new HashMap<>();
-                            trigger.put("key", entry.getKey());
-                            trigger.put("value", entry.getValue());
-                            triggersList.add(trigger);
+                        if(evtContent!=null && !evtContent.isEmpty()){
+                            for (Map.Entry entry : evtContent.entrySet()) {
+                                Map<String, Object> trigger = new HashMap<>();
+                                trigger.put("key", entry.getKey());
+                                trigger.put("value", entry.getValue());
+                                triggersList.add(trigger);
+                            }
+                            map.put("triggers", triggersList);
                         }
-                        map.put("triggers", triggersList);
                     }
                 }
 

@@ -318,7 +318,14 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
 
     @Override
     public Map<String, Object> copyMktCampaign(Long parentMktCampaignId) {
-        Map<String, Object> resultMap = mktCampaignService.copyMktCampaign(parentMktCampaignId);
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            // 修改源活动状态
+            mktCampaignService.changeMktCampaignStatus(parentMktCampaignId, StatusCode.STATUS_CODE_ADJUST.getStatusCode());
+            resultMap = mktCampaignService.copyMktCampaign(parentMktCampaignId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return resultMap;
     }
 

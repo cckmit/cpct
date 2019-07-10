@@ -201,7 +201,7 @@ public class TrialProdServiceImpl implements TrialProdService {
                     redisUtils_es.set("USER_LIST_CAM_"+batchNumSt,"USER_LIST_TEMP");
                 }
                 //大数据方案
-                if (userListCam.equals("USER_LIST_CAM") && mktCamCodeList.contains(campaignDO.getMktCampaignId().toString())){
+                if (userListCam.equals("BIG_DATA_TEMP") && mktCamCodeList.contains(campaignDO.getMktCampaignId().toString())){
                     redisUtils_es.set("USER_LIST_CAM_"+batchNumSt,"BIG_DATA_TEMP");
                 }
                 Map<String,Object> res = issue(operation,campaignDO,strategy,perCampaign);
