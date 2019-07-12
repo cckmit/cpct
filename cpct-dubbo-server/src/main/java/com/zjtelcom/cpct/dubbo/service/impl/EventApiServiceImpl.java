@@ -1985,7 +1985,13 @@ public class EventApiServiceImpl implements EventApiService {
                         param.put("queryFields", "");
                         param.put("type", "4");
                         param.put("centerType", "00");
-                        Map<String, Object> dubboResult_F = yzServ.queryYz(JSON.toJSONString(param));
+                        Map<String, Object> dubboResult_F = new HashMap<>();
+                        try {
+                            dubboResult_F = yzServ.queryYz(JSON.toJSONString(param));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            log.error("queryYz查询失败："+e,JSON.toJSONString(dubboResult_F));
+                        }
                         if ("0".equals(dubboResult_F.get("result_code").toString())) {
                             accArrayF = new JSONArray((List<Object>) dubboResult_F.get("msgbody"));
                         }
@@ -2303,10 +2309,8 @@ public class EventApiServiceImpl implements EventApiService {
                 resultMap.put("mktCampaignCustMap", mktCampaignCustMap);
 
             } catch (Exception e) {
-                e.printStackTrace();
-                log.info("预校验出错");
+                log.info("预校验出错",e);
             }
-
             return resultMap;
         }
     }

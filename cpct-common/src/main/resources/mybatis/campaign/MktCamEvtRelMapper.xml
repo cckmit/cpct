@@ -111,6 +111,7 @@
         left join mkt_campaign cam
         on cam.MKT_CAMPAIGN_ID = mr.MKT_CAMPAIGN_ID
         where EVENT_ID = #{eventId,jdbcType=BIGINT}
+        and cam.STATUS_CD in (2002, 2008)
         order by CAMPAIGN_SEQ asc
     </select>
 

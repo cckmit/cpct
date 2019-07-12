@@ -790,11 +790,20 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      * @throws Exception
      */
     @Override
-    public Map<String, Object> delMktCampaign(Long mktCampaignId, String statusCd) throws Exception {
+    public Map<String, Object> delMktCampaign(Long mktCampaignId) throws Exception {
         Map<String, Object> maps = new HashMap<>();
         // 删除活动基本信息
         try {
+
             MktCampaignDO mktCampaignDO =mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
+
+            // 查询initId为mktCampaignId且状态为调整中
+            MktCampaignDO mktCampaignDOAdjust= mktCampaignMapper.selectPrimaryKeyByInitId(mktCampaignDO.getInitId(), StatusCode.STATUS_CODE_ADJUST.getStatusCode());
+            // 回滚父活动
+            if (mktCampaignDOAdjust != null) {
+                changeMktCampaignStatus(mktCampaignDOAdjust.getMktCampaignId(), StatusCode.STATUS_CODE_PUBLISHED.getStatusCode());
+            }
+
             // 记录活动操作
             mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), mktCampaignDO.getStatusCd(), OperatorLogEnum.DELETE.getOperatorValue(), UserUtil.loginId(), OperatorLogEnum.DELETE.getOperatorValue());
 
@@ -815,12 +824,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktStrategyCloseRuleRelMapper.deleteByStrategyId(mktCampaignId);
             // 删除活动与试运算展示列关系
             mktCamDisplayColumnRelMapper.deleteByMktCampaignId(mktCampaignId);
-
-            if(StatusCode.STATUS_CODE_PRE_PUBLISHED.getStatusCode().equals(statusCd)){
-                // 查询initId为mktCampaignId且状态为调整中
-                MktCampaignDO mktCampaignDOAdjust= mktCampaignMapper.selectPrimaryKeyByInitId(mktCampaignDO.getInitId(), StatusCode.STATUS_CODE_ADJUST.getStatusCode());
-                changeMktCampaignStatus(mktCampaignDOAdjust.getMktCampaignId(), StatusCode.STATUS_CODE_PUBLISHED.getStatusCode());
-            }
 
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
             maps.put("resultMsg", "删除成功！");
@@ -1082,7 +1085,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         try {
             MktCampaignDO mktCampaignDO = new MktCampaignDO();
             mktCampaignDO.setMktCampaignName(params.get("mktCampaignName").toString());  // 活动名称
-            mktCampaignDO.setStatusCd(params.get("statusCd").toString());                 // 活动状态
+            mktCampaignDO.setStatusCd("2002");                 // 活动状态
             mktCampaignDO.setTiggerType(params.get("tiggerType").toString());             // 活动触发类型 - 实时，批量
             mktCampaignDO.setMktCampaignCategory(params.get("mktCampaignCategory").toString());  // 活动分类 - 框架，强制，自主
             mktCampaignDO.setMktCampaignType(params.get("mktCampaignType").toString());   // 活动类别 - 服务，营销，服务+营销
@@ -1532,28 +1535,23 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         }
                     }.start();
                 }
-            } else if ( StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)) {
-                // 暂停或者下线, 该状态为未生效
-                /*MktCamResultRelDO mktCamResultRelDO = new MktCamResultRelDO();
-                mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_NOTACTIVE.getStatusCode());
-
-                mktCamResultRelDO.setMktCampaignId(mktCampaignId);
-                mktCamResultRelDO.setUpdateDate(new Date());
-                mktCamResultRelDO.setUpdateStaff(UserUtil.loginId());
-                mktCamResultRelMapper.changeStatusByMktCampaignId(mktCamResultRelDO);*/
-                List<MktCamResultRelDO> mktCamResultRelDOS = mktCamResultRelMapper.selectResultByMktCampaignId(mktCampaignId);
-                for (MktCamResultRelDO mktCamResultRelDO:mktCamResultRelDOS) {
-                    mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_NOTACTIVE.getStatusCode());
-                    mktCamResultRelMapper.updateByPrimaryKey(mktCamResultRelDO);
-                }
             } else if(StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd) || StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)){
                 // 活动下线清缓存
                 redisUtils.del("MKT_CAMPAIGN_" + mktCampaignId);
+                if(StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)){
+                    List<MktCamResultRelDO> mktCamResultRelDOS = mktCamResultRelMapper.selectResultByMktCampaignId(mktCampaignId);
+                    for (MktCamResultRelDO mktCamResultRelDO:mktCamResultRelDOS) {
+                        mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_NOTACTIVE.getStatusCode());
+                        mktCamResultRelMapper.updateByPrimaryKey(mktCamResultRelDO);
+                    }
+                }
             } else if(StatusCode.STATUS_CODE_ROLL_BACK.getStatusCode().equals(statusCd)){
                 // 查询initId为mktCampaignId且状态为调整待发布
-                MktCampaignDO mktCampaignDONew = mktCampaignMapper.selectPrimaryKeyByInitId(mktCampaignDO.getInitId(), StatusCode.STATUS_CODE_PRE_PUBLISHED.getStatusCode());
+                MktCampaignDO mktCampaignDONew = mktCampaignMapper.selectByInitForRollBack(mktCampaignDO.getInitId());
                 // 删除“调整待发布”活动
-                delMktCampaign(mktCampaignDONew.getMktCampaignId(), "");
+                if (mktCampaignDONew != null) {
+                    delMktCampaign(mktCampaignDONew.getMktCampaignId());
+                }
                 // 回滚活动, 改变原来状态为发布
                 changeMktCampaignStatus(mktCampaignId, StatusCode.STATUS_CODE_PUBLISHED.getStatusCode());
             }
@@ -1752,7 +1750,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         requestInfo.setCreateDate(new Date());
         requestInfo.setUpdateDate(new Date());
         requestInfo.setActionType("add");
-        requestInfo.setActivitiKey("mkt_force_province");  //需求函活动类型
+        requestInfo.setActivitiKey("mkt_force_province_city");  //需求函活动类型
         requestInfo.setRequestUrgentType("一般");
         requestInfo.setProcessType("0");
         requestInfo.setReportTag("0");

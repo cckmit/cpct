@@ -50,6 +50,8 @@
         <dubbo:method name="qryMktCampaignDetail" servicecode="00.1083.qryMktCampaignDetail" timeout="10000"/>
         <!--活动复制服务-->
         <dubbo:method name="copyMktCampaign" servicecode="00.1083.copyMktCampaign" timeout="10000"/>
+        <!--回滚活动服务-->
+        <dubbo:method name="rollBackMktCampaign" servicecode="00.1083.rollBackMktCampaign" timeout="10000"/>
     </dubbo:service>
 
     <!-- 编码查询渠道详细服务 -->

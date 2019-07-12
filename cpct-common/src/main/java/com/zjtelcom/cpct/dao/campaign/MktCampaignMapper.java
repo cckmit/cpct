@@ -52,4 +52,7 @@ public interface MktCampaignMapper {
     MktCampaignDO selectByInitId(@Param("initId")Long initId);
 
     MktCampaignDO selectPrimaryKeyByInitId(@Param("initId")Long initId, @Param("statusCd")String statusCd);
+
+    MktCampaignDO selectByInitForRollBack(@Param("initId")Long initId);;
+
 }

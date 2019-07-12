@@ -21,4 +21,6 @@ public interface MktCampaignApiService {
 
     Map<String, Object> copyMktCampaign(Long mktCampaignId);
 
+    Map<String, Object> rollBackMktCampaign(Long mktCampaignId);
+
 }

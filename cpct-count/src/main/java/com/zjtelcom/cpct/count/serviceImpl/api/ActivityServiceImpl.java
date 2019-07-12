@@ -61,7 +61,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Autowired
     private RequestInfoMapper requestInfoMapper;
-    @Autowired
+    @Autowired(required = false)
     private MktCampaignApiService mktCampaignApiService;
 
     private static String DUBBO_CONFIG="DUBBO_CONFIG";    //系统参数表 权限相关key
@@ -320,7 +320,7 @@ public class ActivityServiceImpl implements ActivityService {
         String mktCampaignName = (String) map.get("mktCampaignName");
         String mktActivityNbr = (String) map.get("mktActivityNbr");
         String mktCampaignType = (String) map.get("mktCampaignType");
-        String status=(String) map.get("statusCd");  //活动状态 我们目前流程只返回已发布的活动
+        String status="2002";  //活动状态 我们目前流程只返回已发布的活动
         Integer page= (Integer) map.get("page") ;
         Integer pageSize= (Integer) map.get("pageSize") ;
         MktCampaignDO mktCampaignDO = new MktCampaignDO();

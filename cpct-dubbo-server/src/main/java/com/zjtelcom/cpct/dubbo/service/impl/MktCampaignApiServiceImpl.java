@@ -319,15 +319,30 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
     @Override
     public Map<String, Object> copyMktCampaign(Long parentMktCampaignId) {
         Map<String, Object> resultMap = new HashMap<>();
+
         try {
-            // 修改源活动状态
-            mktCampaignService.changeMktCampaignStatus(parentMktCampaignId, StatusCode.STATUS_CODE_ADJUST.getStatusCode());
-            resultMap = mktCampaignService.copyMktCampaign(parentMktCampaignId);
+            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(parentMktCampaignId);
+            resultMap.put("mktCampaignId", parentMktCampaignId);
+            if(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaignDO.getStatusCd())){
+                // 修改源活动状态
+                mktCampaignService.changeMktCampaignStatus(parentMktCampaignId, StatusCode.STATUS_CODE_ADJUST.getStatusCode());
+                resultMap = mktCampaignService.copyMktCampaign(parentMktCampaignId);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return resultMap;
     }
 
+    @Override
+    public Map<String, Object> rollBackMktCampaign(Long childCampaignId){
+        Map<String, Object> map = new HashMap<>();
+        try {
+            map = mktCampaignService.delMktCampaign(childCampaignId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
 
 }

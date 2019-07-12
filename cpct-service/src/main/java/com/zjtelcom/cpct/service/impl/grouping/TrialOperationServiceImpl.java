@@ -1020,6 +1020,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 for (int j = 3; j < dataVO.contentList.size(); j++) {
                     List<String> data = Arrays.asList(dataVO.contentList.get(j).split("\\|@\\|"));
                     Map<String, Object> customers = new HashMap<>();
+                    boolean check = true;
                     for (int x = 0; x < codeList.length; x++) {
                         if (codeList[x] == null) {
                             break;
@@ -1035,23 +1036,28 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             value = value.replace("\r", "").replace("\n", "");
                         }
                         if (codeList[x].equals("CCUST_NAME") && (value.contains("null") || value.equals(""))) {
+                            check = false;
                             break;
                         }
                         if (codeList[x].equals("CCUST_ID") && (value.contains("null") || value.equals(""))) {
+                            check = false;
                             break;
                         }
                         if (codeList[x].equals("ASSET_INTEG_ID") && (value.contains("null") || value.equals(""))) {
+                            check = false;
                             break;
                         }
                         if (codeList[x].equals("ASSET_NUMBER") && (value.contains("null") || value.equals(""))) {
+                            check = false;
                             break;
                         }
                         if (codeList[x].equals("LATN_ID") && (value.contains("null") || value.equals(""))) {
+                            check = false;
                             break;
                         }
                         customers.put(codeList[x], value);
                     }
-                    if (customers.isEmpty()) {
+                    if (!check || customers.isEmpty()) {
                         continue;
                     }
                     customerList.add(customers);

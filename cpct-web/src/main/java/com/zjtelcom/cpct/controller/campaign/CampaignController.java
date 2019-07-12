@@ -305,10 +305,9 @@ public class CampaignController extends BaseController {
     @CrossOrigin
     public String delMktCampaign(@RequestBody Map<String, String> params) throws Exception {
         Long mktCampaignId = Long.valueOf(params.get("mktCampaignId"));
-        String statusCd = String.valueOf(params.get("statusCd"));
         Map<String, Object> map = null;
         try {
-            map = mktCampaignService.delMktCampaign(mktCampaignId, statusCd);
+            map = mktCampaignService.delMktCampaign(mktCampaignId);
         } catch (Exception e) {
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", "删除活动失败");

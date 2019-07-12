@@ -31,7 +31,7 @@ public interface MktCampaignService {
 
     Map<String,Object> createMktCampaign(MktCampaignDetailVO mktCampaignVO) throws Exception;
 
-    Map<String,Object> delMktCampaign(Long mktCampaignId, String statusCd) throws Exception;
+    Map<String,Object> delMktCampaign(Long mktCampaignId) throws Exception;
 
     Map<String,Object> getMktCampaign(Long mktCampaignId) throws Exception;
 
