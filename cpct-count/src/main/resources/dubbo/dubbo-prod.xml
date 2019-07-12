@@ -33,5 +33,9 @@
         <dubbo:method name="getCampaignList" servicecode="00.1083.getCampaignList"/>
     </dubbo:service>
 
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MktCampaignApiService" id="mktCampaignApiServiceImpl"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="rollBackMktCampaign" servicecode="00.1083.rollBackMktCampaign" timeout="10000"/>
+    </dubbo:reference>
 
 </beans>

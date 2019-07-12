@@ -8,10 +8,7 @@ package com.zjtelcom.cpct.dubbo.service.impl;
 
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
-import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
-import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
-import com.zjtelcom.cpct.domain.campaign.MktCamChlResultConfRelDO;
-import com.zjtelcom.cpct.domain.campaign.MktCamChlResultDO;
+import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dubbo.model.MktCamChlConfDetail;
@@ -58,6 +55,9 @@ public class MktCamChlResultApiServiceImpl implements MktCamChlResultApiService 
     @Autowired
     private MktCamChlConfAttrMapper mktCamChlConfAttrMapper;
 
+    @Autowired
+    private MktCampaignMapper mktCampaignMapper;
+
     /**
      * 查询所有 有二次协同 且二次协同为工单，且有效的
      *
@@ -71,6 +71,7 @@ public class MktCamChlResultApiServiceImpl implements MktCamChlResultApiService 
         for (Long mktCampaignId : mktCampaignIdList) {
             MktCamResultRelDeatil mktCamResultRelDeatil = new MktCamResultRelDeatil();
             List<MktCamChlResultDO> mktCamChlResultDOList = mktCamChlResultMapper.selectResultByMktCampaignId(mktCampaignId);
+            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
             ArrayList<MktCamChlResult> mktCamChlResultList = new ArrayList<>();
             for (MktCamChlResultDO mktCamChlResultDO : mktCamChlResultDOList) {
                 MktCamChlResult mktCamChlResult = BeanUtil.create(mktCamChlResultDO, new MktCamChlResult());
@@ -78,6 +79,7 @@ public class MktCamChlResultApiServiceImpl implements MktCamChlResultApiService 
                 ArrayList<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
                 for (MktCamChlResultConfRelDO mktCamChlResultConfRelDO : mktCamChlResultConfRelDOList) {
                     MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(mktCamChlResultConfRelDO.getEvtContactConfId());
+                    mktCamChlConfDO.setMktCampaignId(mktCampaignDO.getInitId());
                     MktCamChlConfDetail mktCamChlConfDetail = BeanUtil.create(mktCamChlConfDO, new MktCamChlConfDetail());
                     // 获取触点渠道编码
                     Channel channel = contactChannelMapper.selectByPrimaryKey(mktCamChlConfDetail.getContactChlId());
@@ -97,7 +99,8 @@ public class MktCamChlResultApiServiceImpl implements MktCamChlResultApiService 
                 mktCamChlResult.setMktCamChlConfDetailList(mktCamChlConfDetailList);
                 mktCamChlResultList.add(mktCamChlResult);
             }
-            mktCamResultRelDeatil.setMktCampaignId(mktCampaignId);
+
+            mktCamResultRelDeatil.setMktCampaignId(mktCampaignDO.getInitId());
             mktCamResultRelDeatil.setMktCamChlResultList(mktCamChlResultList);
             mktCamResultRelDeatilList.add(mktCamResultRelDeatil);
         }

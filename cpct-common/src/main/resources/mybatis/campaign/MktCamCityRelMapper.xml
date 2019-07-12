@@ -26,6 +26,18 @@
       #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, 
       #{updateDate,jdbcType=TIMESTAMP})
   </insert>
+  <insert id="insertBatch" parameterType="java.util.ArrayList">
+      insert into mkt_cam_city_rel (MKT_CAM_CITY_REL_ID, MKT_CAMPAIGN_ID, CITY_ID,
+      CREATE_STAFF, CREATE_DATE, UPDATE_STAFF,
+      UPDATE_DATE)
+       values
+       <foreach collection="list" item="item" index="i" separator="," >
+         (#{item.mktCamCityRelId,jdbcType=BIGINT}, #{item.mktCampaignId,jdbcType=BIGINT}, #{item.cityId,jdbcType=BIGINT},
+         #{item.createStaff,jdbcType=BIGINT}, #{item.createDate,jdbcType=TIMESTAMP}, #{item.updateStaff,jdbcType=BIGINT},
+         #{item.updateDate,jdbcType=TIMESTAMP})
+       </foreach>
+  </insert>
+
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamCityRelDO">
     update mkt_cam_city_rel
     set MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},

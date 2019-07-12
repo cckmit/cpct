@@ -30,6 +30,8 @@ public interface MktCamChlResultService {
 
     Map<String, Object> copyMktCamChlResult(Long parentMktCamChlResultId);
 
+    Map<String, Object> copyMktCamChlResultForAdjust(Long parentMktCamChlResultId, Long childMktCampaignId);
+
     Map<String, Object> copyMktCamChlResultFromRedis(MktCamChlResult mktCamChlResult);
 
     Map<String, Object> selectResultList();

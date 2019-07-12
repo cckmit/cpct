@@ -10,6 +10,10 @@ public class MktStrategyConfDO  implements Serializable {
     private Long mktStrategyConfId;
 
     /**
+     * 初始策略配置Id
+     */
+    private Long initId;
+    /**
      * 策略配置名称
      */
     private String mktStrategyConfName;
@@ -41,6 +45,14 @@ public class MktStrategyConfDO  implements Serializable {
     private Long updateStaff;
 
     private Date updateDate;
+
+    public Long getInitId() {
+        return initId;
+    }
+
+    public void setInitId(Long initId) {
+        this.initId = initId;
+    }
 
     public Long getMktStrategyConfId() {
         return mktStrategyConfId;

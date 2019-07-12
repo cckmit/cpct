@@ -33,6 +33,10 @@ public interface MktCampaignMapper {
 
     List<MktCampaignCountDO> qryMktCampaignListPage(MktCampaignDO mktCampaignDO);
 
+    List<MktCampaignCountDO> qryMktCampaignListPageForNoPublish(MktCampaignDO mktCampaignDO);
+
+    List<MktCampaignCountDO> qryMktCampaignListPageForPublish(MktCampaignDO mktCampaignDO);
+
     List<MktCampaignCountDO> qryMktCampaignListPage4Sync(@Param("map") Map<String,Object> map);
 
     void changeMktCampaignStatus(@Param("mktCampaignId")Long mktCampaignId, @Param("statusCd")String statusCd, @Param("updateDate")Date updateDate, @Param("updateStaff")Long updateStaff);
@@ -44,4 +48,11 @@ public interface MktCampaignMapper {
     MktCampaignDO selectByRuleId(@Param("ruleId") Long ruleId);
 
     List<MktCamDisplayColumnRel> selectAllGroupByCamId();
+
+    MktCampaignDO selectByInitId(@Param("initId")Long initId);
+
+    MktCampaignDO selectPrimaryKeyByInitId(@Param("initId")Long initId, @Param("statusCd")String statusCd);
+
+    MktCampaignDO selectByInitForRollBack(@Param("initId")Long initId);;
+
 }

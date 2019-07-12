@@ -27,6 +27,8 @@ public enum StatusCode {
     STATUS_CODE_ROLL("已下线", "2007"),
     STATUS_CODE_ADJUST("调整中", "2008"),
     STATUS_CODE_PRE_PUBLISHED("调整待发布", "2009"),
+    STATUS_CODE_PRE_PAUSE("过期", "2010"),
+    STATUS_CODE_ROLL_BACK ("回滚", "2011"),
 
 
     /*活动关系*/

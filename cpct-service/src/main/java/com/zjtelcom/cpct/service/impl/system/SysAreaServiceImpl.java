@@ -1,18 +1,18 @@
 package com.zjtelcom.cpct.service.impl.system;
 
-import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.channel.OrganizationMapper;
 import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.City;
 import com.zjtelcom.cpct.domain.campaign.CityProperty;
 import com.zjtelcom.cpct.domain.channel.Channel;
+import com.zjtelcom.cpct.domain.channel.Organization;
 import com.zjtelcom.cpct.enums.AreaCodeEnum;
 import com.zjtelcom.cpct.enums.AreaLeveL;
 import com.zjtelcom.cpct.service.system.SysAreaService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
-import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +33,8 @@ public class SysAreaServiceImpl implements SysAreaService {
 
     @Autowired
     private SysAreaMapper sysAreaMapper;
+    @Autowired
+    private OrganizationMapper organizationMapper;
 
     @Autowired
     private RedisUtils redisUtils;
@@ -96,29 +98,19 @@ public class SysAreaServiceImpl implements SysAreaService {
     public Map<String, Object> listAllAreaTrea() {
         Map<String, Object> areaMap = new HashMap<>();
         List<SysArea> sysAreaList = new ArrayList<>();
-        SystemUserDto user = UserUtil.getUser();
-        List<SysArea> provinceAreas = null;
-        if (StringUtils.isNotBlank(user.getOrgId().toString())){
-            Long regionIdByLandId = AreaCodeEnum.getLandIdByRegionId(user.getOrgId());
-            if (regionIdByLandId == 1){
-                provinceAreas  = sysAreaMapper.getByAreaLevelOne(regionIdByLandId);
-            }else {
-                provinceAreas = sysAreaMapper.getByParentArea(regionIdByLandId);
+        //获取省级
+        List<SysArea> provinceAreas = sysAreaMapper.selectByAreaLevel(AreaLeveL.PROVINCE.getAreaLevel());
+        for (SysArea provinceArea : provinceAreas) {
+            SysArea sysArea = (SysArea) redisUtils.get("CITY_" + provinceArea.getAreaId().toString());
+            if (sysArea == null) {
+                // 将城市数据存入到redis
+                saveCityTORedis();
+                // 重新从redis中获取
+                sysArea = (SysArea) redisUtils.get("CITY_" + provinceArea.getAreaId().toString());
             }
-            if (!provinceAreas.isEmpty() && provinceAreas!= null){
-                for (SysArea provinceArea : provinceAreas) {
-                    SysArea sysArea = (SysArea) redisUtils.get("CITY_" + provinceArea.getAreaId().toString());
-                    if (sysArea == null) {
-                        // 将城市数据存入到redis
-                        saveCityTORedis();
-                        // 重新从redis中获取
-                        sysArea = (SysArea) redisUtils.get("CITY_" + provinceArea.getAreaId().toString());
-                    }
-                    sysAreaList.add(ChannelUtil.setOrgArea(sysArea));
-                }
-                areaMap.put("sysAreaList", sysAreaList);
-            }
+            sysAreaList.add(ChannelUtil.setOrgArea(sysArea));
         }
+        areaMap.put("sysAreaList", sysAreaList);
         return areaMap;
     }
 
@@ -143,7 +135,48 @@ public class SysAreaServiceImpl implements SysAreaService {
         return areaMap;
     }
 
-
+    @Override
+    public Map<String, Object> getCityByAreaTree(Long orgId) {
+        Map<String, Object> areaMap = new HashMap<>();
+        List<SysArea> sysAreaList = new ArrayList<>();
+        Organization organization = organizationMapper.selectByPrimaryKey(orgId);
+        if (organization != null){
+            Long regionId = organization.getRegionId();
+            String orgDivision = organization.getOrgDivision();
+            Long landIdByRegionId = AreaCodeEnum.getLandIdByRegionId(regionId);
+            String lanId = "";
+            if (landIdByRegionId != null ){
+                lanId = landIdByRegionId.toString();
+                //获取省级
+                if("".equals(lanId)){
+                    lanId = AreaCodeEnum.ZHEJIAGN.getLanId().toString();
+                }
+                SysArea sysArea = (SysArea) redisUtils.get("CITY_" + lanId);
+                if (sysArea == null) {
+                    // 将城市数据存入到redis
+                    saveCityTORedis();
+                    // 重新从redis中获取
+                    sysArea = (SysArea) redisUtils.get("CITY_" + lanId);
+                }
+                sysAreaList.add(ChannelUtil.setOrgArea(sysArea));
+            }else {
+                SysArea redSysArea = (SysArea) redisUtils.get("CITY_" + regionId);
+                if (redSysArea == null){
+                    SysArea provinceAreas = sysAreaMapper.getByCityFour(regionId.toString());
+                    SysArea sysArea = sysAreaMapper.getCityByName(provinceAreas.getParentArea().toString());
+                    List<SysArea> sysAreas = new ArrayList<>();
+                    sysAreas.add(provinceAreas);
+                    sysArea.setChildAreaList(sysAreas);
+                    sysAreaList.add(ChannelUtil.setOrgArea(sysArea));
+                    redisUtils.set("CITY_" + regionId.toString(),sysArea);
+                }else {
+                    sysAreaList.add(ChannelUtil.setOrgArea(redSysArea));
+                }
+            }
+        }
+        areaMap.put("sysAreaList", sysAreaList);
+        return areaMap;
+    }
 
 
 
@@ -334,4 +367,6 @@ public class SysAreaServiceImpl implements SysAreaService {
         }
         return sysAreaString.toString();
     }
+
+
 }

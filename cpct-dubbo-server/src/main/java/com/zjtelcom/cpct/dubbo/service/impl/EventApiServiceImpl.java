@@ -388,14 +388,15 @@ public class EventApiServiceImpl implements EventApiService {
             result.put("taskList", activityList);
             Map<String, Object> evtContent = (Map<String, Object>) JSON.parse(map.get("evtContent"));
             List<Map<String, Object>> triggersList = new ArrayList<>();
-            for (Map.Entry entry : evtContent.entrySet()) {
-                Map<String, Object> trigger = new HashMap<>();
-                trigger.put("key", entry.getKey());
-                trigger.put("value", entry.getValue());
-                triggersList.add(trigger);
+            if (evtContent != null && !evtContent.isEmpty()) {
+                for (Map.Entry entry : evtContent.entrySet()) {
+                    Map<String, Object> trigger = new HashMap<>();
+                    trigger.put("key", entry.getKey());
+                    trigger.put("value", entry.getValue());
+                    triggersList.add(trigger);
+                }
+                result.put("triggers", triggersList);
             }
-            result.put("triggers", triggersList);
-
 
             //初始化es log
             JSONObject esJson = new JSONObject();
@@ -607,6 +608,7 @@ public class EventApiServiceImpl implements EventApiService {
                                 param.put("queryId", map.get("integrationId"));
                                 param.put("type", "1");
                                 param.put("queryFields", "PRD_NAME");
+                                param.put("centerType", "00");
 
                                 //因子查询-----------------------------------------------------
                                 boolean isCdma = false;
@@ -779,6 +781,7 @@ public class EventApiServiceImpl implements EventApiService {
                         param.put("queryNum", "");
                         param.put("queryFields", "");
                         param.put("type", "4");
+                        param.put("centerType", "00");
                         ExecutorService executorService = Executors.newCachedThreadPool();
                         try {
                             Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
@@ -1239,9 +1242,20 @@ public class EventApiServiceImpl implements EventApiService {
 
         //初始化返回结果
         Map<String, Object> result = new HashMap();
+        Long activityInitId = Long.valueOf((String) params.get("activityId"));
+        Long ruleInitId = Long.valueOf((String) params.get("ruleId"));
+        MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByInitId(activityInitId);
+        Long activityId = mktCampaignDO.getMktCampaignId();
 
-        Long activityId = Long.valueOf((String) params.get("activityId"));
-        Long ruleId = Long.valueOf((String) params.get("ruleId"));
+        Long ruleId = null;
+        // 通过活动Id查询所有规则
+        List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList = mktStrategyConfRuleMapper.selectByCampaignId(mktCampaignDO.getMktCampaignId());
+        for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleDOList) {
+            if(ruleInitId.equals(mktStrategyConfRuleDO.getInitId())){
+                ruleId = mktStrategyConfRuleDO.getMktStrategyConfRuleId();
+                break;
+            }
+        }
         String resultNbr = String.valueOf(params.get("resultNbr"));
         String accNbr = String.valueOf(params.get("accNbr"));
         String integrationId = String.valueOf(params.get("integrationId"));
@@ -1377,6 +1391,7 @@ public class EventApiServiceImpl implements EventApiService {
                                                 httpParams.put("type", "1");
                                                 //待查询的标签列表
                                                 httpParams.put("queryFields", mktCamChlConfAttrDO.getAttrValue());
+                                                httpParams.put("centerType", "00");
                                                 //dubbo接口查询标签
                                                 JSONObject resJson = getLabelByDubbo(httpParams);
                                                 if (resJson.containsKey(mktCamChlConfAttrDO.getAttrValue())) {
@@ -1585,12 +1600,14 @@ public class EventApiServiceImpl implements EventApiService {
             e.printStackTrace();
         }
 
-        result.put("activityId", activityId.toString());
+        result.put("activityId", activityInitId.toString());
 
+        MktStrategyConfRuleRelDO mktStrategyConfRuleRel = mktStrategyConfRuleRelMapper.selectByRuleId(ruleInitId);
         if (mktStrategyConfRuleRelDO != null) {
-            result.put("policyId", mktStrategyConfRuleRelDO.getMktStrategyConfId().toString());
+            result.put("policyId", mktStrategyConfRuleRel.getMktStrategyConfId().toString());
         }
-        result.put("ruleId", ruleId.toString());
+
+        result.put("ruleId", ruleInitId.toString());
         result.put("taskChlList", taskChlList);
         System.out.println("二次协同结果：" + new JSONObject(result).toString());
         if (taskChlList.size() > 0) {
@@ -1817,6 +1834,7 @@ public class EventApiServiceImpl implements EventApiService {
             queryFields.deleteCharAt(queryFields.length() - 1);
         }
         param.put("queryFields", queryFields.toString());
+        param.put("centerType", "00");
         //查询标签实例数据
         log.info("事件规则请求数据：" + JSON.toJSONString(param));
         Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
@@ -1966,8 +1984,14 @@ public class EventApiServiceImpl implements EventApiService {
                         param.put("queryNum", "");
                         param.put("queryFields", "");
                         param.put("type", "4");
-
-                        Map<String, Object> dubboResult_F = yzServ.queryYz(JSON.toJSONString(param));
+                        param.put("centerType", "00");
+                        Map<String, Object> dubboResult_F = new HashMap<>();
+                        try {
+                            dubboResult_F = yzServ.queryYz(JSON.toJSONString(param));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            log.error("queryYz查询失败："+e,JSON.toJSONString(dubboResult_F));
+                        }
                         if ("0".equals(dubboResult_F.get("result_code").toString())) {
                             accArrayF = new JSONArray((List<Object>) dubboResult_F.get("msgbody"));
                         }
@@ -2035,7 +2059,7 @@ public class EventApiServiceImpl implements EventApiService {
 
 
                 //查询活动信息
-                MktCampaignDO mktCampaign = null;//(MktCampaignDO) redisUtils.get("MKT_CAMPAIGN_" + mktCampaginId);
+                MktCampaignDO mktCampaign = (MktCampaignDO) redisUtils.get("MKT_CAMPAIGN_" + mktCampaginId);
                 if (mktCampaign == null) {
                     mktCampaign = mktCampaignMapper.selectByPrimaryKey(mktCampaginId);
                     redisUtils.set("MKT_CAMPAIGN_" + mktCampaginId, mktCampaign);
@@ -2056,7 +2080,8 @@ public class EventApiServiceImpl implements EventApiService {
                 // 判断活动状态
 
 
-                if (!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaign.getStatusCd())) {
+                if (!(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaign.getStatusCd())
+                        || StatusCode.STATUS_CODE_ADJUST.getStatusCode().equals(mktCampaign.getStatusCd()))) {
                     esJson.put("hit", false);
                     esJson.put("msg", "活动状态未发布");
 //                log.info("活动状态未发布");
@@ -2266,6 +2291,8 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
                 if (strategyMapList != null && strategyMapList.size() > 0) {
+                    // 判断initId是否在清单列表里面
+                    // if (mktCamCodeList.contains(mktCampaign.getInitId().toString())) {
                     if (mktCamCodeList.contains(mktCampaign.getMktCampaignId().toString())) {
                         mktCampaignCustMap.put("mktCampaginId", mktCampaginId);
                         mktCampaignCustMap.put("levelConfig", act.get("levelConfig"));
@@ -2282,10 +2309,8 @@ public class EventApiServiceImpl implements EventApiService {
                 resultMap.put("mktCampaignCustMap", mktCampaignCustMap);
 
             } catch (Exception e) {
-                e.printStackTrace();
-                log.info("预校验出错");
+                log.info("预校验出错",e);
             }
-
             return resultMap;
         }
     }
@@ -2315,6 +2340,7 @@ public class EventApiServiceImpl implements EventApiService {
             assParam.put("queryId", privateParams.get("integrationId"));
             assParam.put("type", "1");
             assParam.put("queryFields", mktAllLabel.get("assetLabels"));
+            assParam.put("centerType", "00");
 
             //因子查询-----------------------------------------------------
             Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(assParam));
@@ -2447,6 +2473,7 @@ public class EventApiServiceImpl implements EventApiService {
                 param.put("queryNum", "");
                 param.put("queryFields", "");
                 param.put("type", "4");
+                param.put("centerType", "00");
 
                 Map<String, Object> custParamMap = new HashMap<>();
                 Map<String, Object> assetParamMap = new HashMap<>();
@@ -2605,15 +2632,17 @@ public class EventApiServiceImpl implements EventApiService {
                             // 清单方案放入采集项
                             Map<String, Object> evtContent = (Map<String, Object>) JSON.parse(map.get("evtContent"));
                             for (Map<String, Object> taskChlCountMap : taskChlCountList) {
-                               // taskChlCountMap.put("triggers", JSONArray.parse(JSONArray.toJSON(map.get("evtContent")).toString()));
+                                // taskChlCountMap.put("triggers", JSONArray.parse(JSONArray.toJSON(map.get("evtContent")).toString()));
                                 List<Map<String, Object>> triggersList = new ArrayList<>();
-                                for (Map.Entry entry : evtContent.entrySet()) {
-                                    Map<String, Object> trigger = new HashMap<>();
-                                    trigger.put("key", entry.getKey());
-                                    trigger.put("value", entry.getValue());
-                                    triggersList.add(trigger);
+                                if(evtContent!=null){
+                                    for (Map.Entry entry : evtContent.entrySet()) {
+                                        Map<String, Object> trigger = new HashMap<>();
+                                        trigger.put("key", entry.getKey());
+                                        trigger.put("value", entry.getValue());
+                                        triggersList.add(trigger);
+                                    }
+                                    taskChlCountMap.put("triggers", triggersList);
                                 }
-                                taskChlCountMap.put("triggers", triggersList);
                             }
 
                             if (taskChlCountList != null && taskChlCountList.size() > 0) {

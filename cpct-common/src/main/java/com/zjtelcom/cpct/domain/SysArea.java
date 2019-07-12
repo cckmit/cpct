@@ -14,6 +14,10 @@ public class SysArea implements Serializable {
 
     private String orgArea;
 
+    private String cityThree; //c3
+
+    private String cityFour; // c4
+
     /**
      * 下级区域列表
      */
@@ -66,5 +70,21 @@ public class SysArea implements Serializable {
 
     public void setChildAreaList(List<SysArea> childAreaList) {
         this.childAreaList = childAreaList;
+    }
+
+    public String getCityThree() {
+        return cityThree;
+    }
+
+    public void setCityThree(String cityThree) {
+        this.cityThree = cityThree;
+    }
+
+    public String getCityFour() {
+        return cityFour;
+    }
+
+    public void setCityFour(String cityFour) {
+        this.cityFour = cityFour;
     }
 }

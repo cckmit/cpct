@@ -40,7 +40,6 @@
         <dubbo:method name="queryCachedAssetDetailByIntegId" servicecode="33.1001.queryCachedAssetDetailByIntegId"  timeout="10000"/>
     </dubbo:reference>
 
-
     <!-- 查询销售品实例缓存实体-->
     <dubbo:reference registry="esb3" id="iCacheOfferEntityQryService" interface="com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheOfferEntityQryService" version="2.0" retries="0" check="false">
         <dubbo:method name="getOfferInstCacheEntity" servicecode="00.1074.getOfferInstCacheEntity"  timeout="10000"/>

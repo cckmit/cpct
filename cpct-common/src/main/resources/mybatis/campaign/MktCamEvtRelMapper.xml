@@ -47,6 +47,20 @@
     #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT},
     #{updateDate,jdbcType=TIMESTAMP})
   </insert>
+    <insert id="insertBatch" parameterType="java.util.ArrayList">
+        insert into mkt_cam_evt_rel (MKT_CAMP_EVT_REL_ID, MKT_CAMPAIGN_ID, CAMPAIGN_SEQ,
+        EVENT_ID, STATUS_CD, STATUS_DATE,LEVEL_CONFIG,
+        CREATE_STAFF, CREATE_DATE, UPDATE_STAFF,
+        UPDATE_DATE)
+        values
+        <foreach collection="list" index="i" item="item" separator=",">
+            (#{item.mktCampEvtRelId,jdbcType=BIGINT}, #{item.mktCampaignId,jdbcType=BIGINT}, #{item.campaignSeq,jdbcType=INTEGER},
+            #{item.eventId,jdbcType=BIGINT}, #{item.statusCd,jdbcType=VARCHAR}, #{item.statusDate,jdbcType=TIMESTAMP}, #{item.levelConfig,jdbcType=INTEGER},
+            #{item.createStaff,jdbcType=BIGINT}, #{item.createDate,jdbcType=TIMESTAMP}, #{item.updateStaff,jdbcType=BIGINT},
+            #{item.updateDate,jdbcType=TIMESTAMP})
+        </foreach>
+
+    </insert>
     <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktCamEvtRelDO">
     update mkt_cam_evt_rel
     set MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},
@@ -97,6 +111,7 @@
         left join mkt_campaign cam
         on cam.MKT_CAMPAIGN_ID = mr.MKT_CAMPAIGN_ID
         where EVENT_ID = #{eventId,jdbcType=BIGINT}
+        and cam.STATUS_CD in (2002, 2008)
         order by CAMPAIGN_SEQ asc
     </select>
 

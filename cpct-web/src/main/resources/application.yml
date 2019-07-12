@@ -76,7 +76,8 @@ ctg:
   clientWorkerThreads: 4
   cpctTopic: cpct_detailed_list_topic_gray
 
-
+pagehelper:
+  reasonable: true   # 禁用合理化时，如果pageNum<1或pageNum>pages会返回空数据
 
 
 

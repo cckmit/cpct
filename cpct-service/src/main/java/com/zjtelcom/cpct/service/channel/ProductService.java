@@ -27,8 +27,7 @@ public interface ProductService {
 
     Map<String,Object> copyItemByCampaignPublish(Long oldCampaignId,Long newCampaignId, String mktCampaignCategory);
 
-
-
+    Map<String, Object> copyItemByCampaign(Long oldCampaignId, Long newCampaignId);
 
 
 }

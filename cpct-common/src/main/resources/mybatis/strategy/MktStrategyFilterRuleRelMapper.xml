@@ -31,7 +31,7 @@
     RULE_ID, CREATE_STAFF, CREATE_DATE,
     UPDATE_STAFF, UPDATE_DATE)
     values
-    <foreach collection="list" item="item" open="(" close=")" index="i" separator=",">
+    <foreach collection="list" item="item" index="i" separator=",">
       (#{item.mktStrategyFilterRuleRelId,jdbcType=BIGINT}, #{item.strategyId,jdbcType=BIGINT},
       #{item.ruleId,jdbcType=BIGINT}, #{item.createStaff,jdbcType=BIGINT}, #{item.createDate,jdbcType=TIMESTAMP},
       #{item.updateStaff,jdbcType=BIGINT}, #{item.updateDate,jdbcType=TIMESTAMP})

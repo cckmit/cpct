@@ -83,6 +83,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
     @Override
     public Map<String, Object> queryLabelListByDisplayId(DisplayColumn req) {
         Map<String, Object> maps = new HashMap<>();
+        DisplayColumn displayColumn = displayColumnMapper.selectByPrimaryKey(req.getDisplayColumnId());
         List<DisplayColumnLabel> realList = displayColumnLabelMapper.findListByDisplayId(req.getDisplayColumnId());
         List<LabelDTO> labelList = new ArrayList<>();
         List<Long> messageTypes = new ArrayList<>();
@@ -98,6 +99,11 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
             labelDTO.setLabelType(label.getLabelType());
             labelDTO.setMessageType(real.getMessageType());
             labelDTO.setLabelCode(label.getInjectionLabelCode());
+            if(real.getLabelDisplayType() != null) {
+                labelDTO.setDisplayTypeNum(real.getLabelDisplayType().split(",").length);
+            }else {
+                labelDTO.setDisplayTypeNum(0);
+            }
             labelList.add(labelDTO);
             if (!messageTypes.contains(real.getMessageType())){
                 messageTypes.add(real.getMessageType());
@@ -127,6 +133,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         maps.put("resultCode", CODE_SUCCESS);
         maps.put("resultMsg",mlInfoList);
         maps.put("labels",labelList);
+        maps.put("displayColumn",displayColumn);
         return maps;
 
     }
@@ -458,5 +465,105 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         map.put("resultCode", CODE_SUCCESS);
         map.put("resultMsg", labelDisplayTypeId);
         return map;
+    }
+
+    /**
+     * 分页查询出所有展示列
+     */
+    @Override
+    public Map<String, Object> listDisplaysPage(String displayName, String displayType, Integer page, Integer pageSize) {
+        Map<String, Object> maps = new HashMap<>();
+        List<DisplayColumnVO> displayColumnVOList = new ArrayList<>();
+        PageHelper.startPage(page,pageSize);
+        List<DisplayColumn> displayColumnList = displayColumnMapper.findDisplayListByParam(displayName,displayType);
+        for (DisplayColumn displayColumn : displayColumnList) {
+            DisplayColumnVO displayColumnVO = BeanUtil.create(displayColumn,new DisplayColumnVO());
+            SysParams sysParams = systemParamMapper.findParamsByValue("DISPLAY_CLOUMN_TYPE",displayColumn.getDisplayColumnType());
+            if (sysParams!=null){
+                displayColumnVO.setDisplayColumnTypeName(sysParams.getParamName());
+            }
+            displayColumnVOList.add(displayColumnVO);
+        }
+        Page pageInfo = new Page(new PageInfo(displayColumnList));
+        maps.put("resultCode", CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("displayColumnVOList", displayColumnVOList);
+        maps.put("page",pageInfo);
+        return maps;
+    }
+
+    /**
+     * 新增展示列（新）
+     */
+    @Override
+    public Map<String, Object> createDisplayColumn(DisplayColumnEntity displayColumnEntity) {
+        Map<String, Object> maps = new HashMap<>();
+        DisplayColumn displayColumn = BeanUtil.create(displayColumnEntity,new DisplayColumn());
+        displayColumn.setStatusCd("2000");
+        displayColumn.setCreateStaff(UserUtil.loginId());
+        displayColumn.setUpdateStaff(UserUtil.loginId());
+        displayColumn.setCreateDate(DateUtil.getCurrentTime());
+        displayColumn.setUpdateDate(DateUtil.getCurrentTime());
+        displayColumn.setStatusDate(DateUtil.getCurrentTime());
+        displayColumnMapper.insert(displayColumn);
+        //展示列关联标签
+        List<DisplayLabelInfo> injectionLabelIds = displayColumnEntity.getInjectionLabelIds();
+        if(injectionLabelIds.size() > 0) {
+            for (DisplayLabelInfo labelInfo : injectionLabelIds) {
+                DisplayColumnLabel displayColumnLabel = new DisplayColumnLabel();
+                displayColumnLabel.setDisplayId(displayColumn.getDisplayColumnId());
+                displayColumnLabel.setInjectionLabelId(labelInfo.getLabelId());
+                displayColumnLabel.setMessageType(labelInfo.getMessageTypeId());
+                displayColumnLabel.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                displayColumnLabel.setCreateStaff(UserUtil.loginId());
+                displayColumnLabel.setUpdateStaff(UserUtil.loginId());
+                displayColumnLabel.setCreateDate(DateUtil.getCurrentTime());
+                displayColumnLabel.setUpdateDate(DateUtil.getCurrentTime());
+                displayColumnLabel.setStatusDate(DateUtil.getCurrentTime());
+                displayColumnLabelMapper.insert(displayColumnLabel);
+            }
+        }
+        maps.put("resultCode", CODE_SUCCESS);
+        maps.put("resultMsg", "新增成功");
+        return maps;
+    }
+
+    /**
+     * 修改展示列（新）
+     */
+    @Override
+    public Map<String, Object> editDisplayColumn(DisplayColumnEntity displayColumnEntity) {
+        Map<String, Object> maps = new HashMap<>();
+        DisplayColumn displayColumn = displayColumnMapper.selectByPrimaryKey(displayColumnEntity.getDisplayColumnId());
+        if (displayColumn == null){
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg", "展示列不存在");
+            return maps;
+        }
+        BeanUtil.copy(displayColumnEntity,displayColumn);
+        displayColumn.setUpdateStaff(UserUtil.loginId());
+        displayColumn.setUpdateDate(DateUtil.getCurrentTime());
+        displayColumnMapper.updateByPrimaryKey(displayColumn);
+        //展示列关联标签
+        displayColumnLabelMapper.deleteByDisplayId(displayColumn.getDisplayColumnId());
+        List<DisplayLabelInfo> injectionLabelIds = displayColumnEntity.getInjectionLabelIds();
+        if(injectionLabelIds.size() > 0) {
+            for (DisplayLabelInfo labelInfo : injectionLabelIds) {
+                DisplayColumnLabel displayColumnLabel = new DisplayColumnLabel();
+                displayColumnLabel.setDisplayId(displayColumn.getDisplayColumnId());
+                displayColumnLabel.setInjectionLabelId(labelInfo.getLabelId());
+                displayColumnLabel.setMessageType(labelInfo.getMessageTypeId());
+                displayColumnLabel.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                displayColumnLabel.setCreateStaff(UserUtil.loginId());
+                displayColumnLabel.setUpdateStaff(UserUtil.loginId());
+                displayColumnLabel.setCreateDate(DateUtil.getCurrentTime());
+                displayColumnLabel.setUpdateDate(DateUtil.getCurrentTime());
+                displayColumnLabel.setStatusDate(DateUtil.getCurrentTime());
+                displayColumnLabelMapper.insert(displayColumnLabel);
+            }
+        }
+        maps.put("resultCode", CODE_SUCCESS);
+        maps.put("resultMsg", "修改成功");
+        return maps;
     }
 }

@@ -8,6 +8,7 @@ import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
+import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.thread.TarGrpRule;
@@ -131,6 +132,46 @@ public class CampaignController extends BaseController {
         Map<String, Object> map = null;
         try {
             map = mktCampaignService.qryMktCampaignListPage(params);
+        } catch (Exception e) {
+            logger.info("[op:CampaignController] failed to listCampaignPage , Expection = ", e);
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", "查询活动列表失败！");
+        }
+        return JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 查询活动列表(分页，活动总览，不是发布和调整中的活动)
+     *
+     * @return
+     */
+    @RequestMapping(value = "/listCampaignPageForNoPublish", method = RequestMethod.POST)
+    @CrossOrigin
+    public String qryMktCampaignListForNoPublish(@RequestBody Map<String, Object> params) throws Exception {
+        Map<String, Object> map = null;
+        try {
+            map = mktCampaignService.qryMktCampaignListPageForNoPublish(params);
+        } catch (Exception e) {
+            logger.info("[op:CampaignController] failed to listCampaignPage , Expection = ", e);
+            map.put("resultCode", CommonConstant.CODE_FAIL);
+            map.put("resultMsg", "查询活动列表失败！");
+        }
+        return JSON.toJSONString(map);
+    }
+
+
+    /**
+     * 查询活动列表(分页，活动总览，发布和调整中的活动)
+     *
+     * @return
+     */
+    @RequestMapping(value = "/listCampaignPageForPublish", method = RequestMethod.POST)
+    @CrossOrigin
+    public String qryMktCampaignListForPublish(@RequestBody Map<String, Object> params) throws Exception {
+        Map<String, Object> map = null;
+        try {
+            map = mktCampaignService.qryMktCampaignListPageForPublish(params);
         } catch (Exception e) {
             logger.info("[op:CampaignController] failed to listCampaignPage , Expection = ", e);
             map.put("resultCode", CommonConstant.CODE_FAIL);
@@ -363,6 +404,53 @@ public class CampaignController extends BaseController {
         } catch (Exception e) {
             logger.error("[op:CampaignController] failed to getMktCampaignTemplate by parentMktCampaignId = {}, Exception = ", parentMktCampaignId, e);
             mktCampaignMap.put("resultCode", CommonConstant.CODE_FAIL);
+        }
+        return JSON.toJSONString(mktCampaignMap);
+    }
+
+
+
+    /**
+     * 调整活动
+     *
+     * @param params
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/adjustMktCampaign", method = RequestMethod.POST)
+    @CrossOrigin
+    public String adjustMktCampaign(@RequestBody Map<String, String> params) throws Exception {
+        Long parentMktCampaignId = Long.valueOf(params.get("mktCampaignId"));
+        Map<String, Object> mktCampaignMap = new HashMap<>();
+        try {
+            // 修改源活动状态
+            mktCampaignService.changeMktCampaignStatus(parentMktCampaignId, StatusCode.STATUS_CODE_ADJUST.getStatusCode());
+            // 复制活动
+            mktCampaignMap = mktCampaignService.copyMktCampaign(parentMktCampaignId);
+            mktCampaignMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+        } catch (Exception e) {
+            logger.error("[op:CampaignController] failed to adjustMktCampaign by parentMktCampaignId = {}, Exception = ", parentMktCampaignId, e);
+            mktCampaignMap.put("resultCode", CommonConstant.CODE_FAIL);
+        }
+        return JSON.toJSONString(mktCampaignMap);
+    }
+
+
+    /**
+     * 过期活动
+     *
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/dueMktCampaign", method = RequestMethod.POST)
+    @CrossOrigin
+    public String dueMktCampaign() throws Exception {
+        Map<String, Object> mktCampaignMap = new HashMap<>();
+        try {
+            // 过期活动
+            mktCampaignMap = mktCampaignService.dueMktCampaign();
+        } catch (Exception e) {
+            logger.error("[op:CampaignController] failed to dueMktCampaign, Exception = ", e);
         }
         return JSON.toJSONString(mktCampaignMap);
     }

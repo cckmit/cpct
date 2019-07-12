@@ -22,6 +22,8 @@ public enum TrialStatus {
     ISSEE_ANALYZE_FAIL_REASON_ONE("7201", "协同-没有清单文件"),
     ISEE_ANALYZE_FAIL_REASON_TWO("7202","协同-清单文件没有数据"),
     ISEE_PUBLISH_FAIL_REASON_THREE("7203","协同-字段定义有重复字段"),
+    ISEE_PUBLISH_FAIL_REASON_FORE("7204","协同-任务排队中"),
+    ISEE_PUBLISH_FAIL_REASON_FIVE("7205","协同-任务解析中"),
 
     ISEE_PUBLISH_FAIL("7400", "协同-下发失败"),
     CHANNEL_PUBLISH_SUCCESS("8100", "渠道-下发成功"),
