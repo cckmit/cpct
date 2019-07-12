@@ -1,6 +1,6 @@
 package com.zjtelcom.cpct.dubbo.service;
 
-
+import com.zjhcsoft.eagle.main.dubbo.model.policy.ResponseHeaderModel;
 
 /**
  * @Auther: anson
@@ -9,5 +9,5 @@ package com.zjtelcom.cpct.dubbo.service;
  */
 public interface SyncActService {
 
-//    ResponseHeaderModel syncActivity(Long mktCampaignId);
+    ResponseHeaderModel syncActivity(Long mktCampaignId);
 }

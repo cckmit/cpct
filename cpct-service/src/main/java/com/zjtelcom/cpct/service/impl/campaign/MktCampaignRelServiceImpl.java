@@ -40,7 +40,7 @@ public class MktCampaignRelServiceImpl extends BaseService implements MktCampaig
     private MktCampaignMapper mktCampaignMapper;
 
     /**
-     *  获取当前活动的父活动和 子活动
+     * 获取当前活动的父活动 和 子活动
      *
      * @param mktCampaignId
      * @return
