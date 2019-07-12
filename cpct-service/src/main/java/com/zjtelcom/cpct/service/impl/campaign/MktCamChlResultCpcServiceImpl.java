@@ -6,19 +6,13 @@
  */
 package com.zjtelcom.cpct.service.impl.campaign;
 
-import com.zjtelcom.cpct.dao.campaign.MktCamChlConfAttrMapper;
-import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
-import com.zjtelcom.cpct.dao.campaign.MktCamChlResultConfRelMapper;
-import com.zjtelcom.cpct.dao.campaign.MktCamChlResultMapper;
+import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
 import com.zjtelcom.cpct.dao.channel.MktVerbalMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
-import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
-import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
-import com.zjtelcom.cpct.domain.campaign.MktCamChlResultConfRelDO;
-import com.zjtelcom.cpct.domain.campaign.MktCamChlResultDO;
+import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.CamScript;
 import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.channel.MktVerbal;
@@ -71,10 +65,25 @@ public class MktCamChlResultCpcServiceImpl extends BaseService implements MktCam
     @Autowired
     private MktStrategyConfRuleRelMapper mktStrategyConfRuleRelMapper;
 
+    @Autowired
+    private MktCampaignMapper mktCampaignMapper;
+
     @Override
     public Map<String, Object> secondChannelSynergy(Map<String, Object> params) {
-        Long activityId = Long.valueOf((String) params.get("activityId"));
-        Long ruleId = Long.valueOf((String) params.get("ruleId"));
+        Long activityInitId = Long.valueOf((String) params.get("activityId"));
+        Long ruleInitId = Long.valueOf((String) params.get("ruleId"));
+        MktStrategyConfRuleDO mktStrConfRule = new MktStrategyConfRuleDO();
+        // 通过InitId查询活动
+        MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByInitId(activityInitId);
+        // 通过活动Id查询所有规则
+        List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList = mktStrategyConfRuleMapper.selectByCampaignId(mktCampaignDO.getMktCampaignId());
+        for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleDOList) {
+            if(ruleInitId.equals(mktStrategyConfRuleDO.getInitId())){
+                mktStrConfRule = mktStrategyConfRuleDO;
+                break;
+            }
+        }
+
         String resultNbr = String.valueOf(params.get("resultNbr"));
         String accNbr = String.valueOf(params.get("accNbr"));
         String integrationId = String.valueOf(params.get("integrationId"));
@@ -82,9 +91,8 @@ public class MktCamChlResultCpcServiceImpl extends BaseService implements MktCam
         Map<String, Object> paramMap = new HashMap<>();
         // 通过规则Id获取规则下的结果id
         List<Map<String, Object>> taskChlList = new ArrayList<>();
-        MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleId);
-        if (mktStrategyConfRuleDO != null) {
-            String[] resultIds = mktStrategyConfRuleDO.getMktCamChlResultId().split(",");
+        if (mktStrConfRule != null) {
+            String[] resultIds = mktStrConfRule.getMktCamChlResultId().split(",");
             if (resultIds != null && !"".equals(resultIds[0])) {
                 for (String resultId : resultIds) {
                     MktCamChlResultDO mktCamChlResultDO = mktCamChlResultMapper.selectByPrimaryKey(Long.valueOf(resultId));
@@ -139,13 +147,12 @@ public class MktCamChlResultCpcServiceImpl extends BaseService implements MktCam
                 }
             }
         }
-        MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO = mktStrategyConfRuleRelMapper.selectByRuleId(ruleId);
-
-        paramMap.put("activityId", activityId);
+        MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO = mktStrategyConfRuleRelMapper.selectByRuleId(ruleInitId);
+        paramMap.put("activityId", activityInitId);
         if (mktStrategyConfRuleRelDO != null) {
             paramMap.put("policyId", mktStrategyConfRuleRelDO.getMktStrategyConfId());
         }
-        paramMap.put("ruleId", ruleId);
+        paramMap.put("ruleId", ruleInitId);
         paramMap.put("taskChlList", taskChlList);
         if (taskChlList != null && taskChlList.size() > 0) {
             paramMap.put("resultCode", 1);

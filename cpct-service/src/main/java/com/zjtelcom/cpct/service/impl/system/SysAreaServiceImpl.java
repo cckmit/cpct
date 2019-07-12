@@ -1,6 +1,5 @@
 package com.zjtelcom.cpct.service.impl.system;
 
-import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.channel.OrganizationMapper;
 import com.zjtelcom.cpct.dao.system.SysAreaMapper;
@@ -14,7 +13,6 @@ import com.zjtelcom.cpct.enums.AreaLeveL;
 import com.zjtelcom.cpct.service.system.SysAreaService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
-import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

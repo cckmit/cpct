@@ -175,6 +175,33 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
         return result;
     }
 
+    /**
+     * 活动复制推荐条目
+     * @param oldCampaignId
+     * @param newCampaignId
+     * @return
+     */
+    @Override
+    public Map<String, Object> copyItemByCampaign(Long oldCampaignId, Long newCampaignId) {
+        Map<String,Object> result = new HashMap<>();
+        Map<Long, Long> itemMap = new HashMap<>();
+        List<Long> idList = new ArrayList<>();
+        List<MktCamItem> oldItemList = camItemMapper.selectByCampaignId(oldCampaignId);
+        for (MktCamItem item : oldItemList){
+            MktCamItem newItem = BeanUtil.create(item,new MktCamItem());
+            newItem.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+            newItem.setMktCamItemId(null);
+            newItem.setMktCampaignId(newCampaignId);
+            camItemMapper.insert(newItem);
+            itemMap.put(item.getMktCamItemId(), newItem.getMktCamItemId());
+            idList.add(newItem.getMktCamItemId());
+        }
+        result.put("itemMap", itemMap);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",idList);
+        return result;
+    }
+
     @Override
     @Transactional
     public Map<String, Object> addProductRule(ProductParam param) {

@@ -28,10 +28,15 @@
     </dubbo:reference>
 
     <!--提供给cpc调用的-->
-    <dubbo:service registry="esb2" interface="com.zjtelcom.cpct.count.service.api.ActivityService" ref="activityServiceImpl" version="1.0">
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.count.service.api.ActivityService" ref="activityServiceImpl" version="1.0">
         <dubbo:method name="changeActivityStatus" servicecode="00.1083.changeActivityStatus"/>
         <dubbo:method name="getCampaignList" servicecode="00.1083.getCampaignList"/>
     </dubbo:service>
+
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MktCampaignApiService" ref="mktCampaignApiServiceImpl" version="1.0" >
+        <dubbo:method name="rollBackMktCampaign" servicecode="00.1083.rollBackMktCampaign"/>
+    </dubbo:service>
+
 
 
 

@@ -65,7 +65,7 @@
     <if test="displayType !=null and displayType != ''">
       and DISPLAY_COLUMN_TYPE = #{displayType}
     </if>
-
+    order by UPDATE_DATE desc
   </select>
 
 

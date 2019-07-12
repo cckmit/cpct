@@ -73,7 +73,7 @@ public class TestController extends BaseController {
 
     @Autowired(required = false)
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
-    @Autowired
+    @Autowired(required = false)
     private MktCampaignService campaignService;
     @Autowired
     private LabelService labelService;

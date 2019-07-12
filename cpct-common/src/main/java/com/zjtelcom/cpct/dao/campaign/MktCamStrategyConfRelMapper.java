@@ -16,6 +16,8 @@ public interface MktCamStrategyConfRelMapper {
 
     int insert(MktCamStrategyConfRelDO mktCamStrategyConfRelDO);
 
+    int insertBatch(List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList);
+
     MktCamStrategyConfRelDO selectByPrimaryKey(Long camStrConfRelId);
 
     List<MktCamStrategyConfRelDO> selectByMktCampaignId(Long mktCampaignId);

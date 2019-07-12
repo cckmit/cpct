@@ -14,6 +14,8 @@ public interface MktCamCityRelMapper {
 
     int insert(MktCamCityRelDO mktCamCityRelDO);
 
+    int insertBatch(List<MktCamCityRelDO> mktCamCityRelDOList);
+
     MktCamCityRelDO selectByPrimaryKey(Long mktCamCityRelId);
 
     List<MktCamCityRelDO> selectByMktCampaignId(Long mktCampaignId);

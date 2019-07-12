@@ -1,7 +1,9 @@
 package com.zjtelcom.cpct.dubbo.service.impl;
 
+import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.filter.CloseRuleMapper;
 import com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper;
+import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyCloseRuleRelDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyFilterRuleRelDO;
 import com.zjtelcom.cpct.dto.filter.CloseRule;
@@ -24,6 +26,8 @@ public class ProductServiceImpl implements ProductService {
     private CloseRuleMapper closeRuleMapper;
     @Autowired(required = false)
     private MktStrategyCloseRuleRelMapper mktStrategyCloseRuleRelMapper;
+    @Autowired(required = false)
+    private MktCampaignMapper mktCampaignMapper;
 
     //销售品关联活动查询
     @Override
@@ -59,8 +63,9 @@ public class ProductServiceImpl implements ProductService {
                                 offerInfo = "2";
                             }
                         }
+                        MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktStrategyCloseRuleRelDO.getStrategyId());
                         maps.put("closeType", offerInfo);
-                        maps.put("activityId", mktStrategyCloseRuleRelDO.getStrategyId());
+                        maps.put("activityId", mktCampaignDO.getInitId());
                         maps.put("closeName",filterRule1.getCloseName());
                         maps.put("closeCode",filterRule1.getCloseCode());
                         maps.put("closeNumber",filterRule1.getExpression());

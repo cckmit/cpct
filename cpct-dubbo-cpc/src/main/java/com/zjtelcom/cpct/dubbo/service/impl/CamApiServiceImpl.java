@@ -27,6 +27,8 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
@@ -198,7 +200,7 @@ public class CamApiServiceImpl implements CamApiService {
             return Collections.EMPTY_MAP;
         }
 
-        privateParams.put("activityId", mktCampaign.getMktCampaignId().toString()); //活动编码
+        privateParams.put("activityId", mktCampaign.getMktCampaignId().toString()); //活动Id
         privateParams.put("activityName", mktCampaign.getMktCampaignName()); //活动名称
         if ("1000".equals(mktCampaign.getMktCampaignType())) {
             privateParams.put("activityType", "0"); //营销
@@ -539,13 +541,15 @@ public class CamApiServiceImpl implements CamApiService {
                         map.put("itgTriggers", JSONArray.parse(JSONArray.toJSON(itgTriggers).toString()));
                        // map.put("triggers", JSONArray.parse(JSONArray.toJSON(evtTriggers).toString()));
                         List<Map<String, Object>> triggersList = new ArrayList<>();
-                        for (Map.Entry entry : evtContent.entrySet()) {
-                            Map<String, Object> trigger = new HashMap<>();
-                            trigger.put("key", entry.getKey());
-                            trigger.put("value", entry.getValue());
-                            triggersList.add(trigger);
+                        if(evtContent!=null && !evtContent.isEmpty()){
+                            for (Map.Entry entry : evtContent.entrySet()) {
+                                Map<String, Object> trigger = new HashMap<>();
+                                trigger.put("key", entry.getKey());
+                                trigger.put("value", entry.getValue());
+                                triggersList.add(trigger);
+                            }
+                            map.put("triggers", triggersList);
                         }
-                        map.put("triggers", triggersList);
                     }
                 }
 
@@ -618,14 +622,17 @@ public class CamApiServiceImpl implements CamApiService {
                 promIntegId = (String) context.get("PROM_INTEG_ID");
             }
 
+            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(privateParams.get("activityId")));
+            MktStrategyConfDO mktStrategyConfDO = mktStrategyConfMapper.selectByPrimaryKey(strategyConfId);
+            MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleId);
 
-            jsonObject.put("ruleId", ruleId);
+            jsonObject.put("ruleId", mktStrategyConfRuleDO.getInitId());
             jsonObject.put("ruleName", ruleName);
             jsonObject.put("hitEntity", privateParams.get("accNbr")); //命中对象
             jsonObject.put("reqId", reqId);
             jsonObject.put("eventId", params.get("eventCode"));
-            jsonObject.put("activityId", privateParams.get("activityId"));
-            jsonObject.put("strategyConfId", strategyConfId);
+            jsonObject.put("activityId", mktCampaignDO.getInitId());
+            jsonObject.put("strategyConfId", mktStrategyConfDO.getInitId());
             jsonObject.put("productStr", productStr);
             jsonObject.put("evtContactConfIdStr", evtContactConfIdStr);
             jsonObject.put("tarGrpId", tarGrpId);
@@ -634,12 +641,12 @@ public class CamApiServiceImpl implements CamApiService {
             //ES log 标签实例
             esJson.put("reqId", reqId);
             esJson.put("eventId", params.get("eventCode"));
-            esJson.put("activityId", privateParams.get("activityId"));
-            esJson.put("ruleId", ruleId);
+            esJson.put("activityId", mktCampaignDO.getInitId());
+            esJson.put("ruleId", mktStrategyConfRuleDO.getInitId());
             esJson.put("ruleName", ruleName);
             esJson.put("integrationId", params.get("integrationId"));
             esJson.put("accNbr", params.get("accNbr"));
-            esJson.put("strategyConfId", strategyConfId);
+            esJson.put("strategyConfId", mktStrategyConfDO.getInitId());
             esJson.put("tarGrpId", tarGrpId);
             esJson.put("promIntegId", promIntegId);
             esJson.put("hitEntity", privateParams.get("accNbr")); //命中对象
@@ -894,7 +901,7 @@ public class CamApiServiceImpl implements CamApiService {
 
                     //拼接返回结果
                     ruleMap.put("orderISI", params.get("reqId")); //流水号
-                    ruleMap.put("activityId", privateParams.get("activityId")); //活动编码
+                    ruleMap.put("activityId", mktCampaignDO.getInitId()); //活动编码
                     ruleMap.put("activityName", privateParams.get("activityName")); //活动名称
                     ruleMap.put("activityType", privateParams.get("activityType")); //活动类型
                     ruleMap.put("activityStartTime", privateParams.get("activityStartTime")); //活动开始时间
@@ -903,9 +910,9 @@ public class CamApiServiceImpl implements CamApiService {
                     ruleMap.put("orderPriority", privateParams.get("orderPriority")); //活动优先级
                     ruleMap.put("integrationId", privateParams.get("integrationId")); //集成编号（必填）
                     ruleMap.put("accNbr", privateParams.get("accNbr")); //业务号码（必填）
-                    ruleMap.put("policyId", strategyConfId.toString()); //策略编码
+                    ruleMap.put("policyId", mktStrategyConfDO.getInitId()); //策略编码
                     ruleMap.put("policyName", strategyConfName); //策略名称
-                    ruleMap.put("ruleId", ruleId.toString()); //规则编码
+                    ruleMap.put("ruleId", mktStrategyConfRuleDO.getInitId()); //规则编码
                     ruleMap.put("ruleName", ruleName); //规则名称
                     ruleMap.put("promIntegId", promIntegId); // 销售品实例ID
 

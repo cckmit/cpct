@@ -7,6 +7,7 @@ import java.util.Date;
 public class MktCampaignDO extends BaseEntity{
 
     private Long mktCampaignId;
+    private Long initId;
     private String tiggerType;
     private String mktCampaignName;
     private Date planBeginTime;
@@ -35,6 +36,14 @@ public class MktCampaignDO extends BaseEntity{
     private String lifeStage;
     private String extMktCampaignId;
     private Long execInitTime;
+
+    public Long getInitId() {
+        return initId;
+    }
+
+    public void setInitId(Long initId) {
+        this.initId = initId;
+    }
 
     public Long getCalcDisplay() {
         return calcDisplay;

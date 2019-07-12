@@ -18,6 +18,8 @@ public interface  MktStrategyConfRuleRelMapper {
 
     int insert(MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO);
 
+    int insertBatch(List<MktStrategyConfRuleRelDO> mktStrategyConfRuleRelDOList);
+
     MktStrategyConfRuleRelDO selectByPrimaryKey(Long mktStrategyConfRuleRelId);
 
     List<MktStrategyConfRuleRelDO> selectByMktStrategyConfId(Long mktStrategyConfId);

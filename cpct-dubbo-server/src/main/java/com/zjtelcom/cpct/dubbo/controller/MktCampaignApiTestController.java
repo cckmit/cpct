@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.zjpii.biz.serv.YzServ;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.dubbo.model.RetCamResp;
+import com.zjtelcom.cpct.dubbo.model.RetCamResult;
 import com.zjtelcom.cpct.dubbo.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,9 @@ public class MktCampaignApiTestController {
 
     @Autowired
     private MktCampaignSyncApiService mktCampaignSyncApiService;
+
+    @Autowired
+    private MktCamChlResultApiService mktCamChlResultApiService;
 
 
 
@@ -83,5 +87,23 @@ public class MktCampaignApiTestController {
             return e.getMessage();
         }
         return JSON.toJSONString(resultMap);
+    }
+
+
+    /**
+     * 查询所有 有二次协同 且二次协同为工单，且有效的
+     *
+     * @return
+     */
+    @RequestMapping(value = "/selectResultByMktCampaignId", method = RequestMethod.POST)
+    @CrossOrigin
+    public String selectResultByMktCampaignId() {
+        RetCamResult retCamResult = new RetCamResult();
+        try {
+            retCamResult = mktCamChlResultApiService.selectResultList();
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+        return JSON.toJSONString(retCamResult);
     }
 }

@@ -216,7 +216,7 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
     @Autowired
     private SysAreaMapper sysAreaMapper;
 
-    @Autowired
+    @Autowired(required = false)
     private MktCampaignService mktCampaignService;
 
 

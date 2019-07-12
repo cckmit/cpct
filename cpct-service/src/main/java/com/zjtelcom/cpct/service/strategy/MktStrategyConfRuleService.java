@@ -41,6 +41,6 @@ public interface MktStrategyConfRuleService {
 
     Map<String, Object> test(Long ruleId ,List<Long> orgList);
 
-
+    Map<String, Object> copyMktStrategyConfRuleForAdjust(Long parentMktStrategyConfRuleId, Long parentMktCampaignId , Long MktCampaignId, Map<Long, Long> itemMap) throws Exception;
 
 }

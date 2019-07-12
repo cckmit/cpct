@@ -3,6 +3,7 @@
 <mapper namespace="com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper">
   <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO">
     <id column="MKT_STRATEGY_CONF_RULE_ID" jdbcType="BIGINT" property="mktStrategyConfRuleId" />
+    <result column="INIT_ID" jdbcType="BIGINT" property="initId"/>
     <result column="MKT_STRATEGY_CONF_RULE_NAME" jdbcType="VARCHAR" property="mktStrategyConfRuleName" />
     <result column="TAR_GRP_ID" jdbcType="BIGINT" property="tarGrpId" />
     <result column="PRODUCT_ID" jdbcType="VARCHAR" property="productId" />
@@ -18,25 +19,25 @@
     where MKT_STRATEGY_CONF_RULE_ID = #{mktStrategyConfRuleId,jdbcType=BIGINT}
   </delete>
   <insert id="insert" useGeneratedKeys="true" keyProperty="mktStrategyConfRuleId" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO">
-    insert into mkt_strategy_conf_rule (MKT_STRATEGY_CONF_RULE_ID, MKT_STRATEGY_CONF_RULE_NAME,
+    insert into mkt_strategy_conf_rule (MKT_STRATEGY_CONF_RULE_ID, INIT_ID, MKT_STRATEGY_CONF_RULE_NAME,
       TAR_GRP_ID, PRODUCT_ID, EVT_CONTACT_CONF_ID,
       MKT_CAM_CHL_RESULT_ID, CREATE_STAFF,
       CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
       )
-    values (#{mktStrategyConfRuleId,jdbcType=BIGINT}, #{mktStrategyConfRuleName,jdbcType=VARCHAR},
+    values (#{mktStrategyConfRuleId,jdbcType=BIGINT}, #{initId,jdbcType=BIGINT}, #{mktStrategyConfRuleName,jdbcType=VARCHAR},
       #{tarGrpId,jdbcType=BIGINT}, #{productId,jdbcType=VARCHAR}, #{evtContactConfId,jdbcType=VARCHAR},
       #{mktCamChlResultId,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT},
       #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}
       )
   </insert>
   <insert id="insertByBatch" parameterType="java.util.List">
-    insert into mkt_strategy_conf_rule (MKT_STRATEGY_CONF_RULE_ID, MKT_STRATEGY_CONF_RULE_NAME, TAR_GRP_ID, PRODUCT_ID,
+    insert into mkt_strategy_conf_rule (MKT_STRATEGY_CONF_RULE_ID, INIT_ID, MKT_STRATEGY_CONF_RULE_NAME, TAR_GRP_ID, PRODUCT_ID,
     EVT_CONTACT_CONF_ID, CREATE_STAFF,
     CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
     )
     values
     <foreach collection="list" item="item" index="index" separator=",">
-      (#{mktStrategyConfRuleId,jdbcType=BIGINT}, #{mktStrategyConfRuleName,jdbcType=VARCHAR}, #{tarGrpId,jdbcType=BIGINT}, #{productId,jdbcType=VARCHAR},
+      (#{mktStrategyConfRuleId,jdbcType=BIGINT}, #{initId,jdbcType=BIGINT}, #{mktStrategyConfRuleName,jdbcType=VARCHAR}, #{tarGrpId,jdbcType=BIGINT}, #{productId,jdbcType=VARCHAR},
       #{evtContactConfId,jdbcType=VARCHAR}, #{createStaff,jdbcType=VARCHAR},
       #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=VARCHAR}, #{updateDate,jdbcType=TIMESTAMP}
       )
@@ -45,6 +46,9 @@
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO">
     update mkt_strategy_conf_rule
     set
+    <if test="initId!=null">
+      INIT_ID = #{initId,jdbcType=BIGINT},
+    </if>
     <if test="mktStrategyConfRuleName != null and mktStrategyConfRuleName != ''">
       MKT_STRATEGY_CONF_RULE_NAME = #{mktStrategyConfRuleName,jdbcType=VARCHAR},
     </if>
@@ -66,20 +70,20 @@
     <if test="createDate != null">
       CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
     </if>
-      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
-      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
+    UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+    UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
     where MKT_STRATEGY_CONF_RULE_ID = #{mktStrategyConfRuleId,jdbcType=BIGINT}
   </update>
 
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select MKT_STRATEGY_CONF_RULE_ID, MKT_STRATEGY_CONF_RULE_NAME, TAR_GRP_ID, PRODUCT_ID,
+    select MKT_STRATEGY_CONF_RULE_ID, INIT_ID, MKT_STRATEGY_CONF_RULE_NAME, TAR_GRP_ID, PRODUCT_ID,
     EVT_CONTACT_CONF_ID, MKT_CAM_CHL_RESULT_ID, CREATE_STAFF, CREATE_DATE,
     UPDATE_STAFF, UPDATE_DATE
     from mkt_strategy_conf_rule
     where MKT_STRATEGY_CONF_RULE_ID = #{mktStrategyConfRuleId,jdbcType=BIGINT}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
-    select MKT_STRATEGY_CONF_RULE_ID, MKT_STRATEGY_CONF_RULE_NAME, TAR_GRP_ID, PRODUCT_ID,
+    select MKT_STRATEGY_CONF_RULE_ID, INIT_ID, MKT_STRATEGY_CONF_RULE_NAME, TAR_GRP_ID, PRODUCT_ID,
     EVT_CONTACT_CONF_ID, MKT_CAM_CHL_RESULT_ID, CREATE_STAFF, CREATE_DATE,
     UPDATE_STAFF, UPDATE_DATE
     from mkt_strategy_conf_rule
@@ -90,7 +94,7 @@
     where MKT_STRATEGY_CONF_RULE_ID = #{mktStrategyConfRuleId,jdbcType=BIGINT}
   </select>
   <select id="selectByMktStrategyConfId" resultMap="BaseResultMap" parameterType="Long">
-    select cr.MKT_STRATEGY_CONF_RULE_ID, cr.MKT_STRATEGY_CONF_RULE_NAME,cr.MKT_CAM_CHL_RESULT_ID, cr.TAR_GRP_ID, cr.PRODUCT_ID, cr.EVT_CONTACT_CONF_ID
+    select cr.MKT_STRATEGY_CONF_RULE_ID, cr.INIT_ID, cr.MKT_STRATEGY_CONF_RULE_NAME,cr.MKT_CAM_CHL_RESULT_ID, cr.TAR_GRP_ID, cr.PRODUCT_ID, cr.EVT_CONTACT_CONF_ID
     from mkt_strategy_conf_rule cr
     left join mkt_strategy_conf_rule_rel crr
     on cr.MKT_STRATEGY_CONF_RULE_ID = crr.MKT_STRATEGY_CONF_RULE_ID
@@ -98,7 +102,7 @@
   </select>
 
   <select id="selectByTarGrpId" resultMap="BaseResultMap" parameterType="Long">
-   select MKT_STRATEGY_CONF_RULE_ID, MKT_STRATEGY_CONF_RULE_NAME, TAR_GRP_ID, PRODUCT_ID,
+   select MKT_STRATEGY_CONF_RULE_ID, INIT_ID, MKT_STRATEGY_CONF_RULE_NAME, TAR_GRP_ID, PRODUCT_ID,
     EVT_CONTACT_CONF_ID, MKT_CAM_CHL_RESULT_ID, CREATE_STAFF, CREATE_DATE,
     UPDATE_STAFF, UPDATE_DATE
     from mkt_strategy_conf_rule
@@ -111,7 +115,7 @@
   </select>
 
   <select id="selectByCampaignId" resultMap="BaseResultMap" parameterType="Long">
-    select cr.MKT_STRATEGY_CONF_RULE_ID, cr.MKT_STRATEGY_CONF_RULE_NAME,cr.MKT_CAM_CHL_RESULT_ID, cr.TAR_GRP_ID, cr.PRODUCT_ID, cr.EVT_CONTACT_CONF_ID
+    select cr.MKT_STRATEGY_CONF_RULE_ID, cr.INIT_ID, cr.MKT_STRATEGY_CONF_RULE_NAME,cr.MKT_CAM_CHL_RESULT_ID, cr.TAR_GRP_ID, cr.PRODUCT_ID, cr.EVT_CONTACT_CONF_ID
     from mkt_strategy_conf_rule cr
     left join mkt_strategy_conf_rule_rel crr on cr.MKT_STRATEGY_CONF_RULE_ID = crr.MKT_STRATEGY_CONF_RULE_ID
     left join mkt_cam_strategy_conf_rel camrel on camrel.STRATEGY_CONF_ID = crr.MKT_STRATEGY_CONF_ID
