@@ -458,8 +458,10 @@ public class CamApiServiceImpl implements CamApiService {
                 }
             }
             if(flag) {
+                log.info("------------->10");
                 //判断是否有命中
                 if (ruleList.size() > 1) {
+                    log.info("------------->11");
                     // 从命中列表中移出默认固定规则
                     for (Map<String, Object> strategyMap : strategyMapList) {
                         Long strategyConfId = (Long) strategyMap.get("strategyConfId");
@@ -553,6 +555,7 @@ public class CamApiServiceImpl implements CamApiService {
                         }
                     }
                 } else {
+                    log.info("------------->12");
                     //遍历策略列表
                     for (Map<String, Object> strategyMap : strategyMapList) {
                         Long strategyConfId = (Long) strategyMap.get("strategyConfId");
@@ -582,8 +585,10 @@ public class CamApiServiceImpl implements CamApiService {
                 }
                 esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
             }else {
+                log.info("------------->20");
                 //判断是否有命中
                 if (ruleList.size() > 0) {
+                    log.info("------------->21");
                     activity.put("ruleList", ruleList);
                     esJson.put("hit", true); //添加命中标识
 
@@ -680,8 +685,8 @@ public class CamApiServiceImpl implements CamApiService {
                             }
                         }
                     }
-
                 } else {
+                    log.info("------------->22");
                     esJson.put("hit", false);
                     esJson.put("msg", "策略均未命中");
                 }
@@ -843,8 +848,10 @@ public class CamApiServiceImpl implements CamApiService {
                     //遍历所有规则
                     for (Map<String, String> labelMap : labelMapList) {
                         if(labelMap.get("leftParam").equals(defaultInfallibleTable)){
-                            redisUtils.set("LEFT_PARAM_FLAG" + strategyConfId, ruleId, 1L, TimeUnit.DAYS);
+                          //  redisUtils.set("LEFT_PARAM_FLAG" + strategyConfId, ruleId, 1L, TimeUnit.DAYS);
+                            redisUtils.set("LEFT_PARAM_FLAG" + strategyConfId, ruleId);
                             flag = true;
+                            log.info("flag = true进入...");
                             expressSb.append("true&&");
                             continue;
                         }
@@ -998,8 +1005,10 @@ public class CamApiServiceImpl implements CamApiService {
             try {
                 RuleResult ruleResult = null;
                 if(!flag) {
+                    log.info("------------->1");
                     //验证是否标签实例不足
                     if (notEnoughLabel.length() > 0) {
+                        log.info("notEnoughLabel.length() > 0->标签实例不足");
                         jsonObject.put("hit", "false");
                         jsonObject.put("msg", "标签实例不足：" + notEnoughLabel.toString());
                         esHitService.save(jsonObject, IndexList.RULE_MODULE);
@@ -1032,8 +1041,9 @@ public class CamApiServiceImpl implements CamApiService {
                 //初始化返回结果中的销售品条目
                 List<Map<String, String>> productList = new ArrayList<>();
                 if(!flag){
+                    log.info("------------->2");
                     if (ruleResult.getResult() != null && ((Boolean) ruleResult.getResult())) {
-
+                        log.info("------------->3");
                         jsonObject.put("hit", true);
 
                         //拼接返回结果
@@ -1174,15 +1184,15 @@ public class CamApiServiceImpl implements CamApiService {
                             executorService.shutdownNow();
                         }
                     } else {
-
+                        log.info("------------->4");
                         ruleMap.put("msg", "规则引擎匹配未通过");
-
                         jsonObject.put("hit", "false");
                         jsonObject.put("msg", "规则引擎匹配未通过");
                         esHitService.save(jsonObject, IndexList.RULE_MODULE);
                         return Collections.EMPTY_MAP;
                     }
                 }else{
+                    log.info("------------->5");
                     jsonObject.put("hit", true);
 
                     //拼接返回结果
