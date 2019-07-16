@@ -1031,7 +1031,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         } else {
                             value = data.get(x);
                         }
-                        if (value.contains("\r") || value.equals("\n")) {
+                        if (value.contains("\r") || value.contains("\n")) {
                             // 过滤换行符
                             value = value.replace("\r", "").replace("\n", "");
                         }
@@ -1104,6 +1104,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private void blackList2Redis(MktCampaignDO campaign) {
         List<String> typeList = new ArrayList<>();
         typeList.add("1000");
+        typeList.add("2000");
         List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(campaign.getMktCampaignId(),typeList);
         if (filterRuleList!=null && !filterRuleList.isEmpty()){
             List<String> userList = new ArrayList<>();
