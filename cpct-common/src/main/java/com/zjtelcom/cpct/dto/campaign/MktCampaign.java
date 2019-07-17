@@ -130,7 +130,7 @@ public class MktCampaign extends BaseEntity {
 
     private String extMktCampaignId;
 
-    private Long execInitTime;
+    private String execInitTime;
 
 
     public Long getDirectoryId() {
@@ -357,11 +357,11 @@ public class MktCampaign extends BaseEntity {
         this.preMktCampaignType = preMktCampaignType;
     }
 
-    public Long getExecInitTime() {
+    public String getExecInitTime() {
         return execInitTime;
     }
 
-    public void setExecInitTime(Long execInitTime) {
+    public void setExecInitTime(String execInitTime) {
         this.execInitTime = execInitTime;
     }
 }
