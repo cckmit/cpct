@@ -10,6 +10,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.zjhcsoft.eagle.main.dubbo.model.policy.*;
 import com.zjhcsoft.eagle.main.dubbo.service.ActivitySyncService;
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.*;
@@ -34,9 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Description:
@@ -252,5 +251,25 @@ public class SyncActivityServiceImpl implements SyncActivityService {
         return responseHeaderModel;
     }
 
+
+    @Override
+    public Map<String,Object> syncTotalActivity() {
+        Map<String,Object> result = new HashMap<>();
+        List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.selectAll();
+        List<Long> mktCampaignIdList = new ArrayList<>();
+        for(MktCampaignDO mktCampaignDO : mktCampaignDOList) {
+            if(mktCampaignDO.getStatusCd().equals(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode())) {
+                String mktCampaignName = mktCampaignDO.getMktCampaignName();
+                if(!mktCampaignName.contains("测试") && !mktCampaignName.contains("模板") && !mktCampaignName.contains("test") && !mktCampaignName.contains("演示") && !mktCampaignName.equals("")) {
+                    syncActivity(mktCampaignDO.getMktCampaignId());
+                    mktCampaignIdList.add(mktCampaignDO.getMktCampaignId());
+                }
+            }
+        }
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
+        result.put("resultMsg","同步成功");
+        result.put("campaignTotalNumber", mktCampaignIdList.size());
+        return result;
+    }
 
 }
