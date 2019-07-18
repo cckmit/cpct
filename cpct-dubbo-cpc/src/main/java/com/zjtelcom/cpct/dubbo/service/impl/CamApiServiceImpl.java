@@ -153,7 +153,6 @@ public class CamApiServiceImpl implements CamApiService {
      */
     @Override
     public Map<String, Object> ActivityTask(Map<String, String> params, Long activityId, Map<String, String> privateParams, Map<String, String> laubelItems, List<Map<String, Object>> evtTriggers, List<Map<String, Object>> strategyMapList, DefaultContext<String, Object> context) {
-
         Map<String, Object> activity = new ConcurrentHashMap<>();
         long begin = System.currentTimeMillis();
         String reqId = params.get("reqId");
@@ -277,7 +276,7 @@ public class CamApiServiceImpl implements CamApiService {
                             // 判断是否进行CRM销售品过滤
                             if (realProdFilter != null && "0".equals(realProdFilter)) {
                             //    log.info("111------accNbr --->" + params.get("accNbr"));
-                                List<Long> prodList = new ArrayList<>();
+                                List<String> prodList = new ArrayList<>();
                                 CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(params.get("accNbr"));
                             //    log.info("222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
                                 if(prodInstIdsObject!=null &&  prodInstIdsObject.getResultObject() !=null ){
@@ -304,7 +303,7 @@ public class CamApiServiceImpl implements CamApiService {
                                                         //Offer offer = offerProdMapper.selectByPrimaryKey(Integer.valueOf(offerInst.getOfferId().toString()));
                              //                           log.info("777------offer --->" + JSON.toJSONString(offer));
                                                         //prodStrList.add(offer.getOfferNbr());
-                                                        prodList.add(offerInst.getOfferId());
+                                                        prodList.add(offerInst.getOfferId().toString());
                                                         filterRuleTimeMap.put(offerInst.getOfferId().toString(), offerInst.getEffDate());
                                                         log.info("888------filterRuleTimeMap --->" + JSON.toJSONString(filterRuleTimeMap));
                                                     }
@@ -313,7 +312,7 @@ public class CamApiServiceImpl implements CamApiService {
                                         }
                                     }
                                 }
-                                productStr = ChannelUtil.idList2String(prodList);
+                                productStr = ChannelUtil.StringList2String(prodList);
                                 log.info("999------productStr --->" + JSON.toJSONString(productStr));
                             } else if (!context.containsKey("PROM_LIST")) { // 有没有办理销售品--销售列表标签
                                 //存在于校验
@@ -844,7 +843,7 @@ public class CamApiServiceImpl implements CamApiService {
                                 }
                             }
                             if (realProdFilter != null && "0".equals(realProdFilter)) {
-                                List<Long> prodList = new ArrayList<>();
+                                List<String> prodList = new ArrayList<>();
                              //   log.info("111------accNbr --->" + params.get("accNbr"));
                                 CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(params.get("accNbr"));
                              //   log.info("222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
@@ -871,14 +870,14 @@ public class CamApiServiceImpl implements CamApiService {
                                                         OfferInst offerInst = offerInstCacheEntity.getResultObject();
                                                         //Offer offer = offerProdMapper.selectByPrimaryKey(Integer.valueOf(offerInst.getOfferId().toString()));
                             //                            log.info("777------offer --->" + JSON.toJSONString(offer));
-                                                        prodList.add(offerInst.getOfferId());
+                                                        prodList.add(offerInst.getOfferId().toString());
                                                     }
                                                 }
                                             }
                                         }
                                     }
                                 }
-                                String productString = ChannelUtil.idList2String(prodList);
+                                String productString = ChannelUtil.StringList2String(prodList);
                                 log.info("999------productStr --->" + JSON.toJSONString(productStr));
                                 context.put("PROM_LIST" , productString);
                             }
@@ -954,7 +953,7 @@ public class CamApiServiceImpl implements CamApiService {
                         if(defaultInfallibleTable.equals(labelMap.get("code"))){
                             redisUtils.set("LEFT_PARAM_FLAG" + strategyConfId, ruleId);
                             flagMap.put(ruleId.toString(), true);
-                            //log.info("flag = true进入...");
+                            log.info("flag = true进入...");
                             continue;
                         }
                         //判断标签实例是否足够
