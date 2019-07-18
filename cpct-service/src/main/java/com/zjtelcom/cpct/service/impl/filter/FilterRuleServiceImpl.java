@@ -316,7 +316,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
                 if (offer==null){
                     continue;
                 }
-                codeList.add(offer.getOfferNbr());
+                codeList.add(offer.getOfferId().toString());
             }
             filterRule.setChooseProduct(ChannelUtil.StringList2String(codeList));
             //销售品互斥过滤 加labelcode
@@ -372,7 +372,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
             if (offer==null){
                 continue;
             }
-            codeList.add(offer.getOfferNbr());
+            codeList.add(offer.getOfferId().toString());
         }
         filterRule.setChooseProduct(ChannelUtil.StringList2String(codeList));
         if (filterRule.getFilterType().equals("3000")){
