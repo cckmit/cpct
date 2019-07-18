@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -1045,6 +1046,52 @@ public class SynchronizeController extends BaseController {
             logger.error("同步活动到大数据失败！Exception: ", mktCampaignId, e);
         }
         return JSON.toJSONString(responseHeaderModel);
+    }
+
+
+    /**
+     * 选中的活动同步到大数据
+     *
+     * @param params
+     * @return
+     */
+    @PostMapping("/syncPartActivity")
+    @CrossOrigin
+    public String syncPartActivity(@RequestBody Map<String, Object> params) {
+        Map<String,Object> result = new HashMap<>();
+        List<Integer> mktCampaignIdList = (List<Integer>)params.get("mktCampaignIdList");
+        try {
+            for(int i=0;i<mktCampaignIdList.size();i++) {
+                Long mktCampaignId = Long.valueOf(mktCampaignIdList.get(i));
+                syncActivityService.syncActivity(mktCampaignId);
+            }
+            result.put("resultCode", CommonConstant.CODE_SUCCESS);
+            result.put("resultMsg", "同步成功");
+            result.put("mktCampaignIdList", mktCampaignIdList);
+        } catch (Exception e) {
+            result.put("resultCode", CommonConstant.CODE_FAIL);
+            result.put("resultMsg", "同步失败！");
+            logger.error("同步活动到大数据失败！Exception: ", e);
+        }
+        return JSON.toJSONString(result);
+    }
+
+
+    /**
+     * 所有活动同步到大数据
+     */
+    @PostMapping("/syncTotalActivity")
+    @CrossOrigin
+    public String syncTotalActivity() {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = syncActivityService.syncTotalActivity();
+        } catch (Exception e) {
+            result.put("resultCode", CommonConstant.CODE_FAIL);
+            result.put("resultMsg", "同步失败！");
+            logger.error("同步活动到大数据失败！Exception: ", e);
+        }
+        return JSON.toJSONString(result);
     }
 
 

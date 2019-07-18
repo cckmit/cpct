@@ -267,9 +267,9 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
             List<String> codeList = ChannelUtil.StringToList(filterRuleT.getChooseProduct());
             List<OfferDetail> productList = new ArrayList<>();
             for (String code : codeList){
-                List<Offer> offer = offerMapper.selectByCode(code);
-                if (offer!=null && !offer.isEmpty()){
-                    OfferDetail offerDetail = BeanUtil.create(offer.get(0),new OfferDetail());
+                Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(code));
+                if (offer!=null){
+                    OfferDetail offerDetail = BeanUtil.create(offer,new OfferDetail());
                     productList.add(offerDetail);
                 }
             }
@@ -449,9 +449,9 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
         Sheet sheet = wb.getSheetAt(0);
         int total = sheet.getLastRowNum() + rightListId.length;
-        if(total > 100) {
+        if(total > 500) {
             maps.put("resultCode", CODE_FAIL);
-            maps.put("resultMsg", "销售品数量超过上限100个");
+            maps.put("resultMsg", "销售品数量超过上限500个");
             return maps;
         }
         for(int i=0;i<rightListId.length;i++) {
@@ -459,7 +459,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
             if (offer==null){
                 continue;
             }
-            resultList.add(offer.getOfferNbr());
+            resultList.add(offer.getOfferId().toString());
         }
         Integer rowNums = sheet.getLastRowNum() + 1;
         for (int i = 1; i < rowNums; i++) {
@@ -472,15 +472,17 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
             Cell cell = row.getCell(0);
             String cellValue = ChannelUtil.getCellValue(cell).toString();
             if (!cellValue.equals("null")){
-                List<Offer> offer = offerMapper.selectByCode(cellValue);
-                if (offer!=null && !offer.isEmpty()) {
-                    if(!resultList.contains(cellValue)) {
-                        resultList.add(cellValue);
+                List<Offer> offerList = offerMapper.selectByCode(cellValue);
+                for(Offer offerSingle : offerList) {
+                    if (offerSingle != null) {
+                        if (!resultList.contains(offerSingle.getOfferId().toString())) {
+                            resultList.add(offerSingle.getOfferId().toString());
+                        }
+                    } else {
+                        maps.put("resultCode", CODE_FAIL);
+                        maps.put("resultMsg", cellValue + "销售品不存在");
+                        return maps;
                     }
-                }else {
-                    maps.put("resultCode", CODE_FAIL);
-                    maps.put("resultMsg", cellValue + "销售品不存在");
-                    return maps;
                 }
             }
         }
