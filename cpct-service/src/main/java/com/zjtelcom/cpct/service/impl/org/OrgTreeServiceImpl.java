@@ -1,5 +1,7 @@
 package com.zjtelcom.cpct.service.impl.org;
 
+import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
+import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.fasterxml.jackson.databind.node.LongNode;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -11,10 +13,12 @@ import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.channel.Organization;
 import com.zjtelcom.cpct.domain.org.OrgTree;
 import com.zjtelcom.cpct.domain.system.SysParams;
+import com.zjtelcom.cpct.enums.ORG2RegionId;
 import com.zjtelcom.cpct.exception.SystemException;
 import com.zjtelcom.cpct.service.org.OrgTreeService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.FtpUtils;
+import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -141,16 +145,22 @@ public class OrgTreeServiceImpl implements OrgTreeService{
      */
     @Override
     public Map<String,Object> selectBySumAreaId(Map<String, Object> params) {
+//        String regionId1 = (String) params.get("regionId");
         Map<String, Object> maps = new HashMap<>();
-        List<String> areaIds = (List<String>) params.get("areaId");
         List<Organization> list=new ArrayList<>();
-        if(areaIds==null || areaIds.isEmpty()){
-            list=organizationMapper.selectMenu();
-        }else{
-            for (String id : areaIds){
-                List<Organization> organizations = organizationMapper.selectByParentId(Long.valueOf(id));
-                list.addAll(organizations);
+//        SystemUserDto user = UserUtil.getUser();
+        SystemUserDto user = BssSessionHelp.getSystemUserDto();
+        Long orgId = user.getOrgId();
+//        Long orgId = Long.valueOf(regionId1);
+        Organization organization = organizationMapper.selectByPrimaryKey(orgId);
+        if (organization != null) {
+            Long regionId = organization.getRegionId();
+            String orgDivision = organization.getOrgDivision();
+            if (orgDivision.equals("10")){
+                orgId = ORG2RegionId.getOrgIdByRegionId(regionId);
             }
+            List<Organization> organizations = organizationMapper.selectByParentId(orgId);
+            list.addAll(organizations);
         }
         Page pageInfo = new Page(new PageInfo(list));
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);

@@ -12,13 +12,14 @@
     <dubbo:registry id="esb3" protocol="dubbo" address="134.96.249.149:8001"/>
     <dubbo:registry id="esb2" protocol="dubbo" address="134.96.159.11:8033"/>
 
+
     <!-- 暴露服务 -->
-    <dubbo:protocol name="dubbo" port="30803"/>
+    <dubbo:protocol name="dubbo" port="30803" threadpool="cached" dispatcher="message" threads="1000"/>
     <dubbo:monitor protocol="registry" />
 
     <!--受理清单校验接口-->
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.TarGrpApiService" ref="tarGrpApiServiceImpl" version="1.0" >
-        <dubbo:method name="getCpcTargrp" servicecode="00.1083.getCpcTargrp" timeout="10000"/>
+        <dubbo:method name="getCpcTargrp" servicecode="00.1083.getCpcTargrp" timeout="10000" />
     </dubbo:service>
     <!-- 注册 -->
     <!-- 二次协同查询服务 -->
@@ -37,7 +38,7 @@
 
     <!-- 编码查询事件详情服务 -->
     <dubbo:service  registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ChannelService" ref="channelServiceImpl" version="1.0" >
-        <dubbo:method name="getEventDetail" servicecode="00.1083.getEventDetail" timeout="10000"/>
+        <dubbo:method name="getEventDetail" servicecode="00.1083.getEventDetail" timeout="10000" />
     </dubbo:service>
 
     <!-- 名单导入服务 -->

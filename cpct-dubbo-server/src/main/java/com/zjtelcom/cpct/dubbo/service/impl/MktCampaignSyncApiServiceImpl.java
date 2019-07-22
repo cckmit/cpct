@@ -38,6 +38,7 @@ import com.zjtelcom.cpct.dubbo.service.RecordService;
 import com.zjtelcom.cpct.dubbo.service.SyncActService;
 import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
+import com.zjtelcom.cpct.service.channel.SearchLabelService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInfoMapper;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
@@ -216,8 +217,10 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
     @Autowired
     private SysAreaMapper sysAreaMapper;
 
-    @Autowired
+    @Autowired(required = false)
     private MktCampaignService mktCampaignService;
+    @Autowired
+    private SearchLabelService searchLabelService;
 
 
     //同步表名
@@ -279,7 +282,6 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
 
                 mktCampaignMap = mktCampaignService.publishMktCampaign(mktCampaignId);
                 mktCampaignService.changeMktCampaignStatus(mktCampaignId, "2002");
-
 /*
                 // 获取当前活动信息
                 MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);

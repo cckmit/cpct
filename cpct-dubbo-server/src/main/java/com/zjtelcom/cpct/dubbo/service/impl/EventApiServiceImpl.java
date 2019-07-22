@@ -50,12 +50,12 @@ import com.zjtelcom.cpct.dto.event.EventMatchRulCondition;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dubbo.service.CamApiService;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
-import com.zjtelcom.cpct.dubbo.service.SearchLabelService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.elastic.service.EsHitService;
 import com.zjtelcom.cpct.enums.AreaNameEnum;
 import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
+import com.zjtelcom.cpct.service.channel.SearchLabelService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
@@ -695,16 +695,19 @@ public class EventApiServiceImpl implements EventApiService {
                 Map<String, String> mktAllLabels = (Map<String, String>) redisUtils.get("EVT_ALL_LABEL_" + eventId);
                 if (mktAllLabels == null) {
                     try {
-                        mktAllLabels = searchLabelService.labelListByEventId(eventId);  //查询事件下使用的所有标签
-                        if (null != mktAllLabels) {
-                            redisUtils.set("EVT_ALL_LABEL_" + eventId, mktAllLabels);
-                        } else {
-                            log.info("获取事件下所有标签失败");
-                            esJson.put("hit", false);
-                            esJson.put("msg", "获取事件下所有标签失败");
-                            esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
-                            return Collections.EMPTY_MAP;
-                        }
+
+                        mktAllLabels = new HashMap<>();
+
+//                        mktAllLabels = searchLabelService.labelListByEventId(eventId);  //查询事件下使用的所有标签
+//                        if (null != mktAllLabels) {
+//                            redisUtils.set("EVT_ALL_LABEL_" + eventId, mktAllLabels);
+//                        } else {
+//                            log.info("获取事件下所有标签失败");
+//                            esJson.put("hit", false);
+//                            esJson.put("msg", "获取事件下所有标签失败");
+//                            esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
+//                            return Collections.EMPTY_MAP;
+//                        }
                     } catch (Exception e) {
                         esJson.put("hit", false);
                         esJson.put("msg", "获取事件下所有标签异常");
@@ -1947,10 +1950,6 @@ public class EventApiServiceImpl implements EventApiService {
 
             try {
                 Long mktCampaginId = (Long) act.get("mktCampaginId");
-
-                if (mktCampaginId == 1589) {
-                    System.out.println("11");
-                }
                 //初始化es log
                 JSONObject esJson = new JSONObject();
                 esJson.put("reqId", reqId);
