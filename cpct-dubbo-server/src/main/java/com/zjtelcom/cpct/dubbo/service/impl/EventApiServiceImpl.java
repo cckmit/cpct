@@ -477,7 +477,12 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
                 //验证事件采集项
-                List<EventItem> contactEvtItems = contactEvtItemMapper.listEventItem(eventId);
+                List<EventItem> contactEvtItems = (List<EventItem>) redisUtils.get("EVENT_ITEM_" + eventId);
+                if (contactEvtItems == null) {
+                    contactEvtItems = contactEvtItemMapper.listEventItem(eventId);
+                    redisUtils.set("EVENT_ITEM_" + eventId, contactEvtItems);
+                }
+
                 List<Map<String, Object>> evtTriggers = new ArrayList<>();
                 Map<String, Object> trigger;
                 //事件采集项标签集合(事件采集项标签优先规则)
@@ -1888,7 +1893,12 @@ public class EventApiServiceImpl implements EventApiService {
      * @return
      */
     private List<Map<String, Object>> getResultByEvent(Long eventId, String lanId, String channel, String reqId, String accNbr, String c4, String custId) {
-        List<Map<String, Object>> mktCampaginIdList = mktCamEvtRelMapper.listActivityByEventId(eventId);
+        List<Map<String, Object>> mktCampaginIdList = (List<Map<String, Object>> ) redisUtils.get("MKT_CAM_ID_LIST_" + eventId);
+        if(mktCampaginIdList==null){
+            mktCampaginIdList = mktCamEvtRelMapper.listActivityByEventId(eventId);
+            redisUtils.set("MKT_CAM_ID_LIST_" + eventId, mktCampaginIdList);
+        }
+
         // 初始化线程
         ExecutorService fixThreadPool = Executors.newFixedThreadPool(maxPoolSize);
         List<Future<Map<String, Object>>> futureList = new ArrayList<>();
@@ -1947,10 +1957,6 @@ public class EventApiServiceImpl implements EventApiService {
 
             try {
                 Long mktCampaginId = (Long) act.get("mktCampaginId");
-
-                if (mktCampaginId == 1589) {
-                    System.out.println("11");
-                }
                 //初始化es log
                 JSONObject esJson = new JSONObject();
                 esJson.put("reqId", reqId);
@@ -1968,7 +1974,11 @@ public class EventApiServiceImpl implements EventApiService {
 
                     boolean iSRed = false;
                     //验证过滤规则时间,默认只查询5000类型的时间段过滤
-                    List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(mktCampaginId, strategyTypeList);
+                    List<FilterRule> filterRuleList = (List<FilterRule>) redisUtils.get("FILTER_RULE_LIST_" + mktCampaginId);
+                    if(filterRuleList == null){
+                        filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(mktCampaginId, strategyTypeList);
+                        redisUtils.set("FILTER_RULE_LIST_" + mktCampaginId, filterRuleList);
+                    }
                     for (FilterRule filterRule : filterRuleList) {
                         if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
                             iSRed = true;
@@ -2030,7 +2040,11 @@ public class EventApiServiceImpl implements EventApiService {
                     strategyTypeList.add("2000");
                     strategyTypeList.add("5000");
                     //验证过滤规则时间,默认只查询5000类型的时间段过滤
-                    List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(mktCampaginId, strategyTypeList);
+                    List<FilterRule> filterRuleList = (List<FilterRule>) redisUtils.get("FILTER_RULE_LIST_" + mktCampaginId);
+                    if(filterRuleList == null){
+                        filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(mktCampaginId, strategyTypeList);
+                        redisUtils.set("FILTER_RULE_LIST_" + mktCampaginId, filterRuleList);
+                    }
                     for (FilterRule filterRule : filterRuleList) {
                         if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
                             //获取名单
@@ -2110,7 +2124,12 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
                 // 查询策略信息
-                List<MktStrategyConfDO> mktStrategyConfDOS = mktStrategyConfMapper.selectByCampaignId(mktCampaginId);
+                List<MktStrategyConfDO> mktStrategyConfDOS = (List<MktStrategyConfDO>) redisUtils.get("MKT_STRATEGY_CONF_LIST_" + mktCampaginId);
+                if(mktStrategyConfDOS==null){
+                    mktStrategyConfDOS = mktStrategyConfMapper.selectByCampaignId(mktCampaginId);
+                    redisUtils.set("MKT_STRATEGY_CONF_LIST_" + mktCampaginId, mktStrategyConfDOS);
+                }
+
                 if (mktStrategyConfDOS == null) {
                     esJson.put("hit", false);
                     esJson.put("msg", "策略查询失败");
@@ -2206,7 +2225,11 @@ public class EventApiServiceImpl implements EventApiService {
                                 channelsIdList.add(Long.valueOf(channelsId));
                             }
                         }
-                        List<String> channelCodeList = contactChannelMapper.selectChannelCodeByPrimaryKey(channelsIdList);
+                        List<String> channelCodeList = ( List<String> ) redisUtils.get("CHANNEL_CODE_LIST_" + mktStrategyConf.getMktStrategyConfId());
+                        if(channelCodeList==null){
+                            channelCodeList = contactChannelMapper.selectChannelCodeByPrimaryKey(channelsIdList);
+                            redisUtils.set("CHANNEL_CODE_LIST_" + mktStrategyConf.getMktStrategyConfId(), channelCodeList);
+                        }
                         boolean channelCheck = true;
                         for (String channelCode : channelCodeList) {
                             if (channel != null) {
@@ -2258,7 +2281,12 @@ public class EventApiServiceImpl implements EventApiService {
 
                     // 获取规则
                     List<Map<String, Object>> ruleMapList = new ArrayList<>();
-                    List<MktStrategyConfRuleDO> mktStrategyConfRuleList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(mktStrategyConf.getMktStrategyConfId());
+                    List<MktStrategyConfRuleDO> mktStrategyConfRuleList = (List<MktStrategyConfRuleDO>) redisUtils.get("MKT_RULE_LIST_" +mktStrategyConf.getMktStrategyConfId());
+                    if(mktStrategyConfRuleList == null){
+                        mktStrategyConfRuleList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(mktStrategyConf.getMktStrategyConfId());
+                        redisUtils.set("MKT_RULE_LIST_" +mktStrategyConf.getMktStrategyConfId(), mktStrategyConfRuleList);
+                    }
+
                     for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleList) {
                         Map<String, Object> ruleMap = new ConcurrentHashMap<>();
                         String evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId();
