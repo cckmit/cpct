@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.controller.system;
 
 import com.alibaba.fastjson.JSON;
+import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.enums.AreaCodeEnum;
@@ -126,12 +127,12 @@ public class SysAreaController {
 //            if(!"".equals(regionId)){
 //                lanId = AreaCodeEnum.getLandIdByRegionId(Long.valueOf(regionId));
 //            }
-            SystemUserDto user = UserUtil.getUser();
+            SystemUserDto user = BssSessionHelp.getSystemUserDto();
 //            if (StringUtils.isNotBlank(user.getOrgId().toString())){
 //                map = sysAreaService.listStrAreaTree(lanId.toString());
 //                map = sysAreaService.getCityByAreaTree(user.getOrgId());
             Long orgId = Long.valueOf(user.getOrgId());
-            map = sysAreaService.getCityByAreaTree(Long.valueOf(orgId));
+            map = sysAreaService.getCityByAreaTree(orgId);
 
 //            }
             map.put("resultCode", CommonConstant.CODE_SUCCESS);
