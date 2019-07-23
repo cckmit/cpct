@@ -136,13 +136,33 @@ public class SysAreaServiceImpl implements SysAreaService {
     }
 
     @Override
-    public Map<String, Object> getCityByAreaTree(Long orgId) {
+    public Map<String, Object> getCityByAreaTree(Long staffId) {
         Map<String, Object> areaMap = new HashMap<>();
         List<SysArea> sysAreaList = new ArrayList<>();
+        Long orgId = null;
+        List<Map<String, Object>> staffOrgId = organizationMapper.getStaffOrgId(staffId);
+        if (!staffOrgId.isEmpty() && staffOrgId.size() > 0){
+            for (Map<String, Object> map : staffOrgId) {
+                Object orgDivision = map.get("orgDivision");
+                Object orgId1 = map.get("orgId");
+                if (orgDivision!=null){
+                    if (orgDivision.toString().equals("30")) {
+                        orgId = Long.valueOf(orgId1.toString());
+                        break;
+                    }else if (orgDivision.toString().equals("20")){
+                        orgId = Long.valueOf(orgId1.toString());
+                        break;
+                    }else if (orgDivision.toString().equals("10")){
+                        orgId = Long.valueOf(orgId1.toString());
+                        break;
+                    }
+                }
+            }
+        }
         Organization organization = organizationMapper.selectByPrimaryKey(orgId);
         if (organization != null){
             Long regionId = organization.getRegionId();
-            String orgDivision = organization.getOrgDivision();
+//            String orgDivision = organization.getOrgDivision();
             Long landIdByRegionId = AreaCodeEnum.getLandIdByRegionId(regionId);
             String lanId = "";
             if (landIdByRegionId != null ){
