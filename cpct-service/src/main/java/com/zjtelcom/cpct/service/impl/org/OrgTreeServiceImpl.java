@@ -211,6 +211,10 @@ public class OrgTreeServiceImpl implements OrgTreeService{
             }else {
                list = organizationMapper.selectByParentId(orgId);
             }
+
+            if (list ==null || list.isEmpty()){
+                list = organizationMapper.selectMenu();
+            }
         }
         Page pageInfo = new Page(new PageInfo(list));
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
