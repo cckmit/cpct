@@ -471,7 +471,7 @@ public class CamApiServiceImpl implements CamApiService {
                     // 从命中列表中移出默认固定规则
                     for (Map<String, Object> strategyMap : strategyMapList) {
                         Long strategyConfId = (Long) strategyMap.get("strategyConfId");
-                        String ruleId = redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId).toString();
+                        String ruleId = redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId) == null? "":redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId).toString();
                         if (ruleId != null && ruleId != "") {
                             for (Map<String, Object> map : ruleList) {
                                 Long ruleId2 = Long.valueOf(map.get("ruleId").toString());
