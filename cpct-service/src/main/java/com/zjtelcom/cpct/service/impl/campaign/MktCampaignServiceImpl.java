@@ -1504,7 +1504,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 List<MktCamResultRelDO> mktCamResultRelDOS = mktCamResultRelMapper.selectResultByMktCampaignId(mktCampaignId);
                 for (MktCamResultRelDO mktCamResultRelDO:mktCamResultRelDOS) {
                     mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
-                    mktCamResultRelMapper.updateByPrimaryKey(mktCamResultRelDO);
+                    if(StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)){
+                        mktCamResultRelMapper.updateByPrimaryKey(mktCamResultRelDO);
+                    }
+
                 }
 
                 // 发布调整的活动，下线源活动
@@ -1514,6 +1517,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     MktCampaignDO mktCampaignDOAdjust= mktCampaignMapper.selectPrimaryKeyByInitId(initId, StatusCode.STATUS_CODE_ADJUST.getStatusCode());
                     changeMktCampaignStatus(mktCampaignDOAdjust.getMktCampaignId(), StatusCode.STATUS_CODE_ROLL.getStatusCode());
 
+                }
+                if(StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)){
+                    // 活动下线清缓存
+                    redisUtils.del("MKT_CAMPAIGN_" + mktCampaignId);
+                    // 删除下线活动与事件的关系
+                    mktCamEvtRelMapper.deleteByMktCampaignId(mktCampaignId);
                 }
 
                 // 删除准生产的redis缓存
@@ -1535,7 +1544,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         }
                     }.start();
                 }
-            } else if(StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd) || StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)){
+            } else if(StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)){
                 // 活动下线清缓存
                 redisUtils.del("MKT_CAMPAIGN_" + mktCampaignId);
                 if(StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)){

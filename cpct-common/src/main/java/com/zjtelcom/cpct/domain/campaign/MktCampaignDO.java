@@ -35,7 +35,7 @@ public class MktCampaignDO extends BaseEntity{
     private Long regionId;
     private String lifeStage;
     private String extMktCampaignId;
-    private Long execInitTime;
+    private String execInitTime;
 
     public Long getInitId() {
         return initId;
@@ -270,11 +270,11 @@ public class MktCampaignDO extends BaseEntity{
         this.extMktCampaignId = extMktCampaignId;
     }
 
-    public Long getExecInitTime() {
+    public String getExecInitTime() {
         return execInitTime;
     }
 
-    public void setExecInitTime(Long execInitTime) {
+    public void setExecInitTime(String execInitTime) {
         this.execInitTime = execInitTime;
     }
 }
