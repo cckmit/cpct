@@ -26,11 +26,8 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class RedisUtils {
 
-    @Autowired
-    private RedisTemplate redisTemplate;
     @Autowired(required = false)
     private CtgJedisPool ctgJedisPool;
-
 
     /**
      *
@@ -152,18 +149,18 @@ public class RedisUtils {
      * @param value
      * @return
      */
-    public boolean set(final String key, Object value, Long expireTime, TimeUnit timeUnit) {
-        boolean result = false;
-        try {
-            ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-            operations.set(key, value);
-            redisTemplate.expire(key, expireTime, timeUnit);
-            result = true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
+//    public boolean set(final String key, Object value, Long expireTime, TimeUnit timeUnit) {
+//        boolean result = false;
+//        try {
+//            ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+//            operations.set(key, value);
+//            redisTemplate.expire(key, expireTime, timeUnit);
+//            result = true;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return result;
+//    }
 
 
     /**

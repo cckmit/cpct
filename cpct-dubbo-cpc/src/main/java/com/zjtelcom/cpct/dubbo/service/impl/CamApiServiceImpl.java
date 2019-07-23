@@ -128,8 +128,8 @@ public class CamApiServiceImpl implements CamApiService {
     @Autowired
     private MktCamDisplayColumnRelMapper mktCamDisplayColumnRelMapper;
 
-    @Autowired
-    private OfferProdMapper offerProdMapper;
+//    @Autowired
+//    private OfferProdMapper offerProdMapper;
 
     @Autowired(required = false)
     private SysParamsMapper sysParamsMapper;  //查询系统参数
@@ -277,7 +277,7 @@ public class CamApiServiceImpl implements CamApiService {
                             // 判断是否进行CRM销售品过滤
                             if (realProdFilter != null && "0".equals(realProdFilter)) {
                             //    log.info("111------accNbr --->" + params.get("accNbr"));
-                                List<String> prodStrList = new ArrayList<>();
+                                List<String> prodList = new ArrayList<>();
                                 CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(params.get("accNbr"));
                             //    log.info("222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
                                 if(prodInstIdsObject!=null &&  prodInstIdsObject.getResultObject() !=null ){
@@ -301,10 +301,11 @@ public class CamApiServiceImpl implements CamApiService {
                             //                        log.info("666------offerInstCacheEntity --->" + JSON.toJSONString(offerInstCacheEntity));
                                                     if(offerInstCacheEntity!=null && offerInstCacheEntity.getResultObject()!=null){
                                                         OfferInst offerInst = offerInstCacheEntity.getResultObject();
-                                                        Offer offer = offerProdMapper.selectByPrimaryKey(Integer.valueOf(offerInst.getOfferId().toString()));
+                                                        //Offer offer = offerProdMapper.selectByPrimaryKey(Integer.valueOf(offerInst.getOfferId().toString()));
                              //                           log.info("777------offer --->" + JSON.toJSONString(offer));
-                                                        prodStrList.add(offer.getOfferNbr());
-                                                        filterRuleTimeMap.put(offer.getOfferNbr(), offerInst.getEffDate());
+                                                        //prodStrList.add(offer.getOfferNbr());
+                                                        prodList.add(offerInst.getOfferId().toString());
+                                                        filterRuleTimeMap.put(offerInst.getOfferId().toString(), offerInst.getEffDate());
                                                         log.info("888------filterRuleTimeMap --->" + JSON.toJSONString(filterRuleTimeMap));
                                                     }
                                                 }
@@ -312,7 +313,7 @@ public class CamApiServiceImpl implements CamApiService {
                                         }
                                     }
                                 }
-                                productStr = ChannelUtil.StringList2String(prodStrList);
+                                productStr = ChannelUtil.StringList2String(prodList);
                                 log.info("999------productStr --->" + JSON.toJSONString(productStr));
                             } else if (!context.containsKey("PROM_LIST")) { // 有没有办理销售品--销售列表标签
                                 //存在于校验
@@ -1299,8 +1300,153 @@ public class CamApiServiceImpl implements CamApiService {
                 jsonObject.put("msg", "规则异常");
                 esHitService.save(jsonObject, IndexList.RULE_MODULE);
             }
+
             return ruleMap;
         }
+
+        private void getRuleResult(JSONObject jsonObject, String promIntegId, Map<String, Object> ruleMap, List<Map<String, Object>> taskChlList, RuleResult ruleResult, List<Map<String, String>> productList) {
+            log.info(Thread.currentThread().getName() + "------------->3");
+            jsonObject.put("hit", true);
+
+            //拼接返回结果
+            ruleMap.put("orderISI", params.get("reqId")); //流水号
+            ruleMap.put("activityId", privateParams.get("activityId")); //活动编码
+            ruleMap.put("activityName", privateParams.get("activityName")); //活动名称
+            ruleMap.put("activityType", privateParams.get("activityType")); //活动类型
+            ruleMap.put("activityStartTime", privateParams.get("activityStartTime")); //活动开始时间
+            ruleMap.put("activityEndTime", privateParams.get("activityEndTime")); //活动结束时间
+            ruleMap.put("skipCheck", "0"); //todo 调过预校验
+            ruleMap.put("orderPriority", privateParams.get("orderPriority")); //活动优先级
+            ruleMap.put("integrationId", privateParams.get("integrationId")); //集成编号（必填）
+            ruleMap.put("accNbr", privateParams.get("accNbr")); //业务号码（必填）
+            ruleMap.put("policyId", strategyConfId.toString()); //策略编码
+            ruleMap.put("policyName", strategyConfName); //策略名称
+            ruleMap.put("ruleId", ruleId.toString()); //规则编码
+            ruleMap.put("ruleName", ruleName); //规则名称
+            ruleMap.put("promIntegId", promIntegId); // 销售品实例ID
+
+            //查询销售品列表
+            if (productStr != null && !"".equals(productStr)) {
+                // 推荐条目集合存入redis -- linchao
+                List<MktCamItem> mktCamItemList = (List<MktCamItem>) redisUtils.get("MKT_CAM_ITEM_LIST_" + ruleId.toString());
+                if (mktCamItemList == null) {
+                    mktCamItemList = new ArrayList<>();
+                    String[] productArray = productStr.split("/");
+                    for (String str : productArray) {
+                        // 从redis中获取推荐条目
+                        MktCamItem mktCamItem = (MktCamItem) redisUtils.get("MKT_CAM_ITEM_" + str);
+                        if (mktCamItem == null) {
+                            mktCamItem = mktCamItemMapper.selectByPrimaryKey(Long.valueOf(str));
+                            if (mktCamItem == null) {
+                                continue;
+                            }
+                            redisUtils.set("MKT_CAM_ITEM_" + mktCamItem.getMktCamItemId(), mktCamItem);
+                        }
+                        mktCamItemList.add(mktCamItem);
+                    }
+                    redisUtils.set("MKT_CAM_ITEM_LIST_" + ruleId.toString(), mktCamItemList);
+                }
+                for (MktCamItem mktCamItem : mktCamItemList) {
+                    Map<String, String> product = new ConcurrentHashMap<>();
+                    product.put("productId", mktCamItem.getItemId().toString());
+                    product.put("productCode", mktCamItem.getOfferCode());
+                    product.put("productName", mktCamItem.getOfferName());
+                    product.put("productType", mktCamItem.getItemType());
+                    product.put("productFlag", "1000");  //todo 销售品标签
+                    //销售品优先级
+                    if (mktCamItem.getPriority() != null) {
+                        product.put("productPriority", mktCamItem.getPriority().toString());
+                    } else {
+                        product.put("productPriority", "0");
+                    }
+                    productList.add(product);
+                }
+            }
+            jsonObject.put("productList", productList);
+
+            if (ruleResult.getResult() == null) {
+                ruleResult.setResult(false);
+            }
+
+            //获取协同渠道所有id
+            String[] evtContactConfIdArray = evtContactConfIdStr.split("/");
+
+            //判断需要返回的渠道
+            Channel channelMessage = (Channel) redisUtils.get("MKT_ISALE_LABEL_" + params.get("channelCode"));
+            if (channelMessage == null) {
+                channelMessage = contactChannelMapper.selectByCode(params.get("channelCode"));
+                redisUtils.set("MKT_ISALE_LABEL_" + params.get("channelCode"), channelMessage);
+            }
+            String channelCode = null;
+
+            //新增加入reids -- linchao
+            List<MktCamChlConfDO> mktCamChlConfDOS = (List<MktCamChlConfDO>) redisUtils.get("MKT_CAMCHL_CONF_LIST_" + ruleId.toString());
+            if (mktCamChlConfDOS == null) {
+                mktCamChlConfDOS = new ArrayList<>();
+                if (evtContactConfIdArray != null && !"".equals(evtContactConfIdArray[0])) {
+                    for (String str : evtContactConfIdArray) {
+                        MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(Long.valueOf(str));
+                        mktCamChlConfDOS.add(mktCamChlConfDO);
+                        redisUtils.set("MKT_CAMCHL_CONF_LIST_" + ruleId.toString(), mktCamChlConfDOS);
+                    }
+                }
+            }
+            for (MktCamChlConfDO mktCamChlConfDO : mktCamChlConfDOS) {
+                if (mktCamChlConfDO.getContactChlId().equals(channelMessage.getContactChlId())) {
+                    channelCode = mktCamChlConfDO.getEvtContactConfId().toString();
+                    break;
+                }
+            }
+
+            //初始化结果集
+            List<Future<Map<String, Object>>> threadList = new ArrayList<>();
+            //初始化线程池
+            ExecutorService executorService = Executors.newCachedThreadPool();
+
+            try {
+                //遍历协同渠道
+                if (channelCode != null) {
+                    Long evtContactConfId = Long.parseLong(channelCode);
+                    //提交线程
+                    //Future<Map<String, Object>> f = executorService.submit(new ChannelTask(evtContactConfId, productList, context, reqId));
+                    //将线程处理结果添加到结果集
+                    //threadList.add(f);
+                    Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId);
+                    taskChlList.add(channelMap);
+                } else {
+                    if (evtContactConfIdArray != null && !"".equals(evtContactConfIdArray[0])) {
+                        for (String str : evtContactConfIdArray) {
+                            //协同渠道规则表id（自建表）
+                            Long evtContactConfId = Long.parseLong(str);
+                            //提交线程
+                            //Future<Map<String, Object>> f = executorService.submit(new ChannelTask(evtContactConfId, productList, context, reqId));
+                            //将线程处理结果添加到结果集
+                            //threadList.add(f);
+                            Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId);
+                            if (channelMap != null && !channelMap.isEmpty()) {
+                                taskChlList.add(channelMap);
+                            }
+                        }
+                    }
+                }
+                //获取结果
+
+           /* for (Future<Map<String, Object>> future : threadList) {
+                if (!future.get().isEmpty()) {
+                    taskChlList.add(future.get());
+                }
+            }*/
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                //发生异常关闭线程池
+                executorService.shutdownNow();
+            } finally {
+                //关闭线程池
+                executorService.shutdownNow();
+            }
+        }
+
     }
 
     private Map<String, Object> ChannelTask(Long evtContactConfId, List<Map<String, String>> productList, DefaultContext<String, Object> context, String reqId) {
