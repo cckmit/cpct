@@ -9,6 +9,9 @@ import java.util.Date;
 
 @Data
 public class Label extends BaseEntity implements Serializable {
+
+    private static final long serialVersionUID = 4125096758372084309L;
+
     private Long injectionLabelId;
     private Long tagRowId;
     private String injectionLabelCode;//标签的编码
