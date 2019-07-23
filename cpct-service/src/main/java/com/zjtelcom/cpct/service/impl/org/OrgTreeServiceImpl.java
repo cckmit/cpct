@@ -145,14 +145,20 @@ public class OrgTreeServiceImpl implements OrgTreeService{
      */
     @Override
     public Map<String,Object> selectBySumAreaId(Map<String, Object> params) {
-//        String regionId1 = (String) params.get("regionId");
+        Organization organization = null;
+        Long orgId = null;
         Map<String, Object> maps = new HashMap<>();
         List<Organization> list=new ArrayList<>();
+        List<String> areaList=(List<String>)params.get("areaId");
+        if (areaList!=null && areaList.size()>0){
+            list = organizationMapper.selectByParentId(Long.valueOf(areaList.get(0)));
+        }else {
 //        SystemUserDto user = UserUtil.getUser();
-        SystemUserDto user = BssSessionHelp.getSystemUserDto();
-        Long orgId = user.getOrgId();
+            SystemUserDto user = BssSessionHelp.getSystemUserDto();
+            orgId = user.getOrgId();
 //        Long orgId = Long.valueOf(regionId1);
-        Organization organization = organizationMapper.selectByPrimaryKey(orgId);
+            organization = organizationMapper.selectByPrimaryKey(orgId);
+        }
         if (organization != null) {
             Long regionId = organization.getRegionId();
             String orgDivision = organization.getOrgDivision();
