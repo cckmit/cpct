@@ -463,17 +463,16 @@ public class CamApiServiceImpl implements CamApiService {
             for (Map.Entry entry:flagMap.entrySet()) {
                if(true == Boolean.valueOf(entry.getValue().toString())){
                    isWithDefaultLabel = true;
+                   break;
                }
             }
             if(isWithDefaultLabel) {
-                log.info("------------->10");
                 //判断是否有命中
                 if (ruleList.size() > 1) {
-                    log.info("------------->11");
                     // 从命中列表中移出默认固定规则
                     for (Map<String, Object> strategyMap : strategyMapList) {
                         Long strategyConfId = (Long) strategyMap.get("strategyConfId");
-                        String ruleId = redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId).toString();
+                        String ruleId = redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId) == null? "":redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId).toString();
                         if (ruleId != null && ruleId != "") {
                             for (Map<String, Object> map : ruleList) {
                                 Long ruleId2 = Long.valueOf(map.get("ruleId").toString());
@@ -565,35 +564,6 @@ public class CamApiServiceImpl implements CamApiService {
                         }
                     }
                 }
-                /*{
-                    log.info("------------->12");
-                    //遍历策略列表
-                    for (Map<String, Object> strategyMap : strategyMapList) {
-                        Long strategyConfId = (Long) strategyMap.get("strategyConfId");
-                        String strategyConfName = (String) strategyMap.get("strategyConfName");
-                        List<Map<String, Object>> ruleMapList = (List<Map<String, Object>>) strategyMap.get("ruleMapList");
-                        // 如果是活动是服务级活动，未命中规则采用必命中默认规则
-                        String ruleId = redisUtils.get("LEFT_PARAM_FLAG_" + strategyConfId).toString();
-                        if(ruleId != null && ruleId != ""){
-                            if (ruleMapList != null && ruleMapList.size() > 0) {
-                                for (Map<String, Object> ruleMap : ruleMapList) {
-                                    Long ruleId2 = (Long) ruleMap.get("ruleId");
-                                    String ruleName = (String) ruleMap.get("ruleName");
-                                    Long tarGrpId = (Long) ruleMap.get("tarGrpId");
-                                    String productId = (String) ruleMap.get("productId");
-                                    String evtContactConfId = (String) ruleMap.get("evtContactConfId");
-                                    if(ruleId.equals(ruleId2)){
-                                        Future<Map<String, Object>> f = executorService.submit(new RuleTask(params, privateParams, strategyConfId, strategyConfName, tarGrpId, productId, evtContactConfId, ruleId2, ruleName, context, lanId));
-                                        //将线程处理结果添加到结果集
-                                        ruleList.add(f.get());
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    activity.put("ruleList", ruleList);
-                    esJson.put("hit", true);
-                }*/
                 esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
             }else {
                 log.info("------------->20");
@@ -610,18 +580,6 @@ public class CamApiServiceImpl implements CamApiService {
                     iSaleDisplay = (List<Map<String, Object>>) redisUtils.get("MKT_ISALE_LABEL_" + mktCampaign.getIsaleDisplay());
                     if (iSaleDisplay == null) {
                         iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getIsaleDisplay());
-//                    List<Long> injectionLabelIds = new ArrayList<>();
-//                    List<MktCamDisplayColumnRel> mktCamDisplayColumnRelList = mktCamDisplayColumnRelMapper.selectLabelByCampaignIdAndDisplayId(mktCampaign.getMktCampaignId(), mktCampaign.getIsaleDisplay());
-//                    for (MktCamDisplayColumnRel mktCamDisplayColumnRel : mktCamDisplayColumnRelList) {
-//                        injectionLabelIds.add(mktCamDisplayColumnRel.getInjectionLabelId());
-//                    }
-//                    List<Label> labelList = injectionLabelMapper.listLabelByIdList(injectionLabelIds);
-//                    for (Label label : labelList) {
-//                        Map<String, Object> labelMap = new HashMap<>();
-//                        labelMap.put("labelCode", label.getInjectionLabelCode());
-//                        labelMap.put("labelName", label.getInjectionLabelName());
-//                        labelMap.put("typeCode", label);
-//                    }
                         redisUtils.set("MKT_ISALE_LABEL_" + mktCampaign.getIsaleDisplay(), iSaleDisplay);
                     }
 
@@ -1027,7 +985,6 @@ public class CamApiServiceImpl implements CamApiService {
                 //初始化返回结果中的销售品条目
                 List<Map<String, String>> productList = new ArrayList<>();
                 if(flagMap.get(ruleId.toString()) == false) {
-                    log.info(Thread.currentThread().getName() + "------------->1");
                     //验证是否标签实例不足
                     if (notEnoughLabel.length() > 0) {
                         log.info("notEnoughLabel.length() > 0->标签实例不足");
@@ -1052,14 +1009,9 @@ public class CamApiServiceImpl implements CamApiService {
                         esHitService.save(jsonObject, IndexList.RULE_MODULE);
                         return Collections.EMPTY_MAP;
                     }
-                    //                System.out.println("result=" + ruleResult.getResult());
-                    //                System.out.println("Tree=" + ruleResult.getRule().toTree());
-                    //                System.out.println("TraceMap=" + ruleResult.getTraceMap());
 
                     jsonObject.put("express", express);
 
-
-                    log.info(Thread.currentThread().getName() + "------------->2");
                     if (ruleResult.getResult() != null && ((Boolean) ruleResult.getResult())) {
                         jsonObject.put("hit", true);
 
@@ -1184,14 +1136,6 @@ public class CamApiServiceImpl implements CamApiService {
                                     }
                                 }
                             }
-                            //获取结果
-
-                           /* for (Future<Map<String, Object>> future : threadList) {
-                                if (!future.get().isEmpty()) {
-                                    taskChlList.add(future.get());
-                                }
-                            }*/
-
                         } catch (Exception e) {
                             e.printStackTrace();
                             //发生异常关闭线程池
@@ -1201,7 +1145,6 @@ public class CamApiServiceImpl implements CamApiService {
                             executorService.shutdownNow();
                         }
                     } else {
-                        log.info(Thread.currentThread().getName() + "------------->4");
                         ruleMap.put("msg", "规则引擎匹配未通过");
                         jsonObject.put("hit", "false");
                         jsonObject.put("msg", "规则引擎匹配未通过");
@@ -1332,14 +1275,6 @@ public class CamApiServiceImpl implements CamApiService {
                                 }
                             }
                         }
-                        //获取结果
-
-                       /* for (Future<Map<String, Object>> future : threadList) {
-                            if (!future.get().isEmpty()) {
-                                taskChlList.add(future.get());
-                            }
-                        }*/
-
                     } catch (Exception e) {
                         e.printStackTrace();
                         //发生异常关闭线程池
