@@ -275,9 +275,9 @@ public class CamApiServiceImpl implements CamApiService {
                             Map<String, Object> filterRuleTimeMap = new HashMap<>();
                             // 判断是否进行CRM销售品过滤
                             if (realProdFilter != null && "1".equals(realProdFilter)) {
-                            //    log.info("111------accNbr --->" + params.get("accNbr"));
+                                log.info("111------accNbr --->" + privateParams.get("accNbr"));
                                 List<String> prodList = new ArrayList<>();
-                                CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(params.get("accNbr"));
+                                CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(privateParams.get("accNbr"));
                             //    log.info("222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
                                 if(prodInstIdsObject!=null &&  prodInstIdsObject.getResultObject() !=null ){
                                     Set<String> prodInstIds = prodInstIdsObject.getResultObject();
@@ -377,7 +377,7 @@ public class CamApiServiceImpl implements CamApiService {
                             if (productCheck) {
                                 esJson.put("hit", "false");
                                 esJson.put("msg", "销售品过滤验证未通过:" + esMsg);
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
+                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + privateParams.get("accNbr"));
                                 return Collections.EMPTY_MAP;
                             }
                         }
@@ -394,7 +394,7 @@ public class CamApiServiceImpl implements CamApiService {
                                 //过滤规则信息查询失败
                                 esJson.put("hit", false);
                                 esJson.put("msg", "过扰规则信息查询失败 byId: " + filterRuleId);
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
+                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + privateParams.get("accNbr"));
                                 return Collections.EMPTY_MAP;
                             } else {
                                 redisUtils.set("FILTER_RULE_DISTURB_" + filterRuleId, labels);
@@ -656,13 +656,13 @@ public class CamApiServiceImpl implements CamApiService {
                     esJson.put("hit", false);
                     esJson.put("msg", "策略均未命中");
                 }
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
+                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + privateParams.get("accNbr"));
             }
         } catch (Exception e) {
             e.printStackTrace();
             esJson.put("hit", false);
             esJson.put("msg", "获取计算结果异常");
-            esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
+            esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + privateParams.get("accNbr"));
             //发生异常关闭线程池
             executorService.shutdownNow();
         } finally {
@@ -794,8 +794,8 @@ public class CamApiServiceImpl implements CamApiService {
             }
             if (realProdFilter != null && "1".equals(realProdFilter)) {
                 List<String> prodList = new ArrayList<>();
-                //   log.info("111------accNbr --->" + params.get("accNbr"));
-                CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(params.get("accNbr"));
+                log.info("111------accNbr --->" + privateParams.get("accNbr"));
+                CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(privateParams.get("accNbr"));
                 //   log.info("222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
                 if(prodInstIdsObject!=null &&  prodInstIdsObject.getResultObject() !=null ){
                     Set<String> prodInstIds = prodInstIdsObject.getResultObject();
