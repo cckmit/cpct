@@ -412,11 +412,15 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
             MktCampaignDO mktCampaignDO = mktCampaignPrdMapper.selectByPrimaryKey(mktCampaignId);
             // 删除活动缓存
             redisUtils_prd.del("MKT_CAMPAIGN_" + mktCampaignId);
+            // 过滤规则
+            redisUtils_prd.del("FILTER_RULE_LIST_" + mktCampaignId);
+            // 策略id集合
+            redisUtils_prd.del("MKT_STRATEGY_CONF_LIST_" + mktCampaignId);
             // 删除活动所有标签缓存
-            List<MktCamEvtRelDO> mktCamEvtRelDOS = mktCamEvtRelPrdMapper.selectByMktCampaignId(mktCampaignId);
-            for (MktCamEvtRelDO mktCamEvtRelDO : mktCamEvtRelDOS) {
-                redisUtils_prd.del("EVT_ALL_LABEL_" + mktCamEvtRelDO.getEventId());
-            }
+//            List<MktCamEvtRelDO> mktCamEvtRelDOS = mktCamEvtRelPrdMapper.selectByMktCampaignId(mktCampaignId);
+//            for (MktCamEvtRelDO mktCamEvtRelDO : mktCamEvtRelDOS) {
+//                redisUtils_prd.del("EVT_ALL_LABEL_" + mktCamEvtRelDO.getEventId());
+//            }
 
             // 删除过滤规则缓存
             List<Long> longList = mktStrategyFilterRuleRelPrdMapper.selectByStrategyId(mktCampaignId);
@@ -433,6 +437,10 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
             for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOS) {
                 // 删除策略关系缓存
                 redisUtils_prd.del("MKT_STRATEGY_REL_" + mktCamStrategyConfRelDO.getStrategyConfId());
+                // 渠道编码
+                redisUtils_prd.del("CHANNEL_CODE_LIST_" + mktCamStrategyConfRelDO.getStrategyConfId());
+                // 规则集合
+                redisUtils_prd.del("MKT_RULE_LIST_" + mktCamStrategyConfRelDO.getStrategyConfId());
                 List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList = mktStrategyConfRulePrdMapper.selectByMktStrategyConfId(mktCamStrategyConfRelDO.getStrategyConfId());
                 for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleDOList) {
                     // 删除客户分群标签
@@ -487,11 +495,15 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
             MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
             // 删除活动缓存
             redisUtils.del("MKT_CAMPAIGN_" + mktCampaignId);
-            // 删除活动对应数据的所有标签缓存
-            List<MktCamEvtRelDO> mktCamEvtRelDOS = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignId);
-            for (MktCamEvtRelDO mktCamEvtRelDO : mktCamEvtRelDOS) {
-                redisUtils.del("EVT_ALL_LABEL_" + mktCamEvtRelDO.getEventId());
-            }
+            // 过滤规则
+            redisUtils.del("FILTER_RULE_LIST_" + mktCampaignId);
+            // 策略id集合
+            redisUtils.del("MKT_STRATEGY_CONF_LIST_" + mktCampaignId);
+//            // 删除活动对应数据的所有标签缓存
+//            List<MktCamEvtRelDO> mktCamEvtRelDOS = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignId);
+//            for (MktCamEvtRelDO mktCamEvtRelDO : mktCamEvtRelDOS) {
+//                redisUtils.del("EVT_ALL_LABEL_" + mktCamEvtRelDO.getEventId());
+//            }
 
             // 删除过滤规则缓存
             List<Long> longList = mktStrategyFilterRuleRelMapper.selectByStrategyId(mktCampaignId);
@@ -512,6 +524,10 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
                         // 删除策略关系缓存
 
                         redisUtils.del("MKT_STRATEGY_REL_" + mktCamStrategyConfRelDO.getStrategyConfId());
+                        // 渠道编码
+                        redisUtils.del("CHANNEL_CODE_LIST_" + mktCamStrategyConfRelDO.getStrategyConfId());
+                        // 规则集合
+                        redisUtils.del("MKT_RULE_LIST_" + mktCamStrategyConfRelDO.getStrategyConfId());
                         List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(mktCamStrategyConfRelDO.getStrategyConfId());
                         for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleDOList) {
                             // 删除客户分群标签
