@@ -5,16 +5,19 @@ import com.alibaba.fastjson.JSON;
 import com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService;
 import com.zjpii.biz.serv.YzServ;
 import com.zjtelcom.cpct.controller.BaseController;
+import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
+import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
+import com.zjtelcom.cpct.service.channel.SearchLabelService;
+import com.zjtelcom.cpct.util.ChannelUtil;
+import com.zjtelcom.cpct.util.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -33,6 +36,34 @@ public class EventApiController extends BaseController {
 
     @Autowired(required = false)
     private IContactTaskReceiptService iContactTaskReceiptService; //协同中心dubbo
+
+    @Autowired
+    private SearchLabelService searchLabelService;
+    @Autowired
+    private MktCamEvtRelMapper evtRelMapper;
+    @Autowired
+    private RedisUtils redisUtils;
+
+
+    @PostMapping("test")
+    public  Map<String,String> test(@RequestBody HashMap<String,String> key) {
+        Map<String,String> result = new HashMap<>();
+        List<MktCampaignDO> campaigns = new ArrayList<>();
+        try {
+            List<Long> idlIST = new ArrayList<>();
+            idlIST = ChannelUtil.StringToIdList(key.get("key"));
+            for (Long id : idlIST){
+                Map<String, String> mktAllLabels = searchLabelService.labelListByEventId(id );  //查询事件下使用的所有标签
+                if (null != mktAllLabels) {
+                    redisUtils.set("EVT_ALL_LABEL_" + id, mktAllLabels);
+                    result.put("EVENT_"+id,JSON.toJSONString(redisUtils.get("EVT_ALL_LABEL_"+id)));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 
     /**
      * 事件触发入口

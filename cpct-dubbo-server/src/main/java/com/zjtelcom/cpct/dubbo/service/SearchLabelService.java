@@ -1,10 +1,10 @@
-package com.zjtelcom.cpct.dubbo.service;
+package com.zjtelcom.cpct.service.channel;
 
 import java.util.List;
 import java.util.Map;
 
 
-public interface SearchLabelService  {
+public interface SearchLabelService {
 
     Map<String,String> labelListByCampaignId(List<Long> campaignId);
 

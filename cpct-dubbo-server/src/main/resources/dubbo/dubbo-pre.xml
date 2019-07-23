@@ -18,51 +18,51 @@
 
     <!--受理清单校验接口-->
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.TarGrpApiService" ref="tarGrpApiServiceImpl" version="1.0" >
-        <dubbo:method name="getCpcTargrp" servicecode="00.1083.getCpcTargrp_zsc" timeout="10000"/>
+        <dubbo:method name="getCpcTargrp" servicecode="00.1083.getCpcTargrp" timeout="10000"/>
     </dubbo:service>
-    <!-- 注册 -->
-    <!-- 二次协同查询服务 -->
-    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.EventApiService" ref="eventApiServiceImpl" version="1.0" >
-        <!-- 策略cpct计算服务 -->
-        <dubbo:method name="CalculateCPC" servicecode="00.1083.CalculateCPC_zsc" timeout="10000"/>
-        <!-- 策略cpct计算服务（同步） -->
-        <dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync_zsc" timeout="10000"/>
-        <!-- 二次协同 -->
-        <dubbo:method name="secondChannelSynergy" servicecode="00.1083.SecondChannelSynergy_zsc" timeout="10000"/>
-    </dubbo:service>
+    <!--&lt;!&ndash; 注册 &ndash;&gt;-->
+    <!--&lt;!&ndash; 二次协同查询服务 &ndash;&gt;-->
+    <!--<dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.EventApiService" ref="eventApiServiceImpl" version="1.0" >-->
+        <!--&lt;!&ndash; 策略cpct计算服务 &ndash;&gt;-->
+        <!--<dubbo:method name="CalculateCPC" servicecode="00.1083.CalculateCPC_zsc" timeout="10000"/>-->
+        <!--&lt;!&ndash; 策略cpct计算服务（同步） &ndash;&gt;-->
+        <!--<dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync_zsc" timeout="10000"/>-->
+        <!--&lt;!&ndash; 二次协同 &ndash;&gt;-->
+        <!--<dubbo:method name="secondChannelSynergy" servicecode="00.1083.SecondChannelSynergy_zsc" timeout="10000"/>-->
+    <!--</dubbo:service>-->
 
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MktCamChlResultApiService" ref="mktCamChlResultApiServiceImpl" version="1.0" >
-        <dubbo:method name="selectResultList" servicecode="00.1083.selectResultList_zsc" timeout="10000"/>
+        <dubbo:method name="selectResultList" servicecode="00.1083.selectResultList" timeout="10000"/>
     </dubbo:service>
 
     <!-- 编码查询事件详情服务 -->
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ChannelService" ref="channelServiceImpl" version="1.0" >
-        <dubbo:method name="getEventDetail" servicecode="00.1083.getEventDetail_zsc" timeout="10000"/>
+        <dubbo:method name="getEventDetail" servicecode="00.1083.getEventDetail" timeout="10000"/>
     </dubbo:service>
 
     <!--销售品关联活动查询-->
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ProductService" ref="productServiceImpl" version="1.0" >
-        <dubbo:method name="selectProductCam" servicecode="00.1083.selectProductCam_zsc" timeout="10000"/>
+        <dubbo:method name="selectProductCam" servicecode="00.1083.selectProductCam" timeout="10000"/>
     </dubbo:service>
 
     <!-- 名单导入服务 -->
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ChannelService" ref="channelServiceImpl" version="1.0" >
-        <dubbo:method name="importRuleUserList" servicecode="00.1083.importRuleUserList_zsc" timeout="10000"/>
+        <dubbo:method name="importRuleUserList" servicecode="00.1083.importRuleUserList" timeout="10000"/>
     </dubbo:service>
 
     <!-- 营销活动详情服务 -->
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MktCampaignApiService" ref="mktCampaignApiServiceImpl" version="1.0" >
-        <dubbo:method name="qryMktCampaignDetail" servicecode="00.1083.qryMktCampaignDetail_zsc" timeout="10000"/>
+        <dubbo:method name="qryMktCampaignDetail" servicecode="00.1083.qryMktCampaignDetail" timeout="10000"/>
     </dubbo:service>
 
     <!-- 编码查询渠道详细服务 -->
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ChannelService" ref="channelServiceImpl" version="1.0" >
-        <dubbo:method name="getChannelDetail" servicecode="00.1083.getChannelDetail_zsc" timeout="10000"/>
+        <dubbo:method name="getChannelDetail" servicecode="00.1083.getChannelDetail" timeout="10000"/>
     </dubbo:service>
 
     <!-- 调查问卷详情查询服务 -->
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.QuestionService" ref="questionServiceImpl" version="1.0" >
-        <dubbo:method name="getQuestionnaireDetail" servicecode="00.1083.getQuestionnaireDetail_zsc" timeout="10000"/>
+        <dubbo:method name="getQuestionnaireDetail" servicecode="00.1083.getQuestionnaireDetail" timeout="10000"/>
     </dubbo:service>
 
     <!-- 活动发布接口 -->
@@ -148,6 +148,6 @@
 
     <!-- 根据filterType获取关单类型 -->
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ProductService" ref="productServiceImpl" version="1.0" >
-        <dubbo:method name="getCloseCampaign" servicecode="00.1083.getCloseCampaign_zsc" timeout="10000"/>
+        <dubbo:method name="getCloseCampaign" servicecode="00.1083.getCloseCampaign" timeout="10000"/>
     </dubbo:service>
 </beans>
