@@ -39,7 +39,7 @@
         <result column="REGION_ID" jdbcType="BIGINT" property="regionId" />
         <result column="LIFE_STAGE" jdbcType="VARCHAR" property="lifeStage" />
         <result column="EXT_MKT_CAMPAIGN_ID" jdbcType="VARCHAR" property="extMktCampaignId" />
-        <result column="EXEC_INIT_TIME" jdbcType="BIGINT" property="execInitTime" />
+        <result column="EXEC_INIT_TIME" jdbcType="VARCHAR" property="execInitTime" />
     </resultMap>
 
     <resultMap id="countResultMap" type="com.zjtelcom.cpct.domain.campaign.MktCampaignCountDO">
@@ -133,7 +133,7 @@
         <if test= "lifeStage!=null">LIFE_STAGE = #{lifeStage,jdbcType=VARCHAR},</if>
         <if test= "serviceType!=null">SERVICE_TYPE = #{serviceType,jdbcType=VARCHAR},</if>
         <if test= "extMktCampaignId!=null">EXT_MKT_CAMPAIGN_ID = #{extMktCampaignId,jdbcType=VARCHAR},</if>
-        <if test= "execInitTime!=null">EXEC_INIT_TIME = #{execInitTime,jdbcType=BIGINT},</if>
+        <if test= "execInitTime!=null">EXEC_INIT_TIME = #{execInitTime,jdbcType=VARCHAR},</if>
         UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
         where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
     </update>
@@ -528,7 +528,7 @@
             AND EXT_MKT_CAMPAIGN_ID =  #{extMktCampaignId,jdbcType=VARCHAR}
         </if>
         <if test="execInitTime != null and execInitTime != ''">
-            AND EXEC_INIT_TIME =  #{execInitTime,jdbcType=BIGINT}
+            AND EXEC_INIT_TIME =  #{execInitTime,jdbcType=VARCHAR}
         </if>
         order by UPDATE_DATE desc
     </select>
