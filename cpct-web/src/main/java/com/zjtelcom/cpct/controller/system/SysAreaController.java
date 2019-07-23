@@ -127,11 +127,12 @@ public class SysAreaController {
 //            if(!"".equals(regionId)){
 //                lanId = AreaCodeEnum.getLandIdByRegionId(Long.valueOf(regionId));
 //            }
-            SystemUserDto user = BssSessionHelp.getSystemUserDto();
+
 //            if (StringUtils.isNotBlank(user.getOrgId().toString())){
 //                map = sysAreaService.listStrAreaTree(lanId.toString());
 //                map = sysAreaService.getCityByAreaTree(user.getOrgId());
 //            Long orgId = Long.valueOf(user.getOrgId());
+            SystemUserDto user = BssSessionHelp.getSystemUserDto();
             Long staffId = user.getStaffId();
             map = sysAreaService.getCityByAreaTree(staffId);
 

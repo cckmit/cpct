@@ -1,5 +1,8 @@
 package com.zjtelcom.cpct.service.impl.system;
 
+import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
+import com.ctzj.smt.bss.sysmgr.model.dto.SystemPostDto;
+import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.channel.OrganizationMapper;
 import com.zjtelcom.cpct.dao.system.SysAreaMapper;
@@ -135,10 +138,28 @@ public class SysAreaServiceImpl implements SysAreaService {
         return areaMap;
     }
 
+    //策略适用地市 超管添加
     @Override
     public Map<String, Object> getCityByAreaTree(Long staffId) {
-        Map<String, Object> areaMap = new HashMap<>();
         List<SysArea> sysAreaList = new ArrayList<>();
+        Map<String, Object> areaMap = new HashMap<>();
+        SystemUserDto user = BssSessionHelp.getSystemUserDto();
+        List<SystemPostDto> systemPostDtoList = user.getSystemPostDtoList();
+        if (systemPostDtoList.get(0).getSysPostCode().equals("cpcp0001")) {
+            SysArea redSysArea = (SysArea) redisUtils.get("CITY_1");
+            if (redSysArea == null){
+                SysArea provinceAreas = sysAreaMapper.getByCityFour("1");
+                SysArea sysArea = sysAreaMapper.getCityByName(provinceAreas.getParentArea().toString());
+                List<SysArea> sysAreas = new ArrayList<>();
+                sysAreas.add(provinceAreas);
+                sysArea.setChildAreaList(sysAreas);
+                sysAreaList.add(ChannelUtil.setOrgArea(sysArea));
+                redisUtils.set("CITY_1",sysArea);
+
+            }
+            areaMap.put("sysAreaList", sysAreaList);
+            return areaMap;
+        }
         Long orgId = null;
         List<Map<String, Object>> staffOrgId = organizationMapper.getStaffOrgId(staffId);
         if (!staffOrgId.isEmpty() && staffOrgId.size() > 0){
