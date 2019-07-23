@@ -158,4 +158,32 @@
   </select>
 
 
+  <resultMap id="getOrgIdAndStatusCd" type="java.util.Map">
+    <result property="staffOrgRelId" column="STAFF_ORG_REL_ID"/>
+    <result property="relType" column="REL_TYPE"/>
+    <result property="orgId" column="ORG_ID"/>
+    <result property="orgCode" column="ORG_CODE"/>
+    <result property="orgName" column="ORG_NAME"/>
+    <result property="statusCd" column="STATUS_CD"/>
+    <result property="orgDivision" column="ORG_DIVISION"/>
+  </resultMap>
+
+  <select id="getStaffOrgId" parameterType="java.lang.Long" resultMap="getOrgIdAndStatusCd">
+      SELECT
+        b.STAFF_ORG_REL_ID,
+        b.REL_TYPE,
+        a.ORG_ID,
+        a.ORG_CODE,
+        a.ORG_NAME,
+        b.STATUS_CD,
+        a.ORG_DIVISION
+    FROM
+        organization a,
+        staff_org_rel b
+    WHERE
+        a.ORG_ID = b.ORG_ID
+    AND b.rel_type = 1900
+    AND b.STAFF_ID = #{staffId};
+  </select>
+
 </mapper>
