@@ -354,6 +354,7 @@ public class EventApiServiceImpl implements EventApiService {
         try {
             result = new EventTask().cpc(params);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("同步事件返回失败:" + map.get("reqId"), e.getMessage());
         }
 
