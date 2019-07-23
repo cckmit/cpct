@@ -82,19 +82,19 @@ public class OrgTreeServiceImpl implements OrgTreeService{
     @Override
     public List<OrgTree> getDataByFtp(String path) {
         String code="utf8";
-        List<SysParams> paramKeyIn = systemParamMapper.findParamKeyIn(path);
-        if(!paramKeyIn.isEmpty()){
-            code=paramKeyIn.get(0).getParamValue();
-        }
+//        List<SysParams> paramKeyIn = systemParamMapper.findParamKeyIn(path);
+//        if(!paramKeyIn.isEmpty()){
+//            code=paramKeyIn.get(0).getParamValue();
+//        }
         List<OrgTree> list = changeToList(path, code);
-        long start=System.currentTimeMillis();
-        //先删除该表所有数据
-        orgTreeMapper.deleteAll();
-        System.out.println("删除所有数据完毕");
-        System.out.println("开始插入数据");
-        //  sql上限  4194304   目前数据31008888(117530条数据,每条数据sql长度270)  计算一次插入1W条
-        batchToInsert(list);
-        System.out.println("数据插入完毕 耗时："+(System.currentTimeMillis()-start));
+//        long start=System.currentTimeMillis();
+//        //先删除该表所有数据
+//        orgTreeMapper.deleteAll();
+//        System.out.println("删除所有数据完毕");
+//        System.out.println("开始插入数据");
+//        //  sql上限  4194304   目前数据31008888(117530条数据,每条数据sql长度270)  计算一次插入1W条
+//        batchToInsert(list);
+//        System.out.println("数据插入完毕 耗时："+(System.currentTimeMillis()-start));
 
         return list;
     }
@@ -176,20 +176,55 @@ public class OrgTreeServiceImpl implements OrgTreeService{
 
     @Override
     public Map<String,Object> selectBySumAreaId(Map<String, Object> params) {
+        Organization organization = null;
+        Long orgId = null;
         Map<String, Object> maps = new HashMap<>();
-        List<String> areaIds = (List<String>) params.get("areaId");
         List<Organization> list=new ArrayList<>();
-        if(areaIds==null || areaIds.isEmpty()){
-            list=organizationMapper.selectMenu();
-        }else{
-            for (String id : areaIds){
-                List<Organization> organizations = organizationMapper.selectByParentId(Long.valueOf(id));
-                list.addAll(organizations);
+        List<String> areaList=(List<String>)params.get("areaId");
+        if (areaList!=null && areaList.size()>0){
+            list = organizationMapper.selectByParentId(Long.valueOf(areaList.get(0)));
+        }else {
+//        SystemUserDto user = UserUtil.getUser();
+            SystemUserDto user = BssSessionHelp.getSystemUserDto();
+            orgId = user.getOrgId();
+            Long staffId = user.getStaffId();
+            List<Map<String, Object>> staffOrgId = organizationMapper.getStaffOrgId(staffId);
+            if (!staffOrgId.isEmpty() && staffOrgId.size() > 0){
+                for (Map<String, Object> map : staffOrgId) {
+                    Object orgDivision = map.get("orgDivision");
+                    Object orgId1 = map.get("orgId");
+                    if (orgDivision!=null){
+                        if (orgDivision.toString().equals("30")) {
+                            orgId = Long.valueOf(orgId1.toString());
+                            break;
+                        }else if (orgDivision.toString().equals("20")){
+                            orgId = Long.valueOf(orgId1.toString());
+                            break;
+                        }else if (orgDivision.toString().equals("10")){
+                            orgId = Long.valueOf(orgId1.toString());
+                            break;
+                        }
+                    }
+                }
+            }
+            if (orgId == null){
+                list = organizationMapper.selectMenu();
+            }else {
+               list = organizationMapper.selectByParentId(orgId);
             }
         }
         Page pageInfo = new Page(new PageInfo(list));
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg",list);
+        ////        Long orgId = Long.valueOf(regionId1);
+//            organization = organizationMapper.selectByPrimaryKey(orgId);
+//        }
+//        if (organization != null) {
+//            Long regionId = organization.getRegionId();
+//            String orgDivision = organization.getOrgDivision();
+//            if (orgDivision.equals("10")){
+//                orgId = ORG2RegionId.getOrgIdByRegionId(regionId);
+//            }
         return  maps;
     }
 
