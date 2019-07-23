@@ -186,7 +186,6 @@ public class OrgTreeServiceImpl implements OrgTreeService{
         }else {
 //        SystemUserDto user = UserUtil.getUser();
             SystemUserDto user = BssSessionHelp.getSystemUserDto();
-            orgId = user.getOrgId();
             Long staffId = user.getStaffId();
             List<Map<String, Object>> staffOrgId = organizationMapper.getStaffOrgId(staffId);
             if (!staffOrgId.isEmpty() && staffOrgId.size() > 0){
