@@ -138,35 +138,54 @@ public class OrgTreeServiceImpl implements OrgTreeService{
         return  maps;
     }
 
-    /**
-     * 通过父级菜单查询子菜单
-     * @param params
-     * @return
-     */
+//    /**
+//     * 通过父级菜单查询子菜单
+//     * @param params
+//     * @return
+//     */
+//    @Override
+//    public Map<String,Object> selectBySumAreaId(Map<String, Object> params) {
+//        Organization organization = null;
+//        Long orgId = null;
+//        Map<String, Object> maps = new HashMap<>();
+//        List<Organization> list=new ArrayList<>();
+//        List<String> areaList=(List<String>)params.get("areaId");
+//        if (areaList!=null && areaList.size()>0){
+//            list = organizationMapper.selectByParentId(Long.valueOf(areaList.get(0)));
+//        }else {
+////        SystemUserDto user = UserUtil.getUser();
+//            SystemUserDto user = BssSessionHelp.getSystemUserDto();
+//            orgId = user.getOrgId();
+////        Long orgId = Long.valueOf(regionId1);
+//            organization = organizationMapper.selectByPrimaryKey(orgId);
+//        }
+//        if (organization != null) {
+//            Long regionId = organization.getRegionId();
+//            String orgDivision = organization.getOrgDivision();
+//            if (orgDivision.equals("10")){
+//                orgId = ORG2RegionId.getOrgIdByRegionId(regionId);
+//            }
+//            List<Organization> organizations = organizationMapper.selectByParentId(orgId);
+//            list.addAll(organizations);
+//        }
+//        Page pageInfo = new Page(new PageInfo(list));
+//        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+//        maps.put("resultMsg",list);
+//        return  maps;
+//    }
+
     @Override
     public Map<String,Object> selectBySumAreaId(Map<String, Object> params) {
-        Organization organization = null;
-        Long orgId = null;
         Map<String, Object> maps = new HashMap<>();
+        List<String> areaIds = (List<String>) params.get("areaId");
         List<Organization> list=new ArrayList<>();
-        List<String> areaList=(List<String>)params.get("areaId");
-        if (areaList!=null && areaList.size()>0){
-            list = organizationMapper.selectByParentId(Long.valueOf(areaList.get(0)));
-        }else {
-//        SystemUserDto user = UserUtil.getUser();
-            SystemUserDto user = BssSessionHelp.getSystemUserDto();
-            orgId = user.getOrgId();
-//        Long orgId = Long.valueOf(regionId1);
-            organization = organizationMapper.selectByPrimaryKey(orgId);
-        }
-        if (organization != null) {
-            Long regionId = organization.getRegionId();
-            String orgDivision = organization.getOrgDivision();
-            if (orgDivision.equals("10")){
-                orgId = ORG2RegionId.getOrgIdByRegionId(regionId);
+        if(areaIds==null || areaIds.isEmpty()){
+            list=organizationMapper.selectMenu();
+        }else{
+            for (String id : areaIds){
+                List<Organization> organizations = organizationMapper.selectByParentId(Long.valueOf(id));
+                list.addAll(organizations);
             }
-            List<Organization> organizations = organizationMapper.selectByParentId(orgId);
-            list.addAll(organizations);
         }
         Page pageInfo = new Page(new PageInfo(list));
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
