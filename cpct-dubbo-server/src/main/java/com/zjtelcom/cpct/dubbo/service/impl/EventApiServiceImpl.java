@@ -1947,10 +1947,6 @@ public class EventApiServiceImpl implements EventApiService {
 
             try {
                 Long mktCampaginId = (Long) act.get("mktCampaginId");
-
-                if (mktCampaginId == 1589) {
-                    System.out.println("11");
-                }
                 //初始化es log
                 JSONObject esJson = new JSONObject();
                 esJson.put("reqId", reqId);
