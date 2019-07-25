@@ -275,10 +275,10 @@ public class CamApiServiceImpl implements CamApiService {
                             }
                             Map<String, Object> filterRuleTimeMap = new HashMap<>();
                             // 判断是否进行CRM销售品过滤
-                            if (realProdFilter != null && "0".equals(realProdFilter)) {
-                            //    log.info("111------accNbr --->" + params.get("accNbr"));
+                            if (realProdFilter != null && "1".equals(realProdFilter)) {
+                                log.info("111------accNbr --->" + privateParams.get("accNbr"));
                                 List<String> prodList = new ArrayList<>();
-                                CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(params.get("accNbr"));
+                                CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(privateParams.get("accNbr"));
                             //    log.info("222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
                                 if(prodInstIdsObject!=null &&  prodInstIdsObject.getResultObject() !=null ){
                                     Set<String> prodInstIds = prodInstIdsObject.getResultObject();
@@ -378,7 +378,7 @@ public class CamApiServiceImpl implements CamApiService {
                             if (productCheck) {
                                 esJson.put("hit", "false");
                                 esJson.put("msg", "销售品过滤验证未通过:" + esMsg);
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
+                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + privateParams.get("accNbr"));
                                 return Collections.EMPTY_MAP;
                             }
                         }
@@ -395,7 +395,7 @@ public class CamApiServiceImpl implements CamApiService {
                                 //过滤规则信息查询失败
                                 esJson.put("hit", false);
                                 esJson.put("msg", "过扰规则信息查询失败 byId: " + filterRuleId);
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
+                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + privateParams.get("accNbr"));
                                 return Collections.EMPTY_MAP;
                             } else {
                                 redisUtils.set("FILTER_RULE_DISTURB_" + filterRuleId, labels);
@@ -577,13 +577,14 @@ public class CamApiServiceImpl implements CamApiService {
             e.printStackTrace();
             esJson.put("hit", false);
             esJson.put("msg", "获取计算结果异常");
-            esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
+            esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + privateParams.get("accNbr"));
             //发生异常关闭线程池
             executorService.shutdownNow();
         } finally {
             //关闭线程池
             executorService.shutdownNow();
         }
+
         return activity;
     }
 
@@ -626,7 +627,7 @@ public class CamApiServiceImpl implements CamApiService {
             long begin = System.currentTimeMillis();
 
             //初始化es log   标签使用
-            JSONObject esJsonLabelLog = new JSONObject();
+            JSONObject esJson = new JSONObject();
             //初始化es log   规则使用
             JSONObject jsonObject = new JSONObject();
 
@@ -653,17 +654,17 @@ public class CamApiServiceImpl implements CamApiService {
             jsonObject.put("promIntegId", promIntegId);
 
             //ES log 标签实例
-            esJsonLabelLog.put("reqId", reqId);
-            esJsonLabelLog.put("eventId", params.get("eventCode"));
-            esJsonLabelLog.put("activityId", mktCampaignDO.getInitId());
-            esJsonLabelLog.put("ruleId", mktStrategyConfRuleDO.getInitId());
-            esJsonLabelLog.put("ruleName", ruleName);
-            esJsonLabelLog.put("integrationId", params.get("integrationId"));
-            esJsonLabelLog.put("accNbr", params.get("accNbr"));
-            esJsonLabelLog.put("strategyConfId", mktStrategyConfDO.getInitId());
-            esJsonLabelLog.put("tarGrpId", tarGrpId);
-            esJsonLabelLog.put("promIntegId", promIntegId);
-            esJsonLabelLog.put("hitEntity", privateParams.get("accNbr")); //命中对象
+            esJson.put("reqId", reqId);
+            esJson.put("eventId", params.get("eventCode"));
+            esJson.put("activityId", mktCampaignDO.getInitId());
+            esJson.put("ruleId", mktStrategyConfRuleDO.getInitId());
+            esJson.put("ruleName", ruleName);
+            esJson.put("integrationId", params.get("integrationId"));
+            esJson.put("accNbr", params.get("accNbr"));
+            esJson.put("strategyConfId", mktStrategyConfDO.getInitId());
+            esJson.put("tarGrpId", tarGrpId);
+            esJson.put("promIntegId", promIntegId);
+            esJson.put("hitEntity", privateParams.get("accNbr")); //命中对象
 
             Map<String, Object> ruleMap = new ConcurrentHashMap<>();
             //初始化返回结果中的推荐信息列表
@@ -708,8 +709,8 @@ public class CamApiServiceImpl implements CamApiService {
             }
             if (realProdFilter != null && "1".equals(realProdFilter)) {
                 List<String> prodList = new ArrayList<>();
-                //   log.info("111------accNbr --->" + params.get("accNbr"));
-                CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(params.get("accNbr"));
+                log.info("111------accNbr --->" + privateParams.get("accNbr"));
+                CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(privateParams.get("accNbr"));
                 //   log.info("222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
                 if(prodInstIdsObject!=null &&  prodInstIdsObject.getResultObject() !=null ){
                     Set<String> prodInstIds = prodInstIdsObject.getResultObject();
@@ -844,7 +845,7 @@ public class CamApiServiceImpl implements CamApiService {
                 }
                 //表达式存入redis
                 redisUtils.set("EXPRESS_" + tarGrpId, express);
-                esJsonLabelLog.put("labelResultList", JSONArray.toJSON(labelResultList));
+                esJson.put("labelResultList", JSONArray.toJSON(labelResultList));
             } else {
                 List<LabelResult> labelResultList = new ArrayList<>();
                 try {
@@ -879,7 +880,7 @@ public class CamApiServiceImpl implements CamApiService {
                     }
 
                     // 异步执行当个标签比较结果
-                    new labelResultThread(esJsonLabelLog, labelMapList, context, sysParams, runner, labelResultList).run();
+                    new labelResultThread(esJson, labelMapList, context, sysParams, runner, labelResultList).run();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -890,7 +891,7 @@ public class CamApiServiceImpl implements CamApiService {
                 }
             }
 
-            esHitService.save(esJsonLabelLog, IndexList.Label_MODULE);  //储存标签比较结果
+            esHitService.save(esJson, IndexList.Label_MODULE);  //储存标签比较结果
             try {
                 RuleResult ruleResult = new RuleResult();
                 //初始化返回结果中的销售品条目
@@ -1211,153 +1212,8 @@ public class CamApiServiceImpl implements CamApiService {
                 jsonObject.put("msg", "规则异常");
                 esHitService.save(jsonObject, IndexList.RULE_MODULE);
             }
-
             return ruleMap;
         }
-
-        private void getRuleResult(JSONObject jsonObject, String promIntegId, Map<String, Object> ruleMap, List<Map<String, Object>> taskChlList, RuleResult ruleResult, List<Map<String, String>> productList) {
-            log.info(Thread.currentThread().getName() + "------------->3");
-            jsonObject.put("hit", true);
-
-            //拼接返回结果
-            ruleMap.put("orderISI", params.get("reqId")); //流水号
-            ruleMap.put("activityId", privateParams.get("activityId")); //活动编码
-            ruleMap.put("activityName", privateParams.get("activityName")); //活动名称
-            ruleMap.put("activityType", privateParams.get("activityType")); //活动类型
-            ruleMap.put("activityStartTime", privateParams.get("activityStartTime")); //活动开始时间
-            ruleMap.put("activityEndTime", privateParams.get("activityEndTime")); //活动结束时间
-            ruleMap.put("skipCheck", "0"); //todo 调过预校验
-            ruleMap.put("orderPriority", privateParams.get("orderPriority")); //活动优先级
-            ruleMap.put("integrationId", privateParams.get("integrationId")); //集成编号（必填）
-            ruleMap.put("accNbr", privateParams.get("accNbr")); //业务号码（必填）
-            ruleMap.put("policyId", strategyConfId.toString()); //策略编码
-            ruleMap.put("policyName", strategyConfName); //策略名称
-            ruleMap.put("ruleId", ruleId.toString()); //规则编码
-            ruleMap.put("ruleName", ruleName); //规则名称
-            ruleMap.put("promIntegId", promIntegId); // 销售品实例ID
-
-            //查询销售品列表
-            if (productStr != null && !"".equals(productStr)) {
-                // 推荐条目集合存入redis -- linchao
-                List<MktCamItem> mktCamItemList = (List<MktCamItem>) redisUtils.get("MKT_CAM_ITEM_LIST_" + ruleId.toString());
-                if (mktCamItemList == null) {
-                    mktCamItemList = new ArrayList<>();
-                    String[] productArray = productStr.split("/");
-                    for (String str : productArray) {
-                        // 从redis中获取推荐条目
-                        MktCamItem mktCamItem = (MktCamItem) redisUtils.get("MKT_CAM_ITEM_" + str);
-                        if (mktCamItem == null) {
-                            mktCamItem = mktCamItemMapper.selectByPrimaryKey(Long.valueOf(str));
-                            if (mktCamItem == null) {
-                                continue;
-                            }
-                            redisUtils.set("MKT_CAM_ITEM_" + mktCamItem.getMktCamItemId(), mktCamItem);
-                        }
-                        mktCamItemList.add(mktCamItem);
-                    }
-                    redisUtils.set("MKT_CAM_ITEM_LIST_" + ruleId.toString(), mktCamItemList);
-                }
-                for (MktCamItem mktCamItem : mktCamItemList) {
-                    Map<String, String> product = new ConcurrentHashMap<>();
-                    product.put("productId", mktCamItem.getItemId().toString());
-                    product.put("productCode", mktCamItem.getOfferCode());
-                    product.put("productName", mktCamItem.getOfferName());
-                    product.put("productType", mktCamItem.getItemType());
-                    product.put("productFlag", "1000");  //todo 销售品标签
-                    //销售品优先级
-                    if (mktCamItem.getPriority() != null) {
-                        product.put("productPriority", mktCamItem.getPriority().toString());
-                    } else {
-                        product.put("productPriority", "0");
-                    }
-                    productList.add(product);
-                }
-            }
-            jsonObject.put("productList", productList);
-
-            if (ruleResult.getResult() == null) {
-                ruleResult.setResult(false);
-            }
-
-            //获取协同渠道所有id
-            String[] evtContactConfIdArray = evtContactConfIdStr.split("/");
-
-            //判断需要返回的渠道
-            Channel channelMessage = (Channel) redisUtils.get("MKT_ISALE_LABEL_" + params.get("channelCode"));
-            if (channelMessage == null) {
-                channelMessage = contactChannelMapper.selectByCode(params.get("channelCode"));
-                redisUtils.set("MKT_ISALE_LABEL_" + params.get("channelCode"), channelMessage);
-            }
-            String channelCode = null;
-
-            //新增加入reids -- linchao
-            List<MktCamChlConfDO> mktCamChlConfDOS = (List<MktCamChlConfDO>) redisUtils.get("MKT_CAMCHL_CONF_LIST_" + ruleId.toString());
-            if (mktCamChlConfDOS == null) {
-                mktCamChlConfDOS = new ArrayList<>();
-                if (evtContactConfIdArray != null && !"".equals(evtContactConfIdArray[0])) {
-                    for (String str : evtContactConfIdArray) {
-                        MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(Long.valueOf(str));
-                        mktCamChlConfDOS.add(mktCamChlConfDO);
-                        redisUtils.set("MKT_CAMCHL_CONF_LIST_" + ruleId.toString(), mktCamChlConfDOS);
-                    }
-                }
-            }
-            for (MktCamChlConfDO mktCamChlConfDO : mktCamChlConfDOS) {
-                if (mktCamChlConfDO.getContactChlId().equals(channelMessage.getContactChlId())) {
-                    channelCode = mktCamChlConfDO.getEvtContactConfId().toString();
-                    break;
-                }
-            }
-
-            //初始化结果集
-            List<Future<Map<String, Object>>> threadList = new ArrayList<>();
-            //初始化线程池
-            ExecutorService executorService = Executors.newCachedThreadPool();
-
-            try {
-                //遍历协同渠道
-                if (channelCode != null) {
-                    Long evtContactConfId = Long.parseLong(channelCode);
-                    //提交线程
-                    //Future<Map<String, Object>> f = executorService.submit(new ChannelTask(evtContactConfId, productList, context, reqId));
-                    //将线程处理结果添加到结果集
-                    //threadList.add(f);
-                    Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId);
-                    taskChlList.add(channelMap);
-                } else {
-                    if (evtContactConfIdArray != null && !"".equals(evtContactConfIdArray[0])) {
-                        for (String str : evtContactConfIdArray) {
-                            //协同渠道规则表id（自建表）
-                            Long evtContactConfId = Long.parseLong(str);
-                            //提交线程
-                            //Future<Map<String, Object>> f = executorService.submit(new ChannelTask(evtContactConfId, productList, context, reqId));
-                            //将线程处理结果添加到结果集
-                            //threadList.add(f);
-                            Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId);
-                            if (channelMap != null && !channelMap.isEmpty()) {
-                                taskChlList.add(channelMap);
-                            }
-                        }
-                    }
-                }
-                //获取结果
-
-           /* for (Future<Map<String, Object>> future : threadList) {
-                if (!future.get().isEmpty()) {
-                    taskChlList.add(future.get());
-                }
-            }*/
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                //发生异常关闭线程池
-                executorService.shutdownNow();
-            } finally {
-                //关闭线程池
-                executorService.shutdownNow();
-            }
-        }
-
     }
 
     private Map<String, Object> ChannelTask(Long evtContactConfId, List<Map<String, String>> productList, DefaultContext<String, Object> context, String reqId) {
