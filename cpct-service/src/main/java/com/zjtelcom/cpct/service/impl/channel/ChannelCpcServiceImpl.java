@@ -96,55 +96,60 @@ public class ChannelCpcServiceImpl extends BaseService implements ChannelService
     }
 
     private void listParent(List<ChannelDetail> parentDetailList, List<Channel> parentList,String channelName) {
+        listParent(parentDetailList, parentList, channelName, null);
+    }
+
+    private void listParent(List<ChannelDetail> parentDetailList, List<Channel> parentList,String channelName, String triggerType) {
         for (Channel parent : parentList){
             ChannelDetail parentDetail = new ChannelDetail();
-            List<Channel> childList = channelMapper.findChildListByParentId(parent.getContactChlId());
+            List<Channel> childList = channelMapper.findChildListByParentId(parent.getContactChlId(), triggerType);
             List<ChannelDetail> childDetailList = new ArrayList<>();
-            for (Channel child : childList){
-                if (channelName!=null && !channelName.equals("") && !child.getContactChlName().contains(channelName)){
-                    continue;
+            if(childList == null || childList.isEmpty()){
+                parentList.remove(parent);
+            }else {
+                for (Channel child : childList) {
+                    if (channelName != null && !channelName.equals("") && !child.getContactChlName().contains(channelName)) {
+                        continue;
+                    }
+                    ChannelDetail childDetail = new ChannelDetail();
+                    childDetail.setChannelId(child.getContactChlId());
+                    childDetail.setChannelName(child.getContactChlName());
+                    childDetail.setChannelCode(child.getContactChlCode());
+                    if (child.getRemark() != null && !child.getRemark().equals("")) {
+                        childDetail.setRemark(child.getRemark());
+                    }
+                    childDetailList.add(childDetail);
                 }
-                ChannelDetail childDetail = new ChannelDetail();
-                childDetail.setChannelId(child.getContactChlId());
-                childDetail.setChannelName(child.getContactChlName());
-                childDetail.setChannelCode(child.getContactChlCode());
-                if (child.getRemark()!=null && !child.getRemark().equals("")){
-                    childDetail.setRemark(child.getRemark());
+                if (channelName != null && !channelName.equals("")) {
+                    if (childDetailList.isEmpty() && !parent.getContactChlName().contains(channelName)) {
+                        continue;
+                    }
                 }
-                childDetailList.add(childDetail);
+                parentDetail.setChannelId(parent.getContactChlId());
+                parentDetail.setChannelName(parent.getContactChlName());
+                parentDetail.setChannelCode(parent.getContactChlCode());
+                parentDetail.setChildren(childDetailList);
+                parentDetailList.add(parentDetail);
             }
-            if (channelName!=null && !channelName.equals("")){
-                if (childDetailList.isEmpty() && !parent.getContactChlName().contains(channelName)){
-                    continue;
-                }
-            }
-            parentDetail.setChannelId(parent.getContactChlId());
-            parentDetail.setChannelName(parent.getContactChlName());
-            parentDetail.setChannelCode(parent.getContactChlCode());
-            parentDetail.setChildren(childDetailList);
-            parentDetailList.add(parentDetail);
         }
     }
 
     @Override
-    public Map<String, Object> getChannelTreeList(Long userId) {
+    public Map<String, Object> getChannelTreeList(HashMap<String,String> param) {
         Map<String,Object> result = new HashMap<>();
         List<ChannelDetail> parentDetailList = new ArrayList<>();
         List<Channel> parentList = channelMapper.findParentList();
-        listParent(parentDetailList, parentList,null);
+        listParent(parentDetailList, parentList,null, param == null ? null: param.get("triggerType"));
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",parentDetailList);
         return result;
-
-
-
     }
 
     @Override
     public Map<String, Object> getChannelListByParentId(Long userId, Long parentId) {
         Map<String,Object> result = new HashMap<>();
         List<ChannelVO> voList = new ArrayList<>();
-        List<Channel> childList = channelMapper.findChildListByParentId(parentId);
+        List<Channel> childList = channelMapper.findChildListByParentId(parentId, null);
         for (Channel channel : childList){
             ChannelVO vo = ChannelUtil.map2ChannelVO(channel);
             voList.add(vo);
@@ -197,7 +202,7 @@ public class ChannelCpcServiceImpl extends BaseService implements ChannelService
         for (Channel parent : parentList){
             int initCount = 0;
             int passCount = 0;
-            List<Channel> childList = channelMapper.findChildListByParentId(parent.getContactChlId());
+            List<Channel> childList = channelMapper.findChildListByParentId(parent.getContactChlId(), null);
             List<ChannelDetail> initChildList = new ArrayList<>();
             List<ChannelDetail> passChildList = new ArrayList<>();
             for (Channel child : childList){
