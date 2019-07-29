@@ -55,6 +55,7 @@ import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.campaign.MktOperatorLogService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
+import com.zjtelcom.cpct.service.grouping.TrialProdService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SyncActivityService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
@@ -238,6 +239,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private MktCamChlConfAttrMapper mktCamChlConfAttrMapper;
     @Autowired
     private SearchLabelService searchLabelService;
+    @Autowired
+    private TrialProdService trialProdService;
 
     //指定下发地市人员的数据集合
     private final static String CITY_PUBLISH="CITY_PUBLISH";
@@ -1586,7 +1589,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         public void run() {
                             try {
                                 String roleName = "admin";
-                                //synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
+                                synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
                                 // 删除生产redis缓存
                                 synchronizeCampaignService.deleteCampaignRedisProd(mktCampaignId);
                             } catch (Exception e) {
@@ -1781,6 +1784,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     }
                 }.start();
             }
+            //活动发布若是清单活动重新试算全量清单
+            UserListTemp(mktCampaignId, mktCampaignDO);
         } catch (Exception e) {
             logger.error("[op:MktCampaignServiceImpl] failed to publishMktCampaign by mktCampaignId = {}, Exception = ", mktCampaignId, e);
             mktCampaignMap.put("resultCode", CommonConstant.CODE_FAIL);
@@ -1789,6 +1794,30 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         return mktCampaignMap;
     }
 
+    private void UserListTemp(Long mktCampaignId, MktCampaignDO mktCampaignDO) {
+        List<String> mktCamCodeList = (List<String>) redisUtils.get("MKT_CAM_API_CODE_KEY");
+        if (mktCamCodeList == null) {
+            List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("MKT_CAM_API_CODE");
+            mktCamCodeList = new ArrayList<String>();
+            for (SysParams sysParams : sysParamsList) {
+                mktCamCodeList.add(sysParams.getParamValue());
+            }
+            redisUtils.set("MKT_CAM_API_CODE_KEY", mktCamCodeList);
+        }
+        if (mktCamCodeList.contains(mktCampaignDO.getInitId().toString())) {
+            new Thread() {
+                public void run() {
+                    logger.info("清单活动发布全量算清单：" + mktCampaignId+" INIT_ID:"+mktCampaignDO.getInitId());
+                    Map<String,Object> params = new HashMap<>();
+                    List<Integer> arrayList = new ArrayList<>();
+                    arrayList.add(Integer.valueOf(mktCampaignId.toString()));
+                    params.put("userListCam","USER_LIST_TEMP");
+                    params.put("idList",arrayList);
+                    trialProdService.campaignIndexTask(params);
+                }
+            }.start();
+        }
+    }
 
 
     /**
@@ -1829,6 +1858,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                             requestInfo.setContName(o.getString("name"));
                             requestInfo.setDeptCode(o.getString("department"));
                             requestInfo.setCreateStaff(o.getLong("employeeId"));   //创建人,目前指定到承接人的工号
+                            mktCampaignDO.setCreateStaff(o.getLong("employeeId"));
+                            mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
                             break;
                         }
                     }

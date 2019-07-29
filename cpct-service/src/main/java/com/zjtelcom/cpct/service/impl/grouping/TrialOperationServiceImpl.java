@@ -872,6 +872,18 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 //        return result;
 //    }
 
+
+    private void  addLog2Es(String batchNum,String remark){
+        try {
+            Map<String,Object> param = new HashMap<>();
+            param.put("batchNum",batchNum);
+            param.put("data",remark);
+            esService.addLogByBatchNum(param);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     /**
      * 导入试运算清单
      */
@@ -1248,17 +1260,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         }
 
         for (MktStrategyConfRuleDO rule : ruleList){
-            List<String> labelTypeList = injectionLabelMapper.listLabelByRuleId(rule.getMktStrategyConfRuleId());
-            if (labelTypeList == null || labelTypeList.isEmpty()){
-                result.put("resultCode", CODE_FAIL);
-                result.put("resultMsg", "请检查规则："+rule.getMktStrategyConfRuleName()+"条件配置");
-                return result;
-            }
-            if (!labelTypeList.contains("2000")){
-                result.put("resultCode", CODE_FAIL);
-                result.put("resultMsg", "规则："+rule.getMktStrategyConfRuleName()+"请至少配置一条用户级条件");
-                return result;
-            }
             String orgCheck = redisUtils.get("ORG_CHECK_"+rule.getMktStrategyConfRuleId().toString())==null ? null :redisUtils.get("ORG_CHECK_"+rule.getMktStrategyConfRuleId().toString()).toString();
             if (orgCheck!=null && orgCheck.equals("false")){
                 result.put("resultCode", CODE_FAIL);
@@ -1266,7 +1267,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 return result;
             }
         }
-
         TrialOperation trialOp = BeanUtil.create(operationVO, new TrialOperation());
         trialOp.setCampaignName(campaign.getMktCampaignName());
         trialOp.setStrategyName(strategy.getMktStrategyConfName());
@@ -1636,16 +1636,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(request.getStrategyId());
         for (MktStrategyConfRuleRelDO ruleRelDO : ruleRelList) {
             TrialOperationParamES param = getTrialOperationParamES(request, trialOperation.getBatchNum(), ruleRelDO.getMktStrategyConfRuleId(),false,null);
-            List<LabelResultES> labelResultList = param.getLabelResultList();
-            List<String> labelTypeList = new ArrayList<>();
-            for (LabelResultES la : labelResultList){
-                labelTypeList.add(la.getRightOperand());
-            }
-            if (!labelTypeList.contains("2000")){
-                result.put("resultCode", CODE_FAIL);
-                result.put("resultMsg", "规则："+param.getRuleName()+"不满足查询条件，请至少配置一条用户级标签查询条件！");
-                return result;
-            }
             paramList.add(param);
         }
         requests.setParamList(paramList);
@@ -1657,7 +1647,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             new Thread(){
                 public void run(){
                    esService.strategyIssure(issureRequest);
-//                    TrialResponseES res  =  restTemplate.postForObject("http://localhost:8080/es/cpcMatchFileToFtp", issureRequest, TrialResponseES.class);
                 }
             }.start();
         } catch (Exception e) {
