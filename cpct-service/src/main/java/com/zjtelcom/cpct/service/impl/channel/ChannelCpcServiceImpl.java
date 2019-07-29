@@ -100,12 +100,14 @@ public class ChannelCpcServiceImpl extends BaseService implements ChannelService
     }
 
     private void listParent(List<ChannelDetail> parentDetailList, List<Channel> parentList,String channelName, String triggerType) {
-        for (Channel parent : parentList){
+        Iterator it = parentList.iterator();
+        while(it.hasNext()){
+            Channel parent = (Channel)it.next();
             ChannelDetail parentDetail = new ChannelDetail();
             List<Channel> childList = channelMapper.findChildListByParentId(parent.getContactChlId(), triggerType);
             List<ChannelDetail> childDetailList = new ArrayList<>();
             if(childList == null || childList.isEmpty()){
-                parentList.remove(parent);
+                it.remove();
             }else {
                 for (Channel child : childList) {
                     if (channelName != null && !channelName.equals("") && !child.getContactChlName().contains(channelName)) {
