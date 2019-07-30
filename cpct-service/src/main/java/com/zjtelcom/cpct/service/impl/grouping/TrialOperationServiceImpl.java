@@ -837,115 +837,121 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             trialOp.setStatusDate(new Date());
             trialOp.setCreateStaff(TrialCreateType.IMPORT_USER_LIST.getValue());
             trialOperationMapper.insert(trialOp);
+            Long insertId = trialOp.getId();
             op = trialOp;
             int size = dataVO.contentList.size() - 3;
             new MyThread(index) {
                 public void run() {
-                    Long mqSum = 0L;
-                    List<FilterRule> productFilter = new ArrayList<>();
-                    final TrialOperationVOES request = getTrialOperationVOES(operation, ruleId, batchNumSt, labelList);
-                    List<Map<String, Object>> customerList = new ArrayList<>();
-                    //红黑名单过滤
-                    List<String> typeList = new ArrayList<>();
-                    typeList.add("3000");
-                    List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(campaign.getMktCampaignId(), typeList);
-                    if (filterRuleList != null && !filterRuleList.isEmpty()) {
-                        productFilter = filterRuleList;
-                    }
-                    // 查看当前规则协同渠道是否为沙盘，是否配置接单人派单
-                    boolean flag = false;
-                    Map<String, Object> mktCamChlConf = mktCamChlConfService.getMktCamChlConf(Long.valueOf(confRule.getEvtContactConfId()));
-                    MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConf.get("mktCamChlConfDetail");
-                    List<MktCamChlConfAttr> mktCamChlConfAttrList = mktCamChlConfDetail.getMktCamChlConfAttrList();
-                    for (MktCamChlConfAttr attr : mktCamChlConfAttrList) {
-                        if (attr.getAttrId().equals(ConfAttrEnum.ISEE_CUSTOMER.getArrId()) && (attr.getAttrValue() == null || attr.getAttrValue().equals(""))) {
-                            flag = true;
+                    try {
+                        Long mqSum = 0L;
+                        List<FilterRule> productFilter = new ArrayList<>();
+                        final TrialOperationVOES request = getTrialOperationVOES(operation, ruleId, batchNumSt, labelList);
+                        List<Map<String, Object>> customerList = new ArrayList<>();
+                        //红黑名单过滤
+                        List<String> typeList = new ArrayList<>();
+                        typeList.add("3000");
+                        List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(campaign.getMktCampaignId(), typeList);
+                        if (filterRuleList != null && !filterRuleList.isEmpty()) {
+                            productFilter = filterRuleList;
                         }
-                    }
-                    for (int j = 3; j < dataVO.contentList.size(); j++) {
-                        List<String> data = Arrays.asList(dataVO.contentList.get(j).split("\\|@\\|"));
-                        Object[] objects = data.toArray();
-                        Map<String, Object> customers = new HashMap<>();
-                        boolean check = true;
-                        for (int x = 0; x < codeList.length; x++) {
-                            if (codeList[x] == null) {
-                                break;
+                        // 查看当前规则协同渠道是否为沙盘，是否配置接单人派单
+                        boolean flag = false;
+                        Map<String, Object> mktCamChlConf = mktCamChlConfService.getMktCamChlConf(Long.valueOf(confRule.getEvtContactConfId()));
+                        MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConf.get("mktCamChlConfDetail");
+                        List<MktCamChlConfAttr> mktCamChlConfAttrList = mktCamChlConfDetail.getMktCamChlConfAttrList();
+                        for (MktCamChlConfAttr attr : mktCamChlConfAttrList) {
+                            if (attr.getAttrId().equals(ConfAttrEnum.ISEE_CUSTOMER.getArrId()) && (attr.getAttrValue() == null || attr.getAttrValue().equals(""))) {
+                                flag = true;
                             }
+                        }
+                        for (int j = 3; j < dataVO.contentList.size(); j++) {
+                            List<String> data = Arrays.asList(dataVO.contentList.get(j).split("\\|@\\|"));
+                            Object[] objects = data.toArray();
                             if (flag && (this.getIndex() > data.size() || data.get(this.getIndex()) == null || data.get(this.getIndex()).equals(""))) {
                                 // 记录日志，退出线程
                                 // addLog2Es(batchNumSt, "导入清单第"+ j +"行接单人无数据");
                                 TrialOperation record = new TrialOperation();
-                                BeanUtil.create(operation, record);
+                                record.setId(Long.valueOf(insertId));
                                 record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
+                                record.setRemark("清单导入数据错误");
                                 trialOperationMapper.updateByPrimaryKey(record);
-                                // throw new RuntimeException("导入清单第"+ j +"行接单人无数据");
-                                Thread.currentThread().interrupt();
+                                throw new RuntimeException("导入清单第" + j + "行接单人无数据");
                             }
-                            String value = "";
-                            if (x >= data.size()) {
-                                value = "null";
+                            Map<String, Object> customers = new HashMap<>();
+                            boolean check = true;
+                            for (int x = 0; x < codeList.length; x++) {
+                                if (codeList[x] == null) {
+                                    break;
+                                }
+                                String value = "";
+                                if (x >= data.size()) {
+                                    value = "null";
+                                } else {
+                                    value = data.get(x);
+                                }
+                                if (value.contains("\r") || value.contains("\n")) {
+                                    // 过滤换行符
+                                    value = value.replace("\r", "").replace("\n", "");
+                                }
+                                if (codeList[x].equals("CCUST_NAME") && (value.contains("null") || value.equals(""))) {
+                                    check = false;
+                                    break;
+                                }
+                                if (codeList[x].equals("CCUST_ID") && (value.contains("null") || value.equals(""))) {
+                                    check = false;
+                                    break;
+                                }
+                                if (codeList[x].equals("ASSET_INTEG_ID") && (value.contains("null") || value.equals(""))) {
+                                    check = false;
+                                    break;
+                                }
+                                if (codeList[x].equals("ASSET_NUMBER") && (value.contains("null") || value.equals(""))) {
+                                    check = false;
+                                    break;
+                                }
+                                if (codeList[x].equals("LATN_ID") && (value.contains("null") || value.equals(""))) {
+                                    check = false;
+                                    break;
+                                }
+                                customers.put(codeList[x], value);
+                            }
+                            if (!check || customers.isEmpty()) {
+                                continue;
+                            }
+                            customerList.add(customers);
+                        }
+                        int x = customerList.size() / 1000;
+                        for (int i = 0; i <= x; i++) {
+                            List<Map<String, Object>> newSublist = new ArrayList();
+                            if (i == x) {
+                                newSublist = customerList.subList(i * 1000, customerList.size());
                             } else {
-                                value = data.get(x);
+                                newSublist = customerList.subList(i * 1000, (i + 1) * 1000);
                             }
-                            if (value.contains("\r") || value.contains("\n")) {
-                                // 过滤换行符
-                                value = value.replace("\r", "").replace("\n", "");
+                            // 向MQ中扔入request和customersList
+                            HashMap msgBody = new HashMap();
+                            msgBody.put("request", request);
+                            msgBody.put("customerList", newSublist);
+                            msgBody.put("productFilterList", productFilter);
+                            try {
+                                // 判断是否发送成功
+                                if (!mqService.msg2Producer(msgBody, batchNumSt, ruleId.toString()).equals("SEND_OK")) {
+                                    // 发送失败自动重发2次，如果还是失败，记录
+                                    logger.error("CTGMQ消息生产失败,batchNumSt:" + batchNumSt, msgBody);
+                                }
+                                mqSum++;
+                                msgBody = null;
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
-                            if (codeList[x].equals("CCUST_NAME") && (value.contains("null") || value.equals(""))) {
-                                check = false;
-                                break;
-                            }
-                            if (codeList[x].equals("CCUST_ID") && (value.contains("null") || value.equals(""))) {
-                                check = false;
-                                break;
-                            }
-                            if (codeList[x].equals("ASSET_INTEG_ID") && (value.contains("null") || value.equals(""))) {
-                                check = false;
-                                break;
-                            }
-                            if (codeList[x].equals("ASSET_NUMBER") && (value.contains("null") || value.equals(""))) {
-                                check = false;
-                                break;
-                            }
-                            if (codeList[x].equals("LATN_ID") && (value.contains("null") || value.equals(""))) {
-                                check = false;
-                                break;
-                            }
-                            customers.put(codeList[x], value);
+                            newSublist.clear();
                         }
-                        if (!check || customers.isEmpty()) {
-                            continue;
-                        }
-                        customerList.add(customers);
+                        redisUtils_es.set("MQ_SUM_" + batchNumSt, mqSum);
+                        logger.info("导入试运算清单importUserList->customerList的数量：" + customerList.size());
+
+                    } catch (RuntimeException e) {
+                        e.printStackTrace();
                     }
-                    int x = customerList.size() / 1000;
-                    for (int i = 0; i <= x; i++) {
-                        List<Map<String, Object>> newSublist = new ArrayList();
-                        if (i == x) {
-                            newSublist = customerList.subList(i * 1000, customerList.size());
-                        } else {
-                            newSublist = customerList.subList(i * 1000, (i + 1) * 1000);
-                        }
-                        // 向MQ中扔入request和customersList
-                        HashMap msgBody = new HashMap();
-                        msgBody.put("request", request);
-                        msgBody.put("customerList", newSublist);
-                        msgBody.put("productFilterList", productFilter);
-                        try {
-                            // 判断是否发送成功
-                            if (!mqService.msg2Producer(msgBody, batchNumSt, ruleId.toString()).equals("SEND_OK")) {
-                                // 发送失败自动重发2次，如果还是失败，记录
-                                logger.error("CTGMQ消息生产失败,batchNumSt:" + batchNumSt, msgBody);
-                            }
-                            mqSum++;
-                            msgBody = null;
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        newSublist.clear();
-                    }
-                redisUtils_es.set("MQ_SUM_"+batchNumSt,mqSum);
-                logger.info("导入试运算清单importUserList->customerList的数量：" + customerList.size());
                 }
             }.start();
         } catch (Exception e) {
