@@ -55,6 +55,7 @@ import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.impl.MqServiceImpl;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
+import com.zjtelcom.cpct.service.thread.MyThread;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_prod.dao.offer.MktResourceProdMapper;
 import com.zjtelcom.cpct_prod.dao.offer.OfferProdMapper;
@@ -697,6 +698,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         }
     }
 
+
+
     /**
      * 导入试运算清单
      */
@@ -751,7 +754,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         result.put("resultMsg", "接单人号码标签名称错误");
                         return result;
                     }
-                    index = i;
+                   index = i;
                 }
                 Map<String, Object> label = new HashMap<>();
                 label.put("code", codeList[i]);
@@ -836,86 +839,97 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             trialOperationMapper.insert(trialOp);
             op = trialOp;
             int size = dataVO.contentList.size() - 3;
-            new Thread() {
+            new MyThread(index) {
                 public void run() {
                     Long mqSum = 0L;
-                    final int index = index;
-                List<FilterRule> productFilter = new ArrayList<>();
-                final TrialOperationVOES request = getTrialOperationVOES(operation, ruleId, batchNumSt, labelList);
-                List<Map<String, Object>> customerList = new ArrayList<>();
-                //红黑名单过滤
-                List<String> typeList = new ArrayList<>();
-                typeList.add("3000");
-                List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(campaign.getMktCampaignId(), typeList);
-                if (filterRuleList != null && !filterRuleList.isEmpty()) {
-                    productFilter = filterRuleList;
-                }
-                // 查看当前规则协同渠道是否为沙盘，是否配置接单人派单
-                boolean flag = false;
-                Map<String, Object> mktCamChlConf = mktCamChlConfService.getMktCamChlConf(Long.valueOf(confRule.getEvtContactConfId()));
-                MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConf.get("mktCamChlConfDetail");
-                List<MktCamChlConfAttr> mktCamChlConfAttrList = mktCamChlConfDetail.getMktCamChlConfAttrList();
-                for (MktCamChlConfAttr attr : mktCamChlConfAttrList) {
-                    if(attr.getAttrId().equals(ConfAttrEnum.ISEE_CUSTOMER.getArrId()) && (attr.getAttrValue() == null || attr.getAttrValue().equals(""))){
-                        flag = true;
+                    List<FilterRule> productFilter = new ArrayList<>();
+                    final TrialOperationVOES request = getTrialOperationVOES(operation, ruleId, batchNumSt, labelList);
+                    List<Map<String, Object>> customerList = new ArrayList<>();
+                    //红黑名单过滤
+                    List<String> typeList = new ArrayList<>();
+                    typeList.add("3000");
+                    List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(campaign.getMktCampaignId(), typeList);
+                    if (filterRuleList != null && !filterRuleList.isEmpty()) {
+                        productFilter = filterRuleList;
                     }
-                }
-                int customerListCount = 0;
-                for (int j = 3; j < dataVO.contentList.size(); j++) {
-                    List<String> data = Arrays.asList(dataVO.contentList.get(j).split("\\|@\\|"));
-                    Map<String, Object> customers = new HashMap<>();
-                    boolean check = true;
-                    for (int x = 0; x < codeList.length; x++) {
-                        if (codeList[x] == null) {
-                            break;
+                    // 查看当前规则协同渠道是否为沙盘，是否配置接单人派单
+                    boolean flag = false;
+                    Map<String, Object> mktCamChlConf = mktCamChlConfService.getMktCamChlConf(Long.valueOf(confRule.getEvtContactConfId()));
+                    MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConf.get("mktCamChlConfDetail");
+                    List<MktCamChlConfAttr> mktCamChlConfAttrList = mktCamChlConfDetail.getMktCamChlConfAttrList();
+                    for (MktCamChlConfAttr attr : mktCamChlConfAttrList) {
+                        if (attr.getAttrId().equals(ConfAttrEnum.ISEE_CUSTOMER.getArrId()) && (attr.getAttrValue() == null || attr.getAttrValue().equals(""))) {
+                            flag = true;
                         }
-                        if(flag && (data.get(index) == null || data.get(index).equals(""))){
-                            // 记录日志，退出线程
-
-                            throw new RuntimeException();
-                            // Thread.currentThread().interrupt();
+                    }
+                    for (int j = 3; j < dataVO.contentList.size(); j++) {
+                        List<String> data = Arrays.asList(dataVO.contentList.get(j).split("\\|@\\|"));
+                        Object[] objects = data.toArray();
+                        Map<String, Object> customers = new HashMap<>();
+                        boolean check = true;
+                        for (int x = 0; x < codeList.length; x++) {
+                            if (codeList[x] == null) {
+                                break;
+                            }
+                            if (flag && (this.getIndex() > data.size() || data.get(this.getIndex()) == null || data.get(this.getIndex()).equals(""))) {
+                                // 记录日志，退出线程
+                                // addLog2Es(batchNumSt, "导入清单第"+ j +"行接单人无数据");
+                                TrialOperation record = new TrialOperation();
+                                BeanUtil.create(operation, record);
+                                record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
+                                trialOperationMapper.updateByPrimaryKey(record);
+                                // throw new RuntimeException("导入清单第"+ j +"行接单人无数据");
+                                Thread.currentThread().interrupt();
+                            }
+                            String value = "";
+                            if (x >= data.size()) {
+                                value = "null";
+                            } else {
+                                value = data.get(x);
+                            }
+                            if (value.contains("\r") || value.contains("\n")) {
+                                // 过滤换行符
+                                value = value.replace("\r", "").replace("\n", "");
+                            }
+                            if (codeList[x].equals("CCUST_NAME") && (value.contains("null") || value.equals(""))) {
+                                check = false;
+                                break;
+                            }
+                            if (codeList[x].equals("CCUST_ID") && (value.contains("null") || value.equals(""))) {
+                                check = false;
+                                break;
+                            }
+                            if (codeList[x].equals("ASSET_INTEG_ID") && (value.contains("null") || value.equals(""))) {
+                                check = false;
+                                break;
+                            }
+                            if (codeList[x].equals("ASSET_NUMBER") && (value.contains("null") || value.equals(""))) {
+                                check = false;
+                                break;
+                            }
+                            if (codeList[x].equals("LATN_ID") && (value.contains("null") || value.equals(""))) {
+                                check = false;
+                                break;
+                            }
+                            customers.put(codeList[x], value);
                         }
-                        String value = "";
-                        if (x >= data.size()) {
-                            value = "null";
+                        if (!check || customers.isEmpty()) {
+                            continue;
+                        }
+                        customerList.add(customers);
+                    }
+                    int x = customerList.size() / 1000;
+                    for (int i = 0; i <= x; i++) {
+                        List<Map<String, Object>> newSublist = new ArrayList();
+                        if (i == x) {
+                            newSublist = customerList.subList(i * 1000, customerList.size());
                         } else {
-                            value = data.get(x);
+                            newSublist = customerList.subList(i * 1000, (i + 1) * 1000);
                         }
-                        if (value.contains("\r") || value.contains("\n")) {
-                            // 过滤换行符
-                            value = value.replace("\r", "").replace("\n", "");
-                        }
-                        if (codeList[x].equals("CCUST_NAME") && (value.contains("null") || value.equals(""))) {
-                            check = false;
-                            break;
-                        }
-                        if (codeList[x].equals("CCUST_ID") && (value.contains("null") || value.equals(""))) {
-                            check = false;
-                            break;
-                        }
-                        if (codeList[x].equals("ASSET_INTEG_ID") && (value.contains("null") || value.equals(""))) {
-                            check = false;
-                            break;
-                        }
-                        if (codeList[x].equals("ASSET_NUMBER") && (value.contains("null") || value.equals(""))) {
-                            check = false;
-                            break;
-                        }
-                        if (codeList[x].equals("LATN_ID") && (value.contains("null") || value.equals(""))) {
-                            check = false;
-                            break;
-                        }
-                        customers.put(codeList[x], value);
-                    }
-                    if (!check || customers.isEmpty()) {
-                        continue;
-                    }
-                    customerList.add(customers);
-                    if (customerList.size() >= 1000 || j == dataVO.contentList.size() - 1) {
                         // 向MQ中扔入request和customersList
                         HashMap msgBody = new HashMap();
                         msgBody.put("request", request);
-                        msgBody.put("customerList", customerList);
+                        msgBody.put("customerList", newSublist);
                         msgBody.put("productFilterList", productFilter);
                         try {
                             // 判断是否发送成功
@@ -923,17 +937,15 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                 // 发送失败自动重发2次，如果还是失败，记录
                                 logger.error("CTGMQ消息生产失败,batchNumSt:" + batchNumSt, msgBody);
                             }
-                            customerListCount += customerList.size();
                             mqSum++;
                             msgBody = null;
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        customerList.clear();
+                        newSublist.clear();
                     }
-                }
                 redisUtils_es.set("MQ_SUM_"+batchNumSt,mqSum);
-                logger.info("导入试运算清单importUserList->customerList的数量：" + customerListCount);
+                logger.info("导入试运算清单importUserList->customerList的数量：" + customerList.size());
                 }
             }.start();
         } catch (Exception e) {
