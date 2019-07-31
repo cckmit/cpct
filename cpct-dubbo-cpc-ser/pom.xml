@@ -9,8 +9,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>cpct-dubbo-server</artifactId>
-    <name>cpct-dubbo-server</name>
+    <artifactId>cpct-dubbo-cpc-ser</artifactId>
+    <name>cpct-dubbo-cpc-ser</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -32,30 +32,6 @@
         <dependency>
             <groupId>com.zjtelcom.cpct</groupId>
             <artifactId>cpct-service</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.zjtelcom.cpct</groupId>
-            <artifactId>cpct-dubbo-cpc</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.zjtelcom.cpct</groupId>
-            <artifactId>cpct-dubbo-cpc-ser</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.ctzj.bss.customer.data.carrier</groupId>
-            <artifactId>customer-data-carrier-outbound-api</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.ctzj.shared.biz.account.asset.model</groupId>
-            <artifactId>biz-account-asset-model</artifactId>
-            <version>1.0.0</version>
         </dependency>
 
         <dependency>
@@ -108,16 +84,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.telin</groupId>
-            <artifactId>dubbo-wt</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
-
-        <dependency>
             <groupId>com.zjtelcom.es</groupId>
-            <artifactId>es-event-access</artifactId>
-            <version>1.0.1</version>
+            <artifactId>es-server</artifactId>
+            <version>1.0</version>
         </dependency>
 
         <!-- 黄懿慧dubbo服务jar包 -->
@@ -126,12 +95,17 @@
             <artifactId>biz</artifactId>
         </dependency>
 
-        <!--活动同步大数据-->
         <dependency>
-            <groupId>com.zjhcsoft.eagle</groupId>
-            <artifactId>dubbo-eagle-service</artifactId>
+            <groupId>com.ctzj.bss.customer.data.carrier</groupId>
+            <artifactId>customer-data-carrier-outbound-api</artifactId>
+            <version>1.0.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.ctzj.shared.biz.account.asset.model</groupId>
+            <artifactId>biz-account-asset-model</artifactId>
+            <version>1.0.0</version>
+        </dependency>
 
         <dependency>
             <groupId>com.ctzj.smt.bss</groupId>
@@ -144,6 +118,7 @@
             <artifactId>bss-customer-model</artifactId>
             <version>1.0</version>
         </dependency>
+
     </dependencies>
 
     <profiles>
@@ -199,7 +174,7 @@
     </properties>
 
     <build>
-        <finalName>cpct-dubbo-server</finalName>
+        <finalName>cpct-dubbo-cpc-ser</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -216,7 +191,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>1.4.3.RELEASE</version>
                 <configuration>
-                    <mainClass>com.zjtelcom.cpct.DubboServerApplication</mainClass>
+                    <mainClass>com.zjtelcom.cpct.CamDubboSerServerApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>
