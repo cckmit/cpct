@@ -337,15 +337,15 @@ public class TrialOperationController extends BaseController {
 
     /**
      * 全量试算成功后抽样显示试算记录
-     * @param id
+     * @param param
      * @return
      */
     @PostMapping("showCalculationLog")
     @CrossOrigin
-    public Map<String,Object> showCalculationLog (@RequestBody Long id){
+    public Map<String,Object> showCalculationLog (@RequestBody HashMap<String, Long> param){
         Map<String, Object> result = new HashMap<>();
         try {
-            result = operationService.showCalculationLog(id);
+            result = operationService.showCalculationLog(param.get("id"));
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to showCalculationLog", e);
             result.put("resultCode", CODE_FAIL);
