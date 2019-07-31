@@ -1557,8 +1557,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             } else if(StatusCode.STATUS_CODE_ROLL_BACK.getStatusCode().equals(statusCd)){
                 // 查询initId为mktCampaignId且状态为调整待发布
                 MktCampaignDO mktCampaignDONew = mktCampaignMapper.selectByInitForRollBack(mktCampaignDO.getInitId());
-                // 删除“调整待发布”活动
-                if (mktCampaignDONew != null) {
+                // 删除“调整待发布”活动,并保证不能删除源活动
+                if (mktCampaignDONew != null && mktCampaignDONew.getMktCampaignId()!= mktCampaignDONew.getInitId()) {
                     delMktCampaign(mktCampaignDONew.getMktCampaignId());
                 }
                 // 回滚活动, 改变原来状态为发布
