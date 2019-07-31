@@ -50,12 +50,12 @@ import com.zjtelcom.cpct.dto.event.EventMatchRulCondition;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dubbo.service.CamApiService;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
-import com.zjtelcom.cpct.dubbo.service.SearchLabelService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.elastic.service.EsHitService;
 import com.zjtelcom.cpct.enums.AreaNameEnum;
 import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
+import com.zjtelcom.cpct.service.channel.SearchLabelService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
@@ -431,7 +431,7 @@ public class EventApiServiceImpl implements EventApiService {
             }
 
             try {
-                //事件验证开始↓↓↓↓↓↓↓↓↓↓↓↓↓
+                //事件验证开始↓↓↓↓↓↓↓↓↓↓↓↓↓l
                 //解析事件采集项
                 JSONObject evtParams = JSONObject.parseObject(map.get("evtContent"));
                 //获取C4的数据用于过滤
@@ -696,16 +696,19 @@ public class EventApiServiceImpl implements EventApiService {
                 Map<String, String> mktAllLabels = (Map<String, String>) redisUtils.get("EVT_ALL_LABEL_" + eventId);
                 if (mktAllLabels == null) {
                     try {
-                        mktAllLabels = searchLabelService.labelListByEventId(eventId);  //查询事件下使用的所有标签
-                        if (null != mktAllLabels) {
-                            redisUtils.set("EVT_ALL_LABEL_" + eventId, mktAllLabels);
-                        } else {
-                            log.info("获取事件下所有标签失败");
-                            esJson.put("hit", false);
-                            esJson.put("msg", "获取事件下所有标签失败");
-                            esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
-                            return Collections.EMPTY_MAP;
-                        }
+
+                        mktAllLabels = new HashMap<>();
+
+//                        mktAllLabels = searchLabelService.labelListByEventId(eventId);  //查询事件下使用的所有标签
+//                        if (null != mktAllLabels) {
+//                            redisUtils.set("EVT_ALL_LABEL_" + eventId, mktAllLabels);
+//                        } else {
+//                            log.info("获取事件下所有标签失败");
+//                            esJson.put("hit", false);
+//                            esJson.put("msg", "获取事件下所有标签失败");
+//                            esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
+//                            return Collections.EMPTY_MAP;
+//                        }
                     } catch (Exception e) {
                         esJson.put("hit", false);
                         esJson.put("msg", "获取事件下所有标签异常");
@@ -724,6 +727,8 @@ public class EventApiServiceImpl implements EventApiService {
                     assetLabelList = ChannelUtil.StringToList(mktAllLabels.get("assetLabels"));
                     // 添加 PROM_INTEG_ID标签
                     assetLabelList.add("PROM_INTEG_ID");
+                    // 添加落地网格AREA_ID标签
+                    assetLabelList.add("AREA_ID");
                 }
                 if (mktAllLabels.get("promLabels") != null && !"".equals(mktAllLabels.get("promLabels"))) {
                     promLabelList = ChannelUtil.StringToList(mktAllLabels.get("promLabels"));
@@ -1948,10 +1953,6 @@ public class EventApiServiceImpl implements EventApiService {
 
             try {
                 Long mktCampaginId = (Long) act.get("mktCampaginId");
-
-                if (mktCampaginId == 1589) {
-                    System.out.println("11");
-                }
                 //初始化es log
                 JSONObject esJson = new JSONObject();
                 esJson.put("reqId", reqId);
@@ -2293,8 +2294,8 @@ public class EventApiServiceImpl implements EventApiService {
 
                 if (strategyMapList != null && strategyMapList.size() > 0) {
                     // 判断initId是否在清单列表里面
-                    // if (mktCamCodeList.contains(mktCampaign.getInitId().toString())) {
-                    if (mktCamCodeList.contains(mktCampaign.getMktCampaignId().toString())) {
+                    if (mktCamCodeList.contains(mktCampaign.getInitId().toString())) {
+                   // if (mktCamCodeList.contains(mktCampaign.getMktCampaignId().toString())) {
                         mktCampaignCustMap.put("mktCampaginId", mktCampaginId);
                         mktCampaignCustMap.put("levelConfig", act.get("levelConfig"));
                         mktCampaignCustMap.put("campaignSeq", act.get("campaignSeq"));
@@ -2331,7 +2332,6 @@ public class EventApiServiceImpl implements EventApiService {
 
     // 处理资产级标签和销售品级标签
     private DefaultContext<String, Object> getAssetAndPromLabel(Map<String, String> mktAllLabel, Map<String, String> params, Map<String, String> privateParams, DefaultContext<String, Object> context, JSONObject esJson, Map<String, String> labelItems) {
-        String promIntegId = "";
         //资产级标签
         DefaultContext<String, Object> contextNew = new DefaultContext<String, Object>();
         if (mktAllLabel.get("assetLabels") != null && !"".equals(mktAllLabel.get("assetLabels"))) {
@@ -2352,10 +2352,6 @@ public class EventApiServiceImpl implements EventApiService {
                 for (Map.Entry<String, Object> entry : body.entrySet()) {
                     //添加到上下文
                     contextNew.put(entry.getKey(), entry.getValue());
-
-                    if ("PROM_INTEG_ID".equals(entry.getKey())) {
-                        promIntegId = entry.getValue().toString();
-                    }
                 }
             } else {
                 log.info("查询资产标签失败");
@@ -2677,14 +2673,6 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 }
                 resultMap.put("ruleList", resultList);
-
-/*
-                resultMap.put("CPCResultMsg", "success");
-                resultMap.put("custId", custId);
-                resultMap.put("taskList", resultList);
-                resultMap.put("CPCResultCode", "1");
-                resultMap.put("reqId", map.get("reqId"));
-*/
             } catch (Exception e) {
                 e.printStackTrace();
                 log.error("Exception = " + e);

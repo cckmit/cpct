@@ -43,6 +43,7 @@
         <dubbo:method name="issueByFile" servicecode="00.1083.issueByFile" timeout="10000"/>
         <dubbo:method name="uploadFile2Prod" servicecode="00.1083.uploadFile2Prod" timeout="10000"/>
         <dubbo:method name="trialLog" servicecode="00.1083.trialLog" timeout="10000"/>
+        <dubbo:method name="addLogByBatchNum" servicecode="00.1083.addLogByBatchNum" timeout="10000"/>
     </dubbo:reference>
 
     <!--&lt;!&ndash; 门户-获取用户岗位信息 &ndash;&gt;-->
