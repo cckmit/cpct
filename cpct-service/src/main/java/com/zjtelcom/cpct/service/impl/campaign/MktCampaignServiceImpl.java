@@ -16,9 +16,12 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.DisplayColumnLabelMapper;
+import com.zjtelcom.cpct.dao.channel.MktVerbalMapper;
 import com.zjtelcom.cpct.dao.channel.ObjMktCampaignRelMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
+import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper;
+import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
@@ -37,9 +40,12 @@ import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.campaign.CampaignVO;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
+import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.EventDTO;
+import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
+import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 import com.zjtelcom.cpct.enums.*;
@@ -48,6 +54,8 @@ import com.zjtelcom.cpct.service.campaign.MktCamDisplayColumnRelService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.campaign.MktOperatorLogService;
 import com.zjtelcom.cpct.service.channel.ProductService;
+import com.zjtelcom.cpct.service.channel.SearchLabelService;
+import com.zjtelcom.cpct.service.grouping.TrialProdService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SyncActivityService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
@@ -104,6 +112,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      */
     @Autowired
     private ContactEvtMapper contactEvtMapper;
+
+    @Autowired
+    private MktCamChlConfAttrMapper confAttrMapper;
     /**
      * 策略配置和活动关联
      */
@@ -132,13 +143,21 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private SysAreaMapper sysAreaMapper;
 
     @Autowired
+    private MktStrategyConfRuleMapper ruleMapper;
+
+    @Autowired
     private OfferProdMapper offerMapper;
+    @Autowired
+    private FilterRuleMapper filterRuleMapper;
 
     /**
      * redis
      */
     @Autowired
     private RedisUtils redisUtils;
+
+    @Autowired
+    private TarGrpConditionMapper tarGrpConditionMapper;
 
     @Autowired
     private MktCamDirectoryMapper mktCamDirectoryMapper;
@@ -160,6 +179,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
     @Autowired
     private MktCamItemMapper mktCamItemMapper;
+
+    @Autowired
+    private MktVerbalMapper verbalMapper;
 
     @Autowired
     private MktStrategyCloseRuleRelMapper mktStrategyCloseRuleRelMapper;
@@ -215,6 +237,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
     @Autowired
     private MktCamChlConfAttrMapper mktCamChlConfAttrMapper;
+    @Autowired
+    private SearchLabelService searchLabelService;
+    @Autowired
+    private TrialProdService trialProdService;
 
     //指定下发地市人员的数据集合
     private final static String CITY_PUBLISH="CITY_PUBLISH";
@@ -1516,7 +1542,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     // 查询initId为mktCampaignId且状态为调整中
                     MktCampaignDO mktCampaignDOAdjust= mktCampaignMapper.selectPrimaryKeyByInitId(initId, StatusCode.STATUS_CODE_ADJUST.getStatusCode());
                     changeMktCampaignStatus(mktCampaignDOAdjust.getMktCampaignId(), StatusCode.STATUS_CODE_ROLL.getStatusCode());
-
                 }
                 if(StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)){
                     // 活动下线清缓存
@@ -1527,6 +1552,46 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
                 // 删除准生产的redis缓存
                 synchronizeCampaignService.deleteCampaignRedisPre(mktCampaignId);
+                new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            List<MktCamEvtRelDO> eventRelList = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignId);
+                            for (MktCamEvtRelDO eventDo : eventRelList){
+                                Map<String, String> mktAllLabels = searchLabelService.labelListByEventId(eventDo.getEventId());  //查询事件下使用的所有标签
+                                if (null != mktAllLabels) {
+                                    redisUtils.set("EVT_ALL_LABEL_" + eventDo.getEventId(), mktAllLabels);
+                                }
+                            }
+                            List<LabelDTO> labelDTOList = mktCamDisplayColumnRelMapper.selectLabelDisplayListByCamId(mktCampaignId);
+                            redisUtils.set("CAM_LABEL_DTO_LIST" + mktCampaignId, labelDTOList);
+                            //过滤规则标签
+                            List<FilterRule> filterRules = filterRuleMapper.selectFilterRuleList(Long.valueOf(mktCampaignId.toString()));
+                            redisUtils.set("CAM_FILTER_LIST_"+mktCampaignId,filterRules);
+                            //规则级的标签
+                            List<MktStrategyConfRuleDO>  ruleList = ruleMapper.selectByCampaignId(Long.valueOf(mktCampaignId.toString()));
+                            redisUtils.set("CAM_RULE_LIST_"+mktCampaignId,ruleList);
+                            //话术标签
+                            for (MktStrategyConfRuleDO ruleDO : ruleList){
+                                if (ruleDO.getEvtContactConfId()!=null && !ruleDO.getEvtContactConfId().equals("")){
+                                    String[] confList = ruleDO.getEvtContactConfId().split("/");
+                                    //推荐指引标签
+                                    for (String confId : confList){
+                                        List<MktVerbal>  verbalList = verbalMapper.findVerbalListByConfId(Long.valueOf(confId));
+                                        redisUtils.set("CAM_VERBAL_LIST_"+confId,verbalList);
+                                        List<MktCamChlConfAttrDO>  confAttrDOList = confAttrMapper.selectByEvtContactConfId(Long.valueOf(confId));
+                                        redisUtils.set("CAM_CONF_ATTR_LIST_"+confId,confAttrDOList);
+                                    }
+                                }
+                                List<TarGrpCondition>   conditionList = tarGrpConditionMapper.listTarGrpCondition(ruleDO.getTarGrpId());
+                                redisUtils.set("CAM_TAR_CONDITION_LIST_"+ruleDO.getTarGrpId(),conditionList);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            logger.error("[op:MktCampaignServiceImpl] 缓存添加失败 by mktCampaignId = {}, Expection = ",mktCampaignId, e);
+                        }
+                    }
+                }.start();
                 if (SystemParamsUtil.isCampaignSync()) {
                     // 发布活动异步同步活动到生产环境
                     new Thread() {
@@ -1534,7 +1599,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         public void run() {
                             try {
                                 String roleName = "admin";
-                                //synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
+                                synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
                                 // 删除生产redis缓存
                                 synchronizeCampaignService.deleteCampaignRedisProd(mktCampaignId);
                             } catch (Exception e) {
@@ -1729,6 +1794,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     }
                 }.start();
             }
+            //活动发布若是清单活动重新试算全量清单
+            UserListTemp(mktCampaignId, mktCampaignDO);
         } catch (Exception e) {
             logger.error("[op:MktCampaignServiceImpl] failed to publishMktCampaign by mktCampaignId = {}, Exception = ", mktCampaignId, e);
             mktCampaignMap.put("resultCode", CommonConstant.CODE_FAIL);
@@ -1737,6 +1804,30 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         return mktCampaignMap;
     }
 
+    private void UserListTemp(Long mktCampaignId, MktCampaignDO mktCampaignDO) {
+        List<String> mktCamCodeList = (List<String>) redisUtils.get("MKT_CAM_API_CODE_KEY");
+        if (mktCamCodeList == null) {
+            List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("MKT_CAM_API_CODE");
+            mktCamCodeList = new ArrayList<String>();
+            for (SysParams sysParams : sysParamsList) {
+                mktCamCodeList.add(sysParams.getParamValue());
+            }
+            redisUtils.set("MKT_CAM_API_CODE_KEY", mktCamCodeList);
+        }
+        if (mktCamCodeList.contains(mktCampaignDO.getInitId().toString())) {
+            new Thread() {
+                public void run() {
+                    logger.info("清单活动发布全量算清单：" + mktCampaignId+" INIT_ID:"+mktCampaignDO.getInitId());
+                    Map<String,Object> params = new HashMap<>();
+                    List<Integer> arrayList = new ArrayList<>();
+                    arrayList.add(Integer.valueOf(mktCampaignId.toString()));
+                    params.put("userListCam","USER_LIST_TEMP");
+                    params.put("idList",arrayList);
+                    trialProdService.campaignIndexTask(params);
+                }
+            }.start();
+        }
+    }
 
 
     /**
@@ -1777,6 +1868,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                             requestInfo.setContName(o.getString("name"));
                             requestInfo.setDeptCode(o.getString("department"));
                             requestInfo.setCreateStaff(o.getLong("employeeId"));   //创建人,目前指定到承接人的工号
+                            mktCampaignDO.setCreateStaff(o.getLong("employeeId"));
+                            mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
                             break;
                         }
                     }

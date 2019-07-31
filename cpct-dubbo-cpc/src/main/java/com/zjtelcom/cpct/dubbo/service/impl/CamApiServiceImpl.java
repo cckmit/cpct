@@ -38,7 +38,6 @@ import com.zjtelcom.cpct.dubbo.service.CamApiService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.elastic.service.EsHitService;
 import com.zjtelcom.cpct.enums.AreaNameEnum;
-import com.zjtelcom.cpct.service.dubbo.CamCpcService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
@@ -780,13 +779,14 @@ public class CamApiServiceImpl implements CamApiService {
                 }
                 esHitService.save(jsonObject, IndexList.RULE_MODULE);
             } catch (Exception e) {
-                e.printStackTrace();
                 jsonObject.put("hit", false);
                 jsonObject.put("msg", "规则异常");
                 esHitService.save(jsonObject, IndexList.RULE_MODULE);
             }
+
             return ruleMap;
         }
+
     }
 
     private Map<String, Object> ChannelTask(Long evtContactConfId, List<Map<String, String>> productList, DefaultContext<String, Object> context, String reqId) {
