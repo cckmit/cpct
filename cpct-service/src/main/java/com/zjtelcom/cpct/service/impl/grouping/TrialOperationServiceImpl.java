@@ -874,7 +874,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                 record.setId(Long.valueOf(insertId));
                                 record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
                                 record.setRemark("清单导入数据错误");
-                                trialOperationMapper.updateByPrimaryKey(record);
+                                int i = trialOperationMapper.updateByPrimaryKey(record);
                                 throw new RuntimeException("导入清单第" + j + "行接单人无数据");
                             }
                             Map<String, Object> customers = new HashMap<>();
