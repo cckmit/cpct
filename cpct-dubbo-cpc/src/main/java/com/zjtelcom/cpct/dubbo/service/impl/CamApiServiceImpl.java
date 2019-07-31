@@ -38,6 +38,7 @@ import com.zjtelcom.cpct.dubbo.service.CamApiService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.elastic.service.EsHitService;
 import com.zjtelcom.cpct.enums.AreaNameEnum;
+import com.zjtelcom.cpct.service.dubbo.CamCpcService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
@@ -469,7 +470,6 @@ public class CamApiServiceImpl implements CamApiService {
                 //初始化返回结果中的销售品条目
                 List<Map<String, String>> productList = new ArrayList<>();
                 if(flagMap.get(ruleId.toString()) == false) {
-                    log.info(Thread.currentThread().getName() + "------------->1");
                     //验证是否标签实例不足
                     if (notEnoughLabel.length() > 0) {
                         log.info("notEnoughLabel.length() > 0->标签实例不足");
@@ -630,7 +630,6 @@ public class CamApiServiceImpl implements CamApiService {
                             executorService.shutdownNow();
                         }
                     } else {
-                        log.info(Thread.currentThread().getName() + "------------->4");
                         ruleMap.put("msg", "规则引擎匹配未通过");
                         jsonObject.put("hit", "false");
                         jsonObject.put("msg", "规则引擎匹配未通过");
