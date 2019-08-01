@@ -62,6 +62,7 @@ import com.zjtelcom.es.es.entity.model.LabelResultES;
 import com.zjtelcom.es.es.entity.model.TrialOperationParamES;
 import com.zjtelcom.es.es.entity.model.TrialResponseES;
 import com.zjtelcom.es.es.service.EsService;
+import com.zjtelcom.es.es.service.EsServiceInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -165,7 +166,17 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private MktStrategyCloseRuleRelMapper strategyCloseRuleRelMapper;
     @Autowired
     private CloseRuleMapper closeRuleMapper;
+    @Autowired(required = false)
+    private EsServiceInfo esServiceInfo;
 
+
+    //抽样展示全量试算记录
+    @Override
+    public Map<String, Object> showCalculationLog(Long id) {
+        TrialOperation trialOperation = trialOperationMapper.selectByPrimaryKey(id);
+        return esServiceInfo.showCalculationLog(trialOperation.getBatchNum().toString());
+
+    }
 
 
     private String getCreater(Long createStaff){
@@ -360,6 +371,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         result.put("resultMsg", response.getTotal());
         return result;
     }
+
+
 
     /**
      * 抽样业务校验
