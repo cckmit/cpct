@@ -31,7 +31,7 @@
 
 
     <!-- 事件接入活动任务注册 1.0 -->
-    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.CamApiSerService" ref="camApiServiceImpl" version="1.0" >
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.CamApiSerService" ref="camApiSerServiceImpl" version="1.0" >
         <dubbo:method name="ActivitySerTask" servicecode="00.1083.ActivityTask_zsc" timeout="20000"/>
     </dubbo:service>
 
