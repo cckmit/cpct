@@ -43,6 +43,7 @@
         <dubbo:method name="issueByFile" servicecode="00.1083.issueByFile" timeout="10000"/>
         <dubbo:method name="uploadFile2Prod" servicecode="00.1083.uploadFile2Prod" timeout="10000"/>
         <dubbo:method name="trialLog" servicecode="00.1083.trialLog" timeout="10000"/>
+        <dubbo:method name="addLogByBatchNum" servicecode="00.1083.addLogByBatchNum" timeout="10000"/>
     </dubbo:reference>
 
     <!--&lt;!&ndash; 门户-获取用户岗位信息 &ndash;&gt;-->
@@ -67,6 +68,11 @@
     <dubbo:reference registry="esb2" interface="com.ctzj.smt.bss.cpc.configure.service.api.offer.IOfferRestrictConfigureService"
                      id="offerRestrictConfigureServiceImpl" version="1.0" check="false">
         <dubbo:method name="saveOfferRestrict" servicecode="00.1076.offerRestrict.saveOfferRestrict" timeout="120000"/>
+    </dubbo:reference>
+
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.es.es.service.EsServiceInfo"
+                     id="esServiceInfoImpl" version="1.0" check="false">
+        <dubbo:method name="showCalculationLog" servicecode="00.1083.showCalculationLog" timeout="120000"/>
     </dubbo:reference>
 
 </beans>

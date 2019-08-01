@@ -8,9 +8,7 @@ import com.zjtelcom.cpct.dao.campaign.MktCamChlConfAttrMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamDisplayColumnRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
-import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
-import com.zjtelcom.cpct.dao.channel.MktCamCustMapper;
-import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
+import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
@@ -83,45 +81,45 @@ import static com.zjtelcom.cpct.enums.ConfAttrEnum.*;
 public class TrialProdServiceImpl implements TrialProdService {
 
     @Autowired
-    private TarGrpConditionPrdMapper tarGrpConditionMapper;
+    private TarGrpConditionMapper tarGrpConditionMapper;
     @Autowired
-    private InjectionLabelPrdMapper injectionLabelMapper;
+    private InjectionLabelMapper injectionLabelMapper;
     @Autowired
-    private TrialOperationPrdMapper trialOperationMapper;
+    private TrialOperationMapper trialOperationMapper;
     @Autowired
-    private MktCampaignPrdMapper campaignMapper;
+    private MktCampaignMapper campaignMapper;
     @Autowired
-    private MktStrategyConfPrdMapper strategyMapper;
+    private MktStrategyConfMapper strategyMapper;
     @Autowired
-    private MktStrategyConfRuleRelPrdMapper strategyConfRuleRelMapper;
+    private MktStrategyConfRuleRelMapper strategyConfRuleRelMapper;
     @Autowired
-    private MktStrategyConfRuleRelPrdMapper ruleRelMapper;
+    private MktStrategyConfRuleRelMapper ruleRelMapper;
     @Autowired
     private RedisUtils redisUtils;
     @Autowired
-    private MktStrategyConfRulePrdMapper ruleMapper;
+    private MktStrategyConfRuleMapper ruleMapper;
     @Autowired
-    private InjectionLabelPrdMapper labelMapper;
+    private InjectionLabelMapper labelMapper;
     @Autowired
     private OfferProdMapper offerMapper;
     @Autowired
-    private MktCamChlConfPrdMapper chlConfMapper;
+    private MktCamChlConfMapper chlConfMapper;
     @Autowired
-    private MktCamScriptPrdMapper scriptMapper;
+    private MktCamScriptMapper scriptMapper;
     @Autowired
-    private SysParamsPrdMapper sysParamsMapper;
+    private SysParamsMapper sysParamsMapper;
     @Autowired(required = false)
     private EsService esService;
     @Autowired
-    private MktResourceProdMapper resourceMapper;
+    private MktResourceMapper resourceMapper;
     @Autowired
-    private MktStrategyConfPrdMapper strategyConfMapper;
+    private MktStrategyConfMapper strategyConfMapper;
     @Autowired
-    private FilterRulePrdMapper filterRuleMapper;
+    private FilterRuleMapper filterRuleMapper;
     @Autowired(required = false)
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
     @Autowired
-    private MktStrategyConfPrdMapper strategyConfPrdMapper;
+    private MktStrategyConfMapper strategyConfPrdMapper;
     @Autowired
     private RedisUtils_es redisUtils_es;
     /**
@@ -141,9 +139,9 @@ public class TrialProdServiceImpl implements TrialProdService {
     private MktCamChlConfService mktCamChlConfService;
 
     @Autowired
-    private MktCamChlConfAttrPrdMapper mktCamChlConfAttrMapper;
+    private MktCamChlConfAttrMapper mktCamChlConfAttrMapper;
     @Autowired
-    private MktCamDisplayColumnRelPrdMapper mktCamDisplayColumnRelMapper;
+    private MktCamDisplayColumnRelMapper mktCamDisplayColumnRelMapper;
 
     /**
      * 提供dtts定时任务清单存入es
@@ -172,7 +170,9 @@ public class TrialProdServiceImpl implements TrialProdService {
         List<Map<String,Object>> resList = new ArrayList<>();
         for (Integer id : idList){
             MktCampaignDO cam = campaignMapper.selectByPrimaryKey(Long.valueOf(id.toString()));
-            campaignList.add(cam);
+            if (cam!=null && mktCamCodeList.contains(cam.getInitId())){
+                campaignList.add(cam);
+            }
         }
         for (MktCampaignDO campaignDO : campaignList){
             if(!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(campaignDO.getStatusCd())){

@@ -38,7 +38,7 @@ public interface TrialOperationService  {
 
     Map<String,Object> conditionCheck(Map<String,Object> param);
 
-
+    Map<String,Object> showCalculationLog(Long id);
 
 
 }

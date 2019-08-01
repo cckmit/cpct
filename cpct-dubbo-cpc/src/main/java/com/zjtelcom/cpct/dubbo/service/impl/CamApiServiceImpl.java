@@ -153,7 +153,6 @@ public class CamApiServiceImpl implements CamApiService {
      */
     @Override
     public Map<String, Object> ActivityTask(Map<String, String> params, Long activityId, Map<String, String> privateParams, Map<String, String> laubelItems, List<Map<String, Object>> evtTriggers, List<Map<String, Object>> strategyMapList, DefaultContext<String, Object> context) {
-
         Map<String, Object> activity = new ConcurrentHashMap<>();
         long begin = System.currentTimeMillis();
         String reqId = params.get("reqId");
@@ -275,10 +274,10 @@ public class CamApiServiceImpl implements CamApiService {
                             }
                             Map<String, Object> filterRuleTimeMap = new HashMap<>();
                             // 判断是否进行CRM销售品过滤
-                            if (realProdFilter != null && "0".equals(realProdFilter)) {
-                            //    log.info("111------accNbr --->" + params.get("accNbr"));
-                                List<Long> prodList = new ArrayList<>();
-                                CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(params.get("accNbr"));
+                            if (realProdFilter != null && "1".equals(realProdFilter)) {
+                                log.info("111------accNbr --->" + privateParams.get("accNbr"));
+                                List<String> prodList = new ArrayList<>();
+                                CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(privateParams.get("accNbr"));
                             //    log.info("222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
                                 if(prodInstIdsObject!=null &&  prodInstIdsObject.getResultObject() !=null ){
                                     Set<String> prodInstIds = prodInstIdsObject.getResultObject();
@@ -304,7 +303,7 @@ public class CamApiServiceImpl implements CamApiService {
                                                         //Offer offer = offerProdMapper.selectByPrimaryKey(Integer.valueOf(offerInst.getOfferId().toString()));
                              //                           log.info("777------offer --->" + JSON.toJSONString(offer));
                                                         //prodStrList.add(offer.getOfferNbr());
-                                                        prodList.add(offerInst.getOfferId());
+                                                        prodList.add(offerInst.getOfferId().toString());
                                                         filterRuleTimeMap.put(offerInst.getOfferId().toString(), offerInst.getEffDate());
                                                         log.info("888------filterRuleTimeMap --->" + JSON.toJSONString(filterRuleTimeMap));
                                                     }
@@ -313,7 +312,7 @@ public class CamApiServiceImpl implements CamApiService {
                                         }
                                     }
                                 }
-                                productStr = ChannelUtil.idList2String(prodList);
+                                productStr = ChannelUtil.StringList2String(prodList);
                                 log.info("999------productStr --->" + JSON.toJSONString(productStr));
                             } else if (!context.containsKey("PROM_LIST")) { // 有没有办理销售品--销售列表标签
                                 //存在于校验
@@ -378,7 +377,7 @@ public class CamApiServiceImpl implements CamApiService {
                             if (productCheck) {
                                 esJson.put("hit", "false");
                                 esJson.put("msg", "销售品过滤验证未通过:" + esMsg);
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
+                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + privateParams.get("accNbr"));
                                 return Collections.EMPTY_MAP;
                             }
                         }
@@ -395,7 +394,7 @@ public class CamApiServiceImpl implements CamApiService {
                                 //过滤规则信息查询失败
                                 esJson.put("hit", false);
                                 esJson.put("msg", "过扰规则信息查询失败 byId: " + filterRuleId);
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
+                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + privateParams.get("accNbr"));
                                 return Collections.EMPTY_MAP;
                             } else {
                                 redisUtils.set("FILTER_RULE_DISTURB_" + filterRuleId, labels);
@@ -467,13 +466,13 @@ public class CamApiServiceImpl implements CamApiService {
                    break;
                }
             }
-            if(isWithDefaultLabel) {
-                //判断是否有命中
-                if (ruleList.size() > 1) {
+            //判断是否有命中
+            if (ruleList.size() > 0) {
+                if (isWithDefaultLabel && ruleList.size() > 1) {
                     // 从命中列表中移出默认固定规则
                     for (Map<String, Object> strategyMap : strategyMapList) {
                         Long strategyConfId = (Long) strategyMap.get("strategyConfId");
-                        String ruleId = redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId).toString();
+                        String ruleId = redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId) == null? "":redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId).toString();
                         if (ruleId != null && ruleId != "") {
                             for (Map<String, Object> map : ruleList) {
                                 Long ruleId2 = Long.valueOf(map.get("ruleId").toString());
@@ -487,7 +486,10 @@ public class CamApiServiceImpl implements CamApiService {
                     }
                 }
                 activity.put("ruleList", ruleList);
+                esJson.put("hit", true); //添加命中标识
+
                 Map<String, Object> itgTrigger;
+
                 //查询展示列 （iSale）   todo  展示列的标签未查询到是否影响命中
                 List<Map<String, Object>> iSaleDisplay = new ArrayList<>();
                 iSaleDisplay = (List<Map<String, Object>>) redisUtils.get("MKT_ISALE_LABEL_" + mktCampaign.getIsaleDisplay());
@@ -495,6 +497,7 @@ public class CamApiServiceImpl implements CamApiService {
                     iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getIsaleDisplay());
                     redisUtils.set("MKT_ISALE_LABEL_" + mktCampaign.getIsaleDisplay(), iSaleDisplay);
                 }
+
                 if (iSaleDisplay != null && iSaleDisplay.size() > 0) {
                     Map<String, Object> triggers;
                     List<Map<String, Object>> triggerList1 = new ArrayList<>();
@@ -545,7 +548,6 @@ public class CamApiServiceImpl implements CamApiService {
                         itgTriggers.add(new JSONObject(itgTrigger));
                     }
                 }
-
                 //将iSale展示列的值放入返回结果
                 Map<String, Object> evtContent = (Map<String, Object>) JSON.parse(params.get("evtContent"));
                 for (Map<String, Object> ruleMap : ruleList) {
@@ -554,7 +556,7 @@ public class CamApiServiceImpl implements CamApiService {
                         map.put("itgTriggers", JSONArray.parse(JSONArray.toJSON(itgTriggers).toString()));
                         // map.put("triggers", JSONArray.parse(JSONArray.toJSON(evtTriggers).toString()));
                         List<Map<String, Object>> triggersList = new ArrayList<>();
-                        if(evtContent != null){
+                        if (evtContent != null && !evtContent.isEmpty()) {
                             for (Map.Entry entry : evtContent.entrySet()) {
                                 Map<String, Object> trigger = new HashMap<>();
                                 trigger.put("key", entry.getKey());
@@ -565,105 +567,16 @@ public class CamApiServiceImpl implements CamApiService {
                         }
                     }
                 }
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
-            }else {
-                //判断是否有命中
-                if (ruleList.size() > 0) {
-                    activity.put("ruleList", ruleList);
-                    esJson.put("hit", true); //添加命中标识
-
-                    Map<String, Object> itgTrigger;
-
-                    //查询展示列 （iSale）   todo  展示列的标签未查询到是否影响命中
-                    List<Map<String, Object>> iSaleDisplay = new ArrayList<>();
-                    iSaleDisplay = (List<Map<String, Object>>) redisUtils.get("MKT_ISALE_LABEL_" + mktCampaign.getIsaleDisplay());
-                    if (iSaleDisplay == null) {
-                        iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getIsaleDisplay());
-                        redisUtils.set("MKT_ISALE_LABEL_" + mktCampaign.getIsaleDisplay(), iSaleDisplay);
-                    }
-
-                    if (iSaleDisplay != null && iSaleDisplay.size() > 0) {
-
-                        Map<String, Object> triggers;
-                        List<Map<String, Object>> triggerList1 = new ArrayList<>();
-                        List<Map<String, Object>> triggerList2 = new ArrayList<>();
-                        List<Map<String, Object>> triggerList3 = new ArrayList<>();
-                        List<Map<String, Object>> triggerList4 = new ArrayList<>();
-
-                        for (Map<String, Object> label : iSaleDisplay) {
-                            if (context.containsKey((String) label.get("labelCode"))) {
-                                triggers = new JSONObject();
-                                triggers.put("key", label.get("labelCode"));
-                                triggers.put("value", context.get((String) label.get("labelCode")));
-                                triggers.put("display", 0); //todo 确定display字段
-                                triggers.put("name", label.get("labelName"));
-                                if ("1".equals(label.get("typeCode").toString())) {
-                                    triggerList1.add(triggers);
-                                } else if ("2".equals(label.get("typeCode").toString())) {
-                                    triggerList2.add(triggers);
-                                } else if ("3".equals(label.get("typeCode").toString())) {
-                                    triggerList3.add(triggers);
-                                } else if ("4".equals(label.get("typeCode").toString())) {
-                                    triggerList4.add(triggers);
-                                }
-                            }
-                        }
-                        if (triggerList1.size() > 0) {
-                            itgTrigger = new ConcurrentHashMap<>();
-                            itgTrigger.put("triggerList", triggerList1);
-                            itgTrigger.put("type", "固定信息");
-                            itgTriggers.add(new JSONObject(itgTrigger));
-                        }
-                        if (triggerList2.size() > 0) {
-                            itgTrigger = new JSONObject();
-                            itgTrigger.put("triggerList", triggerList2);
-                            itgTrigger.put("type", "营销信息");
-                            itgTriggers.add(new JSONObject(itgTrigger));
-                        }
-                        if (triggerList3.size() > 0) {
-                            itgTrigger = new JSONObject();
-                            itgTrigger.put("triggerList", triggerList3);
-                            itgTrigger.put("type", "费用信息");
-                            itgTriggers.add(new JSONObject(itgTrigger));
-                        }
-                        if (triggerList4.size() > 0) {
-                            itgTrigger = new JSONObject();
-                            itgTrigger.put("triggerList", triggerList4);
-                            itgTrigger.put("type", "协议信息");
-                            itgTriggers.add(new JSONObject(itgTrigger));
-                        }
-                    }
-
-                    //将iSale展示列的值放入返回结果
-                    Map<String, Object> evtContent = (Map<String, Object>) JSON.parse(params.get("evtContent"));
-                    for (Map<String, Object> ruleMap : ruleList) {
-                        List<Map<String, Object>> ChlMap = (List<Map<String, Object>>) ruleMap.get("taskChlList");
-                        for (Map<String, Object> map : ChlMap) {
-                            map.put("itgTriggers", JSONArray.parse(JSONArray.toJSON(itgTriggers).toString()));
-                            // map.put("triggers", JSONArray.parse(JSONArray.toJSON(evtTriggers).toString()));
-                            List<Map<String, Object>> triggersList = new ArrayList<>();
-                            if (evtContent != null && !evtContent.isEmpty()) {
-                                for (Map.Entry entry : evtContent.entrySet()) {
-                                    Map<String, Object> trigger = new HashMap<>();
-                                    trigger.put("key", entry.getKey());
-                                    trigger.put("value", entry.getValue());
-                                    triggersList.add(trigger);
-                                }
-                                map.put("triggers", triggersList);
-                            }
-                        }
-                    }
-                } else {
-                    esJson.put("hit", false);
-                    esJson.put("msg", "策略均未命中");
-                }
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
+            } else {
+                esJson.put("hit", false);
+                esJson.put("msg", "策略均未命中");
             }
+            esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
         } catch (Exception e) {
             e.printStackTrace();
             esJson.put("hit", false);
             esJson.put("msg", "获取计算结果异常");
-            esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
+            esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + privateParams.get("accNbr"));
             //发生异常关闭线程池
             executorService.shutdownNow();
         } finally {
@@ -784,6 +697,55 @@ public class CamApiServiceImpl implements CamApiService {
                 }
             }
 
+
+            String realProdFilter = (String) redisUtils.get("REAL_PROD_FILTER");
+            if (realProdFilter == null) {
+                List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("REAL_PROD_FILTER");
+                if (sysParamsList != null && sysParamsList.size() > 0) {
+                    realProdFilter = sysParamsList.get(0).getParamValue();
+                    redisUtils.set("REAL_PROD_FILTER", realProdFilter);
+                }
+            }
+            if (realProdFilter != null && "1".equals(realProdFilter)) {
+                List<String> prodList = new ArrayList<>();
+                log.info("111------accNbr --->" + privateParams.get("accNbr"));
+                CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(privateParams.get("accNbr"));
+                //   log.info("222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
+                if(prodInstIdsObject!=null &&  prodInstIdsObject.getResultObject() !=null ){
+                    Set<String> prodInstIds = prodInstIdsObject.getResultObject();
+                    for (String prodInstId : prodInstIds) {
+                        // 根据prodInstId 和 statusCd(1000-有效)查询offerProdInstRelId
+                        //           log.info("333------prodInstId --->" + prodInstId);
+                        CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex2(prodInstId, "1000");
+                        //            log.info("444------setCacheResultObject --->" + JSON.toJSONString(setCacheResultObject));
+                        if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null) {
+                            Set<String> offerProdInstRelIdSet = setCacheResultObject.getResultObject();
+                            for (String offerProdInstRelId : offerProdInstRelIdSet) {
+                                // 查询销售品产品实例关系缓存实体
+                                CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
+                                //                   log.info("555------offerProdInstRelCacheEntity --->" + JSON.toJSONString(offerProdInstRelCacheEntity));
+                                if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
+                                    OfferProdInstRel offerProdInstRel = offerProdInstRelCacheEntity.getResultObject();
+
+                                    // 查询销售品实例缓存实体
+                                    CacheResultObject<OfferInst> offerInstCacheEntity = iCacheOfferEntityQryService.getOfferInstCacheEntity(offerProdInstRel.getOfferInstId().toString());
+                                    //                        log.info("666------offerInstCacheEntity --->" + JSON.toJSONString(offerInstCacheEntity));
+                                    if(offerInstCacheEntity!=null && offerInstCacheEntity.getResultObject()!=null){
+                                        OfferInst offerInst = offerInstCacheEntity.getResultObject();
+                                        //Offer offer = offerProdMapper.selectByPrimaryKey(Integer.valueOf(offerInst.getOfferId().toString()));
+                                        //                            log.info("777------offer --->" + JSON.toJSONString(offer));
+                                        prodList.add(offerInst.getOfferId().toString());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                String productString = ChannelUtil.StringList2String(prodList);
+                log.info("999------productStr --->" + JSON.toJSONString(productStr));
+                context.put("PROM_LIST" , productString);
+            }
+
             if (express == null || "".equals(express)) {
                 List<LabelResult> labelResultList = new ArrayList<>();
                 try {
@@ -825,7 +787,7 @@ public class CamApiServiceImpl implements CamApiService {
                         String type = labelMap.get("operType");
                         //保存标签的es log
                         lr = new LabelResult();
-                        if ("PROM_LIST".equals(labelMap.get("code"))) {
+                        if ("PROM_LIST".equals(labelMap.get("code")) && "1".equals(realProdFilter)) {
                             FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.valueOf(labelMap.get("rightParam")));
                             if (filterRule != null) {
                                 lr.setRightOperand(filterRule.getChooseProduct());
@@ -833,54 +795,6 @@ public class CamApiServiceImpl implements CamApiService {
                             } else {
                                 jsonObject.put("hit", "false");
                                 jsonObject.put("msg", "未查询销售品过滤规则");
-                            }
-
-                            String realProdFilter = (String) redisUtils.get("REAL_PROD_FILTER");
-                            if (realProdFilter == null) {
-                                List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("REAL_PROD_FILTER");
-                                if (sysParamsList != null && sysParamsList.size() > 0) {
-                                    realProdFilter = sysParamsList.get(0).getParamValue();
-                                    redisUtils.set("REAL_PROD_FILTER", realProdFilter);
-                                }
-                            }
-                            if (realProdFilter != null && "0".equals(realProdFilter)) {
-                                List<Long> prodList = new ArrayList<>();
-                             //   log.info("111------accNbr --->" + params.get("accNbr"));
-                                CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(params.get("accNbr"));
-                             //   log.info("222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
-                                if(prodInstIdsObject!=null &&  prodInstIdsObject.getResultObject() !=null ){
-                                    Set<String> prodInstIds = prodInstIdsObject.getResultObject();
-                                    for (String prodInstId : prodInstIds) {
-                                        // 根据prodInstId 和 statusCd(1000-有效)查询offerProdInstRelId
-                             //           log.info("333------prodInstId --->" + prodInstId);
-                                        CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex2(prodInstId, "1000");
-                            //            log.info("444------setCacheResultObject --->" + JSON.toJSONString(setCacheResultObject));
-                                        if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null) {
-                                            Set<String> offerProdInstRelIdSet = setCacheResultObject.getResultObject();
-                                            for (String offerProdInstRelId : offerProdInstRelIdSet) {
-                                                // 查询销售品产品实例关系缓存实体
-                                                CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
-                             //                   log.info("555------offerProdInstRelCacheEntity --->" + JSON.toJSONString(offerProdInstRelCacheEntity));
-                                                if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
-                                                    OfferProdInstRel offerProdInstRel = offerProdInstRelCacheEntity.getResultObject();
-
-                                                    // 查询销售品实例缓存实体
-                                                    CacheResultObject<OfferInst> offerInstCacheEntity = iCacheOfferEntityQryService.getOfferInstCacheEntity(offerProdInstRel.getOfferInstId().toString());
-                            //                        log.info("666------offerInstCacheEntity --->" + JSON.toJSONString(offerInstCacheEntity));
-                                                    if(offerInstCacheEntity!=null && offerInstCacheEntity.getResultObject()!=null){
-                                                        OfferInst offerInst = offerInstCacheEntity.getResultObject();
-                                                        //Offer offer = offerProdMapper.selectByPrimaryKey(Integer.valueOf(offerInst.getOfferId().toString()));
-                            //                            log.info("777------offer --->" + JSON.toJSONString(offer));
-                                                        prodList.add(offerInst.getOfferId());
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                String productString = ChannelUtil.idList2String(prodList);
-                                log.info("999------productStr --->" + JSON.toJSONString(productStr));
-                                context.put("PROM_LIST" , productString);
                             }
                         } else {
                             lr.setRightOperand(labelMap.get("rightParam"));
@@ -954,7 +868,7 @@ public class CamApiServiceImpl implements CamApiService {
                         if(defaultInfallibleTable.equals(labelMap.get("code"))){
                             redisUtils.set("LEFT_PARAM_FLAG" + strategyConfId, ruleId);
                             flagMap.put(ruleId.toString(), true);
-                            //log.info("flag = true进入...");
+                            log.info("flag = true进入...");
                             continue;
                         }
                         //判断标签实例是否足够
@@ -984,7 +898,7 @@ public class CamApiServiceImpl implements CamApiService {
                 if(flagMap.get(ruleId.toString()) == false) {
                     //验证是否标签实例不足
                     if (notEnoughLabel.length() > 0) {
-                        log.info("notEnoughLabel.length() > 0->标签实例不足");
+                        // log.info("notEnoughLabel.length() > 0->标签实例不足");
                         jsonObject.put("hit", "false");
                         jsonObject.put("msg", "标签实例不足：" + notEnoughLabel.toString());
                         esHitService.save(jsonObject, IndexList.RULE_MODULE);

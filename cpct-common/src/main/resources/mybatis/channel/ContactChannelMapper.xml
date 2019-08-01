@@ -95,6 +95,22 @@
     REMARK
     from contact_channel channel
     where PARENT_ID = #{parentId}
+    <if test="triggerType != null and triggerType != ''" >
+      <choose>
+        <when test="triggerType != null and triggerType == '1000'">
+          and CREATE_STAFF between 4 and 5
+        </when>
+        <when test="triggerType != null and triggerType == '2000'">
+          and CREATE_STAFF between 5 and 6
+        </when>
+        <when test="triggerType != null and triggerType == '3000'">
+          and CREATE_STAFF between 4 and 6
+        </when>
+        <when test="triggerType != null and triggerType == '9000'">
+          and CREATE_STAFF between 4 and 9
+        </when>
+      </choose>
+    </if>
   </select>
 
   <select id="selectChannel4AllChannel" resultMap="BaseResultMap">
