@@ -102,6 +102,12 @@
             <artifactId>smt-bss-cpc-configure-dubbo-api</artifactId>
         </dependency>
 
+        <!-- 全量试算抽样展示dubbo服务jar包 -->
+        <dependency>
+            <groupId>com.zjtelcom.es</groupId>
+            <artifactId>es-service-info</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.ctzj.smt.bss</groupId>
             <artifactId>smt-bss-cpc-model</artifactId>
