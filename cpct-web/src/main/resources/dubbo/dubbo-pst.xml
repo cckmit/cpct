@@ -66,10 +66,10 @@
     </dubbo:reference>
 
     <!-- 门户-获取用户岗位信息 -->
-    <!--<dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.IDictionaryDubboService"-->
-                     <!--id="dictionaryDubboService" version="1.0" retries="0" check="false">-->
-        <!--<dubbo:method name="getDictionaryByType" servicecode="00.1077.getDictionaryByType"/>-->
-    <!--</dubbo:reference>-->
+    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.IDictionaryDubboService"
+                     id="dictionaryDubboService" version="1.0" retries="0" check="false">
+        <dubbo:method name="getDictionaryByType" servicecode="00.1077.getDictionaryByType"/>
+    </dubbo:reference>
 
     <!-- 标签饱和度查询接口 -->
     <dubbo:reference registry="esb2" interface="com.zjhcsoft.eagle.main.dubbo.service.QuerySaturationService"
@@ -80,6 +80,11 @@
     <dubbo:reference registry="esb2" interface="com.ctzj.smt.bss.cpc.configure.service.api.offer.IOfferRestrictConfigureService"
                       id="offerRestrictConfigureServiceImpl" version="1.0" check="false">
         <dubbo:method name="saveOfferRestrict" servicecode="00.1076.offerRestrict.saveOfferRestrict" timeout="120000"/>
+    </dubbo:reference>
+
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.es.es.service.EsServiceInfo"
+                     id="esServiceInfoImpl" version="1.0" check="false">
+        <dubbo:method name="showCalculationLog" servicecode="00.1083.showCalculationLog" timeout="10000"/>
     </dubbo:reference>
 
 </beans>

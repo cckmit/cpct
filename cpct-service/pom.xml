@@ -69,6 +69,11 @@
             <artifactId>es-service-batch</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.zjtelcom.es</groupId>
+            <artifactId>es-service-info</artifactId>
+        </dependency>
+
         <!-- 引入协同中心dubbo服务jar包 -->
         <dependency>
             <groupId>com.ctzj.smt.bss</groupId>
