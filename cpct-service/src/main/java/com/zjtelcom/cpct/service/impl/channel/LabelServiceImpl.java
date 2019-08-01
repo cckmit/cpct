@@ -1,5 +1,7 @@
 package com.zjtelcom.cpct.service.impl.channel;
 
+import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
+import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjhcsoft.eagle.main.dubbo.model.policy.RecordModel;
@@ -14,10 +16,7 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.pojo.Result;
-import com.zjtelcom.cpct.enums.LabelCondition;
-import com.zjtelcom.cpct.enums.Operator;
-import com.zjtelcom.cpct.enums.TrialCreateType;
-import com.zjtelcom.cpct.enums.TrialStatus;
+import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.LabelService;
 import com.zjtelcom.cpct.service.synchronize.label.SynLabelGrpService;
@@ -64,6 +63,8 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     private SynLabelGrpService synLabelGrpService;
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired
+    private OrganizationMapper organizationMapper;
 
 
 
@@ -968,9 +969,40 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     @Override
     public Map<String,Object> distributeListRule(Integer labelType) {
         Map<String,Object> result = new HashMap<>();
+        List<Map<String, String>> fixedList = new ArrayList<>();
         List<Map<String, String>> list = new ArrayList<>();
         try {
-            list = labelMapper.selectDistributeLabelByType(labelType);
+            Long orgId = null;
+            fixedList = labelMapper.selectDistributeLabelByType(labelType,"0");
+            SystemUserDto user = BssSessionHelp.getSystemUserDto();
+            List<Map<String, Object>> staffOrgId = organizationMapper.getStaffOrgId(user.getStaffId());
+            if (!staffOrgId.isEmpty()){
+                for (Map<String, Object> map : staffOrgId) {
+                    Object orgDivision = map.get("orgDivision");
+                    Object orgId1 = map.get("orgId");
+                    if (orgDivision!=null){
+                        if (orgDivision.toString().equals("30")) {
+                            orgId = Long.valueOf(orgId1.toString());
+                            break;
+                        }else if (orgDivision.toString().equals("20")){
+                            orgId = Long.valueOf(orgId1.toString());
+                            break;
+                        }else if (orgDivision.toString().equals("10")){
+                            orgId = Long.valueOf(orgId1.toString());
+                            break;
+                        }
+                    }
+                }
+            }
+            Organization organization = organizationMapper.selectByPrimaryKey(orgId);
+            if (organization != null) {
+                Long regionId = organization.getRegionId();
+                Long landIdByRegionId = AreaCodeEnum.getLandIdByRegionId(regionId);
+                if(landIdByRegionId != null) {
+                    list = labelMapper.selectDistributeLabelByType(labelType, landIdByRegionId.toString());
+                    fixedList.addAll(list);
+                }
+            }
             //return ResultUtil.responseSuccessResult(labelMapper.selectByCode(Integer.valueOf(labelType)));
         }catch (Exception e){
             e.printStackTrace();
@@ -979,7 +1011,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","处理成功");
-        result.put("resultObject",list);
+        result.put("resultObject",fixedList);
         return result;
     }
 
