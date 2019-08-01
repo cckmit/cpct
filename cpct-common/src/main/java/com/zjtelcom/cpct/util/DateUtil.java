@@ -768,6 +768,24 @@ public class DateUtil {
         return timeStamp;
     }
 
+    // 获取某日期前一天时间yyyyMMdd
+    public static String getPreDay(Integer days) {
+        String timeNew = null;
+        try {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//            Date date = simpleDateFormat.parse(day);
+            Date date = new Date();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.add(Calendar.DAY_OF_YEAR,-days);
+            Date dateNew = calendar.getTime();
+            timeNew = simpleDateFormat.format(dateNew);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return timeNew;
+    }
+
 
 
 
