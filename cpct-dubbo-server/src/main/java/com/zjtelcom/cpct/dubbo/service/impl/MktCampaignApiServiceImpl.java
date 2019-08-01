@@ -338,7 +338,11 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
     public Map<String, Object> rollBackMktCampaign(Long childCampaignId){
         Map<String, Object> map = new HashMap<>();
         try {
-            map = mktCampaignService.delMktCampaign(childCampaignId);
+            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(childCampaignId);
+            // 删除子活动，并回滚,并保证不能删除源活动
+            if (mktCampaignDO != null && !childCampaignId.equals(mktCampaignDO.getInitId())) {
+                map = mktCampaignService.delMktCampaign(childCampaignId);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

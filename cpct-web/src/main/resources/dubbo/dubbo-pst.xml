@@ -84,7 +84,7 @@
 
     <dubbo:reference registry="esb3" interface="com.zjtelcom.es.es.service.EsServiceInfo"
                      id="esServiceInfoImpl" version="1.0" check="false">
-        <dubbo:method name="showCalculationLog" servicecode="00.1083.showCalculationLog" timeout="120000"/>
+        <dubbo:method name="showCalculationLog" servicecode="00.1083.showCalculationLog" timeout="10000"/>
     </dubbo:reference>
 
 </beans>

@@ -60,10 +60,10 @@
     <if test="updateStaff != null and updateStaff != ''">
       UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
     </if>
-    <if test="createDate != null">
+    <if test="createDate != null and createDate != ''">
       CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
     </if>
-    <if test="statusDate != null">
+    <if test="statusDate != null and statusDate != ''">
       STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
     </if>
     <if test="remark != null and remark != ''">
