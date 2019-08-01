@@ -58,8 +58,8 @@
     <!--</dubbo:reference>-->
 
     <!-- 事件接入活动任务注册 1.0 -->
-    <dubbo:service registry="esb_dev" interface="com.zjtelcom.cpct.dubbo.service.CamApiSerService" ref="camApiServiceImpl" version="1.0" >
-        <dubbo:method name="ActivityTask" servicecode="00.1083.ActivityTask" timeout="10000"/>
+    <dubbo:service registry="esb_dev" interface="com.zjtelcom.cpct.dubbo.service.CamApiSerService" ref="camApiSerServiceImpl" version="1.0" >
+        <dubbo:method name="ActivitySerTask" servicecode="00.1083.ActivityTask_zsc" timeout="10000"/>
     </dubbo:service>
 
     <dubbo:reference registry="esb2" id="ctgCacheAssetService"  interface="com.ctzj.bss.customer.data.carrier.outbound.api.CtgCacheAssetService" version="1.0" retries="0" check="false">

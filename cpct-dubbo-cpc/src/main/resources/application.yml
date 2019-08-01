@@ -52,6 +52,7 @@ table:
   infallible: CPCP_CAM_DEFAULT
 
 
+
 ctg:
   namesrvAddr: 134.108.11.159:9892;134.108.11.160:9892;134.108.11.161:9892
   cpctGroupName: cpct_file_import
@@ -67,6 +68,7 @@ ctg:
   clusterName: pst_crm_mq
   tenantID: 2
   cpctTopic: cpct_topic_import
+  clientWorkerThreads: 4
 
   pushGroupName : cpct_file_import
   pushGroupName2 : cpct_file_import2
