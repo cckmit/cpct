@@ -1549,6 +1549,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     // 删除下线活动与事件的关系
                     mktCamEvtRelMapper.deleteByMktCampaignId(mktCampaignId);
                 }
+                if(StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)){
+                    // 活动下线清缓存
+                    redisUtils.del("MKT_CAMPAIGN_" + mktCampaignId);
+                    // 删除下线活动与事件的关系
+                    mktCamEvtRelMapper.deleteByMktCampaignId(mktCampaignId);
+                }
 
                 // 删除准生产的redis缓存
                 synchronizeCampaignService.deleteCampaignRedisPre(mktCampaignId);
