@@ -92,9 +92,15 @@
     </dubbo:reference>
 
     <!-- 事件接入活动任务订阅 2.0 -->
-    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.CamApiService" id="camApiService"
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.CamApiSerService" id="camApiService"
                      version="2.0" retries="0" check="false">
         <dubbo:method name="ActivityTask" servicecode="00.1083.ActivityTask" timeout="10000"/>
+    </dubbo:reference>
+
+    <!-- 事件接入活动任务订阅 1.0 -->
+    <dubbo:reference interface="com.zjtelcom.cpct.dubbo.service.CamApiSerService" id="camApiSerService"
+                     version="2.0" retries="0" check="false">
+        <dubbo:method name="ActivitySerTask" servicecode="00.1083.ActivityTask_zsc" timeout="15000"/>
     </dubbo:reference>
 
     <!-- 事件接入dubbo接口 -->
