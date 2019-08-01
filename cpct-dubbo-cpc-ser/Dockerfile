@@ -1,9 +1,9 @@
 FROM centosjava8:1.7 
 
 
-COPY target/cpct-dubbo-cpc.jar /app/cpct-dubbo-cpc.jar
+COPY target/cpct-dubbo-cpc-ser.jar /app/cpct-dubbo-cpc-ser.jar
 COPY target/classes/dubbo/unregister.sh /app/unregister.sh
-RUN cd /app && mkdir project && mkdir logs && mv /app/cpct-dubbo-cpc.jar /app/project && mv /app/unregister.sh /app/project && chmod 777 -R /app  && chown -R isale:isale /app
+RUN cd /app && mkdir project && mkdir logs && mv /app/cpct-dubbo-cpc-ser.jar /app/project && mv /app/unregister.sh /app/project && chmod 777 -R /app  && chown -R isale:isale /app
 
 WORKDIR /app
 ENV LANG en_US.UTF-8

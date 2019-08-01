@@ -83,12 +83,12 @@ public class ChannelController extends BaseController {
      *渠道-渠道树
      * @return
      */
-    @GetMapping("getChannelTreeList")
+    @PostMapping("getChannelTreeList")
     @CrossOrigin
-    public Map<String, Object> getChannelTreeList() {
+    public Map<String, Object> getChannelTreeList(@RequestBody HashMap<String,String> param) {
         Map<String,Object> result = new HashMap<>();
         try {
-            result = channelService.getChannelTreeList(1L);
+            result = channelService.getChannelTreeList(param);
         } catch (Exception e) {
             logger.error("[op:ChannelController] fail to getParentList",e);
             result.put("resultCode",CODE_FAIL);
