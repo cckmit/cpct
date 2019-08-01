@@ -70,7 +70,7 @@
         <if test="createStaff != null and createStaff != 0">
             CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
         </if>
-        <if test="updateStaff != null and updateStaff != 0">
+        <if test="updateStaff != null">
             UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
         </if>
         <if test="createDate != null">
@@ -165,7 +165,7 @@
         <if test="createStaff != null and createStaff != 0">
             CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
         </if>
-        <if test="updateStaff != null and updateStaff != 0">
+        <if test="updateStaff != null">
             UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
         </if>
         <if test="createDate != null">

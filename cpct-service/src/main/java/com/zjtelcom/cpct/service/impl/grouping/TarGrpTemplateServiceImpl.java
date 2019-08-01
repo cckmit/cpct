@@ -196,7 +196,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         condition.setCreateDate(new Date());
         condition.setUpdateDate(new Date());
         condition.setStatusDate(new Date());
-        condition.setUpdateStaff(UserUtil.loginId());
+        condition.setUpdateStaff(0L);
         condition.setCreateStaff(UserUtil.loginId());
         condition.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
         tarGrpConditionMapper.insert(condition);
@@ -408,7 +408,6 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                 tarGrpTemplateConditionDO.setCreateDate(new Date());
                 tarGrpTemplateConditionDO.setUpdateDate(new Date());
                 tarGrpTemplateConditionDO.setStatusDate(new Date());
-                tarGrpTemplateConditionDO.setUpdateStaff(UserUtil.loginId());
                 tarGrpTemplateConditionDO.setCreateStaff(UserUtil.loginId());
                 tarGrpTemplateConditionDO.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
                 tarGrpConditionMapper.insert(tarGrpTemplateConditionDO);
@@ -501,7 +500,6 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                 }
                 TarGrpCondition tarGrpTemplateConditionDO = BeanUtil.create(tarGrpTemConditionVO, new TarGrpCondition());
                 if (tarGrpTemConditionVO.getConditionId() != null && tarGrpTemConditionVO.getConditionId() != 0) {
-                    tarGrpTemplateConditionDO.setUpdateStaff(UserUtil.loginId());
                     tarGrpTemplateConditionDO.setUpdateDate(new Date());
                     tarGrpConditionMapper.updateByPrimaryKey(tarGrpTemplateConditionDO);
                 } else {
@@ -511,7 +509,6 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                     tarGrpTemplateConditionDO.setCreateDate(new Date());
                     tarGrpTemplateConditionDO.setCreateStaff(UserUtil.loginId());
                     tarGrpTemplateConditionDO.setStatusDate(new Date());
-                    tarGrpTemplateConditionDO.setUpdateStaff(UserUtil.loginId());
                     tarGrpTemplateConditionDO.setUpdateDate(new Date());
                     tarGrpTemplateConditionDO.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
                     tarGrpConditionMapper.insert(tarGrpTemplateConditionDO);

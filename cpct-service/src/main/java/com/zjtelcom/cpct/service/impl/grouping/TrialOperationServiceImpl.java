@@ -176,10 +176,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             if (systemUserDtoSysmgrResultObject != null) {
                 if (systemUserDtoSysmgrResultObject.getResultObject() != null) {
                     codeNumber = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
+//                    codeNumber=codeNumber+"&&"+systemUserDtoSysmgrResultObject.getResultObject().getStaffName();
                 }
             }
         }catch (Exception e){
             e.printStackTrace();
+            logger.error("创建人查询失败："+createStaff);
             codeNumber = null;
         }
         return codeNumber;
@@ -1942,7 +1944,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         } else if ("7100".equals(type)) {
                             express.append("notIn");
                         }
-                        express.append(tarGrpConditionDOs.get(i).getRightParam());
+                        if (label.getLabelValueType().equals("1100") && tarGrpConditionDOs.get(i).getUpdateStaff()==1L){
+                            String date = DateUtil.getPreDay(Integer.valueOf(tarGrpConditionDOs.get(i).getRightParam()));
+                            express.append(date);
+                        }else {
+                            express.append(tarGrpConditionDOs.get(i).getRightParam());
+                        }
                         express.append(")");
                         if (i + 1 != tarGrpConditionDOs.size()) {
                             express.append("&&");
