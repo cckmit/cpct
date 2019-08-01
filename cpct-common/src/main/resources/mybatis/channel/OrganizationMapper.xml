@@ -186,4 +186,17 @@
     AND b.STAFF_ID = #{staffId};
   </select>
 
+  <select id="selectByParentIdForLevelFive" resultMap="BaseResultMap">
+     select org.ORG_ID, org.PARTY_ID, org.ORG_CODE, org.ORG_NAME, org.REGION_ID, org.ORG_TYPE, org.ORG_SUBTYPE, org.VILLAGE_FLAG,
+    org.PARENT_ORG_ID, org.ORG_LEVEL, org.ORG_INDEX, org.SALESORG_CODE, org.DIVORG_FLAG, org.CREATE_DATE, org.CREATE_STAFF,
+    org.STATUS_CD, org.STATUS_DATE, org.UPDATE_DATE, org.UPDATE_STAFF, org.ORG_DIVISION, org.org_id_4a, org.ORG_CONTRACT_TYPE,
+    org.ORG_AREA_LEVEL, org.REMARK, org.ORG_DESC
+    from organization org left join org_rel orel on orel.Z_ORG_ID = org.ORG_ID
+    where orel.STATUS_CD = 1000
+    and org.ORG_DIVISION in (20,30)
+    and org.STATUS_CD = 1000
+    and orel.ORG_REL_TYPE = 1900
+	and 6 > org.ORG_LEVEL
+    and orel.A_ORG_ID = #{parentId}
+  </select>
 </mapper>
