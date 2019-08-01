@@ -322,7 +322,7 @@ public class DateUtil {
      */
     public static Integer getYearByDate(Date date) {
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
+        calendar.setTime(date);
         return calendar.get(Calendar.YEAR);
     }
 
@@ -334,7 +334,7 @@ public class DateUtil {
      */
     public static Integer getMonthByDate(Date date) {
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
+        calendar.setTime(date);
         return calendar.get(Calendar.MONTH) + 1;
     }
 
