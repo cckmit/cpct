@@ -466,9 +466,9 @@ public class CamApiServiceImpl implements CamApiService {
                    break;
                }
             }
-            if(isWithDefaultLabel) {
-                //判断是否有命中
-                if (ruleList.size() > 1) {
+            //判断是否有命中
+            if (ruleList.size() > 0) {
+                if (isWithDefaultLabel && ruleList.size() > 1) {
                     // 从命中列表中移出默认固定规则
                     for (Map<String, Object> strategyMap : strategyMapList) {
                         Long strategyConfId = (Long) strategyMap.get("strategyConfId");
@@ -486,7 +486,10 @@ public class CamApiServiceImpl implements CamApiService {
                     }
                 }
                 activity.put("ruleList", ruleList);
+                esJson.put("hit", true); //添加命中标识
+
                 Map<String, Object> itgTrigger;
+
                 //查询展示列 （iSale）   todo  展示列的标签未查询到是否影响命中
                 List<Map<String, Object>> iSaleDisplay = new ArrayList<>();
                 iSaleDisplay = (List<Map<String, Object>>) redisUtils.get("MKT_ISALE_LABEL_" + mktCampaign.getIsaleDisplay());
@@ -494,6 +497,7 @@ public class CamApiServiceImpl implements CamApiService {
                     iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getIsaleDisplay());
                     redisUtils.set("MKT_ISALE_LABEL_" + mktCampaign.getIsaleDisplay(), iSaleDisplay);
                 }
+
                 if (iSaleDisplay != null && iSaleDisplay.size() > 0) {
                     Map<String, Object> triggers;
                     List<Map<String, Object>> triggerList1 = new ArrayList<>();
@@ -544,7 +548,6 @@ public class CamApiServiceImpl implements CamApiService {
                         itgTriggers.add(new JSONObject(itgTrigger));
                     }
                 }
-
                 //将iSale展示列的值放入返回结果
                 Map<String, Object> evtContent = (Map<String, Object>) JSON.parse(params.get("evtContent"));
                 for (Map<String, Object> ruleMap : ruleList) {
@@ -553,7 +556,7 @@ public class CamApiServiceImpl implements CamApiService {
                         map.put("itgTriggers", JSONArray.parse(JSONArray.toJSON(itgTriggers).toString()));
                         // map.put("triggers", JSONArray.parse(JSONArray.toJSON(evtTriggers).toString()));
                         List<Map<String, Object>> triggersList = new ArrayList<>();
-                        if(evtContent != null){
+                        if (evtContent != null && !evtContent.isEmpty()) {
                             for (Map.Entry entry : evtContent.entrySet()) {
                                 Map<String, Object> trigger = new HashMap<>();
                                 trigger.put("key", entry.getKey());
@@ -564,100 +567,11 @@ public class CamApiServiceImpl implements CamApiService {
                         }
                     }
                 }
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
-            }else {
-                //判断是否有命中
-                if (ruleList.size() > 0) {
-                    activity.put("ruleList", ruleList);
-                    esJson.put("hit", true); //添加命中标识
-
-                    Map<String, Object> itgTrigger;
-
-                    //查询展示列 （iSale）   todo  展示列的标签未查询到是否影响命中
-                    List<Map<String, Object>> iSaleDisplay = new ArrayList<>();
-                    iSaleDisplay = (List<Map<String, Object>>) redisUtils.get("MKT_ISALE_LABEL_" + mktCampaign.getIsaleDisplay());
-                    if (iSaleDisplay == null) {
-                        iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(mktCampaign.getIsaleDisplay());
-                        redisUtils.set("MKT_ISALE_LABEL_" + mktCampaign.getIsaleDisplay(), iSaleDisplay);
-                    }
-
-                    if (iSaleDisplay != null && iSaleDisplay.size() > 0) {
-
-                        Map<String, Object> triggers;
-                        List<Map<String, Object>> triggerList1 = new ArrayList<>();
-                        List<Map<String, Object>> triggerList2 = new ArrayList<>();
-                        List<Map<String, Object>> triggerList3 = new ArrayList<>();
-                        List<Map<String, Object>> triggerList4 = new ArrayList<>();
-
-                        for (Map<String, Object> label : iSaleDisplay) {
-                            if (context.containsKey((String) label.get("labelCode"))) {
-                                triggers = new JSONObject();
-                                triggers.put("key", label.get("labelCode"));
-                                triggers.put("value", context.get((String) label.get("labelCode")));
-                                triggers.put("display", 0); //todo 确定display字段
-                                triggers.put("name", label.get("labelName"));
-                                if ("1".equals(label.get("typeCode").toString())) {
-                                    triggerList1.add(triggers);
-                                } else if ("2".equals(label.get("typeCode").toString())) {
-                                    triggerList2.add(triggers);
-                                } else if ("3".equals(label.get("typeCode").toString())) {
-                                    triggerList3.add(triggers);
-                                } else if ("4".equals(label.get("typeCode").toString())) {
-                                    triggerList4.add(triggers);
-                                }
-                            }
-                        }
-                        if (triggerList1.size() > 0) {
-                            itgTrigger = new ConcurrentHashMap<>();
-                            itgTrigger.put("triggerList", triggerList1);
-                            itgTrigger.put("type", "固定信息");
-                            itgTriggers.add(new JSONObject(itgTrigger));
-                        }
-                        if (triggerList2.size() > 0) {
-                            itgTrigger = new JSONObject();
-                            itgTrigger.put("triggerList", triggerList2);
-                            itgTrigger.put("type", "营销信息");
-                            itgTriggers.add(new JSONObject(itgTrigger));
-                        }
-                        if (triggerList3.size() > 0) {
-                            itgTrigger = new JSONObject();
-                            itgTrigger.put("triggerList", triggerList3);
-                            itgTrigger.put("type", "费用信息");
-                            itgTriggers.add(new JSONObject(itgTrigger));
-                        }
-                        if (triggerList4.size() > 0) {
-                            itgTrigger = new JSONObject();
-                            itgTrigger.put("triggerList", triggerList4);
-                            itgTrigger.put("type", "协议信息");
-                            itgTriggers.add(new JSONObject(itgTrigger));
-                        }
-                    }
-
-                    //将iSale展示列的值放入返回结果
-                    Map<String, Object> evtContent = (Map<String, Object>) JSON.parse(params.get("evtContent"));
-                    for (Map<String, Object> ruleMap : ruleList) {
-                        List<Map<String, Object>> ChlMap = (List<Map<String, Object>>) ruleMap.get("taskChlList");
-                        for (Map<String, Object> map : ChlMap) {
-                            map.put("itgTriggers", JSONArray.parse(JSONArray.toJSON(itgTriggers).toString()));
-                            // map.put("triggers", JSONArray.parse(JSONArray.toJSON(evtTriggers).toString()));
-                            List<Map<String, Object>> triggersList = new ArrayList<>();
-                            if (evtContent != null && !evtContent.isEmpty()) {
-                                for (Map.Entry entry : evtContent.entrySet()) {
-                                    Map<String, Object> trigger = new HashMap<>();
-                                    trigger.put("key", entry.getKey());
-                                    trigger.put("value", entry.getValue());
-                                    triggersList.add(trigger);
-                                }
-                                map.put("triggers", triggersList);
-                            }
-                        }
-                    }
-                } else {
-                    esJson.put("hit", false);
-                    esJson.put("msg", "策略均未命中");
-                }
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + privateParams.get("accNbr"));
+            } else {
+                esJson.put("hit", false);
+                esJson.put("msg", "策略均未命中");
             }
+            esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
         } catch (Exception e) {
             e.printStackTrace();
             esJson.put("hit", false);
@@ -984,7 +898,7 @@ public class CamApiServiceImpl implements CamApiService {
                 if(flagMap.get(ruleId.toString()) == false) {
                     //验证是否标签实例不足
                     if (notEnoughLabel.length() > 0) {
-                        log.info("notEnoughLabel.length() > 0->标签实例不足");
+                        // log.info("notEnoughLabel.length() > 0->标签实例不足");
                         jsonObject.put("hit", "false");
                         jsonObject.put("msg", "标签实例不足：" + notEnoughLabel.toString());
                         esHitService.save(jsonObject, IndexList.RULE_MODULE);
