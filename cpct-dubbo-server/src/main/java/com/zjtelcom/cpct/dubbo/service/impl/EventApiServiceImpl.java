@@ -48,6 +48,7 @@ import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.ContactEvtMatchRul;
 import com.zjtelcom.cpct.dto.event.EventMatchRulCondition;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
+import com.zjtelcom.cpct.dubbo.service.CamApiSerService;
 import com.zjtelcom.cpct.dubbo.service.CamApiService;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
@@ -158,6 +159,9 @@ public class EventApiServiceImpl implements EventApiService {
 
     @Autowired(required = false)
     private CamApiService camApiService; // 活动任务
+
+    @Autowired(required = false)
+    private CamApiSerService camApiSerService; // 服务活动任务
 
     @Autowired(required = false)
     private EsService esService;
@@ -920,7 +924,7 @@ public class EventApiServiceImpl implements EventApiService {
                             privateParams.put("custId", map.get("custId"));
                             privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
                             //资产级
-                            Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList"), resultMapList.get(0)));
+                            Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), (String) activeMap.get("type"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList"), resultMapList.get(0)));
                             //将线程处理结果添加到结果集
                             threadList.add(f);
                         }
@@ -943,7 +947,7 @@ public class EventApiServiceImpl implements EventApiService {
                                         privateParams.put("custId", map.get("custId"));
                                         //活动优先级为空的时候默认0
                                         privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
-                                        Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList"), o));
+                                        Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), (String) activeMap.get("type"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList"), o));
                                         //将线程处理结果添加到结果集
                                         threadList.add(f);
                                     }
@@ -970,7 +974,7 @@ public class EventApiServiceImpl implements EventApiService {
                                                 privateParams.put("custId", map.get("custId"));
                                                 //活动优先级为空的时候默认0
                                                 privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
-                                                Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList"), o));
+                                                Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), (String) activeMap.get("type"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList"), o));
                                                 //将线程处理结果添加到结果集
                                                 threadList.add(f);
                                             }
@@ -999,7 +1003,7 @@ public class EventApiServiceImpl implements EventApiService {
                                         privateParams.put("custId", map.get("custId"));
                                         privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
                                         //资产级
-                                        Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList"), o));
+                                        Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, (Long) activeMap.get("mktCampaginId"), (String) activeMap.get("type"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList"), o));
                                         //将线程处理结果添加到结果集
                                         threadList.add(f);
                                     }
@@ -1123,6 +1127,7 @@ public class EventApiServiceImpl implements EventApiService {
      */
     class ActivityTask implements Callable<Map<String, Object>> {
         private Long activityId;
+        private String type;
         private String reqId;
         private Map<String, String> params;
         private Map<String, String> privateParams;
@@ -1131,8 +1136,9 @@ public class EventApiServiceImpl implements EventApiService {
         private List<Map<String, Object>> strategyMapList;
         private DefaultContext<String, Object> context;
 
-        ActivityTask(Map<String, String> params, Long activityId, Map<String, String> privateParams, Map<String, String> labelItems, List<Map<String, Object>> evtTriggers, List<Map<String, Object>> strategyMapList, DefaultContext<String, Object> context) {
+        ActivityTask(Map<String, String> params, Long activityId, String type, Map<String, String> privateParams, Map<String, String> labelItems, List<Map<String, Object>> evtTriggers, List<Map<String, Object>> strategyMapList, DefaultContext<String, Object> context) {
             this.activityId = activityId;
+            this.type = type;
             this.params = params;
             this.privateParams = privateParams;
             this.labelItems = labelItems;
@@ -1144,7 +1150,12 @@ public class EventApiServiceImpl implements EventApiService {
 
         @Override
         public Map<String, Object> call() {
-            Map<String, Object> activityTaskResultMap = camApiService.ActivityTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
+            Map<String, Object> activityTaskResultMap = new HashMap<>();
+            if(StatusCode.SERVICE_CAMPAIGN.getStatusCode().equals(type)){
+                activityTaskResultMap = camApiSerService.ActivitySerTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
+            } else {
+                activityTaskResultMap = camApiService.ActivityTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
+            }
             return activityTaskResultMap;
         }
     }
@@ -2305,6 +2316,7 @@ public class EventApiServiceImpl implements EventApiService {
                         mktCampaignMap.put("levelConfig", act.get("levelConfig"));
                         mktCampaignMap.put("campaignSeq", act.get("campaignSeq"));
                         mktCampaignMap.put("strategyMapList", strategyMapList);
+                        mktCampaignMap.put("type", mktCampaign.getMktCampaignType().toString()); // 活动类型 5000
                     }
                 }
                 resultMap.put("mktCampaignMap", mktCampaignMap);
