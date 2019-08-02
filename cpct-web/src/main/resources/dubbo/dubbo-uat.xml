@@ -12,13 +12,13 @@
     <dubbo:registry id="esb2" protocol="dubbo" address="134.96.161.20:8001" />
 
     <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.EventApiService" id="eventApiService"
-                     version="2.0" retries="0" check="false">
+                     version="3.0" retries="0" check="false">
         <dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="20000"/>
     </dubbo:reference>
 
     <!-- es提供试算接口 -->
     <dubbo:reference registry="esb3" interface="com.zjtelcom.es.es.service.EsService" id="esService"
-                     version="2.0" retries="0" check="false">
+                     version="3.0" retries="0" check="false">
         <dubbo:method name="findBatchHitsList" servicecode="00.1083.findBatchHitsList" timeout="10000"/>
         <dubbo:method name="searchBatchInfo" servicecode="00.1083.searchBatchInfo" timeout="300000"/>
         <dubbo:method name="searchCountInfo" servicecode="00.1083.searchCountInfo" timeout="100000"/>
@@ -30,7 +30,7 @@
     </dubbo:reference>
 
     <dubbo:reference registry="esb3" interface="org.springframework.session.data.ctg.IDubboCtgService"
-                     id="dubboCtgService" version="2.0" check="false">
+                     id="dubboCtgService" version="3.0" check="false">
         <dubbo:method name="hmget" servicecode="00.1077.ctgSessionHmget"/>
         <dubbo:method name="hget" servicecode="00.1077.ctgSessionHget"/>
         <dubbo:method name="smembers" servicecode="00.1077.ctgSessionSmembers"/>
@@ -64,18 +64,13 @@
 
     <!--受理清单校验接口-->
     <dubbo:reference interface="com.zjtelcom.cpct.dubbo.service.TarGrpApiService" id="tarGrpApiService"
-                     version="2.0" retries="0" check="false">
+                     version="3.0" retries="0" check="false">
         <dubbo:method name="getCpcTargrp" servicecode="00.1083.getCpcTargrp" timeout="10000"/>
     </dubbo:reference>
 
     <dubbo:reference registry="esb2" interface="com.ctzj.smt.bss.cpc.configure.service.api.offer.IOfferRestrictConfigureService"
                      id="offerRestrictConfigureServiceImpl" version="2.0" check="false">
         <dubbo:method name="saveOfferRestrict" servicecode="00.1076.offerRestrict.saveOfferRestrict" timeout="120000"/>
-    </dubbo:reference>
-
-    <dubbo:reference registry="esb3" interface="com.zjtelcom.es.es.service.EsServiceInfo"
-                     id="esServiceInfoImpl" version="2.0" check="false">
-        <dubbo:method name="showCalculationLog" servicecode="00.1083.showCalculationLog" timeout="120000"/>
     </dubbo:reference>
 
 </beans>

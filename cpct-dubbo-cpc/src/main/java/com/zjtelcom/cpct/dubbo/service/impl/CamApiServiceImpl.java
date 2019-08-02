@@ -354,7 +354,7 @@ public class CamApiServiceImpl implements CamApiService {
                         if(defaultInfallibleTable.equals(labelMap.get("code"))){
                             redisUtils.set("LEFT_PARAM_FLAG" + strategyConfId, ruleId);
                             flagMap.put(ruleId.toString(), true);
-                            log.info(Thread.currentThread().getName() + "flag = true进入...");
+                            //log.info(Thread.currentThread().getName() + "flag = true进入...");
                             expressSb.append("true&&");
                             continue;
                         }
@@ -780,14 +780,13 @@ public class CamApiServiceImpl implements CamApiService {
                 }
                 esHitService.save(jsonObject, IndexList.RULE_MODULE);
             } catch (Exception e) {
+                e.printStackTrace();
                 jsonObject.put("hit", false);
                 jsonObject.put("msg", "规则异常");
                 esHitService.save(jsonObject, IndexList.RULE_MODULE);
             }
-
             return ruleMap;
         }
-
     }
 
     private Map<String, Object> ChannelTask(Long evtContactConfId, List<Map<String, String>> productList, DefaultContext<String, Object> context, String reqId) {
