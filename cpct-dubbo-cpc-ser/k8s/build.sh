@@ -1,6 +1,6 @@
 #! /bin/bash
 version=$1
-project=bss-cpct-dubbo-cpc-pre
+project=bss-cpct-dubbo-ser
 if [[ -n "$6" ]]; then
 	project=$6
 fi
