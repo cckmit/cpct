@@ -1,5 +1,7 @@
 package com.zjtelcom.cpct.dto.grouping;
 
+import com.zjtelcom.cpct.BaseEntity;
+
 import java.io.Serializable;
 /**
  * @Description:
@@ -7,7 +9,7 @@ import java.io.Serializable;
  * @date: 2018/09/06 16:14
  * @version: V1.0
  */
-public class TarGrpTemplateCondition implements Serializable {
+public class TarGrpTemplateCondition extends BaseEntity implements Serializable {
     private Long conditionId;
 
     private Long tarGrpTemplateId;

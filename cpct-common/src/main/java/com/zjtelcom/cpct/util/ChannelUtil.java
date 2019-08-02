@@ -398,6 +398,7 @@ public class ChannelUtil  {
 
     public static LabelVO map2LabelVO(Label label,List<LabelValue> labelValueList){
         LabelVO vo = BeanUtil.create(label,new LabelVO());
+        vo.setLabTechDesc(label.getLabExample());
         if (label.getOperator()!=null && !label.getOperator().equals("")){
             List<String> opratorList = StringToList(label.getOperator());
             List<OperatorDetail> opStList  = new ArrayList<>();

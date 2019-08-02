@@ -731,8 +731,6 @@ public class EventApiServiceImpl implements EventApiService {
                     assetLabelList = ChannelUtil.StringToList(mktAllLabels.get("assetLabels"));
                     // 添加 PROM_INTEG_ID标签
                     assetLabelList.add("PROM_INTEG_ID");
-                    // 添加落地网格AREA_ID标签
-                    assetLabelList.add("AREA_ID");
                 }
                 if (mktAllLabels.get("promLabels") != null && !"".equals(mktAllLabels.get("promLabels"))) {
                     promLabelList = ChannelUtil.StringToList(mktAllLabels.get("promLabels"));
@@ -756,6 +754,8 @@ public class EventApiServiceImpl implements EventApiService {
                 labelList.addAll(assetLabelList);
                 labelList.addAll(promLabelList);
                 labelList.addAll(custLabelList);
+                // 添加落地网格AREA_ID标签
+                labelList.add("AREA_ID");
 
 
                 if (assetLabelList != null && assetLabelList.size() > 0) {

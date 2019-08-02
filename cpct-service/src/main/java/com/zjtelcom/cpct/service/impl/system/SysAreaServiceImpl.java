@@ -147,6 +147,7 @@ public class SysAreaServiceImpl implements SysAreaService {
         List<SystemPostDto> systemPostDtoList = user.getSystemPostDtoList();
         if (systemPostDtoList.get(0).getSysPostCode().equals("cpcp0001")) {
             SysArea redSysArea = (SysArea) redisUtils.get("CITY_1");
+            sysAreaList.add(redSysArea);
             if (redSysArea == null){
                 SysArea provinceAreas = sysAreaMapper.getByCityFour("1");
                 SysArea sysArea = sysAreaMapper.getCityByName(provinceAreas.getParentArea().toString());
