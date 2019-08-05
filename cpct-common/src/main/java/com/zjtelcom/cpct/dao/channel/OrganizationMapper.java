@@ -32,4 +32,8 @@ public interface OrganizationMapper {
     List<Long> selectByIdList(@Param("list")List<Long> idList);
 
     List<Map<String,String>> fuzzySelectByName(@Param("parentIds")List<String> areaIds,@Param("orgName")String fuzzyField);
+
+    List<Map<String,Object>> getStaffOrgId(@Param("staffId") Long staffId);
+
+    List<Organization> selectByParentIdForLevelFive(Long orgId);
 }

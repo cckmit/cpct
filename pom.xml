@@ -16,6 +16,7 @@
         <module>cpct-shiro</module>
         <module>cpct-dubbo-server</module>
         <module>cpct-dubbo-cpc</module>
+        <module>cpct-dubbo-cpc-ser</module>
         <module>cpct-cache</module>
         <module>cpct-dubbo-label</module>
         <module>cpct-open-api</module>
@@ -380,6 +381,13 @@
                 <groupId>com.zjtelcom.cpct.dubbo</groupId>
                 <artifactId>cpct-dubbo</artifactId>
                 <version>${dubbo-server.version}</version>
+            </dependency>
+
+            <!-- 全量试算抽样展示dubbo服务jar包 -->
+            <dependency>
+                <groupId>com.zjtelcom.es</groupId>
+                <artifactId>es-service-info</artifactId>
+                <version>1.0.0</version>
             </dependency>
 
             <!-- 引入集团redis缓存包 -->

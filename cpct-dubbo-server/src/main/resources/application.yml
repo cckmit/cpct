@@ -48,6 +48,10 @@ redisConfig_Prd:
 thread:
   maxPoolSize: 20
 
+#服务事件默认固定命中标签
+table:
+  infallible: CPCP_CAM_DEFAULT
+
 
 ctg:
   namesrvAddr: 134.108.11.159:9892;134.108.11.160:9892;134.108.11.161:9892
