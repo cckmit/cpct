@@ -1,8 +1,7 @@
 #端口配置
 server:
-  port: 8090
+  port: 30801
 
-#数据库相关配置
 spring:
 # 第一数据源
   datasource:
@@ -14,9 +13,9 @@ spring:
 # 第二数据源
   datasourceprd:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://134.108.1.12:8803/smt_bss_cpc_zsc?useUnicode=true&characterEncoding=UTF-8&useSSL=true
-    username: cpc_user_cpct_zsc
-    password: cpc_user_cpct_zsc_prod
+    url: jdbc:mysql://134.96.253.29:8801/smt_bss_cpc2?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: cpc_user
+    password: cpc_user_123
 
 # 第三数据源
   datasourcethird:
@@ -33,11 +32,11 @@ spring:
     password: cpc_user_123
 
 
-  #redis相关配置
+#redis相关配置
   redis:
-    host: 47.94.168.117
-    port: 6379
-    password: 9bOCHtdJkNZ1hb2e35OmgIrLvGEaBXuT2udRBQNt5VQ
+    host: 134.96.252.170
+    port: 30305
+    password: xc.cpct
     pool:
       max-active: 8
       max-wait: -1
@@ -51,18 +50,30 @@ spring:
       pool: 5
       cluster:
         name: es-cpct
-#es接口调用地址
+
+   #es接口调用地址
   esurl:
-#   machfile: http://134.96.252.170:30808/es/cpcMatchFileToFtp
-#   batchinfo: http://134.96.252.170:30808/es/searchBatchInfo
-#   hitslist: http://134.96.252.170:30808/es/findBatchHitsList
-#   countinfo: http://134.96.252.170:30808/es/searchCountInfo
-   machfile: http://localhost:8080/es/cpcMatchFileToFtp
-   batchinfo: http://localhost:8080/es/searchBatchInfo
-   hitslist: http://localhost:8080/es/findBatchHitsList
-   countinfo: http://localhost:8080/es/searchCountInfo
-#是否同步
+    machfile: http://134.96.252.170:30808/es/cpcMatchFileToFtp
+    batchinfo: http://134.96.252.170:30808/es/searchBatchInfo
+    hitslist: http://134.96.252.170:30808/es/findBatchHitsList
+    countinfo: http://134.96.252.170:30808/es/searchCountInfo
+#是否同步  0不开启  1开启
 sync:
-   value: 0
+  value: 1
 
-
+ctg:
+  namesrvAddr: 134.108.11.159:9892;134.108.11.160:9892;134.108.11.161:9892
+  cpctGroupName: cpct_file_import
+  cpctGroupName2: cpct_file_import2
+  namesrvAuthID: cpct_user
+  namesrvAuthPwd: cpct_user123
+  consumeOrderly: false
+  instanceName: prod_cpct
+  maxMessageSize: 8242880
+  sendMaxRetryTimes: 2
+  sendMsgTimeout: 30000
+  compressMsgBodyOverHowmuch: 4098
+  clusterName: pst_crm_mq
+  tenantID: 2
+  cpctTopic: cpct_topic_import
+  clientWorkerThreads: 4
