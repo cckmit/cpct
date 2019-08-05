@@ -581,6 +581,23 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 mktCamRecomCalcRelMapper.insert(mktCamRecomCalcRelDO);
             }
 
+            //如果是增存量联动并且是导入的用户分群模板 创建试算记录
+            TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(mktStrategyConfRuleDO.getTarGrpId());
+            if (tarGrp!=null && tarGrp.getTarGrpType().equals(TarTempType.PROM_IMPORT_TEMPLETE.getValue())){
+                String batchNumSt = DateUtil.date2St4Trial(new Date()) + ChannelUtil.getRandomStr(4);
+                TrialOperation trialOp = new TrialOperation();
+                //当清单导入时 strategyId name 存储规则信息
+                trialOp.setCampaignId(mktStrategyConfRule.getMktCampaignId());
+                trialOp.setCampaignName(mktStrategyConfRule.getMktCampaignName());
+                trialOp.setStrategyId(mktStrategyConfRuleDO.getMktStrategyConfRuleId());
+                trialOp.setStrategyName(mktStrategyConfRuleDO.getMktStrategyConfRuleName());
+                trialOp.setBatchNum(Long.valueOf(batchNumSt));
+                trialOp.setStatusCd(TrialStatus.PPM_IMPORT_GOING.getValue());
+                trialOp.setStatusDate(new Date());
+                trialOp.setCreateStaff(TrialCreateType.IMPORT_USER_LIST.getValue());
+                trialOperationMapper.insert(trialOp);
+            }
+
 
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.UPDATE_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
