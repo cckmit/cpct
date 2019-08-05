@@ -168,10 +168,15 @@ public class TrialProdServiceImpl implements TrialProdService {
         }
 
         List<Map<String,Object>> resList = new ArrayList<>();
+
         for (Integer id : idList){
             MktCampaignDO cam = campaignMapper.selectByPrimaryKey(Long.valueOf(id.toString()));
-            if (cam!=null && mktCamCodeList.contains(cam.getInitId())){
-                campaignList.add(cam);
+            if (cam!=null ){
+                if (userListCam.equals("USER_LIST_CAM")&& mktCamCodeList.contains(cam.getInitId())){
+                    campaignList.add(cam);
+                }else if (perCampaign.equals("PER_CAMPAIGN") || userListCam.equals("BIG_DATA_TEMP")){
+                    campaignList.add(cam);
+                }
             }
         }
         for (MktCampaignDO campaignDO : campaignList){
@@ -197,11 +202,11 @@ public class TrialProdServiceImpl implements TrialProdService {
                     redisUtils_es.set("PER_CAMPAIGN_"+batchNumSt,"true");
                 }
                 //清单方案
-                if (userListCam.equals("USER_LIST_CAM") && mktCamCodeList.contains(campaignDO.getMktCampaignId().toString())){
+                if (userListCam.equals("USER_LIST_CAM")){
                     redisUtils_es.set("USER_LIST_CAM_"+batchNumSt,"USER_LIST_TEMP");
                 }
                 //大数据方案
-                if (userListCam.equals("BIG_DATA_TEMP") && mktCamCodeList.contains(campaignDO.getMktCampaignId().toString())){
+                if (userListCam.equals("BIG_DATA_TEMP")){
                     redisUtils_es.set("USER_LIST_CAM_"+batchNumSt,"BIG_DATA_TEMP");
                 }
                 Map<String,Object> res = issue(operation,campaignDO,strategy,perCampaign);

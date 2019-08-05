@@ -23,7 +23,7 @@ public interface OfferProdMapper {
 
     List<Offer> findByName(@Param("offerName") String name);
 
-    List<Offer>  selectByCode(@Param("offerCode") String code);
+    List<Offer> selectByCode(@Param("offerCode") String code);
 
     Offer selectByPrimaryKeyAndName(@Param("offerId") Integer offerId, @Param("productName") String productName);
 
