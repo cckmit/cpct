@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://code.alibabatech.com/schema/dubbo
+    http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <!-- 提供方应用信息，用于计算依赖关系 -->
+    <dubbo:application name="00.1083"/>
+
+    <dubbo:registry id="esb_dev" protocol="dubbo" address="134.96.253.86:8033"/>
+    <dubbo:registry id="esb3" protocol="dubbo" address="134.96.253.65:8001"/>
+    <dubbo:registry id="esb2" protocol="dubbo" address="134.96.159.11:8033"/>
+
+    <!-- 暴露服务 -->
+    <dubbo:protocol     name="dubbo" port="30303"/>
+    <dubbo:monitor protocol="registry" />
+
+    <!-- 注册 -->
+    <!-- 策略cpct计算服务 -->
+    <!--<dubbo:service interface="com.zjtelcom.cpct.dubbo.service.EventApiService" ref="eventApiServiceImpl" version="1.0" >-->
+        <!--&lt;!&ndash; 策略cpct计算服务（同步） &ndash;&gt;-->
+        <!--<dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="10000"/>-->
+    <!--</dubbo:service>-->
+
+    <!-- 编码查询事件详情服务 -->
+    <!--<dubbo:service interface="com.zjtelcom.cpct.dubbo.service.ChannelService" ref="channelServiceImpl" version="1.0" >-->
+        <!--<dubbo:method name="getEventDetail" servicecode="00.1083.getEventDetail" timeout="10000"/>-->
+    <!--</dubbo:service>-->
+
+    <!-- 因子实时查询 -->
+    <dubbo:reference interface="com.zjpii.biz.serv.YzServ" id="yzServ"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="5000"/>
+    </dubbo:reference>
+
+    <!-- redis实时查询服务 -->
+<!--    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.TrialRedisService" ref="trialRedisServiceImpl" version="1.0" >
+        <dubbo:method name="searchFromRedis" servicecode="00.1083.searchFromRedis" timeout="10000"/>
+        <dubbo:method name="updateOperationStatus" servicecode="00.1083.updateOperationStatus" timeout="10000"/>
+    </dubbo:service>-->
+
+
+    <!-- 活动发布接口 -->
+    <!--<dubbo:service interface="com.zjtelcom.cpct.dubbo.service.MktCampaignSyncApiService" ref="mktCampaignSyncApiServiceImpl" version="1.0" >-->
+        <!--<dubbo:method name="publishMktCampaign" servicecode="00.1083.publishMktCampaign" timeout="10000"/>-->
+    <!--</dubbo:service>-->
+
+    <!-- 销售品关联活动查询 -->
+<!--    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.ProductService" ref="productServiceImpl" version="1.0" >
+        <dubbo:method name="selectProductCam" servicecode="00.1083.selectProductCam" timeout="10000"/>
+    </dubbo:service>-->
+
+    <!--<dubbo:reference interface="com.zjtelcom.cpct.dubbo.service.ProductService" id="productService"-->
+                     <!--version="1.0" retries="0" check="false">-->
+        <!--<dubbo:method name="selectProductCam" servicecode="00.1083.selectProductCam" timeout="5000"/>-->
+    <!--</dubbo:reference>-->
+
+    <!-- 事件接入活动任务注册 1.0 -->
+    <dubbo:service registry="esb_dev" interface="com.zjtelcom.cpct.dubbo.service.CamApiSerService" ref="camApiSerServiceImpl" version="1.0" >
+        <dubbo:method name="ActivitySerTask" servicecode="00.1083.ActivityTask_zsc" timeout="10000"/>
+    </dubbo:service>
+
+    <dubbo:reference registry="esb2" id="ctgCacheAssetService"  interface="com.ctzj.bss.customer.data.carrier.outbound.api.CtgCacheAssetService" version="1.0" retries="0" check="false">
+        <dubbo:method name="queryCachedAssetDetailByIntegId" servicecode="33.1001.queryCachedAssetDetailByIntegId"  timeout="10000"/>
+    </dubbo:reference>
+
+
+
+    <!-- 查询销售品实例缓存实体-->
+    <dubbo:reference registry="esb3" id="iCacheOfferEntityQryService" interface="com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheOfferEntityQryService" version="1.0" retries="0" check="false">
+        <dubbo:method name="getOfferInstCacheEntity" servicecode="00.1074.getOfferInstCacheEntity"  timeout="10000"/>
+    </dubbo:reference>
+
+    <!-- 根据offerInstId和statusCd(1000-有效)查询offerProdInstRelId-->
+    <dubbo:reference registry="esb3" id="iCacheOfferRelIndexQryService" interface="com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheOfferRelIndexQryService" version="1.0" retries="0" check="false">
+        <dubbo:method name="qryOfferProdInstRelIndex2" servicecode="00.1074.qryOfferProdInstRelIndex2"  timeout="10000"/>
+    </dubbo:reference>
+
+    <!-- 查询销售品产品实例关系缓存实体-->
+    <dubbo:reference registry="esb3" id="iCacheRelEntityQryService" interface="com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheRelEntityQryService" version="1.0" retries="0" check="false">
+        <dubbo:method name="getOfferProdInstRelCacheEntity" servicecode="00.1074.getOfferProdInstRelCacheEntity"  timeout="10000"/>
+    </dubbo:reference>
+
+    <!-- 根据accNum查询prodInstId-->
+    <dubbo:reference registry="esb3" id="iCacheProdIndexQryService" interface="com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheProdIndexQryService" version="1.0" retries="0" check="false">
+        <dubbo:method name="qryProdInstIndex2" servicecode="00.1074.qryProdInstIndex2"  timeout="10000"/>
+    </dubbo:reference>
+
+
+
+
+
+</beans>
