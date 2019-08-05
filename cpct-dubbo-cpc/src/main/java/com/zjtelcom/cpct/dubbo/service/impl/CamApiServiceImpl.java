@@ -472,7 +472,7 @@ public class CamApiServiceImpl implements CamApiService {
                 if(flagMap.get(ruleId.toString()) == false) {
                     //验证是否标签实例不足
                     if (notEnoughLabel.length() > 0) {
-                        log.info("notEnoughLabel.length() > 0->标签实例不足");
+                        // log.info("notEnoughLabel.length() > 0->标签实例不足");
                         jsonObject.put("hit", "false");
                         jsonObject.put("msg", "标签实例不足：" + notEnoughLabel.toString());
                         esHitService.save(jsonObject, IndexList.RULE_MODULE);
