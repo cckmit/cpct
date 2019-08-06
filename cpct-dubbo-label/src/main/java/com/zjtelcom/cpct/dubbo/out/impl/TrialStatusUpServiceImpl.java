@@ -80,5 +80,16 @@ public class TrialStatusUpServiceImpl implements TrialStatusUpService {
         return  result;
     }
 
+    //es清单日志 大数据解析 转对外接口
+    @Override
+    public Map<String, Object> cpcLog2WriteFileLabel() {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        Map<String, Object> map = esService.esLog2WriteFile();
+        if ("200".equals(map.get("resultCode"))){
+            hashMap.put("msg","success");
+            hashMap.put("resultCode","200");
+        }
+        return hashMap;
+    }
 
 }

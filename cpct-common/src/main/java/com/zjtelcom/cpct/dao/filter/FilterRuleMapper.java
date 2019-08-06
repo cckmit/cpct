@@ -40,4 +40,5 @@ public interface FilterRuleMapper {
 
     List<FilterRule> selectFilterRuleListByStrategyId(@Param("strategyId") Long strategyId,@Param("strategyTypeList") List<String> strategyTypeList);
 
+    void updateExpression2(@Param("filterRule")String filterRule, @Param("expression")String expression);
 }

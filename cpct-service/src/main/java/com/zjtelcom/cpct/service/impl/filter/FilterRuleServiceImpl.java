@@ -330,7 +330,14 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
                 verbalConditionMapper.insert(condition);
                 filterRule.setConditionId(condition.getConditionId());
             }
+
             filterRuleMapper.createFilterRule(filterRule);
+            if (filterRule.getFilterType()!=null && filterRule.getFilterType().equals("2000") ){
+//                addVO.setExpression("CR002");
+                String expression = CpcUtil.addZeroForNum(String.valueOf(filterRule.getRuleId()), 6);
+//                filterRule.setExpression(expression);
+                filterRuleMapper.updateExpression2(filterRule.getRuleId().toString(),"CR002"+expression);
+            }
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
