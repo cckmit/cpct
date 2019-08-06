@@ -54,6 +54,11 @@
             <artifactId>bss-cooperate-service-api</artifactId>
         </dependency>
 
+        <!-- es试算模块 -->
+        <dependency>
+            <groupId>com.zjtelcom.es</groupId>
+            <artifactId>es-service-batch</artifactId>
+        </dependency>
         <!-- druid -->
         <dependency>
             <groupId>com.alibaba</groupId>

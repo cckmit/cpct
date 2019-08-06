@@ -41,6 +41,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.zjtelcom.cpct</groupId>
+            <artifactId>cpct-dubbo-cpc-ser</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.ctzj.bss.customer.data.carrier</groupId>
             <artifactId>customer-data-carrier-outbound-api</artifactId>
             <version>1.0.0</version>

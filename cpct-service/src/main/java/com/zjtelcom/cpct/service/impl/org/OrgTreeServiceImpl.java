@@ -184,7 +184,6 @@ public class OrgTreeServiceImpl implements OrgTreeService{
         if (areaList!=null && areaList.size()>0){
             list = organizationMapper.selectByParentId(Long.valueOf(areaList.get(0)));
         }else {
-//        SystemUserDto user = UserUtil.getUser();
             SystemUserDto user = BssSessionHelp.getSystemUserDto();
             Long staffId = user.getStaffId();
             List<Map<String, Object>> staffOrgId = organizationMapper.getStaffOrgId(staffId);
@@ -206,15 +205,19 @@ public class OrgTreeServiceImpl implements OrgTreeService{
                     }
                 }
             }
-            if (orgId == null){
+            Object type = params.get("type");
+            if (orgId == null && type == null){
                 list = organizationMapper.selectMenu();
-            }else {
-               list = organizationMapper.selectByParentId(orgId);
+            }else if (orgId!=null && type == null){
+                list = organizationMapper.selectByParentId(orgId);
+            }else if (orgId!=null && type != null){
+                list = organizationMapper.selectByParentIdForLevelFive(orgId);
             }
 
             if (list ==null || list.isEmpty()){
                 list = organizationMapper.selectMenu();
             }
+
         }
         Page pageInfo = new Page(new PageInfo(list));
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
