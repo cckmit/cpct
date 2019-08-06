@@ -1706,6 +1706,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     Long childMktCampaignId = mktCampaignDO.getMktCampaignId();
                     // 活动编码
                     mktCampaignDO.setMktActivityNbr("MKT" + String.format("%06d", childMktCampaignId));
+                    // initId
+                    mktCampaignDO.setInitId(childMktCampaignId);
                     mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
 
                     childMktCampaignIdList.add(childMktCampaignId);
