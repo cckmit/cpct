@@ -50,10 +50,10 @@ spec:
         - name: app-log
           mountPath: /app/dubbo/logs
         ports:
-        - containerPort: 30828    #修改端口号
+        - containerPort: 30808    #修改端口号
         readinessProbe:
           tcpSocket:
-            port: 30828   #修改端口号
+            port: 30808   #修改端口号
           initialDelaySeconds: 20
           periodSeconds: 10
           failureThreshold: 3
@@ -80,7 +80,7 @@ spec:
             memory: "1Gi"
             cpu: "1000m"
       nodeSelector:
-        center: bssOther  #修改镜像所属中心标签
+        center: bssCpct  #修改镜像所属中心标签
       volumes:
       - name: tz-config
         hostPath:
