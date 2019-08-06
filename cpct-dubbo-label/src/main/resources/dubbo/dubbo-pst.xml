@@ -48,6 +48,7 @@
                      version="1.0" retries="0" check="false">
         <dubbo:method name="addLogByBatchNum" servicecode="00.1083.addLogByBatchNum" timeout="5000"/>
         <dubbo:method name="strategyIssure" servicecode="00.1083.strategyIssure" timeout="100000"/>
+        <dubbo:method name="esLog2WriteFile" servicecode="00.1083.esLog2WriteFile" timeout="100000"/>
     </dubbo:reference>
 
     <!-- 门户-获取用户角色信息 -->
@@ -61,7 +62,6 @@
                      id="dictionaryDubboService" version="1.0" retries="0" check="false">
         <dubbo:method name="getDictionaryByType" servicecode="00.1077.getDictionaryByType"/>
     </dubbo:reference>
-
 
 
 </beans>
