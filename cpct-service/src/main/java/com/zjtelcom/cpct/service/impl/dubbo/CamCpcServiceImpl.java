@@ -1030,7 +1030,10 @@ public class CamCpcServiceImpl implements CamCpcService {
                         ruleMap.put("ruleId",  mktStrategyConfRuleDO.getInitId().toString()); //规则编码
                         ruleMap.put("ruleName", ruleName); //规则名称
                         ruleMap.put("promIntegId", promIntegId); // 销售品实例ID
-                        ruleMap.put("areaId", context.get("AREA_ID")); // 落地网格
+                        if (context.get("AREA_ID") != null) {
+                            ruleMap.put("areaId", context.get("AREA_ID")); // 落地网格
+                        }
+
 
                         //查询销售品列表
                         if (productStr != null && !"".equals(productStr)) {
@@ -1170,7 +1173,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                     ruleMap.put("ruleId", ruleId.toString()); //规则编码
                     ruleMap.put("ruleName", ruleName); //规则名称
                     ruleMap.put("promIntegId", promIntegId); // 销售品实例ID
-                    ruleMap.put("areaId", context.get("AREA_ID")); // 落地网格
+                    if (context.get("AREA_ID") != null) {
+                        ruleMap.put("areaId", context.get("AREA_ID")); // 落地网格
+                    }
 
 
                     //查询销售品列表
