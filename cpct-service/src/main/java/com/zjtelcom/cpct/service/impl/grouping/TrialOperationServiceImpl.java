@@ -891,7 +891,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             Object[] objects = data.toArray();
                             if (flag && (this.getIndex() > data.size() || data.get(this.getIndex()) == null || data.get(this.getIndex()).equals(""))) {
                                 // 记录日志，退出线程
-                                // addLog2Es(batchNumSt, "导入清单第"+ j +"行接单人无数据");
+                                addLog2Es(batchNumSt, "导入清单第"+ j +"行接单人无数据");
                                 TrialOperation record = new TrialOperation();
                                 record.setId(Long.valueOf(insertId));
                                 record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
