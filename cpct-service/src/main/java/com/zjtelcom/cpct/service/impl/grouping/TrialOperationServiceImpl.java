@@ -672,7 +672,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private TrialOperationVOES getTrialOperationVOES(TrialOperationVO operation, Long ruleId, String batchNumSt, List<Map<String, Object>> labelList) {
         redisUtils_es.set("LABEL_DETAIL_" + batchNumSt, labelList);
         MktCampaignDO campaignDO = campaignMapper.selectByPrimaryKey(operation.getCampaignId());
-        MktStrategyConfDO strategyConfDO = strategyConfMapper.selectByPrimaryKey(operation.getStrategyId());
+        /*MktStrategyConfDO strategyConfDO = strategyConfMapper.selectByPrimaryKey(operation.getStrategyId());*/
 
         final TrialOperationVOES request = BeanUtil.create(operation, new TrialOperationVOES());
         request.setBatchNum(Long.valueOf(batchNumSt));
@@ -680,7 +680,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         request.setLanId(campaignDO.getLanId());
         request.setCampaignName(campaignDO.getMktCampaignName());
         request.setCamLevel(campaignDO.getCamLevel());
-        request.setStrategyName(strategyConfDO.getMktStrategyConfName());
+        request.setStrategyName(operation.getStrategyName());
         // 获取创建人员code
         request.setStaffCode(getCreater(campaignDO.getCreateStaff()) == null ? "null" : getCreater(campaignDO.getCreateStaff()));
 
