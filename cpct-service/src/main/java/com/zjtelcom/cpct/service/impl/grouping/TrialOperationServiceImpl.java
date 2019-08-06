@@ -673,7 +673,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         redisUtils_es.set("LABEL_DETAIL_" + batchNumSt, labelList);
         MktCampaignDO campaignDO = campaignMapper.selectByPrimaryKey(operation.getCampaignId());
         /*MktStrategyConfDO strategyConfDO = strategyConfMapper.selectByPrimaryKey(operation.getStrategyId());*/
-
         final TrialOperationVOES request = BeanUtil.create(operation, new TrialOperationVOES());
         request.setBatchNum(Long.valueOf(batchNumSt));
         request.setCampaignType(campaignDO.getMktCampaignType());
