@@ -11,6 +11,7 @@ import com.zjtelcom.cpct.dao.question.MktQuestionnaireMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.domain.Rule;
 import com.zjtelcom.cpct.domain.RuleDetail;
+import com.zjtelcom.cpct.domain.User;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlResultConfRelDO;
@@ -113,6 +114,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                 MktCamChlConfAttrDO mktCamChlConfAttrDO = BeanUtil.create(mktCamChlConfAttr, new MktCamChlConfAttrDO());
                 mktCamChlConfAttrDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
                 mktCamChlConfAttrDO.setEvtContactConfId(mktCamChlConfDO.getEvtContactConfId());
+
                 if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
                     mktCamChlConfAttrDO.setAttrValue(evtContactConfId.toString());
                     //协同渠道自策略规则保存
@@ -170,6 +172,12 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                 MktCamChlConfAttrDO mktCamChlConfAttrDO1 = mktCamChlConfAttrMapper.selectByPrimaryKey(mktCamChlConfAttr.getContactChlAttrRstrId());
                 MktCamChlConfAttrDO mktCamChlConfAttrDO = new MktCamChlConfAttrDO();
                 CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttrDO, mktCamChlConfAttr);
+                mktCamChlConfAttrDO.setCreateDate(new Date());
+                mktCamChlConfAttrDO.setCreateStaff(UserUtil.loginId());
+                mktCamChlConfAttrDO.setUpdateDate(new Date());
+                mktCamChlConfAttrDO.setUpdateStaff(UserUtil.loginId());
+                mktCamChlConfAttrDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                mktCamChlConfAttrDO.setStatusDate(new Date());
                 if (mktCamChlConfAttr.getAttrId()!=null && mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
                     mktCamChlConfAttrDO.setEvtContactConfId(mktCamChlConfDO.getEvtContactConfId());
                     mktCamChlConfAttrDO.setAttrValue(evtContactConfId.toString());
@@ -223,6 +231,8 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                 mktCamChlConfDetail.setIsSecondCoop("0");
             }
             List<MktCamChlConfAttr> mktCamChlConfAttrList = new ArrayList<>();
+            boolean isEffectiveDaysAttr = false;
+
             for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
                 MktCamChlConfAttr mktCamChlConfAttr = new MktCamChlConfAttr();
                 CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttr, mktCamChlConfAttrDO);
@@ -250,9 +260,30 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                     if (map != null) {
                         mktCamChlConfAttr.setAttrValName((String) map.get("labelName"));
                     }
+                } else if(mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.EFFECTIVE_DAYS.getArrId())){
+                    isEffectiveDaysAttr = true;
                 }
                 mktCamChlConfAttrList.add(mktCamChlConfAttr);
             }
+            // 是否有新增的属性-有效天数
+            if(!isEffectiveDaysAttr){
+                MktCamChlConfAttr mktCamChlConfAttrNew = new MktCamChlConfAttr();
+                MktCamChlConfAttrDO mktCamChlConfAttrDO = new MktCamChlConfAttrDO();
+                mktCamChlConfAttrDO.setAttrId(ConfAttrEnum.EFFECTIVE_DAYS.getArrId());
+                mktCamChlConfAttrDO.setEvtContactConfId(mktCamChlConfDO.getEvtContactConfId());
+                mktCamChlConfAttrDO.setAttrValue("");
+                mktCamChlConfAttrDO.setAttrValueId(0L);
+                mktCamChlConfAttrDO.setCreateDate(new Date());
+                mktCamChlConfAttrDO.setCreateStaff(UserUtil.loginId());
+                mktCamChlConfAttrDO.setUpdateDate(new Date());
+                mktCamChlConfAttrDO.setUpdateStaff(UserUtil.loginId());
+                mktCamChlConfAttrDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                mktCamChlConfAttrDO.setStatusDate(new Date());
+                mktCamChlConfAttrMapper.insert(mktCamChlConfAttrDO);
+                CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttrDO, mktCamChlConfAttrNew);
+                mktCamChlConfAttrList.add(mktCamChlConfAttrNew);
+            }
+
             Channel channel = channelMapper.selectByPrimaryKey(mktCamChlConfDO.getContactChlId());
             if (channel != null) {
                 mktCamChlConfDetail.setContactChlCode(channel.getContactChlCode());

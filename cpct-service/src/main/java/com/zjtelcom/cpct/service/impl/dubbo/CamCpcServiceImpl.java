@@ -152,6 +152,8 @@ public class CamCpcServiceImpl implements CamCpcService {
      */
     @Override
     public Map<String, Object> ActivityCpcTask(Map<String, String> params, Long activityId, Map<String, String> privateParams, Map<String, String> laubelItems, List<Map<String, Object>> evtTriggers, List<Map<String, Object>> strategyMapList, DefaultContext<String, Object> context) {
+        log.info("进入ActivityCpcTask...");
+
         Map<String, Object> activity = new ConcurrentHashMap<>();
         long begin = System.currentTimeMillis();
         String reqId = params.get("reqId");
@@ -984,7 +986,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                 if(flagMap.get(ruleId.toString()) == false) {
                     //验证是否标签实例不足
                     if (notEnoughLabel.length() > 0) {
-                        log.info("notEnoughLabel.length() > 0->标签实例不足");
+                        // log.info("notEnoughLabel.length() > 0->标签实例不足");
                         jsonObject.put("hit", "false");
                         jsonObject.put("msg", "标签实例不足：" + notEnoughLabel.toString());
                         esHitService.save(jsonObject, IndexList.RULE_MODULE);

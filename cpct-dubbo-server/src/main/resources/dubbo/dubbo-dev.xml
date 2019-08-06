@@ -69,7 +69,7 @@
     </dubbo:reference>
 
     <!-- 事件接入活动任务订阅 1.0 -->
-    <dubbo:reference registry="esb_dev" interface="com.zjtelcom.cpct.dubbo.service.CamApiSerService" id="camApiService"
+    <dubbo:reference registry="esb_dev" interface="com.zjtelcom.cpct.dubbo.service.CamApiService" id="camApiService"
                      version="1.0" retries="0" check="false">
         <dubbo:method name="ActivityTask" servicecode="00.1083.ActivityTask" timeout="15000"/>
     </dubbo:reference>
