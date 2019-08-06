@@ -76,4 +76,21 @@ spring:
 sync:
    value: 0
 
+ctg:
+  namesrvAddr: 134.108.11.159:9892;134.108.11.160:9892;134.108.11.161:9892
+  cpctGroupName: cpct_file_import
+  cpctGroupName2: cpct_file_import2
+  namesrvAuthID: cpct_user
+  namesrvAuthPwd: cpct_user123
+  consumeOrderly: false
+  instanceName: prod_cpct
+  maxMessageSize: 8242880
+  sendMaxRetryTimes: 2
+  sendMsgTimeout: 30000
+  compressMsgBodyOverHowmuch: 4098
+  clusterName: pst_crm_mq
+  tenantID: 2
+  cpctTopic: cpct_topic_import
+  clientWorkerThreads: 4
+
 
