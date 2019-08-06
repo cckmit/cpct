@@ -1813,7 +1813,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         } else if ("7100".equals(type)) {
                             express.append("notIn");
                         }
-                        if (label.getLabelValueType().equals("1100") && tarGrpConditionDOs.get(i).getUpdateStaff()==1L){
+                        if (label.getLabelDataType().equals("1100") && tarGrpConditionDOs.get(i).getUpdateStaff()==1L){
                             String date = DateUtil.getPreDay(Integer.valueOf(tarGrpConditionDOs.get(i).getRightParam()));
                             express.append(date);
                         }else {
