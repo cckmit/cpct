@@ -16,6 +16,7 @@
         <module>cpct-shiro</module>
         <module>cpct-dubbo-server</module>
         <module>cpct-dubbo-cpc</module>
+        <module>cpct-dubbo-cpc-ser</module>
         <module>cpct-cache</module>
         <module>cpct-dubbo-label</module>
         <module>cpct-open-api</module>
