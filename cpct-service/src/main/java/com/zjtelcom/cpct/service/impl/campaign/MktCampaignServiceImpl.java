@@ -1706,6 +1706,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     Long childMktCampaignId = mktCampaignDO.getMktCampaignId();
                     // 活动编码
                     mktCampaignDO.setMktActivityNbr("MKT" + String.format("%06d", childMktCampaignId));
+                    // initId
+                    mktCampaignDO.setInitId(childMktCampaignId);
                     mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
 
                     childMktCampaignIdList.add(childMktCampaignId);
@@ -2099,8 +2101,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             // 将新活动数据入库
             mktCampaignDO.setMktCampaignId(null);
             mktCampaignDO.setInitId(mktCampaignDO.getInitId());
-            mktCampaignDO.setCreateStaff(UserUtil.loginId());
-            mktCampaignDO.setCreateDate(new Date());
             mktCampaignDO.setUpdateStaff(UserUtil.loginId());
             mktCampaignDO.setUpdateDate(new Date());
             mktCampaignDO.setStatusCd(StatusCode.STATUS_CODE_PRE_PUBLISHED.getStatusCode());
