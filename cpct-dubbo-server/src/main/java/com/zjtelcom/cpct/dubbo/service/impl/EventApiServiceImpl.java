@@ -1152,8 +1152,10 @@ public class EventApiServiceImpl implements EventApiService {
         public Map<String, Object> call() {
             Map<String, Object> activityTaskResultMap = new HashMap<>();
             if(StatusCode.SERVICE_CAMPAIGN.getStatusCode().equals(type)){
+                log.info("服务活动进入camApiSerService.ActivitySerTask");
                 activityTaskResultMap = camApiSerService.ActivitySerTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
             } else {
+                log.info("进入camApiService.ActivityTask");
                 activityTaskResultMap = camApiService.ActivityTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
             }
             return activityTaskResultMap;
