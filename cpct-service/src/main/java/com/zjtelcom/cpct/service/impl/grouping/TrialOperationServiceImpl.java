@@ -889,15 +889,15 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         for (int j = 3; j < dataVO.contentList.size(); j++) {
                             List<String> data = Arrays.asList(dataVO.contentList.get(j).split("\\|@\\|"));
                             Object[] objects = data.toArray();
-                            if (flag && (this.getIndex() > data.size() || data.get(this.getIndex()) == null || data.get(this.getIndex()).equals(""))) {
+                            if (flag && (this.getIndex() >= data.size() ? true:(data.get(this.getIndex()) == null || data.get(this.getIndex()).equals("")))) {
                                 // 记录日志，退出线程
-                                // addLog2Es(batchNumSt, "导入清单第"+ j +"行接单人无数据");
+                                addLog2Es(batchNumSt, "导入清单存在接单人无数据");
                                 TrialOperation record = new TrialOperation();
                                 record.setId(Long.valueOf(insertId));
                                 record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
                                 record.setRemark("清单导入数据错误");
                                 int i = trialOperationMapper.updateByPrimaryKey(record);
-                                throw new RuntimeException("导入清单第" + j + "行接单人无数据");
+                                throw new RuntimeException("导入清单第" + j + 1 + "行接单人无数据");
                             }
                             Map<String, Object> customers = new HashMap<>();
                             boolean check = true;
