@@ -700,19 +700,16 @@ public class EventApiServiceImpl implements EventApiService {
                 Map<String, String> mktAllLabels = (Map<String, String>) redisUtils.get("EVT_ALL_LABEL_" + eventId);
                 if (mktAllLabels == null) {
                     try {
-
-                        mktAllLabels = new HashMap<>();
-
-//                        mktAllLabels = searchLabelService.labelListByEventId(eventId);  //查询事件下使用的所有标签
-//                        if (null != mktAllLabels) {
-//                            redisUtils.set("EVT_ALL_LABEL_" + eventId, mktAllLabels);
-//                        } else {
-//                            log.info("获取事件下所有标签失败");
-//                            esJson.put("hit", false);
-//                            esJson.put("msg", "获取事件下所有标签失败");
-//                            esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
-//                            return Collections.EMPTY_MAP;
-//                        }
+                        mktAllLabels = searchLabelService.labelListByEventId(eventId);  //查询事件下使用的所有标签
+                        if (null != mktAllLabels) {
+                            redisUtils.set("EVT_ALL_LABEL_" + eventId, mktAllLabels);
+                        } else {
+                            log.info("获取事件下所有标签失败");
+                            esJson.put("hit", false);
+                            esJson.put("msg", "获取事件下所有标签失败");
+                            esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
+                            return Collections.EMPTY_MAP;
+                        }
                     } catch (Exception e) {
                         esJson.put("hit", false);
                         esJson.put("msg", "获取事件下所有标签异常");
