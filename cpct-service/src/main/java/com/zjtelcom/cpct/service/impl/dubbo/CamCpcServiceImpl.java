@@ -1027,7 +1027,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                         ruleMap.put("accNbr", privateParams.get("accNbr")); //业务号码（必填）
                         ruleMap.put("policyId", mktStrategyConfDO.getInitId().toString()); //策略编码
                         ruleMap.put("policyName", strategyConfName); //策略名称
-                        ruleMap.put("ruleId",  mktStrategyConfRuleDO.getInitId()); //规则编码
+                        ruleMap.put("ruleId",  mktStrategyConfRuleDO.getInitId().toString()); //规则编码
                         ruleMap.put("ruleName", ruleName); //规则名称
                         ruleMap.put("promIntegId", promIntegId); // 销售品实例ID
                         ruleMap.put("areaId", context.get("AREA_ID")); // 落地网格
