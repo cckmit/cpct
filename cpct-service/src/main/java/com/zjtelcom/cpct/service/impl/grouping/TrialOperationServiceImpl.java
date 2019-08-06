@@ -641,7 +641,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         return result;
     }
 
-
     //下发文件
     private Map<String, Object> importUserList(Map<String, Object> result, TrialOperationVO operation, Long ruleId, String batchNumSt, List<Map<String, Object>> customerList, List<Map<String, Object>> labelList) {
         final TrialOperationVOES request = getTrialOperationVOES(operation, ruleId, batchNumSt, labelList);
@@ -944,34 +943,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             customerList.add(customers);
                         }
                         importListMQ2EsService(request, customerList, productFilter, batchNumSt, ruleId.toString(), trialOp);
-                        /*int x = customerList.size() / 1000;
-                        for (int i = 0; i <= x; i++) {
-                            List<Map<String, Object>> newSublist = new ArrayList();
-                            if (i == x) {
-                                newSublist = customerList.subList(i * 1000, customerList.size());
-                            } else {
-                                newSublist = customerList.subList(i * 1000, (i + 1) * 1000);
-                            }
-                            // 向MQ中扔入request和customersList
-                            HashMap msgBody = new HashMap();
-                            msgBody.put("request", request);
-                            msgBody.put("customerList", newSublist);
-                            msgBody.put("productFilterList", productFilter);
-                            try {
-                                // 判断是否发送成功
-                                if (!mqService.msg2Producer(msgBody, batchNumSt, ruleId.toString()).equals("SEND_OK")) {
-                                    // 发送失败自动重发2次，如果还是失败，记录
-                                    logger.error("CTGMQ消息生产失败,batchNumSt:" + batchNumSt, msgBody);
-                                }
-                                mqSum++;
-                                msgBody = null;
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            newSublist.clear();
-                        }
-                        redisUtils_es.set("MQ_SUM_" + batchNumSt, mqSum);
-                        logger.info("导入试运算清单importUserList->customerList的数量：" + customerList.size());*/
                     } catch (RuntimeException e) {
                         e.printStackTrace();
                     }
@@ -1024,12 +995,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         }
         redisUtils_es.set("MQ_SUM_" + batchNumSt, mqSum);
         logger.info("导入试运算清单importUserList->customerList的数量：" + customerList.size());
-        if (flag){
+        /*if (flag){
             operation.setStatusCd(TrialStatus.IMPORT_SUCCESS.getValue());
         }else{
             operation.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
         }
-        trialOperationMapper.updateByPrimaryKey(operation);
+        trialOperationMapper.updateByPrimaryKey(operation);*/
     }
 
     private void blackList2Redis(MktCampaignDO campaign) {
