@@ -99,7 +99,9 @@
       LAB_TECH_DESC, LAB_STATE, LAB_MANAGE_TYPE,
       LAB_TAG_CODE,SYSTEM_INFO_ID, LAB_EXAMPLE,
       LAB_EFFECTIVE_DATE, LAB_EXPIRATION_DATE,
-      DAMANDER, DAMAND_DEPARTMENT, DAMAND_DESCRIPTION)
+      DAMANDER, DAMAND_DEPARTMENT, DAMAND_DESCRIPTION,
+      ORIGINAL_LAB_LEVEL1_NAME, ORIGINAL_LAB_LEVEL2_NAME, ORIGINAL_LAB_LEVEL3_NAME,
+      ORIGINAL_LAB_LEVEL1_CODE, ORIGINAL_LAB_LEVEL2_CODE, ORIGINAL_LAB_LEVEL3_CODE)
     values (#{injectionLabelId,jdbcType=BIGINT}, #{injectionLabelCode,jdbcType=VARCHAR},
       #{injectionLabelName,jdbcType=VARCHAR}, #{injectionLabelDesc,jdbcType=VARCHAR},
       #{labelType,jdbcType=VARCHAR}, #{labelValueType,jdbcType=VARCHAR}, #{labelDataType,jdbcType=VARCHAR},
@@ -117,7 +119,9 @@
       #{labTechDesc,jdbcType=VARCHAR}, #{labState,jdbcType=VARCHAR}, #{labManageType,jdbcType=VARCHAR},
       #{labTagCode,jdbcType=VARCHAR},#{systemInfoId,jdbcType=BIGINT},#{labExample,jdbcType=VARCHAR},
       #{labEffectiveDate,jdbcType=TIMESTAMP}, #{labExpirationDate,jdbcType=TIMESTAMP},
-      #{damander,jdbcType=VARCHAR}, #{damandDepartment,jdbcType=VARCHAR}, #{damandDescription,jdbcType=VARCHAR})
+      #{damander,jdbcType=VARCHAR}, #{damandDepartment,jdbcType=VARCHAR}, #{damandDescription,jdbcType=VARCHAR},
+      #{originalLabLevel1Name,jdbcType=VARCHAR}, #{originalLabLevel2Name,jdbcType=VARCHAR}, #{originalLabLevel3Name,jdbcType=VARCHAR},
+      #{originalLabLevel1Code,jdbcType=VARCHAR}, #{originalLabLevel2Code,jdbcType=VARCHAR}, #{originalLabLevel3Code,jdbcType=VARCHAR})
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.Label">
     update injection_label
@@ -483,7 +487,7 @@
   <select id="selectDistributeLabelByType" resultType="java.util.Map">
     select LABEL_CODE labelCode,LABEL_NAME labelName
     from label_distribute_rel
-    where LABEL_TYPE = #{labelType}
+    where LABEL_TYPE = #{labelType} and REMARK = #{remark}
   </select>
 
   <select id="selectDistributeLabelByCode" resultType="java.util.Map">

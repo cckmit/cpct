@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.service.channel;
 
 import com.zjtelcom.cpct.dto.channel.ContactChannelDetail;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ public interface ChannelService {
 
     Map<String,Object> listChannelTree(Long userId,String channelName);
 
-    Map<String,Object> getChannelTreeList(Long userId);
+    Map<String,Object> getChannelTreeList(HashMap<String,String> param);
 
     Map<String,Object> getParentList(Long userId);
 

@@ -25,7 +25,7 @@ public interface ContactChannelMapper {
 
     List<Channel> findParentList();
 
-    List<Channel> findChildListByParentId(@Param("parentId")Long parentId);
+    List<Channel> findChildListByParentId(@Param("parentId")Long parentId, @Param("triggerType")String triggerType);
 
     int updateByPrimaryKey(Channel record);
 

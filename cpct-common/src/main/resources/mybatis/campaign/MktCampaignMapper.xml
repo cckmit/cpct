@@ -91,7 +91,7 @@
         #{remark,jdbcType=VARCHAR}, #{lanId,jdbcType=BIGINT}, #{createChannel,jdbcType=VARCHAR},
         #{directoryId,jdbcType=BIGINT},#{camLevel,jdbcType=BIGINT}, #{isCheckRule,jdbcType=VARCHAR},
         #{srcId,jdbcType=VARCHAR}, #{srcType,jdbcType=VARCHAR}, #{serviceCancleFlag,jdbcType=BIGINT}, #{regionId,jdbcType=BIGINT},
-        #{lifeStage,jdbcType=VARCHAR}, #{serviceType,jdbcType=VARCHAR}, #{extMktCampaignId,jdbcType=VARCHAR}, #{execInitTime,jdbcType=BIGINT} )
+        #{lifeStage,jdbcType=VARCHAR}, #{serviceType,jdbcType=VARCHAR}, #{extMktCampaignId,jdbcType=VARCHAR}, #{execInitTime,jdbcType=VARCHAR} )
     </insert>
 
 
@@ -329,8 +329,7 @@
         t.MKT_CAMPAIGN_ID = r.Z_MKT_CAMPAIGN_ID
         ) AS A_MKT_CAMPAIGN_ID
         from mkt_campaign t
-        where 1 = 1
-        And NOT ( t.STATUS_CD = 2002 or t.STATUS_CD = 2006  or t.STATUS_CD = 2007 or t.STATUS_CD = 2008  or t.STATUS_CD = 2010)
+        where  t.STATUS_CD NOT IN (2002, 2006, 2007, 2008, 2010)
         <if test="mktCampaignName != null and mktCampaignName != ''">
             AND t.MKT_CAMPAIGN_NAME like CONCAT('%',#{mktCampaignName,jdbcType=VARCHAR},'%')
         </if>
@@ -388,9 +387,7 @@
         t.MKT_CAMPAIGN_ID = r.Z_MKT_CAMPAIGN_ID
         ) AS A_MKT_CAMPAIGN_ID
         from mkt_campaign t
-        where 1 = 1
-        And (t.STATUS_CD = 2002 OR  t.STATUS_CD = 2008 or t.STATUS_CD = 2006 or t.STATUS_CD = 2010 )
-        And NOT ( t.STATUS_CD = 2007)
+        where t.STATUS_CD IN (2002, 2006, 2008, 2010)
         <if test="mktCampaignName != null and mktCampaignName != ''">
             AND t.MKT_CAMPAIGN_NAME like CONCAT('%',#{mktCampaignName,jdbcType=VARCHAR},'%')
         </if>

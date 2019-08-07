@@ -429,7 +429,6 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                     tarGrpCondition.setCreateDate(DateUtil.getCurrentTime());
                     tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
                     tarGrpCondition.setStatusDate(DateUtil.getCurrentTime());
-                    tarGrpCondition.setUpdateStaff(UserUtil.loginId());
                     tarGrpCondition.setCreateStaff(UserUtil.loginId());
                     if (isCopy){
                         tarGrpCondition.setStatusCd(StatusCode.STATUS_CODE_FAILURE.getStatusCode());
@@ -663,14 +662,12 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                     condition.setUpdateDate(DateUtil.getCurrentTime());
                     condition.setCreateDate(DateUtil.getCurrentTime());
                     condition.setStatusDate(DateUtil.getCurrentTime());
-                    condition.setUpdateStaff(UserUtil.loginId());
                     condition.setCreateStaff(UserUtil.loginId());
                     condition.setStatusCd(tarGrpCondition.getStatusCd()==null ? STATUSCD_EFFECTIVE : tarGrpCondition.getStatusCd());
                     insertConditions.add(condition);
                 } else {
                     BeanUtil.copy(tarGrpCondition,tarGrpCondition1);
                     tarGrpCondition1.setUpdateDate(DateUtil.getCurrentTime());
-                    tarGrpCondition1.setUpdateStaff(UserUtil.loginId());
                     tarGrpConditionMapper.modTarGrpCondition(tarGrpCondition1);
                     allCondition.add(tarGrpCondition1);
                 }

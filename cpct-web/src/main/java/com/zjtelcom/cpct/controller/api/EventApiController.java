@@ -6,11 +6,14 @@ import com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService;
 import com.zjpii.biz.serv.YzServ;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
+import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
+import com.zjtelcom.cpct_prd.dao.campaign.MktCampaignPrdMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,6 +46,12 @@ public class EventApiController extends BaseController {
     private MktCamEvtRelMapper evtRelMapper;
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired(required = false)
+    private SynchronizeCampaignService synchronizeCampaignService;
+    @Autowired
+    private MktCampaignMapper campaignMapper;
+    @Autowired
+    private MktCampaignPrdMapper campaignPrdMapper;
 
 
     @PostMapping("test")
@@ -64,6 +73,36 @@ public class EventApiController extends BaseController {
         }
         return result;
     }
+
+    @PostMapping("syncCampaign")
+    public  Map<String,String> syncCampaign(@RequestBody HashMap<String,String> key) {
+        Map<String,String> result = new HashMap<>();
+        List<MktCampaignDO> campaigns = new ArrayList<>();
+        try {
+            List<MktCampaignDO> campaignDOS = campaignMapper.qryMktCampaignListByTypeAndStatus(null,"2002");
+            for (MktCampaignDO campaignDO : campaignDOS){
+                if (campaignPrdMapper.selectByPrimaryKey(campaignDO.getMktCampaignId())==null){
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            try {
+                                String roleName = "admin";
+                                synchronizeCampaignService.synchronizeCampaign(campaignDO.getMktCampaignId(), roleName);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                logger.error("[op:MktCampaignServiceImpl] 活动同步失败 by mktCampaignId = {}, Expection = ",campaignDO.getMktCampaignId(), e);
+                            }
+                        }
+                    }.start();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
 
     /**
      * 事件触发入口
