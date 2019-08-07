@@ -964,15 +964,16 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     }
 
     public void importListMQ2EsService(TrialOperationVOES request, List<Map<String, Object>> customerList, List<FilterRule> productFilter, String batchNumSt, String ruleId, TrialOperation operation){
+        logger.info("导入试运算清单importUserList->customerList的数量：" + customerList.size());
         Long mqSum = 0L;
         boolean flag = true;
         int x = customerList.size() / 1000;
         for (int i = 0; i <= x; i++) {
             List<Map<String, Object>> newSublist = new ArrayList();
             if (i == x) {
-                newSublist = customerList.subList(i * 1000, customerList.size());
+                newSublist = customerList.subList(0, customerList.size());
             } else {
-                newSublist = customerList.subList(i * 1000, (i + 1) * 1000);
+                newSublist = customerList.subList(0, 1000);
             }
             // 向MQ中扔入request和customersList
             HashMap msgBody = new HashMap();
@@ -994,7 +995,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             newSublist.clear();
         }
         redisUtils_es.set("MQ_SUM_" + batchNumSt, mqSum);
-        logger.info("导入试运算清单importUserList->customerList的数量：" + customerList.size());
         /*if (flag){
             operation.setStatusCd(TrialStatus.IMPORT_SUCCESS.getValue());
         }else{
