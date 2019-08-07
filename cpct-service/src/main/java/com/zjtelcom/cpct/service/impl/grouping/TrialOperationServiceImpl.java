@@ -970,9 +970,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         for (int i = 0; i <= x; i++) {
             List<Map<String, Object>> newSublist = new ArrayList();
             if (i == x) {
-                newSublist = customerList.subList(i * 1000, customerList.size());
+                newSublist = customerList.subList(0, customerList.size());
             } else {
-                newSublist = customerList.subList(i * 1000, (i + 1) * 1000);
+                newSublist = customerList.subList(0, 1000);
             }
             // 向MQ中扔入request和customersList
             HashMap msgBody = new HashMap();
