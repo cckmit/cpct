@@ -7,6 +7,9 @@ public interface MqService {
 
      void initConsumer();
 
-     String msg2Producer(Object msgBody, String key, String tag);
+     String msg2Producer(Object msgBody, String topic,String key, String tag);
+
+     //es添加日志队列中转
+     String pushEsLogConsumer();
 
 }

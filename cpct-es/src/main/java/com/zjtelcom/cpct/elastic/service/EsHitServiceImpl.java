@@ -21,6 +21,7 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -35,6 +36,9 @@ public class EsHitServiceImpl implements EsHitService {
     @Autowired(required = false)
     private TransportClient client;
 
+    @Value("${ctg.cpctEsLogTopic}")
+    private String cpctEsLogTopic;
+
     /**
      * 测试索引
      */
@@ -45,9 +49,11 @@ public class EsHitServiceImpl implements EsHitService {
      */
     private String esType = "doc";
 
+    @Autowired
+    private MqProducerService mqProducerService;
 
     @Override
-    public void add() {
+    public void add() throws Exception {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", System.currentTimeMillis() + EsSearchUtil.getRandomStr(15));
         jsonObject.put("age", 25);
@@ -55,9 +61,10 @@ public class EsHitServiceImpl implements EsHitService {
         jsonObject.put("date", DateUtil.formatDate(new Date()));
         jsonObject.put("dateSt", new Date());
         jsonObject.put("dateSt2", "2018-04-25T08:33:44.840Z");
-
-        String id = ElasticsearchUtil.addData(jsonObject, "params_module", esType, jsonObject.getString("id"));
-        System.out.println("*********ID**********: " + id);
+        String s = mqProducerService.msg2ESLogProducer(jsonObject, cpctEsLogTopic, "params_module" + "," + esType + "," + jsonObject.getString("id"), null);
+        logger.info("add to esLog start :" + s);
+//        String id = ElasticsearchUtil.addData(jsonObject, "params_module", esType, jsonObject.getString("id"));
+//        System.out.println("*********ID**********: " + id);
     }
 
     /**
@@ -68,11 +75,13 @@ public class EsHitServiceImpl implements EsHitService {
     @Override
     public void save(final JSONObject jsonObject, final String indexName) {
         try {
-            new Thread() {
-                public void run() {
-                    ElasticsearchUtil.addData(jsonObject, indexName, esType);
-                }
-            }.start();
+//            new Thread() {
+//                public void run() {
+//                    ElasticsearchUtil.addData(jsonObject, indexName, esType);
+//                }
+//            }.start();
+            String s = mqProducerService.msg2ESLogProducer(jsonObject, cpctEsLogTopic, indexName + "," + esType, null);
+            logger.info("saveOne to esLog start :" + s);
         } catch (Exception e) {
             logger.error("es日志存储失败");
         }
@@ -81,11 +90,13 @@ public class EsHitServiceImpl implements EsHitService {
     @Override
     public void save(final JSONObject jsonObject, final String indexName, final String _id) {
         try {
-            new Thread() {
-                public void run() {
-                    ElasticsearchUtil.addData(jsonObject, indexName, esType, _id);
-                }
-            }.start();
+//            new Thread() {
+//                public void run() {
+//                    ElasticsearchUtil.addData(jsonObject, indexName, esType, _id);
+//                }
+//            }.start();
+            String s = mqProducerService.msg2ESLogProducer(jsonObject, cpctEsLogTopic, indexName + "," + esType + "," + _id, null);
+            logger.info("add to esLog start :" + s);
         } catch (Exception e) {
             logger.error("es日志存储失败");
         }
