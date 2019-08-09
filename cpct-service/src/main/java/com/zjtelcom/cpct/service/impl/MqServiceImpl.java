@@ -75,10 +75,10 @@ public class MqServiceImpl implements MqService {
     @Value("${ctg.clientWorkerThreads}")
     private String clientWorkerThreads;
     //日志队列 中转添加es日志
-    @Value("${ctg.cpctEsLogTopic}")
-    private String cpctEsLogTopic;
-    @Value("${ctg.cpctEsLogGroup}")
-    private String cpctEsLogGroup;
+//    @Value("${ctg.cpctEsLogTopic}")
+//    private String cpctEsLogTopic;
+//    @Value("${ctg.cpctEsLogGroup}")
+//    private String cpctEsLogGroup;
 
     @Autowired
     private MqLogMapper mqLogMapper;
@@ -108,22 +108,22 @@ public class MqServiceImpl implements MqService {
         return properties;
     }
 
-    //日志中转队列消费者
-    private void initESLogConsumer() throws Exception {
-        logger.info("initESLogConsumer...init...." + namesrvAddr);
-        Properties properties3 = new Properties();
-        properties3.setProperty(PropertyKeyConst.ConsumerGroupName, cpctEsLogGroup);
-        properties3.setProperty(PropertyKeyConst.NamesrvAddr, namesrvAddr);
-        properties3.setProperty(PropertyKeyConst.NamesrvAuthID, namesrvAuthID);
-        properties3.setProperty(PropertyKeyConst.NamesrvAuthPwd, namesrvAuthPwd);
-        properties3.setProperty(PropertyKeyConst.SendMsgTimeout, sendMsgTimeout);//设置发送超时时间
-        properties3.setProperty(PropertyKeyConst.ClusterName, clusterName);
-        properties3.setProperty(PropertyKeyConst.TenantID, tenantID);
-        properties3.setProperty(PropertyKeyConst.ClientWorkerThreads, clientWorkerThreads);
-        esLogConsumer = CTGMQFactory.createPushConsumer(properties3);
-        esLogConnect = esLogConsumer.connect();
-        logger.info("esLogConnect" + esLogConnect);
-    }
+//    //日志中转队列消费者
+//    private void initESLogConsumer() throws Exception {
+//        logger.info("initESLogConsumer...init...." + namesrvAddr);
+//        Properties properties3 = new Properties();
+//        properties3.setProperty(PropertyKeyConst.ConsumerGroupName, cpctEsLogGroup);
+//        properties3.setProperty(PropertyKeyConst.NamesrvAddr, namesrvAddr);
+//        properties3.setProperty(PropertyKeyConst.NamesrvAuthID, namesrvAuthID);
+//        properties3.setProperty(PropertyKeyConst.NamesrvAuthPwd, namesrvAuthPwd);
+//        properties3.setProperty(PropertyKeyConst.SendMsgTimeout, sendMsgTimeout);//设置发送超时时间
+//        properties3.setProperty(PropertyKeyConst.ClusterName, clusterName);
+//        properties3.setProperty(PropertyKeyConst.TenantID, tenantID);
+//        properties3.setProperty(PropertyKeyConst.ClientWorkerThreads, clientWorkerThreads);
+//        esLogConsumer = CTGMQFactory.createPushConsumer(properties3);
+//        esLogConnect = esLogConsumer.connect();
+//        logger.info("esLogConnect" + esLogConnect);
+//    }
 
     @Override
     public void initProducer() {
@@ -144,8 +144,8 @@ public class MqServiceImpl implements MqService {
             pushConsumer = CTGMQFactory.createPushConsumer(properties);
             consumerConnect = pushConsumer.connect();
             logger.info("MqServiceImpl->initConsumer:MQ消费者初始化成功！");
-            initESLogConsumer();
-            logger.info("MqServiceImpl->initESLogConsumer:MQ日志中转队列消费者初始化成功！");
+//            initESLogConsumer();
+//            logger.info("MqServiceImpl->initESLogConsumer:MQ日志中转队列消费者初始化成功！");
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -181,48 +181,48 @@ public class MqServiceImpl implements MqService {
 
 
     //日志队列 中转日志插入es 消费者
-    @Override
-    public String pushEsLogConsumer() {
-        if (esLogConnect != 0) {
-            return "error";
-        }
-        try {
-            esLogConsumer.listenTopic(cpctEsLogTopic, null, new ConsumerTopicListener() {
-                @Override
-                public ConsumerTopicStatus onMessage(List<MQResult> mqResultList) {
-                    try {
-                        for (MQResult result : mqResultList) {
-                            String esLogResult = new String(result.getMessage().getBody());
-//                            esService.queryCustomerCallBack(esLogResult,result.getMessage().getMessageID(), result.getMessage().getKey());
-                            String[] split = result.getMessage().getKey().split(",");
-                            String index = null;
-                            String esType = null;
-                            String id = null;
-                            if (split.length == 2){
-                                index = split[0];
-                                esType = split[1];
-                                String resultId = ElasticsearchUtil.addData(JSONObject.parseObject(esLogResult), index, esType);
-                            }else if (split.length == 3){
-                                index = split[0];
-                                esType = split[1];
-                                id = split[2];
-                                String resultId = ElasticsearchUtil.addData(JSONObject.parseObject(esLogResult), index, esType,id);
-                            }
-
-                            logger.info("下拉成功转添加esLog日志 索引名称："+index+",id ；" + id);
-                        }
-                        return ConsumerTopicStatus.CONSUME_SUCCESS;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        logger.warn("消息签收失败"+e.getMessage());
-                        return ConsumerTopicStatus.CONSUME_SUCCESS;
-                    }
-                }
-            });
-        } catch (MQException e) {
-            e.printStackTrace();
-            System.out.println("push consumer 出现异常" + e);
-        }
-        return "ok";
-    }
+//    @Override
+//    public String pushEsLogConsumer() {
+//        if (esLogConnect != 0) {
+//            return "error";
+//        }
+//        try {
+//            esLogConsumer.listenTopic(cpctEsLogTopic, null, new ConsumerTopicListener() {
+//                @Override
+//                public ConsumerTopicStatus onMessage(List<MQResult> mqResultList) {
+//                    try {
+//                        for (MQResult result : mqResultList) {
+//                            String esLogResult = new String(result.getMessage().getBody());
+////                            esService.queryCustomerCallBack(esLogResult,result.getMessage().getMessageID(), result.getMessage().getKey());
+//                            String[] split = result.getMessage().getKey().split(",");
+//                            String index = null;
+//                            String esType = null;
+//                            String id = null;
+//                            if (split.length == 2){
+//                                index = split[0];
+//                                esType = split[1];
+//                                String resultId = ElasticsearchUtil.addData(JSONObject.parseObject(esLogResult), index, esType);
+//                            }else if (split.length == 3){
+//                                index = split[0];
+//                                esType = split[1];
+//                                id = split[2];
+//                                String resultId = ElasticsearchUtil.addData(JSONObject.parseObject(esLogResult), index, esType,id);
+//                            }
+//
+//                            logger.info("下拉成功转添加esLog日志 索引名称："+index+",id ；" + id);
+//                        }
+//                        return ConsumerTopicStatus.CONSUME_SUCCESS;
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                        logger.warn("消息签收失败"+e.getMessage());
+//                        return ConsumerTopicStatus.CONSUME_SUCCESS;
+//                    }
+//                }
+//            });
+//        } catch (MQException e) {
+//            e.printStackTrace();
+//            System.out.println("push consumer 出现异常" + e);
+//        }
+//        return "ok";
+//    }
 }
