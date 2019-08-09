@@ -1016,7 +1016,7 @@ public class CamCpcServiceImpl implements CamCpcService {
 
                         //拼接返回结果
                         ruleMap.put("orderISI", params.get("reqId")); //流水号
-                        ruleMap.put("activityId", privateParams.get("activityId")); //活动编码
+                        ruleMap.put("activityId",mktCampaignDO.getInitId().toString()); //活动编码
                         ruleMap.put("activityName", privateParams.get("activityName")); //活动名称
                         ruleMap.put("activityType", privateParams.get("activityType")); //活动类型
                         ruleMap.put("activityStartTime", privateParams.get("activityStartTime")); //活动开始时间
@@ -1025,12 +1025,15 @@ public class CamCpcServiceImpl implements CamCpcService {
                         ruleMap.put("orderPriority", privateParams.get("orderPriority")); //活动优先级
                         ruleMap.put("integrationId", privateParams.get("integrationId")); //集成编号（必填）
                         ruleMap.put("accNbr", privateParams.get("accNbr")); //业务号码（必填）
-                        ruleMap.put("policyId", strategyConfId.toString()); //策略编码
+                        ruleMap.put("policyId", mktStrategyConfDO.getInitId().toString()); //策略编码
                         ruleMap.put("policyName", strategyConfName); //策略名称
-                        ruleMap.put("ruleId", ruleId.toString()); //规则编码
+                        ruleMap.put("ruleId",  mktStrategyConfRuleDO.getInitId().toString()); //规则编码
                         ruleMap.put("ruleName", ruleName); //规则名称
                         ruleMap.put("promIntegId", promIntegId); // 销售品实例ID
-                        ruleMap.put("areaId", context.get("AREA_ID")); // 落地网格
+                        if (context.get("AREA_ID") != null) {
+                            ruleMap.put("areaId", context.get("AREA_ID")); // 落地网格
+                        }
+
 
                         //查询销售品列表
                         if (productStr != null && !"".equals(productStr)) {
@@ -1170,7 +1173,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                     ruleMap.put("ruleId", ruleId.toString()); //规则编码
                     ruleMap.put("ruleName", ruleName); //规则名称
                     ruleMap.put("promIntegId", promIntegId); // 销售品实例ID
-                    ruleMap.put("areaId", context.get("AREA_ID")); // 落地网格
+                    if (context.get("AREA_ID") != null) {
+                        ruleMap.put("areaId", context.get("AREA_ID")); // 落地网格
+                    }
 
 
                     //查询销售品列表

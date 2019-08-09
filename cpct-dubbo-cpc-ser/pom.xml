@@ -9,8 +9,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>cpct-dubbo-ser</artifactId>
-    <name>cpct-dubbo-ser</name>
+    <artifactId>cpct-dubbo-cpc-ser</artifactId>
+    <name>cpct-dubbo-cpc-ser</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -165,6 +165,12 @@
             <id>gray-pre</id>
             <properties>
                 <spring.profiles.active>gray-pre</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>pt</id>
+            <properties>
+                <spring.profiles.active>pt</spring.profiles.active>
             </properties>
         </profile>
     </profiles>

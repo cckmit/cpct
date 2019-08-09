@@ -14,6 +14,6 @@ public class CamDubboSerServerApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(CamDubboSerServerApplication.class, args);
-        logger.info("***********CPCT_CAM_DUBBO_SER_SERVER****启动**********");
+        logger.info("***********CPCT_CAM_DUBBO_SERVER****启动**********");
     }
 }

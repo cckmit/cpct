@@ -1535,7 +1535,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     }
 
                 }
-
+                if(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)){
+                    //活动发布若是清单活动重新试算全量清单
+                    UserListTemp(mktCampaignId, mktCampaignDO);
+                }
                 // 发布调整的活动，下线源活动
                 if(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)
                         && !mktCampaignId.equals(initId)){
@@ -1671,6 +1674,11 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         try {
             // 获取当前活动信息
             MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
+            if (mktCampaignDO!=null && mktCampaignDO.getStatusCd().equals(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode())){
+                mktCampaignMap.put("resultCode", CommonConstant.CODE_FAIL);
+                mktCampaignMap.put("resultMsg", "已发布活动请勿重复发布！");
+                return mktCampaignMap;
+            }
             // 获取当前活动标识
             Long parentMktCampaignId = mktCampaignDO.getMktCampaignId();
             // 获取当前活动名称
@@ -1706,6 +1714,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     Long childMktCampaignId = mktCampaignDO.getMktCampaignId();
                     // 活动编码
                     mktCampaignDO.setMktActivityNbr("MKT" + String.format("%06d", childMktCampaignId));
+                    // initId
+                    mktCampaignDO.setInitId(childMktCampaignId);
                     mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
 
                     childMktCampaignIdList.add(childMktCampaignId);
@@ -1794,8 +1804,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     }
                 }.start();
             }
-            //活动发布若是清单活动重新试算全量清单
-            UserListTemp(mktCampaignId, mktCampaignDO);
         } catch (Exception e) {
             logger.error("[op:MktCampaignServiceImpl] failed to publishMktCampaign by mktCampaignId = {}, Exception = ", mktCampaignId, e);
             mktCampaignMap.put("resultCode", CommonConstant.CODE_FAIL);
@@ -1821,7 +1829,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     Map<String,Object> params = new HashMap<>();
                     List<Integer> arrayList = new ArrayList<>();
                     arrayList.add(Integer.valueOf(mktCampaignId.toString()));
-                    params.put("userListCam","USER_LIST_TEMP");
+                    params.put("userListCam","USER_LIST_CAM");
                     params.put("idList",arrayList);
                     trialProdService.campaignIndexTask(params);
                 }
@@ -1868,7 +1876,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                             requestInfo.setContName(o.getString("name"));
                             requestInfo.setDeptCode(o.getString("department"));
                             requestInfo.setCreateStaff(o.getLong("employeeId"));   //创建人,目前指定到承接人的工号
-                            mktCampaignDO.setCreateStaff(o.getLong("employeeId"));
+                            mktCampaignDO.setCreateStaff(o.getLong("systemUserId"));
                             mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
                             break;
                         }
@@ -2099,8 +2107,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             // 将新活动数据入库
             mktCampaignDO.setMktCampaignId(null);
             mktCampaignDO.setInitId(mktCampaignDO.getInitId());
-            mktCampaignDO.setCreateStaff(UserUtil.loginId());
-            mktCampaignDO.setCreateDate(new Date());
             mktCampaignDO.setUpdateStaff(UserUtil.loginId());
             mktCampaignDO.setUpdateDate(new Date());
             mktCampaignDO.setStatusCd(StatusCode.STATUS_CODE_PRE_PUBLISHED.getStatusCode());
