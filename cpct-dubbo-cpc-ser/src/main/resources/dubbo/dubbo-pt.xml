@@ -9,8 +9,8 @@
     <!-- 提供方应用信息，用于计算依赖关系 -->
     <dubbo:application name="00.1083"/>
 
-    <dubbo:registry id="esb3" protocol="dubbo" address="134.96.249.149:8001"/>
-    <dubbo:registry id="esb2" protocol="dubbo" address="134.96.161.20:8001"/>
+    <dubbo:registry id="esb3" protocol="dubbo" address="134.96.180.23:9001"/>
+    <dubbo:registry id="esb2" protocol="dubbo" address="134.96.180.23:9001"/>
 
     <!-- 暴露服务 -->
     <dubbo:protocol name="dubbo" port="30828"/>
@@ -18,27 +18,27 @@
 
     <!-- 订阅 -->
     <!-- cpc计算协同中心回调 -->
-    <dubbo:reference interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService" id="iContactTaskReceiptService"
+    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService" id="iContactTaskReceiptService"
                      version="1.0" retries="0" check="false">
         <dubbo:method name="contactTaskReceipt" servicecode="00.1079.CPCResultFeedback" timeout="20000"/>
     </dubbo:reference>
 
     <!-- 因子实时查询 -->
-    <dubbo:reference interface="com.zjpii.biz.serv.YzServ" id="yzServ"
+    <dubbo:reference registry="esb3" interface="com.zjpii.biz.serv.YzServ" id="yzServ"
                      version="1.0" retries="0" check="false">
         <dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="10000"/>
     </dubbo:reference>
 
 
     <!-- 事件接入活动任务注册 1.0 -->
-    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.CamApiSerService" ref="camApiSerServiceImpl" version="1.0" >
-        <dubbo:method name="ActivitySerTask" servicecode="00.1083.ActivityTask_zsc" timeout="20000"/>
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.CamApiSerService" ref="camApiSerServiceImpl" version="1.0" >
+        <dubbo:method name="ActivitySerTask" servicecode="00.1083.ActivityTask_zsc" timeout="10000"/>
     </dubbo:service>
-
 
     <dubbo:reference registry="esb2" id="ctgCacheAssetService"  interface="com.ctzj.bss.customer.data.carrier.outbound.api.CtgCacheAssetService" version="1.0" retries="0" check="false">
         <dubbo:method name="queryCachedAssetDetailByIntegId" servicecode="33.1001.queryCachedAssetDetailByIntegId"  timeout="10000"/>
     </dubbo:reference>
+
 
 
     <!-- 查询销售品实例缓存实体-->
@@ -61,6 +61,5 @@
     <dubbo:reference registry="esb3" id="iCacheProdIndexQryService" interface="com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheProdIndexQryService" version="1.0" retries="0" check="false">
         <dubbo:method name="qryProdInstIndex2" servicecode="00.1074.qryProdInstIndex2"  timeout="10000"/>
     </dubbo:reference>
-
 
 </beans>
