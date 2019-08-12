@@ -297,5 +297,8 @@
         </foreach>
     </select>
 
+    <update id="updateExpression2" parameterType="java.lang.String" >
+        UPDATE filter_rule SET EXPRESSION = #{expression,jdbcType=VARCHAR} WHERE RULE_ID = #{filterRule}
+    </update>
 
 </mapper>

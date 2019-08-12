@@ -641,15 +641,23 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         return result;
     }
 
-
     //下发文件
     private Map<String, Object> importUserList(Map<String, Object> result, TrialOperationVO operation, Long ruleId, String batchNumSt, List<Map<String, Object>> customerList, List<Map<String, Object>> labelList) {
         final TrialOperationVOES request = getTrialOperationVOES(operation, ruleId, batchNumSt, labelList);
-        System.out.println(JSON.toJSONString(request));
+        /*System.out.println(JSON.toJSONString(request));*/
         new Thread(){
             public void run(){
                 try {
-                    TrialResponseES responseES = esService.issueByFile(request);
+                    /*TrialResponseES responseES = esService.issueByFile(request);*/
+                    List<FilterRule> productFilter = new ArrayList<>();
+                    List<String> typeList = new ArrayList<>();
+                    typeList.add("3000");
+                    List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(operation.getCampaignId(), typeList);
+                    if (filterRuleList != null && !filterRuleList.isEmpty()) {
+                        productFilter = filterRuleList;
+                    }
+                    TrialOperation trialOperation = BeanUtil.create(operation, new TrialOperation());
+                    importListMQ2EsService(request, customerList, productFilter, batchNumSt, ruleId.toString(), trialOperation);
                 }catch (Exception e){
                     e.printStackTrace();
                     logger.info("导入清单下发失败");
@@ -664,15 +672,14 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private TrialOperationVOES getTrialOperationVOES(TrialOperationVO operation, Long ruleId, String batchNumSt, List<Map<String, Object>> labelList) {
         redisUtils_es.set("LABEL_DETAIL_" + batchNumSt, labelList);
         MktCampaignDO campaignDO = campaignMapper.selectByPrimaryKey(operation.getCampaignId());
-        MktStrategyConfDO strategyConfDO = strategyConfMapper.selectByPrimaryKey(operation.getStrategyId());
-
+        /*MktStrategyConfDO strategyConfDO = strategyConfMapper.selectByPrimaryKey(operation.getStrategyId());*/
         final TrialOperationVOES request = BeanUtil.create(operation, new TrialOperationVOES());
         request.setBatchNum(Long.valueOf(batchNumSt));
         request.setCampaignType(campaignDO.getMktCampaignType());
         request.setLanId(campaignDO.getLanId());
         request.setCampaignName(campaignDO.getMktCampaignName());
         request.setCamLevel(campaignDO.getCamLevel());
-        request.setStrategyName(strategyConfDO.getMktStrategyConfName());
+        request.setStrategyName(operation.getStrategyName());
         // 获取创建人员code
         request.setStaffCode(getCreater(campaignDO.getCreateStaff()) == null ? "null" : getCreater(campaignDO.getCreateStaff()));
 
@@ -858,7 +865,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             new MyThread(index) {
                 public void run() {
                     try {
-                        Long mqSum = 0L;
+                        /*Long mqSum = 0L;*/
                         List<FilterRule> productFilter = new ArrayList<>();
                         final TrialOperationVOES request = getTrialOperationVOES(operation, ruleId, batchNumSt, labelList);
                         List<Map<String, Object>> customerList = new ArrayList<>();
@@ -882,15 +889,15 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         for (int j = 3; j < dataVO.contentList.size(); j++) {
                             List<String> data = Arrays.asList(dataVO.contentList.get(j).split("\\|@\\|"));
                             Object[] objects = data.toArray();
-                            if (flag && (this.getIndex() > data.size() || data.get(this.getIndex()) == null || data.get(this.getIndex()).equals(""))) {
+                            if (flag && (this.getIndex() >= data.size() ? true:(data.get(this.getIndex()) == null || data.get(this.getIndex()).equals("")))) {
                                 // 记录日志，退出线程
-                                // addLog2Es(batchNumSt, "导入清单第"+ j +"行接单人无数据");
+                                addLog2Es(batchNumSt, "导入清单存在接单人无数据");
                                 TrialOperation record = new TrialOperation();
                                 record.setId(Long.valueOf(insertId));
                                 record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
                                 record.setRemark("清单导入数据错误");
                                 int i = trialOperationMapper.updateByPrimaryKey(record);
-                                throw new RuntimeException("导入清单第" + j + "行接单人无数据");
+                                throw new RuntimeException("导入清单第" + (j + 1) + "行接单人无数据");
                             }
                             Map<String, Object> customers = new HashMap<>();
                             boolean check = true;
@@ -935,35 +942,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             }
                             customerList.add(customers);
                         }
-                        int x = customerList.size() / 1000;
-                        for (int i = 0; i <= x; i++) {
-                            List<Map<String, Object>> newSublist = new ArrayList();
-                            if (i == x) {
-                                newSublist = customerList.subList(i * 1000, customerList.size());
-                            } else {
-                                newSublist = customerList.subList(i * 1000, (i + 1) * 1000);
-                            }
-                            // 向MQ中扔入request和customersList
-                            HashMap msgBody = new HashMap();
-                            msgBody.put("request", request);
-                            msgBody.put("customerList", newSublist);
-                            msgBody.put("productFilterList", productFilter);
-                            try {
-                                // 判断是否发送成功
-                                if (!mqService.msg2Producer(msgBody, batchNumSt, ruleId.toString()).equals("SEND_OK")) {
-                                    // 发送失败自动重发2次，如果还是失败，记录
-                                    logger.error("CTGMQ消息生产失败,batchNumSt:" + batchNumSt, msgBody);
-                                }
-                                mqSum++;
-                                msgBody = null;
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            newSublist.clear();
-                        }
-                        redisUtils_es.set("MQ_SUM_" + batchNumSt, mqSum);
-                        logger.info("导入试运算清单importUserList->customerList的数量：" + customerList.size());
-
+                        importListMQ2EsService(request, customerList, productFilter, batchNumSt, ruleId.toString(), trialOp);
                     } catch (RuntimeException e) {
                         e.printStackTrace();
                     }
@@ -982,6 +961,46 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg", "导入成功,请稍后查看结果");
         return result;
+    }
+
+    public void importListMQ2EsService(TrialOperationVOES request, List<Map<String, Object>> customerList, List<FilterRule> productFilter, String batchNumSt, String ruleId, TrialOperation operation){
+        Long mqSum = 0L;
+        boolean flag = true;
+        int x = customerList.size() / 1000;
+        for (int i = 0; i <= x; i++) {
+            List<Map<String, Object>> newSublist = new ArrayList();
+            if (i == x) {
+                newSublist = customerList.subList(i * 1000, customerList.size());
+            } else {
+                newSublist = customerList.subList(i * 1000, (i + 1) * 1000);
+            }
+            // 向MQ中扔入request和customersList
+            HashMap msgBody = new HashMap();
+            msgBody.put("request", request);
+            msgBody.put("customerList", newSublist);
+            msgBody.put("productFilterList", productFilter);
+            try {
+                // 判断是否发送成功
+                if (!mqService.msg2Producer(msgBody, batchNumSt, ruleId).equals("SEND_OK")) {
+                    // 发送失败自动重发2次，如果还是失败，记录
+                    flag = false;
+                    logger.error("CTGMQ消息生产失败,batchNumSt:" + batchNumSt, msgBody);
+                }
+                mqSum++;
+                msgBody = null;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            newSublist.clear();
+        }
+        redisUtils_es.set("MQ_SUM_" + batchNumSt, mqSum);
+        logger.info("导入试运算清单importUserList->customerList的数量：" + customerList.size());
+        /*if (flag){
+            operation.setStatusCd(TrialStatus.IMPORT_SUCCESS.getValue());
+        }else{
+            operation.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
+        }
+        trialOperationMapper.updateByPrimaryKey(operation);*/
     }
 
     private void blackList2Redis(MktCampaignDO campaign) {
@@ -1813,7 +1832,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         } else if ("7100".equals(type)) {
                             express.append("notIn");
                         }
-                        if (label.getLabelDataType().equals("1100") && tarGrpConditionDOs.get(i).getUpdateStaff()==1L){
+                        if (label.getLabelValueType().equals("1100") && tarGrpConditionDOs.get(i).getUpdateStaff()==1L){
                             String date = DateUtil.getPreDay(Integer.valueOf(tarGrpConditionDOs.get(i).getRightParam()));
                             express.append(date);
                         }else {
