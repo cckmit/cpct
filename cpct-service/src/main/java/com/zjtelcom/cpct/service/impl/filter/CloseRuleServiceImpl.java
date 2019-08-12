@@ -437,9 +437,9 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
         Sheet sheet = wb.getSheetAt(0);
         int total = sheet.getLastRowNum() + rightListId.length;
-        if(total > 100) {
+        if(total > 300) {
             maps.put("resultCode", CODE_FAIL);
-            maps.put("resultMsg", "销售品数量超过上限100个");
+            maps.put("resultMsg", "销售品数量超过上限300个");
             return maps;
         }
         for(int i=0;i<rightListId.length;i++) {

@@ -897,7 +897,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                 record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
                                 record.setRemark("清单导入数据错误");
                                 int i = trialOperationMapper.updateByPrimaryKey(record);
-                                throw new RuntimeException("导入清单第" + j + 1 + "行接单人无数据");
+                                throw new RuntimeException("导入清单第" + (j + 1) + "行接单人无数据");
                             }
                             Map<String, Object> customers = new HashMap<>();
                             boolean check = true;
@@ -964,6 +964,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     }
 
     public void importListMQ2EsService(TrialOperationVOES request, List<Map<String, Object>> customerList, List<FilterRule> productFilter, String batchNumSt, String ruleId, TrialOperation operation){
+        logger.info("导入试运算清单importUserList->customerList的数量：" + customerList.size());
         Long mqSum = 0L;
         boolean flag = true;
         int x = customerList.size() / 1000;
@@ -994,7 +995,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             newSublist.clear();
         }
         redisUtils_es.set("MQ_SUM_" + batchNumSt, mqSum);
-        logger.info("导入试运算清单importUserList->customerList的数量：" + customerList.size());
         /*if (flag){
             operation.setStatusCd(TrialStatus.IMPORT_SUCCESS.getValue());
         }else{
@@ -1150,17 +1150,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         }
 
         for (MktStrategyConfRuleDO rule : ruleList){
-            List<String> labelTypeList = injectionLabelMapper.listLabelByRuleId(rule.getMktStrategyConfRuleId());
-            if (labelTypeList == null || labelTypeList.isEmpty()){
-                result.put("resultCode", CODE_FAIL);
-                result.put("resultMsg", "请检查规则："+rule.getMktStrategyConfRuleName()+"条件配置");
-                return result;
-            }
-            if (!labelTypeList.contains("2000")){
-                result.put("resultCode", CODE_FAIL);
-                result.put("resultMsg", "规则："+rule.getMktStrategyConfRuleName()+"请至少配置一条用户级条件");
-                return result;
-            }
             String orgCheck = redisUtils.get("ORG_CHECK_"+rule.getMktStrategyConfRuleId().toString())==null ? null :redisUtils.get("ORG_CHECK_"+rule.getMktStrategyConfRuleId().toString()).toString();
             if (orgCheck!=null && orgCheck.equals("false")){
                 result.put("resultCode", CODE_FAIL);
@@ -1168,7 +1157,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 return result;
             }
         }
-
         TrialOperation trialOp = BeanUtil.create(operationVO, new TrialOperation());
         trialOp.setCampaignName(campaign.getMktCampaignName());
         trialOp.setStrategyName(strategy.getMktStrategyConfName());
@@ -1538,16 +1526,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(request.getStrategyId());
         for (MktStrategyConfRuleRelDO ruleRelDO : ruleRelList) {
             TrialOperationParamES param = getTrialOperationParamES(request, trialOperation.getBatchNum(), ruleRelDO.getMktStrategyConfRuleId(),false,null);
-            List<LabelResultES> labelResultList = param.getLabelResultList();
-            List<String> labelTypeList = new ArrayList<>();
-            for (LabelResultES la : labelResultList){
-                labelTypeList.add(la.getRightOperand());
-            }
-            if (!labelTypeList.contains("2000")){
-                result.put("resultCode", CODE_FAIL);
-                result.put("resultMsg", "规则："+param.getRuleName()+"不满足查询条件，请至少配置一条用户级标签查询条件！");
-                return result;
-            }
             paramList.add(param);
         }
         requests.setParamList(paramList);
