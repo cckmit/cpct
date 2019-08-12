@@ -30,7 +30,8 @@ public enum ConfAttrEnum {
     ISEE_AREA(500600010020L, "ISEE派单到区域"),
     ISEE_LABEL_CUSTOMER(500600010021L, "ISEE标签选择派单人"),
     ISEE_LABEL_AREA(500600010022L, "ISEE标签选择区域"),
-    EFFECTIVE_DAYS(500600010023L, "有效天数");
+    EFFECTIVE_DAYS(500600010023L, "有效天数"),
+    SERVICE_PACK(500600010024L, "服务包ID");
 
     private Long arrId;
     private String arrName;

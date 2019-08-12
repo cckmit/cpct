@@ -15,6 +15,7 @@ import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
 import com.zjtelcom.cpct.dao.filter.CloseRuleMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper;
+import com.zjtelcom.cpct.dao.grouping.ServicePackageMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
@@ -54,6 +55,7 @@ import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.impl.MqServiceImpl;
+import com.zjtelcom.cpct.service.org.OrgTreeService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.service.thread.MyThread;
 import com.zjtelcom.cpct.util.*;
@@ -143,6 +145,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private MqService mqService;
     @Autowired
     private MktCamDisplayColumnRelMapper mktCamDisplayColumnRelMapper;
+    @Autowired
+    private ServicePackageMapper servicePackageMapper;
 
     /**
      * 销售品service
@@ -170,6 +174,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private CloseRuleMapper closeRuleMapper;
     @Autowired(required = false)
     private EsServiceInfo esServiceInfo;
+    @Autowired
+    private OrgTreeService orgTreeService;
 
 
     //抽样展示全量试算记录
@@ -826,6 +832,15 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     labelList.add(label);
                 }
             }
+            if (attrList.contains(SERVICE_PACK.getArrId())){
+                if (!labelEngNameList.contains("AREA")){
+                    Map<String,Object> label = new HashMap<>();
+                    label.put("code","AREA");
+                    label.put("name","派单区域");
+                    label.put("labelType","1200");
+                    labelList.add(label);
+                }
+            }
             redisUtils.set("LABEL_DETAIL_"+batchNumSt,labelList);
 
             if (labelList.size() > 87) {
@@ -833,7 +848,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 result.put("resultMsg", "扩展字段不能超过87个");
                 return result;
             }
-            List<MktStrategyCloseRuleRelDO> closeRuleRelDOS = strategyCloseRuleRelMapper.selectRuleByStrategyId(campaign.getMktCampaignId());
+            /*List<MktStrategyCloseRuleRelDO> closeRuleRelDOS = strategyCloseRuleRelMapper.selectRuleByStrategyId(campaign.getMktCampaignId());
             //todo 关单规则配置信息
             if (closeRuleRelDOS!=null && !closeRuleRelDOS.isEmpty()){
                 List<Map<String,Object>> closeRule = new ArrayList<>();
@@ -848,7 +863,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     }
                 }
                 redisUtils_es.set("CLOSE_RULE_"+campaign.getMktCampaignId(),closeRule);
-            }
+            }*/
             TrialOperation trialOp = BeanUtil.create(operation, new TrialOperation());
             trialOp.setCampaignName(campaign.getMktCampaignName());
             //当清单导入时 strategyId name 存储规则信息
@@ -862,6 +877,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             Long insertId = trialOp.getId();
             op = trialOp;
             int size = dataVO.contentList.size() - 3;
+            Long landId = orgTreeService.getLandIdBySession();
             new MyThread(index) {
                 public void run() {
                     try {
@@ -931,7 +947,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                     check = false;
                                     break;
                                 }
-                                if (codeList[x].equals("LATN_ID") && (value.contains("null") || value.equals(""))) {
+                                if (codeList[x].equals("LATN_ID") && (value.contains("null") || value.equals("") || !value.equals(landId == null?"":landId))) {
                                     check = false;
                                     break;
                                 }

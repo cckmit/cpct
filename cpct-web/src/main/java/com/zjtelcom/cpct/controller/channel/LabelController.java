@@ -599,4 +599,18 @@ public class LabelController extends BaseController {
             return result;
         }
     }
+
+    @PostMapping("")
+    public Map<String,Object> servicePack (@RequestBody Map<String,String> params) {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            return labelService.servicePack(params.get("渠道属性（服务包id）"));
+        } catch (Exception e) {
+            logger.error("[op:LabelController] fail to queryDistributeLabel", e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to queryDistributeLabel");
+            return result;
+        }
+    }
+
 }
