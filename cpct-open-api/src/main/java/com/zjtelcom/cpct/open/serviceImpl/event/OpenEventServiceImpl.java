@@ -84,7 +84,7 @@ public class OpenEventServiceImpl extends BaseService implements OpenEventServic
 
             //新增事件采集项
             List<OpenEventItem> openEventItems = openEvent.getEventItems();
-            if(openEventItems.size() > 0) {
+            if(openEventItems != null && openEventItems.size() > 0) {
                 for (OpenEventItem openEventItem : openEventItems) {
                     if (!openEventItem.getActType().equals("ADD")) {
                         resultObject.put("events", events);
@@ -108,7 +108,7 @@ public class OpenEventServiceImpl extends BaseService implements OpenEventServic
 
             //新增事件匹配规则
             List<OpenEventMatchRul> openEventMatchRuls = openEvent.getEventMatchRuls();
-            if(openEventMatchRuls.size() > 0) {
+            if(openEventMatchRuls != null && openEventMatchRuls.size() > 0) {
                 for (OpenEventMatchRul openEventMatchRul : openEventMatchRuls) {
                     if (!openEventMatchRul.getActType().equals("ADD")) {
                         resultObject.put("events", events);
@@ -152,7 +152,7 @@ public class OpenEventServiceImpl extends BaseService implements OpenEventServic
 
             //新增事件关系
             List<OpenEventRel> openEventRels = openEvent.getEventRels();
-            if(openEventRels.size() > 0) {
+            if(openEventRels != null && openEventRels.size() > 0) {
                 for (OpenEventRel openEventRel : openEventRels) {
                     EventRel eventRel = BeanUtil.create(openEventRel, new EventRel());
                     eventRel.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
