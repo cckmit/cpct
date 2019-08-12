@@ -79,7 +79,6 @@ ctg:
 pagehelper:
   reasonable: true   # 禁用合理化时，如果pageNum<1或pageNum>pages会返回空数据
 
-
 #事件接入线程（活动校验部分）
 thread:
   maxPoolSize: 20
@@ -87,5 +86,3 @@ thread:
 #服务事件默认固定命中标签
 table:
   infallible: CPCP_CAM_DEFAULT
-
-

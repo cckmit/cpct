@@ -172,10 +172,18 @@ public class TrialProdServiceImpl implements TrialProdService {
         for (Integer id : idList){
             MktCampaignDO cam = campaignMapper.selectByPrimaryKey(Long.valueOf(id.toString()));
             if (cam!=null ){
-                if (userListCam.equals("USER_LIST_CAM")&& mktCamCodeList.contains(cam.getInitId())){
-                    campaignList.add(cam);
+                if (userListCam.equals("USER_LIST_CAM")&& mktCamCodeList.contains(cam.getInitId().toString())){
+                    MktCampaignDO campaign = campaignMapper.selectByInitId(cam.getInitId());
+                    if (campaign!=null){
+                        System.out.println("清单方案活动开始："+cam.getMktCampaignName()+cam.getMktCampaignId());
+                        campaignList.add(campaign);
+                    }
                 }else if (perCampaign.equals("PER_CAMPAIGN") || userListCam.equals("BIG_DATA_TEMP")){
-                    campaignList.add(cam);
+                    MktCampaignDO campaign = campaignMapper.selectByInitId(cam.getInitId());
+                    if (campaign!=null){
+                        System.out.println("周期性活动-大数据开始："+userListCam+"  "+cam.getMktCampaignName()+cam.getMktCampaignId());
+                        campaignList.add(campaign);
+                    }
                 }
             }
         }

@@ -193,6 +193,12 @@
                 <spring.profiles.active>gray-pre</spring.profiles.active>
             </properties>
         </profile>
+        <profile>
+            <id>pt</id>
+            <properties>
+                <spring.profiles.active>pt</spring.profiles.active>
+            </properties>
+        </profile>
     </profiles>
 
     <properties>

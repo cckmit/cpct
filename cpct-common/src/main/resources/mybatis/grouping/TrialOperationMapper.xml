@@ -35,18 +35,41 @@
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.grouping.TrialOperation">
     update trial_operation
-    set CAMPAIGN_ID = #{campaignId,jdbcType=BIGINT},
-    CAMPAIGN_NAME = #{campaignName,jdbcType=VARCHAR},
-    STRATEGY_ID = #{strategyId,jdbcType=BIGINT},
-    STRATEGY_NAME = #{strategyName,jdbcType=VARCHAR},
-    BATCH_NUM = #{batchNum,jdbcType=BIGINT},
-    STATUS_CD = #{statusCd,jdbcType=VARCHAR},
-    CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
-    UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
-    CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
-    STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
-    UPDATE_DATE = now(3),
-    REMARK = #{remark,jdbcType=VARCHAR}
+    set
+    <if test="campaignId != null and campaignId != ''">
+      CAMPAIGN_ID = #{campaignId,jdbcType=BIGINT},
+    </if>
+    <if test="campaignName != null and campaignName != ''">
+      CAMPAIGN_NAME = #{campaignName,jdbcType=VARCHAR},
+    </if>
+    <if test="strategyId != null and strategyId != ''">
+      STRATEGY_ID = #{strategyId,jdbcType=BIGINT},
+    </if>
+    <if test="strategyName != null and strategyName != ''">
+      STRATEGY_NAME = #{strategyName,jdbcType=VARCHAR},
+    </if>
+    <if test="batchNum != null and batchNum != ''">
+      BATCH_NUM = #{batchNum,jdbcType=BIGINT},
+    </if>
+    <if test="statusCd != null and statusCd != ''">
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+    </if>
+    <if test="createStaff != null and createStaff != ''">
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+    </if>
+    <if test="updateStaff != null and updateStaff != ''">
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+    </if>
+    <if test="createDate != null">
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+    </if>
+    <if test="statusDate != null">
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+    </if>
+    <if test="remark != null and remark != ''">
+      REMARK = #{remark,jdbcType=VARCHAR},
+    </if>
+    UPDATE_DATE = now(3)
     where ID = #{id,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">

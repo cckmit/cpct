@@ -52,3 +52,24 @@ redisConfig:
    port: 41601
    database: 4970
    password: bss_cpcp_poczsc_user#Bsscpc!z3
+
+
+ctg:
+  namesrvAddr: 134.108.6.29:9876;134.108.6.30:9876;134.108.6.31:9876
+  cpctGroupName: cpct_detailed_list_group_gray
+  namesrvAuthID: plca_user
+  namesrvAuthPwd: Plca!@4$r
+  consumeOrderly: false
+  instanceName: prod_cpct
+  maxMessageSize: 8242880
+  sendMaxRetryTimes: 2
+  sendMsgTimeout: 30000
+  compressMsgBodyOverHowmuch: 4098
+  clusterName: prod_cluster
+  tenantID: 2
+  cpctTopic: cpct_detailed_list_topic_gray
+
+
+  # 第四topic es日志添加队列中转
+  cpctEsLogTopic: cpct_eslog_gray
+  cpctEsLogGroup: cpct_eslog_group_gray

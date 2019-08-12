@@ -64,11 +64,12 @@ public class ProductServiceImpl implements ProductService {
                             }
                         }
                         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktStrategyCloseRuleRelDO.getStrategyId());
+                        CloseRule closeRule = closeRuleMapper.selectByPrimaryKey(filterRule1.getRuleId());
                         maps.put("closeType", offerInfo);
                         maps.put("activityId", mktCampaignDO.getInitId());
                         maps.put("closeName",filterRule1.getCloseName());
                         maps.put("closeCode",filterRule1.getCloseCode());
-                        maps.put("closeNumber",filterRule1.getExpression());
+                        maps.put("closeNumber",closeRule.getExpression());
                         activityList.add(maps);
                     }
                 }
