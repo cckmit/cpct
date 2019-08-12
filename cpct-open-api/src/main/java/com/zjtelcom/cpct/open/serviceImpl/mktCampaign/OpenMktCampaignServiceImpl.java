@@ -325,8 +325,17 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                 resultMap.put("resultObject",resultObject);
                 return resultMap;
             }
+            MktCampaignDO singleCampaign = mktCampaignMapper.selectByPrimaryKey(openMktCampaignEntity.getMktCampaignId());
+            if(singleCampaign != null) {
+                resultObject.put("mktCampaigns",mktCampaigns);
+                resultMap.put("resultCode","1");
+                resultMap.put("resultMsg","处理失败，营服活动标识"+ openMktCampaignEntity.getMktCampaignId() + "已存在");
+                resultMap.put("resultObject",resultObject);
+                return resultMap;
+            }
             //新增营服活动
             MktCampaignDO mktCampaignDO = BeanUtil.create(openMktCampaignEntity, new MktCampaignDO());
+            mktCampaignDO.setInitId(openMktCampaignEntity.getMktCampaignId());
             mktCampaignDO.setMktCampaignCategory(openMktCampaignEntity.getManageType());
             mktCampaignDO.setLanId(AreaCodeEnum.getLandIdByRegionId(mktCampaignDO.getRegionId()));
             mktCampaignDO.setStatusCd(StatusCode.STATUS_CODE_DRAFT.getStatusCode());
@@ -337,7 +346,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
 
             //新增营服活动分群规则
             List<OpenMktCamGrpRulEntity> mktCamGrpRuls = openMktCampaignEntity.getMktCamGrpRuls();
-            if(mktCamGrpRuls.size() > 0) {
+            if(mktCamGrpRuls != null && mktCamGrpRuls.size() > 0) {
                 for (OpenMktCamGrpRulEntity openMktCamGrpRulEntity : mktCamGrpRuls) {
                     if (openMktCamGrpRulEntity.getActType().equals("ADD")) {
                         resultObject.put("mktCampaigns", mktCampaigns);
@@ -377,7 +386,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
 
             //新增营服活动推荐条目
             List<OpenMktCamItemEntity> mktCamItems = openMktCampaignEntity.getMktCamItems();
-            if(mktCamItems.size() > 0) {
+            if(mktCamItems != null && mktCamItems.size() > 0) {
                 for (OpenMktCamItemEntity openMktCamItemEntity : mktCamItems) {
                     if (!openMktCamItemEntity.getActType().equals("ADD")) {
                         resultObject.put("mktCampaigns", mktCampaigns);
@@ -400,7 +409,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
 
             //新增营服活动渠道推送配置
             List<OpenMktCamChlConfEntity> mktCamChlConfDetails = openMktCampaignEntity.getMktCamChlConfDetails();
-            if(mktCamChlConfDetails.size() > 0) {
+            if(mktCamChlConfDetails != null && mktCamChlConfDetails.size() > 0) {
                 for (OpenMktCamChlConfEntity openMktCamChlConfEntity : mktCamChlConfDetails) {
                     if (!openMktCamChlConfEntity.getActType().equals("ADD")) {
                         resultObject.put("mktCampaigns", mktCampaigns);
@@ -450,7 +459,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
 
             //新增营服活动执行算法规则关联
             List<OpenMktCpcAlgorithmsRulEntity> mktCpcAlgorithmsRulDetails = openMktCampaignEntity.getMktCpcAlgorithmsRulDetails();
-            if(mktCpcAlgorithmsRulDetails.size() > 0) {
+            if(mktCpcAlgorithmsRulDetails != null && mktCpcAlgorithmsRulDetails.size() > 0) {
                 for (OpenMktCpcAlgorithmsRulEntity openMktCpcAlgorithmsRulEntity : mktCpcAlgorithmsRulDetails) {
                     if (!openMktCpcAlgorithmsRulEntity.getActType().equals("ADD")) {
                         resultObject.put("mktCampaigns", mktCampaigns);
@@ -485,7 +494,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
 
             //新增营服活动关联事件
             List<OpenEvent> mktCampaignEvts = openMktCampaignEntity.getMktCampaignEvts();
-            if(mktCampaignEvts.size() > 0) {
+            if(mktCampaignEvts != null && mktCampaignEvts.size() > 0) {
                 for (OpenEvent openEvent : mktCampaignEvts) {
                     MktCamEvtRelDO mktCamEvtRelDO = new MktCamEvtRelDO();
                     mktCamEvtRelDO.setMktCampaignId(mktCampaignDO.getMktCampaignId());
@@ -504,7 +513,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
 
             //新增营服活动渠道执行策略
             List<OpenMktStrategyEntity> mktCampaignStrategyDetails = openMktCampaignEntity.getMktCampaignStrategyDetails();
-            if(mktCampaignStrategyDetails.size() > 0) {
+            if(mktCampaignStrategyDetails != null && mktCampaignStrategyDetails.size() > 0) {
                 for (OpenMktStrategyEntity openMktStrategyEntity : mktCampaignStrategyDetails) {
                     //新增营销服务策略
                     MktStrategy mktStrategy = BeanUtil.create(openMktStrategyEntity, new MktStrategy());
