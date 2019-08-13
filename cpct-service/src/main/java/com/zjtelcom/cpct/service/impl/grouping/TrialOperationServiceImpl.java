@@ -996,7 +996,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             msgBody.put("productFilterList", productFilter);
             try {
                 // 判断是否发送成功
-                if (!mqService.msg2Producer(msgBody, batchNumSt, ruleId).equals("SEND_OK")) {
+                if (!mqService.msg2Producer(msgBody,batchNumSt, ruleId).equals("SEND_OK")) {
                     // 发送失败自动重发2次，如果还是失败，记录
                     flag = false;
                     logger.error("CTGMQ消息生产失败,batchNumSt:" + batchNumSt, msgBody);

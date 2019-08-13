@@ -29,6 +29,7 @@ public class TestServiceImpl implements TestService {
     private RedisUtils redisUtils;
     @Autowired(required = false)
     private EsService esService;
+    ExecutorService executorService = Executors.newFixedThreadPool(100);
 
     @Override
     public Map<String, Object> caculateTest() {
@@ -38,7 +39,6 @@ public class TestServiceImpl implements TestService {
         String paramValue = sysParams.get(0).getParamValue();
         trialOperation.setBatchNum(Long.valueOf(paramValue));
         String value = sysParams.get(1).getParamValue();
-        ExecutorService executorService = Executors.newFixedThreadPool(Integer.valueOf(value));
         System.out.println("当前启动线程数："+value);
         try {
             Future<Map<String, Object>> future = executorService.submit(new testTask(trialOperation));
