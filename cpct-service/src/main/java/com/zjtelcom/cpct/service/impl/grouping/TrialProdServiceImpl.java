@@ -255,7 +255,7 @@ public class TrialProdServiceImpl implements TrialProdService {
             fieldList[i] = attrValue.get(i - labelDTOList.size());
         }
         List<Long> attrList = mktCamChlConfAttrMapper.selectByCampaignId(trialOperation.getCampaignId());
-        if (attrList.contains(ISEE_CUSTOMER.getArrId()) || attrList.contains(ISEE_LABEL_CUSTOMER.getArrId())) {
+        if (attrList.contains(ISEE_CUSTOMER.getArrId()) || attrList.contains(ISEE_LABEL_CUSTOMER.getArrId()) || attrList.contains(SERVICE_PACK.getArrId())) {
             Map<String, Object> label = new HashMap<>();
             label.put("code", "SALE_EMP_NBR");
             label.put("name", "接单人号码");
