@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.elastic.service;
 import com.alibaba.fastjson.JSON;
 import com.ctg.mq.api.CTGMQFactory;
 import com.ctg.mq.api.IMQProducer;
+import com.ctg.mq.api.IMQPushConsumer;
 import com.ctg.mq.api.PropertyKeyConst;
 import com.ctg.mq.api.bean.MQMessage;
 import com.ctg.mq.api.bean.MQSendResult;

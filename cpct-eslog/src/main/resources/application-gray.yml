@@ -57,8 +57,8 @@ redisConfig:
 ctg:
   namesrvAddr: 134.108.6.29:9876;134.108.6.30:9876;134.108.6.31:9876
   cpctGroupName: cpct_detailed_list_group_gray
-  namesrvAuthID: plca_user
-  namesrvAuthPwd: Plca!@4$r
+  namesrvAuthID: cpct_user
+  namesrvAuthPwd: Cpct!@3e#
   consumeOrderly: false
   instanceName: prod_cpct
   maxMessageSize: 8242880

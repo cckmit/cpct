@@ -21,6 +21,7 @@
         <module>cpct-dubbo-label</module>
         <module>cpct-open-api</module>
         <module>cpct-count</module>
+        <module>cpct-eslog</module>
     </modules>
 
     <properties>
@@ -118,6 +119,12 @@
             <dependency>
                 <groupId>com.zjtelcom.cpct</groupId>
                 <artifactId>cpct-shiro</artifactId>
+                <version>${cpct.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.zjtelcom.cpct</groupId>
+                <artifactId>cpct-eslog</artifactId>
                 <version>${cpct.version}</version>
             </dependency>
 
