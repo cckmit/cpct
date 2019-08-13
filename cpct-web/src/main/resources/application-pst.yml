@@ -1,5 +1,6 @@
 #端口配置
 server:
+#  port: 8090
   port: 30801
 
 spring:
@@ -77,3 +78,7 @@ ctg:
   tenantID: 2
   cpctTopic: cpct_topic_import
   clientWorkerThreads: 4
+
+  # 第四topic es日志添加队列中转
+  cpctEsLogTopic: cpct_eslog_pst
+  cpctEsLogGroup: cpct_eslog_group_pst
