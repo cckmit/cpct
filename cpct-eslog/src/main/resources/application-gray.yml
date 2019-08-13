@@ -1,0 +1,75 @@
+#端口配置
+server:
+  port: 8080
+
+#数据库相关配置  cpc库
+spring:
+# 第一数据源
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://134.108.1.12:8803/smt_bss_cpc?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: cpc_user_cpct
+    password: cpc_user_cpct_prod
+
+# 第二数据源
+  datasource_prd:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://134.108.1.12:8803/smt_bss_cpc_zsc?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: cpc_user_cpct_zsc
+    password: cpc_user_cpct_zsc_prod
+
+# 第三数据源   链接cpc准生产数据库
+  datasourcethird:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://134.108.1.12:8803/smt_bss_cpc?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: cpc_user_cpct
+    password: cpc_user_cpct_prod
+
+# 第四数据源
+  datasourcefourth:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://134.108.1.12:8803/smt_bss_cpc_zsc?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: cpc_user_cpct_zsc
+    password: cpc_user_cpct_zsc_prod
+
+
+
+#redis相关配置
+  redis:
+    host: 134.96.252.170
+    port: 30305
+    password: xc.cpct
+    pool:
+      max-active: 8
+      max-wait: -1
+      max-idle: 8
+      min-idle: 0
+    timeout: 30000
+
+#集团定制的redis配置prod环境
+redisConfig:
+   ip: 134.108.0.57
+   port: 41601
+   database: 4970
+   password: bss_cpcp_poczsc_user#Bsscpc!z3
+
+
+ctg:
+  namesrvAddr: 134.108.6.29:9876;134.108.6.30:9876;134.108.6.31:9876
+  cpctGroupName: cpct_detailed_list_group_gray
+  namesrvAuthID: cpct_user
+  namesrvAuthPwd: Cpct!@3e#
+  consumeOrderly: false
+  instanceName: prod_cpct
+  maxMessageSize: 8242880
+  sendMaxRetryTimes: 2
+  sendMsgTimeout: 30000
+  compressMsgBodyOverHowmuch: 4098
+  clusterName: prod_cluster
+  tenantID: 2
+  cpctTopic: cpct_detailed_list_topic_gray
+
+
+  # 第四topic es日志添加队列中转
+  cpctEsLogTopic: cpct_eslog_gray
+  cpctEsLogGroup: cpct_eslog_group_gray
