@@ -931,6 +931,16 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                     // 过滤换行符
                                     value = value.replace("\r", "").replace("\n", "");
                                 }
+                                if (codeList[x].equals("LATN_ID") && !value.equals(landId == null?"":landId)) {
+                                    logger.info("导入清单工号地区不符=>landId:" + landId);
+                                    addLog2Es(batchNumSt, "导入清单工号地区不符");
+                                    TrialOperation record = new TrialOperation();
+                                    record.setId(Long.valueOf(insertId));
+                                    record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
+                                    record.setRemark("导入清单工号地区不符");
+                                    int i = trialOperationMapper.updateByPrimaryKey(record);
+                                    throw new RuntimeException("导入清单工号地区不符");
+                                }
                                 if (codeList[x].equals("CCUST_NAME") && (value.contains("null") || value.equals(""))) {
                                     check = false;
                                     break;
@@ -947,7 +957,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                     check = false;
                                     break;
                                 }
-                                if (codeList[x].equals("LATN_ID") && (value.contains("null") || value.equals("") || !value.equals(landId == null?"":landId))) {
+                                if (codeList[x].equals("LATN_ID") && (value.contains("null") || value.equals(""))) {
                                     check = false;
                                     break;
                                 }
