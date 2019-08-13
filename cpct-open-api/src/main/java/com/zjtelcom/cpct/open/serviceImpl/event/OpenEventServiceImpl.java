@@ -95,7 +95,9 @@ public class OpenEventServiceImpl extends BaseService implements OpenEventServic
                     }
                     EventItem eventItem = BeanUtil.create(openEventItem, new EventItem());
                     eventItem.setContactEvtId(contactEvt.getContactEvtId());
-                    eventItem.setIsNullable(Long.valueOf(openEventItem.getIsNullable()));
+                    if(openEventItem.getIsNullable() != null) {
+                        eventItem.setIsNullable(Long.valueOf(openEventItem.getIsNullable()));
+                    }
                     eventItem.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
                     eventItem.setStatusDate(openEventItem.getCreateDate());
                     eventItem.setCreateStaff(openEventItem.getCreateStaff());
