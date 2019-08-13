@@ -66,7 +66,6 @@ import com.zjtelcom.es.es.entity.model.TrialResponseES;
 import com.zjtelcom.es.es.service.EsService;
 import com.zjtelcom.es.es.service.EsServiceInfo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -171,9 +170,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private CloseRuleMapper closeRuleMapper;
     @Autowired(required = false)
     private EsServiceInfo esServiceInfo;
-
-    @Value("${ctg.cpctTopic}")
-    private String topic;
 
 
     //抽样展示全量试算记录
@@ -645,10 +641,11 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         return result;
     }
 
+
     //下发文件
     private Map<String, Object> importUserList(Map<String, Object> result, TrialOperationVO operation, Long ruleId, String batchNumSt, List<Map<String, Object>> customerList, List<Map<String, Object>> labelList) {
         final TrialOperationVOES request = getTrialOperationVOES(operation, ruleId, batchNumSt, labelList);
-        /*System.out.println(JSON.toJSONString(request));*/
+//        System.out.println(JSON.toJSONString(request));
         new Thread(){
             public void run(){
                 try {
@@ -985,7 +982,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             msgBody.put("productFilterList", productFilter);
             try {
                 // 判断是否发送成功
-                if (!mqService.msg2Producer(msgBody,topic, batchNumSt, ruleId).equals("SEND_OK")) {
+                if (!mqService.msg2Producer(msgBody, batchNumSt, ruleId).equals("SEND_OK")) {
                     // 发送失败自动重发2次，如果还是失败，记录
                     flag = false;
                     logger.error("CTGMQ消息生产失败,batchNumSt:" + batchNumSt, msgBody);
@@ -1836,7 +1833,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         } else if ("7100".equals(type)) {
                             express.append("notIn");
                         }
-                        if (label.getLabelValueType().equals("1100") && tarGrpConditionDOs.get(i).getUpdateStaff()==1L){
+                        if (label.getLabelDataType().equals("1100") && tarGrpConditionDOs.get(i).getUpdateStaff()==1L){
                             String date = DateUtil.getPreDay(Integer.valueOf(tarGrpConditionDOs.get(i).getRightParam()));
                             express.append(date);
                         }else {
