@@ -818,7 +818,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 redisUtils_es.set("DISPLAY_LABEL_" + campaign.getMktCampaignId(), fields);
             }
             List<Long> attrList = mktCamChlConfAttrMapper.selectByCampaignId(campaign.getMktCampaignId());
-            if (attrList.contains(ISEE_CUSTOMER.getArrId()) || attrList.contains(ISEE_LABEL_CUSTOMER.getArrId()) || attrList.contains(SERVICE_PACK.getArrId())){
+            if (attrList.contains(ISEE_CUSTOMER.getArrId()) || attrList.contains(ISEE_LABEL_CUSTOMER.getArrId()) || attrList.contains(SERVICE_PACKAGE.getArrId())){
                 if (!labelEngNameList.contains("SALE_EMP_NBR")){
                     Map<String,Object> label = new HashMap<>();
                     label.put("code","SALE_EMP_NBR");
@@ -1509,7 +1509,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             fieldList[i] = attrValue.get(i-labelDTOList.size());
         }
         List<Long> attrList = mktCamChlConfAttrMapper.selectByCampaignId(trialOperation.getCampaignId());
-        if (attrList.contains(ISEE_CUSTOMER.getArrId()) || attrList.contains(ISEE_LABEL_CUSTOMER.getArrId()) || attrList.contains(SERVICE_PACK.getArrId())){
+        if (attrList.contains(ISEE_CUSTOMER.getArrId()) || attrList.contains(ISEE_LABEL_CUSTOMER.getArrId()) || attrList.contains(SERVICE_PACKAGE.getArrId())){
             Map<String,Object> label = new HashMap<>();
             label.put("code","SALE_EMP_NBR");
             label.put("name","接单人号码");
@@ -1691,7 +1691,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             // 保存服务包标签到渠道属性备注中
                             List<MktCamChlConfAttr> mktCamChlConfAttrList = mktCamChlConfDetail.getMktCamChlConfAttrList();
                             for (MktCamChlConfAttr attr : mktCamChlConfAttrList) {
-                                if (ConfAttrEnum.SERVICE_PACK.getArrId().equals(attr.getAttrId())) {
+                                if (SERVICE_PACKAGE.getArrId().equals(attr.getAttrId())) {
                                     String attrValue = attr.getAttrValue();
                                     ServicePackage servicePackage = servicePackageMapper.selectByPrimaryKey(Long.valueOf(attrValue));
                                     MktCamChlConfAttrDO mktCamChlConfAttrDO = BeanUtil.create(attr, new MktCamChlConfAttrDO());
