@@ -48,10 +48,10 @@
         <dubbo:method name="addLogByBatchNum" servicecode="00.1083.addLogByBatchNum" timeout="10000"/>
     </dubbo:reference>
 
-    <!--活动信息同步大数据-->
-    <dubbo:reference registry="esb1" id="activitySyncService" interface="com.zjhcsoft.eagle.main.dubbo.service.ActivitySyncService" version="1.0">
-        <dubbo:method name="syncActivity" servicecode="33.1307.syncActivity" timeout="30000"/>
-    </dubbo:reference>
+    <!--&lt;!&ndash;活动信息同步大数据&ndash;&gt;-->
+    <!--<dubbo:reference registry="esb1" id="activitySyncService" interface="com.zjhcsoft.eagle.main.dubbo.service.ActivitySyncService" version="1.0">-->
+        <!--<dubbo:method name="syncActivity" servicecode="33.1307.syncActivity" timeout="30000"/>-->
+    <!--</dubbo:reference>-->
 
     <!-- 门户-获取用户岗位信息 -->
     <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemPostDubboService"

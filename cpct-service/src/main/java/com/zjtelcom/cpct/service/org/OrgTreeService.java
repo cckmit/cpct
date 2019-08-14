@@ -41,4 +41,6 @@ public interface OrgTreeService {
 
     Map<String,Object> fuzzyQuery(Map<String,Object> params);
 
+    Long getLandIdBySession();
+
 }

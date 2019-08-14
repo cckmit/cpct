@@ -54,6 +54,7 @@ import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.impl.MqServiceImpl;
+import com.zjtelcom.cpct.service.org.OrgTreeService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.service.thread.MyThread;
 import com.zjtelcom.cpct.util.*;
@@ -66,6 +67,7 @@ import com.zjtelcom.es.es.entity.model.TrialResponseES;
 import com.zjtelcom.es.es.service.EsService;
 import com.zjtelcom.es.es.service.EsServiceInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -144,6 +146,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Autowired
     private MktCamDisplayColumnRelMapper mktCamDisplayColumnRelMapper;
 
+    @Value("${ctg.cpctTopic}")
+    private String importTopic;
+
     /**
      * 销售品service
      */
@@ -170,7 +175,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private CloseRuleMapper closeRuleMapper;
     @Autowired(required = false)
     private EsServiceInfo esServiceInfo;
-
+    @Autowired
+    private OrgTreeService orgTreeService;
 
     //抽样展示全量试算记录
     @Override
@@ -641,10 +647,11 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         return result;
     }
 
+
     //下发文件
     private Map<String, Object> importUserList(Map<String, Object> result, TrialOperationVO operation, Long ruleId, String batchNumSt, List<Map<String, Object>> customerList, List<Map<String, Object>> labelList) {
         final TrialOperationVOES request = getTrialOperationVOES(operation, ruleId, batchNumSt, labelList);
-        /*System.out.println(JSON.toJSONString(request));*/
+//        System.out.println(JSON.toJSONString(request));
         new Thread(){
             public void run(){
                 try {
@@ -862,6 +869,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             Long insertId = trialOp.getId();
             op = trialOp;
             int size = dataVO.contentList.size() - 3;
+            Long landId = orgTreeService.getLandIdBySession();
             new MyThread(index) {
                 public void run() {
                     try {
@@ -915,6 +923,16 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                     // 过滤换行符
                                     value = value.replace("\r", "").replace("\n", "");
                                 }
+                                if (codeList[x].equals("LATN_ID") && !value.equals(landId == null?"":landId)) {
+                                    logger.info("导入清单工号地区不符=>landId:" + landId);
+                                    addLog2Es(batchNumSt, "导入清单工号地区不符");
+                                    TrialOperation record = new TrialOperation();
+                                    record.setId(Long.valueOf(insertId));
+                                    record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
+                                    record.setRemark("导入清单工号地区不符");
+                                    int i = trialOperationMapper.updateByPrimaryKey(record);
+                                    throw new RuntimeException("导入清单工号地区不符");
+                                }
                                 if (codeList[x].equals("CCUST_NAME") && (value.contains("null") || value.equals(""))) {
                                     check = false;
                                     break;
@@ -964,15 +982,16 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     }
 
     public void importListMQ2EsService(TrialOperationVOES request, List<Map<String, Object>> customerList, List<FilterRule> productFilter, String batchNumSt, String ruleId, TrialOperation operation){
+        logger.info("导入试运算清单importUserList->customerList的数量：" + customerList.size());
         Long mqSum = 0L;
         boolean flag = true;
         int x = customerList.size() / 1000;
         for (int i = 0; i <= x; i++) {
             List<Map<String, Object>> newSublist = new ArrayList();
             if (i == x) {
-                newSublist = customerList.subList(i * 1000, customerList.size());
+                newSublist = customerList.subList(0, customerList.size());
             } else {
-                newSublist = customerList.subList(i * 1000, (i + 1) * 1000);
+                newSublist = customerList.subList(0, 1000);
             }
             // 向MQ中扔入request和customersList
             HashMap msgBody = new HashMap();
@@ -981,7 +1000,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             msgBody.put("productFilterList", productFilter);
             try {
                 // 判断是否发送成功
-                if (!mqService.msg2Producer(msgBody, batchNumSt, ruleId).equals("SEND_OK")) {
+                if (!mqService.msg2Producer(msgBody,importTopic, batchNumSt, ruleId).equals("SEND_OK")) {
                     // 发送失败自动重发2次，如果还是失败，记录
                     flag = false;
                     logger.error("CTGMQ消息生产失败,batchNumSt:" + batchNumSt, msgBody);
@@ -994,7 +1013,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             newSublist.clear();
         }
         redisUtils_es.set("MQ_SUM_" + batchNumSt, mqSum);
-        logger.info("导入试运算清单importUserList->customerList的数量：" + customerList.size());
         /*if (flag){
             operation.setStatusCd(TrialStatus.IMPORT_SUCCESS.getValue());
         }else{
@@ -1832,7 +1850,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         } else if ("7100".equals(type)) {
                             express.append("notIn");
                         }
-                        if (label.getLabelValueType().equals("1100") && tarGrpConditionDOs.get(i).getUpdateStaff()==1L){
+                        if (label.getLabelDataType().equals("1100") && tarGrpConditionDOs.get(i).getUpdateStaff()==1L){
                             String date = DateUtil.getPreDay(Integer.valueOf(tarGrpConditionDOs.get(i).getRightParam()));
                             express.append(date);
                         }else {
