@@ -376,6 +376,13 @@
                 <version>1.0.0</version>
             </dependency>
 
+            <!--es服务包-->
+            <dependency>
+                <groupId>com.zjtelcom.es</groupId>
+                <artifactId>es-service-package</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+
             <!-- 自己的dubbo-server对内jar  测试用 -->
             <dependency>
                 <groupId>com.zjtelcom.cpct.dubbo</groupId>
