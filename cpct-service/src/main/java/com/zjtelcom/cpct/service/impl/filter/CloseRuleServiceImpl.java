@@ -71,6 +71,8 @@ public class CloseRuleServiceImpl implements CloseRuleService {
     private TarGrpConditionMapper tarGrpConditionMapper;
     @Autowired
     private InjectionLabelMapper injectionLabelMapper;
+    @Autowired
+    private RedisUtils_es RedisUtils_es;
 
     /**
      * 根据关单规则id集合查询过滤规则集合
@@ -415,8 +417,8 @@ public class CloseRuleServiceImpl implements CloseRuleService {
                 express.append("");
             }
         }
-        redisUtils.hset("CLOSE_RULE_EXPRESS_" + ruleId,"express", express.toString());
-        redisUtils.hset("CLOSE_RULE_EXPRESS_" + ruleId,"labelResultList", JSON.toJSONString(labelResultList));
+        RedisUtils_es.hset("CLOSE_RULE_EXPRESS_" + ruleId,"express", express.toString());
+        RedisUtils_es.hset("CLOSE_RULE_EXPRESS_" + ruleId,"labelResultList", JSON.toJSONString(labelResultList));
         return express.toString();
     }
 
@@ -435,9 +437,9 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
         Sheet sheet = wb.getSheetAt(0);
         int total = sheet.getLastRowNum() + rightListId.length;
-        if(total > 100) {
+        if(total > 300) {
             maps.put("resultCode", CODE_FAIL);
-            maps.put("resultMsg", "销售品数量超过上限100个");
+            maps.put("resultMsg", "销售品数量超过上限300个");
             return maps;
         }
         for(int i=0;i<rightListId.length;i++) {

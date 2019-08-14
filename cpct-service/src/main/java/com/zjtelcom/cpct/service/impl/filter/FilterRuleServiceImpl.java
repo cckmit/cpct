@@ -330,7 +330,14 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
                 verbalConditionMapper.insert(condition);
                 filterRule.setConditionId(condition.getConditionId());
             }
+
             filterRuleMapper.createFilterRule(filterRule);
+            if (filterRule.getFilterType()!=null && filterRule.getFilterType().equals("2000") ){
+//                addVO.setExpression("CR002");
+                String expression = CpcUtil.addZeroForNum(String.valueOf(filterRule.getRuleId()), 6);
+//                filterRule.setExpression(expression);
+                filterRuleMapper.updateExpression2(filterRule.getRuleId().toString(),"CR002"+expression);
+            }
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
@@ -473,16 +480,18 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
             String cellValue = ChannelUtil.getCellValue(cell).toString();
             if (!cellValue.equals("null")){
                 List<Offer> offerList = offerMapper.selectByCode(cellValue);
-                for(Offer offerSingle : offerList) {
-                    if (offerSingle != null) {
-                        if (!resultList.contains(offerSingle.getOfferId().toString())) {
-                            resultList.add(offerSingle.getOfferId().toString());
+                if(offerList.size() > 0) {
+                    for (Offer offerSingle : offerList) {
+                        if (offerSingle != null) {
+                            if (!resultList.contains(offerSingle.getOfferId().toString())) {
+                                resultList.add(offerSingle.getOfferId().toString());
+                            }
                         }
-                    } else {
-                        maps.put("resultCode", CODE_FAIL);
-                        maps.put("resultMsg", cellValue + "销售品不存在");
-                        return maps;
                     }
+                }else {
+                    maps.put("resultCode", CODE_FAIL);
+                    maps.put("resultMsg", cellValue + "销售品不存在");
+                    return maps;
                 }
             }
         }
