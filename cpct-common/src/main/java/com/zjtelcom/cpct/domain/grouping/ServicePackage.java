@@ -19,6 +19,8 @@ public class ServicePackage extends BaseEntity {
      */
     private String servicePackageName;
 
+    private String label;
+
     public Long getServicePackageId() {
         return servicePackageId;
     }
@@ -33,5 +35,13 @@ public class ServicePackage extends BaseEntity {
 
     public void setServicePackageName(String servicePackageName) {
         this.servicePackageName = servicePackageName;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 }

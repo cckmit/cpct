@@ -28,6 +28,7 @@ import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.GroupingVO;
+import com.zjtelcom.cpct.domain.grouping.ServicePackage;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyCloseRuleRelDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
@@ -1684,6 +1685,17 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     if(mktCamChlResult.getMktCamChlConfDetailList()!=null){
                         for (MktCamChlConfDetail mktCamChlConfDetail : mktCamChlResult.getMktCamChlConfDetailList()) {
                             mktCamChlConfList.add(mktCamChlConfDetail);
+                            // 保存服务包标签到渠道属性备注中
+                            List<MktCamChlConfAttr> mktCamChlConfAttrList = mktCamChlConfDetail.getMktCamChlConfAttrList();
+                            for (MktCamChlConfAttr attr : mktCamChlConfAttrList) {
+                                if (ConfAttrEnum.SERVICE_PACK.getArrId().equals(attr.getAttrId())) {
+                                    String attrValue = attr.getAttrValue();
+                                    ServicePackage servicePackage = servicePackageMapper.selectByPrimaryKey(Long.valueOf(attrValue));
+                                    MktCamChlConfAttrDO mktCamChlConfAttrDO = BeanUtil.create(attr, new MktCamChlConfAttrDO());
+                                    mktCamChlConfAttrDO.setRemark(servicePackage.getLabel());
+                                    mktCamChlConfAttrMapper.updateByPrimaryKey(mktCamChlConfAttrDO);
+                                }
+                            }
                         }
                     }
                 }

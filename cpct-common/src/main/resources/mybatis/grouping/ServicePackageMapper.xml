@@ -53,7 +53,7 @@
     </update>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select SERVICE_PACKAGE_ID, SERVICE_PACKAGE_NAME, REMARK, STATUS_CD, STATUS_DATE,
-    CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+    CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, LABEL
     from service_package
     where SERVICE_PACKAGE_ID = #{servicePackageId,jdbcType=BIGINT}
   </select>
