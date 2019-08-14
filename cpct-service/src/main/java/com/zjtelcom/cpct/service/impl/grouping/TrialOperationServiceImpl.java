@@ -9,6 +9,7 @@ import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboSe
 import com.mysql.jdbc.StringUtils;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
+import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.MktCamCustMapper;
 import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
@@ -181,6 +182,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private EsServiceInfo esServiceInfo;
     @Autowired
     private OrgTreeService orgTreeService;
+    @Autowired
+    private ContactChannelMapper channelMapper;
 
     //抽样展示全量试算记录
     @Override
@@ -876,7 +879,19 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             new MyThread(index) {
                 public void run() {
                     try {
-                        /*Long mqSum = 0L;*/
+                        /*MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(Long.valueOf(confRule.getEvtContactConfId()));
+                        Channel channel = channelMapper.selectByPrimaryKey(mktCamChlConfDO.getContactChlId());
+                        if ("QD00014".equals(channel.getContactChlCode())) {
+                            if (!(Arrays.asList(nameList).containsAll(labelNameList) && Arrays.asList(codeList).contains(labelEngNameList))) {
+                                addLog2Es(batchNumSt, "导入清单缺少渠道必填列");
+                                TrialOperation record = new TrialOperation();
+                                record.setId(Long.valueOf(insertId));
+                                record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
+                                record.setRemark("清单导入数据错误");
+                                int i = trialOperationMapper.updateByPrimaryKey(record);
+                                throw new RuntimeException("导入清单缺少渠道必填列");
+                            }
+                        }*/
                         List<FilterRule> productFilter = new ArrayList<>();
                         final TrialOperationVOES request = getTrialOperationVOES(operation, ruleId, batchNumSt, labelList);
                         List<Map<String, Object>> customerList = new ArrayList<>();
@@ -888,27 +903,42 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             productFilter = filterRuleList;
                         }
                         // 查看当前规则协同渠道是否为沙盘，是否配置接单人派单
+                        boolean flag2 = false;
+                        if (Arrays.asList(nameList).contains("接单人号码") && Arrays.asList(codeList).contains("SALE_EMP_NBR")) {
+                            flag2 = true;
+                        }
                         boolean flag = false;
+                        String evtContactConfId = confRule.getEvtContactConfId();
                         Map<String, Object> mktCamChlConf = mktCamChlConfService.getMktCamChlConf(Long.valueOf(confRule.getEvtContactConfId()));
                         MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConf.get("mktCamChlConfDetail");
                         List<MktCamChlConfAttr> mktCamChlConfAttrList = mktCamChlConfDetail.getMktCamChlConfAttrList();
                         for (MktCamChlConfAttr attr : mktCamChlConfAttrList) {
-                            if (attr.getAttrId().equals(ConfAttrEnum.ISEE_CUSTOMER.getArrId()) && (attr.getAttrValue() == null || attr.getAttrValue().equals(""))) {
+                            if (attr.getAttrId().equals(ISEE_CUSTOMER.getArrId()) && (attr.getAttrValue() == null || attr.getAttrValue().equals(""))) {
                                 flag = true;
                             }
                         }
                         for (int j = 3; j < dataVO.contentList.size(); j++) {
                             List<String> data = Arrays.asList(dataVO.contentList.get(j).split("\\|@\\|"));
                             Object[] objects = data.toArray();
-                            if (flag && (this.getIndex() >= data.size() ? true:(data.get(this.getIndex()) == null || data.get(this.getIndex()).equals("")))) {
-                                // 记录日志，退出线程
-                                addLog2Es(batchNumSt, "导入清单存在接单人无数据");
+                            if (flag2) {
+                                if (flag && (this.getIndex() >= data.size() ? true:(data.get(this.getIndex()) == null || data.get(this.getIndex()).equals("")))) {
+                                    // 记录日志，退出线程
+                                    addLog2Es(batchNumSt, "导入清单存在接单人无数据");
+                                    TrialOperation record = new TrialOperation();
+                                    record.setId(Long.valueOf(insertId));
+                                    record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
+                                    record.setRemark("清单导入数据错误");
+                                    int i = trialOperationMapper.updateByPrimaryKey(record);
+                                    throw new RuntimeException("导入清单第" + (j + 1) + "行接单人无数据");
+                                }
+                            } else {
+                                addLog2Es(batchNumSt, "导入清单缺少接单人必填列");
                                 TrialOperation record = new TrialOperation();
                                 record.setId(Long.valueOf(insertId));
                                 record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
                                 record.setRemark("清单导入数据错误");
                                 int i = trialOperationMapper.updateByPrimaryKey(record);
-                                throw new RuntimeException("导入清单第" + (j + 1) + "行接单人无数据");
+                                throw new RuntimeException("导入清单缺少渠道必填列");
                             }
                             Map<String, Object> customers = new HashMap<>();
                             boolean check = true;
