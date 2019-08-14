@@ -21,6 +21,7 @@
         <module>cpct-dubbo-label</module>
         <module>cpct-open-api</module>
         <module>cpct-count</module>
+        <module>cpct-eslog</module>
     </modules>
 
     <properties>
@@ -118,6 +119,12 @@
             <dependency>
                 <groupId>com.zjtelcom.cpct</groupId>
                 <artifactId>cpct-shiro</artifactId>
+                <version>${cpct.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.zjtelcom.cpct</groupId>
+                <artifactId>cpct-eslog</artifactId>
                 <version>${cpct.version}</version>
             </dependency>
 
@@ -373,6 +380,13 @@
             <dependency>
                 <groupId>com.zjpii.biz</groupId>
                 <artifactId>biz</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+
+            <!--es服务包-->
+            <dependency>
+                <groupId>com.zjtelcom.es</groupId>
+                <artifactId>es-service-package</artifactId>
                 <version>1.0.0</version>
             </dependency>
 

@@ -88,7 +88,7 @@ public class EsController {
      */
     @RequestMapping("/createIndex")
     @CrossOrigin
-    public String createIndex(HttpServletRequest request, HttpServletResponse response) {
+    public String createIndex(HttpServletRequest request, HttpServletResponse response) throws Exception {
 //        if(!ElasticsearchUtil.isIndexExist("test_hyf")) {
 //            ElasticsearchUtil.createIndex("test_hyf");
 //        }

@@ -19,6 +19,9 @@ public class ServicePackage extends BaseEntity {
      */
     private String servicePackageName;
 
+    /**
+     * 标签
+     */
     private String label;
 
     public Long getServicePackageId() {

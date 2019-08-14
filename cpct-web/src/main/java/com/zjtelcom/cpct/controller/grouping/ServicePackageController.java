@@ -34,13 +34,13 @@ public class ServicePackageController {
 
     @RequestMapping("/saveServicePackage")
     @CrossOrigin
-    public String saveServicePackage(String servicePackageName, MultipartFile multipartFile) {
+    public String saveServicePackage(String servicePackageName, MultipartFile file) {
         Map<String, Object> maps = new HashMap<>();
         try {
-            maps = servicePackageService.saveServicePackage(servicePackageName, multipartFile);
+            maps = servicePackageService.saveServicePackage(servicePackageName, file);
         } catch (Exception e) {
             logger.error("[op:ServicePackageController] fail to saveServicePackage name = {}, multipartFile = {} !" +
-                    " Exception: ", servicePackageName, JSON.toJSONString(multipartFile), e);
+                    " Exception: ", servicePackageName, JSON.toJSONString(file), e);
             return FastJsonUtils.objToJson(maps);
         }
         return FastJsonUtils.objToJson(maps);

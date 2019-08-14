@@ -67,7 +67,7 @@ redisConfig_Prd:
 # cpct_push_end_topic 1個分組 pushGroupName : cpct_push_end_consumer
 ctg:
   namesrvAddr: 134.108.11.159:9892;134.108.11.160:9892;134.108.11.161:9892
-  cpctGroupName: cpct_detailed_list_group_gray
+  cpctGroupName: cpct_file_import
   namesrvAuthID: cpct_user
   namesrvAuthPwd: cpct_user123
   consumeOrderly: false
@@ -79,7 +79,10 @@ ctg:
   clusterName: pst_crm_mq
   tenantID: 2
   clientWorkerThreads: 4
-  cpctTopic: cpct_detailed_list_topic_gray
+  cpctTopic: cpct_topic_import
+
+  cpctEsLogTopic: cpct_eslog_pst
+  cpctEsLogGroup: cpct_eslog_group_pst
 
 pagehelper:
   reasonable: true   # 禁用合理化时，如果pageNum<1或pageNum>pages会返回空数据

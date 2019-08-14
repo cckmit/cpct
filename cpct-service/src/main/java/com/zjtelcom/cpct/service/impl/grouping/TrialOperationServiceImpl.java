@@ -69,6 +69,7 @@ import com.zjtelcom.es.es.entity.model.TrialResponseES;
 import com.zjtelcom.es.es.service.EsService;
 import com.zjtelcom.es.es.service.EsServiceInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -149,6 +150,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Autowired
     private ServicePackageMapper servicePackageMapper;
 
+    @Value("${ctg.cpctTopic}")
+    private String importTopic;
+
     /**
      * 销售品service
      */
@@ -177,7 +181,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private EsServiceInfo esServiceInfo;
     @Autowired
     private OrgTreeService orgTreeService;
-
 
     //抽样展示全量试算记录
     @Override
@@ -840,7 +843,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 result.put("resultMsg", "扩展字段不能超过87个");
                 return result;
             }
-            /*List<MktStrategyCloseRuleRelDO> closeRuleRelDOS = strategyCloseRuleRelMapper.selectRuleByStrategyId(campaign.getMktCampaignId());
+            List<MktStrategyCloseRuleRelDO> closeRuleRelDOS = strategyCloseRuleRelMapper.selectRuleByStrategyId(campaign.getMktCampaignId());
             //todo 关单规则配置信息
             if (closeRuleRelDOS!=null && !closeRuleRelDOS.isEmpty()){
                 List<Map<String,Object>> closeRule = new ArrayList<>();
@@ -855,7 +858,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     }
                 }
                 redisUtils_es.set("CLOSE_RULE_"+campaign.getMktCampaignId(),closeRule);
-            }*/
+            }
             TrialOperation trialOp = BeanUtil.create(operation, new TrialOperation());
             trialOp.setCampaignName(campaign.getMktCampaignName());
             //当清单导入时 strategyId name 存储规则信息
@@ -1000,7 +1003,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             msgBody.put("productFilterList", productFilter);
             try {
                 // 判断是否发送成功
-                if (!mqService.msg2Producer(msgBody, batchNumSt, ruleId).equals("SEND_OK")) {
+                if (!mqService.msg2Producer(msgBody,importTopic, batchNumSt, ruleId).equals("SEND_OK")) {
                     // 发送失败自动重发2次，如果还是失败，记录
                     flag = false;
                     logger.error("CTGMQ消息生产失败,batchNumSt:" + batchNumSt, msgBody);
@@ -1861,7 +1864,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         } else if ("7100".equals(type)) {
                             express.append("notIn");
                         }
-                        if (label.getLabelValueType().equals("1100") && tarGrpConditionDOs.get(i).getUpdateStaff()==1L){
+                        if (label.getLabelDataType().equals("1100") && tarGrpConditionDOs.get(i).getUpdateStaff()==1L){
                             String date = DateUtil.getPreDay(Integer.valueOf(tarGrpConditionDOs.get(i).getRightParam()));
                             express.append(date);
                         }else {
