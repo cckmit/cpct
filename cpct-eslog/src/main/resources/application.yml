@@ -1,6 +1,6 @@
 
 elasticsearch:
-  ip: 134.108.6.161
+  ip: 134.108.3.30
   port: 9300
   pool: 5
   cluster.name: my-application1
