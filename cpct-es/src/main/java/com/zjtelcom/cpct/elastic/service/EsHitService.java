@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface EsHitService {
 
-    void add();
+    void add() throws Exception;
 
     void save(JSONObject jsonObject,String indexName);
 

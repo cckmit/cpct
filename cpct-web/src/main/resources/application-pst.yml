@@ -1,5 +1,6 @@
 #端口配置
 server:
+#  port: 8090
   port: 30801
 
 spring:
@@ -64,7 +65,6 @@ sync:
 ctg:
   namesrvAddr: 134.108.11.159:9892;134.108.11.160:9892;134.108.11.161:9892
   cpctGroupName: cpct_file_import
-  cpctGroupName2: cpct_file_import2
   namesrvAuthID: cpct_user
   namesrvAuthPwd: cpct_user123
   consumeOrderly: false
@@ -77,3 +77,7 @@ ctg:
   tenantID: 2
   cpctTopic: cpct_topic_import
   clientWorkerThreads: 4
+
+  # 第四topic es日志添加队列中转
+  cpctEsLogTopic: cpct_eslog_pst
+  cpctEsLogGroup: cpct_eslog_group_pst

@@ -13,6 +13,7 @@ import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.channel.Organization;
 import com.zjtelcom.cpct.domain.org.OrgTree;
 import com.zjtelcom.cpct.domain.system.SysParams;
+import com.zjtelcom.cpct.enums.AreaCodeEnum;
 import com.zjtelcom.cpct.enums.ORG2RegionId;
 import com.zjtelcom.cpct.exception.SystemException;
 import com.zjtelcom.cpct.service.org.OrgTreeService;
@@ -427,4 +428,38 @@ public class OrgTreeServiceImpl implements OrgTreeService{
         map.put("page",pageInfo);
         return map;
     }
+
+    @Override
+    public Long getLandIdBySession () {
+        Long orgId = null;
+        SystemUserDto user = BssSessionHelp.getSystemUserDto();
+        List<Map<String, Object>> staffOrgId = organizationMapper.getStaffOrgId(user.getStaffId());
+        if (!staffOrgId.isEmpty()){
+            for (Map<String, Object> map : staffOrgId) {
+                Object orgDivision = map.get("orgDivision");
+                Object orgId1 = map.get("orgId");
+                if (orgDivision!=null){
+                    if (orgDivision.toString().equals("30")) {
+                        orgId = Long.valueOf(orgId1.toString());
+                        break;
+                    }else if (orgDivision.toString().equals("20")){
+                        orgId = Long.valueOf(orgId1.toString());
+                        break;
+                    }else if (orgDivision.toString().equals("10")){
+                        orgId = Long.valueOf(orgId1.toString());
+                        break;
+                    }
+                }
+            }
+        }
+        Organization organization = organizationMapper.selectByPrimaryKey(orgId);
+        if (organization != null) {
+            Long regionId = organization.getRegionId();
+            Long latnId = AreaCodeEnum.getLatnIdByRegionId(regionId);
+            return latnId;
+        }
+        return null;
+    }
+
+
 }
