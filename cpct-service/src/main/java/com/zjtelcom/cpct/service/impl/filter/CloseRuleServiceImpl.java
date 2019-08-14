@@ -71,6 +71,8 @@ public class CloseRuleServiceImpl implements CloseRuleService {
     private TarGrpConditionMapper tarGrpConditionMapper;
     @Autowired
     private InjectionLabelMapper injectionLabelMapper;
+    @Autowired
+    private RedisUtils_es RedisUtils_es;
 
     /**
      * 根据关单规则id集合查询过滤规则集合
@@ -415,8 +417,8 @@ public class CloseRuleServiceImpl implements CloseRuleService {
                 express.append("");
             }
         }
-        redisUtils.hset("CLOSE_RULE_EXPRESS_" + ruleId,"express", express.toString());
-        redisUtils.hset("CLOSE_RULE_EXPRESS_" + ruleId,"labelResultList", JSON.toJSONString(labelResultList));
+        RedisUtils_es.hset("CLOSE_RULE_EXPRESS_" + ruleId,"express", express.toString());
+        RedisUtils_es.hset("CLOSE_RULE_EXPRESS_" + ruleId,"labelResultList", JSON.toJSONString(labelResultList));
         return express.toString();
     }
 
