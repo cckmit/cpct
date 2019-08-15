@@ -805,8 +805,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 fields.add(attr);
             }
             // 服务包添加查询字段
-            List<String> attrRemark = mktCamChlConfAttrMapper.selectAttrLabelRemarkByCampaignId(campaign.getMktCampaignId());
-            for (String s : attrRemark) {
+            List<String> labels = mktCamChlConfAttrMapper.selectAttrLabelRemarkByCampaignId(campaign.getMktCampaignId());
+            for (String s : labels) {
                 fields.add(s);
             }
             List<Map<String, Object>> displayList = displayLabel(campaign);
@@ -880,7 +880,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             Long insertId = trialOp.getId();
             op = trialOp;
             int size = dataVO.contentList.size() - 3;
-            Long landId = orgTreeService.getLandIdBySession();
+            /*Long landId = orgTreeService.getLandIdBySession();*/
             new MyThread(index) {
                 public void run() {
                     try {
@@ -961,7 +961,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                     // 过滤换行符
                                     value = value.replace("\r", "").replace("\n", "");
                                 }
-                                if (codeList[x].equals("LATN_ID") && !value.equals(landId == null?"":landId)) {
+                                /*if (codeList[x].equals("LATN_ID") && !value.equals(landId == null?"":landId)) {
                                     logger.info("导入清单工号地区不符=>landId:" + landId);
                                     addLog2Es(batchNumSt, "导入清单工号地区不符");
                                     TrialOperation record = new TrialOperation();
@@ -970,7 +970,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                     record.setRemark("导入清单工号地区不符");
                                     int i = trialOperationMapper.updateByPrimaryKey(record);
                                     throw new RuntimeException("导入清单工号地区不符");
-                                }
+                                }*/
                                 if (codeList[x].equals("CCUST_NAME") && (value.contains("null") || value.equals(""))) {
                                     check = false;
                                     break;

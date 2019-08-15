@@ -97,8 +97,10 @@
   </select>
 
   <select id="selectAttrLabelRemarkByCampaignId" resultType="java.lang.String">
-    select p1.REMARK
-    from mkt_cam_chl_conf_attr p1 LEFT JOIN mkt_cam_chl_conf p2 on p1.EVT_CONTACT_CONF_ID = p2.EVT_CONTACT_CONF_ID
+    select p3.LABEL
+    from mkt_cam_chl_conf_attr p1
+    LEFT JOIN mkt_cam_chl_conf p2 on p1.EVT_CONTACT_CONF_ID = p2.EVT_CONTACT_CONF_ID
+    LEFT JOIN service_package p3 on p1.ATTR_VALUE = p3.SERVICE_PACKAGE_ID
     WHERE p2.MKT_CAMPAIGN_ID = #{campaignId}
     AND p1.ATTR_ID = 500600010024
   </select>
