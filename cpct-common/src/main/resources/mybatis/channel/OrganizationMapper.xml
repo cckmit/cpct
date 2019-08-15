@@ -27,6 +27,10 @@
     <result column="ORG_AREA_LEVEL" jdbcType="VARCHAR" property="orgAreaLevel" />
     <result column="REMARK" jdbcType="VARCHAR" property="remark" />
     <result column="ORG_DESC" jdbcType="VARCHAR" property="orgDesc" />
+    <result column="ORG_NAME_C3" jdbcType="VARCHAR" property="orgNameC3" />
+    <result column="ORG_NAME_C4" jdbcType="VARCHAR" property="orgNameC4" />
+    <result column="ORG_NAME_C5" jdbcType="VARCHAR" property="orgNameC5" />
+    <result column="ORG_PATH_NAME" jdbcType="VARCHAR" property="orgPathName" />
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from organization
@@ -176,7 +180,10 @@
         a.ORG_CODE,
         a.ORG_NAME,
         b.STATUS_CD,
-        a.ORG_DIVISION
+        a.ORG_DIVISION,
+        a.ORG_NAME_C3,
+		a.ORG_NAME_C4,
+		a.ORG_NAME_C5
     FROM
         organization a,
         staff_org_rel b
@@ -198,5 +205,16 @@
     and orel.ORG_REL_TYPE = 1900
 	and 6 > org.ORG_LEVEL
     and orel.A_ORG_ID = #{parentId}
+  </select>
+
+  <select id="selectMenuForLevelFive"  resultMap="BaseResultMap">
+      select ORG_ID, PARTY_ID, ORG_CODE, ORG_NAME, REGION_ID, ORG_TYPE, ORG_SUBTYPE, VILLAGE_FLAG,
+        PARENT_ORG_ID, ORG_LEVEL, ORG_INDEX, SALESORG_CODE, DIVORG_FLAG, CREATE_DATE, CREATE_STAFF,
+        STATUS_CD, STATUS_DATE, UPDATE_DATE, UPDATE_STAFF, ORG_DIVISION, org_id_4a, ORG_CONTRACT_TYPE,
+        ORG_AREA_LEVEL, REMARK, ORG_DESC
+        from organization
+        where ORG_DIVISION in (20,30)
+        and STATUS_CD = 1000
+        and 6 > ORG_LEVEL
   </select>
 </mapper>
