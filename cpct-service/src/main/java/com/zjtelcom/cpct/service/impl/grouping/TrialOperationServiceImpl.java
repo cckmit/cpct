@@ -9,12 +9,14 @@ import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboSe
 import com.mysql.jdbc.StringUtils;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
+import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.MktCamCustMapper;
 import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
 import com.zjtelcom.cpct.dao.filter.CloseRuleMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper;
+import com.zjtelcom.cpct.dao.grouping.ServicePackageMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
@@ -27,6 +29,7 @@ import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.GroupingVO;
+import com.zjtelcom.cpct.domain.grouping.ServicePackage;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyCloseRuleRelDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
@@ -145,6 +148,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private MqService mqService;
     @Autowired
     private MktCamDisplayColumnRelMapper mktCamDisplayColumnRelMapper;
+    @Autowired
+    private ServicePackageMapper servicePackageMapper;
 
     @Value("${ctg.cpctTopic}")
     private String importTopic;
@@ -177,6 +182,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private EsServiceInfo esServiceInfo;
     @Autowired
     private OrgTreeService orgTreeService;
+    @Autowired
+    private ContactChannelMapper channelMapper;
 
     //抽样展示全量试算记录
     @Override
@@ -647,11 +654,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         return result;
     }
 
-
     //下发文件
     private Map<String, Object> importUserList(Map<String, Object> result, TrialOperationVO operation, Long ruleId, String batchNumSt, List<Map<String, Object>> customerList, List<Map<String, Object>> labelList) {
         final TrialOperationVOES request = getTrialOperationVOES(operation, ruleId, batchNumSt, labelList);
-//        System.out.println(JSON.toJSONString(request));
+        /*System.out.println(JSON.toJSONString(request));*/
         new Thread(){
             public void run(){
                 try {
@@ -798,6 +804,11 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             for (String attr : attrValue){
                 fields.add(attr);
             }
+            // 服务包添加查询字段
+            List<String> labels = mktCamChlConfAttrMapper.selectAttrLabelRemarkByCampaignId(campaign.getMktCampaignId());
+            for (String s : labels) {
+                fields.add(s);
+            }
             List<Map<String, Object>> displayList = displayLabel(campaign);
             for (Map<String, Object> display : displayList) {
                 String code = display.get("code") == null ? null : display.get("code").toString();
@@ -815,7 +826,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 redisUtils_es.set("DISPLAY_LABEL_" + campaign.getMktCampaignId(), fields);
             }
             List<Long> attrList = mktCamChlConfAttrMapper.selectByCampaignId(campaign.getMktCampaignId());
-            if (attrList.contains(ISEE_CUSTOMER.getArrId()) || attrList.contains(ISEE_LABEL_CUSTOMER.getArrId()) ){
+            if (attrList.contains(ISEE_CUSTOMER.getArrId()) || attrList.contains(ISEE_LABEL_CUSTOMER.getArrId()) || attrList.contains(SERVICE_PACKAGE.getArrId())){
                 if (!labelEngNameList.contains("SALE_EMP_NBR")){
                     Map<String,Object> label = new HashMap<>();
                     label.put("code","SALE_EMP_NBR");
@@ -869,11 +880,23 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             Long insertId = trialOp.getId();
             op = trialOp;
             int size = dataVO.contentList.size() - 3;
-            Long landId = orgTreeService.getLandIdBySession();
+            /*Long landId = orgTreeService.getLandIdBySession();*/
             new MyThread(index) {
                 public void run() {
                     try {
-                        /*Long mqSum = 0L;*/
+                        /*MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(Long.valueOf(confRule.getEvtContactConfId()));
+                        Channel channel = channelMapper.selectByPrimaryKey(mktCamChlConfDO.getContactChlId());
+                        if ("QD00014".equals(channel.getContactChlCode())) {
+                            if (!(Arrays.asList(nameList).containsAll(labelNameList) && Arrays.asList(codeList).contains(labelEngNameList))) {
+                                addLog2Es(batchNumSt, "导入清单缺少渠道必填列");
+                                TrialOperation record = new TrialOperation();
+                                record.setId(Long.valueOf(insertId));
+                                record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
+                                record.setRemark("清单导入数据错误");
+                                int i = trialOperationMapper.updateByPrimaryKey(record);
+                                throw new RuntimeException("导入清单缺少渠道必填列");
+                            }
+                        }*/
                         List<FilterRule> productFilter = new ArrayList<>();
                         final TrialOperationVOES request = getTrialOperationVOES(operation, ruleId, batchNumSt, labelList);
                         List<Map<String, Object>> customerList = new ArrayList<>();
@@ -885,27 +908,42 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             productFilter = filterRuleList;
                         }
                         // 查看当前规则协同渠道是否为沙盘，是否配置接单人派单
+                        boolean flag2 = false;
+                        if (Arrays.asList(nameList).contains("接单人号码") && Arrays.asList(codeList).contains("SALE_EMP_NBR")) {
+                            flag2 = true;
+                        }
                         boolean flag = false;
+                        String evtContactConfId = confRule.getEvtContactConfId();
                         Map<String, Object> mktCamChlConf = mktCamChlConfService.getMktCamChlConf(Long.valueOf(confRule.getEvtContactConfId()));
                         MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConf.get("mktCamChlConfDetail");
                         List<MktCamChlConfAttr> mktCamChlConfAttrList = mktCamChlConfDetail.getMktCamChlConfAttrList();
                         for (MktCamChlConfAttr attr : mktCamChlConfAttrList) {
-                            if (attr.getAttrId().equals(ConfAttrEnum.ISEE_CUSTOMER.getArrId()) && (attr.getAttrValue() == null || attr.getAttrValue().equals(""))) {
+                            if (attr.getAttrId().equals(ISEE_CUSTOMER.getArrId()) && (attr.getAttrValue() == null || attr.getAttrValue().equals(""))) {
                                 flag = true;
                             }
                         }
                         for (int j = 3; j < dataVO.contentList.size(); j++) {
                             List<String> data = Arrays.asList(dataVO.contentList.get(j).split("\\|@\\|"));
                             Object[] objects = data.toArray();
-                            if (flag && (this.getIndex() >= data.size() ? true:(data.get(this.getIndex()) == null || data.get(this.getIndex()).equals("")))) {
-                                // 记录日志，退出线程
-                                addLog2Es(batchNumSt, "导入清单存在接单人无数据");
+                            if (flag2) {
+                                if (flag && (this.getIndex() >= data.size() ? true:(data.get(this.getIndex()) == null || data.get(this.getIndex()).equals("")))) {
+                                    // 记录日志，退出线程
+                                    addLog2Es(batchNumSt, "导入清单存在接单人无数据");
+                                    TrialOperation record = new TrialOperation();
+                                    record.setId(Long.valueOf(insertId));
+                                    record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
+                                    record.setRemark("清单导入数据错误");
+                                    int i = trialOperationMapper.updateByPrimaryKey(record);
+                                    throw new RuntimeException("导入清单第" + (j + 1) + "行接单人无数据");
+                                }
+                            } else {
+                                addLog2Es(batchNumSt, "导入清单缺少接单人必填列");
                                 TrialOperation record = new TrialOperation();
                                 record.setId(Long.valueOf(insertId));
                                 record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
                                 record.setRemark("清单导入数据错误");
                                 int i = trialOperationMapper.updateByPrimaryKey(record);
-                                throw new RuntimeException("导入清单第" + (j + 1) + "行接单人无数据");
+                                throw new RuntimeException("导入清单缺少渠道必填列");
                             }
                             Map<String, Object> customers = new HashMap<>();
                             boolean check = true;
@@ -923,7 +961,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                     // 过滤换行符
                                     value = value.replace("\r", "").replace("\n", "");
                                 }
-                                if (codeList[x].equals("LATN_ID") && !value.equals(landId == null?"":landId)) {
+                                /*if (codeList[x].equals("LATN_ID") && !value.equals(landId == null?"":landId)) {
                                     logger.info("导入清单工号地区不符=>landId:" + landId);
                                     addLog2Es(batchNumSt, "导入清单工号地区不符");
                                     TrialOperation record = new TrialOperation();
@@ -932,7 +970,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                     record.setRemark("导入清单工号地区不符");
                                     int i = trialOperationMapper.updateByPrimaryKey(record);
                                     throw new RuntimeException("导入清单工号地区不符");
-                                }
+                                }*/
                                 if (codeList[x].equals("CCUST_NAME") && (value.contains("null") || value.equals(""))) {
                                     check = false;
                                     break;
@@ -1506,7 +1544,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             fieldList[i] = attrValue.get(i-labelDTOList.size());
         }
         List<Long> attrList = mktCamChlConfAttrMapper.selectByCampaignId(trialOperation.getCampaignId());
-        if (attrList.contains(ISEE_CUSTOMER.getArrId()) || attrList.contains(ISEE_LABEL_CUSTOMER.getArrId()) ){
+        if (attrList.contains(ISEE_CUSTOMER.getArrId()) || attrList.contains(ISEE_LABEL_CUSTOMER.getArrId()) || attrList.contains(SERVICE_PACKAGE.getArrId())){
             Map<String,Object> label = new HashMap<>();
             label.put("code","SALE_EMP_NBR");
             label.put("name","接单人号码");
@@ -1685,6 +1723,17 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     if(mktCamChlResult.getMktCamChlConfDetailList()!=null){
                         for (MktCamChlConfDetail mktCamChlConfDetail : mktCamChlResult.getMktCamChlConfDetailList()) {
                             mktCamChlConfList.add(mktCamChlConfDetail);
+                            // 保存服务包标签到渠道属性备注中
+                            List<MktCamChlConfAttr> mktCamChlConfAttrList = mktCamChlConfDetail.getMktCamChlConfAttrList();
+                            for (MktCamChlConfAttr attr : mktCamChlConfAttrList) {
+                                if (SERVICE_PACKAGE.getArrId().equals(attr.getAttrId())) {
+                                    String attrValue = attr.getAttrValue();
+                                    ServicePackage servicePackage = servicePackageMapper.selectByPrimaryKey(Long.valueOf(attrValue));
+                                    MktCamChlConfAttrDO mktCamChlConfAttrDO = BeanUtil.create(attr, new MktCamChlConfAttrDO());
+                                    mktCamChlConfAttrDO.setRemark(servicePackage.getLabel());
+                                    mktCamChlConfAttrMapper.updateByPrimaryKey(mktCamChlConfAttrDO);
+                                }
+                            }
                         }
                     }
                 }
