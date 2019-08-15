@@ -113,6 +113,12 @@
             <artifactId>es-service-info</artifactId>
         </dependency>
 
+        <!--服务包-->
+        <dependency>
+            <groupId>com.zjtelcom.es</groupId>
+            <artifactId>es-service-package</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.ctzj.smt.bss</groupId>
             <artifactId>smt-bss-cpc-model</artifactId>
