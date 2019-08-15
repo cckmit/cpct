@@ -46,7 +46,7 @@ public class SysStaffController extends BaseController {
     @CrossOrigin
     public Map<String,Object> getSysMenuList() {
         Map<String,Object> result = new HashMap<>();
-        SystemUserDto userDetail = BssSessionHelp.getSystemUserDto();
+        /*SystemUserDto userDetail = BssSessionHelp.getSystemUserDto();
         List<Map<String,Object>> resultList = new ArrayList<>();
         List<PrivilegeDetail> parentList = new ArrayList<>();
         for (PrivilegeDetail detail : userDetail.getPrivilegeDetails()){
@@ -74,9 +74,9 @@ public class SysStaffController extends BaseController {
             }
             map.put("childList",childList);
             resultList.add(map);
-        }
+        }*/
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",resultList);
+        /*result.put("resultMsg",resultList);*/
         return result;
     }
 
