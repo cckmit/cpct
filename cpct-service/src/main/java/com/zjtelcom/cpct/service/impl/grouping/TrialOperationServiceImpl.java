@@ -804,6 +804,11 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             for (String attr : attrValue){
                 fields.add(attr);
             }
+            // 服务包添加查询字段
+            List<String> attrRemark = mktCamChlConfAttrMapper.selectAttrLabelRemarkByCampaignId(campaign.getMktCampaignId());
+            for (String s : attrRemark) {
+                fields.add(s);
+            }
             List<Map<String, Object>> displayList = displayLabel(campaign);
             for (Map<String, Object> display : displayList) {
                 String code = display.get("code") == null ? null : display.get("code").toString();
