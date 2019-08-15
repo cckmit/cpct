@@ -7,6 +7,7 @@ import com.zjtelcom.cpct.dao.campaign.MktCamChlConfAttrMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlResultConfRelMapper;
 import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.dao.grouping.ServicePackageMapper;
 import com.zjtelcom.cpct.dao.question.MktQuestionnaireMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.domain.Rule;
@@ -16,6 +17,7 @@ import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlResultConfRelDO;
 import com.zjtelcom.cpct.domain.channel.*;
+import com.zjtelcom.cpct.domain.grouping.ServicePackage;
 import com.zjtelcom.cpct.domain.question.Questionnaire;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
@@ -87,6 +89,9 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
 
     @Autowired
     private OrganizationMapper organizationMapper;
+
+    @Autowired
+    private ServicePackageMapper servicePackageMapper;
 
     @Override
     public Map<String, Object> saveMktCamChlConf(MktCamChlConfDetail mktCamChlConfDetail) {
@@ -262,6 +267,11 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                     }
                 } else if(mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.EFFECTIVE_DAYS.getArrId())){
                     isEffectiveDaysAttr = true;
+                } else if(mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.SERVICE_PACKAGE.getArrId())){
+                    if (mktCamChlConfAttr.getAttrValue() != null) {
+                        ServicePackage servicePackage = servicePackageMapper.selectByPrimaryKey(Long.valueOf(mktCamChlConfAttr.getAttrValue()));
+                        mktCamChlConfAttr.setAttrValName(servicePackage.getServicePackageName());
+                    }
                 }
                 mktCamChlConfAttrList.add(mktCamChlConfAttr);
             }
