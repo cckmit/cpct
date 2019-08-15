@@ -36,4 +36,7 @@ public interface OrganizationMapper {
     List<Map<String,Object>> getStaffOrgId(@Param("staffId") Long staffId);
 
     List<Organization> selectByParentIdForLevelFive(Long orgId);
+
+    List<Organization> selectMenuForLevelFive();
+
 }
