@@ -80,3 +80,9 @@ ctg:
   # 第四topic es日志添加队列中转
   cpctEsLogTopic: cpct_eslog_prod
   cpctEsLogGroup: cpct_eslog_group_prod
+
+elasticsearch:
+  ip: 134.108.6.161
+  port: 9300
+  pool: 5
+  cluster.name: my-application1

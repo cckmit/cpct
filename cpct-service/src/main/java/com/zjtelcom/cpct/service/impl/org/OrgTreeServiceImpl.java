@@ -186,15 +186,17 @@ public class OrgTreeServiceImpl implements OrgTreeService{
         Object type = params.get("type");
         SystemUserDto user = BssSessionHelp.getSystemUserDto();
         Long staffId = user.getStaffId();
-        List<SystemPostDto> systemPostDtoList = user.getSystemPostDtoList();
-        String sysPostCode = systemPostDtoList.get(0).getSysPostCode();
+//        List<SystemPostDto> systemPostDtoList = user.getSystemPostDtoList();
+//        String sysPostCode = systemPostDtoList.get(0).getSysPostCode();
+//        Long staffId = 121119809L;
+//        String sysPostCode = "C3";
         //有父节点不能超过 Level 6
         if (areaList!=null && areaList.size()>0 && type!=null){
             list = organizationMapper.selectByParentIdForLevelFive(Long.valueOf(areaList.get(0)));
             //都为空的情况 使用用户的 staffid 查询
         }else if(areaList!=null && areaList.size()>0 && type==null){
             list = organizationMapper.selectByParentId(Long.valueOf(areaList.get(0)));
-        }else if (areaList==null){
+        }else if (areaList.size()==0){
             List<Map<String, Object>> staffOrgId = organizationMapper.getStaffOrgId(staffId);
             if (!staffOrgId.isEmpty() && staffOrgId.size() > 0){
                 for (Map<String, Object> map : staffOrgId) {
@@ -249,45 +251,22 @@ public class OrgTreeServiceImpl implements OrgTreeService{
         //组织树控制权限
         List<SystemPostDto> systemPostDtoList = user.getSystemPostDtoList();
         String sysPostCode = systemPostDtoList.get(0).getSysPostCode();
-        //如果是超管 或者 省管理
 //        String sysPostCode = "C3";
-        if ((AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea()).equals(sysPostCode) ||
-                AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea().equals(sysPostCode) && areaList!=null){
+        //有父节点的情况
+        if (areaList!=null && areaList.size()>0){
             list = organizationMapper.selectByParentId(Long.valueOf(areaList.get(0)));
-            // 分公司 C3 权限 支局 C4 分局 C5
-        }else if (AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea().equals(sysPostCode)  ||
-                AreaCodeEnum.sysAreaCode.FENGJU.getSysArea().equals(sysPostCode) ||
-                AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea().equals(sysPostCode) && areaList!=null){
-            if (!staffOrgId.isEmpty() && staffOrgId.size() > 0){
-                for (Map<String, Object> map : staffOrgId) {
-                    Object orgDivision = map.get("orgDivision");
-                    Object orgId1 = map.get("ORG_NAME_"+sysPostCode);
-                    if (orgDivision!=null){
-                        if (orgDivision.toString().equals("30")) {
-                            orgId = Long.valueOf(orgId1.toString());
-                            break;
-                        }else if (orgDivision.toString().equals("20")){
-                            orgId = Long.valueOf(orgId1.toString());
-                            break;
-                        }else if (orgDivision.toString().equals("10")){
-                            orgId = Long.valueOf(orgId1.toString());
-                            break;
-                        }
-                    }
-                }
-            }
-            list = organizationMapper.selectByParentId(Long.valueOf(areaList.get(0)));
-            //超管 无父节点 查全省
+           // 超管 省管 c1 c2
         }else if ((AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea()).equals(sysPostCode) ||
                 AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea().equals(sysPostCode) && areaList==null){
             list = organizationMapper.selectMenu();
+            // 分公司 C3 权限 支局 C4 分局 C5
         }else if (AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea().equals(sysPostCode)  ||
                 AreaCodeEnum.sysAreaCode.FENGJU.getSysArea().equals(sysPostCode) ||
                 AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea().equals(sysPostCode) && areaList==null) {
             if (!staffOrgId.isEmpty() && staffOrgId.size() > 0) {
                 for (Map<String, Object> map : staffOrgId) {
                     Object orgDivision = map.get("orgDivision");
-                    Object orgId1 = map.get("orgName" + sysPostCode);
+                    Object orgId1 = map.get("ORG_NAME_"+sysPostCode);
                     if (orgDivision != null) {
                         if (orgDivision.toString().equals("30")) {
                             orgId = Long.valueOf(orgId1.toString());

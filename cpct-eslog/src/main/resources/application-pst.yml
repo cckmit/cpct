@@ -1,6 +1,6 @@
 #端口配置
 server:
-  port: 8080
+  port: 30810
 
 #数据库相关配置
 spring:
@@ -66,3 +66,10 @@ ctg:
   # 第四topic es日志添加队列中转
   cpctEsLogTopic: cpct_eslog_pst
   cpctEsLogGroup: cpct_eslog_group_pst
+
+
+elasticsearch:
+  ip: 134.108.6.161
+  port: 9300
+  pool: 5
+  cluster.name: my-application1
