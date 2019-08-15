@@ -24,7 +24,7 @@ public class UserUtil {
         Long userId = 1L;
         SystemUserDto userDetail = null;
         try {
-            userDetail = BssSessionHelp.getSystemUserDto();
+            userDetail = BssSessionHelp.getCpctSystemUserDto();
         } catch (Exception e) {
             return userId;
         }
