@@ -46,7 +46,7 @@ public class OrgTreeController extends BaseController {
 
 
     /**
-     * 通过菜单id查询其子菜单
+     * 通过菜单id查询其子菜单 营销组织树
      * @param params
      * @return
      */
@@ -59,10 +59,31 @@ public class OrgTreeController extends BaseController {
         } catch (Exception e) {
             maps.put("resultCode", CommonConstant.CODE_FAIL);
             maps.put("resultMsg", e.getMessage());
-            logger.error("通过菜单id查询其子菜单失败！Exception: ", e.getMessage());
+            logger.error("selectOrg通过菜单id查询其子菜单失败！Exception: ", e.getMessage());
         }
         return JSON.toJSONString(maps);
     }
+
+    /**
+     * 通过菜单id查询其子菜单 营销组织树权限控制 c1 c2 c3 c4 c5
+     * @param params
+     * @return
+     */
+    @RequestMapping("selectOrgTreeForUser")
+    @CrossOrigin
+    public String selectOrgTreeForUser(@RequestBody Map<String, Object> params){
+        Map<String, Object> maps = new HashMap<>();
+        try{
+            maps = orgTreeService.selectOrgTreeForUser(params);
+        } catch (Exception e) {
+            maps.put("resultCode", CommonConstant.CODE_FAIL);
+            maps.put("resultMsg", e.getMessage());
+            logger.error("selectOrgTreeForUser通过菜单id查询其子菜单失败！Exception: ", e);
+        }
+        return JSON.toJSONString(maps);
+    }
+
+
 
     /**
      *  组织数模糊查询

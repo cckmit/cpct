@@ -134,6 +134,7 @@ public class SysAreaController {
 //            Long orgId = Long.valueOf(user.getOrgId());
             SystemUserDto user = BssSessionHelp.getSystemUserDto();
             Long staffId = user.getStaffId();
+//            Long orgId = Long.valueOf(regionId);
             map = sysAreaService.getCityByAreaTree(staffId);
 
 //            }
