@@ -54,6 +54,15 @@ public class Organization implements Serializable {
 
     private String orgDesc;
 
+    private String orgNameC3;
+
+    private String orgNameC4;
+
+    private String orgNameC5;
+
+    private String orgPathName;
+
+
     public Long getOrgId() {
         return orgId;
     }
@@ -252,5 +261,37 @@ public class Organization implements Serializable {
 
     public void setOrgDesc(String orgDesc) {
         this.orgDesc = orgDesc;
+    }
+
+    public String getOrgNameC3() {
+        return orgNameC3;
+    }
+
+    public void setOrgNameC3(String orgNameC3) {
+        this.orgNameC3 = orgNameC3;
+    }
+
+    public String getOrgNameC4() {
+        return orgNameC4;
+    }
+
+    public void setOrgNameC4(String orgNameC4) {
+        this.orgNameC4 = orgNameC4;
+    }
+
+    public String getOrgNameC5() {
+        return orgNameC5;
+    }
+
+    public void setOrgNameC5(String orgNameC5) {
+        this.orgNameC5 = orgNameC5;
+    }
+
+    public String getOrgPathName() {
+        return orgPathName;
+    }
+
+    public void setOrgPathName(String orgPathName) {
+        this.orgPathName = orgPathName;
     }
 }
