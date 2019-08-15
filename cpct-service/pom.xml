@@ -113,6 +113,8 @@
             <artifactId>es-service-info</artifactId>
         </dependency>
 
+
+
         <!--服务包-->
         <dependency>
             <groupId>com.zjtelcom.es</groupId>
