@@ -1,14 +1,19 @@
 package com.zjtelcom.cpct.service.impl.report;
 
-import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
-import com.ctzj.smt.bss.sysmgr.model.dto.SystemPostDto;
-import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
+import com.zjtelcom.cpct.dao.channel.ChannelMapper;
+import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
+import com.zjtelcom.cpct.dao.channel.OrgRelMapper;
 import com.zjtelcom.cpct.dao.channel.OrganizationMapper;
+import com.zjtelcom.cpct.domain.channel.Channel;
+import com.zjtelcom.cpct.domain.channel.OrgRel;
 import com.zjtelcom.cpct.domain.channel.Organization;
 import com.zjtelcom.cpct.enums.AreaCodeEnum;
 import com.zjtelcom.cpct.service.report.ActivityStatisticsService;
+import com.zjtelcom.cpct.util.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +29,16 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
 
     @Autowired
     private OrganizationMapper organizationMapper;
+    @Autowired(required = false)
+    private OrgRelMapper orgRelMapper;
+    @Autowired(required = false)
+    private ChannelMapper channelMapper;
+    @Autowired(required = false)
+    private ContactChannelMapper contactChannelMapper;
+    @Autowired
+    private RedisUtils redisUtils;
+
+
 
 
 
@@ -80,6 +95,10 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                  if (organizationC3!=null && organizationC3.getOrgName()!=null){
                      maps.put("C3",organizationC3.getOrgName());
                      maps.put("C3orgId",orgId);
+                     maps.put("C4","所有");
+                     maps.put("C4orgId","all");
+                     maps.put("C5","所有");
+                     maps.put("C5orgId","all");
                  }
              }else if (AreaCodeEnum.sysAreaCode.FENGJU.getSysArea().equals(sysPostCode)){
                  //定位C4地市 并且显示当前C4下所有子节点
@@ -87,6 +106,10 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                  if (organizationC4!=null && organizationC4.getOrgName()!=null){
                      maps.put("C4",organizationC4.getOrgName());
                      maps.put("C4orgId",orgId);
+                     maps.put("C5","所有");
+                     maps.put("C5orgId","all");
+                     maps.put("C6","所有");
+                     maps.put("C6orgId","all");
                  }
                  //并显示C3父节点
                  Object o = staffOrgId.get(0).get("ORG_NAME_" + "C3");
@@ -102,6 +125,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                  if (organizationC5!=null && organizationC5.getOrgName()!=null){
                      maps.put("C5",organizationC5.getOrgName());
                      maps.put("C5orgId",orgId);
+                     maps.put("C6","所有");
+                     maps.put("C6orgId","all");
                  }
                  Object o3 = staffOrgId.get(0).get("ORG_NAME_" + "C3");
                  Object o4 = staffOrgId.get(0).get("ORG_NAME_" + "C4");
@@ -131,31 +156,100 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         if (areaId != null){
             arrayList = organizationMapper.selectByParentId(Long.valueOf(areaId.toString()));
             Page pageInfo2 = new Page(new PageInfo(arrayList));
-            maps.put("resultMsg2",pageInfo2);
+            maps.put("resultMsg2",arrayList);
         }
         return maps;
 
     }
 
-//    @Override
-//    public Map<String, Object> getStoreForTwo(Map<String, Object> params) {
-//        Map<String, Object> maps = new HashMap<>();
-//        List<Organization> list=new ArrayList<>();
-//        list = organizationMapper.selectMenu();
-//        Page pageInfo = new Page(new PageInfo(list));
-//        maps.put("C2","浙江分公司");
-//        maps.put("C2orgId","800000000004");
-//        maps.put("resultMsg",list);
-//        return maps;
-//    }
-//
-//    @Override
-//    public Map<String, Object> getStoreForThree(Map<String, Object> params) {
-//        Map<String, Object> maps = new HashMap<>();
-//        List<Organization> list=new ArrayList<>();
-//        String areaId = params.get("areaId").toString();
-//        list = organizationMapper.selectByParentId(Long.valueOf(areaId));
-//        Page pageInfo = new Page(new PageInfo(list));
-//        return maps;
-//    }
+    @Override
+    public Map<String, Object> getStore(Map<String, Object> params) {
+        Map<String, Object> map = new HashMap<>();
+        List<Channel> channelList = new ArrayList<>();
+        List<Organization> organizations = new ArrayList<>();
+        List<String> resultList = new ArrayList<>();
+        Object type = params.get("type");
+        if (type == null){
+            map.put("msg","请传入type");
+            return map;
+        }
+        Object orgId = params.get("orgId");
+        if (orgId==null){
+            map.put("msg","请传入orgId");
+            return map;
+        }
+        Organization organization = organizationMapper.selectByPrimaryKey(Long.valueOf(orgId.toString()));
+        if (organization==null){
+            map.put("msg","请传入正确的参数");
+        }
+        if ("C5".equals(type.toString())){
+            Object o = redisUtils.get("getStore_" + orgId.toString());
+            if (o!=null){
+                map.put("msg",o);
+//                map.put("size", channelList.size());
+                return map;
+            }
+        }
+        List<String> strings = areaList(organization.getOrgId(), resultList, organizations);
+        strings.add(organization.getOrgId().toString());
+        if (strings!=null && strings.size()>0){
+            for (String string : strings) {
+                List<OrgRel> orgRels = orgRelMapper.selectByAOrgId(string);
+                if (orgRels.size()>0 && orgRels!=null){
+                    for (OrgRel orgRel : orgRels) {
+                        Channel channel = channelMapper.selectByPrimaryKey(orgRel.getzOrgId());
+                        channelList.add(channel);
+                    }
+                }
+            }
+        }
+        Channel channel = new Channel();
+        channel.setContactChlName("所有");
+        channel.setContactChlCode("all");
+        channelList.add(channel);
+        if ("C5".equals(type.toString())){
+            redisUtils.set("getStore_"+orgId.toString(),channelList);
+        }
+        map.put("msg",channelList);
+        map.put("size",channelList.size());
+        return map;
+    }
+
+
+
+    public List<String> areaList(Long parentId,List<String> resultList,List<Organization> areas){
+        List<Organization> sysAreaList = organizationMapper.selectByParentId(parentId);
+        if (sysAreaList.isEmpty()){
+            return resultList;
+        }
+        for (Organization area : sysAreaList){
+            resultList.add(area.getOrgId().toString());
+            areas.add(area);
+            areaList(area.getOrgId(),resultList,areas);
+        }
+        return resultList;
+    }
+
+
+    @Override
+    public Map<String, Object> getChannel(Map<String, Object> params) {
+        HashMap hashMap = new HashMap<String,Object>();
+        List<Channel> channelList = new ArrayList<>();
+        Object type = params.get("type");
+        if (type!=null && "realTime".equals(type.toString())){
+            //实时 5,6 问正义
+            channelList = contactChannelMapper.getRealTimeChannel();
+        }
+        // 批量 4,5 问正义
+        if (type!=null && "batch".equals(type.toString())){
+            channelList = contactChannelMapper.getBatchChannel();
+        }
+        Channel channel = new Channel();
+        channel.setContactChlName("所有");
+        channel.setContactChlCode("all");
+        channelList.add(channel);
+        hashMap.put("channelList",channelList);
+        return hashMap;
+    }
+
 }

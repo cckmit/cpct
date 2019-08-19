@@ -6,10 +6,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.service.report.ActivityStatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,9 +20,11 @@ public class ActivityStatisticsController extends BaseController {
     ActivityStatisticsService activityStatisticsService;
 
     /**
-     * 递归 获取 门店信息
+     *
+     * 根据用户登入信息 权限定位 C2 C3 C4 C5
+     * 根据父节点查询字节点下所有节点返回
      */
-    @RequestMapping("/getStoreForUser")
+    @PostMapping("/getStoreForUser")
     @CrossOrigin
     public String getStoreForUser(@RequestBody Map<String, Object> params) {
         Map<String, Object> maps = new HashMap<>();
@@ -38,16 +37,35 @@ public class ActivityStatisticsController extends BaseController {
         return JSON.toJSONString(maps);
     }
 
-//    @RequestMapping("/getStoreForTwo")
-//    @CrossOrigin
-//    public String getStoreForTwo(@RequestBody Map<String, Object> params) {
-//        Map<String, Object> maps = new HashMap<>();
-//        try {
-//            maps = activityStatisticsService.getStoreForTwo(params);
-//        } catch (Exception e) {
-//            logger.error("[op:ActivityStatisticsController] fail to listEvents for getStoreForThree = {}! Exception: ", JSONArray.toJSON(params), e);
-//            return JSON.toJSONString(maps);
-//        }
-//        return JSON.toJSONString(maps);
-//    }
+    /**
+     * 根据选中的父节点 获取父节点下所有子节点下的门店信息
+     * A_ORG_ID Z_ORG_ID（关联关系）  org_rel （表）
+     * 递归 获取 门店信息
+     */
+    @PostMapping("/getStore")
+    @CrossOrigin
+    public String getStore(@RequestBody Map<String, Object> params) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = activityStatisticsService.getStore(params);
+        } catch (Exception e) {
+            logger.error("[op:ActivityStatisticsController] fail to listEvents for getStore = {}! Exception: ", JSONArray.toJSON(params), e);
+            return JSON.toJSONString(maps);
+        }
+        return JSON.toJSONString(maps);
+    }
+
+    @PostMapping("/getChannel")
+    @CrossOrigin
+    public Map<String,Object> getChannel(@RequestBody Map<String, Object> params){
+        Map<String, Object> map = new HashMap<>();
+        try {
+            map = activityStatisticsService.getChannel(params);
+        } catch (Exception e) {
+            logger.error("[op:ActivityStatisticsController] fail to listEvents for getStore = {}! Exception: ", JSONArray.toJSON(params), e);
+            return map;
+        }
+        return map;
+    }
+
 }
