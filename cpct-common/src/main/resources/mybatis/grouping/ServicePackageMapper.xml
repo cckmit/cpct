@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.grouping.ServicePackageMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.grouping.ServicePackage">
+        <id column="SERVICE_PACKAGE_ID" jdbcType="BIGINT" property="servicePackageId"/>
+        <result column="SERVICE_PACKAGE_NAME" jdbcType="VARCHAR" property="servicePackageName"/>
+        <result column="LABEL" jdbcType="VARCHAR" property="label"/>
+        <result column="REMARK" jdbcType="VARCHAR" property="remark"/>
+        <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd"/>
+        <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate"/>
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff"/>
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from service_package
+        where SERVICE_PACKAGE_ID = #{servicePackageId,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="servicePackageId"
+            parameterType="com.zjtelcom.cpct.domain.grouping.ServicePackage">
+        insert into service_package (SERVICE_PACKAGE_ID, SERVICE_PACKAGE_NAME, LABEL,
+        REMARK, STATUS_CD, STATUS_DATE,
+        CREATE_STAFF, CREATE_DATE, UPDATE_STAFF,
+        UPDATE_DATE)
+        values (#{servicePackageId,jdbcType=BIGINT}, #{servicePackageName,jdbcType=VARCHAR}, #{label,jdbcType=VARCHAR},
+        #{remark,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP},
+        #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT},
+        #{updateDate,jdbcType=TIMESTAMP})
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.grouping.ServicePackage">
+        update service_package
+        set
+        <if test="servicePackageName != null and servicePackageName != ''">
+            SERVICE_PACKAGE_NAME = #{servicePackageName,jdbcType=VARCHAR},
+        </if>
+        <if test="label != null and label != ''">
+            LABEL = #{label,jdbcType=VARCHAR},
+        </if>
+        <if test="remark != null and remark != ''">
+            REMARK = #{remark,jdbcType=VARCHAR},
+        </if>
+        <if test="statusDate != null">
+            STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="createStaff != null and createStaff != ''">
+            CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+        </if>
+        <if test="createDate != null">
+            CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="updateStaff != null and updateStaff != ''">
+            UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        </if>
+        UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
+        where SERVICE_PACKAGE_ID = #{servicePackageId,jdbcType=BIGINT}
+    </update>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select SERVICE_PACKAGE_ID, SERVICE_PACKAGE_NAME, LABEL, REMARK, STATUS_CD, STATUS_DATE,
+        CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+        from service_package
+        where SERVICE_PACKAGE_ID = #{servicePackageId,jdbcType=BIGINT}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select SERVICE_PACKAGE_ID, SERVICE_PACKAGE_NAME, LABEL, REMARK, STATUS_CD, STATUS_DATE,
+        CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+        from service_package order by UPDATE_DATE desc
+    </select>
+    <select id="selectByName" resultMap="BaseResultMap">
+        select SERVICE_PACKAGE_ID, SERVICE_PACKAGE_NAME, LABEL, REMARK, STATUS_CD, STATUS_DATE,
+        CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
+        from service_package
+        where 1 = 1
+        <if test="servicePackageName != null and servicePackageName != ''">
+            AND SERVICE_PACKAGE_NAME LIKE CONCAT('%', #{servicePackageName, jdbcType=VARCHAR}, '%')
+        </if>
+        order by UPDATE_DATE desc
+    </select>
+</mapper>

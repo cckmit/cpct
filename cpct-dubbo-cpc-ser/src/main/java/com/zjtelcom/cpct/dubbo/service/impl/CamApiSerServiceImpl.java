@@ -106,7 +106,7 @@ public class CamApiSerServiceImpl implements CamApiSerService {
     @Autowired
     private InjectionLabelMapper injectionLabelMapper; //标签因子
 
-    @Autowired
+    @Autowired(required = false)
     private EsHitService esHitService;  //es存储
 
     @Autowired
