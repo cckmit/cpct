@@ -1899,9 +1899,30 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         } else if ("7100".equals(type)) {
                             express.append("notIn");
                         }
+                        if (tarGrpConditionDOs.get(i).getUpdateStaff()==null && label.getLabelDataType().equals("1100")){
+                            if (tarGrpConditionDOs.get(i).getRightParam().contains("-")){
+                                tarGrpConditionDOs.get(i).setUpdateStaff(0L);
+                            }else {
+                                tarGrpConditionDOs.get(i).setUpdateStaff(1L);
+                            }
+                        }
                         if (label.getLabelDataType().equals("1100") && tarGrpConditionDOs.get(i).getUpdateStaff()==1L){
                             String date = DateUtil.getPreDay(Integer.valueOf(tarGrpConditionDOs.get(i).getRightParam()));
                             express.append(date);
+                        }else if (label.getInjectionLabelCode().equals("PROM_LIST")){
+                            FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.valueOf(tarGrpConditionDOs.get(i).getRightParam()));
+                            List<String> stringList = new ArrayList<>();
+                            if (filterRule!=null && filterRule.getChooseProduct()!=null){
+                                List<String> list = ChannelUtil.StringToList(filterRule.getChooseProduct());
+                                for (String id : list){
+                                    Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(id));
+                                    if (offer!=null){
+                                        stringList.add(offer.getOfferNbr());
+                                    }
+                                }
+                                express.append(ChannelUtil.list2String(stringList,","));
+                            }
+
                         }else {
                             express.append(tarGrpConditionDOs.get(i).getRightParam());
                         }
