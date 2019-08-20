@@ -663,13 +663,11 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                     mktCamEvtRelDO.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
                     mktCamEvtRelMapper.insert(mktCamEvtRelDO);
                 }
-                redisUtils.del("EVT_ALL_LABEL_" + mktCamEvtRelDO.getEventId());
             }
             //删除不存在的关联关系
             for (MktCamEvtRel evtRel : oldRelList){
                 if (!relIdList.contains(evtRel.getMktCampEvtRelId())){
                     mktCamEvtRelMapper.deleteByPrimaryKey(evtRel.getMktCampEvtRelId());
-                    redisUtils.del("EVT_ALL_LABEL_" + evtRel.getEventId());
                 }
             }
             //更新事件规则

@@ -889,15 +889,15 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         for (int j = 3; j < dataVO.contentList.size(); j++) {
                             List<String> data = Arrays.asList(dataVO.contentList.get(j).split("\\|@\\|"));
                             Object[] objects = data.toArray();
-                            if (flag && (this.getIndex() > data.size() || data.get(this.getIndex()) == null || data.get(this.getIndex()).equals(""))) {
+                            if (flag && (this.getIndex() >= data.size() ? true:(data.get(this.getIndex()) == null || data.get(this.getIndex()).equals("")))) {
                                 // 记录日志，退出线程
-                                // addLog2Es(batchNumSt, "导入清单第"+ j +"行接单人无数据");
+                                addLog2Es(batchNumSt, "导入清单存在接单人无数据");
                                 TrialOperation record = new TrialOperation();
                                 record.setId(Long.valueOf(insertId));
                                 record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
                                 record.setRemark("清单导入数据错误");
                                 int i = trialOperationMapper.updateByPrimaryKey(record);
-                                throw new RuntimeException("导入清单第" + j + "行接单人无数据");
+                                throw new RuntimeException("导入清单第" + (j + 1) + "行接单人无数据");
                             }
                             Map<String, Object> customers = new HashMap<>();
                             boolean check = true;
@@ -964,15 +964,16 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     }
 
     public void importListMQ2EsService(TrialOperationVOES request, List<Map<String, Object>> customerList, List<FilterRule> productFilter, String batchNumSt, String ruleId, TrialOperation operation){
+        logger.info("导入试运算清单importUserList->customerList的数量：" + customerList.size());
         Long mqSum = 0L;
         boolean flag = true;
         int x = customerList.size() / 1000;
         for (int i = 0; i <= x; i++) {
             List<Map<String, Object>> newSublist = new ArrayList();
             if (i == x) {
-                newSublist = customerList.subList(i * 1000, customerList.size());
+                newSublist = customerList.subList(0, customerList.size());
             } else {
-                newSublist = customerList.subList(i * 1000, (i + 1) * 1000);
+                newSublist = customerList.subList(0, 1000);
             }
             // 向MQ中扔入request和customersList
             HashMap msgBody = new HashMap();
@@ -994,7 +995,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             newSublist.clear();
         }
         redisUtils_es.set("MQ_SUM_" + batchNumSt, mqSum);
-        logger.info("导入试运算清单importUserList->customerList的数量：" + customerList.size());
         /*if (flag){
             operation.setStatusCd(TrialStatus.IMPORT_SUCCESS.getValue());
         }else{
@@ -1832,9 +1832,30 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         } else if ("7100".equals(type)) {
                             express.append("notIn");
                         }
-                        if (label.getLabelValueType().equals("1100") && tarGrpConditionDOs.get(i).getUpdateStaff()==1L){
+                        if (tarGrpConditionDOs.get(i).getUpdateStaff()==null && label.getLabelDataType().equals("1100")){
+                            if (tarGrpConditionDOs.get(i).getRightParam().contains("-")){
+                                tarGrpConditionDOs.get(i).setUpdateStaff(0L);
+                            }else {
+                                tarGrpConditionDOs.get(i).setUpdateStaff(1L);
+                            }
+                        }
+                        if (label.getLabelDataType().equals("1100") && tarGrpConditionDOs.get(i).getUpdateStaff()==1L){
                             String date = DateUtil.getPreDay(Integer.valueOf(tarGrpConditionDOs.get(i).getRightParam()));
                             express.append(date);
+                        }else if (label.getInjectionLabelCode().equals("PROM_LIST")){
+                            FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.valueOf(tarGrpConditionDOs.get(i).getRightParam()));
+                            List<String> stringList = new ArrayList<>();
+                            if (filterRule!=null && filterRule.getChooseProduct()!=null){
+                                List<String> list = ChannelUtil.StringToList(filterRule.getChooseProduct());
+                                for (String id : list){
+                                    Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(id));
+                                    if (offer!=null){
+                                        stringList.add(offer.getOfferNbr());
+                                    }
+                                }
+                                express.append(ChannelUtil.list2String(stringList,","));
+                            }
+
                         }else {
                             express.append(tarGrpConditionDOs.get(i).getRightParam());
                         }

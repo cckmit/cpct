@@ -1,6 +1,9 @@
 package com.zjtelcom.cpct.elastic.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.zjtelcom.cpct.dao.system.SysParamsMapper;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
+import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.elastic.model.CampaignHitParam;
 import com.zjtelcom.cpct.elastic.model.CampaignHitResponse;
 import com.zjtelcom.cpct.elastic.model.CampaignInfoTree;
@@ -9,6 +12,7 @@ import com.zjtelcom.cpct.elastic.util.DateUtil;
 import com.zjtelcom.cpct.elastic.util.ElasticsearchUtil;
 import com.zjtelcom.cpct.elastic.util.EsSearchUtil;
 import com.zjtelcom.cpct.enums.Operator;
+import com.zjtelcom.cpct.util.RedisUtils;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
@@ -34,6 +38,12 @@ public class EsHitServiceImpl implements EsHitService {
 
     @Autowired(required = false)
     private TransportClient client;
+    @Autowired
+    private RedisUtils redisUtils;
+    @Autowired
+    private SysParamsMapper sysParamsMapper;
+
+
 
     /**
      * 测试索引
@@ -81,11 +91,19 @@ public class EsHitServiceImpl implements EsHitService {
     @Override
     public void save(final JSONObject jsonObject, final String indexName, final String _id) {
         try {
-            new Thread() {
-                public void run() {
-                    ElasticsearchUtil.addData(jsonObject, indexName, esType, _id);
-                }
-            }.start();
+            String eslogflg = (String) redisUtils.get("ES_LOG_FLG");
+            if (eslogflg==null){
+                List<SysParams> sysParams= sysParamsMapper.listParamsByKeyForCampaign("ES_LOG_FLG");
+                eslogflg = sysParams.get(0).getParamValue();
+                redisUtils.set("ES_LOG_FLG",sysParams.get(0).getParamValue());
+            }
+            if (eslogflg.equals("1")){
+                new Thread() {
+                    public void run() {
+                        ElasticsearchUtil.addData(jsonObject, indexName, esType, _id);
+                    }
+                }.start();
+            }
         } catch (Exception e) {
             logger.error("es日志存储失败");
         }
