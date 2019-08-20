@@ -469,6 +469,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
             resultList.add(offer.getOfferId().toString());
         }
         Integer rowNums = sheet.getLastRowNum() + 1;
+        List<String> errorOffer = new ArrayList<>();
         for (int i = 1; i < rowNums; i++) {
             Row row = sheet.getRow(i);
             if (row.getLastCellNum() >= 2) {
@@ -489,11 +490,14 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
                         }
                     }
                 }else {
-                    maps.put("resultCode", CODE_FAIL);
-                    maps.put("resultMsg", cellValue + "销售品不存在");
-                    return maps;
+                    errorOffer.add(cellValue);
                 }
             }
+        }
+        if(errorOffer.size() > 0) {
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg", "失败原因：以下" + errorOffer.size() + "个销售品编码错误！" + "\n" + errorOffer);
+            return maps;
         }
         FilterRule filterRules = new FilterRule();
         if(ruleId == null) {
@@ -525,7 +529,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
             filterRuleMapper.updateByPrimaryKey(filterRules);
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
-        maps.put("resultMsg", filterRules.getChooseProduct());
+        maps.put("resultMsg", "导入成功，销售品共导入" + sheet.getLastRowNum() + "个");
         return maps;
     }
 
