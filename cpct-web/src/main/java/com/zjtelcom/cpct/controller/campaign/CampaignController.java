@@ -455,4 +455,23 @@ public class CampaignController extends BaseController {
         return JSON.toJSONString(mktCampaignMap);
     }
 
+
+    /**
+     * 统计活动报表
+     *
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/countMktCampaign", method = RequestMethod.POST)
+    @CrossOrigin
+    public String countdueMktCampaign(@RequestBody Map<String, Object> params) throws Exception {
+        Map<String, Object> mktCampaignMap = new HashMap<>();
+        try {
+            mktCampaignMap = mktCampaignService.countMktCampaign(params);
+        } catch (Exception e) {
+            logger.error("[op:CampaignController] failed to dueMktCampaign, Exception = ", e);
+        }
+        return JSON.toJSONString(mktCampaignMap);
+    }
+
 }

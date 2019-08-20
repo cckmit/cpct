@@ -113,6 +113,10 @@
             <artifactId>es-service-info</artifactId>
         </dependency>
 
+
+
+
+
         <dependency>
             <groupId>com.ctzj.smt.bss</groupId>
             <artifactId>smt-bss-cpc-model</artifactId>
@@ -147,7 +151,10 @@
             <artifactId>bss-customer-model</artifactId>
             <version>1.0</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.zjtelcom.es</groupId>
+            <artifactId>es-service-package</artifactId>
+        </dependency>
     </dependencies>
 
 

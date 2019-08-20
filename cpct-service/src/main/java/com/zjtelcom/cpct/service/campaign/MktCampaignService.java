@@ -61,4 +61,6 @@ public interface MktCampaignService {
 
     Map<String, Object> dueMktCampaign();
 
+    Map<String, Object> countMktCampaign(Map<String, Object> params);
+
 }

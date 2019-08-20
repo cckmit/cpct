@@ -2,17 +2,17 @@ package com.zjtelcom.cpct.controller.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dto.filter.CloseRule;
 import com.zjtelcom.cpct.dto.filter.CloseRuleAddVO;
+import com.zjtelcom.cpct.elastic.service.EsHitService;
 import com.zjtelcom.cpct.request.filter.CloseRuleReq;
+import com.zjtelcom.cpct.service.MqService;
 import com.zjtelcom.cpct.service.filter.CloseRuleService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
@@ -170,5 +170,23 @@ public class CloseRuleController extends BaseController {
             return JSON.toJSONString(maps);
         }
         return JSON.toJSONString(maps);
+    }
+
+
+    @Autowired
+    private EsHitService esHitService;
+    @PostMapping("addLogToEsTest")
+    public String addLogToEsTest(){
+        //初始化es log
+        JSONObject esJson = new JSONObject();
+        esJson.put("reqId", "1");
+        esJson.put("activityId", "1");
+        esJson.put("activityName", "测试");
+        esJson.put("activityCode", "999");
+        esJson.put("hitEntity", "测试场"); //命中对象
+        esJson.put("hit", false);
+        esJson.put("msg", "红黑名单过滤规则验证被拦截");
+        esHitService.save(esJson,"activity_1234");
+        return null;
     }
 }
