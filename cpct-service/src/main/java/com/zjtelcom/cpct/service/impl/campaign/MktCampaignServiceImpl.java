@@ -2475,6 +2475,16 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 cityMap.put("percent", df.format((int) cityMap.get("count") * 100.0 / total) + "%");
             }
         }
+        //排序
+        Collections.sort(cityMapList, new Comparator<Map<String, Object>>() {
+                    @Override
+                    public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                        Integer count1 = (Integer) o1.get("count");
+                        Integer count2 = (Integer) o2.get("count");
+                        return count2.compareTo(count1);
+                    }
+                });
+
         Map<String, Object> cityDataMap = new HashMap<>();
         Map<String, Object> tableDataMap = new HashMap<>();
         if("(1000, 2000, 3000, 4000)".equals(paramMap.get("mktCampaignType").toString())){
