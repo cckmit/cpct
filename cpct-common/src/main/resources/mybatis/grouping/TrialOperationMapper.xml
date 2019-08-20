@@ -16,6 +16,11 @@
     <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
     <result column="REMARK" jdbcType="VARCHAR" property="remark" />
   </resultMap>
+
+  <sql id="selectColumn">
+    ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+  </sql>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from trial_operation
     where ID = #{id,jdbcType=BIGINT}
@@ -73,27 +78,23 @@
     where ID = #{id,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
-    REMARK
+    select <include refid="selectColumn"/>
     from trial_operation
     where ID = #{id,jdbcType=BIGINT}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
-    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
-    REMARK
+    select <include refid="selectColumn"/>
     from trial_operation
   </select>
 
   <select id="findOperationListByRuleId" resultMap="BaseResultMap">
-    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
-    REMARK
+    select <include refid="selectColumn"/>
     from trial_operation
     where RULE_ID = #{ruleId}
   </select>
 
   <select id="findOperationListByStrategyId" resultMap="BaseResultMap">
-    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM,  STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
-    REMARK
+    select <include refid="selectColumn"/>
     from trial_operation
     where STRATEGY_ID = #{strategyId}
     and CREATE_STAFF = #{createStaff}
@@ -101,8 +102,7 @@
   </select>
 
   <select id="listOperationByUpdateTime" resultMap="BaseResultMap">
-    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM,  STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
-    REMARK
+    select <include refid="selectColumn"/>
     from trial_operation
     where
     <![CDATA[
@@ -119,8 +119,7 @@
   </select>
 
   <select id="listOperationByCreateTime" resultMap="BaseResultMap">
-    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM,  STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
-    REMARK
+    select <include refid="selectColumn"/>
     from trial_operation
     where
     <![CDATA[
@@ -137,24 +136,21 @@
   </select>
 
     <select id="selectByBatchNum" resultMap="BaseResultMap">
-    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM, STATUS_CD,
-    CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
-    REMARK
+    select <include refid="selectColumn"/>
     from trial_operation
     where BATCH_NUM = #{batchNum}
   </select>
 
 
   <select id="listOperationByStatusCd" resultMap="BaseResultMap">
-    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM,  STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,  UPDATE_DATE, REMARK
+    select <include refid="selectColumn"/>
     from trial_operation
     where STATUS_CD = #{statusCd}
   </select>
 
 
   <select id="listOperationCheck" resultMap="BaseResultMap">
-    select ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM,  STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
-    REMARK
+    select <include refid="selectColumn"/>
     from trial_operation
     where STATUS_CD in
     <foreach item="item" index="index" collection="list"

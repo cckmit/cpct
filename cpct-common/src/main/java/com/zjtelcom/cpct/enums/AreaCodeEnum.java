@@ -7,26 +7,28 @@ package com.zjtelcom.cpct.enums;
  */
 public enum AreaCodeEnum {
 
-    ZHEJIAGN(1L, 8330000L),
-    QUZHOU(570L, 8330800L),
-    HAGNZHOU(571L, 8330100L),
-    HUZHOU(572L, 8330500L),
-    JIAXING(573L, 8330400L),
-    NINGBO(574L, 8330200L),
-    SHAOXING(575L, 8330600L),
-    TAIZHOU(576L, 8331000L),
-    WENZHOU(577L, 8330300L),
-    LISHUI(578L, 8331100L),
-    JINHUA(579L, 8330700L),
-    ZHOUSHAN(580L, 8330900L);
+    ZHEJIAGN(1L, 8330000L, 0L),
+    QUZHOU(570L, 8330800L, 20L),
+    HAGNZHOU(571L, 8330100L, 10L),
+    HUZHOU(572L, 8330500L, 11L),
+    JIAXING(573L, 8330400L, 12L),
+    NINGBO(574L, 8330200L, 13L),
+    SHAOXING(575L, 8330600L, 14L),
+    TAIZHOU(576L, 8331000L, 15L),
+    WENZHOU(577L, 8330300L, 16L),
+    LISHUI(578L, 8331100L, 17L),
+    JINHUA(579L, 8330700L, 18L),
+    ZHOUSHAN(580L, 8330900L, 19L);
 
 
     private Long lanId;
     private Long regionId;
+    private Long latnId;
 
-    AreaCodeEnum(Long lanId, Long regionId) {
+    AreaCodeEnum(Long lanId, Long regionId, Long latnId) {
         this.lanId = lanId;
         this.regionId = regionId;
+        this.latnId = latnId;
     }
 
     public Long getLanId() {
@@ -45,6 +47,10 @@ public enum AreaCodeEnum {
         this.regionId = regionId;
     }
 
+    public Long getLatnId() { return latnId; }
+
+    public void setLatnId(Long latnId) { this.latnId = latnId; }
+
     public static Long getRegionIdByLandId(Long LandId){
         for (AreaCodeEnum areaCodeEnum : AreaCodeEnum.values()) {
             if(LandId.equals(areaCodeEnum.lanId)){
@@ -62,4 +68,55 @@ public enum AreaCodeEnum {
         }
         return null;
     }
+
+    public static Long getLatnIdByRegionId(Long RegionId){
+        for (AreaCodeEnum areaCodeEnum : AreaCodeEnum.values()) {
+            if(RegionId.equals(areaCodeEnum.regionId)){
+                return areaCodeEnum.latnId;
+            }
+        }
+        return null;
+    }
+
+    public enum sysAreaCode{
+        CHAOGUAN("cpcp0001","C1"),
+        SHENGJI("cpcpch0001","C2"),
+        FENGONGSI("cpcpch0002","C3"),
+        FENGJU("cpcpch0003","C4"),
+        ZHIJU("cpcpch0003","C5");
+
+        private String sysPostCode;
+        private String sysArea;
+
+        public String getSysPostCode() {
+            return sysPostCode;
+        }
+
+        public void setSysPostCode(String sysPostCode) {
+            this.sysPostCode = sysPostCode;
+        }
+
+        public String getSysArea() {
+            return sysArea;
+        }
+
+        public void setSysArea(String sysArea) {
+            this.sysArea = sysArea;
+        }
+
+        sysAreaCode(String sysPostCode, String sysArea) {
+            this.sysPostCode = sysPostCode;
+            this.sysArea = sysArea;
+        }
+
+    }
+    public static String getSysAreaBySysPostCode(String sysPostCode) {
+        for (sysAreaCode sysAreaCode : sysAreaCode.values()) {
+            if (sysPostCode.equals(sysAreaCode.sysPostCode)){
+                return sysAreaCode.sysArea;
+            }
+        }
+        return null;
+    }
+
 }

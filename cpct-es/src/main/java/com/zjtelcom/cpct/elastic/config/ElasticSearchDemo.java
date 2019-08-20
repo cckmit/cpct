@@ -16,7 +16,11 @@ public class ElasticSearchDemo implements Runnable {
     public void run() {
         System.out.println("开始："+new Date());
         for (int i =0; i<10000;i++){
-            esService.add();
+            try {
+                esService.add();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         System.out.println("结束："+new Date());
     }

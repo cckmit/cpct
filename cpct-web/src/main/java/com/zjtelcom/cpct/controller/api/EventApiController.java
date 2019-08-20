@@ -8,7 +8,9 @@ import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
-import com.zjtelcom.cpct.dubbo.service.EventApiService;
+//import com.zjtelcom.cpct.dubbo.service.EventApiService;
+import com.zjtelcom.cpct.service.api.EventApiService;
+import com.zjtelcom.cpct.service.api.TestService;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.util.ChannelUtil;
@@ -52,6 +54,22 @@ public class EventApiController extends BaseController {
     private MktCampaignMapper campaignMapper;
     @Autowired
     private MktCampaignPrdMapper campaignPrdMapper;
+
+    @Autowired
+    private TestService testService;
+
+
+    @PostMapping("caculateTest")
+    public  Map<String,Object> caculateTest() {
+        Map<String,Object> result = new HashMap<>();
+        List<MktCampaignDO> campaigns = new ArrayList<>();
+        try {
+            result = testService.caculateTest();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 
 
     @PostMapping("test")

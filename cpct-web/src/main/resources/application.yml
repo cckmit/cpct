@@ -41,6 +41,12 @@ spring:
    batch-hits-list: http://134.96.252.170:30808/es/findBatchHitsList
    count-info: http://134.96.252.170:30808/es/searchCountInfo
 
+#事件接入线程（活动校验部分）
+thread:
+  maxPoolSize: 20
+#服务事件默认固定命中标签
+table:
+  infallible: CPCP_CAM_DEFAULT
 
 
 #集团定制的redis配置pst环境
@@ -62,7 +68,7 @@ redisConfig_Prd:
 # cpct_push_end_topic 1個分組 pushGroupName : cpct_push_end_consumer
 ctg:
   namesrvAddr: 134.108.11.159:9892;134.108.11.160:9892;134.108.11.161:9892
-  cpctGroupName: cpct_detailed_list_group_gray
+  cpctGroupName: cpct_file_import
   namesrvAuthID: cpct_user
   namesrvAuthPwd: cpct_user123
   consumeOrderly: false
@@ -74,15 +80,17 @@ ctg:
   clusterName: pst_crm_mq
   tenantID: 2
   clientWorkerThreads: 4
-  cpctTopic: cpct_detailed_list_topic_gray
+  cpctTopic: cpct_topic_import
+
+  cpctEsLogTopic: cpct_eslog_pst
+  cpctEsLogGroup: cpct_eslog_group_pst
 
 pagehelper:
   reasonable: true   # 禁用合理化时，如果pageNum<1或pageNum>pages会返回空数据
 
-#事件接入线程（活动校验部分）
-thread:
-  maxPoolSize: 20
 
-#服务事件默认固定命中标签
-table:
-  infallible: CPCP_CAM_DEFAULT
+#importUserListNecessaryField:
+#  QD00014:
+#    nameList: 客户类型,区域ID,客户联系人,客户联系号码,账户ID,星级,接单人号码
+#    codeList: CORP_USER_NAME,AREA_ID,LINKMAN_NAME,CCUST_TEL,CACCT_ID,MKT_STAR_GRADE_NAME,SALE_EMP_NBR
+
