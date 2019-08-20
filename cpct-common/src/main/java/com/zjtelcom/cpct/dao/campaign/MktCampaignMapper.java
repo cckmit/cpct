@@ -53,6 +53,10 @@ public interface MktCampaignMapper {
 
     MktCampaignDO selectPrimaryKeyByInitId(@Param("initId")Long initId, @Param("statusCd")String statusCd);
 
-    MktCampaignDO selectByInitForRollBack(@Param("initId")Long initId);;
+    MktCampaignDO selectByInitForRollBack(@Param("initId")Long initId);
+
+    int countByStatus(@Param("map")Map<String, Object> map);
+
+    int countByTrial(@Param("map")Map<String, Object> map);
 
 }

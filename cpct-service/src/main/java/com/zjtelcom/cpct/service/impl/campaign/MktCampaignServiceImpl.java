@@ -59,6 +59,7 @@ import com.zjtelcom.cpct.service.grouping.TrialProdService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SyncActivityService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
+import com.zjtelcom.cpct.service.system.SysAreaService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInfoMapper;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
@@ -70,7 +71,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.*;
 
@@ -241,36 +244,37 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private SearchLabelService searchLabelService;
     @Autowired
     private TrialProdService trialProdService;
+    @Autowired
+    private SysAreaService sysAreaService;
 
     //指定下发地市人员的数据集合
-    private final static String CITY_PUBLISH="CITY_PUBLISH";
-
+    private final static String CITY_PUBLISH = "CITY_PUBLISH";
 
 
     @Override
     public Map<String, Object> searchByCampaignId(Long campaignId) {
-        Map<String,Object> result = new HashMap<>();
-        Map<String,Object> strategyMap = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> strategyMap = new HashMap<>();
         List<MktStrategyConfDO> strategyConfList = mktStrategyConfMapper.selectByCampaignId(campaignId);
-        for (MktStrategyConfDO strategyConfDO : strategyConfList){
-            strategyMap.put("strategyId",strategyConfDO.getMktStrategyConfId());
-            strategyMap.put("strategyName",strategyConfDO.getMktStrategyConfName());
-            Map<String,Object> ruleMap = new HashMap<>();
+        for (MktStrategyConfDO strategyConfDO : strategyConfList) {
+            strategyMap.put("strategyId", strategyConfDO.getMktStrategyConfId());
+            strategyMap.put("strategyName", strategyConfDO.getMktStrategyConfName());
+            Map<String, Object> ruleMap = new HashMap<>();
             List<MktStrategyConfRuleDO> ruleDOList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(strategyConfDO.getMktStrategyConfId());
-            for (MktStrategyConfRuleDO ruleDO : ruleDOList){
-                ruleMap.put("ruleId",ruleDO.getMktStrategyConfRuleId());
-                ruleMap.put("ruleName",ruleDO.getMktStrategyConfRuleName());
+            for (MktStrategyConfRuleDO ruleDO : ruleDOList) {
+                ruleMap.put("ruleId", ruleDO.getMktStrategyConfRuleId());
+                ruleMap.put("ruleName", ruleDO.getMktStrategyConfRuleName());
                 TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(ruleDO.getTarGrpId());
-                Map<String,Object> tarMap = new HashMap<>();
-                if (tarGrp!=null){
-                    tarMap.put("tarGrpId",tarGrp.getTarGrpId());
-                    ruleMap.put("tarGrp",tarMap);
+                Map<String, Object> tarMap = new HashMap<>();
+                if (tarGrp != null) {
+                    tarMap.put("tarGrpId", tarGrp.getTarGrpId());
+                    ruleMap.put("tarGrp", tarMap);
                 }
             }
-            strategyMap.put("rule",ruleMap);
+            strategyMap.put("rule", ruleMap);
         }
-        result.put("campaignId",campaignId);
-        result.put("strategy",strategyMap);
+        result.put("campaignId", campaignId);
+        result.put("strategy", strategyMap);
         return result;
     }
 
@@ -300,7 +304,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 SystemUserDto userDetail = UserUtil.getRoleCode();
                 for (SystemPostDto role : userDetail.getSystemPostDtoList()) {
                     // 判断是否为超级管理员
-                    if(role.getSysPostCode().contains(PostEnum.ADMIN.getPostCode())){
+                    if (role.getSysPostCode().contains(PostEnum.ADMIN.getPostCode())) {
                         mktCampaignDO.setCreateChannel(role.getSysPostCode());
                         break;
                     } else if (role.getSysPostCode().contains("cpcpch")) {
@@ -308,7 +312,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         continue;
                     }
                 }
-            } else{
+            } else {
                 mktCampaignDO.setRegionId(AreaCodeEnum.ZHEJIAGN.getRegionId());
                 mktCampaignDO.setCreateChannel(PostEnum.ADMIN.getPostCode());
             }
@@ -372,7 +376,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
 
             //更新推荐条目
-            if (mktCampaignVO.getMktCamItemIdList()!=null && !mktCampaignVO.getMktCamItemIdList().isEmpty()){
+            if (mktCampaignVO.getMktCamItemIdList() != null && !mktCampaignVO.getMktCamItemIdList().isEmpty()) {
                 List<MktCamItem> mktCamItemList = mktCamItemMapper.selectByBatch(mktCampaignVO.getMktCamItemIdList());
                 for (MktCamItem mktCamItem : mktCamItemList) {
                     mktCamItem.setMktCampaignId(mktCampaignId);
@@ -381,7 +385,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
 
             //需求涵id不为空添加与活动的关系
-            if (mktCampaignVO.getRequestId()!=null){
+            if (mktCampaignVO.getRequestId() != null) {
                 RequestInstRel requestInstRel = new RequestInstRel();
                 requestInstRel.setRequestInfoId(mktCampaignVO.getRequestId());
                 requestInstRel.setRequestObjId(mktCampaignId);
@@ -392,11 +396,11 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 requestInstRel.setCreateDate(new Date());
                 requestInstRel.setRequestObjType("mkt");
                 requestInstRelMapper.insert(requestInstRel);
-                List<RequestInstRel> requestInstRels = requestInstRelMapper.selectByRequestId(mktCampaignVO.getRequestId(),"offer");
-                for (RequestInstRel request : requestInstRels){
+                List<RequestInstRel> requestInstRels = requestInstRelMapper.selectByRequestId(mktCampaignVO.getRequestId(), "offer");
+                for (RequestInstRel request : requestInstRels) {
                     Long offerId = request.getRequestObjId();
                     Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
-                    if (offer==null){
+                    if (offer == null) {
                         continue;
                     }
                     ObjMktCampaignRel objMktCam = new ObjMktCampaignRel();
@@ -441,9 +445,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
 
             //试运算展示列实例化
-            if(mktCampaignVO.getCalcDisplay() != null) {
+            if (mktCampaignVO.getCalcDisplay() != null) {
                 List<DisplayColumnLabel> displayColumnLabelList = displayColumnLabelMapper.findListByDisplayId(mktCampaignVO.getCalcDisplay());
-                for(DisplayColumnLabel displayColumnLabel : displayColumnLabelList) {
+                for (DisplayColumnLabel displayColumnLabel : displayColumnLabelList) {
                     MktCamDisplayColumnRel mktCamDisplayColumnRel = new MktCamDisplayColumnRel();
                     mktCamDisplayColumnRel.setMktCampaignId(mktCampaignId);
                     mktCamDisplayColumnRel.setInjectionLabelId(displayColumnLabel.getInjectionLabelId());
@@ -531,7 +535,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
 
             //更新推荐条目
-            if (mktCampaignVO.getMktCamItemIdList() !=null && !mktCampaignVO.getMktCamItemIdList().isEmpty()){
+            if (mktCampaignVO.getMktCamItemIdList() != null && !mktCampaignVO.getMktCamItemIdList().isEmpty()) {
                 List<MktCamItem> mktCamItemList = mktCamItemMapper.selectByBatch(mktCampaignVO.getMktCamItemIdList());
                 for (MktCamItem mktCamItem : mktCamItemList) {
                     mktCamItem.setMktCampaignId(mktCampaignId);
@@ -617,9 +621,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
             //重建展示列实例
             mktCamDisplayColumnRelMapper.deleteByMktCampaignId(mktCampaignId);
-            if(mktCampaignVO.getCalcDisplay() != null) {
+            if (mktCampaignVO.getCalcDisplay() != null) {
                 List<DisplayColumnLabel> displayColumnLabelList = displayColumnLabelMapper.findListByDisplayId(mktCampaignVO.getCalcDisplay());
-                for(DisplayColumnLabel displayColumnLabel : displayColumnLabelList) {
+                for (DisplayColumnLabel displayColumnLabel : displayColumnLabelList) {
                     MktCamDisplayColumnRel mktCamDisplayColumnRel = new MktCamDisplayColumnRel();
                     mktCamDisplayColumnRel.setMktCampaignId(mktCampaignId);
                     mktCamDisplayColumnRel.setInjectionLabelId(displayColumnLabel.getInjectionLabelId());
@@ -687,14 +691,14 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
         //查询父活动信息
         List<MktCampaignRelDO> mktCampaignRelDOS = mktCampaignRelMapper.selectByZmktCampaignId(mktCampaignId, "1000");
-        if(mktCampaignRelDOS!=null && mktCampaignRelDOS.size()>0){
+        if (mktCampaignRelDOS != null && mktCampaignRelDOS.size() > 0) {
             MktCampaignDO mktCampaignDOPre = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(mktCampaignRelDOS.get(0).getaMktCampaignId()));
             mktCampaignVO.setPreMktCampaignId(mktCampaignDOPre.getMktCampaignId());
-            if("1000".equals(mktCampaignDOPre.getMktCampaignCategory())){
+            if ("1000".equals(mktCampaignDOPre.getMktCampaignCategory())) {
                 mktCampaignVO.setPreMktCampaignType("框架活动");
-            }else if("2000".equals(mktCampaignDOPre.getMktCampaignCategory())){
+            } else if ("2000".equals(mktCampaignDOPre.getMktCampaignCategory())) {
                 mktCampaignVO.setPreMktCampaignType("强制活动");
-            }else if("3000".equals(mktCampaignDOPre.getMktCampaignCategory())){
+            } else if ("3000".equals(mktCampaignDOPre.getMktCampaignCategory())) {
                 mktCampaignVO.setPreMktCampaignType("自主活动");
             }
         }
@@ -821,10 +825,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         // 删除活动基本信息
         try {
 
-            MktCampaignDO mktCampaignDO =mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
+            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
 
             // 查询initId为mktCampaignId且状态为调整中
-            MktCampaignDO mktCampaignDOAdjust= mktCampaignMapper.selectPrimaryKeyByInitId(mktCampaignDO.getInitId(), StatusCode.STATUS_CODE_ADJUST.getStatusCode());
+            MktCampaignDO mktCampaignDOAdjust = mktCampaignMapper.selectPrimaryKeyByInitId(mktCampaignDO.getInitId(), StatusCode.STATUS_CODE_ADJUST.getStatusCode());
             // 回滚父活动
             if (mktCampaignDOAdjust != null) {
                 changeMktCampaignStatus(mktCampaignDOAdjust.getMktCampaignId(), StatusCode.STATUS_CODE_PUBLISHED.getStatusCode());
@@ -950,7 +954,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCampaignVO.setCreateChannel(mktCampaignCountDO.getCreateChannel());
                     mktCampaignVO.setCreateDate(mktCampaignCountDO.getCreateDate());
                     mktCampaignVO.setUpdateDate(mktCampaignCountDO.getUpdateDate());
-                    if (mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode()) || mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_PASS.getStatusCode()) || mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_ROLL.getStatusCode())|| mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_ADJUST.getStatusCode()) || mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_STOP.getStatusCode()) || mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_PRE_PAUSE.getStatusCode())) {
+                    if (mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode()) || mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_PASS.getStatusCode()) || mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_ROLL.getStatusCode()) || mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_ADJUST.getStatusCode()) || mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_STOP.getStatusCode()) || mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_PRE_PAUSE.getStatusCode())) {
                         mktCampaignVO.setStatusExamine(StatusCode.STATUS_CODE_PASS.getStatusMsg());
                     } else if (mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_UNPASS.getStatusCode())) {
                         mktCampaignVO.setStatusExamine(StatusCode.STATUS_CODE_UNPASS.getStatusMsg());
@@ -1059,8 +1063,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         Map<String, Object> maps = new HashMap<>();
         try {
             MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(campaignId);
-            if(!(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(campaignDO.getStatusCd())
-                    || StatusCode.STATUS_CODE_PRE_PAUSE.getStatusCode().equals(campaignDO.getStatusCd()))){
+            if (!(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(campaignDO.getStatusCd()) || StatusCode.STATUS_CODE_PRE_PAUSE.getStatusCode().equals(campaignDO.getStatusCd()))) {
                 maps.put("resultCode", CODE_FAIL);
                 maps.put("resultMsg", "活动状态不为发布或者过期");
                 return maps;
@@ -1085,7 +1088,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
             // 渠道生失效时间延期
             List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectAttrEndDateByCampaignId(campaignId);
-            for (MktCamChlConfAttrDO mktCamChlConfAttrDO:mktCamChlConfAttrDOList) {
+            for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
                 mktCamChlConfAttrDO.setAttrValue(String.valueOf(lastTime.getTime()));
             }
             mktCamChlConfAttrMapper.updateByPrimaryKeyBatch(mktCamChlConfAttrDOList);
@@ -1115,7 +1118,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setTiggerType(params.get("tiggerType").toString());             // 活动触发类型 - 实时，批量
             mktCampaignDO.setMktCampaignCategory(params.get("mktCampaignCategory").toString());  // 活动分类 - 框架，强制，自主
             mktCampaignDO.setMktCampaignType(params.get("mktCampaignType").toString());   // 活动类别 - 服务，营销，服务+营销
-            if(params.get("createStaff").toString()!=null && !"".equals(params.get("createStaff").toString())){
+            if (params.get("createStaff").toString() != null && !"".equals(params.get("createStaff").toString())) {
                 mktCampaignDO.setCreateStaff(Long.valueOf(params.get("createStaff").toString()));  // 创建人
             }
 
@@ -1153,22 +1156,21 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         QrySystemPostReq qrySystemPostReq = new QrySystemPostReq();
                         qrySystemPostReq.setSystemPost(systemPost);
                         long before1 = System.currentTimeMillis();
-                        SysmgrResultObject<com.ctzj.smt.bss.sysmgr.model.common.Page> pageSysmgrResultObject =
-                                iSystemPostDubboService.qrySystemPostPage(new com.ctzj.smt.bss.sysmgr.model.common.Page(), qrySystemPostReq);
+                        SysmgrResultObject<com.ctzj.smt.bss.sysmgr.model.common.Page> pageSysmgrResultObject = iSystemPostDubboService.qrySystemPostPage(new com.ctzj.smt.bss.sysmgr.model.common.Page(), qrySystemPostReq);
                         logger.info("iSystemPostDubboService.qrySystemPostPage 消耗时间：" + (System.currentTimeMillis() - before1) + " ms");
-                        if(pageSysmgrResultObject!=null){
-                            if( pageSysmgrResultObject.getResultObject()!=null){
+                        if (pageSysmgrResultObject != null) {
+                            if (pageSysmgrResultObject.getResultObject() != null) {
                                 List<SystemPost> dataList = (List<SystemPost>) pageSysmgrResultObject.getResultObject().getDataList();
-                                if(dataList!=null){
-                                    if(dataList.get(0)!=null){
+                                if (dataList != null) {
+                                    if (dataList.get(0) != null) {
                                         postName = dataList.get(0).getSysPostName();
                                         logger.info("--->>> 岗位信息：" + postName);
                                     }
                                 }
                             }
                         }
-                    }catch (Exception e){
-                        logger.error("iSystemPostDubboService.qrySystemPostPage接口错误！Exception = " , e);
+                    } catch (Exception e) {
+                        logger.error("iSystemPostDubboService.qrySystemPostPage接口错误！Exception = ", e);
                     }
                     mktCampaignVO.setCreateChannelName(postName);
                     mktCampaignVO.setCreateDate(mktCampaignCountDO.getCreateDate());
@@ -1236,7 +1238,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     }
 
 
-
     /**
      * 查询活动列表（分页） -- 活动总览(没有发布状态的活动)
      */
@@ -1250,7 +1251,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setTiggerType(params.get("tiggerType").toString());             // 活动触发类型 - 实时，批量
             mktCampaignDO.setMktCampaignCategory(params.get("mktCampaignCategory").toString());  // 活动分类 - 框架，强制，自主
             mktCampaignDO.setMktCampaignType(params.get("mktCampaignType").toString());   // 活动类别 - 服务，营销，服务+营销
-            if(params.get("createStaff").toString()!=null && !"".equals(params.get("createStaff").toString())){
+            if (params.get("createStaff").toString() != null && !"".equals(params.get("createStaff").toString())) {
                 mktCampaignDO.setCreateStaff(Long.valueOf(params.get("createStaff").toString()));  // 创建人
             }
 
@@ -1288,22 +1289,21 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         QrySystemPostReq qrySystemPostReq = new QrySystemPostReq();
                         qrySystemPostReq.setSystemPost(systemPost);
                         long before1 = System.currentTimeMillis();
-                        SysmgrResultObject<com.ctzj.smt.bss.sysmgr.model.common.Page> pageSysmgrResultObject =
-                                iSystemPostDubboService.qrySystemPostPage(new com.ctzj.smt.bss.sysmgr.model.common.Page(), qrySystemPostReq);
+                        SysmgrResultObject<com.ctzj.smt.bss.sysmgr.model.common.Page> pageSysmgrResultObject = iSystemPostDubboService.qrySystemPostPage(new com.ctzj.smt.bss.sysmgr.model.common.Page(), qrySystemPostReq);
                         logger.info("iSystemPostDubboService.qrySystemPostPage 消耗时间：" + (System.currentTimeMillis() - before1) + " ms");
-                        if(pageSysmgrResultObject!=null){
-                            if( pageSysmgrResultObject.getResultObject()!=null){
+                        if (pageSysmgrResultObject != null) {
+                            if (pageSysmgrResultObject.getResultObject() != null) {
                                 List<SystemPost> dataList = (List<SystemPost>) pageSysmgrResultObject.getResultObject().getDataList();
-                                if(dataList!=null){
-                                    if(dataList.get(0)!=null){
+                                if (dataList != null) {
+                                    if (dataList.get(0) != null) {
                                         postName = dataList.get(0).getSysPostName();
                                         logger.info("--->>> 岗位信息：" + postName);
                                     }
                                 }
                             }
                         }
-                    }catch (Exception e){
-                        logger.error("iSystemPostDubboService.qrySystemPostPage接口错误！Exception = " , e);
+                    } catch (Exception e) {
+                        logger.error("iSystemPostDubboService.qrySystemPostPage接口错误！Exception = ", e);
                     }
                     mktCampaignVO.setCreateChannelName(postName);
                     mktCampaignVO.setCreateDate(mktCampaignCountDO.getCreateDate());
@@ -1371,7 +1371,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     }
 
 
-
     /**
      * 查询活动列表（分页） -- 活动总览(发布或者调整中状态的活动)
      */
@@ -1385,7 +1384,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setTiggerType(params.get("tiggerType").toString());             // 活动触发类型 - 实时，批量
             mktCampaignDO.setMktCampaignCategory(params.get("mktCampaignCategory").toString());  // 活动分类 - 框架，强制，自主
             mktCampaignDO.setMktCampaignType(params.get("mktCampaignType").toString());   // 活动类别 - 服务，营销，服务+营销
-            if(params.get("createStaff").toString()!=null && !"".equals(params.get("createStaff").toString())){
+            if (params.get("createStaff").toString() != null && !"".equals(params.get("createStaff").toString())) {
                 mktCampaignDO.setCreateStaff(Long.valueOf(params.get("createStaff").toString()));  // 创建人
             }
 
@@ -1423,22 +1422,21 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         QrySystemPostReq qrySystemPostReq = new QrySystemPostReq();
                         qrySystemPostReq.setSystemPost(systemPost);
                         long before1 = System.currentTimeMillis();
-                        SysmgrResultObject<com.ctzj.smt.bss.sysmgr.model.common.Page> pageSysmgrResultObject =
-                                iSystemPostDubboService.qrySystemPostPage(new com.ctzj.smt.bss.sysmgr.model.common.Page(), qrySystemPostReq);
+                        SysmgrResultObject<com.ctzj.smt.bss.sysmgr.model.common.Page> pageSysmgrResultObject = iSystemPostDubboService.qrySystemPostPage(new com.ctzj.smt.bss.sysmgr.model.common.Page(), qrySystemPostReq);
                         logger.info("iSystemPostDubboService.qrySystemPostPage 消耗时间：" + (System.currentTimeMillis() - before1) + " ms");
-                        if(pageSysmgrResultObject!=null){
-                            if( pageSysmgrResultObject.getResultObject()!=null){
+                        if (pageSysmgrResultObject != null) {
+                            if (pageSysmgrResultObject.getResultObject() != null) {
                                 List<SystemPost> dataList = (List<SystemPost>) pageSysmgrResultObject.getResultObject().getDataList();
-                                if(dataList!=null){
-                                    if(dataList.get(0)!=null){
+                                if (dataList != null) {
+                                    if (dataList.get(0) != null) {
                                         postName = dataList.get(0).getSysPostName();
                                         logger.info("--->>> 岗位信息：" + postName);
                                     }
                                 }
                             }
                         }
-                    }catch (Exception e){
-                        logger.error("iSystemPostDubboService.qrySystemPostPage接口错误！Exception = " , e);
+                    } catch (Exception e) {
+                        logger.error("iSystemPostDubboService.qrySystemPostPage接口错误！Exception = ", e);
                     }
                     mktCampaignVO.setCreateChannelName(postName);
                     mktCampaignVO.setCreateDate(mktCampaignCountDO.getCreateDate());
@@ -1528,25 +1526,24 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             // 判断是否是发布活动, 是该状态生效
             if (StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd) || StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)) {
                 List<MktCamResultRelDO> mktCamResultRelDOS = mktCamResultRelMapper.selectResultByMktCampaignId(mktCampaignId);
-                for (MktCamResultRelDO mktCamResultRelDO:mktCamResultRelDOS) {
+                for (MktCamResultRelDO mktCamResultRelDO : mktCamResultRelDOS) {
                     mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
-                    if(StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)){
+                    if (StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)) {
                         mktCamResultRelMapper.updateByPrimaryKey(mktCamResultRelDO);
                     }
 
                 }
-                if(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)){
+                if (StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)) {
                     //活动发布若是清单活动重新试算全量清单
                     UserListTemp(mktCampaignId, mktCampaignDO);
                 }
                 // 发布调整的活动，下线源活动
-                if(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)
-                        && !mktCampaignId.equals(initId)){
+                if (StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd) && !mktCampaignId.equals(initId)) {
                     // 查询initId为mktCampaignId且状态为调整中
-                    MktCampaignDO mktCampaignDOAdjust= mktCampaignMapper.selectPrimaryKeyByInitId(initId, StatusCode.STATUS_CODE_ADJUST.getStatusCode());
+                    MktCampaignDO mktCampaignDOAdjust = mktCampaignMapper.selectPrimaryKeyByInitId(initId, StatusCode.STATUS_CODE_ADJUST.getStatusCode());
                     changeMktCampaignStatus(mktCampaignDOAdjust.getMktCampaignId(), StatusCode.STATUS_CODE_ROLL.getStatusCode());
                 }
-                if(StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)){
+                if (StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)) {
                     // 活动下线清缓存
                     redisUtils.del("MKT_CAMPAIGN_" + mktCampaignId);
                     // 删除下线活动与事件的关系
@@ -1560,7 +1557,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     public void run() {
                         try {
                             List<MktCamEvtRelDO> eventRelList = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignId);
-                            for (MktCamEvtRelDO eventDo : eventRelList){
+                            for (MktCamEvtRelDO eventDo : eventRelList) {
                                 Map<String, String> mktAllLabels = searchLabelService.labelListByEventId(eventDo.getEventId());  //查询事件下使用的所有标签
                                 if (null != mktAllLabels) {
                                     redisUtils.set("EVT_ALL_LABEL_" + eventDo.getEventId(), mktAllLabels);
@@ -1570,28 +1567,28 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                             redisUtils.set("CAM_LABEL_DTO_LIST" + mktCampaignId, labelDTOList);
                             //过滤规则标签
                             List<FilterRule> filterRules = filterRuleMapper.selectFilterRuleList(Long.valueOf(mktCampaignId.toString()));
-                            redisUtils.set("CAM_FILTER_LIST_"+mktCampaignId,filterRules);
+                            redisUtils.set("CAM_FILTER_LIST_" + mktCampaignId, filterRules);
                             //规则级的标签
-                            List<MktStrategyConfRuleDO>  ruleList = ruleMapper.selectByCampaignId(Long.valueOf(mktCampaignId.toString()));
-                            redisUtils.set("CAM_RULE_LIST_"+mktCampaignId,ruleList);
+                            List<MktStrategyConfRuleDO> ruleList = ruleMapper.selectByCampaignId(Long.valueOf(mktCampaignId.toString()));
+                            redisUtils.set("CAM_RULE_LIST_" + mktCampaignId, ruleList);
                             //话术标签
-                            for (MktStrategyConfRuleDO ruleDO : ruleList){
-                                if (ruleDO.getEvtContactConfId()!=null && !ruleDO.getEvtContactConfId().equals("")){
+                            for (MktStrategyConfRuleDO ruleDO : ruleList) {
+                                if (ruleDO.getEvtContactConfId() != null && !ruleDO.getEvtContactConfId().equals("")) {
                                     String[] confList = ruleDO.getEvtContactConfId().split("/");
                                     //推荐指引标签
-                                    for (String confId : confList){
-                                        List<MktVerbal>  verbalList = verbalMapper.findVerbalListByConfId(Long.valueOf(confId));
-                                        redisUtils.set("CAM_VERBAL_LIST_"+confId,verbalList);
-                                        List<MktCamChlConfAttrDO>  confAttrDOList = confAttrMapper.selectByEvtContactConfId(Long.valueOf(confId));
-                                        redisUtils.set("CAM_CONF_ATTR_LIST_"+confId,confAttrDOList);
+                                    for (String confId : confList) {
+                                        List<MktVerbal> verbalList = verbalMapper.findVerbalListByConfId(Long.valueOf(confId));
+                                        redisUtils.set("CAM_VERBAL_LIST_" + confId, verbalList);
+                                        List<MktCamChlConfAttrDO> confAttrDOList = confAttrMapper.selectByEvtContactConfId(Long.valueOf(confId));
+                                        redisUtils.set("CAM_CONF_ATTR_LIST_" + confId, confAttrDOList);
                                     }
                                 }
-                                List<TarGrpCondition>   conditionList = tarGrpConditionMapper.listTarGrpCondition(ruleDO.getTarGrpId());
-                                redisUtils.set("CAM_TAR_CONDITION_LIST_"+ruleDO.getTarGrpId(),conditionList);
+                                List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(ruleDO.getTarGrpId());
+                                redisUtils.set("CAM_TAR_CONDITION_LIST_" + ruleDO.getTarGrpId(), conditionList);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
-                            logger.error("[op:MktCampaignServiceImpl] 缓存添加失败 by mktCampaignId = {}, Expection = ",mktCampaignId, e);
+                            logger.error("[op:MktCampaignServiceImpl] 缓存添加失败 by mktCampaignId = {}, Expection = ", mktCampaignId, e);
                         }
                     }
                 }.start();
@@ -1607,26 +1604,26 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                                 synchronizeCampaignService.deleteCampaignRedisProd(mktCampaignId);
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                logger.error("[op:MktCampaignServiceImpl] 活动同步失败 by mktCampaignId = {}, Expection = ",mktCampaignId, e);
+                                logger.error("[op:MktCampaignServiceImpl] 活动同步失败 by mktCampaignId = {}, Expection = ", mktCampaignId, e);
                             }
                         }
                     }.start();
                 }
-            } else if(StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)){
+            } else if (StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)) {
                 // 活动下线清缓存
                 redisUtils.del("MKT_CAMPAIGN_" + mktCampaignId);
-                if(StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)){
+                if (StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)) {
                     List<MktCamResultRelDO> mktCamResultRelDOS = mktCamResultRelMapper.selectResultByMktCampaignId(mktCampaignId);
-                    for (MktCamResultRelDO mktCamResultRelDO:mktCamResultRelDOS) {
+                    for (MktCamResultRelDO mktCamResultRelDO : mktCamResultRelDOS) {
                         mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_NOTACTIVE.getStatusCode());
                         mktCamResultRelMapper.updateByPrimaryKey(mktCamResultRelDO);
                     }
                 }
-            } else if(StatusCode.STATUS_CODE_ROLL_BACK.getStatusCode().equals(statusCd)){
+            } else if (StatusCode.STATUS_CODE_ROLL_BACK.getStatusCode().equals(statusCd)) {
                 // 查询initId为mktCampaignId且状态为调整待发布
                 MktCampaignDO mktCampaignDONew = mktCampaignMapper.selectByInitForRollBack(mktCampaignDO.getInitId());
                 // 删除“调整待发布”活动,并保证不能删除源活动
-                if (mktCampaignDONew != null && mktCampaignDONew.getMktCampaignId()!= mktCampaignDONew.getInitId()) {
+                if (mktCampaignDONew != null && mktCampaignDONew.getMktCampaignId() != mktCampaignDONew.getInitId()) {
                     delMktCampaign(mktCampaignDONew.getMktCampaignId());
                 }
                 // 回滚活动, 改变原来状态为发布
@@ -1674,7 +1671,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         try {
             // 获取当前活动信息
             MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
-            if (mktCampaignDO!=null && mktCampaignDO.getStatusCd().equals(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode())){
+            if (mktCampaignDO != null && mktCampaignDO.getStatusCd().equals(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode())) {
                 mktCampaignMap.put("resultCode", CommonConstant.CODE_FAIL);
                 mktCampaignMap.put("resultMsg", "已发布活动请勿重复发布！");
                 return mktCampaignMap;
@@ -1700,7 +1697,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCampaignDO.setMktCampaignId(null);
                     // 活动名称加上地市
                     String areaName = AreaNameEnum.getNameByLandId(mktCamCityRelDO.getCityId());
-                    mktCampaignDO.setMktCampaignName(parentMktCampaignName + "-" + areaName );
+                    mktCampaignDO.setMktCampaignName(parentMktCampaignName + "-" + areaName);
                     mktCampaignDO.setMktCampaignCategory(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()); // 子活动默认为自主活动
                     mktCampaignDO.setLanId(mktCamCityRelDO.getCityId()); // 本地网标识
                     mktCampaignDO.setRegionId(AreaCodeEnum.getRegionIdByLandId(mktCamCityRelDO.getCityId()));
@@ -1825,12 +1822,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         if (mktCamCodeList.contains(mktCampaignDO.getInitId().toString())) {
             new Thread() {
                 public void run() {
-                    logger.info("清单活动发布全量算清单：" + mktCampaignId+" INIT_ID:"+mktCampaignDO.getInitId());
-                    Map<String,Object> params = new HashMap<>();
+                    logger.info("清单活动发布全量算清单：" + mktCampaignId + " INIT_ID:" + mktCampaignDO.getInitId());
+                    Map<String, Object> params = new HashMap<>();
                     List<Integer> arrayList = new ArrayList<>();
                     arrayList.add(Integer.valueOf(mktCampaignId.toString()));
-                    params.put("userListCam","USER_LIST_CAM");
-                    params.put("idList",arrayList);
+                    params.put("userListCam", "USER_LIST_CAM");
+                    params.put("idList", arrayList);
                     trialProdService.campaignIndexTask(params);
                 }
             }.start();
@@ -1840,11 +1837,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
     /**
      * 根据地市生成子需求函，子活动和子需求函的关联，和指定的承接人员
+     *
      * @param mktCampaignDO 新生成的子活动
-     * @param lanId 地市id
+     * @param lanId         地市id
      */
-    public void generateRequest(MktCampaignDO mktCampaignDO,Long lanId){
-        RequestInfo requestInfo=new RequestInfo();
+    public void generateRequest(MktCampaignDO mktCampaignDO, Long lanId) {
+        RequestInfo requestInfo = new RequestInfo();
         requestInfo.setRequestType("mkt");
         //需求函批次号按规律递增1
         requestInfo.setBatchNo(getBatchNo(requestInfoMapper.selectMaxBatchNo()));
@@ -1864,28 +1862,28 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         requestInfo.setReportTag("0");
         //得到指定下发的人员信息集合
         List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign(CITY_PUBLISH);
-        if(!sysParams.isEmpty()){
-                SysParams s=sysParams.get(0);
-                String paramValue = s.getParamValue();
-                if(StringUtils.isNotBlank(paramValue)){
-                    JSONArray jsonArray = JSONArray.parseArray(paramValue);
-                    for (int i = 0; i <jsonArray.size() ; i++) {
-                        JSONObject o = JSONObject.parseObject(JSON.toJSONString(jsonArray.get(i)));
-                        String lan =o.getString("lanId");
-                        if(lanId-Long.valueOf(lan)==0){
-                            requestInfo.setContName(o.getString("name"));
-                            requestInfo.setDeptCode(o.getString("department"));
-                            requestInfo.setCreateStaff(o.getLong("employeeId"));   //创建人,目前指定到承接人的工号
-                            mktCampaignDO.setCreateStaff(o.getLong("systemUserId"));
-                            mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
-                            break;
-                        }
+        if (!sysParams.isEmpty()) {
+            SysParams s = sysParams.get(0);
+            String paramValue = s.getParamValue();
+            if (StringUtils.isNotBlank(paramValue)) {
+                JSONArray jsonArray = JSONArray.parseArray(paramValue);
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    JSONObject o = JSONObject.parseObject(JSON.toJSONString(jsonArray.get(i)));
+                    String lan = o.getString("lanId");
+                    if (lanId - Long.valueOf(lan) == 0) {
+                        requestInfo.setContName(o.getString("name"));
+                        requestInfo.setDeptCode(o.getString("department"));
+                        requestInfo.setCreateStaff(o.getLong("employeeId"));   //创建人,目前指定到承接人的工号
+                        mktCampaignDO.setCreateStaff(o.getLong("systemUserId"));
+                        mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
+                        break;
                     }
                 }
+            }
         }
         requestInfoMapper.insert(requestInfo);
         //开始增加子活动和需求函的关系
-        RequestInstRel rel=new RequestInstRel();
+        RequestInstRel rel = new RequestInstRel();
         rel.setRequestObjId(mktCampaignDO.getMktCampaignId());
         rel.setRequestInfoId(requestInfo.getRequestTemplateInstId());
         rel.setRequestObjType("mkt");
@@ -1900,16 +1898,16 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     /**
      * 得到最新的批次编号
      * 浙电产品套餐需求浙【2019】1002116号
+     *
      * @param batchNo
      * @return
      */
-    public String getBatchNo(String batchNo){
-        String substring = batchNo.substring(0,batchNo.length() - 8);
-        Long s1=Long.valueOf(batchNo.substring(batchNo.length() - 8, batchNo.length() - 1))+1;
-        String path=substring+s1+"号";
-        return  path;
+    public String getBatchNo(String batchNo) {
+        String substring = batchNo.substring(0, batchNo.length() - 8);
+        Long s1 = Long.valueOf(batchNo.substring(batchNo.length() - 8, batchNo.length() - 1)) + 1;
+        String path = substring + s1 + "号";
+        return path;
     }
-
 
 
     /**
@@ -2090,7 +2088,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     }
 
 
-
     /**
      * 调整活动（复制活动）
      *
@@ -2155,7 +2152,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             // 获取过滤规则集合
             List<Long> filterRuleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(parentMktCampaignId);
             List<MktStrategyFilterRuleRelDO> mktStrategyFilterRuleRelDOList = new ArrayList<>();
-            for (Long filterRuleId:filterRuleIdList) {
+            for (Long filterRuleId : filterRuleIdList) {
                 MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO = new MktStrategyFilterRuleRelDO();
                 mktStrategyFilterRuleRelDO.setStrategyId(newMktCampaignId);
                 mktStrategyFilterRuleRelDO.setRuleId(filterRuleId);
@@ -2173,7 +2170,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             // 获取关单规则集合
             List<Long> closeRuleIdList = mktStrategyCloseRuleRelMapper.selectByStrategyId(parentMktCampaignId);
             List<MktStrategyCloseRuleRelDO> mktStrategyCloseRuleRelDOList = new ArrayList<>();
-            for (Long closeRuleId:closeRuleIdList) {
+            for (Long closeRuleId : closeRuleIdList) {
                 MktStrategyCloseRuleRelDO mktStrategyCloseRuleRelDO = new MktStrategyCloseRuleRelDO();
                 mktStrategyCloseRuleRelDO.setStrategyId(newMktCampaignId);
                 mktStrategyCloseRuleRelDO.setRuleId(closeRuleId);
@@ -2217,6 +2214,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
     /**
      * 定时过期活动
+     *
      * @return
      */
     @Override
@@ -2243,5 +2241,294 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         }
         return result;
     }
+
+
+    /**
+     * 统计活动
+     *
+     * @return
+     */
+    @Override
+    public Map<String, Object> countMktCampaign(Map<String, Object> params) {
+
+        /* 条件入参处理 */
+        Map<String, Object> paramMap = new HashMap<>();
+        Map<String, Object> resultMap = new HashMap<>();
+        if (params.get("month") != null && !"".equals(params.get("month"))) {
+            String month = params.get("month").toString();
+            String[] timeArr = month.split("-");
+            paramMap.put("startTime", DateUtil.string2DateTime4Day(DateUtil.getFisrtDayOfMonth(Integer.valueOf(timeArr[0]), Integer.valueOf(timeArr[1]))));
+            paramMap.put("endTime", DateUtil.string2DateTime4Day(DateUtil.getLastDayOfMonth(Integer.valueOf(timeArr[0]), Integer.valueOf(timeArr[1]))));
+        }
+        if (params.get("startTime") != null && !"".equals(params.get("startTime"))) {
+            String startTime = params.get("startTime").toString();
+            String[] timeArr = startTime.split("-");
+            paramMap.put("startTime", DateUtil.string2DateTime4Day(DateUtil.getFisrtDayOfMonth(Integer.valueOf(timeArr[0]), Integer.valueOf(timeArr[1]))));
+
+        }
+        if (params.get("endTime") != null && !"".equals(params.get("endTime"))) {
+            String endTime = params.get("endTime").toString();
+            String[] timeArr = endTime.split("-");
+            paramMap.put("endTime", DateUtil.string2DateTime4Day(DateUtil.getLastDayOfMonth(Integer.valueOf(timeArr[0]), Integer.valueOf(timeArr[1]))));
+
+        }
+        String lanId = params.get("lanId").toString();
+        if (params.get("lanId") != null && !"".equals(params.get("lanId"))) {
+            // 全为查所有
+            if (AreaCodeEnum.ZHEJIAGN.getLanId().equals(Long.valueOf(lanId))) {
+                paramMap.put("lanId", "");
+                lanId = "";
+            } else {
+                paramMap.put("lanId", Long.valueOf(lanId));
+            }
+
+        }
+        try {
+            //3个统计
+            List<Map> topMapList = new ArrayList<>();
+            Map<String, Object> draftMap = new HashMap<>();
+            //统计草稿状态活动
+            paramMap.put("statusCd", "2001");
+            int draftCount = mktCampaignMapper.countByStatus(paramMap);
+            draftMap.put("count", draftCount);
+            draftMap.put("name", "草稿");
+            topMapList.add(draftMap);
+            //统计已发布状态活动
+            paramMap.put("statusCd", "(2002, 2008)");
+            int publishedCount = mktCampaignMapper.countByStatus(paramMap);
+            Map<String, Object> publishedMap = new HashMap<>();
+            publishedMap.put("count", publishedCount);
+            publishedMap.put("name", "已发布的活动");
+            topMapList.add(publishedMap);
+            //统计下线状态活动
+            Map<String, Object> rollMap = new HashMap<>();
+            paramMap.put("statusCd", "2007");
+            int rollCount = mktCampaignMapper.countByStatus(paramMap);
+            rollMap.put("count", rollCount);
+            rollMap.put("name", "下线活动");
+            topMapList.add(rollMap);
+            resultMap.put("topMapList", topMapList);
+
+            //将状态-发布中，已暂停，已下线，调整中
+            paramMap.put("statusCd", "(2002, 2006, 2007, 2008)");
+
+
+            // 饼图
+            List<Map> secondMapList = new ArrayList<>();
+            // 表格
+            List<Map> tableMapList = new ArrayList<>();
+            // 柱状图
+            List<Map> cityList = new ArrayList<>();
+            // 营销活动
+            paramMap.put("mktCampaignType", "(1000, 2000, 3000, 4000)");
+            int marketingCount = mktCampaignMapper.countByStatus(paramMap);
+            Map<String, Object> marketingCountMap = new HashMap<>();
+            marketingCountMap.put("count", marketingCount);
+            marketingCountMap.put("name", "营销活动");
+            secondMapList.add(marketingCountMap);
+            paramMap.put("lanId", lanId);
+
+            typeCount(paramMap, tableMapList, cityList);
+
+            // 服务活动
+            paramMap.put("mktCampaignType", "(5000, 6000)");
+            paramMap.put("lanId", lanId);
+            int serviceCount = mktCampaignMapper.countByStatus(paramMap);
+            Map<String, Object> serviceCountMap = new HashMap<>();
+            serviceCountMap.put("count", serviceCount);
+            serviceCountMap.put("name", "服务活动");
+            secondMapList.add(serviceCountMap);
+            paramMap.put("lanId", lanId);
+            typeCount(paramMap, tableMapList, cityList);
+
+            // 全部活动
+            paramMap.put("mktCampaignType", "");
+            paramMap.put("lanId", lanId);
+            typeCount(paramMap, tableMapList, cityList);
+
+            resultMap.put("secondMapList", secondMapList);
+            resultMap.put("tableMapList", tableMapList);
+            resultMap.put("cityList", cityList);
+            resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+
+        } catch (Exception e) {
+            logger.error("失败！Exception = ", e);
+            resultMap.put("resultCode", CommonConstant.CODE_FAIL);
+            resultMap.put("resultMsg", e);
+        }
+        return resultMap;
+    }
+
+
+    private Map<String, Object> typeCount(Map<String, Object> paramMap,List<Map> tableMapList ,List<Map> cityList) throws Exception {
+        DecimalFormat df = new DecimalFormat("0.00");
+        // 随销活动（实时营销活动）
+        paramMap.put("tiggerType", StatusCode.REAL_TIME_CAMPAIGN.getStatusCode());
+        int realTimeCount = mktCampaignMapper.countByStatus(paramMap);
+        Map<String, Object> realTimeMap = new HashMap<>();
+        realTimeMap.put("count", realTimeCount);
+        realTimeMap.put("name", "随销活动");
+
+        // 派单活动（批量营销活动）
+        paramMap.put("tiggerType", StatusCode.BATCH_CAMPAIGN.getStatusCode());
+        int batchCount = mktCampaignMapper.countByStatus(paramMap);
+        Map<String, Object> batchMap = new HashMap<>();
+        batchMap.put("count", batchCount);
+        batchMap.put("name", "派单活动");
+
+        Map<String, Object> trilParamMap = new HashMap<>();
+        trilParamMap.putAll(paramMap);
+        List<Map<String, Object>> trilMapList = new ArrayList<>();
+        int labelListTotal = 0;
+        // 标签取数
+        trilParamMap.put("trilType", "2000");
+        int labelCount = mktCampaignMapper.countByTrial(trilParamMap);
+        Map<String, Object> trilMap = new HashMap<>();
+        trilMap.put("name", "标签取数");
+        trilMap.put("count", labelCount);
+        labelListTotal += labelCount;
+        // 清单导入
+        trilParamMap.put("trilType", "1000");
+        int listCount = mktCampaignMapper.countByTrial(trilParamMap);
+        Map<String, Object> listMap = new HashMap<>();
+        listMap.put("name", "清单导入");
+        listMap.put("count", listCount);
+        labelListTotal += listCount;
+        if (labelListTotal != 0) {
+            trilMap.put("percent", df.format(labelCount * 100.0 / labelListTotal) + "%");
+            listMap.put("percent", df.format(listCount * 100.0 / labelListTotal) + "%");
+        } else {
+            trilMap.put("percent", "0.00%");
+            listMap.put("percent", "0.00%");
+        }
+        trilMapList.add(trilMap);
+        trilMapList.add(listMap);
+        batchMap.put("labelList", trilMapList);
+
+
+
+        // 混合活动（混合营销活动）
+        paramMap.put("tiggerType", StatusCode.MIXTURE_CAMPAIGN.getStatusCode());
+        int mixtureCount = mktCampaignMapper.countByStatus(paramMap);
+        Map<String, Object> mixtureMap = new HashMap<>();
+        mixtureMap.put("count", mixtureCount);
+        mixtureMap.put("name", "混合活动");
+
+        int tableTotal = realTimeCount + batchCount + mixtureCount;
+        Map<String, Object> totalMap = new HashMap<>();
+        totalMap.put("count", tableTotal);
+        totalMap.put("name", "总量");
+        if (tableTotal != 0) {
+            totalMap.put("percent", df.format(tableTotal * 100.0 / tableTotal) + "%");
+            realTimeMap.put("percent", df.format(realTimeCount * 100.0 / tableTotal) + "%");
+            batchMap.put("percent", df.format(batchCount * 100.0 / tableTotal) + "%");
+            mixtureMap.put("percent", df.format(mixtureCount * 100.0 / tableTotal) + " %");
+        } else {
+            realTimeMap.put("percent", "0.00%");
+            batchMap.put("percent", "0.00%");
+            mixtureMap.put("percent", "0.00%");
+        }
+        List<Map<String, Object>> tableDateList = new ArrayList<>();
+        tableDateList.add(totalMap);
+        tableDateList.add(realTimeMap);
+        tableDateList.add(batchMap);
+        tableDateList.add(mixtureMap);
+
+
+        paramMap.put("tiggerType", "");
+        String lanId = paramMap.get("lanId").toString();
+        List<Future<Map<String, Object>>> futureList = new ArrayList<>();
+        Map<String, Object> cityCountMap = new HashMap<>();
+        // 省查所有地市
+        if ("".equals(lanId)) {
+            Map<String, Object> sysAreaMap = sysAreaService.listCityByParentId(AreaCodeEnum.ZHEJIAGN.getLanId().intValue());
+            List<SysArea> sysAreaList = (List<SysArea>) sysAreaMap.get("sysAreaList");
+            // 起线程去统计11个地市的数据
+            ExecutorService executorService = Executors.newCachedThreadPool();
+
+            for (SysArea sysArea : sysAreaList) {
+                Future<Map<String, Object>> futureMap = executorService.submit(new cityCountTask(paramMap, sysArea.getAreaId(), sysArea.getName()));
+                futureList.add(futureMap);
+            }
+            executorService.shutdown();
+        } else {
+            cityCountMap = cityCount(paramMap, Integer.valueOf(lanId), AreaNameEnum.getNameByLandId(Long.valueOf(lanId)));
+        }
+        List<Map<String, Object>> cityMapList = new ArrayList<>();
+
+        int total = 0;
+        if(futureList.size()>0){
+            for (Future<Map<String, Object>> future : futureList) {
+                if (future.get() != null && !future.get().isEmpty()) {
+                    cityMapList.add(future.get());
+                    total += (int) future.get().get("count");
+                }
+            }
+        } else {
+            cityMapList.add(cityCountMap);
+        }
+
+
+        // 统计百分比
+        if (total != 0) {
+            for (Map<String, Object> cityMap : cityMapList) {
+                cityMap.put("percent", df.format((int) cityMap.get("count") * 100.0 / total) + "%");
+            }
+        }
+        Map<String, Object> cityDataMap = new HashMap<>();
+        Map<String, Object> tableDataMap = new HashMap<>();
+        if("(1000, 2000, 3000, 4000)".equals(paramMap.get("mktCampaignType").toString())){
+            cityDataMap.put("name", "营销活动");
+            cityDataMap.put("cityDataList", cityMapList);
+            tableDataMap.put("name", "营销活动");
+            tableDataMap.put("tableDateList", tableDateList);
+        } else if("(5000, 6000)".equals(paramMap.get("mktCampaignType").toString())){
+            cityDataMap.put("name", "服务活动");
+            cityDataMap.put("cityDataList", cityMapList);
+            tableDataMap.put("name", "服务活动");
+            tableDataMap.put("tableDateList", tableDateList);
+        } else {
+            cityDataMap.put("name", "全部活动");
+            cityDataMap.put("cityDataList", cityMapList);
+            tableDataMap.put("name", "全部活动");
+            tableDataMap.put("tableDateList", tableDateList);
+        }
+        tableMapList.add(tableDataMap);
+        cityList.add(cityDataMap);
+        return cityDataMap;
+    }
+
+
+
+    class cityCountTask implements Callable<Map<String, Object>>{
+        private Map<String, Object> paramMap;
+        private Integer areaId;
+        private String name;
+
+
+        public cityCountTask(Map<String, Object> paramMap, Integer areaId, String name) {
+            this.paramMap = paramMap;
+            this.areaId = areaId;
+            this.name = name;
+        }
+
+        @Override
+        public Map<String, Object> call() throws Exception {
+            return cityCount(paramMap, areaId, name);
+        }
+    }
+
+    private Map<String, Object> cityCount(Map<String, Object> paramMap, Integer areaId, String name) throws Exception {
+        Map<String, Object> cityParamMap = new ConcurrentHashMap<>();
+        cityParamMap.putAll(paramMap);
+        cityParamMap.put("lanId", areaId);
+        int cityCount = mktCampaignMapper.countByStatus(cityParamMap);
+        Map<String, Object> cityCountMap = new ConcurrentHashMap<>();
+        cityCountMap.put("count", cityCount);
+        cityCountMap.put("lanId", areaId);
+        cityCountMap.put("name", name);
+        return cityCountMap;
+    }
+
 
 }

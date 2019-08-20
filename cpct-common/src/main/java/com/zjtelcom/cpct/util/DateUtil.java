@@ -441,14 +441,33 @@ public class DateUtil {
         cal.set(Calendar.YEAR,year);
         //设置月份
         cal.set(Calendar.MONTH, month-1);
-        //获取某月最小天数
-        int firstDay = cal.getActualMinimum(Calendar.DAY_OF_MONTH);
         //设置日历中月份的最小天数
-        cal.set(Calendar.DAY_OF_MONTH, firstDay);
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
         //格式化日期
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String firstDayOfMonth = sdf.format(cal.getTime());
         return firstDayOfMonth;
+    }
+
+
+    /**
+     * 获取下个月的第一天
+     * @param year
+     * @param month
+     * @return
+     */
+    public static String getLastDayOfMonth(int year,int month)
+    {
+        Calendar cal = Calendar.getInstance();
+        //设置年份
+        cal.set(Calendar.YEAR,year);
+        //设置月份
+        cal.set(Calendar.MONTH, month);
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
+        //格式化日期
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String lastDayOfMonth = sdf.format(cal.getTime());
+        return lastDayOfMonth;
     }
 
     /**
