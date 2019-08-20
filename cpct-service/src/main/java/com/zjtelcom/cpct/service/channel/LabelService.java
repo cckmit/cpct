@@ -81,5 +81,4 @@ public interface LabelService {
 
     Map<String,Object> queryDistributeLabel(String labelCode);
 
-
 }

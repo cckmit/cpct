@@ -1031,5 +1031,4 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         return result;
     }
 
-
 }

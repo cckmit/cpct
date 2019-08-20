@@ -43,4 +43,5 @@ public interface OrgTreeService {
 
     Long getLandIdBySession();
 
+    Map<String,Object> selectOrgTreeForUser(Map<String, Object> params);
 }

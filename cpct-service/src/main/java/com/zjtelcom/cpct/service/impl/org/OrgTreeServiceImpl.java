@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.service.impl.org;
 
 import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
+import com.ctzj.smt.bss.sysmgr.model.dto.SystemPostDto;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.fasterxml.jackson.databind.node.LongNode;
 import com.github.pagehelper.PageHelper;
@@ -182,11 +183,20 @@ public class OrgTreeServiceImpl implements OrgTreeService{
         Map<String, Object> maps = new HashMap<>();
         List<Organization> list=new ArrayList<>();
         List<String> areaList=(List<String>)params.get("areaId");
-        if (areaList!=null && areaList.size()>0){
+        Object type = params.get("type");
+        SystemUserDto user = BssSessionHelp.getSystemUserDto();
+        Long staffId = user.getStaffId();
+//        List<SystemPostDto> systemPostDtoList = user.getSystemPostDtoList();
+//        String sysPostCode = systemPostDtoList.get(0).getSysPostCode();
+//        Long staffId = 121119809L;
+//        String sysPostCode = "C3";
+        //有父节点不能超过 Level 6
+        if (areaList!=null && areaList.size()>0 && type!=null){
+            list = organizationMapper.selectByParentIdForLevelFive(Long.valueOf(areaList.get(0)));
+            //都为空的情况 使用用户的 staffid 查询
+        }else if(areaList!=null && areaList.size()>0 && type==null){
             list = organizationMapper.selectByParentId(Long.valueOf(areaList.get(0)));
-        }else {
-            SystemUserDto user = BssSessionHelp.getSystemUserDto();
-            Long staffId = user.getStaffId();
+        }else if (areaList.size()==0){
             List<Map<String, Object>> staffOrgId = organizationMapper.getStaffOrgId(staffId);
             if (!staffOrgId.isEmpty() && staffOrgId.size() > 0){
                 for (Map<String, Object> map : staffOrgId) {
@@ -206,34 +216,80 @@ public class OrgTreeServiceImpl implements OrgTreeService{
                     }
                 }
             }
-            Object type = params.get("type");
             if (orgId == null && type == null){
                 list = organizationMapper.selectMenu();
+            }else if (orgId == null && type != null){
+                list = organizationMapper.selectMenuForLevelFive();
             }else if (orgId!=null && type == null){
                 list = organizationMapper.selectByParentId(orgId);
             }else if (orgId!=null && type != null){
                 list = organizationMapper.selectByParentIdForLevelFive(orgId);
             }
 
-            if (list ==null || list.isEmpty()){
+            if (type == null && list == null || list.isEmpty()){
                 list = organizationMapper.selectMenu();
             }
-
         }
         Page pageInfo = new Page(new PageInfo(list));
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg",list);
-        ////        Long orgId = Long.valueOf(regionId1);
-//            organization = organizationMapper.selectByPrimaryKey(orgId);
-//        }
-//        if (organization != null) {
-//            Long regionId = organization.getRegionId();
-//            String orgDivision = organization.getOrgDivision();
-//            if (orgDivision.equals("10")){
-//                orgId = ORG2RegionId.getOrgIdByRegionId(regionId);
-//            }
         return  maps;
     }
+
+
+    @Override
+    public Map<String, Object> selectOrgTreeForUser(Map<String, Object> params) {
+        Organization organization = null;
+        Long orgId = null;
+        Map<String, Object> maps = new HashMap<>();
+        List<Organization> list=new ArrayList<>();
+        List<String> areaList=(List<String>)params.get("areaId");
+        SystemUserDto user = BssSessionHelp.getSystemUserDto();
+        Long staffId = user.getStaffId();
+//        Long staffId = 120011114242L;
+        List<Map<String, Object>> staffOrgId = organizationMapper.getStaffOrgId(staffId);
+        //组织树控制权限
+        List<SystemPostDto> systemPostDtoList = user.getSystemPostDtoList();
+        String sysPostCode = systemPostDtoList.get(0).getSysPostCode();
+//        String sysPostCode = "C3";
+        //有父节点的情况
+        if (areaList!=null && areaList.size()>0){
+            list = organizationMapper.selectByParentId(Long.valueOf(areaList.get(0)));
+           // 超管 省管 c1 c2
+        }else if ((AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea()).equals(sysPostCode) ||
+                AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea().equals(sysPostCode) && areaList==null){
+            list = organizationMapper.selectMenu();
+            // 分公司 C3 权限 支局 C4 分局 C5
+        }else if (AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea().equals(sysPostCode)  ||
+                AreaCodeEnum.sysAreaCode.FENGJU.getSysArea().equals(sysPostCode) ||
+                AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea().equals(sysPostCode) && areaList==null) {
+            if (!staffOrgId.isEmpty() && staffOrgId.size() > 0) {
+                for (Map<String, Object> map : staffOrgId) {
+                    Object orgDivision = map.get("orgDivision");
+                    Object orgId1 = map.get("ORG_NAME_"+sysPostCode);
+                    if (orgDivision != null) {
+                        if (orgDivision.toString().equals("30")) {
+                            orgId = Long.valueOf(orgId1.toString());
+                            break;
+                        } else if (orgDivision.toString().equals("20")) {
+                            orgId = Long.valueOf(orgId1.toString());
+                            break;
+                        } else if (orgDivision.toString().equals("10")) {
+                            orgId = Long.valueOf(orgId1.toString());
+                            break;
+                        }
+                    }
+                }
+            }
+            list = organizationMapper.selectByParentId(orgId);
+        }
+            //超管 无父节点 查全省
+        Page pageInfo = new Page(new PageInfo(list));
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg",list);
+        return  maps;
+    }
+
 
     /**
      * 分段插入
@@ -460,6 +516,8 @@ public class OrgTreeServiceImpl implements OrgTreeService{
         }
         return null;
     }
+
+
 
 
 }
