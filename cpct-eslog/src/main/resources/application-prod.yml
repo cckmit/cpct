@@ -75,6 +75,7 @@ ctg:
   clusterName: CRM_MQ
   tenantID: 2
   cpctTopic: cpct_detailed_list_topic
+  clientWorkerThreads: 4
 
 
   # 第四topic es日志添加队列中转

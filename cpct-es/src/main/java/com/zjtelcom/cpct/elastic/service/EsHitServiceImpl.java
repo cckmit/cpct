@@ -49,7 +49,7 @@ public class EsHitServiceImpl implements EsHitService {
      */
     private String esType = "doc";
 
-    @Autowired
+    @Autowired(required = false)
     private MqProducerService mqProducerService;
 
     @Override
