@@ -173,7 +173,7 @@ public class CloseRuleController extends BaseController {
     }
 
 
-    @Autowired
+    @Autowired(required = false)
     private EsHitService esHitService;
     @PostMapping("addLogToEsTest")
     public String addLogToEsTest(){
@@ -186,7 +186,10 @@ public class CloseRuleController extends BaseController {
         esJson.put("hitEntity", "测试场"); //命中对象
         esJson.put("hit", false);
         esJson.put("msg", "红黑名单过滤规则验证被拦截");
-        esHitService.save(esJson,"activity_123");
+        esHitService.save(esJson,"activity_1234");
         return null;
     }
+
+
+    
 }

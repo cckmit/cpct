@@ -26,12 +26,14 @@
         <!--<dubbo:method name="contactTaskReceipt" servicecode="00.1079.CPCResultFeedback" timeout="20000"/>-->
     <!--</dubbo:reference>-->
 
-    <!--<dubbo:reference registry="esb2" interface="org.springframework.session.data.ctg.IDubboCtgService"-->
-                     <!--id="dubboCtgService" version="1.0" check="false">-->
-        <!--<dubbo:method name="smembers" servicecode="00.1077.ctgSessionSmembers"/>-->
-        <!--<dubbo:method name="hgetAll" servicecode="00.1077.ctgSessionHgetAll"/>-->
-        <!--<dubbo:method name="exists" servicecode="00.1077.ctgSessionExists"/>-->
-    <!--</dubbo:reference>-->
+    <dubbo:reference registry="esb3" interface="org.springframework.session.data.ctg.IDubboCtgService"
+                     id="dubboCtgService" version="1.0" check="false">
+        <dubbo:method name="hmget" servicecode="00.1077.ctgSessionHmget"/>
+        <dubbo:method name="hget" servicecode="00.1077.ctgSessionHget"/>
+        <dubbo:method name="smembers" servicecode="00.1077.ctgSessionSmembers"/>
+        <dubbo:method name="hgetAll" servicecode="00.1077.ctgSessionHgetAll"/>
+        <dubbo:method name="exists" servicecode="00.1077.ctgSessionExists"/>
+    </dubbo:reference>
 
     <!-- es提供试算接口 -->
     <dubbo:reference registry="esb_dev" interface=" com.zjtelcom.es.es.service.EsService" id="esService"
@@ -75,8 +77,4 @@
         <dubbo:method name="showCalculationLog" servicecode="00.1083.showCalculationLog" timeout="120000"/>
     </dubbo:reference>
 
-    <dubbo:reference registry="esb_dev" interface="com.zjtelcom.es.es.service.EsServicePackageService"
-                     id="servicePackageInport" version="1.0" check="false">
-        <dubbo:method name="servicePackageInport" servicecode="00.1083.servicePackageInport" timeout="120000"/>
-    </dubbo:reference>
 </beans>

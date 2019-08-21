@@ -78,4 +78,45 @@ public enum AreaCodeEnum {
         return null;
     }
 
+    public enum sysAreaCode{
+        CHAOGUAN("cpcp0001","C1"),
+        SHENGJI("cpcpch0001","C2"),
+        FENGONGSI("cpcpch0002","C3"),
+        FENGJU("cpcpch0003","C4"),
+        ZHIJU("cpcpch0003","C5");
+
+        private String sysPostCode;
+        private String sysArea;
+
+        public String getSysPostCode() {
+            return sysPostCode;
+        }
+
+        public void setSysPostCode(String sysPostCode) {
+            this.sysPostCode = sysPostCode;
+        }
+
+        public String getSysArea() {
+            return sysArea;
+        }
+
+        public void setSysArea(String sysArea) {
+            this.sysArea = sysArea;
+        }
+
+        sysAreaCode(String sysPostCode, String sysArea) {
+            this.sysPostCode = sysPostCode;
+            this.sysArea = sysArea;
+        }
+
+    }
+    public static String getSysAreaBySysPostCode(String sysPostCode) {
+        for (sysAreaCode sysAreaCode : sysAreaCode.values()) {
+            if (sysPostCode.equals(sysAreaCode.sysPostCode)){
+                return sysAreaCode.sysArea;
+            }
+        }
+        return null;
+    }
+
 }

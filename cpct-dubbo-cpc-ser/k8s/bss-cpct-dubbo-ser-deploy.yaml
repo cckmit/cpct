@@ -50,10 +50,10 @@ spec:
         - name: app-log
           mountPath: /app/dubbo/logs
         ports:
-        - containerPort: 30808    #修改端口号
+        - containerPort: 30810    #修改端口号
         readinessProbe:
           tcpSocket:
-            port: 30808   #修改端口号
+            port: 30810   #修改端口号
           initialDelaySeconds: 20
           periodSeconds: 10
           failureThreshold: 3
@@ -67,7 +67,7 @@ spec:
             memory: "8Gi"
             cpu: "4000m"
       - name: jmx
-        image: 134.108.5.132:8000/mgt/jmxtrans:v3.0
+        image: 134.96.161.41:8000/mgt/jmxtrans:v3.0
         imagePullPolicy: Always
         volumeMounts:
         - name: tz-config
@@ -80,7 +80,7 @@ spec:
             memory: "1Gi"
             cpu: "1000m"
       nodeSelector:
-        center: bssCpct  #修改镜像所属中心标签
+        center: bssOther  #修改镜像所属中心标签
       volumes:
       - name: tz-config
         hostPath:
