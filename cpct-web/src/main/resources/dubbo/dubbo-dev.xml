@@ -77,6 +77,11 @@
         <dubbo:method name="showCalculationLog" servicecode="00.1083.showCalculationLog" timeout="120000"/>
     </dubbo:reference>
 
+    <dubbo:reference registry="esb_dev" interface="com.zjtelcom.es.es.service.EsServicePackageService"
+                     id="servicePackageInport" version="1.0" check="false">
+        <dubbo:method name="servicePackageInport" servicecode="00.1083.servicePackageInport" timeout="120000"/>
+    </dubbo:reference>
+
     <dubbo:reference registry="esb3" interface="com.zjtelcom.es.es.service.EsTarGrpTemplate"
                      id="tarGrpTemplateCountAndIssue" version="1.0" check="false">
         <dubbo:method name="tarGrpTemplateCountAndIssue" servicecode="00.1083.tarGrpTemplateCountAndIssue" timeout="120000"/>

@@ -173,7 +173,7 @@ public class CloseRuleController extends BaseController {
     }
 
 
-    @Autowired
+    @Autowired(required = false)
     private EsHitService esHitService;
     @PostMapping("addLogToEsTest")
     public String addLogToEsTest(){
@@ -189,4 +189,7 @@ public class CloseRuleController extends BaseController {
         esHitService.save(esJson,"activity_1234");
         return null;
     }
+
+
+    
 }
