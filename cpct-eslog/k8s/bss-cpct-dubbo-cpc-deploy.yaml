@@ -67,7 +67,7 @@ spec:
             memory: "8Gi"
             cpu: "4000m"
       - name: jmx
-        image: 134.108.5.132:8000/mgt/jmxtrans:v3.0
+        image: 134.96.161.41:8000/mgt/jmxtrans:v3.0
         imagePullPolicy: Always
         volumeMounts:
         - name: tz-config

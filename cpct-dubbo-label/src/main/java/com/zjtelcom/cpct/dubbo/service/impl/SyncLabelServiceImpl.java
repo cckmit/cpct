@@ -302,6 +302,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             }else {
                 labelValodate.setLabelValueType("1000");
             }
+            labelValodate.setRightOperand("0");
             //label.setLabelDataType(ChannelUtil.getDataType(tagModel.getSourceTableColumnType()));
             if (labelValodate.getLabObject().equals("客户级")){
                 labelValodate.setLabelType("1000");
@@ -363,6 +364,7 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             }else {
                 label.setLabelValueType("1000");
             }
+            label.setRightOperand("0");
             label.setStatusCd(STATUSCD_EFFECTIVE);
             label.setCreateStaff(UserUtil.loginId());
             label.setCreateDate(new Date());

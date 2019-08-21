@@ -440,7 +440,7 @@
                 <artifactId>bss-centralized-authenticate</artifactId>
                 <version>${bss-centralized.verson}</version>
             </dependency>
-            <!--<dependency>
+            <dependency>
                 <groupId>com.zjhcsoft.session</groupId>
                 <artifactId>spring-session</artifactId>
                 <version>${spring-session.verson}</version>
@@ -465,7 +465,7 @@
                         <artifactId>spring-session</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>-->
+            </dependency>
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>

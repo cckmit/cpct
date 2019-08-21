@@ -77,10 +77,14 @@
         <dubbo:method name="showCalculationLog" servicecode="00.1083.showCalculationLog" timeout="120000"/>
     </dubbo:reference>
 
-    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.IReportService"
-                     id="reportServiceImpl" version="1.0" check="false">
-        <dubbo:method name="queryRptBatchOrder" servicecode="00.1079.queryRptBatchOrder" timeout="12000"/>
-        <dubbo:method name="queryRptEventOrder" servicecode="00.1079.queryRptEventOrder" timeout="12000"/>
+    <dubbo:reference registry="esb_dev" interface="com.zjtelcom.es.es.service.EsServicePackageService"
+                     id="servicePackageInport" version="1.0" check="false">
+        <dubbo:method name="servicePackageInport" servicecode="00.1083.servicePackageInport" timeout="120000"/>
+    </dubbo:reference>
+
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.es.es.service.EsTarGrpTemplate"
+                     id="tarGrpTemplateCountAndIssue" version="1.0" check="false">
+        <dubbo:method name="tarGrpTemplateCountAndIssue" servicecode="00.1083.tarGrpTemplateCountAndIssue" timeout="120000"/>
     </dubbo:reference>
 
 </beans>
