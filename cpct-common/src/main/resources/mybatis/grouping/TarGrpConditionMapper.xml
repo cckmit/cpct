@@ -230,7 +230,7 @@
     where TAR_GRP_ID = #{tarGrpTemplateId,jdbcType=BIGINT}
     </delete>
 
-  <select id="selectAllLabelByTarId" parameterType="java.lang.Long" resultType="Map">
+  <select id="selectAllLabelByTarId" parameterType="java.lang.Long" resultType="java.util.Map">
     SELECT DISTINCT
 	i.INJECTION_LABEL_CODE AS code,i.INJECTION_LABEL_NAME as name,i.CLASS_NAME as className,
 	tgc.OPER_TYPE AS operType,tgc.RIGHT_PARAM as rightParam
