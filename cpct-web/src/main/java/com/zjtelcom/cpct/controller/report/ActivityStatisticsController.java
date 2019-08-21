@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.controller.report;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.ctzj.smt.bss.cooperate.service.dubbo.IReportService;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.service.report.ActivityStatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,46 @@ public class ActivityStatisticsController extends BaseController {
         try {
             map = activityStatisticsService.getChannel(params);
         } catch (Exception e) {
-            logger.error("[op:ActivityStatisticsController] fail to listEvents for getStore = {}! Exception: ", JSONArray.toJSON(params), e);
+            logger.error("[op:ActivityStatisticsController] fail to listEvents for getChannel = {}! Exception: ", JSONArray.toJSON(params), e);
+            return map;
+        }
+        return map;
+    }
+
+    @PostMapping("/getRptBatchOrder")
+    @CrossOrigin
+    public Map<String,Object> getRptBatchOrder(@RequestBody Map<String, Object> params){
+        Map<String, Object> map = new HashMap<>();
+        try {
+            map = activityStatisticsService.getRptBatchOrder(params);
+        } catch (Exception e) {
+            logger.error("[op:ActivityStatisticsController] fail to listEvents for getRptBatchOrder = {}! Exception: ", JSONArray.toJSON(params), e);
+            return map;
+        }
+        return map;
+    }
+
+    @PostMapping("/queryRptBatchOrder")
+    @CrossOrigin
+    public Map<String,Object> queryRptBatchOrder(@RequestBody Map<String, Object> params){
+        Map<String, Object> map = new HashMap<>();
+        try {
+            map = activityStatisticsService.queryRptBatchOrder(params);
+        } catch (Exception e) {
+            logger.error("[op:ActivityStatisticsController] fail to listEvents for queryRptBatchOrder = {}! Exception: ", JSONArray.toJSON(params), e);
+            return map;
+        }
+        return map;
+    }
+
+    @PostMapping("/queryRptBatchOrderTest")
+    @CrossOrigin
+    public Map<String,Object> queryRptBatchOrderTest(@RequestBody Map<String, Object> params){
+        Map<String, Object> map = new HashMap<>();
+        try {
+            map = activityStatisticsService.queryRptBatchOrderTest(params);
+        } catch (Exception e) {
+            logger.error("[op:ActivityStatisticsController] fail to listEvents for queryRptBatchOrder = {}! Exception: ", JSONArray.toJSON(params), e);
             return map;
         }
         return map;

@@ -68,6 +68,7 @@
         <cpct-trial.version>1.0.1</cpct-trial.version>
         <smt-bss-cpc.version>1.0-SNAPSHOT</smt-bss-cpc.version>
         <smt-bss-cpc-model.version>1.0.1</smt-bss-cpc-model.version>
+        <cooperate-service-api.version>1.2</cooperate-service-api.version>
     </properties>
 
     <parent>
@@ -530,6 +531,12 @@
                 <groupId>com.ctzj.smt.bss</groupId>
                 <artifactId>smt-bss-cpc-model</artifactId>
                 <version>${smt-bss-cpc-model.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.zjhcsoft.bss</groupId>
+                <artifactId>cooperate-service-api</artifactId>
+                <version>${cooperate-service-api.version}</version>
             </dependency>
 
         </dependencies>
