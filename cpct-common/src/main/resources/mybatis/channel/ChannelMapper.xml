@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.ChannelMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.Channel">
+    <id column="ORG_ID" jdbcType="BIGINT" property="orgId" />
+    <result column="CHANNEL_NBR" jdbcType="VARCHAR" property="channelNbr" />
+    <result column="CHANNEL_NAME" jdbcType="VARCHAR" property="channelName" />
+    <result column="CHANNEL_CLASS" jdbcType="VARCHAR" property="channelClass" />
+    <result column="SALES_FIRST_TYPE" jdbcType="VARCHAR" property="salesFirstType" />
+    <result column="SALES_SECOND_TYPE" jdbcType="VARCHAR" property="salesSecondType" />
+    <result column="SALES_THIRD_TYPE" jdbcType="VARCHAR" property="salesThirdType" />
+    <result column="CHN_TYPE_CD" jdbcType="VARCHAR" property="chnTypeCd" />
+    <result column="PARTY_ID" jdbcType="BIGINT" property="partyId" />
+    <result column="CHANNEL_DESC" jdbcType="VARCHAR" property="channelDesc" />
+    <result column="CHANNEL_LEVEL" jdbcType="VARCHAR" property="channelLevel" />
+    <result column="APPLY_CODE" jdbcType="VARCHAR" property="applyCode" />
+    <result column="REGION_ID" jdbcType="BIGINT" property="regionId" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from channel
+    where ORG_ID = #{orgId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.Channel">
+    insert into channel (ORG_ID, CHANNEL_NBR, CHANNEL_NAME, 
+      CHANNEL_CLASS, SALES_FIRST_TYPE, SALES_SECOND_TYPE, 
+      SALES_THIRD_TYPE, CHN_TYPE_CD, PARTY_ID, 
+      CHANNEL_DESC, CHANNEL_LEVEL, APPLY_CODE, 
+      REGION_ID, CREATE_DATE, CREATE_STAFF, 
+      STATUS_CD, STATUS_DATE, UPDATE_DATE, 
+      UPDATE_STAFF)
+    values (#{orgId,jdbcType=BIGINT}, #{channelNbr,jdbcType=VARCHAR}, #{channelName,jdbcType=VARCHAR}, 
+      #{channelClass,jdbcType=VARCHAR}, #{salesFirstType,jdbcType=VARCHAR}, #{salesSecondType,jdbcType=VARCHAR}, 
+      #{salesThirdType,jdbcType=VARCHAR}, #{chnTypeCd,jdbcType=VARCHAR}, #{partyId,jdbcType=BIGINT}, 
+      #{channelDesc,jdbcType=VARCHAR}, #{channelLevel,jdbcType=VARCHAR}, #{applyCode,jdbcType=VARCHAR}, 
+      #{regionId,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT}, 
+      #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{updateStaff,jdbcType=BIGINT})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.Channel">
+    update channel
+    set CHANNEL_NBR = #{channelNbr,jdbcType=VARCHAR},
+      CHANNEL_NAME = #{channelName,jdbcType=VARCHAR},
+      CHANNEL_CLASS = #{channelClass,jdbcType=VARCHAR},
+      SALES_FIRST_TYPE = #{salesFirstType,jdbcType=VARCHAR},
+      SALES_SECOND_TYPE = #{salesSecondType,jdbcType=VARCHAR},
+      SALES_THIRD_TYPE = #{salesThirdType,jdbcType=VARCHAR},
+      CHN_TYPE_CD = #{chnTypeCd,jdbcType=VARCHAR},
+      PARTY_ID = #{partyId,jdbcType=BIGINT},
+      CHANNEL_DESC = #{channelDesc,jdbcType=VARCHAR},
+      CHANNEL_LEVEL = #{channelLevel,jdbcType=VARCHAR},
+      APPLY_CODE = #{applyCode,jdbcType=VARCHAR},
+      REGION_ID = #{regionId,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT}
+    where ORG_ID = #{orgId,jdbcType=BIGINT}
+  </update>
+  <!--<select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">-->
+    <!--select ORG_ID, CHANNEL_NBR, CHANNEL_NAME, CHANNEL_CLASS, SALES_FIRST_TYPE, SALES_SECOND_TYPE, -->
+    <!--SALES_THIRD_TYPE, CHN_TYPE_CD, PARTY_ID, CHANNEL_DESC, CHANNEL_LEVEL, APPLY_CODE, -->
+    <!--REGION_ID, CREATE_DATE, CREATE_STAFF, STATUS_CD, STATUS_DATE, UPDATE_DATE, UPDATE_STAFF-->
+    <!--from channel-->
+    <!--where ORG_ID = #{orgId,jdbcType=BIGINT}-->
+  <!--</select>-->
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select ORG_ID, CHANNEL_NBR, CHANNEL_NAME
+    from channel
+    where ORG_ID = #{orgId,jdbcType=BIGINT}
+  </select>
+
+  <select id="selectAll" resultMap="BaseResultMap">
+    select ORG_ID, CHANNEL_NBR, CHANNEL_NAME, CHANNEL_CLASS, SALES_FIRST_TYPE, SALES_SECOND_TYPE, 
+    SALES_THIRD_TYPE, CHN_TYPE_CD, PARTY_ID, CHANNEL_DESC, CHANNEL_LEVEL, APPLY_CODE, 
+    REGION_ID, CREATE_DATE, CREATE_STAFF, STATUS_CD, STATUS_DATE, UPDATE_DATE, UPDATE_STAFF
+    from channel
+  </select>
+
+</mapper>

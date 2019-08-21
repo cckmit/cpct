@@ -97,4 +97,13 @@
       UPDATE_DATE, REMARK
       from mkt_campaign_rel
     </select>
+
+    <select id="selectByZmktCampaignIdAndRelType" parameterType="java.lang.String" resultMap="BaseResultMap">
+      select MKT_CAMPAIGN_REL_ID, REL_TYPE, A_MKT_CAMPAIGN_ID, Z_MKT_CAMPAIGN_ID, EFF_DATE,
+        EXP_DATE, APPLY_REGION_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+        UPDATE_DATE, REMARK
+        from mkt_campaign_rel
+        where Z_MKT_CAMPAIGN_ID = #{zMktCampaignId}
+        AND REL_TYPE = '1000'
+    </select>
 </mapper>
