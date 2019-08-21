@@ -225,8 +225,10 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             String expression = code + operType + rightParam;
             expressions.add(expression);
         }
+        map.put("expressions", expressions);
+        map.put("operationType", operationType);
         try {
-            String result = esTarGrpTemplateService.tarGrpTemplateCountAndIssue(expressions, operationType);
+            String result = esTarGrpTemplateService.tarGrpTemplateCountAndIssue(map);
             map.put("resultCode",CODE_SUCCESS);
             map.put("resultMsg","查询成功");
             map.put("resultData", result);
