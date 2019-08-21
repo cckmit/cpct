@@ -790,7 +790,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
                 mktCamChlConfAttrDO.setContactChlAttrRstrId(null);
                 mktCamChlConfAttrDO.setEvtContactConfId(childEvtContactConfId);
-
+                mktCamChlConfAttrDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
                 if (mktCamChlConfAttrDO.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
                     //协同渠道自策略规则保存
                     mktCamChlConfAttrDO.setAttrValue(childEvtContactConfId.toString());

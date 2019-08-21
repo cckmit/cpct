@@ -186,15 +186,17 @@ public class OrgTreeServiceImpl implements OrgTreeService{
         Object type = params.get("type");
         SystemUserDto user = BssSessionHelp.getSystemUserDto();
         Long staffId = user.getStaffId();
-        List<SystemPostDto> systemPostDtoList = user.getSystemPostDtoList();
-        String sysPostCode = systemPostDtoList.get(0).getSysPostCode();
+//        List<SystemPostDto> systemPostDtoList = user.getSystemPostDtoList();
+//        String sysPostCode = systemPostDtoList.get(0).getSysPostCode();
+//        Long staffId = 121119809L;
+//        String sysPostCode = "C3";
         //有父节点不能超过 Level 6
         if (areaList!=null && areaList.size()>0 && type!=null){
             list = organizationMapper.selectByParentIdForLevelFive(Long.valueOf(areaList.get(0)));
             //都为空的情况 使用用户的 staffid 查询
         }else if(areaList!=null && areaList.size()>0 && type==null){
             list = organizationMapper.selectByParentId(Long.valueOf(areaList.get(0)));
-        }else if (areaList==null){
+        }else if (areaList.size()==0){
             List<Map<String, Object>> staffOrgId = organizationMapper.getStaffOrgId(staffId);
             if (!staffOrgId.isEmpty() && staffOrgId.size() > 0){
                 for (Map<String, Object> map : staffOrgId) {
@@ -249,13 +251,15 @@ public class OrgTreeServiceImpl implements OrgTreeService{
         //组织树控制权限
         List<SystemPostDto> systemPostDtoList = user.getSystemPostDtoList();
         String sysPostCode = systemPostDtoList.get(0).getSysPostCode();
+//        String sysPostCode = "C3";
         //有父节点的情况
-        if (areaList!=null){
+        if (areaList!=null && areaList.size()>0){
             list = organizationMapper.selectByParentId(Long.valueOf(areaList.get(0)));
-            // 分公司 C3 权限 支局 C4 分局 C5
+           // 超管 省管 c1 c2
         }else if ((AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea()).equals(sysPostCode) ||
                 AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea().equals(sysPostCode) && areaList==null){
             list = organizationMapper.selectMenu();
+            // 分公司 C3 权限 支局 C4 分局 C5
         }else if (AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea().equals(sysPostCode)  ||
                 AreaCodeEnum.sysAreaCode.FENGJU.getSysArea().equals(sysPostCode) ||
                 AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea().equals(sysPostCode) && areaList==null) {

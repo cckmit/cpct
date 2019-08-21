@@ -83,11 +83,12 @@ ctg:
   sendMaxRetryTimes: 2
   sendMsgTimeout: 30000
   compressMsgBodyOverHowmuch: 4098
+  clientWorkerThreads : 4
   clusterName: prod_cluster
   tenantID: 2
   cpctTopic: cpct_detailed_list_topic_gray
 
 
   # 第四topic es日志添加队列中转
-  cpctEsLogTopic: cpct_eslog_gray
+  cpctEsLogTopic: cpct_eslog_prod
   cpctEsLogGroup: cpct_eslog_group_gray
