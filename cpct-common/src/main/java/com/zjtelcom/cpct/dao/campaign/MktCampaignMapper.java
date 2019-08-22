@@ -4,11 +4,13 @@ package com.zjtelcom.cpct.dao.campaign;
 import com.zjtelcom.cpct.domain.campaign.MktCamDisplayColumnRel;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignCountDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.dto.campaign.MktCampaign;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,5 +56,7 @@ public interface MktCampaignMapper {
     MktCampaignDO selectPrimaryKeyByInitId(@Param("initId")Long initId, @Param("statusCd")String statusCd);
 
     MktCampaignDO selectByInitForRollBack(@Param("initId")Long initId);;
+
+    List<MktCampaignDO> queryRptBatchOrderForMktCampaign(HashMap<String, Object> paramMap);
 
 }
