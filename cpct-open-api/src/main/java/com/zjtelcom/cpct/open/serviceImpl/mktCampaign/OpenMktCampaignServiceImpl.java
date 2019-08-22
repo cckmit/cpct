@@ -360,6 +360,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                             for(OpenTarGrpConditionEntity openTarGrpConditionEntity : openTarGrpConditionList) {
                                 TarGrpCondition tarGrpCondition = BeanUtil.create(openTarGrpConditionEntity, new TarGrpCondition());
                                 tarGrpCondition.setTarGrpId(tarGrp.getTarGrpId());
+                                tarGrpCondition.setRemark("2000");
                                 tarGrpConditionMapper.insert(tarGrpCondition);
                             }
                         }
