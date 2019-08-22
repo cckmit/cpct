@@ -593,9 +593,6 @@
         <if test="mktCampaignId != null and mktCampaignId != ''">
             AND MKT_CAMPAIGN_ID = #{mktCampaignId}
         </if>
-        <if test="endDate != null ">
-            AND  CREATE_DATE > #{endDate}
-        </if>
         <choose>
             <when test="statusCd != null and statusCd!='' and statusCd!='all'">
                 AND STATUS_CD = #{statusCd}
