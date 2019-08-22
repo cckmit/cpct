@@ -594,7 +594,7 @@
             AND MKT_CAMPAIGN_ID = #{mktCampaignId}
         </if>
         <if test="endDate != null ">
-            AND END_TIME > #{endDate}
+            AND  CREATE_DATE > #{endDate}
         </if>
         <choose>
             <when test="statusCd != null and statusCd!='' and statusCd!='all'">
