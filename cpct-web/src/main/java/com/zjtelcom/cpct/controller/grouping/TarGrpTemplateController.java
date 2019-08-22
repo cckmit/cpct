@@ -168,7 +168,7 @@ public class TarGrpTemplateController  extends BaseController {
         return JSON.toJSONString(map);
     }
 
-    @PostMapping("tarGrpTemplateCountAndIssue")
+    @PostMapping("/tarGrpTemplateCountAndIssue")
     @CrossOrigin
     public String tarGrpTemplateCountAndIssue(@RequestBody Map<String, String> params) {
         String tarGrpTemplateId = params.get("tarGrpTemplateId");
