@@ -158,6 +158,13 @@
             <groupId>com.zjtelcom.es</groupId>
             <artifactId>es-service-package</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.zjtelcom.es</groupId>
+            <artifactId>es-targrp-template</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
     </dependencies>
 
 
