@@ -88,4 +88,10 @@
         <dubbo:method name="tarGrpTemplateCountAndIssue" servicecode="00.1083.tarGrpTemplateCountAndIssue" timeout="120000"/>
     </dubbo:reference>
 
+    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.IReportService"
+                     id="reportServiceImpl" version="1.0" check="false">
+        <dubbo:method name="queryRptBatchOrder" servicecode="00.1079.queryRptBatchOrder" timeout="12000"/>
+        <dubbo:method name="queryRptEventOrder" servicecode="00.1079.queryRptEventOrder" timeout="12000"/>
+    </dubbo:reference>
+
 </beans>

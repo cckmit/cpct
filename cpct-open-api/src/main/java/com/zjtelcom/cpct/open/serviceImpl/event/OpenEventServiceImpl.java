@@ -59,15 +59,18 @@ public class OpenEventServiceImpl extends BaseService implements OpenEventServic
             singleEvent.put("eventNbr",openEvent.getEventNbr());
             singleEvent.put("eventName",openEvent.getEventName());
             events.add(singleEvent);
-            if(!openEvent.getActType().equals("ADD")) {
-                resultObject.put("events",events);
-                resultMap.put("resultCode","1");
-                resultMap.put("resultMsg","新增失败,事件的数据操作类型字段的值不是ADD");
-                resultMap.put("resultObject",resultObject);
-                return resultMap;
+            if(openEvent.getActType() != null) {
+                if (!openEvent.getActType().equals("ADD")) {
+                    resultObject.put("events", events);
+                    resultMap.put("resultCode", "1");
+                    resultMap.put("resultMsg", "新增失败,事件的数据操作类型字段的值不是ADD");
+                    resultMap.put("resultObject", resultObject);
+                    return resultMap;
+                }
             }
             //新增事件
             ContactEvt contactEvt = BeanUtil.create(openEvent, new ContactEvt());
+            contactEvt.setContactEvtId(null);
             contactEvt.setContactEvtName(openEvent.getEventName());
             contactEvt.setContactEvtDesc(openEvent.getEventDesc());
             contactEvt.setContactEvtCode(openEvent.getEventNbr());
@@ -80,7 +83,7 @@ public class OpenEventServiceImpl extends BaseService implements OpenEventServic
             contactEvt.setCreateDate(openEvent.getCreateDate());
             contactEvt.setUpdateStaff(openEvent.getCreateStaff());
             contactEvt.setUpdateDate(openEvent.getCreateDate());
-            contactEvtMapper.insert(contactEvt);
+            contactEvtMapper.createContactEvt(contactEvt);
 
             //新增事件采集项
             List<OpenEventItem> openEventItems = openEvent.getEventItems();
@@ -94,6 +97,7 @@ public class OpenEventServiceImpl extends BaseService implements OpenEventServic
                         return resultMap;
                     }
                     ContactEvtItem contactEvtItem = BeanUtil.create(openEventItem, new ContactEvtItem());
+                    contactEvtItem.setEvtItemId(null);
                     contactEvtItem.setContactEvtId(contactEvt.getContactEvtId());
                     if(openEventItem.getIsNullable() != null) {
                         contactEvtItem.setIsNullable(Long.valueOf(openEventItem.getIsNullable()));
@@ -112,14 +116,17 @@ public class OpenEventServiceImpl extends BaseService implements OpenEventServic
             List<OpenEventMatchRul> openEventMatchRuls = openEvent.getEventMatchRuls();
             if(openEventMatchRuls != null && openEventMatchRuls.size() > 0) {
                 for (OpenEventMatchRul openEventMatchRul : openEventMatchRuls) {
-                    if (!openEventMatchRul.getActType().equals("ADD")) {
-                        resultObject.put("events", events);
-                        resultMap.put("resultCode", "1");
-                        resultMap.put("resultMsg", "新增失败,事件匹配规则的数据操作类型字段的值不是ADD");
-                        resultMap.put("resultObject", resultObject);
-                        return resultMap;
+                    if(openEventMatchRul.getActType() != null) {
+                        if (!openEventMatchRul.getActType().equals("ADD")) {
+                            resultObject.put("events", events);
+                            resultMap.put("resultCode", "1");
+                            resultMap.put("resultMsg", "新增失败,事件匹配规则的数据操作类型字段的值不是ADD");
+                            resultMap.put("resultObject", resultObject);
+                            return resultMap;
+                        }
                     }
                     EventMatchRulDTO eventMatchRulDTO = BeanUtil.create(openEventMatchRul, new EventMatchRulDTO());
+                    eventMatchRulDTO.setEventId(contactEvt.getContactEvtId());
                     eventMatchRulDTO.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
                     eventMatchRulDTO.setStatusDate(openEventMatchRul.getCreateDate());
                     eventMatchRulDTO.setCreateStaff(openEventMatchRul.getCreateStaff());
