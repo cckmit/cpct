@@ -329,6 +329,9 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
             MktCampaignDO mktCampaignDO = BeanUtil.create(openMktCampaignEntity, new MktCampaignDO());
             mktCampaignDO.setMktCampaignId(null);
             mktCampaignDO.setMktCampaignCategory(openMktCampaignEntity.getManageType());
+            if(mktCampaignDO.getStatusCd().equals("1000")) {
+                mktCampaignDO.setStatusCd(StatusCode.STATUS_CODE_DRAFT.getStatusCode());
+            }
             mktCampaignMapper.insert(mktCampaignDO);
             mktCampaignDO.setInitId(mktCampaignDO.getMktCampaignId());
             mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
