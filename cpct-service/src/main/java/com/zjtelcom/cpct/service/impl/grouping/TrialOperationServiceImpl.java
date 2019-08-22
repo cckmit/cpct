@@ -798,21 +798,25 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 labelNameList.add(nameList[i]);
                 labelEngNameList.add(codeList[i]);
             }
+            List<String> fields = new ArrayList<>();
             //查询活动下面所有渠道属性id是21和22的value
             List<String> attrValue = mktCamChlConfAttrMapper.selectAttrLabelValueByCampaignId(campaign.getMktCampaignId());
-            List<String> fields = new ArrayList<>();
-            for (String attr : attrValue){
-                fields.add(attr);
+            if (attrValue != null && attrValue.size() > 0) {
+                for (String attr : attrValue){
+                    fields.add(attr);
+                }
             }
             // 服务包添加查询字段
             List<String> labels = mktCamChlConfAttrMapper.selectAttrLabelRemarkByCampaignId(campaign.getMktCampaignId());
-            for (String s : labels) {
-                Label label1= injectionLabelMapper.selectByLabelCode(s);
-                Map<String, Object> label = new HashMap<>();
-                label.put("code", s);
-                label.put("name", label1.getInjectionLabelName());
-                labelList.add(label);
-                fields.add(s);
+            if(labels != null && labels.size() > 0){
+                for (String s : labels) {
+                    Label label1= injectionLabelMapper.selectByLabelCode(s);
+                    Map<String, Object> label = new HashMap<>();
+                    label.put("code", s);
+                    label.put("name", label1 == null? "":label1.getInjectionLabelName());
+                    labelList.add(label);
+                    fields.add(s);
+                }
             }
             List<Map<String, Object>> displayList = displayLabel(campaign);
             for (Map<String, Object> display : displayList) {

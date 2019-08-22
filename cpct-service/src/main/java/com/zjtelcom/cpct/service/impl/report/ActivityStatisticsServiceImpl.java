@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Logger;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -282,10 +283,10 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         Object endDate = params.get("endDate");
         if (endDate != null && endDate!="") {
             //类型转换 YYYYMMMDD YYYY-MM-DD
-            Date date = DateUtil.parseDate(endDate.toString(), "YYYY-MM-DD");
-            paramMap.put("endDate", date);
+//            Date date = DateUtil.parseDate(endDate.toString(), "YYYY-MM-DD");
+            paramMap.put("endDate", endDate.toString().replaceAll("-",""));
             //起始统计日期(YYYYMMDD)必填 dubbo接口用
-            paramMap.put("startDate", date);
+            paramMap.put("startDate", endDate.toString().replaceAll("-",""));
         }else {
             paramMap.put("resultCode", CODE_FAIL);
             paramMap.put("resultMsg", "时间是必填字段");
@@ -364,6 +365,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         Integer pageSize = Integer.valueOf(params.get("pageSize").toString());
         //销报表查询接口
         Map<String, Object> stringObjectMap = iReportService.queryRptEventOrder(paramMap);
+
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
             stringObjectMap = addParams(stringObjectMap,page,pageSize);
         }else {
@@ -396,10 +398,10 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         Object endDate = params.get("endDate");
         if (endDate != null && endDate!="") {
             //类型转换 YYYYMMMDD YYYY-MM-DD
-            Date date = DateUtil.parseDate(endDate.toString(), "YYYY-MM-DD");
-            paramMap.put("endDate", date);
+//            Date date = DateUtil.parseDate(endDate.toString(), "YYYY-MM-DD");
+            paramMap.put("endDate", endDate.toString().replaceAll("-",""));
             //起始统计日期(YYYYMMDD)必填 dubbo接口用
-            paramMap.put("startDate", date);
+            paramMap.put("startDate", endDate.toString().replaceAll("-",""));
         }else {
             paramMap.put("resultCode", CODE_FAIL);
             paramMap.put("resultMsg", "时间是必填字段");
@@ -438,9 +440,9 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                 stringBuilder.append(mktCampaignDO.getMktCampaignId()).append(",");
             }
         }else {
-                paramMap.put("resultMsg","没有找到对应的活动方案");
-                paramMap.put("resultCode",CODE_FAIL);
-                return paramMap;
+            paramMap.put("resultMsg","没有找到对应的活动方案");
+            paramMap.put("resultCode",CODE_FAIL);
+            return paramMap;
         }
         //多个id  “，”拼接
         String substring = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
@@ -511,11 +513,18 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
     private Map<String, Object> addParams(Map<String, Object> stringObjectMap, Integer page, Integer pageSize) {
         Map<String, Object> maps = new HashMap<>();
         List<HashMap<String, Object>> hashMaps = new ArrayList<>();
+        List<Map<String, Object>> data = new ArrayList<>();
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
             PageHelper.startPage(page,pageSize);
-            List<Map<String, Object>> rptBatchOrderList = (List<Map<String, Object>>) stringObjectMap.get("rptBatchOrderList");
-            if (rptBatchOrderList.size() > 0 && rptBatchOrderList != null) {
-                for (Map<String, Object> map : rptBatchOrderList) {
+            //event 解析 判断
+            Object rptBatchOrderList1 = stringObjectMap.get("rptBatchOrderList");
+            if (rptBatchOrderList1!= null && rptBatchOrderList1!=""){
+                data = (List<Map<String, Object>>) stringObjectMap.get("rptBatchOrderList");
+            }else {
+                data = (List<Map<String, Object>>) stringObjectMap.get("rptEventOrderList");
+            }
+            if (data.size() > 0 && data != null) {
+                for (Map<String, Object> map : data) {
                     HashMap<String, Object> resultMap = new HashMap<>();
                     String mktCampaignId1 = map.get("mktCampaignId").toString();
                     MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(mktCampaignId1));
@@ -580,13 +589,24 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             msgMap.put("nub",o);
                             statisicts.add(msgMap);
                         }
-                        if (key.equals("revenueReduceRate")){
-                            msgMap.put("name","收入低迁率");
+                        if (key.equals("orgChannelRate")){
+                            msgMap.put("name","门店有销率");
                             msgMap.put("nub",o);
                             statisicts.add(msgMap);
                         }
-                        if (key.equals("orgChannelRate")){
-                            msgMap.put("name","门店有销率");
+                        //eventList 解析数据
+                        if (key.equals("contactNum")){
+                            msgMap.put("name","客户接触数");
+                            msgMap.put("nub",o);
+                            statisicts.add(msgMap);
+                        }
+                        if (key.equals("contactRate")){
+                            msgMap.put("name","客触转化率");
+                            msgMap.put("nub",o);
+                            statisicts.add(msgMap);
+                        }
+                        if (key.equals("orderRate")){
+                            msgMap.put("name","商机转化率");
                             msgMap.put("nub",o);
                             statisicts.add(msgMap);
                         }
