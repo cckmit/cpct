@@ -337,7 +337,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
             List<OpenMktCamGrpRulEntity> mktCamGrpRuls = openMktCampaignEntity.getMktCamGrpRuls();
             if(mktCamGrpRuls != null && mktCamGrpRuls.size() > 0) {
                 for (OpenMktCamGrpRulEntity openMktCamGrpRulEntity : mktCamGrpRuls) {
-                    if (openMktCamGrpRulEntity.getActType().equals("ADD")) {
+                    if (!openMktCamGrpRulEntity.getActType().equals("ADD")) {
                         resultObject.put("mktCampaigns", mktCampaigns);
                         resultMap.put("resultCode", "1");
                         resultMap.put("resultMsg", "处理失败,营服活动分群规则的数据操作类型字段的值不是ADD");
@@ -363,6 +363,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                     }
                     //关联表
                     mktCamGrpRul.setMktCampaignId(mktCampaignDO.getMktCampaignId());
+                    mktCamGrpRul.setMktCamGrpRulId(null);
                     mktCamGrpRulMapper.insert(mktCamGrpRul);
                 }
             }
@@ -488,6 +489,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                 for (OpenMktStrategyEntity openMktStrategyEntity : mktCampaignStrategyDetails) {
                     //新增营销服务策略
                     MktStrategy mktStrategy = BeanUtil.create(openMktStrategyEntity, new MktStrategy());
+                    mktStrategy.setStrategyId(null);
                     mktStrategy.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
                     mktStrategy.setStatusDate(mktCampaignDO.getCreateDate());
                     mktStrategy.setCreateStaff(mktCampaignDO.getCreateStaff());
@@ -496,6 +498,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                     mktStrategy.setUpdateDate(mktCampaignDO.getCreateDate());
                     mktStrategyMapper.insert(mktStrategy);
                     MktCamStrategyRel mktCamStrategyRel = new MktCamStrategyRel();
+                    mktCamStrategyRel.setCampStrRelId(null);
                     mktCamStrategyRel.setMktCampaignId(mktCampaignDO.getMktCampaignId());
                     mktCamStrategyRel.setStrategyId(mktStrategy.getStrategyId());
                     mktCamStrategyRel.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);

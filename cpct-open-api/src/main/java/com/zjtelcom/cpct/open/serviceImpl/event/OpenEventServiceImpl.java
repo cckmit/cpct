@@ -1,7 +1,5 @@
 package com.zjtelcom.cpct.open.serviceImpl.event;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.channel.EventRelMapper;
 import com.zjtelcom.cpct.dao.event.*;
@@ -9,22 +7,15 @@ import com.zjtelcom.cpct.domain.channel.EventItem;
 import com.zjtelcom.cpct.domain.channel.EventRel;
 import com.zjtelcom.cpct.domain.event.EventMatchRulDO;
 import com.zjtelcom.cpct.dto.event.*;
-import com.zjtelcom.cpct.open.base.common.CommonUtil;
 import com.zjtelcom.cpct.open.base.service.BaseService;
 import com.zjtelcom.cpct.open.entity.event.*;
 import com.zjtelcom.cpct.open.service.event.OpenEventService;
 import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.DateUtil;
-import com.zjtelcom.cpct.util.UserUtil;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Transactional
@@ -76,12 +67,14 @@ public class OpenEventServiceImpl extends BaseService implements OpenEventServic
             contactEvt.setContactEvtTypeId(openEvent.getEvtTypeId());
             contactEvt.setEvtTrigType(openEvent.getEventTrigType());
             contactEvt.setExtEventId(1000L);
-            contactEvt.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-            contactEvt.setStatusDate(openEvent.getCreateDate());
-            contactEvt.setCreateStaff(openEvent.getCreateStaff());
-            contactEvt.setCreateDate(openEvent.getCreateDate());
-            contactEvt.setUpdateStaff(openEvent.getCreateStaff());
-            contactEvt.setUpdateDate(openEvent.getCreateDate());
+            if(openEvent.getStatusCd() == null) {
+                contactEvt.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+            }
+            if(openEvent.getCreateDate() == null) {
+                contactEvt.setStatusDate(new Date());
+                contactEvt.setCreateDate(new Date());
+                contactEvt.setUpdateDate(new Date());
+            }
             contactEvtMapper.createContactEvt(contactEvt);
 
             //新增事件采集项
@@ -101,12 +94,14 @@ public class OpenEventServiceImpl extends BaseService implements OpenEventServic
                     if(openEventItem.getIsNullable() != null) {
                         contactEvtItem.setIsNullable(Long.valueOf(openEventItem.getIsNullable()));
                     }
-                    contactEvtItem.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-                    contactEvtItem.setStatusDate(openEventItem.getCreateDate());
-                    contactEvtItem.setCreateStaff(openEventItem.getCreateStaff());
-                    contactEvtItem.setCreateDate(openEventItem.getCreateDate());
-                    contactEvtItem.setUpdateStaff(openEventItem.getCreateStaff());
-                    contactEvtItem.setUpdateDate(openEventItem.getCreateDate());
+                    if(contactEvtItem.getStatusCd() == null) {
+                        contactEvtItem.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                    }
+                    if(contactEvtItem.getCreateDate() == null) {
+                        contactEvtItem.setStatusDate(new Date());
+                        contactEvtItem.setCreateDate(new Date());
+                        contactEvtItem.setUpdateDate(new Date());
+                    }
                     contactEvtItemMapper.insert(contactEvtItem);
                 }
             }
