@@ -799,25 +799,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 labelEngNameList.add(codeList[i]);
             }
             List<String> fields = new ArrayList<>();
-            //查询活动下面所有渠道属性id是21和22的value
-            List<String> attrValue = mktCamChlConfAttrMapper.selectAttrLabelValueByCampaignId(campaign.getMktCampaignId());
-            if (attrValue != null && attrValue.size() > 0) {
-                for (String attr : attrValue){
-                    fields.add(attr);
-                }
-            }
-            // 服务包添加查询字段
-            List<String> labels = mktCamChlConfAttrMapper.selectAttrLabelRemarkByCampaignId(campaign.getMktCampaignId());
-            if(labels != null && labels.size() > 0){
-                for (String s : labels) {
-                    Label label1= injectionLabelMapper.selectByLabelCode(s);
-                    Map<String, Object> label = new HashMap<>();
-                    label.put("code", s);
-                    label.put("name", label1 == null? "":label1.getInjectionLabelName());
-                    labelList.add(label);
-                    fields.add(s);
-                }
-            }
+
+
             List<Map<String, Object>> displayList = displayLabel(campaign);
             for (Map<String, Object> display : displayList) {
                 String code = display.get("code") == null ? null : display.get("code").toString();
@@ -829,6 +812,30 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     labelList.add(label);
                     fields.add(code);
                     labelEngNameList.add(code);
+                }
+            }
+            //查询活动下面所有渠道属性id是21和22的value
+            List<String> attrValue = mktCamChlConfAttrMapper.selectAttrLabelValueByCampaignId(campaign.getMktCampaignId());
+            if (attrValue != null && attrValue.size() > 0) {
+                for (String attr : attrValue){
+                    if (!fields.contains(attr)) {
+                        fields.add(attr);
+                    }
+                }
+            }
+            // 服务包添加查询字段
+            List<String> labels = mktCamChlConfAttrMapper.selectAttrLabelRemarkByCampaignId(campaign.getMktCampaignId());
+            if(labels != null && labels.size() > 0){
+                for (String s : labels) {
+                    if (s != null && !labelEngNameList.contains(s)) {
+                        Label label1= injectionLabelMapper.selectByLabelCode(s);
+                        Map<String, Object> label = new HashMap<>();
+                        label.put("code", s);
+                        label.put("name", label1 == null? "":label1.getInjectionLabelName());
+                        labelList.add(label);
+                        fields.add(s);
+                        labelEngNameList.add(s);
+                    }
                 }
             }
             if (!fields.isEmpty()) {

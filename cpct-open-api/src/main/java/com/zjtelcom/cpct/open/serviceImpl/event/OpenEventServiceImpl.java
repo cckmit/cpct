@@ -51,12 +51,14 @@ public class OpenEventServiceImpl extends BaseService implements OpenEventServic
             singleEvent.put("eventName",openEvent.getEventName());
             events.add(singleEvent);
             if(openEvent.getActType() != null) {
-                if (!openEvent.getActType().equals("ADD")) {
-                    resultObject.put("events", events);
-                    resultMap.put("resultCode", "1");
-                    resultMap.put("resultMsg", "新增失败,事件的数据操作类型字段的值不是ADD");
-                    resultMap.put("resultObject", resultObject);
-                    return resultMap;
+                if (openEvent.getActType() != null){
+                    if (!openEvent.getActType().equals("ADD")) {
+                        resultObject.put("events", events);
+                        resultMap.put("resultCode", "1");
+                        resultMap.put("resultMsg", "新增失败,事件的数据操作类型字段的值不是ADD");
+                        resultMap.put("resultObject", resultObject);
+                        return resultMap;
+                    }
                 }
             }
             //新增事件
@@ -67,6 +69,13 @@ public class OpenEventServiceImpl extends BaseService implements OpenEventServic
             contactEvt.setContactEvtTypeId(openEvent.getEvtTypeId());
             contactEvt.setEvtTrigType(openEvent.getEventTrigType());
             contactEvt.setExtEventId(1000L);
+            if(openEvent.getInterfaceCfgId() == null) {
+                resultObject.put("events", events);
+                resultMap.put("resultCode", "1");
+                resultMap.put("resultMsg", "新增失败,interfaceCfgId是必填项，不能为空");
+                resultMap.put("resultObject", resultObject);
+                return resultMap;
+            }
             if(openEvent.getStatusCd() == null) {
                 contactEvt.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
             }
