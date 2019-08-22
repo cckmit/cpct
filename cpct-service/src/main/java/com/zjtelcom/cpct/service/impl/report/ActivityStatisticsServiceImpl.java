@@ -278,7 +278,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         }
         paramMap.put("mktCampaignName", mktCampaignName);
         paramMap.put("mktCampaignId", mktCampaignId);
-        //统计日期
+        //统计日期 必填字段
         Object endDate = params.get("endDate");
         if (endDate != null && endDate!="") {
             //类型转换 YYYYMMMDD YYYY-MM-DD
@@ -286,16 +286,32 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             paramMap.put("endDate", date);
             //起始统计日期(YYYYMMDD)必填 dubbo接口用
             paramMap.put("startDate", date);
+        }else {
+            paramMap.put("resultCode", CODE_FAIL);
+            paramMap.put("resultMsg", "时间是必填字段");
+            return paramMap;
         }
         //活动状态 支持all
         Object statusCd = params.get("statusCd");
-        paramMap.put("statusCd", statusCd);
+        if (statusCd == "" || statusCd == null){
+            paramMap.put("statusCd", "all");
+        }else {
+            paramMap.put("statusCd", statusCd);
+        }
         //活动类型 支持all
         Object mktCampaignType = params.get("mktCampaignType");
-        paramMap.put("mktCampaignType", mktCampaignType);
+        if (mktCampaignType == "" || mktCampaignType == null){
+            paramMap.put("mktCampaignType", "all");
+        }else {
+            paramMap.put("mktCampaignType", mktCampaignType);
+        }
         //渠道编码(必填,ALL表示所有,多个用逗号隔开)
-        Object channelCode1 = params.get("channelCode");
-        paramMap.put("channelCode1", channelCode1);
+        Object channelCode = params.get("channelCode");
+        if (channelCode == "" || channelCode ==null){
+            paramMap.put("channelCode", "all");
+        }else {
+            paramMap.put("channelCode", channelCode);
+        }
         StringBuilder stringBuilder = new StringBuilder();
         List<MktCampaignDO> mktCampaignList = mktCampaignMapper.queryRptBatchOrderForMktCampaign(paramMap);
         if (mktCampaignList.size()>0 && mktCampaignList!=null){
@@ -311,8 +327,14 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         String substring = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
         paramMap.put("mktCampaignId", substring);
         //省公司(必填)
-        String orglevel1 = params.get("orglevel1").toString();
-        paramMap.put("orglevel1", orglevel1);
+        Object orglevel1 = params.get("orglevel1");
+        if (orglevel1 == null || orglevel1 == ""){
+            paramMap.put("resultMsg","省公司 必填 ");
+            paramMap.put("resultCode",CODE_FAIL);
+            return paramMap;
+        }else {
+            paramMap.put("orglevel1", orglevel1);
+        }
         if (params.get("orglevel2") != null && params.get("orglevel2") != "") {
             //地市(ALL表示所有,多个用逗号隔开)
             String orglevel2 = params.get("orglevel2").toString();
@@ -370,24 +392,40 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         }
         paramMap.put("mktCampaignName", mktCampaignName);
         paramMap.put("mktCampaignId", mktCampaignId);
-        //统计日期
+        //统计日期 必填字段
         Object endDate = params.get("endDate");
-        if (endDate != null) {
+        if (endDate != null && endDate!="") {
             //类型转换 YYYYMMMDD YYYY-MM-DD
-            String s = dateConvertion(endDate.toString());
-            paramMap.put("endDate", s);
+            Date date = DateUtil.parseDate(endDate.toString(), "YYYY-MM-DD");
+            paramMap.put("endDate", date);
             //起始统计日期(YYYYMMDD)必填 dubbo接口用
-            paramMap.put("startDate", s);
+            paramMap.put("startDate", date);
+        }else {
+            paramMap.put("resultCode", CODE_FAIL);
+            paramMap.put("resultMsg", "时间是必填字段");
+            return paramMap;
         }
         //活动状态 支持all
         Object statusCd = params.get("statusCd");
-        paramMap.put("statusCd", statusCd);
+        if (statusCd == "" || statusCd == null){
+            paramMap.put("statusCd", "all");
+        }else {
+            paramMap.put("statusCd", statusCd);
+        }
         //活动类型 支持all
         Object mktCampaignType = params.get("mktCampaignType");
-        paramMap.put("mktCampaignType", mktCampaignType);
+        if (mktCampaignType == "" || mktCampaignType == null){
+            paramMap.put("mktCampaignType", "all");
+        }else {
+            paramMap.put("mktCampaignType", mktCampaignType);
+        }
         //渠道编码(必填,ALL表示所有,多个用逗号隔开)
-        Object channelCode1 = params.get("channelCode");
-        paramMap.put("channelCode1", channelCode1);
+        Object channelCode = params.get("channelCode");
+        if (channelCode == "" || channelCode ==null){
+            paramMap.put("channelCode", "all");
+        }else {
+            paramMap.put("channelCode", channelCode);
+        }
         //活动创建地市
         if (params.get("lanId")!=null && params.get("lanId")!=""){
             Object lanId = params.get("lanId");
@@ -401,15 +439,21 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             }
         }else {
                 paramMap.put("resultMsg","没有找到对应的活动方案");
-                paramMap.put("resultCode","200");
+                paramMap.put("resultCode",CODE_FAIL);
                 return paramMap;
         }
         //多个id  “，”拼接
         String substring = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
         paramMap.put("mktCampaignId", substring);
         //省公司(必填)
-        String orglevel1 = params.get("orglevel1").toString();
-        paramMap.put("orglevel1", orglevel1);
+        Object orglevel1 = params.get("orglevel1");
+        if (orglevel1 == null || orglevel1 == ""){
+            paramMap.put("resultMsg","省公司 必填 ");
+            paramMap.put("resultCode",CODE_FAIL);
+            return paramMap;
+        }else {
+            paramMap.put("orglevel1", orglevel1);
+        }
         if (params.get("orglevel2") != null && params.get("orglevel2")!="") {
             //地市(ALL表示所有,多个用逗号隔开)
             String orglevel2 = params.get("orglevel2").toString();
@@ -430,14 +474,19 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             String orglevel5 = params.get("orglevel5").toString();
             paramMap.put("orglevel5", orglevel5);
         }
-        //门店(ALL表示所有,多个用逗号隔开)
-        String orgChannel = params.get("orgChannel").toString();
-        paramMap.put("orgChannel", orgChannel);
-//        if (params.get("flag") != null) {
-//            按活动展现还是按批次展现(0:按活动，1：按批次) 暂时只支持0
-//            String flag = params.get("flag").toString();
+        if (params.get("orgChannel") != null && params.get("orgChannel") != "") {
+            //门店(ALL表示所有,多个用逗号隔开)
+            String orgChannel = params.get("orgChannel").toString();
+            paramMap.put("orgChannel", orgChannel);
+        }
+        if (params.get("flag") != null && params.get("flag") != "") {
+            //按活动展现还是按批次展现(0:按活动，1：按批次)
+            String flag = params.get("flag").toString();
+            paramMap.put("flag", flag);
+        }else {
+            //暂时只支持0
             paramMap.put("flag", 0);
-//        }
+        }
         Integer page = Integer.valueOf(params.get("page").toString());
         Integer pageSize = Integer.valueOf(params.get("pageSize").toString());
         //活动报表查询接口
