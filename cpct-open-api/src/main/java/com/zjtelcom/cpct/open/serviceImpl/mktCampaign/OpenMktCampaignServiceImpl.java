@@ -338,10 +338,10 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
             mktCampaignDO.setInitId(openMktCampaignEntity.getMktCampaignId());
             mktCampaignDO.setMktCampaignCategory(openMktCampaignEntity.getManageType());
             mktCampaignDO.setLanId(AreaCodeEnum.getLandIdByRegionId(mktCampaignDO.getRegionId()));
-            mktCampaignDO.setStatusCd(StatusCode.STATUS_CODE_DRAFT.getStatusCode());
-            mktCampaignDO.setStatusDate(openMktCampaignEntity.getCreateDate());
-            mktCampaignDO.setUpdateDate(openMktCampaignEntity.getCreateDate());
-            mktCampaignDO.setUpdateStaff(openMktCampaignEntity.getCreateStaff());
+            //mktCampaignDO.setStatusCd(StatusCode.STATUS_CODE_DRAFT.getStatusCode());
+            //mktCampaignDO.setStatusDate(openMktCampaignEntity.getCreateDate());
+            //mktCampaignDO.setUpdateDate(openMktCampaignEntity.getCreateDate());
+            //mktCampaignDO.setUpdateStaff(openMktCampaignEntity.getCreateStaff());
             mktCampaignMapper.insert(mktCampaignDO);
 
             //新增营服活动分群规则
@@ -397,12 +397,12 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                     }
                     MktCamItem mktCamItem = BeanUtil.create(openMktCamItemEntity, new MktCamItem());
                     mktCamItem.setMktCampaignId(mktCampaignDO.getMktCampaignId());
-                    mktCamItem.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
-                    mktCamItem.setStatusDate(mktCampaignDO.getCreateDate());
-                    mktCamItem.setCreateStaff(mktCampaignDO.getCreateStaff());
-                    mktCamItem.setCreateDate(mktCampaignDO.getCreateDate());
-                    mktCamItem.setUpdateStaff(mktCampaignDO.getCreateStaff());
-                    mktCamItem.setUpdateDate(mktCampaignDO.getCreateDate());
+                    //mktCamItem.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                    //mktCamItem.setStatusDate(mktCampaignDO.getCreateDate());
+                    //mktCamItem.setCreateStaff(mktCampaignDO.getCreateStaff());
+                    //mktCamItem.setCreateDate(mktCampaignDO.getCreateDate());
+                    //mktCamItem.setUpdateStaff(mktCampaignDO.getCreateStaff());
+                    //mktCamItem.setUpdateDate(mktCampaignDO.getCreateDate());
                     mktCamItemMapper.insert(mktCamItem);
                 }
             }
