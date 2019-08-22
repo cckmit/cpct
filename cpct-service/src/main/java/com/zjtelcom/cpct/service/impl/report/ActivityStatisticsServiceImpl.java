@@ -1,6 +1,9 @@
 package com.zjtelcom.cpct.service.impl.report;
 
+import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
 import com.ctzj.smt.bss.cooperate.service.dubbo.IReportService;
+import com.ctzj.smt.bss.sysmgr.model.dto.SystemPostDto;
+import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
@@ -61,13 +64,13 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         List<Organization> list = new ArrayList<>();
         List<Organization> arrayList = new ArrayList<>();
         Long orgId = null;
-//        SystemUserDto user = BssSessionHelp.getSystemUserDto();
-//        Long staffId = user.getStaffId();
+        SystemUserDto user = BssSessionHelp.getSystemUserDto();
+        Long staffId = user.getStaffId();
 //        //组织树控制权限
-//        List<SystemPostDto> systemPostDtoList = user.getSystemPostDtoList();
-//        String sysPostCode = systemPostDtoList.get(0).getSysPostCode();
-        Long staffId = Long.valueOf(params.get("staffId").toString());
-        String sysPostCode = params.get("sysPostCode").toString();
+        List<SystemPostDto> systemPostDtoList = user.getSystemPostDtoList();
+        String sysPostCode = systemPostDtoList.get(0).getSysPostCode();
+//        Long staffId = Long.valueOf(params.get("staffId").toString());
+//        String sysPostCode = params.get("sysPostCode").toString();
         Object areaId = params.get("areaId");
         if (areaId != null && areaId != "") {
             arrayList = organizationMapper.selectByParentId(Long.valueOf(areaId.toString()));
