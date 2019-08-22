@@ -17,6 +17,7 @@ import com.zjtelcom.cpct.domain.channel.OrgRel;
 import com.zjtelcom.cpct.domain.channel.Organization;
 import com.zjtelcom.cpct.enums.AreaCodeEnum;
 import com.zjtelcom.cpct.service.report.ActivityStatisticsService;
+import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 @Service
@@ -180,11 +182,13 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         Object type = params.get("type");
         if (type == null) {
             map.put("resultMsg", "请传入type");
+            map.put("resultCode", CODE_FAIL);
             return map;
         }
         Object orgId = params.get("orgId");
         if (orgId == null) {
             map.put("resultMsg", "请传入orgId");
+            map.put("resultCode", CODE_FAIL);
             return map;
         }
         Organization organization = organizationMapper.selectByPrimaryKey(Long.valueOf(orgId.toString()));
@@ -266,6 +270,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         //活动ID
         Object mktCampaignId = params.get("mktCampaignId");
         if ( (mktCampaignName == null || mktCampaignName == "") && (mktCampaignId == null || mktCampaignId == "")) {
+            paramMap.put("resultCode", CODE_FAIL);
             return paramMap;
         }
         if ((mktCampaignName != null && mktCampaignName == "")  && (mktCampaignId != null && mktCampaignId == "")) {
@@ -277,10 +282,10 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         Object endDate = params.get("endDate");
         if (endDate != null && endDate!="") {
             //类型转换 YYYYMMMDD YYYY-MM-DD
-            String s = dateConvertion(endDate.toString());
-            paramMap.put("endDate", s);
+            Date date = DateUtil.parseDate(endDate.toString(), "YYYY-MM-DD");
+            paramMap.put("endDate", date);
             //起始统计日期(YYYYMMDD)必填 dubbo接口用
-            paramMap.put("startDate", s);
+            paramMap.put("startDate", date);
         }
         //活动状态 支持all
         Object statusCd = params.get("statusCd");
@@ -299,11 +304,12 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             }
         }else {
             paramMap.put("resultMsg","没有找到对应的活动方案");
-            paramMap.put("resultCode","200");
+            paramMap.put("resultCode",CODE_FAIL);
             return paramMap;
         }
-        //多个id  “，”拼接
-        paramMap.put("mktCampaignId", stringBuilder);
+        //多个id  “，”拼接 去除最后的一个 ，
+        String substring = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
+        paramMap.put("mktCampaignId", substring);
         //省公司(必填)
         String orglevel1 = params.get("orglevel1").toString();
         paramMap.put("orglevel1", orglevel1);
@@ -396,7 +402,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                 return paramMap;
         }
         //多个id  “，”拼接
-        paramMap.put("mktCampaignId", stringBuilder);
+        String substring = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
+        paramMap.put("mktCampaignId", substring);
         //省公司(必填)
         String orglevel1 = params.get("orglevel1").toString();
         paramMap.put("orglevel1", orglevel1);
@@ -450,6 +457,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         Map<String, Object> maps = new HashMap<>();
         List<HashMap<String, Object>> hashMaps = new ArrayList<>();
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
+            PageHelper.startPage(page,pageSize);
             List<Map<String, Object>> rptBatchOrderList = (List<Map<String, Object>>) stringObjectMap.get("rptBatchOrderList");
             if (rptBatchOrderList.size() > 0 && rptBatchOrderList != null) {
                 for (Map<String, Object> map : rptBatchOrderList) {
@@ -544,10 +552,10 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                 }
             }
         }
-        PageHelper.startPage(page,pageSize);
+
         Page pageInfo = new Page(new PageInfo(hashMaps));
         maps.put("resultMsg",hashMaps);
-        maps.put("resultCode","200");
+        maps.put("resultCode",CODE_SUCCESS);
         return maps;
     }
 
