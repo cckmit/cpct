@@ -19,7 +19,7 @@ public interface ContactEvtMapper {
 
     List<ContactEvt> listEvents(ContactEvt contactEvt);
 
-    int saveEvent(EventDO record);
+    int insert(ContactEvt contactEvt);
 
     int delEvent(@Param("contactEvtId") Long contactEvtId);
 

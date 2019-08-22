@@ -80,7 +80,7 @@ public class OpenEventServiceImpl extends BaseService implements OpenEventServic
             contactEvt.setCreateDate(openEvent.getCreateDate());
             contactEvt.setUpdateStaff(openEvent.getCreateStaff());
             contactEvt.setUpdateDate(openEvent.getCreateDate());
-            contactEvtMapper.createContactEvt(contactEvt);
+            contactEvtMapper.insert(contactEvt);
 
             //新增事件采集项
             List<OpenEventItem> openEventItems = openEvent.getEventItems();
@@ -93,18 +93,18 @@ public class OpenEventServiceImpl extends BaseService implements OpenEventServic
                         resultMap.put("resultObject", resultObject);
                         return resultMap;
                     }
-                    EventItem eventItem = BeanUtil.create(openEventItem, new EventItem());
-                    eventItem.setContactEvtId(contactEvt.getContactEvtId());
+                    ContactEvtItem contactEvtItem = BeanUtil.create(openEventItem, new ContactEvtItem());
+                    contactEvtItem.setContactEvtId(contactEvt.getContactEvtId());
                     if(openEventItem.getIsNullable() != null) {
-                        eventItem.setIsNullable(Long.valueOf(openEventItem.getIsNullable()));
+                        contactEvtItem.setIsNullable(Long.valueOf(openEventItem.getIsNullable()));
                     }
-                    eventItem.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-                    eventItem.setStatusDate(openEventItem.getCreateDate());
-                    eventItem.setCreateStaff(openEventItem.getCreateStaff());
-                    eventItem.setCreateDate(openEventItem.getCreateDate());
-                    eventItem.setUpdateStaff(openEventItem.getCreateStaff());
-                    eventItem.setUpdateDate(openEventItem.getCreateDate());
-                    contactEvtItemMapper.insertContactEvtItem(eventItem);
+                    contactEvtItem.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                    contactEvtItem.setStatusDate(openEventItem.getCreateDate());
+                    contactEvtItem.setCreateStaff(openEventItem.getCreateStaff());
+                    contactEvtItem.setCreateDate(openEventItem.getCreateDate());
+                    contactEvtItem.setUpdateStaff(openEventItem.getCreateStaff());
+                    contactEvtItem.setUpdateDate(openEventItem.getCreateDate());
+                    contactEvtItemMapper.insert(contactEvtItem);
                 }
             }
 

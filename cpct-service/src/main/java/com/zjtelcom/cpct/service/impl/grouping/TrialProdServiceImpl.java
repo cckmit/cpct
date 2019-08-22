@@ -188,7 +188,7 @@ public class TrialProdServiceImpl implements TrialProdService {
             }
         }
         for (MktCampaignDO campaignDO : campaignList){
-            if(!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(campaignDO.getStatusCd())){
+            if(!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(campaignDO.getStatusCd()) && !StatusCode.STATUS_CODE_ADJUST.getStatusCode().equals(campaignDO.getStatusCd()) ){
                continue;
             }
 //            if (redisUtils.get("CAMPAIGN_ES_STOP")==null || "0".equals(redisUtils.get("CAMPAIGN_ES_STOP"))){
