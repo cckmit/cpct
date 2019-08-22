@@ -807,6 +807,11 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             // 服务包添加查询字段
             List<String> labels = mktCamChlConfAttrMapper.selectAttrLabelRemarkByCampaignId(campaign.getMktCampaignId());
             for (String s : labels) {
+                Label label1= injectionLabelMapper.selectByLabelCode(s);
+                Map<String, Object> label = new HashMap<>();
+                label.put("code", s);
+                label.put("name", label1.getInjectionLabelName());
+                labelList.add(label);
                 fields.add(s);
             }
             List<Map<String, Object>> displayList = displayLabel(campaign);
