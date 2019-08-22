@@ -2309,7 +2309,7 @@ public class EventApiServiceImpl implements EventApiService {
                     // 判断initId是否在清单列表里面
                     if (mktCamCodeList.contains(mktCampaign.getInitId().toString())) {
                    // if (mktCamCodeList.contains(mktCampaign.getMktCampaignId().toString())) {
-                        mktCampaignCustMap.put("mktCampaginId", mktCampaign.getInitId());
+                        mktCampaignCustMap.put("mktCampaginId", mktCampaginId);
                         mktCampaignCustMap.put("levelConfig", act.get("levelConfig"));
                         mktCampaignCustMap.put("campaignSeq", act.get("campaignSeq"));
                         mktCampaignCustMap.put("strategyMapList", strategyMapList);
