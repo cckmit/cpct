@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 /**
  * Description:
@@ -164,6 +165,15 @@ public class TarGrpTemplateController  extends BaseController {
         Integer page = Integer.parseInt(params.get("page"));
         Integer pageSize = Integer.parseInt(params.get("pageSize"));
         Map<String, Object> map = tarGrpTemplateService.listTarGrpTemplatePage(tarGrpTemplateName,tarGrpType, page, pageSize);
+        return JSON.toJSONString(map);
+    }
+
+    @PostMapping("tarGrpTemplateCountAndIssue")
+    @CrossOrigin
+    public String tarGrpTemplateCountAndIssue(@RequestBody Map<String, String> params) {
+        String tarGrpTemplateId = params.get("tarGrpTemplateId");
+        String operationType = params.get("operationType");
+        Map<String, Object> map = tarGrpTemplateService.tarGrpTemplateCountAndIssue(tarGrpTemplateId, operationType);
         return JSON.toJSONString(map);
     }
 }

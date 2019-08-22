@@ -56,6 +56,8 @@ public class CloseRuleServiceImpl implements CloseRuleService {
     @Autowired
     private RedisUtils redisUtils;
     @Autowired
+    private RedisUtils_es redisUtils_es;
+    @Autowired
     private SysParamsMapper sysParamsMapper;
     @Autowired
     private OfferMapper offerMapper;
@@ -415,8 +417,8 @@ public class CloseRuleServiceImpl implements CloseRuleService {
                 express.append("");
             }
         }
-        redisUtils.hset("CLOSE_RULE_EXPRESS_" + ruleId,"express", express.toString());
-        redisUtils.hset("CLOSE_RULE_EXPRESS_" + ruleId,"labelResultList", JSON.toJSONString(labelResultList));
+        redisUtils_es.hset("CLOSE_RULE_EXPRESS_" + ruleId,"express", express.toString());
+        redisUtils_es.hset("CLOSE_RULE_EXPRESS_" + ruleId,"labelResultList", JSON.toJSONString(labelResultList));
         return express.toString();
     }
 
@@ -448,6 +450,7 @@ public class CloseRuleServiceImpl implements CloseRuleService {
             resultList.add(offer.getOfferNbr());
         }
         Integer rowNums = sheet.getLastRowNum() + 1;
+        List<String> errorOffer = new ArrayList<>();
         for (int i = 1; i < rowNums; i++) {
             Row row = sheet.getRow(i);
             if (row.getLastCellNum() >= 2) {
@@ -464,11 +467,14 @@ public class CloseRuleServiceImpl implements CloseRuleService {
                         resultList.add(cellValue);
                     }
                 }else {
-                    maps.put("resultCode", CODE_FAIL);
-                    maps.put("resultMsg", cellValue + "销售品不存在");
-                    return maps;
+                    errorOffer.add(cellValue);
                 }
             }
+        }
+        if(errorOffer.size() > 0) {
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg", "失败原因：以下" + errorOffer.size() + "个销售品编码错误！" + "\n" + errorOffer);
+            return maps;
         }
         CloseRule closeRule = new CloseRule();
         if(ruleId == null) {
@@ -503,7 +509,7 @@ public class CloseRuleServiceImpl implements CloseRuleService {
             closeRuleMapper.updateByPrimaryKey(closeRule);
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
-        maps.put("resultMsg", closeRule.getChooseProduct());
+        maps.put("resultMsg", "导入成功，销售品共导入" + sheet.getLastRowNum() + "个");
         return maps;
     }
 }

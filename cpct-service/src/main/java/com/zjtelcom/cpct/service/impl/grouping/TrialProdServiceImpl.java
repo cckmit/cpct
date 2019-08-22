@@ -188,7 +188,7 @@ public class TrialProdServiceImpl implements TrialProdService {
             }
         }
         for (MktCampaignDO campaignDO : campaignList){
-            if(!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(campaignDO.getStatusCd())){
+            if(!StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(campaignDO.getStatusCd()) && !StatusCode.STATUS_CODE_ADJUST.getStatusCode().equals(campaignDO.getStatusCd()) ){
                continue;
             }
 //            if (redisUtils.get("CAMPAIGN_ES_STOP")==null || "0".equals(redisUtils.get("CAMPAIGN_ES_STOP"))){
@@ -255,7 +255,7 @@ public class TrialProdServiceImpl implements TrialProdService {
             fieldList[i] = attrValue.get(i - labelDTOList.size());
         }
         List<Long> attrList = mktCamChlConfAttrMapper.selectByCampaignId(trialOperation.getCampaignId());
-        if (attrList.contains(ISEE_CUSTOMER.getArrId()) || attrList.contains(ISEE_LABEL_CUSTOMER.getArrId())) {
+        if (attrList.contains(ISEE_CUSTOMER.getArrId()) || attrList.contains(ISEE_LABEL_CUSTOMER.getArrId()) || attrList.contains(SERVICE_PACKAGE.getArrId())) {
             Map<String, Object> label = new HashMap<>();
             label.put("code", "SALE_EMP_NBR");
             label.put("name", "接单人号码");
