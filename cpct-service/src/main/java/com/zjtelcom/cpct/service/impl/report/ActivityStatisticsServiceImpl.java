@@ -344,6 +344,9 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         Map<String, Object> stringObjectMap = iReportService.queryRptEventOrder(paramMap);
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
             stringObjectMap = addParams(stringObjectMap,page,pageSize);
+        }else {
+            stringObjectMap.put("resultCode",CODE_FAIL);
+            stringObjectMap.put("resultMsg","查询无结果（（9 . 9））");
         }
         return stringObjectMap;
     }
@@ -441,6 +444,9 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         stringObjectMap = iReportService.queryRptBatchOrder(paramMap);
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
             stringObjectMap = addParams(stringObjectMap, page, pageSize);
+        }else {
+            stringObjectMap.put("resultCode",CODE_FAIL);
+            stringObjectMap.put("resultMsg","查询无结果（（0 . 0））");
         }
         return stringObjectMap;
     }
