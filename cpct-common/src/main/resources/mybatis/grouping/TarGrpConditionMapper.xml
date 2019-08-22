@@ -230,15 +230,13 @@
     where TAR_GRP_ID = #{tarGrpTemplateId,jdbcType=BIGINT}
     </delete>
 
-    <select id="selectAllLabelByTarId" parameterType="java.lang.Long" resultType="Map">
+  <select id="selectAllLabelByTarId" parameterType="java.lang.Long" resultType="java.util.Map">
     SELECT DISTINCT
 	i.INJECTION_LABEL_CODE AS code,i.INJECTION_LABEL_NAME as name,i.CLASS_NAME as className,
 	tgc.OPER_TYPE AS operType,tgc.RIGHT_PARAM as rightParam
-    FROM
-	tar_grp_condition tgc
+    FROM tar_grp_condition tgc
     LEFT JOIN injection_label i ON tgc.LEFT_PARAM = i.INJECTION_LABEL_ID
-    WHERE
-	tgc.TAR_GRP_ID = #{tarId,jdbcType=BIGINT}
+    WHERE tgc.TAR_GRP_ID = #{tarId,jdbcType=BIGINT}
   </select>
 
 

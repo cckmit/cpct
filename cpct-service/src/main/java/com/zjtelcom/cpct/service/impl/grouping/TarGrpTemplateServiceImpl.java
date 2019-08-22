@@ -46,6 +46,7 @@ import com.zjtelcom.cpct_prod.dao.offer.OfferProdMapper;
 import com.zjtelcom.es.es.entity.TrialOperationVOES;
 import com.zjtelcom.es.es.entity.model.TrialOperationParamES;
 import com.zjtelcom.es.es.entity.model.TrialResponseES;
+import com.zjtelcom.es.es.service.EsTarGrpTemplate;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -112,7 +113,8 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     private MktCamCustMapper camCustMapper;
     @Autowired(required = false)
     private IOfferRestrictConfigureService iOfferRestrictConfigureService;
-
+    @Autowired(required = false)
+    private EsTarGrpTemplate esTarGrpTemplateService;
 
 
     /**
@@ -209,6 +211,61 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         result.put("resultMsg", "导入成功,请稍后查看结果");
         return result;
     }
+
+    @Override
+    public Map<String, Object> tarGrpTemplateCountAndIssue(String tarGrpTemplateId, String operationType) {
+        Map<String, Object> map = new HashMap<>();
+        List<Map<String, String>> list = tarGrpConditionMapper.selectAllLabelByTarId(Long.valueOf(tarGrpTemplateId));
+        List<String> expressions = new ArrayList<>();
+        for (Map<String, String> tarGrpCondition : list) {
+            String code = tarGrpCondition.get("code");
+            String operType = tarGrpCondition.get("operType");
+            operType = equationSymbolConversion(operType);
+            String rightParam = tarGrpCondition.get("rightParam");
+            String expression = code + operType + rightParam;
+            expressions.add(expression);
+        }
+        map.put("expressions", expressions);
+        map.put("operationType", operationType);
+        try {
+            String result = esTarGrpTemplateService.tarGrpTemplateCountAndIssue(map);
+            map.put("resultCode",CODE_SUCCESS);
+            map.put("resultMsg","查询成功");
+            map.put("resultData", result);
+        }catch (Exception e){
+            logger.error("esTarGrpTemplateService错误！");
+            e.printStackTrace();
+            map.put("resultCode",CODE_FAIL);
+            map.put("resultMsg","查询失败");
+        }
+        return map;
+    }
+
+    public String equationSymbolConversion(String type){
+        switch (type) {
+            case "1000":
+                return ">";
+            case "2000":
+                return "<";
+            case "3000":
+                return "==";
+            case "4000":
+                return "!=";
+            case "5000":
+                return ">=";
+            case "6000":
+                return "<=";
+            case "7000":
+                return "in";
+            case "7100":
+                return "notIn";
+            case "7200":
+                return "@@@@";
+            default:
+                return "";
+        }
+    }
+
 
     private void addCamCust( List<Map<String,Object>> customerList, List<Map<String,Object>>  labelList,Long tarTempId){
         List<MktCamCust> camCustList = new ArrayList<>();
