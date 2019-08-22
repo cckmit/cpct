@@ -41,6 +41,6 @@ public interface TarGrpConditionMapper {
 
     int deleteByTarGrpTemplateId(@Param("tarGrpTemplateId") Long tarGrpTemplateId);
 
-    List<Map<String,String>> selectAllLabelByTarId(Long tarGrpTemplateId);
+    List<Map<String,String>> selectAllLabelByTarId(@Param("tarId")Long tarGrpTemplateId);
 
 }
