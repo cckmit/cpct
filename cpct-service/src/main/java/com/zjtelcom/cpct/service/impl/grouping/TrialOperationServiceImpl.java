@@ -1907,7 +1907,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             }
                         }
                         if (label.getLabelDataType().equals("1100") && tarGrpConditionDOs.get(i).getUpdateStaff()==1L){
-                            String date = DateUtil.getPreDay(Integer.valueOf(tarGrpConditionDOs.get(i).getRightParam()));
+                            String date = tarGrpConditionDOs.get(i).getRightParam();
+                            if (!tarGrpConditionDOs.get(i).getRightParam().contains("-")){
+                               date =  DateUtil.getPreDay(Integer.valueOf(tarGrpConditionDOs.get(i).getRightParam()));
+                            }
                             express.append(date);
                         }else if (label.getInjectionLabelCode().equals("PROM_LIST")){
                             FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.valueOf(tarGrpConditionDOs.get(i).getRightParam()));
