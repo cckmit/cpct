@@ -70,7 +70,6 @@ public class OpenEventServiceImpl extends BaseService implements OpenEventServic
             }
             //新增事件
             ContactEvt contactEvt = BeanUtil.create(openEvent, new ContactEvt());
-            contactEvt.setContactEvtId(null);
             contactEvt.setContactEvtName(openEvent.getEventName());
             contactEvt.setContactEvtDesc(openEvent.getEventDesc());
             contactEvt.setContactEvtCode(openEvent.getEventNbr());
