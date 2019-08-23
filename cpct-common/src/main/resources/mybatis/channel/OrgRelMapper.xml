@@ -59,9 +59,6 @@
     STATUS_DATE, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF, REMARK
     from org_rel
   </select>
-
-
-
   <select id="selectByAOrgId" parameterType="java.lang.String" resultMap="BaseResultMap">
     select ORG_REL_ID, A_ORG_ID, Z_ORG_ID, ORG_REL_TYPE, EFF_DATE, EXP_DATE, STATUS_CD,
     STATUS_DATE, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF, REMARK
