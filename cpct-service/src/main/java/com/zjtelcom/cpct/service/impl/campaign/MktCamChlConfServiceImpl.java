@@ -126,6 +126,12 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                     String params = mktCamChlConfAttr.getAttrValue();
                     ruleInsert(evtContactConfId, params);
                 }
+                // 渠道为服务包保存标签
+                if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.SERVICE_PACKAGE.getArrId())) {
+                    ServicePackage servicePackage = servicePackageMapper.selectByPrimaryKey(Long.valueOf(mktCamChlConfAttr.getAttrValue()));
+                    String label = servicePackage.getLabel();
+                    mktCamChlConfAttrDO.setRemark(label);
+                }
                 //mktCamChlConfAttrMapper.insert(mktCamChlConfAttrDO);
                 mktCamChlConfAttrDOList.add(mktCamChlConfAttrDO);
             }

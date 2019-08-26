@@ -69,6 +69,23 @@ public class ActivityStatisticsController extends BaseController {
         return map;
     }
 
+
+    //销报表查询接口
+    @PostMapping("/getRptEventOrder")
+    @CrossOrigin
+    public Map<String,Object> getRptEventOrder(@RequestBody Map<String, Object> params){
+        Map<String, Object> map = new HashMap<>();
+        try {
+            map = activityStatisticsService.getRptEventOrder(params);
+        } catch (Exception e) {
+            logger.error("[op:ActivityStatisticsController] fail to listEvents for getRptEventOrder = {}! Exception: ", JSONArray.toJSON(params), e);
+            return map;
+        }
+        return map;
+    }
+
+
+    //活动报表查询接口
     @PostMapping("/getRptBatchOrder")
     @CrossOrigin
     public Map<String,Object> getRptBatchOrder(@RequestBody Map<String, Object> params){
@@ -77,19 +94,6 @@ public class ActivityStatisticsController extends BaseController {
             map = activityStatisticsService.getRptBatchOrder(params);
         } catch (Exception e) {
             logger.error("[op:ActivityStatisticsController] fail to listEvents for getRptBatchOrder = {}! Exception: ", JSONArray.toJSON(params), e);
-            return map;
-        }
-        return map;
-    }
-
-    @PostMapping("/queryRptBatchOrder")
-    @CrossOrigin
-    public Map<String,Object> queryRptBatchOrder(@RequestBody Map<String, Object> params){
-        Map<String, Object> map = new HashMap<>();
-        try {
-            map = activityStatisticsService.queryRptBatchOrder(params);
-        } catch (Exception e) {
-            logger.error("[op:ActivityStatisticsController] fail to listEvents for queryRptBatchOrder = {}! Exception: ", JSONArray.toJSON(params), e);
             return map;
         }
         return map;

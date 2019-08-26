@@ -529,7 +529,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
             filterRuleMapper.updateByPrimaryKey(filterRules);
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
-        maps.put("resultMsg", "导入成功，销售品共导入" + sheet.getLastRowNum() + "个");
+        maps.put("resultMsg", "导入成功，文件导入" + sheet.getLastRowNum() + "个，共计" + total + "个");
         return maps;
     }
 
