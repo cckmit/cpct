@@ -12,6 +12,7 @@ import com.zjtelcom.cpct.dao.campaign.MktCampaignRelMapper;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.domain.campaign.MktCampaignRelDO;
 import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.channel.OrgRel;
 import com.zjtelcom.cpct.domain.channel.Organization;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Logger;
@@ -249,10 +251,10 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         List<Channel> channelList = new ArrayList<>();
         Object type = params.get("type");
         if (type != null && "realTime".equals(type.toString())) {
-            //实时 5,6 问正义
+            //实时（随销） 5,6 问正义
             channelList = contactChannelMapper.getRealTimeChannel();
         }
-        // 批量 4,5 问正义
+        // 批量（派单） 4,5 问正义
         if (type != null && "batch".equals(type.toString())) {
             channelList = contactChannelMapper.getBatchChannel();
         }
@@ -270,58 +272,59 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         Object mktCampaignName = params.get("mktCampaignName");
         //活动ID
         Object mktCampaignId = params.get("mktCampaignId");
-        if ( (mktCampaignName == null || mktCampaignName == "") && (mktCampaignId == null || mktCampaignId == "")) {
+        if ((mktCampaignName == null || mktCampaignName == "") && (mktCampaignId == null || mktCampaignId == "")) {
             paramMap.put("resultCode", CODE_FAIL);
             return paramMap;
         }
-        if ((mktCampaignName != null && mktCampaignName == "")  && (mktCampaignId != null && mktCampaignId == "")) {
+        if ((mktCampaignName != null && mktCampaignName == "") && (mktCampaignId != null && mktCampaignId == "")) {
             paramMap.put("mktCampaignId", mktCampaignId);
         }
         paramMap.put("mktCampaignName", mktCampaignName);
         paramMap.put("mktCampaignId", mktCampaignId);
         //统计日期 必填字段
         Object endDate = params.get("endDate");
-        if (endDate != null && endDate!="") {
+        if (endDate != null && endDate != "") {
             //类型转换 YYYYMMMDD YYYY-MM-DD
 //            Date date = DateUtil.parseDate(endDate.toString(), "YYYY-MM-DD");
-            paramMap.put("endDate", endDate.toString().replaceAll("-",""));
+            paramMap.put("endDate", endDate.toString().replaceAll("-", ""));
             //起始统计日期(YYYYMMDD)必填 dubbo接口用
-            paramMap.put("startDate", endDate.toString().replaceAll("-",""));
-        }else {
+            paramMap.put("startDate", endDate.toString().replaceAll("-", ""));
+        } else {
             paramMap.put("resultCode", CODE_FAIL);
             paramMap.put("resultMsg", "时间是必填字段");
             return paramMap;
         }
         //活动状态 支持all
         Object statusCd = params.get("statusCd");
-        if (statusCd == "" || statusCd == null){
+        if (statusCd == "" || statusCd == null) {
             paramMap.put("statusCd", "all");
-        }else {
+        } else {
             paramMap.put("statusCd", statusCd);
         }
         //活动类型 支持all
         Object mktCampaignType = params.get("mktCampaignType");
-        if (mktCampaignType == "" || mktCampaignType == null){
+        if (mktCampaignType == "" || mktCampaignType == null) {
             paramMap.put("mktCampaignType", "all");
-        }else {
+        } else {
             paramMap.put("mktCampaignType", mktCampaignType);
         }
         //渠道编码(必填,ALL表示所有,多个用逗号隔开)
         Object channelCode = params.get("channelCode");
-        if (channelCode == "" || channelCode ==null){
+        if (channelCode == "" || channelCode == null) {
             paramMap.put("channelCode", "all");
-        }else {
+        } else {
             paramMap.put("channelCode", channelCode);
         }
         StringBuilder stringBuilder = new StringBuilder();
         List<MktCampaignDO> mktCampaignList = mktCampaignMapper.queryRptBatchOrderForMktCampaign(paramMap);
-        if (mktCampaignList.size()>0 && mktCampaignList!=null){
+        //todo 修改为 init_id 原 getMktCampaignId
+        if (mktCampaignList.size() > 0 && mktCampaignList != null) {
             for (MktCampaignDO mktCampaignDO : mktCampaignList) {
-                stringBuilder.append(mktCampaignDO.getMktCampaignId()).append(",");
+                stringBuilder.append(mktCampaignDO.getInitId()).append(",");
             }
-        }else {
-            paramMap.put("resultMsg","没有找到对应的活动方案");
-            paramMap.put("resultCode",CODE_FAIL);
+        } else {
+            paramMap.put("resultMsg", "没有找到对应的活动方案");
+            paramMap.put("resultCode", CODE_FAIL);
             return paramMap;
         }
         //多个id  “，”拼接 去除最后的一个 ，
@@ -329,11 +332,11 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         paramMap.put("mktCampaignId", substring);
         //省公司(必填)
         Object orglevel1 = params.get("orglevel1");
-        if (orglevel1 == null || orglevel1 == ""){
-            paramMap.put("resultMsg","省公司 必填 ");
-            paramMap.put("resultCode",CODE_FAIL);
+        if (orglevel1 == null || orglevel1 == "") {
+            paramMap.put("resultMsg", "省公司 必填 ");
+            paramMap.put("resultCode", CODE_FAIL);
             return paramMap;
-        }else {
+        } else {
             paramMap.put("orglevel1", orglevel1);
         }
         if (params.get("orglevel2") != null && params.get("orglevel2") != "") {
@@ -367,10 +370,10 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         Map<String, Object> stringObjectMap = iReportService.queryRptEventOrder(paramMap);
 
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
-            stringObjectMap = addParams(stringObjectMap,page,pageSize);
-        }else {
-            stringObjectMap.put("resultCode",CODE_FAIL);
-            stringObjectMap.put("resultMsg","查询无结果（（9 . 9））");
+            stringObjectMap = addParams(stringObjectMap, page, pageSize);
+        } else {
+            stringObjectMap.put("resultCode", CODE_FAIL);
+            stringObjectMap.put("resultMsg", "查询无结果（（9 . 9））");
         }
         return stringObjectMap;
     }
@@ -386,62 +389,63 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         Object mktCampaignName = params.get("mktCampaignName");
         //活动ID
         Object mktCampaignId = params.get("mktCampaignId");
-        if ( (mktCampaignName == null || mktCampaignName == "") && (mktCampaignId == null || mktCampaignId == "")) {
+        if ((mktCampaignName == null || mktCampaignName == "") && (mktCampaignId == null || mktCampaignId == "")) {
             return paramMap;
         }
-        if ((mktCampaignName != null && mktCampaignName == "")  && (mktCampaignId != null && mktCampaignId == "")) {
+        if ((mktCampaignName != null && mktCampaignName == "") && (mktCampaignId != null && mktCampaignId == "")) {
             paramMap.put("mktCampaignId", mktCampaignId);
         }
         paramMap.put("mktCampaignName", mktCampaignName);
         paramMap.put("mktCampaignId", mktCampaignId);
         //统计日期 必填字段
         Object endDate = params.get("endDate");
-        if (endDate != null && endDate!="") {
+        if (endDate != null && endDate != "") {
             //类型转换 YYYYMMMDD YYYY-MM-DD
 //            Date date = DateUtil.parseDate(endDate.toString(), "YYYY-MM-DD");
-            paramMap.put("endDate", endDate.toString().replaceAll("-",""));
+            paramMap.put("endDate", endDate.toString().replaceAll("-", ""));
             //起始统计日期(YYYYMMDD)必填 dubbo接口用
-            paramMap.put("startDate", endDate.toString().replaceAll("-",""));
-        }else {
+            paramMap.put("startDate", endDate.toString().replaceAll("-", ""));
+        } else {
             paramMap.put("resultCode", CODE_FAIL);
             paramMap.put("resultMsg", "时间是必填字段");
             return paramMap;
         }
         //活动状态 支持all
         Object statusCd = params.get("statusCd");
-        if (statusCd == "" || statusCd == null){
+        if (statusCd == "" || statusCd == null) {
             paramMap.put("statusCd", "all");
-        }else {
+        } else {
             paramMap.put("statusCd", statusCd);
         }
         //活动类型 支持all
         Object mktCampaignType = params.get("mktCampaignType");
-        if (mktCampaignType == "" || mktCampaignType == null){
+        if (mktCampaignType == "" || mktCampaignType == null) {
             paramMap.put("mktCampaignType", "all");
-        }else {
+        } else {
             paramMap.put("mktCampaignType", mktCampaignType);
         }
         //渠道编码(必填,ALL表示所有,多个用逗号隔开)
         Object channelCode = params.get("channelCode");
-        if (channelCode == "" || channelCode ==null){
+        if (channelCode == "" || channelCode == null) {
             paramMap.put("channelCode", "all");
-        }else {
+        } else {
             paramMap.put("channelCode", channelCode);
         }
         //活动创建地市
-        if (params.get("lanId")!=null && params.get("lanId")!=""){
+        if (params.get("lanId") != null && params.get("lanId") != "") {
             Object lanId = params.get("lanId");
             paramMap.put("lanId", lanId.toString());
         }
         StringBuilder stringBuilder = new StringBuilder();
         List<MktCampaignDO> mktCampaignList = mktCampaignMapper.queryRptBatchOrderForMktCampaign(paramMap);
-        if (mktCampaignList.size()>0 && mktCampaignList!=null){
+        //todo 修改为 init_id 原 getMktCampaignId
+        if (mktCampaignList.size() > 0 && mktCampaignList != null) {
             for (MktCampaignDO mktCampaignDO : mktCampaignList) {
-                stringBuilder.append(mktCampaignDO.getMktCampaignId()).append(",");
+                stringBuilder.append(mktCampaignDO.getInitId()).append(",");
             }
-        }else {
-            paramMap.put("resultMsg","没有找到对应的活动方案");
-            paramMap.put("resultCode",CODE_FAIL);
+        } else {
+            paramMap.put("resultMsg", "没有找到对应的活动方案");
+            paramMap.put("resultCode", CODE_FAIL);
             return paramMap;
         }
         //多个id  “，”拼接
@@ -449,29 +453,29 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         paramMap.put("mktCampaignId", substring);
         //省公司(必填)
         Object orglevel1 = params.get("orglevel1");
-        if (orglevel1 == null || orglevel1 == ""){
-            paramMap.put("resultMsg","省公司 必填 ");
-            paramMap.put("resultCode",CODE_FAIL);
+        if (orglevel1 == null || orglevel1 == "") {
+            paramMap.put("resultMsg", "省公司 必填 ");
+            paramMap.put("resultCode", CODE_FAIL);
             return paramMap;
-        }else {
+        } else {
             paramMap.put("orglevel1", orglevel1);
         }
-        if (params.get("orglevel2") != null && params.get("orglevel2")!="") {
+        if (params.get("orglevel2") != null && params.get("orglevel2") != "") {
             //地市(ALL表示所有,多个用逗号隔开)
             String orglevel2 = params.get("orglevel2").toString();
             paramMap.put("orglevel2", orglevel2);
         }
-        if (params.get("orglevel3") != null && params.get("orglevel3")!="") {
+        if (params.get("orglevel3") != null && params.get("orglevel3") != "") {
             //分局(ALL表示所有,多个用逗号隔开)
             String orglevel3 = params.get("orglevel3").toString();
             paramMap.put("orglevel3", orglevel3);
         }
-        if (params.get("orglevel4") != null && params.get("orglevel4")!="") {
+        if (params.get("orglevel4") != null && params.get("orglevel4") != "") {
             //支局(ALL表示所有,多个用逗号隔开)
             String orglevel4 = params.get("orglevel4").toString();
             paramMap.put("orglevel4", orglevel4);
         }
-        if (params.get("orglevel5") != null && params.get("orglevel5")!="") {
+        if (params.get("orglevel5") != null && params.get("orglevel5") != "") {
             //网格(ALL表示所有,多个用逗号隔开)
             String orglevel5 = params.get("orglevel5").toString();
             paramMap.put("orglevel5", orglevel5);
@@ -485,7 +489,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             //按活动展现还是按批次展现(0:按活动，1：按批次)
             String flag = params.get("flag").toString();
             paramMap.put("flag", flag);
-        }else {
+        } else {
             //暂时只支持0
             paramMap.put("flag", 0);
         }
@@ -495,9 +499,9 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         stringObjectMap = iReportService.queryRptBatchOrder(paramMap);
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
             stringObjectMap = addParams(stringObjectMap, page, pageSize);
-        }else {
-            stringObjectMap.put("resultCode",CODE_FAIL);
-            stringObjectMap.put("resultMsg","查询无结果（（0 . 0））");
+        } else {
+            stringObjectMap.put("resultCode", CODE_FAIL);
+            stringObjectMap.put("resultMsg", "查询无结果（（0 . 0））");
         }
         return stringObjectMap;
     }
@@ -515,12 +519,12 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         List<HashMap<String, Object>> hashMaps = new ArrayList<>();
         List<Map<String, Object>> data = new ArrayList<>();
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
-            PageHelper.startPage(page,pageSize);
+            PageHelper.startPage(page, pageSize);
             //event 解析 判断
             Object rptBatchOrderList1 = stringObjectMap.get("rptBatchOrderList");
-            if (rptBatchOrderList1!= null && rptBatchOrderList1!=""){
+            if (rptBatchOrderList1 != null && rptBatchOrderList1 != "") {
                 data = (List<Map<String, Object>>) stringObjectMap.get("rptBatchOrderList");
-            }else {
+            } else {
                 data = (List<Map<String, Object>>) stringObjectMap.get("rptEventOrderList");
             }
             if (data.size() > 0 && data != null) {
@@ -544,93 +548,101 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                         resultMap.put("statusCd", mktCampaignDO.getStatusCd());
                     }
                     List<HashMap<String, Object>> statisicts = new ArrayList<>();
+                    //添加框架活动是否字活动
+                    map.put("yesOrNo", "1");
                     Iterator<String> iter = map.keySet().iterator();
                     while (iter.hasNext()) {
                         HashMap<String, Object> msgMap = new HashMap<>();
                         String key = iter.next();
                         Object o = map.get(key);
-                        if (key.equals("orderNum")){
-                            msgMap.put("name","派单数");
-                            msgMap.put("nub",o);
+                        if (key.equals("orderNum")) {
+                            msgMap.put("name", "派单数");
+                            msgMap.put("nub", o);
                             statisicts.add(msgMap);
                         }
-                        if (key.equals("acceptOrderNum")){
-                            msgMap.put("name","接单数");
-                            msgMap.put("nub",o);
+                        if (key.equals("acceptOrderNum")) {
+                            msgMap.put("name", "接单数");
+                            msgMap.put("nub", o);
                             statisicts.add(msgMap);
                         }
-                        if (key.equals("outBoundNum")){
-                            msgMap.put("name","外呼数");
-                            msgMap.put("nub",o);
+                        if (key.equals("outBoundNum")) {
+                            msgMap.put("name", "外呼数");
+                            msgMap.put("nub", o);
                             statisicts.add(msgMap);
                         }
-                        if (key.equals("orderSuccessNum")){
-                            msgMap.put("name","成功数");
-                            msgMap.put("nub",o);
+                        if (key.equals("orderSuccessNum")) {
+                            msgMap.put("name", "成功数");
+                            msgMap.put("nub", o);
                             statisicts.add(msgMap);
                         }
-                        if (key.equals("acceptOrderRate")){
-                            msgMap.put("name","接单率");
-                            msgMap.put("nub",o);
+                        if (key.equals("acceptOrderRate")) {
+                            //转换成百分比 保留二位小数位
+                            String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
+                            msgMap.put("name", "接单率");
+                            msgMap.put("nub", percentFormat);
                             statisicts.add(msgMap);
                         }
-                        if (key.equals("outBoundRate")){
-                            msgMap.put("name","外呼率");
-                            msgMap.put("nub",o);
+                        if (key.equals("outBoundRate")) {
+                            msgMap.put("name", "外呼率");
+                            String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
+                            msgMap.put("nub", percentFormat);
                             statisicts.add(msgMap);
                         }
-                        if (key.equals("orderSuccessRate")){
-                            msgMap.put("name","转化率");
-                            msgMap.put("nub",o);
+                        if (key.equals("orderSuccessRate")) {
+                            msgMap.put("name", "转化率");
+                            String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
+                            msgMap.put("nub", percentFormat);
                             statisicts.add(msgMap);
                         }
-                        if (key.equals("revenueReduceNum")){
-                            msgMap.put("name","收入低迁数");
-                            msgMap.put("nub",o);
+                        if (key.equals("revenueReduceNum")) {
+                            msgMap.put("name", "收入低迁数");
+                            msgMap.put("nub", o);
                             statisicts.add(msgMap);
                         }
-                        if (key.equals("orgChannelRate")){
-                            msgMap.put("name","门店有销率");
-                            msgMap.put("nub",o);
+                        if (key.equals("orgChannelRate")) {
+                            msgMap.put("name", "门店有销率");
+                            String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
+                            msgMap.put("nub", percentFormat);
                             statisicts.add(msgMap);
                         }
                         //eventList 解析数据
-                        if (key.equals("contactNum")){
-                            msgMap.put("name","客户接触数");
-                            msgMap.put("nub",o);
+                        if (key.equals("contactNum")) {
+                            msgMap.put("name", "客户接触数");
+                            msgMap.put("nub", o);
                             statisicts.add(msgMap);
                         }
-                        if (key.equals("contactRate")){
-                            msgMap.put("name","客触转化率");
-                            msgMap.put("nub",o);
+                        if (key.equals("contactRate")) {
+                            msgMap.put("name", "客触转化率");
+                            String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
+                            msgMap.put("nub", percentFormat);
                             statisicts.add(msgMap);
                         }
-                        if (key.equals("orderRate")){
-                            msgMap.put("name","商机转化率");
-                            msgMap.put("nub",o);
+                        if (key.equals("orderRate")) {
+                            msgMap.put("name", "商机转化率");
+                            String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
+                            msgMap.put("nub", percentFormat);
                             statisicts.add(msgMap);
+                        }
+                        if (key.equals("yesOrNo")) {
+                            MktCampaignRelDO MktCampaignRelDO = mktCampaignRelMapper.selectByZmktCampaignIdAndRelType(mktCampaignId1);
+                            if (MktCampaignRelDO != null) {
+                                msgMap.put("name", "是否框架子活动");
+                                msgMap.put("nub", "是");
+                            } else {
+                                msgMap.put("name", "是否框架子活动");
+                                msgMap.put("nub", "否");
+                            }
                         }
                     }
-                    resultMap.put("statistics",statisicts);
-
-                    //是否框架子活动
-//                    MktCampaignRelDO MktCampaignRelDO = mktCampaignRelMapper.selectByZmktCampaignIdAndRelType(mktCampaignId1);
-//                    if (MktCampaignRelDO != null) {
-//                        msgMap.put("name","是否框架子活动");
-//                        msgMap.put("nub","是");
-//                    }else {
-//                        msgMap.put("name","是否框架子活动");
-//                        msgMap.put("nub","否");
-//                    }
-//                    statisicts.add(msgMap);
+                    resultMap.put("statistics", statisicts);
                     hashMaps.add(resultMap);
                 }
             }
         }
 
         Page pageInfo = new Page(new PageInfo(hashMaps));
-        maps.put("resultMsg",hashMaps);
-        maps.put("resultCode",CODE_SUCCESS);
+        maps.put("resultMsg", hashMaps);
+        maps.put("resultCode", CODE_SUCCESS);
         return maps;
     }
 
@@ -654,5 +666,21 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         }
 
         return dateString;
+    }
+
+    /**
+     * 将double类型数据转换为百分比格式，并保留小数点前IntegerDigits位和小数点后FractionDigits位
+     *
+     * @param d
+     * @param IntegerDigits
+     * @param FractionDigits
+     * @return
+     */
+    public static String getPercentFormat(double d, int IntegerDigits, int FractionDigits) {
+        NumberFormat nf = java.text.NumberFormat.getPercentInstance();
+        nf.setMaximumIntegerDigits(IntegerDigits);//小数点前保留几位
+        nf.setMinimumFractionDigits(FractionDigits);// 小数点后保留几位
+        String str = nf.format(d);
+        return str;
     }
 }
