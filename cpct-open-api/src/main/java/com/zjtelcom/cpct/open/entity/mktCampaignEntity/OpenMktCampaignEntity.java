@@ -49,7 +49,7 @@ public class OpenMktCampaignEntity {
     //营服活动推荐条目
     private List<OpenMktCamItemEntity> mktCamItems;
     //营服活动渠道推送配置
-    private List<OpenMktCamChlConfEntity> mktCamChlConfDetails;
+    private List<OpenMktCamChlConfEntity> mktCamChlConfs;
     //营服活动执行算法规则关联
     private List<OpenMktCamRecomCalcRelEntity> mktCamRecomCalcRels;
     private List<OpenMktCpcAlgorithmsRulEntity> mktCpcAlgorithmsRulDetails;
@@ -336,12 +336,12 @@ public class OpenMktCampaignEntity {
         this.mktCamItems = mktCamItems;
     }
 
-    public List<OpenMktCamChlConfEntity> getMktCamChlConfDetails() {
-        return mktCamChlConfDetails;
+    public List<OpenMktCamChlConfEntity> getMktCamChlConfs() {
+        return mktCamChlConfs;
     }
 
-    public void setMktCamChlConfDetails(List<OpenMktCamChlConfEntity> mktCamChlConfDetails) {
-        this.mktCamChlConfDetails = mktCamChlConfDetails;
+    public void setMktCamChlConfs(List<OpenMktCamChlConfEntity> mktCamChlConfs) {
+        this.mktCamChlConfs = mktCamChlConfs;
     }
 
     public List<OpenMktCamRecomCalcRelEntity> getMktCamRecomCalcRels() {
