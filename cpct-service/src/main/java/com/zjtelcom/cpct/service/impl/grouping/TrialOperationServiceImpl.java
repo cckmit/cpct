@@ -805,13 +805,14 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             for (Map<String, Object> display : displayList) {
                 String code = display.get("code") == null ? null : display.get("code").toString();
                 String name = display.get("name") == null ? null : display.get("name").toString();
-                if (code != null && !labelEngNameList.contains(code)) {
+                if (code != null && !labelEngNameList.contains(code) && name != null && !labelNameList.contains(name)) {
                     Map<String, Object> label = new HashMap<>();
                     label.put("code", code);
                     label.put("name", name);
                     labelList.add(label);
                     fields.add(code);
                     labelEngNameList.add(code);
+                    labelNameList.add(name);
                 }
             }
             //查询活动下面所有渠道属性id是21和22的value

@@ -1,7 +1,9 @@
 package com.zjtelcom.cpct;
 
+import com.zjtelcom.cpct.dubbo.service.impl.MqProducerServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ImportResource;

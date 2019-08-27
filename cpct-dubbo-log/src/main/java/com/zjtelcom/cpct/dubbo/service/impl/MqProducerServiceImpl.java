@@ -91,7 +91,7 @@ public class MqProducerServiceImpl implements MqProducerService, InitializingBea
     @Override
     public void afterPropertiesSet() throws Exception {
         long start = System.currentTimeMillis();
-//        initESLogProducer(); //标签日志
+        initESLogProducer(); //标签日志
         long end = System.currentTimeMillis();
         logger.info("生产者实例化耗时:" + (end - start));
     }
