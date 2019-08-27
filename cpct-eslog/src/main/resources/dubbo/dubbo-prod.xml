@@ -13,7 +13,7 @@
     <dubbo:registry id="esb2" protocol="dubbo" address="134.96.161.20:8001"/>
 
     <!-- 暴露服务 -->
-    <dubbo:protocol name="dubbo" port="30808"/>
+    <dubbo:protocol name="dubbo" port="30810"/>
     <dubbo:monitor protocol="registry" />
 
     <!--&lt;!&ndash; 订阅 &ndash;&gt;-->
