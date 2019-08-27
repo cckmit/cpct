@@ -612,7 +612,7 @@
         from mkt_campaign t
         where 1 = 1
         <if test="map.startTime != null and map.endTime != null">
-            AND t.CREATE_DATE BETWEEN  #{map.startTime,jdbcType=TIMESTAMP} AND #{map.endTime,jdbcType=TIMESTAMP}
+            AND CREATE_DATE BETWEEN  #{map.startTime,jdbcType=TIMESTAMP} AND #{map.endTime,jdbcType=TIMESTAMP}
         </if>
         <if test="map.statusCd != null and map.statusCd != ''">
             AND t.STATUS_CD IN ${map.statusCd}
@@ -626,14 +626,25 @@
         <if test="map.tiggerType != null and map.tiggerType != ''">
             AND t.TIGGER_TYPE = #{map.tiggerType,jdbcType=VARCHAR}
         </if>
-        AND t.MKT_CAMPAIGN_ID IN (
-        SELECT
-        tril.CAMPAIGN_ID
-        FROM
-        trial_operation tril
-        WHERE
-        tril.CREATE_STAFF = #{map.trilType,jdbcType=VARCHAR}
-        )
+        <if test="map.trilType != null and map.trilType != '' and map.trilType == '1000' ">
+            AND t.MKT_CAMPAIGN_ID IN (
+            SELECT
+            tril.CAMPAIGN_ID
+            FROM
+            trial_operation tril
+            WHERE
+            tril.CREATE_STAFF = 1000)
+        </if>
+        <if test="map.trilType != null and map.trilType != '' and map.trilType == '2000' ">
+            AND t.MKT_CAMPAIGN_ID NOT IN (
+            SELECT
+            tril.CAMPAIGN_ID
+            FROM
+            trial_operation tril
+            WHERE
+            tril.CREATE_STAFF = 1000 )
+        </if>
+
 
     </select>
 
