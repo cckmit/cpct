@@ -400,4 +400,17 @@
         ORDER BY e.CREATE_DATE DESC
     </select>
 
+    <insert id="insert" parameterType="com.zjtelcom.cpct.dto.event.ContactEvt">
+        insert into event (INTERFACE_CFG_ID, EVENT_NBR, EVENT_NAME, EVT_MAPPED_ADDR, EVT_MAPPED_IP, EVT_PROCOTOL_TYPE,
+                           EVT_MAPPED_FUN_NAME, EVENT_DESC, EVT_TYPE_ID, EVENT_TRIG_TYPE, EXT_EVENT_ID, STATUS_CD,
+                           CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REC_CAMPAIGN_AMOUNT,
+                           REMARK)
+        values (#{interfaceCfgId,jdbcType=BIGINT}, #{contactEvtCode,jdbcType=VARCHAR}, #{contactEvtName,jdbcType=VARCHAR},
+                #{evtMappedAddr,jdbcType=VARCHAR}, #{evtMappedIp,jdbcType=VARCHAR}, #{evtProcotolType,jdbcType=VARCHAR},
+                #{evtMappedFunName,jdbcType=VARCHAR}, #{contactEvtDesc,jdbcType=VARCHAR}, #{contactEvtTypeId,jdbcType=BIGINT},
+                #{evtTrigType,jdbcType=VARCHAR}, #{extEventId,jdbcType=BIGINT}, #{statusCd,jdbcType=VARCHAR},
+                #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP},
+                #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{recCampaignAmount,jdbcType=VARCHAR},
+                #{remark,jdbcType=VARCHAR})
+    </insert>
 </mapper>
