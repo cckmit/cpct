@@ -798,28 +798,45 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 labelNameList.add(nameList[i]);
                 labelEngNameList.add(codeList[i]);
             }
-            //查询活动下面所有渠道属性id是21和22的value
-            List<String> attrValue = mktCamChlConfAttrMapper.selectAttrLabelValueByCampaignId(campaign.getMktCampaignId());
             List<String> fields = new ArrayList<>();
-            for (String attr : attrValue){
-                fields.add(attr);
-            }
-            // 服务包添加查询字段
-            List<String> labels = mktCamChlConfAttrMapper.selectAttrLabelRemarkByCampaignId(campaign.getMktCampaignId());
-            for (String s : labels) {
-                fields.add(s);
-            }
+
+
             List<Map<String, Object>> displayList = displayLabel(campaign);
             for (Map<String, Object> display : displayList) {
                 String code = display.get("code") == null ? null : display.get("code").toString();
                 String name = display.get("name") == null ? null : display.get("name").toString();
-                if (code != null && !labelEngNameList.contains(code)) {
+                if (code != null && !labelEngNameList.contains(code) && name != null && !labelNameList.contains(name)) {
                     Map<String, Object> label = new HashMap<>();
                     label.put("code", code);
                     label.put("name", name);
                     labelList.add(label);
                     fields.add(code);
                     labelEngNameList.add(code);
+                    labelNameList.add(name);
+                }
+            }
+            //查询活动下面所有渠道属性id是21和22的value
+            List<String> attrValue = mktCamChlConfAttrMapper.selectAttrLabelValueByCampaignId(campaign.getMktCampaignId());
+            if (attrValue != null && attrValue.size() > 0) {
+                for (String attr : attrValue){
+                    if (!fields.contains(attr)) {
+                        fields.add(attr);
+                    }
+                }
+            }
+            // 服务包添加查询字段
+            List<String> labels = mktCamChlConfAttrMapper.selectAttrLabelRemarkByCampaignId(campaign.getMktCampaignId());
+            if(labels != null && labels.size() > 0){
+                for (String s : labels) {
+                    if (s != null && !labelEngNameList.contains(s)) {
+                        Label label1= injectionLabelMapper.selectByLabelCode(s);
+                        Map<String, Object> label = new HashMap<>();
+                        label.put("code", s);
+                        label.put("name", label1 == null? "":label1.getInjectionLabelName());
+                        labelList.add(label);
+                        fields.add(s);
+                        labelEngNameList.add(s);
+                    }
                 }
             }
             if (!fields.isEmpty()) {
@@ -1907,7 +1924,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             }
                         }
                         if (label.getLabelDataType().equals("1100") && tarGrpConditionDOs.get(i).getUpdateStaff()==1L){
-                            String date = DateUtil.getPreDay(Integer.valueOf(tarGrpConditionDOs.get(i).getRightParam()));
+                            String date = tarGrpConditionDOs.get(i).getRightParam();
+                            if (!tarGrpConditionDOs.get(i).getRightParam().contains("-")){
+                               date =  DateUtil.getPreDay(Integer.valueOf(tarGrpConditionDOs.get(i).getRightParam()));
+                            }
                             express.append(date);
                         }else if (label.getInjectionLabelCode().equals("PROM_LIST")){
                             FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.valueOf(tarGrpConditionDOs.get(i).getRightParam()));

@@ -731,7 +731,6 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     public Map<String, Object> updateTarGrpCondition(TarGrpCondition tarGrpCondition) {
         Map<String, Object> mapsT = new HashMap<>();
         tarGrpCondition.setUpdateDate(DateUtil.getCurrentTime());
-        tarGrpCondition.setUpdateStaff(UserUtil.loginId());
         tarGrpConditionMapper.modTarGrpCondition(tarGrpCondition);
         mapsT.put("resultCode", CommonConstant.CODE_SUCCESS);
         mapsT.put("resultMsg", StringUtils.EMPTY);
