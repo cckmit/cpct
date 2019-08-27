@@ -1,11 +1,11 @@
 package com.zjtelcom.cpct.service.impl.es;
 
 import com.alibaba.fastjson.JSONObject;
+import com.zjtelcom.cpct.dubbo.service.MqProducerService;
 import com.zjtelcom.cpct.elastic.model.CampaignHitParam;
 import com.zjtelcom.cpct.elastic.model.CampaignHitResponse;
 import com.zjtelcom.cpct.elastic.model.CampaignInfoTree;
 import com.zjtelcom.cpct.elastic.model.TotalModel;
-import com.zjtelcom.cpct.elastic.service.MqProducerService;
 import com.zjtelcom.cpct.elastic.util.DateUtil;
 import com.zjtelcom.cpct.elastic.util.EsSearchUtil;
 import com.zjtelcom.cpct.enums.Operator;
