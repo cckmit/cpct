@@ -2281,6 +2281,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
 
         String lanId = params.get("lanId").toString();
+        paramMap.put("lanId", lanId);
         try {
             //3个统计
             List<Map> topMapList = new ArrayList<>();
