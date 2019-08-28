@@ -5,7 +5,7 @@ import com.zjtelcom.cpct.elastic.model.CampaignHitParam;
 
 import java.util.Map;
 
-public interface EsHitService {
+public interface EsHitsService {
 
     void add() throws Exception;
 

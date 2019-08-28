@@ -9,7 +9,7 @@ import com.zjtelcom.cpct.elastic.model.TotalModel;
 import com.zjtelcom.cpct.elastic.util.DateUtil;
 import com.zjtelcom.cpct.elastic.util.EsSearchUtil;
 import com.zjtelcom.cpct.enums.Operator;
-import com.zjtelcom.cpct.service.es.EsHitService;
+import com.zjtelcom.cpct.service.es.EsHitsService;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
@@ -30,9 +30,9 @@ import java.util.*;
 import static com.zjtelcom.cpct.elastic.config.IndexList.*;
 
 @Service
-public class EsHitServiceImpl implements EsHitService {
+public class EsHitsServiceImpl implements EsHitsService {
 
-    protected Logger logger = LoggerFactory.getLogger(EsHitServiceImpl.class);
+    protected Logger logger = LoggerFactory.getLogger(EsHitsServiceImpl.class);
 
     @Autowired(required = false)
     private TransportClient client;
