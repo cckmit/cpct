@@ -202,7 +202,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             if (systemUserDtoSysmgrResultObject != null) {
                 if (systemUserDtoSysmgrResultObject.getResultObject() != null) {
                     codeNumber = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
-                    codeNumber=codeNumber+"&&"+systemUserDtoSysmgrResultObject.getResultObject().getStaffName();
+                    codeNumber = codeNumber+"&&"+systemUserDtoSysmgrResultObject.getResultObject().getStaffName();
                 }
             }
         }catch (Exception e){
@@ -925,10 +925,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             productFilter = filterRuleList;
                         }
                         // 查看当前规则协同渠道是否为沙盘，是否配置接单人派单
-                        boolean flag2 = false;
-                        if (Arrays.asList(nameList).contains("接单人号码") && Arrays.asList(codeList).contains("SALE_EMP_NBR")) {
-                            flag2 = true;
-                        }
                         boolean flag = false;
                         String evtContactConfId = confRule.getEvtContactConfId();
                         Map<String, Object> mktCamChlConf = mktCamChlConfService.getMktCamChlConf(Long.valueOf(confRule.getEvtContactConfId()));
@@ -939,11 +935,15 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                 flag = true;
                             }
                         }
+                        boolean flag2 = false;
+                        if (Arrays.asList(nameList).contains("接单人号码") && Arrays.asList(codeList).contains("SALE_EMP_NBR")) {
+                            flag2 = true;
+                        }
                         for (int j = 3; j < dataVO.contentList.size(); j++) {
                             List<String> data = Arrays.asList(dataVO.contentList.get(j).split("\\|@\\|"));
                             Object[] objects = data.toArray();
-                            if (flag2) {
-                                if (flag && (this.getIndex() >= data.size() ? true:(data.get(this.getIndex()) == null || data.get(this.getIndex()).equals("")))) {
+                            if (flag) {
+                                if (flag2 && (this.getIndex() >= data.size() ? true:(data.get(this.getIndex()) == null || data.get(this.getIndex()).equals("")))) {
                                     // 记录日志，退出线程
                                     addLog2Es(batchNumSt, "导入清单存在接单人无数据");
                                     TrialOperation record = new TrialOperation();
@@ -952,15 +952,15 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                     record.setRemark("清单导入数据错误");
                                     int i = trialOperationMapper.updateByPrimaryKey(record);
                                     throw new RuntimeException("导入清单第" + (j + 1) + "行接单人无数据");
+                                } else {
+                                    addLog2Es(batchNumSt, "导入清单缺少接单人必填列");
+                                    TrialOperation record = new TrialOperation();
+                                    record.setId(Long.valueOf(insertId));
+                                    record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
+                                    record.setRemark("清单导入数据错误");
+                                    int i = trialOperationMapper.updateByPrimaryKey(record);
+                                    throw new RuntimeException("导入清单缺少渠道必填列");
                                 }
-                            } else {
-                                addLog2Es(batchNumSt, "导入清单缺少接单人必填列");
-                                TrialOperation record = new TrialOperation();
-                                record.setId(Long.valueOf(insertId));
-                                record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
-                                record.setRemark("清单导入数据错误");
-                                int i = trialOperationMapper.updateByPrimaryKey(record);
-                                throw new RuntimeException("导入清单缺少渠道必填列");
                             }
                             Map<String, Object> customers = new HashMap<>();
                             boolean check = true;
