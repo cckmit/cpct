@@ -173,8 +173,8 @@ public class CloseRuleController extends BaseController {
     }
 
 
-    @Autowired(required = false)
-    private EsHitService esHitService;
+   /* @Autowired
+    private EsHitsService esHitService;
     @PostMapping("addLogToEsTest")
     public String addLogToEsTest(){
         //初始化es log
@@ -188,8 +188,5 @@ public class CloseRuleController extends BaseController {
         esJson.put("msg", "红黑名单过滤规则验证被拦截");
         esHitService.save(esJson,"activity_1234");
         return null;
-    }
-
-
-
+    }*/
 }

@@ -4,7 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.zjtelcom.cpct.elastic.model.CampaignHitParam;
 import com.zjtelcom.cpct.elastic.util.ElasticsearchUtil;
 import com.zjtelcom.cpct.elastic.util.EsPage;
-import com.zjtelcom.cpct.service.es.EsHitService;
+
+import com.zjtelcom.cpct.service.es.EsHitsService;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -27,8 +28,8 @@ import java.util.Map;
  */
 @RestController
 @EnableAutoConfiguration
-@RequestMapping("/es")
-public class EsController {
+@RequestMapping("/esHits")
+public class EsHitsController {
     /**
      * 测试索引
      */
@@ -40,7 +41,7 @@ public class EsController {
     private String esType="external";
 
     @Autowired
-    private EsHitService esService;
+    private EsHitsService esService;
 
 
     /**

@@ -202,7 +202,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             if (systemUserDtoSysmgrResultObject != null) {
                 if (systemUserDtoSysmgrResultObject.getResultObject() != null) {
                     codeNumber = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
-//                    codeNumber=codeNumber+"&&"+systemUserDtoSysmgrResultObject.getResultObject().getStaffName();
+                    codeNumber=codeNumber+"&&"+systemUserDtoSysmgrResultObject.getResultObject().getStaffName();
                 }
             }
         }catch (Exception e){
