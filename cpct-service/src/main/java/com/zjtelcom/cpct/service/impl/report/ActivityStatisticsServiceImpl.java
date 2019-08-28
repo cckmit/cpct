@@ -17,14 +17,17 @@ import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.channel.OrgRel;
 import com.zjtelcom.cpct.domain.channel.Organization;
 import com.zjtelcom.cpct.enums.AreaCodeEnum;
+import com.zjtelcom.cpct.service.impl.querySaturation.QuerySaturationCpcServiceImpl;
 import com.zjtelcom.cpct.service.report.ActivityStatisticsService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Logger;
@@ -35,6 +38,8 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 @Service
 @Transactional
 public class ActivityStatisticsServiceImpl implements ActivityStatisticsService {
+
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ActivityStatisticsServiceImpl.class);
 
     @Autowired
     private OrganizationMapper organizationMapper;
@@ -514,6 +519,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         return addParams(stringObjectMap, page, pageSize);
     }
 
+
+
     private Map<String, Object> addParams(Map<String, Object> stringObjectMap, Integer page, Integer pageSize) {
         Map<String, Object> maps = new HashMap<>();
         List<HashMap<String, Object>> hashMaps = new ArrayList<>();
@@ -535,8 +542,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                     //活动名称
                     resultMap.put("mktCampaignName", mktCampaignDO.getMktCampaignName());
                     //活动开始是时间和结束时间
-                    resultMap.put("beginTime", mktCampaignDO.getBeginTime());
-                    resultMap.put("endTime", mktCampaignDO.getEndTime());
+                    resultMap.put("beginTime", mktCampaignDO.getPlanBeginTime());
+                    resultMap.put("endTime", mktCampaignDO.getPlanEndTime());
                     String mktCampaignType = mktCampaignDO.getMktCampaignType();
                     //活动类型
                     if (mktCampaignType != null) {
@@ -628,9 +635,11 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             if (MktCampaignRelDO != null) {
                                 msgMap.put("name", "是否框架子活动");
                                 msgMap.put("nub", "是");
+                                statisicts.add(msgMap);
                             } else {
                                 msgMap.put("name", "是否框架子活动");
                                 msgMap.put("nub", "否");
+                                statisicts.add(msgMap);
                             }
                         }
                     }
@@ -682,5 +691,90 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         nf.setMinimumFractionDigits(FractionDigits);// 小数点后保留几位
         String str = nf.format(d);
         return str;
+    }
+
+    @Override
+    public Map<String, Object> getMktCampaignDetails(Map<String, Object> params) {
+        HashMap<String, Object> resultMap = new HashMap<>();
+        HashMap<String, Object> hashMap = new HashMap<>();
+        //TIGGER_TYPE = '1000' # 2000-实时, 1000-批量
+        Object tiggerType = params.get("tiggerType");
+        if ("".equals(tiggerType.toString()) || tiggerType == null){
+            resultMap.put("resultMsg", "实时或批量请传入类型！");
+            resultMap.put("resultCode", CODE_FAIL);
+            return resultMap;
+        }else {
+            // 2000-实时, 1000-批量
+            hashMap.put("tiggerType",tiggerType);
+        }
+        //类型 1000（当前时间提前一个月） 2000（当前时间提前二个月） 3000 （当前时间提前三个月）
+        Object createDate = params.get("createDate");
+        if ("".equals(createDate.toString()) || createDate == null){
+            resultMap.put("resultMsg", "时间类型不能为空！");
+            resultMap.put("resultCode", CODE_FAIL);
+            return resultMap;
+        }else {
+            String s = DateToString(createDate.toString());
+            hashMap.put("createDate",s);
+        }
+        //分页参数
+        Integer page = Integer.valueOf(params.get("page").toString());
+        Integer pageSize = Integer.valueOf(params.get("pageSize").toString());
+        if ("1000".equals(tiggerType.toString())){
+            PageHelper.startPage(page, pageSize);
+            List<MktCampaignDO> mktCampaignList = mktCampaignMapper.getMktCampaignDetails(hashMap);
+            Page pageInfo = new Page(new PageInfo(mktCampaignList));
+            resultMap.put("pageInfo",pageInfo);
+            resultMap.put("resultMsg", mktCampaignList);
+            resultMap.put("resultCode", CODE_SUCCESS);
+        }else if("2000".equals(tiggerType)){
+            Object o = null;
+            Map<String, Object> stringObjectMap = iReportService.queryValidCampaign();
+            logger.info("查看dubbo返回活动返回结果"+stringObjectMap);
+            if (stringObjectMap.get("resultCode")!=null && "1".equals(stringObjectMap.get("resultCode").toString())){
+                if ("1000".equals(createDate.toString())){
+                    //30Ds 30天有效活动
+                    o = stringObjectMap.get("30Ds");
+                }else if ("2000".equals(createDate.toString())){
+                    //60Ds 60天有效活动
+                    o = stringObjectMap.get("60Ds");
+                }else if ("3000".equals(createDate.toString())){
+                    //90Ds 90天有效活动
+                    o = stringObjectMap.get("90Ds");
+                }
+            }
+            String[] split = o.toString().split(",");
+            logger.info("查看活动有效时间的长度！@#￥%"+split.length+"和参数!@#$%"+split);
+            List<String> userList = new ArrayList<String>();
+            Collections.addAll(userList, split);
+            logger.info("查看dubbo返回活动天数是啥！！！！！@#￥"+userList);
+            PageHelper.startPage(page, pageSize);
+            List<MktCampaignDO> mktCampaignList =  mktCampaignMapper.getMktCampaignDetailsForDate(userList);
+            Page pageInfo = new Page(new PageInfo(mktCampaignList));
+            resultMap.put("pageInfo",pageInfo);
+            resultMap.put("resultMsg", mktCampaignList);
+            resultMap.put("resultCode", CODE_SUCCESS);
+        }
+        return resultMap;
+    }
+
+
+    public static String DateToString(String s){
+        Date date = new Date();//当前日期
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");//格式化对象
+        Calendar calendar = Calendar.getInstance();//日历对象
+        calendar.setTime(date);//设置当前日期
+        if (s.equals("1000")){
+            calendar.add(Calendar.MONTH, -1);//月份减一
+            return sdf.format(calendar.getTime());
+        }else if ("2000".equals(s)){
+            calendar.add(Calendar.MONTH, -2);//月份减二
+            return sdf.format(calendar.getTime());
+        }else if ("3000".equals(s)){
+            calendar.add(Calendar.MONTH, -3);//月份减三
+            return sdf.format(calendar.getTime());
+        }
+//        System.out.println(sdf.format(calendar.getTime()));//输出格式化的日期
+        return sdf.format(calendar.getTime());
     }
 }

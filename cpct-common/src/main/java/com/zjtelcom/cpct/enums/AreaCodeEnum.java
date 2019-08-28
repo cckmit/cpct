@@ -83,7 +83,7 @@ public enum AreaCodeEnum {
         SHENGJI("cpcpch0001","C2"),
         FENGONGSI("cpcpch0002","C3"),
         FENGJU("cpcpch0003","C4"),
-        ZHIJU("cpcpch0003","C5");
+        ZHIJU("cpcpch0004","C5");
 
         private String sysPostCode;
         private String sysArea;
