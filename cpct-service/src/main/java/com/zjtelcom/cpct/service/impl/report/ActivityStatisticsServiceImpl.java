@@ -372,8 +372,13 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         Integer page = Integer.valueOf(params.get("page").toString());
         Integer pageSize = Integer.valueOf(params.get("pageSize").toString());
         //销报表查询接口
-        Map<String, Object> stringObjectMap = iReportService.queryRptEventOrder(paramMap);
-
+        Map<String, Object> stringObjectMap = null;
+        try {
+            stringObjectMap = iReportService.queryRptEventOrder(paramMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        logger.info("销报表查询接口:stringObjectMap"+stringObjectMap);
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
             stringObjectMap = addParams(stringObjectMap, page, pageSize);
         } else {
@@ -501,7 +506,12 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         Integer page = Integer.valueOf(params.get("page").toString());
         Integer pageSize = Integer.valueOf(params.get("pageSize").toString());
         //活动报表查询接口
-        stringObjectMap = iReportService.queryRptBatchOrder(paramMap);
+        try {
+            stringObjectMap = iReportService.queryRptBatchOrder(paramMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        logger.info("活动报表查询接口:queryRptBatchOrder"+stringObjectMap);
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
             stringObjectMap = addParams(stringObjectMap, page, pageSize);
         } else {

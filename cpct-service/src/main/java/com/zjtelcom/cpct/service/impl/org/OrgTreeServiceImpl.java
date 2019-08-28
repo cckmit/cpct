@@ -25,6 +25,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sun.rmi.runtime.Log;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -311,8 +312,30 @@ public class OrgTreeServiceImpl implements OrgTreeService{
         List<Map<String, Object>> staffOrgId = organizationMapper.getStaffOrgId(staffId);
         //组织树控制权限
         List<SystemPostDto> systemPostDtoList = user.getSystemPostDtoList();
-        String sysPostCode = systemPostDtoList.get(0).getSysPostCode();
+//        String sysPostCode = systemPostDtoList.get(0).getSysPostCode();
+        String sysPostCode = null;
+        ArrayList<String> arrayList = new ArrayList<>();
 //        String sysPostCode = "C3";
+        //岗位信息查看最大权限作为岗位信息
+        if (systemPostDtoList.size()>0 && systemPostDtoList!=null){
+            for (SystemPostDto systemPostDto : systemPostDtoList) {
+                arrayList.add(systemPostDto.getSysPostCode());
+            }
+        }
+        if (arrayList.contains(AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea())){
+            sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea())){
+            sysPostCode = AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea();
+        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea())){
+            sysPostCode = AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea();
+        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.FENGJU.getSysArea())){
+            sysPostCode = AreaCodeEnum.sysAreaCode.FENGJU.getSysArea();
+        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea())){
+            sysPostCode = AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea();
+        }else {
+            sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+        }
+
         //有父节点的情况
         if (areaList!=null && areaList.size()>0){
             list = organizationMapper.selectByParentId(Long.valueOf(areaList.get(0)));
@@ -328,6 +351,10 @@ public class OrgTreeServiceImpl implements OrgTreeService{
                 for (Map<String, Object> map : staffOrgId) {
                     Object orgDivision = map.get("orgDivision");
                     Object orgId1 = map.get("ORG_NAME_"+sysPostCode);
+                    if (orgId1 == null || "" == orgId1){
+                        orgId = Long.valueOf(map.get("orgId").toString());
+                        break;
+                    }
                     if (orgDivision != null) {
                         if (orgDivision.toString().equals("30")) {
                             orgId = Long.valueOf(orgId1.toString());
