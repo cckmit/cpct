@@ -38,7 +38,7 @@
 //import com.zjtelcom.cpct.dubbo.service.EventApiService;
 //import com.zjtelcom.cpct.dubbo.service.SearchLabelService;
 //import com.zjtelcom.cpct.elastic.config.IndexList;
-//import com.zjtelcom.cpct.elastic.service.EsHitService;
+//import com.zjtelcom.cpct.elastic.service.EsHitsService;
 //import com.zjtelcom.cpct.enums.ConfAttrEnum;
 //import com.zjtelcom.cpct.enums.StatusCode;
 //import com.zjtelcom.cpct.util.BeanUtil;
@@ -117,7 +117,7 @@
 //    private InjectionLabelMapper injectionLabelMapper; //标签因子
 //
 //    @Autowired
-//    private EsHitService esHitService;  //es存储
+//    private EsHitsService esHitService;  //es存储
 //
 //    @Autowired
 //    private RedisUtils redisUtils;  // redis方法

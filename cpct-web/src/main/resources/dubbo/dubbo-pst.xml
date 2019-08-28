@@ -13,7 +13,7 @@
     <dubbo:registry id="esb1" protocol="dubbo" address="134.96.159.11:8033"/>
 
     <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.EventApiService" id="eventApiService"
-                     version="1.0" retries="0" check="false">
+                     version="1.0" retries="0" init="true">
         <!--<dubbo:method name="CalculateCPC" servicecode="00.1083.CalculateCPC" timeout="20000"/>-->
         <dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="20000"/>
         <dubbo:method name="secondChannelSynergy" servicecode="00.1083.SecondChannelSynergy" timeout="5000"/>
@@ -96,11 +96,17 @@
                      id="reportServiceImpl" version="1.0" check="false">
         <dubbo:method name="queryRptBatchOrder" servicecode="00.1079.queryRptBatchOrder" timeout="12000"/>
         <dubbo:method name="queryRptEventOrder" servicecode="00.1079.queryRptEventOrder" timeout="12000"/>
+        <dubbo:method name="queryValidCampaign" servicecode="00.1079.queryValidCampaign" timeout="12000"/>
     </dubbo:reference>
 
     <dubbo:reference registry="esb3" interface="com.zjtelcom.es.es.service.EsTarGrpTemplate"
                      id="tarGrpTemplateCountAndIssue" version="1.0" check="false">
         <dubbo:method name="tarGrpTemplateCountAndIssue" servicecode="00.1083.tarGrpTemplateCountAndIssue" timeout="120000"/>
+    </dubbo:reference>
+
+    <!-- eslog -->
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MqProducerService" id="mqProducerService" version="1.0" check="false">
+        <dubbo:method name="msg2ESLogProducer" servicecode="00.1083.msg2ESLogProducer" timeout="120000"/>
     </dubbo:reference>
 
 </beans>

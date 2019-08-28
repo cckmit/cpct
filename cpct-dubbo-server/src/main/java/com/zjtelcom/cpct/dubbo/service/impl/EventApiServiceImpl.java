@@ -888,13 +888,15 @@ public class EventApiServiceImpl implements EventApiService {
 
                 // 启动线程走清单流程
                 List<String> mktCampaginIdList = new ArrayList<>();
+                List<String>initIdList = new ArrayList<>();
                 for (Map<String, Object> activeMap : resultByEvent) {
                     if (activeMap.get("mktCampaignCustMap") != null && !((Map<String, Object>) activeMap.get("mktCampaignCustMap")).isEmpty()) {
                         mktCampaginIdList.add(((Map<String, Object>) activeMap.get("mktCampaignCustMap")).get("mktCampaginId").toString());
+                        initIdList.add(((Map<String, Object>) activeMap.get("mktCampaignCustMap")).get("initId").toString());
                     }
                 }
                 if (mktCampaginIdList != null && mktCampaginIdList.size() > 0) {
-                    Future<Map<String, Object>> f = executorService.submit(new getCustListTask(mktCampaginIdList, eventId, map.get("lanId"), custId, map, evtTriggers));
+                    Future<Map<String, Object>> f = executorService.submit(new getCustListTask(mktCampaginIdList, initIdList, eventId, map.get("lanId"), custId, map, evtTriggers));
                     threadList.add(f);
                 }
 
@@ -2309,7 +2311,8 @@ public class EventApiServiceImpl implements EventApiService {
                     // 判断initId是否在清单列表里面
                     if (mktCamCodeList.contains(mktCampaign.getInitId().toString())) {
                    // if (mktCamCodeList.contains(mktCampaign.getMktCampaignId().toString())) {
-                        mktCampaignCustMap.put("mktCampaginId", mktCampaign.getInitId());
+                        mktCampaignCustMap.put("initId", mktCampaign.getInitId());
+                        mktCampaignCustMap.put("mktCampaginId", mktCampaginId);
                         mktCampaignCustMap.put("levelConfig", act.get("levelConfig"));
                         mktCampaignCustMap.put("campaignSeq", act.get("campaignSeq"));
                         mktCampaignCustMap.put("strategyMapList", strategyMapList);
@@ -2428,14 +2431,16 @@ public class EventApiServiceImpl implements EventApiService {
     class getCustListTask implements Callable<Map<String, Object>> {
 
         private List<String> campaignList;
+        private List<String> initIdList;
         private Long eventId;
         private String landId;
         private String custId;
         private Map<String, String> map;
         private List<Map<String, Object>> evtTriggers;
 
-        public getCustListTask(List<String> campaignList, Long eventId, String landId, String custId, Map<String, String> map, List<Map<String, Object>> evtTriggers) {
+        public getCustListTask(List<String> campaignList, List<String> initIdList, Long eventId, String landId, String custId, Map<String, String> map, List<Map<String, Object>> evtTriggers) {
             this.campaignList = campaignList;
+            this.initIdList = initIdList;
             this.eventId = eventId;
             this.landId = landId;
             this.custId = custId;
@@ -2524,7 +2529,7 @@ public class EventApiServiceImpl implements EventApiService {
                 paramMap.put("prom", promParamMap);
                 paramMap.put("cust", custParamMap);
                 paramMap.put("asset", assetParamMap);
-                paramMap.put("campaignList", campaignList);
+                paramMap.put("campaignList", initIdList);
 
                 // 获取本地网的中文名
                 String landName = AreaNameEnum.getNameByLandId(Long.valueOf(landId));

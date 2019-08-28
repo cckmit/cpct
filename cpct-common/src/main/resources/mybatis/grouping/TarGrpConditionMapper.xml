@@ -232,7 +232,7 @@
 
   <select id="selectAllLabelByTarId" parameterType="java.lang.Long" resultType="java.util.Map">
     SELECT DISTINCT
-	i.INJECTION_LABEL_CODE AS code,i.INJECTION_LABEL_NAME as name,i.CLASS_NAME as className,
+	i.INJECTION_LABEL_CODE AS code,i.INJECTION_LABEL_NAME as name, i.LABEL_DATA_TYPE as labelType,i.CLASS_NAME as className,
 	tgc.OPER_TYPE AS operType,tgc.RIGHT_PARAM as rightParam
     FROM tar_grp_condition tgc
     LEFT JOIN injection_label i ON tgc.LEFT_PARAM = i.INJECTION_LABEL_ID

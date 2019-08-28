@@ -16,7 +16,7 @@ public class OpenTarGrpEntity {
     private Date createDate;
     private Long updateStaff;
     private Date updateDate;
-    private OpenTarGrpConditionEntity tarGrpConditions;
+    private List<OpenTarGrpConditionEntity> tarGrpConditions;
     private String remark;
 
     public String getActType() {
@@ -107,11 +107,11 @@ public class OpenTarGrpEntity {
         this.updateDate = updateDate;
     }
 
-    public OpenTarGrpConditionEntity getTarGrpConditions() {
+    public List<OpenTarGrpConditionEntity> getTarGrpConditions() {
         return tarGrpConditions;
     }
 
-    public void setTarGrpConditions(OpenTarGrpConditionEntity tarGrpConditions) {
+    public void setTarGrpConditions(List<OpenTarGrpConditionEntity> tarGrpConditions) {
         this.tarGrpConditions = tarGrpConditions;
     }
 

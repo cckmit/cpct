@@ -65,6 +65,7 @@ import com.zjtelcom.cpct_offer.dao.inst.RequestInfoMapper;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
 import com.zjtelcom.cpct_prd.dao.campaign.MktCamDisplayColumnRelPrdMapper;
 import com.zjtelcom.cpct_prod.dao.offer.OfferProdMapper;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +77,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.*;
+import static com.zjtelcom.cpct.util.DateUtil.*;
 
 /**
  * Description:
@@ -2254,35 +2256,32 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         /* 条件入参处理 */
         Map<String, Object> paramMap = new HashMap<>();
         Map<String, Object> resultMap = new HashMap<>();
+        Date startDate = null;
+        Date endDate = null;
         if (params.get("month") != null && !"".equals(params.get("month"))) {
             String month = params.get("month").toString();
             String[] timeArr = month.split("-");
-            paramMap.put("startTime", DateUtil.string2DateTime4Day(DateUtil.getFisrtDayOfMonth(Integer.valueOf(timeArr[0]), Integer.valueOf(timeArr[1]))));
-            paramMap.put("endTime", DateUtil.string2DateTime4Day(DateUtil.getLastDayOfMonth(Integer.valueOf(timeArr[0]), Integer.valueOf(timeArr[1]))));
+            startDate = string2DateTime4Day(getFisrtDayOfMonth(Integer.valueOf(timeArr[0]), Integer.valueOf(timeArr[1])));
+            endDate = string2DateTime4Day(getLastDayOfMonth(Integer.valueOf(timeArr[0]), Integer.valueOf(timeArr[1])));
+            paramMap.put("startTime", startDate);
+            paramMap.put("endTime", endDate);
         }
         if (params.get("startTime") != null && !"".equals(params.get("startTime"))) {
             String startTime = params.get("startTime").toString();
             String[] timeArr = startTime.split("-");
-            paramMap.put("startTime", DateUtil.string2DateTime4Day(DateUtil.getFisrtDayOfMonth(Integer.valueOf(timeArr[0]), Integer.valueOf(timeArr[1]))));
-
+            startDate = string2DateTime4Day(getFisrtDayOfMonth(Integer.valueOf(timeArr[0]), Integer.valueOf(timeArr[1])));
+            paramMap.put("startTime", startDate);
         }
         if (params.get("endTime") != null && !"".equals(params.get("endTime"))) {
             String endTime = params.get("endTime").toString();
             String[] timeArr = endTime.split("-");
-            paramMap.put("endTime", DateUtil.string2DateTime4Day(DateUtil.getLastDayOfMonth(Integer.valueOf(timeArr[0]), Integer.valueOf(timeArr[1]))));
-
+            endDate = string2DateTime4Day(getLastDayOfMonth(Integer.valueOf(timeArr[0]), Integer.valueOf(timeArr[1])));
+            paramMap.put("endTime", endDate);
         }
+
+
         String lanId = params.get("lanId").toString();
-        if (params.get("lanId") != null && !"".equals(params.get("lanId"))) {
-            // 全为查所有
-            if (AreaCodeEnum.ZHEJIAGN.getLanId().equals(Long.valueOf(lanId))) {
-                paramMap.put("lanId", "");
-                lanId = "";
-            } else {
-                paramMap.put("lanId", Long.valueOf(lanId));
-            }
-
-        }
+        paramMap.put("lanId", lanId);
         try {
             //3个统计
             List<Map> topMapList = new ArrayList<>();
@@ -2293,8 +2292,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             draftMap.put("count", draftCount);
             draftMap.put("name", "草稿");
             topMapList.add(draftMap);
-            //统计已发布状态活动
-            paramMap.put("statusCd", "(2002, 2008)");
+            //统计已发布,暂停,状态活动
+            paramMap.put("statusCd", "(2002, 2006, 2008)");
             int publishedCount = mktCampaignMapper.countByStatus(paramMap);
             Map<String, Object> publishedMap = new HashMap<>();
             publishedMap.put("count", publishedCount);
@@ -2328,9 +2327,25 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             secondMapList.add(marketingCountMap);
             paramMap.put("lanId", lanId);
 
-            typeCount(paramMap, tableMapList, cityList);
+
+            // 查询所有地市
+            List<SysArea> sysAreaList = new ArrayList<>();
+            if ("".equals(lanId)) {
+                Map<String, Object> sysAreaMap = sysAreaService.listCityAndParentByParentId(AreaCodeEnum.ZHEJIAGN.getLanId().intValue());
+                SysArea sysAreaPare = (SysArea) sysAreaMap.get("sysAreaList");
+                sysAreaList = sysAreaPare.getChildAreaList();
+                sysAreaList.add(sysAreaPare);
+            }
+
+            typeCount(paramMap, tableMapList, cityList, sysAreaList);
 
             // 服务活动
+            if(startDate!=null){
+                paramMap.put("startTime", startDate);
+            }
+            if(endDate!=null){
+                paramMap.put("endDate", endDate);
+            }
             paramMap.put("mktCampaignType", "(5000, 6000)");
             paramMap.put("lanId", lanId);
             int serviceCount = mktCampaignMapper.countByStatus(paramMap);
@@ -2339,12 +2354,18 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             serviceCountMap.put("name", "服务活动");
             secondMapList.add(serviceCountMap);
             paramMap.put("lanId", lanId);
-            typeCount(paramMap, tableMapList, cityList);
+            typeCount(paramMap, tableMapList, cityList, sysAreaList);
 
             // 全部活动
+            if(startDate!=null){
+                paramMap.put("startTime", startDate);
+            }
+            if(endDate!=null){
+                paramMap.put("endDate", endDate);
+            }
             paramMap.put("mktCampaignType", "");
             paramMap.put("lanId", lanId);
-            typeCount(paramMap, tableMapList, cityList);
+            typeCount(paramMap, tableMapList, cityList, sysAreaList);
 
             resultMap.put("secondMapList", secondMapList);
             resultMap.put("tableMapList", tableMapList);
@@ -2360,7 +2381,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     }
 
 
-    private Map<String, Object> typeCount(Map<String, Object> paramMap,List<Map> tableMapList ,List<Map> cityList) throws Exception {
+    private Map<String, Object> typeCount(Map<String, Object> paramMap,List<Map> tableMapList, List<Map> cityList,  List<SysArea> sysAreaList) throws Exception {
         DecimalFormat df = new DecimalFormat("0.00");
         // 随销活动（实时营销活动）
         paramMap.put("tiggerType", StatusCode.REAL_TIME_CAMPAIGN.getStatusCode());
@@ -2381,14 +2402,14 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         List<Map<String, Object>> trilMapList = new ArrayList<>();
         int labelListTotal = 0;
         // 标签取数
-        trilParamMap.put("trilType", "2000");
+        trilParamMap.put("trilType", "2000"); // 试算类型
         int labelCount = mktCampaignMapper.countByTrial(trilParamMap);
         Map<String, Object> trilMap = new HashMap<>();
         trilMap.put("name", "标签取数");
         trilMap.put("count", labelCount);
         labelListTotal += labelCount;
         // 清单导入
-        trilParamMap.put("trilType", "1000");
+        trilParamMap.put("trilType", "1000");// 试算类型
         int listCount = mktCampaignMapper.countByTrial(trilParamMap);
         Map<String, Object> listMap = new HashMap<>();
         listMap.put("name", "清单导入");
@@ -2441,18 +2462,15 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         Map<String, Object> cityCountMap = new HashMap<>();
         // 省查所有地市
         if ("".equals(lanId)) {
-            Map<String, Object> sysAreaMap = sysAreaService.listCityByParentId(AreaCodeEnum.ZHEJIAGN.getLanId().intValue());
-            List<SysArea> sysAreaList = (List<SysArea>) sysAreaMap.get("sysAreaList");
-            // 起线程去统计11个地市的数据
+            // 起线程去统计11个地市的数据 + 省级
             ExecutorService executorService = Executors.newCachedThreadPool();
-
             for (SysArea sysArea : sysAreaList) {
                 Future<Map<String, Object>> futureMap = executorService.submit(new cityCountTask(paramMap, sysArea.getAreaId(), sysArea.getName()));
                 futureList.add(futureMap);
             }
             executorService.shutdown();
         } else {
-            cityCountMap = cityCount(paramMap, Integer.valueOf(lanId), AreaNameEnum.getNameByLandId(Long.valueOf(lanId)));
+            cityCountMap = cityLineCount(paramMap, Integer.valueOf(lanId), AreaNameEnum.getNameByLandId(Long.valueOf(lanId)));
         }
         List<Map<String, Object>> cityMapList = new ArrayList<>();
 
@@ -2464,26 +2482,28 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     total += (int) future.get().get("count");
                 }
             }
+
+            // 统计百分比
+            if (total != 0) {
+                for (Map<String, Object> cityMap : cityMapList) {
+                    cityMap.put("percent", df.format((int) cityMap.get("count") * 100.0 / total) + "%");
+                }
+            }
+            //排序
+            Collections.sort(cityMapList, new Comparator<Map<String, Object>>() {
+                @Override
+                public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                    Integer count1 = (Integer) o1.get("count");
+                    Integer count2 = (Integer) o2.get("count");
+                    return count2.compareTo(count1);
+                }
+            });
         } else {
             cityMapList.add(cityCountMap);
         }
 
 
-        // 统计百分比
-        if (total != 0) {
-            for (Map<String, Object> cityMap : cityMapList) {
-                cityMap.put("percent", df.format((int) cityMap.get("count") * 100.0 / total) + "%");
-            }
-        }
-        //排序
-        Collections.sort(cityMapList, new Comparator<Map<String, Object>>() {
-                    @Override
-                    public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-                        Integer count1 = (Integer) o1.get("count");
-                        Integer count2 = (Integer) o2.get("count");
-                        return count2.compareTo(count1);
-                    }
-                });
+
 
         Map<String, Object> cityDataMap = new HashMap<>();
         Map<String, Object> tableDataMap = new HashMap<>();
@@ -2524,20 +2544,86 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
         @Override
         public Map<String, Object> call() throws Exception {
-            return cityCount(paramMap, areaId, name);
+            Map<String, Object> cityParamMap = new ConcurrentHashMap<>();
+            cityParamMap.putAll(paramMap);
+            cityParamMap.put("lanId", areaId);
+            int cityCount = mktCampaignMapper.countByStatus(cityParamMap);
+            Map<String, Object> cityCountMap = new ConcurrentHashMap<>();
+            cityCountMap.put("count", cityCount);
+            cityCountMap.put("lanId", areaId);
+            cityCountMap.put("name", name);
+            return cityCountMap;
         }
     }
 
-    private Map<String, Object> cityCount(Map<String, Object> paramMap, Integer areaId, String name) throws Exception {
-        Map<String, Object> cityParamMap = new ConcurrentHashMap<>();
-        cityParamMap.putAll(paramMap);
-        cityParamMap.put("lanId", areaId);
-        int cityCount = mktCampaignMapper.countByStatus(cityParamMap);
-        Map<String, Object> cityCountMap = new ConcurrentHashMap<>();
-        cityCountMap.put("count", cityCount);
-        cityCountMap.put("lanId", areaId);
-        cityCountMap.put("name", name);
-        return cityCountMap;
+    /**
+     * 近6个月的折线图
+     *
+     * @param paramMap
+     * @param areaId
+     * @param name
+     * @return
+     * @throws Exception
+     */
+    private Map<String, Object> cityLineCount(Map<String, Object> paramMap, Integer areaId, String name) throws Exception {
+        Map<String, Object> lineResultMap = new HashMap<>();
+        Map<Integer, Date> dateMap = new HashedMap();
+        dateMap.put(6, string2DateTime4Day(getCurMFirstDay()));// 获取本月的第一天
+        // 获取6个月的
+        for (int i = 6; i > 0; i--) {
+            dateMap.put(i-1, string2DateTime4Day(getFisrtDayOfMonth(dateMap.get(i))));
+        }
+        try {
+            ExecutorService cityExecutorService = Executors.newCachedThreadPool();
+            List<Future<Map<String, Object>>> futureList = new ArrayList<>();
+            for (int i = 0; i < 6; i++) {
+                Future<Map<String, Object>> futureMap = cityExecutorService.submit(new cityMonthTask(paramMap,  dateMap.get(i), dateMap.get(i + 1)));
+                futureList.add(futureMap);
+            }
+            List<Map<String, Object>> lineMapList = new ArrayList<>();
+            for (Future<Map<String, Object>> future : futureList) {
+                lineMapList.add(future.get());
+            }
+            lineResultMap.put("areaId", areaId);
+            lineResultMap.put("name", name);
+            lineResultMap.put("data", lineMapList);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return lineResultMap;
+    }
+
+    class cityMonthTask implements Callable<Map<String, Object>>{
+        private Map<String, Object> paramMap;
+        private Date startDate;
+        private Date endDate;
+
+        public cityMonthTask(Map<String, Object> paramMap, Date startDate, Date endDate) {
+            this.paramMap = paramMap;
+            this.startDate = startDate;
+            this.endDate = endDate;
+        }
+
+        @Override
+        public Map<String, Object> call() throws Exception {
+            Map<String, Object> cityMonthMap = new HashMap<>();
+            cityMonthMap.putAll(paramMap);
+            cityMonthMap.put("startTime", startDate);
+            cityMonthMap.put("endTime", endDate);
+            int cityCount = mktCampaignMapper.countByStatus(cityMonthMap);
+            Calendar calendar = Calendar.getInstance();
+            //设置日期
+            calendar.setTime((Date)cityMonthMap.get("startTime"));
+            //获取年份
+            int year = calendar.get(Calendar.YEAR);
+            //获取上个月份
+            int month = calendar.get(Calendar.MONTH) + 1;
+            Map<String, Object> lineMap = new HashMap<>();
+            lineMap.put("count", cityCount);
+            lineMap.put("month", year+"年"+month+"月");
+            return lineMap;
+        }
     }
 
 
