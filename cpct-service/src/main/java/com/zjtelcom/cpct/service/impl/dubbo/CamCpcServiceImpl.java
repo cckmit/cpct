@@ -216,11 +216,7 @@ public class CamCpcServiceImpl implements CamCpcService {
         } else {
             privateParams.put("activityType", "0"); //活动类型 默认营销
         }
-        if ("0".equals(mktCampaign.getIsCheckRule()) || "校验".equals(mktCampaign.getIsCheckRule())) {
-            privateParams.put("skipCheck", "0"); //是否预校验
-        } else {
-            privateParams.put("skipCheck", "1"); //是否预校验
-        }
+        privateParams.put("skipCheck", mktCampaign.getIsCheckRule()); //是否预校验
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         privateParams.put("activityStartTime", simpleDateFormat.format(mktCampaign.getPlanBeginTime())); //活动开始时间
@@ -1013,7 +1009,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                         ruleMap.put("activityType", privateParams.get("activityType")); //活动类型
                         ruleMap.put("activityStartTime", privateParams.get("activityStartTime")); //活动开始时间
                         ruleMap.put("activityEndTime", privateParams.get("activityEndTime")); //活动结束时间
-                        ruleMap.put("skipCheck", "0"); //todo 调过预校验
+                        ruleMap.put("skipCheck", privateParams.get("skipCheck")); //todo 调过预校验
                         ruleMap.put("orderPriority", privateParams.get("orderPriority")); //活动优先级
                         ruleMap.put("integrationId", privateParams.get("integrationId")); //集成编号（必填）
                         ruleMap.put("accNbr", privateParams.get("accNbr")); //业务号码（必填）
@@ -1156,7 +1152,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     ruleMap.put("activityType", privateParams.get("activityType")); //活动类型
                     ruleMap.put("activityStartTime", privateParams.get("activityStartTime")); //活动开始时间
                     ruleMap.put("activityEndTime", privateParams.get("activityEndTime")); //活动结束时间
-                    ruleMap.put("skipCheck", "0"); //todo 调过预校验
+                    ruleMap.put("skipCheck", privateParams.get("skipCheck")); //todo 调过预校验
                     ruleMap.put("orderPriority", privateParams.get("orderPriority")); //活动优先级
                     ruleMap.put("integrationId", privateParams.get("integrationId")); //集成编号（必填）
                     ruleMap.put("accNbr", privateParams.get("accNbr")); //业务号码（必填）
