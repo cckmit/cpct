@@ -52,17 +52,16 @@ public class OpenMktCampaignEntity {
     private List<OpenMktCamChlConfEntity> mktCamChlConfs;
     //营服活动执行算法规则关联
     private List<OpenMktCamRecomCalcRelEntity> mktCamRecomCalcRels;
-    private List<OpenMktCpcAlgorithmsRulEntity> mktCpcAlgorithmsRulDetails;
     //营服活动关联事件
     private List<OpenMktCamEvtRelEntity> mktCamEvtRels;
-    private List<OpenEvent> mktCampaignEvts;
     //营服活动渠道执行策略
     private List<OpenMktCamStrategyRelEntity> mktCamStrategyRels;
-    private List<OpenMktStrategyEntity> mktCampaignStrategyDetails;
     //营服活动关系
     private List<OpenMktCampaignRelEntity> mktCampaignRels;
     //事件触发活动规则
     private List<OpenEvtTrigCamRulEntity> evtTrigCamRuls;
+
+    private List<OpenEvent> mktCampaignEvts;
 
     public String getActType() {
         return actType;
@@ -352,14 +351,6 @@ public class OpenMktCampaignEntity {
         this.mktCamRecomCalcRels = mktCamRecomCalcRels;
     }
 
-    public List<OpenMktCpcAlgorithmsRulEntity> getMktCpcAlgorithmsRulDetails() {
-        return mktCpcAlgorithmsRulDetails;
-    }
-
-    public void setMktCpcAlgorithmsRulDetails(List<OpenMktCpcAlgorithmsRulEntity> mktCpcAlgorithmsRulDetails) {
-        this.mktCpcAlgorithmsRulDetails = mktCpcAlgorithmsRulDetails;
-    }
-
     public List<OpenMktCamEvtRelEntity> getMktCamEvtRels() {
         return mktCamEvtRels;
     }
@@ -382,14 +373,6 @@ public class OpenMktCampaignEntity {
 
     public void setMktCamStrategyRels(List<OpenMktCamStrategyRelEntity> mktCamStrategyRels) {
         this.mktCamStrategyRels = mktCamStrategyRels;
-    }
-
-    public List<OpenMktStrategyEntity> getMktCampaignStrategyDetails() {
-        return mktCampaignStrategyDetails;
-    }
-
-    public void setMktCampaignStrategyDetails(List<OpenMktStrategyEntity> mktCampaignStrategyDetails) {
-        this.mktCampaignStrategyDetails = mktCampaignStrategyDetails;
     }
 
     public List<OpenMktCampaignRelEntity> getMktCampaignRels() {
