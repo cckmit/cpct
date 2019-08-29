@@ -4,7 +4,9 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.grouping.ServicePackageMapper;
+import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.grouping.ServicePackage;
 import com.zjtelcom.cpct.dto.channel.TransDetailDataVO;
 import com.zjtelcom.cpct.enums.StatusCode;
@@ -34,6 +36,9 @@ public class ServicePackageServiceImpl implements ServicePackageService {
     @Autowired
     private ServicePackageMapper servicePackageMapper;
 
+    @Autowired
+    private InjectionLabelMapper injectionLabelMapper;
+
     @Autowired(required = false)
     private EsServicePackageService esServicePackageService;
 
@@ -48,6 +53,23 @@ public class ServicePackageServiceImpl implements ServicePackageService {
             List<String> contentList = dataVO.getContentList();
             // 获取标签code
             String labelCode = contentList.get(2).split("\\|@\\|")[0];
+
+
+            //查询是否为我们库中的标签
+            List<Label> labelList = injectionLabelMapper.selectAll();
+            boolean isExit = false;
+            for (Label label : labelList) {
+                if(labelCode.equals(label.getInjectionLabelCode())){
+                    isExit = true;
+                    break;
+                }
+            }
+            if (!isExit){
+                maps.put("resultCode", CommonConstant.CODE_FAIL);
+                maps.put("resultMsg", "不存在该标签！");
+                return maps;
+            }
+
 
             ServicePackage servicePackage = new ServicePackage();
             servicePackage.setServicePackageName(name);

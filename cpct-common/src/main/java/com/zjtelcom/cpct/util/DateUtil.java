@@ -449,6 +449,22 @@ public class DateUtil {
         return firstDayOfMonth;
     }
 
+    /**
+     * 某个时间上个月的第一天
+     * @return
+     */
+    public static String getFisrtDayOfMonth(Date date)
+    {
+        Calendar calendar = Calendar.getInstance();
+        //设置日期
+        calendar.setTime(date);
+        //获取年份
+        int yearStr = calendar.get(Calendar.YEAR);
+        //获取上个月份
+        int month = calendar.get(Calendar.MONTH);
+        return getFisrtDayOfMonth(yearStr, month);
+    }
+
 
     /**
      * 获取下个月的第一天
