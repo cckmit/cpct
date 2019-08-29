@@ -73,7 +73,7 @@ redisConfig_Prd:
 # cpct_pst_topic 下二個分組 producerGroupName  producerGroupName2
 # cpct_push_end_topic 1個分組 pushGroupName : cpct_push_end_consumer
 ctg:
-  namesrvAddr: 134.108.6.29:9876;134.108.6.30:9876;134.108.6.31:9876
+  namesrvAddr: 134.108.6.201:9876;134.108.6.202:9876;134.108.6.203:9876
   cpctGroupName: cpct_detailed_list_group_gray
   namesrvAuthID: cpct_user
   namesrvAuthPwd: Cpct!@3e#
