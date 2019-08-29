@@ -41,6 +41,7 @@ import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.elastic.service.EsHitService;
 import com.zjtelcom.cpct.enums.AreaNameEnum;
 import com.zjtelcom.cpct.service.dubbo.CamCpcService;
+import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
@@ -110,7 +111,7 @@ public class CamCpcServiceImpl implements CamCpcService {
     private InjectionLabelMapper injectionLabelMapper; //标签因子
 
     @Autowired
-    private EsHitService esHitService;  //es存储
+    private EsHitsService esHitService;  //es存储
 
     @Autowired
     private RedisUtils redisUtils;  // redis方法
