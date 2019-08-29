@@ -1,9 +1,9 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: bss-cpct-dubbo-ser #这里修改
+  name: bss-cpct-dubbo-log #这里修改
   labels:
-    name: bss-cpct-dubbo-ser  #这里修改
+    name: bss-cpct-dubbo-log  #这里修改
 spec:
   replicas: 1
   strategy:
@@ -15,11 +15,11 @@ spec:
   template:
     metadata:
       labels:
-        name: bss-cpct-dubbo-ser #这里修改
+        name: bss-cpct-dubbo-log #这里修改
     spec:
       containers:
-      - name: bss-cpct-dubbo-ser  #这里修改
-        image: 134.96.180.23:8001/hchc/bss-cpct-dubbo-ser:1.0  #这里修改  地址使用这个么？
+      - name: bss-cpct-dubbo-log  #这里修改
+        image: 134.96.180.23:8001/hchc/bss-cpct-dubbo-log:1.0  #这里修改  地址使用这个么？
         imagePullPolicy: Always
         lifecycle:     #处理dubbo没有取消注册问题
           preStop:
@@ -87,4 +87,4 @@ spec:
           path: /etc/localtime
       - name: app-log
         hostPath:
-          path: /app/app-log/bss-cpct-dubbo-ser
+          path: /app/app-log/bss-cpct-log
