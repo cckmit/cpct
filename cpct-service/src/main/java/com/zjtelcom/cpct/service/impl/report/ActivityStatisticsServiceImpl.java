@@ -78,7 +78,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         Long staffId = user.getStaffId();
 //        //组织树控制权限
         List<SystemPostDto> systemPostDtoList = user.getSystemPostDtoList();
-        String sysPostCode = systemPostDtoList.get(0).getSysPostCode();
+        String sysPostCode = null;
+        sysPostCode = systemPostDtoList.get(0).getSysPostCode();
 //        Long staffId = Long.valueOf(params.get("staffId").toString());
 //        String sysPostCode = params.get("sysPostCode").toString();
         Object areaId = params.get("areaId");
@@ -91,14 +92,15 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         }
         List<Map<String, Object>> staffOrgId = organizationMapper.getStaffOrgId(staffId);
         try {
-            if (AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea().equals(sysPostCode) ||
-                    AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea().equals(sysPostCode)) {
+            if (AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysPostCode().equals(sysPostCode) ||
+                    AreaCodeEnum.sysAreaCode.SHENGJI.getSysPostCode().equals(sysPostCode)) {
                 //权限对应 超管 省管 显示所有 11个地市
                 list = organizationMapper.selectMenu();
-            } else if (AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea().equals(sysPostCode) ||
-                    AreaCodeEnum.sysAreaCode.FENGJU.getSysArea().equals(sysPostCode) ||
-                    AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea().equals(sysPostCode)) {
+            } else if (AreaCodeEnum.sysAreaCode.FENGONGSI.getSysPostCode().equals(sysPostCode) ||
+                    AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode().equals(sysPostCode) ||
+                    AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode().equals(sysPostCode)) {
                 //权限对应 C3 C4 C5 如 定位C3地市 并且显示当前C3下所有子节点
+                sysPostCode = AreaCodeEnum.getSysAreaBySysPostCode(sysPostCode);
                 // C4 显示前一级父节点 以及显示C4下所有子节点
                 //确定用户 orgId
                 for (Map<String, Object> map : staffOrgId) {
