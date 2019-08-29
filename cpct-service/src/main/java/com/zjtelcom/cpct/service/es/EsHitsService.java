@@ -9,6 +9,8 @@ public interface EsHitsService {
 
     void add() throws Exception;
 
+    void save(JSONObject jsonObject, String indexName);
+
     void save(JSONObject jsonObject, String indexName, String _id);
 
     Map<String,Object> searchCampaignHitsInfo(CampaignHitParam param);

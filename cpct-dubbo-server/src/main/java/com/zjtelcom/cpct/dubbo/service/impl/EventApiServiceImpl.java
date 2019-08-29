@@ -57,6 +57,7 @@ import com.zjtelcom.cpct.enums.AreaNameEnum;
 import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
+import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
@@ -119,7 +120,7 @@ public class EventApiServiceImpl implements EventApiService {
     private InjectionLabelMapper injectionLabelMapper; //标签因子
 
     @Autowired
-    private EsHitService esHitService;  //es存储
+    private EsHitsService esHitService;  //es存储
 
     @Autowired
     private RedisUtils redisUtils;  // redis方法
@@ -657,6 +658,9 @@ public class EventApiServiceImpl implements EventApiService {
                 //事件下所有活动的规则预校验，返回初步可命中活动
                 List<Map<String, Object>> resultByEvent = getResultByEvent(eventId, map.get("lanId"), map.get("channelCode"), map.get("reqId"), map.get("accNbr"), c4, map.get("custId"));
 
+                // 固定必中规则提取
+                List<Map<String, Object>> resultByEvent2 = getBitslapByEvent(eventId, resultByEvent);
+
                 if (resultByEvent == null || resultByEvent.size() <= 0) {
                     log.info("预校验为空");
                     long cost = System.currentTimeMillis() - begin;
@@ -1121,6 +1125,22 @@ public class EventApiServiceImpl implements EventApiService {
             log.info("事件计算流程结束:" + map.get("eventCode") + "***" + map.get("reqId") + "（" + (System.currentTimeMillis() - begin) + "）");
             return result;
         }
+    }
+
+    private List<Map<String,Object>> getBitslapByEvent(Long eventId, List<Map<String,Object>> resultByEvent) {
+        List<Map<String, Object>> mktCampaginIdList = mktCamEvtRelMapper.listActivityByEventId(eventId);
+        /*for (Map<String, Object> passMap : resultByEvent) {
+            for (Map<String, Object> countMap : mktCampaginIdList) {
+                Object o = passMap.get("");
+                Object o1 = countMap.get("");
+                if (o.equals(o1)) {
+                    mktCampaginIdList.removeAll(resultByEvent);
+                }
+            }
+        }*/
+        boolean b = mktCampaginIdList.removeAll(resultByEvent);
+
+        return mktCampaginIdList;
     }
 
 
