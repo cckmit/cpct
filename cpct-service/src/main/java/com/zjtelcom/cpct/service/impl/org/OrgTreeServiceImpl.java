@@ -312,7 +312,7 @@ public class OrgTreeServiceImpl implements OrgTreeService{
         List<Map<String, Object>> staffOrgId = organizationMapper.getStaffOrgId(staffId);
         //组织树控制权限
         List<SystemPostDto> systemPostDtoList = user.getSystemPostDtoList();
-        String sysPostCode = systemPostDtoList.get(0).getSysPostCode();
+//        String sysPostCode = systemPostDtoList.get(0).getSysPostCode();
 //        List<SystemPostDto> systemPostDtoList = new ArrayList<>();
 //        SystemPostDto systemPostDto0 = new SystemPostDto();
 //        systemPostDto0.setSysPostCode("cpcpch0004");
@@ -323,7 +323,7 @@ public class OrgTreeServiceImpl implements OrgTreeService{
 //        systemPostDtoList.add(systemPostDto0);
 //        systemPostDtoList.add(systemPostDto1);
 //        systemPostDtoList.add(systemPostDto2);
-//        String sysPostCode = null;
+        String sysPostCode = null;
         ArrayList<String> arrayList = new ArrayList<>();
 //        String sysPostCode = "C3";
         //岗位信息查看最大权限作为岗位信息
