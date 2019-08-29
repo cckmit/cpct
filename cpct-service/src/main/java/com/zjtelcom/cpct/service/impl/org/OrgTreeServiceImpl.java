@@ -314,6 +314,16 @@ public class OrgTreeServiceImpl extends BaseService implements OrgTreeService{
         //组织树控制权限
         List<SystemPostDto> systemPostDtoList = user.getSystemPostDtoList();
 //        String sysPostCode = systemPostDtoList.get(0).getSysPostCode();
+//        List<SystemPostDto> systemPostDtoList = new ArrayList<>();
+//        SystemPostDto systemPostDto0 = new SystemPostDto();
+//        systemPostDto0.setSysPostCode("cpcpch0004");
+//        SystemPostDto systemPostDto1 = new SystemPostDto();
+//        systemPostDto1.setSysPostCode("cpcpcj0001");
+//        SystemPostDto systemPostDto2 = new SystemPostDto();
+//        systemPostDto2.setSysPostCode("cannel-manger-0003");
+//        systemPostDtoList.add(systemPostDto0);
+//        systemPostDtoList.add(systemPostDto1);
+//        systemPostDtoList.add(systemPostDto2);
         String sysPostCode = null;
         ArrayList<String> arrayList = new ArrayList<>();
         //岗位信息查看最大权限作为岗位信息
