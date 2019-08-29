@@ -17,6 +17,7 @@ import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.enums.AreaCodeEnum;
 import com.zjtelcom.cpct.enums.ORG2RegionId;
 import com.zjtelcom.cpct.exception.SystemException;
+import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.org.OrgTreeService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.FtpUtils;
@@ -39,7 +40,7 @@ import java.util.*;
  */
 @Service
 @Transactional
-public class OrgTreeServiceImpl implements OrgTreeService{
+public class OrgTreeServiceImpl extends BaseService implements OrgTreeService{
 
     @Autowired
     private OrgTreeMapper orgTreeMapper;
@@ -325,7 +326,6 @@ public class OrgTreeServiceImpl implements OrgTreeService{
 //        systemPostDtoList.add(systemPostDto2);
         String sysPostCode = null;
         ArrayList<String> arrayList = new ArrayList<>();
-//        String sysPostCode = "C3";
         //岗位信息查看最大权限作为岗位信息
         if (systemPostDtoList.size()>0 && systemPostDtoList!=null){
             for (SystemPostDto systemPostDto : systemPostDtoList) {
@@ -345,7 +345,7 @@ public class OrgTreeServiceImpl implements OrgTreeService{
         }else {
             sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
         }
-
+        logger.info("岗位到底选着什么级别展示++++++:"+sysPostCode);
         //有父节点的情况
         if (areaList!=null && areaList.size()>0){
             list = organizationMapper.selectByParentId(Long.valueOf(areaList.get(0)));
@@ -361,6 +361,7 @@ public class OrgTreeServiceImpl implements OrgTreeService{
                 for (Map<String, Object> map : staffOrgId) {
                     Object orgDivision = map.get("orgDivision");
                     Object orgId1 = map.get("ORG_NAME_"+sysPostCode);
+                    logger.info("查看！@# + + + orgId1"+orgId1);
                     if (orgId1 == null || "" == orgId1){
                         orgId = Long.valueOf(map.get("orgId").toString());
                         break;
