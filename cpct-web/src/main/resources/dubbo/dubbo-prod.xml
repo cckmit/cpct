@@ -95,4 +95,9 @@
         <dubbo:method name="queryRptEventOrder" servicecode="00.1079.queryRptEventOrder" timeout="12000"/>
         <dubbo:method name="queryValidCampaign" servicecode="00.1079.queryValidCampaign" timeout="12000"/>
     </dubbo:reference>
+
+    <!-- eslog -->
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MqProducerService" id="mqProducerService" version="1.0" check="false">
+        <dubbo:method name="msg2ESLogProducer" servicecode="00.1083.msg2ESLogProducer" timeout="120000"/>
+    </dubbo:reference>
 </beans>
