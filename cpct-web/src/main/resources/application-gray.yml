@@ -90,5 +90,5 @@ ctg:
 
 
   # 第四topic es日志添加队列中转
-  cpctEsLogTopic: cpct_eslog_prod
+  cpctEsLogTopic: cpct_eslog_gray
   cpctEsLogGroup: cpct_eslog_group_gray
