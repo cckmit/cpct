@@ -202,7 +202,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             if (systemUserDtoSysmgrResultObject != null) {
                 if (systemUserDtoSysmgrResultObject.getResultObject() != null) {
                     codeNumber = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
-//                    codeNumber=codeNumber+"&&"+systemUserDtoSysmgrResultObject.getResultObject().getStaffName();
+                    codeNumber = codeNumber+"&&"+systemUserDtoSysmgrResultObject.getResultObject().getStaffName();
                 }
             }
         }catch (Exception e){
@@ -798,28 +798,45 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 labelNameList.add(nameList[i]);
                 labelEngNameList.add(codeList[i]);
             }
-            //查询活动下面所有渠道属性id是21和22的value
-            List<String> attrValue = mktCamChlConfAttrMapper.selectAttrLabelValueByCampaignId(campaign.getMktCampaignId());
             List<String> fields = new ArrayList<>();
-            for (String attr : attrValue){
-                fields.add(attr);
-            }
-            // 服务包添加查询字段
-            List<String> labels = mktCamChlConfAttrMapper.selectAttrLabelRemarkByCampaignId(campaign.getMktCampaignId());
-            for (String s : labels) {
-                fields.add(s);
-            }
+
+
             List<Map<String, Object>> displayList = displayLabel(campaign);
             for (Map<String, Object> display : displayList) {
                 String code = display.get("code") == null ? null : display.get("code").toString();
                 String name = display.get("name") == null ? null : display.get("name").toString();
-                if (code != null && !labelEngNameList.contains(code)) {
+                if (code != null && !labelEngNameList.contains(code) && name != null && !labelNameList.contains(name)) {
                     Map<String, Object> label = new HashMap<>();
                     label.put("code", code);
                     label.put("name", name);
                     labelList.add(label);
                     fields.add(code);
                     labelEngNameList.add(code);
+                    labelNameList.add(name);
+                }
+            }
+            //查询活动下面所有渠道属性id是21和22的value
+            List<String> attrValue = mktCamChlConfAttrMapper.selectAttrLabelValueByCampaignId(campaign.getMktCampaignId());
+            if (attrValue != null && attrValue.size() > 0) {
+                for (String attr : attrValue){
+                    if (!fields.contains(attr)) {
+                        fields.add(attr);
+                    }
+                }
+            }
+            // 服务包添加查询字段
+            List<String> labels = mktCamChlConfAttrMapper.selectAttrLabelRemarkByCampaignId(campaign.getMktCampaignId());
+            if(labels != null && labels.size() > 0){
+                for (String s : labels) {
+                    if (s != null && !labelEngNameList.contains(s)) {
+                        Label label1= injectionLabelMapper.selectByLabelCode(s);
+                        Map<String, Object> label = new HashMap<>();
+                        label.put("code", s);
+                        label.put("name", label1 == null? "":label1.getInjectionLabelName());
+                        labelList.add(label);
+                        fields.add(s);
+                        labelEngNameList.add(s);
+                    }
                 }
             }
             if (!fields.isEmpty()) {
@@ -908,10 +925,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             productFilter = filterRuleList;
                         }
                         // 查看当前规则协同渠道是否为沙盘，是否配置接单人派单
-                        boolean flag2 = false;
-                        if (Arrays.asList(nameList).contains("接单人号码") && Arrays.asList(codeList).contains("SALE_EMP_NBR")) {
-                            flag2 = true;
-                        }
                         boolean flag = false;
                         String evtContactConfId = confRule.getEvtContactConfId();
                         Map<String, Object> mktCamChlConf = mktCamChlConfService.getMktCamChlConf(Long.valueOf(confRule.getEvtContactConfId()));
@@ -922,11 +935,15 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                 flag = true;
                             }
                         }
+                        boolean flag2 = false;
+                        if (Arrays.asList(nameList).contains("接单人号码") && Arrays.asList(codeList).contains("SALE_EMP_NBR")) {
+                            flag2 = true;
+                        }
                         for (int j = 3; j < dataVO.contentList.size(); j++) {
                             List<String> data = Arrays.asList(dataVO.contentList.get(j).split("\\|@\\|"));
                             Object[] objects = data.toArray();
-                            if (flag2) {
-                                if (flag && (this.getIndex() >= data.size() ? true:(data.get(this.getIndex()) == null || data.get(this.getIndex()).equals("")))) {
+                            if (flag) {
+                                if (flag2 && (this.getIndex() >= data.size() ? true:(data.get(this.getIndex()) == null || data.get(this.getIndex()).equals("")))) {
                                     // 记录日志，退出线程
                                     addLog2Es(batchNumSt, "导入清单存在接单人无数据");
                                     TrialOperation record = new TrialOperation();
@@ -935,15 +952,15 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                     record.setRemark("清单导入数据错误");
                                     int i = trialOperationMapper.updateByPrimaryKey(record);
                                     throw new RuntimeException("导入清单第" + (j + 1) + "行接单人无数据");
+                                } else {
+                                    addLog2Es(batchNumSt, "导入清单缺少接单人必填列");
+                                    TrialOperation record = new TrialOperation();
+                                    record.setId(Long.valueOf(insertId));
+                                    record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
+                                    record.setRemark("清单导入数据错误");
+                                    int i = trialOperationMapper.updateByPrimaryKey(record);
+                                    throw new RuntimeException("导入清单缺少渠道必填列");
                                 }
-                            } else {
-                                addLog2Es(batchNumSt, "导入清单缺少接单人必填列");
-                                TrialOperation record = new TrialOperation();
-                                record.setId(Long.valueOf(insertId));
-                                record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
-                                record.setRemark("清单导入数据错误");
-                                int i = trialOperationMapper.updateByPrimaryKey(record);
-                                throw new RuntimeException("导入清单缺少渠道必填列");
                             }
                             Map<String, Object> customers = new HashMap<>();
                             boolean check = true;

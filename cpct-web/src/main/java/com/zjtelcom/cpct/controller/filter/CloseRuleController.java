@@ -174,7 +174,7 @@ public class CloseRuleController extends BaseController {
 
 
    /* @Autowired
-    private EsHitService esHitService;
+    private EsHitsService esHitService;
     @PostMapping("addLogToEsTest")
     public String addLogToEsTest(){
         //初始化es log
