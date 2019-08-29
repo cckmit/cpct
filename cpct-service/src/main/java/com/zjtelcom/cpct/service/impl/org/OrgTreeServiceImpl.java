@@ -308,12 +308,22 @@ public class OrgTreeServiceImpl implements OrgTreeService{
         List<String> areaList=(List<String>)params.get("areaId");
         SystemUserDto user = BssSessionHelp.getSystemUserDto();
         Long staffId = user.getStaffId();
-//        Long staffId = 120011114242L;
+//        Long staffId = 121047805L;
         List<Map<String, Object>> staffOrgId = organizationMapper.getStaffOrgId(staffId);
         //组织树控制权限
         List<SystemPostDto> systemPostDtoList = user.getSystemPostDtoList();
-//        String sysPostCode = systemPostDtoList.get(0).getSysPostCode();
-        String sysPostCode = null;
+        String sysPostCode = systemPostDtoList.get(0).getSysPostCode();
+//        List<SystemPostDto> systemPostDtoList = new ArrayList<>();
+//        SystemPostDto systemPostDto0 = new SystemPostDto();
+//        systemPostDto0.setSysPostCode("cpcpch0004");
+//        SystemPostDto systemPostDto1 = new SystemPostDto();
+//        systemPostDto1.setSysPostCode("cpcpcj0001");
+//        SystemPostDto systemPostDto2 = new SystemPostDto();
+//        systemPostDto2.setSysPostCode("cannel-manger-0003");
+//        systemPostDtoList.add(systemPostDto0);
+//        systemPostDtoList.add(systemPostDto1);
+//        systemPostDtoList.add(systemPostDto2);
+//        String sysPostCode = null;
         ArrayList<String> arrayList = new ArrayList<>();
 //        String sysPostCode = "C3";
         //岗位信息查看最大权限作为岗位信息
@@ -322,15 +332,15 @@ public class OrgTreeServiceImpl implements OrgTreeService{
                 arrayList.add(systemPostDto.getSysPostCode());
             }
         }
-        if (arrayList.contains(AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea())){
+        if (arrayList.contains(AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysPostCode())){
             sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
-        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea())){
+        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.SHENGJI.getSysPostCode())){
             sysPostCode = AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea();
-        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea())){
+        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.FENGONGSI.getSysPostCode())){
             sysPostCode = AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea();
-        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.FENGJU.getSysArea())){
+        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode())){
             sysPostCode = AreaCodeEnum.sysAreaCode.FENGJU.getSysArea();
-        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea())){
+        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode())){
             sysPostCode = AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea();
         }else {
             sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
