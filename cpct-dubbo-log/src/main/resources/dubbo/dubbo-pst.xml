@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://code.alibabatech.com/schema/dubbo
+    http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <!-- 提供方应用信息，用于计算依赖关系 -->
+    <dubbo:application name="00.1083"/>
+
+    <dubbo:registry id="esb3" protocol="dubbo" address="134.96.253.65:8001"/>
+
+    <!-- 暴露服务 -->
+    <dubbo:protocol name="dubbo" port="30811"/>
+    <dubbo:monitor protocol="registry" />
+
+    <!-- eslog -->
+    <dubbo:service registry="esb3" id="mqProducerService"  interface="com.zjtelcom.cpct.dubbo.service.MqProducerService" ref="mqProducerServiceImpl" version="1.0" >
+        <dubbo:method name="msg2ESLogProducer" servicecode="00.1083.msg2ESLogProducer"  timeout="10000"/>
+    </dubbo:service>
+
+</beans>

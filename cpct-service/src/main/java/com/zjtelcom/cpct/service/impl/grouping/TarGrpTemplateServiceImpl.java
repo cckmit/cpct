@@ -44,6 +44,7 @@ import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
 import com.zjtelcom.cpct_prod.dao.offer.MktResourceProdMapper;
 import com.zjtelcom.cpct_prod.dao.offer.OfferProdMapper;
 import com.zjtelcom.es.es.entity.TrialOperationVOES;
+import com.zjtelcom.es.es.entity.model.LabelResultES;
 import com.zjtelcom.es.es.entity.model.TrialOperationParamES;
 import com.zjtelcom.es.es.entity.model.TrialResponseES;
 import com.zjtelcom.es.es.service.EsTarGrpTemplate;
@@ -217,6 +218,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         Map<String, Object> map = new HashMap<>();
         List<Map<String, String>> list = tarGrpConditionMapper.selectAllLabelByTarId(Long.valueOf(tarGrpTemplateId));
         List<String> expressions = new ArrayList<>();
+        List<LabelResultES> labelList = new ArrayList<>();
         for (Map<String, String> tarGrpCondition : list) {
             String code = tarGrpCondition.get("code");
             String operType = tarGrpCondition.get("operType");
@@ -224,9 +226,14 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             String rightParam = tarGrpCondition.get("rightParam");
             String expression = code + operType + rightParam;
             expressions.add(expression);
+            LabelResultES label = new LabelResultES();
+            label.setLabelCode(code);
+            label.setLabelDataType(tarGrpCondition.get("labelType") == null? "":tarGrpCondition.get("labelType"));
+            labelList.add(label);
         }
         map.put("expressions", expressions);
         map.put("operationType", operationType);
+        map.put("labelList", labelList);
         try {
             String result = esTarGrpTemplateService.tarGrpTemplateCountAndIssue(map);
             map.put("resultCode",CODE_SUCCESS);
