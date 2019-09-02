@@ -380,6 +380,7 @@ public class OrgTreeServiceImpl extends BaseService implements OrgTreeService{
                 }
             }
 //            list = organizationMapper.selectByParentId(orgId);
+            //收缩展示父节点
             Organization organization1 = organizationMapper.selectByPrimaryKey(orgId);
             list.add(organization1);
         }
