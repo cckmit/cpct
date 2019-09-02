@@ -15,4 +15,7 @@ public interface ActivityStatisticsService {
     Map<String,Object> getRptBatchOrder(Map<String, Object> params);
 
     Map<String,Object> queryRptBatchOrderTest(Map<String, Object> params);
+
+    Map<String,Object> getMktCampaignDetails(Map<String, Object> params);
+
 }
