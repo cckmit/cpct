@@ -99,8 +99,7 @@
         <dubbo:method name="queryValidCampaign" servicecode="00.1079.queryValidCampaign" timeout="12000"/>
     </dubbo:reference>
 
-    <dubbo:reference registry="esb3" interface="com.zjtelcom.es.es.service.EsTarGrpTemplate"
-                     id="tarGrpTemplateCountAndIssue" version="1.0" check="false">
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.es.es.service.EsTarGrpTemplate" id="tarGrpTemplateCountAndIssue" version="1.0" check="false">
         <dubbo:method name="tarGrpTemplateCountAndIssue" servicecode="00.1083.tarGrpTemplateCountAndIssue" timeout="120000"/>
     </dubbo:reference>
 
