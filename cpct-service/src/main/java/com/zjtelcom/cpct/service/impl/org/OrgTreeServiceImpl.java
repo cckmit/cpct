@@ -349,13 +349,13 @@ public class OrgTreeServiceImpl extends BaseService implements OrgTreeService{
         if (areaList!=null && areaList.size()>0){
             list = organizationMapper.selectByParentId(Long.valueOf(areaList.get(0)));
            // 超管 省管 c1 c2
-        }else if ((AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea()).equals(sysPostCode) ||
-                AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea().equals(sysPostCode) && areaList==null){
+        }else if (AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea().equals(sysPostCode) ||
+                AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea().equals(sysPostCode) && areaList.isEmpty()){
             list = organizationMapper.selectMenu();
             // 分公司 C3 权限 支局 C4 分局 C5
         }else if (AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea().equals(sysPostCode)  ||
                 AreaCodeEnum.sysAreaCode.FENGJU.getSysArea().equals(sysPostCode) ||
-                AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea().equals(sysPostCode) && areaList==null) {
+                AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea().equals(sysPostCode) && areaList.isEmpty()) {
             if (!staffOrgId.isEmpty() && staffOrgId.size() > 0) {
                 for (Map<String, Object> map : staffOrgId) {
                     Object orgDivision = map.get("orgDivision");
