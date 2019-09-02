@@ -664,7 +664,7 @@ public class EventApiServiceImpl implements EventApiService {
                 List<Map<String, Object>> resultByEvent = getResultByEvent(eventId, map.get("lanId"), map.get("channelCode"), map.get("reqId"), map.get("accNbr"), c4, map.get("custId"));
 
                 // 固定必中规则提取
-                List<Map<String, Object>> resultByEvent2 = getBitslapByEvent(eventId, resultByEvent);
+                // List<Map<String, Object>> resultByEvent2 = getBitslapByEvent(eventId, resultByEvent);
 
                 if (resultByEvent == null || resultByEvent.size() <= 0) {
                     log.info("预校验为空");
@@ -1047,7 +1047,7 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
 
-                //判断事件推荐活动数，按照优先级排序
+                // 判断事件推荐活动数，按照优先级排序
                 if (activityList.size() > 0 && recCampaignAmount > 0 && recCampaignAmount < activityList.size()) {
                     Collections.sort(activityList, new Comparator<Map<String, Object>>() {
                         public int compare(Map o1, Map o2) {
