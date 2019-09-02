@@ -33,6 +33,7 @@ import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMatchRulMapper;
 import com.zjtelcom.cpct.dao.event.EventMatchRulConditionMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
+import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
@@ -83,7 +84,8 @@ public class EventApiServiceImpl implements EventApiService {
 
     @Value("${thread.maxPoolSize}")
     private int maxPoolSize;
-
+    @Value("${table.infallible}")
+    private String defaultInfallibleTable;
     private static final Logger log = LoggerFactory.getLogger(EventApiServiceImpl.class);
 
     @Autowired
@@ -187,6 +189,9 @@ public class EventApiServiceImpl implements EventApiService {
 
     @Autowired(required = false)
     private ICacheIdMappingEntityQryService iCacheIdMappingEntityQryService;
+
+    @Autowired
+    private TarGrpConditionMapper tarGrpConditionMapper;
 
     @Override
     public Map<String, Object> CalculateCPC(Map<String, Object> map) {
@@ -1128,18 +1133,46 @@ public class EventApiServiceImpl implements EventApiService {
     }
 
     private List<Map<String,Object>> getBitslapByEvent(Long eventId, List<Map<String,Object>> resultByEvent) {
+        // 遍历出被过滤掉的活动
         List<Map<String, Object>> mktCampaginIdList = mktCamEvtRelMapper.listActivityByEventId(eventId);
-        /*for (Map<String, Object> passMap : resultByEvent) {
-            for (Map<String, Object> countMap : mktCampaginIdList) {
-                Object o = passMap.get("");
-                Object o1 = countMap.get("");
-                if (o.equals(o1)) {
-                    mktCampaginIdList.removeAll(resultByEvent);
+        for (Map<String, Object> passMap : resultByEvent) {
+            Map<String,Object> map = passMap.get("mktCampaignMap") == null ? new HashMap<>() : (Map<String, Object>)passMap.get("mktCampaignMap");
+            if (map != null && map.get("mktCampaginId") != null && map.get("mktCampaginId") != "") {
+                String passCamId = map.get("mktCampaginId").toString();
+                for (Map<String, Object> countMap : mktCampaginIdList) {
+                    String countCamId = countMap.get("mktCampaginId").toString();
+                    if (passCamId.equals(countCamId)) {
+                        mktCampaginIdList.remove(countMap);
+                        break;
+                    }
                 }
             }
-        }*/
-        boolean b = mktCampaginIdList.removeAll(resultByEvent);
-
+        }
+        // 遍历活动找出配有必中标签的活动
+        boolean flag = true;
+        if (!mktCampaginIdList.isEmpty()) {
+            ListIterator it = mktCampaginIdList.listIterator();
+            while (it.hasNext()) {
+                flag = true;
+                Map<String, Object> map = (Map<String, Object>) it.next();
+                String mktCampaginId = map.get("mktCampaginId").toString();
+                List<Map<String, String>> mapList = tarGrpConditionMapper.selectAllLabelByCamId(Long.valueOf(mktCampaginId));
+                if (!mapList.isEmpty()) {
+                    for (Map<String, String> ruleMap : mapList) {
+                        String labelCode = ruleMap.get("labelCode");
+                        String ruleId = ruleMap.get("ruleId");
+                        if (labelCode.equals(defaultInfallibleTable)) {
+                            flag = false;
+                            map.put("camPass", false);
+                            map.put("willBeInRuleId", ruleId);
+                        }
+                    }
+                }
+                if (flag) {
+                    mktCampaginIdList.remove(map);
+                }
+            }
+        }
         return mktCampaginIdList;
     }
 
@@ -2344,7 +2377,9 @@ public class EventApiServiceImpl implements EventApiService {
                         mktCampaignMap.put("type", mktCampaign.getMktCampaignType().toString()); // 活动类型 5000
                     }
                 }
+                // 实时
                 resultMap.put("mktCampaignMap", mktCampaignMap);
+                // 清单
                 resultMap.put("mktCampaignCustMap", mktCampaignCustMap);
 
             } catch (Exception e) {
