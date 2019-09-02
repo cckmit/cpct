@@ -307,23 +307,22 @@ public class OrgTreeServiceImpl extends BaseService implements OrgTreeService{
         Map<String, Object> maps = new HashMap<>();
         List<Organization> list=new ArrayList<>();
         List<String> areaList=(List<String>)params.get("areaId");
-        SystemUserDto user = BssSessionHelp.getSystemUserDto();
-        Long staffId = user.getStaffId();
-//        Long staffId = 121047805L;
+//        SystemUserDto user = BssSessionHelp.getSystemUserDto();
+//        Long staffId = user.getStaffId();
+        Long staffId = 121047805L;
         List<Map<String, Object>> staffOrgId = organizationMapper.getStaffOrgId(staffId);
         //组织树控制权限
-        List<SystemPostDto> systemPostDtoList = user.getSystemPostDtoList();
-//        String sysPostCode = systemPostDtoList.get(0).getSysPostCode();
-//        List<SystemPostDto> systemPostDtoList = new ArrayList<>();
-//        SystemPostDto systemPostDto0 = new SystemPostDto();
-//        systemPostDto0.setSysPostCode("cpcpch0004");
-//        SystemPostDto systemPostDto1 = new SystemPostDto();
-//        systemPostDto1.setSysPostCode("cpcpcj0001");
-//        SystemPostDto systemPostDto2 = new SystemPostDto();
-//        systemPostDto2.setSysPostCode("cannel-manger-0003");
-//        systemPostDtoList.add(systemPostDto0);
-//        systemPostDtoList.add(systemPostDto1);
-//        systemPostDtoList.add(systemPostDto2);
+//        List<SystemPostDto> systemPostDtoList = user.getSystemPostDtoList();
+        List<SystemPostDto> systemPostDtoList = new ArrayList<>();
+        SystemPostDto systemPostDto0 = new SystemPostDto();
+        systemPostDto0.setSysPostCode("cpcpch0004");
+        SystemPostDto systemPostDto1 = new SystemPostDto();
+        systemPostDto1.setSysPostCode("cpcpcj0001");
+        SystemPostDto systemPostDto2 = new SystemPostDto();
+        systemPostDto2.setSysPostCode("cannel-manger-0003");
+        systemPostDtoList.add(systemPostDto0);
+        systemPostDtoList.add(systemPostDto1);
+        systemPostDtoList.add(systemPostDto2);
         String sysPostCode = null;
         ArrayList<String> arrayList = new ArrayList<>();
         //岗位信息查看最大权限作为岗位信息
@@ -380,7 +379,9 @@ public class OrgTreeServiceImpl extends BaseService implements OrgTreeService{
                     }
                 }
             }
-            list = organizationMapper.selectByParentId(orgId);
+//            list = organizationMapper.selectByParentId(orgId);
+            Organization organization1 = organizationMapper.selectByPrimaryKey(orgId);
+            list.add(organization1);
         }
             //超管 无父节点 查全省
         Page pageInfo = new Page(new PageInfo(list));
