@@ -551,8 +551,10 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                         //活动名称
                         resultMap.put("mktCampaignName", mktCampaignDO.getMktCampaignName());
                         //活动开始是时间和结束时间
-                        resultMap.put("beginTime", mktCampaignDO.getPlanBeginTime());
-                        resultMap.put("endTime", mktCampaignDO.getPlanEndTime());
+                        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
+                        resultMap.put("beginTime", fmt.format(mktCampaignDO.getPlanBeginTime()));
+                        resultMap.put("endTime", fmt.format(mktCampaignDO.getPlanEndTime()));
+                        resultMap.put("mktActivityBnr", mktCampaignDO.getMktActivityNbr());
                         String mktCampaignType = mktCampaignDO.getMktCampaignType();
                         //活动类型
                         if (mktCampaignType != null) {
