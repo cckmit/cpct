@@ -62,6 +62,7 @@
         <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
     </resultMap>
 
+
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from mkt_campaign
         where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
@@ -587,7 +588,7 @@
         BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MANAGE_TYPE, MKT_ACTIVITY_NBR,
         MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD,
         STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID,
-        CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE, SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID,EXEC_INIT_TIME
+        CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE, SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID,EXEC_INIT_TIME,INIT_ID
         from mkt_campaign
         where 1 = 1
         <if test="mktCampaignId != null and mktCampaignId != ''">
@@ -603,7 +604,7 @@
         </choose>
         <choose>
             <when test="mktCampaignType != null and mktCampaignType!='' and mktCampaignType !='all'">
-                AND MKT_CAMPAIGN_TYPE = #{MKT_CAMPAIGN_TYPE}
+                AND MKT_CAMPAIGN_TYPE = #{mktCampaignType}
             </when>
             <otherwise>
                 AND MKT_CAMPAIGN_TYPE IN (1000,2000,3000,4000,5000,6000)
@@ -683,5 +684,97 @@
 
     </select>
 
+    <select id="getMktCampaignDetails" parameterType="java.util.Map" resultMap="BaseResultMap">
+        SELECT
+        t.MKT_CAMPAIGN_ID,
+        t.INIT_ID,
+        t.MKT_CAMPAIGN_NAME,
+        t.CREATE_DATE,
+        t.MKT_ACTIVITY_NBR,
+        (
+        CASE t.LAN_ID
+        WHEN '570' THEN
+        '衢州'
+        WHEN '571' THEN
+        '杭州'
+        WHEN '572' THEN
+        '湖州'
+        WHEN '573' THEN
+        '嘉兴'
+        WHEN '574' THEN
+        '宁波'
+        WHEN '575' THEN
+        '绍兴'
+        WHEN '576' THEN
+        '台州'
+        WHEN '577' THEN
+        '温州'
+        WHEN '578' THEN
+        '丽水'
+        WHEN '579' THEN
+        '金华'
+        WHEN '580' THEN
+        '舟山'
+        WHEN '1' THEN
+        '浙江省'
+        END
+        ) SRC_ID
+        FROM
+        mkt_campaign t
+        LEFT JOIN trial_operation p1 ON p1.CAMPAIGN_ID = t.MKT_CAMPAIGN_ID
+        WHERE
+        t.STATUS_CD IN ('2002', '2008')
+        AND t.MKT_CAMPAIGN_TYPE NOT IN ('5000', '6000')
+        AND t.TIGGER_TYPE = #{tiggerType}
+        AND t.MKT_CAMPAIGN_NAME NOT LIKE '%测试%'
+        AND t.MKT_CAMPAIGN_NAME NOT LIKE '%模板%'
+        AND t.MKT_CAMPAIGN_NAME != ''
+        AND t.MKT_CAMPAIGN_NAME NOT LIKE '%test%'
+        AND t.MKT_CAMPAIGN_NAME NOT LIKE '%演示%'
+        AND t.MKT_CAMPAIGN_NAME NOT LIKE '%勿动%'
+        AND t.MKT_CAMPAIGN_ID NOT IN (
+        SELECT
+        p1.CAMPAIGN_ID
+        FROM
+        mkt_campaign t
+        LEFT JOIN trial_operation p1 ON p1.CAMPAIGN_ID = t.MKT_CAMPAIGN_ID
+        WHERE
+        t.STATUS_CD IN ('2002', '2008')
+        AND t.MKT_CAMPAIGN_TYPE NOT IN ('5000', '6000')
+        AND t.TIGGER_TYPE = #{tiggerType}
+        AND p1.CREATE_DATE > #{createDate}
+        AND t.MKT_CAMPAIGN_NAME NOT LIKE '%测试%'
+        AND t.MKT_CAMPAIGN_NAME NOT LIKE '%模板%'
+        AND t.MKT_CAMPAIGN_NAME != ''
+        AND t.MKT_CAMPAIGN_NAME NOT LIKE '%test%'
+        AND t.MKT_CAMPAIGN_NAME NOT LIKE '%演示%'
+        AND t.MKT_CAMPAIGN_NAME NOT LIKE '%勿动%'
+        )
+        GROUP BY
+        t.INIT_ID
+    </select>
+
+    <select id="getMktCampaignDetailsForDate" parameterType="java.util.List" resultMap="BaseResultMap">
+        SELECT
+        t.MKT_CAMPAIGN_ID,t.MKT_ACTIVITY_NBR,t.MKT_CAMPAIGN_NAME,t.CREATE_DATE
+        FROM
+        mkt_campaign t
+        WHERE
+        t.STATUS_CD in ('2002','2008') # 2002-发布状态
+        AND t.MKT_CAMPAIGN_TYPE not in ('5000','6000') # 1000-营销活动, 5000-服务活动 6000-随销活动
+        AND t.TIGGER_TYPE != '1000' # 2000-实时, 1000-批量
+        AND t.MKT_CAMPAIGN_NAME NOT LIKE '%测试%'
+        AND t.MKT_CAMPAIGN_NAME NOT LIKE '%模板%'
+        AND t.MKT_CAMPAIGN_NAME != ''
+        AND t.MKT_CAMPAIGN_NAME NOT LIKE '%test%'
+        AND t.MKT_CAMPAIGN_NAME NOT LIKE '%演示%'
+        AND t.MKT_CAMPAIGN_NAME NOT LIKE '%勿动%'
+        AND t.MKT_CAMPAIGN_ID not in
+        <foreach item="item" index="index" collection="mktCampaignId"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        ORDER BY t.CREATE_DATE DESC
+    </select>
 
 </mapper>
