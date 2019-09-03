@@ -69,6 +69,8 @@ spec:
       - name: jmx
         image: 134.108.5.132:8000/mgt/jmxtrans:v3.0
         imagePullPolicy: Always
+        nodeSelector:
+          center: bssCpct  #修改镜像所属中心标签
         volumeMounts:
         - name: tz-config
           mountPath: /etc/localtime
