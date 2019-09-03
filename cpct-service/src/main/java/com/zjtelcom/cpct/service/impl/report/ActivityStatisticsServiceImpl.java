@@ -816,12 +816,20 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             String s = DateToString(createDate.toString());
             hashMap.put("createDate",s);
         }
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
         //分页参数
         Integer page = Integer.valueOf(params.get("page").toString());
         Integer pageSize = Integer.valueOf(params.get("pageSize").toString());
         if ("1000".equals(tiggerType.toString())){
             PageHelper.startPage(page, pageSize);
             List<MktCampaignDO> mktCampaignList = mktCampaignMapper.getMktCampaignDetails(hashMap);
+            if (mktCampaignList.isEmpty()){
+                //添加时间格式
+                for (MktCampaignDO mktCampaignDO : mktCampaignList) {
+                    mktCampaignDO.setStrBeginTime(fmt.format(mktCampaignDO.getBeginTime()));
+                    mktCampaignDO.setStrEndTime(fmt.format(mktCampaignDO.getEndTime()));
+                }
+            }
             Page pageInfo = new Page(new PageInfo(mktCampaignList));
             resultMap.put("pageInfo",pageInfo);
             resultMap.put("resultMsg", mktCampaignList);
@@ -849,6 +857,13 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             logger.info("查看dubbo返回活动天数是啥！！！！！@#￥"+userList);
             PageHelper.startPage(page, pageSize);
             List<MktCampaignDO> mktCampaignList =  mktCampaignMapper.getMktCampaignDetailsForDate(userList);
+            if (mktCampaignList.isEmpty()){
+                //添加时间格式
+                for (MktCampaignDO mktCampaignDO : mktCampaignList) {
+                    mktCampaignDO.setStrBeginTime(fmt.format(mktCampaignDO.getBeginTime()));
+                    mktCampaignDO.setStrEndTime(fmt.format(mktCampaignDO.getEndTime()));
+                }
+            }
             Page pageInfo = new Page(new PageInfo(mktCampaignList));
             resultMap.put("pageInfo",pageInfo);
             resultMap.put("resultMsg", mktCampaignList);

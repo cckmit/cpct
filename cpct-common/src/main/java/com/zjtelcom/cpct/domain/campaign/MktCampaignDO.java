@@ -36,6 +36,24 @@ public class MktCampaignDO extends BaseEntity{
     private String lifeStage;
     private String extMktCampaignId;
     private String execInitTime;
+    private String strBeginTime;
+    private String strEndTime;
+
+    public String getStrBeginTime() {
+        return strBeginTime;
+    }
+
+    public void setStrBeginTime(String strBeginTime) {
+        this.strBeginTime = strBeginTime;
+    }
+
+    public String getStrEndTime() {
+        return strEndTime;
+    }
+
+    public void setStrEndTime(String strEndTime) {
+        this.strEndTime = strEndTime;
+    }
 
     public Long getInitId() {
         return initId;

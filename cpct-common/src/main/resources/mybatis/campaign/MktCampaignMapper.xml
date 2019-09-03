@@ -616,6 +616,7 @@
         <if test="lanId != null and lanId != '' and lanId != '1'">
             AND LAN_ID IN #{lanId}
         </if>
+        ORDER BY CREATE_DATE DESC
     </select>
 
 
