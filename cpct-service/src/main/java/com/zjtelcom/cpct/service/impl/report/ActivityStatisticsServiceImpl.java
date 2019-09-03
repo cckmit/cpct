@@ -826,8 +826,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             if (mktCampaignList.isEmpty()){
                 //添加时间格式
                 for (MktCampaignDO mktCampaignDO : mktCampaignList) {
-                    mktCampaignDO.setStrBeginTime(fmt.format(mktCampaignDO.getBeginTime()));
-                    mktCampaignDO.setStrEndTime(fmt.format(mktCampaignDO.getEndTime()));
+                    mktCampaignDO.setStrBeginTime(fmt.format(mktCampaignDO.getCreateDate()));
+                    mktCampaignDO.setStrEndTime(fmt.format(mktCampaignDO.getUpdateDate()));
                 }
             }
             Page pageInfo = new Page(new PageInfo(mktCampaignList));
@@ -860,8 +860,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             if (mktCampaignList.isEmpty()){
                 //添加时间格式
                 for (MktCampaignDO mktCampaignDO : mktCampaignList) {
-                    mktCampaignDO.setStrBeginTime(fmt.format(mktCampaignDO.getBeginTime()));
-                    mktCampaignDO.setStrEndTime(fmt.format(mktCampaignDO.getEndTime()));
+                    mktCampaignDO.setStrBeginTime(fmt.format(mktCampaignDO.getCreateDate()));
+                    mktCampaignDO.setStrEndTime(fmt.format(mktCampaignDO.getUpdateDate()));
                 }
             }
             Page pageInfo = new Page(new PageInfo(mktCampaignList));
