@@ -60,6 +60,8 @@ public class OpenMktCampaignEntity {
     private List<OpenMktCampaignRelEntity> mktCampaignRels;
     //事件触发活动规则
     private List<OpenEvtTrigCamRulEntity> evtTrigCamRuls;
+    //营服活动校验规则
+    private List<OpenMktCamCheckruleEntity> mktCamCheckrules;
 
     private List<OpenEvent> mktCampaignEvts;
 
@@ -389,5 +391,13 @@ public class OpenMktCampaignEntity {
 
     public void setEvtTrigCamRuls(List<OpenEvtTrigCamRulEntity> evtTrigCamRuls) {
         this.evtTrigCamRuls = evtTrigCamRuls;
+    }
+
+    public List<OpenMktCamCheckruleEntity> getMktCamCheckrules() {
+        return mktCamCheckrules;
+    }
+
+    public void setMktCamCheckrules(List<OpenMktCamCheckruleEntity> mktCamCheckrules) {
+        this.mktCamCheckrules = mktCamCheckrules;
     }
 }
