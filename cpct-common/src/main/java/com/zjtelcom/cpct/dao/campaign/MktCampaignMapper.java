@@ -9,10 +9,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Description:
@@ -63,4 +60,7 @@ public interface MktCampaignMapper {
 
     List<MktCampaignDO> queryRptBatchOrderForMktCampaign(HashMap<String, Object> paramMap);
 
+    List<MktCampaignDO> getMktCampaignDetails(HashMap<String, Object> hashMap);
+
+    List<MktCampaignDO> getMktCampaignDetailsForDate(@Param("mktCampaignId")List<String> s);
 }
