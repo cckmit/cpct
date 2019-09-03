@@ -283,11 +283,12 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             paramMap.put("resultCode", CODE_FAIL);
             return paramMap;
         }
-        if ((mktCampaignName != null && mktCampaignName == "") && (mktCampaignId != null && mktCampaignId == "")) {
+        if (mktCampaignId != null && mktCampaignId != "") {
             paramMap.put("mktCampaignId", mktCampaignId);
         }
-        paramMap.put("mktCampaignName", mktCampaignName);
-        paramMap.put("mktCampaignId", mktCampaignId);
+        if ((mktCampaignName != null && mktCampaignName != "") && (mktCampaignId == null && mktCampaignId == "")) {
+            paramMap.put("mktCampaignName", mktCampaignName);
+        }
         //统计日期 必填字段
         Object endDate = params.get("endDate");
         if (endDate != null && endDate != "") {
@@ -402,13 +403,15 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         //活动ID
         Object mktCampaignId = params.get("mktCampaignId");
         if ((mktCampaignName == null || mktCampaignName == "") && (mktCampaignId == null || mktCampaignId == "")) {
+            paramMap.put("resultCode", CODE_FAIL);
             return paramMap;
         }
-        if ((mktCampaignName != null && mktCampaignName == "") && (mktCampaignId != null && mktCampaignId == "")) {
+        if (mktCampaignId != null && mktCampaignId != "") {
             paramMap.put("mktCampaignId", mktCampaignId);
         }
-        paramMap.put("mktCampaignName", mktCampaignName);
-        paramMap.put("mktCampaignId", mktCampaignId);
+        if ((mktCampaignName != null && mktCampaignName != "") && (mktCampaignId == null && mktCampaignId == "")) {
+            paramMap.put("mktCampaignName", mktCampaignName);
+        }
         //统计日期 必填字段
         Object endDate = params.get("endDate");
         if (endDate != null && endDate != "") {
