@@ -681,7 +681,7 @@ public class EventApiServiceImpl implements EventApiService {
                     result.put("taskList", activityList);
 
                     paramsJson.put("backParams", result);
-                    esHitService.save(paramsJson, IndexList.PARAMS_MODULE);
+                    esHitService.save(paramsJson, IndexList.PARAMS_MODULE, map.get("reqId"));
 
                     log.info("事件计算流程结束:" + map.get("eventCode") + "***" + map.get("reqId") + "（" + (System.currentTimeMillis() - begin) + "）");
 
@@ -1099,7 +1099,7 @@ public class EventApiServiceImpl implements EventApiService {
                 result.put("custId", custId);
 
                 paramsJson.put("backParams", result);
-                esHitService.save(paramsJson, IndexList.PARAMS_MODULE);
+                esHitService.save(paramsJson, IndexList.PARAMS_MODULE, map.get("reqId"));
 
                 //es log
                 long cost = System.currentTimeMillis() - begin;
@@ -1110,8 +1110,8 @@ public class EventApiServiceImpl implements EventApiService {
             } catch (Exception e) {
                 log.info("策略中心计算异常");
                 log.error("Exception = ", e);
-                paramsJson.put("errorMsg", e.getMessage());
-                esHitService.save(paramsJson, IndexList.PARAMS_MODULE);
+                esJson.put("errorMsg", e.getMessage());
+                esHitService.save(paramsJson, IndexList.PARAMS_MODULE, map.get("reqId"));
 
                 long cost = System.currentTimeMillis() - begin;
                 esJson.put("timeCost", cost);
