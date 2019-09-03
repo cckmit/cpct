@@ -17,6 +17,7 @@ import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.enums.AreaCodeEnum;
 import com.zjtelcom.cpct.enums.ORG2RegionId;
 import com.zjtelcom.cpct.exception.SystemException;
+import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.org.OrgTreeService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.FtpUtils;
@@ -39,7 +40,7 @@ import java.util.*;
  */
 @Service
 @Transactional
-public class OrgTreeServiceImpl implements OrgTreeService{
+public class OrgTreeServiceImpl extends BaseService implements OrgTreeService{
 
     @Autowired
     private OrgTreeMapper orgTreeMapper;
@@ -312,7 +313,6 @@ public class OrgTreeServiceImpl implements OrgTreeService{
         List<Map<String, Object>> staffOrgId = organizationMapper.getStaffOrgId(staffId);
         //组织树控制权限
         List<SystemPostDto> systemPostDtoList = user.getSystemPostDtoList();
-        String sysPostCode = systemPostDtoList.get(0).getSysPostCode();
 //        List<SystemPostDto> systemPostDtoList = new ArrayList<>();
 //        SystemPostDto systemPostDto0 = new SystemPostDto();
 //        systemPostDto0.setSysPostCode("cpcpch0004");
@@ -323,9 +323,8 @@ public class OrgTreeServiceImpl implements OrgTreeService{
 //        systemPostDtoList.add(systemPostDto0);
 //        systemPostDtoList.add(systemPostDto1);
 //        systemPostDtoList.add(systemPostDto2);
-//        String sysPostCode = null;
+        String sysPostCode = null;
         ArrayList<String> arrayList = new ArrayList<>();
-//        String sysPostCode = "C3";
         //岗位信息查看最大权限作为岗位信息
         if (systemPostDtoList.size()>0 && systemPostDtoList!=null){
             for (SystemPostDto systemPostDto : systemPostDtoList) {
@@ -345,22 +344,23 @@ public class OrgTreeServiceImpl implements OrgTreeService{
         }else {
             sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
         }
-
+        logger.info("岗位到底选着什么级别展示++++++:"+sysPostCode);
         //有父节点的情况
         if (areaList!=null && areaList.size()>0){
             list = organizationMapper.selectByParentId(Long.valueOf(areaList.get(0)));
            // 超管 省管 c1 c2
-        }else if ((AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea()).equals(sysPostCode) ||
-                AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea().equals(sysPostCode) && areaList==null){
+        }else if (AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea().equals(sysPostCode) ||
+                AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea().equals(sysPostCode) && areaList.isEmpty()){
             list = organizationMapper.selectMenu();
             // 分公司 C3 权限 支局 C4 分局 C5
         }else if (AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea().equals(sysPostCode)  ||
                 AreaCodeEnum.sysAreaCode.FENGJU.getSysArea().equals(sysPostCode) ||
-                AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea().equals(sysPostCode) && areaList==null) {
+                AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea().equals(sysPostCode) && areaList.isEmpty()) {
             if (!staffOrgId.isEmpty() && staffOrgId.size() > 0) {
                 for (Map<String, Object> map : staffOrgId) {
                     Object orgDivision = map.get("orgDivision");
                     Object orgId1 = map.get("ORG_NAME_"+sysPostCode);
+                    logger.info("查看！@# + + + orgId1"+orgId1);
                     if (orgId1 == null || "" == orgId1){
                         orgId = Long.valueOf(map.get("orgId").toString());
                         break;
@@ -379,7 +379,10 @@ public class OrgTreeServiceImpl implements OrgTreeService{
                     }
                 }
             }
-            list = organizationMapper.selectByParentId(orgId);
+//            list = organizationMapper.selectByParentId(orgId);
+            //收缩展示父节点
+            Organization organization1 = organizationMapper.selectByPrimaryKey(orgId);
+            list.add(organization1);
         }
             //超管 无父节点 查全省
         Page pageInfo = new Page(new PageInfo(list));

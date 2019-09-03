@@ -604,7 +604,7 @@
         </choose>
         <choose>
             <when test="mktCampaignType != null and mktCampaignType!='' and mktCampaignType !='all'">
-                AND MKT_CAMPAIGN_TYPE = #{MKT_CAMPAIGN_TYPE}
+                AND MKT_CAMPAIGN_TYPE = #{mktCampaignType}
             </when>
             <otherwise>
                 AND MKT_CAMPAIGN_TYPE IN (1000,2000,3000,4000,5000,6000)
