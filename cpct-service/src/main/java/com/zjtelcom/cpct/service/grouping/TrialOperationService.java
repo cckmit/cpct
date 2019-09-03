@@ -40,5 +40,7 @@ public interface TrialOperationService  {
 
     Map<String,Object> showCalculationLog(Long id);
 
+    Map<String,Object> importUserList4File(MultipartFile multipartFile);
+
 
 }

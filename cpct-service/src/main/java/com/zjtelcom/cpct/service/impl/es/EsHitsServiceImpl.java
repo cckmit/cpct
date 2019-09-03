@@ -13,6 +13,7 @@ import com.zjtelcom.cpct.service.es.EsHitsService;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHits;
@@ -52,6 +53,33 @@ public class EsHitsServiceImpl implements EsHitsService {
 
     @Autowired(required = false)
     private MqProducerService mqProducerService;
+
+    @Override
+    public List<Map<String, Object> >search(List<String> assetList) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder.must(QueryBuilders.termsQuery("ASSET_INTEG_ID.keyword", assetList));
+        String[] fields = new String[2];
+        fields[0] = "ASSET_INTEG_ID";
+        fields[1] = "AREA_ID";
+
+        SearchRequestBuilder builder = client.prepareSearch("asset*_20190902190742").setTypes(esType);
+
+        SearchResponse myresponse = builder.setQuery(boolQueryBuilder).setScroll(new TimeValue(60000)).setFetchSource(fields, null)
+                .setSize(10000).setExplain(false).execute().actionGet();
+        do {
+            SearchHits hits = myresponse.getHits();
+            for (int j = 0; j < hits.getHits().length; j++) {
+                Map<String, Object> stringMap = hits.getHits()[j].getSourceAsMap();
+                result.add(stringMap);
+            }
+            myresponse = client.prepareSearchScroll(myresponse.getScrollId())
+                    .setScroll(new TimeValue(60000))
+                    .execute()
+                    .actionGet();
+        } while (myresponse.getHits().getHits().length != 0);
+        return result;
+    }
 
     @Override
     public void add() throws Exception {

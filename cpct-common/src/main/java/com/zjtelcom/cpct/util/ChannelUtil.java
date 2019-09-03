@@ -14,11 +14,41 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
 
 @Component
 public class ChannelUtil  {
+
+    /**
+     * 向文件中写入内容
+     *
+     * @param filepath 文件路径与名称
+     * @param newstr   写入的内容
+     * @return
+     * @throws IOException
+     */
+    public boolean writeFileContent(String filepath, String newstr) throws IOException {
+        File file = new File(filepath);
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+        try {
+            fw = new FileWriter(file, true);
+            bw = new BufferedWriter(fw);
+            bw.write(newstr);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            bw.close();
+            fw.close();
+        }
+        return true;
+    }
+
 
     public static boolean equalsList(List<Long> list1, List<Long> list2){
         // null情况

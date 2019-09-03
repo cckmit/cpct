@@ -9,6 +9,7 @@ import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.campaign.MktCampaign;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
+import com.zjtelcom.cpct.dubbo.service.MktCampaignApiService;
 import com.zjtelcom.cpct.dubbo.service.MktCampaignSyncApiService;
 import com.zjtelcom.cpct.dubbo.service.TrialRedisService;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
@@ -44,7 +45,21 @@ public class EventApiTestController {
     private MktCamEvtRelMapper evtRelMapper;
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired
+    private MktCampaignApiService mktCampaignApiService;
 
+
+    @PostMapping("copyMktCampaign")
+    public  Map<String,Object> copyMktCampaign(@RequestBody HashMap<String,String> key) {
+        Map<String,Object> result = new HashMap<>();
+        List<MktCampaignDO> campaigns = new ArrayList<>();
+        try {
+            result =  mktCampaignApiService.copyMktCampaign(Long.valueOf(key.get("campaignId")));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
     @PostMapping("test")
     public  Map<String,String> test(@RequestBody HashMap<String,String> key) {
         Map<String,String> result = new HashMap<>();

@@ -4,19 +4,27 @@ package com.zjtelcom.cpct.controller.grouping;
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
+import com.zjtelcom.cpct.dto.filter.FilterRuleVO;
 import com.zjtelcom.cpct.dto.grouping.TrialOperationVO;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.grouping.TrialProdService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import org.apache.ibatis.annotations.Param;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
@@ -159,6 +167,27 @@ public class TrialOperationController extends BaseController {
     /**
      * 客户清单导入试运算
      * @param file
+     * @return
+     * @throws IOException
+     */
+    @PostMapping("importUserList4File")
+    @CrossOrigin
+    public Map<String, Object> importUserList4File(MultipartFile file, HSSFWorkbook workBook, HttpServletRequest request, HttpServletResponse response)throws IOException{
+        Map<String, Object> result = new HashMap<>();
+        try {
+           result = operationService.importUserList4File(file);
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to importUserList", e);
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "客户清单导入失败！");
+            return result;
+        }
+        return result;
+    }
+
+    /**
+     * 客户清单导入试运算
+     * @param file
      * @param operation
      * @param ruleId
      * @return
@@ -178,8 +207,8 @@ public class TrialOperationController extends BaseController {
                 result.put("resultCode", CODE_FAIL);
                 result.put("resultMsg", "文件格式不正确");
                 return result;
-            }
-            result = operationService.importUserList(file,operation,ruleId);
+            }result = operationService.importUserList(file,operation,ruleId);
+
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to importUserList", e);
             result.put("resultCode", CODE_FAIL);
