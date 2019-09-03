@@ -283,11 +283,14 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             paramMap.put("resultCode", CODE_FAIL);
             return paramMap;
         }
-        if (mktCampaignId != null && mktCampaignId != "") {
+        if ((mktCampaignId != null && mktCampaignId != "") && (mktCampaignName != null || mktCampaignName != "")) {
             paramMap.put("mktCampaignId", mktCampaignId);
         }
-        if ((mktCampaignName != null && mktCampaignName != "") && (mktCampaignId == null && mktCampaignId == "")) {
+        if ((mktCampaignName != null || mktCampaignName != "") && (mktCampaignId == null || mktCampaignId == "")) {
             paramMap.put("mktCampaignName", mktCampaignName);
+        }
+        if ((mktCampaignId != null && mktCampaignId != "") && (mktCampaignName == null || mktCampaignName == "")) {
+            paramMap.put("mktCampaignId", mktCampaignId);
         }
         //统计日期 必填字段
         Object endDate = params.get("endDate");
@@ -386,7 +389,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             stringObjectMap = addParams(stringObjectMap, page, pageSize);
         } else {
             stringObjectMap.put("resultCode", CODE_FAIL);
-            stringObjectMap.put("resultMsg", "查询无结果（（9 . 9））");
+            stringObjectMap.put("resultMsg", "查询无结果 queryRptEventOrder error");
         }
         return stringObjectMap;
     }
@@ -406,11 +409,14 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             paramMap.put("resultCode", CODE_FAIL);
             return paramMap;
         }
-        if (mktCampaignId != null && mktCampaignId != "") {
+        if ((mktCampaignId != null && mktCampaignId != "") && (mktCampaignName != null || mktCampaignName != "")) {
             paramMap.put("mktCampaignId", mktCampaignId);
         }
-        if ((mktCampaignName != null && mktCampaignName != "") && (mktCampaignId == null && mktCampaignId == "")) {
+        if ((mktCampaignName != null || mktCampaignName != "") && (mktCampaignId == null || mktCampaignId == "")) {
             paramMap.put("mktCampaignName", mktCampaignName);
+        }
+        if ((mktCampaignId != null && mktCampaignId != "") && (mktCampaignName == null || mktCampaignName == "")) {
+            paramMap.put("mktCampaignId", mktCampaignId);
         }
         //统计日期 必填字段
         Object endDate = params.get("endDate");
@@ -521,7 +527,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             stringObjectMap = addParams(stringObjectMap, page, pageSize);
         } else {
             stringObjectMap.put("resultCode", CODE_FAIL);
-            stringObjectMap.put("resultMsg", "查询无结果（（0 . 0））");
+            stringObjectMap.put("resultMsg", "查询无结果 queryRptBatchOrder error ");
         }
         return stringObjectMap;
     }
@@ -826,14 +832,15 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         if ("1000".equals(tiggerType.toString())){
             PageHelper.startPage(page, pageSize);
             List<MktCampaignDO> mktCampaignList = mktCampaignMapper.getMktCampaignDetails(hashMap);
-            if (mktCampaignList.isEmpty()){
+            Page pageInfo = new Page(new PageInfo(mktCampaignList));
+            if (!mktCampaignList.isEmpty()){
                 //添加时间格式
                 for (MktCampaignDO mktCampaignDO : mktCampaignList) {
-                    mktCampaignDO.setStrBeginTime(fmt.format(mktCampaignDO.getCreateDate()));
-                    mktCampaignDO.setStrEndTime(fmt.format(mktCampaignDO.getUpdateDate()));
+                    if (mktCampaignDO.getCreateDate()!=null){
+                        mktCampaignDO.setStrBeginTime(fmt.format(mktCampaignDO.getCreateDate()));
+                    }
                 }
             }
-            Page pageInfo = new Page(new PageInfo(mktCampaignList));
             resultMap.put("pageInfo",pageInfo);
             resultMap.put("resultMsg", mktCampaignList);
             resultMap.put("resultCode", CODE_SUCCESS);
@@ -860,14 +867,15 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             logger.info("查看dubbo返回活动天数是啥！！！！！@#￥"+userList);
             PageHelper.startPage(page, pageSize);
             List<MktCampaignDO> mktCampaignList =  mktCampaignMapper.getMktCampaignDetailsForDate(userList);
-            if (mktCampaignList.isEmpty()){
+            Page pageInfo = new Page(new PageInfo(mktCampaignList));
+            if (!mktCampaignList.isEmpty()){
                 //添加时间格式
                 for (MktCampaignDO mktCampaignDO : mktCampaignList) {
-                    mktCampaignDO.setStrBeginTime(fmt.format(mktCampaignDO.getCreateDate()));
-                    mktCampaignDO.setStrEndTime(fmt.format(mktCampaignDO.getUpdateDate()));
+                    if (mktCampaignDO.getCreateDate()!=null){
+                        mktCampaignDO.setStrBeginTime(fmt.format(mktCampaignDO.getCreateDate()));
+                    }
                 }
             }
-            Page pageInfo = new Page(new PageInfo(mktCampaignList));
             resultMap.put("pageInfo",pageInfo);
             resultMap.put("resultMsg", mktCampaignList);
             resultMap.put("resultCode", CODE_SUCCESS);
