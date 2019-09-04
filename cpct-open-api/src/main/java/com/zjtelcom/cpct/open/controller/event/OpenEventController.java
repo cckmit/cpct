@@ -46,7 +46,7 @@ public class OpenEventController extends BaseController{
     @CrossOrigin
     @RequestMapping(value = "/event", method = RequestMethod.POST)
     public String saveEvent(@RequestBody Map<String,Object> param, HttpServletResponse response) {
-        logger.info("新增事件入参：",param);
+        logger.info("新增事件入参：" + param);
         CreateEvtJtReq requestObject = JSON.parseObject(JSON.toJSONString(param.get("requestObject")),CreateEvtJtReq.class);
         Map<String, Object> eventMap = openEventService.addByObject(requestObject);
         response.setStatus(HttpStatus.SC_CREATED);
