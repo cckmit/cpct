@@ -2,6 +2,8 @@ package com.zjtelcom.cpct.service.impl.filter;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSON;
+import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
+import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
@@ -510,6 +512,56 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", "导入成功，文件导入" + sheet.getLastRowNum() + "个，共计" + total + "个");
+        return maps;
+    }
+
+    @Override
+    public Map<String, Object> qryCloseRuleForUser(CloseRuleReq closeRuleReq) {
+        Map<String, Object> map = new HashMap<>();
+        //获取用户信息
+        SystemUserDto user = BssSessionHelp.getSystemUserDto();
+        Long staffId = user.getStaffId();
+//        Long staffId = 1000033L;
+        //过滤参数设置
+        map.put("staffId",staffId);
+        if (StringUtils.isNotBlank(closeRuleReq.getCloseRule().getCloseName())){
+            map.put("closeName",closeRuleReq.getCloseRule().getCloseName());
+        }
+        if (StringUtils.isNotBlank(closeRuleReq.getCloseRule().getCloseType())){
+            map.put("closeType",closeRuleReq.getCloseRule().getCloseType());
+        }
+        //分页参数设置
+        Page pageInfo = closeRuleReq.getPageInfo();
+        PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
+        List<CloseRule> closeRules = closeRuleMapper.qryCloseRuleForUser(map);
+        Page page = new Page(new PageInfo(closeRules));
+        Map<String, Object> maps = new HashMap<>();
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("closeRules", closeRules);
+        maps.put("pageInfo",page);
+        return maps;
+    }
+
+    @Override
+    public Map<String, Object> getCloseRuleOut(CloseRuleReq closeRuleReq) {
+        Map<String, Object> maps = new HashMap<>();
+        Page pageInfo = closeRuleReq.getPageInfo();
+        if (StringUtils.isNotBlank(closeRuleReq.getCloseRule().getCloseType())
+                && (closeRuleReq.getCloseRule().getCloseType().equals("1000")
+                || closeRuleReq.getCloseRule().getCloseType().equals("3000"))){
+            maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+            maps.put("resultMsg", " 不接受~~欠费关单规则和拆机关单规则");
+            maps.put("closeRules", new ArrayList<Object>());
+            return maps;
+        }
+        PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
+        List<CloseRule> closeRules = closeRuleMapper.getCloseRuleOut(closeRuleReq.getCloseRule());
+        Page page = new Page(new PageInfo(closeRules));
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("closeRules", closeRules);
+        maps.put("pageInfo",page);
         return maps;
     }
 }
