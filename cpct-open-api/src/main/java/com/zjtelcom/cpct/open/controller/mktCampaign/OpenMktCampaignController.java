@@ -54,6 +54,7 @@ public class OpenMktCampaignController extends BaseController {
     @CrossOrigin
     @RequestMapping(value = "/mktCampaign", method = RequestMethod.POST)
     public String saveMktCampaign(@RequestBody Map<String,Object> param, HttpServletResponse response) {
+        logger.info("新增营服活动入参：",param);
         CreateMktCampaignReq requestObject = JSON.parseObject(JSON.toJSONString(param.get("requestObject")),CreateMktCampaignReq.class);
         Map<String, Object> resultMap = openMktCampaignService.addByObject(requestObject);
         response.setStatus(HttpStatus.SC_CREATED);

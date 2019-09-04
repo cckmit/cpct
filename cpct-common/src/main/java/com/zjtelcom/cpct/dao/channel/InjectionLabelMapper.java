@@ -65,4 +65,6 @@ public interface InjectionLabelMapper{
 
     Map<String, Object> selectDistributeLabelByCode(@Param("labelCode")String labelCode);
 
+    List<Label> selectByTagCode(@Param("labTagCode") String labTagCode);
+
 }

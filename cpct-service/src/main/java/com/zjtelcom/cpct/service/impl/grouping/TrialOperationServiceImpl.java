@@ -201,8 +201,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(createStaff, new ArrayList<Long>());
             if (systemUserDtoSysmgrResultObject != null) {
                 if (systemUserDtoSysmgrResultObject.getResultObject() != null) {
+                    /*codeNumber = systemUserDtoSysmgrResultObject.getResultObject().getStaffCode();
+                    codeNumber = codeNumber + "&&" + systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
+                    codeNumber = codeNumber + "&&" + systemUserDtoSysmgrResultObject.getResultObject().getStaffName();*/
                     codeNumber = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
-                    codeNumber = codeNumber+"&&"+systemUserDtoSysmgrResultObject.getResultObject().getStaffName();
                 }
             }
         }catch (Exception e){

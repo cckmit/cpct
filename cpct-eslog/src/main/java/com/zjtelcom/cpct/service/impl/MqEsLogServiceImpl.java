@@ -118,7 +118,7 @@ public class MqEsLogServiceImpl implements MqEsLogService, InitializingBean, Dis
                                 String s = ElasticsearchUtil.addData(JSONObject.parseObject(esLogResult), index, esType,id);
                             }
 
-                            logger.info("下拉成功转添加esLog日志 索引名称："+index+",id ；" + id);
+                            //logger.info("下拉成功转添加esLog日志 索引名称："+index+",id ；" + id);
                         }
                         return ConsumerTopicStatus.CONSUME_SUCCESS;
                     } catch (Exception e) {
