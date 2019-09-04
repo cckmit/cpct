@@ -954,7 +954,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                     record.setRemark("清单导入数据错误");
                                     int i = trialOperationMapper.updateByPrimaryKey(record);
                                     throw new RuntimeException("导入清单第" + (j + 1) + "行接单人无数据");
-                                } else {
+                                }
+                                if (!flag2) {
                                     addLog2Es(batchNumSt, "导入清单缺少接单人必填列");
                                     TrialOperation record = new TrialOperation();
                                     record.setId(Long.valueOf(insertId));
