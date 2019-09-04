@@ -2472,6 +2472,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         } else {
             cityCountMap = cityLineCount(paramMap, Integer.valueOf(lanId), AreaNameEnum.getNameByLandId(Long.valueOf(lanId)));
         }
+
+        List<Map<String, Object>> cityDataList = new ArrayList<>();
         List<Map<String, Object>> cityMapList = new ArrayList<>();
 
         int total = 0;
@@ -2490,36 +2492,131 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
             }
             //排序
-            Collections.sort(cityMapList, new Comparator<Map<String, Object>>() {
+          /*  Collections.sort(cityMapList, new Comparator<Map<String, Object>>() {
                 @Override
                 public int compare(Map<String, Object> o1, Map<String, Object> o2) {
                     Integer count1 = (Integer) o1.get("count");
                     Integer count2 = (Integer) o2.get("count");
                     return count2.compareTo(count1);
                 }
-            });
+            });*/
+            for (Map<String, Object> cityMap : cityMapList) {
+               Long areaId = Long.valueOf((Integer) cityMap.get("lanId"));
+                if(AreaCodeEnum.ZHEJIAGN.getLanId().equals(areaId)){
+                    cityDataList.add(cityMap);
+                    cityMapList.remove(cityMap);
+                    break;
+                }
+            }
+            for (Map<String, Object> cityMap : cityMapList) {
+                Long areaId = Long.valueOf((Integer) cityMap.get("lanId"));
+                if(AreaCodeEnum.HAGNZHOU.getLanId().equals(areaId)){
+                    cityDataList.add(cityMap);
+                    cityMapList.remove(cityMap);
+                    break;
+                }
+            }
+            for (Map<String, Object> cityMap : cityMapList) {
+                Long areaId = Long.valueOf((Integer) cityMap.get("lanId"));
+                if(AreaCodeEnum.NINGBO.getLanId().equals(areaId)){
+                    cityDataList.add(cityMap);
+                    cityMapList.remove(cityMap);
+                    break;
+                }
+            }
+            for (Map<String, Object> cityMap : cityMapList) {
+                Long areaId = Long.valueOf((Integer) cityMap.get("lanId"));
+                if(AreaCodeEnum.WENZHOU.getLanId().equals(areaId)){
+                    cityDataList.add(cityMap);
+                    cityMapList.remove(cityMap);
+                    break;
+                }
+            }
+            for (Map<String, Object> cityMap : cityMapList) {
+                Long areaId = Long.valueOf((Integer) cityMap.get("lanId"));
+                if(AreaCodeEnum.TAIZHOU.getLanId().equals(areaId)){
+                    cityDataList.add(cityMap);
+                    cityMapList.remove(cityMap);
+                    break;
+                }
+            }
+            for (Map<String, Object> cityMap : cityMapList) {
+                Long areaId = Long.valueOf((Integer) cityMap.get("lanId"));
+                if(AreaCodeEnum.SHAOXING.getLanId().equals(areaId)){
+                    cityDataList.add(cityMap);
+                    cityMapList.remove(cityMap);
+                    break;
+                }
+            }
+            for (Map<String, Object> cityMap : cityMapList) {
+                Long areaId = Long.valueOf((Integer) cityMap.get("lanId"));
+                if(AreaCodeEnum.JINHUA.getLanId().equals(areaId)){
+                    cityDataList.add(cityMap);
+                    cityMapList.remove(cityMap);
+                    break;
+                }
+            }
+            for (Map<String, Object> cityMap : cityMapList) {
+                Long areaId = Long.valueOf((Integer) cityMap.get("lanId"));
+                if(AreaCodeEnum.JIAXING.getLanId().equals(areaId)){
+                    cityDataList.add(cityMap);
+                    cityMapList.remove(cityMap);
+                    break;
+                }
+            }
+            for (Map<String, Object> cityMap : cityMapList) {
+                Long areaId = Long.valueOf((Integer) cityMap.get("lanId"));
+                if(AreaCodeEnum.HUZHOU.getLanId().equals(areaId)){
+                    cityDataList.add(cityMap);
+                    cityMapList.remove(cityMap);
+                    break;
+                }
+            }
+            for (Map<String, Object> cityMap : cityMapList) {
+                Long areaId = Long.valueOf((Integer) cityMap.get("lanId"));
+                if(AreaCodeEnum.QUZHOU.getLanId().equals(areaId)){
+                    cityDataList.add(cityMap);
+                    cityMapList.remove(cityMap);
+                    break;
+                }
+            }
+            for (Map<String, Object> cityMap : cityMapList) {
+                Long areaId = Long.valueOf((Integer) cityMap.get("lanId"));
+                if(AreaCodeEnum.LISHUI.getLanId().equals(areaId)){
+                    cityDataList.add(cityMap);
+                    cityMapList.remove(cityMap);
+                    break;
+                }
+            }
+            for (Map<String, Object> cityMap : cityMapList) {
+                Long areaId = Long.valueOf((Integer) cityMap.get("lanId"));
+                if(AreaCodeEnum.ZHOUSHAN.getLanId().equals(areaId)){
+                    cityDataList.add(cityMap);
+                    cityMapList.remove(cityMap);
+                    break;
+                }
+            }
+
         } else {
-            cityMapList.add(cityCountMap);
+            cityDataList.add(cityCountMap);
         }
-
-
 
 
         Map<String, Object> cityDataMap = new HashMap<>();
         Map<String, Object> tableDataMap = new HashMap<>();
         if("(1000, 2000, 3000, 4000)".equals(paramMap.get("mktCampaignType").toString())){
             cityDataMap.put("name", "营销活动");
-            cityDataMap.put("cityDataList", cityMapList);
+            cityDataMap.put("cityDataList", cityDataList);
             tableDataMap.put("name", "营销活动");
             tableDataMap.put("tableDateList", tableDateList);
         } else if("(5000, 6000)".equals(paramMap.get("mktCampaignType").toString())){
             cityDataMap.put("name", "服务活动");
-            cityDataMap.put("cityDataList", cityMapList);
+            cityDataMap.put("cityDataList", cityDataList);
             tableDataMap.put("name", "服务活动");
             tableDataMap.put("tableDateList", tableDateList);
         } else {
             cityDataMap.put("name", "全部活动");
-            cityDataMap.put("cityDataList", cityMapList);
+            cityDataMap.put("cityDataList", cityDataList);
             tableDataMap.put("name", "全部活动");
             tableDataMap.put("tableDateList", tableDateList);
         }
