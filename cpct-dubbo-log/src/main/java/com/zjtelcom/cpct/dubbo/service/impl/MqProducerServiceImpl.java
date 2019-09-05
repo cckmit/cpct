@@ -9,6 +9,7 @@ import com.ctg.mq.api.bean.MQSendResult;
 import com.ctg.mq.api.bean.MQSendStatus;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.dubbo.service.MqProducerService;
+import com.zjtelcom.cpct.util.RedisUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -70,6 +71,9 @@ public class MqProducerServiceImpl implements MqProducerService, InitializingBea
     @Autowired
     private SysParamsMapper sysParamsMapper;
 
+    @Autowired
+    private RedisUtils redisUtils;
+
 
     private int esLogConnect;
     private IMQProducer esLogProducer;
@@ -112,9 +116,15 @@ public class MqProducerServiceImpl implements MqProducerService, InitializingBea
         try {
             if (esLogConnect == 0 && msgBody != null) {
                 String prodFilter = "0";
-                List<Map<String, String>> sysFilList = sysParamsMapper.listParamsByKey("SYSYTEM_ESLOG_STATUS");
-                if (sysFilList != null && !sysFilList.isEmpty()) {
-                    prodFilter = sysFilList.get(0).get("value");
+                Object status = redisUtils.get("SYSYTEM_ESLOG_STATUS");
+                if (status != null) {
+                    prodFilter = status.toString();
+                }else {
+                    List<Map<String, String>> sysFilList = sysParamsMapper.listParamsByKey("SYSYTEM_ESLOG_STATUS");
+                    if (sysFilList != null && !sysFilList.isEmpty()) {
+                        prodFilter = sysFilList.get(0).get("value");
+                        redisUtils.set("SYSYTEM_ESLOG_STATUS", prodFilter);
+                    }
                 }
                 if (prodFilter.equals("1")) {
                     MQMessage message = new MQMessage(topic, key, tag, null);
