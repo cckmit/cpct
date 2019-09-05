@@ -56,6 +56,13 @@ public class ActivityStatisticsController extends BaseController {
         return JSON.toJSONString(maps);
     }
 
+    /**
+     *  营销活动获取渠道信息
+     *  //实时（随销） 5,6 问正义
+     *  // 批量（派单） 4,5 问正义
+     * @param params
+     * @return
+     */
     @PostMapping("/getChannel")
     @CrossOrigin
     public Map<String,Object> getChannel(@RequestBody Map<String, Object> params){
@@ -110,6 +117,13 @@ public class ActivityStatisticsController extends BaseController {
             return map;
         }
         return map;
+    }
+
+
+    @PostMapping("/getMktCampaignDetails")
+    @CrossOrigin
+    public Map<String,Object> getMktCampaignDetails(@RequestBody Map<String, Object> params){
+        return activityStatisticsService.getMktCampaignDetails(params);
     }
 
 }

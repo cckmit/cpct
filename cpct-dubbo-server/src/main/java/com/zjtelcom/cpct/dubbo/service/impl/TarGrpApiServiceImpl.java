@@ -17,6 +17,7 @@ import com.zjtelcom.cpct.dubbo.service.TarGrpApiService;
 
 import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.elastic.service.EsHitService;
+import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -40,7 +41,7 @@ public class TarGrpApiServiceImpl implements TarGrpApiService {
     private YzServ yzServ; //因子实时查询dubbo服务
 
     @Autowired
-    private EsHitService esHitService;  //es存储
+    private EsHitsService esHitService;  //es存储
 
     @Autowired
     private RedisUtils redisUtils;  // redis方法

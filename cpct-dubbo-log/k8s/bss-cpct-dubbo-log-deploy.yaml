@@ -1,9 +1,9 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: bss-cpct-web #这里修改
+  name: bss-cpct-dubbo-log #这里修改
   labels:
-    name: bss-cpct-web  #这里修改
+    name: bss-cpct-dubbo-log  #这里修改
 spec:
   replicas: 1
   strategy:
@@ -15,11 +15,11 @@ spec:
   template:
     metadata:
       labels:
-        name: bss-cpct-web  #这里修改
+        name: bss-cpct-dubbo-log #这里修改
     spec:
       containers:
-      - name: bss-cpct-web  #这里修改
-        image: 134.96.180.23:8001/hchc/bss-cpct-web:1.0  #这里修改  地址使用这个么？
+      - name: bss-cpct-dubbo-log  #这里修改
+        image: 134.96.180.23:8001/hchc/bss-cpct-dubbo-log:1.0  #这里修改  地址使用这个么？
         imagePullPolicy: Always
         lifecycle:     #处理dubbo没有取消注册问题
           preStop:
@@ -29,12 +29,12 @@ spec:
                 - "/app/project/unregister.sh"
                 - "30007"
         env:
-        - name: DUBBO_IP_TO_REGISTRY     # 当项目为对外项目时，此处注解取消
-          valueFrom:
-           fieldRef:
-            fieldPath: status.hostIP
-        - name: DUBBO_PORT_TO_REGISTRY
-          value: "30801"
+#        - name: DUBBO_IP_TO_REGISTRY     # 当项目为对外项目时，此处注解取消
+#          valueFrom:
+#           fieldRef:
+#            fieldPath: status.hostIP
+#        - name: DUBBO_PORT_TO_REGISTRY
+#          value: "30828"
         - name: ESB_UNREGISTER_URI
           valueFrom:
             configMapKeyRef:
@@ -48,12 +48,12 @@ spec:
         - name: tz-config
           mountPath: /etc/localtime
         - name: app-log
-          mountPath: /app/logs
+          mountPath: /app/dubbo/logs
         ports:
-        - containerPort: 30801    #修改端口号
+        - containerPort: 30810    #修改端口号
         readinessProbe:
           tcpSocket:
-            port: 30801   #修改端口号
+            port: 30810   #修改端口号
           initialDelaySeconds: 20
           periodSeconds: 10
           failureThreshold: 3
@@ -67,7 +67,7 @@ spec:
             memory: "8Gi"
             cpu: "4000m"
       - name: jmx
-        image: 134.108.5.132:8000/mgt/jmxtrans:v3.0
+        image: 134.96.161.41:8000/mgt/jmxtrans:v3.0
         imagePullPolicy: Always
         volumeMounts:
         - name: tz-config
@@ -80,11 +80,11 @@ spec:
             memory: "1Gi"
             cpu: "1000m"
       nodeSelector:
-        center: bssOther   #修改镜像所属中心标签
+        center: bssCpct  #修改镜像所属中心标签
       volumes:
       - name: tz-config
         hostPath:
           path: /etc/localtime
       - name: app-log
         hostPath:
-          path: /app/app-log
+          path: /app/app-log/bss-cpct-log

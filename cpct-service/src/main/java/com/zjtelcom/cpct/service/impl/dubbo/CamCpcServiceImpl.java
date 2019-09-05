@@ -41,6 +41,7 @@ import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.elastic.service.EsHitService;
 import com.zjtelcom.cpct.enums.AreaNameEnum;
 import com.zjtelcom.cpct.service.dubbo.CamCpcService;
+import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
@@ -110,7 +111,7 @@ public class CamCpcServiceImpl implements CamCpcService {
     private InjectionLabelMapper injectionLabelMapper; //标签因子
 
     @Autowired
-    private EsHitService esHitService;  //es存储
+    private EsHitsService esHitService;  //es存储
 
     @Autowired
     private RedisUtils redisUtils;  // redis方法
@@ -280,26 +281,26 @@ public class CamCpcServiceImpl implements CamCpcService {
                                 log.info("111------accNbr --->" + privateParams.get("accNbr"));
                                 List<String> prodList = new ArrayList<>();
                                 CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(privateParams.get("accNbr"));
-                            //    log.info("222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
+                                log.info("222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
                                 if(prodInstIdsObject!=null &&  prodInstIdsObject.getResultObject() !=null ){
                                     Set<String> prodInstIds = prodInstIdsObject.getResultObject();
                                     for (String prodInstId : prodInstIds) {
                                         // 根据prodInstId 和 statusCd(1000-有效)查询offerProdInstRelId
-                            //            log.info("333------prodInstId --->" + prodInstId);
+                                        log.info("333------prodInstId --->" + prodInstId);
                                         CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex2(prodInstId, "1000");
-                            //            log.info("444------setCacheResultObject --->" + JSON.toJSONString(setCacheResultObject));
+                                        log.info("444------setCacheResultObject --->" + JSON.toJSONString(setCacheResultObject));
                                         if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null) {
                                             Set<String> offerProdInstRelIdSet = setCacheResultObject.getResultObject();
                                             for (String offerProdInstRelId : offerProdInstRelIdSet) {
                                                 // 查询销售品产品实例关系缓存实体
                                                 CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
-                            //                    log.info("555------offerProdInstRelCacheEntity --->" + JSON.toJSONString(offerProdInstRelCacheEntity));
+                                                log.info("555------offerProdInstRelCacheEntity --->" + JSON.toJSONString(offerProdInstRelCacheEntity));
                                                 if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
                                                         OfferProdInstRel offerProdInstRel = offerProdInstRelCacheEntity.getResultObject();
 
                                                     // 查询销售品实例缓存实体
                                                     CacheResultObject<OfferInst> offerInstCacheEntity = iCacheOfferEntityQryService.getOfferInstCacheEntity(offerProdInstRel.getOfferInstId().toString());
-                            //                        log.info("666------offerInstCacheEntity --->" + JSON.toJSONString(offerInstCacheEntity));
+                                                    log.info("666------offerInstCacheEntity --->" + JSON.toJSONString(offerInstCacheEntity));
                                                     if(offerInstCacheEntity!=null && offerInstCacheEntity.getResultObject()!=null){
                                                         OfferInst offerInst = offerInstCacheEntity.getResultObject();
                                                         //Offer offer = offerProdMapper.selectByPrimaryKey(Integer.valueOf(offerInst.getOfferId().toString()));
