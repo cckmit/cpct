@@ -84,7 +84,7 @@ ctg:
   sendMsgTimeout: 30000
   compressMsgBodyOverHowmuch: 4098
   clientWorkerThreads : 4
-  clusterName: prod_cluster
+  clusterName: CRM_MQ
   tenantID: 2
   cpctTopic: cpct_detailed_list_topic_gray
 
