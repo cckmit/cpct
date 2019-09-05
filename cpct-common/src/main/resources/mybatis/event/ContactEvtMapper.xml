@@ -48,6 +48,9 @@
         <if test="contactEvtTypeId != null and contactEvtTypeId != 0">
             and e.EVT_TYPE_ID = #{contactEvtTypeId}
         </if>
+        <if test="contactEvtCode != null and contactEvtCode != ''">
+            and e.EVENT_NBR LIKE CONCAT(CONCAT('%',#{contactEvtCode}),'%')
+        </if>
         ORDER BY e.UPDATE_DATE DESC
     </select>
 

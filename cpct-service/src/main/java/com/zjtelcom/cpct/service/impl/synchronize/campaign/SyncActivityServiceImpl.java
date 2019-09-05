@@ -88,7 +88,7 @@ public class SyncActivityServiceImpl implements SyncActivityService {
         // 获取活动基本信息
         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
         ActivityModel activityModel = new ActivityModel();
-        activityModel.setActivityId(mktCampaignDO.getMktCampaignId().toString());
+        activityModel.setActivityId(mktCampaignDO.getInitId().toString());
         activityModel.setActivityCode(mktCampaignDO.getMktActivityNbr());
         activityModel.setActivityName(mktCampaignDO.getMktCampaignName());
         activityModel.setStartDate(mktCampaignDO.getPlanBeginTime());
@@ -117,7 +117,7 @@ public class SyncActivityServiceImpl implements SyncActivityService {
         List<MktStrategyConfDO> strategyConfList = mktStrategyConfMapper.selectByCampaignId(mktCampaignId);
         for (MktStrategyConfDO mktStrategyConfDO : strategyConfList) {
             PolicyModel policyModel = new PolicyModel();
-            policyModel.setPolicyId(mktStrategyConfDO.getMktStrategyConfId().toString());
+            policyModel.setPolicyId(mktStrategyConfDO.getInitId().toString());
             policyModel.setPolicyName(mktStrategyConfDO.getMktStrategyConfName());
             policyModel.setStartDate(mktStrategyConfDO.getBeginTime());
             policyModel.setEndDate(mktStrategyConfDO.getEndTime());
@@ -129,7 +129,7 @@ public class SyncActivityServiceImpl implements SyncActivityService {
             List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(mktStrategyConfDO.getMktStrategyConfId());
             for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleDOList) {
                 RuleModel ruleModel = new RuleModel();
-                ruleModel.setRuleId(mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString());
+                ruleModel.setRuleId(mktStrategyConfRuleDO.getInitId().toString());
                 ruleModel.setRuleName(mktStrategyConfRuleDO.getMktStrategyConfRuleName());
                 // 销售品
                 String[] productIds = mktStrategyConfRuleDO.getProductId().split("/");
@@ -261,7 +261,11 @@ public class SyncActivityServiceImpl implements SyncActivityService {
             if(mktCampaignDO.getStatusCd().equals(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode())) {
                 String mktCampaignName = mktCampaignDO.getMktCampaignName();
                 if(!mktCampaignName.contains("测试") && !mktCampaignName.contains("模板") && !mktCampaignName.contains("test") && !mktCampaignName.contains("演示") && !mktCampaignName.equals("")) {
-                    syncActivity(mktCampaignDO.getMktCampaignId());
+                    try {
+                        syncActivity(mktCampaignDO.getMktCampaignId());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     mktCampaignIdList.add(mktCampaignDO.getMktCampaignId());
                 }
             }

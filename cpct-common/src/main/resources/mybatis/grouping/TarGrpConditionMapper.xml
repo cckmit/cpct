@@ -239,5 +239,15 @@
     WHERE tgc.TAR_GRP_ID = #{tarId,jdbcType=BIGINT}
   </select>
 
+  <select id="selectAllLabelByCamId" parameterType="java.lang.Long" resultType="java.util.Map">
+    select cr.MKT_STRATEGY_CONF_RULE_ID ruleId, cr.MKT_STRATEGY_CONF_RULE_NAME ruleName, i.INJECTION_LABEL_CODE labelCode, i.INJECTION_LABEL_NAME labelName
+    from mkt_strategy_conf_rule cr
+    left join mkt_strategy_conf_rule_rel crr on cr.MKT_STRATEGY_CONF_RULE_ID = crr.MKT_STRATEGY_CONF_RULE_ID
+    left join mkt_cam_strategy_conf_rel camrel on camrel.STRATEGY_CONF_ID = crr.MKT_STRATEGY_CONF_ID
+    LEFT JOIN tar_grp_condition tgc ON cr.TAR_GRP_ID = tgc.TAR_GRP_ID
+    LEFT JOIN injection_label i ON tgc.LEFT_PARAM = i.INJECTION_LABEL_ID
+    where camrel.MKT_CAMPAIGN_ID = #{campaignId,jdbcType=BIGINT}
+  </select>
+
 
 </mapper>

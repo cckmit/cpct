@@ -281,26 +281,26 @@ public class CamCpcServiceImpl implements CamCpcService {
                                 log.info("111------accNbr --->" + privateParams.get("accNbr"));
                                 List<String> prodList = new ArrayList<>();
                                 CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(privateParams.get("accNbr"));
-                                log.info("222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
+                            //    log.info("222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
                                 if(prodInstIdsObject!=null &&  prodInstIdsObject.getResultObject() !=null ){
                                     Set<String> prodInstIds = prodInstIdsObject.getResultObject();
                                     for (String prodInstId : prodInstIds) {
                                         // 根据prodInstId 和 statusCd(1000-有效)查询offerProdInstRelId
-                                        log.info("333------prodInstId --->" + prodInstId);
+                            //            log.info("333------prodInstId --->" + prodInstId);
                                         CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex2(prodInstId, "1000");
-                                        log.info("444------setCacheResultObject --->" + JSON.toJSONString(setCacheResultObject));
+                            //            log.info("444------setCacheResultObject --->" + JSON.toJSONString(setCacheResultObject));
                                         if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null) {
                                             Set<String> offerProdInstRelIdSet = setCacheResultObject.getResultObject();
                                             for (String offerProdInstRelId : offerProdInstRelIdSet) {
                                                 // 查询销售品产品实例关系缓存实体
                                                 CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
-                                                log.info("555------offerProdInstRelCacheEntity --->" + JSON.toJSONString(offerProdInstRelCacheEntity));
+                            //                    log.info("555------offerProdInstRelCacheEntity --->" + JSON.toJSONString(offerProdInstRelCacheEntity));
                                                 if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
                                                         OfferProdInstRel offerProdInstRel = offerProdInstRelCacheEntity.getResultObject();
 
                                                     // 查询销售品实例缓存实体
                                                     CacheResultObject<OfferInst> offerInstCacheEntity = iCacheOfferEntityQryService.getOfferInstCacheEntity(offerProdInstRel.getOfferInstId().toString());
-                                                    log.info("666------offerInstCacheEntity --->" + JSON.toJSONString(offerInstCacheEntity));
+                            //                        log.info("666------offerInstCacheEntity --->" + JSON.toJSONString(offerInstCacheEntity));
                                                     if(offerInstCacheEntity!=null && offerInstCacheEntity.getResultObject()!=null){
                                                         OfferInst offerInst = offerInstCacheEntity.getResultObject();
                                                         //Offer offer = offerProdMapper.selectByPrimaryKey(Integer.valueOf(offerInst.getOfferId().toString()));
@@ -308,7 +308,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                                                         //prodStrList.add(offer.getOfferNbr());
                                                         prodList.add(offerInst.getOfferId().toString());
                                                         filterRuleTimeMap.put(offerInst.getOfferId().toString(), offerInst.getEffDate());
-                                                        log.info("888------filterRuleTimeMap --->" + JSON.toJSONString(filterRuleTimeMap));
+                            //                            log.info("888------filterRuleTimeMap --->" + JSON.toJSONString(filterRuleTimeMap));
                                                     }
                                                 }
                                             }
@@ -1152,7 +1152,7 @@ public class CamCpcServiceImpl implements CamCpcService {
 
                     //拼接返回结果
                     ruleMap.put("orderISI", params.get("reqId")); //流水号
-                    ruleMap.put("activityId", privateParams.get("activityId")); //活动编码
+                    ruleMap.put("activityId",mktCampaignDO.getInitId().toString()); //活动编码
                     ruleMap.put("activityName", privateParams.get("activityName")); //活动名称
                     ruleMap.put("activityType", privateParams.get("activityType")); //活动类型
                     ruleMap.put("activityStartTime", privateParams.get("activityStartTime")); //活动开始时间
@@ -1161,9 +1161,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                     ruleMap.put("orderPriority", privateParams.get("orderPriority")); //活动优先级
                     ruleMap.put("integrationId", privateParams.get("integrationId")); //集成编号（必填）
                     ruleMap.put("accNbr", privateParams.get("accNbr")); //业务号码（必填）
-                    ruleMap.put("policyId", strategyConfId.toString()); //策略编码
+                    ruleMap.put("policyId", mktStrategyConfDO.getInitId().toString()); //策略编码
                     ruleMap.put("policyName", strategyConfName); //策略名称
-                    ruleMap.put("ruleId", ruleId.toString()); //规则编码
+                    ruleMap.put("ruleId",  mktStrategyConfRuleDO.getInitId().toString()); //规则编码
                     ruleMap.put("ruleName", ruleName); //规则名称
                     ruleMap.put("promIntegId", promIntegId); // 销售品实例ID
                     if (context.get("AREA_ID") != null) {
