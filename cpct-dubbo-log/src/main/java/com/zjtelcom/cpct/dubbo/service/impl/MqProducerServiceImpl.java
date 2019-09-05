@@ -142,6 +142,8 @@ public class MqProducerServiceImpl implements MqProducerService, InitializingBea
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                }else {
+                    return "开关关闭！";
                 }
             }
         } catch (Exception e) {
