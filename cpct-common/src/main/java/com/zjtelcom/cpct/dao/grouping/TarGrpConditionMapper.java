@@ -43,4 +43,6 @@ public interface TarGrpConditionMapper {
 
     List<Map<String,String>> selectAllLabelByTarId(@Param("tarId")Long tarGrpTemplateId);
 
+    List<Map<String,String>> selectAllLabelByCamId(@Param("mktCampaginId")Long mktCampaginId);
+
 }

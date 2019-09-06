@@ -1,21 +1,16 @@
 package com.zjtelcom.cpct.open.entity.mktCampaignEntity;
 
-import com.zjtelcom.cpct.open.entity.mktAlgorithms.OpenMktAlgorithmsEntity;
-import com.zjtelcom.cpct.open.entity.mktCpcAlgorithmsRule.OpenMktCpcAlgorithmsRulEntity;
-
 import java.util.Date;
 
-public class OpenMktCamRecomCalcRelEntity {
+public class OpenMktCamCheckruleEntity {
 
     private String actType;
-    private Long evtRecomCalcRelId;
+    private Long checkruleId;
     private Long mktCampaignId;
-    private Long algoId;
-    private Long algorithmsRulId;
-    private Long priority;
-    private OpenMktAlgorithmsEntity mktAlgorithms;
-    private OpenMktCpcAlgorithmsRulEntity mktCpcAlgorithmsRul;
-    private String statusCd;
+    private String checkruleType;
+    private Long busiRuleId;
+    private String checkruleResult;
+    private String statusCd	;
     private Date statusDate;
     private Long createStaff;
     private Date createDate;
@@ -31,12 +26,12 @@ public class OpenMktCamRecomCalcRelEntity {
         this.actType = actType;
     }
 
-    public Long getEvtRecomCalcRelId() {
-        return evtRecomCalcRelId;
+    public Long getCheckruleId() {
+        return checkruleId;
     }
 
-    public void setEvtRecomCalcRelId(Long evtRecomCalcRelId) {
-        this.evtRecomCalcRelId = evtRecomCalcRelId;
+    public void setCheckruleId(Long checkruleId) {
+        this.checkruleId = checkruleId;
     }
 
     public Long getMktCampaignId() {
@@ -47,44 +42,28 @@ public class OpenMktCamRecomCalcRelEntity {
         this.mktCampaignId = mktCampaignId;
     }
 
-    public Long getAlgoId() {
-        return algoId;
+    public String getCheckruleType() {
+        return checkruleType;
     }
 
-    public void setAlgoId(Long algoId) {
-        this.algoId = algoId;
+    public void setCheckruleType(String checkruleType) {
+        this.checkruleType = checkruleType;
     }
 
-    public Long getAlgorithmsRulId() {
-        return algorithmsRulId;
+    public Long getBusiRuleId() {
+        return busiRuleId;
     }
 
-    public void setAlgorithmsRulId(Long algorithmsRulId) {
-        this.algorithmsRulId = algorithmsRulId;
+    public void setBusiRuleId(Long busiRuleId) {
+        this.busiRuleId = busiRuleId;
     }
 
-    public Long getPriority() {
-        return priority;
+    public String getCheckruleResult() {
+        return checkruleResult;
     }
 
-    public void setPriority(Long priority) {
-        this.priority = priority;
-    }
-
-    public OpenMktAlgorithmsEntity getMktAlgorithms() {
-        return mktAlgorithms;
-    }
-
-    public void setMktAlgorithms(OpenMktAlgorithmsEntity mktAlgorithms) {
-        this.mktAlgorithms = mktAlgorithms;
-    }
-
-    public OpenMktCpcAlgorithmsRulEntity getMktCpcAlgorithmsRul() {
-        return mktCpcAlgorithmsRul;
-    }
-
-    public void setMktCpcAlgorithmsRul(OpenMktCpcAlgorithmsRulEntity mktCpcAlgorithmsRul) {
-        this.mktCpcAlgorithmsRul = mktCpcAlgorithmsRul;
+    public void setCheckruleResult(String checkruleResult) {
+        this.checkruleResult = checkruleResult;
     }
 
     public String getStatusCd() {
