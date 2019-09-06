@@ -25,4 +25,9 @@ public interface CloseRuleService {
     Map<String,Object> getFilterRule(Long ruleId);
 
     Map<String,Object> importProductList(MultipartFile multipartFile, Long ruleId, String closeName, String closeType, String offerInfo, String productType, String closeCode, Long[] rightListId)throws IOException;
+
+    Map<String,Object> qryCloseRuleForUser(CloseRuleReq closeRuleReq);
+
+    Map<String,Object> getCloseRuleOut(CloseRuleReq closeRuleReq);
+
 }

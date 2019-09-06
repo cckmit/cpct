@@ -42,4 +42,8 @@ public interface CloseRuleMapper {
     void insertTarGrp(CloseRule closeRule);
 
     void updateLabelCodeByPrimaryKey(@Param("ruleId")Long ruleId, @Param("express")String express);
+
+    List<CloseRule> qryCloseRuleForUser(Map<String, Object> map);
+
+    List<CloseRule> getCloseRuleOut(CloseRule closeRule);
 }
