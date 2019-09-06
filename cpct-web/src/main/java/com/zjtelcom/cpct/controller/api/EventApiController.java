@@ -140,6 +140,9 @@ public class EventApiController extends BaseController {
     @RequestMapping(value = "/CalculateCPCSync", method = RequestMethod.POST)
     @CrossOrigin
     public String eventInputSync(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> params) {
+        // 打开日志开关
+        redisUtils.set("SYSYTEM_ESLOG_STATUS", "1");
+
 
         response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -162,6 +165,8 @@ public class EventApiController extends BaseController {
             resultMap.put("resultMsg","失败！");
             return JSON.toJSONString(resultMap);
         }
+        // 关闭日志开关
+        redisUtils.set("SYSYTEM_ESLOG_STATUS", "0");
         resultMap.put("resultCode",CODE_SUCCESS);
         resultMap.put("resultMsg",result);
         return JSON.toJSONString(resultMap);

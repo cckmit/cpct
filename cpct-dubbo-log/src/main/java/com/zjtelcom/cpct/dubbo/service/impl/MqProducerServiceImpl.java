@@ -7,14 +7,19 @@ import com.ctg.mq.api.PropertyKeyConst;
 import com.ctg.mq.api.bean.MQMessage;
 import com.ctg.mq.api.bean.MQSendResult;
 import com.ctg.mq.api.bean.MQSendStatus;
+import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.dubbo.service.MqProducerService;
+import com.zjtelcom.cpct.util.RedisUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 @Service
@@ -63,6 +68,12 @@ public class MqProducerServiceImpl implements MqProducerService, InitializingBea
     @Value("${ctg.cpctEsLogGroup}")
     private String cpctEsLogGroup;
 
+    @Autowired
+    private SysParamsMapper sysParamsMapper;
+
+    @Autowired
+    private RedisUtils redisUtils;
+
 
     private int esLogConnect;
     private IMQProducer esLogProducer;
@@ -104,20 +115,35 @@ public class MqProducerServiceImpl implements MqProducerService, InitializingBea
     public String msg2ESLogProducer(Object msgBody, String topic, String key, String tag) throws Exception {
         try {
             if (esLogConnect == 0 && msgBody != null) {
-                MQMessage message = new MQMessage(topic, key, tag, null);
-                message.setBody(JSON.toJSONString(msgBody).getBytes());
-                try {
-                    MQSendResult send = esLogProducer.send(message);
-                    String content = "topic:" + topic + " , messageId:" + send.getMessageID();
-                    logger.info("content: " + content);
-                    MQSendStatus sendStatus = send.getSendStatus();
-                    System.out.println(send.getMessageID().getBytes());
-                    if (sendStatus.toString().equals("SEND_OK")) {
-                        System.out.println(send.getMessageID().toString());
+                String prodFilter = "0";
+                Object status = redisUtils.get("SYSYTEM_ESLOG_STATUS");
+                if (status != null) {
+                    prodFilter = status.toString();
+                }else {
+                    List<Map<String, String>> sysFilList = sysParamsMapper.listParamsByKey("SYSYTEM_ESLOG_STATUS");
+                    if (sysFilList != null && !sysFilList.isEmpty()) {
+                        prodFilter = sysFilList.get(0).get("value");
+                        redisUtils.set("SYSYTEM_ESLOG_STATUS", prodFilter);
                     }
-                    return sendStatus.toString();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                }
+                if (prodFilter.equals("1")) {
+                    MQMessage message = new MQMessage(topic, key, tag, null);
+                    message.setBody(JSON.toJSONString(msgBody).getBytes());
+                    try {
+                        MQSendResult send = esLogProducer.send(message);
+                        String content = "topic:" + topic + " , messageId:" + send.getMessageID();
+                        logger.info("content: " + content);
+                        MQSendStatus sendStatus = send.getSendStatus();
+                        System.out.println(send.getMessageID().getBytes());
+                        if (sendStatus.toString().equals("SEND_OK")) {
+                            System.out.println(send.getMessageID().toString());
+                        }
+                        return sendStatus.toString();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }else {
+                    return "开关关闭！";
                 }
             }
         } catch (Exception e) {
