@@ -258,10 +258,10 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         List<Channel> channelList = new ArrayList<>();
         Object type = params.get("type");
         if (type != null && "realTime".equals(type.toString())) {
-            //实时（随销） 5,6 问正义
+            //实时（随销） 5,6 问正义  getRptEventOrder
             channelList = contactChannelMapper.getRealTimeChannel();
         }
-        // 批量（派单） 4,5 问正义
+        // 批量（派单） 4,5 问正义 queryRptBatchOrder
         if (type != null && "batch".equals(type.toString())) {
             channelList = contactChannelMapper.getBatchChannel();
         }
@@ -270,7 +270,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         return hashMap;
     }
 
-    //销报表查询接口
+    //随销报表查询接口
     //getRptEventOrder
     @Override
     public Map<String, Object> getRptEventOrder(Map<String, Object> params) {
@@ -377,6 +377,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         }
         Integer page = Integer.valueOf(params.get("page").toString());
         Integer pageSize = Integer.valueOf(params.get("pageSize").toString());
+        paramMap.put("currenPage", page);
+        paramMap.put("pageSize", pageSize);
         //销报表查询接口
         Map<String, Object> stringObjectMap = null;
         try {
@@ -386,16 +388,17 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         }
         logger.info("销报表查询接口:stringObjectMap"+stringObjectMap);
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
-            stringObjectMap = addParams(stringObjectMap, page, pageSize);
+            stringObjectMap = addParams(stringObjectMap, page, pageSize,mktCampaignType);
         } else {
+            Object reqId = stringObjectMap.get("reqId");
             stringObjectMap.put("resultCode", CODE_FAIL);
-            stringObjectMap.put("resultMsg", "查询无结果 queryRptEventOrder error");
+            stringObjectMap.put("resultMsg", "查询无结果 queryRptEventOrder error:"+reqId.toString());
         }
         return stringObjectMap;
     }
 
 
-    //活动报表查询接口
+    //活动报表查询接口  派单
     //queryRptBatchOrder
     @Override
     public Map<String, Object> getRptBatchOrder(Map<String, Object> params) {
@@ -516,6 +519,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         }
         Integer page = Integer.valueOf(params.get("page").toString());
         Integer pageSize = Integer.valueOf(params.get("pageSize").toString());
+        paramMap.put("currenPage", page);
+        paramMap.put("pageSize", pageSize);
         //活动报表查询接口
         try {
             stringObjectMap = iReportService.queryRptBatchOrder(paramMap);
@@ -524,10 +529,11 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         }
         logger.info("活动报表查询接口:queryRptBatchOrder"+stringObjectMap);
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
-            stringObjectMap = addParams(stringObjectMap, page, pageSize);
+            stringObjectMap = addParams(stringObjectMap, page, pageSize,mktCampaignType);
         } else {
+            Object reqId = stringObjectMap.get("reqId");
             stringObjectMap.put("resultCode", CODE_FAIL);
-            stringObjectMap.put("resultMsg", "查询无结果 queryRptBatchOrder error ");
+            stringObjectMap.put("resultMsg", "查询无结果 queryRptBatchOrder error :" + reqId.toString());
         }
         return stringObjectMap;
     }
@@ -537,15 +543,17 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         Map<String, Object> stringObjectMap = (Map<String, Object>) params.get("key");
         Integer page = Integer.valueOf(params.get("page").toString());
         Integer pageSize = Integer.valueOf(params.get("pageSize").toString());
-        return addParams(stringObjectMap, page, pageSize);
+        Object mktCampaignType =params.get("mktCampaignType");
+        return addParams(stringObjectMap, page, pageSize,mktCampaignType);
     }
 
 
 
-    private Map<String, Object> addParams(Map<String, Object> stringObjectMap, Integer page, Integer pageSize) {
+    private Map<String, Object> addParams(Map<String, Object> stringObjectMap, Integer page, Integer pageSize,Object ymktCampaignType) {
         Map<String, Object> maps = new HashMap<>();
         List<HashMap<String, Object>> hashMaps = new ArrayList<>();
         List<Map<String, Object>> data = new ArrayList<>();
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
             PageHelper.startPage(page, pageSize);
             //event 解析 判断
@@ -556,16 +564,33 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                     for (Map<String, Object> map : data) {
                         HashMap<String, Object> resultMap = new HashMap<>();
                         String mktCampaignId1 = map.get("mktCampaignId").toString();
-                        MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(mktCampaignId1));
+                        MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(mktCampaignId1));
+                        if (mktCampaignDO == null){
+                            // 如果有为空 跳过
+                            continue;
+                        }
+                        //活动类型 过滤页面筛选条件
+                        String mktCampaignType = mktCampaignDO.getMktCampaignType();
+                        if (!ymktCampaignType.toString().equals("") && !"all".equals(ymktCampaignType.toString())){
+                            if (!mktCampaignType.equals(ymktCampaignType.toString())){
+                                continue;
+                            }
+                        }
                         //活动名称
                         resultMap.put("mktCampaignName", mktCampaignDO.getMktCampaignName());
                         //活动开始是时间和结束时间
-                        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
                         resultMap.put("beginTime", fmt.format(mktCampaignDO.getPlanBeginTime()));
                         resultMap.put("endTime", fmt.format(mktCampaignDO.getPlanEndTime()));
                         resultMap.put("mktActivityBnr", mktCampaignDO.getMktActivityNbr());
-                        String mktCampaignType = mktCampaignDO.getMktCampaignType();
-                        //活动类型
+                        //渠道编码
+                        Object channel = map.get("channel");
+                        if (channel== null || "" == channel || "null" == channel){
+                            resultMap.put("channel", "");
+                        }else {
+                            // todo 渠道编码展示
+                            Channel channel1 = contactChannelMapper.selectByCode(channel.toString());
+                            resultMap.put("channel", channel1.getContactChlName());
+                        }
                         if (mktCampaignType != null) {
                             Map<String, String> paramsByValue = sysParamsMapper.getParamsByValue("CAM-C-0033", mktCampaignType);
                             resultMap.put("mktCampaignType", paramsByValue.get("PARAM_NAME"));
@@ -664,16 +689,33 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                     for (Map<String, Object> map : data) {
                         HashMap<String, Object> resultMap = new HashMap<>();
                         String mktCampaignId1 = map.get("mktCampaignId").toString();
-                        MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(mktCampaignId1));
+                        MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(mktCampaignId1));
+                        if (mktCampaignDO == null){
+                            // 如果有为空 跳过
+                            continue;
+                        }
+                        //活动类型 过滤页面筛选条件
+                        String mktCampaignType = mktCampaignDO.getMktCampaignType();
+                        if (!ymktCampaignType.toString().equals("") && !"all".equals(ymktCampaignType.toString())){
+                            if (!mktCampaignType.equals(ymktCampaignType.toString())){
+                                continue;
+                            }
+                        }
                         //活动名称
                         resultMap.put("mktCampaignName", mktCampaignDO.getMktCampaignName());
                         //活动开始是时间和结束时间
-                        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
                         resultMap.put("beginTime", fmt.format(mktCampaignDO.getPlanBeginTime()));
                         resultMap.put("endTime", fmt.format(mktCampaignDO.getPlanEndTime()));
                         resultMap.put("mktActivityBnr", mktCampaignDO.getMktActivityNbr());
-                        String mktCampaignType = mktCampaignDO.getMktCampaignType();
-                        //活动类型
+                        //渠道编码
+                        Object channel = map.get("channel");
+                        if (channel== null || "" == channel || "null" == channel){
+                            resultMap.put("channel", "");
+                        }else {
+                            // todo 渠道编码展示
+                            Channel channel1 = contactChannelMapper.selectByCode(channel.toString());
+                            resultMap.put("channel", channel1.getContactChlName());
+                        }
                         if (mktCampaignType != null) {
                             Map<String, String> paramsByValue = sysParamsMapper.getParamsByValue("CAM-C-0033", mktCampaignType);
                             resultMap.put("mktCampaignType", paramsByValue.get("PARAM_NAME"));
