@@ -518,12 +518,19 @@ public class CloseRuleServiceImpl implements CloseRuleService {
     @Override
     public Map<String, Object> qryCloseRuleForUser(CloseRuleReq closeRuleReq) {
         Map<String, Object> map = new HashMap<>();
+        Map<String, Object> maps = new HashMap<>();
         //获取用户信息
         SystemUserDto user = BssSessionHelp.getSystemUserDto();
-        Long staffId = user.getStaffId();
-//        Long staffId = 1000033L;
+        Long sysUserId = user.getSysUserId();
+//        Long sysUserId = 1000033L;
+        if (sysUserId == null){
+            maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+            maps.put("resultMsg", "sysUserId为空 无创建人信息");
+            maps.put("closeRules", new ArrayList<Object>());
+            return maps;
+        }
         //过滤参数设置
-        map.put("staffId",staffId);
+        map.put("staffId",sysUserId);
         if (StringUtils.isNotBlank(closeRuleReq.getCloseRule().getCloseName())){
             map.put("closeName",closeRuleReq.getCloseRule().getCloseName());
         }
@@ -535,7 +542,7 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
         List<CloseRule> closeRules = closeRuleMapper.qryCloseRuleForUser(map);
         Page page = new Page(new PageInfo(closeRules));
-        Map<String, Object> maps = new HashMap<>();
+
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("closeRules", closeRules);
