@@ -571,7 +571,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                         }
                         //活动类型 过滤页面筛选条件
                         String mktCampaignType = mktCampaignDO.getMktCampaignType();
-                        if (!ymktCampaignType.toString().equals("")){
+                        if (!ymktCampaignType.toString().equals("") && !"all".equals(ymktCampaignType.toString())){
                             if (!mktCampaignType.equals(ymktCampaignType.toString())){
                                 continue;
                             }
@@ -696,7 +696,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                         }
                         //活动类型 过滤页面筛选条件
                         String mktCampaignType = mktCampaignDO.getMktCampaignType();
-                        if (!ymktCampaignType.toString().equals("")){
+                        if (!ymktCampaignType.toString().equals("") && !"all".equals(ymktCampaignType.toString())){
                             if (!mktCampaignType.equals(ymktCampaignType.toString())){
                                 continue;
                             }
