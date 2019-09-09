@@ -277,7 +277,7 @@
             AND t.MKT_CAMPAIGN_NAME like CONCAT('%',#{mktCampaignName,jdbcType=VARCHAR},'%')
         </if>
         <if test="statusCd != null and statusCd != ''">
-            AND t.STATUS_CD = #{statusCd,jdbcType=VARCHAR}
+            AND t.STATUS_CD IN ${statusCd}
         </if>
         <if test="tiggerType != null and tiggerType != ''">
             AND t.TIGGER_TYPE = #{tiggerType,jdbcType=VARCHAR}
@@ -445,7 +445,7 @@
             AND MKT_CAMPAIGN_NAME like CONCAT('%',#{mktCampaignName,jdbcType=VARCHAR},'%')
         </if>
         <if test="statusCd != null and statusCd != ''">
-            AND STATUS_CD = #{statusCd,jdbcType=VARCHAR}
+            AND STATUS_CD IN ${statusCd}
         </if>
         <if test="tiggerType != null and tiggerType != ''">
             AND TIGGER_TYPE = #{tiggerType,jdbcType=VARCHAR}
@@ -616,6 +616,7 @@
         <if test="lanId != null and lanId != '' and lanId != '1'">
             AND LAN_ID IN #{lanId}
         </if>
+        ORDER BY CREATE_DATE DESC
     </select>
 
 

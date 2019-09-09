@@ -120,7 +120,7 @@ public class EsHitsServiceImpl implements EsHitsService {
     public void save(final JSONObject jsonObject, final String indexName) {
         try {
             String result = mqProducerService.msg2ESLogProducer(jsonObject, cpctEsLogTopic, indexName + "," + esType, null);
-            logger.info("saveOne to esLog start :" + result);
+            // logger.info("saveOne to esLog start :" + result);
         } catch (Exception e) {
             logger.error("es日志存储失败");
         }
@@ -130,7 +130,7 @@ public class EsHitsServiceImpl implements EsHitsService {
     public void save(final JSONObject jsonObject, final String indexName, final String _id) {
         try {
             String result = mqProducerService.msg2ESLogProducer(jsonObject, cpctEsLogTopic, indexName + "," + esType + "," + _id, null);
-            logger.info("add to esLog start :" + result);
+            // logger.info("add to esLog start :" + result);
         } catch (Exception e) {
             logger.error("es日志存储失败");
         }
