@@ -104,6 +104,7 @@ public class MqEsLogServiceImpl implements MqEsLogService, InitializingBean, Dis
                 public ConsumerTopicStatus onMessage(List<MQResult> mqResultList) {
                     try {
                         for (MQResult result : mqResultList) {
+                            long startTime = System.currentTimeMillis();
                             String esLogResult = new String(result.getMessage().getBody());
                             String[] split = result.getMessage().getKey().split(",");
                             String index = null;
@@ -117,7 +118,8 @@ public class MqEsLogServiceImpl implements MqEsLogService, InitializingBean, Dis
                                 id = split[2];
                                 String s = ElasticsearchUtil.addData(JSONObject.parseObject(esLogResult), index, esType,id);
                             }
-
+                            long endTime = System.currentTimeMillis();
+                            System.out.println("下拉成功转添加esLog日志消耗时间："+ (endTime - startTime));
                             //logger.info("下拉成功转添加esLog日志 索引名称："+index+",id ；" + id);
                         }
                         return ConsumerTopicStatus.CONSUME_SUCCESS;
