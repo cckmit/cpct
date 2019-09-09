@@ -390,9 +390,9 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
             stringObjectMap = addParams(stringObjectMap, page, pageSize,mktCampaignType);
         } else {
-            Object resultMsg = stringObjectMap.get("resultMsg");
+            Object reqId = stringObjectMap.get("reqId");
             stringObjectMap.put("resultCode", CODE_FAIL);
-            stringObjectMap.put("resultMsg", "查询无结果 queryRptEventOrder error:"+resultMsg.toString());
+            stringObjectMap.put("resultMsg", "查询无结果 queryRptEventOrder error:"+reqId.toString());
         }
         return stringObjectMap;
     }
@@ -531,9 +531,9 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
             stringObjectMap = addParams(stringObjectMap, page, pageSize,mktCampaignType);
         } else {
-            Object resultMsg = stringObjectMap.get("resultMsg");
+            Object reqId = stringObjectMap.get("reqId");
             stringObjectMap.put("resultCode", CODE_FAIL);
-            stringObjectMap.put("resultMsg", "查询无结果 queryRptBatchOrder error :" + resultMsg.toString());
+            stringObjectMap.put("resultMsg", "查询无结果 queryRptBatchOrder error :" + reqId.toString());
         }
         return stringObjectMap;
     }
@@ -571,7 +571,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                         }
                         //活动类型 过滤页面筛选条件
                         String mktCampaignType = mktCampaignDO.getMktCampaignType();
-                        if (ymktCampaignType != "" || ymktCampaignType != null){
+                        if (!ymktCampaignType.toString().equals("") && !"all".equals(ymktCampaignType.toString())){
                             if (!mktCampaignType.equals(ymktCampaignType.toString())){
                                 continue;
                             }
@@ -696,7 +696,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                         }
                         //活动类型 过滤页面筛选条件
                         String mktCampaignType = mktCampaignDO.getMktCampaignType();
-                        if (ymktCampaignType != "" || ymktCampaignType != null){
+                        if (!ymktCampaignType.toString().equals("") && !"all".equals(ymktCampaignType.toString())){
                             if (!mktCampaignType.equals(ymktCampaignType.toString())){
                                 continue;
                             }
