@@ -190,8 +190,8 @@ public class EventApiServiceImpl implements EventApiService {
     @Autowired(required = false)
     private ICacheIdMappingEntityQryService iCacheIdMappingEntityQryService;
 
-    @Autowired
-    private TarGrpConditionMapper tarGrpConditionMapper;
+    /*@Autowired
+    private TarGrpConditionMapper tarGrpConditionMapper;*/
 
     @Override
     public Map<String, Object> CalculateCPC(Map<String, Object> map) {
@@ -1132,7 +1132,7 @@ public class EventApiServiceImpl implements EventApiService {
         }
     }
 
-    private List<Map<String,Object>> getBitslapByEvent(Long eventId, List<Map<String,Object>> resultByEvent) {
+    /*private List<Map<String,Object>> getBitslapByEvent(Long eventId, List<Map<String,Object>> resultByEvent) {
         // 遍历出被过滤掉的活动
         List<Map<String, Object>> mktCampaginIdList = mktCamEvtRelMapper.listActivityByEventId(eventId);
         for (Map<String, Object> passMap : resultByEvent) {
@@ -1174,7 +1174,7 @@ public class EventApiServiceImpl implements EventApiService {
             }
         }
         return mktCampaginIdList;
-    }
+    }*/
 
 
     /**
