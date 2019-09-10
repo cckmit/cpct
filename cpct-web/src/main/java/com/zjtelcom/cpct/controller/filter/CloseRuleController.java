@@ -172,6 +172,48 @@ public class CloseRuleController extends BaseController {
         return JSON.toJSONString(maps);
     }
 
+    /**;
+     * 查询过滤规则列表(含分页)
+     * 关单类型过滤 和 用户登入匹配查看（自己看自己）
+     */
+    @PostMapping("/qryCloseRuleForUser")
+    @CrossOrigin
+    public String qryCloseRuleForUser(@RequestBody CloseRuleReq closeRuleReq) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = closeRuleService.qryCloseRuleForUser(closeRuleReq);
+        } catch (Exception e) {
+            logger.error("[op:qryCloseRuleForUser] fail to listEvents for CloseRule = {}! Exception: ", JSONArray.toJSON(closeRuleReq), e);
+            return JSON.toJSONString(maps);
+        }
+        return JSON.toJSONString(maps);
+    }
+
+
+    /**
+     * 受理关单规则	2000
+     欠费关单规则	3000 排除
+     拆机关单规则	1000 排除
+     按账期欠费关单	4000
+     标签关单规则	5000
+     去掉排除 展示其余
+     * @param closeRuleReq
+     * @return
+     */
+    @PostMapping("/getCloseRuleOut")
+    @CrossOrigin
+    public String getCloseRuleOut(@RequestBody CloseRuleReq closeRuleReq) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = closeRuleService.getCloseRuleOut(closeRuleReq);
+        } catch (Exception e) {
+            logger.error("[op:qryCloseRuleForUser] fail to listEvents for CloseRule = {}! Exception: ", JSONArray.toJSON(closeRuleReq), e);
+            return JSON.toJSONString(maps);
+        }
+        return JSON.toJSONString(maps);
+    }
+
+
 
    /* @Autowired
     private EsHitsService esHitService;
