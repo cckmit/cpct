@@ -6,6 +6,8 @@ import com.ctg.mq.api.bean.MQSendStatus;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSchException;
 import com.mysql.jdbc.StringUtils;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
@@ -69,15 +71,17 @@ import com.zjtelcom.es.es.entity.model.TrialOperationParamES;
 import com.zjtelcom.es.es.entity.model.TrialResponseES;
 import com.zjtelcom.es.es.service.EsService;
 import com.zjtelcom.es.es.service.EsServiceInfo;
+import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -153,6 +157,15 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
     @Value("${ctg.cpctTopic}")
     private String importTopic;
+
+    private String ftpAddress = "134.108.3.130";
+    private int ftpPort = 22;
+    private String ftpName= "ftp";
+    private String ftpPassword="V1p9*2_9%3#";
+    private String excelIssurepath="/app/ftp/msc/userlist/new/fees";
+    private String uploadExcelPath="/app/ftp/msc/userlist/new/fees/";
+
+    private String downloadFilePath = "/app";
 
     /**
      * 销售品service
@@ -2231,4 +2244,111 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         }
 
     }
+
+
+    @Override
+    public Map<String, Object> importUserListByExcel() {
+        logger.info("定时任务importUserListByExcel启动");
+        SftpUtils sftpUtils = new SftpUtils();
+        final ChannelSftp sftp = sftpUtils.connect(ftpAddress, ftpPort, ftpName, ftpPassword);
+        logger.info("sftp已获得连接");
+        String path = sftpUtils.cd(excelIssurepath, sftp);
+        String tempFilePath = downloadFilePath + "/";
+        List<String> files = new ArrayList<>();
+        try {
+            List<String> allFile = sftpUtils.listFiles(path, sftp);
+            for (String fileName : allFile) {
+                if (".".equals(fileName) || "..".equals(fileName)) {
+                    continue;
+                }
+                if (fileName.contains("xlsx")){
+                    files.add(fileName);
+                }
+            }
+            logger.info("批量excel已选择文件数量 "+ files.size());
+        } catch (Exception e) {
+            logger.error("批量excel文件读取失败", e);
+        }
+        List<String> uploadList = new ArrayList<>();
+        try {
+            for (String fileName : files) {
+                // 下载文件到本地
+                File file = new File(fileName);
+                if (!file.exists()) {
+                    logger.info("开始下载文件--->>>" + fileName + " --->>> 时间：" + DateUtil.formatDate(new Date()));
+                    boolean download = sftpUtils.download(sftp, path + "/", fileName, tempFilePath);
+                    if (!download) {
+                        logger.info("文件下载失败","文件名：" + fileName);
+                    }
+                    logger.info("结束下载文件--->>>" + fileName + " --->>> 时间：" + DateUtil.formatDate(new Date()));
+                    //                sftpUtils.delete(path + "/", fileName, sftp);
+                    //                logger.info("删除校验文件--->>>" + fileName + " --->>> 时间：" + DateUtil.formatDate(new Date()));
+                    uploadList.add(fileName);
+                }
+            }
+        } catch (Exception e) {
+            logger.info("批量excel下载文件失败");
+            e.printStackTrace();
+        }
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");
+        String format = fmt.format(new Date());
+        //判断文件是否存在 不存在则创建新文件夹
+        File newFile = new File(uploadExcelPath+format);
+        if (!newFile.exists()) {
+            newFile.mkdirs();
+        }
+        sftpUtils.changeDir(uploadExcelPath+format, sftp);
+        try {
+            for (String s : uploadList) {
+                logger.info("上传文件名称" + s);
+                File file = new File(s);
+                if (file.exists()) {
+                    boolean uploadResult = sftpUtils.uploadFile(uploadExcelPath, s, new FileInputStream(file), sftp);
+                    if (uploadResult) {
+                        // 删除本地文件
+                        logger.info("上传文件成功，开始删除本地文件！");
+
+                        FileInputStream fileInputStream = new FileInputStream(file);
+                        MultipartFile multipartFile = new MockMultipartFile(file.getName(), file.getName(),
+                                ContentType.APPLICATION_OCTET_STREAM.toString(), fileInputStream);
+                        importExcelUserList(multipartFile);
+                        boolean b1 = delFile(s);
+                        if (b1) {
+                            logger.info("删除本地文件成功！");
+                        }
+                    }
+                }
+            }
+            quitSftp(sftp);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static boolean delFile(String path) {
+        Boolean bool = false;
+        File file = new File(path);
+        try {
+            if (file.exists()) {
+                file.delete();
+                bool = true;
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        return bool;
+    }
+
+    private boolean quitSftp(ChannelSftp sftp) throws JSchException {
+        if (sftp.isConnected()) {
+            sftp.disconnect();
+        }
+        if (sftp.getSession().isConnected()) {
+            sftp.getSession().disconnect();
+        }
+        sftp.quit();
+        return true;
+    }
+
 }

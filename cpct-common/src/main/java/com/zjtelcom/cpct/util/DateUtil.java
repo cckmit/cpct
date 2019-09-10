@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,8 +19,11 @@ public class DateUtil {
 
     private static final String DEFAULT_FORMAT = "yyyy-MM-dd";
     private static final Logger logger = LoggerFactory.getLogger(DateUtil.class);
+    private static DateFormat ldf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-
+    public static String formatDate(Date date) {
+        return ldf.format(date);
+    }
     /**
      * 获取上一个月的月份
      *
