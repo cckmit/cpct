@@ -201,10 +201,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(createStaff, new ArrayList<Long>());
             if (systemUserDtoSysmgrResultObject != null) {
                 if (systemUserDtoSysmgrResultObject.getResultObject() != null) {
-                    /*codeNumber = systemUserDtoSysmgrResultObject.getResultObject().getStaffCode();
+                    codeNumber = systemUserDtoSysmgrResultObject.getResultObject().getStaffCode();
                     codeNumber = codeNumber + "&&" + systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
-                    codeNumber = codeNumber + "&&" + systemUserDtoSysmgrResultObject.getResultObject().getStaffName();*/
-                    codeNumber = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
+                    codeNumber = codeNumber + "&&" + systemUserDtoSysmgrResultObject.getResultObject().getStaffName();
+                    // codeNumber = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
                 }
             }
         }catch (Exception e){
@@ -1042,7 +1042,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     public void importListMQ2EsService(TrialOperationVOES request, List<Map<String, Object>> customerList, List<FilterRule> productFilter, String batchNumSt, String ruleId, TrialOperation operation){
         logger.info("导入试运算清单importUserList->customerList的数量：" + customerList.size());
         Long mqSum = 0L;
-        boolean flag = true;
         int x = customerList.size() / 1000;
         for (int i = 0; i <= x; i++) {
             List<Map<String, Object>> newSublist = new ArrayList();
@@ -1060,7 +1059,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 // 判断是否发送成功
                 if (!mqService.msg2Producer(msgBody,importTopic, batchNumSt, ruleId).equals("SEND_OK")) {
                     // 发送失败自动重发2次，如果还是失败，记录
-                    flag = false;
                     logger.error("CTGMQ消息生产失败,batchNumSt:" + batchNumSt, msgBody);
                 }
                 mqSum++;
@@ -1071,12 +1069,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             newSublist.clear();
         }
         redisUtils_es.set("MQ_SUM_" + batchNumSt, mqSum);
-        /*if (flag){
-            operation.setStatusCd(TrialStatus.IMPORT_SUCCESS.getValue());
-        }else{
-            operation.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
-        }
-        trialOperationMapper.updateByPrimaryKey(operation);*/
     }
 
     private void blackList2Redis(MktCampaignDO campaign) {
