@@ -158,12 +158,13 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Value("${ctg.cpctTopic}")
     private String importTopic;
 
-    private String ftpAddress = "134.108.3.130";
+//    private String ftpAddress = "134.108.3.130";
+    private String ftpAddress = "134.108.0.93";
     private int ftpPort = 22;
     private String ftpName= "ftp";
     private String ftpPassword="V1p9*2_9%3#";
-    private String excelIssurepath="/app/ftp/msc/userlist/new/fees";
-    private String uploadExcelPath="/app/ftp/msc/userlist/new/fees/";
+    private String excelIssurepath="/app/ftp/msc/userlist/fees";
+    private String uploadExcelPath="/app/ftp/msc/userlist/fees/";
 
     private String downloadFilePath = "/app";
 
@@ -2247,7 +2248,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
 
     @Override
-    public Map<String, Object> importUserListByExcel() {
+    public Map<String, Object> importUserListByExcel() throws IOException {
         logger.info("定时任务importUserListByExcel启动");
         SftpUtils sftpUtils = new SftpUtils();
         final ChannelSftp sftp = sftpUtils.connect(ftpAddress, ftpPort, ftpName, ftpPassword);
@@ -2293,21 +2294,22 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");
         String format = fmt.format(new Date());
         //判断文件是否存在 不存在则创建新文件夹
-        File newFile = new File(uploadExcelPath+format);
-        if (!newFile.exists()) {
-            newFile.mkdirs();
+        File newFile = new File("/app/ftp/msc/userlist/fees/"+format);
+        if(!newFile .exists()) {
+            newFile.setWritable(true, false);
+            newFile.mkdir();
+            System.out.println("文件不存在创建文件夹名称"+newFile);
         }
-        sftpUtils.changeDir(uploadExcelPath+format, sftp);
+        sftpUtils.changeDir("/app/ftp/msc/userlist/fees/"+format, sftp);
         try {
             for (String s : uploadList) {
-                logger.info("上传文件名称" + s);
-                File file = new File(s);
+                logger.info("准备上传文件名称:" + s);
+                File file = new File(downloadFilePath+s);
                 if (file.exists()) {
                     boolean uploadResult = sftpUtils.uploadFile(uploadExcelPath, s, new FileInputStream(file), sftp);
                     if (uploadResult) {
                         // 删除本地文件
                         logger.info("上传文件成功，开始删除本地文件！");
-
                         FileInputStream fileInputStream = new FileInputStream(file);
                         MultipartFile multipartFile = new MockMultipartFile(file.getName(), file.getName(),
                                 ContentType.APPLICATION_OCTET_STREAM.toString(), fileInputStream);
