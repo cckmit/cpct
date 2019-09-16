@@ -2253,7 +2253,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         SftpUtils sftpUtils = new SftpUtils();
         final ChannelSftp sftp = sftpUtils.connect(ftpAddress, ftpPort, ftpName, ftpPassword);
         logger.info("sftp已获得连接");
-        String path = sftpUtils.cd(excelIssurepath, sftp);
+        String path = sftpUtils.cd(uploadExcelPath, sftp);
         String tempFilePath = downloadFilePath + "/";
         List<String> files = new ArrayList<>();
         try {
@@ -2300,7 +2300,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             newFile.mkdir();
             System.out.println("文件不存在创建文件夹名称"+newFile);
         }
-        sftpUtils.changeDir("/app/ftp/msc/userlist/fees/"+format, sftp);
+        sftpUtils.cd("/app/ftp/msc/userlist/fees/"+format, sftp);
         try {
             for (String s : uploadList) {
                 logger.info("准备上传文件名称:" + s);
