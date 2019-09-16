@@ -478,7 +478,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                         String ruleId = redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId) == null? "":redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId).toString();
                         if (ruleId != null && ruleId != "") {
                             for (Map<String, Object> map : ruleList) {
-                                Long ruleId2 = Long.valueOf(map.get("ruleId").toString());
+                                Long ruleId2 = Long.valueOf(map.get("nowRuleId").toString());
                                 if (ruleId.equals(ruleId2.toString())) {
                                     ruleList.remove(map);
                                     break;
@@ -1021,6 +1021,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                         ruleMap.put("policyId", mktStrategyConfDO.getInitId().toString()); //策略编码
                         ruleMap.put("policyName", strategyConfName); //策略名称
                         ruleMap.put("ruleId",  mktStrategyConfRuleDO.getInitId().toString()); //规则编码
+                        ruleMap.put("nowRuleId", ruleId); //新规则编码
                         ruleMap.put("ruleName", ruleName); //规则名称
                         ruleMap.put("promIntegId", promIntegId); // 销售品实例ID
                         if (context.get("AREA_ID") != null) {
@@ -1164,6 +1165,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     ruleMap.put("policyId", mktStrategyConfDO.getInitId().toString()); //策略编码
                     ruleMap.put("policyName", strategyConfName); //策略名称
                     ruleMap.put("ruleId",  mktStrategyConfRuleDO.getInitId().toString()); //规则编码
+                    ruleMap.put("nowRuleId", ruleId); //新规则编码
                     ruleMap.put("ruleName", ruleName); //规则名称
                     ruleMap.put("promIntegId", promIntegId); // 销售品实例ID
                     if (context.get("AREA_ID") != null) {

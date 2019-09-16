@@ -549,7 +549,6 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         List<Map<String, Object>> data = new ArrayList<>();
         SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
-            PageHelper.startPage(page, pageSize);
             //event 解析 判断
             Object rptBatchOrderList1 = stringObjectMap.get("rptBatchOrderList");
             if (rptBatchOrderList1 != null && rptBatchOrderList1 != "") {
@@ -793,7 +792,9 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                 }
             }
         }
-        Page pageInfo = new Page(new PageInfo(hashMaps));
+        maps.put("pageSize", stringObjectMap.get("pageSize"));
+        maps.put("page", stringObjectMap.get("currenPage"));
+        maps.put("total", stringObjectMap.get("total"));
         maps.put("resultMsg", hashMaps);
         maps.put("resultCode", CODE_SUCCESS);
         return maps;

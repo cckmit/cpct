@@ -147,7 +147,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             // 将推送渠道缓存到redis
             redisUtils.set("MktCamChlConfDetail_" + evtContactConfId, mktCamChlConfDetailNew);
         } catch (Exception e) {
-            logger.error("[op:MktCamChlConfServiceImpl] fail to save mktCamChlConf = {}", mktCamChlConfDO, e);
+            logger.error("[op:MktCamChlConfServiceImpl] fail to save MktCamChlConf = {}", mktCamChlConfDO, e);
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_FAIL);
             mktCamChlConfMap.put("resultMsg", ErrorCode.SAVE_CAM_CHL_CONF_FAILURE.getErrorMsg());
             mktCamChlConfMap.put("evtContactConfId", mktCamChlConfDO.getEvtContactConfId());
@@ -212,7 +212,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             // 将推送渠道缓存到redis
             redisUtils.set("MktCamChlConfDetail_" + evtContactConfId, mktCamChlConfDetail);
         } catch (Exception e) {
-            logger.error("[op:MktCamChlConfServiceImpl] fail to save mktCamChlConf = {}", mktCamChlConfDO, e);
+            logger.error("[op:MktCamChlConfServiceImpl] fail to save MktCamChlConf = {}", mktCamChlConfDO, e);
             mktCamChlConfMap.put("resultCode", CommonConstant.CODE_FAIL);
             mktCamChlConfMap.put("resultMsg", ErrorCode.UPDATE_CAM_CHL_CONF_FAILURE.getErrorMsg());
             mktCamChlConfMap.put("evtContactConfId", mktCamChlConfDO.getEvtContactConfId());
