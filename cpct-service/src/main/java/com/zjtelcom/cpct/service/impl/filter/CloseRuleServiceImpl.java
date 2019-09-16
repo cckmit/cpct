@@ -176,6 +176,14 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         //受理关单规则 欠费关单规则  拆机关单规则
         Map<String, Object> maps = new HashMap<>();
         final CloseRule closeRule = BeanUtil.create(addVO,new CloseRule());
+        //关单规则名称 去除重复
+        String closeName = closeRule.getCloseName();
+        Integer count = closeRuleMapper.getCloseNameCount(closeName);
+        if (count>0){
+            maps.put("resultCode", CommonConstant.CODE_FAIL);
+            maps.put("resultMsg", "关单规则名称重复！");
+            return maps;
+        }
         closeRule.setCreateDate(DateUtil.getCurrentTime());
         closeRule.setUpdateDate(DateUtil.getCurrentTime());
         closeRule.setStatusDate(DateUtil.getCurrentTime());
@@ -263,6 +271,14 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         if (closeRule==null){
             maps.put("resultCode", CODE_FAIL);
             maps.put("resultMsg", StringUtils.EMPTY);
+            return maps;
+        }
+        //过滤名称重复
+        String closeName = editVO.getCloseName();
+        Integer count = closeRuleMapper.getCloseNameCount(closeName);
+        if (count>0){
+            maps.put("resultCode", CommonConstant.CODE_FAIL);
+            maps.put("resultMsg", "修改过滤规则 关单规则名称重复！");
             return maps;
         }
         BeanUtil.copy(editVO,closeRule);
@@ -433,6 +449,12 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         if(closeName.equals("") || closeType.equals("") || offerInfo.equals("") || closeCode.equals("")) {
             maps.put("resultCode", CODE_FAIL);
             maps.put("resultMsg", "关单规则信息不完善");
+        }
+        Integer count = closeRuleMapper.getCloseNameCount(closeName);
+        if (count>0){
+            maps.put("resultCode", CommonConstant.CODE_FAIL);
+            maps.put("resultMsg", "导入销售品！关单规则名称重复！");
+            return maps;
         }
         List<String> resultList = new ArrayList<>();
         InputStream inputStream = multipartFile.getInputStream();
