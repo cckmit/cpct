@@ -2305,6 +2305,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             for (String s : uploadList) {
                 logger.info("准备上传文件名称:" + s);
                 File file = new File(downloadFilePath+s);
+                System.out.println("文件是否存在："+file.exists());
                 if (file.exists()) {
                     boolean uploadResult = sftpUtils.uploadFile(uploadExcelPath, s, new FileInputStream(file), sftp);
                     if (uploadResult) {
