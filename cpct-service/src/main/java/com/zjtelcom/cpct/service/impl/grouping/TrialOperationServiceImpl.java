@@ -1061,11 +1061,16 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         String batchNumSt = DateUtil.date2St4Trial(new Date()) + ChannelUtil.getRandomStr(4);
         XlsxProcessAbstract xlsxProcess = new XlsxProcessAbstract();
         //InputStream inputStream = multipartFile.getInputStream();
-        String fileName = multipartFile.getOriginalFilename();
-        String[] split = fileName.split("_");
-        Long camId = Long.valueOf(split[0]);
-        Long strId = Long.valueOf(split[1]);
-        Long ruleId = Long.valueOf(split[2]);
+        //String fileName = multipartFile.getOriginalFilename();
+        List<Map<String, String>> list = sysParamsMapper.listParamsByKey("EVT001");
+        String[] values = null;
+        if (list != null) {
+            values = list.get(0).get("value").split("/");
+        }
+        //String[] split = fileName.split("_");
+        Long camId = Long.valueOf(values[0]);
+        Long strId = Long.valueOf(values[1]);
+        Long ruleId = Long.valueOf(values[2]);
         TrialOperationVO operation = new TrialOperationVO();
         MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(camId);
         MktStrategyConfDO strategy = strategyMapper.selectByPrimaryKey(strId);
@@ -2314,7 +2319,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                 ContentType.APPLICATION_OCTET_STREAM.toString(), fileInputStream);
                         importExcelUserList(multipartFile);
                         logger.info("解析成功，开始删除本地文件！");
-                        boolean b1 = delFile(s);
+                        boolean b1 = delFile(tempFilePath+s);
                         if (b1) {
                             logger.info("删除本地文件成功！");
                         }
