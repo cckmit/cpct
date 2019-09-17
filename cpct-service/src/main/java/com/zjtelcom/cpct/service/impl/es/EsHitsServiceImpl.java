@@ -95,21 +95,21 @@ public class EsHitsServiceImpl implements EsHitsService {
     }
 
     public void saveAll(JSONObject jsonObject, String indexName, String id) {
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                String prodFilter = "0";
-                Object status = redisUtils.get("SYSYTEM_ESLOG_STATUS");
-                if (status != null) {
-                    prodFilter = status.toString();
-                }else {
-                    List<Map<String, String>> sysFilList = sysParamsMapper.listParamsByKey("SYSYTEM_ESLOG_STATUS");
-                    if (sysFilList != null && !sysFilList.isEmpty()) {
-                        prodFilter = sysFilList.get(0).get("value");
-                        redisUtils.set("SYSYTEM_ESLOG_STATUS", prodFilter);
-                    }
-                }
-                if (prodFilter.equals("1")) {
+        String prodFilter = "0";
+        Object status = redisUtils.get("SYSYTEM_ESLOG_STATUS");
+        if (status != null) {
+            prodFilter = status.toString();
+        }else {
+            List<Map<String, String>> sysFilList = sysParamsMapper.listParamsByKey("SYSYTEM_ESLOG_STATUS");
+            if (sysFilList != null && !sysFilList.isEmpty()) {
+                prodFilter = sysFilList.get(0).get("value");
+                redisUtils.set("SYSYTEM_ESLOG_STATUS", prodFilter);
+            }
+        }
+        if (prodFilter.equals("1")) {
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
                     try {
                         if (id == null) {
                             String result = mqProducerService.msg2ESLogProducer(jsonObject, cpctEsLogTopic, indexName + "," + esType, null);
@@ -120,8 +120,8 @@ public class EsHitsServiceImpl implements EsHitsService {
                         logger.error("es日志存储失败");
                     }
                 }
-            }
-        });
+            });
+        }
     }
 
     /**
@@ -573,6 +573,3 @@ public class EsHitsServiceImpl implements EsHitsService {
     }
 
 }
-
-
-class saveAll extends
