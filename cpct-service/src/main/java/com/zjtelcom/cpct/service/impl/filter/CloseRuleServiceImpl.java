@@ -276,7 +276,7 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         //过滤名称重复
         String closeName = editVO.getCloseName();
         Integer count = closeRuleMapper.getCloseNameCount(closeName);
-        if (count>0){
+        if (count>1){
             maps.put("resultCode", CommonConstant.CODE_FAIL);
             maps.put("resultMsg", "修改过滤规则 关单规则名称重复！");
             return maps;
@@ -451,7 +451,7 @@ public class CloseRuleServiceImpl implements CloseRuleService {
             maps.put("resultMsg", "关单规则信息不完善");
         }
         Integer count = closeRuleMapper.getCloseNameCount(closeName);
-        if (count>0){
+        if (count>1){
             maps.put("resultCode", CommonConstant.CODE_FAIL);
             maps.put("resultMsg", "导入销售品！关单规则名称重复！");
             return maps;

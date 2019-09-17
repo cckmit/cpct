@@ -2330,7 +2330,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("resultCode","200");
+        map.put("resultMsg","成功");
+        return map;
     }
 
     public static boolean delFile(String path) {
