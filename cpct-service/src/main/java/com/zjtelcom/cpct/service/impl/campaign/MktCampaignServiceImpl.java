@@ -319,6 +319,23 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 mktCampaignDO.setCreateChannel(PostEnum.ADMIN.getPostCode());
             }
 
+            // 判断是否有创建人信息和岗位信息
+            if(mktCampaignDO.getCreateChannel() == null && mktCampaignDO.getCreateStaff() == 1 ) {
+                maps.put("resultCode", CommonConstant.CODE_FAIL);
+                maps.put("resultMsg", "创建人信息和岗位信息都为空");
+                return maps;
+            }
+            if(mktCampaignDO.getCreateChannel() == null) {
+                maps.put("resultCode", CommonConstant.CODE_FAIL);
+                maps.put("resultMsg", "");
+                return maps;
+            }
+            if(mktCampaignDO.getCreateStaff() == 1 ) {
+                maps.put("resultCode", CommonConstant.CODE_FAIL);
+                maps.put("resultMsg", "创建人信息为空");
+                return maps;
+            }
+
             mktCampaignDO.setServiceType(StatusCode.CUST_TYPE.getStatusCode()); // 1000 - 客账户类
             mktCampaignDO.setLanId(AreaCodeEnum.getLandIdByRegionId(mktCampaignDO.getRegionId()));
             mktCampaignMapper.insert(mktCampaignDO);

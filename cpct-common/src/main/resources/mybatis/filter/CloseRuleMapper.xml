@@ -312,4 +312,8 @@
         </choose>
         ORDER BY RULE_ID DESC
     </select>
+
+    <select id="getCloseNameCount" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(0) FROM close_rule where CLOSE_NAME = #{closeName}
+    </select>
 </mapper>

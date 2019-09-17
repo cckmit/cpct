@@ -169,6 +169,11 @@
             <groupId>com.zjtelcom.cpct.dubbo</groupId>
             <artifactId>cpct-dubbo-log</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>5.1.6.RELEASE</version>
+        </dependency>
 
     </dependencies>
 

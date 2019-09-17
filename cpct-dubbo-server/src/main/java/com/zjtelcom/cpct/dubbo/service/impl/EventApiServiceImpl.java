@@ -192,7 +192,6 @@ public class EventApiServiceImpl implements EventApiService {
     @Autowired(required = false)
     private ICacheIdMappingEntityQryService iCacheIdMappingEntityQryService;
 
-
     /*@Autowired
     private TarGrpConditionMapper tarGrpConditionMapper;*/
 

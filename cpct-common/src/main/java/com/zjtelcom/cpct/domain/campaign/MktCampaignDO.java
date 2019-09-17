@@ -5,7 +5,6 @@ import com.zjtelcom.cpct.BaseEntity;
 import java.util.Date;
 
 public class MktCampaignDO extends BaseEntity{
-    
 
     private Long mktCampaignId;
     private Long initId;
