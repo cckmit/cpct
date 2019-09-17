@@ -3,7 +3,8 @@ package com.zjtelcom.cpct.enums;
 public enum TrialCreateType {
 
     IMPORT_USER_LIST(1000L,"清单导入"),
-    TRIAL_OPERATION(2000L,"策略试运算");
+    TRIAL_OPERATION(2000L,"策略试运算"),
+    ADVANCE_USER_LIST(3000L,"批量导入");
 
     private Long value;
     private String name;
