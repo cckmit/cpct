@@ -121,7 +121,7 @@ public class EventApiServiceImpl implements EventApiService {
     @Autowired
     private InjectionLabelMapper injectionLabelMapper; //标签因子
 
-    @Autowired
+    @Autowired(required = false)
     private EsHitsService esHitService;  //es存储
 
     @Autowired
@@ -384,6 +384,9 @@ public class EventApiServiceImpl implements EventApiService {
             //记录开始时间
             long begin = System.currentTimeMillis();
             log.info("事件计算流程开始:" + map.get("eventCode") + "***" + map.get("reqId"));
+
+            // 翼支付特殊活动id
+            String specialCamId = map.get("TARGET_ACT");
 
             //初始化返回结果中的工单信息
             List<Map<String, Object>> activityList = new ArrayList<>();
@@ -661,7 +664,7 @@ public class EventApiServiceImpl implements EventApiService {
 
 
                 //事件下所有活动的规则预校验，返回初步可命中活动
-                List<Map<String, Object>> resultByEvent = getResultByEvent(eventId, map.get("lanId"), map.get("channelCode"), map.get("reqId"), map.get("accNbr"), c4, map.get("custId"));
+                List<Map<String, Object>> resultByEvent = getResultByEvent(eventId, map.get("lanId"), map.get("channelCode"), map.get("reqId"), map.get("accNbr"), c4, map.get("custId"), specialCamId);
 
                 // 固定必中规则提取
                 // List<Map<String, Object>> resultByEvent2 = getBitslapByEvent(eventId, resultByEvent);
@@ -1206,13 +1209,13 @@ public class EventApiServiceImpl implements EventApiService {
         @Override
         public Map<String, Object> call() {
             Map<String, Object> activityTaskResultMap = new HashMap<>();
-            if(StatusCode.SERVICE_CAMPAIGN.getStatusCode().equals(type) || StatusCode.SERVICE_SALES_CAMPAIGN.getStatusCode().equals(type)){
+            /*if(StatusCode.SERVICE_CAMPAIGN.getStatusCode().equals(type) || StatusCode.SERVICE_SALES_CAMPAIGN.getStatusCode().equals(type)){
                 log.info("服务活动进入camApiSerService.ActivitySerTask");
                 activityTaskResultMap = camApiSerService.ActivitySerTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
-            } else {
+            } else {*/
                 log.info("进入camApiService.ActivityTask");
                 activityTaskResultMap = camApiService.ActivityTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
-            }
+            /*}*/
             return activityTaskResultMap;
         }
     }
@@ -2456,7 +2459,7 @@ public class EventApiServiceImpl implements EventApiService {
                 log.info("查询资产标签失败");
                 esJson.put("hit", "false");
                 esJson.put("msg", "查询资产标签失败");
-                //esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
+                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
                 esHitService.save(esJson, IndexList.EVENT_MODULE, params.get("reqId"));
                 return null;
             }
