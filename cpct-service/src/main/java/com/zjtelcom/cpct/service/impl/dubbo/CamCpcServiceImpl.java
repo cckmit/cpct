@@ -177,7 +177,15 @@ public class CamCpcServiceImpl implements CamCpcService {
         MktCampaignDO mktCampaign = null;
         try {
             //查询活动基本信息
-            mktCampaign = (MktCampaignDO) redisUtils.get("MKT_CAMPAIGN_" + activityId);
+            try {
+                Object campaign =  redisUtils.get("MKT_CAMPAIGN_" + activityId);
+                if (campaign!=null){
+                    mktCampaign = (MktCampaignDO) campaign;
+                }
+            } catch (Exception e) {
+                log.info("活动信息查询失败，缓存失败");
+                e.printStackTrace();
+            }
             if (mktCampaign == null) {
                 mktCampaign = mktCampaignMapper.selectByPrimaryKey(activityId);
                 if (mktCampaign == null) {
@@ -458,10 +466,24 @@ public class CamCpcServiceImpl implements CamCpcService {
         //获取结果
         try {
             for (Future<Map<String, Object>> future : threadList) {
-                if (!future.get().isEmpty()) {
-                    ruleList.add(future.get());
+                try {
+                    Map<String,Object> futureMap =  future.get();
+                    if (!futureMap.isEmpty()) {
+                        ruleList.add(futureMap);
+                    }
+                } catch (InterruptedException e) {
+                    esJson.put("hit", "false");
+                    esJson.put("msg", "规则校验出错:" + e.getMessage());
+                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + privateParams.get("accNbr"));
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    esJson.put("hit", "false");
+                    esJson.put("msg", "规则校验出错:" + e.getMessage());
+                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + privateParams.get("accNbr"));
+                    e.printStackTrace();
                 }
             }
+
             boolean isWithDefaultLabel = false;
             for (Map.Entry entry:flagMap.entrySet()) {
                if(true == Boolean.valueOf(entry.getValue().toString())){
@@ -734,8 +756,8 @@ public class CamCpcServiceImpl implements CamCpcService {
             jsonObject.put("hitEntity", privateParams.get("accNbr")); //命中对象
             jsonObject.put("reqId", reqId);
             jsonObject.put("eventId", params.get("eventCode"));
-            jsonObject.put("activityId", mktCampaignDO.getInitId());
-            jsonObject.put("strategyConfId", mktStrategyConfDO.getInitId());
+            jsonObject.put("activityId", mktCampaignDO.getMktCampaignId());
+            jsonObject.put("strategyConfId", mktStrategyConfDO.getMktStrategyConfId());
             jsonObject.put("productStr", productStr);
             jsonObject.put("evtContactConfIdStr", evtContactConfIdStr);
             jsonObject.put("tarGrpId", tarGrpId);
@@ -744,8 +766,8 @@ public class CamCpcServiceImpl implements CamCpcService {
             //ES log 标签实例
             esJson.put("reqId", reqId);
             esJson.put("eventId", params.get("eventCode"));
-            esJson.put("activityId", mktCampaignDO.getInitId());
-            esJson.put("ruleId", mktStrategyConfRuleDO.getInitId());
+            esJson.put("activityId",  mktCampaignDO.getMktCampaignId());
+            esJson.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
             esJson.put("ruleName", ruleName);
             esJson.put("integrationId", params.get("integrationId"));
             esJson.put("accNbr", params.get("accNbr"));
@@ -785,8 +807,6 @@ public class CamCpcServiceImpl implements CamCpcService {
                     redisUtils.set("EVT_SWITCH_CHECK_LABEL", systemParamList.get(0));
                 }
             }
-
-
             String realProdFilter = (String) redisUtils.get("REAL_PROD_FILTER");
             if (realProdFilter == null) {
                 List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("REAL_PROD_FILTER");
