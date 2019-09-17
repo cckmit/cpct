@@ -178,6 +178,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
             if(filterRuleList != null && filterRuleList.size() > 0) {
                 maps.put("resultCode", CODE_FAIL);
                 maps.put("resultMsg", "过滤规则名称已存在");
+                return maps;
             }
             filterRules.setRuleName(ruleName);
             filterRules.setFilterType(filterType);
