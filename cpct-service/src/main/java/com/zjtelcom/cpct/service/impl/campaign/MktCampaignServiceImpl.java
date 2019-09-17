@@ -1108,7 +1108,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     }
 
     /**
-     * 查询活动列表（分页） -- 活动总览
+     * 查询活动列表（分页） -- 活动模板
      */
     @Override
     public Map<String, Object> qryMktCampaignListPage(Map<String, Object> params) {
@@ -1116,7 +1116,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         try {
             MktCampaignDO mktCampaignDO = new MktCampaignDO();
             mktCampaignDO.setMktCampaignName(params.get("mktCampaignName").toString());  // 活动名称
-            mktCampaignDO.setStatusCd("2002");                 // 活动状态
+            mktCampaignDO.setStatusCd("(2002, 2010)");                 // 活动状态发布
             mktCampaignDO.setTiggerType(params.get("tiggerType").toString());             // 活动触发类型 - 实时，批量
             mktCampaignDO.setMktCampaignCategory(params.get("mktCampaignCategory").toString());  // 活动分类 - 框架，强制，自主
             mktCampaignDO.setMktCampaignType(params.get("mktCampaignType").toString());   // 活动类别 - 服务，营销，服务+营销
@@ -2225,7 +2225,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         // 查出所有已经发布的活动
         try {
             MktCampaignDO parma = new MktCampaignDO();
-            parma.setStatusCd(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode());
+            parma.setStatusCd("(2002, 2006, 2008)");
             List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListByCondition(parma);
             Date now = new Date();
             for (MktCampaignDO mktCampaignDO : mktCampaignDOList) {

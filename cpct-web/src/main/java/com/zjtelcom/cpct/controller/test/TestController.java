@@ -12,6 +12,7 @@ import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboSe
 import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.rule.RuleResult;
+import com.zjtelcom.cpct.Application;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
 import com.zjtelcom.cpct.dao.channel.ObjMktCampaignRelMapper;
@@ -36,6 +37,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -229,6 +231,8 @@ public class TestController extends BaseController {
         Map<String, Object> map = mktCamChlResultApiService.secondChannelSynergy(params);
         return JSON.toJSONString(map);
     }
+
+
 }
 
 

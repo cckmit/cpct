@@ -201,10 +201,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(createStaff, new ArrayList<Long>());
             if (systemUserDtoSysmgrResultObject != null) {
                 if (systemUserDtoSysmgrResultObject.getResultObject() != null) {
-                    /*codeNumber = systemUserDtoSysmgrResultObject.getResultObject().getStaffCode();
+                    codeNumber = systemUserDtoSysmgrResultObject.getResultObject().getStaffCode();
                     codeNumber = codeNumber + "&&" + systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
-                    codeNumber = codeNumber + "&&" + systemUserDtoSysmgrResultObject.getResultObject().getStaffName();*/
-                    codeNumber = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
+                    codeNumber = codeNumber + "&&" + systemUserDtoSysmgrResultObject.getResultObject().getStaffName();
+                    // codeNumber = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
                 }
             }
         }catch (Exception e){
@@ -1042,7 +1042,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     public void importListMQ2EsService(TrialOperationVOES request, List<Map<String, Object>> customerList, List<FilterRule> productFilter, String batchNumSt, String ruleId, TrialOperation operation){
         logger.info("导入试运算清单importUserList->customerList的数量：" + customerList.size());
         Long mqSum = 0L;
-        boolean flag = true;
         int x = customerList.size() / 1000;
         for (int i = 0; i <= x; i++) {
             List<Map<String, Object>> newSublist = new ArrayList();
@@ -1060,7 +1059,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 // 判断是否发送成功
                 if (!mqService.msg2Producer(msgBody,importTopic, batchNumSt, ruleId).equals("SEND_OK")) {
                     // 发送失败自动重发2次，如果还是失败，记录
-                    flag = false;
                     logger.error("CTGMQ消息生产失败,batchNumSt:" + batchNumSt, msgBody);
                 }
                 mqSum++;
@@ -1071,12 +1069,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             newSublist.clear();
         }
         redisUtils_es.set("MQ_SUM_" + batchNumSt, mqSum);
-        /*if (flag){
-            operation.setStatusCd(TrialStatus.IMPORT_SUCCESS.getValue());
-        }else{
-            operation.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
-        }
-        trialOperationMapper.updateByPrimaryKey(operation);*/
     }
 
     private void blackList2Redis(MktCampaignDO campaign) {
@@ -1869,6 +1861,15 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 tarGrpConditionDOs = conditions;
                 tarGrpId = -1L;
             }
+            //过滤规则
+            String prodFilter = "0";
+            List<Map<String, String>> sysFilList = sysParamsMapper.listParamsByKey("CUST_PRODUCT_FILTER");
+            if (sysFilList != null && !sysFilList.isEmpty()) {
+                prodFilter = sysFilList.get(0).get("value");
+            }
+            if ("1".equals(prodFilter)){
+                targrpCondition(mktCampaignId,tarGrpConditionDOs);
+            }
             System.out.println(JSON.toJSONString(tarGrpConditionDOs));
             List<LabelResult> labelResultList = new ArrayList<>();
             List<String> codeList = new ArrayList<>();
@@ -1970,4 +1971,30 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         }
 
     }
+
+    private void  targrpCondition(Long campaignId, List<TarGrpCondition> tarGrpConditionDOs){
+        List<String> typeList = new ArrayList<>();
+        typeList.add("3000");
+        List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(campaignId,typeList);
+        List<String> stringList = new ArrayList<>();
+        Label label = labelMapper.selectByLabelCode("PROM_LIST");
+        for (FilterRule filterRule : filterRuleList){
+            if (filterRule!=null && filterRule.getChooseProduct()!=null){
+                TarGrpCondition condition = new TarGrpCondition();
+                condition.setLeftParam(label.getInjectionLabelId().toString());
+                List<String> list = ChannelUtil.StringToList(filterRule.getChooseProduct());
+                for (String id : list){
+                    Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(id));
+                    if (offer!=null){
+                        stringList.add(offer.getOfferNbr());
+                    }
+                }
+              String rightParam =  ChannelUtil.list2String(stringList,",");
+                condition.setRightParam(rightParam);
+                condition.setOperType(filterRule.getOperator().equals("1000")? "7100" : "7200");
+                tarGrpConditionDOs.add(condition);
+            }
+        }
+    }
+
 }
