@@ -27,6 +27,8 @@ public class DisplayColumnVO implements Serializable {
 
     private String statusCd;
 
+    private Long createStaff;
+
 
     public String getStatusCd() {
         return statusCd;
@@ -66,5 +68,13 @@ public class DisplayColumnVO implements Serializable {
 
     public void setDisplayColumnName(String displayColumnName) {
         this.displayColumnName = displayColumnName;
+    }
+
+    public Long getCreateStaff() {
+        return createStaff;
+    }
+
+    public void setCreateStaff(Long createStaff) {
+        this.createStaff = createStaff;
     }
 }
