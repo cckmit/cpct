@@ -747,34 +747,45 @@ public class CamCpcServiceImpl implements CamCpcService {
                 promIntegId = (String) context.get("PROM_INTEG_ID");
             }
 
-            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(privateParams.get("activityId")));
-            MktStrategyConfDO mktStrategyConfDO = mktStrategyConfMapper.selectByPrimaryKey(strategyConfId);
-            MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleId);
+            MktCampaignDO mktCampaignDO = null;
+            MktStrategyConfDO mktStrategyConfDO = null;
+            MktStrategyConfRuleDO mktStrategyConfRuleDO = null;
+            try {
+                mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(privateParams.get("activityId")));
+                mktStrategyConfDO = mktStrategyConfMapper.selectByPrimaryKey(strategyConfId);
+                mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleId);
 
-            jsonObject.put("ruleId", mktStrategyConfRuleDO.getInitId());
-            jsonObject.put("ruleName", ruleName);
-            jsonObject.put("hitEntity", privateParams.get("accNbr")); //命中对象
-            jsonObject.put("reqId", reqId);
-            jsonObject.put("eventId", params.get("eventCode"));
-            jsonObject.put("activityId", mktCampaignDO.getMktCampaignId());
-            jsonObject.put("strategyConfId", mktStrategyConfDO.getMktStrategyConfId());
-            jsonObject.put("productStr", productStr);
-            jsonObject.put("evtContactConfIdStr", evtContactConfIdStr);
-            jsonObject.put("tarGrpId", tarGrpId);
-            jsonObject.put("promIntegId", promIntegId);
+                jsonObject.put("ruleId", mktStrategyConfRuleDO.getInitId());
+                jsonObject.put("ruleName", ruleName);
+                jsonObject.put("hitEntity", privateParams.get("accNbr")); //命中对象
+                jsonObject.put("reqId", reqId);
+                jsonObject.put("eventId", params.get("eventCode"));
+                jsonObject.put("activityId", mktCampaignDO.getMktCampaignId());
+                jsonObject.put("strategyConfId", mktStrategyConfDO.getMktStrategyConfId());
+                jsonObject.put("productStr", productStr);
+                jsonObject.put("evtContactConfIdStr", evtContactConfIdStr);
+                jsonObject.put("tarGrpId", tarGrpId);
+                jsonObject.put("promIntegId", promIntegId);
 
-            //ES log 标签实例
-            esJson.put("reqId", reqId);
-            esJson.put("eventId", params.get("eventCode"));
-            esJson.put("activityId",  mktCampaignDO.getMktCampaignId());
-            esJson.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
-            esJson.put("ruleName", ruleName);
-            esJson.put("integrationId", params.get("integrationId"));
-            esJson.put("accNbr", params.get("accNbr"));
-            esJson.put("strategyConfId", mktStrategyConfDO.getInitId());
-            esJson.put("tarGrpId", tarGrpId);
-            esJson.put("promIntegId", promIntegId);
-            esJson.put("hitEntity", privateParams.get("accNbr")); //命中对象
+                //ES log 标签实例
+                esJson.put("reqId", reqId);
+                esJson.put("eventId", params.get("eventCode"));
+                esJson.put("activityId",  mktCampaignDO.getMktCampaignId());
+                esJson.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
+                esJson.put("ruleName", ruleName);
+                esJson.put("integrationId", params.get("integrationId"));
+                esJson.put("accNbr", params.get("accNbr"));
+                esJson.put("strategyConfId", mktStrategyConfDO.getInitId());
+                esJson.put("tarGrpId", tarGrpId);
+                esJson.put("promIntegId", promIntegId);
+                esJson.put("hitEntity", privateParams.get("accNbr")); //命中对象
+            } catch (NumberFormatException e) {
+                jsonObject.put("hit", "false");
+                jsonObject.put("msg", "类型转换异常"+e.getMessage());
+                esHitService.save(jsonObject, IndexList.RULE_MODULE);
+                e.printStackTrace();
+                return Collections.EMPTY_MAP;
+            }
 
             Map<String, Object> ruleMap = new ConcurrentHashMap<>();
             //初始化返回结果中的推荐信息列表
@@ -807,46 +818,54 @@ public class CamCpcServiceImpl implements CamCpcService {
                     redisUtils.set("EVT_SWITCH_CHECK_LABEL", systemParamList.get(0));
                 }
             }
-            String realProdFilter = (String) redisUtils.get("REAL_PROD_FILTER");
-            if (realProdFilter == null) {
-                List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("REAL_PROD_FILTER");
-                if (sysParamsList != null && sysParamsList.size() > 0) {
-                    realProdFilter = sysParamsList.get(0).getParamValue();
-                    redisUtils.set("REAL_PROD_FILTER", realProdFilter);
+            String realProdFilter = null;
+            try {
+                realProdFilter = (String) redisUtils.get("REAL_PROD_FILTER");
+                if (realProdFilter == null) {
+                    List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("REAL_PROD_FILTER");
+                    if (sysParamsList != null && sysParamsList.size() > 0) {
+                        realProdFilter = sysParamsList.get(0).getParamValue();
+                        redisUtils.set("REAL_PROD_FILTER", realProdFilter);
+                    }
                 }
-            }
-            if (realProdFilter != null && "1".equals(realProdFilter)) {
-                List<String> prodList = new ArrayList<>();
-                log.info("111------accNbr --->" + privateParams.get("accNbr"));
-                CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(privateParams.get("accNbr"));
-                if(prodInstIdsObject!=null &&  prodInstIdsObject.getResultObject() !=null ){
-                    Set<String> prodInstIds = prodInstIdsObject.getResultObject();
-                    for (String prodInstId : prodInstIds) {
-                        // 根据prodInstId 和 statusCd(1000-有效)查询offerProdInstRelId
-                        CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex2(prodInstId, "1000");
-                        if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null) {
-                            Set<String> offerProdInstRelIdSet = setCacheResultObject.getResultObject();
-                            for (String offerProdInstRelId : offerProdInstRelIdSet) {
-                                // 查询销售品产品实例关系缓存实体
-                                CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
-                                if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
-                                    OfferProdInstRel offerProdInstRel = offerProdInstRelCacheEntity.getResultObject();
-                                    // 查询销售品实例缓存实体
-                                    CacheResultObject<OfferInst> offerInstCacheEntity = iCacheOfferEntityQryService.getOfferInstCacheEntity(offerProdInstRel.getOfferInstId().toString());
-                                    if(offerInstCacheEntity!=null && offerInstCacheEntity.getResultObject()!=null){
-                                        OfferInst offerInst = offerInstCacheEntity.getResultObject();
-                                        prodList.add(offerInst.getOfferId().toString());
+                if (realProdFilter != null && "1".equals(realProdFilter)) {
+                    List<String> prodList = new ArrayList<>();
+                    log.info("111------accNbr --->" + privateParams.get("accNbr"));
+                    CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(privateParams.get("accNbr"));
+                    if(prodInstIdsObject!=null &&  prodInstIdsObject.getResultObject() !=null ){
+                        Set<String> prodInstIds = prodInstIdsObject.getResultObject();
+                        for (String prodInstId : prodInstIds) {
+                            // 根据prodInstId 和 statusCd(1000-有效)查询offerProdInstRelId
+                            CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex2(prodInstId, "1000");
+                            if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null) {
+                                Set<String> offerProdInstRelIdSet = setCacheResultObject.getResultObject();
+                                for (String offerProdInstRelId : offerProdInstRelIdSet) {
+                                    // 查询销售品产品实例关系缓存实体
+                                    CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
+                                    if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
+                                        OfferProdInstRel offerProdInstRel = offerProdInstRelCacheEntity.getResultObject();
+                                        // 查询销售品实例缓存实体
+                                        CacheResultObject<OfferInst> offerInstCacheEntity = iCacheOfferEntityQryService.getOfferInstCacheEntity(offerProdInstRel.getOfferInstId().toString());
+                                        if(offerInstCacheEntity!=null && offerInstCacheEntity.getResultObject()!=null){
+                                            OfferInst offerInst = offerInstCacheEntity.getResultObject();
+                                            prodList.add(offerInst.getOfferId().toString());
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+                    String productString = ChannelUtil.StringList2String(prodList);
+                    log.info("999------productStr --->" + JSON.toJSONString(productStr));
+                    context.put("PROM_LIST" , productString);
                 }
-                String productString = ChannelUtil.StringList2String(prodList);
-                log.info("999------productStr --->" + JSON.toJSONString(productStr));
-                context.put("PROM_LIST" , productString);
+            } catch (Exception e) {
+                e.printStackTrace();
+                jsonObject.put("hit", "false");
+                jsonObject.put("msg", "销售品过滤查询异常"+e.getMessage());
+                esHitService.save(jsonObject, IndexList.RULE_MODULE);
+                return Collections.EMPTY_MAP;
             }
-
             if (express == null || "".equals(express)) {
                 List<LabelResult> labelResultList = new ArrayList<>();
                 try {
