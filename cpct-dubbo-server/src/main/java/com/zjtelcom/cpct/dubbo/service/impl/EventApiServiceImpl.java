@@ -2475,7 +2475,7 @@ public class EventApiServiceImpl implements EventApiService {
                 log.info("查询资产标签失败");
                 esJson.put("hit", "false");
                 esJson.put("msg", "查询资产标签失败");
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
+            //    esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
                 esHitService.save(esJson, IndexList.EVENT_MODULE, params.get("reqId"));
                 return null;
             }
