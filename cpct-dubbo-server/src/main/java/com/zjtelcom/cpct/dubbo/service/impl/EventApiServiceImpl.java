@@ -1962,10 +1962,6 @@ public class EventApiServiceImpl implements EventApiService {
      * @return
      */
     private List<Map<String, Object>> getResultByEvent(Long eventId, String lanId, String channel, String reqId, String accNbr, String c4, String custId) {
-        return getResultByEvent(eventId, lanId, channel, reqId, accNbr, c4, custId, null);
-    }
-
-    private List<Map<String, Object>> getResultByEvent(Long eventId, String lanId, String channel, String reqId, String accNbr, String c4, String custId, String special) {
         List<Map<String, Object>> mktCampaginIdList = mktCamEvtRelMapper.listActivityByEventId(eventId);
         // 初始化线程
         ExecutorService fixThreadPool = Executors.newFixedThreadPool(maxPoolSize);
@@ -1973,7 +1969,7 @@ public class EventApiServiceImpl implements EventApiService {
         List<Map<String, Object>> resultMapList = new ArrayList<>();
         try {
             for (Map<String, Object> act : mktCampaginIdList) {
-                Future<Map<String, Object>> future = fixThreadPool.submit(new ListResultByEventTask(lanId, channel, reqId, accNbr, act, c4, custId, special));
+                Future<Map<String, Object>> future = fixThreadPool.submit(new ListResultByEventTask(lanId, channel, reqId, accNbr, act, c4, custId));
                 futureList.add(future);
             }
             if (futureList != null && futureList.size() > 0) {
@@ -1992,11 +1988,9 @@ public class EventApiServiceImpl implements EventApiService {
         return resultMapList;
     }
 
-
-
-        /**
-         * 多线程活动校验
-         */
+    /**
+     * 多线程活动校验
+     */
     class ListResultByEventTask implements Callable<Map<String, Object>> {
         private String lanId;
         private String channel;
@@ -2005,9 +1999,8 @@ public class EventApiServiceImpl implements EventApiService {
         private Map<String, Object> act;
         private String c4;
         private String custId;
-        private String special;
 
-        public ListResultByEventTask(String lanId, String channel, String reqId, String accNbr, Map<String, Object> act, String c4, String custId, String special) {
+        public ListResultByEventTask(String lanId, String channel, String reqId, String accNbr, Map<String, Object> act, String c4, String custId) {
             this.lanId = lanId;
             this.channel = channel;
             this.reqId = reqId;
@@ -2015,7 +2008,6 @@ public class EventApiServiceImpl implements EventApiService {
             this.act = act;
             this.c4 = c4;
             this.custId = custId;
-            this.special = special;
         }
 
         @Override
@@ -2026,8 +2018,6 @@ public class EventApiServiceImpl implements EventApiService {
             Map<String, Object> mktCampaignMap = new ConcurrentHashMap<>();
 
             Map<String, Object> mktCampaignCustMap = new ConcurrentHashMap<>();
-
-            Map<String, Object> nonPassedMsg = new ConcurrentHashMap<>();
 
             try {
                 Long mktCampaginId = (Long) act.get("mktCampaginId");
@@ -2072,94 +2062,95 @@ public class EventApiServiceImpl implements EventApiService {
                             e.printStackTrace();
                             log.error("queryYz查询失败："+e,JSON.toJSONString(dubboResult_F));
                         }
-                        if ("0".equals(dubboResult_F.get("result_code").toString())) {
-                            accArrayF = new JSONArray((List<Object>) dubboResult_F.get("msgbody"));
+                        try {
+                            if ("0".equals(dubboResult_F.get("result_code").toString())) {
+                                accArrayF = new JSONArray((List<Object>) dubboResult_F.get("msgbody"));
+                            }
+                        } catch (Exception e) {
+                            log.info("dubboResult_F.get(\"result_code\").toString()异常了~~~");
+                            e.printStackTrace();
                         }
                     }
 
-                    for (FilterRule filterRule : filterRuleList) {
-                        if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
-                            //获取名单
-                            String userList = filterRule.getUserList();
-                            if (userList != null && !"".equals(userList)) {
-                                for (Object ob : accArrayF) {
-                                    int index = userList.indexOf(((Map) ob).get("ACC_NBR").toString());
+                    try {
+                        for (FilterRule filterRule : filterRuleList) {
+                            if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
+                                //获取名单
+                                String userList = filterRule.getUserList();
+                                if (userList != null && !"".equals(userList)) {
+                                    for (Object ob : accArrayF) {
+                                        int index = userList.indexOf(((Map) ob).get("ACC_NBR").toString());
+                                        if (index >= 0) {
+                                            esJson.put("hit", false);
+                                            esJson.put("msg", "红黑名单过滤规则验证被拦截");
+                                            esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                                            return Collections.EMPTY_MAP;
+                                        }
+                                    }
+
+                                }
+                            } else if ("5000".equals(filterRule.getFilterType())) {
+                                //时间段的格式
+                                if (compareHourAndMinute(filterRule)) {
+                                    log.info("过滤时间段验证被拦截");
+                                    esJson.put("hit", false);
+                                    esJson.put("msg", "过滤时间段验证被拦截");
+                                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                                    return Collections.EMPTY_MAP;
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        log.info("filterRuleList ！我在这里出错了，你看着办");
+                        e.printStackTrace();
+                    }
+                } else {
+                    try {
+                        List<String> strategyTypeList = new ArrayList<>();
+                        strategyTypeList.add("1000");
+                        strategyTypeList.add("2000");
+                        strategyTypeList.add("5000");
+                        //验证过滤规则时间,默认只查询5000类型的时间段过滤
+                        List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(mktCampaginId, strategyTypeList);
+                        for (FilterRule filterRule : filterRuleList) {
+                            if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
+                                //获取名单
+                                String userList = filterRule.getUserList();
+                                if (userList != null && !"".equals(userList)) {
+                                    int index = userList.indexOf(accNbr);
                                     if (index >= 0) {
                                         esJson.put("hit", false);
                                         esJson.put("msg", "红黑名单过滤规则验证被拦截");
                                         esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                                        if (special != null && special.equals(mktCampaginId)) {
-                                            nonPassedMsg.put("cam_" + special, "红黑名单过滤规则验证被拦截");
-                                            resultMap.put("nonPassedMsg", nonPassedMsg);
-                                            return resultMap;
-                                        }
                                         return Collections.EMPTY_MAP;
                                     }
                                 }
-
-                            }
-                        } else if ("5000".equals(filterRule.getFilterType())) {
-                            //时间段的格式
-                            if (compareHourAndMinute(filterRule)) {
-                                log.info("过滤时间段验证被拦截");
-                                esJson.put("hit", false);
-                                esJson.put("msg", "过滤时间段验证被拦截");
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                                if (special != null && special.equals(mktCampaginId)) {
-                                    nonPassedMsg.put("cam_" + special, "过滤时间段验证被拦截");
-                                    resultMap.put("nonPassedMsg", nonPassedMsg);
-                                    return resultMap;
-                                }
-                                return Collections.EMPTY_MAP;
-                            }
-                        }
-                    }
-                } else {
-                    List<String> strategyTypeList = new ArrayList<>();
-                    strategyTypeList.add("1000");
-                    strategyTypeList.add("2000");
-                    strategyTypeList.add("5000");
-                    //验证过滤规则时间,默认只查询5000类型的时间段过滤
-                    List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(mktCampaginId, strategyTypeList);
-                    for (FilterRule filterRule : filterRuleList) {
-                        if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
-                            //获取名单
-                            String userList = filterRule.getUserList();
-                            if (userList != null && !"".equals(userList)) {
-                                int index = userList.indexOf(accNbr);
-                                if (index >= 0) {
+                            } else if ("5000".equals(filterRule.getFilterType())) {
+                                //时间段的格式
+                                if (compareHourAndMinute(filterRule)) {
+                                    log.info("过滤时间段验证被拦截");
                                     esJson.put("hit", false);
-                                    esJson.put("msg", "红黑名单过滤规则验证被拦截");
+                                    esJson.put("msg", "过滤时间段验证被拦截");
                                     esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                                    if (special != null && special.equals(mktCampaginId)) {
-                                        nonPassedMsg.put("cam_" + special, "红黑名单过滤规则验证被拦截");
-                                        resultMap.put("nonPassedMsg", nonPassedMsg);
-                                        return resultMap;
-                                    }
                                     return Collections.EMPTY_MAP;
                                 }
                             }
-                        } else if ("5000".equals(filterRule.getFilterType())) {
-                            //时间段的格式
-                            if (compareHourAndMinute(filterRule)) {
-                                log.info("过滤时间段验证被拦截");
-                                esJson.put("hit", false);
-                                esJson.put("msg", "过滤时间段验证被拦截");
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                                if (special != null && special.equals(mktCampaginId)) {
-                                    nonPassedMsg.put("cam_" + special, "过滤时间段验证被拦截");
-                                    resultMap.put("nonPassedMsg", nonPassedMsg);
-                                    return resultMap;
-                                }
-                                return Collections.EMPTY_MAP;
-                            }
                         }
+                    } catch (Exception e) {
+                        log.info("filterRuleList else ！我在这里出错了，你看着办");
+                        e.printStackTrace();
                     }
                 }
 
 
                 //查询活动信息
-                MktCampaignDO mktCampaign = (MktCampaignDO) redisUtils.get("MKT_CAMPAIGN_" + mktCampaginId);
+                MktCampaignDO mktCampaign = null;
+                try {
+                    mktCampaign = (MktCampaignDO) redisUtils.get("MKT_CAMPAIGN_" + mktCampaginId);
+                } catch (Exception e) {
+                    log.info("(MktCampaignDO) redisUtils.get(\"MKT_CAMPAIGN_\" + mktCampaginId)出现异常 缓存没取到？");
+                    e.printStackTrace();
+                }
                 if (mktCampaign == null) {
                     mktCampaign = mktCampaignMapper.selectByPrimaryKey(mktCampaginId);
                     redisUtils.set("MKT_CAMPAIGN_" + mktCampaginId, mktCampaign);
@@ -2174,28 +2165,21 @@ public class EventApiServiceImpl implements EventApiService {
                     esJson.put("msg", "当前时间不在活动生效时间内");
                     log.info("当前时间不在活动生效时间内");
                     esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                    if (special != null && special.equals(mktCampaginId)) {
-                        nonPassedMsg.put("cam_" + special, "当前时间不在活动生效时间内");
-                        resultMap.put("nonPassedMsg", nonPassedMsg);
-                        return resultMap;
-                    }
                     return Collections.EMPTY_MAP;
                 }
 
                 // 判断活动状态
+
+
                 if (!(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaign.getStatusCd())
                         || StatusCode.STATUS_CODE_ADJUST.getStatusCode().equals(mktCampaign.getStatusCd()))) {
                     esJson.put("hit", false);
                     esJson.put("msg", "活动状态未发布");
 //                log.info("活动状态未发布");
                     esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                    if (special != null && special.equals(mktCampaginId)) {
-                        nonPassedMsg.put("cam_" + special, "活动状态未发布");
-                        resultMap.put("nonPassedMsg", nonPassedMsg);
-                        return resultMap;
-                    }
                     return Collections.EMPTY_MAP;
                 }
+
 
                 // 判断触发活动类型
                 if (!StatusCode.REAL_TIME_CAMPAIGN.getStatusCode().equals(mktCampaign.getTiggerType())
@@ -2204,11 +2188,6 @@ public class EventApiServiceImpl implements EventApiService {
                     esJson.put("msg", "活动触发类型不符");
                     log.info("活动触发类型不符");
                     esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                    if (special != null && special.equals(mktCampaginId)) {
-                        nonPassedMsg.put("cam_" + special, "活动触发类型不符");
-                        resultMap.put("nonPassedMsg", nonPassedMsg);
-                        return resultMap;
-                    }
                     return Collections.EMPTY_MAP;
                 }
 
@@ -2218,11 +2197,6 @@ public class EventApiServiceImpl implements EventApiService {
                     esJson.put("msg", "活动类型不符");
                     log.info("活动类型不符");
                     esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                    if (special != null && special.equals(mktCampaginId)) {
-                        nonPassedMsg.put("cam_" + special, "活动类型不符");
-                        resultMap.put("nonPassedMsg", nonPassedMsg);
-                        return resultMap;
-                    }
                     return Collections.EMPTY_MAP;
                 }
 
@@ -2233,11 +2207,6 @@ public class EventApiServiceImpl implements EventApiService {
                     esJson.put("msg", "策略查询失败");
                     log.info("策略查询失败");
                     esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                    if (special != null && special.equals(mktCampaginId)) {
-                        nonPassedMsg.put("cam_" + special, "策略查询失败");
-                        resultMap.put("nonPassedMsg", nonPassedMsg);
-                        return resultMap;
-                    }
                     return Collections.EMPTY_MAP;
                 }
                 List<Map<String, Object>> strategyMapList = new ArrayList<>();
@@ -2264,10 +2233,6 @@ public class EventApiServiceImpl implements EventApiService {
                         esJsonStrategy.put("hit", false);
                         esJsonStrategy.put("msg", "当前时间不在策略生效时间内");
                         esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
-                        if (special != null && special.equals(mktCampaginId)) {
-                            nonPassedMsg.put("str_" + mktStrategyConf.getMktStrategyConfId(), "当前时间不在策略生效时间内");
-                            //resultMap.put("nonPassedMsg", nonPassedMsg);
-                        }
                         continue;
                     }
                     //适用地市校验
@@ -2295,9 +2260,6 @@ public class EventApiServiceImpl implements EventApiService {
                                 esJsonStrategy.put("hit", "false");
                                 esJsonStrategy.put("msg", "适用地市获取异常");
                                 esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
-                                if (special != null && special.equals(mktCampaginId)) {
-                                    nonPassedMsg.put("str_" + mktStrategyConf.getMktStrategyConfId(), "适用地市获取异常");
-                                }
                             }
                         }
                         if (areaCheck) {
@@ -2310,9 +2272,6 @@ public class EventApiServiceImpl implements EventApiService {
                             esJsonStrategy.put("hit", "false");
                             esJsonStrategy.put("msg", "适用地市不符");
                             esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
-                            if (special != null && special.equals(mktCampaginId)) {
-                                nonPassedMsg.put("str_" + mktStrategyConf.getMktStrategyConfId(), "适用地市不符");
-                            }
                             continue;
                         }
                     } else {
@@ -2327,9 +2286,6 @@ public class EventApiServiceImpl implements EventApiService {
                         esJsonStrategy.put("hit", "false");
                         esJsonStrategy.put("msg", "适用地市数据异常");
                         esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
-                        if (special != null && special.equals(mktCampaginId)) {
-                            nonPassedMsg.put("str_" + mktStrategyConf.getMktStrategyConfId(), "适用地市数据异常");
-                        }
                         continue;
                     }
                     //判断适用渠道
@@ -2361,9 +2317,6 @@ public class EventApiServiceImpl implements EventApiService {
                                 esJsonStrategy.put("hit", "false");
                                 esJsonStrategy.put("msg", "适用渠道获取异常");
                                 esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
-                                if (special != null && special.equals(mktCampaginId)) {
-                                    nonPassedMsg.put("str_" + mktStrategyConf.getMktStrategyConfId(), "适用渠道获取异常");
-                                }
                             }
                         }
                         if (channelCheck) {
@@ -2377,9 +2330,6 @@ public class EventApiServiceImpl implements EventApiService {
                             esJsonStrategy.put("hit", "false");
                             esJsonStrategy.put("msg", "适用渠道不符");
                             esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
-                            if (special != null && special.equals(mktCampaginId)) {
-                                nonPassedMsg.put("str_" + mktStrategyConf.getMktStrategyConfId(), "适用渠道不符");
-                            }
                             continue;
                         }
                     } else {
@@ -2394,9 +2344,6 @@ public class EventApiServiceImpl implements EventApiService {
                         esJsonStrategy.put("hit", "false");
                         esJsonStrategy.put("msg", "适用渠道数据异常");
                         esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
-                        if (special != null && special.equals(mktCampaginId)) {
-                            nonPassedMsg.put("str_" + mktStrategyConf.getMktStrategyConfId(), "适用渠道数据异常");
-                        }
                         continue;
                     }
 
@@ -2424,7 +2371,13 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 }
 
-                List<String> mktCamCodeList = (List<String>) redisUtils.get("MKT_CAM_API_CODE_KEY");
+                List<String> mktCamCodeList = null;
+                try {
+                    mktCamCodeList = (List<String>) redisUtils.get("MKT_CAM_API_CODE_KEY");
+                } catch (Exception e) {
+                    log.info("(List<String>) redisUtils.get(\"MKT_CAM_API_CODE_KEY\") 出现异常 ！请检查~");
+                    e.printStackTrace();
+                }
                 if (mktCamCodeList == null) {
                     List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("MKT_CAM_API_CODE");
                     mktCamCodeList = new ArrayList<String>();
@@ -2455,8 +2408,6 @@ public class EventApiServiceImpl implements EventApiService {
                 resultMap.put("mktCampaignMap", mktCampaignMap);
                 // 清单
                 resultMap.put("mktCampaignCustMap", mktCampaignCustMap);
-                // 未命中信息
-                resultMap.put("nonPassedMsg", nonPassedMsg);
 
             } catch (Exception e) {
                 log.info("预校验出错",e);
