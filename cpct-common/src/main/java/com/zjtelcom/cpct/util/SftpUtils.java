@@ -292,6 +292,7 @@ public class SftpUtils {
         }
     }
 
+    // 切换sftp链接目录路径
     public String cd(String directory, ChannelSftp sftp) {
         String path = directory;
         try {

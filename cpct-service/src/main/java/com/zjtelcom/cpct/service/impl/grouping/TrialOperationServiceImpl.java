@@ -158,8 +158,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Value("${ctg.cpctTopic}")
     private String importTopic;
 
-    private String ftpAddress = "134.108.3.130";
-//    private String ftpAddress = "134.108.0.93";
+//    private String ftpAddress = "134.108.3.130";
+    private String ftpAddress = "134.108.0.93";
     private int ftpPort = 22;
     private String ftpName= "ftp";
     private String ftpPassword="V1p9*2_9%3#";
