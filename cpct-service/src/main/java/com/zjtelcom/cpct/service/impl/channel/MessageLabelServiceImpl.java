@@ -498,6 +498,13 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
     @Override
     public Map<String, Object> createDisplayColumn(DisplayColumnEntity displayColumnEntity) {
         Map<String, Object> maps = new HashMap<>();
+        //重名校验
+        List<DisplayColumn> displayColumnList = displayColumnMapper.findDisplayListByName(displayColumnEntity.getDisplayColumnName());
+        if(displayColumnList != null && displayColumnList.size() > 0) {
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg", "展示列名称已存在");
+            return maps;
+        }
         DisplayColumn displayColumn = BeanUtil.create(displayColumnEntity,new DisplayColumn());
         displayColumn.setStatusCd("2000");
         displayColumn.setCreateStaff(UserUtil.loginId());
@@ -539,6 +546,18 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
             maps.put("resultCode", CODE_FAIL);
             maps.put("resultMsg", "展示列不存在");
             return maps;
+        }
+        //重名校验
+        List<DisplayColumn> displayColumnList = displayColumnMapper.findDisplayListByName(displayColumnEntity.getDisplayColumnName());
+        if(displayColumnList != null && displayColumnList.size() > 0) {
+            for(DisplayColumn display : displayColumnList) {
+                if(display.getDisplayColumnId().equals(displayColumnEntity.getDisplayColumnId())) {
+                    continue;
+                }
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg", "展示列名称已存在");
+                return maps;
+            }
         }
         BeanUtil.copy(displayColumnEntity,displayColumn);
         displayColumn.setUpdateStaff(UserUtil.loginId());
