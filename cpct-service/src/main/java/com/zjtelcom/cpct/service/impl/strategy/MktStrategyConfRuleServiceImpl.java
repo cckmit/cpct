@@ -1078,7 +1078,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                         mktCamChlConfDetail.setScriptDesc(mktCamChlConf.getScriptDesc());
                     }
                     //   redisUtils.set("MktCamChlConfDetail_" + mktCamChlConfDetail.getEvtContactConfId(), mktCamChlConfDetail);
-                    //   mktCamChlConf camChlConf = BeanUtil.create(mktCamChlConfDO, new mktCamChlConf());
+                    //   MktCamChlConf camChlConf = BeanUtil.create(mktCamChlConfDO, new MktCamChlConf());
                     mktCamChlConfDetailNewList.add(mktCamChlConfDetail);
                 }
                 mktCamChlConfDetailMap.put("mktCamChlConfDetailList", mktCamChlConfDetailNewList);
