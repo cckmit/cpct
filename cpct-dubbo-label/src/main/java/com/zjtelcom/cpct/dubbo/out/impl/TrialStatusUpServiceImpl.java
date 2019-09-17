@@ -5,13 +5,14 @@ import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.dubbo.out.TrialStatusUpService;
 import com.zjtelcom.cpct.enums.TrialStatus;
-import com.zjtelcom.cpct.service.campaign.MktCampaignService;
+import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.grouping.TrialProdService;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.es.es.service.EsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
@@ -25,8 +26,8 @@ public class TrialStatusUpServiceImpl implements TrialStatusUpService {
     private EsService esService;
     @Autowired
     private TrialProdService trialProdService;
-    @Autowired
-    private MktCampaignService mktCampaignService;
+    @Autowired(required = false)
+    private TrialOperationService trialOperationService;
 
 
     @Override
@@ -95,15 +96,9 @@ public class TrialStatusUpServiceImpl implements TrialStatusUpService {
         return hashMap;
     }
 
-    /**
-     * 定时过期活动
-     * @return
-     */
     @Override
-    public Map<String, Object> dueMktCampaign() {
-        Map<String, Object> result = new HashMap<>();
-        result = mktCampaignService.dueMktCampaign();
-        return result;
+    public Map<String, Object> importUserListByExcel() throws IOException {
+        return trialOperationService.importUserListByExcel();
     }
 
 }

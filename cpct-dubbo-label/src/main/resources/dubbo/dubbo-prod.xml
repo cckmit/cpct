@@ -28,7 +28,7 @@
         <dubbo:method name="updateOperationStatus" servicecode="33.1083.updateOperationStatus" timeout="10000"/>
         <dubbo:method name="campaignIndexTask" servicecode="33.1083.campaignIndexTask" timeout="10000"/>
         <dubbo:method name="cpcLog2WriteFileLabel" servicecode="33.1083.cpcLog2WriteFileLabel" timeout="10000"/>
-        <dubbo:method name="dueMktCampaign" servicecode="33.1083.dueMktCampaign" timeout="10000"/>
+        <dubbo:method name="importUserListByExcel" servicecode="33.1083.importUserListByExcel" timeout="10000"/>
     </dubbo:service>
 
     <!-- 更新试算日志 -->

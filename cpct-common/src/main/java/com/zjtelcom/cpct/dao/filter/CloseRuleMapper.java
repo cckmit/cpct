@@ -46,4 +46,6 @@ public interface CloseRuleMapper {
     List<CloseRule> qryCloseRuleForUser(Map<String, Object> map);
 
     List<CloseRule> getCloseRuleOut(CloseRule closeRule);
+
+    Integer getCloseNameCount(@Param("closeName")String closeName);
 }
