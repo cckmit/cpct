@@ -26,4 +26,6 @@ public interface DisplayColumnMapper {
     List<DisplayColumn> findDisplayListByParam(@Param("displayName") String displayName,@Param("displayType") String displayType);
 
     int updateByPrimaryKey(DisplayColumn record);
+
+    List<DisplayColumn> findDisplayListByName(@Param("displayName") String displayName);
 }

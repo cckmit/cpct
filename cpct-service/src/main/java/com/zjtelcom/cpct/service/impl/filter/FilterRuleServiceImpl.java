@@ -127,7 +127,6 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
     @Override
     public Map<String, Object> importUserList(MultipartFile multipartFile, Long ruleId, String ruleName, String filterType) throws IOException {
         Map<String, Object> maps = new HashMap<>();
-
         InputStream inputStream = multipartFile.getInputStream();
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
         Sheet sheet = wb.getSheetAt(0);
@@ -172,7 +171,14 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
 
         }
         FilterRule filterRules = new FilterRule();
+        List<FilterRule> filterRuleList = new ArrayList<>();
         if(ruleId == null) {
+            //重名校验
+            filterRuleList = filterRuleMapper.selectFilterRuleByRuleName(ruleName);
+            if(filterRuleList != null && filterRuleList.size() > 0) {
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg", "过滤规则名称已存在");
+            }
             filterRules.setRuleName(ruleName);
             filterRules.setFilterType(filterType);
             filterRules.setCreateDate(new Date());
@@ -189,6 +195,18 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
                 maps.put("resultCode", CODE_FAIL);
                 maps.put("resultMsg","过滤规则不存在");
                 return maps;
+            }
+            //重名校验
+            filterRuleList = filterRuleMapper.selectFilterRuleByRuleName(ruleName);
+            if(filterRuleList != null && filterRuleList.size() > 0) {
+                for(FilterRule rule : filterRuleList) {
+                    if(rule.getRuleId().equals(ruleId)) {
+                        continue;
+                    }
+                    maps.put("resultCode", CODE_FAIL);
+                    maps.put("resultMsg", "过滤规则名称已存在");
+                    return maps;
+                }
             }
             filterRules.setRuleName(ruleName);
             filterRules.setFilterType(filterType);
@@ -301,6 +319,13 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
     @Override
     public Map<String, Object> createFilterRule(FilterRuleAddVO addVO) {
         Map<String, Object> maps = new HashMap<>();
+        //重名校验
+        List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleByRuleName(addVO.getRuleName());
+        if(filterRuleList != null && filterRuleList.size() > 0) {
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg", "过滤规则名称已存在");
+            return maps;
+        }
         final FilterRule filterRule = BeanUtil.create(addVO,new FilterRule());
         filterRule.setCreateDate(DateUtil.getCurrentTime());
         filterRule.setUpdateDate(DateUtil.getCurrentTime());
@@ -370,6 +395,18 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
             maps.put("resultCode", CODE_FAIL);
             maps.put("resultMsg", StringUtils.EMPTY);
             return maps;
+        }
+        //重名校验
+        List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleByRuleName(editVO.getRuleName());
+        if(filterRuleList != null && filterRuleList.size() > 0) {
+            for(FilterRule rule : filterRuleList) {
+                if(rule.getRuleId().equals(editVO.getRuleId())) {
+                    continue;
+                }
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg", "过滤规则名称已存在");
+                return maps;
+            }
         }
         BeanUtil.copy(editVO,filterRule);
         filterRule.setUpdateDate(DateUtil.getCurrentTime());
@@ -502,7 +539,15 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
             return maps;
         }
         FilterRule filterRules = new FilterRule();
+        List<FilterRule> filterRuleList = new ArrayList<>();
         if(ruleId == null) {
+            //重名校验
+            filterRuleList = filterRuleMapper.selectFilterRuleByRuleName(ruleName);
+            if(filterRuleList != null && filterRuleList.size() > 0) {
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg", "过滤规则名称已存在");
+                return maps;
+            }
             filterRules.setRuleName(ruleName);
             filterRules.setFilterType(filterType);
             filterRules.setLabelCode("PROM_LIST");
@@ -521,6 +566,18 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
                 maps.put("resultCode", CODE_FAIL);
                 maps.put("resultMsg","过滤规则不存在");
                 return maps;
+            }
+            //重名校验
+            filterRuleList = filterRuleMapper.selectFilterRuleByRuleName(ruleName);
+            if(filterRuleList != null && filterRuleList.size() > 0) {
+                for(FilterRule rule : filterRuleList) {
+                    if(rule.getRuleId().equals(ruleId)) {
+                        continue;
+                    }
+                    maps.put("resultCode", CODE_FAIL);
+                    maps.put("resultMsg", "过滤规则名称已存在");
+                    return maps;
+                }
             }
             filterRules.setRuleName(ruleName);
             filterRules.setFilterType(filterType);
