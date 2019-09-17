@@ -5,6 +5,7 @@ import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.dubbo.out.TrialStatusUpService;
 import com.zjtelcom.cpct.enums.TrialStatus;
+import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.grouping.TrialProdService;
 import com.zjtelcom.cpct.util.MapUtil;
@@ -26,6 +27,8 @@ public class TrialStatusUpServiceImpl implements TrialStatusUpService {
     private EsService esService;
     @Autowired
     private TrialProdService trialProdService;
+    @Autowired
+    private MktCampaignService mktCampaignService;
     @Autowired(required = false)
     private TrialOperationService trialOperationService;
 
@@ -94,6 +97,17 @@ public class TrialStatusUpServiceImpl implements TrialStatusUpService {
             hashMap.put("resultCode","200");
         }
         return hashMap;
+    }
+
+    /**
+     * 定时过期活动
+     * @return
+     */
+    @Override
+    public Map<String, Object> dueMktCampaign() {
+        Map<String, Object> result = new HashMap<>();
+        result = mktCampaignService.dueMktCampaign();
+        return result;
     }
 
     @Override

@@ -2149,6 +2149,15 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 tarGrpConditionDOs = conditions;
                 tarGrpId = -1L;
             }
+            //过滤规则
+            String prodFilter = "0";
+            List<Map<String, String>> sysFilList = sysParamsMapper.listParamsByKey("CUST_PRODUCT_FILTER");
+            if (sysFilList != null && !sysFilList.isEmpty()) {
+                prodFilter = sysFilList.get(0).get("value");
+            }
+            if ("1".equals(prodFilter)){
+                targrpCondition(mktCampaignId,tarGrpConditionDOs);
+            }
             System.out.println(JSON.toJSONString(tarGrpConditionDOs));
             List<LabelResult> labelResultList = new ArrayList<>();
             List<String> codeList = new ArrayList<>();
@@ -2251,6 +2260,30 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
     }
 
+    private void  targrpCondition(Long campaignId, List<TarGrpCondition> tarGrpConditionDOs){
+        List<String> typeList = new ArrayList<>();
+        typeList.add("3000");
+        List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(campaignId,typeList);
+        List<String> stringList = new ArrayList<>();
+        Label label = labelMapper.selectByLabelCode("PROM_LIST");
+        for (FilterRule filterRule : filterRuleList){
+            if (filterRule!=null && filterRule.getChooseProduct()!=null){
+                TarGrpCondition condition = new TarGrpCondition();
+                condition.setLeftParam(label.getInjectionLabelId().toString());
+                List<String> list = ChannelUtil.StringToList(filterRule.getChooseProduct());
+                for (String id : list){
+                    Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(id));
+                    if (offer!=null){
+                        stringList.add(offer.getOfferNbr());
+                    }
+                }
+                String rightParam =  ChannelUtil.list2String(stringList,",");
+                condition.setRightParam(rightParam);
+                condition.setOperType(filterRule.getOperator().equals("1000")? "7100" : "7200");
+                tarGrpConditionDOs.add(condition);
+            }
+        }
+    }
 
     @Override
     public Map<String, Object> importUserListByExcel() throws IOException {

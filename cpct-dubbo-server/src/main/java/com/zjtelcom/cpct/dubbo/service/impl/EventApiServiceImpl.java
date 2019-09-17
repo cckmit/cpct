@@ -45,6 +45,7 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
+import com.zjtelcom.cpct.dto.campaign.MktCampaign;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.ContactEvtMatchRul;
 import com.zjtelcom.cpct.dto.event.EventMatchRulCondition;
@@ -74,6 +75,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.logging.Filter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -677,7 +679,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                     //事件采集项没有客户编码
                     result.put("CPCResultCode", "1000");
-                    result.put("CPCResultMsg", "success");
+                    result.put("CPCResultMsg", "succes 预校验为空");
                     result.put("taskList", activityList);
 
                     paramsJson.put("backParams", result);
@@ -2018,6 +2020,7 @@ public class EventApiServiceImpl implements EventApiService {
             Map<String, Object> mktCampaignMap = new ConcurrentHashMap<>();
 
             Map<String, Object> mktCampaignCustMap = new ConcurrentHashMap<>();
+            log.info("活动预校验开始************");
 
             try {
                 Long mktCampaginId = (Long) act.get("mktCampaginId");
@@ -2031,6 +2034,7 @@ public class EventApiServiceImpl implements EventApiService {
 
 
                 if ("QD000015".equals(channel)) {
+                    log.info("活动预校验：channel-----QD000015");
                     List<String> strategyTypeList = new ArrayList<>();
                     strategyTypeList.add("1000");
                     strategyTypeList.add("2000");
@@ -2087,7 +2091,6 @@ public class EventApiServiceImpl implements EventApiService {
                                             return Collections.EMPTY_MAP;
                                         }
                                     }
-
                                 }
                             } else if ("5000".equals(filterRule.getFilterType())) {
                                 //时间段的格式
@@ -2101,7 +2104,7 @@ public class EventApiServiceImpl implements EventApiService {
                             }
                         }
                     } catch (Exception e) {
-                        log.info("filterRuleList ！我在这里出错了，你看着办");
+                        log.info("filterRuleList 预校验过滤出错！");
                         e.printStackTrace();
                     }
                 } else {
@@ -2137,7 +2140,7 @@ public class EventApiServiceImpl implements EventApiService {
                             }
                         }
                     } catch (Exception e) {
-                        log.info("filterRuleList else ！我在这里出错了，你看着办");
+                        log.info("filterRuleList else ！预校验过滤出错");
                         e.printStackTrace();
                     }
                 }
@@ -2146,7 +2149,11 @@ public class EventApiServiceImpl implements EventApiService {
                 //查询活动信息
                 MktCampaignDO mktCampaign = null;
                 try {
-                    mktCampaign = (MktCampaignDO) redisUtils.get("MKT_CAMPAIGN_" + mktCampaginId);
+                    Object campaign =  redisUtils.get("MKT_CAMPAIGN_" + mktCampaginId);
+                    if (campaign!=null){
+                        mktCampaign = (MktCampaignDO) campaign;
+                    }
+                    log.info(JSON.toJSONString(mktCampaign));
                 } catch (Exception e) {
                     log.info("(MktCampaignDO) redisUtils.get(\"MKT_CAMPAIGN_\" + mktCampaginId)出现异常 缓存没取到？");
                     e.printStackTrace();
@@ -2155,18 +2162,26 @@ public class EventApiServiceImpl implements EventApiService {
                     mktCampaign = mktCampaignMapper.selectByPrimaryKey(mktCampaginId);
                     redisUtils.set("MKT_CAMPAIGN_" + mktCampaginId, mktCampaign);
                 }
-                Date now = new Date();
-                //验证活动生效时间
-                Date beginTime = mktCampaign.getPlanBeginTime();
-                Date endTime = mktCampaign.getPlanEndTime();
-                if (now.before(beginTime) || now.after(endTime)) {
-                    //当前时间不在活动生效时间内
-                    esJson.put("hit", false);
-                    esJson.put("msg", "当前时间不在活动生效时间内");
-                    log.info("当前时间不在活动生效时间内");
-                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                    return Collections.EMPTY_MAP;
+                Date now = null;
+                try {
+                    now = new Date();
+                    //验证活动生效时间
+                    Date beginTime = mktCampaign.getPlanBeginTime();
+                    Date endTime = mktCampaign.getPlanEndTime();
+                    if (now.before(beginTime) || now.after(endTime)) {
+                        //当前时间不在活动生效时间内
+                        esJson.put("hit", false);
+                        esJson.put("msg", "当前时间不在活动生效时间内");
+                        log.info("当前时间不在活动生效时间内");
+                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                        return Collections.EMPTY_MAP;
+                    }
+                } catch (Exception e) {
+                    log.info("验证活动生效时间失败");
+                    e.printStackTrace();
                 }
+
+                log.info("预校验还没出错，拿到活动信息");
 
                 // 判断活动状态
 
@@ -2299,25 +2314,30 @@ public class EventApiServiceImpl implements EventApiService {
                         }
                         List<String> channelCodeList = contactChannelMapper.selectChannelCodeByPrimaryKey(channelsIdList);
                         boolean channelCheck = true;
-                        for (String channelCode : channelCodeList) {
-                            if (channel != null) {
-                                if (channel.equals(channelCode)) {
-                                    channelCheck = false;
-                                    break;
+                        try {
+                            for (String channelCode : channelCodeList) {
+                                if (channel != null) {
+                                    if (channel.equals(channelCode)) {
+                                        channelCheck = false;
+                                        break;
+                                    }
+                                } else {
+                                    //适用地市获取异常 lanId
+    //                            log.info("适用渠道获取异常");
+
+                                    esJson.put("hit", false);
+                                    esJson.put("msg", "策略未命中");
+                                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
+
+                                    strategyMap.put("msg", "适用渠道获取异常");
+                                    esJsonStrategy.put("hit", "false");
+                                    esJsonStrategy.put("msg", "适用渠道获取异常");
+                                    esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
                                 }
-                            } else {
-                                //适用地市获取异常 lanId
-//                            log.info("适用渠道获取异常");
-
-                                esJson.put("hit", false);
-                                esJson.put("msg", "策略未命中");
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
-
-                                strategyMap.put("msg", "适用渠道获取异常");
-                                esJsonStrategy.put("hit", "false");
-                                esJsonStrategy.put("msg", "适用渠道获取异常");
-                                esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
                             }
+                        } catch (Exception e) {
+                            log.error("预校验渠道获取异常");
+                            e.printStackTrace();
                         }
                         if (channelCheck) {
 //                        log.info("适用渠道不符");
@@ -2346,22 +2366,27 @@ public class EventApiServiceImpl implements EventApiService {
                         esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
                         continue;
                     }
-
+                    log.info("预校验还没出错1");
                     // 获取规则
                     List<Map<String, Object>> ruleMapList = new ArrayList<>();
                     List<MktStrategyConfRuleDO> mktStrategyConfRuleList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(mktStrategyConf.getMktStrategyConfId());
-                    for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleList) {
-                        Map<String, Object> ruleMap = new ConcurrentHashMap<>();
-                        String evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId();
-//                    if (evtContactConfMapList != null && evtContactConfMapList.size() > 0) {
-                        ruleMap.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
-                        ruleMap.put("ruleName", mktStrategyConfRuleDO.getMktStrategyConfRuleName());
-                        ruleMap.put("tarGrpId", mktStrategyConfRuleDO.getTarGrpId());
-                        ruleMap.put("productId", mktStrategyConfRuleDO.getProductId());
-                        ruleMap.put("evtContactConfId", mktStrategyConfRuleDO.getEvtContactConfId());
-//                        ruleMap.put("evtContactConfMapList", evtContactConfMapList);
-                        ruleMapList.add(ruleMap);
-//                    }
+                    try {
+                        for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleList) {
+                            Map<String, Object> ruleMap = new ConcurrentHashMap<>();
+                            String evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId();
+    //                    if (evtContactConfMapList != null && evtContactConfMapList.size() > 0) {
+                            ruleMap.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
+                            ruleMap.put("ruleName", mktStrategyConfRuleDO.getMktStrategyConfRuleName());
+                            ruleMap.put("tarGrpId", mktStrategyConfRuleDO.getTarGrpId());
+                            ruleMap.put("productId", mktStrategyConfRuleDO.getProductId());
+                            ruleMap.put("evtContactConfId", mktStrategyConfRuleDO.getEvtContactConfId());
+    //                        ruleMap.put("evtContactConfMapList", evtContactConfMapList);
+                            ruleMapList.add(ruleMap);
+    //                    }
+                        }
+                    } catch (Exception e) {
+                        log.error("预校验获取规则查询失败");
+                        e.printStackTrace();
                     }
                     if (ruleMapList != null && ruleMapList.size() > 0) {
                         strategyMap.put("strategyConfId", mktStrategyConf.getMktStrategyConfId());
@@ -2371,6 +2396,7 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 }
 
+                log.info("预校验还没出错2");
                 List<String> mktCamCodeList = null;
                 try {
                     mktCamCodeList = (List<String>) redisUtils.get("MKT_CAM_API_CODE_KEY");
@@ -2410,7 +2436,10 @@ public class EventApiServiceImpl implements EventApiService {
                 resultMap.put("mktCampaignCustMap", mktCampaignCustMap);
 
             } catch (Exception e) {
-                log.info("预校验出错",e);
+                log.info("预校验出错",e.getCause());
+                log.info("预校验出错",e.toString());
+                log.info("预校验出错",e.getMessage());
+                e.printStackTrace();
             }
             return resultMap;
         }
