@@ -2062,18 +2062,62 @@ public class EventApiServiceImpl implements EventApiService {
                             e.printStackTrace();
                             log.error("queryYz查询失败："+e,JSON.toJSONString(dubboResult_F));
                         }
-                        if ("0".equals(dubboResult_F.get("result_code").toString())) {
-                            accArrayF = new JSONArray((List<Object>) dubboResult_F.get("msgbody"));
+                        try {
+                            if ("0".equals(dubboResult_F.get("result_code").toString())) {
+                                accArrayF = new JSONArray((List<Object>) dubboResult_F.get("msgbody"));
+                            }
+                        } catch (Exception e) {
+                            log.info("dubboResult_F.get(\"result_code\").toString()异常了~~~");
+                            e.printStackTrace();
                         }
                     }
 
-                    for (FilterRule filterRule : filterRuleList) {
-                        if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
-                            //获取名单
-                            String userList = filterRule.getUserList();
-                            if (userList != null && !"".equals(userList)) {
-                                for (Object ob : accArrayF) {
-                                    int index = userList.indexOf(((Map) ob).get("ACC_NBR").toString());
+                    try {
+                        for (FilterRule filterRule : filterRuleList) {
+                            if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
+                                //获取名单
+                                String userList = filterRule.getUserList();
+                                if (userList != null && !"".equals(userList)) {
+                                    for (Object ob : accArrayF) {
+                                        int index = userList.indexOf(((Map) ob).get("ACC_NBR").toString());
+                                        if (index >= 0) {
+                                            esJson.put("hit", false);
+                                            esJson.put("msg", "红黑名单过滤规则验证被拦截");
+                                            esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                                            return Collections.EMPTY_MAP;
+                                        }
+                                    }
+
+                                }
+                            } else if ("5000".equals(filterRule.getFilterType())) {
+                                //时间段的格式
+                                if (compareHourAndMinute(filterRule)) {
+                                    log.info("过滤时间段验证被拦截");
+                                    esJson.put("hit", false);
+                                    esJson.put("msg", "过滤时间段验证被拦截");
+                                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                                    return Collections.EMPTY_MAP;
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        log.info("filterRuleList ！我在这里出错了，你看着办");
+                        e.printStackTrace();
+                    }
+                } else {
+                    try {
+                        List<String> strategyTypeList = new ArrayList<>();
+                        strategyTypeList.add("1000");
+                        strategyTypeList.add("2000");
+                        strategyTypeList.add("5000");
+                        //验证过滤规则时间,默认只查询5000类型的时间段过滤
+                        List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(mktCampaginId, strategyTypeList);
+                        for (FilterRule filterRule : filterRuleList) {
+                            if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
+                                //获取名单
+                                String userList = filterRule.getUserList();
+                                if (userList != null && !"".equals(userList)) {
+                                    int index = userList.indexOf(accNbr);
                                     if (index >= 0) {
                                         esJson.put("hit", false);
                                         esJson.put("msg", "红黑名单过滤规则验证被拦截");
@@ -2081,55 +2125,32 @@ public class EventApiServiceImpl implements EventApiService {
                                         return Collections.EMPTY_MAP;
                                     }
                                 }
-
-                            }
-                        } else if ("5000".equals(filterRule.getFilterType())) {
-                            //时间段的格式
-                            if (compareHourAndMinute(filterRule)) {
-                                log.info("过滤时间段验证被拦截");
-                                esJson.put("hit", false);
-                                esJson.put("msg", "过滤时间段验证被拦截");
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                                return Collections.EMPTY_MAP;
-                            }
-                        }
-                    }
-                } else {
-                    List<String> strategyTypeList = new ArrayList<>();
-                    strategyTypeList.add("1000");
-                    strategyTypeList.add("2000");
-                    strategyTypeList.add("5000");
-                    //验证过滤规则时间,默认只查询5000类型的时间段过滤
-                    List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(mktCampaginId, strategyTypeList);
-                    for (FilterRule filterRule : filterRuleList) {
-                        if ("1000".equals(filterRule.getFilterType()) || "2000".equals(filterRule.getFilterType())) {
-                            //获取名单
-                            String userList = filterRule.getUserList();
-                            if (userList != null && !"".equals(userList)) {
-                                int index = userList.indexOf(accNbr);
-                                if (index >= 0) {
+                            } else if ("5000".equals(filterRule.getFilterType())) {
+                                //时间段的格式
+                                if (compareHourAndMinute(filterRule)) {
+                                    log.info("过滤时间段验证被拦截");
                                     esJson.put("hit", false);
-                                    esJson.put("msg", "红黑名单过滤规则验证被拦截");
+                                    esJson.put("msg", "过滤时间段验证被拦截");
                                     esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
                                     return Collections.EMPTY_MAP;
                                 }
                             }
-                        } else if ("5000".equals(filterRule.getFilterType())) {
-                            //时间段的格式
-                            if (compareHourAndMinute(filterRule)) {
-                                log.info("过滤时间段验证被拦截");
-                                esJson.put("hit", false);
-                                esJson.put("msg", "过滤时间段验证被拦截");
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                                return Collections.EMPTY_MAP;
-                            }
                         }
+                    } catch (Exception e) {
+                        log.info("filterRuleList else ！我在这里出错了，你看着办");
+                        e.printStackTrace();
                     }
                 }
 
 
                 //查询活动信息
-                MktCampaignDO mktCampaign = (MktCampaignDO) redisUtils.get("MKT_CAMPAIGN_" + mktCampaginId);
+                MktCampaignDO mktCampaign = null;
+                try {
+                    mktCampaign = (MktCampaignDO) redisUtils.get("MKT_CAMPAIGN_" + mktCampaginId);
+                } catch (Exception e) {
+                    log.info("(MktCampaignDO) redisUtils.get(\"MKT_CAMPAIGN_\" + mktCampaginId)出现异常 缓存没取到？");
+                    e.printStackTrace();
+                }
                 if (mktCampaign == null) {
                     mktCampaign = mktCampaignMapper.selectByPrimaryKey(mktCampaginId);
                     redisUtils.set("MKT_CAMPAIGN_" + mktCampaginId, mktCampaign);
