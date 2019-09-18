@@ -65,9 +65,5 @@
         <dubbo:method name="getDictionaryByType" servicecode="00.1077.getDictionaryByType"/>
     </dubbo:reference>
 
-    <!-- 后台excel批量清单导入 -->
-    <dubbo:service  interface="com.zjtelcom.cpct.service.grouping.TrialOperationService" ref="trialOperationService" version="1.0" >
-        <dubbo:method name="importUserListByExcel" servicecode="33.1083.importUserListByExcel" timeout="10000"/>
-    </dubbo:service>
 
 </beans>
