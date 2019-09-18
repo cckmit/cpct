@@ -1,7 +1,7 @@
 FROM centosjava8:1.7 
 
 
-COPY target/cpct-dubbo-cpc-ser.jar /app/cpct-dubbo-log.jar
+COPY target/cpct-dubbo-log.jar /app/cpct-dubbo-log.jar
 COPY target/classes/dubbo/unregister.sh /app/unregister.sh
 RUN cd /app && mkdir project && mkdir logs && mv /app/cpct-dubbo-log.jar /app/project && mv /app/unregister.sh /app/project && chmod 777 -R /app  && chown -R isale:isale /app
 

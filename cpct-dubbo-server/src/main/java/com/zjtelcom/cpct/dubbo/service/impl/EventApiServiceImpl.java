@@ -2134,221 +2134,267 @@ public class EventApiServiceImpl implements EventApiService {
                     mktCampaign = mktCampaignMapper.selectByPrimaryKey(mktCampaginId);
                     redisUtils.set("MKT_CAMPAIGN_" + mktCampaginId, mktCampaign);
                 }
-                Date now = new Date();
-                //验证活动生效时间
-                Date beginTime = mktCampaign.getPlanBeginTime();
-                Date endTime = mktCampaign.getPlanEndTime();
-                if (now.before(beginTime) || now.after(endTime)) {
-                    //当前时间不在活动生效时间内
-                    esJson.put("hit", false);
-                    esJson.put("msg", "当前时间不在活动生效时间内");
-                    log.info("当前时间不在活动生效时间内");
-                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                    return Collections.EMPTY_MAP;
-                }
-
-                // 判断活动状态
-
-
-                if (!(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaign.getStatusCd())
-                        || StatusCode.STATUS_CODE_ADJUST.getStatusCode().equals(mktCampaign.getStatusCd()))) {
-                    esJson.put("hit", false);
-                    esJson.put("msg", "活动状态未发布");
-//                log.info("活动状态未发布");
-                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                    return Collections.EMPTY_MAP;
-                }
-
-
-                // 判断触发活动类型
-                if (!StatusCode.REAL_TIME_CAMPAIGN.getStatusCode().equals(mktCampaign.getTiggerType())
-                        && !StatusCode.MIXTURE_CAMPAIGN.getStatusCode().equals(mktCampaign.getTiggerType())) {
-                    esJson.put("hit", false);
-                    esJson.put("msg", "活动触发类型不符");
-                    log.info("活动触发类型不符");
-                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                    return Collections.EMPTY_MAP;
-                }
-
-                // 判断活动类型
-                if (!StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode().equals(mktCampaign.getMktCampaignCategory())) {
-                    esJson.put("hit", false);
-                    esJson.put("msg", "活动类型不符");
-                    log.info("活动类型不符");
-                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                    return Collections.EMPTY_MAP;
-                }
-
-                // 查询策略信息
-                List<MktStrategyConfDO> mktStrategyConfDOS = mktStrategyConfMapper.selectByCampaignId(mktCampaginId);
-                if (mktStrategyConfDOS == null) {
-                    esJson.put("hit", false);
-                    esJson.put("msg", "策略查询失败");
-                    log.info("策略查询失败");
-                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
-                    return Collections.EMPTY_MAP;
-                }
                 List<Map<String, Object>> strategyMapList = new ArrayList<>();
-                for (MktStrategyConfDO mktStrategyConf : mktStrategyConfDOS) {
+                // 营销活动
+                if (StatusCode.MARKETING_CAMPAIGN.getStatusCode().equals(mktCampaign.getMktCampaignType())
+                    || StatusCode.MAINTAIN_CAMPAIGN.getStatusCode().equals(mktCampaign.getMktCampaignType())
+                        || StatusCode.RETAIN_CAMPAIGN.getStatusCode().equals(mktCampaign.getMktCampaignType())
+                            || StatusCode.VALUE_ADDED_SERVICE_CAMPAIGN.getStatusCode().equals(mktCampaign.getMktCampaignType())){
 
-                    //初始化es log
-                    JSONObject esJsonStrategy = new JSONObject();
-                    esJsonStrategy.put("reqId", reqId);
-                    esJsonStrategy.put("activityId", mktCampaginId);
-                    esJsonStrategy.put("hitEntity", accNbr); //命中对象
-                    esJsonStrategy.put("strategyConfId", mktStrategyConf.getMktStrategyConfId());
-                    esJsonStrategy.put("strategyConfName", mktStrategyConf.getMktStrategyConfName());
+                    Date now = new Date();
+                    //验证活动生效时间
+                    Date beginTime = mktCampaign.getPlanBeginTime();
+                    Date endTime = mktCampaign.getPlanEndTime();
+                    if (now.before(beginTime) || now.after(endTime)) {
+                        //当前时间不在活动生效时间内
+                        esJson.put("hit", false);
+                        esJson.put("msg", "当前时间不在活动生效时间内");
+                        log.info("当前时间不在活动生效时间内");
+                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                        return Collections.EMPTY_MAP;
+                    }
 
-                    Map<String, Object> strategyMap = new ConcurrentHashMap<>();
-                    //验证策略生效时间
-                    if (!(now.after(mktStrategyConf.getBeginTime()) && now.before(mktStrategyConf.getEndTime()))) {
-                        //若当前时间在策略生效时间外
+                    // 判断活动状态
+                    if (!(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaign.getStatusCd())
+                            || StatusCode.STATUS_CODE_ADJUST.getStatusCode().equals(mktCampaign.getStatusCd()))) {
+                        esJson.put("hit", false);
+                        esJson.put("msg", "活动状态未发布");
+//                log.info("活动状态未发布");
+                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                        return Collections.EMPTY_MAP;
+                    }
+
+
+                    // 判断触发活动类型
+                    if (!StatusCode.REAL_TIME_CAMPAIGN.getStatusCode().equals(mktCampaign.getTiggerType())
+                            && !StatusCode.MIXTURE_CAMPAIGN.getStatusCode().equals(mktCampaign.getTiggerType())) {
+                        esJson.put("hit", false);
+                        esJson.put("msg", "活动触发类型不符");
+                        log.info("活动触发类型不符");
+                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                        return Collections.EMPTY_MAP;
+                    }
+
+                    // 判断活动类型
+                    if (!StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode().equals(mktCampaign.getMktCampaignCategory())) {
+                        esJson.put("hit", false);
+                        esJson.put("msg", "活动类型不符");
+                        log.info("活动类型不符");
+                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                        return Collections.EMPTY_MAP;
+                    }
+
+                    // 查询策略信息
+                    List<MktStrategyConfDO> mktStrategyConfDOS = mktStrategyConfMapper.selectByCampaignId(mktCampaginId);
+                    if (mktStrategyConfDOS == null) {
+                        esJson.put("hit", false);
+                        esJson.put("msg", "策略查询失败");
+                        log.info("策略查询失败");
+                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                        return Collections.EMPTY_MAP;
+                    }
+                    for (MktStrategyConfDO mktStrategyConf : mktStrategyConfDOS) {
+
+                        //初始化es log
+                        JSONObject esJsonStrategy = new JSONObject();
+                        esJsonStrategy.put("reqId", reqId);
+                        esJsonStrategy.put("activityId", mktCampaginId);
+                        esJsonStrategy.put("hitEntity", accNbr); //命中对象
+                        esJsonStrategy.put("strategyConfId", mktStrategyConf.getMktStrategyConfId());
+                        esJsonStrategy.put("strategyConfName", mktStrategyConf.getMktStrategyConfName());
+
+                        Map<String, Object> strategyMap = new ConcurrentHashMap<>();
+                        //验证策略生效时间
+                        if (!(now.after(mktStrategyConf.getBeginTime()) && now.before(mktStrategyConf.getEndTime()))) {
+                            //若当前时间在策略生效时间外
 //                    log.info("当前时间不在策略生效时间内");
 
-                        esJson.put("hit", false);
-                        esJson.put("msg", "策略未命中");
-                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
+                            esJson.put("hit", false);
+                            esJson.put("msg", "策略未命中");
+                            esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
 
-                        esJsonStrategy.put("hit", false);
-                        esJsonStrategy.put("msg", "当前时间不在策略生效时间内");
-                        esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
-                        continue;
-                    }
-                    //适用地市校验
-                    if (mktStrategyConf.getAreaId() != null && !"".equals(mktStrategyConf.getAreaId())) {
-                        String[] strArrayCity = mktStrategyConf.getAreaId().split("/");
-                        boolean areaCheck = true;
-                        for (String str : strArrayCity) {
-                            if (c4 != null && c4.equals(str)) {
-                                areaCheck = false;
-                                break;
-                            } else if (lanId != null) {
-                                if (lanId.equals(str)) {
+                            esJsonStrategy.put("hit", false);
+                            esJsonStrategy.put("msg", "当前时间不在策略生效时间内");
+                            esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
+                            continue;
+                        }
+                        //适用地市校验
+                        if (mktStrategyConf.getAreaId() != null && !"".equals(mktStrategyConf.getAreaId())) {
+                            String[] strArrayCity = mktStrategyConf.getAreaId().split("/");
+                            boolean areaCheck = true;
+                            for (String str : strArrayCity) {
+                                if (c4 != null && c4.equals(str)) {
                                     areaCheck = false;
                                     break;
-                                }
-                            } else {
-                                //适用地市获取异常 lanId
+                                } else if (lanId != null) {
+                                    if (lanId.equals(str)) {
+                                        areaCheck = false;
+                                        break;
+                                    }
+                                } else {
+                                    //适用地市获取异常 lanId
 //                            log.info("适用地市获取异常");
 
+                                    esJson.put("hit", false);
+                                    esJson.put("msg", "策略未命中");
+                                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
+
+                                    strategyMap.put("msg", "适用地市获取异常");
+                                    esJsonStrategy.put("hit", "false");
+                                    esJsonStrategy.put("msg", "适用地市获取异常");
+                                    esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
+                                }
+                            }
+                            if (areaCheck) {
+
                                 esJson.put("hit", false);
                                 esJson.put("msg", "策略未命中");
                                 esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
 
-                                strategyMap.put("msg", "适用地市获取异常");
+                                strategyMap.put("msg", "适用地市不符");
                                 esJsonStrategy.put("hit", "false");
-                                esJsonStrategy.put("msg", "适用地市获取异常");
+                                esJsonStrategy.put("msg", "适用地市不符");
                                 esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
+                                continue;
                             }
-                        }
-                        if (areaCheck) {
-
-                            esJson.put("hit", false);
-                            esJson.put("msg", "策略未命中");
-                            esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
-
-                            strategyMap.put("msg", "适用地市不符");
-                            esJsonStrategy.put("hit", "false");
-                            esJsonStrategy.put("msg", "适用地市不符");
-                            esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
-                            continue;
-                        }
-                    } else {
-                        //适用地市数据异常
+                        } else {
+                            //适用地市数据异常
 //                    log.info("适用地市数据异常");
 
-                        esJson.put("hit", false);
-                        esJson.put("msg", "策略未命中");
-                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
+                            esJson.put("hit", false);
+                            esJson.put("msg", "策略未命中");
+                            esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
 
-                        strategyMap.put("msg", "适用地市数据异常");
-                        esJsonStrategy.put("hit", "false");
-                        esJsonStrategy.put("msg", "适用地市数据异常");
-                        esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
-                        continue;
-                    }
-                    //判断适用渠道
-                    if (mktStrategyConf.getChannelsId() != null && !"".equals(mktStrategyConf.getChannelsId())) {
-                        String[] strArrayChannelsId = mktStrategyConf.getChannelsId().split("/");
-                        List<Long> channelsIdList = new ArrayList<>();
-                        if (strArrayChannelsId != null && !"".equals(strArrayChannelsId[0])) {
-                            for (String channelsId : strArrayChannelsId) {
-                                channelsIdList.add(Long.valueOf(channelsId));
-                            }
+                            strategyMap.put("msg", "适用地市数据异常");
+                            esJsonStrategy.put("hit", "false");
+                            esJsonStrategy.put("msg", "适用地市数据异常");
+                            esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
+                            continue;
                         }
-                        List<String> channelCodeList = contactChannelMapper.selectChannelCodeByPrimaryKey(channelsIdList);
-                        boolean channelCheck = true;
-                        for (String channelCode : channelCodeList) {
-                            if (channel != null) {
-                                if (channel.equals(channelCode)) {
-                                    channelCheck = false;
-                                    break;
+                        //判断适用渠道
+                        if (mktStrategyConf.getChannelsId() != null && !"".equals(mktStrategyConf.getChannelsId())) {
+                            String[] strArrayChannelsId = mktStrategyConf.getChannelsId().split("/");
+                            List<Long> channelsIdList = new ArrayList<>();
+                            if (strArrayChannelsId != null && !"".equals(strArrayChannelsId[0])) {
+                                for (String channelsId : strArrayChannelsId) {
+                                    channelsIdList.add(Long.valueOf(channelsId));
                                 }
-                            } else {
-                                //适用地市获取异常 lanId
+                            }
+                            List<String> channelCodeList = contactChannelMapper.selectChannelCodeByPrimaryKey(channelsIdList);
+                            boolean channelCheck = true;
+                            for (String channelCode : channelCodeList) {
+                                if (channel != null) {
+                                    if (channel.equals(channelCode)) {
+                                        channelCheck = false;
+                                        break;
+                                    }
+                                } else {
+                                    //适用地市获取异常 lanId
 //                            log.info("适用渠道获取异常");
+
+                                    esJson.put("hit", false);
+                                    esJson.put("msg", "策略未命中");
+                                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
+
+                                    strategyMap.put("msg", "适用渠道获取异常");
+                                    esJsonStrategy.put("hit", "false");
+                                    esJsonStrategy.put("msg", "适用渠道获取异常");
+                                    esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
+                                }
+                            }
+                            if (channelCheck) {
+//                        log.info("适用渠道不符");
 
                                 esJson.put("hit", false);
                                 esJson.put("msg", "策略未命中");
                                 esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
 
-                                strategyMap.put("msg", "适用渠道获取异常");
+                                strategyMap.put("msg", "适用渠道不符");
                                 esJsonStrategy.put("hit", "false");
-                                esJsonStrategy.put("msg", "适用渠道获取异常");
+                                esJsonStrategy.put("msg", "适用渠道不符");
                                 esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
+                                continue;
                             }
-                        }
-                        if (channelCheck) {
-//                        log.info("适用渠道不符");
+                        } else {
+                            //适用地市数据异常
+                            log.info("适用渠道数据异常");
 
                             esJson.put("hit", false);
                             esJson.put("msg", "策略未命中");
                             esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
 
-                            strategyMap.put("msg", "适用渠道不符");
+                            strategyMap.put("msg", "适用渠道数据异常");
                             esJsonStrategy.put("hit", "false");
-                            esJsonStrategy.put("msg", "适用渠道不符");
+                            esJsonStrategy.put("msg", "适用渠道数据异常");
                             esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
                             continue;
                         }
-                    } else {
-                        //适用地市数据异常
-                        log.info("适用渠道数据异常");
 
+                        // 获取规则
+                        List<Map<String, Object>> ruleMapList = new ArrayList<>();
+                        List<MktStrategyConfRuleDO> mktStrategyConfRuleList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(mktStrategyConf.getMktStrategyConfId());
+                        for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleList) {
+                            Map<String, Object> ruleMap = new ConcurrentHashMap<>();
+                            String evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId();
+                            ruleMap.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
+                            ruleMap.put("ruleName", mktStrategyConfRuleDO.getMktStrategyConfRuleName());
+                            ruleMap.put("tarGrpId", mktStrategyConfRuleDO.getTarGrpId());
+                            ruleMap.put("productId", mktStrategyConfRuleDO.getProductId());
+                            ruleMap.put("evtContactConfId", mktStrategyConfRuleDO.getEvtContactConfId());
+                            ruleMapList.add(ruleMap);
+                        }
+                        if (ruleMapList != null && ruleMapList.size() > 0) {
+                            strategyMap.put("strategyConfId", mktStrategyConf.getMktStrategyConfId());
+                            strategyMap.put("strategyConfName", mktStrategyConf.getMktStrategyConfName());
+                            strategyMap.put("ruleMapList", ruleMapList);
+                            strategyMapList.add(strategyMap);
+                        }
+                    }
+                } else {
+                    // 服务活动
+
+                    // 查询策略信息
+                    List<MktStrategyConfDO> mktStrategyConfDOS = mktStrategyConfMapper.selectByCampaignId(mktCampaginId);
+                    if (mktStrategyConfDOS == null) {
                         esJson.put("hit", false);
-                        esJson.put("msg", "策略未命中");
-                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
-
-                        strategyMap.put("msg", "适用渠道数据异常");
-                        esJsonStrategy.put("hit", "false");
-                        esJsonStrategy.put("msg", "适用渠道数据异常");
-                        esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
-                        continue;
+                        esJson.put("msg", "策略查询失败");
+                        log.info("策略查询失败");
+                        //esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+                        return Collections.EMPTY_MAP;
                     }
+                    for (MktStrategyConfDO mktStrategyConf : mktStrategyConfDOS) {
+                        //初始化es log
+                        JSONObject esJsonStrategy = new JSONObject();
+                        esJsonStrategy.put("reqId", reqId);
+                        esJsonStrategy.put("activityId", mktCampaginId);
+                        esJsonStrategy.put("hitEntity", accNbr); //命中对象
+                        esJsonStrategy.put("strategyConfId", mktStrategyConf.getMktStrategyConfId());
+                        esJsonStrategy.put("strategyConfName", mktStrategyConf.getMktStrategyConfName());
 
-                    // 获取规则
-                    List<Map<String, Object>> ruleMapList = new ArrayList<>();
-                    List<MktStrategyConfRuleDO> mktStrategyConfRuleList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(mktStrategyConf.getMktStrategyConfId());
-                    for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleList) {
-                        Map<String, Object> ruleMap = new ConcurrentHashMap<>();
-                        String evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId();
-//                    if (evtContactConfMapList != null && evtContactConfMapList.size() > 0) {
-                        ruleMap.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
-                        ruleMap.put("ruleName", mktStrategyConfRuleDO.getMktStrategyConfRuleName());
-                        ruleMap.put("tarGrpId", mktStrategyConfRuleDO.getTarGrpId());
-                        ruleMap.put("productId", mktStrategyConfRuleDO.getProductId());
-                        ruleMap.put("evtContactConfId", mktStrategyConfRuleDO.getEvtContactConfId());
-//                        ruleMap.put("evtContactConfMapList", evtContactConfMapList);
-                        ruleMapList.add(ruleMap);
-//                    }
-                    }
-                    if (ruleMapList != null && ruleMapList.size() > 0) {
-                        strategyMap.put("strategyConfId", mktStrategyConf.getMktStrategyConfId());
-                        strategyMap.put("strategyConfName", mktStrategyConf.getMktStrategyConfName());
-                        strategyMap.put("ruleMapList", ruleMapList);
-                        strategyMapList.add(strategyMap);
+                        Map<String, Object> strategyMap = new ConcurrentHashMap<>();
+
+                        // 获取规则
+                        List<Map<String, Object>> ruleMapList = new ArrayList<>();
+                        List<MktStrategyConfRuleDO> mktStrategyConfRuleList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(mktStrategyConf.getMktStrategyConfId());
+                        for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleList) {
+                            Map<String, Object> ruleMap = new ConcurrentHashMap<>();
+                            String evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId();
+                            ruleMap.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
+                            ruleMap.put("ruleName", mktStrategyConfRuleDO.getMktStrategyConfRuleName());
+                            ruleMap.put("tarGrpId", mktStrategyConfRuleDO.getTarGrpId());
+                            ruleMap.put("productId", mktStrategyConfRuleDO.getProductId());
+                            ruleMap.put("evtContactConfId", mktStrategyConfRuleDO.getEvtContactConfId());
+                            ruleMapList.add(ruleMap);
+                        }
+                        if (ruleMapList != null && ruleMapList.size() > 0) {
+                            strategyMap.put("strategyConfId", mktStrategyConf.getMktStrategyConfId());
+                            strategyMap.put("strategyConfName", mktStrategyConf.getMktStrategyConfName());
+                            strategyMap.put("ruleMapList", ruleMapList);
+                            strategyMapList.add(strategyMap);
+                        }
                     }
                 }
+
 
                 List<String> mktCamCodeList = (List<String>) redisUtils.get("MKT_CAM_API_CODE_KEY");
                 if (mktCamCodeList == null) {
@@ -2429,7 +2475,7 @@ public class EventApiServiceImpl implements EventApiService {
                 log.info("查询资产标签失败");
                 esJson.put("hit", "false");
                 esJson.put("msg", "查询资产标签失败");
-                //esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
+            //    esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
                 esHitService.save(esJson, IndexList.EVENT_MODULE, params.get("reqId"));
                 return null;
             }
@@ -2634,7 +2680,7 @@ public class EventApiServiceImpl implements EventApiService {
                                 // 判断该活动是否配置了销售品过滤
                                 Integer mktCampaignId = (Integer) taskMap.get("activityId");
 
-                                List<FilterRule> filterRuleList = null;//(List<FilterRule>) redisUtils.get("FILTER_RULE_" + mktCampaignId);
+                                List<FilterRule> filterRuleList = (List<FilterRule>) redisUtils.get("FILTER_RULE_" + mktCampaignId);
                                 if (filterRuleList == null) {
                                     filterRuleList = filterRuleMapper.selectFilterRuleList(Long.valueOf(mktCampaignId));
                                     redisUtils.set("FILTER_RULE_" + mktCampaignId, filterRuleList);
@@ -2806,39 +2852,41 @@ public class EventApiServiceImpl implements EventApiService {
         CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(accNbr);
         //log.info("22222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
         if (prodInstIdsObject != null && prodInstIdsObject.getResultObject() != null) {
+            Long mainOfferInstId = null;
             Set<String> prodInstIds = prodInstIdsObject.getResultObject();
             for (String prodInstId : prodInstIds) {
-                // 查询产品实例实体缓存
+                // 查询产品实例实体缓存 取主产品（1000）的一个
                 CacheResultObject<ProdInst> prodInstCacheEntity = iCacheProdEntityQryService.getProdInstCacheEntity(prodInstId);
-        //        log.info("333333------prodInstCacheEntity --->" + JSON.toJSONString(prodInstCacheEntity));
-                if (prodInstCacheEntity != null && prodInstCacheEntity.getResultObject() != null) {
-                    Long mainOfferInstId = prodInstCacheEntity.getResultObject().getMainOfferInstId();
-                    // 根据offerInstId和statusCd查询offerProdInstRelId
-                    CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex1(mainOfferInstId.toString(), "1000");
-        //            log.info("444444------setCacheResultObject --->" + JSON.toJSONString(setCacheResultObject));
-                    if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null && setCacheResultObject.getResultObject().size() > 0) {
-                        Set<String> offerProdInstRelIds = setCacheResultObject.getResultObject();
-                        for (String offerProdInstRelId : offerProdInstRelIds) {
-                            CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
-        //                    log.info("55555------offerProdInstRelCacheEntity --->" + JSON.toJSONString(offerProdInstRelCacheEntity));
-                            if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
-                                Long prodInstIdNew = offerProdInstRelCacheEntity.getResultObject().getProdInstId();
-                                CacheResultObject<ProdInst> prodInstCacheEntityNew = iCacheProdEntityQryService.getProdInstCacheEntity(prodInstIdNew.toString());
-        //                        log.info("6666666------prodInstCacheEntityNew --->" + JSON.toJSONString(prodInstCacheEntityNew));
-                                if (prodInstCacheEntityNew != null && prodInstCacheEntityNew.getResultObject() != null) {
-        //                            log.info("777777------AccNum --->" + prodInstCacheEntityNew.getResultObject().getAccNum());
-                                    if (!accNbrList.contains(prodInstCacheEntityNew.getResultObject().getAccNum())) {
-                                        accNbrList.add(prodInstCacheEntityNew.getResultObject().getAccNum());
-                                        final CacheResultObject<RowIdMapping> prodInstIdMappingCacheEntity = iCacheIdMappingEntityQryService.getProdInstIdMappingCacheEntity(prodInstIdNew.toString());
-         //                               log.info("888888------prodInstIdMappingCacheEntity --->" + JSON.toJSONString(prodInstIdMappingCacheEntity));
-                                        if (prodInstIdMappingCacheEntity != null && prodInstIdMappingCacheEntity.getResultObject() != null ) {
-                                            Map<String, Object> accNbrMap = new HashMap<>();
-                                            accNbrMap.put("ACC_NBR", prodInstCacheEntityNew.getResultObject().getAccNum());
-                                            accNbrMap.put("ASSET_INTEG_ID", prodInstIdMappingCacheEntity.getResultObject().getCrmRowId());
-        //                                    log.info("999999------accNbrMap --->" + JSON.toJSONString(accNbrMap));
-                                            accNbrMapList.add(accNbrMap);
-                                        }
-                                    }
+                //        log.info("333333------prodInstCacheEntity --->" + JSON.toJSONString(prodInstCacheEntity));
+                if (prodInstCacheEntity != null && prodInstCacheEntity.getResultObject() != null && "1000".equals(prodInstCacheEntity.getResultObject().getProdUseType())) {
+                    mainOfferInstId = prodInstCacheEntity.getResultObject().getMainOfferInstId();
+                    break;
+                }
+            }
+
+            // 根据offerInstId和statusCd查询offerProdInstRelId
+            if (mainOfferInstId!=null){
+                CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex1(mainOfferInstId.toString(), "1000");
+                //            log.info("444444------setCacheResultObject --->" + JSON.toJSONString(setCacheResultObject));
+                if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null && setCacheResultObject.getResultObject().size() > 0) {
+                    Set<String> offerProdInstRelIds = setCacheResultObject.getResultObject();
+                    for (String offerProdInstRelId : offerProdInstRelIds) {
+                        CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
+                        //                    log.info("55555------offerProdInstRelCacheEntity --->" + JSON.toJSONString(offerProdInstRelCacheEntity));
+                        if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
+                            Long prodInstIdNew = offerProdInstRelCacheEntity.getResultObject().getProdInstId();
+                            CacheResultObject<ProdInst> prodInstCacheEntityNew = iCacheProdEntityQryService.getProdInstCacheEntity(prodInstIdNew.toString());
+                            //                        log.info("6666666------prodInstCacheEntityNew --->" + JSON.toJSONString(prodInstCacheEntityNew));
+                            if (prodInstCacheEntityNew != null && prodInstCacheEntityNew.getResultObject() != null) {
+                                //                            log.info("777777------AccNum --->" + prodInstCacheEntityNew.getResultObject().getAccNum());
+                                final CacheResultObject<RowIdMapping> prodInstIdMappingCacheEntity = iCacheIdMappingEntityQryService.getProdInstIdMappingCacheEntity(prodInstIdNew.toString());
+                                //                               log.info("888888------prodInstIdMappingCacheEntity --->" + JSON.toJSONString(prodInstIdMappingCacheEntity));
+                                if (prodInstIdMappingCacheEntity != null && prodInstIdMappingCacheEntity.getResultObject() != null) {
+                                    Map<String, Object> accNbrMap = new HashMap<>();
+                                    accNbrMap.put("ACC_NBR", prodInstCacheEntityNew.getResultObject().getAccNum());
+                                    accNbrMap.put("ASSET_INTEG_ID", prodInstIdMappingCacheEntity.getResultObject().getCrmRowId());
+                                    //                                    log.info("999999------accNbrMap --->" + JSON.toJSONString(accNbrMap));
+                                    accNbrMapList.add(accNbrMap);
                                 }
                             }
                         }

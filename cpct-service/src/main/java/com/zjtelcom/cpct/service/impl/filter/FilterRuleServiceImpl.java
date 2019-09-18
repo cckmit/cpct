@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.service.impl.filter;
 
+import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
 import com.ctzj.smt.bss.cpc.configure.service.api.offer.IFairValueConfigureService;
+import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
@@ -530,6 +532,65 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", "导入成功，文件导入" + sheet.getLastRowNum() + "个，共计" + total + "个");
+        return maps;
+    }
+
+    /**
+     * 过滤规则列表（分页），排除红黑名单过滤类型
+     */
+    @Override
+    public Map<String, Object> qryFilterRuleExcludeType(FilterRuleReq filterRuleReq) {
+        Map<String, Object> maps = new HashMap<>();
+        Page pageInfo = filterRuleReq.getPageInfo();
+        PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
+        List<FilterRule> filterRules = filterRuleMapper.qryFilterRuleExcludeType(filterRuleReq.getFilterRule());
+        Page page = new Page(new PageInfo(filterRules));
+        List<FilterRuleVO> voList = new ArrayList<>();
+        for (FilterRule rule : filterRules){
+            FilterRuleVO vo = BeanUtil.create(rule,new FilterRuleVO());
+            SysParams sysParams = sysParamsMapper.findParamsByValue("FILTER_RULE_TYPE",rule.getFilterType());
+            if (sysParams!=null){
+                vo.setFilterTypeName(sysParams.getParamName());
+            }
+            voList.add(vo);
+        }
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("filterRules", voList);
+        maps.put("pageInfo",page);
+        return maps;
+    }
+
+    /**
+     * 过滤规则列表（分页），创建人权限控制
+     */
+    @Override
+    public Map<String, Object> qryFilterRuleByUser(FilterRuleReq filterRuleReq) {
+        Map<String, Object> maps = new HashMap<>();
+        SystemUserDto user = BssSessionHelp.getSystemUserDto();
+        if(user.getSysUserId() == null) {
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg", StringUtils.EMPTY);
+            maps.put("filterRules", "");
+        }
+        filterRuleReq.getFilterRule().setCreateStaff(user.getSysUserId());
+        Page pageInfo = filterRuleReq.getPageInfo();
+        PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
+        List<FilterRule> filterRules = filterRuleMapper.qryFilterRule(filterRuleReq.getFilterRule());
+        Page page = new Page(new PageInfo(filterRules));
+        List<FilterRuleVO> voList = new ArrayList<>();
+        for (FilterRule rule : filterRules){
+            FilterRuleVO vo = BeanUtil.create(rule,new FilterRuleVO());
+            SysParams sysParams = sysParamsMapper.findParamsByValue("FILTER_RULE_TYPE",rule.getFilterType());
+            if (sysParams!=null){
+                vo.setFilterTypeName(sysParams.getParamName());
+            }
+            voList.add(vo);
+        }
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("filterRules", voList);
+        maps.put("pageInfo",page);
         return maps;
     }
 
