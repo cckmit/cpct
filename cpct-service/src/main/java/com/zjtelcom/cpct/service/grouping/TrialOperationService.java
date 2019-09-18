@@ -41,6 +41,6 @@ public interface TrialOperationService  {
     Map<String,Object> showCalculationLog(Long id);
 
     //xyl excel文件清单批量导入
-    Map<String,Object> importUserListByExcel();
+    Map<String,Object> importUserListByExcel() throws IOException;
 
 }

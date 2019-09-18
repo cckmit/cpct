@@ -158,12 +158,13 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Value("${ctg.cpctTopic}")
     private String importTopic;
 
-    private String ftpAddress = "134.108.3.130";
+//    private String ftpAddress = "134.108.3.130";
+    private String ftpAddress = "134.108.0.93";
     private int ftpPort = 22;
     private String ftpName= "ftp";
     private String ftpPassword="V1p9*2_9%3#";
-    private String excelIssurepath="/app/ftp/msc/userlist/new/fees";
-    private String uploadExcelPath="/app/ftp/msc/userlist/new/fees/";
+    private String excelIssurepath="/app/ftp/msc/userlist/fees";
+    private String uploadExcelPath="/app/ftp/msc/userlist/fees/";
 
     private String downloadFilePath = "/app";
 
@@ -2148,6 +2149,15 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 tarGrpConditionDOs = conditions;
                 tarGrpId = -1L;
             }
+            //过滤规则
+            String prodFilter = "0";
+            List<Map<String, String>> sysFilList = sysParamsMapper.listParamsByKey("CUST_PRODUCT_FILTER");
+            if (sysFilList != null && !sysFilList.isEmpty()) {
+                prodFilter = sysFilList.get(0).get("value");
+            }
+            if ("1".equals(prodFilter)){
+                targrpCondition(mktCampaignId,tarGrpConditionDOs);
+            }
             System.out.println(JSON.toJSONString(tarGrpConditionDOs));
             List<LabelResult> labelResultList = new ArrayList<>();
             List<String> codeList = new ArrayList<>();
@@ -2250,14 +2260,38 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
     }
 
+    private void  targrpCondition(Long campaignId, List<TarGrpCondition> tarGrpConditionDOs){
+        List<String> typeList = new ArrayList<>();
+        typeList.add("3000");
+        List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(campaignId,typeList);
+        List<String> stringList = new ArrayList<>();
+        Label label = labelMapper.selectByLabelCode("PROM_LIST");
+        for (FilterRule filterRule : filterRuleList){
+            if (filterRule!=null && filterRule.getChooseProduct()!=null){
+                TarGrpCondition condition = new TarGrpCondition();
+                condition.setLeftParam(label.getInjectionLabelId().toString());
+                List<String> list = ChannelUtil.StringToList(filterRule.getChooseProduct());
+                for (String id : list){
+                    Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(id));
+                    if (offer!=null){
+                        stringList.add(offer.getOfferNbr());
+                    }
+                }
+                String rightParam =  ChannelUtil.list2String(stringList,",");
+                condition.setRightParam(rightParam);
+                condition.setOperType(filterRule.getOperator().equals("1000")? "7100" : "7200");
+                tarGrpConditionDOs.add(condition);
+            }
+        }
+    }
 
     @Override
-    public Map<String, Object> importUserListByExcel() {
+    public Map<String, Object> importUserListByExcel() throws IOException {
         logger.info("定时任务importUserListByExcel启动");
         SftpUtils sftpUtils = new SftpUtils();
         final ChannelSftp sftp = sftpUtils.connect(ftpAddress, ftpPort, ftpName, ftpPassword);
         logger.info("sftp已获得连接");
-        String path = sftpUtils.cd(excelIssurepath, sftp);
+         String path = sftpUtils.cd(uploadExcelPath, sftp);
         String tempFilePath = downloadFilePath + "/";
         List<String> files = new ArrayList<>();
         try {
@@ -2295,29 +2329,30 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             logger.info("批量excel下载文件失败");
             e.printStackTrace();
         }
-        SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");
-        String format = fmt.format(new Date());
+//        SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");
+//        String format = fmt.format(new Date());
         //判断文件是否存在 不存在则创建新文件夹
-        File newFile = new File(uploadExcelPath+format);
-        if (!newFile.exists()) {
-            newFile.mkdirs();
-        }
-        sftpUtils.changeDir(uploadExcelPath+format, sftp);
+//        File newFile = new File("/app/ftp/msc/userlist/feesExcelPreserve");
+//        if(!newFile .exists()) {
+//            newFile.setWritable(true, false);
+//            newFile.mkdirs();
+//            System.out.println("文件不存在创建文件夹名称"+newFile);
+//        }
+        sftpUtils.cd("/app/ftp/msc/userlist/feesExcelPreserve/", sftp);
         try {
             for (String s : uploadList) {
-                logger.info("上传文件名称" + s);
-                File file = new File(s);
+                logger.info("准备上传文件名称:" + s);
+                File file = new File(tempFilePath+s);
+                System.out.println("文件是否存在："+file.exists());
                 if (file.exists()) {
                     boolean uploadResult = sftpUtils.uploadFile(uploadExcelPath, s, new FileInputStream(file), sftp);
                     if (uploadResult) {
-                        // 删除本地文件
-                        logger.info("上传文件成功，开始删除本地文件！");
-
                         FileInputStream fileInputStream = new FileInputStream(file);
                         MultipartFile multipartFile = new MockMultipartFile(file.getName(), file.getName(),
                                 ContentType.APPLICATION_OCTET_STREAM.toString(), fileInputStream);
                         importExcelUserList(multipartFile);
-                        boolean b1 = delFile(s);
+                        logger.info("解析成功，开始删除本地文件！");
+                        boolean b1 = delFile(tempFilePath+s);
                         if (b1) {
                             logger.info("删除本地文件成功！");
                         }
@@ -2328,7 +2363,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("resultCode","200");
+        map.put("resultMsg","成功");
+        return map;
     }
 
     public static boolean delFile(String path) {

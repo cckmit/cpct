@@ -599,7 +599,7 @@
                 AND STATUS_CD = #{statusCd}
             </when>
             <otherwise>
-                AND STATUS_CD IN (2002,2006,2007,2008)
+                AND STATUS_CD IN (2002,2008)
             </otherwise>
         </choose>
         <choose>
