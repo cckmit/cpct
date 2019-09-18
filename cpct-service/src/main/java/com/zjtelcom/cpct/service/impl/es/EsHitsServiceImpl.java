@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.service.impl.es;
 
 import com.alibaba.fastjson.JSONObject;
-import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.dubbo.service.MqProducerService;
 import com.zjtelcom.cpct.elastic.model.CampaignHitParam;
 import com.zjtelcom.cpct.elastic.model.CampaignHitResponse;
@@ -11,7 +10,6 @@ import com.zjtelcom.cpct.elastic.util.DateUtil;
 import com.zjtelcom.cpct.elastic.util.EsSearchUtil;
 import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.service.es.EsHitsService;
-import com.zjtelcom.cpct.util.RedisUtils;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
@@ -28,9 +26,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import static com.zjtelcom.cpct.elastic.config.IndexList.*;
 
@@ -39,14 +34,8 @@ public class EsHitsServiceImpl implements EsHitsService {
 
     protected Logger logger = LoggerFactory.getLogger(EsHitsServiceImpl.class);
 
-    ThreadPoolExecutor executor = new ThreadPoolExecutor(20, 1000,5000, TimeUnit.SECONDS, new LinkedBlockingQueue(1000000));
-
     @Autowired(required = false)
     private TransportClient client;
-    @Autowired
-    private SysParamsMapper sysParamsMapper;
-    @Autowired
-    private RedisUtils redisUtils;
 
     @Value("${ctg.cpctEsLogTopic}")
     private String cpctEsLogTopic;
@@ -84,43 +73,38 @@ public class EsHitsServiceImpl implements EsHitsService {
      * @param jsonObject
      * @param indexName
      */
+    /*@Override
+    public void save(final JSONObject jsonObject, final String indexName, final String _id) {
+        try {
+            String result;
+            if (_id == null) {
+                result = mqProducerService.msg2ESLogProducer(jsonObject, cpctEsLogTopic, indexName + "," + esType, null);
+            } else {
+                result = mqProducerService.msg2ESLogProducer(jsonObject, cpctEsLogTopic, indexName + "," + esType + "," + _id, null);
+            }
+            logger.info("add to esLog start :" + result);
+        } catch (Exception e) {
+            logger.error("es日志存储失败");
+        }
+    }*/
+
     @Override
     public void save(final JSONObject jsonObject, final String indexName) {
-        saveAll(jsonObject, indexName, null);
+        try {
+            String result = mqProducerService.msg2ESLogProducer(jsonObject, cpctEsLogTopic, indexName + "," + esType, null);
+            // logger.info("saveOne to esLog start :" + result);
+        } catch (Exception e) {
+            logger.error("es日志存储失败");
+        }
     }
 
     @Override
     public void save(final JSONObject jsonObject, final String indexName, final String _id) {
-        saveAll(jsonObject, indexName, _id);
-    }
-
-    public void saveAll(JSONObject jsonObject, String indexName, String id) {
-        String prodFilter = "0";
-        Object status = redisUtils.get("SYSYTEM_ESLOG_STATUS");
-        if (status != null) {
-            prodFilter = status.toString();
-        }else {
-            List<Map<String, String>> sysFilList = sysParamsMapper.listParamsByKey("SYSYTEM_ESLOG_STATUS");
-            if (sysFilList != null && !sysFilList.isEmpty()) {
-                prodFilter = sysFilList.get(0).get("value");
-                redisUtils.set("SYSYTEM_ESLOG_STATUS", prodFilter);
-            }
-        }
-        if (prodFilter.equals("1")) {
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        if (id == null) {
-                            String result = mqProducerService.msg2ESLogProducer(jsonObject, cpctEsLogTopic, indexName + "," + esType, null);
-                        } else {
-                            String result = mqProducerService.msg2ESLogProducer(jsonObject, cpctEsLogTopic, indexName + "," + esType + "," + id, null);
-                        }
-                    } catch (Exception e) {
-                        logger.error("es日志存储失败");
-                    }
-                }
-            });
+        try {
+            String result = mqProducerService.msg2ESLogProducer(jsonObject, cpctEsLogTopic, indexName + "," + esType + "," + _id, null);
+            // logger.info("add to esLog start :" + result);
+        } catch (Exception e) {
+            logger.error("es日志存储失败");
         }
     }
 

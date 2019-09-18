@@ -375,6 +375,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         String evtContactConfIds = "";
         try {
             if(mktStrategyConfRule.getTarGrpId()!=null){
+
 /*
                 MktCamGrpRul camGrpRul = mktCamGrpRulMapper.selectByTarGrpId(mktStrategyConfRule.getTarGrpId());
                 if (camGrpRul == null) {
@@ -396,6 +397,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     mktCamGrpRul.setUpdateStaff(UserUtil.loginId());
                     mktCamGrpRulMapper.insert(mktCamGrpRul);
                 }
+
 */
                 // 更新客户分群名字为规则名称
                 TarGrp tarGrp = new TarGrp();
