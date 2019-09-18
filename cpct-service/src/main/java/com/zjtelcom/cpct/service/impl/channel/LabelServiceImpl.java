@@ -1001,6 +1001,13 @@ public class LabelServiceImpl extends BaseService implements LabelService {
                 if(landIdByRegionId != null) {
                     list = labelMapper.selectDistributeLabelByType(labelType, landIdByRegionId.toString());
                     fixedList.addAll(list);
+                }else {
+                    String region = regionId.toString().substring(0, 5) + "00";
+                    landIdByRegionId = AreaCodeEnum.getLandIdByRegionId(Long.valueOf(region));
+                    if(landIdByRegionId != null) {
+                        list = labelMapper.selectDistributeLabelByType(labelType, landIdByRegionId.toString());
+                        fixedList.addAll(list);
+                    }
                 }
             }
             //return ResultUtil.responseSuccessResult(labelMapper.selectByCode(Integer.valueOf(labelType)));

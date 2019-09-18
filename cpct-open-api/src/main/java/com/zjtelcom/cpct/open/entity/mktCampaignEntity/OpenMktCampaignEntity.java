@@ -63,8 +63,6 @@ public class OpenMktCampaignEntity {
     //营服活动校验规则
     private List<OpenMktCamCheckruleEntity> mktCamCheckrules;
 
-    private List<OpenEvent> mktCampaignEvts;
-
     public String getActType() {
         return actType;
     }
@@ -359,14 +357,6 @@ public class OpenMktCampaignEntity {
 
     public void setMktCamEvtRels(List<OpenMktCamEvtRelEntity> mktCamEvtRels) {
         this.mktCamEvtRels = mktCamEvtRels;
-    }
-
-    public List<OpenEvent> getMktCampaignEvts() {
-        return mktCampaignEvts;
-    }
-
-    public void setMktCampaignEvts(List<OpenEvent> mktCampaignEvts) {
-        this.mktCampaignEvts = mktCampaignEvts;
     }
 
     public List<OpenMktCamStrategyRelEntity> getMktCamStrategyRels() {
