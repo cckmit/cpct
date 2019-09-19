@@ -826,6 +826,20 @@ public class DateUtil {
     }
 
 
-
+    /**
+     * 计算两个日期之间相差的天数
+     * @param targetDate
+     * @param compareDate
+     * @return
+     */
+    public static int daysBetween(Date targetDate,Date compareDate) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(targetDate);
+        long targetTime = cal.getTimeInMillis();
+        cal.setTime(compareDate);
+        long compareTime = cal.getTimeInMillis();
+        long between_days=(compareTime - targetTime) / (1000 * 3600 * 24);
+        return Integer.parseInt(String.valueOf(between_days));
+    }
 
 }
