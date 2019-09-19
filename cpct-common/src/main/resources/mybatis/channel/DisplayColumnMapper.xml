@@ -68,5 +68,11 @@
     order by UPDATE_DATE desc
   </select>
 
+  <select id="findDisplayListByName" resultMap="BaseResultMap">
+    select DISPLAY_COLUMN_ID, DISPLAY_COLUMN_NAME, DISPLAY_COLUMN_CODE, DISPLAY_COLUMN_TYPE,STATUS_CD, CREATE_STAFF,
+           UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from display_column
+    where DISPLAY_COLUMN_NAME = #{displayName,jdbcType=VARCHAR}
+  </select>
 
 </mapper>

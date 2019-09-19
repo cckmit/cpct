@@ -269,4 +269,51 @@
         UPDATE close_rule SET NOTE_FIVE = #{express,jdbcType=VARCHAR} WHERE RULE_ID = #{ruleId}
     </update>
 
+    <select id="qryCloseRuleForUser" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select RULE_ID, CLOSE_NAME, CLOSE_TYPE,
+        PRODUCT_TYPE, CHANNEL_CONTACTS, EFFECTIVE_DATE,
+        FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF,
+        UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+        UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID,
+        DAYS, TIMES, OFFER_INFO,CLOSE_CODE,NOTE_ONE,NOTE_TWO,NOTE_THREE
+        from close_rule
+        where 1 = 1
+        <if test="closeName != null and closeName != ''">
+            AND CLOSE_NAME like concat('%',concat(#{closeName},'%'))
+        </if>
+        <if test="closeType != null and closeType != ''">
+            AND CLOSE_TYPE = #{closeType}
+        </if>
+        <if test="staffId != null and staffId != ''">
+            AND CREATE_STAFF = #{staffId}
+        </if>
+        ORDER BY RULE_ID DESC
+    </select>
+
+    <select id="getCloseRuleOut" resultMap="BaseResultMap">
+        select RULE_ID, CLOSE_NAME, CLOSE_TYPE,
+        PRODUCT_TYPE, CHANNEL_CONTACTS, EFFECTIVE_DATE,
+        FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF,
+        UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+        UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID,
+        DAYS, TIMES, OFFER_INFO,CLOSE_CODE,NOTE_ONE,NOTE_TWO,NOTE_THREE
+        from close_rule
+        where 1 = 1
+        <if test="closeName != null and closeName != ''">
+            AND CLOSE_NAME like concat('%',concat(#{closeName},'%'))
+        </if>
+        <choose>
+            <when test="closeType != null and closeType!=''">
+                AND CLOSE_TYPE = #{closeType}
+            </when>
+            <otherwise>
+                AND CLOSE_TYPE NOT IN (1000,3000)
+            </otherwise>
+        </choose>
+        ORDER BY RULE_ID DESC
+    </select>
+
+    <select id="getCloseNameCount" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(0) FROM close_rule where CLOSE_NAME = #{closeName}
+    </select>
 </mapper>
