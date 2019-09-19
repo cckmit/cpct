@@ -8,7 +8,6 @@ import com.zjtelcom.cpct.service.api.TestService;
 import com.zjtelcom.cpct.service.impl.grouping.TrialOperationServiceImpl;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
-import com.zjtelcom.cpct.util.SpringUtil;
 import com.zjtelcom.es.es.entity.TrialOperationVOES;
 import com.zjtelcom.es.es.entity.model.TrialResponseES;
 import com.zjtelcom.es.es.service.EsService;
@@ -80,12 +79,7 @@ public class TestServiceImpl implements TestService {
         }
     }
 
-    @Test
-    public void  test2(){
-        RedisUtils bean = SpringUtil.getBean(RedisUtils.class);
-        String s = (String) bean.get("Event_" + 1L);
-        System.out.println(s);
-    }
+
 
     @Test
     public void  test(){

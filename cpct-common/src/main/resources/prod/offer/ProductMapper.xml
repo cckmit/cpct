@@ -89,26 +89,4 @@
     UPDATE_DATE, ALIAS_NAME, REMARK, GRP_PROD_NBR
     from product
   </select>
-
-  <select id="findProductByType" resultMap="BaseResultMap">
-    select pr.PROD_ID  , pr.PROD_USE_TYPE , pr.PROD_NBR , pr.PROD_NAME
-    from product pr
-    where 1=1
-    <if test="statusCd == null or statusCd == ''">
-      and pr.STATUS_CD = 1000
-    </if>
-    <if test="type != null and type != ''">
-      and pr.PROD_USE_TYPE = #{type}
-    </if>
-    <if test="null != offerIds and offerIds.size > 0">
-      and pr.PROD_ID not in
-      <foreach collection="offerIds" item="item" open="(" close=")" separator=",">
-        #{item}
-      </foreach>
-    </if>
-    <if test="offerName != null and offerName != ''">
-      and pr.PROD_NAME  LIKE CONCAT(CONCAT('%',#{offerName}),'%')
-    </if>
-  </select>
-
 </mapper>

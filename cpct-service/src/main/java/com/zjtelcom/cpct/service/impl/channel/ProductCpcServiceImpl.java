@@ -8,7 +8,10 @@ import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.ServiceMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
-import com.zjtelcom.cpct.domain.channel.*;
+import com.zjtelcom.cpct.domain.channel.MktProductRule;
+import com.zjtelcom.cpct.domain.channel.MktResource;
+import com.zjtelcom.cpct.domain.channel.Offer;
+import com.zjtelcom.cpct.domain.channel.ServiceEntity;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.channel.OfferDetail;
 import com.zjtelcom.cpct.dto.channel.ProductParam;
@@ -60,14 +63,6 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
         for (Long productId : productIdList){
             Offer product = offerProdMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
             if (product==null){
-                Product productM = productProdMapper.selectByPrimaryKey(productId);
-                if (productM!=null){
-                    OfferDetail offerDetail = new OfferDetail();
-                    offerDetail.setOfferId(Integer.valueOf(productM.getProdId().toString()));
-                    offerDetail.setOfferName(productM.getProdName());
-                    nameList.add(offerDetail);
-                    continue;
-                }
                 continue;
             }
             OfferDetail offerDetail = BeanUtil.create(product,new OfferDetail());
@@ -109,18 +104,7 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
         String statusCd = MapUtil.getString(params.get("statusCd") == null? "":params.get("statusCd"));
         List<Long> producetIdList = (List<Long>)params.get("productIdList");
         PageHelper.startPage(page,pageSize);
-        if (produtType.equals("")){
-            productList = offerProdMapper.findByType(productName, produtType, statusCd, producetIdList);
-        }else {
-            List<Product> products = productProdMapper.findProductByType(productName,produtType,statusCd,producetIdList);
-            for (Product product : products){
-                Offer offer = new Offer();
-                offer.setOfferId(Integer.valueOf(product.getProdId().toString()));
-                offer.setOfferName(product.getProdName());
-                offer.setOfferNbr(product.getProdNbr());
-                productList.add(offer);
-            }
-        }
+        productList = offerProdMapper.findByType(productName, produtType, statusCd, producetIdList);
         Page pageInfo = new Page(new PageInfo(productList));
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",productList);
