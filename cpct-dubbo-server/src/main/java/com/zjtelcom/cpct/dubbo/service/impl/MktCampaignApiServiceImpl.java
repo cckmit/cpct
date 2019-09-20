@@ -1,5 +1,8 @@
 package com.zjtelcom.cpct.dubbo.service.impl;
 
+import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
+import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
+import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
@@ -174,6 +177,8 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
 
     @Autowired
     private MktCampaignService mktCampaignService;
+    @Autowired(required =false)
+    private ISystemUserDtoDubboService iSystemUserDtoDubboService;
 
     //同步表名
     private static final String tableName = "mkt_campaign";
@@ -348,5 +353,34 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
         }
         return map;
     }
+
+    @Override
+    public Map<String, Object> salesOffShelf(Map<String, Object> map) {
+        Map<String, Object> resultMap = new HashMap<>();
+        Object type = map.get("type");
+        Object id = map.get("id");
+        if (type == null && id == null){
+            resultMap.put("resultCode",CODE_FAIL);
+            resultMap.put("resultMsg","请传入正确的类型和id");
+            return resultMap;
+        }
+        List<MktCamItem> mktCamItems = mktCamItemMapper.selectByCampaignAndType(Long.valueOf(id.toString()), type.toString(), null);
+        if (!mktCamItems.isEmpty()){
+            for (MktCamItem mktCamItem : mktCamItems) {
+                Long mktCampaignId = mktCamItem.getMktCampaignId();
+                MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
+                Long createStaff = mktCampaignDO.getCreateStaff();
+                //调用dubbo接口查询改创建人的手机号码 下发短信
+                SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(createStaff, new ArrayList<Long>());
+                if (systemUserDtoSysmgrResultObject != null && systemUserDtoSysmgrResultObject.getResultObject() != null) {
+                    String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
+                    // TODO  调用发送短信接口
+
+                }
+            }
+        }
+        return null;
+    }
+
 
 }

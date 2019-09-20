@@ -23,4 +23,7 @@ public interface MktCampaignApiService {
 
     Map<String, Object> rollBackMktCampaign(Long mktCampaignId);
 
+    //销售品下架 遍历活动销售品下架 发短信给活动创建人 xyl
+    Map<String,Object> salesOffShelf(Map<String,Object> map);
+
 }
