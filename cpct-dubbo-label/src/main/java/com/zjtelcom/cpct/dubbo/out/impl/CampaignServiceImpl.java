@@ -31,7 +31,7 @@ public class CampaignServiceImpl implements CampaignService {
     public boolean CampaignDelayNotice() {
         ArrayList<String> list = new ArrayList<>();
         list.add("2002");
-        List<MktCampaignDO> mktCampaignDOS = mktCampaignMapper.selectAllMktCampaignDetailsByStatus(list);
+        List<MktCampaignDO> mktCampaignDOS = mktCampaignMapper.selectAllMktCampaignDetailsByStatus(list,null);
         for (MktCampaignDO mktCampaignDO : mktCampaignDOS) {
             int i = DateUtil.daysBetween(mktCampaignDO.getPlanEndTime(), new Date());
             if (i == 3) {

@@ -789,6 +789,10 @@
         <foreach item="item" index="index" collection="status" open="(" separator="," close=")">
           #{item}
         </foreach>
+        <if test="staff != null">
+          and CREATE_STAFF = #{staff}
+        </if>
+
     </select>
 
 </mapper>
