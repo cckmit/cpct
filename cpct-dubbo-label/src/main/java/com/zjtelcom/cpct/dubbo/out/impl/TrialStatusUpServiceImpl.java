@@ -5,6 +5,7 @@ import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.dubbo.out.TrialStatusUpService;
 import com.zjtelcom.cpct.enums.TrialStatus;
+import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.grouping.TrialProdService;
@@ -31,6 +32,9 @@ public class TrialStatusUpServiceImpl implements TrialStatusUpService {
     private MktCampaignService mktCampaignService;
     @Autowired(required = false)
     private TrialOperationService trialOperationService;
+
+    @Autowired
+    private MktCampaignApiService mktCampaignApiService;
 
 
     @Override
@@ -113,6 +117,17 @@ public class TrialStatusUpServiceImpl implements TrialStatusUpService {
     @Override
     public Map<String, Object> importUserListByExcel() throws IOException {
         return trialOperationService.importUserListByExcel();
+    }
+
+    /**
+     * 销售品下架发送短信 调用 MktCampaignApiServiceImpl salesOffShelf
+     * @return
+     */
+    @Override
+    public Map<String, Object> sendMsgByOfferOver() {
+        Map<String, Object> stringObjectMap = mktCampaignApiService.salesOffShelf(new HashMap<String, Object>());
+        return stringObjectMap;
+
     }
 
 }

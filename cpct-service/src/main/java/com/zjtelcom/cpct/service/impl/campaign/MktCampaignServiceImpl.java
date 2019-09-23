@@ -1849,8 +1849,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     params.put("idList", arrayList);
                     trialProdService.campaignIndexTask(params);
                 }
-            }.start();
+            }.start(); //BIG_DATA_TEMP
         }
+
     }
 
 
