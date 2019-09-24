@@ -259,7 +259,7 @@ public class SearchLabelServiceImpl extends BaseService implements SearchLabelSe
 
                 }
             }
-            if (!promCode.isEmpty() && !assetCode.contains("PROM_INTEG_ID")){
+            if (!promCode.isEmpty() && !assetCode.contains("ASSI_PROM_INTEG_ID")){
                 assetCode.add("PROM_INTEG_ID");
             }
         } catch (NumberFormatException e) {

@@ -294,7 +294,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      */
     @Override
     public Map<String, Object> createMktCampaign(MktCampaignDetailVO mktCampaignVO) throws Exception {
-        Map<String, Object> maps = null;
+        Map<String, Object> maps = new HashMap<>();;
         try {
             MktCampaignDO mktCampaignDO = BeanUtil.create(mktCampaignVO, new MktCampaignDO());
             // 创建活动基本信息
@@ -488,8 +488,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamDisplayColumnRelMapper.insert(mktCamDisplayColumnRel);
                 }
             }
-
-            maps = new HashMap<>();
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
             if (StatusCode.STATUS_CODE_DRAFT.getStatusCode().equals(mktCampaignVO.getStatusCd())) {
                 maps.put("resultMsg", ErrorCode.SAVE_MKT_CAMPAIGN_SUCCESS.getErrorMsg());

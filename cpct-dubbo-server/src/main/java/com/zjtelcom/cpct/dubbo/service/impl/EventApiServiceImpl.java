@@ -453,7 +453,11 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
                 //根据事件code查询事件信息
-                ContactEvt event = (ContactEvt) redisUtils.get("EVENT_" + map.get("eventCode"));
+                 Object eventC =  redisUtils.get("EVENT_" + map.get("eventCode"));
+                ContactEvt event = null;
+                if (eventC!=null){
+                    event = (ContactEvt)eventC;
+                }
                 if (event == null) {
                     event = contactEvtMapper.getEventByEventNbr(map.get("eventCode"));
                     redisUtils.set("EVENT_" + map.get("eventCode"), event);
@@ -660,10 +664,19 @@ public class EventApiServiceImpl implements EventApiService {
                 } else {
                     recCampaignAmount = Integer.parseInt(recCampaignAmountStr);
                 }
+                List<Map<String, Object>> resultByEvent = null;
 
 
-                //事件下所有活动的规则预校验，返回初步可命中活动
-                List<Map<String, Object>> resultByEvent = getResultByEvent(eventId, map.get("lanId"), map.get("channelCode"), map.get("reqId"), map.get("accNbr"), c4, map.get("custId"));
+                try {
+                    //事件下所有活动的规则预校验，返回初步可命中活动
+                    resultByEvent = getResultByEvent(eventId, map.get("lanId"), map.get("channelCode"), map.get("reqId"), map.get("accNbr"), c4, map.get("custId"));
+                } catch (Exception e) {
+                    esJson.put("hit", false);
+                    esJson.put("success", true);
+                    esJson.put("msg", "预校验返回异常");
+                    esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
+                    e.printStackTrace();
+                }
 
                 // 固定必中规则提取
                 // List<Map<String, Object>> resultByEvent2 = getBitslapByEvent(eventId, resultByEvent);
@@ -1119,12 +1132,12 @@ public class EventApiServiceImpl implements EventApiService {
                 esJson.put("timeCost", cost);
                 esJson.put("hit", false);
                 esJson.put("success", true);
-                esJson.put("msg", "策略中心计算异常");
+                esJson.put("msg", "策略中心计算异常"+e.getMessage()+e.toString());
                 esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
 
                 //构造返回参数
                 result.put("CPCResultCode", "1000");
-                result.put("CPCResultMsg", "策略中心计算异常");
+                result.put("CPCResultMsg", "策略中心计算异常"+e.getMessage()+e.toString());
                 result.put("reqId", map.get("reqId"));
                 result.put("custId", custId);
                 return result;
@@ -1976,9 +1989,15 @@ public class EventApiServiceImpl implements EventApiService {
             }
             if (futureList != null && futureList.size() > 0) {
                 for (Future<Map<String, Object>> future : futureList) {
-                    Map<String, Object> resultMap = future.get();
-                    if (resultMap != null && !resultMap.isEmpty()) {
-                        resultMapList.add(resultMap);
+                    try {
+                        Map<String, Object> resultMap = future.get();
+                        if (resultMap != null && !resultMap.isEmpty()) {
+                            resultMapList.add(resultMap);
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
                     }
                 }
             }

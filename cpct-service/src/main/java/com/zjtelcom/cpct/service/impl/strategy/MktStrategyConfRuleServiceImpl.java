@@ -345,7 +345,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             if (mktStrategyConfRule.getOrganizationList()!=null && !mktStrategyConfRule.getOrganizationList().isEmpty()){
                 redisUtils.set("ORG_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString(),mktStrategyConfRule.getOrganizationList());
                 redisUtils.set("ORG_CHECK_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString(),"false");
-                area2RedisThread(mktStrategyConfRule.getMktStrategyConfRuleId(),mktStrategyConfRule.getOrganizationList());
+                area2RedisThread(mktStrategyConfRuleDO.getMktStrategyConfRuleId(),mktStrategyConfRule.getOrganizationList());
             }
 
 
@@ -470,17 +470,17 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
 
             //营销组织树
             if (mktStrategyConfRule.getOrganizationList()!=null && !mktStrategyConfRule.getOrganizationList().isEmpty()){
-                if (redisUtils.get("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString())==null
-                        || !ChannelUtil.equalsList((List<Long>)redisUtils.get("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString()),mktStrategyConfRule.getOrganizationList())){
-                    redisUtils.set("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString(),mktStrategyConfRule.getOrganizationList());
+                if (redisUtils.get("ORG_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString())==null
+                        || !ChannelUtil.equalsList((List<Long>)redisUtils.get("ORG_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString()),mktStrategyConfRule.getOrganizationList())){
+                    redisUtils.set("ORG_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString(),mktStrategyConfRule.getOrganizationList());
                     redisUtils.set("ORG_CHECK_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString(),"false");
-                    area2RedisThread(mktStrategyConfRule.getMktStrategyConfRuleId(),mktStrategyConfRule.getOrganizationList());
+                    area2RedisThread(mktStrategyConfRuleDO.getMktStrategyConfRuleId(),mktStrategyConfRule.getOrganizationList());
                 }
             }else {
-                if (redisUtils.get("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString())!=null){
-                    redisUtils.remove("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString());
+                if (redisUtils.get("ORG_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString())!=null){
+                    redisUtils.remove("ORG_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString());
                     redisUtils.remove("ORG_CHECK_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString());
-                    redisUtils.remove("AREA_RULE_ISSURE_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString());
+                    redisUtils.remove("AREA_RULE_ISSURE_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString());
                 }
             }
             String confs = "";
