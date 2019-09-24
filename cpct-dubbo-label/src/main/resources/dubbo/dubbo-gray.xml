@@ -29,6 +29,7 @@
         <!--<dubbo:method name="updateOperationStatus" servicecode="33.1083.updateOperationStatus" timeout="10000"/>-->
         <dubbo:method name="campaignIndexTask" servicecode="33.1083.campaignIndexTask" timeout="10000"/>
         <dubbo:method name="importUserListByExcel" servicecode="33.1083.importUserListByExcel" timeout="10000"/>
+        <dubbo:method name="sendMsgByOfferOver" servicecode="33.1083.sendMsgByOfferOver" timeout="10000"/>
     </dubbo:service>
 
     <!-- 更新试算日志 -->
