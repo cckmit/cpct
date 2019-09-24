@@ -1112,7 +1112,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 return maps;
             }
             // 周期性活动最大延期1年
-            if ("1000".equals(campaignDO.getExecType()) && !"5000".equals(campaignDO.getMktCampaignType()) && lastTime.after(DateUtil.addDate(campaignDO.getPlanEndTime(), 1, YEAR))) {
+            if ("2000".equals(campaignDO.getExecType()) && !"5000".equals(campaignDO.getMktCampaignType()) && lastTime.after(DateUtil.addDate(campaignDO.getPlanEndTime(), 1, YEAR))) {
                 maps.put("resultCode", CODE_FAIL);
                 maps.put("resultMsg", "周期性活动最大延期1年");
                 return maps;
