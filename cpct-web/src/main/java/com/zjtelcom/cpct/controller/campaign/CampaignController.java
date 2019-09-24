@@ -122,13 +122,19 @@ public class CampaignController extends BaseController {
     }
 
     /**
-     * 延期活动列表（分页，只显示创建人为当前登录人的活动）
+     * 延期活动列表（只显示创建人为当前登录人的活动）
      */
     @PostMapping("/queryDelayCampaignList")
     @CrossOrigin
     public String queryDelayCampaignList() {
-        Result result = mktCampaignService.queryDelayCampaignList();
-        return null;
+        Result result = new Result();
+        try{
+            result = mktCampaignService.queryDelayCampaignList();
+        }catch(Exception e){
+            result.setResultCode("500");
+            result.setResultMessage(e.toString());
+        }
+        return JSON.toJSONString(result);
     }
 
 
