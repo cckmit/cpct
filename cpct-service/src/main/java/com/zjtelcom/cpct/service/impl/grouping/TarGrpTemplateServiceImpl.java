@@ -236,7 +236,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             }
         }
         if (failTarGrpIdList.isEmpty()) {
-            resultMap.put("result", "succee");
+            resultMap.put("result", "succees");
             resultMap.put("mapping", mapping);
             return resultMap;
         }else {

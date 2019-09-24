@@ -14,6 +14,9 @@ public class TarGrpServiceImpl implements TarGrpService {
     @Autowired
     private TarGrpTemplateService tarGrpTemplateService;
 
+    /**
+     * 分群定时批量下发
+     */
     @Override
     public Map<String, Object> tarGrpTemplateScheduledBatchIssue() {
         return tarGrpTemplateService.tarGrpTemplateScheduledBatchIssue();

@@ -7,6 +7,7 @@ import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
+import com.zjtelcom.cpct.dto.pojo.Result;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
@@ -119,6 +120,23 @@ public class CampaignController extends BaseController {
         Map<String, Object> map = mktCampaignService.qryMktCampaignList4Sync(params, page, pageSize);
         return JSON.toJSONString(map);
     }
+
+    /**
+     * 延期活动列表（只显示创建人为当前登录人的活动）
+     */
+    @PostMapping("/queryDelayCampaignList")
+    @CrossOrigin
+    public String queryDelayCampaignList() {
+        Result result = new Result();
+        try{
+            result = mktCampaignService.queryDelayCampaignList();
+        }catch(Exception e){
+            result.setResultCode("500");
+            result.setResultMessage(e.toString());
+        }
+        return JSON.toJSONString(result);
+    }
+
 
     /**
      * 查询活动列表(分页，活动总览)
