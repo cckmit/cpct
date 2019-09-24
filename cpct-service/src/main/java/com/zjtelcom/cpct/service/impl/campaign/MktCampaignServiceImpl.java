@@ -2430,6 +2430,14 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         List<String> list = new ArrayList<>();
         list.add(STATUS_CODE_PUBLISHED.getStatusCode());
         List<MktCampaignDO> mktCampaignDOS = mktCampaignMapper.selectAllMktCampaignDetailsByStatus(list, loginId);
+        Iterator<MktCampaignDO> iterator = mktCampaignDOS.iterator();
+        while (iterator.hasNext()) {
+            MktCampaignDO campaignDO = iterator.next();
+            Date planEndTime = campaignDO.getPlanEndTime();
+            if (planEndTime.after(new Date()) || DateUtil.daysBetween(new Date(), planEndTime) > 7) {
+                iterator.remove();
+            }
+        }
         result.setResultCode("200");
         result.setResultMessage("查询成功");
         result.setResultObject(mktCampaignDOS);
