@@ -80,8 +80,9 @@ public class PpmProductController extends BaseController  {
     public Map<String, Object> getProductNameById(@RequestBody ProductParam param) {
         Map<String ,Object> result = new HashMap<>();
         Long userId = UserUtil.loginId();
+//        Long userId = 1l;
         try {
-            result = productService.getProductNameById(userId,param.getIdList());
+            result = productService.getProductNameById(userId,param.getIdList(),param.getItemType());
         }catch (Exception e){
             logger.error("[op:PpmProductController] fail to getProductNameById",e);
             result.put("resultCode",CODE_FAIL);
