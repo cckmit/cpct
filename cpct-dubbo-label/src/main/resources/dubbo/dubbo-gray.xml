@@ -63,7 +63,7 @@
         <!--<dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="5000"/>-->
     <!--</dubbo:reference>-->
 
-    <dubbo:service  interface="com.zjtelcom.cpct.dubbo.out.TarGrpService" ref="TarGrpServiceImpl" version="2.0" >
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.TargetGroupService" ref="TarGrpServiceImpl" version="2.0" >
         <dubbo:method name="tarGrpTemplateScheduledBatchIssue" servicecode="33.1083.tarGrpTemplateScheduledBatchIssue" timeout="10000"/>
     </dubbo:service>
 
