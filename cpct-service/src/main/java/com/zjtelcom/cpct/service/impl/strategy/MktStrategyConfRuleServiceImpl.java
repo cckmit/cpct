@@ -629,14 +629,18 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
     private void area2RedisThread(Long ruleId,List<Long> orgIdList) {
         //过滤 选择level 大于3 的
         List<Long> orgs = organizationMapper.selectByIdList(orgIdList);
-        //添加所有选择的节点信息到缓存
-        redisUtils.set("ORG_ID_"+ruleId.toString(),orgs);
-        redisUtils.remove("AREA_RULE_ISSURE_"+ruleId);
-        new Thread(){
-            public void run(){
-                areaList2Redis(ruleId,orgs);
-            }
-        }.start();
+        if (orgs == null || orgs.isEmpty()){
+            redisUtils.set("ORG_CHECK_"+ruleId.toString(),"true");
+        }else {
+            //添加所有选择的节点信息到缓存
+            redisUtils.set("ORG_ID_"+ruleId.toString(),orgs);
+            redisUtils.remove("AREA_RULE_ISSURE_"+ruleId);
+            new Thread(){
+                public void run(){
+                    areaList2Redis(ruleId,orgs);
+                }
+            }.start();
+        }
     }
 
     public void areaList2Redis(Long ruleId,List<Long> areaIdList){
