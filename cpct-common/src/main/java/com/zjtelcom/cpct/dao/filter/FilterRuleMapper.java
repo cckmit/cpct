@@ -43,4 +43,6 @@ public interface FilterRuleMapper {
     void updateExpression2(@Param("filterRule")String filterRule, @Param("expression")String expression);
 
     List<FilterRule> qryFilterRuleExcludeType(FilterRule filterRule);
+
+    List<FilterRule> selectFilterRuleByRuleName(@Param("ruleName") String ruleName);
 }

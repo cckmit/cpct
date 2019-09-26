@@ -450,12 +450,6 @@ public class CloseRuleServiceImpl implements CloseRuleService {
             maps.put("resultCode", CODE_FAIL);
             maps.put("resultMsg", "关单规则信息不完善");
         }
-        Integer count = closeRuleMapper.getCloseNameCount(closeName);
-        if (count>1){
-            maps.put("resultCode", CommonConstant.CODE_FAIL);
-            maps.put("resultMsg", "导入销售品！关单规则名称重复！");
-            return maps;
-        }
         List<String> resultList = new ArrayList<>();
         InputStream inputStream = multipartFile.getInputStream();
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
