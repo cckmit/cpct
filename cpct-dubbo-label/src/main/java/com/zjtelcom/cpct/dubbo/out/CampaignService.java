@@ -2,5 +2,5 @@ package com.zjtelcom.cpct.dubbo.out;
 
 public interface CampaignService {
 
-    boolean CampaignDelayNotice();
+    void campaignDelayNotice();
 }
