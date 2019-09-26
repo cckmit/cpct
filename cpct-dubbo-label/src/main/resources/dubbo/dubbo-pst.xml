@@ -17,26 +17,26 @@
 
     <!-- 注册 -->
     <!-- 标签增量同步 -->
-    <!--<dubbo:service interface="com.zjtelcom.cpct.dubbo.service.SyncLabelService" ref="syncLabelServiceImpl"
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.SyncLabelService" ref="syncLabelServiceImpl"
                    version="1.0">
         <dubbo:method name="syncLabelInfo" servicecode="33.1083.syncLabelInfo_zsc" timeout="10000"/>
-    </dubbo:service>-->
+    </dubbo:service>
 
     <!-- 试运算状态记录更新 -->
-    <!--<dubbo:service interface="com.zjtelcom.cpct.dubbo.out.TrialStatusUpService" ref="trialStatusUpServiceImpl"
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.TrialStatusUpService" ref="trialStatusUpServiceImpl"
                    version="1.0">
         <dubbo:method name="updateOperationStatus" servicecode="33.1083.updateOperationStatus" timeout="10000"/>
         <dubbo:method name="campaignIndexTask" servicecode="33.1083.campaignIndexTask" timeout="10000"/>
         <dubbo:method name="cpcLog2WriteFileLabel" servicecode="33.1083.cpcLog2WriteFileLabel" timeout="10000"/>
         <dubbo:method name="importUserListByExcel" servicecode="33.1083.importUserListByExcel" timeout="10000"/>
         <dubbo:method name="dueMktCampaign" servicecode="33.1083.dueMktCampaign" timeout="10000"/>
-    </dubbo:service>-->
+    </dubbo:service>
 
     <!-- 事件外部调用测试 -->
-    <!--<dubbo:service interface="com.zjtelcom.cpct.dubbo.service.SyncEventService" ref="syncEventServiceImpl"
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.SyncEventService" ref="syncEventServiceImpl"
                    version="1.0">
         <dubbo:method name="syncEvent" servicecode="33.1083.syncEvent" timeout="10000"/>
-    </dubbo:service>-->
+    </dubbo:service>
 
     <!-- 订阅事件实时计算服务 -->
     <dubbo:reference interface="com.zjtelcom.cpct.dubbo.service.EventApiService" id="eventApiService"
@@ -66,9 +66,9 @@
     </dubbo:reference>
 
     <!-- 分群定时批量下发 -->
-    <!--<dubbo:service interface="com.zjtelcom.cpct.dubbo.out.TargetGroupService" ref="TarGrpServiceImpl" version="1.0" >
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.TargetGroupService" ref="TarGrpServiceImpl" version="1.0" >
         <dubbo:method name="tarGrpTemplateScheduledBatchIssue" servicecode="33.1083.tarGrpTemplateScheduledBatchIssue" timeout="10000"/>
-    </dubbo:service>-->
+    </dubbo:service>
 
     <!-- UCCP短信发送 -->
     <dubbo:reference  interface="com.ztesoft.uccp.dubbo.interfaces.UCCPSendService" id="UCCPSendService" version="1.0" retries="0" check="false">
