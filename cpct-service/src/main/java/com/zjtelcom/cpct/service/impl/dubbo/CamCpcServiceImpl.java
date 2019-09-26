@@ -246,7 +246,11 @@ public class CamCpcServiceImpl implements CamCpcService {
         //iSale展示列参数对象初始化
         List<Map<String, Object>> itgTriggers = new ArrayList<>();
         //验证过滤规则 活动级
-        List<Long> filterRuleIds = (List<Long>) redisUtils.get("MKT_FILTER_RULE_IDS_" + activityId);
+        Object o = redisUtils.get("MKT_FILTER_RULE_IDS_" + activityId);
+        List<Long> filterRuleIds = null;
+        if (o!=null){
+            filterRuleIds = (List<Long>)o;
+        }
         if (filterRuleIds == null) {
             filterRuleIds = mktStrategyFilterRuleRelMapper.selectByStrategyId(activityId);
             if (filterRuleIds == null) {

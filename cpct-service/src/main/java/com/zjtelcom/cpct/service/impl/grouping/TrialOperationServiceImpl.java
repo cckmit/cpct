@@ -2270,16 +2270,16 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             if (filterRule!=null && filterRule.getChooseProduct()!=null){
                 TarGrpCondition condition = new TarGrpCondition();
                 condition.setLeftParam(label.getInjectionLabelId().toString());
-                List<String> list = ChannelUtil.StringToList(filterRule.getChooseProduct());
-                for (String id : list){
-                    Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(id));
-                    if (offer!=null){
-                        stringList.add(offer.getOfferNbr());
-                    }
-                }
-                String rightParam =  ChannelUtil.list2String(stringList,",");
-                condition.setRightParam(rightParam);
-                condition.setOperType(filterRule.getOperator().equals("1000")? "7100" : "7200");
+//                List<String> list = ChannelUtil.StringToList(filterRule.getChooseProduct());
+//                for (String id : list){
+//                    Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(id));
+//                    if (offer!=null){
+//                        stringList.add(offer.getOfferNbr());
+//                    }
+//                }
+//                String rightParam =  ChannelUtil.list2String(stringList,",");
+                condition.setRightParam(filterRule.getRuleId().toString());
+                condition.setOperType(filterRule.getOperator().equals("1000")? "7000" : "7100");
                 tarGrpConditionDOs.add(condition);
             }
         }
