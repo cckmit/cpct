@@ -1084,6 +1084,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      */
     @Override
     public Map<String, Object> delayCampaign4Sync(Long campaignId, Date lastTime) {
+
+
         Map<String, Object> maps = new HashMap<>();
         try {
             MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(campaignId);
@@ -2434,6 +2436,11 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             Date planEndTime = campaignDO.getPlanEndTime();
             if (planEndTime.before(new Date()) || DateUtil.daysBetween(new Date(), planEndTime) > 7) {
                 iterator.remove();
+            }
+        }
+        for (MktCampaignDO mktCampaignDO : mktCampaignDOS) {
+            if (STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaignDO.getStatusCd())) {
+                mktCampaignDO.setStatusCd(STATUS_CODE_PUBLISHED.getStatusMsg());
             }
         }
         result.setResultCode("200");
