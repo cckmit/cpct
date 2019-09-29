@@ -22,6 +22,7 @@ public class FilterRule extends BaseEntity implements Serializable{
     private Date failureDate;//失效时间
     private String labelCode;//
     private String chooseProduct;//选择的销售品
+    private String chooseProductCode;
     private String expression;
     private Date dayStart;
     private Date dayEnd;
@@ -180,4 +181,11 @@ public class FilterRule extends BaseEntity implements Serializable{
         this.failureDate = failureDate;
     }
 
+    public String getChooseProductCode() {
+        return chooseProductCode;
+    }
+
+    public void setChooseProductCode(String chooseProductCode) {
+        this.chooseProductCode = chooseProductCode;
+    }
 }
