@@ -49,11 +49,12 @@ public class CampaignServiceImpl implements CampaignService {
                     String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
                     Long lanId = systemUserDtoSysmgrResultObject.getResultObject().getLanId();
                     // TODO  调用发送短信接口
-                    String sendContent = "你好，你创建的活动（" + mktCampaignDO.getMktCampaignName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
+                    String sendContent = "您好，您创建的活动（" + mktCampaignDO.getMktCampaignName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
                     System.out.println(sendContent);
                     try {
                         System.out.println("campaignDelayNotice=>" + mktCampaignDO.getMktCampaignId() + "44444444444444444");
-                        UCCPUtil.sendShortMessage(sysUserCode, sendContent, lanId.toString());
+                        UCCPUtil uccp = new UCCPUtil();
+                        uccp.sendShortMessage(sysUserCode, sendContent, lanId.toString());
                         i++;
                         System.out.println("campaignDelayNotice=>" + mktCampaignDO.getMktCampaignId() + "55555555555555555");
                     } catch (Exception e) {
