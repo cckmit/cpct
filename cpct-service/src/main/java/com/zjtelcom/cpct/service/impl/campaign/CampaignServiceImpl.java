@@ -40,17 +40,22 @@ public class CampaignServiceImpl implements CampaignService {
         int i = 0;
         for (MktCampaignDO mktCampaignDO : mktCampaignDOS) {
             if (mktCampaignDO.getPlanEndTime().after(new Date()) && DateUtil.daysBetween(new Date(), mktCampaignDO.getPlanEndTime()) == 7) {
-                Long staff = mktCampaignDO.getUpdateStaff();
+                System.out.println("campaignDelayNotice=>" + mktCampaignDO.getMktCampaignId() + "1111111111111111111");
+                Long staff = mktCampaignDO.getCreateStaff();
                 SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(staff, new ArrayList<Long>());
+                System.out.println("campaignDelayNotice=>" + mktCampaignDO.getMktCampaignId() + "222222222222222222");
                 if (systemUserDtoSysmgrResultObject != null && systemUserDtoSysmgrResultObject.getResultObject() != null) {
+                    System.out.println("campaignDelayNotice=>" + mktCampaignDO.getMktCampaignId() + "3333333333333333333");
                     String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
                     Long lanId = systemUserDtoSysmgrResultObject.getResultObject().getLanId();
                     // TODO  调用发送短信接口
                     String sendContent = "你好，你创建的活动（" + mktCampaignDO.getMktCampaignName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
                     System.out.println(sendContent);
                     try {
+                        System.out.println("campaignDelayNotice=>" + mktCampaignDO.getMktCampaignId() + "44444444444444444");
                         UCCPUtil.sendShortMessage(sysUserCode, sendContent, lanId.toString());
                         i++;
+                        System.out.println("campaignDelayNotice=>" + mktCampaignDO.getMktCampaignId() + "55555555555555555");
                     } catch (Exception e) {
                         logger.error(sysUserCode + e.toString());
                     }
