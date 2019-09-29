@@ -58,7 +58,8 @@ public class CampaignServiceImpl implements CampaignService {
                         i++;
                         System.out.println("campaignDelayNotice=>" + mktCampaignDO.getMktCampaignId() + "55555555555555555");
                     } catch (Exception e) {
-                        logger.error(sysUserCode + e.toString());
+                        logger.error(sysUserCode);
+                        e.printStackTrace();
                     }
                 }
             }
