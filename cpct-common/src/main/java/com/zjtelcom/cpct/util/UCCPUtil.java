@@ -16,6 +16,9 @@ import java.util.Random;
 @Component
 public class UCCPUtil {
 
+    @Autowired(required = false)
+    private UCCPSendService uCCPSendService;
+
     /**
      * 查询消息网关发送结果
      * @param
@@ -54,7 +57,7 @@ public class UCCPUtil {
      * @param
      * @return
      */
-    public static void sendShortMessage(String targPhone, String sendContent, String lanId)throws Exception{
+    public void sendShortMessage(String targPhone, String sendContent, String lanId)throws Exception{
         HashMap params = new HashMap();
         //请求消息流水，格式：系统编码（6位）+yyyymmddhhmiss+10位序列号
         params.put("TransactionId","CPCPYX"+ DateUtil.date2St4Trial(new Date()) + getRandom(10));
@@ -84,12 +87,16 @@ public class UCCPUtil {
         //params.put("ExtOrderId", "");
 
         System.out.println("-----------------------请求开始-------------------");
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:dubbo/dubbo-${spring.profiles.active}.xml");
-        context.start();
+//        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:dubbo/dubbo-${spring.profiles.active}.xml");
+//        context.start();
+//        long beginTime = System.currentTimeMillis();
+//        //通过spring获取实例
+//        UCCPSendService service = (UCCPSendService) context.getBean("UCCPSendService");
+//        Map reqMap = service.sendShortMessage(params);
+
+
         long beginTime = System.currentTimeMillis();
-        //通过spring获取实例
-        UCCPSendService service = (UCCPSendService) context.getBean("UCCPSendService");
-        Map reqMap = service.sendShortMessage(params);
+        Map reqMap = uCCPSendService.sendShortMessage(params);
         System.out.println("接口返回结果:"+reqMap);
         System.out.println("-----------------------请求总耗时:"+(System.currentTimeMillis()-beginTime)+"-------------------");
         System.exit(0);
@@ -103,4 +110,5 @@ public class UCCPUtil {
         }
         return val;
     }
+
 }
