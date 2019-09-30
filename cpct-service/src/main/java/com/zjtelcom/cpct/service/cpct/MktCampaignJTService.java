@@ -13,6 +13,8 @@ package com.zjtelcom.cpct.service.cpct;
 import com.zjtelcom.cpct.dto.pojo.Result;
 import com.zjtelcom.cpct.pojo.MktCampaignDetailReq;
 
+import java.util.Map;
+
 /**
  * 集团活动服务接口</br>
  * 主要用于集团活动的新增删除修改
@@ -40,4 +42,6 @@ public interface MktCampaignJTService {
      */
     Result updateBatch(MktCampaignDetailReq req);
 
+    // 发送短信
+    Map<String,Object> sendMsgResult(String targPhone, String sendContent, String lanId);
 }

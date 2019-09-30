@@ -5,16 +5,17 @@ import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
-import com.zjtelcom.cpct.service.UCCPUtil;
+
 import com.zjtelcom.cpct.service.campaign.CampaignService;
+import com.zjtelcom.cpct.service.cpct.MktCampaignJTService;
 import com.zjtelcom.cpct.util.DateUtil;
+import com.ztesoft.uccp.dubbo.interfaces.UCCPSendService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static com.zjtelcom.cpct.enums.StatusCode.STATUS_CODE_PUBLISHED;
 
@@ -27,6 +28,8 @@ public class CampaignServiceImpl implements CampaignService {
     private MktCampaignMapper mktCampaignMapper;
     @Autowired(required = false)
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
+    @Autowired
+    private MktCampaignJTService mktCampaignJTService;
 
     /**
      * 活动延期短信通知
@@ -41,6 +44,15 @@ public class CampaignServiceImpl implements CampaignService {
         for (MktCampaignDO mktCampaignDO : mktCampaignDOS) {
             if (mktCampaignDO.getPlanEndTime().after(new Date()) && DateUtil.daysBetween(new Date(), mktCampaignDO.getPlanEndTime()) == 7) {
                 System.out.println("campaignDelayNotice=>" + mktCampaignDO.getMktCampaignId() + "1111111111111111111");
+
+//                UCCPUtil uccp = new UCCPUtil();
+//                String sendContent = "您好，您创建的活动（" + mktCampaignDO.getMktCampaignName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
+//                try {
+//                    mktCampaignJTService.sendMsgResult("1", sendContent, "1");
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+
                 Long staff = mktCampaignDO.getCreateStaff();
                 SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(staff, new ArrayList<Long>());
                 System.out.println("campaignDelayNotice=>" + mktCampaignDO.getMktCampaignId() + "222222222222222222");
@@ -53,8 +65,9 @@ public class CampaignServiceImpl implements CampaignService {
                     System.out.println(sendContent);
                     try {
                         System.out.println("campaignDelayNotice=>" + mktCampaignDO.getMktCampaignId() + "44444444444444444");
-                        UCCPUtil uccp = new UCCPUtil();
-                        uccp.sendShortMessage(sysUserCode, sendContent, lanId.toString());
+                        /*UCCPUtil uccp = new UCCPUtil();
+                        uccp.sendShortMessage(sysUserCode, sendContent, lanId.toString());*/
+                        mktCampaignJTService.sendMsgResult("1", sendContent, "1");
                         i++;
                         System.out.println("campaignDelayNotice=>" + mktCampaignDO.getMktCampaignId() + "55555555555555555");
                     } catch (Exception e) {
@@ -66,4 +79,5 @@ public class CampaignServiceImpl implements CampaignService {
         }
         System.out.println("共发送数量=>" + i);
     }
+
 }
