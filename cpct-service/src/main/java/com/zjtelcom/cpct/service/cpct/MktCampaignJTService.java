@@ -41,7 +41,4 @@ public interface MktCampaignJTService {
      * @return 处理结果
      */
     Result updateBatch(MktCampaignDetailReq req);
-
-    // 发送短信
-    Map<String,Object> sendMsgResult(String targPhone, String sendContent, String lanId);
 }
