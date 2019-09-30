@@ -1324,7 +1324,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         }
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg", "导入成功,请稍后查看结果");
-        redisUtils_es.set("YOUR_SO_BEAUTIFUL", batchNumSt);
+        redisUtils_es.set("YOUR_SO_BEAUTIFUL_" + batchNumSt, batchNumSt);
         return result;
     }
 
