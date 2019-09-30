@@ -2,9 +2,10 @@ package com.zjtelcom.cpct.dubbo.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.dubbo.model.RecordModel;
-import com.zjtelcom.cpct.dubbo.out.CampaignService;
+//import com.zjtelcom.cpct.dubbo.out.CampaignService;
 import com.zjtelcom.cpct.dubbo.service.SyncEventService;
 import com.zjtelcom.cpct.dubbo.service.SyncLabelService;
+import com.zjtelcom.cpct.service.campaign.CampaignService;
 import com.zjtelcom.cpct.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

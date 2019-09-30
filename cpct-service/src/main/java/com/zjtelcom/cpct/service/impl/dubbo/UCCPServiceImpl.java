@@ -1,12 +1,9 @@
-/*
-package com.zjtelcom.cpct.service;
+package com.zjtelcom.cpct.service.impl.dubbo;
 
+import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.util.DateUtil;
-import com.zjtelcom.cpct.util.SpringUtil;
 import com.ztesoft.uccp.dubbo.interfaces.UCCPSendService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -14,62 +11,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-*/
-/**
- * 调用UCCP短信dubbo接口，发送短信工具类
- *//*
-
 @Service
-public class UCCPUtil {
+public class UCCPServiceImpl implements UCCPService {
 
-    @Autowired
+    @Autowired(required = false)
     private UCCPSendService uCCPSendService;
 
-    */
-/**
-     * @param
-     * 查询消息网关发送结果
-     * @return
-     *//*
-
-    */
-/*public void queryMessage() throws Exception{
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:dubbo-consumer.xml");
-        context.start();
-        long beginTime = System.currentTimeMillis();
-
-        //通过spring获取实例
-        UCCPSendService service = (UCCPSendService) context.getBean("UCCPSendService");
-
-        Map param = new HashMap();
-        //查询推送的号码
-        param.put("acc_nbr", "18909120999");
-        //本地网ID
-        param.put("lan_id", "318");
-        //每页多少条,为空或者不传默认10条
-        param.put("pageSize", "5");
-        //页数,为空或者不传默认第1页
-        param.put("pageIndex", "1");
-        //查询开始时间
-        param.put("begin_date", "2015-01-23 14:30:20");
-        //查询结束时间
-        param.put("end_date", "2015-01-23 14:30:20");
-
-        Map reqMap = service.queryMessage(param);
-        System.out.println("接口返回结果:"+reqMap);
-        System.out.println("-----------------------请求总耗时:"+(System.currentTimeMillis()-beginTime)+"-------------------");
-        System.exit(0);
-    }*//*
-
-
-    */
-/**
-     * 实时推送消息
-     * @param
-     * @return
-     *//*
-
-    public void sendShortMessage(String targPhone, String sendContent, String lanId)throws Exception{
+    @Override
+    public void sendShortMessage(String targPhone, String sendContent, String lanId) throws Exception {
         HashMap params = new HashMap();
         //请求消息流水，格式：系统编码（6位）+yyyymmddhhmiss+10位序列号
         params.put("TransactionId","CPCPYX"+ DateUtil.date2St4Trial(new Date()) + getRandom(10));
@@ -99,14 +48,6 @@ public class UCCPUtil {
         //params.put("ExtOrderId", "");
 
         System.out.println("-----------------------请求开始-------------------");
-//        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:dubbo/dubbo-${spring.profiles.active}.xml");
-//        context.start();
-//        long beginTime = System.currentTimeMillis();
-//        //通过spring获取实例
-//        UCCPSendService service = (UCCPSendService) context.getBean("uCCPSendService");
-//        Map reqMap = service.sendShortMessage(params);
-
-        SpringUtil.getBean(uCCPSendService);
         long beginTime = System.currentTimeMillis();
         Map reqMap = uCCPSendService.sendShortMessage(params);
         System.out.println("接口返回结果:"+reqMap);
@@ -122,6 +63,4 @@ public class UCCPUtil {
         }
         return val;
     }
-
 }
-*/
