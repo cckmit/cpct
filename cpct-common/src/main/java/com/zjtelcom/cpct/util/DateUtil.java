@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.util;
 
+import com.zjtelcom.cpct.enums.DateUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -826,6 +827,39 @@ public class DateUtil {
     }
 
 
+    /**
+     * 计算两个日期之间相差的天数
+     * @param targetDate
+     * @param compareDate
+     * @return
+     */
+    public static int daysBetween(Date targetDate,Date compareDate) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(targetDate);
+        long targetTime = cal.getTimeInMillis();
+        cal.setTime(compareDate);
+        long compareTime = cal.getTimeInMillis();
+        long between_days=(compareTime - targetTime) / (1000 * 3600 * 24);
+        return Integer.parseInt(String.valueOf(between_days));
+    }
 
+    /**
+     * 计算某个日期增加一定时间后的日期
+     */
+    public static Date addDate(Date targetDate,int count,DateUnit unit) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(targetDate);
+        switch (unit){
+            case MONTH:
+                cal.add(Calendar.MONTH, count);
+                break;
+            case YEAR:
+                cal.add(Calendar.YEAR, count);
+                break;
+            default:
+                break;
+        }
+        return cal.getTime();
+    }
 
 }
