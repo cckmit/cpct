@@ -75,3 +75,9 @@ thread:
 #服务事件默认固定命中标签
 table:
   infallible: CPCP_CAM_DEFAULT
+
+#uccp短信平台账号配置
+uccp:
+  userAcct: CPCPYX
+  password: 908234
+  sceneId: 7149
