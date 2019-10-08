@@ -5,7 +5,16 @@ import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 public class SystemUserVO extends SystemUserDto {
     private String c4CodeName;
     private String c5CodeName;
+    private String userLevel;
 
+
+    public String getUserLevel() {
+        return userLevel;
+    }
+
+    public void setUserLevel(String userLevel) {
+        this.userLevel = userLevel;
+    }
 
     public String getC4CodeName() {
         return c4CodeName;
