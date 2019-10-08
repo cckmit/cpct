@@ -40,6 +40,7 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyFilterRuleRelDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.campaign.CampaignVO;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
@@ -58,6 +59,7 @@ import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.campaign.MktOperatorLogService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
+import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.service.grouping.TrialProdService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SyncActivityService;
@@ -257,9 +259,71 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Autowired
     private OrganizationMapper organizationMapper;
 
+    @Autowired
+    private UCCPService uccpService;
+    
     //指定下发地市人员的数据集合
     private final static String CITY_PUBLISH = "CITY_PUBLISH";
 
+
+    /**
+     * 校验协同渠道时间是否在活动时间范围之内
+     * @param params
+     * @return
+     */
+    @Override
+    public Map<String, Object> channelEffectDateCheck(Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        Date camStart = new Date((Long) params.get("camStart")) ;
+        Date camEnd = new Date((Long) params.get("camEnd")) ;
+        String campaignId = String.valueOf((Integer) params.get("campaignId"));
+        System.out.println("活动开始时间："+DateUtil.Date2String(camStart));
+        System.out.println("活动失效时间："+DateUtil.Date2String(camEnd));
+        System.out.println("活动id"+campaignId);
+        List<MktCamChlConfAttrDO> startDoList = mktCamChlConfAttrMapper.selectAttrStartDateByCampaignId(Long.valueOf(campaignId));
+        for (MktCamChlConfAttrDO attrDO : startDoList){
+            if (new Date(Long.valueOf(attrDO.getAttrValue())).before(camStart)){
+                System.out.println("协同渠道开始时间："+DateUtil.Date2String(new Date(Long.valueOf(attrDO.getAttrValue()))));
+                String ruleName = "";
+                List<MktStrategyConfRuleDO> ruleDOList = mktStrategyConfRuleMapper.selectByCampaignId(Long.valueOf(campaignId));
+                for (MktStrategyConfRuleDO ruleDO : ruleDOList) {
+                    List<Long> evtConfList = ChannelUtil.StringToIdList(ruleDO.getEvtContactConfId());
+                    if (evtConfList.contains(attrDO.getEvtContactConfId())){
+                        ruleName = ruleDO.getMktStrategyConfRuleName();
+                        break;
+                    }
+                }
+                result.put("resultCode",CODE_SUCCESS);
+                result.put("resultMsg","协同渠道开始时间不符合规范，请检查规则：["+ruleName+"]");
+                result.put("data","false");
+                return result;
+            }
+        }
+
+        List<MktCamChlConfAttrDO> endDoList = mktCamChlConfAttrMapper.selectAttrEndDateByCampaignId(Long.valueOf(campaignId));
+        for (MktCamChlConfAttrDO attrDO : endDoList){
+            if (new Date(Long.valueOf(attrDO.getAttrValue())).after(camEnd)){
+                System.out.println("协同渠道结束时间："+DateUtil.Date2String(new Date(Long.valueOf(attrDO.getAttrValue()))));
+                String ruleName = "";
+                List<MktStrategyConfRuleDO> ruleDOList = mktStrategyConfRuleMapper.selectByCampaignId(Long.valueOf(campaignId));
+                for (MktStrategyConfRuleDO ruleDO : ruleDOList) {
+                    List<Long> evtConfList = ChannelUtil.StringToIdList(ruleDO.getEvtContactConfId());
+                    if (evtConfList.contains(attrDO.getEvtContactConfId())){
+                        ruleName = ruleDO.getMktStrategyConfRuleName();
+                        break;
+                    }
+                }
+                result.put("resultCode",CODE_SUCCESS);
+                result.put("resultMsg","协同渠道结束时间不符合规范，请检查规则：["+ruleName+"]");
+                result.put("data","false");
+                return result;
+            }
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","校验通过");
+        result.put("data","true");
+        return result;
+    }
 
     @Override
     public Map<String, Object> searchByCampaignId(Long campaignId) {
@@ -876,7 +940,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             MktCampaignDO mktCampaignDOAdjust = mktCampaignMapper.selectPrimaryKeyByInitId(mktCampaignDO.getInitId(), StatusCode.STATUS_CODE_ADJUST.getStatusCode());
             // 回滚父活动
             if (mktCampaignDOAdjust != null) {
-                changeMktCampaignStatus(mktCampaignDOAdjust.getMktCampaignId(), StatusCode.STATUS_CODE_PUBLISHED.getStatusCode());
+                changeMktCampaignStatus(mktCampaignDOAdjust.getMktCampaignId(), STATUS_CODE_PUBLISHED.getStatusCode());
             }
 
             // 记录活动操作
@@ -999,7 +1063,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCampaignVO.setCreateChannel(mktCampaignCountDO.getCreateChannel());
                     mktCampaignVO.setCreateDate(mktCampaignCountDO.getCreateDate());
                     mktCampaignVO.setUpdateDate(mktCampaignCountDO.getUpdateDate());
-                    if (mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode()) || mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_PASS.getStatusCode()) || mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_ROLL.getStatusCode()) || mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_ADJUST.getStatusCode()) || mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_STOP.getStatusCode()) || mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_PRE_PAUSE.getStatusCode())) {
+                    if (mktCampaignCountDO.getStatusCd().equals(STATUS_CODE_PUBLISHED.getStatusCode()) || mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_PASS.getStatusCode()) || mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_ROLL.getStatusCode()) || mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_ADJUST.getStatusCode()) || mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_STOP.getStatusCode()) || mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_PRE_PAUSE.getStatusCode())) {
                         mktCampaignVO.setStatusExamine(StatusCode.STATUS_CODE_PASS.getStatusMsg());
                     } else if (mktCampaignCountDO.getStatusCd().equals(StatusCode.STATUS_CODE_UNPASS.getStatusCode())) {
                         mktCampaignVO.setStatusExamine(StatusCode.STATUS_CODE_UNPASS.getStatusMsg());
@@ -1034,6 +1098,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     }
 
 
+
+
     /**
      * 活动审核--同步列表
      *
@@ -1050,7 +1116,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 maps.put("resultMsg", "活动不存在");
                 return maps;
             }
-            if (campaignDO.getStatusCd().equals(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode()) || campaignDO.getStatusCd().equals(StatusCode.STATUS_CODE_PASS.getStatusCode())) {
+            if (campaignDO.getStatusCd().equals(STATUS_CODE_PUBLISHED.getStatusCode()) || campaignDO.getStatusCd().equals(StatusCode.STATUS_CODE_PASS.getStatusCode())) {
                 maps.put("resultCode", CODE_FAIL);
                 maps.put("resultMsg", "非待审核活动");
                 return maps;
@@ -1105,10 +1171,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      */
     @Override
     public Map<String, Object> delayCampaign4Sync(Long campaignId, Date lastTime) {
+
+
         Map<String, Object> maps = new HashMap<>();
         try {
             MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(campaignId);
-            if (!(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(campaignDO.getStatusCd()) || StatusCode.STATUS_CODE_PRE_PAUSE.getStatusCode().equals(campaignDO.getStatusCd()))) {
+            if (!(STATUS_CODE_PUBLISHED.getStatusCode().equals(campaignDO.getStatusCd()) || StatusCode.STATUS_CODE_PRE_PAUSE.getStatusCode().equals(campaignDO.getStatusCd()))) {
                 maps.put("resultCode", CODE_FAIL);
                 maps.put("resultMsg", "活动状态不为发布或者过期");
                 return maps;
@@ -1122,6 +1190,24 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             if (lastTime.before(campaignDO.getPlanEndTime())) {
                 maps.put("resultCode", CODE_FAIL);
                 maps.put("resultMsg", "时间只能后延");
+                return maps;
+            }
+            // 一次性活动最大延期3个月
+            if ("1000".equals(campaignDO.getExecType()) && !"5000".equals(campaignDO.getMktCampaignType()) && lastTime.after(DateUtil.addDate(campaignDO.getPlanEndTime(), 3, MONTH))) {
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg", "一次性活动最大延期3个月");
+                return maps;
+            }
+            // 周期性活动最大延期1年
+            if ("2000".equals(campaignDO.getExecType()) && !"5000".equals(campaignDO.getMktCampaignType()) && lastTime.after(DateUtil.addDate(campaignDO.getPlanEndTime(), 1, YEAR))) {
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg", "周期性活动最大延期1年");
+                return maps;
+            }
+            // 服务活动最大延期5年
+            if (("5000".equals(campaignDO.getMktCampaignType()) || "6000".equals(campaignDO.getMktCampaignType())) && lastTime.after(DateUtil.addDate(campaignDO.getPlanEndTime(), 5, YEAR))) {
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg", "服务活动最大延期5年");
                 return maps;
             }
             // 策略生失效时间延期
@@ -1599,7 +1685,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
             mktCampaignMapper.changeMktCampaignStatus(mktCampaignId, statusCd, new Date(), UserUtil.loginId());
             // 判断是否是发布活动, 是该状态生效
-            if (StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd) || StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)) {
+            if (STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd) || StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)) {
                 List<MktCamResultRelDO> mktCamResultRelDOS = mktCamResultRelMapper.selectResultByMktCampaignId(mktCampaignId);
                 for (MktCamResultRelDO mktCamResultRelDO : mktCamResultRelDOS) {
                     mktCamResultRelDO.setStatus(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
@@ -1608,12 +1694,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     }
 
                 }
-                if (StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)) {
+                if (STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)) {
                     //活动发布若是清单活动重新试算全量清单
                     UserListTemp(mktCampaignId, mktCampaignDO);
                 }
                 // 发布调整的活动，下线源活动
-                if (StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd) && !mktCampaignId.equals(initId)) {
+                if (STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd) && !mktCampaignId.equals(initId)) {
                     // 查询initId为mktCampaignId且状态为调整中
                     MktCampaignDO mktCampaignDOAdjust = mktCampaignMapper.selectPrimaryKeyByInitId(initId, StatusCode.STATUS_CODE_ADJUST.getStatusCode());
                     changeMktCampaignStatus(mktCampaignDOAdjust.getMktCampaignId(), StatusCode.STATUS_CODE_ROLL.getStatusCode());
@@ -1702,10 +1788,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     delMktCampaign(mktCampaignDONew.getMktCampaignId());
                 }
                 // 回滚活动, 改变原来状态为发布
-                changeMktCampaignStatus(mktCampaignId, StatusCode.STATUS_CODE_PUBLISHED.getStatusCode());
+                changeMktCampaignStatus(mktCampaignId, STATUS_CODE_PUBLISHED.getStatusCode());
             }
 
-            if (StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)) {
+            if (STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)) {
                 maps.put("resultMsg", ErrorCode.STATUS_CODE_PUBLISHED_SUCCESS.getErrorMsg());
             } else if (StatusCode.STATUS_CODE_CHECKING.getStatusCode().equals(statusCd)) {
                 maps.put("resultMsg", ErrorCode.STATUS_CODE_CHECKING_SUCCESS.getErrorMsg());
@@ -1717,7 +1803,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         } catch (Exception e) {
             logger.error("[op:changeMktCampaignStatus] 修改活动状态statusCd = {}失败,Exception = ", statusCd, e);
-            if (StatusCode.STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)) {
+            if (STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)) {
                 maps.put("resultMsg", ErrorCode.STATUS_CODE_PUBLISHED_FAILURE.getErrorMsg());
             } else if (StatusCode.STATUS_CODE_CHECKING.getStatusCode().equals(statusCd)) {
                 maps.put("resultMsg", ErrorCode.STATUS_CODE_CHECKING_FAILURE.getErrorMsg());
@@ -1746,7 +1832,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         try {
             // 获取当前活动信息
             MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
-            if (mktCampaignDO != null && mktCampaignDO.getStatusCd().equals(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode())) {
+            if (mktCampaignDO != null && mktCampaignDO.getStatusCd().equals(STATUS_CODE_PUBLISHED.getStatusCode())) {
                 mktCampaignMap.put("resultCode", CommonConstant.CODE_FAIL);
                 mktCampaignMap.put("resultMsg", "已发布活动请勿重复发布！");
                 return mktCampaignMap;
@@ -2473,6 +2559,39 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         result.setResultMessage("查询成功");
         result.setResultObject(mktCampaignDOS);
         return result;
+    }
+
+    /**
+     * 活动延期短信通知
+     * @return
+     */
+    @Override
+    public void campaignDelayNotice() {
+        ArrayList<String> list = new ArrayList<>();
+        list.add(STATUS_CODE_PUBLISHED.getStatusCode());
+        List<MktCampaignDO> mktCampaignDOS = mktCampaignMapper.selectAllMktCampaignDetailsByStatus(list,null);
+        int i = 0;
+        for (MktCampaignDO mktCampaignDO : mktCampaignDOS) {
+            if (mktCampaignDO.getPlanEndTime().after(new Date()) && DateUtil.daysBetween(new Date(), mktCampaignDO.getPlanEndTime()) == 7) {
+                Long staff = mktCampaignDO.getCreateStaff();
+                SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(staff, new ArrayList<Long>());
+                if (systemUserDtoSysmgrResultObject != null && systemUserDtoSysmgrResultObject.getResultObject() != null) {
+                    String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
+                    Long lanId = systemUserDtoSysmgrResultObject.getResultObject().getLanId();
+                    // TODO  调用发送短信接口
+                    String sendContent = "您好，您创建的活动（" + mktCampaignDO.getMktCampaignName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
+                    System.out.println(sendContent);
+                    try {
+                        uccpService.sendShortMessage(sysUserCode, sendContent, lanId.toString());
+                        i++;
+                    } catch (Exception e) {
+                        logger.error(sysUserCode);
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        System.out.println("共发送数量=>" + i);
     }
 
 

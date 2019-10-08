@@ -355,24 +355,4 @@ public class TrialOperationController extends BaseController {
         return result;
     }
 
-    /**
-     * 定时任务Excel清单导入
-     * @param
-     * @return
-     */
-    @PostMapping("importUserListByExcel")
-    @CrossOrigin
-    public Map<String,Object> importUserListByExcel (){
-        Map<String, Object> result = new HashMap<>();
-        try {
-            result = operationService.importUserListByExcel();
-        } catch (Exception e) {
-            logger.error("[op:ScriptController] fail to importUserListByExcel", e);
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", " fail to importUserListByExcel");
-            return result;
-        }
-        return result;
-    }
-
 }
