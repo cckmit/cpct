@@ -327,4 +327,15 @@
         ORDER BY UPDATE_DATE DESC
     </select>
 
+    <select id="selectFilterRuleByRuleName" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select RULE_ID, RULE_NAME, FILTER_TYPE,
+               EXECUTION_CHANNEL, CHANNEL_CONTACTS, EFFECTIVE_DATE,
+               FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF,
+               UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+               UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID,
+               DAYS, TIMES, OFFER_INFO,OPERATOR
+        from filter_rule
+        where RULE_NAME = #{ruleName,jdbcType=VARCHAR}
+    </select>
+
 </mapper>
