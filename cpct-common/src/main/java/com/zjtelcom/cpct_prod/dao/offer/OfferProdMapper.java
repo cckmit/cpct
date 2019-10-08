@@ -34,4 +34,9 @@ public interface OfferProdMapper {
     int updateByPrimaryKey(Offer record);
 
     List<Offer> findByType(@Param("offerName")String offerName,@Param("type") String type, @Param("statusCd") String statusCd,@Param("offerIds")List<Long> offerIds);
+
+    List<Offer> selectByFourNum();
+
+    List<Offer> findProductByType(@Param("offerName")String offerName, @Param("statusCd") String statusCd,@Param("offerIds")List<Long> offerIds);
+
 }

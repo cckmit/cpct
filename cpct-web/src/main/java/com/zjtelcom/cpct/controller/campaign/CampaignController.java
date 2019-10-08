@@ -10,6 +10,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
 import com.zjtelcom.cpct.dto.pojo.Result;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 import com.zjtelcom.cpct.enums.StatusCode;
+import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.thread.TarGrpRule;
@@ -45,6 +46,9 @@ public class CampaignController extends BaseController {
 
     @Autowired
     private RedisUtils redisUtils;
+
+    @Autowired
+    private MktCampaignApiService mktCampaignApiService;
 
 
 
@@ -514,6 +518,13 @@ public class CampaignController extends BaseController {
             logger.error("[op:CampaignController] failed to dueMktCampaign, Exception = ", e);
         }
         return JSON.toJSONString(mktCampaignMap);
+    }
+
+    @PostMapping("salesOffShelf")
+    @CrossOrigin
+    public Map<String,Object> salesOffShelf(){
+        Map<String, Object> stringObjectMap = mktCampaignApiService.salesOffShelf(new HashMap<String, Object>());
+        return stringObjectMap;
     }
 
 }

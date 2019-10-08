@@ -15,4 +15,7 @@ public interface TrialStatusUpService {
 
     //xyl excel文件清单批量导入
     Map<String,Object> importUserListByExcel() throws IOException;
+
+    //xyl 销售品下架发送短信
+    Map<String,Object> sendMsgByOfferOver();
 }

@@ -29,7 +29,7 @@
         <dubbo:method name="campaignIndexTask" servicecode="33.1083.campaignIndexTask" timeout="10000"/>
         <dubbo:method name="cpcLog2WriteFileLabel" servicecode="33.1083.cpcLog2WriteFileLabel" timeout="10000"/>
         <dubbo:method name="importUserListByExcel" servicecode="33.1083.importUserListByExcel" timeout="10000"/>
-        <dubbo:method name="dueMktCampaign" servicecode="33.1083.dueMktCampaign" timeout="10000"/>
+        <dubbo:method name="sendMsgByOfferOver" servicecode="33.1083.sendMsgByOfferOver" timeout="10000"/>
     </dubbo:service>
 
     <!-- 事件外部调用测试 -->
@@ -65,13 +65,9 @@
         <dubbo:method name="getDictionaryByType" servicecode="00.1077.getDictionaryByType"/>
     </dubbo:reference>
 
-    <!-- 分群定时批量下发 -->
-    <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.TargetGroupService" ref="targetGroupServiceImpl" version="1.0" >
-        <dubbo:method name="tarGrpTemplateScheduledBatchIssue" servicecode="33.1083.tarGrpTemplateScheduledBatchIssue" timeout="10000"/>
-    </dubbo:service>
-
-    <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.CampaignService" ref="campaignServiceImpl" version="1.0" >
-        <dubbo:method name="campaignDelayNotice" servicecode="33.1083.campaignDelayNotice" timeout="10000"/>
+    <!-- 后台excel批量清单导入 -->
+    <dubbo:service  interface="com.zjtelcom.cpct.service.grouping.TrialOperationService" ref="trialOperationService" version="1.0" >
+        <dubbo:method name="importUserListByExcel" servicecode="33.1083.importUserListByExcel" timeout="10000"/>
     </dubbo:service>
 
 </beans>
