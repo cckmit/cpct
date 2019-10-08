@@ -66,4 +66,7 @@ public interface MktCampaignMapper {
 
     List<Long> getUserListTempMktCamCodeList();
 
+    List<Long> getCreateStaffList();
+
+    void updateByStaffToC4AndC5(@Param("map")Map<String, Object> map);
 }

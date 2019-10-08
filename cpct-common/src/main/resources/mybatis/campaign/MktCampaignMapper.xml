@@ -794,4 +794,22 @@
         AND t.MKT_CAMPAIGN_NAME NOT LIKE '%演示%'
         AND t.MKT_CAMPAIGN_NAME NOT LIKE '%勿动%'
     </select>
+
+    <select id="getCreateStaffList" resultType="java.lang.Long">
+        select CREATE_STAFF from mkt_campaign  WHERE LAN_ID_FOUR IS NULL AND LAN_ID_FIVE IS NULL
+        AND CREATE_STAFF IS NOT NULL GROUP BY CREATE_STAFF
+    </select>
+
+    <update id="updateByStaffToC4AndC5" parameterType="java.util.Map">
+        UPDATE mkt_campaign
+          <set>
+            <if test="orgNameC4 != null and orgNameC4 != ''">
+                AND LAN_ID_FOUR = #{orgNameC4}
+            </if>
+            <if test="orgNameC5 != null and orgNameC5 != ''">
+                AND LAN_ID_FIVE = #{orgNameC5}
+            </if>
+          </set>
+          WHERE CREATE_STAFF = #{aLong}
+    </update>
 </mapper>
