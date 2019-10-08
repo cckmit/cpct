@@ -38,6 +38,7 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyFilterRuleRelDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.campaign.CampaignVO;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
@@ -253,6 +254,65 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private final static String CITY_PUBLISH = "CITY_PUBLISH";
 
 
+    /**
+     * 校验协同渠道时间是否在活动时间范围之内
+     * @param params
+     * @return
+     */
+    @Override
+    public Map<String, Object> channelEffectDateCheck(Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        Date camStart = new Date((Long) params.get("camStart")) ;
+        Date camEnd = new Date((Long) params.get("camEnd")) ;
+        String campaignId = String.valueOf((Integer) params.get("campaignId"));
+        System.out.println("活动开始时间："+DateUtil.Date2String(camStart));
+        System.out.println("活动失效时间："+DateUtil.Date2String(camEnd));
+        System.out.println("活动id"+campaignId);
+        List<MktCamChlConfAttrDO> startDoList = mktCamChlConfAttrMapper.selectAttrStartDateByCampaignId(Long.valueOf(campaignId));
+        for (MktCamChlConfAttrDO attrDO : startDoList){
+            if (new Date(Long.valueOf(attrDO.getAttrValue())).before(camStart)){
+                System.out.println("协同渠道开始时间："+DateUtil.Date2String(new Date(Long.valueOf(attrDO.getAttrValue()))));
+                String ruleName = "";
+                List<MktStrategyConfRuleDO> ruleDOList = mktStrategyConfRuleMapper.selectByCampaignId(Long.valueOf(campaignId));
+                for (MktStrategyConfRuleDO ruleDO : ruleDOList) {
+                    List<Long> evtConfList = ChannelUtil.StringToIdList(ruleDO.getEvtContactConfId());
+                    if (evtConfList.contains(attrDO.getEvtContactConfId())){
+                        ruleName = ruleDO.getMktStrategyConfRuleName();
+                        break;
+                    }
+                }
+                result.put("resultCode",CODE_SUCCESS);
+                result.put("resultMsg","协同渠道开始时间不符合规范，请检查规则：["+ruleName+"]");
+                result.put("data","false");
+                return result;
+            }
+        }
+
+        List<MktCamChlConfAttrDO> endDoList = mktCamChlConfAttrMapper.selectAttrEndDateByCampaignId(Long.valueOf(campaignId));
+        for (MktCamChlConfAttrDO attrDO : endDoList){
+            if (new Date(Long.valueOf(attrDO.getAttrValue())).after(camEnd)){
+                System.out.println("协同渠道结束时间："+DateUtil.Date2String(new Date(Long.valueOf(attrDO.getAttrValue()))));
+                String ruleName = "";
+                List<MktStrategyConfRuleDO> ruleDOList = mktStrategyConfRuleMapper.selectByCampaignId(Long.valueOf(campaignId));
+                for (MktStrategyConfRuleDO ruleDO : ruleDOList) {
+                    List<Long> evtConfList = ChannelUtil.StringToIdList(ruleDO.getEvtContactConfId());
+                    if (evtConfList.contains(attrDO.getEvtContactConfId())){
+                        ruleName = ruleDO.getMktStrategyConfRuleName();
+                        break;
+                    }
+                }
+                result.put("resultCode",CODE_SUCCESS);
+                result.put("resultMsg","协同渠道结束时间不符合规范，请检查规则：["+ruleName+"]");
+                result.put("data","false");
+                return result;
+            }
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","校验通过");
+        result.put("data","true");
+        return result;
+    }
+
     @Override
     public Map<String, Object> searchByCampaignId(Long campaignId) {
         Map<String, Object> result = new HashMap<>();
@@ -299,42 +359,42 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setUpdateStaff(UserUtil.loginId());
             mktCampaignDO.setStatusDate(new Date());
             //添加所属地市
-            if (UserUtil.getUser() != null) {
-                // 获取当前用户
-                mktCampaignDO.setRegionId(UserUtil.getUser().getLanId());
-                // 获取当前用户的岗位编码包含“cpcpch”
-                SystemUserDto userDetail = UserUtil.getRoleCode();
-                for (SystemPostDto role : userDetail.getSystemPostDtoList()) {
-                    // 判断是否为超级管理员
-                    if (role.getSysPostCode().contains(PostEnum.ADMIN.getPostCode())) {
-                        mktCampaignDO.setCreateChannel(role.getSysPostCode());
-                        break;
-                    } else if (role.getSysPostCode().contains("cpcpch")) {
-                        mktCampaignDO.setCreateChannel(role.getSysPostCode());
-                        continue;
-                    }
-                }
-            } else {
+//            if (UserUtil.getUser() != null) {
+//                // 获取当前用户
+//                mktCampaignDO.setRegionId(UserUtil.getUser().getLanId());
+//                // 获取当前用户的岗位编码包含“cpcpch”
+//                SystemUserDto userDetail = UserUtil.getRoleCode();
+//                for (SystemPostDto role : userDetail.getSystemPostDtoList()) {
+//                    // 判断是否为超级管理员
+//                    if (role.getSysPostCode().contains(PostEnum.ADMIN.getPostCode())) {
+//                        mktCampaignDO.setCreateChannel(role.getSysPostCode());
+//                        break;
+//                    } else if (role.getSysPostCode().contains("cpcpch")) {
+//                        mktCampaignDO.setCreateChannel(role.getSysPostCode());
+//                        continue;
+//                    }
+//                }
+//            } else {
                 mktCampaignDO.setRegionId(AreaCodeEnum.ZHEJIAGN.getRegionId());
                 mktCampaignDO.setCreateChannel(PostEnum.ADMIN.getPostCode());
-            }
+//            }
 
             // 判断是否有创建人信息和岗位信息
-            if(mktCampaignDO.getCreateChannel() == null && mktCampaignDO.getCreateStaff() == 1 ) {
-                maps.put("resultCode", CommonConstant.CODE_FAIL);
-                maps.put("resultMsg", "创建人信息和岗位信息都为空");
-                return maps;
-            }
-            if(mktCampaignDO.getCreateChannel() == null) {
-                maps.put("resultCode", CommonConstant.CODE_FAIL);
-                maps.put("resultMsg", "");
-                return maps;
-            }
-            if(mktCampaignDO.getCreateStaff() == 1 ) {
-                maps.put("resultCode", CommonConstant.CODE_FAIL);
-                maps.put("resultMsg", "创建人信息为空");
-                return maps;
-            }
+//            if(mktCampaignDO.getCreateChannel() == null && mktCampaignDO.getCreateStaff() == 1 ) {
+//                maps.put("resultCode", CommonConstant.CODE_FAIL);
+//                maps.put("resultMsg", "创建人信息和岗位信息都为空");
+//                return maps;
+//            }
+//            if(mktCampaignDO.getCreateChannel() == null) {
+//                maps.put("resultCode", CommonConstant.CODE_FAIL);
+//                maps.put("resultMsg", "");
+//                return maps;
+//            }
+//            if(mktCampaignDO.getCreateStaff() == 1 ) {
+//                maps.put("resultCode", CommonConstant.CODE_FAIL);
+//                maps.put("resultMsg", "创建人信息为空");
+//                return maps;
+//            }
 
             mktCampaignDO.setServiceType(StatusCode.CUST_TYPE.getStatusCode()); // 1000 - 客账户类
             mktCampaignDO.setLanId(AreaCodeEnum.getLandIdByRegionId(mktCampaignDO.getRegionId()));
