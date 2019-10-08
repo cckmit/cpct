@@ -66,4 +66,6 @@ public interface MktCampaignService {
 
     Result queryDelayCampaignList();
 
+    void campaignDelayNotice();
+
 }
