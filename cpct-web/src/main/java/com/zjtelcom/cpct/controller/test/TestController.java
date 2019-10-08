@@ -1,12 +1,8 @@
 package com.zjtelcom.cpct.controller.test;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.ctzj.smt.bss.sysmgr.model.common.Page;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
-import com.ctzj.smt.bss.sysmgr.model.dataobject.SystemPost;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
-import com.ctzj.smt.bss.sysmgr.model.query.QrySystemPostReq;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemPostDubboService;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
 import com.ql.util.express.DefaultContext;
@@ -14,12 +10,7 @@ import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.rule.RuleResult;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
-import com.zjtelcom.cpct.dao.channel.ObjMktCampaignRelMapper;
-import com.zjtelcom.cpct.domain.channel.ObjMktCampaignRel;
-import com.zjtelcom.cpct.domain.channel.RequestInstRel;
-import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.service.EngineTestService;
-import com.zjtelcom.cpct.service.campaign.CampaignService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlResultApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
@@ -27,25 +18,13 @@ import com.zjtelcom.cpct.service.channel.LabelService;
 import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
-import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
-import com.zjtelcom.cpct.util.UserUtil;
-import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
 import java.util.*;
-
-import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
-import static com.zjtelcom.cpct.constants.CommonConstant.STATUSCD_EFFECTIVE;
 
 
 @RestController
@@ -241,14 +220,7 @@ public class TestController extends BaseController {
         esHitsService.save(null, "111");
     }
 
-    @Autowired
-    private CampaignService campaignService;
 
-    @PostMapping("campaignDelayNotice")
-    @CrossOrigin
-    public void campaignDelayNotice() {
-        campaignService.campaignDelayNotice();
-    }
 
 
 }

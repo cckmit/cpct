@@ -57,6 +57,7 @@ import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.campaign.MktOperatorLogService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
+import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.service.grouping.TrialProdService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SyncActivityService;
@@ -253,6 +254,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private TrialProdService trialProdService;
     @Autowired
     private SysAreaService sysAreaService;
+
+    @Autowired
+    private UCCPService uccpService;
 
     //指定下发地市人员的数据集合
     private final static String CITY_PUBLISH = "CITY_PUBLISH";
@@ -2447,6 +2451,39 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         result.setResultMessage("查询成功");
         result.setResultObject(mktCampaignDOS);
         return result;
+    }
+
+    /**
+     * 活动延期短信通知
+     * @return
+     */
+    @Override
+    public void campaignDelayNotice() {
+        ArrayList<String> list = new ArrayList<>();
+        list.add(STATUS_CODE_PUBLISHED.getStatusCode());
+        List<MktCampaignDO> mktCampaignDOS = mktCampaignMapper.selectAllMktCampaignDetailsByStatus(list,null);
+        int i = 0;
+        for (MktCampaignDO mktCampaignDO : mktCampaignDOS) {
+            if (mktCampaignDO.getPlanEndTime().after(new Date()) && DateUtil.daysBetween(new Date(), mktCampaignDO.getPlanEndTime()) == 7) {
+                Long staff = mktCampaignDO.getCreateStaff();
+                SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(staff, new ArrayList<Long>());
+                if (systemUserDtoSysmgrResultObject != null && systemUserDtoSysmgrResultObject.getResultObject() != null) {
+                    String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
+                    Long lanId = systemUserDtoSysmgrResultObject.getResultObject().getLanId();
+                    // TODO  调用发送短信接口
+                    String sendContent = "您好，您创建的活动（" + mktCampaignDO.getMktCampaignName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
+                    System.out.println(sendContent);
+                    try {
+                        uccpService.sendShortMessage(sysUserCode, sendContent, lanId.toString());
+                        i++;
+                    } catch (Exception e) {
+                        logger.error(sysUserCode);
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        System.out.println("共发送数量=>" + i);
     }
 
 
