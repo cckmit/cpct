@@ -359,42 +359,42 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setUpdateStaff(UserUtil.loginId());
             mktCampaignDO.setStatusDate(new Date());
             //添加所属地市
-//            if (UserUtil.getUser() != null) {
-//                // 获取当前用户
-//                mktCampaignDO.setRegionId(UserUtil.getUser().getLanId());
-//                // 获取当前用户的岗位编码包含“cpcpch”
-//                SystemUserDto userDetail = UserUtil.getRoleCode();
-//                for (SystemPostDto role : userDetail.getSystemPostDtoList()) {
-//                    // 判断是否为超级管理员
-//                    if (role.getSysPostCode().contains(PostEnum.ADMIN.getPostCode())) {
-//                        mktCampaignDO.setCreateChannel(role.getSysPostCode());
-//                        break;
-//                    } else if (role.getSysPostCode().contains("cpcpch")) {
-//                        mktCampaignDO.setCreateChannel(role.getSysPostCode());
-//                        continue;
-//                    }
-//                }
-//            } else {
+            if (UserUtil.getUser() != null) {
+                // 获取当前用户
+                mktCampaignDO.setRegionId(UserUtil.getUser().getLanId());
+                // 获取当前用户的岗位编码包含“cpcpch”
+                SystemUserDto userDetail = UserUtil.getRoleCode();
+                for (SystemPostDto role : userDetail.getSystemPostDtoList()) {
+                    // 判断是否为超级管理员
+                    if (role.getSysPostCode().contains(PostEnum.ADMIN.getPostCode())) {
+                        mktCampaignDO.setCreateChannel(role.getSysPostCode());
+                        break;
+                    } else if (role.getSysPostCode().contains("cpcpch")) {
+                        mktCampaignDO.setCreateChannel(role.getSysPostCode());
+                        continue;
+                    }
+                }
+            } else {
                 mktCampaignDO.setRegionId(AreaCodeEnum.ZHEJIAGN.getRegionId());
                 mktCampaignDO.setCreateChannel(PostEnum.ADMIN.getPostCode());
-//            }
+            }
 
             // 判断是否有创建人信息和岗位信息
-//            if(mktCampaignDO.getCreateChannel() == null && mktCampaignDO.getCreateStaff() == 1 ) {
-//                maps.put("resultCode", CommonConstant.CODE_FAIL);
-//                maps.put("resultMsg", "创建人信息和岗位信息都为空");
-//                return maps;
-//            }
-//            if(mktCampaignDO.getCreateChannel() == null) {
-//                maps.put("resultCode", CommonConstant.CODE_FAIL);
-//                maps.put("resultMsg", "");
-//                return maps;
-//            }
-//            if(mktCampaignDO.getCreateStaff() == 1 ) {
-//                maps.put("resultCode", CommonConstant.CODE_FAIL);
-//                maps.put("resultMsg", "创建人信息为空");
-//                return maps;
-//            }
+            if(mktCampaignDO.getCreateChannel() == null && mktCampaignDO.getCreateStaff() == 1 ) {
+                maps.put("resultCode", CommonConstant.CODE_FAIL);
+                maps.put("resultMsg", "创建人信息和岗位信息都为空");
+                return maps;
+            }
+            if(mktCampaignDO.getCreateChannel() == null) {
+                maps.put("resultCode", CommonConstant.CODE_FAIL);
+                maps.put("resultMsg", "");
+                return maps;
+            }
+            if(mktCampaignDO.getCreateStaff() == 1 ) {
+                maps.put("resultCode", CommonConstant.CODE_FAIL);
+                maps.put("resultMsg", "创建人信息为空");
+                return maps;
+            }
 
             mktCampaignDO.setServiceType(StatusCode.CUST_TYPE.getStatusCode()); // 1000 - 客账户类
             mktCampaignDO.setLanId(AreaCodeEnum.getLandIdByRegionId(mktCampaignDO.getRegionId()));
