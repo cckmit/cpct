@@ -48,6 +48,7 @@ import com.zjtelcom.cpct.dto.event.EventDTO;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
+import com.zjtelcom.cpct.dto.pojo.Result;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 import com.zjtelcom.cpct.enums.*;
@@ -79,6 +80,9 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.*;
+import static com.zjtelcom.cpct.enums.DateUnit.MONTH;
+import static com.zjtelcom.cpct.enums.DateUnit.YEAR;
+import static com.zjtelcom.cpct.enums.StatusCode.STATUS_CODE_PUBLISHED;
 import static com.zjtelcom.cpct.util.DateUtil.*;
 
 /**
@@ -2447,6 +2451,28 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             resultMap.put("resultMsg", e);
         }
         return resultMap;
+    }
+
+
+    @Override
+    public Result queryDelayCampaignList() {
+        Result result = new Result();
+        Long loginId = UserUtil.loginId();
+        List<String> list = new ArrayList<>();
+        list.add(STATUS_CODE_PUBLISHED.getStatusCode());
+        List<MktCampaignDO> mktCampaignDOS = mktCampaignMapper.selectAllMktCampaignDetailsByStatus(list, loginId);
+        Iterator<MktCampaignDO> iterator = mktCampaignDOS.iterator();
+        while (iterator.hasNext()) {
+            MktCampaignDO campaignDO = iterator.next();
+            Date planEndTime = campaignDO.getPlanEndTime();
+            if (planEndTime.after(new Date()) || DateUtil.daysBetween(new Date(), planEndTime) > 7) {
+                iterator.remove();
+            }
+        }
+        result.setResultCode("200");
+        result.setResultMessage("查询成功");
+        result.setResultObject(mktCampaignDOS);
+        return result;
     }
 
 
