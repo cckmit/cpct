@@ -1366,15 +1366,15 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     }
 
                     // c4,c5
-                    if (mktCampaignDO.getLanIdFour() != null) {
-                        SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour().intValue());
+                    if (mktCampaignCountDO.getLanIdFour() != null) {
+                        SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFour().intValue());
                         //    Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour());
                         if (sysArea != null) {
                             mktCampaignVO.setLanIdFourName(sysArea.getName());
                         }
                     }
-                    if (mktCampaignDO.getLanIdFive() != null) {
-                        Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFive());
+                    if (mktCampaignCountDO.getLanIdFive() != null) {
+                        Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFive());
                         if(organization!=null){
                             mktCampaignVO.setLanIdFiveName(organization.getOrgName());
                         }
@@ -1514,15 +1514,15 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     }
 
                     // c4,c5
-                    if (mktCampaignDO.getLanIdFour() != null) {
-                        SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour().intValue());
+                    if (mktCampaignCountDO.getLanIdFour() != null) {
+                        SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFour().intValue());
                     //    Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour());
                         if (sysArea != null) {
                             mktCampaignVO.setLanIdFourName(sysArea.getName());
                         }
                     }
-                    if (mktCampaignDO.getLanIdFive() != null) {
-                        Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFive());
+                    if (mktCampaignCountDO.getLanIdFive() != null) {
+                        Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFive());
                         if(organization!=null){
                             mktCampaignVO.setLanIdFiveName(organization.getOrgName());
                         }
