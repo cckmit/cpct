@@ -19,10 +19,12 @@ import com.zjtelcom.cpct.domain.channel.ObjMktCampaignRel;
 import com.zjtelcom.cpct.domain.channel.RequestInstRel;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.service.EngineTestService;
+import com.zjtelcom.cpct.service.campaign.CampaignService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlResultApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.channel.LabelService;
+import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.util.ChannelUtil;
@@ -74,7 +76,7 @@ public class TestController extends BaseController {
     @Autowired(required = false)
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
     @Autowired(required = false)
-    private MktCampaignService campaignService;
+    private MktCampaignService mktCampaignService;
     @Autowired
     private LabelService labelService;
     @Autowired
@@ -122,7 +124,7 @@ public class TestController extends BaseController {
     @PostMapping("searchByCampaignId")
     @CrossOrigin
     public Object searchByCampaignId(Long campaignId) {
-        Map<String,Object> result = campaignService.searchByCampaignId(campaignId);
+        Map<String,Object> result = mktCampaignService.searchByCampaignId(campaignId);
         return result;
     }
 
@@ -229,6 +231,26 @@ public class TestController extends BaseController {
         Map<String, Object> map = mktCamChlResultApiService.secondChannelSynergy(params);
         return JSON.toJSONString(map);
     }
+
+    @Autowired
+    private EsHitsService esHitsService;
+
+    @PostMapping("saveEsLogTest")
+    @CrossOrigin
+    public void saveEsLog() {
+        esHitsService.save(null, "111");
+    }
+
+    @Autowired
+    private CampaignService campaignService;
+
+    @PostMapping("campaignDelayNotice")
+    @CrossOrigin
+    public void campaignDelayNotice() {
+        campaignService.campaignDelayNotice();
+    }
+
+
 }
 
 

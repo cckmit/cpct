@@ -1,6 +1,6 @@
-package com.zjtelcom.cpct.dubbo.out;
-
-public interface CampaignService {
-
-    boolean CampaignDelayNotice();
-}
+//package com.zjtelcom.cpct.dubbo.out;
+//
+//public interface CampaignService {
+//
+//    void campaignDelayNotice();
+//}

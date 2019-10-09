@@ -161,4 +161,9 @@
         <dubbo:method name="getCloseCampaign" servicecode="00.1083.getCloseCampaign" timeout="10000"/>
     </dubbo:service>
 
+    <!-- eslog -->
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MqProducerService" id="mqProducerService" version="1.0" check="false">
+        <dubbo:method name="msg2ESLogProducer" servicecode="00.1083.msg2ESLogProducer" timeout="120000"/>
+    </dubbo:reference>
+
 </beans>
