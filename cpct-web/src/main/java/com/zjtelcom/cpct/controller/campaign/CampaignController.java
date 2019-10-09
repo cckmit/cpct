@@ -72,28 +72,6 @@ public class CampaignController extends BaseController {
     }
 
 
-
-    /**
-     * 校验协同渠道时间是否在活动时间范围之内
-     *
-     * @return
-     */
-    @PostMapping("/channelEffectDateCheck")
-    @CrossOrigin
-    public Map<String, Object> channelEffectDateCheck(@RequestBody Map<String,Object> params){
-        Map<String,Object> result = new HashMap<>();
-        try {
-            result = mktCampaignService.channelEffectDateCheck(params);
-        } catch (Exception e) {
-            logger.error("[op:CampaignController] fail to channelEffectDateCheck",e);
-            result.put("resultCode",CODE_SUCCESS);
-            result.put("resultMsg","");
-            result.put("data","true");
-            return result;
-        }
-        return result;
-    }
-
     /**
      * 同步活动列表--活动延期
      *
