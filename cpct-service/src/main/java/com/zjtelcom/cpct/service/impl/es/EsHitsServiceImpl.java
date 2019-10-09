@@ -117,6 +117,7 @@ public class EsHitsServiceImpl implements EsHitsService {
                             String result = mqProducerService.msg2ESLogProducer(jsonObject, cpctEsLogTopic, indexName + "," + esType + "," + id, null);
                         }
                     } catch (Exception e) {
+                        e.printStackTrace();
                         logger.error("es日志存储失败");
                     }
                 }

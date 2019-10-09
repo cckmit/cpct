@@ -18,10 +18,8 @@
                 ${logPath}/${appName}-%d{yyyy-MM-dd}/${appName}-%d{yyyy-MM-dd}-%i.log
             </FileNamePattern>
             <MaxHistory>30</MaxHistory>
-            <minIndex>1</minIndex>
-            <maxIndex>10</maxIndex>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>1024MB</maxFileSize>
+                <maxFileSize>400MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
         <layout class="ch.qos.logback.classic.PatternLayout">

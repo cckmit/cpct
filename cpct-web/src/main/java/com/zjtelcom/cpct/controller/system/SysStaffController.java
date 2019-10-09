@@ -2,12 +2,20 @@ package com.zjtelcom.cpct.controller.system;
 
 import com.alibaba.fastjson.JSON;
 import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
+import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dto.PrivilegeDetail;
+import com.ctzj.smt.bss.sysmgr.model.dto.SystemPostDto;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.zjtelcom.cpct.controller.BaseController;
+import com.zjtelcom.cpct.dao.channel.OrganizationMapper;
+import com.zjtelcom.cpct.domain.channel.Organization;
+import com.zjtelcom.cpct.dto.channel.SystemUserVO;
 import com.zjtelcom.cpct.dto.system.SysStaffDTO;
+import com.zjtelcom.cpct.enums.AreaCodeEnum;
 import com.zjtelcom.cpct.enums.ErrorCode;
+import com.zjtelcom.cpct.enums.PostEnum;
 import com.zjtelcom.cpct.service.system.SysStaffService;
+import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +36,8 @@ public class SysStaffController extends BaseController {
 
     @Autowired
     private SysStaffService sysStaffService;
+    @Autowired
+    private OrganizationMapper organizationMapper;
 
 
     @RequestMapping("/getSysUser")
@@ -36,8 +46,62 @@ public class SysStaffController extends BaseController {
     public Map<String,Object> getSysUser() {
         Map<String,Object> result = new HashMap<>();
         SystemUserDto userDetail = BssSessionHelp.getSystemUserDto();
+        SystemUserVO userVO = BeanUtil.create(userDetail,new SystemUserVO());
+        try {
+            Long staffId = userDetail.getStaffId();
+            Long orgId = null;
+            List<Map<String, Object>> staffOrgId = organizationMapper.getStaffOrgId(staffId);
+            if (!staffOrgId.isEmpty() && staffOrgId.size() > 0){
+                for (Map<String, Object> map : staffOrgId) {
+                    Object orgDivision = map.get("orgDivision");
+                    Object orgId1 = map.get("orgId");
+                    if (orgDivision!=null){
+                        if (orgDivision.toString().equals("30")) {
+                            orgId = Long.valueOf(orgId1.toString());
+                            break;
+                        }else if (orgDivision.toString().equals("20")){
+                            orgId = Long.valueOf(orgId1.toString());
+                            break;
+                        }else if (orgDivision.toString().equals("10")){
+                            orgId = Long.valueOf(orgId1.toString());
+                            break;
+                        }
+                    }
+                }
+            }
+            Organization organization = organizationMapper.selectByPrimaryKey(orgId);
+            if (organization!=null){
+                userVO.setC4CodeName(organization.getOrgNameC4());
+                userVO.setC5CodeName(organization.getOrgNameC5());
+            }
+            String sysPostCode = null;
+            ArrayList<String> arrayList = new ArrayList<>();
+            List<SystemPostDto> systemPostDtoList = userDetail.getSystemPostDtoList();
+            //岗位信息查看最大权限作为岗位信息
+            if (systemPostDtoList.size()>0 && systemPostDtoList!=null){
+                for (SystemPostDto systemPostDto : systemPostDtoList) {
+                    arrayList.add(systemPostDto.getSysPostCode());
+                }
+            }
+            if (arrayList.contains(AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysPostCode())){
+                sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+            }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.SHENGJI.getSysPostCode())){
+                sysPostCode = AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea();
+            }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.FENGONGSI.getSysPostCode())){
+                sysPostCode = AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea();
+            }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode())){
+                sysPostCode = AreaCodeEnum.sysAreaCode.FENGJU.getSysArea();
+            }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode())){
+                sysPostCode = AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea();
+            }else {
+                sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+            }
+            userVO.setUserLevel(sysPostCode);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",userDetail);
+        result.put("resultMsg",userVO);
         return result;
     }
 
