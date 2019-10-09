@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface ProductService {
 
-    Map<String,Object> getProductNameById(Long userId,List<Long> productIdList);
+    Map<String,Object> getProductNameById(Long userId, List<Long> productIdList, String itemType);
 
     Map<String,Object>  getProductList(Long userId,Map<String,Object> params);
 
