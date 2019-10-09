@@ -2416,8 +2416,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         return map;
     }
 
-
-
     public static boolean delFile(String path) {
         Boolean bool = false;
         File file = new File(path);

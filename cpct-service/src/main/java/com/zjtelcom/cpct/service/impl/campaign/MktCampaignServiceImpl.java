@@ -261,7 +261,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
     @Autowired
     private UCCPService uccpService;
-    
+
     //指定下发地市人员的数据集合
     private final static String CITY_PUBLISH = "CITY_PUBLISH";
 
@@ -1098,8 +1098,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     }
 
 
-
-
     /**
      * 活动审核--同步列表
      *
@@ -1452,15 +1450,15 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     }
 
                     // c4,c5
-                    if (mktCampaignDO.getLanIdFour() != null) {
-                        SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour().intValue());
+                    if (mktCampaignCountDO.getLanIdFour() != null) {
+                        SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFour().intValue());
                         //    Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour());
                         if (sysArea != null) {
                             mktCampaignVO.setLanIdFourName(sysArea.getName());
                         }
                     }
-                    if (mktCampaignDO.getLanIdFive() != null) {
-                        Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFive());
+                    if (mktCampaignCountDO.getLanIdFive() != null) {
+                        Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFive());
                         if(organization!=null){
                             mktCampaignVO.setLanIdFiveName(organization.getOrgName());
                         }
@@ -1600,15 +1598,15 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     }
 
                     // c4,c5
-                    if (mktCampaignDO.getLanIdFour() != null) {
-                        SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour().intValue());
+                    if (mktCampaignCountDO.getLanIdFour() != null) {
+                        SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFour().intValue());
                     //    Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour());
                         if (sysArea != null) {
                             mktCampaignVO.setLanIdFourName(sysArea.getName());
                         }
                     }
-                    if (mktCampaignDO.getLanIdFive() != null) {
-                        Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFive());
+                    if (mktCampaignCountDO.getLanIdFive() != null) {
+                        Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFive());
                         if(organization!=null){
                             mktCampaignVO.setLanIdFiveName(organization.getOrgName());
                         }
@@ -1697,7 +1695,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 if (STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)) {
                     //活动发布若是清单活动重新试算全量清单
                     UserListTemp(mktCampaignId, mktCampaignDO);
-                    UserListTemp(mktCampaignId,mktCampaignDO.getInitId());
                 }
                 // 发布调整的活动，下线源活动
                 if (STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd) && !mktCampaignId.equals(initId)) {
@@ -1994,28 +1991,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
             }.start();
         }
-
     }
-
-    //xyl 活动发布 一些活动直接做全量试算
-    private void UserListTemp(Long mktCampaignId, Long initId) {
-        List<Long> mktCamCodeList = mktCampaignMapper.getUserListTempMktCamCodeList();
-        if (mktCamCodeList.contains(initId.toString())) {
-            new Thread() {
-                public void run() {
-                    logger.info("清单活动发布全量算清单：" + mktCampaignId + " INIT_ID:" + initId);
-                    Map<String, Object> params = new HashMap<>();
-                    List<Integer> arrayList = new ArrayList<>();
-                    arrayList.add(Integer.valueOf(mktCampaignId.toString()));
-                    params.put("userListCam", "BIG_DATA_TEMP");
-                    params.put("idList", arrayList);
-                    trialProdService.campaignIndexTask(params);
-                }
-            }.start(); //BIG_DATA_TEMP
-        }
-
-    }
-
 
 
     /**
@@ -2573,8 +2549,13 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         while (iterator.hasNext()) {
             MktCampaignDO campaignDO = iterator.next();
             Date planEndTime = campaignDO.getPlanEndTime();
-            if (planEndTime.after(new Date()) || DateUtil.daysBetween(new Date(), planEndTime) > 7) {
+            if (planEndTime.before(new Date()) || DateUtil.daysBetween(new Date(), planEndTime) > 7) {
                 iterator.remove();
+            }
+        }
+        for (MktCampaignDO mktCampaignDO : mktCampaignDOS) {
+            if (STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaignDO.getStatusCd())) {
+                mktCampaignDO.setStatusCd(STATUS_CODE_PUBLISHED.getStatusMsg());
             }
         }
         result.setResultCode("200");
@@ -2615,7 +2596,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         }
         System.out.println("共发送数量=>" + i);
     }
-
 
     // 表格中的类型统计
     private Map<String, Object> typeCount(Map<String, Object> paramMap,List<Map> tableMapList, List<Map> cityList,  List<SysArea> sysAreaList) throws Exception {

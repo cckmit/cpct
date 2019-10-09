@@ -62,6 +62,8 @@
         <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
         <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
         <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
+        <result column="LAN_ID_FOUR" jdbcType="BIGINT" property="lanIdFour"/>
+        <result column="LAN_ID_FIVE" jdbcType="BIGINT" property="lanIdFive"/>
     </resultMap>
 
 
@@ -848,7 +850,7 @@
 
     </select>
 
-    <select id="getUserListTempMktCamCodeList" resultMap="java.lang.Long">
+    <select id="getUserListTempMktCamCodeList" resultType="java.lang.Long">
         SELECT
         t.INIT_ID
         FROM

@@ -24,5 +24,5 @@ public interface SysParamsService {
 
     Map<String, Object> listParamsByKeyForCampaign();
 
-
+    String systemSwitch(String key);
 }
