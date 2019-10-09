@@ -132,6 +132,14 @@ public class MktCampaign extends BaseEntity {
 
     private String execInitTime;
 
+    private Long lanIdFour;
+
+    private Long lanIdFive;
+
+    private String lanIdFourName;
+
+    private String lanIdFiveName;
+
 
     public Long getDirectoryId() {
         return directoryId;
@@ -363,5 +371,37 @@ public class MktCampaign extends BaseEntity {
 
     public void setExecInitTime(String execInitTime) {
         this.execInitTime = execInitTime;
+    }
+
+    public Long getLanIdFour() {
+        return lanIdFour;
+    }
+
+    public void setLanIdFour(Long lanIdFour) {
+        this.lanIdFour = lanIdFour;
+    }
+
+    public Long getLanIdFive() {
+        return lanIdFive;
+    }
+
+    public void setLanIdFive(Long lanIdFive) {
+        this.lanIdFive = lanIdFive;
+    }
+
+    public String getLanIdFourName() {
+        return lanIdFourName;
+    }
+
+    public void setLanIdFourName(String lanIdFourName) {
+        this.lanIdFourName = lanIdFourName;
+    }
+
+    public String getLanIdFiveName() {
+        return lanIdFiveName;
+    }
+
+    public void setLanIdFiveName(String lanIdFiveName) {
+        this.lanIdFiveName = lanIdFiveName;
     }
 }

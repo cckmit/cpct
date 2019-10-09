@@ -4,6 +4,7 @@ import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.ztesoft.uccp.dubbo.interfaces.UCCPSendService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -17,29 +18,36 @@ public class UCCPServiceImpl implements UCCPService {
     @Autowired(required = false)
     private UCCPSendService uCCPSendService;
 
+    @Value("${uccp.userAcct}")
+    private String userAcct;
+    @Value("${uccp.password}")
+    private String password;
+    @Value("${uccp.sceneId}")
+    private String sceneId;
+
     @Override
     public void sendShortMessage(String targPhone, String sendContent, String lanId) throws Exception {
         HashMap params = new HashMap();
         //请求消息流水，格式：系统编码（6位）+yyyymmddhhmiss+10位序列号
-        params.put("TransactionId","CPCPYX"+ DateUtil.date2St4Trial(new Date()) + getRandom(10));
+        params.put("TransactionId", userAcct + DateUtil.date2St4Trial(new Date()) + getRandom(10));
         //UCCP分配的系统编码
-        params.put("SystemCode","CPCPYX");
+        params.put("SystemCode", userAcct);
         //UCCP分配的帐号
-        params.put("UserAcct","CPCPYX");
+        params.put("UserAcct", userAcct);
         //UCCP分配的认证密码
-        params.put("Password","908234");
+        params.put("Password", password);
         //场景标识
-        params.put("SceneId","7149");
+        params.put("SceneId", sceneId);
         //请求的时间,请求发起的时间,必须为下边的格式
         params.put("RequestTime",DateUtil.date2StringDate(new Date()));
         //接收消息推送的手机号码
-        //params.put("AccNbr",targPhone);
-        params.put("AccNbr","18957181789");
+        params.put("AccNbr",targPhone);
+        //params.put("AccNbr","18957181789");
         //消息内容
         params.put("OrderContent",sendContent);
         //本地网/辖区
-        //params.put("LanId",lanId);
-        params.put("LanId","571");
+        params.put("LanId",lanId);
+        //params.put("LanId", "571");
         //定时发送的时间设置
         //params.put("SendDate","");
         //如果使用场景模板来发送短信,必须填值
