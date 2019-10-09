@@ -802,14 +802,14 @@
 
     <update id="updateByStaffToC4AndC5" parameterType="java.util.Map">
         UPDATE mkt_campaign
-          <set>
-            <if test="orgNameC4 != null and orgNameC4 != ''">
-                AND LAN_ID_FOUR = #{orgNameC4}
+        <set>
+            <if test="map.orgNameC4 != null and map.orgNameC4 != ''">
+                LAN_ID_FOUR = #{map.orgNameC4},
             </if>
-            <if test="orgNameC5 != null and orgNameC5 != ''">
-                AND LAN_ID_FIVE = #{orgNameC5}
+            <if test="map.orgNameC5 != null and map.orgNameC5 != ''">
+                LAN_ID_FIVE = #{map.orgNameC5}
             </if>
-          </set>
-          WHERE CREATE_STAFF = #{aLong}
+        </set>
+        WHERE CREATE_STAFF = #{map.aLong}
     </update>
 </mapper>
