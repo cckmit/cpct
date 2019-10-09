@@ -840,7 +840,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                         redisUtils.set("REAL_PROD_FILTER", realProdFilter);
                     }
                 }
-                if (realProdFilter != null && "1".equals(realProdFilter)) {
+                if (realProdFilter != null && "1".equals(realProdFilter) && context.get("PROM_LIST")!=null) {
                     List<String> prodList = new ArrayList<>();
                     log.info("111------accNbr --->" + privateParams.get("accNbr"));
                     CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(privateParams.get("accNbr"));
