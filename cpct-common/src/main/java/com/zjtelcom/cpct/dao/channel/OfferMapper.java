@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 @Mapper
 @Repository
@@ -31,4 +32,6 @@ public interface OfferMapper {
     List<String> listByOfferIdList(@Param("list")List<Long> offerList);
 
     int updateByPrimaryKey(Offer record);
+
+    List<Offer> selectOfferByOver(@Param("preDay")Date preDay, @Param("date")Date date);
 }

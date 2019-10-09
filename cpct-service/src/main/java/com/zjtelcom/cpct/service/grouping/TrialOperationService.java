@@ -43,4 +43,7 @@ public interface TrialOperationService  {
     //xyl excel文件清单批量导入
     Map<String,Object> importUserListByExcel() throws IOException;
 
+    // xyl 补全mkt_campaign c4 c5 地市编码
+    Map<String,Object> insertMktCampaignByC4AndC5();
+
 }

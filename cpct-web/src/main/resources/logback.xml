@@ -12,14 +12,12 @@
 
 
     <appender name="logFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <!--<file>${logPath}/${appName}/${appName}.%i.log</file>-->
-        <file>${logPath}/${appName}/test.log</file>
+        <file>${logPath}/${appName}/${appName}-%i.log</file>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <!--<fileNamePattern>${logPath}/${appName}/${appName}.%i.log.zip</fileNamePattern>-->
-            <fileNamePattern>${logPath}/${appName}/tests.%i.log.zip</fileNamePattern>
+            <fileNamePattern>${logPath}/${appName}/${appName}-%i.log.zip</fileNamePattern>
             <minIndex>1</minIndex>
-            <maxIndex>3</maxIndex>
+            <maxIndex>10</maxIndex>
         </rollingPolicy>
 
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
