@@ -11,6 +11,7 @@ import com.zjtelcom.cpct.enums.ParamKeyEnum;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.synchronize.sys.SynSysParamsService;
 import com.zjtelcom.cpct.service.system.SysParamsService;
+import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.SystemParamsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +28,8 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
     private SysParamsMapper sysParamsMapper;
     @Autowired
     private SynSysParamsService synSysParamsService;
-
+    @Autowired
+    private RedisUtils redisUtils;
 
 
     @Override
@@ -202,6 +204,27 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
         List<SysParams> timeTypeParams = sysParamsMapper.listParamsByKeyForCampaign(ParamKeyEnum.TIME_TYPE.getParamKey());
         result.put(ParamKeyEnum.TIME_TYPE.getParamName(), timeTypeParams);
         return result;
+    }
+
+    /**
+     * 系统开关
+     * @return
+     */
+    @Override
+    public String systemSwitch(String key) {
+        Object o = redisUtils.get(key);
+        if (o != null) {
+            return o.toString();
+        } else {
+            List<Map<String, String>> maps = sysParamsMapper.listParamsByKey(key);
+            if (maps == null) {
+                return null;
+            } else {
+                String value = maps.get(0).get("value");
+                redisUtils.set(key, value);
+                return value;
+            }
+        }
     }
 
 }
