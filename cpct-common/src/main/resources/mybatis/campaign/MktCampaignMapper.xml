@@ -778,7 +778,7 @@
         ORDER BY t.CREATE_DATE DESC
     </select>
 
-    <select id="getUserListTempMktCamCodeList" resultMap="java.lang.Long">
+    <select id="getUserListTempMktCamCodeList" resultType="java.lang.Long">
         SELECT
         t.INIT_ID
         FROM
