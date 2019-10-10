@@ -241,6 +241,9 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         if (StringUtils.isNotBlank(addVO.getCloseType()) && addVO.getCloseType().equals("4000")){
             addVO.setExpression("CR004");
         }
+        if (StringUtils.isNotBlank(addVO.getCloseType()) && addVO.getCloseType().equals("2000")){
+            addVO.setExpression("CR002");
+        }
         //自动步枪6位数 前面补零
         String expression = CpcUtil.addZeroForNum(String.valueOf(closeRule.getRuleId()), 6);
         closeRuleMapper.updateExpression(closeRule.getRuleId().toString(),addVO.getExpression()+expression);
@@ -450,12 +453,6 @@ public class CloseRuleServiceImpl implements CloseRuleService {
             maps.put("resultCode", CODE_FAIL);
             maps.put("resultMsg", "关单规则信息不完善");
         }
-        Integer count = closeRuleMapper.getCloseNameCount(closeName);
-        if (count>1){
-            maps.put("resultCode", CommonConstant.CODE_FAIL);
-            maps.put("resultMsg", "导入销售品！关单规则名称重复！");
-            return maps;
-        }
         List<String> resultList = new ArrayList<>();
         InputStream inputStream = multipartFile.getInputStream();
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
@@ -502,6 +499,13 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         }
         CloseRule closeRule = new CloseRule();
         if(ruleId == null) {
+            //新增 出现同名的情况
+            Integer count = closeRuleMapper.getCloseNameCount(closeName);
+            if (count>=1){
+                maps.put("resultCode", CommonConstant.CODE_FAIL);
+                maps.put("resultMsg", "导入销售品！关单规则名称重复！");
+                return maps;
+            }
             closeRule.setCloseName(closeName);
             closeRule.setCloseType(closeType);
             closeRule.setOfferInfo(offerInfo);
@@ -516,6 +520,12 @@ public class CloseRuleServiceImpl implements CloseRuleService {
             closeRule.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
             closeRuleMapper.createFilterRule(closeRule);
         }else {
+            Integer count = closeRuleMapper.getCloseNameCount(closeName);
+            if (count>1){
+                maps.put("resultCode", CommonConstant.CODE_FAIL);
+                maps.put("resultMsg", "导入销售品！关单规则名称重复！");
+                return maps;
+            }
             closeRule = closeRuleMapper.selectByPrimaryKey(ruleId);
             if (closeRule==null){
                 maps.put("resultCode", CODE_FAIL);

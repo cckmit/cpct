@@ -56,6 +56,8 @@ public interface MktCampaignMapper {
 
     int countByStatus(@Param("map")Map<String, Object> map);
 
+    int countBylanIdFour(@Param("map")Map<String, Object> map);
+
     int countByTrial(@Param("map")Map<String, Object> map);
 
     List<MktCampaignDO> queryRptBatchOrderForMktCampaign(HashMap<String, Object> paramMap);
@@ -63,4 +65,12 @@ public interface MktCampaignMapper {
     List<MktCampaignDO> getMktCampaignDetails(HashMap<String, Object> hashMap);
 
     List<MktCampaignDO> getMktCampaignDetailsForDate(@Param("mktCampaignId")List<String> s);
+
+    List<MktCampaignDO> selectAllMktCampaignDetailsByStatus(@Param("status")List<String> status, @Param("staff")Long createStaffId);
+
+    List<Long> getUserListTempMktCamCodeList();
+
+    List<Long> getCreateStaffList();
+
+    void updateByStaffToC4AndC5(@Param("map")Map<String, Object> map);
 }

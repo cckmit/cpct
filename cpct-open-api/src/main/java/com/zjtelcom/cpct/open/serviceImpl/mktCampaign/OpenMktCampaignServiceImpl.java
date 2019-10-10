@@ -466,6 +466,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                     }
                     MktCamItem mktCamItem = BeanUtil.create(openMktCamItemEntity, new MktCamItem());
                     mktCamItem.setMktCamItemId(null);
+                    mktCamItem.setOfferCode(openMktCamItemEntity.getItemNbr());
                     if(openMktCamItemEntity.getItemType().equals("1000")) {
                         List<Offer> offerList = offerMapper.selectByCode(openMktCamItemEntity.getItemNbr());
                         if(offerList.size() > 0) {
@@ -601,8 +602,19 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                 for (OpenMktCamEvtRelEntity openMktCamEvtRelEntity : mktCamEvtRels) {
                     MktCamEvtRelDO mktCamEvtRelDO = BeanUtil.create(openMktCamEvtRelEntity, new MktCamEvtRelDO());
                     mktCamEvtRelDO.setMktCampaignId(mktCampaignDO.getMktCampaignId());
-                    ContactEvt contactEvt = contactEvtMapper.getEventByEventNbr(openMktCamEvtRelEntity.getEventNbr());
-                    mktCamEvtRelDO.setEventId(contactEvt.getContactEvtId());
+                    try {
+                        mktCamEvtRelDO.setEventId(Long.valueOf(openMktCamEvtRelEntity.getEventNbr()));
+                    }catch (Exception e) {
+                        logger.info("事件编码: " + openMktCamEvtRelEntity.getEventNbr());
+                        e.printStackTrace();
+                    }
+                    ContactEvt contactEvt = new ContactEvt();
+                    if(openMktCamEvtRelEntity.getEventNbr() != null) {
+                        contactEvt = contactEvtMapper.getEventByEventNbr(openMktCamEvtRelEntity.getEventNbr());
+                    }
+                    if(contactEvt != null) {
+                        mktCamEvtRelDO.setEventId(contactEvt.getContactEvtId());
+                    }
                     mktCamEvtRelDO.setCampaignSeq(0);
                     mktCamEvtRelDO.setLevelConfig(0);
                     mktCamEvtRelMapper.insert(mktCamEvtRelDO);

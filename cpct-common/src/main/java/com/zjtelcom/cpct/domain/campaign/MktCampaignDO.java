@@ -38,6 +38,8 @@ public class MktCampaignDO extends BaseEntity{
     private String execInitTime;
     private String strBeginTime;
     private String strEndTime;
+    private Long lanIdFour;
+    private Long lanIdFive;
 
     public String getStrBeginTime() {
         return strBeginTime;
@@ -294,5 +296,21 @@ public class MktCampaignDO extends BaseEntity{
 
     public void setExecInitTime(String execInitTime) {
         this.execInitTime = execInitTime;
+    }
+
+    public Long getLanIdFour() {
+        return lanIdFour;
+    }
+
+    public void setLanIdFour(Long lanIdFour) {
+        this.lanIdFour = lanIdFour;
+    }
+
+    public Long getLanIdFive() {
+        return lanIdFive;
+    }
+
+    public void setLanIdFive(Long lanIdFive) {
+        this.lanIdFive = lanIdFive;
     }
 }

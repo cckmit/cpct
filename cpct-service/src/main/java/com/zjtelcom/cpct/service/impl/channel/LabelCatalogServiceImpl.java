@@ -111,6 +111,12 @@ public class LabelCatalogServiceImpl extends BaseService implements LabelCatalog
 //            }
 //        }
 
+        if ("".equals(rightOperand)){
+            rightOperand = "0";
+        }
+        if ("".equals(newOrOld)){
+            newOrOld = "0";
+        }
         Map<String,Object> result = new HashMap<>();
         List<CatalogTreeParent> resultTree = new ArrayList<>();
         List<CatalogTreeParentVO> resultTreeVO = new ArrayList<>();

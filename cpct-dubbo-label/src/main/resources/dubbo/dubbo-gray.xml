@@ -29,6 +29,8 @@
         <!--<dubbo:method name="updateOperationStatus" servicecode="33.1083.updateOperationStatus" timeout="10000"/>-->
         <dubbo:method name="campaignIndexTask" servicecode="33.1083.campaignIndexTask" timeout="10000"/>
         <dubbo:method name="importUserListByExcel" servicecode="33.1083.importUserListByExcel" timeout="10000"/>
+        <dubbo:method name="dueMktCampaign" servicecode="33.1083.dueMktCampaign" timeout="10000"/>
+        <dubbo:method name="sendMsgByOfferOver" servicecode="33.1083.sendMsgByOfferOver" timeout="10000"/>
     </dubbo:service>
 
     <!-- 更新试算日志 -->
@@ -61,5 +63,10 @@
                      <!--version="1.0" retries="0" check="false">-->
         <!--<dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="5000"/>-->
     <!--</dubbo:reference>-->
+
+    <!-- 分群定时批量下发 -->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.TargetGroupService" ref="targetGroupServiceImpl" version="2.0" >
+        <dubbo:method name="tarGrpTemplateScheduledBatchIssue" servicecode="33.1083.tarGrpTemplateScheduledBatchIssue" timeout="10000"/>
+    </dubbo:service>
 
 </beans>

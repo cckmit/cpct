@@ -22,4 +22,12 @@ public class OfferDetail implements Serializable {
     public void setOfferName(String offerName) {
         this.offerName = offerName;
     }
+
+    public OfferDetail(Integer offerId, String offerName) {
+        this.offerId = offerId;
+        this.offerName = offerName;
+    }
+
+    public OfferDetail() {
+    }
 }

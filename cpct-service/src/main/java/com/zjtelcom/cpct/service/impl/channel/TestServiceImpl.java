@@ -1,7 +1,10 @@
 package com.zjtelcom.cpct.service.impl.channel;
 
 import com.alibaba.fastjson.JSON;
+import com.ctzj.smt.bss.cpc.model.offer.atomic.InjectionLabel;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
+import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.service.api.TestService;
@@ -32,6 +35,10 @@ public class TestServiceImpl implements TestService {
     @Autowired(required = false)
     private EsService esService;
     ExecutorService executorService = Executors.newFixedThreadPool(100);
+    @Autowired
+    private InjectionLabelMapper injectionLabelMapper;
+
+
 
     @Override
     public Map<String, Object> caculateTest() {
