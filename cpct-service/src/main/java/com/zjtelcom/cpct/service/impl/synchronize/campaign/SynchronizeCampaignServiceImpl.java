@@ -412,20 +412,12 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
             MktCampaignDO mktCampaignDO = mktCampaignPrdMapper.selectByPrimaryKey(mktCampaignId);
             // 删除活动缓存
             redisUtils_prd.del("MKT_CAMPAIGN_" + mktCampaignId);
-            // 删除活动所有标签缓存
-//            List<MktCamEvtRelDO> mktCamEvtRelDOS = mktCamEvtRelPrdMapper.selectByMktCampaignId(mktCampaignId);
-//            for (MktCamEvtRelDO mktCamEvtRelDO : mktCamEvtRelDOS) {
-//                redisUtils_prd.del("EVT_ALL_LABEL_" + mktCamEvtRelDO.getEventId());
-//            }
-
             // 删除过滤规则缓存
             List<Long> longList = mktStrategyFilterRuleRelPrdMapper.selectByStrategyId(mktCampaignId);
             redisUtils_prd.del("MKT_FILTER_RULE_IDS_" + mktCampaignId);
             for (Long filterRuleId : longList) {
                 redisUtils_prd.del("FILTER_RULE_DISTURB_" + filterRuleId);
             }
-
-
             // 删除展示列的标签
             redisUtils_prd.del("MKT_ISALE_LABEL_" + mktCampaignDO.getIsaleDisplay());
 

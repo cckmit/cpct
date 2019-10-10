@@ -19,6 +19,7 @@ import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.DisplayColumnLabelMapper;
 import com.zjtelcom.cpct.dao.channel.MktVerbalMapper;
 import com.zjtelcom.cpct.dao.channel.ObjMktCampaignRelMapper;
+import com.zjtelcom.cpct.dao.channel.OrganizationMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper;
@@ -255,6 +256,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private TrialProdService trialProdService;
     @Autowired
     private SysAreaService sysAreaService;
+    @Autowired
+    private OrganizationMapper organizationMapper;
 
     @Autowired
     private UCCPService uccpService;
@@ -396,7 +399,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
             if(mktCampaignDO.getCreateChannel() == null) {
                 maps.put("resultCode", CommonConstant.CODE_FAIL);
-                maps.put("resultMsg", "");
+                maps.put("resultMsg", "岗位信息都为空");
                 return maps;
             }
             if(mktCampaignDO.getCreateStaff() == 1 ) {
@@ -407,6 +410,11 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
             mktCampaignDO.setServiceType(StatusCode.CUST_TYPE.getStatusCode()); // 1000 - 客账户类
             mktCampaignDO.setLanId(AreaCodeEnum.getLandIdByRegionId(mktCampaignDO.getRegionId()));
+            Map<String, Object> landFourAndFiveMap = getLandFourAndFive();
+            if(landFourAndFiveMap!=null){
+                mktCampaignDO.setLanIdFour((Long) landFourAndFiveMap.get("C4"));
+                mktCampaignDO.setLanIdFive((Long) landFourAndFiveMap.get("C5"));
+            }
             mktCampaignMapper.insert(mktCampaignDO);
             Long mktCampaignId = mktCampaignDO.getMktCampaignId();
             // 活动编码
@@ -552,8 +560,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamDisplayColumnRelMapper.insert(mktCamDisplayColumnRel);
                 }
             }
-
-            maps = new HashMap<>();
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
             if (StatusCode.STATUS_CODE_DRAFT.getStatusCode().equals(mktCampaignVO.getStatusCd())) {
                 maps.put("resultMsg", ErrorCode.SAVE_MKT_CAMPAIGN_SUCCESS.getErrorMsg());
@@ -776,6 +782,21 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             applyRegionIds.add(cityProperty);
         }
         mktCampaignVO.setApplyRegionIdList(applyRegionIds);
+
+        // c4,c5
+        if (mktCampaignDO.getLanIdFour() != null) {
+            SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour().intValue());
+            //    Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour());
+            if (sysArea != null) {
+                mktCampaignVO.setLanIdFourName(sysArea.getName());
+            }
+        }
+        if (mktCampaignDO.getLanIdFive() != null) {
+            Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFive());
+            if(organization!=null){
+                mktCampaignVO.setLanIdFiveName(organization.getOrgName());
+            }
+        }
 
         //查询父活动信息
         List<MktCampaignRelDO> mktCampaignRelDOS = mktCampaignRelMapper.selectByZmktCampaignId(mktCampaignId, "1000");
@@ -1430,6 +1451,21 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         }
                     }
 
+                    // c4,c5
+                    if (mktCampaignCountDO.getLanIdFour() != null) {
+                        SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFour().intValue());
+                        //    Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour());
+                        if (sysArea != null) {
+                            mktCampaignVO.setLanIdFourName(sysArea.getName());
+                        }
+                    }
+                    if (mktCampaignCountDO.getLanIdFive() != null) {
+                        Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFive());
+                        if(organization!=null){
+                            mktCampaignVO.setLanIdFiveName(organization.getOrgName());
+                        }
+                    }
+
                     // 获取创建人信息
                     long before2 = System.currentTimeMillis();
                     SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(mktCampaignCountDO.getCreateStaff(), new ArrayList<Long>());
@@ -1560,6 +1596,21 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                             mktCampaignVO.setPreMktCampaignType("强制活动");
                         } else if ("3000".equals(mktCampaignDOPre.getMktCampaignCategory())) {
                             mktCampaignVO.setPreMktCampaignType("自主活动");
+                        }
+                    }
+
+                    // c4,c5
+                    if (mktCampaignCountDO.getLanIdFour() != null) {
+                        SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFour().intValue());
+                    //    Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour());
+                        if (sysArea != null) {
+                            mktCampaignVO.setLanIdFourName(sysArea.getName());
+                        }
+                    }
+                    if (mktCampaignCountDO.getLanIdFive() != null) {
+                        Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFive());
+                        if(organization!=null){
+                            mktCampaignVO.setLanIdFiveName(organization.getOrgName());
                         }
                     }
 
@@ -1944,26 +1995,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }.start();
         }
     }
-
-    //xyl 活动发布 一些活动直接做全量试算
-    private void UserListTemp(Long mktCampaignId, Long initId) {
-        List<Long> mktCamCodeList = mktCampaignMapper.getUserListTempMktCamCodeList();
-        if (mktCamCodeList.contains(initId.toString())) {
-            new Thread() {
-                public void run() {
-                    logger.info("清单活动发布全量算清单：" + mktCampaignId + " INIT_ID:" + initId);
-                    Map<String, Object> params = new HashMap<>();
-                    List<Integer> arrayList = new ArrayList<>();
-                    arrayList.add(Integer.valueOf(mktCampaignId.toString()));
-                    params.put("userListCam", "BIG_DATA_TEMP");
-                    params.put("idList", arrayList);
-                    trialProdService.campaignIndexTask(params);
-                }
-            }.start(); //BIG_DATA_TEMP
-        }
-
-    }
-
 
 
     /**
@@ -2821,7 +2852,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     }
 
 
-
+    // 柱状图统计
     class cityCountTask implements Callable<Map<String, Object>>{
         private Map<String, Object> paramMap;
         private Integer areaId;
@@ -2844,6 +2875,26 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             cityCountMap.put("count", cityCount);
             cityCountMap.put("lanId", areaId);
             cityCountMap.put("name", name);
+            // c4级别
+            if (areaId != null && areaId != 1) {
+                List<Map<String, Object>> cityC4MapList = new ArrayList<>();
+                Map<String, Object> sysC4AreaMap = sysAreaService.listCityByParentId(areaId);
+                List<SysArea> sysAreaC4List = ( List<SysArea>) sysC4AreaMap.get("sysAreaList");
+                List<Future<Map<String, Object>>> futureList = new ArrayList<>();
+                ExecutorService executorService = Executors.newCachedThreadPool();
+                for (SysArea sysArea : sysAreaC4List) {
+                    Future<Map<String, Object>> futureMap = executorService.submit(new CountC4Task(paramMap, areaId.longValue(), sysArea.getAreaId().longValue(), sysArea.getName()));
+                    futureList.add(futureMap);
+                }
+                executorService.shutdown();
+
+                for (Future<Map<String, Object>> future : futureList) {
+                    if (future != null && future.get() != null) {
+                        cityC4MapList.add(future.get());
+                    }
+                }
+                cityCountMap.put("cityFourList", cityC4MapList);
+            }
             return cityCountMap;
         }
     }
@@ -2869,7 +2920,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             ExecutorService cityExecutorService = Executors.newCachedThreadPool();
             List<Future<Map<String, Object>>> futureList = new ArrayList<>();
             for (int i = 0; i < 6; i++) {
-                Future<Map<String, Object>> futureMap = cityExecutorService.submit(new cityMonthTask(paramMap,  dateMap.get(i), dateMap.get(i + 1)));
+                Future<Map<String, Object>> futureMap = cityExecutorService.submit(new cityMonthTask(paramMap, areaId,  dateMap.get(i), dateMap.get(i + 1)));
                 futureList.add(futureMap);
             }
             List<Map<String, Object>> lineMapList = new ArrayList<>();
@@ -2879,6 +2930,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             lineResultMap.put("areaId", areaId);
             lineResultMap.put("name", name);
             lineResultMap.put("data", lineMapList);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -2888,11 +2940,13 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
     class cityMonthTask implements Callable<Map<String, Object>>{
         private Map<String, Object> paramMap;
+        private Integer areaId;
         private Date startDate;
         private Date endDate;
 
-        public cityMonthTask(Map<String, Object> paramMap, Date startDate, Date endDate) {
+        public cityMonthTask(Map<String, Object> paramMap, Integer areaId, Date startDate, Date endDate) {
             this.paramMap = paramMap;
+            this.areaId = areaId;
             this.startDate = startDate;
             this.endDate = endDate;
         }
@@ -2914,8 +2968,106 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             Map<String, Object> lineMap = new HashMap<>();
             lineMap.put("count", cityCount);
             lineMap.put("month", year+"年"+month+"月");
+
+
+            // c4级别
+            if (areaId != null && areaId != 1) {
+                List<Map<String, Object>> cityC4MapList = new ArrayList<>();
+                Map<String, Object> sysC4AreaMap = sysAreaService.listCityByParentId(areaId);
+                List<SysArea> sysAreaC4List = ( List<SysArea>) sysC4AreaMap.get("sysAreaList");
+                List<Future<Map<String, Object>>> futureC4List = new ArrayList<>();
+                ExecutorService executorService = Executors.newCachedThreadPool();
+                for (SysArea sysArea : sysAreaC4List) {
+                    Future<Map<String, Object>> futureMap = executorService.submit(new CountC4Task(paramMap, areaId.longValue(), sysArea.getAreaId().longValue(), sysArea.getName()));
+                    futureC4List.add(futureMap);
+                }
+                executorService.shutdown();
+
+                for (Future<Map<String, Object>> futureC4 : futureC4List) {
+                    if (futureC4 != null && futureC4.get() != null) {
+                        cityC4MapList.add(futureC4.get());
+                    }
+                }
+                lineMap.put("cityFourList", cityC4MapList);
+            }
+
+
             return lineMap;
         }
+    }
+
+    /**
+     * 获取C4数据
+     * @return
+     */
+    class CountC4Task implements Callable<Map<String, Object>>{
+
+        private Map<String, Object> paramMap;
+        private Long LanId;
+        private Long landIdFour;
+        private String landIdFourName;
+
+        public CountC4Task(Map<String, Object> paramMap, Long lanId, Long landIdFour, String landIdFourName) {
+            this.paramMap = paramMap;
+            LanId = lanId;
+            this.landIdFour = landIdFour;
+            this.landIdFourName = landIdFourName;
+        }
+
+        @Override
+        public Map<String, Object> call() throws Exception {
+            Map<String, Object> c4ParamMap = new HashMap<>();
+            c4ParamMap.putAll(paramMap);
+            c4ParamMap.put("lanId", LanId);
+            c4ParamMap.put("lanIdFour", landIdFour);
+            int c4Count = mktCampaignMapper.countBylanIdFour(c4ParamMap);
+
+            Map<String, Object> c4ResultMap = new HashMap<>();
+            c4ResultMap.put("count", c4Count);
+            c4ResultMap.put("lanId", landIdFour);
+            c4ResultMap.put("name" , landIdFourName);
+            return c4ResultMap;
+        }
+    }
+
+
+
+    // 获取c4，c5的数据
+    private Map<String, Object> getLandFourAndFive() {
+        Map<String, Object> resutlMap = new HashMap<>();
+        SystemUserDto user = BssSessionHelp.getSystemUserDto();
+        Long staffId = user.getStaffId();
+        Long orgId = null;
+        List<Map<String, Object>> staffOrgId = organizationMapper.getStaffOrgId(staffId);
+        if (!staffOrgId.isEmpty() && staffOrgId.size() > 0) {
+            for (Map<String, Object> map : staffOrgId) {
+                Object orgDivision = map.get("orgDivision");
+                Object orgId1 = map.get("orgId");
+                if (orgDivision != null) {
+                    if (orgDivision.toString().equals("30")) {
+                        orgId = Long.valueOf(orgId1.toString());
+                        break;
+                    } else if (orgDivision.toString().equals("20")) {
+                        orgId = Long.valueOf(orgId1.toString());
+                        break;
+                    } else if (orgDivision.toString().equals("10")) {
+                        orgId = Long.valueOf(orgId1.toString());
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (orgId != null) {
+            Organization organization = organizationMapper.selectByPrimaryKey(orgId);
+            if (organization != null) {
+                Long regionId = organization.getRegionId();
+                Long landIdFour = AreaCodeEnum.getLandIdByRegionId(regionId / 100 * 100);
+                resutlMap.put("C4", landIdFour);
+                resutlMap.put("C5", Long.valueOf(organization.getOrgNameC5()));
+            }
+        }
+        return resutlMap;
     }
 
 
