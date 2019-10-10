@@ -39,6 +39,7 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyFilterRuleRelDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.campaign.CampaignVO;
+import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
@@ -262,6 +263,65 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private final static String CITY_PUBLISH = "CITY_PUBLISH";
 
 
+    /**
+     * 校验协同渠道时间是否在活动时间范围之内
+     * @param params
+     * @return
+     */
+    @Override
+    public Map<String, Object> channelEffectDateCheck(Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        Date camStart = new Date((Long) params.get("camStart")) ;
+        Date camEnd = new Date((Long) params.get("camEnd")) ;
+        String campaignId = String.valueOf((Integer) params.get("campaignId"));
+        System.out.println("活动开始时间："+DateUtil.Date2String(camStart));
+        System.out.println("活动失效时间："+DateUtil.Date2String(camEnd));
+        System.out.println("活动id"+campaignId);
+        List<MktCamChlConfAttrDO> startDoList = mktCamChlConfAttrMapper.selectAttrStartDateByCampaignId(Long.valueOf(campaignId));
+        for (MktCamChlConfAttrDO attrDO : startDoList){
+            if (new Date(Long.valueOf(attrDO.getAttrValue())).before(camStart)){
+                System.out.println("协同渠道开始时间："+DateUtil.Date2String(new Date(Long.valueOf(attrDO.getAttrValue()))));
+                String ruleName = "";
+                List<MktStrategyConfRuleDO> ruleDOList = mktStrategyConfRuleMapper.selectByCampaignId(Long.valueOf(campaignId));
+                for (MktStrategyConfRuleDO ruleDO : ruleDOList) {
+                    List<Long> evtConfList = ChannelUtil.StringToIdList(ruleDO.getEvtContactConfId());
+                    if (evtConfList.contains(attrDO.getEvtContactConfId())){
+                        ruleName = ruleDO.getMktStrategyConfRuleName();
+                        break;
+                    }
+                }
+                result.put("resultCode",CODE_SUCCESS);
+                result.put("resultMsg","协同渠道开始时间不符合规范，请检查规则：["+ruleName+"]");
+                result.put("data","false");
+                return result;
+            }
+        }
+
+        List<MktCamChlConfAttrDO> endDoList = mktCamChlConfAttrMapper.selectAttrEndDateByCampaignId(Long.valueOf(campaignId));
+        for (MktCamChlConfAttrDO attrDO : endDoList){
+            if (new Date(Long.valueOf(attrDO.getAttrValue())).after(camEnd)){
+                System.out.println("协同渠道结束时间："+DateUtil.Date2String(new Date(Long.valueOf(attrDO.getAttrValue()))));
+                String ruleName = "";
+                List<MktStrategyConfRuleDO> ruleDOList = mktStrategyConfRuleMapper.selectByCampaignId(Long.valueOf(campaignId));
+                for (MktStrategyConfRuleDO ruleDO : ruleDOList) {
+                    List<Long> evtConfList = ChannelUtil.StringToIdList(ruleDO.getEvtContactConfId());
+                    if (evtConfList.contains(attrDO.getEvtContactConfId())){
+                        ruleName = ruleDO.getMktStrategyConfRuleName();
+                        break;
+                    }
+                }
+                result.put("resultCode",CODE_SUCCESS);
+                result.put("resultMsg","协同渠道结束时间不符合规范，请检查规则：["+ruleName+"]");
+                result.put("data","false");
+                return result;
+            }
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","校验通过");
+        result.put("data","true");
+        return result;
+    }
+
     @Override
     public Map<String, Object> searchByCampaignId(Long campaignId) {
         Map<String, Object> result = new HashMap<>();
@@ -298,7 +358,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      */
     @Override
     public Map<String, Object> createMktCampaign(MktCampaignDetailVO mktCampaignVO) throws Exception {
-        Map<String, Object> maps = new HashMap<>();;
+        Map<String, Object> maps = new HashMap<>();
         try {
             MktCampaignDO mktCampaignDO = BeanUtil.create(mktCampaignVO, new MktCampaignDO());
             // 创建活动基本信息
@@ -492,6 +552,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamDisplayColumnRelMapper.insert(mktCamDisplayColumnRel);
                 }
             }
+
+            maps = new HashMap<>();
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
             if (StatusCode.STATUS_CODE_DRAFT.getStatusCode().equals(mktCampaignVO.getStatusCd())) {
                 maps.put("resultMsg", ErrorCode.SAVE_MKT_CAMPAIGN_SUCCESS.getErrorMsg());
@@ -1584,6 +1646,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 if (STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)) {
                     //活动发布若是清单活动重新试算全量清单
                     UserListTemp(mktCampaignId, mktCampaignDO);
+                    UserListTemp(mktCampaignId,mktCampaignDO.getInitId());
                 }
                 // 发布调整的活动，下线源活动
                 if (STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd) && !mktCampaignId.equals(initId)) {
@@ -1881,6 +1944,26 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }.start();
         }
     }
+
+    //xyl 活动发布 一些活动直接做全量试算
+    private void UserListTemp(Long mktCampaignId, Long initId) {
+        List<Long> mktCamCodeList = mktCampaignMapper.getUserListTempMktCamCodeList();
+        if (mktCamCodeList.contains(initId.toString())) {
+            new Thread() {
+                public void run() {
+                    logger.info("清单活动发布全量算清单：" + mktCampaignId + " INIT_ID:" + initId);
+                    Map<String, Object> params = new HashMap<>();
+                    List<Integer> arrayList = new ArrayList<>();
+                    arrayList.add(Integer.valueOf(mktCampaignId.toString()));
+                    params.put("userListCam", "BIG_DATA_TEMP");
+                    params.put("idList", arrayList);
+                    trialProdService.campaignIndexTask(params);
+                }
+            }.start(); //BIG_DATA_TEMP
+        }
+
+    }
+
 
 
     /**

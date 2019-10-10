@@ -10,6 +10,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
 import com.zjtelcom.cpct.dto.pojo.Result;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 import com.zjtelcom.cpct.enums.StatusCode;
+import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.thread.TarGrpRule;
@@ -25,6 +26,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 @RestController
 @RequestMapping("${adminPath}/campaign")
@@ -44,6 +46,31 @@ public class CampaignController extends BaseController {
 
     @Autowired
     private RedisUtils redisUtils;
+
+    @Autowired
+    private MktCampaignApiService mktCampaignApiService;
+
+
+    /**
+     * 校验协同渠道时间是否在活动时间范围之内
+     *
+     * @return
+     */
+    @PostMapping("/channelEffectDateCheck")
+    @CrossOrigin
+    public Map<String, Object> channelEffectDateCheck(@RequestBody Map<String,Object> params){
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = mktCampaignService.channelEffectDateCheck(params);
+        } catch (Exception e) {
+            logger.error("[op:CampaignController] fail to channelEffectDateCheck",e);
+            result.put("resultCode",CODE_SUCCESS);
+            result.put("resultMsg","");
+            result.put("data","true");
+            return result;
+        }
+        return result;
+    }
 
 
     /**
@@ -490,6 +517,13 @@ public class CampaignController extends BaseController {
             logger.error("[op:CampaignController] failed to dueMktCampaign, Exception = ", e);
         }
         return JSON.toJSONString(mktCampaignMap);
+    }
+
+    @PostMapping("salesOffShelf")
+    @CrossOrigin
+    public Map<String,Object> salesOffShelf(){
+        Map<String, Object> stringObjectMap = mktCampaignApiService.salesOffShelf(new HashMap<String, Object>());
+        return stringObjectMap;
     }
 
 }

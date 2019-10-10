@@ -65,4 +65,10 @@ public interface MktCampaignMapper {
     List<MktCampaignDO> getMktCampaignDetailsForDate(@Param("mktCampaignId")List<String> s);
 
     List<MktCampaignDO> selectAllMktCampaignDetailsByStatus(@Param("status")List<String> status, @Param("staff")Long createStaffId);
+
+    List<Long> getUserListTempMktCamCodeList();
+
+    List<Long> getCreateStaffList();
+
+    void updateByStaffToC4AndC5(@Param("map")Map<String, Object> map);
 }

@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.service.campaign;
 
 import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
-import com.zjtelcom.cpct.dto.pojo.Result;
 
 import java.util.Date;
 import java.util.Map;
@@ -63,6 +62,8 @@ public interface MktCampaignService {
     Map<String, Object> dueMktCampaign();
 
     Map<String, Object> countMktCampaign(Map<String, Object> params);
+
+    Map<String, Object> channelEffectDateCheck(Map<String, Object> params);
 
     Result queryDelayCampaignList();
 
