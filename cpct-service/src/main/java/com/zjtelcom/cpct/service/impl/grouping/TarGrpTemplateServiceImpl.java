@@ -21,6 +21,7 @@ import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateMapper;
+import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO;
@@ -116,6 +117,8 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     private IOfferRestrictConfigureService iOfferRestrictConfigureService;
     @Autowired(required = false)
     private EsTarGrpTemplate esTarGrpTemplateService;
+    @Autowired
+    private SysParamsMapper systemParamMapper;
 
 
     /**
@@ -211,6 +214,37 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg", "导入成功,请稍后查看结果");
         return result;
+    }
+
+    @Override
+    public Map<String, Object> tarGrpTemplateScheduledBatchIssue() {
+        Map<String, Object> resultMap = new HashMap<>();
+        List<Map<String, String>> mapList = systemParamMapper.listParamsByKey("TARGRPTEMPLATE_SCHEDULED_BATCH");
+        List<String> failTarGrpIdList = new ArrayList<>();
+        Map<String, String> mapping = new HashMap<>();
+        if (mapList != null ) {
+            String[] tarGrpIds = mapList.get(0).get("value").split(",");
+            for (String tarGrpId : tarGrpIds) {
+                try {
+                    Map<String, Object> map = tarGrpTemplateCountAndIssue(tarGrpId, "2");
+                    mapping.put(tarGrpId, map.get("resultData") == null ? "" : map.get("resultData").toString());
+                }catch (Exception e) {
+                    failTarGrpIdList.add(tarGrpId);
+                    logger.error("tarGrpTemplateScheduledBatchIssue=>分群定时批量下发报错" + tarGrpId);
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (failTarGrpIdList.isEmpty()) {
+            resultMap.put("result", "succees");
+            resultMap.put("mapping", mapping);
+            return resultMap;
+        }else {
+            resultMap.put("result", "error");
+            resultMap.put("mapping", mapping);
+            resultMap.put("failTarGrpIdList", failTarGrpIdList);
+            return resultMap;
+        }
     }
 
     @Override

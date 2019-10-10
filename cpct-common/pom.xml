@@ -138,6 +138,13 @@
             <artifactId>bss-centralized-authenticate</artifactId>
         </dependency>
 
+        <!-- UCCP发送短信 -->
+        <dependency>
+            <groupId>com.ztesoft.uccp</groupId>
+            <artifactId>uccp_dubbo</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
         <!--<dependency>-->
         <!--<groupId>com.zjhcsoft.session</groupId>-->
         <!--<artifactId>spring-session</artifactId>-->

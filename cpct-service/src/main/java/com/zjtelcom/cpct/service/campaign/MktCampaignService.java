@@ -65,4 +65,8 @@ public interface MktCampaignService {
 
     Map<String, Object> channelEffectDateCheck(Map<String, Object> params);
 
+    Result queryDelayCampaignList();
+
+    void campaignDelayNotice();
+
 }
