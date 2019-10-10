@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 @Service
-public class targetGroupServiceImpl implements TarGrpService {
+public class TargetGroupServiceImpl implements TarGrpService {
 
     @Autowired
     private TarGrpTemplateService tarGrpTemplateService;
