@@ -41,8 +41,8 @@ public class UCCPServiceImpl implements UCCPService {
         //请求的时间,请求发起的时间,必须为下边的格式
         params.put("RequestTime",DateUtil.date2StringDate(new Date()));
         //接收消息推送的手机号码
-        params.put("AccNbr",targPhone);
-        //params.put("AccNbr","18957181789");
+        //params.put("AccNbr",targPhone);
+        params.put("AccNbr","18957181789");
         //消息内容
         params.put("OrderContent",sendContent);
         //本地网/辖区
