@@ -1419,8 +1419,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         if (filterRuleList!=null && !filterRuleList.isEmpty()){
             List<String> userList = new ArrayList<>();
             for (FilterRule filterRule : filterRuleList){
-                String[] users = filterRule.getUserList().split(",");
-                userList.addAll(Arrays.asList(users));
+                if (filterRule.getUserList()!=null && !"".equals(filterRule.getUserList())){
+                    String[] users = filterRule.getUserList().split(",");
+                    userList.addAll(Arrays.asList(users));
+                }
             }
             int num = userList.size()/100 + 1;
             List<List<String>> list = ChannelUtil.averageAssign(userList,num);
