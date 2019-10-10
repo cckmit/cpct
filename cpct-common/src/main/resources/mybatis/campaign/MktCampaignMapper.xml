@@ -884,4 +884,12 @@
         </set>
         WHERE CREATE_STAFF = #{map.aLong}
     </update>
+
+    <update id="updateMktCampaignByC4OfSysArea" parameterType="java.util.Map">
+         UPDATE mkt_campaign SET LAN_ID_FOUR =#{map.areaId} WHERE LAN_ID_FOUR = #{map.orgId}
+    </update>
+
+    <select id="getByOrgNameC4IsNotNull" resultType="java.lang.Long">
+        SELECT LAN_ID_FOUR from mkt_campaign WHERE LAN_ID_FOUR IS NOT NULL GROUP BY LAN_ID_FOUR
+    </select>
 </mapper>
