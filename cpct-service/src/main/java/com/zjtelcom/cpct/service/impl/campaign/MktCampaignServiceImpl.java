@@ -2463,6 +2463,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         list.add(STATUS_CODE_PUBLISHED.getStatusCode());
         List<MktCampaignDO> mktCampaignDOS = mktCampaignMapper.selectAllMktCampaignDetailsByStatus(list,null);
         int i = 0;
+        List<String> sendFailList = new ArrayList();
         for (MktCampaignDO mktCampaignDO : mktCampaignDOS) {
             try {
                 if (mktCampaignDO.getPlanEndTime().after(new Date()) && DateUtil.daysBetween(new Date(), mktCampaignDO.getPlanEndTime()) == 7) {
@@ -2478,6 +2479,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                             uccpService.sendShortMessage(sysUserCode, sendContent, lanId.toString());
                             i++;
                         } catch (Exception e) {
+                            sendFailList.add(mktCampaignDO.getMktCampaignId().toString());
                             logger.error(sysUserCode);
                             e.printStackTrace();
                         }
@@ -2487,7 +2489,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 e.printStackTrace();
             }
         }
-        System.out.println("共发送数量=>" + i);
+        System.out.println("共发送数量=>" + i + ",发送失败活动：" + JSON.toJSONString(sendFailList));
     }
 
 
