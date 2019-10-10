@@ -39,4 +39,6 @@ public interface TarGrpTemplateService {
     Map<String, Object> importUserList4TarTemp(MultipartFile file,String tempName)throws IOException ;
 
     Map<String, Object> tarGrpTemplateCountAndIssue(String tarGrpTemplateId, String operationType);
+
+    Map<String, Object> tarGrpTemplateScheduledBatchIssue();
 }

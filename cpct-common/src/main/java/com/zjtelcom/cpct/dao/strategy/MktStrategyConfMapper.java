@@ -23,6 +23,6 @@ public interface MktStrategyConfMapper {
 
     List<MktStrategyConfDO> selectByCampaignId(@Param("campaignId")Long campaignId);
 
-
+    List<MktStrategyConfDO> selectByIdList(@Param("idList")List<String> idList);
 
 }

@@ -326,7 +326,7 @@
         </choose>
         ORDER BY UPDATE_DATE DESC
     </select>
-    
+
     <select id="selectFilterRuleByRuleName" parameterType="java.lang.String" resultMap="BaseResultMap">
         select RULE_ID, RULE_NAME, FILTER_TYPE,
                EXECUTION_CHANNEL, CHANNEL_CONTACTS, EFFECTIVE_DATE,

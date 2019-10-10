@@ -88,9 +88,10 @@ ctg:
 pagehelper:
   reasonable: true   # 禁用合理化时，如果pageNum<1或pageNum>pages会返回空数据
 
+#uccp短信平台账号配置
+uccp:
+  userAcct: CPCPYX
+  password: 908234
+  sceneId: 7149
 
-#importUserListNecessaryField:
-#  QD00014:
-#    nameList: 客户类型,区域ID,客户联系人,客户联系号码,账户ID,星级,接单人号码
-#    codeList: CORP_USER_NAME,AREA_ID,LINKMAN_NAME,CCUST_TEL,CACCT_ID,MKT_STAR_GRADE_NAME,SALE_EMP_NBR
 

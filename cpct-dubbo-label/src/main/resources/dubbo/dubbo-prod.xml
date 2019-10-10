@@ -30,6 +30,7 @@
         <dubbo:method name="cpcLog2WriteFileLabel" servicecode="33.1083.cpcLog2WriteFileLabel" timeout="10000"/>
         <dubbo:method name="dueMktCampaign" servicecode="33.1083.dueMktCampaign" timeout="10000"/>
         <dubbo:method name="importUserListByExcel" servicecode="33.1083.importUserListByExcel" timeout="10000"/>
+        <dubbo:method name="sendMsgByOfferOver" servicecode="33.1083.sendMsgByOfferOver" timeout="10000"/>
     </dubbo:service>
 
     <!-- 更新试算日志 -->
@@ -63,5 +64,10 @@
                       id="iSystemUserDtoDubboService" version="1.0" retries="0" check="false">
         <dubbo:method name="qrySystemUserDto" servicecode="00.1077.qrySystemUserDto" timeout="10000"/>
     </dubbo:reference>
+
+    <!-- 分群定时批量下发 -->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.TargetGroupService" ref="targetGroupServiceImpl" version="1.0" >
+        <dubbo:method name="tarGrpTemplateScheduledBatchIssue" servicecode="33.1083.tarGrpTemplateScheduledBatchIssue" timeout="10000"/>
+    </dubbo:service>
 
 </beans>

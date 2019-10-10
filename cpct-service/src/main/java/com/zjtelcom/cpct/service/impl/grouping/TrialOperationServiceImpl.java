@@ -11,10 +11,7 @@ import com.jcraft.jsch.JSchException;
 import com.mysql.jdbc.StringUtils;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
-import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
-import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
-import com.zjtelcom.cpct.dao.channel.MktCamCustMapper;
-import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
+import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.filter.CloseRuleMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper;
@@ -198,6 +195,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private OrgTreeService orgTreeService;
     @Autowired
     private ContactChannelMapper channelMapper;
+    @Autowired
+    private OrganizationMapper organizationMapper;
 
     //抽样展示全量试算记录
     @Override
@@ -205,6 +204,58 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         TrialOperation trialOperation = trialOperationMapper.selectByPrimaryKey(id);
         return esServiceInfo.showCalculationLog(trialOperation.getBatchNum().toString());
 
+    }
+
+    //xyl 补全mkt_campaign c4 c5 地市编码
+    @Override
+    public Map<String, Object> insertMktCampaignByC4AndC5() {
+        List<Long> staffList = campaignMapper.getCreateStaffList();
+        Long orgId = null;
+        for (Long aLong : staffList) {
+            SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(aLong, new ArrayList<Long>());
+            if (systemUserDtoSysmgrResultObject != null) {
+                if (systemUserDtoSysmgrResultObject.getResultObject()==null || systemUserDtoSysmgrResultObject.getResultObject().getStaffId()==null){
+                    continue;
+                }
+                Long staffId = systemUserDtoSysmgrResultObject.getResultObject().getStaffId();
+                List<Map<String, Object>> staffOrgId = organizationMapper.getStaffOrgId(staffId);
+                if (!staffOrgId.isEmpty() && staffOrgId.size() > 0){
+                    for (Map<String, Object> map : staffOrgId) {
+                        Object orgDivision = map.get("orgDivision");
+                        Object orgId1 = map.get("orgId");
+                        if (orgDivision!=null){
+                            if (orgDivision.toString().equals("30")) {
+                                orgId = Long.valueOf(orgId1.toString());
+                                break;
+                            }else if (orgDivision.toString().equals("20")){
+                                orgId = Long.valueOf(orgId1.toString());
+                                break;
+                            }else if (orgDivision.toString().equals("10")){
+                                orgId = Long.valueOf(orgId1.toString());
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (orgId==null) return null;
+                Organization organization = organizationMapper.selectByPrimaryKey(orgId);
+                if (organization!=null){
+                    String orgNameC4 = organization.getOrgNameC4();
+                    String orgNameC5 = organization.getOrgNameC5();
+                    if (org.apache.commons.lang3.StringUtils.isNotBlank(orgNameC4) || org.apache.commons.lang3.StringUtils.isNotBlank(orgNameC5)){
+                        HashMap<String, Object> map = new HashMap<>();
+                        map.put("orgNameC4",orgNameC4);
+                        map.put("orgNameC5",orgNameC5);
+                        map.put("aLong",aLong);
+                        campaignMapper.updateByStaffToC4AndC5(map);
+                    }
+                }
+            }
+        }
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("code","200");
+        result.put("msg","补全mkt_campaign c4 c5 地市编码");
+        return result;
     }
 
 
@@ -1324,6 +1375,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         }
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg", "导入成功,请稍后查看结果");
+        redisUtils_es.set("YOUR_SO_BEAUTIFUL_" + batchNumSt, batchNumSt);
         return result;
     }
 
@@ -2370,6 +2422,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         map.put("resultMsg","成功");
         return map;
     }
+
+
 
     public static boolean delFile(String path) {
         Boolean bool = false;
