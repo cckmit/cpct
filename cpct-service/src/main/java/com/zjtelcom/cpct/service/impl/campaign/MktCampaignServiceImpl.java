@@ -2464,23 +2464,27 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         List<MktCampaignDO> mktCampaignDOS = mktCampaignMapper.selectAllMktCampaignDetailsByStatus(list,null);
         int i = 0;
         for (MktCampaignDO mktCampaignDO : mktCampaignDOS) {
-            if (mktCampaignDO.getPlanEndTime().after(new Date()) && DateUtil.daysBetween(new Date(), mktCampaignDO.getPlanEndTime()) == 7) {
-                Long staff = mktCampaignDO.getCreateStaff();
-                SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(staff, new ArrayList<Long>());
-                if (systemUserDtoSysmgrResultObject != null && systemUserDtoSysmgrResultObject.getResultObject() != null) {
-                    String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
-                    Long lanId = systemUserDtoSysmgrResultObject.getResultObject().getLanId();
-                    // TODO  调用发送短信接口
-                    String sendContent = "您好，您创建的活动（" + mktCampaignDO.getMktCampaignName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
-                    System.out.println(sendContent);
-                    try {
-                        uccpService.sendShortMessage(sysUserCode, sendContent, lanId.toString());
-                        i++;
-                    } catch (Exception e) {
-                        logger.error(sysUserCode);
-                        e.printStackTrace();
+            try {
+                if (mktCampaignDO.getPlanEndTime().after(new Date()) && DateUtil.daysBetween(new Date(), mktCampaignDO.getPlanEndTime()) == 7) {
+                    Long staff = mktCampaignDO.getCreateStaff();
+                    SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(staff, new ArrayList<Long>());
+                    if (systemUserDtoSysmgrResultObject != null && systemUserDtoSysmgrResultObject.getResultObject() != null) {
+                        String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
+                        Long lanId = systemUserDtoSysmgrResultObject.getResultObject().getLanId();
+                        // TODO  调用发送短信接口
+                        String sendContent = "您好，您创建的活动（" + mktCampaignDO.getMktCampaignName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
+                        System.out.println(sendContent);
+                        try {
+                            uccpService.sendShortMessage(sysUserCode, sendContent, lanId.toString());
+                            i++;
+                        } catch (Exception e) {
+                            logger.error(sysUserCode);
+                            e.printStackTrace();
+                        }
                     }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         System.out.println("共发送数量=>" + i);
