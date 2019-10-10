@@ -209,11 +209,14 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     //xyl 补全mkt_campaign c4 c5 地市编码
     @Override
     public Map<String, Object> insertMktCampaignByC4AndC5() {
-       List<Long> staffList = campaignMapper.getCreateStaffList();
+        List<Long> staffList = campaignMapper.getCreateStaffList();
         Long orgId = null;
         for (Long aLong : staffList) {
             SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(aLong, new ArrayList<Long>());
             if (systemUserDtoSysmgrResultObject != null) {
+                if (systemUserDtoSysmgrResultObject.getResultObject()==null || systemUserDtoSysmgrResultObject.getResultObject().getStaffId()==null){
+                    continue;
+                }
                 Long staffId = systemUserDtoSysmgrResultObject.getResultObject().getStaffId();
                 List<Map<String, Object>> staffOrgId = organizationMapper.getStaffOrgId(staffId);
                 if (!staffOrgId.isEmpty() && staffOrgId.size() > 0){
@@ -239,11 +242,13 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 if (organization!=null){
                     String orgNameC4 = organization.getOrgNameC4();
                     String orgNameC5 = organization.getOrgNameC5();
-                    HashMap<String, Object> map = new HashMap<>();
-                    map.put("orgNameC4",orgNameC4);
-                    map.put("orgNameC5",orgNameC5);
-                    map.put("aLong",aLong);
-                    campaignMapper.updateByStaffToC4AndC5(map);
+                    if (org.apache.commons.lang3.StringUtils.isNotBlank(orgNameC4) || org.apache.commons.lang3.StringUtils.isNotBlank(orgNameC5)){
+                        HashMap<String, Object> map = new HashMap<>();
+                        map.put("orgNameC4",orgNameC4);
+                        map.put("orgNameC5",orgNameC5);
+                        map.put("aLong",aLong);
+                        campaignMapper.updateByStaffToC4AndC5(map);
+                    }
                 }
             }
         }
