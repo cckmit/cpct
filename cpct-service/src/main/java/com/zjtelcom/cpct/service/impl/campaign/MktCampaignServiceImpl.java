@@ -1996,6 +1996,24 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         }
     }
 
+    //xyl 活动发布 一些活动直接做全量试算
+    private void UserListTemp(Long mktCampaignId, Long initId) {
+        List<Long> mktCamCodeList = mktCampaignMapper.getUserListTempMktCamCodeList();
+        if (mktCamCodeList.contains(initId.toString())) {
+            new Thread() {
+                public void run() {
+                    logger.info("清单活动发布全量算清单：" + mktCampaignId + " INIT_ID:" + initId);
+                    Map<String, Object> params = new HashMap<>();
+                    List<Integer> arrayList = new ArrayList<>();
+                    arrayList.add(Integer.valueOf(mktCampaignId.toString()));
+                    params.put("userListCam", "BIG_DATA_TEMP");
+                    params.put("idList", arrayList);
+                    trialProdService.campaignIndexTask(params);
+                }
+            }.start(); //BIG_DATA_TEMP
+        }
+
+    }
 
     /**
      * 根据地市生成子需求函，子活动和子需求函的关联，和指定的承接人员
