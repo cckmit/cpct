@@ -64,5 +64,11 @@ ctg:
   pushGroupName2 : cpct_file_import2
   pushTopic : cpct_push_end_topic
 
+#uccp短信平台账号配置
+uccp:
+  userAcct: CPCPYX
+  password: 908234
+  sceneId: 7149
+
 
 
