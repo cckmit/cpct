@@ -46,4 +46,6 @@ public interface TrialOperationService  {
     // xyl 补全mkt_campaign c4 c5 地市编码
     Map<String,Object> insertMktCampaignByC4AndC5();
 
+    //xyl 修改补全C4 地市编码改为sys_area 对应参数
+    Map<String,Object> insertMktCampaignByC4OfSysArea();
 }

@@ -21,7 +21,9 @@ import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
+import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
+import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
@@ -197,6 +199,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private ContactChannelMapper channelMapper;
     @Autowired
     private OrganizationMapper organizationMapper;
+    @Autowired
+    private SysAreaMapper sysAreaMapper;
 
     //抽样展示全量试算记录
     @Override
@@ -255,6 +259,34 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         HashMap<String, Object> result = new HashMap<>();
         result.put("code","200");
         result.put("msg","补全mkt_campaign c4 c5 地市编码");
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> insertMktCampaignByC4OfSysArea() {
+        List<Long> lists =  campaignMapper.getByOrgNameC4IsNotNull();
+        for (Long orgId : lists) {
+            Organization organization = organizationMapper.selectByPrimaryKey(orgId);
+            if (organization!=null){
+                String orgNameC4 = organization.getOrgNameC4();
+                Organization organizationC4 = organizationMapper.selectByPrimaryKey(Long.valueOf(orgNameC4));
+                if (organizationC4!=null){
+                    Long regionId = organizationC4.getRegionId();
+                    if (regionId!=null){
+                        SysArea sysArea =sysAreaMapper.getByCityFour(regionId.toString());
+                        if (sysArea!=null && sysArea.getCityFour()!=null){
+                            HashMap<String, Object> map = new HashMap<>();
+                            map.put("orgId",orgId);
+                            map.put("areaId",sysArea.getAreaId());
+                            campaignMapper.updateMktCampaignByC4OfSysArea(map);
+                        }
+                    }
+                }
+            }
+        }
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("code","200");
+        result.put("msg","修改补全mkt_campaign c4 地市编码");
         return result;
     }
 
@@ -1419,8 +1451,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         if (filterRuleList!=null && !filterRuleList.isEmpty()){
             List<String> userList = new ArrayList<>();
             for (FilterRule filterRule : filterRuleList){
-                String[] users = filterRule.getUserList().split(",");
-                userList.addAll(Arrays.asList(users));
+                if (filterRule.getUserList()!=null && !"".equals(filterRule.getUserList())){
+                    String[] users = filterRule.getUserList().split(",");
+                    userList.addAll(Arrays.asList(users));
+                }
             }
             int num = userList.size()/100 + 1;
             List<List<String>> list = ChannelUtil.averageAssign(userList,num);

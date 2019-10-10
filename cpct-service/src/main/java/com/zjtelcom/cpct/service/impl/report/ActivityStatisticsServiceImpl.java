@@ -280,8 +280,10 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         //活动ID
         Object mktCampaignId = params.get("mktCampaignId");
         if ((mktCampaignName == null || mktCampaignName == "") && (mktCampaignId == null || mktCampaignId == "")) {
-            paramMap.put("resultCode", CODE_FAIL);
-            return paramMap;
+//            paramMap.put("resultCode", CODE_FAIL);
+//            return paramMap;
+            paramMap.put("mktCampaignId", "");
+            paramMap.put("mktCampaignName", "");
         }
         if (mktCampaignId != null && mktCampaignId != "") {
             paramMap.put("mktCampaignId", mktCampaignId);
@@ -406,8 +408,10 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         //活动ID
         Object mktCampaignId = params.get("mktCampaignId");
         if ((mktCampaignName == null || mktCampaignName == "") && (mktCampaignId == null || mktCampaignId == "")) {
-            paramMap.put("resultCode", CODE_FAIL);
-            return paramMap;
+//            paramMap.put("resultCode", CODE_FAIL);
+//            return paramMap;
+            paramMap.put("mktCampaignId", "");
+            paramMap.put("mktCampaignName", "");
         }
         if (mktCampaignId != null && mktCampaignId != "") {
             paramMap.put("mktCampaignId", mktCampaignId);

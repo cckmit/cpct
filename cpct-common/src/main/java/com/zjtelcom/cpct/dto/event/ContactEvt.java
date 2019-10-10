@@ -29,6 +29,10 @@ public class ContactEvt extends BaseEntity implements Serializable {
     private String evtTrigType;//记录事件的触发类型,1000实时触发事件 2000定期触发事件 3000人工触发事件
     private String coopType;//记录推送渠道协同类型，
     private Long extEventId;//记录集团下发的事件标识
+    private String locationNbr;//位置编号
+    private String longitude;//经度
+    private String latitude;//纬度
+    private String locationSwitch;//位置切换开关
 
     public String getRecCampaignAmount() {
         return recCampaignAmount;
@@ -164,5 +168,37 @@ public class ContactEvt extends BaseEntity implements Serializable {
 
     public void setContactEvtTypeName(String contactEvtTypeName) {
         this.contactEvtTypeName = contactEvtTypeName;
+    }
+
+    public String getLocationNbr() {
+        return locationNbr;
+    }
+
+    public void setLocationNbr(String locationNbr) {
+        this.locationNbr = locationNbr;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getLocationSwitch() {
+        return locationSwitch;
+    }
+
+    public void setLocationSwitch(String locationSwitch) {
+        this.locationSwitch = locationSwitch;
     }
 }
