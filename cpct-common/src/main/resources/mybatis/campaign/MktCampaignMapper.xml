@@ -778,6 +778,23 @@
         ORDER BY t.CREATE_DATE DESC
     </select>
 
+    <select id="selectAllMktCampaignDetailsByStatus" parameterType="java.util.List" resultMap="BaseResultMap">
+        select MKT_CAMPAIGN_ID, INIT_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
+        BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MANAGE_TYPE, MKT_ACTIVITY_NBR,
+        MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD,
+        STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID,
+        CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE, SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID,EXEC_INIT_TIME
+        from mkt_campaign
+        where STATUS_CD in
+        <foreach item="item" index="index" collection="status" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+        <if test="staff != null">
+          and CREATE_STAFF = #{staff}
+        </if>
+
+    </select>
+
     <select id="getUserListTempMktCamCodeList" resultType="java.lang.Long">
         SELECT
         t.INIT_ID

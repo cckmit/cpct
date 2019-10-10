@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ImportResource;
 
 @SpringBootApplication
-@ImportResource("classpath:dubbo/dubbo-${spring.profiles.active}.xml")
+/*@ImportResource("classpath:dubbo/dubbo-${spring.profiles.active}.xml")*/
 public class LabelServerApplication {
 
     public static Logger logger = LoggerFactory.getLogger(LabelServerApplication.class);

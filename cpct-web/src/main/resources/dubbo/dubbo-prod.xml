@@ -100,4 +100,10 @@
     <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MqProducerService" id="mqProducerService" version="1.0" check="false">
         <dubbo:method name="msg2ESLogProducer" servicecode="00.1083.msg2ESLogProducer" timeout="120000"/>
     </dubbo:reference>
+
+    <!-- UCCP短信发送 -->
+    <dubbo:reference registry="esb3" interface="com.ztesoft.uccp.dubbo.interfaces.UCCPSendService" id="uCCPSendService" version="1.0" check="false">
+        <dubbo:method name="sendShortMessage" servicecode="33.1099.sendShortMessage" timeout="120000"/>
+    </dubbo:reference>
+
 </beans>
