@@ -56,6 +56,8 @@ public interface MktCampaignMapper {
 
     int countByStatus(@Param("map")Map<String, Object> map);
 
+    int countBylanIdFour(@Param("map")Map<String, Object> map);
+
     int countByTrial(@Param("map")Map<String, Object> map);
 
     List<MktCampaignDO> queryRptBatchOrderForMktCampaign(HashMap<String, Object> paramMap);
