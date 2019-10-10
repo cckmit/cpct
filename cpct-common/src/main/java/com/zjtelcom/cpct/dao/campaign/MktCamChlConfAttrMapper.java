@@ -34,4 +34,7 @@ public interface MktCamChlConfAttrMapper {
     List<String> selectAttrLabelRemarkByCampaignId(@Param("campaignId") Long campaignId);
 
     List<MktCamChlConfAttrDO> selectAttrEndDateByCampaignId(@Param("campaignId") Long campaignId);
+
+    List<MktCamChlConfAttrDO> selectAttrStartDateByCampaignId(@Param("campaignId") Long campaignId);
+
 }

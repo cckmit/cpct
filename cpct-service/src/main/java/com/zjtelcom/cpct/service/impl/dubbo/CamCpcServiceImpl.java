@@ -42,6 +42,7 @@ import com.zjtelcom.cpct.elastic.service.EsHitService;
 import com.zjtelcom.cpct.enums.AreaNameEnum;
 import com.zjtelcom.cpct.service.dubbo.CamCpcService;
 import com.zjtelcom.cpct.service.es.EsHitsService;
+import com.zjtelcom.cpct.service.system.SysParamsService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
@@ -145,6 +146,9 @@ public class CamCpcServiceImpl implements CamCpcService {
 
     @Autowired(required = false)
     private ICacheProdIndexQryService iCacheProdIndexQryService;
+
+    @Autowired
+    private SysParamsService sysParamsService;
 
     Map<String,Boolean> flagMap = new ConcurrentHashMap();
 
@@ -274,6 +278,10 @@ public class CamCpcServiceImpl implements CamCpcService {
                         boolean productCheck = true; // 默认拦截
                         //获取需要过滤的销售品
                         String checkProduct = filterRule.getChooseProduct();
+                        String s = sysParamsService.systemSwitch("PRODUCT_FILTER_SWITCH");
+                        if (s != null && s.equals("code")) {
+                            checkProduct = filterRule.getChooseProductCode();
+                        }
                         if (checkProduct != null && !"".equals(checkProduct)) {
                             String esMsg = "";
                             //获取用户已办理销售品
@@ -914,8 +922,13 @@ public class CamCpcServiceImpl implements CamCpcService {
                         if ("PROM_LIST".equals(labelMap.get("code")) && "1".equals(realProdFilter)) {
                             FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.valueOf(labelMap.get("rightParam")));
                             if (filterRule != null) {
-                                lr.setRightOperand(filterRule.getChooseProduct());
-                                labelMap.put("rightParam", filterRule.getChooseProduct());
+                                String checkProduct = filterRule.getChooseProduct();
+                                String s = sysParamsService.systemSwitch("PRODUCT_FILTER_SWITCH");
+                                if (s != null && s.equals("code")) {
+                                    checkProduct = filterRule.getChooseProductCode();
+                                }
+                                lr.setRightOperand(checkProduct);
+                                labelMap.put("rightParam", checkProduct);
                             } else {
                                 jsonObject.put("hit", "false");
                                 jsonObject.put("msg", "未查询销售品过滤规则");
@@ -1952,7 +1965,12 @@ public class CamCpcServiceImpl implements CamCpcService {
                 lr.setLabelName(labelMap.get("name"));
                 if ("PROM_LIST".equals(labelMap.get("code"))) {
                     FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.valueOf(labelMap.get("rightParam")));
-                    lr.setRightOperand(filterRule.getChooseProduct());
+                    String checkProduct = filterRule.getChooseProduct();
+                    String s = sysParamsService.systemSwitch("PRODUCT_FILTER_SWITCH");
+                    if (s != null && s.equals("code")) {
+                        checkProduct = filterRule.getChooseProductCode();
+                    }
+                    lr.setRightOperand(checkProduct);
                 } else {
                     lr.setRightOperand(labelMap.get("rightParam"));
                 }

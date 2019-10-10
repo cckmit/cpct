@@ -833,14 +833,21 @@ public class DateUtil {
      * @param compareDate
      * @return
      */
-    public static int daysBetween(Date targetDate,Date compareDate) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(targetDate);
-        long targetTime = cal.getTimeInMillis();
-        cal.setTime(compareDate);
-        long compareTime = cal.getTimeInMillis();
-        long between_days=(compareTime - targetTime) / (1000 * 3600 * 24);
-        return Integer.parseInt(String.valueOf(between_days));
+    public static Integer daysBetween(Date targetDate,Date compareDate) {
+        try {
+            //设置转换的日期格式
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            //开始时间
+            Date startDate = sdf.parse(sdf.format(targetDate));
+            //结束时间
+            Date endDate = sdf.parse(sdf.format(compareDate));
+            //得到相差的天数 betweenDate
+            long between_days = (endDate.getTime() - startDate.getTime()) / (60 * 60 * 24 * 1000);
+            return Integer.parseInt(String.valueOf(between_days));
+        }catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
     /**

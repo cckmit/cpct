@@ -33,10 +33,8 @@ import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRuleRel;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.pojo.*;
 import com.zjtelcom.cpct.service.cpct.MktCampaignJTService;
-import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.CopyPropertiesUtil;
-import com.zjtelcom.cpct.util.ResultUtil;
-import com.zjtelcom.cpct.util.UserUtil;
+import com.zjtelcom.cpct.util.*;
+import com.ztesoft.uccp.dubbo.interfaces.UCCPSendService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -536,6 +534,4 @@ public class MktCampaignJTServiceImpl implements MktCampaignJTService {
         resultObject.put("mktCampaigns", campaignResult);
         return ResultUtil.buildSuccessResult(resultObject);
     }
-
-
 }
