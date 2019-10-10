@@ -51,8 +51,6 @@ public class CampaignController extends BaseController {
     private MktCampaignApiService mktCampaignApiService;
 
 
-
-
     /**
      * 校验协同渠道时间是否在活动时间范围之内
      *
@@ -73,6 +71,7 @@ public class CampaignController extends BaseController {
         }
         return result;
     }
+
 
     /**
      * 同步活动列表--活动延期

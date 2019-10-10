@@ -1695,6 +1695,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 if (STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)) {
                     //活动发布若是清单活动重新试算全量清单
                     UserListTemp(mktCampaignId, mktCampaignDO);
+                    UserListTemp(mktCampaignId,mktCampaignDO.getInitId());
                 }
                 // 发布调整的活动，下线源活动
                 if (STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd) && !mktCampaignId.equals(initId)) {
@@ -1992,6 +1993,26 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }.start();
         }
     }
+
+    //xyl 活动发布 一些活动直接做全量试算
+    private void UserListTemp(Long mktCampaignId, Long initId) {
+        List<Long> mktCamCodeList = mktCampaignMapper.getUserListTempMktCamCodeList();
+        if (mktCamCodeList.contains(initId.toString())) {
+            new Thread() {
+                public void run() {
+                    logger.info("清单活动发布全量算清单：" + mktCampaignId + " INIT_ID:" + initId);
+                    Map<String, Object> params = new HashMap<>();
+                    List<Integer> arrayList = new ArrayList<>();
+                    arrayList.add(Integer.valueOf(mktCampaignId.toString()));
+                    params.put("userListCam", "BIG_DATA_TEMP");
+                    params.put("idList", arrayList);
+                    trialProdService.campaignIndexTask(params);
+                }
+            }.start(); //BIG_DATA_TEMP
+        }
+
+    }
+
 
 
     /**
@@ -2574,27 +2595,33 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         list.add(STATUS_CODE_PUBLISHED.getStatusCode());
         List<MktCampaignDO> mktCampaignDOS = mktCampaignMapper.selectAllMktCampaignDetailsByStatus(list,null);
         int i = 0;
+        List<String> sendFailList = new ArrayList();
         for (MktCampaignDO mktCampaignDO : mktCampaignDOS) {
-            if (mktCampaignDO.getPlanEndTime().after(new Date()) && DateUtil.daysBetween(new Date(), mktCampaignDO.getPlanEndTime()) == 7) {
-                Long staff = mktCampaignDO.getCreateStaff();
-                SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(staff, new ArrayList<Long>());
-                if (systemUserDtoSysmgrResultObject != null && systemUserDtoSysmgrResultObject.getResultObject() != null) {
-                    String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
-                    Long lanId = systemUserDtoSysmgrResultObject.getResultObject().getLanId();
-                    // TODO  调用发送短信接口
-                    String sendContent = "您好，您创建的活动（" + mktCampaignDO.getMktCampaignName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
-                    System.out.println(sendContent);
-                    try {
-                        uccpService.sendShortMessage(sysUserCode, sendContent, lanId.toString());
-                        i++;
-                    } catch (Exception e) {
-                        logger.error(sysUserCode);
-                        e.printStackTrace();
+            try {
+                if (mktCampaignDO.getPlanEndTime().after(new Date()) && DateUtil.daysBetween(new Date(), mktCampaignDO.getPlanEndTime()) == 7) {
+                    Long staff = mktCampaignDO.getCreateStaff();
+                    SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(staff, new ArrayList<Long>());
+                    if (systemUserDtoSysmgrResultObject != null && systemUserDtoSysmgrResultObject.getResultObject() != null) {
+                        String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
+                        Long lanId = systemUserDtoSysmgrResultObject.getResultObject().getLanId();
+                        // TODO  调用发送短信接口
+                        String sendContent = "您好，您创建的活动（" + mktCampaignDO.getMktCampaignName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
+                        System.out.println(sendContent);
+                        try {
+                            uccpService.sendShortMessage(sysUserCode, sendContent, lanId.toString());
+                            i++;
+                        } catch (Exception e) {
+                            sendFailList.add(mktCampaignDO.getMktCampaignId().toString());
+                            logger.error(sysUserCode);
+                            e.printStackTrace();
+                        }
                     }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-        System.out.println("共发送数量=>" + i);
+        System.out.println("共发送数量=>" + i + ",发送失败活动：" + JSON.toJSONString(sendFailList));
     }
 
     // 表格中的类型统计
@@ -2921,7 +2948,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             lineResultMap.put("areaId", areaId);
             lineResultMap.put("name", name);
             lineResultMap.put("data", lineMapList);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
