@@ -31,6 +31,7 @@ import com.zjtelcom.cpct.service.MktCampaignResp;
 import com.zjtelcom.cpct.service.MktStrConfRuleResp;
 import com.zjtelcom.cpct.service.MktStrategyConfResp;
 import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
+import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.DateUtil;
@@ -112,6 +113,9 @@ public class MktCampaignCpcServiceImpl implements MktCampaignApiService {
     @Autowired(required = false)
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
 
+    @Autowired
+    private UCCPService uccpService;
+
     @Override
     public Map<String, Object> qryMktCampaignDetail(Long mktCampaignId) throws Exception {
         // 获取活动基本信息
@@ -161,15 +165,24 @@ public class MktCampaignCpcServiceImpl implements MktCampaignApiService {
         List<Offer> offerList = offerMapper.selectOfferByOver(preDate,date);
         if (!offerList.isEmpty()){
             for (Offer offer : offerList) {
-                Long createStaff = offer.getCreateStaff();
-                if (createStaff!=null){
-                    SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(createStaff, new ArrayList<Long>());
-                    if (systemUserDtoSysmgrResultObject != null && systemUserDtoSysmgrResultObject.getResultObject() != null) {
-                        String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
-                        // TODO  调用发送短信接口
-
-
+                try {
+                    Long createStaff = offer.getCreateStaff();
+                    if (createStaff!=null){
+                        SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(createStaff, new ArrayList<Long>());
+                        if (systemUserDtoSysmgrResultObject != null && systemUserDtoSysmgrResultObject.getResultObject() != null) {
+                            String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
+                            String lanId = systemUserDtoSysmgrResultObject.getResultObject().getLanId().toString();
+                            // TODO  调用发送短信接口
+                            String sendContent = "您好，您的销售品（" + offer.getOfferName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
+                            try {
+                                uccpService.sendShortMessage(sysUserCode,sendContent,lanId);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
             }
         }
