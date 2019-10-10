@@ -259,7 +259,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Autowired
     private OrganizationMapper organizationMapper;
 
-    @Autowired
+    @Autowired(required = false)
     private UCCPService uccpService;
 
     //指定下发地市人员的数据集合
@@ -2997,6 +2997,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 List<SysArea> sysAreaC4List = ( List<SysArea>) sysC4AreaMap.get("sysAreaList");
                 List<Future<Map<String, Object>>> futureC4List = new ArrayList<>();
                 ExecutorService executorService = Executors.newCachedThreadPool();
+                paramMap.put("startTime", startDate);
+                paramMap.put("endTime", endDate);
                 for (SysArea sysArea : sysAreaC4List) {
                     Future<Map<String, Object>> futureMap = executorService.submit(new CountC4Task(paramMap, areaId.longValue(), sysArea.getAreaId().longValue(), sysArea.getName()));
                     futureC4List.add(futureMap);
