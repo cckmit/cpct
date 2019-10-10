@@ -295,7 +295,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
                 result.put("resultCode",CODE_SUCCESS);
                 result.put("resultMsg","协同渠道开始时间不符合规范，请检查规则：["+ruleName+"]");
-                result.put("data","false");
+                result.put("data","true");
                 return result;
             }
         }
@@ -315,13 +315,13 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
                 result.put("resultCode",CODE_SUCCESS);
                 result.put("resultMsg","协同渠道结束时间不符合规范，请检查规则：["+ruleName+"]");
-                result.put("data","false");
+                result.put("data","true");
                 return result;
             }
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","校验通过");
-        result.put("data","true");
+        result.put("data","false");
         return result;
     }
 
