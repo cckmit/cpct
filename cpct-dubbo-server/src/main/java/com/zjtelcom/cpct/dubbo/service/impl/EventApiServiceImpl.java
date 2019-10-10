@@ -753,8 +753,8 @@ public class EventApiServiceImpl implements EventApiService {
                 List<String> custLabelList = new ArrayList<>();
                 if (mktAllLabels.get("assetLabels") != null && !"".equals(mktAllLabels.get("assetLabels"))) {
                     assetLabelList = ChannelUtil.StringToList(mktAllLabels.get("assetLabels"));
-                    // 添加 PROM_INTEG_ID标签
-                    assetLabelList.add("PROM_INTEG_ID");
+                    // ASSI_PROM_INTEG_ID标签
+                    assetLabelList.add("ASSI_PROM_INTEG_ID");
                 }
                 if (mktAllLabels.get("promLabels") != null && !"".equals(mktAllLabels.get("promLabels"))) {
                     promLabelList = ChannelUtil.StringToList(mktAllLabels.get("promLabels"));

@@ -745,10 +745,10 @@ public class CamCpcServiceImpl implements CamCpcService {
             //初始化es log   规则使用
             JSONObject jsonObject = new JSONObject();
 
-            // 获取 PROM_INTEG_ID标签
+            // 获取 ASSI_PROM_INTEG_ID标签
             String promIntegId = "";
-            if (context.get("PROM_INTEG_ID") != null) {
-                promIntegId = (String) context.get("PROM_INTEG_ID");
+            if (context.get("ASSI_PROM_INTEG_ID") != null) {
+                promIntegId = (String) context.get("ASSI_PROM_INTEG_ID");
             }
 
             MktCampaignDO mktCampaignDO = null;
