@@ -1382,7 +1382,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setTiggerType(params.get("tiggerType").toString());             // 活动触发类型 - 实时，批量
             mktCampaignDO.setMktCampaignCategory(params.get("mktCampaignCategory").toString());  // 活动分类 - 框架，强制，自主
             mktCampaignDO.setMktCampaignType(params.get("mktCampaignType").toString());   // 活动类别 - 服务，营销，服务+营销
-            mktCampaignDO.setMktActivityNbr(params.get("mktActivityNbr").toString());   // 活动编码
+//            mktCampaignDO.setMktActivityNbr(params.get("mktActivityNbr").toString());   // 活动编码
             if (params.get("createStaff").toString() != null && !"".equals(params.get("createStaff").toString())) {
                 mktCampaignDO.setCreateStaff(Long.valueOf(params.get("createStaff").toString()));  // 创建人
             }
@@ -1531,7 +1531,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setTiggerType(params.get("tiggerType").toString());             // 活动触发类型 - 实时，批量
             mktCampaignDO.setMktCampaignCategory(params.get("mktCampaignCategory").toString());  // 活动分类 - 框架，强制，自主
             mktCampaignDO.setMktCampaignType(params.get("mktCampaignType").toString());   // 活动类别 - 服务，营销，服务+营销
-            mktCampaignDO.setMktActivityNbr(params.get("mktActivityNbr").toString());   // 活动编码
+//            mktCampaignDO.setMktActivityNbr(params.get("mktActivityNbr").toString());   // 活动编码
             if (params.get("createStaff").toString() != null && !"".equals(params.get("createStaff").toString())) {
                 mktCampaignDO.setCreateStaff(Long.valueOf(params.get("createStaff").toString()));  // 创建人
             }
