@@ -259,7 +259,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Autowired
     private OrganizationMapper organizationMapper;
 
-    @Autowired
+    @Autowired(required = false)
     private UCCPService uccpService;
 
     //指定下发地市人员的数据集合
@@ -295,7 +295,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
                 result.put("resultCode",CODE_SUCCESS);
                 result.put("resultMsg","协同渠道开始时间不符合规范，请检查规则：["+ruleName+"]");
-                result.put("data","false");
+                result.put("data","true");
                 return result;
             }
         }
@@ -315,13 +315,13 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
                 result.put("resultCode",CODE_SUCCESS);
                 result.put("resultMsg","协同渠道结束时间不符合规范，请检查规则：["+ruleName+"]");
-                result.put("data","false");
+                result.put("data","true");
                 return result;
             }
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","校验通过");
-        result.put("data","true");
+        result.put("data","false");
         return result;
     }
 
@@ -1382,6 +1382,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setTiggerType(params.get("tiggerType").toString());             // 活动触发类型 - 实时，批量
             mktCampaignDO.setMktCampaignCategory(params.get("mktCampaignCategory").toString());  // 活动分类 - 框架，强制，自主
             mktCampaignDO.setMktCampaignType(params.get("mktCampaignType").toString());   // 活动类别 - 服务，营销，服务+营销
+//            mktCampaignDO.setMktCampaignType(params.get("mktActivityNbr").toString());   // 活动编码
             if (params.get("createStaff").toString() != null && !"".equals(params.get("createStaff").toString())) {
                 mktCampaignDO.setCreateStaff(Long.valueOf(params.get("createStaff").toString()));  // 创建人
             }
@@ -1530,6 +1531,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setTiggerType(params.get("tiggerType").toString());             // 活动触发类型 - 实时，批量
             mktCampaignDO.setMktCampaignCategory(params.get("mktCampaignCategory").toString());  // 活动分类 - 框架，强制，自主
             mktCampaignDO.setMktCampaignType(params.get("mktCampaignType").toString());   // 活动类别 - 服务，营销，服务+营销
+//            mktCampaignDO.setMktCampaignType(params.get("mktActivityNbr").toString());   // 活动编码
             if (params.get("createStaff").toString() != null && !"".equals(params.get("createStaff").toString())) {
                 mktCampaignDO.setCreateStaff(Long.valueOf(params.get("createStaff").toString()));  // 创建人
             }
@@ -1996,6 +1998,24 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         }
     }
 
+    //xyl 活动发布 一些活动直接做全量试算
+    private void UserListTemp(Long mktCampaignId, Long initId) {
+        List<Long> mktCamCodeList = mktCampaignMapper.getUserListTempMktCamCodeList();
+        if (mktCamCodeList.contains(initId.toString())) {
+            new Thread() {
+                public void run() {
+                    logger.info("清单活动发布全量算清单：" + mktCampaignId + " INIT_ID:" + initId);
+                    Map<String, Object> params = new HashMap<>();
+                    List<Integer> arrayList = new ArrayList<>();
+                    arrayList.add(Integer.valueOf(mktCampaignId.toString()));
+                    params.put("userListCam", "BIG_DATA_TEMP");
+                    params.put("idList", arrayList);
+                    trialProdService.campaignIndexTask(params);
+                }
+            }.start(); //BIG_DATA_TEMP
+        }
+
+    }
 
     /**
      * 根据地市生成子需求函，子活动和子需求函的关联，和指定的承接人员
@@ -2875,6 +2895,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             cityCountMap.put("count", cityCount);
             cityCountMap.put("lanId", areaId);
             cityCountMap.put("name", name);
+            Date startDate = (Date) paramMap.get("startDate");
+            Date endDate = (Date) paramMap.get("endDate");
+
             // c4级别
             if (areaId != null && areaId != 1) {
                 List<Map<String, Object>> cityC4MapList = new ArrayList<>();
@@ -2883,7 +2906,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 List<Future<Map<String, Object>>> futureList = new ArrayList<>();
                 ExecutorService executorService = Executors.newCachedThreadPool();
                 for (SysArea sysArea : sysAreaC4List) {
-                    Future<Map<String, Object>> futureMap = executorService.submit(new CountC4Task(paramMap, areaId.longValue(), sysArea.getAreaId().longValue(), sysArea.getName()));
+                    Future<Map<String, Object>> futureMap = executorService.submit(new CountC4Task(paramMap, startDate, endDate, areaId.longValue(), sysArea.getAreaId().longValue(), sysArea.getName()));
                     futureList.add(futureMap);
                 }
                 executorService.shutdown();
@@ -2978,7 +3001,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 List<Future<Map<String, Object>>> futureC4List = new ArrayList<>();
                 ExecutorService executorService = Executors.newCachedThreadPool();
                 for (SysArea sysArea : sysAreaC4List) {
-                    Future<Map<String, Object>> futureMap = executorService.submit(new CountC4Task(paramMap, areaId.longValue(), sysArea.getAreaId().longValue(), sysArea.getName()));
+                    Future<Map<String, Object>> futureMap = executorService.submit(new CountC4Task(paramMap, startDate, endDate, areaId.longValue(), sysArea.getAreaId().longValue(), sysArea.getName()));
                     futureC4List.add(futureMap);
                 }
                 executorService.shutdown();
@@ -3003,12 +3026,16 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     class CountC4Task implements Callable<Map<String, Object>>{
 
         private Map<String, Object> paramMap;
+        private Date startDate;
+        private Date endDate;
         private Long LanId;
         private Long landIdFour;
         private String landIdFourName;
 
-        public CountC4Task(Map<String, Object> paramMap, Long lanId, Long landIdFour, String landIdFourName) {
+        public CountC4Task(Map<String, Object> paramMap, Date startDate, Date endDate, Long lanId, Long landIdFour, String landIdFourName) {
             this.paramMap = paramMap;
+            this.startDate = startDate;
+            this.endDate = endDate;
             LanId = lanId;
             this.landIdFour = landIdFour;
             this.landIdFourName = landIdFourName;
@@ -3020,6 +3047,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             c4ParamMap.putAll(paramMap);
             c4ParamMap.put("lanId", LanId);
             c4ParamMap.put("lanIdFour", landIdFour);
+            c4ParamMap.put("startTime", startDate);
+            c4ParamMap.put("endTime", endDate);
             int c4Count = mktCampaignMapper.countBylanIdFour(c4ParamMap);
 
             Map<String, Object> c4ResultMap = new HashMap<>();
@@ -3062,9 +3091,16 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             Organization organization = organizationMapper.selectByPrimaryKey(orgId);
             if (organization != null) {
                 Long regionId = organization.getRegionId();
-                Long landIdFour = AreaCodeEnum.getLandIdByRegionId(regionId / 100 * 100);
-                resutlMap.put("C4", landIdFour);
-                resutlMap.put("C5", Long.valueOf(organization.getOrgNameC5()));
+                if (regionId != null) {
+                    SysArea byCityFour = sysAreaMapper.getByCityFour(regionId.toString());
+                    if (byCityFour.getAreaId() != null) {
+                        resutlMap.put("C4", Long.valueOf(byCityFour.getAreaId()));
+                    }
+                    if (organization.getOrgNameC5() != null) {
+                        resutlMap.put("C5", Long.valueOf(organization.getOrgNameC5()));
+                    }
+                }
+
             }
         }
         return resutlMap;

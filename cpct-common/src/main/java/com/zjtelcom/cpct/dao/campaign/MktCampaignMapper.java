@@ -73,4 +73,9 @@ public interface MktCampaignMapper {
     List<Long> getCreateStaffList();
 
     void updateByStaffToC4AndC5(@Param("map")Map<String, Object> map);
+
+    void updateMktCampaignByC4OfSysArea(@Param("map")HashMap<String, Object> map);
+
+    List<Long> getByOrgNameC4IsNotNull();
+
 }
