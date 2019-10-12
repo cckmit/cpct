@@ -56,7 +56,7 @@ public class TestController extends BaseController {
     @Autowired(required = false)
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
     @Autowired(required = false)
-    private MktCampaignService campaignService;
+    private MktCampaignService mktCampaignService;
     @Autowired
     private LabelService labelService;
     @Autowired
@@ -104,7 +104,7 @@ public class TestController extends BaseController {
     @PostMapping("searchByCampaignId")
     @CrossOrigin
     public Object searchByCampaignId(Long campaignId) {
-        Map<String,Object> result = campaignService.searchByCampaignId(campaignId);
+        Map<String,Object> result = mktCampaignService.searchByCampaignId(campaignId);
         return result;
     }
 
@@ -236,6 +236,13 @@ public class TestController extends BaseController {
     public Map<String, Object> tarGrpTemplateScheduledBatchIssue() {
         return tarGrpTemplateService.tarGrpTemplateScheduledBatchIssue();
     }
+    @RequestMapping(value = "/salesOffShelf", method = RequestMethod.POST)
+    @CrossOrigin
+    public String salesOffShelf(@RequestBody  Map<String, Object> params) throws Exception {
+        Map<String, Object> map = mktCampaignApiService.salesOffShelf(new HashMap<>());
+        return JSON.toJSONString(map);
+    }
+
     @RequestMapping(value = "/salesOffShelf", method = RequestMethod.POST)
     @CrossOrigin
     public String salesOffShelf(@RequestBody  Map<String, Object> params) throws Exception {
