@@ -3000,7 +3000,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 List<Future<Map<String, Object>>> futureC4List = new ArrayList<>();
                 ExecutorService executorService = Executors.newCachedThreadPool();
                 for (SysArea sysArea : sysAreaC4List) {
-                    Future<Map<String, Object>> futureMap = executorService.submit(new CountC4Task(paramMap, areaId.longValue(), sysArea.getAreaId().longValue(), sysArea.getName()));
+                    Future<Map<String, Object>> futureMap = executorService.submit(new CountC4Task(paramMap, startDate, endDate, areaId.longValue(), sysArea.getAreaId().longValue(), sysArea.getName()));
                     futureC4List.add(futureMap);
                 }
                 executorService.shutdown();
