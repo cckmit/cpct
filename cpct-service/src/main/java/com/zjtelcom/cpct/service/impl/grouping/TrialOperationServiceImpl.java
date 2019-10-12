@@ -946,6 +946,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         ruleMap.put("closeName",closeR.getCloseName());
                         ruleMap.put("closeCode",closeR.getCloseCode());
                         ruleMap.put("closeNbr",closeR.getExpression());
+                        ruleMap.put("closeType",closeR.getCloseType());
                         closeRule.add(ruleMap);
                     }
                 }
@@ -1255,6 +1256,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         ruleMap.put("closeName",closeR.getCloseName());
                         ruleMap.put("closeCode",closeR.getCloseCode());
                         ruleMap.put("closeNbr",closeR.getExpression());
+                        ruleMap.put("closeType",closeR.getCloseType());
                         closeRule.add(ruleMap);
                     }
                 }
@@ -1866,6 +1868,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     ruleMap.put("closeName",closeR.getCloseName());
                     ruleMap.put("closeCode",closeR.getCloseCode());
                     ruleMap.put("closeNbr",closeR.getExpression());
+                    ruleMap.put("closeType",closeR.getCloseType());
                     closeRule.add(ruleMap);
                 }
             }
