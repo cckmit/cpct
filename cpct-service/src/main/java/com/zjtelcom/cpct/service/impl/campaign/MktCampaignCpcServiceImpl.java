@@ -163,11 +163,13 @@ public class MktCampaignCpcServiceImpl implements MktCampaignApiService {
         String preDay = DateUtil.getPreDay(1);
         Date preDate = DateUtil.string2DateTime4Day(preDay);
         List<Offer> offerList = offerMapper.selectOfferByOver(preDate,date);
-        if (!offerList.isEmpty()){
+        System.out.println("查询销售品长度："+offerList.size());
+        if (offerList!=null && offerList.size()>0){
             for (Offer offer : offerList) {
                 try {
                     if (offer.getCreateStaff()!=null){
                         SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(offer.getCreateStaff(), new ArrayList<Long>());
+                        System.out.println("查询用户信息是否执行？ 查看systemUserDtoSysmgrResultObject是否有值："+systemUserDtoSysmgrResultObject);
                         if (systemUserDtoSysmgrResultObject != null && systemUserDtoSysmgrResultObject.getResultObject() != null) {
                             String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
                             String lanId = systemUserDtoSysmgrResultObject.getResultObject().getLanId().toString();
