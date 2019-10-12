@@ -56,7 +56,7 @@ public class TestController extends BaseController {
     @Autowired(required = false)
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
     @Autowired(required = false)
-    private MktCampaignService mktCampaignService;
+    private MktCampaignService campaignService;
     @Autowired
     private LabelService labelService;
     @Autowired
@@ -104,7 +104,7 @@ public class TestController extends BaseController {
     @PostMapping("searchByCampaignId")
     @CrossOrigin
     public Object searchByCampaignId(Long campaignId) {
-        Map<String,Object> result = mktCampaignService.searchByCampaignId(campaignId);
+        Map<String,Object> result = campaignService.searchByCampaignId(campaignId);
         return result;
     }
 
