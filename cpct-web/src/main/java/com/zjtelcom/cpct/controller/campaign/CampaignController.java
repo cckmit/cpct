@@ -160,6 +160,7 @@ public class CampaignController extends BaseController {
         }catch(Exception e){
             result.setResultCode("500");
             result.setResultMessage(e.toString());
+            logger.error(e.getMessage());
         }
         return JSON.toJSONString(result);
     }

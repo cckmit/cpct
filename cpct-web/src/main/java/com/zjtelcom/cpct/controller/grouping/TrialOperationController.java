@@ -390,4 +390,20 @@ public class TrialOperationController extends BaseController {
         return result;
     }
 
+
+    @PostMapping("insertMktCampaignByC4OfSysArea")
+    @CrossOrigin
+    public Map<String,Object> insertMktCampaignByC4OfSysArea (){
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = operationService.insertMktCampaignByC4OfSysArea();
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to importUserListByExcel", e);
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", " fail to importUserListByExcel");
+            return result;
+        }
+        return result;
+    }
+
 }

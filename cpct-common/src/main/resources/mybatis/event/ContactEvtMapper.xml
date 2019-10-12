@@ -16,6 +16,10 @@
         <result column="EVT_TYPE_ID" jdbcType="BIGINT" property="contactEvtTypeId" />
         <result column="EVENT_TRIG_TYPE" jdbcType="VARCHAR" property="evtTrigType" />
         <result column="EXT_EVENT_ID" jdbcType="BIGINT" property="extEventId" />
+        <result column="LOCATION_NBR" jdbcType="VARCHAR" property="locationNbr" />
+        <result column="LONGITUDE" jdbcType="VARCHAR" property="longitude" />
+        <result column="LATITUDE" jdbcType="VARCHAR" property="latitude" />
+        <result column="LOCATION_SWITCH" jdbcType="VARCHAR" property="locationSwitch" />
         <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
         <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
         <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
@@ -127,6 +131,10 @@
         EVT_TYPE_ID,
         EVENT_TRIG_TYPE,
         EXT_EVENT_ID,
+        LOCATION_NBR,
+        LONGITUDE,
+        LATITUDE,
+        LOCATION_SWITCH,
         STATUS_CD,
         CREATE_STAFF,
         UPDATE_STAFF,
@@ -147,6 +155,10 @@
         #{contactEvtTypeId,jdbcType=BIGINT},
         #{evtTrigType,jdbcType=VARCHAR},
         #{extEventId,jdbcType=BIGINT},
+        #{locationNbr,jdbcType=VARCHAR},
+        #{longitude,jdbcType=VARCHAR},
+        #{latitude,jdbcType=VARCHAR},
+        #{locationSwitch,jdbcType=VARCHAR},
         #{statusCd,jdbcType=VARCHAR},
         #{createStaff,jdbcType=BIGINT},
         #{updateStaff,jdbcType=BIGINT},
@@ -340,6 +352,14 @@
             EVT_TYPE_ID = #{contactEvtTypeId,jdbcType=BIGINT},
 
             EVENT_TRIG_TYPE = #{evtTrigType,jdbcType=VARCHAR},
+
+            LOCATION_NBR = #{locationNbr,jdbcType=VARCHAR},
+
+            LONGITUDE = #{longitude,jdbcType=VARCHAR},
+
+            LATITUDE = #{latitude,jdbcType=VARCHAR},
+
+            LOCATION_SWITCH = #{locationSwitch,jdbcType=VARCHAR},
 
             STATUS_CD = #{statusCd,jdbcType=VARCHAR},
 

@@ -565,6 +565,10 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             mktStrategyConfMapper.insert(mktStrategyConfDO);
             Long childMktStrategyConfId = mktStrategyConfDO.getMktStrategyConfId();
 
+            // initId
+            mktStrategyConfDO.setInitId(childMktStrategyConfId);
+            mktStrategyConfMapper.updateByPrimaryKey(mktStrategyConfDO);
+
             //获取策略对应的过滤规则
 /*            List<Long> ruleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(parentMktStrategyConfId);
             // 与新的策略建立关联
