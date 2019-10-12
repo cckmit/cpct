@@ -259,7 +259,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Autowired
     private OrganizationMapper organizationMapper;
 
-    @Autowired
+    @Autowired(required = false)
     private UCCPService uccpService;
 
     //指定下发地市人员的数据集合
@@ -295,7 +295,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
                 result.put("resultCode",CODE_SUCCESS);
                 result.put("resultMsg","协同渠道开始时间不符合规范，请检查规则：["+ruleName+"]");
-                result.put("data","true");
+                result.put("data","false");
                 return result;
             }
         }
@@ -315,13 +315,13 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
                 result.put("resultCode",CODE_SUCCESS);
                 result.put("resultMsg","协同渠道结束时间不符合规范，请检查规则：["+ruleName+"]");
-                result.put("data","true");
+                result.put("data","false");
                 return result;
             }
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","校验通过");
-        result.put("data","false");
+        result.put("data","true");
         return result;
     }
 
@@ -1380,7 +1380,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setTiggerType(params.get("tiggerType").toString());             // 活动触发类型 - 实时，批量
             mktCampaignDO.setMktCampaignCategory(params.get("mktCampaignCategory").toString());  // 活动分类 - 框架，强制，自主
             mktCampaignDO.setMktCampaignType(params.get("mktCampaignType").toString());   // 活动类别 - 服务，营销，服务+营销
-//            mktCampaignDO.setMktCampaignType(params.get("mktActivityNbr").toString());   // 活动编码
+//            mktCampaignDO.setMktActivityNbr(params.get("mktActivityNbr").toString());   // 活动编码
             if (params.get("createStaff").toString() != null && !"".equals(params.get("createStaff").toString())) {
                 mktCampaignDO.setCreateStaff(Long.valueOf(params.get("createStaff").toString()));  // 创建人
             }
@@ -1529,7 +1529,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setTiggerType(params.get("tiggerType").toString());             // 活动触发类型 - 实时，批量
             mktCampaignDO.setMktCampaignCategory(params.get("mktCampaignCategory").toString());  // 活动分类 - 框架，强制，自主
             mktCampaignDO.setMktCampaignType(params.get("mktCampaignType").toString());   // 活动类别 - 服务，营销，服务+营销
-//            mktCampaignDO.setMktCampaignType(params.get("mktActivityNbr").toString());   // 活动编码
+//            mktCampaignDO.setMktActivityNbr(params.get("mktActivityNbr").toString());   // 活动编码
             if (params.get("createStaff").toString() != null && !"".equals(params.get("createStaff").toString())) {
                 mktCampaignDO.setCreateStaff(Long.valueOf(params.get("createStaff").toString()));  // 创建人
             }
@@ -3080,13 +3080,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             Organization organization = organizationMapper.selectByPrimaryKey(orgId);
             if (organization != null) {
                 Long regionId = organization.getRegionId();
-                SysArea byCityFour = sysAreaMapper.getByCityFour(regionId.toString());
-                if(byCityFour.getAreaId()!=null){
-                    resutlMap.put("C4", Long.valueOf(byCityFour.getAreaId()));
-                }
-                if(organization.getOrgNameC5()!=null){
-                    resutlMap.put("C5", Long.valueOf(organization.getOrgNameC5()));
-                }
+                Long landIdFour = AreaCodeEnum.getLandIdByRegionId(regionId / 100 * 100);
+                resutlMap.put("C4", landIdFour);
+                resutlMap.put("C5", Long.valueOf(organization.getOrgNameC5()));
             }
         }
         return resutlMap;

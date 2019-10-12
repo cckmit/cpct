@@ -373,6 +373,9 @@
         <if test="lanIdFive != null and lanIdFive != ''">
             AND t.LAN_ID_FIVE = #{lanIdFive,jdbcType=BIGINT}
         </if>
+        <if test="mktActivityNbr != null and mktActivityNbr != ''">
+            AND MKT_ACTIVITY_NBR like CONCAT('%',#{mktActivityNbr,jdbcType=VARCHAR},'%')
+        </if>
         order by t.UPDATE_DATE desc
     </select>
 
@@ -436,6 +439,9 @@
         </if>
         <if test="lanIdFive != null and lanIdFive != ''">
             AND t.LAN_ID_FIVE = #{lanIdFive,jdbcType=BIGINT}
+        </if>
+        <if test="mktActivityNbr != null and mktActivityNbr != ''">
+            AND MKT_ACTIVITY_NBR like CONCAT('%',#{mktActivityNbr,jdbcType=VARCHAR},'%')
         </if>
         order by t.UPDATE_DATE desc
     </select>
