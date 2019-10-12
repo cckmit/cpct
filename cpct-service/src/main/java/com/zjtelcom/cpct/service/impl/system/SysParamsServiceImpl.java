@@ -212,18 +212,23 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
      */
     @Override
     public String systemSwitch(String key) {
-        Object o = redisUtils.get(key);
-        if (o != null) {
-            return o.toString();
-        } else {
-            List<Map<String, String>> maps = sysParamsMapper.listParamsByKey(key);
-            if (maps == null) {
-                return null;
+        try {
+            Object o = redisUtils.get(key);
+            if (o != null) {
+                return o.toString();
             } else {
-                String value = maps.get(0).get("value");
-                redisUtils.set(key, value);
-                return value;
+                List<Map<String, String>> maps = sysParamsMapper.listParamsByKey(key);
+                if (maps == null) {
+                    return null;
+                } else {
+                    String value = maps.get(0).get("value");
+                    redisUtils.set(key, value);
+                    return value;
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
