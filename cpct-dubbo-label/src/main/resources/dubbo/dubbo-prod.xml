@@ -66,7 +66,7 @@
     </dubbo:reference>
 
     <!-- 分群定时批量下发 -->
-    <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.TarGrpService" ref="targetGroupServiceImpl" version="1.0" >
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.TargetGroupService" ref="targetGroupServiceImpl" version="1.0" >
         <dubbo:method name="tarGrpTemplateScheduledBatchIssue" servicecode="33.1083.tarGrpTemplateScheduledBatchIssue" timeout="10000"/>
     </dubbo:service>
 

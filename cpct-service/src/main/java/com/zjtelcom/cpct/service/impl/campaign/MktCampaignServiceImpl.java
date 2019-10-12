@@ -1098,8 +1098,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     }
 
 
-
-
     /**
      * 活动审核--同步列表
      *
@@ -1382,7 +1380,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setTiggerType(params.get("tiggerType").toString());             // 活动触发类型 - 实时，批量
             mktCampaignDO.setMktCampaignCategory(params.get("mktCampaignCategory").toString());  // 活动分类 - 框架，强制，自主
             mktCampaignDO.setMktCampaignType(params.get("mktCampaignType").toString());   // 活动类别 - 服务，营销，服务+营销
-//            mktCampaignDO.setMktCampaignType(params.get("mktActivityNbr").toString());   // 活动编码
+//            mktCampaignDO.setMktActivityNbr(params.get("mktActivityNbr").toString());   // 活动编码
             if (params.get("createStaff").toString() != null && !"".equals(params.get("createStaff").toString())) {
                 mktCampaignDO.setCreateStaff(Long.valueOf(params.get("createStaff").toString()));  // 创建人
             }
@@ -1531,7 +1529,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setTiggerType(params.get("tiggerType").toString());             // 活动触发类型 - 实时，批量
             mktCampaignDO.setMktCampaignCategory(params.get("mktCampaignCategory").toString());  // 活动分类 - 框架，强制，自主
             mktCampaignDO.setMktCampaignType(params.get("mktCampaignType").toString());   // 活动类别 - 服务，营销，服务+营销
-//            mktCampaignDO.setMktCampaignType(params.get("mktActivityNbr").toString());   // 活动编码
+//            mktCampaignDO.setMktActivityNbr(params.get("mktActivityNbr").toString());   // 活动编码
             if (params.get("createStaff").toString() != null && !"".equals(params.get("createStaff").toString())) {
                 mktCampaignDO.setCreateStaff(Long.valueOf(params.get("createStaff").toString()));  // 创建人
             }
@@ -1604,7 +1602,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     // c4,c5
                     if (mktCampaignCountDO.getLanIdFour() != null) {
                         SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFour().intValue());
-                    //    Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour());
+                        //    Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour());
                         if (sysArea != null) {
                             mktCampaignVO.setLanIdFourName(sysArea.getName());
                         }
@@ -2627,6 +2625,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     }
 
 
+    // 表格中的类型统计
     private Map<String, Object> typeCount(Map<String, Object> paramMap,List<Map> tableMapList, List<Map> cityList,  List<SysArea> sysAreaList) throws Exception {
         DecimalFormat df = new DecimalFormat("0.00");
         // 随销活动（实时营销活动）
@@ -2747,7 +2746,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
             });*/
             for (Map<String, Object> cityMap : cityMapList) {
-               Long areaId = Long.valueOf((Integer) cityMap.get("lanId"));
+                Long areaId = Long.valueOf((Integer) cityMap.get("lanId"));
                 if(AreaCodeEnum.ZHEJIAGN.getLanId().equals(areaId)){
                     cityDataList.add(cityMap);
                     cityMapList.remove(cityMap);
@@ -2953,7 +2952,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             lineResultMap.put("areaId", areaId);
             lineResultMap.put("name", name);
             lineResultMap.put("data", lineMapList);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -3093,7 +3091,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 Long regionId = organization.getRegionId();
                 if (regionId != null) {
                     SysArea byCityFour = sysAreaMapper.getByCityFour(regionId.toString());
-                    if (byCityFour.getAreaId() != null) {
+                    if (byCityFour!=null && byCityFour.getAreaId() != null) {
                         resutlMap.put("C4", Long.valueOf(byCityFour.getAreaId()));
                     }
                     if (organization.getOrgNameC5() != null) {
