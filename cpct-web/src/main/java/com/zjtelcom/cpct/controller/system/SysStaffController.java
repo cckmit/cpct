@@ -8,6 +8,8 @@ import com.ctzj.smt.bss.sysmgr.model.dto.SystemPostDto;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.channel.OrganizationMapper;
+import com.zjtelcom.cpct.dao.system.SysAreaMapper;
+import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.channel.Organization;
 import com.zjtelcom.cpct.dto.channel.SystemUserVO;
 import com.zjtelcom.cpct.dto.system.SysStaffDTO;
@@ -38,6 +40,8 @@ public class SysStaffController extends BaseController {
     private SysStaffService sysStaffService;
     @Autowired
     private OrganizationMapper organizationMapper;
+    @Autowired
+    private SysAreaMapper sysAreaMapper;
 
 
     @RequestMapping("/getSysUser")
@@ -71,7 +75,13 @@ public class SysStaffController extends BaseController {
             }
             Organization organization = organizationMapper.selectByPrimaryKey(orgId);
             if (organization!=null){
-                userVO.setC4CodeName(organization.getOrgNameC4());
+                Organization c4Org = organizationMapper.selectByPrimaryKey(Long.valueOf(organization.getOrgNameC4()));
+                if (c4Org!=null){
+                    SysArea sysArea = sysAreaMapper.getByCityFour(c4Org.getRegionId().toString());
+                    if (sysArea!=null){
+                        userVO.setC4CodeName(sysArea.getAreaId().toString());
+                    }
+                }
                 userVO.setC5CodeName(organization.getOrgNameC5());
             }
             String sysPostCode = null;

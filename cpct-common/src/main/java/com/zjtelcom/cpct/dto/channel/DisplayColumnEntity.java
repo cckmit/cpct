@@ -1,10 +1,8 @@
 package com.zjtelcom.cpct.dto.channel;
 
-import com.zjtelcom.cpct.BaseEntity;
-
 import java.util.List;
 
-public class DisplayColumnEntity extends BaseEntity {
+public class DisplayColumnEntity {
 
     /**
      * 展示列ID

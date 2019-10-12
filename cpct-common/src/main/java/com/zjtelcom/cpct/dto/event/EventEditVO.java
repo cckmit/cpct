@@ -14,6 +14,10 @@ public class EventEditVO implements Serializable {
     private String evtMappedIp;//记录事件的映射匹配IP地址，事件识别可通过匹配IP地址进行匹配触点事件
     private String evtMappedAddr;//记录事件的映射地址，事件识别时可通过这个映身地址来适配触点事件，可以是URL地址，APP的类包名或其它识别编码
     private String evtProcotolType;//记录接口协议类型,1000	HTTP 2000FTP
+    private String locationNbr;//位置编号
+    private String longitude;//经度
+    private String latitude;//纬度
+    private String locationSwitch;//位置切换开关
     private String remark;
 
 
@@ -103,5 +107,37 @@ public class EventEditVO implements Serializable {
 
     public void setContactEvtTypeId(Long contactEvtTypeId) {
         this.contactEvtTypeId = contactEvtTypeId;
+    }
+
+    public String getLocationNbr() {
+        return locationNbr;
+    }
+
+    public void setLocationNbr(String locationNbr) {
+        this.locationNbr = locationNbr;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getLocationSwitch() {
+        return locationSwitch;
+    }
+
+    public void setLocationSwitch(String locationSwitch) {
+        this.locationSwitch = locationSwitch;
     }
 }
