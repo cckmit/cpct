@@ -295,7 +295,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
                 result.put("resultCode",CODE_SUCCESS);
                 result.put("resultMsg","协同渠道开始时间不符合规范，请检查规则：["+ruleName+"]");
-                result.put("data","false");
+                result.put("data","true");
                 return result;
             }
         }
@@ -315,13 +315,13 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
                 result.put("resultCode",CODE_SUCCESS);
                 result.put("resultMsg","协同渠道结束时间不符合规范，请检查规则：["+ruleName+"]");
-                result.put("data","false");
+                result.put("data","true");
                 return result;
             }
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","校验通过");
-        result.put("data","true");
+        result.put("data","false");
         return result;
     }
 
@@ -1602,7 +1602,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     // c4,c5
                     if (mktCampaignCountDO.getLanIdFour() != null) {
                         SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFour().intValue());
-                    //    Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour());
+                        //    Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour());
                         if (sysArea != null) {
                             mktCampaignVO.setLanIdFourName(sysArea.getName());
                         }
@@ -2746,7 +2746,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
             });*/
             for (Map<String, Object> cityMap : cityMapList) {
-               Long areaId = Long.valueOf((Integer) cityMap.get("lanId"));
+                Long areaId = Long.valueOf((Integer) cityMap.get("lanId"));
                 if(AreaCodeEnum.ZHEJIAGN.getLanId().equals(areaId)){
                     cityDataList.add(cityMap);
                     cityMapList.remove(cityMap);
@@ -2952,7 +2952,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             lineResultMap.put("areaId", areaId);
             lineResultMap.put("name", name);
             lineResultMap.put("data", lineMapList);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -3092,7 +3091,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 Long regionId = organization.getRegionId();
                 if (regionId != null) {
                     SysArea byCityFour = sysAreaMapper.getByCityFour(regionId.toString());
-                    if (byCityFour.getAreaId() != null) {
+                    if (byCityFour!=null && byCityFour.getAreaId() != null) {
                         resutlMap.put("C4", Long.valueOf(byCityFour.getAreaId()));
                     }
                     if (organization.getOrgNameC5() != null) {
