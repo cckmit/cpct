@@ -105,7 +105,7 @@ public class OpenLabelController extends BaseController {
             String taskId= (String) parameterMap.get("taskId");
             Map<String,String> stringObjectMap=new HashMap<>();
             stringObjectMap.put("contactTaskId",taskId);
-            Map<String, Object> stringObjectMap1 = iContactTaskService.queryTaskDetail4openApi(stringObjectMap);
+            Map<String, String> stringObjectMap1 = iContactTaskService.queryTaskDetail4openApi(stringObjectMap);
 
             System.out.println("请求返回："+stringObjectMap1);
             return JSON.toJSONString(stringObjectMap1, SerializerFeature.WriteMapNullValue);

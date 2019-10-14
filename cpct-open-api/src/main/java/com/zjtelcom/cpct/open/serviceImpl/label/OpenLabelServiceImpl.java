@@ -458,7 +458,7 @@ public class OpenLabelServiceImpl implements OpenLabelService {
         Map<String, String> map = new HashMap<>();
         map.put("contactTaskId", taskId);
         log.info("协同查询入参："+map);
-        Map<String, Object> stringObjectMap = null;
+        Map<String, String> stringObjectMap = null;
         try {
             stringObjectMap = iContactTaskService.queryTaskDetail4openApi(map);
             log.info("协同返回结果："+stringObjectMap);
