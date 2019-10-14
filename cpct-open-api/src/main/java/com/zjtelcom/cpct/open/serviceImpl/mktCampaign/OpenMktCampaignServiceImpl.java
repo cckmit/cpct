@@ -281,7 +281,10 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
             Map<String, Object> map = iReportService.queryCampaignByNum(paramMap);
             logger.info("用户号码协同查询结果：" + JSON.toJSONString(map));
             List<String> campaignIdList = new ArrayList<>();
-            campaignIdList = (List<String>) map.get("mktCampaignIds");
+            Object mktCampaignIds = map.get("mktCampaignIds");
+            if(mktCampaignIds != null) {
+                campaignIdList = (List<String>)mktCampaignIds;
+            }
             if(!campaignIdList.isEmpty()) {
                 for(String campaignId : campaignIdList) {
                     MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(campaignId));
