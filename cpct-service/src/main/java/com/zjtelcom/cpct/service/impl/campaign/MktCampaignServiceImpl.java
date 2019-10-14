@@ -2595,22 +2595,28 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         list.add(STATUS_CODE_PUBLISHED.getStatusCode());
         List<MktCampaignDO> mktCampaignDOS = mktCampaignMapper.selectAllMktCampaignDetailsByStatus(list,null);
         int i = 0;
+        System.out.println("11111111111");
         List<String> sendFailList = new ArrayList();
         for (MktCampaignDO mktCampaignDO : mktCampaignDOS) {
             try {
                 if (mktCampaignDO.getPlanEndTime().after(new Date()) && DateUtil.daysBetween(new Date(), mktCampaignDO.getPlanEndTime()) == 7) {
                     Long staff = mktCampaignDO.getCreateStaff();
+                    System.out.println("222222222222");
                     SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(staff, new ArrayList<Long>());
                     if (systemUserDtoSysmgrResultObject != null && systemUserDtoSysmgrResultObject.getResultObject() != null) {
                         String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
                         Long lanId = systemUserDtoSysmgrResultObject.getResultObject().getLanId();
                         // TODO  调用发送短信接口
+                        System.out.println("3333333333333");
                         String sendContent = "您好，您创建的活动（" + mktCampaignDO.getMktCampaignName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
                         System.out.println(sendContent);
                         try {
+                            System.out.println("444444444444");
                             uccpService.sendShortMessage(sysUserCode, sendContent, lanId.toString());
                             i++;
+                            System.out.println("555555555555");
                         } catch (Exception e) {
+                            System.out.println("666666666666");
                             sendFailList.add(mktCampaignDO.getMktCampaignId().toString());
                             logger.error(sysUserCode);
                             e.printStackTrace();
@@ -2618,9 +2624,11 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     }
                 }
             } catch (Exception e) {
+                System.out.println("777777777777");
                 e.printStackTrace();
             }
         }
+        System.out.println("888888888888");
         System.out.println("共发送数量=>" + i + ",发送失败活动：" + JSON.toJSONString(sendFailList));
     }
 
