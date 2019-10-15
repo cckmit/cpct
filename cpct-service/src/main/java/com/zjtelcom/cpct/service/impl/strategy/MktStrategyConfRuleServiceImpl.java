@@ -979,6 +979,12 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             chiledMktStrategyConfRuleDO.setUpdateDate(new Date());
             chiledMktStrategyConfRuleDO.setUpdateStaff(UserUtil.loginId());
             mktStrategyConfRuleMapper.insert(chiledMktStrategyConfRuleDO);
+            Long chiledMktStrategyConfRuleId = chiledMktStrategyConfRuleDO.getMktStrategyConfRuleId();
+
+            // initId
+            chiledMktStrategyConfRuleDO.setInitId(chiledMktStrategyConfRuleId);
+            mktStrategyConfRuleMapper.updateByPrimaryKey(chiledMktStrategyConfRuleDO);
+
             mktStrategyConfRuleMap.put("mktStrategyConfRuleId", chiledMktStrategyConfRuleDO.getMktStrategyConfRuleId());
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfRuleMap.put("resultMsg", "复制成功！");

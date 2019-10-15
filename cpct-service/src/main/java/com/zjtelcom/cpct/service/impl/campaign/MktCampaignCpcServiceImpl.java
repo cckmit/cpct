@@ -166,16 +166,18 @@ public class MktCampaignCpcServiceImpl implements MktCampaignApiService {
         if (!offerList.isEmpty()){
             for (Offer offer : offerList) {
                 try {
-                    Long createStaff = offer.getCreateStaff();
-                    if (createStaff!=null){
-                        SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(createStaff, new ArrayList<Long>());
+                    if (offer.getCreateStaff()!=null){
+                        SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(offer.getCreateStaff(), new ArrayList<Long>());
                         if (systemUserDtoSysmgrResultObject != null && systemUserDtoSysmgrResultObject.getResultObject() != null) {
                             String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
                             String lanId = systemUserDtoSysmgrResultObject.getResultObject().getLanId().toString();
+                            System.out.println("11111+sysUserCode:"+sysUserCode+"123444324 lanId:"+lanId);
                             // TODO  调用发送短信接口
                             String sendContent = "您好，您的销售品（" + offer.getOfferName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
                             try {
+                                System.out.println("11111+22222222");
                                 uccpService.sendShortMessage(sysUserCode,sendContent,lanId);
+                                System.out.println("11111+3333333");
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
