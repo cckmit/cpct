@@ -35,6 +35,7 @@ import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.DateUtil;
+import com.zjtelcom.cpct_prd.dao.campaign.MktCamItemPrdMapper;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,6 +117,9 @@ public class MktCampaignCpcServiceImpl implements MktCampaignApiService {
     @Autowired
     private UCCPService uccpService;
 
+    @Autowired
+    private MktCamItemPrdMapper mktCamItemPrdMapper;
+
     @Override
     public Map<String, Object> qryMktCampaignDetail(Long mktCampaignId) throws Exception {
         // 获取活动基本信息
@@ -163,28 +167,33 @@ public class MktCampaignCpcServiceImpl implements MktCampaignApiService {
         String preDay = DateUtil.getPreDay(1);
         Date preDate = DateUtil.string2DateTime4Day(preDay);
         List<Offer> offerList = offerMapper.selectOfferByOver(preDate,date);
+//        offerList.get(0).setOfferId(290508);
+//        offerList.get(1).setOfferId(290936);
         if (!offerList.isEmpty()){
-            for (Offer offer : offerList) {
-                try {
-                    if (offer.getCreateStaff()!=null){
-                        SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(offer.getCreateStaff(), new ArrayList<Long>());
-                        if (systemUserDtoSysmgrResultObject != null && systemUserDtoSysmgrResultObject.getResultObject() != null) {
-                            String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
-                            String lanId = systemUserDtoSysmgrResultObject.getResultObject().getLanId().toString();
-                            System.out.println("11111+sysUserCode:"+sysUserCode+"123444324 lanId:"+lanId);
-                            // TODO  调用发送短信接口
-                            String sendContent = "您好，您的销售品（" + offer.getOfferName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
-                            try {
-                                System.out.println("11111+22222222");
-                                uccpService.sendShortMessage(sysUserCode,sendContent,lanId);
-                                System.out.println("11111+3333333");
-                            } catch (Exception e) {
-                                e.printStackTrace();
+            List<MktCamItem> mktCamItems = mktCamItemPrdMapper.getMktCampaignById(offerList);
+            if (!mktCamItems.isEmpty()){
+                for (MktCamItem mktCamItem : mktCamItems) {
+                    MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCamItem.getMktCampaignId());
+                    if (mktCampaignDO==null) continue;
+                    if (mktCampaignDO.getCreateStaff()!=null){
+                        try {
+                            if (mktCampaignDO.getCreateStaff()!=null){
+                                SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(mktCampaignDO.getCreateStaff(), new ArrayList<Long>());
+                                if (systemUserDtoSysmgrResultObject != null && systemUserDtoSysmgrResultObject.getResultObject() != null) {
+                                    String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
+                                    System.out.println("11111+sysUserCode:"+sysUserCode+"123444324 lanId:"+mktCampaignDO.getLanId());
+                                    String sendContent = "您好，您的销售品（" + mktCamItem.getOfferName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
+                                    try {
+                                        uccpService.sendShortMessage(sysUserCode,sendContent,mktCampaignDO.getLanId().toString());
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
                             }
+                        }catch (Exception e){
+                            e.printStackTrace();
                         }
                     }
-                }catch (Exception e){
-                    e.printStackTrace();
                 }
             }
         }

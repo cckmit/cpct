@@ -2627,7 +2627,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         List<String> sendFailList = new ArrayList();
         for (MktCampaignDO mktCampaignDO : mktCampaignDOS) {
             try {
-                if (mktCampaignDO.getPlanEndTime().after(new Date()) && DateUtil.daysBetween(new Date(), mktCampaignDO.getPlanEndTime()) == 7) {
+                if (mktCampaignDO.getPlanEndTime() != null && mktCampaignDO.getPlanEndTime().after(new Date()) && DateUtil.daysBetween(new Date(), mktCampaignDO.getPlanEndTime()) == 7) {
                     Long staff = mktCampaignDO.getCreateStaff();
                     System.out.println("222222222222");
                     SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(staff, new ArrayList<Long>());
