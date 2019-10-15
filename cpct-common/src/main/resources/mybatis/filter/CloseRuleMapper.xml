@@ -77,7 +77,6 @@
         <if test="expression != null and expression != ''">
             AND EXPRESSION = #{expression,jdbcType=VARCHAR}
         </if>
---         EXPRESSION = #{expression,jdbcType=VARCHAR},
         DAY_START = #{dayStart,jdbcType=TIMESTAMP},
         DAY_END =  #{dayEnd,jdbcType=TIMESTAMP},
         STATUS_CD = #{statusCd,jdbcType=VARCHAR},
