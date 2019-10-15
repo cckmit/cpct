@@ -2566,17 +2566,20 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         List<String> list = new ArrayList<>();
         list.add(STATUS_CODE_PUBLISHED.getStatusCode());
         List<MktCampaignDO> mktCampaignDOS = mktCampaignMapper.selectAllMktCampaignDetailsByStatus(list, loginId);
-        Iterator<MktCampaignDO> iterator = mktCampaignDOS.iterator();
-        while (iterator.hasNext()) {
-            MktCampaignDO campaignDO = iterator.next();
-            Date planEndTime = campaignDO.getPlanEndTime();
-            if (planEndTime.before(new Date()) || DateUtil.daysBetween(new Date(), planEndTime) > 7) {
-                iterator.remove();
+        if (mktCampaignDOS != null && !mktCampaignDOS.isEmpty()) {
+            Iterator<MktCampaignDO> iterator = mktCampaignDOS.iterator();
+            while (iterator.hasNext()) {
+                MktCampaignDO campaignDO = iterator.next();
+                Date planEndTime = campaignDO.getPlanEndTime();
+                if (planEndTime.before(new Date()) || DateUtil.daysBetween(new Date(), planEndTime) > 7) {
+                    iterator.remove();
+                }
             }
-        }
-        for (MktCampaignDO mktCampaignDO : mktCampaignDOS) {
-            if (STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaignDO.getStatusCd())) {
-                mktCampaignDO.setStatusCd(STATUS_CODE_PUBLISHED.getStatusMsg());
+            // 为方便前端显示，后端转化状态为字符串（前端偷懒= =）
+            for (MktCampaignDO mktCampaignDO : mktCampaignDOS) {
+                if (STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaignDO.getStatusCd())) {
+                    mktCampaignDO.setStatusCd(STATUS_CODE_PUBLISHED.getStatusMsg());
+                }
             }
         }
         result.setResultCode("200");
