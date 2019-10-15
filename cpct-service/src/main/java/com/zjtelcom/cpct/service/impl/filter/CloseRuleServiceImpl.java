@@ -208,7 +208,7 @@ public class CloseRuleServiceImpl implements CloseRuleService {
                 }else {
                     for (Long offerId : addVO.getChooseProduct()){
                         Product product = productMapper.selectByPrimaryKey(offerId);
-                        if (product!=null){
+                        if (product==null){
                             continue;
                         }
                         codeList.add(product.getProdNbr());
@@ -316,7 +316,7 @@ public class CloseRuleServiceImpl implements CloseRuleService {
                 }else {
                     for (Long offerId : editVO.getChooseProduct()){
                         Product product = productMapper.selectByPrimaryKey(offerId);
-                        if (product!=null){
+                        if (product==null){
                             continue;
                         }
                         codeList.add(product.getProdNbr());
@@ -378,13 +378,26 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         if (closeRuleT.getChooseProduct()!=null && !closeRuleT.getChooseProduct().equals("")){
             List<String> codeList = ChannelUtil.StringToList(closeRuleT.getChooseProduct());
             List<OfferDetail> productList = new ArrayList<>();
-            for (String code : codeList){
-                List<Offer> offer = offerMapper.selectByCode(code);
-                if (offer!=null && !offer.isEmpty()){
-                    OfferDetail offerDetail = BeanUtil.create(offer.get(0),new OfferDetail());
-                    productList.add(offerDetail);
+            if (closeRuleT.getProductType().equals("1000")){
+                for (String code : codeList){
+                    List<Offer> offer = offerMapper.selectByCode(code);
+                    if (offer!=null && !offer.isEmpty()){
+                        OfferDetail offerDetail = BeanUtil.create(offer.get(0),new OfferDetail());
+                        productList.add(offerDetail);
+                    }
+                }
+            }else {
+                for (String code : codeList){
+                    List<Product> product = productMapper.selectByCode(code);
+                    if (product!=null && !product.isEmpty()){
+                        OfferDetail offerDetail = new OfferDetail();
+                        offerDetail.setOfferId(Integer.valueOf(product.get(0).getProdId().toString()));
+                        offerDetail.setOfferName(product.get(0).getProdName());
+                        productList.add(offerDetail);
+                    }
                 }
             }
+
             vo.setProductList(productList);
         }
         if (closeRuleT.getConditionId()!=null){
