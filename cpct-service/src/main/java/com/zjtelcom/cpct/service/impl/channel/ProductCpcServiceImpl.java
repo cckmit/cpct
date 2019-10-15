@@ -59,7 +59,7 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
         //销售品	1000
         //主产品	2000
         //子产品	3000
-        if (itemType.equals("1000") || "".equals(itemType) || "null".equals(itemType)){
+        if (itemType==null || itemType.equals("1000") || "".equals(itemType)){
             for (Long productId : productIdList){
                 Offer product = offerProdMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
                 if (product==null){
