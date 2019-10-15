@@ -70,8 +70,14 @@
         <dubbo:method name="tarGrpTemplateScheduledBatchIssue" servicecode="33.1083.tarGrpTemplateScheduledBatchIssue" timeout="10000"/>
     </dubbo:service>
 
+    <!-- 活动延期短信通知 -->
     <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.CampaignService" ref="campaignServiceImpl" version="1.0" >
         <dubbo:method name="campaignDelayNotice" servicecode="33.1083.campaignDelayNotice" timeout="10000"/>
     </dubbo:service>
+
+    <!-- UCCP短信发送 -->
+    <dubbo:reference registry="esb3" interface="com.ztesoft.uccp.dubbo.interfaces.UCCPSendService" id="uCCPSendService" version="1.0" check="false">
+        <dubbo:method name="sendShortMessage" servicecode="33.1099.sendShortMessage" timeout="120000"/>
+    </dubbo:reference>
 
 </beans>
