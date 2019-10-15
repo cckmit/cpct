@@ -8,6 +8,7 @@ import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.SftpException;
 import com.mysql.jdbc.StringUtils;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
@@ -1143,17 +1144,26 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         Map<String, Object> result = new HashMap<>();
         String batchNumSt = DateUtil.date2St4Trial(new Date()) + ChannelUtil.getRandomStr(4);
         XlsxProcessAbstract xlsxProcess = new XlsxProcessAbstract();
-        //InputStream inputStream = multipartFile.getInputStream();
-        //String fileName = multipartFile.getOriginalFilename();
-        List<Map<String, String>> list = sysParamsMapper.listParamsByKey("EVT001");
-        String[] values = null;
-        if (list != null) {
-            values = list.get(0).get("value").split("/");
-        }
-        //String[] split = fileName.split("_");
-        Long camId = Long.valueOf(values[0]);
-        Long strId = Long.valueOf(values[1]);
-        Long ruleId = Long.valueOf(values[2]);
+
+        String fileName = multipartFile.getName();
+        String[] split = fileName.split("_");
+        List<Map<String, String>> list = sysParamsMapper.listParamsByKey(split[0]);  // 静态参数表EVT001
+        if (list == null || list.isEmpty())
+            return null;
+        Map<String, String> stringStringMap = list.get(0);
+        String value = stringStringMap.get("value");
+        List<MktStrategyConfDO> mktStrategyConfDOS = strategyMapper.selectByCampaignId(Long.valueOf(value));
+        if (mktStrategyConfDOS == null)
+            return null;
+        Long mktStrategyConfId = mktStrategyConfDOS.get(0).getMktStrategyConfId();
+        List<MktStrategyConfRuleRelDO> mktStrategyConfRuleRelDOS = ruleRelMapper.selectByMktStrategyConfId(mktStrategyConfId);
+        if (mktStrategyConfRuleRelDOS == null)
+            return null;
+        Long mktStrategyConfRuleId = mktStrategyConfRuleRelDOS.get(0).getMktStrategyConfRuleId();
+
+        Long camId = Long.valueOf(value);
+        Long strId = Long.valueOf(mktStrategyConfId);
+        Long ruleId = Long.valueOf(mktStrategyConfRuleId);
         TrialOperationVO operation = new TrialOperationVO();
         MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(camId);
         MktStrategyConfDO strategy = strategyMapper.selectByPrimaryKey(strId);
@@ -2377,31 +2387,54 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         SftpUtils sftpUtils = new SftpUtils();
         final ChannelSftp sftp = sftpUtils.connect(ftpAddress, ftpPort, ftpName, ftpPassword);
         logger.info("sftp已获得连接");
-         String path = sftpUtils.cd(uploadExcelPath, sftp);
+        String path = sftpUtils.cd(uploadExcelPath, sftp);
         String tempFilePath = downloadFilePath + "/";
         List<String> files = new ArrayList<>();
+        List<String> excelFiles = new ArrayList<>();
         try {
             List<String> allFile = sftpUtils.listFiles(path, sftp);
             for (String fileName : allFile) {
                 if (".".equals(fileName) || "..".equals(fileName)) {
                     continue;
                 }
-                if (fileName.contains("xlsx")){
+//                if (fileName.contains("xlsx")){
+//                    files.add(fileName);
+//                }
+                if (fileName.contains("EVT")){
+                    logger.info("excel批量清单文件目录夹名称："+fileName);
                     files.add(fileName);
                 }
             }
-            logger.info("批量excel已选择文件数量 "+ files.size());
+            logger.info("批量excel已选择文件夹数量 "+ files.size());
         } catch (Exception e) {
             logger.error("批量excel文件读取失败", e);
         }
+        //修改遍历文件夹下的文件
+        for (String file : files) {
+            try {
+                List<String> allExcelFile = sftpUtils.listFiles(uploadExcelPath+file, sftp);
+                for (String fileName : allExcelFile) {
+                    if (".".equals(fileName) || "..".equals(fileName)) {
+                        continue;
+                    }
+                    if (fileName.contains("xlsx")){
+                        excelFiles.add(fileName);
+                    }
+                }
+            } catch (SftpException e) {
+                e.printStackTrace();
+            }
+        }
+        logger.info("批量excel已选择文件数量 "+ excelFiles.size());
         List<String> uploadList = new ArrayList<>();
         try {
-            for (String fileName : files) {
+            for (String fileName : excelFiles) {
                 // 下载文件到本地
                 File file = new File(fileName);
                 if (!file.exists()) {
                     logger.info("开始下载文件--->>>" + fileName + " --->>> 时间：" + DateUtil.formatDate(new Date()));
-                    boolean download = sftpUtils.download(sftp, path + "/", fileName, tempFilePath);
+                    String pathxx = sftpUtils.cd(uploadExcelPath+"/"+fileName.split("_")[0], sftp);
+                    boolean download = sftpUtils.download(sftp, pathxx+"/", fileName, tempFilePath);
                     if (!download) {
                         logger.info("文件下载失败","文件名：" + fileName);
                     }
@@ -2429,6 +2462,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             for (String s : uploadList) {
                 logger.info("准备上传文件名称:" + s);
                 File file = new File(tempFilePath+s);
+//                File file = new File("D:/idea/cpc/CPCT/app/"+s);
                 System.out.println("文件是否存在："+file.exists());
                 if (file.exists()) {
                     boolean uploadResult = sftpUtils.uploadFile(uploadExcelPath, s, new FileInputStream(file), sftp);
