@@ -197,18 +197,23 @@ public class CloseRuleServiceImpl implements CloseRuleService {
 
         if (StringUtils.isNotBlank(addVO.getCloseType()) && addVO.getCloseType().equals("2000")){
             if (addVO.getChooseProduct()!= null && !addVO.getChooseProduct().isEmpty()){
-                for (Long offerId : addVO.getChooseProduct()){
-//                    Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
-//                    if (offer==null){
-//                        continue;
-//                    }
-//                    codeList.add(offer.getOfferNbr());
-                    Product product = productMapper.selectByPrimaryKey(offerId);
-                    if (product!=null){
+                if (addVO.getProductType().equals("1000")){
+                    for (Long offerId : addVO.getChooseProduct()){
+                    Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
+                    if (offer==null){
                         continue;
                     }
-                    codeList.add(product.getProdNbr());
+                    codeList.add(offer.getOfferNbr());
+                    }
+                }else {
+                    for (Long offerId : addVO.getChooseProduct()){
+                        Product product = productMapper.selectByPrimaryKey(offerId);
+                        if (product!=null){
+                            continue;
+                        }
+                        codeList.add(product.getProdNbr());
 
+                    }
                 }
                 closeRule.setChooseProduct(ChannelUtil.StringList2String(codeList));
             }
@@ -298,24 +303,27 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         closeRule.setUpdateStaff(UserUtil.loginId());
 
         List<String> codeList = new ArrayList<>();
-        if (editVO.getProductType()!=null){
-            if (editVO.getProductType().equals("2000") || editVO.getProductType().equals("3000")){
-                for (Long offerId : editVO.getChooseProduct()){
-                    Product product = productMapper.selectByPrimaryKey(offerId);
-                    if (product!=null){
-                        continue;
+        if (StringUtils.isNotBlank(editVO.getCloseType()) && editVO.getCloseType().equals("2000")){
+            if (editVO.getChooseProduct()!= null && !editVO.getChooseProduct().isEmpty()){
+                if (editVO.getProductType().equals("1000")){
+                    for (Long offerId : editVO.getChooseProduct()){
+                        Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
+                        if (offer==null){
+                            continue;
+                        }
+                        codeList.add(offer.getOfferNbr());
                     }
-                    codeList.add(product.getProdNbr());
-                }
+                }else {
+                    for (Long offerId : editVO.getChooseProduct()){
+                        Product product = productMapper.selectByPrimaryKey(offerId);
+                        if (product!=null){
+                            continue;
+                        }
+                        codeList.add(product.getProdNbr());
 
-            }else {
-                for (Long offerId : editVO.getChooseProduct()){
-                    Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
-                    if (offer==null){
-                        continue;
                     }
-                    codeList.add(offer.getOfferNbr());
                 }
+                closeRule.setChooseProduct(ChannelUtil.StringList2String(codeList));
             }
         }
         if(editVO.getCloseType().equals("5000")){
