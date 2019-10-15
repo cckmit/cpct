@@ -38,7 +38,7 @@ public class OpenMktCampaignController extends BaseController {
                                      @RequestParam(required = false) String accNum, HttpServletResponse response) {
         try {
             Map<String, Object> map = openMktCampaignService.getMktCampaignList(mktActivityNbr, accNum);
-            return JSON.toJSONString(map.get("params"));
+            return JSON.toJSONString(map.get("params"), SerializerFeature.WriteMapNullValue);
         } catch (SystemException e) {
             e.printStackTrace();
             response.setStatus(HttpStatus.SC_NOT_FOUND);
@@ -57,7 +57,7 @@ public class OpenMktCampaignController extends BaseController {
     public String getMktCampaignDetail(@PathVariable String mktActivityNbr, HttpServletResponse response) {
         try {
             Map<String, Object> map = openMktCampaignService.getMktCampaignDetail(mktActivityNbr);
-            return JSON.toJSONString(map.get("params"));
+            return JSON.toJSONString(map.get("params"), SerializerFeature.WriteMapNullValue);
         } catch (SystemException e) {
             e.printStackTrace();
             response.setStatus(HttpStatus.SC_NOT_FOUND);
