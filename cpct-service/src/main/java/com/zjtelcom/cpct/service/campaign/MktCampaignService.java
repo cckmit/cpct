@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.service.campaign;
 
 import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
-import com.zjtelcom.cpct.dto.pojo.Result;
 
 import java.util.Date;
 import java.util.Map;
