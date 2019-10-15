@@ -16,6 +16,8 @@ import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.thread.TarGrpRule;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,6 +51,7 @@ public class CampaignController extends BaseController {
 
     @Autowired
     private MktCampaignApiService mktCampaignApiService;
+
 
 
     /**
@@ -160,7 +163,7 @@ public class CampaignController extends BaseController {
         }catch(Exception e){
             result.setResultCode("500");
             result.setResultMessage(e.toString());
-            logger.error(e.getMessage());
+            logger.error("[op:CampaignController] fail to queryDelayCampaignList",e);
         }
         return JSON.toJSONString(result);
     }
