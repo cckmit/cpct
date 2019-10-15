@@ -112,7 +112,13 @@
     where MKT_CAMPAIGN_ID = #{campaignId,jdbcType=BIGINT}
   </delete>
 
-
-
-
+  <select id="getMktCampaignById" parameterType="java.util.List" resultMap="BaseResultMap">
+    select MKT_CAM_ITEM_ID, MKT_CAMPAIGN_ID, ITEM_TYPE, ITEM_ID, PRIORITY, ITEM_GROUP, OFFER_CODE,OFFER_NAME,
+    STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK,
+    LAN_ID  from mkt_cam_item WHERE ITEM_ID IN
+    <foreach collection="list" item="item" index="index"  open="(" close=")" separator=",">
+      #{item.offerId}
+    </foreach>
+    AND ITEM_TYPE = '1000' GROUP BY MKT_CAMPAIGN_ID
+  </select>
 </mapper>
