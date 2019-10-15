@@ -45,4 +45,6 @@ public interface FilterRuleMapper {
     List<FilterRule> qryFilterRuleExcludeType(FilterRule filterRule);
 
     List<FilterRule> selectFilterRuleByRuleName(@Param("ruleName") String ruleName);
+
+    List<FilterRule> qryFilterRuleByUserExcludeType(FilterRule filterRule);
 }

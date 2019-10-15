@@ -115,10 +115,7 @@
         RIGHT_PARAM, RIGHT_PARAM_TYPE, CONDITION_TEXT, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
         CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
         from tar_grp_condition
-        WHERE 1 = 1
-        <if test="tarGrpId != null and tarGrpId != 0">
-            AND TAR_GRP_ID = #{tarGrpId,jdbcType=BIGINT}
-        </if>
+        WHERE TAR_GRP_ID = #{tarGrpId,jdbcType=BIGINT}
     </select>
 
     <select id="selectByActivityId" parameterType="java.lang.Long" resultMap="BaseResultMap">
