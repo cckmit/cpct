@@ -3088,17 +3088,19 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         if (orgId != null) {
             Organization organization = organizationMapper.selectByPrimaryKey(orgId);
             if (organization != null) {
-                Long regionId = organization.getRegionId();
-                if (regionId != null) {
-                    SysArea byCityFour = sysAreaMapper.getByCityFour(regionId.toString());
-                    if (byCityFour!=null && byCityFour.getAreaId() != null) {
-                        resutlMap.put("C4", Long.valueOf(byCityFour.getAreaId()));
-                    }
-                    if (organization.getOrgNameC5() != null) {
-                        resutlMap.put("C5", Long.valueOf(organization.getOrgNameC5()));
+                if (organization.getOrgNameC4() != null) {
+                    Organization organizationC4 = organizationMapper.selectByPrimaryKey(Long.valueOf(organization.getOrgNameC4()));
+                    Long regionIdC4 = organizationC4.getRegionId();
+                    if (regionIdC4 != null) {
+                        SysArea byCityFour = sysAreaMapper.getByCityFour(regionIdC4.toString());
+                        if (byCityFour!=null && byCityFour.getAreaId() != null) {
+                            resutlMap.put("C4", Long.valueOf(byCityFour.getAreaId()));
+                        }
+                        if (organization.getOrgNameC5() != null) {
+                            resutlMap.put("C5", Long.valueOf(organization.getOrgNameC5()));
+                        }
                     }
                 }
-
             }
         }
         return resutlMap;
