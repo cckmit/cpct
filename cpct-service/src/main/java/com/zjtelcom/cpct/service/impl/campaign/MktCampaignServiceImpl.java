@@ -2562,29 +2562,42 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Override
     public Result queryDelayCampaignList() {
         Result result = new Result();
-        Long loginId = UserUtil.loginId();
-        List<String> list = new ArrayList<>();
-        list.add(STATUS_CODE_PUBLISHED.getStatusCode());
-        List<MktCampaignDO> mktCampaignDOS = mktCampaignMapper.selectAllMktCampaignDetailsByStatus(list, loginId);
-        if (mktCampaignDOS != null && !mktCampaignDOS.isEmpty()) {
-            Iterator<MktCampaignDO> iterator = mktCampaignDOS.iterator();
-            while (iterator.hasNext()) {
-                MktCampaignDO campaignDO = iterator.next();
-                Date planEndTime = campaignDO.getPlanEndTime();
-                if (planEndTime.before(new Date()) || DateUtil.daysBetween(new Date(), planEndTime) > 7) {
-                    iterator.remove();
+        try {
+            System.out.println("queryDelayCampaignList111");
+            Long loginId = UserUtil.loginId();
+            System.out.println("queryDelayCampaignList222");
+            List<String> list = new ArrayList<>();
+            list.add(STATUS_CODE_PUBLISHED.getStatusCode());
+            List<MktCampaignDO> mktCampaignDOS = mktCampaignMapper.selectAllMktCampaignDetailsByStatus(list, loginId);
+            System.out.println("queryDelayCampaignList333");
+            if (mktCampaignDOS != null && !mktCampaignDOS.isEmpty()) {
+                Iterator<MktCampaignDO> iterator = mktCampaignDOS.iterator();
+                while (iterator.hasNext()) {
+                    MktCampaignDO campaignDO = iterator.next();
+                    Date planEndTime = campaignDO.getPlanEndTime();
+                    if (planEndTime.before(new Date()) || DateUtil.daysBetween(new Date(), planEndTime) > 7) {
+                        iterator.remove();
+                    }
+                }
+                System.out.println("queryDelayCampaignList444");
+                // 为方便前端显示，后端转化状态为字符串（前端偷懒= =）
+                for (MktCampaignDO mktCampaignDO : mktCampaignDOS) {
+                    if (STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaignDO.getStatusCd())) {
+                        mktCampaignDO.setStatusCd(STATUS_CODE_PUBLISHED.getStatusMsg());
+                    }
                 }
             }
-            // 为方便前端显示，后端转化状态为字符串（前端偷懒= =）
-            for (MktCampaignDO mktCampaignDO : mktCampaignDOS) {
-                if (STATUS_CODE_PUBLISHED.getStatusCode().equals(mktCampaignDO.getStatusCd())) {
-                    mktCampaignDO.setStatusCd(STATUS_CODE_PUBLISHED.getStatusMsg());
-                }
-            }
+            System.out.println("queryDelayCampaignList555");
+            result.setResultCode("200");
+            result.setResultMessage("查询成功");
+            result.setResultObject(mktCampaignDOS);
+            return result;
+        } catch (Exception e) {
+            System.out.println("queryDelayCampaignList666");
+            e.printStackTrace();
+            result.setResultCode("500");
+            result.setResultMessage(e.toString());
         }
-        result.setResultCode("200");
-        result.setResultMessage("查询成功");
-        result.setResultObject(mktCampaignDOS);
         return result;
     }
 
