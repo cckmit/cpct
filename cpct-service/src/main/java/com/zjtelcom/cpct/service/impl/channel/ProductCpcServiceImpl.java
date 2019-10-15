@@ -69,7 +69,7 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
                 nameList.add(offerDetail);
             }
         }
-        if (itemType.equals("2000") || itemType.equals("3000")){
+        if (itemType==null || itemType.equals("2000") || itemType.equals("3000")){
             for (Long productId : productIdList){
                 Product product = productProdMapper.selectByPrimaryKey(Long.valueOf(productId.toString()));
                 if (product==null){
