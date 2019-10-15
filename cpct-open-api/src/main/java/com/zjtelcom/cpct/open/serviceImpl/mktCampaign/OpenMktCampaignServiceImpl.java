@@ -175,44 +175,45 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                 campaign.setMktStrategys(mktStrategyList);
             }
 
-            //2. 查询营销活动推荐脚本
-            List<CamScript> camScripts = mktCamScriptMapper.selectByCampaignId(mktCampaignDO.getMktCampaignId());
-            if(!camScripts.isEmpty()){
-                for (CamScript script : camScripts){
-                    MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(script.getEvtContactConfId());
-                    Channel channel = contactChannelMapper.selectByPrimaryKey(mktCamChlConfDO.getContactChlId());
-                    OpenScript openScript = new OpenScript();
-                    openScript.setScriptId(Integer.parseInt(script.getMktCampaignScptId().toString()));
-                    openScript.setScriptName(mktCamChlConfDO.getEvtContactConfName() + "脚本");
-                    openScript.setScriptDesc(script.getScriptDesc());
-                    openScript.setScriptType("1000");
-                    openScript.setSuitChannelType("100000");
-                    openScript.setExecChannel(channel.getContactChlCode());
-                    openScript.setStatusCd(script.getStatusCd());
-                    if(script.getStatusDate() != null) {
-                        openScript.setStatusDate(DateUtil.getDatetime(script.getStatusDate()));
-                    }
-                    openScript.setRemark(script.getRemark());
-                    mktScriptList.add(openScript);
-                }
-                campaign.setMktScripts(mktScriptList);
-            }
-
-            //3.查询相关营销活动推荐条目列表(属于规则)
-            //3.1.查出活动下的策略
+            //查出活动下的策略
             List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOS = mktCamStrategyConfRelMapper.selectByMktCampaignId(mktCampaignDO.getMktCampaignId());
             if (!mktCamStrategyConfRelDOS.isEmpty()) {
-                //3.2.查出策略下的规则
+                //查出策略下的规则
                 for (MktCamStrategyConfRelDO m : mktCamStrategyConfRelDOS) {
                     List<MktStrategyConfRuleRelDO> mktStrategyConfRuleRelDOS = mktStrategyConfRuleRelMapper.selectByMktStrategyConfId(m.getStrategyConfId());
                     if (!mktStrategyConfRuleRelDOS.isEmpty()) {
-                        //3.2. 通过规则id查出规则
+                        //通过规则id查出规则
                         for (MktStrategyConfRuleRelDO ruleRelDo : mktStrategyConfRuleRelDOS) {
                             MktStrategyConfRuleDO rule = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleRelDo.getMktStrategyConfRuleId());
                             // 规则信息中可以得到 1分群id  2推送条目id集合  3协同渠道配置id集合  4二次协同渠道配置结果id集合
                             if (rule != null) {
+                                //2. 查询营销活动推荐脚本
+                                if (StringUtils.isNotBlank(rule.getEvtContactConfId())) {
+                                    String[] splits = rule.getEvtContactConfId().split("/");
+                                    for(int i = 0; i < splits.length; i++) {
+                                        CamScript camScript = mktCamScriptMapper.selectByConfId(Long.valueOf(splits[i]));
+                                        if(camScript != null) {
+                                            MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(camScript.getEvtContactConfId());
+                                            Channel channel = contactChannelMapper.selectByPrimaryKey(mktCamChlConfDO.getContactChlId());
+                                            OpenScript openScript = new OpenScript();
+                                            openScript.setScriptId(Integer.parseInt(camScript.getMktCampaignScptId().toString()));
+                                            openScript.setScriptName(mktCamChlConfDO.getEvtContactConfName() + "脚本");
+                                            openScript.setScriptDesc(camScript.getScriptDesc());
+                                            openScript.setScriptType("1000");
+                                            openScript.setSuitChannelType("100000");
+                                            openScript.setExecChannel(channel.getContactChlCode());
+                                            openScript.setStatusCd(camScript.getStatusCd());
+                                            if(camScript.getStatusDate() != null) {
+                                                openScript.setStatusDate(DateUtil.getDatetime(camScript.getStatusDate()));
+                                            }
+                                            openScript.setRemark(camScript.getRemark());
+                                            mktScriptList.add(openScript);
+                                        }
+                                    }
+                                }
+
+                                //3. 获取客户分群
                                 List<OpenTarGrp> tarGrpList = new ArrayList<>();
-                                //3.3.1 获取客户分群
                                 if (rule.getTarGrpId() != null) {
                                     TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(rule.getTarGrpId());
                                     OpenTarGrp openTarGrp = BeanUtil.create(tarGrp, new OpenTarGrp());
@@ -222,7 +223,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                                     }
                                     tarGrpList.add(openTarGrp);
                                 }
-                                //3.3.2 获取推荐条目信息
+                                //4. 获取推荐条目信息
                                 if (StringUtils.isNotBlank(rule.getProductId())) {
                                     String[] split = rule.getProductId().split("/");
                                     for (int i = 0; i < split.length; i++) {
@@ -254,6 +255,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                         }
                     }
                 }
+                campaign.setMktScripts(mktScriptList);
                 //返回活动推荐条目列表
                 campaign.setMktCamItems(mktCamItemList);
             }
