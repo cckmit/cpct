@@ -75,4 +75,9 @@
         <dubbo:method name="campaignDelayNotice" servicecode="33.1083.campaignDelayNotice" timeout="10000"/>
     </dubbo:service>
 
+    <!-- UCCP短信发送 -->
+    <!--<dubbo:reference  interface="com.ztesoft.uccp.dubbo.interfaces.UCCPSendService" id="uCCPSendService" version="1.0" retries="0" check="false">
+        <dubbo:method name="sendShortMessage" servicecode="33.1099.sendShortMessage"/>
+    </dubbo:reference>-->
+
 </beans>
