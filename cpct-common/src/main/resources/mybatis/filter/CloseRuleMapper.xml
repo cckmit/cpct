@@ -74,7 +74,10 @@
         FAILURE_DATE = #{failureDate,jdbcType=TIMESTAMP},
         LABEL_CODE =  #{labelCode,jdbcType=VARCHAR},
         CHOOSE_PRODUCT = #{chooseProduct,jdbcType=VARCHAR},
-        EXPRESSION = #{expression,jdbcType=VARCHAR},
+        <if test="expression != null and expression != ''">
+            AND EXPRESSION = #{expression,jdbcType=VARCHAR}
+        </if>
+--         EXPRESSION = #{expression,jdbcType=VARCHAR},
         DAY_START = #{dayStart,jdbcType=TIMESTAMP},
         DAY_END =  #{dayEnd,jdbcType=TIMESTAMP},
         STATUS_CD = #{statusCd,jdbcType=VARCHAR},
