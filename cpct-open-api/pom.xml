@@ -99,7 +99,7 @@
 		<dependency>
 			<groupId>com.ctzj.smt.bss</groupId>
 			<artifactId>bss-cooperate-realtime-mkt-service-api</artifactId>
-			<version>1.0</version>
+			<version>1.1</version>
 		</dependency>
 
 

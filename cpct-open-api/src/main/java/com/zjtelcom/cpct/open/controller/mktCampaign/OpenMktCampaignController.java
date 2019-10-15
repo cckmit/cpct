@@ -30,17 +30,34 @@ public class OpenMktCampaignController extends BaseController {
 
 
     /**
-     * 查询营销活动
+     * 查询营销活动列表
+     */
+    @CrossOrigin
+    @RequestMapping(value = "/mktCampaign", method = RequestMethod.GET)
+    public String getMktCampaignList(@RequestParam(required = false) String mktActivityNbr,
+                                     @RequestParam(required = false) String accNum, HttpServletResponse response) {
+        try {
+            Map<String, Object> map = openMktCampaignService.getMktCampaignList(mktActivityNbr, accNum);
+            return JSON.toJSONString(map.get("params"));
+        } catch (SystemException e) {
+            e.printStackTrace();
+            response.setStatus(HttpStatus.SC_NOT_FOUND);
+            return "";
+        }
+    }
+
+    /**
+     * 查询营销活动详情
      *
-     * @param mktCampaignId
+     * @param mktActivityNbr
      * @return
      */
     @CrossOrigin
-    @RequestMapping(value = "/mktCampaign/{mktCampaignId}", method = RequestMethod.GET)
-    public String getContactChannel(@PathVariable String mktCampaignId, HttpServletResponse response) {
+    @RequestMapping(value = "/mktCampaign/{mktActivityNbr}", method = RequestMethod.GET)
+    public String getMktCampaignDetail(@PathVariable String mktActivityNbr, HttpServletResponse response) {
         try {
-            Map<String, Object> map = openMktCampaignService.queryById(mktCampaignId);
-            return JSON.toJSONString(map.get("params"), SerializerFeature.WriteMapNullValue);
+            Map<String, Object> map = openMktCampaignService.getMktCampaignDetail(mktActivityNbr);
+            return JSON.toJSONString(map.get("params"));
         } catch (SystemException e) {
             e.printStackTrace();
             response.setStatus(HttpStatus.SC_NOT_FOUND);
@@ -54,7 +71,7 @@ public class OpenMktCampaignController extends BaseController {
     @CrossOrigin
     @RequestMapping(value = "/mktCampaign", method = RequestMethod.POST)
     public String saveMktCampaign(@RequestBody Map<String,Object> param, HttpServletResponse response) {
-        logger.info("新增营服活动入参：" + param);
+        logger.info("新增营服活动入参：" + JSON.toJSONString(param));
         CreateMktCampaignReq requestObject = JSON.parseObject(JSON.toJSONString(param.get("requestObject")),CreateMktCampaignReq.class);
         Map<String, Object> resultMap = openMktCampaignService.addByObject(requestObject);
         response.setStatus(HttpStatus.SC_CREATED);

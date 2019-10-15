@@ -55,8 +55,8 @@ public class OpenTarGrpServiceImpl extends BaseService implements OpenTarGrpServ
         //转换为openapi返回规范
         OpenTarGrp openTarGrp = BeanUtil.create(tarGrp, new OpenTarGrp());
         //设置id  和href  转换时间为对应格式
-        openTarGrp.setId(id);
-        openTarGrp.setHref("/tarGrp/" + id);
+        //openTarGrp.setId(id);
+        //openTarGrp.setHref("/tarGrp/" + id);
         if (null != tarGrp.getStatusDate()) {
             openTarGrp.setStatusDate(DateUtil.getDatetime(tarGrp.getStatusDate()));
         }
@@ -79,8 +79,8 @@ public class OpenTarGrpServiceImpl extends BaseService implements OpenTarGrpServ
         TarGrp result = tarGrpMapper.selectByPrimaryKey(tarGrp.getTarGrpId());
         OpenTarGrp openTarGrp = BeanUtil.create(result, new OpenTarGrp());
         //设置id  和href  转换时间为对应格式
-        openTarGrp.setId(result.getTarGrpId().toString());
-        openTarGrp.setHref("/tarGrp/" + result.getTarGrpId().toString());
+        //openTarGrp.setId(result.getTarGrpId().toString());
+        //openTarGrp.setHref("/tarGrp/" + result.getTarGrpId().toString());
         if (null != result.getStatusDate()) {
             openTarGrp.setStatusDate(DateUtil.getDatetime(result.getStatusDate()));
         }
@@ -159,8 +159,8 @@ public class OpenTarGrpServiceImpl extends BaseService implements OpenTarGrpServ
         List<OpenTarGrp> returnList = new ArrayList<>();
         for (TarGrp m : list) {
             OpenTarGrp openTarGrp = BeanUtil.create(m, new OpenTarGrp());
-            openTarGrp.setId(m.getTarGrpId().toString());
-            openTarGrp.setHref("/tarGrp/" + m.getTarGrpId().toString());
+            //openTarGrp.setId(m.getTarGrpId().toString());
+            //openTarGrp.setHref("/tarGrp/" + m.getTarGrpId().toString());
             if (null != tarGrp.getStatusDate()) {
                 openTarGrp.setStatusDate(DateUtil.getDatetime(tarGrp.getStatusDate()));
             }
