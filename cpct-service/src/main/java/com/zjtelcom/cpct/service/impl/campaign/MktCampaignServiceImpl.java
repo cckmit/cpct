@@ -2587,7 +2587,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 while (iterator.hasNext()) {
                     MktCampaignDO campaignDO = iterator.next();
                     Date planEndTime = campaignDO.getPlanEndTime();
-                    if (planEndTime.before(new Date()) || DateUtil.daysBetween(new Date(), planEndTime) > 7) {
+                    if (planEndTime == null || planEndTime.before(new Date()) || DateUtil.daysBetween(new Date(), planEndTime) > 7) {
                         iterator.remove();
                     }
                 }
