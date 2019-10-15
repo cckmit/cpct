@@ -263,7 +263,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
         }
         if(resultMap.isEmpty()) {
             JSONObject json = new JSONObject();
-            json.put("message","对应的营销活动不存在!");
+            json.put("message","对应的营销活动未发布!");
             resultMap.put("params", json);
         }
         return resultMap;
