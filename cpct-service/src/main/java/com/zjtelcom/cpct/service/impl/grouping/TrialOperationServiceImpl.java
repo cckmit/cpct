@@ -1143,17 +1143,26 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         Map<String, Object> result = new HashMap<>();
         String batchNumSt = DateUtil.date2St4Trial(new Date()) + ChannelUtil.getRandomStr(4);
         XlsxProcessAbstract xlsxProcess = new XlsxProcessAbstract();
-        //InputStream inputStream = multipartFile.getInputStream();
-        //String fileName = multipartFile.getOriginalFilename();
-        List<Map<String, String>> list = sysParamsMapper.listParamsByKey("EVT001");
-        String[] values = null;
-        if (list != null) {
-            values = list.get(0).get("value").split("/");
-        }
-        //String[] split = fileName.split("_");
-        Long camId = Long.valueOf(values[0]);
-        Long strId = Long.valueOf(values[1]);
-        Long ruleId = Long.valueOf(values[2]);
+
+        String fileName = multipartFile.getName();
+        String[] split = fileName.split("_");
+        List<Map<String, String>> list = sysParamsMapper.listParamsByKey(split[0]);  // 静态参数表EVT001
+        if (list == null || list.isEmpty())
+            return null;
+        Map<String, String> stringStringMap = list.get(0);
+        String value = stringStringMap.get("value");
+        List<MktStrategyConfDO> mktStrategyConfDOS = strategyMapper.selectByCampaignId(Long.valueOf(value));
+        if (mktStrategyConfDOS == null)
+            return null;
+        Long mktStrategyConfId = mktStrategyConfDOS.get(0).getMktStrategyConfId();
+        List<MktStrategyConfRuleRelDO> mktStrategyConfRuleRelDOS = ruleRelMapper.selectByMktStrategyConfId(mktStrategyConfId);
+        if (mktStrategyConfRuleRelDOS == null)
+            return null;
+        Long mktStrategyConfRuleId = mktStrategyConfRuleRelDOS.get(0).getMktStrategyConfRuleId();
+
+        Long camId = Long.valueOf(value);
+        Long strId = Long.valueOf(mktStrategyConfId);
+        Long ruleId = Long.valueOf(mktStrategyConfRuleId);
         TrialOperationVO operation = new TrialOperationVO();
         MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(camId);
         MktStrategyConfDO strategy = strategyMapper.selectByPrimaryKey(strId);
