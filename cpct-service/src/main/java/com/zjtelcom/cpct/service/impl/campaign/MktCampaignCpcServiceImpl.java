@@ -169,7 +169,7 @@ public class MktCampaignCpcServiceImpl implements MktCampaignApiService {
                 try {
                     if (offer.getCreateStaff()!=null){
                         SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(offer.getCreateStaff(), new ArrayList<Long>());
-                        System.out.println("查询用户信息是否执行？ 查看systemUserDtoSysmgrResultObject是否有值："+systemUserDtoSysmgrResultObject);
+                        System.out.println("查询用户信息是否执行？ 查看systemUserDtoSysmgrResultObject是否有值："+JSON.toJSONString(systemUserDtoSysmgrResultObject));
                         if (systemUserDtoSysmgrResultObject != null && systemUserDtoSysmgrResultObject.getResultObject() != null) {
                             String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
                             String lanId = systemUserDtoSysmgrResultObject.getResultObject().getLanId().toString();

@@ -547,6 +547,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 // NoteFive字段对应的是express表达式
                 closeRule.setNoteFive(express);
                 closeRuleMapper.updateByPrimaryKey(closeRule);
+
             }
         }
         return delTarGrpConditions(conditionId);

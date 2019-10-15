@@ -239,17 +239,9 @@ public class TestController extends BaseController {
     @RequestMapping(value = "/salesOffShelf", method = RequestMethod.POST)
     @CrossOrigin
     public String salesOffShelf(@RequestBody  Map<String, Object> params) throws Exception {
-        Map<String, Object> map = mktCampaignApiService.salesOffShelf(new HashMap<>());
+        Map<String, Object> map = mktCampaignApiService.salesOffShelf(params);
         return JSON.toJSONString(map);
     }
-
-    @RequestMapping(value = "/salesOffShelf", method = RequestMethod.POST)
-    @CrossOrigin
-    public String salesOffShelf(@RequestBody  Map<String, Object> params) throws Exception {
-        Map<String, Object> map = mktCampaignApiService.salesOffShelf(new HashMap<>());
-        return JSON.toJSONString(map);
-    }
-
 }
 
 
