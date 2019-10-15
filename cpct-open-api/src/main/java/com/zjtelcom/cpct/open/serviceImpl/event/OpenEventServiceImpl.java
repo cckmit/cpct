@@ -145,6 +145,16 @@ public class OpenEventServiceImpl extends BaseService implements OpenEventServic
                     eventMatchRulDTO.setUpdateDate(openEventMatchRul.getCreateDate());
                     eventMatchRulMapper.createEventMatchRul(eventMatchRulDTO);
                 }
+            }else {
+                EventMatchRulDTO eventMatchRulDTO = new EventMatchRulDTO();
+                eventMatchRulDTO.setEventId(contactEvt.getContactEvtId());
+                eventMatchRulDTO.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                eventMatchRulDTO.setStatusDate(openEvent.getStatusDate());
+                eventMatchRulDTO.setCreateStaff(openEvent.getCreateStaff());
+                eventMatchRulDTO.setCreateDate(openEvent.getCreateDate());
+                eventMatchRulDTO.setUpdateStaff(openEvent.getUpdateStaff());
+                eventMatchRulDTO.setUpdateDate(openEvent.getUpdateDate());
+                eventMatchRulMapper.createEventMatchRul(eventMatchRulDTO);
             }
 
             //新增事件类型
