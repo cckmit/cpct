@@ -634,7 +634,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         filterRuleReq.getFilterRule().setCreateStaff(user.getSysUserId());
         Page pageInfo = filterRuleReq.getPageInfo();
         PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
-        List<FilterRule> filterRules = filterRuleMapper.qryFilterRule(filterRuleReq.getFilterRule());
+        List<FilterRule> filterRules = filterRuleMapper.qryFilterRuleByUserExcludeType(filterRuleReq.getFilterRule());
         Page page = new Page(new PageInfo(filterRules));
         List<FilterRuleVO> voList = new ArrayList<>();
         for (FilterRule rule : filterRules){
