@@ -11,6 +11,7 @@
         <result column="FAILURE_DATE" jdbcType="TIMESTAMP" property="failureDate"/>
         <result column="LABEL_CODE" jdbcType="VARCHAR" property="labelCode"/>
         <result column="CHOOSE_PRODUCT" jdbcType="VARCHAR" property="chooseProduct"/>
+        <result column="CHOOSE_PRODUCT_CODE" jdbcType="VARCHAR" property="chooseProductCode"/>
         <result column="EXPRESSION" jdbcType="VARCHAR" property="expression"/>
         <result column="DAY_START" jdbcType="TIMESTAMP" property="dayStart"/>
         <result column="DAY_END" jdbcType="TIMESTAMP" property="dayEnd"/>
@@ -96,7 +97,7 @@
       EXECUTION_CHANNEL, CHANNEL_CONTACTS, EFFECTIVE_DATE,
       FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF,
       UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
-      UPDATE_DATE, REMARK,USER_LIST,CONDITION_ID,DAYS,TIMES,OFFER_INFO,OPERATOR
+      UPDATE_DATE, REMARK,USER_LIST,CONDITION_ID,DAYS,TIMES,OFFER_INFO,OPERATOR,CHOOSE_PRODUCT_CODE
     from filter_rule
     where RULE_ID = #{ruleId,jdbcType=BIGINT}
   </select>
@@ -336,6 +337,27 @@
                DAYS, TIMES, OFFER_INFO,OPERATOR
         from filter_rule
         where RULE_NAME = #{ruleName,jdbcType=VARCHAR}
+    </select>
+
+    <select id="qryFilterRuleByUserExcludeType" resultMap="BaseResultMap">
+        select RULE_ID, RULE_NAME, FILTER_TYPE,
+               EXECUTION_CHANNEL, CHANNEL_CONTACTS, EFFECTIVE_DATE,
+               FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF,
+               UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+               UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID,
+               DAYS, TIMES, OFFER_INFO,OPERATOR
+        from filter_rule
+        where 1 = 1
+        <if test="createStaff != null and createStaff != ''">
+            AND ((CREATE_STAFF = #{createStaff} AND FILTER_TYPE NOT IN (1000,2000)) OR (FILTER_TYPE IN (1000,2000)))
+        </if>
+        <if test="ruleName != null and ruleName != ''">
+            AND RULE_NAME like concat('%',concat(#{ruleName},'%'))
+        </if>
+        <if test="filterType != null and filterType != ''">
+            AND FILTER_TYPE = #{filterType}
+        </if>
+        ORDER BY UPDATE_DATE DESC
     </select>
 
 </mapper>

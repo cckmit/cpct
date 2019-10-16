@@ -74,7 +74,9 @@
         FAILURE_DATE = #{failureDate,jdbcType=TIMESTAMP},
         LABEL_CODE =  #{labelCode,jdbcType=VARCHAR},
         CHOOSE_PRODUCT = #{chooseProduct,jdbcType=VARCHAR},
-        EXPRESSION = #{expression,jdbcType=VARCHAR},
+        <if test="expression != null and expression != ''">
+            AND EXPRESSION = #{expression,jdbcType=VARCHAR}
+        </if>
         DAY_START = #{dayStart,jdbcType=TIMESTAMP},
         DAY_END =  #{dayEnd,jdbcType=TIMESTAMP},
         STATUS_CD = #{statusCd,jdbcType=VARCHAR},
@@ -92,7 +94,9 @@
         CLOSE_CODE = #{closeCode,jdbcType=VARCHAR},
         NOTE_ONE = #{noteOne,jdbcType=VARCHAR},
         NOTE_TWO = #{noteTwo,jdbcType=VARCHAR},
-        NOTE_THREE = #{noteThree,jdbcType=VARCHAR}
+        NOTE_THREE = #{noteThree,jdbcType=VARCHAR},
+        NOTE_FOUR = #{noteFour,jdbcType=VARCHAR},
+        NOTE_FIVE = #{noteFive,jdbcType=VARCHAR}
         where RULE_ID = #{ruleId,jdbcType=BIGINT}
     </update>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
