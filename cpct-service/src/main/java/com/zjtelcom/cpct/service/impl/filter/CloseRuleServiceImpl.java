@@ -28,6 +28,7 @@ import com.zjtelcom.cpct.request.filter.CloseRuleReq;
 import com.zjtelcom.cpct.service.filter.CloseRuleService;
 import com.zjtelcom.cpct.service.synchronize.filter.SynFilterRuleService;
 import com.zjtelcom.cpct.util.*;
+import com.zjtelcom.cpct_prod.dao.offer.ProductMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -75,6 +76,8 @@ public class CloseRuleServiceImpl implements CloseRuleService {
     private TarGrpConditionMapper tarGrpConditionMapper;
     @Autowired
     private InjectionLabelMapper injectionLabelMapper;
+    @Autowired
+    private ProductMapper productMapper;
 
     /**
      * 根据关单规则id集合查询过滤规则集合
@@ -194,12 +197,23 @@ public class CloseRuleServiceImpl implements CloseRuleService {
 
         if (StringUtils.isNotBlank(addVO.getCloseType()) && addVO.getCloseType().equals("2000")){
             if (addVO.getChooseProduct()!= null && !addVO.getChooseProduct().isEmpty()){
-                for (Long offerId : addVO.getChooseProduct()){
+                if (addVO.getProductType().equals("1000")){
+                    for (Long offerId : addVO.getChooseProduct()){
                     Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
                     if (offer==null){
                         continue;
                     }
                     codeList.add(offer.getOfferNbr());
+                    }
+                }else {
+                    for (Long offerId : addVO.getChooseProduct()){
+                        Product product = productMapper.selectByPrimaryKey(offerId);
+                        if (product==null){
+                            continue;
+                        }
+                        codeList.add(product.getProdNbr());
+
+                    }
                 }
                 closeRule.setChooseProduct(ChannelUtil.StringList2String(codeList));
             }
@@ -289,12 +303,28 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         closeRule.setUpdateStaff(UserUtil.loginId());
 
         List<String> codeList = new ArrayList<>();
-        for (Long offerId : editVO.getChooseProduct()){
-            Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
-            if (offer==null){
-                continue;
+        if (StringUtils.isNotBlank(editVO.getCloseType()) && editVO.getCloseType().equals("2000")){
+            if (editVO.getChooseProduct()!= null && !editVO.getChooseProduct().isEmpty()){
+                if (editVO.getProductType().equals("1000")){
+                    for (Long offerId : editVO.getChooseProduct()){
+                        Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
+                        if (offer==null){
+                            continue;
+                        }
+                        codeList.add(offer.getOfferNbr());
+                    }
+                }else {
+                    for (Long offerId : editVO.getChooseProduct()){
+                        Product product = productMapper.selectByPrimaryKey(offerId);
+                        if (product==null){
+                            continue;
+                        }
+                        codeList.add(product.getProdNbr());
+
+                    }
+                }
+                closeRule.setChooseProduct(ChannelUtil.StringList2String(codeList));
             }
-            codeList.add(offer.getOfferNbr());
         }
         if(editVO.getCloseType().equals("5000")){
             String express = saveExpressions2Redis(closeRule.getRuleId(), Long.valueOf(closeRule.getLabelCode()));
@@ -348,13 +378,26 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         if (closeRuleT.getChooseProduct()!=null && !closeRuleT.getChooseProduct().equals("")){
             List<String> codeList = ChannelUtil.StringToList(closeRuleT.getChooseProduct());
             List<OfferDetail> productList = new ArrayList<>();
-            for (String code : codeList){
-                List<Offer> offer = offerMapper.selectByCode(code);
-                if (offer!=null && !offer.isEmpty()){
-                    OfferDetail offerDetail = BeanUtil.create(offer.get(0),new OfferDetail());
-                    productList.add(offerDetail);
+            if (closeRuleT.getProductType().equals("1000")){
+                for (String code : codeList){
+                    List<Offer> offer = offerMapper.selectByCode(code);
+                    if (offer!=null && !offer.isEmpty()){
+                        OfferDetail offerDetail = BeanUtil.create(offer.get(0),new OfferDetail());
+                        productList.add(offerDetail);
+                    }
+                }
+            }else {
+                for (String code : codeList){
+                    List<Product> product = productMapper.selectByCode(code);
+                    if (product!=null && !product.isEmpty()){
+                        OfferDetail offerDetail = new OfferDetail();
+                        offerDetail.setOfferId(Integer.valueOf(product.get(0).getProdId().toString()));
+                        offerDetail.setOfferName(product.get(0).getProdName());
+                        productList.add(offerDetail);
+                    }
                 }
             }
+
             vo.setProductList(productList);
         }
         if (closeRuleT.getConditionId()!=null){
