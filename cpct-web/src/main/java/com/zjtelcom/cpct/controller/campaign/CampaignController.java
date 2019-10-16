@@ -272,6 +272,7 @@ public class CampaignController extends BaseController {
         logger.info("[op:createMktCampaign] mktCampaignVO = " + JSON.toJSONString(mktCampaignVO));
         // 存活动
         Map<String, Object> mktCampaignMap = mktCampaignService.createMktCampaign(mktCampaignVO);
+        if (mktCampaignMap.get("mktCampaignId")==null) return JSON.toJSONString(mktCampaignMap);
         Long mktCampaignId = Long.valueOf(mktCampaignMap.get("mktCampaignId").toString());
         if (mktCampaignVO.getMktStrategyConfDetailList().size() > 0) {
             for (MktStrategyConfDetail mktStrategyConfDetail : mktCampaignVO.getMktStrategyConfDetailList()) {
