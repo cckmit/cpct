@@ -3138,7 +3138,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         if (byCityFour!=null && byCityFour.getAreaId() != null) {
                             resutlMap.put("C4", Long.valueOf(byCityFour.getAreaId()));
                         }
-                        if (organization.getOrgNameC5() != null) {
+                        if (StringUtils.isNotBlank(organization.getOrgNameC5())) {
                             resutlMap.put("C5", Long.valueOf(organization.getOrgNameC5()));
                         }
                     }
