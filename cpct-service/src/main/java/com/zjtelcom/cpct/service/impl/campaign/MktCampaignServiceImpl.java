@@ -302,10 +302,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         break;
                     }
                 }
-                result.put("resultCode",CODE_SUCCESS);
-                result.put("resultMsg","协同渠道开始时间不符合规范，请检查规则：["+ruleName+"]");
-                result.put("data","true");
-                return result;
+                if (!"".equals(ruleName)){
+                    result.put("resultCode",CODE_SUCCESS);
+                    result.put("resultMsg","协同渠道开始时间不符合规范，请检查规则：["+ruleName+"]");
+                    result.put("data","true");
+                    return result;
+                }
             }
         }
 
@@ -325,10 +327,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         break;
                     }
                 }
-                result.put("resultCode",CODE_SUCCESS);
-                result.put("resultMsg","协同渠道结束时间不符合规范，请检查规则：["+ruleName+"]");
-                result.put("data","true");
-                return result;
+                if (!"".equals(ruleName)){
+                    result.put("resultCode",CODE_SUCCESS);
+                    result.put("resultMsg","协同渠道开始时间不符合规范，请检查规则：["+ruleName+"]");
+                    result.put("data","true");
+                    return result;
+                }
             }
         }
         result.put("resultCode",CODE_SUCCESS);
