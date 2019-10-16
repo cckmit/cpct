@@ -75,9 +75,21 @@ public class OpenEventServiceImpl extends BaseService implements OpenEventServic
             if(openEvent.getStatusCd() == null) {
                 contactEvt.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
             }
-            contactEvt.setStatusDate(openEvent.getCreateDate());
-            contactEvt.setUpdateStaff(openEvent.getCreateStaff());
-            contactEvt.setUpdateDate(openEvent.getCreateDate());
+            if(openEvent.getStatusDate() == null) {
+                contactEvt.setStatusDate(new Date());
+            }
+            if(openEvent.getCreateStaff() == null) {
+                contactEvt.setCreateStaff(1L);
+            }
+            if(openEvent.getCreateDate() == null) {
+                contactEvt.setCreateDate(new Date());
+            }
+            if(openEvent.getUpdateStaff() == null) {
+                contactEvt.setUpdateStaff(1L);
+            }
+            if(openEvent.getUpdateDate() == null) {
+                contactEvt.setUpdateDate(new Date());
+            }
             contactEvtMapper.createContactEvt(contactEvt);
 
             //新增事件采集项
@@ -133,6 +145,16 @@ public class OpenEventServiceImpl extends BaseService implements OpenEventServic
                     eventMatchRulDTO.setUpdateDate(openEventMatchRul.getCreateDate());
                     eventMatchRulMapper.createEventMatchRul(eventMatchRulDTO);
                 }
+            }else {
+                EventMatchRulDTO eventMatchRulDTO = new EventMatchRulDTO();
+                eventMatchRulDTO.setEventId(contactEvt.getContactEvtId());
+                eventMatchRulDTO.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                eventMatchRulDTO.setStatusDate(openEvent.getStatusDate());
+                eventMatchRulDTO.setCreateStaff(openEvent.getCreateStaff());
+                eventMatchRulDTO.setCreateDate(openEvent.getCreateDate());
+                eventMatchRulDTO.setUpdateStaff(openEvent.getUpdateStaff());
+                eventMatchRulDTO.setUpdateDate(openEvent.getUpdateDate());
+                eventMatchRulMapper.createEventMatchRul(eventMatchRulDTO);
             }
 
             //新增事件类型

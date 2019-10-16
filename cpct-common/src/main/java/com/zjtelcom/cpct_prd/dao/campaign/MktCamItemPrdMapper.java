@@ -3,6 +3,7 @@ package com.zjtelcom.cpct_prd.dao.campaign;
 
 
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
+import com.zjtelcom.cpct.domain.channel.Offer;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -23,4 +24,6 @@ public interface MktCamItemPrdMapper {
     int updateByPrimaryKey(MktCamItem record);
 
     int deleteByCampaignId(@Param("campaignId") Long campaignId);
+
+    List<MktCamItem> getMktCampaignById(@Param("list")List<Offer> offerList);
 }

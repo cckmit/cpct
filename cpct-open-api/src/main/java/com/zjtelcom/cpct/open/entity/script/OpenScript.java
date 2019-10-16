@@ -1,61 +1,36 @@
 package com.zjtelcom.cpct.open.entity.script;
 
-import com.zjtelcom.cpct.open.base.entity.BaseEntity;
-
 /**
  * @Auther: anson
  * @Date: 2018/11/7
  * @Description:营销活动脚本
  */
-public class OpenScript{
+public class OpenScript {
 
-    private String href;
-    private Long id;
-    private String mktActivityNbr;
-    private Long mktCampaignId;
-    private String remark;
+    private Integer scriptId;
+    private String scriptName;
     private String scriptDesc;
+    private String scriptType;
+    private String suitChannelType;
+    private String execChannel;
     private String statusCd;
-    private Long evtContactConfId;
+    private String statusDate;
+    private String remark;
 
-    public String getHref() {
-        return href;
+    public Integer getScriptId() {
+        return scriptId;
     }
 
-    public void setHref(String href) {
-        this.href = href;
+    public void setScriptId(Integer scriptId) {
+        this.scriptId = scriptId;
     }
 
-    public Long getId() {
-        return id;
+    public String getScriptName() {
+        return scriptName;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getMktActivityNbr() {
-        return mktActivityNbr;
-    }
-
-    public void setMktActivityNbr(String mktActivityNbr) {
-        this.mktActivityNbr = mktActivityNbr;
-    }
-
-    public Long getMktCampaignId() {
-        return mktCampaignId;
-    }
-
-    public void setMktCampaignId(Long mktCampaignId) {
-        this.mktCampaignId = mktCampaignId;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
+    public void setScriptName(String scriptName) {
+        this.scriptName = scriptName;
     }
 
     public String getScriptDesc() {
@@ -66,6 +41,30 @@ public class OpenScript{
         this.scriptDesc = scriptDesc;
     }
 
+    public String getScriptType() {
+        return scriptType;
+    }
+
+    public void setScriptType(String scriptType) {
+        this.scriptType = scriptType;
+    }
+
+    public String getSuitChannelType() {
+        return suitChannelType;
+    }
+
+    public void setSuitChannelType(String suitChannelType) {
+        this.suitChannelType = suitChannelType;
+    }
+
+    public String getExecChannel() {
+        return execChannel;
+    }
+
+    public void setExecChannel(String execChannel) {
+        this.execChannel = execChannel;
+    }
+
     public String getStatusCd() {
         return statusCd;
     }
@@ -74,11 +73,19 @@ public class OpenScript{
         this.statusCd = statusCd;
     }
 
-    public Long getEvtContactConfId() {
-        return evtContactConfId;
+    public String getStatusDate() {
+        return statusDate;
     }
 
-    public void setEvtContactConfId(Long evtContactConfId) {
-        this.evtContactConfId = evtContactConfId;
+    public void setStatusDate(String statusDate) {
+        this.statusDate = statusDate;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }

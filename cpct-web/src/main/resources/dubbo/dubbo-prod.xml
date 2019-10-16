@@ -38,6 +38,14 @@
         <dubbo:method name="exists" servicecode="00.1077.ctgSessionExists"/>
     </dubbo:reference>
 
+    <dubbo:reference interface="com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.IDictionaryDubboService"
+                     id="dictionaryDubboServiceImpl" version="1.0">
+        <dubbo:method name="getDictionaryByType" servicecode="00.1077.getDictionaryByType"/>
+        <dubbo:method name="getValueByTypeAndCode" servicecode="00.1077.getValueByTypeAndCode"/>
+        <dubbo:method name="getDictionaryByTypeAndCode" servicecode="00.1077.getDictionaryByTypeAndCode"/>
+    </dubbo:reference>
+
+
     <!--活动信息同步大数据-->
     <dubbo:reference registry="esb2" id="activitySyncService" interface="com.zjhcsoft.eagle.main.dubbo.service.ActivitySyncService" version="1.0">
         <dubbo:method name="syncActivity" servicecode="33.1307.syncActivity" timeout="30000"/>

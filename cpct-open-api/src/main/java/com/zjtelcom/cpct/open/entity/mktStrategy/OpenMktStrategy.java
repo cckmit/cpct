@@ -1,11 +1,5 @@
 package com.zjtelcom.cpct.open.entity.mktStrategy;
 
-import com.zjtelcom.cpct.open.base.entity.BaseEntity;
-import lombok.Data;
-
-import java.util.Date;
-
-
 /**
 * @Auther: anson
 * @Date: 2018-11-02 14:30:02
@@ -13,13 +7,12 @@ import java.util.Date;
  * //如果设计到时间字段  请设置为String类型
 */
 //@Data
-public class OpenMktStrategy{
-
+public class OpenMktStrategy {
 
     /**
      * 营销策略标识
      */
-    private Long strategyId;
+    private Integer strategyId;
     /**
      * 策略名称
      */
@@ -41,10 +34,16 @@ public class OpenMktStrategy{
     private String ruleExpression;
 
     private String statusDate;//状态时间
-
     private String remark;//备注
+    private String lanId;//本地网标识
 
-    private Long lanId;//本地网标识
+    public Integer getStrategyId() {
+        return strategyId;
+    }
+
+    public void setStrategyId(Integer strategyId) {
+        this.strategyId = strategyId;
+    }
 
     public String getStrategyName() {
         return strategyName;
@@ -94,19 +93,11 @@ public class OpenMktStrategy{
         this.remark = remark;
     }
 
-    public Long getLanId() {
+    public String getLanId() {
         return lanId;
     }
 
-    public void setLanId(Long lanId) {
+    public void setLanId(String lanId) {
         this.lanId = lanId;
-    }
-
-    public Long getStrategyId() {
-        return strategyId;
-    }
-
-    public void setStrategyId(Long strategyId) {
-        this.strategyId = strategyId;
     }
 }
