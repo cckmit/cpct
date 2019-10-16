@@ -395,16 +395,19 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             if(mktCampaignDO.getCreateChannel() == null && mktCampaignDO.getCreateStaff() == 1 ) {
                 maps.put("resultCode", CommonConstant.CODE_FAIL);
                 maps.put("resultMsg", "创建人信息和岗位信息都为空，请核实工号已选中的岗位权限");
+                logger.info("创建人信息和岗位信息都为空，请核实工号已选中的岗位权限" + JSON.toJSONString(mktCampaignDO));
                 return maps;
             }
             if(mktCampaignDO.getCreateChannel() == null) {
                 maps.put("resultCode", CommonConstant.CODE_FAIL);
                 maps.put("resultMsg", "岗位信息都为空，请核实工号已选中的岗位权限");
+                logger.info("岗位信息都为空，请核实工号已选中的岗位权限" + JSON.toJSONString(mktCampaignDO));
                 return maps;
             }
             if(mktCampaignDO.getCreateStaff() == 1 ) {
                 maps.put("resultCode", CommonConstant.CODE_FAIL);
                 maps.put("resultMsg", "创建人信息为空，请核实工号已选中的岗位权限");
+                logger.info("创建人信息为空，请核实工号已选中的岗位权限" + JSON.toJSONString(mktCampaignDO));
                 return maps;
             }
 
