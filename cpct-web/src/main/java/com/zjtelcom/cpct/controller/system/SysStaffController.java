@@ -73,16 +73,22 @@ public class SysStaffController extends BaseController {
                     }
                 }
             }
-            Organization organization = organizationMapper.selectByPrimaryKey(orgId);
-            if (organization!=null){
-                Organization c4Org = organizationMapper.selectByPrimaryKey(Long.valueOf(organization.getOrgNameC4()));
-                if (c4Org!=null){
-                    SysArea sysArea = sysAreaMapper.getByCityFour(c4Org.getRegionId().toString());
-                    if (sysArea!=null){
-                        userVO.setC4CodeName(sysArea.getAreaId().toString());
+            try {
+                Organization organization = organizationMapper.selectByPrimaryKey(orgId);
+                if (organization!=null){
+                    if (organization.getOrgNameC4()!=null && !"".equals(organization.getOrgNameC4())){
+                        Organization c4Org = organizationMapper.selectByPrimaryKey(Long.valueOf(organization.getOrgNameC4()));
+                        if (c4Org!=null){
+                            SysArea sysArea = sysAreaMapper.getByCityFour(c4Org.getRegionId().toString());
+                            if (sysArea!=null){
+                                userVO.setC4CodeName(sysArea.getAreaId().toString());
+                            }
+                        }
                     }
+                    userVO.setC5CodeName(organization.getOrgNameC5());
                 }
-                userVO.setC5CodeName(organization.getOrgNameC5());
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
             }
             String sysPostCode = null;
             ArrayList<String> arrayList = new ArrayList<>();
