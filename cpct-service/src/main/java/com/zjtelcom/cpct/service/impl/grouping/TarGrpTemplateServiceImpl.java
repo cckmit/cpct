@@ -247,10 +247,33 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         }
     }
 
+    // operationType操作标识：1.看总数，2.下发
     @Override
     public Map<String, Object> tarGrpTemplateCountAndIssue(String tarGrpTemplateId, String operationType) {
-        Map<String, Object> map = new HashMap<>();
         List<Map<String, String>> list = tarGrpConditionMapper.selectAllLabelByTarId(Long.valueOf(tarGrpTemplateId));
+        return commonTarGrpTemplateCount(list, operationType);
+    }
+
+    @Override
+    public Map<String, Object> tarGrpTemplateCountByExpressions(Map<String, Object> map) {
+        List<HashMap<String, Object>> list = (List<HashMap<String, Object>>)map.get("conditionList");
+        List arrayList = new ArrayList();
+        for (Map<String, Object> hashMap : list) {
+            Long labelId = Long.valueOf(hashMap.get("leftParam").toString());
+            Label label = injectionLabelMapper.selectByPrimaryKey(labelId);
+
+            Map<String, String> map1 = new HashMap<>();
+            map1.put("code", label.getInjectionLabelCode());
+            map1.put("operType", hashMap.get("operType").toString());
+            map1.put("rightParam", hashMap.get("rightParam").toString());
+            map1.put("labelType", label.getLabelDataType());
+            arrayList.add(map1);
+        }
+        return commonTarGrpTemplateCount(arrayList, "1");
+    }
+
+    public Map<String, Object> commonTarGrpTemplateCount(List<Map<String, String>> list, String operationType) {
+        Map<String, Object> map = new HashMap<>();
         List<String> expressions = new ArrayList<>();
         List<LabelResultES> labelList = new ArrayList<>();
         for (Map<String, String> tarGrpCondition : list) {
@@ -281,6 +304,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         }
         return map;
     }
+
 
     public String equationSymbolConversion(String type){
         switch (type) {

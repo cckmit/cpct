@@ -176,4 +176,11 @@ public class TarGrpTemplateController  extends BaseController {
         Map<String, Object> map = tarGrpTemplateService.tarGrpTemplateCountAndIssue(tarGrpTemplateId, operationType);
         return JSON.toJSONString(map);
     }
+
+    @PostMapping("tarGrpTemplateCountByExpressions")
+    @CrossOrigin
+    public String tarGrpTemplateCountByExpressions(@RequestBody Map<String, Object> params) {
+        Map<String, Object> map = tarGrpTemplateService.tarGrpTemplateCountByExpressions(params);
+        return JSON.toJSONString(map);
+    }
 }
