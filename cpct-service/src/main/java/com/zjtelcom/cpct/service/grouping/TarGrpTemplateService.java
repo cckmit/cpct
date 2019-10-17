@@ -41,4 +41,6 @@ public interface TarGrpTemplateService {
     Map<String, Object> tarGrpTemplateCountAndIssue(String tarGrpTemplateId, String operationType);
 
     Map<String, Object> tarGrpTemplateScheduledBatchIssue();
+
+    Map<String, Object> tarGrpTemplateCountByExpressions(Map<String, Object> params);
 }
