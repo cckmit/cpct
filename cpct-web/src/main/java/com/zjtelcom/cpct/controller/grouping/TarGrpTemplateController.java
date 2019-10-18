@@ -9,6 +9,7 @@ package com.zjtelcom.cpct.controller.grouping;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.zjtelcom.cpct.controller.BaseController;
+import com.zjtelcom.cpct.dto.grouping.OrgGridRel;
 import com.zjtelcom.cpct.dto.grouping.TarGrpTemplateDetail;
 import com.zjtelcom.cpct.service.grouping.TarGrpTemplateService;
 import com.zjtelcom.cpct.util.ChannelUtil;
@@ -20,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
@@ -176,4 +178,29 @@ public class TarGrpTemplateController  extends BaseController {
         Map<String, Object> map = tarGrpTemplateService.tarGrpTemplateCountAndIssue(tarGrpTemplateId, operationType);
         return JSON.toJSONString(map);
     }
+
+    @PostMapping("tarGrpTemplateCountByExpressions")
+    @CrossOrigin
+    public String tarGrpTemplateCountByExpressions(@RequestBody Map<String, Object> params) {
+        Map<String, Object> map = tarGrpTemplateService.tarGrpTemplateCountByExpressions(params);
+        return JSON.toJSONString(map);
+    }
+
+    @PostMapping("fuzzyQueryOrgGrid")
+    @CrossOrigin
+    public String fuzzyQueryOrgGrid(@RequestBody Map<String, Object> params) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            List<OrgGridRel> orgGridRels = tarGrpTemplateService.fuzzyQueryOrgGrid(params.get("name").toString());
+            map.put("resultCode",CODE_SUCCESS);
+            map.put("resultMsg","查询成功");
+            map.put("resultData", orgGridRels);
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("resultCode",CODE_FAIL);
+            map.put("resultMsg","查询失败");
+        }
+        return JSON.toJSONString(map);
+    }
+
 }

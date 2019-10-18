@@ -80,4 +80,8 @@
         <dubbo:method name="sendShortMessage" servicecode="33.1099.sendShortMessage" timeout="120000"/>
     </dubbo:reference>
 
+    <dubbo:reference interface="com.zjtelcom.es.es.service.EsTarGrpTemplate" id="tarGrpTemplateCountAndIssue" version="1.0" check="false">
+        <dubbo:method name="tarGrpTemplateCountAndIssue" servicecode="00.1083.tarGrpTemplateCountAndIssue" timeout="120000"/>
+    </dubbo:reference>
+
 </beans>
