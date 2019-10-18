@@ -388,6 +388,14 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         logger.info("销报表查询接口:stringObjectMap"+stringObjectMap);
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
             stringObjectMap = addParams(stringObjectMap, page, pageSize,mktCampaignType);
+            Object reqId = stringObjectMap.get("reqId");
+            Object total = stringObjectMap.get("total");
+            paramMap.put("pageSize",total);
+            paramMap.put("page","1");
+            if (reqId!=null && reqId!=""){
+                stringObjectMap.put("reqId",reqId);
+                redisUtils.set(reqId.toString(),paramMap);
+            }
         } else {
             Object reqId = stringObjectMap.get("reqId");
             stringObjectMap.put("resultCode", CODE_FAIL);
