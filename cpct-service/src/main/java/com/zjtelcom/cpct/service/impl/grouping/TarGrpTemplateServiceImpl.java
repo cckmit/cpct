@@ -18,6 +18,7 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
+import com.zjtelcom.cpct.dao.grouping.OrgGridRelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateMapper;
@@ -119,7 +120,8 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     private EsTarGrpTemplate esTarGrpTemplateService;
     @Autowired
     private SysParamsMapper systemParamMapper;
-
+    @Autowired
+    private OrgGridRelMapper orgGridRelMapper;
 
     /**
      * 分群模板导入清单
@@ -214,6 +216,11 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg", "导入成功,请稍后查看结果");
         return result;
+    }
+
+    // 模糊查询组织对应的网格表
+    public List<OrgGridRel> fuzzyQueryOrgGrid (String gridName) {
+        return orgGridRelMapper.fuzzySelectByGridName(gridName);
     }
 
     @Override
