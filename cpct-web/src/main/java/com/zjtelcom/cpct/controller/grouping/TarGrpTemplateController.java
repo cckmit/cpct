@@ -188,10 +188,10 @@ public class TarGrpTemplateController  extends BaseController {
 
     @PostMapping("fuzzyQueryOrgGrid")
     @CrossOrigin
-    public String fuzzyQueryOrgGrid(@RequestBody String params) {
+    public String fuzzyQueryOrgGrid(@RequestBody Map<String, Object> params) {
         Map<String, Object> map = new HashMap<>();
         try {
-            List<OrgGridRel> orgGridRels = tarGrpTemplateService.fuzzyQueryOrgGrid(params);
+            List<OrgGridRel> orgGridRels = tarGrpTemplateService.fuzzyQueryOrgGrid(params.get("name").toString());
             map.put("resultCode",CODE_SUCCESS);
             map.put("resultMsg","查询成功");
             map.put("resultData", orgGridRels);
