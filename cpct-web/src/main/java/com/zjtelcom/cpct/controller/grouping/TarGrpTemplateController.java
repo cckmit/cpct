@@ -20,9 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -203,4 +201,21 @@ public class TarGrpTemplateController  extends BaseController {
         return JSON.toJSONString(map);
     }
 
+    @PostMapping("queryOrgGridByCode")
+    @CrossOrigin
+    public String queryOrgGridByCode(@RequestBody Map<String, Object> params) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            List<String> list = (List<String>)(List)params.get("list");
+            List<OrgGridRel> orgGridRels = tarGrpTemplateService.queryOrgGridByCode(list);
+            map.put("resultCode",CODE_SUCCESS);
+            map.put("resultMsg","查询成功");
+            map.put("resultData", orgGridRels);
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("resultCode",CODE_FAIL);
+            map.put("resultMsg","查询失败");
+        }
+        return JSON.toJSONString(map);
+    }
 }

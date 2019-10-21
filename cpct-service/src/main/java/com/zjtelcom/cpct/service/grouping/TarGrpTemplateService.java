@@ -47,4 +47,6 @@ public interface TarGrpTemplateService {
     Map<String, Object> tarGrpTemplateCountByExpressions(Map<String, Object> params);
 
     List<OrgGridRel> fuzzyQueryOrgGrid(String gridName);
+
+    List<OrgGridRel> queryOrgGridByCode(List<String> codeList);
 }

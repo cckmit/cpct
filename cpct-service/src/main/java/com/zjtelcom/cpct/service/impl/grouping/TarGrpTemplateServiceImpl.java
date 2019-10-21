@@ -218,11 +218,6 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         return result;
     }
 
-    // 模糊查询组织对应的网格表
-    public List<OrgGridRel> fuzzyQueryOrgGrid (String gridName) {
-        return orgGridRelMapper.fuzzySelectByGridName(gridName);
-    }
-
     @Override
     public Map<String, Object> tarGrpTemplateScheduledBatchIssue() {
         Map<String, Object> resultMap = new HashMap<>();
@@ -277,6 +272,18 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             arrayList.add(map1);
         }
         return commonTarGrpTemplateCount(arrayList, "1");
+    }
+
+    @Override
+    // 模糊查询组织对应的网格表
+    public List<OrgGridRel> fuzzyQueryOrgGrid (String gridName) {
+        return orgGridRelMapper.fuzzySelectByGridName(gridName);
+    }
+
+    @Override
+    public List<OrgGridRel> queryOrgGridByCode(List<String> codeList) {
+        // String[] toArray = codeList.toArray(new String[codeList.size()]);
+        return orgGridRelMapper.selectOrgGridByCode(codeList);
     }
 
     public Map<String, Object> commonTarGrpTemplateCount(List<Map<String, String>> list, String operationType) {
