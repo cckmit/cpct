@@ -282,7 +282,6 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
 
     @Override
     public List<OrgGridRel> queryOrgGridByCode(List<String> codeList) {
-        // String[] toArray = codeList.toArray(new String[codeList.size()]);
         return orgGridRelMapper.selectOrgGridByCode(codeList);
     }
 
