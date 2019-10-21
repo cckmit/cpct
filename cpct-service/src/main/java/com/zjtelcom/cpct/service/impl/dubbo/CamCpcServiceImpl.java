@@ -778,6 +778,8 @@ public class CamCpcServiceImpl implements CamCpcService {
                 jsonObject.put("evtContactConfIdStr", evtContactConfIdStr);
                 jsonObject.put("tarGrpId", tarGrpId);
                 jsonObject.put("promIntegId", promIntegId);
+                jsonObject.put("isAlongWith", mktStrategyConfRuleDO.getIsAlongWith());
+
 
                 //ES log 标签实例
                 esJson.put("reqId", reqId);
@@ -790,6 +792,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                 esJson.put("strategyConfId", mktStrategyConfDO.getInitId());
                 esJson.put("tarGrpId", tarGrpId);
                 esJson.put("promIntegId", promIntegId);
+                esJson.put("isAlongWith", mktStrategyConfRuleDO.getIsAlongWith());
                 esJson.put("hitEntity", privateParams.get("accNbr")); //命中对象
             } catch (NumberFormatException e) {
                 jsonObject.put("hit", "false");
@@ -1080,7 +1083,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                         ruleMap.put("nowRuleId", ruleId); //新规则编码
                         ruleMap.put("ruleName", ruleName); //规则名称
                         ruleMap.put("promIntegId", promIntegId); // 销售品实例ID
-                        // ruleMap.put("isMarketRule", ); // 是否随销规则标识
+                        ruleMap.put("isMarketRule", mktStrategyConfRuleDO.getIsAlongWith()); // 是否随销规则标识
                         if (context.get("AREA_ID") != null) {
                             ruleMap.put("areaId", context.get("AREA_ID")); // 落地网格
                         }
@@ -1225,6 +1228,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     ruleMap.put("nowRuleId", ruleId); //新规则编码
                     ruleMap.put("ruleName", ruleName); //规则名称
                     ruleMap.put("promIntegId", promIntegId); // 销售品实例ID
+                    ruleMap.put("isMarketRule", mktStrategyConfRuleDO.getIsAlongWith()); // 是否随销标志
                     if (context.get("AREA_ID") != null) {
                         ruleMap.put("areaId", context.get("AREA_ID")); // 落地网格
                     }
