@@ -8,6 +8,9 @@ package com.zjtelcom.cpct.controller.grouping;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dto.grouping.OrgGridRel;
 import com.zjtelcom.cpct.dto.grouping.TarGrpTemplateDetail;
@@ -189,10 +192,15 @@ public class TarGrpTemplateController  extends BaseController {
     public String fuzzyQueryOrgGrid(@RequestBody Map<String, Object> params) {
         Map<String, Object> map = new HashMap<>();
         try {
-            List<OrgGridRel> orgGridRels = tarGrpTemplateService.fuzzyQueryOrgGrid(params.get("name").toString());
+            Integer page = Integer.parseInt(params.get("page").toString());
+            Integer pageSize = Integer.parseInt(params.get("pageSize").toString());
+            PageHelper.startPage(page, pageSize);
+            List<OrgGridRel> orgGridRels = tarGrpTemplateService.fuzzyQueryOrgGrid(params.get("name").toString(), page, pageSize);
+            Page pageInfo = new Page(new PageInfo(orgGridRels));
             map.put("resultCode",CODE_SUCCESS);
             map.put("resultMsg","查询成功");
             map.put("resultData", orgGridRels);
+            map.put("pageInfo", pageInfo);
         } catch (Exception e) {
             e.printStackTrace();
             map.put("resultCode",CODE_FAIL);

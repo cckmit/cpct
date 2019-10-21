@@ -276,7 +276,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
 
     @Override
     // 模糊查询组织对应的网格表
-    public List<OrgGridRel> fuzzyQueryOrgGrid (String gridName) {
+    public List<OrgGridRel> fuzzyQueryOrgGrid (String gridName, Integer page, Integer pageSize) {
         return orgGridRelMapper.fuzzySelectByGridName(gridName);
     }
 
