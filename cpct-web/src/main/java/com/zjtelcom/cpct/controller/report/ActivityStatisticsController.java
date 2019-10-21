@@ -139,7 +139,15 @@ public class ActivityStatisticsController extends BaseController {
         return activityStatisticsService.getMktCampaignDetails(params);
     }
 
-    //随销报表导出成excel文件1000,  活动报表导出成excel文件2000
+    // xyl 活动报表模糊搜索 type 1000 随销  2000 派单
+    @PostMapping("/getActivityStatisticsByName")
+    @CrossOrigin
+    public Map<String,Object> getActivityStatisticsByName(@RequestBody Map<String, Object> params){
+        return activityStatisticsService.getActivityStatisticsByName(params);
+    }
+
+
+    //xyl 随销报表导出成excel文件1000,  活动报表导出成excel文件2000
     @GetMapping("/exportExcel")
     @CrossOrigin
     public void exportExcel(HttpServletRequest request, HttpServletResponse response,String reqId,String type) throws UnsupportedEncodingException {

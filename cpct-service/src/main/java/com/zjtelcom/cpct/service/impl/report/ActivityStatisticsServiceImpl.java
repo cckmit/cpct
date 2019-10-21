@@ -10,6 +10,7 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignRelMapper;
 import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignRelDO;
@@ -59,6 +60,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
     private SysParamsMapper sysParamsMapper;
     @Autowired
     private MktCampaignRelMapper mktCampaignRelMapper;
+    @Autowired
+    private TrialOperationMapper trialOperationMapper;
 
 
     /**
@@ -429,12 +432,13 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         }
         //统计日期 必填字段
         Object endDate = params.get("endDate");
-        if (endDate != null && endDate != "") {
+        Object startDate = params.get("startDate");
+        if (endDate != null && endDate != "" && startDate != null && startDate != "") {
             //类型转换 YYYYMMMDD YYYY-MM-DD
 //            Date date = DateUtil.parseDate(endDate.toString(), "YYYY-MM-DD");
             paramMap.put("endDate", endDate.toString().replaceAll("-", ""));
             //起始统计日期(YYYYMMDD)必填 dubbo接口用
-            paramMap.put("startDate", endDate.toString().replaceAll("-", ""));
+            paramMap.put("startDate", startDate.toString().replaceAll("-", ""));
         } else {
             paramMap.put("resultCode", CODE_FAIL);
             paramMap.put("resultMsg", "时间是必填字段");
@@ -467,7 +471,14 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             paramMap.put("lanId", lanId.toString());
         }
         StringBuilder stringBuilder = new StringBuilder();
-        List<MktCampaignDO> mktCampaignList = mktCampaignMapper.queryRptBatchOrderForMktCampaign(paramMap);
+        List<String> campaignIdLists =trialOperationMapper.selectByMktCampaingIDFromTrial(paramMap);
+        if (campaignIdLists==null || campaignIdLists.size()<0) {
+            paramMap.put("resultCode", CODE_FAIL);
+            paramMap.put("resultMsg", "无区间段派单活动!");
+            return paramMap;
+        }
+        paramMap.put("campaignIdLists",campaignIdLists);
+        List<MktCampaignDO> mktCampaignList = mktCampaignMapper.queryRptBatchOrderForMktCampaignFromDate(paramMap);
         //todo 修改为 init_id 原 getMktCampaignId
         if (mktCampaignList.size() > 0 && mktCampaignList != null) {
             for (MktCampaignDO mktCampaignDO : mktCampaignList) {
@@ -930,6 +941,22 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             resultMap.put("resultCode", CODE_SUCCESS);
         }
         return resultMap;
+    }
+
+    // xyl 活动报表模糊搜索 type 1000 随销  2000 派单
+    @Override
+    public Map<String, Object> getActivityStatisticsByName(Map<String, Object> params) {
+        HashMap<String, Object> result = new HashMap<>();
+        Object name = params.get("name");
+        if (name!=null){
+            List<MktCampaignDO> mktCampaignList = mktCampaignMapper.getActivityStatisticsByName(name.toString());
+            result.put("resultMsg",mktCampaignList);
+            result.put("resultCode","200");
+        }else {
+            result.put("resultMsg","name为空");
+            result.put("resultCode","500");
+        }
+        return result;
     }
 
 

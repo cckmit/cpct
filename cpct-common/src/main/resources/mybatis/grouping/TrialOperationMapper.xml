@@ -160,7 +160,10 @@
   </select>
 
 
-
+ <select id="selectByMktCampaingIDFromTrial" parameterType="java.util.Map" resultType="java.lang.String">
+   SELECT CAMPAIGN_ID FROM trial_operation WHERE CREATE_DATE > #{startDate}
+    AND #{endDate} > CREATE_DATE AND STATUS_CD IN (7300,8100,8000) GROUP BY CAMPAIGN_ID
+ </select>
 
 
 
