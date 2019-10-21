@@ -63,4 +63,13 @@
     from org_grid_rel
     where X_ATTRIB_NAME like CONCAT('%', #{gridName, jdbcType=VARCHAR}, '%')
   </select>
+
+  <select id="selectOrgGridByCode" resultMap="BaseResultMap">
+    select X_ATTRIB, X_ATTRIB_NAME
+    from org_grid_rel
+    where X_ATTRIB in
+    <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </select>
 </mapper>

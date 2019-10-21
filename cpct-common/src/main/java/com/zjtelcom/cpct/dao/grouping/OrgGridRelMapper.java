@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.dao.grouping;
 
 import com.zjtelcom.cpct.dto.grouping.OrgGridRel;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,4 +21,6 @@ public interface OrgGridRelMapper {
     int updateByPrimaryKey(OrgGridRel record);
 
     List<OrgGridRel> fuzzySelectByGridName(String gridName);
+
+    List<OrgGridRel> selectOrgGridByCode(@Param("list")List<String> codeList);
 }
