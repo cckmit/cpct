@@ -432,13 +432,12 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         }
         //统计日期 必填字段
         Object endDate = params.get("endDate");
-        Object startDate = params.get("startDate");
-        if (endDate != null && endDate != "" && startDate != null && startDate != "") {
+        if (endDate != null && endDate != "") {
             //类型转换 YYYYMMMDD YYYY-MM-DD
 //            Date date = DateUtil.parseDate(endDate.toString(), "YYYY-MM-DD");
             paramMap.put("endDate", endDate.toString().replaceAll("-", ""));
             //起始统计日期(YYYYMMDD)必填 dubbo接口用
-            paramMap.put("startDate", startDate.toString().replaceAll("-", ""));
+            paramMap.put("startDate", endDate.toString().replaceAll("-", ""));
         } else {
             paramMap.put("resultCode", CODE_FAIL);
             paramMap.put("resultMsg", "时间是必填字段");
@@ -471,6 +470,14 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             paramMap.put("lanId", lanId.toString());
         }
         StringBuilder stringBuilder = new StringBuilder();
+        //派单增加派单时间段过滤
+        Object activeDate = params.get("activeDate");
+        Object overDate = params.get("overDate");
+        if (activeDate != null && activeDate != "" &&  overDate !=null && overDate!="") {
+            //类型转换 YYYYMMMDD YYYY-MM-DD
+            paramMap.put("activeDate", activeDate.toString());
+            paramMap.put("overDate", overDate.toString());
+        }
         List<String> campaignIdLists =trialOperationMapper.selectByMktCampaingIDFromTrial(paramMap);
         if (campaignIdLists==null || campaignIdLists.size()<0) {
             paramMap.put("resultCode", CODE_FAIL);
