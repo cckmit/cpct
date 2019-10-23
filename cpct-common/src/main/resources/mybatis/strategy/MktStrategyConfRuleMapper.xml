@@ -9,7 +9,6 @@
     <result column="PRODUCT_ID" jdbcType="VARCHAR" property="productId" />
     <result column="EVT_CONTACT_CONF_ID" jdbcType="VARCHAR" property="evtContactConfId" />
     <result column="MKT_CAM_CHL_RESULT_ID" jdbcType="VARCHAR" property="mktCamChlResultId" />
-    <result column="IS_ALONG_WITH" jdbcType="BOOL" property="isAlongWith" />
     <result column="CREATE_STAFF" jdbcType="VARCHAR" property="createStaff" />
     <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
     <result column="UPDATE_STAFF" jdbcType="VARCHAR" property="updateStaff" />
@@ -79,7 +78,7 @@
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select MKT_STRATEGY_CONF_RULE_ID, INIT_ID, MKT_STRATEGY_CONF_RULE_NAME, TAR_GRP_ID, PRODUCT_ID,
     EVT_CONTACT_CONF_ID, MKT_CAM_CHL_RESULT_ID, CREATE_STAFF, CREATE_DATE,
-    UPDATE_STAFF, UPDATE_DATE, IS_ALONG_WITH
+    UPDATE_STAFF, UPDATE_DATE
     from mkt_strategy_conf_rule
     where MKT_STRATEGY_CONF_RULE_ID = #{mktStrategyConfRuleId,jdbcType=BIGINT}
   </select>

@@ -796,7 +796,6 @@ public class CamCpcServiceImpl implements CamCpcService {
                 jsonObject.put("evtContactConfIdStr", evtContactConfIdStr);
                 jsonObject.put("tarGrpId", tarGrpId);
                 jsonObject.put("promIntegId", promIntegId);
-                jsonObject.put("isAlongWith", mktStrategyConfRuleDO.getIsAlongWith());
 
 
                 //ES log 标签实例
@@ -810,7 +809,6 @@ public class CamCpcServiceImpl implements CamCpcService {
                 esJson.put("strategyConfId", mktStrategyConfDO.getInitId());
                 esJson.put("tarGrpId", tarGrpId);
                 esJson.put("promIntegId", promIntegId);
-                esJson.put("isAlongWith", mktStrategyConfRuleDO.getIsAlongWith());
                 esJson.put("hitEntity", privateParams.get("accNbr")); //命中对象
             } catch (NumberFormatException e) {
                 jsonObject.put("hit", "false");
