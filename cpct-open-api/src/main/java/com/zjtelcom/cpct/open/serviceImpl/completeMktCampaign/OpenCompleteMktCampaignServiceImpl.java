@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.open.serviceImpl.completeMktCampaign;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.ctzj.smt.bss.core.util.UUIDUtil;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
@@ -28,6 +29,8 @@ import com.zjtelcom.cpct.util.DateUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
@@ -144,7 +147,7 @@ public class OpenCompleteMktCampaignServiceImpl extends BaseService implements O
         //配置营销互动反馈单
         StringBuilder detaileTacheList = new StringBuilder();
         for(MktCampaignComplete mktCampaignComplete : mktCampaignCompleteList) {
-            SysParams sysParams = sysParamsMapper.findParamsByValue("", mktCampaignComplete.getTacheCd());
+            SysParams sysParams = sysParamsMapper.findParamsByValue("JTCAMPAIGN_NODE", mktCampaignComplete.getTacheCd());
             detaileTacheList.append(sysParams.getParamName()).append("开始：").append(mktCampaignComplete.getBeginTime());
             detaileTacheList.append("结束：").append(mktCampaignComplete.getEndTime());
             detaileTacheList.append("处理人：").append("#").append("\r\n");
@@ -163,24 +166,33 @@ public class OpenCompleteMktCampaignServiceImpl extends BaseService implements O
         logger.info("集团活动反馈接口入参：" + jsonString);
 
         //调用集团营服活动反馈接口地址
-//        CloseableHttpClient httpClient = HttpClients.createDefault();
-//        String url = "";
-//        HttpPost ht = new HttpPost(url);
-//        ht.setHeader("Content-Type", "application/json;charset=utf-8");
-//        ht.setHeader("X-CTG-Request-ID", UUIDUtil.getUUID());
-//        ht.setHeader("X-CTG-Region-ID", "8330000");
-//        String appId = "";
-//        String appKey = "";
-//        ht.setHeader("X-APP-ID", appId);
-//        ht.setHeader("X-APP-KEY", appKey);
-//        try {
-//            HttpResponse response = httpClient.execute(ht);
-//            String content = EntityUtils.toString(response.getEntity());
-//            logger.info("集团返回结果：" + content);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        resultMap.put("message", "营服活动信息反馈完成");
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("OPENAPI_URL");
+        String url = sysParamsList.get(0).getParamValue();
+        HttpPost ht = new HttpPost(url);
+        ht.setHeader("Content-Type", "application/json");
+        String uuid = UUIDUtil.getUUID();
+        ht.setHeader("X-CTG-Request-ID", uuid);
+        logger.info("集团活动反馈接口l流水号：" + uuid);
+        List<SysParams> sysParamList = sysParamsMapper.selectAll(null, "OPENAPI_HEADER");
+        JSONObject json = JSON.parseObject(sysParamList.get(0).getParamValue());
+        String appId = json.get("X-APP-ID").toString();
+        String appKey = json.get("X-APP-KEY").toString();
+        String reginId = json.get("X-CTG-Region-ID").toString();
+        ht.setHeader("X-CTG-Region-ID", reginId);
+        ht.setHeader("X-APP-ID", appId);
+        ht.setHeader("X-APP-KEY", appKey);
+        StringEntity entity = new StringEntity(jsonString, ContentType.APPLICATION_JSON);
+        ht.setEntity(entity);
+        String content = "";
+        try {
+            HttpResponse response = httpClient.execute(ht);
+            content = EntityUtils.toString(response.getEntity());
+            logger.info("集团返回结果：" + content);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        resultMap.put("message", "营服活动信息反馈完成");
         resultMap.put("inputMap", jsonString);
         return resultMap;
     }
