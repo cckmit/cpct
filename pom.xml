@@ -549,7 +549,7 @@
 
             <dependency>
                 <groupId>com.zjtelcom.cpct</groupId>
-                <artifactId>open-complete-service</artifactId>
+                <artifactId>open-complete</artifactId>
                 <version>${open-complete-service.version}</version>
             </dependency>
 

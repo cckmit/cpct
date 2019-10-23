@@ -190,7 +190,7 @@
         <!--集团活动反馈接口-->
         <dependency>
             <groupId>com.zjtelcom.cpct</groupId>
-            <artifactId>open-complete-service</artifactId>
+            <artifactId>open-complete</artifactId>
         </dependency>
 
     </dependencies>
