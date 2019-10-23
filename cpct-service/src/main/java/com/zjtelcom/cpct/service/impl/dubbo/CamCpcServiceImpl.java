@@ -496,20 +496,27 @@ public class CamCpcServiceImpl implements CamCpcService {
                 }
             }
 
+            // 统计固定命中规则的个数
+            // String s = null; // 固定规则配的采集项标签
+            // List<String> list = new ArrayList<>();
+
             boolean isWithDefaultLabel = false;
             for (Map.Entry entry:flagMap.entrySet()) {
                if(true == Boolean.valueOf(entry.getValue().toString())){
                    isWithDefaultLabel = true;
+                   // s = context.get(entry.getValue()) == null ? null : context.get(entry.getValue()).toString();
+                   // list.add(entry.getKey().toString());
                    break;
                }
             }
             if(isWithDefaultLabel) {
-                //判断是否有命中
+                // 判断是否有命中
                 if (ruleList.size() > 1) {
-                    // 从命中列表中移出默认固定规则
+                    // 非固定规则有命中的情况下，从命中列表中移出默认固定规则
                     for (Map<String, Object> strategyMap : strategyMapList) {
                         Long strategyConfId = (Long) strategyMap.get("strategyConfId");
                         String ruleId = redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId) == null? "":redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId).toString();
+                        // String s1 = redisUtils.hgetAll("LEFT_PARAM_FLAG" + strategyConfId) == null ? "" : redisUtils.hgetAll("LEFT_PARAM_FLAG" + strategyConfId).toString();
                         if (ruleId != null && ruleId != "") {
                             for (Map<String, Object> map : ruleList) {
                                 Long ruleId2 = Long.valueOf(map.get("nowRuleId").toString());
@@ -521,7 +528,18 @@ public class CamCpcServiceImpl implements CamCpcService {
                             break;
                         }
                     }
-                }
+                } /*else {
+                    // 非固定规则无命中的情况下，从命中列表中移出不匹配采集项配置的固定规则
+                    // 取采集项标签，按照采集项标签执行固定必中规则
+                    if (s == null || s.equals("")) {
+                        Object o1 = context.get(s);
+                        if (o1 != null && "".equals(o1.toString())) {
+                            String s1 = o1.toString();
+                        }
+                    }
+                    // 移出固定规则中不匹配采集项值的规则
+
+                }*/
                 activity.put("ruleList", ruleList);
                 Map<String, Object> itgTrigger;
                 //查询展示列 （iSale）   todo  展示列的标签未查询到是否影响命中
@@ -914,6 +932,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     for (Map<String, String> labelMap : labelMapList) {
                         if(defaultInfallibleTable.equals(labelMap.get("code"))){
                             redisUtils.set("LEFT_PARAM_FLAG" + strategyConfId, ruleId);
+                            // redisUtils.hset("LEFT_PARAM_FLAG" + strategyConfId, ruleId.toString(),1);
                             flagMap.put(ruleId.toString(), true);
                             log.info(Thread.currentThread().getName() + "flag = true进入...");
                             expressSb.append("true&&");
@@ -1007,6 +1026,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     for (Map<String, String> labelMap : labelMapList) {
                         if(defaultInfallibleTable.equals(labelMap.get("code"))){
                             redisUtils.set("LEFT_PARAM_FLAG" + strategyConfId, ruleId);
+                            // redisUtils.hset("LEFT_PARAM_FLAG" + strategyConfId, ruleId.toString(), 1);
                             flagMap.put(ruleId.toString(), true);
                             log.info("flag = true进入...");
                             continue;
@@ -1035,7 +1055,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                 RuleResult ruleResult = new RuleResult();
                 //初始化返回结果中的销售品条目
                 List<Map<String, String>> productList = new ArrayList<>();
-                if(flagMap.get(ruleId.toString()) == false) {
+                // if(flagMap.get(ruleId.toString()) == false) {
                     //验证是否标签实例不足
                     if (notEnoughLabel.length() > 0) {
                         // log.info("notEnoughLabel.length() > 0->标签实例不足");
@@ -1050,6 +1070,8 @@ public class CamCpcServiceImpl implements CamCpcService {
                     runnerQ.addFunction("toNum", new StringToNumOperator("toNum"));
                     runnerQ.addFunction("checkProm", new PromCheckOperator("checkProm"));
                     runnerQ.addFunction("dateLabel", new ComperDateLabel("dateLabel"));
+                    // 固定必中默认值设置为1
+                    context.put("CPCP_CAM_DEFAULT", "1");
 
                     try {
                         ruleResult = runnerQ.executeRule(express, context, true, true);
@@ -1083,7 +1105,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                         ruleMap.put("nowRuleId", ruleId); //新规则编码
                         ruleMap.put("ruleName", ruleName); //规则名称
                         ruleMap.put("promIntegId", promIntegId); // 销售品实例ID
-                        ruleMap.put("isMarketRule", mktStrategyConfRuleDO.getIsAlongWith()); // 是否随销规则标识
+                        ruleMap.put("isMarketRule", flagMap.get(ruleId) == true ? 0 : 1); // 是否随销规则标识
                         if (context.get("AREA_ID") != null) {
                             ruleMap.put("areaId", context.get("AREA_ID")); // 落地网格
                         }
@@ -1208,7 +1230,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                         esHitService.save(jsonObject, IndexList.RULE_MODULE);
                         return Collections.EMPTY_MAP;
                     }
-                } else {
+                /*} else {
                     jsonObject.put("hit", true);
 
                     //拼接返回结果
@@ -1228,7 +1250,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     ruleMap.put("nowRuleId", ruleId); //新规则编码
                     ruleMap.put("ruleName", ruleName); //规则名称
                     ruleMap.put("promIntegId", promIntegId); // 销售品实例ID
-                    ruleMap.put("isMarketRule", mktStrategyConfRuleDO.getIsAlongWith()); // 是否随销标志
+                    ruleMap.put("isMarketRule", flagMap.get(ruleId) == true ? 0 : 1); // 是否随销标志
                     if (context.get("AREA_ID") != null) {
                         ruleMap.put("areaId", context.get("AREA_ID")); // 落地网格
                     }
@@ -1346,7 +1368,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                         //关闭线程池
                         executorService.shutdownNow();
                     }
-                }
+                }*/
                 ruleMap.put("taskChlList", taskChlList);
                 if (taskChlList.size() > 0) {
                     jsonObject.put("hit", true);
