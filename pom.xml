@@ -70,6 +70,7 @@
         <smt-bss-cpc-model.version>1.0.2</smt-bss-cpc-model.version>
         <cooperate-service-api.version>1.1</cooperate-service-api.version>
         <cpct-dubbo-log.version>1.0.0</cpct-dubbo-log.version>
+        <open-complete-service.version>1.0.0</open-complete-service.version>
     </properties>
 
     <parent>
@@ -544,6 +545,12 @@
                 <groupId>com.zjtelcom.cpct.dubbo</groupId>
                 <artifactId>cpct-dubbo-log</artifactId>
                 <version>${cpct-dubbo-log.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.zjtelcom.cpct</groupId>
+                <artifactId>open-complete-service</artifactId>
+                <version>${open-complete-service.version}</version>
             </dependency>
 
         </dependencies>
