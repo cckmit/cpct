@@ -27,9 +27,8 @@ import com.zjtelcom.cpct.dto.strategy.MktStrategy;
 import com.zjtelcom.cpct.enums.AreaCodeEnum;
 import com.zjtelcom.cpct.enums.PostEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
-import com.zjtelcom.cpct.open.base.common.CommonUtil;
 import com.zjtelcom.cpct.open.base.service.BaseService;
-import com.zjtelcom.cpct.open.entity.event.OpenEvent;
+import com.zjtelcom.cpct.open.entity.RequestTemplateInst;
 import com.zjtelcom.cpct.open.entity.event.OpenEvtTrigCamRulEntity;
 import com.zjtelcom.cpct.open.entity.mktAlgorithms.OpenMktAlgorithmsEntity;
 import com.zjtelcom.cpct.open.entity.mktCamChlConf.OpenMktCamChlConfAttrEntity;
@@ -123,6 +122,8 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
     private ContactEvtMapper contactEvtMapper;
     @Autowired
     private SysParamsMapper sysParamsMapper;
+    @Autowired
+    private MktCampaignCompleteMapper mktCampaignCompleteMapper;
     @Autowired(required = false)
     private IReportService iReportService;
 
@@ -379,6 +380,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
         List<Map<String, Object>> mktCampaigns = new ArrayList<>();
 
         CreateMktCampaignReq createMktCampaignReq = (CreateMktCampaignReq)object;
+        //营服活动信息
         List<OpenMktCampaignEntity> openMktCampaignEntityList = createMktCampaignReq.getMktCampaignDetails();
         for(OpenMktCampaignEntity openMktCampaignEntity : openMktCampaignEntityList) {
             singleMktCampaign.put("mktActivityNbr",openMktCampaignEntity.getMktActivityNbr());
@@ -800,6 +802,26 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
             //新增事件触发活动规则
             List<OpenEvtTrigCamRulEntity> evtTrigCamRuls = openMktCampaignEntity.getEvtTrigCamRuls();
 
+            //需求单信息
+            RequestTemplateInst requestTemplateInst = createMktCampaignReq.getRequestTemplateInst();
+            MktCampaignComplete mktCampaignComplete = new MktCampaignComplete();
+            mktCampaignComplete.setMktActivityNbr(mktCampaignDO.getMktActivityNbr());
+            mktCampaignComplete.setMktCampaignId(mktCampaignDO.getInitId());
+            mktCampaignComplete.setOrderId(requestTemplateInst.getRequestTemplateInstId().toString());
+            mktCampaignComplete.setOrderName(requestTemplateInst.getName());
+            mktCampaignComplete.setTacheCd("1100");
+            mktCampaignComplete.setTacheValueCd("10");
+            mktCampaignComplete.setBeginTime(new Date());
+            mktCampaignComplete.setEndTime(new Date());
+            mktCampaignComplete.setSort(Long.valueOf("1"));
+            mktCampaignComplete.setStatusCd("1100");
+            mktCampaignComplete.setStatusDate(new Date());
+            mktCampaignComplete.setCreateStaff(mktCampaignDO.getCreateStaff());
+            mktCampaignComplete.setCreateDate(new Date());
+            mktCampaignComplete.setUpdateStaff(mktCampaignDO.getUpdateStaff());
+            mktCampaignComplete.setUpdateDate(new Date());
+            mktCampaignComplete.setRemark(JSON.toJSONString(requestTemplateInst));
+            mktCampaignCompleteMapper.insert(mktCampaignComplete);
         }
         resultObject.put("mktCampaigns",mktCampaigns);
         resultMap.put("resultCode","0");
