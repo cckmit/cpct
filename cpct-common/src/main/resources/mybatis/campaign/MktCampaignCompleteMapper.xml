@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.campaign.MktCampaignCompleteMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.campaign.MktCampaignComplete">
+        <id column="COMPLETE_ID" jdbcType="BIGINT" property="completeId" />
+        <result column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId" />
+        <result column="MKT_ACTIVITY_NBR" jdbcType="VARCHAR" property="mktActivityNbr" />
+        <result column="ORDER_ID" jdbcType="VARCHAR" property="orderId" />
+        <result column="ORDER_NAME" jdbcType="VARCHAR" property="orderName" />
+        <result column="TACHE_CD" jdbcType="VARCHAR" property="tacheCd" />
+        <result column="TACHE_VALUE_CD" jdbcType="VARCHAR" property="tacheValueCd" />
+        <result column="BEGIN_TIME" jdbcType="TIMESTAMP" property="beginTime" />
+        <result column="END_TIME" jdbcType="TIMESTAMP" property="endTime" />
+        <result column="SORT" jdbcType="BIGINT" property="sort" />
+        <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+        <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+        <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+
+    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignComplete" useGeneratedKeys="true"
+            keyProperty="completeId">
+        insert into mkt_campaign_complete(COMPLETE_ID, MKT_CAMPAIGN_ID, MKT_ACTIVITY_NBR, ORDER_ID, ORDER_NAME,
+                    TACHE_CD, TACHE_VALUE_CD, BEGIN_TIME, END_TIME, SORT, STATUS_CD, STATUS_DATE, CREATE_STAFF,
+                    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK)
+        values (#{completeId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{mktActivityNbr,jdbcType=VARCHAR},
+                #{orderId,jdbcType=VARCHAR}, #{orderName,jdbcType=VARCHAR}, #{tacheCd,jdbcType=VARCHAR},
+                #{tacheValueCd,jdbcType=VARCHAR},#{beginTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP},
+                #{sort,jdbcType=BIGINT}, #{statusCd,jdbcType=VARCHAR}, #{statusDate,jdbcType=TIMESTAMP},
+                #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT},
+                #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR})
+    </insert>
+
+    <select id="selectByCampaignId" resultMap="BaseResultMap">
+        select COMPLETE_ID, MKT_CAMPAIGN_ID, MKT_ACTIVITY_NBR, ORDER_ID, ORDER_NAME, TACHE_CD, TACHE_VALUE_CD,
+               BEGIN_TIME, END_TIME, SORT, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF,
+               UPDATE_DATE, REMARK
+        from mkt_campaign_complete
+        where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+        order by SORT asc
+    </select>
+
+    <update id="update" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignComplete">
+        update mkt_campaign_complete
+        set
+        <if test="mktCampaignId != null and mktCampaignId != ''">
+            MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},
+        </if>
+        <if test="mktActivityNbr != null and mktActivityNbr != ''">
+            MKT_ACTIVITY_NBR = #{mktActivityNbr,jdbcType=VARCHAR},
+        </if>
+        <if test="orderId != null and orderId != ''">
+            ORDER_ID = #{orderId,jdbcType=VARCHAR},
+        </if>
+        <if test="orderName != null and orderName != ''">
+            ORDER_NAME = #{orderName,jdbcType=VARCHAR},
+        </if>
+        <if test="tacheCd != null and tacheCd != ''">
+            TACHE_CD = #{tacheCd,jdbcType=VARCHAR},
+        </if>
+        <if test="tacheValueCd != null and tacheValueCd != ''">
+            TACHE_VALUE_CD = #{tacheValueCd,jdbcType=VARCHAR},
+        </if>
+        <if test="beginTime != null">
+            BEGIN_TIME = #{beginTime,jdbcType=TIMESTAMP},
+        </if>
+        <if test="endTime != null">
+            END_TIME = #{endTime,jdbcType=TIMESTAMP},
+        </if>
+        <if test="sort != null and sort != ''">
+            SORT = #{sort,jdbcType=BIGINT},
+        </if>
+        <if test="statusCd != null and statusCd != ''">
+            STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+        </if>
+        <if test="statusDate != null ">
+            STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="updateStaff != null and updateStaff != 0">
+            UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        </if>
+        <if test="updateDate != null">
+            UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="remark != null and remark != ''">
+            REMARK = #{remark,jdbcType=VARCHAR},
+        </if>
+        COMPLETE_ID = #{completeId,jdbcType=BIGINT}
+        where COMPLETE_ID = = #{completeId,jdbcType=BIGINT}
+    </update>
+</mapper>
