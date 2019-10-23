@@ -13,6 +13,10 @@
     <dubbo:registry id="esb2" protocol="dubbo" address="134.96.161.20:8001"/><!--esb2.0 prod-->
 
 
+    <!-- 暴露服务 -->
+    <dubbo:protocol name="dubbo" port="30809"/>
+    <dubbo:monitor protocol="registry" />
+
     <!-- 因子实时查询 -->
     <dubbo:reference registry="esb3" interface="com.zjpii.biz.serv.YzServ" id="yzServ"
                      version="1.0" retries="0" check="false">
@@ -37,5 +41,10 @@
                      version="1.0" retries="0" check="false">
         <dubbo:method name="queryCampaignByNum" servicecode="00.1079.queryValidCampaignByAccNum"/>
     </dubbo:reference>
+
+    <!-- 集团下发活动反馈接口 1.0 -->
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.open.service.completeMktCampaign.OpenCompleteMktCampaignService" ref="openCompleteMktCampaignServiceImpl" version="1.0" >
+        <dubbo:method name="completeMktCampaign" servicecode="00.1083.completeMktCampaign" timeout="10000"/>
+    </dubbo:service>
 
 </beans>
