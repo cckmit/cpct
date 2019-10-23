@@ -41,11 +41,6 @@ public class MktStrategyConfRuleDO extends BaseEntity {
      */
     private String mktCamChlResultId;
 
-    /**
-     * 随销标志
-     */
-    private Boolean isAlongWith;
-
     public Long getMktStrategyConfRuleId() {
         return mktStrategyConfRuleId;
     }
@@ -101,13 +96,5 @@ public class MktStrategyConfRuleDO extends BaseEntity {
 
     public void setMktCamChlResultId(String mktCamChlResultId) {
         this.mktCamChlResultId = mktCamChlResultId;
-    }
-
-    public Boolean getIsAlongWith() {
-        return isAlongWith;
-    }
-
-    public void setIsAlongWith(Boolean isAlongWith) {
-        this.isAlongWith = isAlongWith;
     }
 }
