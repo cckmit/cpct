@@ -15,4 +15,6 @@ public interface MktCampaignCompleteMapper {
 
     List<MktCampaignComplete> selectByCampaignId(Long mktCampaignId);
 
+    MktCampaignComplete selectByCampaignIdAndTacheCd(Long mktCampaignId, String tacheCd);
+
 }

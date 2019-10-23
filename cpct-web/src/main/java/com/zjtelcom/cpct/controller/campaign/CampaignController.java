@@ -531,4 +531,15 @@ public class CampaignController extends BaseController {
         return stringObjectMap;
     }
 
+    /**
+     * 集团活动不承接反馈接口
+     */
+    @RequestMapping(value = "/mktCampaignJtRefuse", method = RequestMethod.POST)
+    @CrossOrigin
+    public Map<String, Object> mktCampaignJtRefuse(Long mktCampaignId) {
+        Map<String, Object> result = new HashMap<>();
+        result = mktCampaignService.mktCampaignJtRefuse(mktCampaignId);
+        return result;
+    }
+
 }
