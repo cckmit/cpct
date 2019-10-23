@@ -9,6 +9,7 @@
     <result column="PRODUCT_ID" jdbcType="VARCHAR" property="productId" />
     <result column="EVT_CONTACT_CONF_ID" jdbcType="VARCHAR" property="evtContactConfId" />
     <result column="MKT_CAM_CHL_RESULT_ID" jdbcType="VARCHAR" property="mktCamChlResultId" />
+    <result column="IS_ALONG_WITH" jdbcType="BOOL" property="isAlongWith" />
     <result column="CREATE_STAFF" jdbcType="VARCHAR" property="createStaff" />
     <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
     <result column="UPDATE_STAFF" jdbcType="VARCHAR" property="updateStaff" />
@@ -22,12 +23,12 @@
     insert into mkt_strategy_conf_rule (MKT_STRATEGY_CONF_RULE_ID, INIT_ID, MKT_STRATEGY_CONF_RULE_NAME,
       TAR_GRP_ID, PRODUCT_ID, EVT_CONTACT_CONF_ID,
       MKT_CAM_CHL_RESULT_ID, CREATE_STAFF,
-      CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, IS_ALONG_WITH
+      CREATE_DATE, UPDATE_STAFF, UPDATE_DATE
       )
     values (#{mktStrategyConfRuleId,jdbcType=BIGINT}, #{initId,jdbcType=BIGINT}, #{mktStrategyConfRuleName,jdbcType=VARCHAR},
       #{tarGrpId,jdbcType=BIGINT}, #{productId,jdbcType=VARCHAR}, #{evtContactConfId,jdbcType=VARCHAR},
       #{mktCamChlResultId,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT},
-      #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, #{isAlongWith,jdbcType=TINYINT}
+      #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}
       )
   </insert>
   <insert id="insertByBatch" parameterType="java.util.List">
@@ -70,9 +71,6 @@
     <if test="createDate != null">
       CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
     </if>
-    <if test="isAlongWith != null">
-      IS_ALONG_WITH = #{isAlongWith,jdbcType=TINYINT},
-    </if>
     UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
     UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
     where MKT_STRATEGY_CONF_RULE_ID = #{mktStrategyConfRuleId,jdbcType=BIGINT}
@@ -81,7 +79,7 @@
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select MKT_STRATEGY_CONF_RULE_ID, INIT_ID, MKT_STRATEGY_CONF_RULE_NAME, TAR_GRP_ID, PRODUCT_ID,
     EVT_CONTACT_CONF_ID, MKT_CAM_CHL_RESULT_ID, CREATE_STAFF, CREATE_DATE,
-    UPDATE_STAFF, UPDATE_DATE
+    UPDATE_STAFF, UPDATE_DATE, IS_ALONG_WITH
     from mkt_strategy_conf_rule
     where MKT_STRATEGY_CONF_RULE_ID = #{mktStrategyConfRuleId,jdbcType=BIGINT}
   </select>

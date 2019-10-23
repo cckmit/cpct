@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.util.*;
 
@@ -97,10 +99,11 @@ public class TarGrpTemplateController  extends BaseController {
      */
     @RequestMapping(value = "/saveTarGrpTemplate", method = RequestMethod.POST)
     @CrossOrigin
-    public String saveTarGrpTemplate(@RequestBody TarGrpTemplateDetail tarGrpTemplateDetail) {
-        Map<String, Object> map = tarGrpTemplateService.saveTarGrpTemplate(tarGrpTemplateDetail);
+    public String saveTarGrpTemplate(HttpServletRequest request, HttpServletResponse response , @RequestBody TarGrpTemplateDetail tarGrpTemplateDetail) {
+        Map<String, Object> map = tarGrpTemplateService.saveTarGrpTemplate(tarGrpTemplateDetail, request,  response );
         return JSON.toJSONString(map);
     }
+
 
     /**
      * 获取目标分群模板
