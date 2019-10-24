@@ -1241,7 +1241,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamComplete.setCreateDate(new Date());
                     mktCampaignCompleteMapper.insert(mktCampaignComplete);
                     try {
-                        openCompleteMktCampaignService.completeMktCampaign(campaignDO.getInitId(), "1200");
+                        openCompleteMktCampaignService.completeMktCampaign(campaignDO.getInitId(), "1300");
                     }catch (Exception e){
                         e.printStackTrace();
                     }
@@ -3278,13 +3278,18 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             return resultMap;
         }
         for(MktCampaignComplete mktCampaignComplete : mktCampaignCompleteList) {
-            if(mktCampaignComplete.getTacheCd().equals("1100")) {
+            if(mktCampaignComplete.getTacheCd().equals("1100") && mktCampaignComplete.getTacheValueCd().equals("10")) {
                 mktCampaignComplete.setTacheValueCd("11");
                 mktCampaignComplete.setStatusCd("1200");
                 mktCampaignComplete.setEndTime(new Date());
                 mktCampaignComplete.setUpdateDate(new Date());
                 mktCampaignComplete.setUpdateStaff(UserUtil.loginId());
                 mktCampaignCompleteMapper.update(mktCampaignComplete);
+                try {
+                    openCompleteMktCampaignService.completeMktCampaign(mktCampaignDO.getInitId(), "1100");
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         }
         resultMap.put("resultCode",CODE_SUCCESS);
