@@ -1,6 +1,6 @@
 package com.zjtelcom.cpct.open.entity.mktCampaignEntity;
 
-import java.util.Date;
+import java.util.List;
 
 public class CompleteMktCampaign {
 
@@ -13,7 +13,7 @@ public class CompleteMktCampaign {
     private String detaileTacheList	;//省内环节明细(省份在省环节结束时统一反馈省内环节明细，且格式符合以下规范：环节名称、环节开始时间、环节结束时间、换行符#)
     private String regionCode;//省编码
     private String statusCd	;//环节状态(1100：环节开始 1200：环节结束 1300：回退)
-    private OpenMktCampaignEntity mktCampaigns;
+    private List<OpenMktCampaignEntity> mktCampaigns;
 
     public String getOrderId() {
         return orderId;
@@ -87,11 +87,11 @@ public class CompleteMktCampaign {
         this.statusCd = statusCd;
     }
 
-    public OpenMktCampaignEntity getMktCampaigns() {
+    public List<OpenMktCampaignEntity> getMktCampaigns() {
         return mktCampaigns;
     }
 
-    public void setMktCampaigns(OpenMktCampaignEntity mktCampaigns) {
+    public void setMktCampaigns(List<OpenMktCampaignEntity> mktCampaigns) {
         this.mktCampaigns = mktCampaigns;
     }
 }

@@ -73,8 +73,7 @@ public class OpenCompleteMktCampaignServiceImpl extends BaseService implements O
         Map<String, Object> inputMap = new HashMap<>();
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        SimpleDateFormat sdft = new SimpleDateFormat("yyyy-MM-dd");
-        ParsePosition pos = new ParsePosition(8);
+        List<OpenMktCampaignEntity> openMktCampaignEntityList = new ArrayList<>();
         CompleteMktCampaignJtReq completeMktCampaignJtReq = new CompleteMktCampaignJtReq();
         CompleteMktCampaign completeMktCampaign = new CompleteMktCampaign();
         //查询出对应活动（排除非集团下发活动）
@@ -146,6 +145,7 @@ public class OpenCompleteMktCampaignServiceImpl extends BaseService implements O
             }
         }
         openMktCampaignEntity.setMktCamChlConfs(mktCamChlConfs);
+        openMktCampaignEntityList.add(openMktCampaignEntity);
 
         //配置营销互动反馈单
         StringBuilder detaileTacheList = new StringBuilder();
@@ -162,7 +162,7 @@ public class OpenCompleteMktCampaignServiceImpl extends BaseService implements O
                 completeMktCampaign.setEndTime(endTime);
                 completeMktCampaign.setDetaileTacheList(detaileTacheList.toString());
                 completeMktCampaign.setRegionCode("8330000");
-                completeMktCampaign.setMktCampaigns(openMktCampaignEntity);
+                completeMktCampaign.setMktCampaigns(openMktCampaignEntityList);
             }
         }
 
@@ -190,6 +190,7 @@ public class OpenCompleteMktCampaignServiceImpl extends BaseService implements O
         ht.setHeader("X-APP-ID", appId);
         ht.setHeader("X-APP-KEY", appKey);
         StringEntity entity = new StringEntity(jsonString, ContentType.APPLICATION_JSON);
+        logger.info(entity.toString());
         ht.setEntity(entity);
         String content = "";
         try {
