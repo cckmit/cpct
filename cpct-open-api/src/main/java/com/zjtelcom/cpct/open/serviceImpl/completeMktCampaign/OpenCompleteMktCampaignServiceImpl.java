@@ -38,10 +38,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 @Transactional
@@ -72,6 +71,10 @@ public class OpenCompleteMktCampaignServiceImpl extends BaseService implements O
     public Map<String, Object> completeMktCampaign(Long mktCampaignId, String tacheCd) {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> inputMap = new HashMap<>();
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        SimpleDateFormat sdft = new SimpleDateFormat("yyyy-MM-dd");
+        ParsePosition pos = new ParsePosition(8);
         CompleteMktCampaignJtReq completeMktCampaignJtReq = new CompleteMktCampaignJtReq();
         CompleteMktCampaign completeMktCampaign = new CompleteMktCampaign();
         //查询出对应活动（排除非集团下发活动）
@@ -148,11 +151,15 @@ public class OpenCompleteMktCampaignServiceImpl extends BaseService implements O
         StringBuilder detaileTacheList = new StringBuilder();
         for(MktCampaignComplete mktCampaignComplete : mktCampaignCompleteList) {
             SysParams sysParams = sysParamsMapper.findParamsByValue("JTCAMPAIGN_NODE", mktCampaignComplete.getTacheCd());
-            detaileTacheList.append(sysParams.getParamName()).append("开始：").append(mktCampaignComplete.getBeginTime());
-            detaileTacheList.append("结束：").append(mktCampaignComplete.getEndTime());
-            detaileTacheList.append("处理人：").append("#").append("\r\n");
+            detaileTacheList.append(sysParams.getParamName()).append(" 开始：").append(sdf.format(mktCampaignComplete.getBeginTime()));
+            detaileTacheList.append(" 结束：").append(sdf.format(mktCampaignComplete.getEndTime()));
+            detaileTacheList.append(" 处理人：").append("#").append("\r\n");
             if(mktCampaignComplete.getTacheCd().equals(tacheCd)) {
                 BeanUtil.copy(mktCampaignComplete, completeMktCampaign);
+                String beginTime = df.format(mktCampaignComplete.getBeginTime());
+                String endTime = df.format(mktCampaignComplete.getEndTime());
+                completeMktCampaign.setBeginTime(beginTime);
+                completeMktCampaign.setEndTime(endTime);
                 completeMktCampaign.setDetaileTacheList(detaileTacheList.toString());
                 completeMktCampaign.setRegionCode("8330000");
                 completeMktCampaign.setMktCampaigns(openMktCampaignEntity);
@@ -173,7 +180,7 @@ public class OpenCompleteMktCampaignServiceImpl extends BaseService implements O
         ht.setHeader("Content-Type", "application/json");
         String uuid = UUIDUtil.getUUID();
         ht.setHeader("X-CTG-Request-ID", uuid);
-        logger.info("集团活动反馈接口l流水号：" + uuid);
+        logger.info("集团活动反馈接口流水号：" + uuid);
         List<SysParams> sysParamList = sysParamsMapper.selectAll(null, "OPENAPI_HEADER");
         JSONObject json = JSON.parseObject(sysParamList.get(0).getParamValue());
         String appId = json.get("X-APP-ID").toString();

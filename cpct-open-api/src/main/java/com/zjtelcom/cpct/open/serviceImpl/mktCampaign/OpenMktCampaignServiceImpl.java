@@ -543,7 +543,9 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                     mktCamChlConfDO.setEvtContactConfId(null);
                     mktCamChlConfDO.setMktCampaignId(mktCampaignDO.getMktCampaignId());
                     Channel channel = contactChannelMapper.selectByCode(mktCamChlConfDO.getContactChlId().toString());
-                    mktCamChlConfDO.setContactChlId(channel.getContactChlId());
+                    if(channel != null) {
+                        mktCamChlConfDO.setContactChlId(channel.getContactChlId());
+                    }
                     mktCamChlConfDO.setEvtContactConfName(channel.getContactChlName());
                     mktCamChlConfDO.setPushType("1000");
                     mktCamChlConfMapper.insert(mktCamChlConfDO);
