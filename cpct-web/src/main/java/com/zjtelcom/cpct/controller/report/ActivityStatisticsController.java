@@ -4,24 +4,23 @@ package com.zjtelcom.cpct.controller.report;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ctzj.smt.bss.cooperate.service.dubbo.IReportService;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.service.report.ActivityStatisticsService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import sun.net.sdp.SdpSupport;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("${adminPath}/report")

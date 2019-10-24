@@ -599,6 +599,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                 continue;
                             }
                         }
+                        //活动id
+                        resultMap.put("mktCampaignId", mktCampaignDO.getMktCampaignId());
                         //活动名称
                         resultMap.put("mktCampaignName", mktCampaignDO.getMktCampaignName());
                         //活动开始是时间和结束时间
@@ -724,6 +726,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                 continue;
                             }
                         }
+                        //活动id
+                        resultMap.put("mktCampaignId", mktCampaignDO.getMktCampaignId());
                         //活动名称
                         resultMap.put("mktCampaignName", mktCampaignDO.getMktCampaignName());
                         //活动开始是时间和结束时间
