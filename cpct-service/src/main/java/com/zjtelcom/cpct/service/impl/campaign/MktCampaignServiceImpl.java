@@ -302,10 +302,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         break;
                     }
                 }
-                result.put("resultCode",CODE_SUCCESS);
-                result.put("resultMsg","协同渠道开始时间不符合规范，请检查规则：["+ruleName+"]");
-                result.put("data","true");
-                return result;
+                if (!"".equals(ruleName)){
+                    result.put("resultCode",CODE_SUCCESS);
+                    result.put("resultMsg","协同渠道开始时间不符合规范，请检查规则：["+ruleName+"]");
+                    result.put("data","true");
+                    return result;
+                }
             }
         }
 
@@ -325,10 +327,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         break;
                     }
                 }
-                result.put("resultCode",CODE_SUCCESS);
-                result.put("resultMsg","协同渠道结束时间不符合规范，请检查规则：["+ruleName+"]");
-                result.put("data","true");
-                return result;
+                if (!"".equals(ruleName)){
+                    result.put("resultCode",CODE_SUCCESS);
+                    result.put("resultMsg","协同渠道开始时间不符合规范，请检查规则：["+ruleName+"]");
+                    result.put("data","true");
+                    return result;
+                }
             }
         }
         result.put("resultCode",CODE_SUCCESS);
@@ -2627,7 +2631,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         List<String> sendFailList = new ArrayList();
         for (MktCampaignDO mktCampaignDO : mktCampaignDOS) {
             try {
-                if (mktCampaignDO.getPlanEndTime().after(new Date()) && DateUtil.daysBetween(new Date(), mktCampaignDO.getPlanEndTime()) == 7) {
+                if (mktCampaignDO.getPlanEndTime() != null && mktCampaignDO.getPlanEndTime().after(new Date()) && DateUtil.daysBetween(new Date(), mktCampaignDO.getPlanEndTime()) == 7) {
                     Long staff = mktCampaignDO.getCreateStaff();
                     System.out.println("222222222222");
                     SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(staff, new ArrayList<Long>());
@@ -3134,7 +3138,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         if (byCityFour!=null && byCityFour.getAreaId() != null) {
                             resutlMap.put("C4", Long.valueOf(byCityFour.getAreaId()));
                         }
-                        if (organization.getOrgNameC5() != null) {
+                        if (StringUtils.isNotBlank(organization.getOrgNameC5())) {
                             resutlMap.put("C5", Long.valueOf(organization.getOrgNameC5()));
                         }
                     }
