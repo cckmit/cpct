@@ -14,6 +14,7 @@ public class OpenMktCamChlConfEntity {
     private Long mktCampaignId;
     private String mktActivityNbr;
     private Long contactChlId;
+    private String contactChlCode;
     private String pushType;
     private Long policyId;
     private String statusCd;
@@ -44,6 +45,14 @@ public class OpenMktCamChlConfEntity {
 
     public void setEvtContactConfId(Long evtContactConfId) {
         this.evtContactConfId = evtContactConfId;
+    }
+
+    public String getContactChlCode() {
+        return contactChlCode;
+    }
+
+    public void setContactChlCode(String contactChlCode) {
+        this.contactChlCode = contactChlCode;
     }
 
     public String getEvtContactConfName() {
