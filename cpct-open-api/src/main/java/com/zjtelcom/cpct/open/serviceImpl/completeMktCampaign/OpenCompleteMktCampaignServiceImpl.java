@@ -95,10 +95,10 @@ public class OpenCompleteMktCampaignServiceImpl extends BaseService implements O
             ObjRegionRel objRegionRel = new ObjRegionRel();
             objRegionRel.setObjId(mktCampaignDO.getInitId());
             objRegionRel.setObjNbr(mktCampaignDO.getMktActivityNbr());
-            //objRegionRel.setApplyRegionId();
-            Long regionId = AreaCodeEnum.getLandIdByRegionId(mktCampaignDO.getLanId());
+            Long regionId = AreaCodeEnum.getRegionIdByLandId(mktCampaignDO.getLanId());
             if(regionId != null) {
                 objRegionRel.setApplyRegionNbr(regionId.toString());
+                objRegionRel.setApplyRegionId(regionId);
             }
             objRegionRels.add(objRegionRel);
         }
