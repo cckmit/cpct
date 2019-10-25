@@ -123,7 +123,7 @@ public class OpenCompleteMktCampaignServiceImpl extends BaseService implements O
                                     if(mktCamChlConfDO != null) {
                                         OpenMktCamChlConfEntity openMktCamChlConfEntity = BeanUtil.create(mktCamChlConfDO, new OpenMktCamChlConfEntity());
                                         openMktCamChlConfEntity.setMktActivityNbr(mktCampaignDO.getMktActivityNbr());
-                                        Channel channel = contactChannelMapper.selectByCode(mktCamChlConfDO.getContactChlId().toString());
+                                        Channel channel = contactChannelMapper.selectByPrimaryKey(mktCamChlConfDO.getContactChlId());
                                         openMktCamChlConfEntity.setContactChlCode(channel.getContactChlCode());
                                         //营服活动执行渠道配置属性
                                         List<OpenMktCamChlConfAttrEntity> mktCamChlConfAttrs = new ArrayList<>();
