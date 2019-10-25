@@ -9,12 +9,16 @@
     <!-- 提供方应用信息，用于计算依赖关系 33.1059  00.1083-->
     <dubbo:application name="00.1083"/>
 
-    <dubbo:registry id="esb3" protocol="dubbo" address="134.96.253.65:8001"/><!--bss3.0 pst环境-->
+    <!--<dubbo:registry id="esb" protocol="dubbo" address="134.96.253.65:8001"/>&lt;!&ndash;bss3.0 pst环境&ndash;&gt;-->
     <dubbo:registry id="esb2" protocol="dubbo" address="134.96.161.20:8001"/><!--esb2.0生产环境-->
-    <dubbo:registry id="esb4" protocol="dubbo" address="134.96.249.149:8001"/><!--bss3.0 prod环境-->
+    <dubbo:registry id="esb3" protocol="dubbo" address="134.96.249.149:8001"/><!--bss3.0 prod环境-->
+
+    <!-- 暴露服务 -->
+    <dubbo:protocol name="dubbo" port="30813"/>
+    <dubbo:monitor protocol="registry" />
 
     <!-- 因子实时查询 -->
-    <dubbo:reference registry="esb4" interface="com.zjpii.biz.serv.YzServ" id="yzServ"
+    <dubbo:reference registry="esb3" interface="com.zjpii.biz.serv.YzServ" id="yzServ"
                      version="2.0" retries="0" check="false">
         <dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="10000"/>
     </dubbo:reference>
@@ -27,7 +31,7 @@
     </dubbo:reference>
 
     <!--协同渠道接触任务-->
-    <dubbo:reference registry="esb4" interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskService" id="iContactTaskService"
+    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskService" id="iContactTaskService"
                      version="2.0" retries="0" check="false">
         <dubbo:method name="queryTaskDetail4openApi" servicecode="00.1079.queryTaskDetail4openApi"/>
     </dubbo:reference>

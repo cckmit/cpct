@@ -100,6 +100,7 @@ public class OpenCompleteMktCampaignServiceImpl extends BaseService implements O
                 objRegionRel.setApplyRegionNbr(regionId.toString());
                 objRegionRel.setApplyRegionId(regionId);
             }
+            objRegionRel.setStatusCd("1000");
             objRegionRels.add(objRegionRel);
         }
         openMktCampaignEntity.setObjRegionRels(objRegionRels);
