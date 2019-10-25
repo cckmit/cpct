@@ -159,6 +159,9 @@ public class CamCpcServiceImpl implements CamCpcService {
     public Map<String, Object> ActivityCpcTask(Map<String, String> params, Long activityId, Map<String, String> privateParams, Map<String, String> laubelItems, List<Map<String, Object>> evtTriggers, List<Map<String, Object>> strategyMapList, DefaultContext<String, Object> context) {
         log.info("进入ActivityCpcTask...");
 
+        //
+        Map<String, Object> nonPassedMsg = new HashMap<>();
+
         Map<String, Object> activity = new ConcurrentHashMap<>();
         long begin = System.currentTimeMillis();
         String reqId = params.get("reqId");
@@ -197,7 +200,8 @@ public class CamCpcServiceImpl implements CamCpcService {
                     esJson.put("hit", false);
                     esJson.put("msg", "活动信息查询失败，活动为null");
                     esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
-                    return Collections.EMPTY_MAP;
+                    nonPassedMsg.put("cam_" + activityId, "活动信息查询失败");
+                    return nonPassedMsg;
                 } else {
                     redisUtils.set("MKT_CAMPAIGN_" + activityId, mktCampaign);
                 }
@@ -207,7 +211,8 @@ public class CamCpcServiceImpl implements CamCpcService {
             esJson.put("hit", false);
             esJson.put("msg", "活动信息查询失败");
             esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
-            return Collections.EMPTY_MAP;
+            nonPassedMsg.put("cam_" + activityId, "活动信息查询失败");
+            return nonPassedMsg;
         }
 
         if (mktCampaign == null) {
@@ -215,7 +220,8 @@ public class CamCpcServiceImpl implements CamCpcService {
             esJson.put("hit", false);
             esJson.put("msg", "活动信息查询失败，活动为null");
             esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
-            return Collections.EMPTY_MAP;
+            nonPassedMsg.put("cam_" + activityId, "活动信息查询失败");
+            return nonPassedMsg;
         }
 
         privateParams.put("activityId", mktCampaign.getMktCampaignId().toString()); //活动Id
@@ -262,7 +268,8 @@ public class CamCpcServiceImpl implements CamCpcService {
                 esJson.put("hit", false);
                 esJson.put("msg", "过滤规则信息查询失败");
                 esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
-                return Collections.EMPTY_MAP;
+                nonPassedMsg.put("cam_" + activityId, "活动信息查询失败");
+                return nonPassedMsg;
             } else {
                 redisUtils.set("MKT_FILTER_RULE_IDS_" + activityId, filterRuleIds);
             }
@@ -401,7 +408,8 @@ public class CamCpcServiceImpl implements CamCpcService {
                                 esJson.put("hit", "false");
                                 esJson.put("msg", "销售品过滤验证未通过:" + esMsg);
                                 esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + privateParams.get("accNbr"));
-                                return Collections.EMPTY_MAP;
+                                nonPassedMsg.put("cam_" + activityId, "销售品过滤验证未通过:" + esMsg);
+                                return nonPassedMsg;
                             }
                         }
                     } else if ("4000".equals(filterRule.getFilterType())) {  //表达式过滤
@@ -418,7 +426,8 @@ public class CamCpcServiceImpl implements CamCpcService {
                                 esJson.put("hit", false);
                                 esJson.put("msg", "过扰规则信息查询失败 byId: " + filterRuleId);
                                 esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + privateParams.get("accNbr"));
-                                return Collections.EMPTY_MAP;
+                                nonPassedMsg.put("cam_" + activityId, "过扰规则信息查询失败 byId: " + filterRuleId);
+                                return nonPassedMsg;
                             } else {
                                 redisUtils.set("FILTER_RULE_DISTURB_" + filterRuleId, labels);
                             }
@@ -469,7 +478,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     String productId = (String) ruleMap.get("productId");
                     String evtContactConfId = (String) ruleMap.get("evtContactConfId");
                     flagMap.put(ruleId.toString(), false);
-                    Future<Map<String, Object>> f = executorService.submit(new RuleTask(params, privateParams, strategyConfId, strategyConfName, tarGrpId, productId, evtContactConfId, ruleId, ruleName, context, lanId));
+                    Future<Map<String, Object>> f = executorService.submit(new RuleTask(params, privateParams, strategyConfId, strategyConfName, tarGrpId, productId, evtContactConfId, ruleId, ruleName, context, lanId, nonPassedMsg));
                     //将线程处理结果添加到结果集
                     threadList.add(f);
                 }
@@ -745,8 +754,9 @@ public class CamCpcServiceImpl implements CamCpcService {
         private Map<String, String> privateParams;
         private DefaultContext<String, Object> context;
         private String lanId;
+        private Map<String, Object> nonPassedMsg;
 
-        public RuleTask(Map<String, String> params, Map<String, String> privateParams, Long strategyConfId, String strategyConfName, Long tarGrpId, String productStr, String evtContactConfIdStr, Long mktStrategyConfRuleId, String mktStrategyConfRuleName, DefaultContext<String, Object> context, String lanId) {
+        public RuleTask(Map<String, String> params, Map<String, String> privateParams, Long strategyConfId, String strategyConfName, Long tarGrpId, String productStr, String evtContactConfIdStr, Long mktStrategyConfRuleId, String mktStrategyConfRuleName, DefaultContext<String, Object> context, String lanId, Map<String, Object> nonPassedMsg) {
             this.strategyConfId = strategyConfId;
             this.strategyConfName = strategyConfName;
             this.tarGrpId = tarGrpId;
@@ -759,6 +769,7 @@ public class CamCpcServiceImpl implements CamCpcService {
             this.privateParams = privateParams;
             this.context = context;
             this.lanId = lanId;
+            this.nonPassedMsg = nonPassedMsg;
         }
 
         @Override
@@ -815,7 +826,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                 jsonObject.put("msg", "类型转换异常"+e.getMessage());
                 esHitService.save(jsonObject, IndexList.RULE_MODULE);
                 e.printStackTrace();
-                return Collections.EMPTY_MAP;
+                // return Collections.EMPTY_MAP;
+                nonPassedMsg.put("rule_" + ruleId, "类型转换异常");
+                return nonPassedMsg;
             }
 
             Map<String, Object> ruleMap = new ConcurrentHashMap<>();
@@ -833,7 +846,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                 jsonObject.put("hit", "false");
                 jsonObject.put("msg", "分群ID异常");
                 esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                return Collections.EMPTY_MAP;
+                // return Collections.EMPTY_MAP;
+                nonPassedMsg.put("rule_" + ruleId, "分群ID异常");
+                return nonPassedMsg;
             }
 
             //记录实例不足的标签
@@ -895,7 +910,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                 jsonObject.put("hit", "false");
                 jsonObject.put("msg", "销售品过滤查询异常"+e.getMessage());
                 esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                return Collections.EMPTY_MAP;
+                // return Collections.EMPTY_MAP;
+                nonPassedMsg.put("rule_" + ruleId, "销售品过滤查询异常");
+                return nonPassedMsg;
             }
             if (express == null || "".equals(express)) {
                 List<LabelResult> labelResultList = new ArrayList<>();
@@ -910,7 +927,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                             jsonObject.put("hit", "false");
                             jsonObject.put("msg", "规则下标签查询失败");
                             esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                            return Collections.EMPTY_MAP;
+                            // return Collections.EMPTY_MAP;
+                            nonPassedMsg.put("rule_" + ruleId, "规则下标签查询失败");
+                            return nonPassedMsg;
                         }
                         redisUtils.set("RULE_ALL_LABEL_" + tarGrpId, labelMapList);
                     }
@@ -920,7 +939,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                         jsonObject.put("hit", "false");
                         jsonObject.put("msg", "未查询到分群标签");
                         esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                        return Collections.EMPTY_MAP;
+                        // return Collections.EMPTY_MAP;
+                        nonPassedMsg.put("rule_" + ruleId, "未查询到分群标签");
+                        return nonPassedMsg;
                     }
 
                     //将规则拼装为表达式
@@ -997,7 +1018,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                     jsonObject.put("hit", "false");
                     jsonObject.put("msg", "表达式拼接异常");
                     esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                    return Collections.EMPTY_MAP;
+                    // return Collections.EMPTY_MAP;
+                    nonPassedMsg.put("rule_" + ruleId, "表达式拼接异常");
+                    return nonPassedMsg;
                 }
                 //表达式存入redis
                 redisUtils.set("EXPRESS_" + tarGrpId, express);
@@ -1015,7 +1038,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                             jsonObject.put("hit", "false");
                             jsonObject.put("msg", "规则下标签查询失败");
                             esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                            return Collections.EMPTY_MAP;
+                            // return Collections.EMPTY_MAP;
+                            nonPassedMsg.put("rule_" + ruleId, "规则下标签查询失败");
+                            return nonPassedMsg;
                         }
                         redisUtils.set("RULE_ALL_LABEL_" + tarGrpId, labelMapList);
                     }
@@ -1044,7 +1069,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                     jsonObject.put("hit", "false");
                     jsonObject.put("msg", "表达式拼接异常");
                     esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                    return Collections.EMPTY_MAP;
+                    // return Collections.EMPTY_MAP;
+                    nonPassedMsg.put("rule_" + ruleId, "表达式拼接异常");
+                    return nonPassedMsg;
                 }
             }
 
@@ -1060,7 +1087,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                         jsonObject.put("hit", "false");
                         jsonObject.put("msg", "标签实例不足：" + notEnoughLabel.toString());
                         esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                        return Collections.EMPTY_MAP;
+                        // return Collections.EMPTY_MAP;
+                        nonPassedMsg.put("rule_" + ruleId, "标签实例不足");
+                        return nonPassedMsg;
                     }
 
                     //规则引擎计算
@@ -1078,7 +1107,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                         jsonObject.put("hit", "false");
                         jsonObject.put("msg", "规则引擎计算失败");
                         esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                        return Collections.EMPTY_MAP;
+                        // return Collections.EMPTY_MAP;
+                        nonPassedMsg.put("rule_" + ruleId, "规则引擎计算失败");
+                        return nonPassedMsg;
                     }
 
                     jsonObject.put("express", express);
@@ -1226,7 +1257,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                         jsonObject.put("hit", "false");
                         jsonObject.put("msg", "规则引擎匹配未通过");
                         esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                        return Collections.EMPTY_MAP;
+                        // return Collections.EMPTY_MAP;
+                        nonPassedMsg.put("rule_" + ruleId, "规则引擎匹配未通过");
+                        return nonPassedMsg;
                     }
                 /*} else {
                     jsonObject.put("hit", true);
@@ -1374,7 +1407,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                     jsonObject.put("hit", false);
                     jsonObject.put("msg", "渠道均未命中");
                     esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                    return Collections.EMPTY_MAP;
+                    // return Collections.EMPTY_MAP;
+                    nonPassedMsg.put("rule_" + ruleId, "渠道均未命中");
+                    return nonPassedMsg;
                 }
                 esHitService.save(jsonObject, IndexList.RULE_MODULE);
             } catch (Exception e) {

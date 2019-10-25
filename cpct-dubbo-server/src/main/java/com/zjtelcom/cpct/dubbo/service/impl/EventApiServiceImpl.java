@@ -695,6 +695,7 @@ public class EventApiServiceImpl implements EventApiService {
                     result.put("CPCResultMsg", "succes 预校验为空");
                     result.put("taskList", activityList);
 
+
                     paramsJson.put("backParams", result);
                     esHitService.save(paramsJson, IndexList.PARAMS_MODULE, map.get("reqId"));
 
@@ -1042,11 +1043,20 @@ public class EventApiServiceImpl implements EventApiService {
 
                 //获取结果
                 try {
+                    Map<String, Object> nonPassedMsg = new HashMap<>();
                     for (Future<Map<String, Object>> future : threadList) {
-                        if (future.get() != null && !future.get().isEmpty()) {
+                        /*if (future.get() != null && !future.get().isEmpty()) {
                             activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
+                        }*/
+                        if (future.get() != null && !(future.get().containsKey("cam_") || future.get().containsKey("str_") || future.get().containsKey("rule_"))) {
+                            // 命中活动
+                            activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
+                        } else {
+                            // 翼支付未命中原因
+                            nonPassedMsg.putAll(future.get());
                         }
                     }
+                    result.put("nonPassedMsg", JSON.toJSONString(nonPassedMsg));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     //发生异常关闭线程池
