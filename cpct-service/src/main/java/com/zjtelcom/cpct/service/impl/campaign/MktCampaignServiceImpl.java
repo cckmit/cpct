@@ -367,7 +367,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 mktCamComplete.setStatusDate(new Date());
                 mktCamComplete.setCreateStaff(campaign.getCreateStaff());
                 mktCamComplete.setCreateDate(new Date());
-                mktCampaignCompleteMapper.insert(mktCampaignComplete);
+                mktCampaignCompleteMapper.insert(mktCamComplete);
                 try {
                     openCompleteMktCampaignService.completeMktCampaign(campaign.getInitId(), "1200");
                 }catch (Exception e){
@@ -814,7 +814,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamComplete.setStatusDate(new Date());
                     mktCamComplete.setCreateStaff(mktCampaignDO.getCreateStaff());
                     mktCamComplete.setCreateDate(new Date());
-                    mktCampaignCompleteMapper.insert(mktCampaignComplete);
+                    mktCampaignCompleteMapper.insert(mktCamComplete);
                     try {
                         openCompleteMktCampaignService.completeMktCampaign(campaign.getInitId(), "1100");
                     }catch (Exception e){
@@ -1239,7 +1239,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamComplete.setStatusDate(new Date());
                     mktCamComplete.setCreateStaff(campaignDO.getCreateStaff());
                     mktCamComplete.setCreateDate(new Date());
-                    mktCampaignCompleteMapper.insert(mktCampaignComplete);
+                    mktCampaignCompleteMapper.insert(mktCamComplete);
                     try {
                         openCompleteMktCampaignService.completeMktCampaign(campaignDO.getInitId(), "1300");
                     }catch (Exception e){
