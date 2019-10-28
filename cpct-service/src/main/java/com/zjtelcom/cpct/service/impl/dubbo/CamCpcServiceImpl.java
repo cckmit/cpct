@@ -1226,8 +1226,12 @@ public class CamCpcServiceImpl implements CamCpcService {
                                 //Future<Map<String, Object>> f = executorService.submit(new ChannelTask(evtContactConfId, productList, context, reqId));
                                 //将线程处理结果添加到结果集
                                 //threadList.add(f);
-                                Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId);
-                                taskChlList.add(channelMap);
+                                Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId, nonPassedMsg, ruleId);
+                                if (channelMap.containsKey("rule_")){
+                                    nonPassedMsg.putAll(channelMap);
+                                } else {
+                                    taskChlList.add(channelMap);
+                                }
                             } else {
                                 if (evtContactConfIdArray != null && !"".equals(evtContactConfIdArray[0])) {
                                     for (String str : evtContactConfIdArray) {
@@ -1237,9 +1241,13 @@ public class CamCpcServiceImpl implements CamCpcService {
                                         //Future<Map<String, Object>> f = executorService.submit(new ChannelTask(evtContactConfId, productList, context, reqId));
                                         //将线程处理结果添加到结果集
                                         //threadList.add(f);
-                                        Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId);
+                                        Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId, nonPassedMsg, ruleId);
                                         if (channelMap != null && !channelMap.isEmpty()) {
-                                            taskChlList.add(channelMap);
+                                            if (channelMap.containsKey("rule_")){
+                                                nonPassedMsg.putAll(channelMap);
+                                            } else {
+                                                taskChlList.add(channelMap);
+                                            }
                                         }
                                     }
                                 }
@@ -1423,7 +1431,7 @@ public class CamCpcServiceImpl implements CamCpcService {
         }
     }
 
-    private Map<String, Object> ChannelTask(Long evtContactConfId, List<Map<String, String>> productList, DefaultContext<String, Object> context, String reqId) {
+    private Map<String, Object> ChannelTask(Long evtContactConfId, List<Map<String, String>> productList, DefaultContext<String, Object> context, String reqId, Map<String, Object> nonPassedMsg, Long ruleId) {
 
         Date now = new Date();
 
@@ -1501,7 +1509,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                         channelMap.put("contactAccount", context.get(mktCamChlConfAttr.getAttrValue()));
                     } else {
                         //未查询到推送账号 就不命中
-                        return Collections.EMPTY_MAP;
+                        // return Collections.EMPTY_MAP;
+                        nonPassedMsg.put("rule_" + ruleId, "未查询到渠道推送账号");
+                        return nonPassedMsg;
                     }
                 }
             } else {
@@ -1516,7 +1526,9 @@ public class CamCpcServiceImpl implements CamCpcService {
         channelMap.put("taskChlAttrList", taskChlAttrList);
 
         if (!checkTime) {
-            return Collections.EMPTY_MAP;
+            // return Collections.EMPTY_MAP;
+            nonPassedMsg.put("rule_" + ruleId, "渠道生失效时间错误");
+            return nonPassedMsg;
         }
 
         //渠道信息
@@ -1558,7 +1570,9 @@ public class CamCpcServiceImpl implements CamCpcService {
             }
         } else {
             //未查询到话术 不命中
-            return Collections.EMPTY_MAP;
+            // return Collections.EMPTY_MAP;
+            nonPassedMsg.put("rule_" + ruleId, "未查询到推送话术");
+            return nonPassedMsg;
         }
 
         //查询指引
@@ -1619,7 +1633,9 @@ public class CamCpcServiceImpl implements CamCpcService {
             if (contactScript != null) {
                 if (subScript(contactScript).size() > 0) {
 //                    System.out.println("推荐话术标签替换含有无值的标签");
-                    return Collections.EMPTY_MAP;
+                    // return Collections.EMPTY_MAP;
+                    nonPassedMsg.put("rule_" + ruleId, "推荐话术标签替换含有无值的标签");
+                    return nonPassedMsg;
                 }
             }
 
@@ -1627,7 +1643,9 @@ public class CamCpcServiceImpl implements CamCpcService {
             if (mktVerbalStr != null) {
                 if (subScript(mktVerbalStr).size() > 0) {
 //                    System.out.println("推荐指引标签替换含有无值的标签");
-                    return Collections.EMPTY_MAP;
+                    // return Collections.EMPTY_MAP;
+                    nonPassedMsg.put("rule_" + ruleId, "推荐指引标签替换含有无值的标签");
+                    return nonPassedMsg;
                 }
             }
         }            //返回结果中添加脚本信息
