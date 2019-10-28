@@ -45,6 +45,7 @@ import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.service.system.SysParamsService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
+import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -524,17 +525,21 @@ public class CamCpcServiceImpl implements CamCpcService {
                     // 非固定规则有命中的情况下，从命中列表中移出默认固定规则
                     for (Map<String, Object> strategyMap : strategyMapList) {
                         Long strategyConfId = (Long) strategyMap.get("strategyConfId");
-                        String ruleId = redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId) == null? "":redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId).toString();
-                        // String s1 = redisUtils.hgetAll("LEFT_PARAM_FLAG" + strategyConfId) == null ? "" : redisUtils.hgetAll("LEFT_PARAM_FLAG" + strategyConfId).toString();
-                        if (ruleId != null && ruleId != "") {
-                            for (Map<String, Object> map : ruleList) {
+                        // String ruleId = redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId) == null? "":redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId).toString();
+                        Object object = redisUtils.hgetAll("LEFT_PARAM_FLAG" + strategyConfId) == null ? "" : redisUtils.hgetAll("LEFT_PARAM_FLAG" + strategyConfId);
+                        if (object != null && object != "") {
+                            Iterator<Map<String, Object>> iterator = ruleList.iterator();
+                            while (iterator.hasNext()) {
+                                Map<String, Object> map = iterator.next();
                                 Long ruleId2 = Long.valueOf(map.get("nowRuleId").toString());
-                                if (ruleId.equals(ruleId2.toString())) {
-                                    ruleList.remove(map);
-                                    break;
+                                HashMap<String, Integer> ruleMap = (HashMap<String, Integer>) object;
+                                for (String filed : ruleMap.keySet()) {
+                                    if (filed.equals(ruleId2.toString())) {
+                                        ruleList.remove(map);
+                                        break;
+                                    }
                                 }
                             }
-                            break;
                         }
                     }
                 } /*else {
@@ -950,8 +955,8 @@ public class CamCpcServiceImpl implements CamCpcService {
                     //遍历所有规则
                     for (Map<String, String> labelMap : labelMapList) {
                         if(defaultInfallibleTable.equals(labelMap.get("code"))){
-                            redisUtils.set("LEFT_PARAM_FLAG" + strategyConfId, ruleId);
-                            // redisUtils.hset("LEFT_PARAM_FLAG" + strategyConfId, ruleId.toString(),1);
+                            // redisUtils.set("LEFT_PARAM_FLAG" + strategyConfId, ruleId);
+                            redisUtils.hset("LEFT_PARAM_FLAG" + strategyConfId, ruleId.toString(),1);
                             flagMap.put(ruleId.toString(), true);
                             log.info(Thread.currentThread().getName() + "flag = true进入...");
                             expressSb.append("true&&");
@@ -1048,8 +1053,8 @@ public class CamCpcServiceImpl implements CamCpcService {
                     //遍历所有规则
                     for (Map<String, String> labelMap : labelMapList) {
                         if(defaultInfallibleTable.equals(labelMap.get("code"))){
-                            redisUtils.set("LEFT_PARAM_FLAG" + strategyConfId, ruleId);
-                            // redisUtils.hset("LEFT_PARAM_FLAG" + strategyConfId, ruleId.toString(), 1);
+                            // redisUtils.set("LEFT_PARAM_FLAG" + strategyConfId, ruleId);
+                            redisUtils.hset("LEFT_PARAM_FLAG" + strategyConfId, ruleId.toString(), 1);
                             flagMap.put(ruleId.toString(), true);
                             log.info("flag = true进入...");
                             continue;
