@@ -1139,7 +1139,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                         ruleMap.put("nowRuleId", ruleId); //新规则编码
                         ruleMap.put("ruleName", ruleName); //规则名称
                         ruleMap.put("promIntegId", promIntegId); // 销售品实例ID
+                        System.out.println("1234567890");
                         ruleMap.put("isMarketRule", flagMap.get(ruleId) == true ? 0 : 1); // 是否随销规则标识
+                        System.out.println("0987654321");
                         if (context.get("AREA_ID") != null) {
                             ruleMap.put("areaId", context.get("AREA_ID")); // 落地网格
                         }
