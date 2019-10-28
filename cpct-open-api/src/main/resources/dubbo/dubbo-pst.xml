@@ -42,9 +42,4 @@
         <dubbo:method name="queryCampaignByNum" servicecode="00.1079.queryValidCampaignByAccNum"/>
     </dubbo:reference>
 
-    <!-- 集团下发活动反馈接口 1.0 -->
-    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.open.service.completeMktCampaign.OpenCompleteMktCampaignService" ref="openCompleteMktCampaignServiceImpl" version="1.0" >
-        <dubbo:method name="completeMktCampaign" servicecode="00.1083.completeMktCampaign" timeout="10000"/>
-    </dubbo:service>
-
 </beans>
