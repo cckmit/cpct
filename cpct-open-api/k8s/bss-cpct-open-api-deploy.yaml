@@ -29,12 +29,12 @@ spec:
                 - "/app/project/unregister.sh"
                 - "30007"
         env:
-        - name: DUBBO_IP_TO_REGISTRY     # 当项目为对外项目时，此处注解取消
-          valueFrom:
-           fieldRef:
-            fieldPath: status.hostIP
-        - name: DUBBO_PORT_TO_REGISTRY
-          value: "30809"
+#        - name: DUBBO_IP_TO_REGISTRY     # 当项目为对外项目时，此处注解取消
+#          valueFrom:
+#           fieldRef:
+#            fieldPath: status.hostIP
+#        - name: DUBBO_PORT_TO_REGISTRY
+#          value: "30809"
         - name: ESB_UNREGISTER_URI
           valueFrom:
             configMapKeyRef:
