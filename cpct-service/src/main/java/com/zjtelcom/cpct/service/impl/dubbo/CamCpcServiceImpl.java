@@ -526,15 +526,15 @@ public class CamCpcServiceImpl implements CamCpcService {
                     for (Map<String, Object> strategyMap : strategyMapList) {
                         Long strategyConfId = (Long) strategyMap.get("strategyConfId");
                         // String ruleId = redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId) == null? "":redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId).toString();
-                        Object object = redisUtils.hgetAll("LEFT_PARAM_FLAG" + strategyConfId) == null ? "" : redisUtils.hgetAll("LEFT_PARAM_FLAG" + strategyConfId);
+                        Object object = redisUtils.hgetAllField("LEFT_PARAM_FLAG" + strategyConfId) == null ? "" : redisUtils.hgetAllField("LEFT_PARAM_FLAG" + strategyConfId);
                         if (object != null && object != "") {
                             Iterator<Map<String, Object>> iterator = ruleList.iterator();
                             while (iterator.hasNext()) {
                                 Map<String, Object> map = iterator.next();
                                 Long ruleId2 = Long.valueOf(map.get("nowRuleId").toString());
-                                HashMap<String, Integer> ruleMap = (HashMap<String, Integer>) object;
-                                for (String filed : ruleMap.keySet()) {
-                                    if (filed.equals(ruleId2.toString())) {
+                                List<String> list = (List<String>) object;
+                                for (String field : list) {
+                                    if (field.equals(ruleId2.toString())) {
                                         ruleList.remove(map);
                                         break;
                                     }
