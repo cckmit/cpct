@@ -955,7 +955,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                             flagMap.put(ruleId.toString(), true);
                             log.info(Thread.currentThread().getName() + "flag = true进入...");
                             expressSb.append("true&&");
-                            continue;
+                            // continue;
                         }
                         String type = labelMap.get("operType");
                         //保存标签的es log
