@@ -123,7 +123,7 @@ public class EventApiServiceImpl implements EventApiService {
     @Autowired
     private InjectionLabelMapper injectionLabelMapper; //标签因子
 
-    @Autowired
+    @Autowired(required = false)
     private EsHitsService esHitService;  //es存储
 
     @Autowired
@@ -1042,21 +1042,30 @@ public class EventApiServiceImpl implements EventApiService {
 
 
                 //获取结果
+                Boolean flag = true;
                 try {
                     Map<String, Object> nonPassedMsg = new HashMap<>();
                     for (Future<Map<String, Object>> future : threadList) {
+                        if (future.get() != null && !future.get().isEmpty()) {
+                            activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
+                        }
                         /*if (future.get() != null && !future.get().isEmpty()) {
-                            activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
-                        }*/
-                        if (future.get() != null && !(future.get().containsKey("cam_") || future.get().containsKey("str_") || future.get().containsKey("rule_"))) {
-                            // 命中活动
-                            activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
+                            Map<String, Object> map1 = future.get();
+                            for (String s : map1.keySet()) {
+                                if (s.contains("cam_") || s.contains("rule_")) {
+                                    flag = false;
+                                }
+                            }
+                            if (flag) {
+                                // 命中活动
+                                activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
+                            }
                         } else {
                             // 翼支付未命中原因
                             nonPassedMsg.putAll(future.get());
-                        }
+                        }*/
                     }
-                    result.put("nonPassedMsg", JSON.toJSONString(nonPassedMsg));
+                    // result.put("nonPassedMsg", JSON.toJSONString(nonPassedMsg));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     //发生异常关闭线程池
