@@ -95,7 +95,7 @@ public class RedisUtils {
                 jedis = ctgJedisPool.getResource();
                 Map<String, String> resultMap = jedis.hgetAll(key);
                 for (Map.Entry<String, String> entry : resultMap.entrySet()) {
-                    fieldList.addAll( (List<String>)unserizlize(entry.getKey()));
+                    fieldList.add(unserizlize(entry.getKey()).toString());
                 }
                 jedis.close();
             } catch (Throwable je) {
