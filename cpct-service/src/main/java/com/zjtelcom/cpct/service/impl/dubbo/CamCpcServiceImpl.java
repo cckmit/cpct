@@ -956,7 +956,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     for (Map<String, String> labelMap : labelMapList) {
                         if(defaultInfallibleTable.equals(labelMap.get("code"))){
                             // redisUtils.set("LEFT_PARAM_FLAG" + strategyConfId, ruleId);
-                            redisUtils.hset("LEFT_PARAM_FLAG" + strategyConfId, ruleId.toString(),1);
+                            redisUtils.hset("LEFT_PARAM_FLAG" + strategyConfId, ruleId.toString(),"1");
                             flagMap.put(ruleId.toString(), true);
                             log.info(Thread.currentThread().getName() + "flag = true进入...");
                             expressSb.append("true&&");
@@ -1054,7 +1054,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     for (Map<String, String> labelMap : labelMapList) {
                         if(defaultInfallibleTable.equals(labelMap.get("code"))){
                             // redisUtils.set("LEFT_PARAM_FLAG" + strategyConfId, ruleId);
-                            redisUtils.hset("LEFT_PARAM_FLAG" + strategyConfId, ruleId.toString(), 1);
+                            redisUtils.hset("LEFT_PARAM_FLAG" + strategyConfId, ruleId.toString(), "1");
                             flagMap.put(ruleId.toString(), true);
                             log.info("flag = true进入...");
                             continue;
