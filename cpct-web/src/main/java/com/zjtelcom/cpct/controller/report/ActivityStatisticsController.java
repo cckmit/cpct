@@ -302,8 +302,14 @@ public class ActivityStatisticsController extends BaseController {
     }
 
     private Map fixedMap(List<HashMap<String, Object>> hashMaps, String[][] content, int i) {
-        JSONObject jsonObject = JSON.parseObject(String.valueOf(hashMaps.get(i)));
-        Map map2 = JSONObject.parseObject(jsonObject.toJSONString(), Map.class);
+        System.out.println("为什么解析会出错 ："+String.valueOf(hashMaps.get(i)));
+        Map map2 = null;
+        try {
+            JSONObject jsonObject = JSON.parseObject(String.valueOf(hashMaps.get(i)));
+            map2 = JSONObject.parseObject(jsonObject.toJSONString(), Map.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         //活动名称
         content[i][0] = String.valueOf(map2.get("mktCampaignName"));
         //活动状态 2002 已发布 2008 调整中
