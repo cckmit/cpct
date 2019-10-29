@@ -396,7 +396,6 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             paramMap.put("pageSize",total);
             paramMap.put("page","1");
             if (reqId!=null && reqId!=""){
-                stringObjectMap.put("reqId",reqId);
                 redisUtils.set(reqId.toString(),paramMap);
             }
         } else {
@@ -559,7 +558,6 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             paramMap.put("pageSize",total);
             paramMap.put("page","1");
             if (reqId!=null && reqId!=""){
-                stringObjectMap.put("reqId",reqId);
                 redisUtils.set(reqId.toString(),paramMap);
             }
         } else {
@@ -641,7 +639,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             String key = iter.next();
                             Object o = map.get(key);
                             if ("".equals(o) || "null".equals(o) || null == o){
-                                o = 0;
+                                o = 0+"";
                             }
                             if (key.equals("orderNum")) {
                                 msgMap.put("name", "派单数");
@@ -768,7 +766,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             String key = iter.next();
                             Object o = map.get(key);
                             if ("".equals(o) || "null".equals(o) || null == o){
-                                o = 0;
+                                o = 0+"";
                             }
                             if (key.equals("contactNum")) {
                                 msgMap.put("name", "客户接触数");
