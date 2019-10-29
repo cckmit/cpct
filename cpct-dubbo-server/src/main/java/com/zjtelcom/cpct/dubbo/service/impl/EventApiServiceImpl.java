@@ -123,7 +123,7 @@ public class EventApiServiceImpl implements EventApiService {
     @Autowired
     private InjectionLabelMapper injectionLabelMapper; //标签因子
 
-    @Autowired(required = false)
+    @Autowired
     private EsHitsService esHitService;  //es存储
 
     @Autowired
@@ -453,7 +453,7 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
                 //根据事件code查询事件信息
-                 Object eventC =  redisUtils.get("EVENT_" + map.get("eventCode"));
+                Object eventC =  redisUtils.get("EVENT_" + map.get("eventCode"));
                 ContactEvt event = null;
                 if (eventC!=null){
                     event = (ContactEvt)eventC;
@@ -694,7 +694,6 @@ public class EventApiServiceImpl implements EventApiService {
                     result.put("CPCResultCode", "1000");
                     result.put("CPCResultMsg", "succes 预校验为空");
                     result.put("taskList", activityList);
-
 
                     paramsJson.put("backParams", result);
                     esHitService.save(paramsJson, IndexList.PARAMS_MODULE, map.get("reqId"));
@@ -1042,30 +1041,12 @@ public class EventApiServiceImpl implements EventApiService {
 
 
                 //获取结果
-                Boolean flag = true;
                 try {
-                    Map<String, Object> nonPassedMsg = new HashMap<>();
                     for (Future<Map<String, Object>> future : threadList) {
                         if (future.get() != null && !future.get().isEmpty()) {
                             activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
                         }
-                        /*if (future.get() != null && !future.get().isEmpty()) {
-                            Map<String, Object> map1 = future.get();
-                            for (String s : map1.keySet()) {
-                                if (s.contains("cam_") || s.contains("rule_")) {
-                                    flag = false;
-                                }
-                            }
-                            if (flag) {
-                                // 命中活动
-                                activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
-                            }
-                        } else {
-                            // 翼支付未命中原因
-                            nonPassedMsg.putAll(future.get());
-                        }*/
                     }
-                    // result.put("nonPassedMsg", JSON.toJSONString(nonPassedMsg));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     //发生异常关闭线程池
@@ -2361,7 +2342,7 @@ public class EventApiServiceImpl implements EventApiService {
                                     }
                                 } else {
                                     //适用地市获取异常 lanId
-    //                            log.info("适用渠道获取异常");
+                                    //                            log.info("适用渠道获取异常");
 
                                     esJson.put("hit", false);
                                     esJson.put("msg", "策略未命中");
@@ -2412,15 +2393,15 @@ public class EventApiServiceImpl implements EventApiService {
                         for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleList) {
                             Map<String, Object> ruleMap = new ConcurrentHashMap<>();
                             String evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId();
-    //                    if (evtContactConfMapList != null && evtContactConfMapList.size() > 0) {
+                            //                    if (evtContactConfMapList != null && evtContactConfMapList.size() > 0) {
                             ruleMap.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
                             ruleMap.put("ruleName", mktStrategyConfRuleDO.getMktStrategyConfRuleName());
                             ruleMap.put("tarGrpId", mktStrategyConfRuleDO.getTarGrpId());
                             ruleMap.put("productId", mktStrategyConfRuleDO.getProductId());
                             ruleMap.put("evtContactConfId", mktStrategyConfRuleDO.getEvtContactConfId());
-    //                        ruleMap.put("evtContactConfMapList", evtContactConfMapList);
+                            //                        ruleMap.put("evtContactConfMapList", evtContactConfMapList);
                             ruleMapList.add(ruleMap);
-    //                    }
+                            //                    }
                         }
                     } catch (Exception e) {
                         log.error("预校验获取规则查询失败");
@@ -2454,7 +2435,7 @@ public class EventApiServiceImpl implements EventApiService {
                 if (strategyMapList != null && strategyMapList.size() > 0) {
                     // 判断initId是否在清单列表里面
                     if (mktCamCodeList.contains(mktCampaign.getInitId().toString())) {
-                   // if (mktCamCodeList.contains(mktCampaign.getMktCampaignId().toString())) {
+                        // if (mktCamCodeList.contains(mktCampaign.getMktCampaignId().toString())) {
                         mktCampaignCustMap.put("initId", mktCampaign.getInitId());
                         mktCampaignCustMap.put("mktCampaginId", mktCampaginId);
                         mktCampaignCustMap.put("levelConfig", act.get("levelConfig"));
