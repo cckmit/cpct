@@ -396,7 +396,6 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             paramMap.put("pageSize",total);
             paramMap.put("page","1");
             if (reqId!=null && reqId!=""){
-                stringObjectMap.put("reqId",reqId);
                 redisUtils.set(reqId.toString(),paramMap);
             }
         } else {
@@ -559,7 +558,6 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             paramMap.put("pageSize",total);
             paramMap.put("page","1");
             if (reqId!=null && reqId!=""){
-                stringObjectMap.put("reqId",reqId);
                 redisUtils.set(reqId.toString(),paramMap);
             }
         } else {

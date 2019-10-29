@@ -161,6 +161,9 @@ public class ActivityStatisticsController extends BaseController {
                 //随销报表
                 try {
                     System.out.println("测试exportExcel接口入参"+JSONObject.toJSONString(paramMap));
+                    if (paramMap.get("mktCampaignId")!=null && paramMap.get("mktCampaignId").toString().contains(",")){
+                        paramMap.put("mktCampaignId","");
+                    }
                     map = activityStatisticsService.getRptEventOrder(paramMap);
 //               String str = "{\"total\":742,\"resultCode\":\"200\",\"pageSize\":5,\"page\":1,\"resultMsg\":[{\"mktCampaignName\":\"智能组网201812\",\"mktCampaignType\":\"营销活动\",\"channel\":\"iSale\",\"statusCd\":\"2008\",\"beginTime\":\"2018-12-20\",\"endTime\":\"2019-09-30\",\"mktActivityBnr\":\"MKT000020\",\"statistics\":[{\"name\":\"客户接触数\",\"nub\":1},{\"name\":\"商机推荐数\",\"nub\":1},{\"name\":\"商机成功数\",\"nub\":0},{\"name\":\"客触转化率\",\"nub\":\"0.00%\"},{\"name\":\"商机转化率\",\"nub\":\"0.00%\"},{\"name\":\"收入低迁数\",\"nub\":0},{\"name\":\"收入低迁率\",\"nub\":\"0.00%\"},{\"name\":\"门店有销率\",\"nub\":\"0.00%\"},{\"name\":\"是否框架子活动\",\"nub\":\"否\"}]},{\"mktCampaignName\":\"智能组网201812\",\"mktCampaignType\":\"营销活动\",\"channel\":\"iSale\",\"statusCd\":\"2008\",\"beginTime\":\"2018-12-20\",\"endTime\":\"2019-09-30\",\"mktActivityBnr\":\"MKT000020\",\"statistics\":[{\"name\":\"客户接触数\",\"nub\":6},{\"name\":\"商机推荐数\",\"nub\":6},{\"name\":\"商机成功数\",\"nub\":0},{\"name\":\"客触转化率\",\"nub\":\"0.00%\"},{\"name\":\"商机转化率\",\"nub\":\"0.00%\"},{\"name\":\"收入低迁数\",\"nub\":0},{\"name\":\"收入低迁率\",\"nub\":\"0.00%\"},{\"name\":\"门店有销率\",\"nub\":\"0.00%\"},{\"name\":\"是否框架子活动\",\"nub\":\"否\"}]},{\"mktCampaignName\":\"智能组网201812\",\"mktCampaignType\":\"营销活动\",\"channel\":\"iSale\",\"statusCd\":\"2008\",\"beginTime\":\"2018-12-20\",\"endTime\":\"2019-09-30\",\"mktActivityBnr\":\"MKT000020\",\"statistics\":[{\"name\":\"客户接触数\",\"nub\":7},{\"name\":\"商机推荐数\",\"nub\":8},{\"name\":\"商机成功数\",\"nub\":0},{\"name\":\"客触转化率\",\"nub\":\"0.00%\"},{\"name\":\"商机转化率\",\"nub\":\"0.00%\"},{\"name\":\"收入低迁数\",\"nub\":0},{\"name\":\"收入低迁率\",\"nub\":\"0.00%\"},{\"name\":\"门店有销率\",\"nub\":\"0.00%\"},{\"name\":\"是否框架子活动\",\"nub\":\"否\"}]},{\"mktCampaignName\":\"智能组网201812\",\"mktCampaignType\":\"营销活动\",\"channel\":\"爱装维\",\"statusCd\":\"2008\",\"beginTime\":\"2018-12-20\",\"endTime\":\"2019-09-30\",\"mktActivityBnr\":\"MKT000020\",\"statistics\":[{\"name\":\"客户接触数\",\"nub\":2},{\"name\":\"商机推荐数\",\"nub\":2},{\"name\":\"商机成功数\",\"nub\":0},{\"name\":\"客触转化率\",\"nub\":\"0.00%\"},{\"name\":\"商机转化率\",\"nub\":\"0.00%\"},{\"name\":\"收入低迁数\",\"nub\":0},{\"name\":\"收入低迁率\",\"nub\":\"0.00%\"},{\"name\":\"门店有销率\",\"nub\":\"0.00%\"},{\"name\":\"是否框架子活动\",\"nub\":\"否\"}]},{\"mktCampaignName\":\"智能组网201812\",\"mktCampaignType\":\"营销活动\",\"channel\":\"iSale\",\"statusCd\":\"2008\",\"beginTime\":\"2018-12-20\",\"endTime\":\"2019-09-30\",\"mktActivityBnr\":\"MKT000020\",\"statistics\":[{\"name\":\"客户接触数\",\"nub\":20},{\"name\":\"商机推荐数\",\"nub\":20},{\"name\":\"商机成功数\",\"nub\":0},{\"name\":\"客触转化率\",\"nub\":\"0.00%\"},{\"name\":\"商机转化率\",\"nub\":\"0.00%\"},{\"name\":\"收入低迁数\",\"nub\":0},{\"name\":\"收入低迁率\",\"nub\":\"0.00%\"},{\"name\":\"门店有销率\",\"nub\":\"0.00%\"},{\"name\":\"是否框架子活动\",\"nub\":\"否\"}]}]}";
 //                map = (Map)JSON.parse(str);
@@ -226,6 +229,9 @@ public class ActivityStatisticsController extends BaseController {
             }else if (StringUtils.isNotBlank(type) && "2000".equals(type)){
                 //活动报表
                 try {
+                    if (paramMap.get("mktCampaignId")!=null && paramMap.get("mktCampaignId").toString().contains(",")){
+                        paramMap.put("mktCampaignId","");
+                    }
                     map = activityStatisticsService.getRptBatchOrder(paramMap);
                 } catch (Exception e) {
                     logger.error("活动报表查询异常", e);
