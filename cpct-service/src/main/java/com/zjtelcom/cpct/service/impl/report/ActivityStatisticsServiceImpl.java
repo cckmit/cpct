@@ -554,6 +554,14 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         logger.info("活动报表查询接口:queryRptBatchOrder"+stringObjectMap);
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
             stringObjectMap = addParams(stringObjectMap, page, pageSize,mktCampaignType);
+            Object reqId = stringObjectMap.get("reqId");
+            Object total = stringObjectMap.get("total");
+            paramMap.put("pageSize",total);
+            paramMap.put("page","1");
+            if (reqId!=null && reqId!=""){
+                stringObjectMap.put("reqId",reqId);
+                redisUtils.set(reqId.toString(),paramMap);
+            }
         } else {
             Object reqId = stringObjectMap.get("reqId");
             stringObjectMap.put("resultCode", CODE_FAIL);
@@ -831,6 +839,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         maps.put("total", stringObjectMap.get("total"));
         maps.put("resultMsg", hashMaps);
         maps.put("resultCode", CODE_SUCCESS);
+        maps.put("reqId",  stringObjectMap.get("reqId"));
         return maps;
     }
 
