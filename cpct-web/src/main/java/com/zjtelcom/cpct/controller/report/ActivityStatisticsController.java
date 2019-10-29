@@ -160,7 +160,6 @@ public class ActivityStatisticsController extends BaseController {
             if (StringUtils.isNotBlank(type) && "1000".equals(type)){
                 //随销报表
                 try {
-                    System.out.println("测试exportExcel接口入参"+JSONObject.toJSONString(paramMap));
                     if (paramMap.get("mktCampaignId")!=null && paramMap.get("mktCampaignId").toString().contains(",")){
                         paramMap.put("mktCampaignId","");
                     }
@@ -178,7 +177,6 @@ public class ActivityStatisticsController extends BaseController {
                 String fileName = "随销报表"+ DateUtil.formatDate(new Date())+".xls"; //表名
                 //开始解析
                 Object resultMsg = map.get("resultMsg");
-                System.out.println("开始解析resultMsg："+JSONObject.toJSONString(resultMsg));
                 if (resultMsg!=null){
                     List<HashMap<String, Object>> hashMaps = ( List<HashMap<String, Object>>)resultMsg;
                     String[][] content = new String[hashMaps.size()][title.length+1];
