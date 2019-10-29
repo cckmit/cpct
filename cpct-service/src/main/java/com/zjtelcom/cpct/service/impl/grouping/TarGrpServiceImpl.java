@@ -7,6 +7,7 @@ import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.filter.CloseRuleMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
+import com.zjtelcom.cpct.dao.grouping.OrgGridRelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.org.OrgTreeMapper;
@@ -22,10 +23,7 @@ import com.zjtelcom.cpct.dto.channel.LabelValueVO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.filter.CloseRule;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
-import com.zjtelcom.cpct.dto.grouping.SysAreaVO;
-import com.zjtelcom.cpct.dto.grouping.TarGrp;
-import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
-import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
+import com.zjtelcom.cpct.dto.grouping.*;
 import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.MessageLabelService;
@@ -39,10 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -94,7 +89,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     private CloseRuleServiceImpl closeRuleServiceImpl;
     @Autowired
     private CloseRuleMapper closeRuleMapper;
-
+    @Autowired
+    private OrgGridRelMapper orgGridRelMapper;
 
     @Override
     public Map<String, Object> conditionSwitch(Long conditionId, String type, String value) {
@@ -787,6 +783,15 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                             rightParam.add(valueVO.getValueName());
                         }
                     }
+                }
+                tarGrpConditionVO.setRightParamName(ChannelUtil.list2String(rightParam,","));
+            }else if (label.getInjectionLabelCode().equals("GIS_CLUSTER_ID")){
+                List<String> rightParam = new ArrayList<>();
+                String[] paramList = tarGrpConditionVO.getRightParam().split(",");
+                List<String> stringList = Arrays.asList(paramList);
+                List<OrgGridRel> orgGridRels = orgGridRelMapper.selectOrgGridByCode(stringList);
+                for (OrgGridRel valueVO : orgGridRels) {
+                    rightParam.add(valueVO.getxAttribName());
                 }
                 tarGrpConditionVO.setRightParamName(ChannelUtil.list2String(rightParam,","));
             }else {

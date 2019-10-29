@@ -70,4 +70,6 @@ public interface MktCampaignService {
 
     void campaignDelayNotice();
 
+    Map<String, Object> mktCampaignJtRefuse(Long mktCampaignId);
+
 }

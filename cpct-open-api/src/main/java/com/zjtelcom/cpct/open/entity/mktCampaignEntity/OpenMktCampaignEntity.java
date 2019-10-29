@@ -1,11 +1,8 @@
 package com.zjtelcom.cpct.open.entity.mktCampaignEntity;
 
-import com.zjtelcom.cpct.open.entity.event.OpenEvent;
 import com.zjtelcom.cpct.open.entity.event.OpenEvtTrigCamRulEntity;
 import com.zjtelcom.cpct.open.entity.mktCamChlConf.OpenMktCamChlConfEntity;
 import com.zjtelcom.cpct.open.entity.mktCamItem.OpenMktCamItemEntity;
-import com.zjtelcom.cpct.open.entity.mktCpcAlgorithmsRule.OpenMktCpcAlgorithmsRulEntity;
-import com.zjtelcom.cpct.open.entity.mktStrategy.OpenMktStrategyEntity;
 
 import java.util.Date;
 import java.util.List;
@@ -44,6 +41,7 @@ public class OpenMktCampaignEntity {
     private String serviceType;
     private String lifeStage;
     private Long serviceCancleFlag;
+    private Long lanId;
     //营服活动分群规则
     private List<OpenMktCamGrpRulEntity> mktCamGrpRuls;
     //营服活动推荐条目
@@ -62,6 +60,8 @@ public class OpenMktCampaignEntity {
     private List<OpenEvtTrigCamRulEntity> evtTrigCamRuls;
     //营服活动校验规则
     private List<OpenMktCamCheckruleEntity> mktCamCheckrules;
+    //对象区域关系
+    private List<ObjRegionRel> objRegionRels;
 
     public String getActType() {
         return actType;
@@ -389,5 +389,21 @@ public class OpenMktCampaignEntity {
 
     public void setMktCamCheckrules(List<OpenMktCamCheckruleEntity> mktCamCheckrules) {
         this.mktCamCheckrules = mktCamCheckrules;
+    }
+
+    public List<ObjRegionRel> getObjRegionRels() {
+        return objRegionRels;
+    }
+
+    public void setObjRegionRels(List<ObjRegionRel> objRegionRels) {
+        this.objRegionRels = objRegionRels;
+    }
+
+    public Long getLanId() {
+        return lanId;
+    }
+
+    public void setLanId(Long lanId) {
+        this.lanId = lanId;
     }
 }

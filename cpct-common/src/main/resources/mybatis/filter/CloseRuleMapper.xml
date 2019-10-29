@@ -94,7 +94,9 @@
         CLOSE_CODE = #{closeCode,jdbcType=VARCHAR},
         NOTE_ONE = #{noteOne,jdbcType=VARCHAR},
         NOTE_TWO = #{noteTwo,jdbcType=VARCHAR},
-        NOTE_THREE = #{noteThree,jdbcType=VARCHAR}
+        NOTE_THREE = #{noteThree,jdbcType=VARCHAR},
+        NOTE_FOUR = #{noteFour,jdbcType=VARCHAR},
+        NOTE_FIVE = #{noteFive,jdbcType=VARCHAR}
         where RULE_ID = #{ruleId,jdbcType=BIGINT}
     </update>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">

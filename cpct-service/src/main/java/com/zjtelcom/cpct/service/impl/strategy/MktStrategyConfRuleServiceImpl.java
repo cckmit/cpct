@@ -20,6 +20,7 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyMapper;
 import com.zjtelcom.cpct.domain.User;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.CamScript;
+import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.channel.Organization;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.org.OrgTreeDO;
@@ -129,6 +130,8 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
     private MktCampaignMapper campaignMapper;
     @Autowired
     private OrganizationMapper organizationMapper;
+    @Autowired
+    private MktCamChlConfAttrMapper mktCamChlConfAttrMapper;
 
     /**
      * 添加策略规则
@@ -860,6 +863,12 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktStrategyConfRuleRelMapper.deleteByMktStrategyConfRulId(mktStrategyConfRuleId);
             //删除活动与客户分群的关系
             MktStrategyConfRuleDO strategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(mktStrategyConfRuleId);
+            if (strategyConfRuleDO!=null){
+                List<String> confList = ChannelUtil.StringToList4LabelValue(strategyConfRuleDO.getEvtContactConfId());
+                for (String confId : confList){
+                   mktCamChlConfAttrMapper.deleteByEvtContactConfId(Long.valueOf(confId));
+                }
+            }
             if(strategyConfRuleDO!=null && strategyConfRuleDO.getTarGrpId()!=null){
                 mktCamGrpRulMapper.deleteByTarGrpId(strategyConfRuleDO.getTarGrpId());
             }
@@ -875,6 +884,8 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
 
             //
             mktCamRecomCalcRelMapper.deleteByRuleId(mktStrategyConfRuleId);
+
+
 
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());

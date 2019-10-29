@@ -258,6 +258,9 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         if (StringUtils.isNotBlank(addVO.getCloseType()) && addVO.getCloseType().equals("2000")){
             addVO.setExpression("CR002");
         }
+        if (StringUtils.isNotBlank(addVO.getCloseType()) && addVO.getCloseType().equals("5000")){
+            addVO.setExpression("CR005");
+        }
         //自动步枪6位数 前面补零
         String expression = CpcUtil.addZeroForNum(String.valueOf(closeRule.getRuleId()), 6);
         closeRuleMapper.updateExpression(closeRule.getRuleId().toString(),addVO.getExpression()+expression);

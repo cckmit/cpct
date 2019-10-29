@@ -272,6 +272,7 @@ public class CampaignController extends BaseController {
         logger.info("[op:createMktCampaign] mktCampaignVO = " + JSON.toJSONString(mktCampaignVO));
         // 存活动
         Map<String, Object> mktCampaignMap = mktCampaignService.createMktCampaign(mktCampaignVO);
+        if (mktCampaignMap.get("mktCampaignId")==null) return JSON.toJSONString(mktCampaignMap);
         Long mktCampaignId = Long.valueOf(mktCampaignMap.get("mktCampaignId").toString());
         if (mktCampaignVO.getMktStrategyConfDetailList().size() > 0) {
             for (MktStrategyConfDetail mktStrategyConfDetail : mktCampaignVO.getMktStrategyConfDetailList()) {
@@ -528,6 +529,17 @@ public class CampaignController extends BaseController {
     public Map<String,Object> salesOffShelf(){
         Map<String, Object> stringObjectMap = mktCampaignApiService.salesOffShelf(new HashMap<String, Object>());
         return stringObjectMap;
+    }
+
+    /**
+     * 集团活动不承接反馈接口
+     */
+    @RequestMapping(value = "/mktCampaignJtRefuse", method = RequestMethod.POST)
+    @CrossOrigin
+    public Map<String, Object> mktCampaignJtRefuse(Long mktCampaignId) {
+        Map<String, Object> result = new HashMap<>();
+        result = mktCampaignService.mktCampaignJtRefuse(mktCampaignId);
+        return result;
     }
 
 }
