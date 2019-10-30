@@ -170,7 +170,7 @@ public class ActivityStatisticsController extends BaseController {
                 }
 //                HSSFWorkbook wb = new HSSFWorkbook(); //创建excel
 //                Sheet sheetName = wb.createSheet("明知山有虎，知难而退？");//新建表 数据随销报表
-                String sheetName = "明知山有虎，知难而退？";
+                String sheetName = "明知山有虎，知难而退";
                 String[] title = {"活动名称", "活动状态", "活动类型", "活动编码", "活动渠道", "活动生效时间", "活动失效时间","客户接触数",
                         "商机推荐数","商机成功数","客触转化率","商机转化率","收入低迁数","收入低迁率","门店有销率","是否框架子活动"};
                 String fileName = "随销报表"+ DateUtil.formatDate(new Date())+".xls"; //表名
@@ -184,8 +184,7 @@ public class ActivityStatisticsController extends BaseController {
                             Map map2 = fixedMap(hashMaps, content, i);
                             List<HashMap<String, Object>> statisicts = (List<HashMap<String, Object>>) map2.get("statistics");
                             for (int j = 0; j < statisicts.size(); j++) {
-                                JSONObject jsonObject2 = JSON.parseObject(String.valueOf(statisicts.get(j)));
-                                Map map3 = JSONObject.parseObject(jsonObject2.toJSONString(), Map.class);
+                                HashMap<String, Object> map3 = statisicts.get(j);
                                 String name = map3.get("name").toString();
                                 if (name.equals("客户接触数")){
                                     //客户接触数 contactNum
@@ -247,8 +246,9 @@ public class ActivityStatisticsController extends BaseController {
                             Map map2 = fixedMap(hashMaps, content, i);
                             List<HashMap<String, Object>> statisicts = (List<HashMap<String, Object>>) map2.get("statistics");
                             for (int j = 0; j < statisicts.size(); j++) {
-                                JSONObject jsonObject2 = JSON.parseObject(String.valueOf(statisicts.get(j)));
-                                Map map3 = JSONObject.parseObject(jsonObject2.toJSONString(), Map.class);
+//                                JSONObject jsonObject2 = JSON.parseObject(String.valueOf(statisicts.get(j)));
+//                                Map map3 = JSONObject.parseObject(jsonObject2.toJSONString(), Map.class);
+                                HashMap<String, Object> map3 = statisicts.get(j);
                                 String name = map3.get("name").toString();
                                 if (name.equals("派单数")){
                                     content[i][7] = String.valueOf(map3.get("nub"));
@@ -301,37 +301,26 @@ public class ActivityStatisticsController extends BaseController {
     }
 
     private Map fixedMap(List<HashMap<String, Object>> hashMaps, String[][] content, int i) {
-        String s = String.valueOf(hashMaps.get(i));
-        String str = null;
-        if (s.contains("=")){
-            str = s.replaceAll("=", ":");
-        }
-        Map map2 = null;
-        try {
-            JSONObject jsonObject = JSON.parseObject(str);
-            map2 = JSONObject.parseObject(jsonObject.toJSONString(), Map.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        HashMap<String, Object> stringObjectHashMap = hashMaps.get(i);
         //活动名称
-        content[i][0] = String.valueOf(map2.get("mktCampaignName"));
+        content[i][0] = String.valueOf(stringObjectHashMap.get("mktCampaignName").toString());
         //活动状态 2002 已发布 2008 调整中
-        if (map2.get("statusCd").equals("2002")) {
+        if (stringObjectHashMap.get("statusCd").toString().equals("2002")) {
             content[i][1] = String.valueOf("已发布");
         }else {
             content[i][1] = String.valueOf("调整中");
         }
         //活动类型 mktCampaignType
-        content[i][2] = String.valueOf(map2.get("mktCampaignType"));
+        content[i][2] = String.valueOf(stringObjectHashMap.get("mktCampaignType").toString());
         //活动编码 mktActivityBnr
-        content[i][3] = String.valueOf(map2.get("mktActivityBnr"));
+        content[i][3] = String.valueOf(stringObjectHashMap.get("mktActivityBnr").toString());
         //活动渠道 channel
-        content[i][4] = String.valueOf(map2.get("channel"));
+        content[i][4] = String.valueOf(stringObjectHashMap.get("channel").toString());
         //活动生效时间 beginTime
-        content[i][5] = String.valueOf(map2.get("beginTime"));
+        content[i][5] = String.valueOf(stringObjectHashMap.get("beginTime").toString());
         //活动失效时间 endTime
-        content[i][6] = String.valueOf(map2.get("endTime"));
-        return map2;
+        content[i][6] = String.valueOf(stringObjectHashMap.get("endTime").toString());
+        return stringObjectHashMap;
     }
 
 
