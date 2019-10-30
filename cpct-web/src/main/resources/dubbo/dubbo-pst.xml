@@ -115,7 +115,7 @@
 
     <!-- 集团下发活动反馈接口 1.0 -->
     <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.open.service.completeMktCampaign.OpenCompleteMktCampaignService"
-                     id="openCompleteMktCampaignServiceImpl" version="1.0" check="false">
+                   id="openCompleteMktCampaignServiceImpl" version="1.0" check="false">
         <dubbo:method name="completeMktCampaign" servicecode="00.1083.completeMktCampaign" timeout="10000"/>
     </dubbo:reference>
 

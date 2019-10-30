@@ -817,6 +817,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             label.put("code",labelDTOList.get(i).getLabelCode());
             label.put("name",labelDTOList.get(i).getInjectionLabelName());
             label.put("labelType",labelDTOList.get(i).getLabelType());
+            label.put("displayType",labelDTOList.get(i).getLabelDisplayType());
             labelList.add(label);
         }
         return labelList;
@@ -909,6 +910,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     Map<String, Object> label = new HashMap<>();
                     label.put("code", code);
                     label.put("name", name);
+                    label.put("displayType", display.get("displayType"));
                     labelList.add(label);
                     fields.add(code);
                     labelEngNameList.add(code);
@@ -1228,6 +1230,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     Map<String, Object> label = new HashMap<>();
                     label.put("code", code);
                     label.put("name", name);
+                    label.put("displayType", display.get("displayType"));
                     labelList.add(label);
                     fields.add(code);
                     labelEngNameList.add(code);
@@ -1936,6 +1939,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             label.put("code",labelDTOList.get(i).getLabelCode());
             label.put("name",labelDTOList.get(i).getInjectionLabelName());
             label.put("labelType",labelDTOList.get(i).getLabelType());
+            label.put("displayType",labelDTOList.get(i).getLabelDisplayType());
             labelList.add(label);
         }
 

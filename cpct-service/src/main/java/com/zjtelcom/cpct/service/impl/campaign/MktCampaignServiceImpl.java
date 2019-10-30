@@ -74,6 +74,7 @@ import com.zjtelcom.cpct_prod.dao.offer.OfferProdMapper;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
+import org.bouncycastle.jcajce.provider.asymmetric.ec.KeyFactorySpi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -367,7 +368,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 mktCamComplete.setStatusDate(new Date());
                 mktCamComplete.setCreateStaff(campaign.getCreateStaff());
                 mktCamComplete.setCreateDate(new Date());
-                mktCampaignCompleteMapper.insert(mktCampaignComplete);
+                mktCampaignCompleteMapper.insert(mktCamComplete);
                 try {
                     openCompleteMktCampaignService.completeMktCampaign(campaign.getInitId(), "1200");
                 }catch (Exception e){
@@ -814,7 +815,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamComplete.setStatusDate(new Date());
                     mktCamComplete.setCreateStaff(mktCampaignDO.getCreateStaff());
                     mktCamComplete.setCreateDate(new Date());
-                    mktCampaignCompleteMapper.insert(mktCampaignComplete);
+                    mktCampaignCompleteMapper.insert(mktCamComplete);
                     try {
                         openCompleteMktCampaignService.completeMktCampaign(campaign.getInitId(), "1100");
                     }catch (Exception e){
@@ -1239,9 +1240,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamComplete.setStatusDate(new Date());
                     mktCamComplete.setCreateStaff(campaignDO.getCreateStaff());
                     mktCamComplete.setCreateDate(new Date());
-                    mktCampaignCompleteMapper.insert(mktCampaignComplete);
+                    mktCampaignCompleteMapper.insert(mktCamComplete);
                     try {
-                        openCompleteMktCampaignService.completeMktCampaign(campaignDO.getInitId(), "1200");
+                        openCompleteMktCampaignService.completeMktCampaign(campaignDO.getInitId(), "1300");
                     }catch (Exception e){
                         e.printStackTrace();
                     }
@@ -2083,7 +2084,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }.start();
             }
             //集团活动环节信息更新反馈
-            MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(mktCampaignDO.getInitId(), "1400");
+            MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(mktCampaignId, "1400");
             if(mktCampaignComplete != null) {
                 mktCampaignComplete.setEndTime(new Date());
                 mktCampaignComplete.setTacheValueCd("10");
@@ -3271,20 +3272,25 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     public Map<String, Object> mktCampaignJtRefuse(Long mktCampaignId) {
         Map<String, Object> resultMap = new HashMap<>();
         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
-        List<MktCampaignComplete> mktCampaignCompleteList = mktCampaignCompleteMapper.selectByCampaignId(mktCampaignDO.getInitId());
+        List<MktCampaignComplete> mktCampaignCompleteList = mktCampaignCompleteMapper.selectByCampaignId(mktCampaignId);
         if(mktCampaignCompleteList.isEmpty()) {
             resultMap.put("resultCode",CODE_FAIL);
             resultMap.put("resultMsg","此活动不是集团活动");
             return resultMap;
         }
         for(MktCampaignComplete mktCampaignComplete : mktCampaignCompleteList) {
-            if(mktCampaignComplete.getTacheCd().equals("1100")) {
+            if(mktCampaignComplete.getTacheCd().equals("1100") && mktCampaignComplete.getTacheValueCd().equals("10")) {
                 mktCampaignComplete.setTacheValueCd("11");
                 mktCampaignComplete.setStatusCd("1200");
                 mktCampaignComplete.setEndTime(new Date());
                 mktCampaignComplete.setUpdateDate(new Date());
                 mktCampaignComplete.setUpdateStaff(UserUtil.loginId());
                 mktCampaignCompleteMapper.update(mktCampaignComplete);
+                try {
+                    openCompleteMktCampaignService.completeMktCampaign(mktCampaignDO.getInitId(), "1100");
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         }
         resultMap.put("resultCode",CODE_SUCCESS);

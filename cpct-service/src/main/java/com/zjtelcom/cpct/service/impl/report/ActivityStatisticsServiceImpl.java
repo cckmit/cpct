@@ -10,6 +10,7 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignRelMapper;
 import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignRelDO;
@@ -59,6 +60,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
     private SysParamsMapper sysParamsMapper;
     @Autowired
     private MktCampaignRelMapper mktCampaignRelMapper;
+    @Autowired
+    private TrialOperationMapper trialOperationMapper;
 
 
     /**
@@ -388,6 +391,14 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         logger.info("销报表查询接口:stringObjectMap"+stringObjectMap);
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
             stringObjectMap = addParams(stringObjectMap, page, pageSize,mktCampaignType);
+            Object reqId = stringObjectMap.get("reqId");
+            Object total = stringObjectMap.get("total");
+            paramMap.put("pageSize",total);
+            paramMap.put("page","1");
+            if (reqId!=null && reqId!=""){
+                stringObjectMap.put("reqId",reqId);
+                redisUtils.set(reqId.toString(),paramMap);
+            }
         } else {
             Object reqId = stringObjectMap.get("reqId");
             stringObjectMap.put("resultCode", CODE_FAIL);
@@ -459,7 +470,22 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             paramMap.put("lanId", lanId.toString());
         }
         StringBuilder stringBuilder = new StringBuilder();
-        List<MktCampaignDO> mktCampaignList = mktCampaignMapper.queryRptBatchOrderForMktCampaign(paramMap);
+        //派单增加派单时间段过滤
+        Object activeDate = params.get("activeDate");
+        Object overDate = params.get("overDate");
+        if (activeDate != null && activeDate != "" &&  overDate !=null && overDate!="") {
+            //类型转换 YYYYMMMDD YYYY-MM-DD
+            paramMap.put("activeDate", activeDate.toString());
+            paramMap.put("overDate", overDate.toString());
+        }
+        List<String> campaignIdLists =trialOperationMapper.selectByMktCampaingIDFromTrial(paramMap);
+        if (campaignIdLists==null || campaignIdLists.size()<0) {
+            paramMap.put("resultCode", CODE_FAIL);
+            paramMap.put("resultMsg", "无区间段派单活动!");
+            return paramMap;
+        }
+        paramMap.put("campaignIdLists",campaignIdLists);
+        List<MktCampaignDO> mktCampaignList = mktCampaignMapper.queryRptBatchOrderForMktCampaignFromDate(paramMap);
         //todo 修改为 init_id 原 getMktCampaignId
         if (mktCampaignList.size() > 0 && mktCampaignList != null) {
             for (MktCampaignDO mktCampaignDO : mktCampaignList) {
@@ -573,6 +599,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                 continue;
                             }
                         }
+                        //活动id
+                        resultMap.put("mktCampaignId", mktCampaignDO.getMktCampaignId());
                         //活动名称
                         resultMap.put("mktCampaignName", mktCampaignDO.getMktCampaignName());
                         //活动开始是时间和结束时间
@@ -698,6 +726,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                 continue;
                             }
                         }
+                        //活动id
+                        resultMap.put("mktCampaignId", mktCampaignDO.getMktCampaignId());
                         //活动名称
                         resultMap.put("mktCampaignName", mktCampaignDO.getMktCampaignName());
                         //活动开始是时间和结束时间
@@ -922,6 +952,22 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             resultMap.put("resultCode", CODE_SUCCESS);
         }
         return resultMap;
+    }
+
+    // xyl 活动报表模糊搜索 type 1000 随销  2000 派单
+    @Override
+    public Map<String, Object> getActivityStatisticsByName(Map<String, Object> params) {
+        HashMap<String, Object> result = new HashMap<>();
+        Object name = params.get("name");
+        if (name!=null){
+            List<MktCampaignDO> mktCampaignList = mktCampaignMapper.getActivityStatisticsByName(name.toString());
+            result.put("resultMsg",mktCampaignList);
+            result.put("resultCode","200");
+        }else {
+            result.put("resultMsg","name为空");
+            result.put("resultCode","500");
+        }
+        return result;
     }
 
 

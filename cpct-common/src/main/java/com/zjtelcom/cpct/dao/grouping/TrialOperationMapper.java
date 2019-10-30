@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 @Mapper
@@ -36,4 +37,6 @@ public interface TrialOperationMapper {
     List<TrialOperation> listOperationByStatusCd(@Param("statusCd")String statusCd);
 
     TrialOperation selectByBatchNum(@Param("batchNum") String batchNum);
+
+    List<String> selectByMktCampaingIDFromTrial(HashMap<String, Object> paramMap);
 }

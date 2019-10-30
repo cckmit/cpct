@@ -24,8 +24,8 @@
     <insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignComplete" useGeneratedKeys="true"
             keyProperty="completeId">
         insert into mkt_campaign_complete(COMPLETE_ID, MKT_CAMPAIGN_ID, MKT_ACTIVITY_NBR, ORDER_ID, ORDER_NAME,
-                                          TACHE_CD, TACHE_VALUE_CD, BEGIN_TIME, END_TIME, SORT, STATUS_CD, STATUS_DATE, CREATE_STAFF,
-                                          CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK)
+                    TACHE_CD, TACHE_VALUE_CD, BEGIN_TIME, END_TIME, SORT, STATUS_CD, STATUS_DATE, CREATE_STAFF,
+                    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK)
         values (#{completeId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{mktActivityNbr,jdbcType=VARCHAR},
                 #{orderId,jdbcType=VARCHAR}, #{orderName,jdbcType=VARCHAR}, #{tacheCd,jdbcType=VARCHAR},
                 #{tacheValueCd,jdbcType=VARCHAR},#{beginTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP},
