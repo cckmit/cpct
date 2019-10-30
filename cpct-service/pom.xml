@@ -182,6 +182,17 @@
             <version>1.0.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.zjhcsoft</groupId>
+            <artifactId>dubbo</artifactId>
+        </dependency>
+
+        <!--集团活动反馈接口-->
+        <dependency>
+            <groupId>com.zjtelcom.cpct</groupId>
+            <artifactId>open-complete</artifactId>
+        </dependency>
+
     </dependencies>
 
 

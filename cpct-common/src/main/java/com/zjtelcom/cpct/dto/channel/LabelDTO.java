@@ -26,7 +26,16 @@ public class LabelDTO implements Serializable {
 
     private int displayTypeNum;
 
+    private String labelDisplayType;
 
+
+    public String getLabelDisplayType() {
+        return labelDisplayType;
+    }
+
+    public void setLabelDisplayType(String labelDisplayType) {
+        this.labelDisplayType = labelDisplayType;
+    }
 
     public String getLabelType() {
         return labelType;
