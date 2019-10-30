@@ -2084,7 +2084,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }.start();
             }
             //集团活动环节信息更新反馈
-            MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(mktCampaignDO.getInitId(), "1400");
+            MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(mktCampaignId, "1400");
             if(mktCampaignComplete != null) {
                 mktCampaignComplete.setEndTime(new Date());
                 mktCampaignComplete.setTacheValueCd("10");
@@ -3272,7 +3272,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     public Map<String, Object> mktCampaignJtRefuse(Long mktCampaignId) {
         Map<String, Object> resultMap = new HashMap<>();
         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
-        List<MktCampaignComplete> mktCampaignCompleteList = mktCampaignCompleteMapper.selectByCampaignId(mktCampaignDO.getInitId());
+        List<MktCampaignComplete> mktCampaignCompleteList = mktCampaignCompleteMapper.selectByCampaignId(mktCampaignId);
         if(mktCampaignCompleteList.isEmpty()) {
             resultMap.put("resultCode",CODE_FAIL);
             resultMap.put("resultMsg","此活动不是集团活动");
