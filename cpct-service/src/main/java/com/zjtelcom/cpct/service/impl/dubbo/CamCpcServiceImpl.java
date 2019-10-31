@@ -520,23 +520,34 @@ public class CamCpcServiceImpl implements CamCpcService {
                    break;
                }
             }
+
             if(isWithDefaultLabel) {
                 // 判断是否有命中
                 if (ruleList.size() > 1) {
+                    List<String> ruleIdList = new ArrayList<>();
+                    for (Map<String,Object> map : ruleList) {
+                        Long ruleId2 = Long.valueOf(map.get("nowRuleId") == null ? "0" : map.get("nowRuleId").toString());
+                        ruleIdList.add(ruleId2.toString());
+                    }
+
                     // 非固定规则有命中的情况下，从命中列表中移出默认固定规则
                     for (Map<String, Object> strategyMap : strategyMapList) {
                         Long strategyConfId = (Long) strategyMap.get("strategyConfId");
                         // String ruleId = redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId) == null? "":redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId).toString();
                         Object object = redisUtils.hgetAllField("LEFT_PARAM_FLAG" + strategyConfId) == null ? "" : redisUtils.hgetAllField("LEFT_PARAM_FLAG" + strategyConfId);
                         if (object != null && object != "") {
+                            List<String> list = (List<String>) object;
                             Iterator<Map<String, Object>> iterator = ruleList.iterator();
                             while (iterator.hasNext()) {
                                 Map<String, Object> map = iterator.next();
                                 Long ruleId2 = Long.valueOf(map.get("nowRuleId") == null ? "0" : map.get("nowRuleId").toString());
-                                List<String> list = (List<String>) object;
                                 for (String field : list) {
                                     if (field.equals(ruleId2.toString())) {
-                                        ruleList.remove(map);
+                                        if (list.containsAll(ruleIdList)) {
+                                            ruleList.remove(map);
+                                        } else {
+                                            iterator.remove();
+                                        }
                                         break;
                                     }
                                 }
