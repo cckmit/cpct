@@ -388,6 +388,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     public Map<String, Object> createTarGrp(TarGrpDetail tarGrpDetail, boolean isCopy) {
         Map<String, Object> maps = new HashMap<>();
         try {
+            tarGrpDetail = finalWillBeIn(tarGrpDetail);
             //插入客户分群记录
             TarGrp tarGrp = new TarGrp();
             tarGrp = tarGrpDetail;
@@ -626,6 +627,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     public Map<String, Object> modTarGrp(TarGrpDetail tarGrpDetail) {
         Map<String, Object> maps = new HashMap<>();
         try {
+            tarGrpDetail = finalWillBeIn(tarGrpDetail);
             TarGrp tarGrp = new TarGrp();
             tarGrp = tarGrpDetail;
             tarGrp.setUpdateDate(DateUtil.getCurrentTime());
@@ -866,5 +868,16 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         return null;
     }
 
+
+    public TarGrpDetail finalWillBeIn(TarGrpDetail tarGrpDetail) {
+        for (TarGrpCondition tarGrpCondition : tarGrpDetail.getTarGrpConditions()) {
+            // 固定必中标签特殊处理
+            if (Integer.valueOf(tarGrpCondition.getLeftParam()) == 801842) {
+                tarGrpCondition.setRightParam("1");
+                tarGrpCondition.setOperType("3000");
+            }
+        }
+        return tarGrpDetail;
+    }
 
 }
