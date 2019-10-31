@@ -661,7 +661,9 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
                 // 计费短信合并功能 CPCP_JIFEI_CONTENT
-                cpcpJifeiContent(labelItems, evtParams);
+                if (evtParams != null) {
+                    cpcpJifeiContent(labelItems, evtParams);
+                }
 
                 //获取事件推荐活动数
                 int recCampaignAmount;
