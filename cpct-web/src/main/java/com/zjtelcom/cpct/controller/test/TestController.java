@@ -228,7 +228,7 @@ public class TestController extends BaseController {
         mktCampaignService.campaignDelayNotice();
     }
 
-    @Autowired
+    @Autowired(required = false)
     private TarGrpTemplateService tarGrpTemplateService;
 
     @PostMapping("tarGrpTemplateScheduledBatchIssue")
