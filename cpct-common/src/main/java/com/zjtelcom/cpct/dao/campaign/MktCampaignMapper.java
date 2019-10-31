@@ -26,6 +26,8 @@ public interface MktCampaignMapper {
 
     MktCampaignDO selectByPrimaryKey(Long mktCampaignId);
 
+    List<MktCampaignDO> selectBatch(@Param("mktCampaignIds") List<Long> mktCampaignIds);
+
     List<MktCampaignDO> selectAll();
 
     int updateByPrimaryKey(MktCampaignDO mktCampaignDO);
@@ -78,4 +80,7 @@ public interface MktCampaignMapper {
 
     List<Long> getByOrgNameC4IsNotNull();
 
+    List<MktCampaignDO> getActivityStatisticsByName(@Param("name")String s);
+
+    List<MktCampaignDO> queryRptBatchOrderForMktCampaignFromDate(HashMap<String, Object> paramMap);
 }

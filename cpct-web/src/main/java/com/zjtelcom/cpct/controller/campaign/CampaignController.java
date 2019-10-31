@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -529,6 +530,27 @@ public class CampaignController extends BaseController {
     public Map<String,Object> salesOffShelf(){
         Map<String, Object> stringObjectMap = mktCampaignApiService.salesOffShelf(new HashMap<String, Object>());
         return stringObjectMap;
+    }
+
+    /**
+     * 集团活动不承接反馈接口
+     */
+    @RequestMapping(value = "/mktCampaignJtRefuse", method = RequestMethod.POST)
+    @CrossOrigin
+    public Map<String, Object> mktCampaignJtRefuse(Long mktCampaignId) {
+        Map<String, Object> result = new HashMap<>();
+        result = mktCampaignService.mktCampaignJtRefuse(mktCampaignId);
+        return result;
+    }
+
+
+    @RequestMapping(value = "/searchBatch", method = RequestMethod.POST)
+    @CrossOrigin
+    public Map<String, Object> searchBatch(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        List<Long> mktCampaignIdList = (List<Long>) params.get("mktCampaignIdList");
+        result = mktCampaignService.searchBatch(mktCampaignIdList);
+        return result;
     }
 
 }

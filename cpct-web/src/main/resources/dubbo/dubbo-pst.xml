@@ -97,6 +97,7 @@
         <dubbo:method name="queryRptBatchOrder" servicecode="00.1079.queryRptBatchOrder" timeout="12000"/>
         <dubbo:method name="queryRptEventOrder" servicecode="00.1079.queryRptEventOrder" timeout="12000"/>
         <dubbo:method name="queryValidCampaign" servicecode="00.1079.queryValidCampaign" timeout="12000"/>
+        <dubbo:method name="queryRptEventInstList" servicecode="00.1079.queryRptEventInstList" timeout="120000"/>
     </dubbo:reference>
 
     <dubbo:reference registry="esb3" interface="com.zjtelcom.es.es.service.EsTarGrpTemplate" id="tarGrpTemplateCountAndIssue" version="1.0" check="false">

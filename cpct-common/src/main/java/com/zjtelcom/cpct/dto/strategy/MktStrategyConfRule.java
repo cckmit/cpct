@@ -69,10 +69,6 @@ public class MktStrategyConfRule {
      */
     private List<Long> organizationList;
 
-
-
-
-
     public List<Long> getOrganizationList() {
         return organizationList;
     }

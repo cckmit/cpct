@@ -13,6 +13,10 @@
     <dubbo:registry id="esb2" protocol="dubbo" address="134.96.161.20:8001"/><!--esb2.0 prod-->
 
 
+    <!-- 暴露服务 -->
+    <dubbo:protocol name="dubbo" port="30809"/>
+    <dubbo:monitor protocol="registry" />
+
     <!-- 因子实时查询 -->
     <dubbo:reference registry="esb3" interface="com.zjpii.biz.serv.YzServ" id="yzServ"
                      version="1.0" retries="0" check="false">
