@@ -453,7 +453,7 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
                 //根据事件code查询事件信息
-                 Object eventC =  redisUtils.get("EVENT_" + map.get("eventCode"));
+                Object eventC =  redisUtils.get("EVENT_" + map.get("eventCode"));
                 ContactEvt event = null;
                 if (eventC!=null){
                     event = (ContactEvt)eventC;
@@ -2342,7 +2342,7 @@ public class EventApiServiceImpl implements EventApiService {
                                     }
                                 } else {
                                     //适用地市获取异常 lanId
-    //                            log.info("适用渠道获取异常");
+                                    //                            log.info("适用渠道获取异常");
 
                                     esJson.put("hit", false);
                                     esJson.put("msg", "策略未命中");
@@ -2393,15 +2393,15 @@ public class EventApiServiceImpl implements EventApiService {
                         for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleList) {
                             Map<String, Object> ruleMap = new ConcurrentHashMap<>();
                             String evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId();
-    //                    if (evtContactConfMapList != null && evtContactConfMapList.size() > 0) {
+                            //                    if (evtContactConfMapList != null && evtContactConfMapList.size() > 0) {
                             ruleMap.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
                             ruleMap.put("ruleName", mktStrategyConfRuleDO.getMktStrategyConfRuleName());
                             ruleMap.put("tarGrpId", mktStrategyConfRuleDO.getTarGrpId());
                             ruleMap.put("productId", mktStrategyConfRuleDO.getProductId());
                             ruleMap.put("evtContactConfId", mktStrategyConfRuleDO.getEvtContactConfId());
-    //                        ruleMap.put("evtContactConfMapList", evtContactConfMapList);
+                            //                        ruleMap.put("evtContactConfMapList", evtContactConfMapList);
                             ruleMapList.add(ruleMap);
-    //                    }
+                            //                    }
                         }
                     } catch (Exception e) {
                         log.error("预校验获取规则查询失败");
@@ -2435,7 +2435,7 @@ public class EventApiServiceImpl implements EventApiService {
                 if (strategyMapList != null && strategyMapList.size() > 0) {
                     // 判断initId是否在清单列表里面
                     if (mktCamCodeList.contains(mktCampaign.getInitId().toString())) {
-                   // if (mktCamCodeList.contains(mktCampaign.getMktCampaignId().toString())) {
+                        // if (mktCamCodeList.contains(mktCampaign.getMktCampaignId().toString())) {
                         mktCampaignCustMap.put("initId", mktCampaign.getInitId());
                         mktCampaignCustMap.put("mktCampaginId", mktCampaginId);
                         mktCampaignCustMap.put("levelConfig", act.get("levelConfig"));

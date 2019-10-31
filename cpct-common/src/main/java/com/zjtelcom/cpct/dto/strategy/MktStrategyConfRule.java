@@ -69,11 +69,6 @@ public class MktStrategyConfRule {
      */
     private List<Long> organizationList;
 
-    /**
-     * 随销标志
-     */
-    private boolean isAlongWith;
-
     public List<Long> getOrganizationList() {
         return organizationList;
     }
@@ -168,13 +163,5 @@ public class MktStrategyConfRule {
 
     public void setMktCampaignType(String mktCampaignType) {
         this.mktCampaignType = mktCampaignType;
-    }
-
-    public boolean getIsAlongWith() {
-        return isAlongWith;
-    }
-
-    public void setIsAlongWith(boolean isAlongWith) {
-        this.isAlongWith = isAlongWith;
     }
 }
