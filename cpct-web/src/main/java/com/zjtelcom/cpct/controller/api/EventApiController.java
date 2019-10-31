@@ -54,7 +54,7 @@ public class EventApiController extends BaseController {
     @Autowired
     private MktCampaignPrdMapper campaignPrdMapper;
 
-    @Autowired
+    @Autowired(required = false)
     private TestService testService;
 
 

@@ -37,6 +37,8 @@ public interface ContactChannelMapper {
 
     List<String> selectChannelCodeByPrimaryKey(List<Long> contactChlIdList);
 
+    List<Channel> selectBatchByCode(@Param("contactChlCodeList") List<String> contactChlCodeList);
+
     List<Channel> getRealTimeChannel();
 
     List<Channel> getBatchChannel();

@@ -114,7 +114,7 @@ public class MktCampaignCpcServiceImpl implements MktCampaignApiService {
     @Autowired(required = false)
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
 
-    @Autowired
+    @Autowired(required = false)
     private UCCPService uccpService;
 
     @Autowired

@@ -195,6 +195,10 @@ public class EventApiServiceImpl implements EventApiService {
     /*@Autowired
     private TarGrpConditionMapper tarGrpConditionMapper;*/
 
+    private final static String USED_FLOW = "used_flow";
+
+    private final static String TOTAL_FLOW = "total_flow";
+
     @Override
     public Map<String, Object> CalculateCPC(Map<String, Object> map) {
 
@@ -655,6 +659,9 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                     //  log.info("555---labelItems --->" + JSON.toJSONString(labelItems));
                 }
+
+                // 计费短信合并功能 CPCP_JIFEI_CONTENT
+                cpcpJifeiContent(labelItems, evtParams);
 
                 //获取事件推荐活动数
                 int recCampaignAmount;
@@ -2925,6 +2932,55 @@ public class EventApiServiceImpl implements EventApiService {
         }
         log.info("10101010------accNbrMapList --->" + JSON.toJSONString(accNbrMapList));
         return accNbrMapList;
+    }
+
+
+
+    /**
+     * 计费短信合并功能 CPCP_JIFEI_CONTENT
+     * @param labelItems
+     */
+    private void cpcpJifeiContent(Map<String, String> labelItems, JSONObject evtParams){
+        StringBuilder content = new StringBuilder();
+        String usedFlow = "";
+        String totalFlow = "";
+
+        usedFlow = (String) redisUtils.get(USED_FLOW);
+        if (usedFlow == null || "".equals(usedFlow)) {
+            List<SysParams> usedFlowList = sysParamsMapper.listParamsByKeyForCampaign(USED_FLOW);
+            if (usedFlowList != null && usedFlowList.size() > 0) {
+                SysParams usedFlowParams = usedFlowList.get(0);
+                if (usedFlowParams != null) {
+                    usedFlow = usedFlowParams.getParamValue();
+                    redisUtils.set(USED_FLOW, usedFlow);
+                }
+            }
+        }
+
+        totalFlow = (String) redisUtils.get(TOTAL_FLOW);
+        if (totalFlow == null || "".equals(totalFlow)) {
+            List<SysParams> totalFlowList = sysParamsMapper.listParamsByKeyForCampaign(TOTAL_FLOW);
+            if (totalFlowList != null && totalFlowList.size() > 0) {
+                SysParams totalFlowParams = totalFlowList.get(0);
+                if (totalFlowParams != null) {
+                    totalFlow = totalFlowParams.getParamValue();
+                    redisUtils.set(TOTAL_FLOW, totalFlow);
+                }
+            }
+        }
+
+        if (evtParams.get("CPCP_JIFEI_CONTENT") != null) {
+            List<Map<String, String>> contentMapList = (List<Map<String, String>>) evtParams.get("CPCP_JIFEI_CONTENT");
+            for (int i = 0; i < contentMapList.size(); i++) {
+                if (i > 0) {
+                    content.append("，");
+                }
+                content.append(contentMapList.get(i).get("message_name").toString());
+                content.append(usedFlow + contentMapList.get(i).get(USED_FLOW) + "，");
+                content.append(totalFlow + contentMapList.get(i).get(TOTAL_FLOW));
+            }
+        }
+        labelItems.put("CPCP_JIFEI_MESSAGE", content.toString());
     }
 
 }

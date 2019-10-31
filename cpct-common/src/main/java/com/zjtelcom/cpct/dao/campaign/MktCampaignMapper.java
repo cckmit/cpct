@@ -26,6 +26,8 @@ public interface MktCampaignMapper {
 
     MktCampaignDO selectByPrimaryKey(Long mktCampaignId);
 
+    List<MktCampaignDO> selectBatch(@Param("mktCampaignIds") List<Long> mktCampaignIds);
+
     List<MktCampaignDO> selectAll();
 
     int updateByPrimaryKey(MktCampaignDO mktCampaignDO);

@@ -44,8 +44,7 @@ public interface ChannelService {
 
     Object addAcount();
 
-
-
+    Map<String,Object> selectBatchByCode(List<String> contactChlCodeList);
 
 
 }

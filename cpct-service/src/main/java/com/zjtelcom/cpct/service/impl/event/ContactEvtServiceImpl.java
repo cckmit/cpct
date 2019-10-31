@@ -750,4 +750,19 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         maps.put("resultMsg", evts);
         return maps;
     }
+
+    /**
+     * 批量查询事件列表
+     * @param contactChlCodeList
+     * @return
+     */
+    @Override
+    public Map<String,Object> selectBatchByCode(List<String> contactChlCodeList){
+        Map<String,Object> maps = new HashMap<>();
+        List<ContactEvt> contactEvtList = contactEvtMapper.selectBatchByCode(contactChlCodeList);
+        maps.put("contactEvtList", contactEvtList);
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", "批量查询事件列表成功");
+        return maps;
+    }
 }
