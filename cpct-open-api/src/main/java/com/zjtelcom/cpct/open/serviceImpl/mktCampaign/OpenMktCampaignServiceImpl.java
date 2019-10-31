@@ -814,6 +814,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
             mktCampaignComplete.setTacheCd("1100");
             mktCampaignComplete.setTacheValueCd("10");
             mktCampaignComplete.setBeginTime(new Date());
+            mktCampaignComplete.setEndTime(new Date());
             mktCampaignComplete.setSort(Long.valueOf("1"));
             mktCampaignComplete.setStatusCd("1100");
             mktCampaignComplete.setStatusDate(new Date());
