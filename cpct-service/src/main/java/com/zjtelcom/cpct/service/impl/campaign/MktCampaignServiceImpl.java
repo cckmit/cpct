@@ -452,16 +452,19 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             if(mktCampaignDO.getCreateChannel() == null && mktCampaignDO.getCreateStaff() == 1 ) {
                 maps.put("resultCode", CommonConstant.CODE_FAIL);
                 maps.put("resultMsg", "创建人信息和岗位信息都为空，请核实工号已选中的岗位权限");
+                logger.info("创建人信息和岗位信息都为空，请核实工号已选中的岗位权限" + JSON.toJSONString(mktCampaignDO));
                 return maps;
             }
             if(mktCampaignDO.getCreateChannel() == null) {
                 maps.put("resultCode", CommonConstant.CODE_FAIL);
                 maps.put("resultMsg", "岗位信息都为空，请核实工号已选中的岗位权限");
+                logger.info("岗位信息都为空，请核实工号已选中的岗位权限" + JSON.toJSONString(mktCampaignDO));
                 return maps;
             }
             if(mktCampaignDO.getCreateStaff() == 1 ) {
                 maps.put("resultCode", CommonConstant.CODE_FAIL);
                 maps.put("resultMsg", "创建人信息为空，请核实工号已选中的岗位权限");
+                logger.info("创建人信息为空，请核实工号已选中的岗位权限" + JSON.toJSONString(mktCampaignDO));
                 return maps;
             }
 
@@ -1500,7 +1503,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setTiggerType(params.get("tiggerType").toString());             // 活动触发类型 - 实时，批量
             mktCampaignDO.setMktCampaignCategory(params.get("mktCampaignCategory").toString());  // 活动分类 - 框架，强制，自主
             mktCampaignDO.setMktCampaignType(params.get("mktCampaignType").toString());   // 活动类别 - 服务，营销，服务+营销
-//            mktCampaignDO.setMktActivityNbr(params.get("mktActivityNbr").toString());   // 活动编码
+            mktCampaignDO.setMktActivityNbr(params.get("mktActivityNbr").toString());   // 活动编码
             if (params.get("createStaff").toString() != null && !"".equals(params.get("createStaff").toString())) {
                 mktCampaignDO.setCreateStaff(Long.valueOf(params.get("createStaff").toString()));  // 创建人
             }
@@ -1649,7 +1652,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setTiggerType(params.get("tiggerType").toString());             // 活动触发类型 - 实时，批量
             mktCampaignDO.setMktCampaignCategory(params.get("mktCampaignCategory").toString());  // 活动分类 - 框架，强制，自主
             mktCampaignDO.setMktCampaignType(params.get("mktCampaignType").toString());   // 活动类别 - 服务，营销，服务+营销
-//            mktCampaignDO.setMktActivityNbr(params.get("mktActivityNbr").toString());   // 活动编码
+            mktCampaignDO.setMktActivityNbr(params.get("mktActivityNbr").toString());   // 活动编码
             if (params.get("createStaff").toString() != null && !"".equals(params.get("createStaff").toString())) {
                 mktCampaignDO.setCreateStaff(Long.valueOf(params.get("createStaff").toString()));  // 创建人
             }
@@ -3295,6 +3298,22 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         }
         resultMap.put("resultCode",CODE_SUCCESS);
         resultMap.put("resultMsg","反馈完成");
+        return resultMap;
+    }
+
+
+    /**
+     * 通过活动编码集合批量查询
+     * @param mktCampaignIdList
+     * @return
+     */
+    @Override
+    public Map<String,Object> searchBatch(List<Long> mktCampaignIdList){
+        Map<String, Object> resultMap = new HashMap<>();
+        List<MktCampaignDO> mktCampaignList = mktCampaignMapper.selectBatch(mktCampaignIdList);
+        resultMap.put("mktCampaignList", mktCampaignList);
+        resultMap.put("resultCode",CODE_SUCCESS);
+        resultMap.put("resultMsg","查询成功");
         return resultMap;
     }
 

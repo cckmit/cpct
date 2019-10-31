@@ -436,4 +436,13 @@
                 #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{recCampaignAmount,jdbcType=VARCHAR},
                 #{remark,jdbcType=VARCHAR})
     </insert>
+
+
+    <select id="selectBatchByCode"  parameterType="java.util.List" resultMap="resultMapper">
+        select * from event
+        where EVENT_NBR IN
+        <foreach collection="contactEvtCodeList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

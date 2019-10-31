@@ -222,7 +222,7 @@ public class ActivityStatisticsController extends BaseController {
                     }
                     excelWrite(response, sheetName, title, fileName, content, "随销报表导出成excel文件异常");
                 }
-            }else if (StringUtils.isNotBlank(type) && "2000".equals(type)){
+            } else if (StringUtils.isNotBlank(type) && "2000".equals(type)){
                 //活动报表
                 try {
                     if (paramMap.get("mktCampaignId")!=null && paramMap.get("mktCampaignId").toString().contains(",")){
