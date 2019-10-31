@@ -59,6 +59,7 @@ import com.zjtelcom.cpct.enums.AreaNameEnum;
 import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
+import com.zjtelcom.cpct.service.dubbo.CamCpcService;
 import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
@@ -191,6 +192,9 @@ public class EventApiServiceImpl implements EventApiService {
 
     @Autowired(required = false)
     private ICacheIdMappingEntityQryService iCacheIdMappingEntityQryService;
+
+    /*@Autowired(required = false)
+    private CamCpcService camCpcService;*/
 
     /*@Autowired
     private TarGrpConditionMapper tarGrpConditionMapper;*/
@@ -746,7 +750,7 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 }
 
-                // 过滤事件采集相中的标签
+                // 过滤事件采集项中的标签
                 Map<String, String> mktAllLabel = new HashMap<>();
                 Iterator<Map.Entry<String, String>> iterator = labelItems.entrySet().iterator();
                 List<String> assetLabelList = new ArrayList<>();
@@ -1042,15 +1046,24 @@ public class EventApiServiceImpl implements EventApiService {
 
 
                 //获取结果
+                Boolean flag = true;
                 try {
                     Map<String, Object> nonPassedMsg = new HashMap<>();
                     for (Future<Map<String, Object>> future : threadList) {
                         /*if (future.get() != null && !future.get().isEmpty()) {
                             activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
                         }*/
-                        if (future.get() != null && !(future.get().containsKey("cam_") || future.get().containsKey("str_") || future.get().containsKey("rule_"))) {
-                            // 命中活动
-                            activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
+                        if (future.get() != null && !future.get().isEmpty()) {
+                            Map<String, Object> map1 = future.get();
+                            for (String s : map1.keySet()) {
+                                if (s.contains("cam_") || s.contains("rule_")) {
+                                    flag = false;
+                                }
+                            }
+                            if (flag) {
+                                // 命中活动
+                                activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
+                            }
                         } else {
                             // 翼支付未命中原因
                             nonPassedMsg.putAll(future.get());
@@ -1233,9 +1246,11 @@ public class EventApiServiceImpl implements EventApiService {
             Map<String, Object> activityTaskResultMap = new HashMap<>();
             if(StatusCode.SERVICE_CAMPAIGN.getStatusCode().equals(type) || StatusCode.SERVICE_SALES_CAMPAIGN.getStatusCode().equals(type)){
                 log.info("服务活动进入camApiSerService.ActivitySerTask");
+                //activityTaskResultMap = camCpcService.ActivityCpcTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
                 activityTaskResultMap = camApiSerService.ActivitySerTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
             } else {
                 log.info("进入camApiService.ActivityTask");
+                //activityTaskResultMap = camCpcService.ActivityCpcTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
                 activityTaskResultMap = camApiService.ActivityTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
             }
             return activityTaskResultMap;

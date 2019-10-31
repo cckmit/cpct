@@ -491,7 +491,14 @@ public class CamCpcServiceImpl implements CamCpcService {
                 try {
                     Map<String,Object> futureMap =  future.get();
                     if (!futureMap.isEmpty()) {
-                        ruleList.add(futureMap);
+                        Boolean flag = true;
+                        for (String key : futureMap.keySet()) {
+                            if (key.contains("rule_")) {
+                                flag = false;
+                                break;
+                            }
+                        }
+                        if (flag) ruleList.add(futureMap);
                     }
                 } catch (InterruptedException e) {
                     esJson.put("hit", "false");
@@ -506,16 +513,10 @@ public class CamCpcServiceImpl implements CamCpcService {
                 }
             }
 
-            // 统计固定命中规则的个数
-            // String s = null; // 固定规则配的采集项标签
-            // List<String> list = new ArrayList<>();
-
             boolean isWithDefaultLabel = false;
             for (Map.Entry entry:flagMap.entrySet()) {
                if(true == Boolean.valueOf(entry.getValue().toString())){
                    isWithDefaultLabel = true;
-                   // s = context.get(entry.getValue()) == null ? null : context.get(entry.getValue()).toString();
-                   // list.add(entry.getKey().toString());
                    break;
                }
             }
@@ -531,7 +532,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                             Iterator<Map<String, Object>> iterator = ruleList.iterator();
                             while (iterator.hasNext()) {
                                 Map<String, Object> map = iterator.next();
-                                Long ruleId2 = Long.valueOf(map.get("nowRuleId").toString());
+                                Long ruleId2 = Long.valueOf(map.get("nowRuleId") == null ? "0" : map.get("nowRuleId").toString());
                                 List<String> list = (List<String>) object;
                                 for (String field : list) {
                                     if (field.equals(ruleId2.toString())) {
@@ -1139,7 +1140,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                         ruleMap.put("nowRuleId", ruleId); //新规则编码
                         ruleMap.put("ruleName", ruleName); //规则名称
                         ruleMap.put("promIntegId", promIntegId); // 销售品实例ID
-                        ruleMap.put("isMarketRule", flagMap.get(ruleId) == true ? 0 : 1); // 是否随销规则标识
+                        ruleMap.put("isMarketRule", flagMap.get(ruleId.toString()) == true ? 0 : 1); // 是否随销规则标识
                         if (context.get("AREA_ID") != null) {
                             ruleMap.put("areaId", context.get("AREA_ID")); // 落地网格
                         }
