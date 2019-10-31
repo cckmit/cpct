@@ -41,7 +41,7 @@
         <commons-lang.version>2.6</commons-lang.version>
         <pagehelper.version>1.2.5</pagehelper.version>
         <QLExpress.version>3.2.0</QLExpress.version>
-        <dubbo-eagle-service.version>4.0.0</dubbo-eagle-service.version>
+        <dubbo-eagle-service.version>5.0.0</dubbo-eagle-service.version>
         <ehcache.version>2.9.1</ehcache.version>
         <groovy.version>2.4.7</groovy.version>
         <freemarker.version>2.3.23</freemarker.version>
