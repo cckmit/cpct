@@ -170,7 +170,7 @@ public class ActivityStatisticsController extends BaseController {
                 }
 //                HSSFWorkbook wb = new HSSFWorkbook(); //创建excel
 //                Sheet sheetName = wb.createSheet("明知山有虎，知难而退？");//新建表 数据随销报表
-                String sheetName = "明知山有虎，知难而退";
+                String sheetName = "随销报表";
                 String[] title = {"活动名称", "活动状态", "活动类型", "活动编码", "活动渠道", "活动生效时间", "活动失效时间","客户接触数",
                         "商机推荐数","商机成功数","客触转化率","商机转化率","收入低迁数","收入低迁率","门店有销率","是否框架子活动"};
                 String fileName = "随销报表"+ DateUtil.formatDate(new Date())+".xls"; //表名
@@ -232,7 +232,7 @@ public class ActivityStatisticsController extends BaseController {
                 } catch (Exception e) {
                     logger.error("活动报表查询异常", e);
                 }
-                String sheetName = "十步杀一人，千里不留行？";
+                String sheetName = "派单报表";
                 String[] title = {"活动名称", "活动状态", "活动类型", "活动编码", "活动渠道", "活动生效时间", "活动失效时间","派单数",
                         "接单数","外呼数","成功数","接单率","外呼率","转化率","收入低迁数","收入低迁率","门店有销率","是否框架子活动"};
                 String fileName = "派单报表"+ DateUtil.formatDate(new Date())+".xls"; //表名
