@@ -71,22 +71,30 @@ public class EventApiCountServiceImpl implements EventApiCountService {
 
         StringBuilder initIdStr = new StringBuilder();
         if (mktCampaignIdList != null && mktCampaignIdList.size() > 0 ) {
-            List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.selectBatch(mktCampaignIdList);
-            for (MktCampaignDO mktCampaignDO : mktCampaignDOList) {
-                initIdStr.append(mktCampaignDO.getInitId() + ",");
+            if (Integer.valueOf(0).equals(mktCampaignIdList.get(0))) {
+                initIdStr.append(0);
+            } else {
+                List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.selectBatch(mktCampaignIdList);
+                for (MktCampaignDO mktCampaignDO : mktCampaignDOList) {
+                    initIdStr.append(mktCampaignDO.getInitId() + ",");
+                }
+                // 移除最后一个","
+                initIdStr.delete(initIdStr.length() - 1, initIdStr.length());
             }
-            // 移除最后一个","
-            initIdStr.delete(initIdStr.length() - 1, initIdStr.length());
         } else {
             initIdStr.append("all");
         }
         StringBuilder channelCodeStr = new StringBuilder();
         if (channelCodeList != null && channelCodeList.size() > 0) {
-            for (String channelCode : channelCodeList) {
-                channelCodeStr.append(channelCode + ",");
+            if ("0".equals(channelCodeList.get(0))) {
+                channelCodeStr.append(0);
+            } else {
+                for (String channelCode : channelCodeList) {
+                    channelCodeStr.append(channelCode + ",");
+                }
+                // 移除最后一个","
+                channelCodeStr.delete(channelCodeStr.length() - 1, channelCodeStr.length());
             }
-            // 移除最后一个","
-            channelCodeStr.delete(channelCodeStr.length() - 1, channelCodeStr.length());
         } else {
             channelCodeStr.append("all");
         }
@@ -94,11 +102,15 @@ public class EventApiCountServiceImpl implements EventApiCountService {
 
         StringBuilder eventCodeStr = new StringBuilder();
         if (eventCodeList != null && eventCodeList.size() > 0) {
-            for (String eventCode : eventCodeList) {
-                eventCodeStr.append(eventCode + ",");
+            if ("0".equals(eventCodeList.get(0))) {
+                eventCodeStr.append(0);
+            } else {
+                for (String eventCode : eventCodeList) {
+                    eventCodeStr.append(eventCode + ",");
+                }
+                // 移除最后一个","
+                eventCodeStr.delete(eventCodeStr.length() - 1, eventCodeStr.length());
             }
-            // 移除最后一个","
-            eventCodeStr.delete(eventCodeStr.length() - 1, eventCodeStr.length());
         } else {
             eventCodeStr.append("all");
         }
@@ -116,7 +128,12 @@ public class EventApiCountServiceImpl implements EventApiCountService {
 
         logger.info("入参为paramMap：" + JSON.toJSONString(paramMap));
         // 调用协同中心的接口
-        Map<String, Object> returnMap = iReportService.queryRptEventInstList(paramMap);
+        Map<String, Object> returnMap = null;
+        try {
+            returnMap = iReportService.queryRptEventInstList(paramMap);
+        } catch (Exception e) {
+            return returnMap;
+        }
 
         logger.info("出参数为returnMap：" + JSON.toJSONString(returnMap));
 
