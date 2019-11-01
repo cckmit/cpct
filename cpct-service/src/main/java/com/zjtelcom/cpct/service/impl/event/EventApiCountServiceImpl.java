@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.service.impl.event;
 
 import com.alibaba.fastjson.JSON;
 import com.ctzj.smt.bss.cooperate.service.dubbo.IReportService;
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.ChannelMapper;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
@@ -137,7 +138,11 @@ public class EventApiCountServiceImpl implements EventApiCountService {
 
         logger.info("出参数为returnMap：" + JSON.toJSONString(returnMap));
 
-        resultMap.put("resultCode", returnMap.get("resultCode"));
+        if("1".equals(returnMap.get("resultCode"))){
+            resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+        } else {
+            resultMap.put("resultCode", CommonConstant.CODE_FAIL);
+        }
         resultMap.put("resultMsg", returnMap.get("resultMsg"));
         resultMap.put("pageSize", returnMap.get("pageSize"));
         resultMap.put("currenPage", returnMap.get("currenPage"));
